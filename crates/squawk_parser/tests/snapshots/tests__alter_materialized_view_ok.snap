@@ -421,7 +421,7 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "n_distinct"
             WHITESPACE " "
             EQ "="
@@ -457,7 +457,7 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "a"
             WHITESPACE " "
             EQ "="
@@ -468,7 +468,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "b"
             WHITESPACE " "
             EQ "="
@@ -506,7 +506,7 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "n_distinct"
           R_PAREN ")"
     SEMICOLON ";"
@@ -538,12 +538,12 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "n_distinct"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "n_distinct_inherited"
           R_PAREN ")"
     SEMICOLON ";"

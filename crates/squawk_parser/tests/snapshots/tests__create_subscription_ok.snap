@@ -59,7 +59,7 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "connect"
           WHITESPACE " "
           EQ "="
@@ -70,7 +70,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "create_slot"
           WHITESPACE " "
           EQ "="
@@ -81,7 +81,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "enabled"
           WHITESPACE " "
           EQ "="
@@ -92,7 +92,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "slot_name"
           WHITESPACE " "
           EQ "="
@@ -103,7 +103,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             BINARY_KW "binary"
           WHITESPACE " "
           EQ "="
@@ -114,7 +114,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "copy_data"
           WHITESPACE " "
           EQ "="
@@ -125,7 +125,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "synchronous_commit"
           WHITESPACE " "
           EQ "="
@@ -136,7 +136,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "two_phase"
           WHITESPACE " "
           EQ "="
@@ -147,7 +147,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "disable_on_error"
           WHITESPACE " "
           EQ "="
@@ -158,7 +158,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "password_required"
           WHITESPACE " "
           EQ "="
@@ -169,7 +169,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "run_as_owner"
           WHITESPACE " "
           EQ "="
@@ -180,7 +180,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "origin"
           WHITESPACE " "
           EQ "="
@@ -191,7 +191,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "failover"
           WHITESPACE " "
           EQ "="

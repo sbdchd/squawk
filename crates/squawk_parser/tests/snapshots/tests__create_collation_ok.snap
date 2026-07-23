@@ -95,7 +95,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "locale"
         WHITESPACE " "
         EQ "="
@@ -106,7 +106,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "lc_collate"
         WHITESPACE " "
         EQ "="
@@ -117,7 +117,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "lc_ctype"
         WHITESPACE " "
         EQ "="
@@ -128,7 +128,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "provider"
         WHITESPACE " "
         EQ "="
@@ -139,7 +139,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "deterministic"
         WHITESPACE " "
         EQ "="
@@ -150,7 +150,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "rules"
         WHITESPACE " "
         EQ "="
@@ -164,7 +164,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           VERSION_KW "version"
         WHITESPACE " "
         EQ "="

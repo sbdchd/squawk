@@ -68,12 +68,12 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "a"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "b"
           WHITESPACE " "
           EQ "="
@@ -132,12 +132,12 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "a"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "b"
           WHITESPACE " "
           EQ "="
@@ -196,12 +196,12 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "a"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "b"
           WHITESPACE " "
           EQ "="
@@ -232,7 +232,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "copy_data"
           WHITESPACE " "
           EQ "="
@@ -287,7 +287,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "slot_name"
           WHITESPACE " "
           EQ "="
@@ -298,7 +298,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "synchronous_commit"
           WHITESPACE " "
           EQ "="
@@ -325,7 +325,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             LSN_KW "lsn"
           WHITESPACE " "
           EQ "="

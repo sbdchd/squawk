@@ -1805,8 +1805,8 @@ fn search_path_from_set_config_param(
             search_path.push(Schema::new(string_value));
         }
     }
-    for name_ref in set_config_param.name_refs() {
-        search_path.push(Schema::new(name_ref.syntax().text().to_string()));
+    for config_value_name in set_config_param.config_value_names() {
+        search_path.push(Schema::new(config_value_name.syntax().text().to_string()));
     }
 
     Some(SearchPathOverride::Explicit(search_path))
@@ -1879,8 +1879,8 @@ fn bind_set_config(b: &mut Binder, set_config: ast::SetConfig, position: TextSiz
                         }
                     }
                 }
-                ast::ConfigValue::NameRef(name_ref) => {
-                    let schema_name = name_ref.syntax().text().to_string();
+                ast::ConfigValue::ConfigValueName(config_value_name) => {
+                    let schema_name = config_value_name.syntax().text().to_string();
                     search_path.push(Schema::new(schema_name));
                 }
             }

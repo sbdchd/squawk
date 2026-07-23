@@ -707,12 +707,12 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "b"
             WHITESPACE " "
             EQ "="
@@ -749,12 +749,12 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "b"
             WHITESPACE " "
             EQ "="
@@ -795,12 +795,12 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "b"
           R_PAREN ")"
     SEMICOLON ";"
@@ -831,7 +831,7 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "a"
           R_PAREN ")"
     SEMICOLON ";"
@@ -1014,7 +1014,7 @@ SOURCE_FILE
           OPTIONS_KW "options"
           L_PAREN "("
           ALTER_OPTION
-            NAME
+            FOREIGN_OPTION_NAME
               IDENT "b"
             WHITESPACE " "
             LITERAL
@@ -1024,7 +1024,7 @@ SOURCE_FILE
           ALTER_OPTION
             ADD_KW "add"
             WHITESPACE " "
-            NAME
+            FOREIGN_OPTION_NAME
               IDENT "c"
             WHITESPACE " "
             LITERAL
@@ -1034,7 +1034,7 @@ SOURCE_FILE
           ALTER_OPTION
             SET_KW "set"
             WHITESPACE " "
-            NAME
+            FOREIGN_OPTION_NAME
               IDENT "x"
             WHITESPACE " "
             LITERAL
@@ -1044,7 +1044,7 @@ SOURCE_FILE
           ALTER_OPTION
             DROP_KW "drop"
             WHITESPACE " "
-            NAME
+            FOREIGN_OPTION_NAME
               IDENT "x"
           R_PAREN ")"
     SEMICOLON ";"
@@ -1076,7 +1076,7 @@ SOURCE_FILE
           ALTER_OPTION
             SET_KW "set"
             WHITESPACE " "
-            NAME
+            FOREIGN_OPTION_NAME
               IDENT "x"
             WHITESPACE " "
             LITERAL

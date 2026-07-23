@@ -15,17 +15,24 @@ pub(super) fn quote_identifier(
     let token = token_from_offset(db, position)?;
     let parent = token.parent()?;
 
-    let (is_quoted, text, text_range) = if let Some(name) = ast::Name::cast(parent.clone()) {
-        (name.is_quoted(), name.text(), name.syntax().text_range())
-    } else if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        (
-            name_ref.is_quoted(),
-            name_ref.text(),
-            name_ref.syntax().text_range(),
-        )
-    } else {
-        return None;
-    };
+    let (is_quoted, text, text_range) =
+        if let Some(column_name) = ast::ColumnName::cast(parent.clone()) {
+            (
+                column_name.is_quoted(),
+                column_name.text(),
+                column_name.syntax().text_range(),
+            )
+        } else if let Some(name) = ast::Name::cast(parent.clone()) {
+            (name.is_quoted(), name.text(), name.syntax().text_range())
+        } else if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
+            (
+                name_ref.is_quoted(),
+                name_ref.text(),
+                name_ref.syntax().text_range(),
+            )
+        } else {
+            return None;
+        };
 
     if is_quoted {
         return None;

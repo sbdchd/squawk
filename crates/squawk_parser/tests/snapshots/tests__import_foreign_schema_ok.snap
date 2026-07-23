@@ -100,7 +100,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "foo"
         WHITESPACE " "
         LITERAL
@@ -139,7 +139,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "foo"
         WHITESPACE " "
         LITERAL
@@ -147,7 +147,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "a"
         WHITESPACE " "
         LITERAL

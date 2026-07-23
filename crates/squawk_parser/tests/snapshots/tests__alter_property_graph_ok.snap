@@ -283,14 +283,14 @@ SOURCE_FILE
               PROPERTIES
                 PROPERTIES_KW "properties"
                 WHITESPACE " "
-                EXPR_AS_NAME_LIST
+                EXPR_AS_PROPERTY_NAME_LIST
                   L_PAREN "("
-                  EXPR_AS_NAME
+                  EXPR_AS_PROPERTY_NAME
                     NAME_REF
                       IDENT "o"
                   COMMA ","
                   WHITESPACE " "
-                  EXPR_AS_NAME
+                  EXPR_AS_PROPERTY_NAME
                     BIN_EXPR
                       NAME_REF
                         IDENT "f"
@@ -302,7 +302,7 @@ SOURCE_FILE
                     WHITESPACE " "
                     AS_KW "as"
                     WHITESPACE " "
-                    NAME
+                    PROPERTY_NAME
                       IDENT "p"
                   R_PAREN ")"
             WHITESPACE "\n      "
@@ -315,15 +315,15 @@ SOURCE_FILE
               PROPERTIES
                 PROPERTIES_KW "properties"
                 WHITESPACE " "
-                EXPR_AS_NAME_LIST
+                EXPR_AS_PROPERTY_NAME_LIST
                   L_PAREN "("
-                  EXPR_AS_NAME
+                  EXPR_AS_PROPERTY_NAME
                     NAME_REF
                       IDENT "i"
                     WHITESPACE " "
                     AS_KW "as"
                     WHITESPACE " "
-                    NAME
+                    PROPERTY_NAME
                       IDENT "x"
                   R_PAREN ")"
         WHITESPACE "\n  "
@@ -567,9 +567,9 @@ SOURCE_FILE
       WHITESPACE " "
       PROPERTIES_KW "properties"
       WHITESPACE " "
-      EXPR_AS_NAME_LIST
+      EXPR_AS_PROPERTY_NAME_LIST
         L_PAREN "("
-        EXPR_AS_NAME
+        EXPR_AS_PROPERTY_NAME
           NAME_REF
             IDENT "id"
         R_PAREN ")"
@@ -610,7 +610,7 @@ SOURCE_FILE
       PROPERTIES_KW "properties"
       WHITESPACE " "
       L_PAREN "("
-      PROPERTY_REF
+      PROPERTY_NAME_REF
         IDENT "id"
       R_PAREN ")"
     SEMICOLON ";"

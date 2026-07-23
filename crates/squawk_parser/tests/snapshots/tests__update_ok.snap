@@ -426,7 +426,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1524,7 +1524,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "previous_quantity"
         COMMA ","
         WHITESPACE "\n    "
@@ -1539,7 +1539,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "current_quantity"
         COMMA ","
         WHITESPACE "\n    "
@@ -1564,7 +1564,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "change"
     SEMICOLON ";"
   WHITESPACE "\n\n"

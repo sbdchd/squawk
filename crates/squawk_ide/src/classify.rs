@@ -157,6 +157,7 @@ fn classify_object_ref(kind: SyntaxKind) -> Option<NameRefClass> {
         SyntaxKind::LANGUAGE_REF => NameRefClass::Language,
         SyntaxKind::OP_CLASS_REF => NameRefClass::OperatorClass,
         SyntaxKind::OP_FAMILY_REF => NameRefClass::OperatorFamily,
+        SyntaxKind::PARAM_NAME_REF => NameRefClass::NamedArgParameter,
         SyntaxKind::POLICY_REF => NameRefClass::Policy,
         SyntaxKind::PREPARED_STATEMENT_REF => NameRefClass::PreparedStatement,
         SyntaxKind::PROCEDURE_NAME_REF => NameRefClass::Procedure,
@@ -382,6 +383,22 @@ fn classify_object_column_path(node: &SyntaxNode) -> Option<NameRefClass> {
         Some(NameRefClass::Table)
     } else {
         Some(NameRefClass::Schema)
+    }
+}
+
+pub(crate) fn classify_config_value_name(node: &SyntaxNode) -> Option<NameRefClass> {
+    let parent = node.parent()?;
+    let path = if let Some(set_config) = ast::SetConfig::cast(parent.clone()) {
+        set_config.path_ref()
+    } else if let Some(set_config_param) = ast::SetConfigParam::cast(parent) {
+        set_config_param.path_ref()
+    } else {
+        return None;
+    };
+    if is_search_path(path) {
+        Some(NameRefClass::Schema)
+    } else {
+        None
     }
 }
 
@@ -710,9 +727,10 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
     }
 
     if let Some(parent) = node.parent()
-        && let Some(expr_as_name) = ast::ExprAsName::cast(parent)
-        && let Some(expr_as_name_list) = ast::ExprAsNameList::cast(expr_as_name.syntax().parent()?)
-        && ast::Properties::cast(expr_as_name_list.syntax().parent()?).is_some()
+        && let Some(expr_as_property_name) = ast::ExprAsPropertyName::cast(parent)
+        && let Some(expr_as_property_name_list) =
+            ast::ExprAsPropertyNameList::cast(expr_as_property_name.syntax().parent()?)
+        && ast::Properties::cast(expr_as_property_name_list.syntax().parent()?).is_some()
     {
         return Some(NameRefClass::PropertyGraphColumn);
     }
@@ -762,22 +780,6 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
         if in_type {
             return Some(NameRefClass::Type);
-        }
-        if let Some(set_config) = ast::SetConfig::cast(ancestor.clone())
-            && is_search_path(set_config.path_ref())
-            && set_config
-                .config_values()
-                .any(|config_value| config_value.syntax() == node)
-        {
-            return Some(NameRefClass::Schema);
-        }
-        if let Some(set_config_param) = ast::SetConfigParam::cast(ancestor.clone())
-            && is_search_path(set_config_param.path_ref())
-            && set_config_param
-                .name_refs()
-                .any(|name_ref| name_ref.syntax() == node)
-        {
-            return Some(NameRefClass::Schema);
         }
         if in_column_list
             && (ast::VertexTableDef::can_cast(ancestor.kind())

@@ -166,12 +166,12 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "b"
           R_PAREN ")"
         WHITESPACE " "
@@ -233,7 +233,7 @@ SOURCE_FILE
                   INT_NUMBER "1"
                 WHITESPACE " "
                 AS_NAME
-                  NAME
+                  COLUMN_NAME
                     IDENT "e"
               COMMA ","
               WHITESPACE " "
@@ -242,7 +242,7 @@ SOURCE_FILE
                   INT_NUMBER "2"
                 WHITESPACE " "
                 AS_NAME
-                  NAME
+                  COLUMN_NAME
                     IDENT "b"
               COMMA ","
               WHITESPACE " "
@@ -251,7 +251,7 @@ SOURCE_FILE
                   INT_NUMBER "3"
                 WHITESPACE " "
                 AS_NAME
-                  NAME
+                  COLUMN_NAME
                     IDENT "u"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -263,7 +263,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "e"
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "\"bar\""
         COMMA ","
         WHITESPACE " "
@@ -271,7 +271,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "\"b\""
         COMMA ","
         WHITESPACE " "
@@ -279,7 +279,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "u"
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "\"u\""
     WHITESPACE " "
     FROM_CLAUSE
@@ -464,17 +464,17 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "id"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "link"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               DATA_KW "data"
           R_PAREN ")"
         WHITESPACE " "
@@ -660,17 +660,17 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "id"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "link"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               DATA_KW "data"
           R_PAREN ")"
         WHITESPACE " "
@@ -856,22 +856,22 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "id"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "link"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               DATA_KW "data"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               DEPTH_KW "depth"
           R_PAREN ")"
         WHITESPACE " "
@@ -1067,27 +1067,27 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "id"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               IDENT "link"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               DATA_KW "data"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               DEPTH_KW "depth"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            COLUMN_NAME
               PATH_KW "path"
           R_PAREN ")"
         WHITESPACE " "
@@ -1337,7 +1337,7 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            COLUMN_NAME
               TIMESTAMP_KW "timestamp"
           R_PAREN ")"
         WHITESPACE " "
@@ -1380,7 +1380,7 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            COLUMN_NAME
               TIME_KW "time"
           R_PAREN ")"
         WHITESPACE " "

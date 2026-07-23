@@ -42,7 +42,7 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n  "
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -81,7 +81,7 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n  "
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -101,7 +101,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
@@ -112,7 +112,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "c"
           WHITESPACE " "
           PATH_TYPE
@@ -227,7 +227,7 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "subtype"
           WHITESPACE " "
           EQ "="
@@ -318,7 +318,7 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             INPUT_KW "input"
           WHITESPACE " "
           EQ "="
@@ -342,7 +342,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "output"
           WHITESPACE " "
           EQ "="
@@ -373,7 +373,7 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             INPUT_KW "input"
           WHITESPACE " "
           EQ "="
@@ -397,7 +397,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "output"
           WHITESPACE " "
           EQ "="
@@ -411,7 +411,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "receive"
           WHITESPACE " "
           EQ "="
@@ -425,7 +425,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "send"
           WHITESPACE " "
           EQ "="
@@ -439,7 +439,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "typmod_in"
           WHITESPACE " "
           EQ "="
@@ -453,7 +453,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "typmod_out"
           WHITESPACE " "
           EQ "="
@@ -467,7 +467,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             ANALYZE_KW "analyze"
           WHITESPACE " "
           EQ "="
@@ -481,7 +481,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "subscript"
           WHITESPACE " "
           EQ "="
@@ -495,7 +495,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "internallength"
           WHITESPACE " "
           EQ "="
@@ -509,14 +509,14 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "passedbyvalue"
         COMMA ","
         WHITESPACE "\n  "
         COMMENT "-- The allowed values equate to alignment on 1, 2, 4, or 8 byte boundaries."
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "alignment"
           WHITESPACE " "
           EQ "="
@@ -527,7 +527,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             STORAGE_KW "storage"
           WHITESPACE " "
           EQ "="
@@ -541,7 +541,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             LIKE_KW "like"
           WHITESPACE " "
           EQ "="
@@ -557,7 +557,7 @@ SOURCE_FILE
         COMMENT "-- see: https://www.postgresql.org/docs/17/catalog-pg-type.html#CATALOG-TYPCATEGORY-TABLE"
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "category"
           WHITESPACE " "
           EQ "="
@@ -568,7 +568,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "preferred"
           WHITESPACE " "
           EQ "="
@@ -579,7 +579,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             DEFAULT_KW "default"
           WHITESPACE " "
           EQ "="
@@ -589,7 +589,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "element"
           WHITESPACE " "
           EQ "="
@@ -603,7 +603,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             DELIMITER_KW "delimiter"
           WHITESPACE " "
           EQ "="
@@ -614,7 +614,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "collatable"
           WHITESPACE " "
           EQ "="

@@ -60,17 +60,17 @@ SOURCE_FILE
     COLUMN_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
@@ -86,7 +86,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "x"
           WHITESPACE " "
           EQ "="
@@ -97,12 +97,12 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "bar"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "buzz"
           WHITESPACE " "
           EQ "="
@@ -266,7 +266,7 @@ SOURCE_FILE
               AS_NAME
                 AS_KW "as"
                 WHITESPACE " "
-                NAME
+                COLUMN_NAME
                   IDENT "\"country\""
         WHITESPACE " \n    "
         FROM_CLAUSE

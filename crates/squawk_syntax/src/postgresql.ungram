@@ -67,6 +67,9 @@ Param =
 ParamName =
   '#name'?
 
+ParamNameRef =
+  '#name'?
+
 ParamList =
   (Param (',' Param)*)?
 
@@ -215,7 +218,10 @@ XmlNamespaceList =
 
 XmlNamespace =
   'default' Expr
-| Expr 'as' Name
+| Expr 'as' prefix:XmlNamespacePrefix
+
+XmlNamespacePrefix =
+  '#name'?
 
 XmlPassingMech =
   'by' 'ref'
@@ -329,24 +335,48 @@ XmlSerializeFn =
 XmlElementFn =
   'xmlelement' '('
     'name'
-    Name
+    tag:ElementTag
     (
       ',' 'xmlattributes' '('
-           ExprAsNameList
+           ExprAsXmlAttrList
         ')'
         (',' (Expr (',' Expr)*))?
     | ',' (Expr (',' Expr)*)
     )?
   ')'
 
-ExprAsName =
-  Expr AsName?
+ElementTag =
+  '#name'?
 
-ExprAsNameList =
-  (ExprAsName (',' ExprAsName)*)
+ExprAsColumnName =
+  Expr ('as' ColumnName)?
+
+ExprAsColumnNameList =
+  (ExprAsColumnName (',' ExprAsColumnName)*)
+
+ExprAsElementTag =
+  Expr ('as' tag:ElementTag)?
+
+ExprAsElementTagList =
+  (ExprAsElementTag (',' ExprAsElementTag)*)
+
+ExprAsPropertyName =
+  Expr ('as' PropertyName)?
+
+ExprAsPropertyNameList =
+  (ExprAsPropertyName (',' ExprAsPropertyName)*)
+
+ExprAsXmlAttr =
+  Expr ('as' attr:XmlAttr)?
+
+ExprAsXmlAttrList =
+  (ExprAsXmlAttr (',' ExprAsXmlAttr)*)
+
+XmlAttr =
+  '#name'?
 
 XmlForestFn =
-  'xmlforest' '(' ExprAsNameList ')'
+  'xmlforest' '(' ExprAsElementTagList ')'
 
 XmlExistsFn =
   'xmlexists' '('
@@ -370,9 +400,12 @@ XmlParseFn =
 XmlPiFn =
   'xmlpi' '('
     'name'
-    Name
+    target:XmlPiTarget
     (',' Expr)?
   ')'
+
+XmlPiTarget =
+  '#name'?
 
 CollationForFn =
   'collation' 'for' '(' Expr ')'
@@ -408,7 +441,7 @@ Literal =
   )
 
 NamedArg =
-  NameRef (FatArrow | ColonEq) Expr
+  name:ParamNameRef (FatArrow | ColonEq) Expr
 
 JsonFormatClause =
   'format' 'json' JsonEncodingClause?
@@ -607,7 +640,7 @@ ArrayType =
   // int array[]
   // text[]
   // t[10][10]
-  Type NameRef 'array'? '[' Expr? ']'
+  Type 'array'? '[' Expr? ']'
 
 PercentType =
   'setof'? PathRef PercentTypeClause
@@ -880,7 +913,7 @@ ColumnNameRef =
   '#name'?
 
 Column =
-  Name
+  name:ColumnName
   WithOptions?
   Type?
   Storage?
@@ -1180,7 +1213,7 @@ Target =
 | Expr AsName?
 
 AsName =
-  'as'? Name
+  'as'? name:ColumnName
 
 TargetList =
   Target (',' Target)*
@@ -2016,7 +2049,10 @@ PostfixExpr =
   Expr
 
 NonStandardParam =
-  ':' NameRef
+  ':' name:BindParamNameRef
+
+BindParamNameRef =
+  '#name'?
 
 IndexExpr =
   base:Expr '[' index:Expr ']'
@@ -2105,10 +2141,13 @@ JsonOnEmptyClause =
   JsonBehavior 'on' 'empty'
 
 JsonPassingArg =
-  Expr 'as' Name
+  Expr 'as' name:JsonVariableName
 
 JsonPassingClause =
   'passing' (JsonPassingArg (',' JsonPassingArg)*)
+
+JsonVariableName =
+  '#name'?
 
 PercentTypeClause =
   '%' 'type'
@@ -2120,8 +2159,14 @@ WithoutTimezone =
   'without' 'time' 'zone'
 
 AttributeOption =
-  (Name | Name '.' Name)
+  (name:AttributeName | namespace:AttributeNamespace '.' name:AttributeName)
   ('=' AttributeValue)?
+
+AttributeName =
+  '#name'?
+
+AttributeNamespace =
+  '#name'?
 
 AttributeValue =
   Literal
@@ -2471,8 +2516,11 @@ AlterOptionList =
   'options' '(' (AlterOption (',' AlterOption)*)? ')'
 
 AlterOption =
-  ('add' | 'set')? Name Literal
-| 'drop' Name
+  ('add' | 'set')? ForeignOptionName Literal
+| 'drop' ForeignOptionName
+
+ForeignOptionName =
+  '#name'?
 
 AlterSequence =
   'alter' 'sequence' IfExists? SequenceRef
@@ -2936,13 +2984,13 @@ DatabaseOption =
 | '#ident'
 | 'connection' 'limit')
   '='?
-  (Literal | 'default' | NameRef)
+  (Literal | 'default' | ConfigValueName)
 
 SetConfigParam =
   'set' PathRef
   (
     'from' 'current'
-  | ('to' | '=') ('default' | 'null' | (Literal (',' Literal)*) | (NameRef (',' NameRef)*))
+  | ('to' | '=') ('default' | 'null' | (Literal (',' Literal)*) | (ConfigValueName (',' ConfigValueName)*))
   )
 
 ResetConfigParam =
@@ -3159,7 +3207,7 @@ AlterView =
   ) ';'?
 
 AlterViewColumn =
-  'alter' 'column'? NameRef (SetDefault | DropDefault)
+  'alter' 'column'? name:ColumnNameRef (SetDefault | DropDefault)
 
 Analyze =
   ('analyze' | 'analyse')
@@ -3302,7 +3350,7 @@ AllProperties =
   'properties' 'all' 'columns'
 
 Properties = 
-  'properties' '(' ExprAsNameList ')'
+  'properties' '(' ExprAsPropertyNameList ')'
 
 LabelAndPropertiesList =
   (LabelAndProperties (',' LabelAndProperties)*)
@@ -3355,7 +3403,10 @@ ElementTableAlias =
 ElementVariable =
   '#ident'?
 
-PropertyRef =
+PropertyName =
+  '#name'?
+
+PropertyNameRef =
   '#ident'?
 
 AlterPropertyGraph =
@@ -3401,18 +3452,18 @@ DropVertexEdgeLabel =
 AddVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
     'alter' 'label' LabelRef
-    'add' 'properties' '(' ExprAsNameList ')'
+    'add' 'properties' '(' ExprAsPropertyNameList ')'
 
 DropVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
     'alter' 'label' LabelRef
-    'drop' 'properties' '(' (PropertyRef (',' PropertyRef)*) ')' ('cascade' | 'restrict')?
+    'drop' 'properties' '(' (PropertyNameRef (',' PropertyNameRef)*) ')' ('cascade' | 'restrict')?
 
 DropPropertyGraph =
   'drop' 'property' 'graph' IfExists? PropertyGraphRef ('cascade' | 'restrict')? ';'?
 
 GraphTableFn =
-  'graph_table' '(' PropertyGraphRef 'match' PathPatternList WhereClause? 'columns' '(' ExprAsNameList ')' ')'
+  'graph_table' '(' PropertyGraphRef 'match' PathPatternList WhereClause? 'columns' '(' ExprAsColumnNameList ')' ')'
 
 PathPatternList =
   (PathPattern (',' PathPattern)*)
@@ -3943,7 +3994,10 @@ ExplainOptionList =
   '(' (ExplainOption (',' ExplainOption)*) ')'
 
 ExplainOption =
-  Name ExplainOptionValue?
+  ExplainOptionName ExplainOptionValue?
+
+ExplainOptionName =
+  '#name'?
 
 ExplainOptionValue =
   Literal
@@ -4056,7 +4110,10 @@ GrantRoleOptionList =
   GrantRoleOption (',' GrantRoleOption)*
 
 GrantRoleOption =
-  Name ('option' | 'true' | 'false')
+  GrantRoleOptionName ('option' | 'true' | 'false')
+
+GrantRoleOptionName =
+  '#name'?
 
 PrivilegeObjects =
   PrivilegeAllInSchema
@@ -4351,14 +4408,19 @@ TableAndColumns =
   TableRelationName ColumnRefList?
 
 VacuumOption =
-  Name VacuumOptionValue?
+  VacuumOptionName VacuumOptionValue?
+
+VacuumOptionName =
+  '#name'?
 
 VacuumOptionValue =
   Literal
-| Name
-| '#ident'
+| VacuumOptionValueName
 | 'no'
 | 'yes'
+
+VacuumOptionValueName =
+  '#name'?
 
 Copy =
   'copy'
@@ -4384,7 +4446,10 @@ CopyOptionList =
   '(' (CopyOption (',' CopyOption)*)? ')'
 
 CopyOption =
-  Name (CopyOptionList | Literal | 'default' | 'on' | 'off' | '*' | '#ident')?
+  CopyOptionName (CopyOptionList | Literal | 'default' | 'on' | 'off' | '*' | '#ident')?
+
+CopyOptionName =
+  '#name'?
 
 CopyLegacyOption =
   'binary'
@@ -4561,7 +4626,10 @@ SetConfig =
 
 ConfigValue =
   Literal
-| NameRef
+| ConfigValueName
+
+ConfigValueName =
+  '#name'?
 
 Show =
   'show'
@@ -4601,7 +4669,10 @@ LeakproofFuncOption =
   'leakproof' | 'not' 'leakproof'
 
 ResetFuncOption =
-  'reset' NameRef
+  'reset' ('all' | ConfigParameterRef)
+
+ConfigParameterRef =
+  PathRef
 
 StrictFuncOption =
   'strict' | 'called' 'on' 'null' 'input' | 'returns' 'null' 'on' 'null' 'input'

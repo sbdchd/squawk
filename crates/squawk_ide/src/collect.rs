@@ -647,6 +647,8 @@ pub(crate) fn column_name_from_node(node: &SyntaxNode) -> Option<Name> {
         ast_nav::iter_values_columns(&values)
             .find(|(_, expr)| expr.syntax() == node)
             .map(|(name, _)| name)
+    } else if let Some(column_name) = ast::ColumnName::cast(node.clone()) {
+        Some(Name::from_node(&column_name))
     } else if let Some(name) = ast::Name::cast(node.clone()) {
         Some(Name::from_node(&name))
     } else {

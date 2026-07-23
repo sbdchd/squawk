@@ -1573,7 +1573,7 @@ SOURCE_FILE
       WHITESPACE " "
       GRANT_ROLE_OPTION_LIST
         GRANT_ROLE_OPTION
-          NAME
+          GRANT_ROLE_OPTION_NAME
             SET_KW "set"
           WHITESPACE " "
           OPTION_KW "option"
@@ -1887,7 +1887,7 @@ SOURCE_FILE
       WHITESPACE " "
       GRANT_ROLE_OPTION_LIST
         GRANT_ROLE_OPTION
-          NAME
+          GRANT_ROLE_OPTION_NAME
             ADMIN_KW "admin"
           WHITESPACE " "
           OPTION_KW "option"
@@ -1912,7 +1912,7 @@ SOURCE_FILE
       WHITESPACE " "
       GRANT_ROLE_OPTION_LIST
         GRANT_ROLE_OPTION
-          NAME
+          GRANT_ROLE_OPTION_NAME
             INHERIT_KW "inherit"
           WHITESPACE " "
           OPTION_KW "option"
@@ -1937,7 +1937,7 @@ SOURCE_FILE
       WHITESPACE " "
       GRANT_ROLE_OPTION_LIST
         GRANT_ROLE_OPTION
-          NAME
+          GRANT_ROLE_OPTION_NAME
             INHERIT_KW "inherit"
           WHITESPACE " "
           TRUE_KW "true"
@@ -1962,7 +1962,7 @@ SOURCE_FILE
       WHITESPACE " "
       GRANT_ROLE_OPTION_LIST
         GRANT_ROLE_OPTION
-          NAME
+          GRANT_ROLE_OPTION_NAME
             SET_KW "set"
           WHITESPACE " "
           FALSE_KW "false"
@@ -2003,7 +2003,7 @@ SOURCE_FILE
       WHITESPACE " "
       GRANT_ROLE_OPTION_LIST
         GRANT_ROLE_OPTION
-          NAME
+          GRANT_ROLE_OPTION_NAME
             SET_KW "set"
           WHITESPACE " "
           OPTION_KW "option"

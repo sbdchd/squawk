@@ -38,9 +38,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -132,9 +132,9 @@ SOURCE_FILE
           WHITESPACE " \n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -175,9 +175,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -269,9 +269,9 @@ SOURCE_FILE
           WHITESPACE " \n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -312,9 +312,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -391,9 +391,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -433,9 +433,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -498,9 +498,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -571,9 +571,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -619,9 +619,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -670,9 +670,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -721,9 +721,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -770,9 +770,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -839,9 +839,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -940,9 +940,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -951,7 +951,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -1147,9 +1147,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "a"
@@ -1158,7 +1158,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "b"
@@ -1167,7 +1167,7 @@ SOURCE_FILE
                   IDENT "order_id"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -1176,7 +1176,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "d"
@@ -1331,9 +1331,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "a"
@@ -1342,7 +1342,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "b"
@@ -1351,7 +1351,7 @@ SOURCE_FILE
                   IDENT "order_id"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -1360,7 +1360,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "w"
@@ -1537,9 +1537,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "a"
@@ -1548,7 +1548,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -1715,9 +1715,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "a"
@@ -1726,7 +1726,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "b"
@@ -1735,7 +1735,7 @@ SOURCE_FILE
                   IDENT "order_id"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -1744,7 +1744,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "d"
@@ -1753,7 +1753,7 @@ SOURCE_FILE
                   IDENT "wishlist_name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "e"
@@ -1915,9 +1915,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "a"
@@ -1926,7 +1926,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -2110,9 +2110,9 @@ SOURCE_FILE
           WHITESPACE "\n    "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "a"
@@ -2121,7 +2121,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "d"
@@ -2130,7 +2130,7 @@ SOURCE_FILE
                   NAME_KW "name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "h"

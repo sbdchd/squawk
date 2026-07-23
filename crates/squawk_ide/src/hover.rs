@@ -148,6 +148,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         || ast::LanguageRef::can_cast(parent.kind())
         || ast::NameRef::can_cast(parent.kind())
         || ast::ParamName::can_cast(parent.kind())
+        || ast::ParamNameRef::can_cast(parent.kind())
         || ast::PolicyRef::can_cast(parent.kind())
         || ast::PreparedStatementRef::can_cast(parent.kind())
         || ast::Publication::can_cast(parent.kind())

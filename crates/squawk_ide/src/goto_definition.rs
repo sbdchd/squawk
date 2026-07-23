@@ -164,6 +164,16 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
         return resolve::resolve_json_path_name_ref(file, &json_path_name_ref).unwrap_or_default();
     }
 
+    if let Some(param_name_ref) = ast::ParamNameRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_param_name_ref(db, InFile::new(definition_file, &param_name_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
     if let Some(column_name_ref) = ast::ColumnNameRef::cast(parent.clone()) {
         for definition_file in list_files(db, file) {
             if let Some(locations) =
@@ -319,6 +329,17 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
 
     if let Some(window_ref) = ast::WindowRef::cast(parent.clone()) {
         return resolve::resolve_window_ref(file, &window_ref).unwrap_or_default();
+    }
+
+    if let Some(config_value_name) = ast::ConfigValueName::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) = resolve::resolve_config_value_name(
+                db,
+                InFile::new(definition_file, &config_value_name),
+            ) {
+                return locations;
+            }
+        }
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {

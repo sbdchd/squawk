@@ -55,7 +55,7 @@ SOURCE_FILE
       L_PAREN "("
       ARG
         NAMED_ARG
-          NAME_REF
+          PARAM_NAME_REF
             IDENT "x"
           WHITESPACE " "
           FAT_ARROW "=>"
@@ -71,7 +71,7 @@ SOURCE_FILE
       WHITESPACE " "
       ARG
         NAMED_ARG
-          NAME_REF
+          PARAM_NAME_REF
             IDENT "b"
           WHITESPACE " "
           FAT_ARROW "=>"

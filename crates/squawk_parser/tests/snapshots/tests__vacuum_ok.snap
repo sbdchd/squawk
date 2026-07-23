@@ -17,12 +17,12 @@ SOURCE_FILE
     VACUUM_OPTION_LIST
       L_PAREN "("
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           VERBOSE_KW "VERBOSE"
       COMMA ","
       WHITESPACE " "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           ANALYZE_KW "ANALYZE"
       R_PAREN ")"
     WHITESPACE " "
@@ -45,12 +45,12 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           FULL_KW "full"
       COMMA ","
       WHITESPACE " \n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           FULL_KW "full"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -59,7 +59,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           FULL_KW "full"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -68,12 +68,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           ANALYZE_KW "analyze"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           ANALYZE_KW "analyze"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -82,7 +82,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           ANALYZE_KW "analyze"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -91,12 +91,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "disable_page_skipping"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "disable_page_skipping"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -105,7 +105,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "disable_page_skipping"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -114,12 +114,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "skip_locked"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "skip_locked"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -128,7 +128,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "skip_locked"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -137,15 +137,16 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "index_cleanup"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
-          IDENT "auto"
+          VACUUM_OPTION_VALUE_NAME
+            IDENT "auto"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "index_cleanup"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -154,7 +155,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "index_cleanup"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -163,12 +164,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "process_main"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "process_main"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -177,7 +178,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "process_main"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -186,12 +187,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           TRUNCATE_KW "truncate"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           TRUNCATE_KW "truncate"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -200,7 +201,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           TRUNCATE_KW "truncate"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -209,7 +210,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           PARALLEL_KW "parallel"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -218,12 +219,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "skip_database_stats"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "skip_database_stats"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -232,7 +233,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "skip_database_stats"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -241,12 +242,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "only_database_stats"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "only_database_stats"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -255,7 +256,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "only_database_stats"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -264,7 +265,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "buffer_usage_limit"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -273,7 +274,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           IDENT "buffer_usage_limit"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -282,7 +283,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           FULL_KW "full"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -290,7 +291,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           VERBOSE_KW "verbose"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
@@ -299,7 +300,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
-        NAME
+        VACUUM_OPTION_NAME
           ANALYZE_KW "analyze"
         WHITESPACE " "
         VACUUM_OPTION_VALUE

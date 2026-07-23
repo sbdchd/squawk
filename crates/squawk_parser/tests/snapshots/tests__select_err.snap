@@ -17,7 +17,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "x"
         COMMA ","
         WHITESPACE "\n  "
@@ -42,7 +42,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "y"
         COMMA ","
         WHITESPACE "\n  "
@@ -53,7 +53,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "z"
         ERROR
           COMMA ","
@@ -85,7 +85,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             ERROR
               COMMA ","
@@ -109,7 +109,7 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "c"
         WHITESPACE "  "
         TARGET
@@ -1010,7 +1010,7 @@ SOURCE_FILE
                   INT_NUMBER "2"
                 WHITESPACE " "
                 AS_NAME
-                  NAME
+                  COLUMN_NAME
                     IDENT "b"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -1023,7 +1023,7 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "a"
     WHITESPACE " "
     FROM_CLAUSE

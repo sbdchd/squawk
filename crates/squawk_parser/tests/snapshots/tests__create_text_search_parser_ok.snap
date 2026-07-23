@@ -24,7 +24,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           START_KW "start"
         WHITESPACE " "
         EQ "="
@@ -38,7 +38,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "gettoken"
         WHITESPACE " "
         EQ "="
@@ -52,7 +52,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           END_KW "end"
         WHITESPACE " "
         EQ "="
@@ -66,7 +66,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "lextypes"
         WHITESPACE " "
         EQ "="
@@ -107,7 +107,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           START_KW "start"
         WHITESPACE " "
         EQ "="
@@ -121,7 +121,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "gettoken"
         WHITESPACE " "
         EQ "="
@@ -135,7 +135,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           END_KW "end"
         WHITESPACE " "
         EQ "="
@@ -149,7 +149,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "lextypes"
         WHITESPACE " "
         EQ "="
@@ -163,7 +163,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "headline"
         WHITESPACE " "
         EQ "="

@@ -419,25 +419,25 @@ SOURCE_FILE
         PROPERTIES
           PROPERTIES_KW "properties"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_PROPERTY_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_PROPERTY_NAME
               NAME_REF
                 IDENT "a"
               WHITESPACE " "
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              PROPERTY_NAME
                 IDENT "k"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_PROPERTY_NAME
               NAME_REF
                 IDENT "f"
               WHITESPACE " "
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              PROPERTY_NAME
                 IDENT "y"
             R_PAREN ")"
       R_PAREN ")"

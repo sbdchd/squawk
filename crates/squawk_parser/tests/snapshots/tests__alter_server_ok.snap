@@ -43,7 +43,7 @@ SOURCE_FILE
       ALTER_OPTION
         ADD_KW "add"
         WHITESPACE " "
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "o"
         WHITESPACE " "
         LITERAL
@@ -53,7 +53,7 @@ SOURCE_FILE
       ALTER_OPTION
         DROP_KW "drop"
         WHITESPACE " "
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "p"
       R_PAREN ")"
     SEMICOLON ";"

@@ -15,10 +15,54 @@ use crate::name::{self, Name, Schema};
 use crate::symbols::SymbolKind;
 use crate::{
     binder::extract_string_literal,
-    classify::{NameRefClass, classify_literal, classify_name_ref},
+    classify::{NameRefClass, classify_config_value_name, classify_literal, classify_name_ref},
     db::{bind, parse},
 };
 use salsa::Database as Db;
+
+fn resolve_named_arg_parameter<T>(
+    db: &dyn Db,
+    name_ref: InFile<&T>,
+) -> Option<SmallVec<[Location; 1]>>
+where
+    T: AstNode + ast::NameLike,
+{
+    let file = name_ref.file_id;
+    let name_ref = name_ref.value;
+    let (schema, function_name) = name_ref.syntax().ancestors().find_map(|ancestor| {
+        if let Some(call_expr) = ast::CallExpr::cast(ancestor.clone()) {
+            name::schema_and_func_name(&call_expr)
+        } else if let Some(call) = ast::Call::cast(ancestor) {
+            name::schema_and_name_path(&call.procedure_name_ref()?.path_ref()?)
+        } else {
+            None
+        }
+    })?;
+    let param_name = Name::from_node(name_ref);
+    let position = name_ref.syntax().text_range().start();
+    let binder = bind(db, file);
+    let schemas = binder.resolved_schemas(position, schema.as_ref());
+
+    // TODO: this should be one lookup
+    let function_ptr = binder
+        .lookup_with(&function_name, SymbolKind::Function, &schemas)
+        .or_else(|| binder.lookup_with(&function_name, SymbolKind::Procedure, &schemas))
+        .or_else(|| binder.lookup_with(&function_name, SymbolKind::Aggregate, &schemas))?;
+
+    let param_ptr = find_param_in_func_def(db, InFile::new(file, function_ptr), &param_name)?;
+    Some(smallvec![Location::new(
+        file,
+        param_ptr.text_range(),
+        LocationKind::NamedArgParameter
+    )])
+}
+
+pub(crate) fn resolve_param_name_ref(
+    db: &dyn Db,
+    name_ref: InFile<&ast::ParamNameRef>,
+) -> Option<SmallVec<[Location; 1]>> {
+    resolve_named_arg_parameter(db, name_ref)
+}
 
 /// Resolves a name reference to its definition(s).
 ///
@@ -90,32 +134,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::NamedArgParameter => {
-            let (schema, function_name) = name_ref.syntax().ancestors().find_map(|a| {
-                if let Some(call_expr) = ast::CallExpr::cast(a.clone()) {
-                    name::schema_and_func_name(&call_expr)
-                } else if let Some(call) = ast::Call::cast(a) {
-                    name::schema_and_name_path(&call.procedure_name_ref()?.path_ref()?)
-                } else {
-                    None
-                }
-            })?;
-            let param_name = Name::from_node(name_ref);
-            let position = name_ref.syntax().text_range().start();
-            let schemas = binder.resolved_schemas(position, schema.as_ref());
-
-            // TODO: this should be one lookup
-            let function_ptr = binder
-                .lookup_with(&function_name, SymbolKind::Function, &schemas)
-                .or_else(|| binder.lookup_with(&function_name, SymbolKind::Procedure, &schemas))
-                .or_else(|| binder.lookup_with(&function_name, SymbolKind::Aggregate, &schemas))?;
-
-            let param_ptr =
-                find_param_in_func_def(db, InFile::new(file, function_ptr), &param_name)?;
-            Some(smallvec![Location::new(
-                file,
-                param_ptr.text_range(),
-                LocationKind::NamedArgParameter
-            )])
+            resolve_named_arg_parameter(db, InFile::new(file, name_ref))
         }
         NameRefClass::ParamDefault => resolve_enclosing_function_param(InFile::new(file, name_ref)),
         NameRefClass::Cursor => {
@@ -897,6 +916,27 @@ pub(crate) fn resolve_name_ref(
     .or_else(|| resolve_special_keyword_as_function(db, InFile::new(file, name_ref)))
 }
 
+pub(crate) fn resolve_config_value_name(
+    db: &dyn Db,
+    config_value_name: InFile<&ast::ConfigValueName>,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = config_value_name.file_id;
+    let config_value_name = config_value_name.value;
+    match classify_config_value_name(config_value_name.syntax())? {
+        NameRefClass::Schema => {
+            let schema_name = Name::from_node(config_value_name);
+            let binder = bind(db, file);
+            let ptr = binder.lookup(&schema_name, SymbolKind::Schema)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Schema
+            )])
+        }
+        _ => None,
+    }
+}
+
 /// Resolves a string literal to its definition(s), e.g. the schema name in
 /// `set schema 'app'` or `set search_path to 'app'`.
 pub(crate) fn resolve_literal(
@@ -1314,9 +1354,11 @@ fn resolve_property_graph_column_ptr(
                 column_name,
             );
         }
-    } else if let Some(expr_as_name) = ast::ExprAsName::cast(parent)
-        && let Some(expr_as_name_list) = ast::ExprAsNameList::cast(expr_as_name.syntax().parent()?)
-        && let Some(properties) = ast::Properties::cast(expr_as_name_list.syntax().parent()?)
+    } else if let Some(expr_as_property_name) = ast::ExprAsPropertyName::cast(parent)
+        && let Some(expr_as_property_name_list) =
+            ast::ExprAsPropertyNameList::cast(expr_as_property_name.syntax().parent()?)
+        && let Some(properties) =
+            ast::Properties::cast(expr_as_property_name_list.syntax().parent()?)
     {
         let parent = properties.syntax().parent()?;
         if let Some(edge) = ast::EdgeTableDef::cast(parent.clone()) {

@@ -30,7 +30,7 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              XML_NAMESPACE_PREFIX
                 IDENT "bk"
             R_PAREN ")"
           COMMA ","

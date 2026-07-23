@@ -163,11 +163,11 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "a"
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "b"
             WHITESPACE " "
             EQ "="
@@ -206,7 +206,7 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "a"
           COMMA ","
           WHITESPACE " "
@@ -214,7 +214,7 @@ SOURCE_FILE
             COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "b"
             WHITESPACE " "
             EQ "="

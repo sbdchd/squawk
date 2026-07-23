@@ -42,7 +42,7 @@ SOURCE_FILE
     COPY_OPTION_LIST
       L_PAREN "("
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           DELIMITER_KW "DELIMITER"
         WHITESPACE " "
         LITERAL
@@ -166,14 +166,14 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE " "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "on_error"
         WHITESPACE " "
         IGNORE_KW "ignore"
       COMMA ","
       WHITESPACE " "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "log_verbosity"
         WHITESPACE " "
         VERBOSE_KW "verbose"
@@ -203,7 +203,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE " "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "on_error"
         WHITESPACE " "
         IGNORE_KW "ignore"
@@ -233,19 +233,19 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           FORMAT_KW "format"
         WHITESPACE " "
         CSV_KW "csv"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           FREEZE_KW "freeze"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           FREEZE_KW "freeze"
         WHITESPACE " "
         LITERAL
@@ -253,7 +253,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           FREEZE_KW "freeze"
         WHITESPACE " "
         LITERAL
@@ -261,7 +261,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           DELIMITER_KW "delimiter"
         WHITESPACE " "
         LITERAL
@@ -269,7 +269,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           NULL_KW "null"
         WHITESPACE " "
         LITERAL
@@ -277,7 +277,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           DEFAULT_KW "default"
         WHITESPACE " "
         LITERAL
@@ -285,12 +285,12 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           HEADER_KW "header"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           HEADER_KW "header"
         WHITESPACE " "
         LITERAL
@@ -298,7 +298,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           HEADER_KW "header"
         WHITESPACE " "
         LITERAL
@@ -306,14 +306,14 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           HEADER_KW "header"
         WHITESPACE " "
         MATCH_KW "match"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           QUOTE_KW "quote"
         WHITESPACE " "
         LITERAL
@@ -321,7 +321,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           ESCAPE_KW "escape"
         WHITESPACE " "
         LITERAL
@@ -329,98 +329,98 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "force_quote"
         WHITESPACE " "
         STAR "*"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "force_quote"
         WHITESPACE " "
         COPY_OPTION_LIST
           L_PAREN "("
           COPY_OPTION
-            NAME
+            COPY_OPTION_NAME
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COPY_OPTION
-            NAME
+            COPY_OPTION_NAME
               IDENT "b"
           COMMA ","
           WHITESPACE " "
           COPY_OPTION
-            NAME
+            COPY_OPTION_NAME
               IDENT "c"
           COMMA ","
           WHITESPACE " "
           COPY_OPTION
-            NAME
+            COPY_OPTION_NAME
               IDENT "d"
           R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "force_not_null"
         WHITESPACE " "
         STAR "*"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "force_not_null"
         WHITESPACE " "
         COPY_OPTION_LIST
           L_PAREN "("
           COPY_OPTION
-            NAME
+            COPY_OPTION_NAME
               IDENT "a"
           R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "force_null"
         WHITESPACE " "
         STAR "*"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "force_null"
         WHITESPACE " "
         COPY_OPTION_LIST
           L_PAREN "("
           COPY_OPTION
-            NAME
+            COPY_OPTION_NAME
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COPY_OPTION
-            NAME
+            COPY_OPTION_NAME
               IDENT "b"
           R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "on_error"
         WHITESPACE " "
         IDENT "stop"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "on_error"
         WHITESPACE " "
         IGNORE_KW "ignore"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           ENCODING_KW "encoding"
         WHITESPACE " "
         LITERAL
@@ -428,7 +428,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "log_verbosity"
         WHITESPACE " "
         VERBOSE_KW "verbose"

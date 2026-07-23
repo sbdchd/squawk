@@ -440,7 +440,7 @@ SOURCE_FILE
               COMMA ","
               WHITESPACE " "
               NAMED_ARG
-                NAME_REF
+                PARAM_NAME_REF
                   IDENT "a"
                 WHITESPACE " "
                 FAT_ARROW "=>"
@@ -859,7 +859,7 @@ SOURCE_FILE
               L_PAREN "("
               NAME_KW "name"
               WHITESPACE " "
-              NAME
+              ELEMENT_TAG
                 IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
@@ -876,25 +876,25 @@ SOURCE_FILE
               L_PAREN "("
               NAME_KW "name"
               WHITESPACE " "
-              NAME
+              ELEMENT_TAG
                 IDENT "c"
               COMMA ","
               WHITESPACE " "
               XMLATTRIBUTES_KW "xmlattributes"
-              EXPR_AS_NAME_LIST
+              EXPR_AS_XML_ATTR_LIST
                 L_PAREN "("
-                EXPR_AS_NAME
+                EXPR_AS_XML_ATTR
                   NAME_REF
                     IDENT "foo"
                 COMMA ","
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_XML_ATTR
                   NAME_REF
                     IDENT "bar"
                   WHITESPACE " "
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  XML_ATTR
                     IDENT "b"
                 R_PAREN ")"
               R_PAREN ")"
@@ -912,7 +912,7 @@ SOURCE_FILE
               L_PAREN "("
               NAME_KW "name"
               WHITESPACE " "
-              NAME
+              ELEMENT_TAG
                 IDENT "d"
               COMMA ","
               WHITESPACE " "
@@ -941,25 +941,25 @@ SOURCE_FILE
               L_PAREN "("
               NAME_KW "name"
               WHITESPACE " "
-              NAME
+              ELEMENT_TAG
                 IDENT "d"
               COMMA ","
               WHITESPACE " "
               XMLATTRIBUTES_KW "xmlattributes"
-              EXPR_AS_NAME_LIST
+              EXPR_AS_XML_ATTR_LIST
                 L_PAREN "("
-                EXPR_AS_NAME
+                EXPR_AS_XML_ATTR
                   NAME_REF
                     IDENT "buzz"
                 COMMA ","
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_XML_ATTR
                   NAME_REF
                     IDENT "foo"
                   WHITESPACE " "
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  XML_ATTR
                     IDENT "c"
                 R_PAREN ")"
               COMMA ","
@@ -1090,21 +1090,43 @@ SOURCE_FILE
           CALL_EXPR
             XML_FOREST_FN
               XMLFOREST_KW "xmlforest"
-              EXPR_AS_NAME_LIST
+              EXPR_AS_ELEMENT_TAG_LIST
                 L_PAREN "("
-                EXPR_AS_NAME
+                EXPR_AS_ELEMENT_TAG
                   NAME_REF
                     IDENT "foo"
                 COMMA ","
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_ELEMENT_TAG
                   NAME_REF
                     IDENT "bar"
                 COMMA ","
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_ELEMENT_TAG
                   NAME_REF
                     IDENT "buzz"
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            XML_FOREST_FN
+              XMLFOREST_KW "xmlforest"
+              EXPR_AS_ELEMENT_TAG_LIST
+                L_PAREN "("
+                EXPR_AS_ELEMENT_TAG
+                  NAME_REF
+                    IDENT "foo"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  ELEMENT_TAG
+                    IDENT "bar"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1166,7 +1188,7 @@ SOURCE_FILE
               L_PAREN "("
               NAME_KW "name"
               WHITESPACE " "
-              NAME
+              XML_PI_TARGET
                 IDENT "foo"
               R_PAREN ")"
     SEMICOLON ";"
@@ -1183,7 +1205,7 @@ SOURCE_FILE
               L_PAREN "("
               NAME_KW "name"
               WHITESPACE " "
-              NAME
+              XML_PI_TARGET
                 IDENT "foo"
               COMMA ","
               WHITESPACE " "
@@ -2835,7 +2857,7 @@ SOURCE_FILE
               L_PAREN "("
               ARG
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "a"
                   WHITESPACE " "
                   FAT_ARROW "=>"
@@ -2846,7 +2868,7 @@ SOURCE_FILE
               WHITESPACE " "
               ARG
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "b"
                   WHITESPACE " "
                   FAT_ARROW "=>"
@@ -2881,7 +2903,7 @@ SOURCE_FILE
               WHITESPACE " "
               ARG
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "boo"
                   WHITESPACE " "
                   FAT_ARROW "=>"
@@ -2911,7 +2933,7 @@ SOURCE_FILE
               WHITESPACE " "
               ARG
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "a"
                   WHITESPACE " "
                   COLON_EQ ":="
@@ -3734,7 +3756,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "unfiltered"
         COMMA ","
         WHITESPACE "\n  "
@@ -3766,7 +3788,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "filtered"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -3796,7 +3818,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "i"
             R_PAREN ")"
     SEMICOLON ";"
@@ -3945,7 +3967,7 @@ SOURCE_FILE
                 VARIADIC_KW "variadic"
                 WHITESPACE " "
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "arr"
                   WHITESPACE " "
                   FAT_ARROW "=>"
@@ -4052,7 +4074,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "c"
     WHITESPACE " "
     FROM_CLAUSE
@@ -4318,7 +4340,7 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              JSON_VARIABLE_NAME
                 FILTER_KW "filter"
           WHITESPACE "\n   "
           JSON_TABLE_COLUMN_LIST
@@ -5901,7 +5923,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  JSON_VARIABLE_NAME
                     IDENT "foo"
                 COMMA ","
                 WHITESPACE " \n  "
@@ -5911,7 +5933,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  JSON_VARIABLE_NAME
                     IDENT "bar"
               WHITESPACE " \n  "
               JSON_RETURNING_CLAUSE
@@ -6022,7 +6044,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  JSON_VARIABLE_NAME
                     IDENT "d"
               WHITESPACE "\n  "
               JSON_ON_ERROR_CLAUSE
@@ -6074,7 +6096,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   AS_KW "AS"
                   WHITESPACE " "
-                  NAME
+                  JSON_VARIABLE_NAME
                     IDENT "x"
               R_PAREN ")"
     SEMICOLON ";"
@@ -6200,7 +6222,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  JSON_VARIABLE_NAME
                     IDENT "d"
               WHITESPACE "\n  "
               JSON_RETURNING_CLAUSE

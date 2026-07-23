@@ -182,17 +182,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -266,12 +266,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 TARGET_KW "target"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 FUNCTION_KW "function"
             R_PAREN ")"
     SEMICOLON ";"
@@ -302,12 +302,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "col1"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "col2"
             R_PAREN ")"
     SEMICOLON ";"
@@ -354,12 +354,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 TARGET_KW "target"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 FUNCTION_KW "function"
             R_PAREN ")"
     SEMICOLON ";"
@@ -1498,7 +1498,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "bar"
     WHITESPACE " "
     FROM_CLAUSE
@@ -1519,7 +1519,7 @@ SOURCE_FILE
             IDENT "foo"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "bar"
     WHITESPACE " "
     FROM_CLAUSE
@@ -1540,7 +1540,7 @@ SOURCE_FILE
             IDENT "foo"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "bar"
         COMMA ","
         WHITESPACE " "
@@ -1554,7 +1554,7 @@ SOURCE_FILE
             IDENT "x"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "y"
     WHITESPACE " "
     FROM_CLAUSE
@@ -1720,17 +1720,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
         WHITESPACE " "
@@ -1828,17 +1828,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -1890,12 +1890,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
     SEMICOLON ";"
@@ -1943,12 +1943,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2056,12 +2056,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2099,12 +2099,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2139,7 +2139,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -2150,7 +2150,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -2188,7 +2188,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -2199,7 +2199,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -2235,7 +2235,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -2246,7 +2246,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -2284,7 +2284,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -2295,7 +2295,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -2350,7 +2350,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -2361,7 +2361,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -2495,17 +2495,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2535,17 +2535,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2571,17 +2571,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2687,17 +2687,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "x"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "y"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "z"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2780,17 +2780,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2827,17 +2827,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2975,17 +2975,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -3017,17 +3017,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -3057,17 +3057,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -3129,7 +3129,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -3140,7 +3140,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -3176,7 +3176,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -3187,7 +3187,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -3240,7 +3240,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "x"
               WHITESPACE " "
               PATH_TYPE
@@ -3251,7 +3251,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "y"
               WHITESPACE " "
               PATH_TYPE
@@ -3262,7 +3262,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "z"
               WHITESPACE " "
               PATH_TYPE
@@ -3427,17 +3427,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -3472,17 +3472,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
     SEMICOLON ";"
@@ -4910,11 +4910,11 @@ SOURCE_FILE
             COLUMN_LIST
               L_PAREN "("
               COLUMN
-                NAME
+                COLUMN_NAME
                   IDENT "x0"
               COMMA ","
               COLUMN
-                NAME
+                COLUMN_NAME
                   IDENT "x1"
               R_PAREN ")"
         WHITESPACE " "
@@ -5363,7 +5363,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "mname"
         COMMA ","
         WHITESPACE " "
@@ -5770,7 +5770,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               SELECT_KW "select"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -5786,7 +5786,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               FROM_KW "from"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -5802,7 +5802,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               WHERE_KW "where"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5816,7 +5816,7 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5832,7 +5832,7 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               IS_KW "is"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5846,7 +5846,7 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               AND_KW "and"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5860,7 +5860,7 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               OR_KW "or"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5874,7 +5874,7 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               COLLATE_KW "collate"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5892,7 +5892,7 @@ SOURCE_FILE
               IDENT "bar"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               NULL_KW "null"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -5910,7 +5910,7 @@ SOURCE_FILE
               IDENT "bar"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5924,7 +5924,7 @@ SOURCE_FILE
             IDENT "c"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -5948,7 +5948,7 @@ SOURCE_FILE
             IDENT "c"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               NULL_KW "null"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -6167,7 +6167,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               DAY_KW "day"
         COMMA ","
         WHITESPACE " "
@@ -6185,7 +6185,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "max_value"
         COMMA ","
         WHITESPACE " "
@@ -6203,7 +6203,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "min_value"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -6409,7 +6409,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "costs"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE

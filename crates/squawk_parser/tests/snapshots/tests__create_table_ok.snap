@@ -22,7 +22,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -33,7 +33,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -60,7 +60,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           GRAPH_TABLE_KW "graph_table"
         WHITESPACE " "
         PATH_TYPE
@@ -94,7 +94,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -105,7 +105,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -134,7 +134,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -155,7 +155,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -184,7 +184,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -233,7 +233,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -334,7 +334,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -366,7 +366,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -398,7 +398,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -426,7 +426,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -483,7 +483,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -586,7 +586,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -628,7 +628,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -675,7 +675,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -708,7 +708,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -725,12 +725,12 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "foo"
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "bar"
           WHITESPACE " "
           EQ "="
@@ -741,10 +741,10 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAMESPACE
             IDENT "buzz"
           DOT "."
-          NAME
+          ATTRIBUTE_NAME
             IDENT "bar"
           WHITESPACE " "
           EQ "="
@@ -772,7 +772,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -804,7 +804,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -839,7 +839,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -874,7 +874,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -909,7 +909,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -943,7 +943,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -954,7 +954,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "\"like\""
         WHITESPACE " "
         PATH_TYPE
@@ -995,7 +995,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1029,7 +1029,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1061,7 +1061,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1096,7 +1096,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1111,7 +1111,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1133,7 +1133,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -1153,12 +1153,12 @@ SOURCE_FILE
                 L_PAREN "("
                 WHITESPACE "\n    "
                 ATTRIBUTE_OPTION
-                  NAME
+                  ATTRIBUTE_NAME
                     IDENT "fillfactor"
                 COMMA ","
                 WHITESPACE "\n    "
                 ATTRIBUTE_OPTION
-                  NAME
+                  ATTRIBUTE_NAME
                     IDENT "toast_tuple_target"
                   WHITESPACE " "
                   EQ "="
@@ -1169,7 +1169,7 @@ SOURCE_FILE
                 COMMA ","
                 WHITESPACE "\n    "
                 ATTRIBUTE_OPTION
-                  NAME
+                  ATTRIBUTE_NAME
                     IDENT "parallel_workers"
                   WHITESPACE " "
                   EQ "="
@@ -1180,7 +1180,7 @@ SOURCE_FILE
                 COMMA ","
                 WHITESPACE "\n    "
                 ATTRIBUTE_OPTION
-                  NAME
+                  ATTRIBUTE_NAME
                     IDENT "autovacuum_enabled"
                   WHITESPACE " "
                   EQ "="
@@ -1191,7 +1191,7 @@ SOURCE_FILE
                 COMMA ","
                 WHITESPACE "\n    "
                 ATTRIBUTE_OPTION
-                  NAME
+                  ATTRIBUTE_NAME
                     IDENT "autovacuum_vacuum_cost_delay"
                   WHITESPACE " "
                   EQ "="
@@ -1206,7 +1206,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "d"
         WHITESPACE " "
         PATH_TYPE
@@ -1249,7 +1249,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1307,7 +1307,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1365,7 +1365,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1387,14 +1387,14 @@ SOURCE_FILE
                 L_PAREN "("
                 WHITESPACE " "
                 ATTRIBUTE_OPTION
-                  NAME
+                  ATTRIBUTE_NAME
                     IDENT "autovacuum_enabled"
                 WHITESPACE " "
                 R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1429,7 +1429,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1454,7 +1454,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -1502,7 +1502,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1530,7 +1530,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1551,7 +1551,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -1572,7 +1572,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "d"
         WHITESPACE " "
         PATH_TYPE
@@ -1611,7 +1611,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1652,7 +1652,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1663,7 +1663,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1715,7 +1715,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1726,7 +1726,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1758,7 +1758,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -1808,7 +1808,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1819,7 +1819,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1874,7 +1874,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1885,7 +1885,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1929,7 +1929,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1940,7 +1940,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1980,7 +1980,7 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE " "
               ATTRIBUTE_OPTION
-                NAME
+                ATTRIBUTE_NAME
                   IDENT "bar"
                 WHITESPACE " "
                 EQ "="
@@ -2011,7 +2011,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2022,7 +2022,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2071,7 +2071,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2082,7 +2082,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2140,7 +2140,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2151,7 +2151,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2232,7 +2232,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2243,7 +2243,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2341,7 +2341,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2352,7 +2352,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2406,7 +2406,7 @@ SOURCE_FILE
           ATTRIBUTE_LIST
             L_PAREN "("
             ATTRIBUTE_OPTION
-              NAME
+              ATTRIBUTE_NAME
                 IDENT "x"
               WHITESPACE " "
               EQ "="
@@ -2417,7 +2417,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             ATTRIBUTE_OPTION
-              NAME
+              ATTRIBUTE_NAME
                 IDENT "z"
             R_PAREN ")"
         WHITESPACE "\n    "
@@ -2482,7 +2482,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2493,7 +2493,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2569,7 +2569,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2580,7 +2580,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2661,7 +2661,7 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE " "
               ATTRIBUTE_OPTION
-                NAME
+                ATTRIBUTE_NAME
                   IDENT "bar"
                 WHITESPACE " "
                 EQ "="
@@ -2866,7 +2866,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           NAME_KW "name"
         WHITESPACE "            "
         PATH_TYPE
@@ -2877,7 +2877,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "pay_by_quarter"
         WHITESPACE "  "
         ARRAY_TYPE
@@ -2891,7 +2891,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "schedule"
         WHITESPACE "        "
         ARRAY_TYPE
@@ -2925,7 +2925,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "squares"
         WHITESPACE "   "
         ARRAY_TYPE
@@ -2963,7 +2963,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "pay_by_quarter"
         WHITESPACE "  "
         ARRAY_TYPE
@@ -2981,7 +2981,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "pay_by_quarter"
         WHITESPACE "  "
         ARRAY_TYPE
@@ -3057,12 +3057,12 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         NOT_NULL_CONSTRAINT
@@ -3072,7 +3072,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         WITH_OPTIONS
@@ -3171,12 +3171,12 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         WITH_OPTIONS
@@ -3186,7 +3186,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         NOT_NULL_CONSTRAINT
@@ -3369,7 +3369,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         GENERATED_CONSTRAINT
@@ -3450,7 +3450,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "sensor_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3461,7 +3461,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "ts"
         WHITESPACE " "
         PATH_TYPE
@@ -3477,7 +3477,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -3506,7 +3506,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -3523,7 +3523,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -3558,7 +3558,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -3575,7 +3575,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -3592,7 +3592,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -3609,7 +3609,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "d"
         WHITESPACE " "
         PATH_TYPE
@@ -3626,7 +3626,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "e"
         WHITESPACE " "
         PATH_TYPE
@@ -3659,7 +3659,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "x"
         WHITESPACE " "
         PATH_TYPE
@@ -3688,7 +3688,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -3699,7 +3699,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -3788,7 +3788,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -3811,7 +3811,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "address_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3827,7 +3827,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "address_valid_at"
         WHITESPACE " "
         PATH_TYPE
@@ -3843,7 +3843,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           CONTENT_KW "content"
         WHITESPACE " "
         PATH_TYPE
@@ -3924,7 +3924,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -3935,7 +3935,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -3980,7 +3980,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -3991,7 +3991,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -4002,7 +4002,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -4065,7 +4065,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -4088,7 +4088,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "valid_range"
         WHITESPACE " "
         PATH_TYPE
@@ -4131,7 +4131,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "recipient"
         WHITESPACE " "
         PATH_TYPE
@@ -4190,7 +4190,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "symbol"
         WHITESPACE " "
         PATH_TYPE
@@ -4201,7 +4201,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           PERIOD_KW "period"
         WHITESPACE " "
         PATH_TYPE
@@ -4212,7 +4212,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           YEAR_KW "year"
         WHITESPACE " "
         PATH_TYPE
@@ -4223,7 +4223,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "quarter"
         WHITESPACE " "
         PATH_TYPE
@@ -4280,7 +4280,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         CHAR_TYPE
@@ -4317,7 +4317,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         CHAR_TYPE
@@ -4354,7 +4354,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         CHAR_TYPE
@@ -4397,7 +4397,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
