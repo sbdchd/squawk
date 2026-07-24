@@ -522,57 +522,60 @@ IsNot =
   'is' 'not'
 
 Op =
-'or' 
-| '-' 
-| ':' 
-| '/' 
-| '%' 
-| '^' 
-| '+' 
-| '<' 
-| '=' 
-| '>' 
-| 'and'
-| 'escape'
-| 'ilike'
-| 'in' 
-| 'is'
-| 'isnull'
-| 'notnull'
-| 'like'
-| 'overlaps'
-| 'value'
-| AtLocal
-| AtTimeZone
-| ColonColon
-| ColonEq 
-| CustomOp 
-| FatArrow 
-| Gteq 
-| IsDistinctFrom 
-| IsJson 
-| IsJsonArray 
-| IsJsonObject 
-| IsJsonScalar 
-| IsJsonValue 
-| IsNormalized
-| IsNot 
-| IsNotDistinctFrom 
-| IsNotJson 
-| IsNotJsonArray 
-| IsNotJsonObject 
-| IsNotJsonScalar 
-| IsNotJsonValue 
-| IsNotNormalized
-| Lteq 
-| Neq 
-| Neqb 
-| NotIlike 
-| NotIn 
-| NotLike 
-| NotSimilarTo 
-| OperatorCall 
-| SimilarTo 
+  PathRef?
+  (
+    'or'
+  | '-'
+  | ':'
+  | '/'
+  | '%'
+  | '^'
+  | '+'
+  | '<'
+  | '='
+  | '>'
+  | 'and'
+  | 'escape'
+  | 'ilike'
+  | 'in'
+  | 'is'
+  | 'isnull'
+  | 'notnull'
+  | 'like'
+  | 'overlaps'
+  | 'value'
+  | AtLocal
+  | AtTimeZone
+  | ColonColon
+  | ColonEq
+  | CustomOp
+  | FatArrow
+  | Gteq
+  | IsDistinctFrom
+  | IsJson
+  | IsJsonArray
+  | IsJsonObject
+  | IsJsonScalar
+  | IsJsonValue
+  | IsNormalized
+  | IsNot
+  | IsNotDistinctFrom
+  | IsNotJson
+  | IsNotJsonArray
+  | IsNotJsonObject
+  | IsNotJsonScalar
+  | IsNotJsonValue
+  | IsNotNormalized
+  | Lteq
+  | Neq
+  | Neqb
+  | NotIlike
+  | NotIn
+  | NotLike
+  | NotSimilarTo
+  | OperatorCall
+  | SimilarTo
+  )
 
 IsJson =
   'is' 'json' JsonKeysUniqueClause?
@@ -912,6 +915,9 @@ ColumnName =
 ColumnNameRef =
   '#name'?
 
+QualifiedColumnNameRef =
+  PathRef
+
 Column =
   name:ColumnName
   WithOptions?
@@ -1139,17 +1145,56 @@ EmptyStmt =
   ';'
 
 LikeOption =
-  ('including' | 'excluding')
-  ('comments'
-  | 'compression'
-  | 'constraints'
-  | 'defaults'
-  | 'generated'
-  | 'identity'
-  | 'indexes'
-  | 'statistics'
-  | 'storage'
-  | 'all')
+  ExcludingProperty
+| IncludingProperty
+
+ExcludingProperty =
+  'excluding' TableProperty
+
+IncludingProperty =
+  'including' TableProperty
+
+TableProperty =
+  PropertyAll
+| PropertyComments
+| PropertyCompression
+| PropertyConstraints
+| PropertyDefaults
+| PropertyGenerated
+| PropertyIdentity
+| PropertyIndexes
+| PropertyStatistics
+| PropertyStorage
+
+PropertyAll =
+  'all'
+
+PropertyComments =
+  'comments'
+
+PropertyCompression =
+  'compression'
+
+PropertyConstraints =
+  'constraints'
+
+PropertyDefaults =
+  'defaults'
+
+PropertyGenerated =
+  'generated'
+
+PropertyIdentity =
+  'identity'
+
+PropertyIndexes =
+  'indexes'
+
+PropertyStatistics =
+  'statistics'
+
+PropertyStorage =
+  'storage'
 
 LikeClause =
   'like' RelationNameRef LikeOption*
@@ -1263,21 +1308,66 @@ SequenceOptionList =
   '(' (SequenceOption (',' SequenceOption)*) ')'
 
 SequenceOption =
+  OptionAsType
+| OptionCache
+| OptionIncrement
+| OptionSequenceName
+| OptionRestart
+| OptionLogged
+| OptionUnlogged
+| OptionStart
+| OptionOwnedBy
+| OptionMaxValue
+| OptionMinValue
+| OptionNoMaxValue
+| OptionNoMinValue
+| OptionNoCycle
+| OptionCycle
+
+OptionAsType =
   'as' Type
-| 'cache' Literal
-| 'increment' 'by'? Literal
-| 'sequence' 'name' Sequence
-| 'restart' ('with'? Literal)?
-| 'logged'
-| 'unlogged'
-| 'start' 'with'? Literal
-| 'owned' 'by' ('none' | PathRef)
-| 'maxvalue' Literal
-| 'minvalue' Literal
-| 'no' 'maxvalue'
-| 'no' 'minvalue'
-| 'no' 'cycle'
-| 'cycle'
+
+OptionCache =
+  'cache' Literal
+
+OptionIncrement =
+  'increment' 'by'? Literal
+
+OptionSequenceName =
+  'sequence' 'name' Sequence
+
+OptionRestart =
+  'restart' ('with'? Literal)?
+
+OptionLogged =
+  'logged'
+
+OptionUnlogged =
+  'unlogged'
+
+OptionStart =
+  'start' 'with'? Literal
+
+OptionOwnedBy =
+  'owned' 'by' ('none' | name:QualifiedColumnNameRef)
+
+OptionMaxValue =
+  'maxvalue' Literal
+
+OptionMinValue =
+  'minvalue' Literal
+
+OptionNoMaxValue =
+  'no' 'maxvalue'
+
+OptionNoMinValue =
+  'no' 'minvalue'
+
+OptionNoCycle =
+  'no' 'cycle'
+
+OptionCycle =
+  'cycle'
 
 ColumnList =
   '(' (Column (',' Column)*) ')'
@@ -1603,8 +1693,11 @@ FuncOption =
 | CostFuncOption
 | ParallelFuncOption
 | SecurityFuncOption
+| CalledOnNullInputFuncOption
+| ReturnsNullOnNullInputFuncOption
 | StrictFuncOption
 | LeakproofFuncOption
+| NotLeakproofFuncOption
 | ResetFuncOption
 | VolatilityFuncOption
 | WindowFuncOption
@@ -2087,10 +2180,24 @@ JsonReturningClause =
   'returning' Type
 
 JsonNullClause =
-  'null' 'on' 'null' | 'absent' 'on' 'null'
+  JsonAbsentOnNull
+| JsonNullOnNull
+
+JsonAbsentOnNull =
+  'absent' 'on' 'null'
+
+JsonNullOnNull =
+  'null' 'on' 'null'
 
 JsonKeysUniqueClause =
-  'with' 'unique' 'keys' | 'without' 'unique' 'keys'
+  JsonWithUniqueKeys
+| JsonWithoutUniqueKeys
+
+JsonWithUniqueKeys =
+  'with' 'unique' 'keys'
+
+JsonWithoutUniqueKeys =
+  'without' 'unique' 'keys'
 
 JsonQuotesClause =
   ('keep' | 'omit') 'quotes' ('on' 'scalar' 'string')?
@@ -2130,9 +2237,18 @@ JsonBehavior =
 | JsonBehaviorEmptyObject
 
 JsonWrapperBehaviorClause =
+  JsonWithConditionalWrapper
+| JsonWithUnconditionalWrapper
+| JsonWithoutWrapper
+
+JsonWithConditionalWrapper =
+  'with' 'conditional' 'array'? 'wrapper'
+
+JsonWithUnconditionalWrapper =
+  'with' 'unconditional'? 'array'? 'wrapper'
+
+JsonWithoutWrapper =
   'without' 'array'? 'wrapper'
-| 'with' 'unconditional'? 'array'? 'wrapper'
-| 'with' 'conditional' 'array'? 'wrapper'
 
 JsonOnErrorClause =
   JsonBehavior 'on' 'error'
@@ -2379,7 +2495,7 @@ FunctionFromItem =
   'lateral'? CallExpr ('with' 'ordinality')? alias:FromAlias?
 
 ParenFromItem =
-  'lateral'? (ParenSelect | ParenExpr) alias:FromAlias?
+  'only'? 'lateral'? (ParenSelect | ParenExpr) alias:FromAlias?
 
 JsonTableFromItem =
   'lateral'? JsonTable alias:FromAlias?
@@ -2412,11 +2528,26 @@ XmlColumnOptionList =
   (XmlColumnOption (XmlColumnOption*))
 
 XmlColumnOption =
+  OptionIdent
+| OptionDefault
+| OptionNotNull
+| OptionNull
+| OptionPath
+
+OptionIdent =
   '#ident' Expr
-| 'default' Expr
-| 'not' 'null'
-| 'null'
-| 'path' Expr
+
+OptionDefault =
+  'default' Expr
+
+OptionNotNull =
+  'not' 'null'
+
+OptionNull =
+  'null'
+
+OptionPath =
+  'path' Expr
 
 ConstraintIndexMethod =
   'using' AccessMethodRef
@@ -2493,21 +2624,22 @@ PartitionByClause =
   'partition' 'by' (Expr (',' Expr)*)
 
 AlterStatistics =
-  'alter' 'statistics' StatisticsRef
-  (
-    OwnerTo
-  | StatisticsRenameTo
-  | SetSchema
-  | SetStatistics
-  ) ';'?
+  'alter' 'statistics' StatisticsRef AlterStatisticsAction ';'?
+
+AlterStatisticsAction =
+  OwnerTo
+| SetSchema
+| SetStatistics
+| StatisticsRenameTo
 
 AlterServer =
-  'alter' 'server' ServerRef
-  (
-    OwnerTo
-  | ServerRenameTo
-  | SetVersion? AlterOptionList?
-  ) ';'?
+  'alter' 'server' ServerRef actions:AlterServerAction* ';'?
+
+AlterServerAction =
+  AlterOptionList
+| OwnerTo
+| ServerRenameTo
+| SetVersion
 
 SetVersion =
   'version' Literal
@@ -2523,59 +2655,61 @@ ForeignOptionName =
   '#name'?
 
 AlterSequence =
-  'alter' 'sequence' IfExists? SequenceRef
-  (
-    SetSchema
-  | SetLogged
-  | SetUnlogged
-  | OwnerTo
-  | SequenceRenameTo
-  | SequenceOption SequenceOption*
-  ) ';'?
+  'alter' 'sequence' IfExists? SequenceRef actions:AlterSequenceAction* ';'?
+
+AlterSequenceAction =
+  OwnerTo
+| SequenceOption
+| SequenceRenameTo
+| SetLogged
+| SetSchema
+| SetUnlogged
 
 AlterSchema =
-  'alter' 'schema' SchemaRef
-  (SchemaRenameTo
-  | OwnerTo) ';'?
+  'alter' 'schema' SchemaRef AlterSchemaAction ';'?
+
+AlterSchemaAction =
+  OwnerTo
+| SchemaRenameTo
 
 AlterRule =
   'alter' 'rule' RuleRef OnRelation RuleRenameTo ';'?
 
 AlterRoutine =
-  'alter' 'routine' RoutineSig
-  (
-    RoutineRenameTo
-  | OwnerTo
-  | SetSchema
-  | DependsOnExtension
-  | NoDependsOnExtension
-  | FuncOptionList
-  )
+  'alter' 'routine' RoutineSig AlterRoutineAction
   'restrict'? ';'?
 
+AlterRoutineAction =
+  DependsOnExtension
+| FuncOptionList
+| NoDependsOnExtension
+| OwnerTo
+| RoutineRenameTo
+| SetSchema
+
 AlterRole =
-  'alter' 'role' ('all' | RoleRef)
-  (
-    RoleRenameTo
-  | InDatabase? SetConfigParam
-  | InDatabase? ResetConfigParam
-  | RoleOptionList
-  )? ';'?
+  'alter' 'role' ('all' | RoleRef) InDatabase? AlterRoleAction? ';'?
+
+AlterRoleAction =
+  ResetConfigParam
+| RoleOptionList
+| RoleRenameTo
+| SetConfigParam
 
 InDatabase =
   'in' 'database' DatabaseRef
 
 AlterPublication =
-  'alter' 'publication' PublicationRef
-  (
-    AddPublicationObjects
-  | DropPublicationObjects
-  | SetOptions
-  | SetAllPublicationObjects
-  | SetPublicationObjects
-  | OwnerTo
-  | PublicationRenameTo
-  ) ';'?
+  'alter' 'publication' PublicationRef AlterPublicationAction ';'?
+
+AlterPublicationAction =
+  AddPublicationObjects
+| DropPublicationObjects
+| OwnerTo
+| PublicationRenameTo
+| SetAllPublicationObjects
+| SetOptions
+| SetPublicationObjects
 
 AddPublicationObjects =
   'add' (PublicationObject (',' PublicationObject)*)
@@ -2590,20 +2724,23 @@ SetPublicationObjects =
   'set' (PublicationObject (',' PublicationObject)*)
 
 AlterProcedure =
-  'alter' 'procedure' ProcedureSig
-  (
-    ProcedureRenameTo
-  | OwnerTo
-  | SetSchema
-  | DependsOnExtension
-  | NoDependsOnExtension
-  | FuncOptionList
-  )
+  'alter' 'procedure' ProcedureSig AlterProcedureAction
   'restrict'? ';'?
 
+AlterProcedureAction =
+  DependsOnExtension
+| FuncOptionList
+| NoDependsOnExtension
+| OwnerTo
+| ProcedureRenameTo
+| SetSchema
+
 AlterPolicy =
-  'alter' 'policy' PolicyRef OnTable
-  (PolicyRenameTo | AlterPolicyTo) ';'?
+  'alter' 'policy' PolicyRef OnTable AlterPolicyAction ';'?
+
+AlterPolicyAction =
+  AlterPolicyTo
+| PolicyRenameTo
 
 AlterPolicyTo =
   ('to' RoleRefList)?
@@ -2612,14 +2749,14 @@ AlterPolicyTo =
 
 
 AlterOperatorFamily =
-  'alter' 'operator' 'family' OpFamilyRef UsingMethod
-  (
-    AddOpClassOptions
-  | DropOpClassOptions
-  | OpFamilyRenameTo
-  | OwnerTo
-  | SetSchema
-  ) ';'?
+  'alter' 'operator' 'family' OpFamilyRef UsingMethod AlterOperatorFamilyAction ';'?
+
+AlterOperatorFamilyAction =
+  AddOpClassOptions
+| DropOpClassOptions
+| OpFamilyRenameTo
+| OwnerTo
+| SetSchema
 
 DropOpClassOptions =
   'drop' DropOpClassOptionList
@@ -2640,20 +2777,20 @@ OpClassOption =
 | 'storage' Type
 
 AlterOperatorClass =
-  'alter' 'operator' 'class' OpClassRef UsingMethod
-  (
-    OpClassRenameTo
-  | OwnerTo
-  | SetSchema
-  ) ';'?
+  'alter' 'operator' 'class' OpClassRef UsingMethod AlterOperatorClassAction ';'?
+
+AlterOperatorClassAction =
+  OpClassRenameTo
+| OwnerTo
+| SetSchema
 
 AlterOperator =
-  'alter' 'operator' OpSig
-  (
-    OwnerTo
-  | SetSchema
-  | SetOptions
-  ) ';'?
+  'alter' 'operator' OpSig AlterOperatorAction ';'?
+
+AlterOperatorAction =
+  OwnerTo
+| SetOptions
+| SetSchema
 
 AlterMaterializedViewAction =
   ViewRenameTo
@@ -2680,8 +2817,11 @@ AlterLargeObject =
   'alter' 'large' 'object' Literal 'owner' 'to' RoleRef ';'?
 
 AlterLanguage =
-  'alter' 'language' LanguageRef
-  (LanguageRenameTo | OwnerTo)? ';'?
+  'alter' 'language' LanguageRef AlterLanguageAction? ';'?
+
+AlterLanguageAction =
+  LanguageRenameTo
+| OwnerTo
 
 AlterIndex =
   'alter' 'index' (
@@ -2703,12 +2843,12 @@ AlterIndexAction =
 | AlterSetStatistics
 
 AlterGroup =
-  'alter' 'group' RoleRef
-  (
-    AddUsers
-  | DropUsers
-  | RoleRenameTo
-  ) ';'?
+  'alter' 'group' RoleRef AlterGroupAction ';'?
+
+AlterGroupAction =
+  AddUsers
+| DropUsers
+| RoleRenameTo
 
 AddUsers =
   'add' 'user' (RoleRef (',' RoleRef)*)
@@ -2717,54 +2857,79 @@ DropUsers =
   'drop' 'user' (RoleRef (',' RoleRef)*)
 
 AlterFunction =
-  'alter' 'function' FunctionSig
-  (
-    FunctionRenameTo
-  | OwnerTo
-  | SetSchema
-  | DependsOnExtension
-  | NoDependsOnExtension
-  | FuncOptionList
-  )
+  'alter' 'function' FunctionSig AlterFunctionAction
   'restrict'? ';'?
+
+AlterFunctionAction =
+  DependsOnExtension
+| FuncOptionList
+| FunctionRenameTo
+| NoDependsOnExtension
+| OwnerTo
+| SetSchema
 
 AlterForeignTable =
   'alter' 'foreign' 'table' IfExists? TableRelationName
-  (TableRenameTo
-  | RenameColumn
-  | SetSchema
-  | AlterTableAction*
-  ) ';'?
+  actions:AlterForeignTableAction* ';'?
+
+AlterForeignTableAction =
+  AlterTableAction
+| RenameColumn
+| SetSchema
+| TableRenameTo
 
 AlterForeignDataWrapper =
   'alter' 'foreign' 'data' 'wrapper' ForeignDataWrapperRef
-  (ForeignDataWrapperRenameTo
-  | OwnerTo
-  | FdwOptionList
-  )? ';'?
+  AlterForeignDataWrapperAction? ';'?
+
+AlterForeignDataWrapperAction =
+  FdwOptionList
+| ForeignDataWrapperRenameTo
+| OwnerTo
 
 FdwOptionList =
   FdwOption*
 
 FdwOption =
-  AlterOptionList
-| 'connection' FunctionNameRef
-| 'handler' FunctionNameRef
-| 'validator' FunctionNameRef
-| 'no' 'connection'
-| 'no' 'handler'
-| 'no' 'validator'
+  OptionAlterOptionList
+| OptionConnection
+| OptionHandler
+| OptionValidator
+| OptionNoConnection
+| OptionNoHandler
+| OptionNoValidator
+
+OptionAlterOptionList =
+  'options' '(' (AlterOption (',' AlterOption)*)? ')'
+
+OptionConnection =
+  'connection' FunctionNameRef
+
+OptionHandler =
+  'handler' FunctionNameRef
+
+OptionValidator =
+  'validator' FunctionNameRef
+
+OptionNoConnection =
+  'no' 'connection'
+
+OptionNoHandler =
+  'no' 'handler'
+
+OptionNoValidator =
+  'no' 'validator'
 
 AlterEventTrigger =
-  'alter' 'event' 'trigger' EventTriggerRef
-  (
-    Disable
-  | Enable
-  | EnableAlways
-  | EnableReplica
-  | OwnerTo
-  | EventTriggerRenameTo
-  )? ';'?
+  'alter' 'event' 'trigger' EventTriggerRef AlterEventTriggerAction? ';'?
+
+AlterEventTriggerAction =
+  Disable
+| Enable
+| EnableAlways
+| EnableReplica
+| EventTriggerRenameTo
+| OwnerTo
 
 Disable =
   'disable'
@@ -2779,13 +2944,13 @@ EnableReplica =
   'enable' 'replica'
 
 AlterExtension =
-  'alter' 'extension' ExtensionRef
-  (
-    AlterExtensionUpdate
-  | SetSchema
-  | AlterExtensionAdd
-  | AlterExtensionDrop
-  )? ';'?
+  'alter' 'extension' ExtensionRef AlterExtensionAction? ';'?
+
+AlterExtensionAction =
+  AlterExtensionAdd
+| AlterExtensionDrop
+| AlterExtensionUpdate
+| SetSchema
 
 AlterExtensionUpdate =
   'update' ('to' ('#ident' | Literal))?
@@ -2937,10 +3102,11 @@ AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
   ('for' ('role' | 'user') RoleRefList)?
   ('in' 'schema' (SchemaRef (',' SchemaRef)*))?
-  (
-    GrantDefaultPrivileges
-  | RevokeDefaultPrivileges
-  )? ';'?
+  AlterDefaultPrivilegesAction? ';'?
+
+AlterDefaultPrivilegesAction =
+  GrantDefaultPrivileges
+| RevokeDefaultPrivileges
 
 GrantDefaultPrivileges =
   'grant' Privileges 'on' PrivilegeTarget 'to' RoleRefList ('with' 'grant' 'option')?
@@ -2962,16 +3128,16 @@ PrivilegeTarget  =
 | 'schemas'
 
 AlterDatabase =
-  'alter' 'database' DatabaseRef
-  (
-    DatabaseRenameTo
-  | OwnerTo
-  | SetTablespace
-  | SetConfigParam
-  | ResetConfigParam
-  | RefreshCollationVersion
-  | DatabaseOptionList
-  )? ';'?
+  'alter' 'database' DatabaseRef AlterDatabaseAction? ';'?
+
+AlterDatabaseAction =
+  DatabaseOptionList
+| DatabaseRenameTo
+| OwnerTo
+| RefreshCollationVersion
+| ResetConfigParam
+| SetConfigParam
+| SetTablespace
 
 DatabaseOptionList =
   'with'? DatabaseOption*
@@ -2987,44 +3153,45 @@ DatabaseOption =
   (Literal | 'default' | ConfigValueName)
 
 SetConfigParam =
-  'set' PathRef
+  'set' ConfigParameterRef
   (
     'from' 'current'
   | ('to' | '=') ('default' | 'null' | (Literal (',' Literal)*) | (ConfigValueName (',' ConfigValueName)*))
   )
 
 ResetConfigParam =
-  'reset' ('all' | PathRef)
+  'reset' ('all' | ConfigParameterRef)
 
 RefreshCollationVersion =
   'refresh' 'collation' 'version'
 
 AlterConversion =
-  'alter' 'conversion' ConversionRef
-  (
-    ConversionRenameTo
-  | OwnerTo
-  | SetSchema
-  ) ';'?
+  'alter' 'conversion' ConversionRef AlterConversionAction ';'?
+
+AlterConversionAction =
+  ConversionRenameTo
+| OwnerTo
+| SetSchema
 
 AlterCollation =
-  'alter' 'collation' CollationRef
-  (CollationRenameTo
-  | RefreshVersion
-  | OwnerTo
-  | SetSchema
-  ) ';'?
+  'alter' 'collation' CollationRef AlterCollationAction ';'?
+
+AlterCollationAction =
+  CollationRenameTo
+| OwnerTo
+| RefreshVersion
+| SetSchema
 
 RefreshVersion =
   'refresh' 'version'
 
 AlterAggregate =
-  'alter' 'aggregate' Aggregate
-  (
-    AggregateRenameTo
-  | OwnerTo
-  | SetSchema
-  ) ';'?
+  'alter' 'aggregate' Aggregate AlterAggregateAction ';'?
+
+AlterAggregateAction =
+  AggregateRenameTo
+| OwnerTo
+| SetSchema
 
 AlterSubscription =
   'alter' 'subscription' SubscriptionRef action:AlterSubscriptionAction ';'?
@@ -3071,44 +3238,50 @@ SkipSubscription =
   'skip' AttributeList
 
 AlterSystem =
-  'alter' 'system'
-  (
-    SetConfigParam
-  | ResetConfigParam
-  ) ';'?
+  'alter' 'system' AlterSystemAction ';'?
+
+AlterSystemAction =
+  ResetConfigParam
+| SetConfigParam
 
 AlterTablespace =
-  'alter' 'tablespace' TablespaceRef
-  (
-    TablespaceRenameTo
-  | OwnerTo
-  | SetOptions
-  | ResetOptions
-  ) ';'?
+  'alter' 'tablespace' TablespaceRef AlterTablespaceAction ';'?
+
+AlterTablespaceAction =
+  OwnerTo
+| ResetOptions
+| SetOptions
+| TablespaceRenameTo
 
 AlterTextSearchParser =
   'alter' 'text' 'search' 'parser' TextSearchParserRef
-  (TextSearchParserRenameTo | SetSchema) ';'?
+  AlterTextSearchParserAction ';'?
+
+AlterTextSearchParserAction =
+  SetSchema
+| TextSearchParserRenameTo
 
 AlterTextSearchDictionary =
   'alter' 'text' 'search' 'dictionary' TextSearchDictionaryRef
-  (
-    TextSearchDictionaryRenameTo
-  | OwnerTo
-  | SetSchema
-  | AttributeList
-  ) ';'?
+  AlterTextSearchDictionaryAction ';'?
+
+AlterTextSearchDictionaryAction =
+  AttributeList
+| OwnerTo
+| SetSchema
+| TextSearchDictionaryRenameTo
 
 AlterTextSearchConfiguration =
   'alter' 'text' 'search' 'configuration' TextSearchConfigurationRef
-  (
-    AddMapping
-  | AlterMapping
-  | DropMapping
-  | TextSearchConfigurationRenameTo
-  | OwnerTo
-  | SetSchema
-  ) ';'?
+  AlterTextSearchConfigurationAction ';'?
+
+AlterTextSearchConfigurationAction =
+  AddMapping
+| AlterMapping
+| DropMapping
+| OwnerTo
+| SetSchema
+| TextSearchConfigurationRenameTo
 
 AddMapping =
   'add' 'mapping' 'for' (TextSearchTokenKind (',' TextSearchTokenKind)*) 'with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*)
@@ -3126,39 +3299,46 @@ DropMapping =
 
 AlterTextSearchTemplate =
   'alter' 'text' 'search' 'template' TextSearchTemplateRef
-  (TextSearchTemplateRenameTo | SetSchema) ';'?
+  AlterTextSearchTemplateAction ';'?
+
+AlterTextSearchTemplateAction =
+  SetSchema
+| TextSearchTemplateRenameTo
 
 AlterTrigger =
-  'alter' 'trigger' TriggerRef OnRelation
-  (
-    TriggerRenameTo
-  | DependsOnExtension
-  | NoDependsOnExtension
-  ) ';'?
+  'alter' 'trigger' TriggerRef OnRelation AlterTriggerAction ';'?
+
+AlterTriggerAction =
+  DependsOnExtension
+| NoDependsOnExtension
+| TriggerRenameTo
 
 AlterType =
-  'alter' 'type' TypeNameRef
-  (
-    AlterTypeAction (',' AlterTypeAction)*
-  | OwnerTo
-  | SetSchema
-  | SetOptions
-  | TypeRenameTo
-  | RenameAttribute
-  | RenameValue
-  | AddValue
-  ) ';'?
+  'alter' 'type' TypeNameRef action:AlterTypeAction ';'?
+
+AlterTypeAction =
+  AddValue
+| AlterTypeAttributeActionList
+| OwnerTo
+| RenameAttribute
+| RenameValue
+| SetOptions
+| SetSchema
+| TypeRenameTo
+
+AlterTypeAttributeActionList =
+  actions:(AlterTypeAttributeAction (',' AlterTypeAttributeAction)*)
+
+AlterTypeAttributeAction =
+  AddAttribute
+| AlterAttribute
+| DropAttribute
 
 RenameAttribute =
   'rename' 'attribute' ColumnNameRef 'to' ColumnName (Cascade | Restrict)?
 
 RenameValue =
   'rename' 'value' from:Literal 'to' to:Literal
-
-AlterTypeAction =
-  AddAttribute
-| DropAttribute
-| AlterAttribute
 
 AddAttribute =
   'add' 'attribute' ColumnName Type Collate? (Cascade | Restrict)?
@@ -3183,28 +3363,28 @@ AfterValue =
   'after' Literal
 
 AlterUser =
-  'alter' 'user' ('all' | RoleRef)
-  (
-    RoleOptionList
-  | RoleRenameTo
-  | InDatabase? SetConfigParam
-  | InDatabase? ResetConfigParam
-  )? ';'?
+  'alter' 'user' ('all' | RoleRef) InDatabase? AlterUserAction? ';'?
+
+AlterUserAction =
+  ResetConfigParam
+| RoleOptionList
+| RoleRenameTo
+| SetConfigParam
 
 AlterUserMapping =
   'alter' 'user' 'mapping' 'for' RoleRef ServerName AlterOptionList ';'?
 
 AlterView =
-  'alter' 'view' IfExists? ViewRef
-  (
-    AlterViewColumn
-  | OwnerTo
-  | ViewRenameTo
-  | RenameColumn
-  | SetSchema
-  | SetOptions
-  | ResetOptions
-  ) ';'?
+  'alter' 'view' IfExists? ViewRef AlterViewAction ';'?
+
+AlterViewAction =
+  AlterViewColumn
+| OwnerTo
+| RenameColumn
+| ResetOptions
+| SetOptions
+| SetSchema
+| ViewRenameTo
 
 AlterViewColumn =
   'alter' 'column'? name:ColumnNameRef (SetDefault | DropDefault)
@@ -3262,7 +3442,7 @@ CommentObject =
 | ObjectTrigger
 
 ObjectColumn =
-  'column' PathRef
+  'column' name:QualifiedColumnNameRef
 
 ObjectConstraint =
   'constraint' ConstraintNameRef 'on' ('domain' DomainRef | TableNameRef)
@@ -3615,10 +3795,7 @@ CreateLanguage =
   ('handler' FunctionNameRef ('inline' FunctionNameRef)? ('validator' FunctionNameRef)?)? ';'?
 
 CreateOperator =
-  'create' 'operator'
-  PathRef?
-  Op
-  AttributeList ';'?
+  'create' 'operator' Op AttributeList ';'?
 
 CreateOperatorClass =
   'create' 'operator' 'class' OpClassName 'default'? 'for' 'type' Type
@@ -4132,7 +4309,7 @@ PrivilegeAllInSchema =
   'in' 'schema' (SchemaRef (',' SchemaRef)*)
 
 PrivilegeParameter =
-  'parameter' (PathRef (',' PathRef)*)
+  'parameter' (ConfigParameterRef (',' ConfigParameterRef)*)
 
 PrivilegeRoutine =
   'function' FunctionSigList
@@ -4314,7 +4491,7 @@ Reset =
 
 ResetTarget =
   All
-| PathRef
+| ConfigParameterRef
 | ResetTimeZone
 | ResetTransactionIsolation
 
@@ -4619,7 +4796,7 @@ SetSchemaValue =
   'schema' Literal
 
 SetConfig =
-  PathRef (
+  ConfigParameterRef (
     'from' 'current'
   | (('to' | '=') (ConfigValue* | 'default'))
   )
@@ -4638,7 +4815,7 @@ Show =
   | SessionAuthorization
   | TransactionIsolationLevel
   | TimeZone
-  | PathRef
+  | ConfigParameterRef
   ) ';'?
 
 All =
@@ -4666,7 +4843,10 @@ VolatilityFuncOption =
   'immutable' | 'stable' | 'volatile'
 
 LeakproofFuncOption =
-  'leakproof' | 'not' 'leakproof'
+  'leakproof'
+
+NotLeakproofFuncOption =
+  'not' 'leakproof'
 
 ResetFuncOption =
   'reset' ('all' | ConfigParameterRef)
@@ -4675,7 +4855,13 @@ ConfigParameterRef =
   PathRef
 
 StrictFuncOption =
-  'strict' | 'called' 'on' 'null' 'input' | 'returns' 'null' 'on' 'null' 'input'
+  'strict'
+
+CalledOnNullInputFuncOption =
+  'called' 'on' 'null' 'input'
+
+ReturnsNullOnNullInputFuncOption =
+  'returns' 'null' 'on' 'null' 'input'
 
 SecurityFuncOption =
   'security' ('invoker' | 'definer')

@@ -154,9 +154,11 @@ select foo from bar;
 
 -- from only
 select a from only t;
+select a from only (foo.bar);
 
--- from field expr
+-- from qualified table name
 select a from foo.bar;
+select a from database_name.schema_name.table_name;
 
 -- from with everything
 select * from t * as r(a, b, c) tablesample sample_method (10, 23, 50) repeatable (42);

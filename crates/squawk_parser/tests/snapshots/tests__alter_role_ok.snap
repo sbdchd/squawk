@@ -163,10 +163,11 @@ SOURCE_FILE
     SET_CONFIG_PARAM
       SET_KW "set"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "param"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "param"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -185,10 +186,11 @@ SOURCE_FILE
     SET_CONFIG_PARAM
       SET_KW "set"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "param"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "param"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -207,10 +209,11 @@ SOURCE_FILE
     SET_CONFIG_PARAM
       SET_KW "set"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "param"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "param"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -230,10 +233,11 @@ SOURCE_FILE
     SET_CONFIG_PARAM
       SET_KW "set"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "param"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "param"
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
@@ -253,10 +257,11 @@ SOURCE_FILE
     RESET_CONFIG_PARAM
       RESET_KW "reset"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "param"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "param"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_all"
@@ -296,10 +301,11 @@ SOURCE_FILE
     SET_CONFIG_PARAM
       SET_KW "set"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "param"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "param"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "

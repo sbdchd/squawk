@@ -245,7 +245,7 @@ SOURCE_FILE
       VOLATILITY_FUNC_OPTION
         VOLATILE_KW "volatile"
       WHITESPACE "\n  "
-      LEAKPROOF_FUNC_OPTION
+      NOT_LEAKPROOF_FUNC_OPTION
         NOT_KW "not"
         WHITESPACE " "
         LEAKPROOF_KW "leakproof"
@@ -308,10 +308,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -322,10 +323,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -335,10 +337,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           TO_KW "to"
           WHITESPACE " "

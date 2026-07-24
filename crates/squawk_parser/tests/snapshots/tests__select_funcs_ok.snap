@@ -1688,7 +1688,7 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bar'"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_NULL_ON_NULL
                 NULL_KW "null"
                 WHITESPACE " "
                 ON_KW "on"
@@ -1716,7 +1716,7 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bar'"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_ABSENT_ON_NULL
                 ABSENT_KW "absent"
                 WHITESPACE " "
                 ON_KW "on"
@@ -1791,14 +1791,14 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bar'"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_NULL_ON_NULL
                 NULL_KW "null"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
                 NULL_KW "null"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITH_UNIQUE_KEYS
                 WITH_KW "with"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -1826,14 +1826,14 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bar'"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_NULL_ON_NULL
                 NULL_KW "null"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
                 NULL_KW "null"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITH_UNIQUE_KEYS
                 WITH_KW "with"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -1859,14 +1859,14 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bar'"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_NULL_ON_NULL
                 NULL_KW "null"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
                 NULL_KW "null"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITHOUT_UNIQUE_KEYS
                 WITHOUT_KW "without"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -1894,14 +1894,14 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bar'"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_NULL_ON_NULL
                 NULL_KW "null"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
                 NULL_KW "null"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITHOUT_UNIQUE_KEYS
                 WITHOUT_KW "without"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -2113,7 +2113,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_NULL_ON_NULL
                 NULL_KW "null"
                 WHITESPACE " "
                 ON_KW "on"
@@ -2166,7 +2166,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "a"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_ABSENT_ON_NULL
                 ABSENT_KW "absent"
                 WHITESPACE " "
                 ON_KW "on"
@@ -2189,7 +2189,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "a"
               WHITESPACE " "
-              JSON_NULL_CLAUSE
+              JSON_ABSENT_ON_NULL
                 ABSENT_KW "absent"
                 WHITESPACE " "
                 ON_KW "on"
@@ -4260,7 +4260,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'$.films[*].title'"
               WHITESPACE " "
-              JSON_WRAPPER_BEHAVIOR_CLAUSE
+              JSON_WITH_UNCONDITIONAL_WRAPPER
                 WITH_KW "WITH"
                 WHITESPACE " "
                 WRAPPER_KW "WRAPPER"
@@ -4282,7 +4282,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'$.films[*].director'"
               WHITESPACE " "
-              JSON_WRAPPER_BEHAVIOR_CLAUSE
+              JSON_WITH_UNCONDITIONAL_WRAPPER
                 WITH_KW "WITH"
                 WHITESPACE " "
                 WRAPPER_KW "WRAPPER"
@@ -5684,7 +5684,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITH_UNIQUE_KEYS
                 WITH_KW "with"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -5711,7 +5711,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITH_UNIQUE_KEYS
                 WITH_KW "with"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -5736,7 +5736,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITHOUT_UNIQUE_KEYS
                 WITHOUT_KW "without"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -5763,7 +5763,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               WHITESPACE " "
-              JSON_KEYS_UNIQUE_CLAUSE
+              JSON_WITHOUT_UNIQUE_KEYS
                 WITHOUT_KW "without"
                 WHITESPACE " "
                 UNIQUE_KW "unique"
@@ -5884,8 +5884,164 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               WHITESPACE " "
-              JSON_WRAPPER_BEHAVIOR_CLAUSE
+              JSON_WITH_UNCONDITIONAL_WRAPPER
                 WITH_KW "with"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_QUERY_FN
+              JSON_QUERY_KW "json_query"
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_WITH_UNCONDITIONAL_WRAPPER
+                WITH_KW "with"
+                WHITESPACE " "
+                ARRAY_KW "array"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_QUERY_FN
+              JSON_QUERY_KW "json_query"
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_WITH_UNCONDITIONAL_WRAPPER
+                WITH_KW "with"
+                WHITESPACE " "
+                UNCONDITIONAL_KW "unconditional"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_QUERY_FN
+              JSON_QUERY_KW "json_query"
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_WITH_CONDITIONAL_WRAPPER
+                WITH_KW "with"
+                WHITESPACE " "
+                CONDITIONAL_KW "conditional"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_QUERY_FN
+              JSON_QUERY_KW "json_query"
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_WITH_CONDITIONAL_WRAPPER
+                WITH_KW "with"
+                WHITESPACE " "
+                CONDITIONAL_KW "conditional"
+                WHITESPACE " "
+                ARRAY_KW "array"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_QUERY_FN
+              JSON_QUERY_KW "json_query"
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_WITHOUT_WRAPPER
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_QUERY_FN
+              JSON_QUERY_KW "json_query"
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_WITHOUT_WRAPPER
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                ARRAY_KW "array"
                 WHITESPACE " "
                 WRAPPER_KW "wrapper"
               R_PAREN ")"
@@ -5950,7 +6106,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               WHITESPACE " \n  "
-              JSON_WRAPPER_BEHAVIOR_CLAUSE
+              JSON_WITH_UNCONDITIONAL_WRAPPER
                 WITH_KW "with"
                 WHITESPACE " "
                 UNCONDITIONAL_KW "unconditional"

@@ -10,10 +10,7 @@ use squawk_syntax::{
 };
 
 fn is_reference_node(node: &SyntaxNode) -> bool {
-    if ast::ConfigValueName::can_cast(node.kind())
-        || ast::NameRef::can_cast(node.kind())
-        || ast::ParamNameRef::can_cast(node.kind())
-    {
+    if ast::AnyNameRef::can_cast(node.kind()) || ast::ConfigValueName::can_cast(node.kind()) {
         return true;
     }
 
@@ -503,6 +500,408 @@ select '1'::bpchar;
           │             ──── 2. reference
         5 │ select '1'::bpchar;
           ╰╴            ────── 3. reference
+        ");
+    }
+
+    #[test]
+    fn access_method_ref() {
+        assert_snapshot!(find_refs("
+create access method heap2$0 type table handler heap_tableam_handler;
+drop access method heap2;
+"), @"
+          ╭▸ 
+        2 │ create access method heap2 type table handler heap_tableam_handler;
+          │                      ┬───┬
+          │                      │   │
+          │                      │   0. query
+          │                      1. reference
+        3 │ drop access method heap2;
+          ╰╴                   ───── 2. reference
+        ");
+    }
+
+    #[test]
+    fn channel_ref() {
+        assert_snapshot!(find_refs("
+listen updates$0;
+notify updates;
+"), @"
+          ╭▸ 
+        2 │ listen updates;
+          │        ┬─────┬
+          │        │     │
+          │        │     0. query
+          │        1. reference
+        3 │ notify updates;
+          ╰╴       ─────── 2. reference
+        ");
+    }
+
+    #[test]
+    fn column_name_ref() {
+        assert_snapshot!(find_refs("
+create table t(id$0 int);
+create table u(t_id int references t(id));
+"), @"
+          ╭▸ 
+        2 │ create table t(id int);
+          │                ┬┬
+          │                ││
+          │                │0. query
+          │                1. reference
+        3 │ create table u(t_id int references t(id));
+          ╰╴                                     ── 2. reference
+        ");
+    }
+
+    #[test]
+    fn cursor_ref() {
+        assert_snapshot!(find_refs("
+declare c$0 scroll cursor for select * from t;
+fetch forward 5 from c;
+"), @"
+          ╭▸ 
+        2 │ declare c scroll cursor for select * from t;
+          │         ┬
+          │         │
+          │         0. query
+          │         1. reference
+        3 │ fetch forward 5 from c;
+          ╰╴                     ─ 2. reference
+        ");
+    }
+
+    #[test]
+    fn database_ref() {
+        assert_snapshot!(find_refs("
+create database mydb$0;
+drop database mydb;
+"), @"
+          ╭▸ 
+        2 │ create database mydb;
+          │                 ┬──┬
+          │                 │  │
+          │                 │  0. query
+          │                 1. reference
+        3 │ drop database mydb;
+          ╰╴              ──── 2. reference
+        ");
+    }
+
+    #[test]
+    fn event_trigger_ref() {
+        assert_snapshot!(find_refs("
+create event trigger et$0 on ddl_command_start execute function f();
+drop event trigger et;
+"), @"
+          ╭▸ 
+        2 │ create event trigger et on ddl_command_start execute function f();
+          │                      ┬┬
+          │                      ││
+          │                      │0. query
+          │                      1. reference
+        3 │ drop event trigger et;
+          ╰╴                   ── 2. reference
+        ");
+    }
+
+    #[test]
+    fn extension_ref() {
+        assert_snapshot!(find_refs("
+create extension myext$0;
+drop extension myext;
+"), @"
+          ╭▸ 
+        2 │ create extension myext;
+          │                  ┬───┬
+          │                  │   │
+          │                  │   0. query
+          │                  1. reference
+        3 │ drop extension myext;
+          ╰╴               ───── 2. reference
+        ");
+    }
+
+    #[test]
+    fn foreign_data_wrapper_ref() {
+        assert_snapshot!(find_refs("
+create foreign data wrapper fdw$0;
+create server srv foreign data wrapper fdw;
+"), @"
+          ╭▸ 
+        2 │ create foreign data wrapper fdw;
+          │                             ┬─┬
+          │                             │ │
+          │                             │ 0. query
+          │                             1. reference
+        3 │ create server srv foreign data wrapper fdw;
+          ╰╴                                       ─── 2. reference
+        ");
+    }
+
+    #[test]
+    fn json_path_name_ref() {
+        assert_snapshot!(find_refs("
+select * from json_table(
+  '{}'::jsonb, '$' as root$0
+  columns (value text path '$')
+  plan (root)
+);
+"), @"
+          ╭▸ 
+        3 │   '{}'::jsonb, '$' as root
+          │                       ┬──┬
+          │                       │  │
+          │                       │  0. query
+          │                       1. reference
+        4 │   columns (value text path '$')
+        5 │   plan (root)
+          ╰╴        ──── 2. reference
+        ");
+    }
+
+    #[test]
+    fn language_ref() {
+        assert_snapshot!(find_refs("
+create language mylang$0;
+create function f() returns int language mylang as $$x$$;
+"), @"
+          ╭▸ 
+        2 │ create language mylang;
+          │                 ┬────┬
+          │                 │    │
+          │                 │    0. query
+          │                 1. reference
+        3 │ create function f() returns int language mylang as $$x$$;
+          ╰╴                                         ────── 2. reference
+        ");
+    }
+
+    #[test]
+    fn policy_ref() {
+        assert_snapshot!(find_refs("
+create table t(c int);
+create policy p$0 on t;
+drop policy p on t;
+"), @"
+          ╭▸ 
+        3 │ create policy p on t;
+          │               ┬
+          │               │
+          │               0. query
+          │               1. reference
+        4 │ drop policy p on t;
+          ╰╴            ─ 2. reference
+        ");
+    }
+
+    #[test]
+    fn prepared_statement_ref() {
+        assert_snapshot!(find_refs("
+prepare stmt$0 as select 1;
+execute stmt;
+"), @"
+          ╭▸ 
+        2 │ prepare stmt as select 1;
+          │         ┬──┬
+          │         │  │
+          │         │  0. query
+          │         1. reference
+        3 │ execute stmt;
+          ╰╴        ──── 2. reference
+        ");
+    }
+
+    #[test]
+    fn publication_ref() {
+        assert_snapshot!(find_refs("
+create table t(id int);
+create publication pub$0 for table t;
+alter publication pub add table t;
+"), @"
+          ╭▸ 
+        3 │ create publication pub for table t;
+          │                    ┬─┬
+          │                    │ │
+          │                    │ 0. query
+          │                    1. reference
+        4 │ alter publication pub add table t;
+          ╰╴                  ─── 2. reference
+        ");
+    }
+
+    #[test]
+    fn role_ref() {
+        assert_snapshot!(find_refs("
+create role reader$0;
+drop role reader;
+"), @"
+          ╭▸ 
+        2 │ create role reader;
+          │             ┬────┬
+          │             │    │
+          │             │    0. query
+          │             1. reference
+        3 │ drop role reader;
+          ╰╴          ────── 2. reference
+        ");
+    }
+
+    #[test]
+    fn rule_ref() {
+        assert_snapshot!(find_refs("
+create table t(a int);
+create rule r$0 as on select to t do instead nothing;
+drop rule r on t;
+"), @"
+          ╭▸ 
+        3 │ create rule r as on select to t do instead nothing;
+          │             ┬
+          │             │
+          │             0. query
+          │             1. reference
+        4 │ drop rule r on t;
+          ╰╴          ─ 2. reference
+        ");
+    }
+
+    #[test]
+    fn savepoint_ref() {
+        assert_snapshot!(find_refs("
+begin;
+savepoint sp$0;
+release savepoint sp;
+"), @"
+          ╭▸ 
+        3 │ savepoint sp;
+          │           ┬┬
+          │           ││
+          │           │0. query
+          │           1. reference
+        4 │ release savepoint sp;
+          ╰╴                  ── 2. reference
+        ");
+    }
+
+    #[test]
+    fn schema_ref() {
+        assert_snapshot!(find_refs("
+create schema app$0;
+drop schema app;
+"), @"
+          ╭▸ 
+        2 │ create schema app;
+          │               ┬─┬
+          │               │ │
+          │               │ 0. query
+          │               1. reference
+        3 │ drop schema app;
+          ╰╴            ─── 2. reference
+        ");
+    }
+
+    #[test]
+    fn server_ref() {
+        assert_snapshot!(find_refs("
+create server myserver$0 foreign data wrapper fdw;
+drop server myserver;
+"), @"
+          ╭▸ 
+        2 │ create server myserver foreign data wrapper fdw;
+          │               ┬──────┬
+          │               │      │
+          │               │      0. query
+          │               1. reference
+        3 │ drop server myserver;
+          ╰╴            ──────── 2. reference
+        ");
+    }
+
+    #[test]
+    fn subscription_ref() {
+        assert_snapshot!(find_refs("
+create subscription sub$0 connection $$host=localhost$$ publication pub;
+alter subscription sub refresh publication;
+"), @"
+          ╭▸ 
+        2 │ create subscription sub connection $$host=localhost$$ publication pub;
+          │                     ┬─┬
+          │                     │ │
+          │                     │ 0. query
+          │                     1. reference
+        3 │ alter subscription sub refresh publication;
+          ╰╴                   ─── 2. reference
+        ");
+    }
+
+    #[test]
+    fn tablespace_ref() {
+        assert_snapshot!(find_refs("
+create tablespace ts$0 location '/tmp/ts';
+drop tablespace ts;
+"), @"
+          ╭▸ 
+        2 │ create tablespace ts location '/tmp/ts';
+          │                   ┬┬
+          │                   ││
+          │                   │0. query
+          │                   1. reference
+        3 │ drop tablespace ts;
+          ╰╴                ── 2. reference
+        ");
+    }
+
+    #[test]
+    fn trigger_ref() {
+        assert_snapshot!(find_refs("
+create trigger tr$0 before insert on t for each row execute function f();
+drop trigger tr on t;
+"), @"
+          ╭▸ 
+        2 │ create trigger tr before insert on t for each row execute function f();
+          │                ┬┬
+          │                ││
+          │                │0. query
+          │                1. reference
+        3 │ drop trigger tr on t;
+          ╰╴             ── 2. reference
+        ");
+    }
+
+    #[test]
+    fn vertex_table_ref() {
+        assert_snapshot!(find_refs("
+create table v1(id int);
+create table e1(source_id int references v1);
+create property graph g
+  vertex tables (v1 as source_vertex)
+  edge tables (e1 source source_vertex$0 destination source_vertex);
+"), @"
+          ╭▸ 
+        5 │   vertex tables (v1 as source_vertex)
+          │                        ───────────── 1. reference
+        6 │   edge tables (e1 source source_vertex destination source_vertex);
+          │                          ┬───────────┬             ───────────── 3. reference
+          │                          │           │
+          │                          │           0. query
+          ╰╴                         2. reference
+        ");
+    }
+
+    #[test]
+    fn window_ref() {
+        assert_snapshot!(find_refs("
+select row_number() over w
+window w$0 as (partition by 1);
+"), @"
+          ╭▸ 
+        2 │ select row_number() over w
+          │                          ─ 1. reference
+        3 │ window w as (partition by 1);
+          │        ┬
+          │        │
+          │        0. query
+          ╰╴       2. reference
         ");
     }
 }

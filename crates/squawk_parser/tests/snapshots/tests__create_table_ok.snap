@@ -208,10 +208,11 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
         WHITESPACE " "
-        LIKE_OPTION
+        INCLUDING_PROPERTY
           INCLUDING_KW "including"
           WHITESPACE " "
-          COMMENTS_KW "comments"
+          PROPERTY_COMMENTS
+            COMMENTS_KW "comments"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -257,50 +258,65 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
         WHITESPACE " "
-        LIKE_OPTION
+        INCLUDING_PROPERTY
           INCLUDING_KW "including"
           WHITESPACE " "
-          COMMENTS_KW "comments"
+          PROPERTY_COMMENTS
+            COMMENTS_KW "comments"
         WHITESPACE " "
-        LIKE_OPTION
+        INCLUDING_PROPERTY
           INCLUDING_KW "including"
           WHITESPACE " "
-          CONSTRAINTS_KW "constraints"
+          PROPERTY_COMPRESSION
+            COMPRESSION_KW "compression"
         WHITESPACE " "
-        LIKE_OPTION
-          EXCLUDING_KW "excluding"
-          WHITESPACE " "
-          DEFAULTS_KW "defaults"
-        WHITESPACE " "
-        LIKE_OPTION
-          EXCLUDING_KW "excluding"
-          WHITESPACE " "
-          GENERATED_KW "generated"
-        WHITESPACE " "
-        LIKE_OPTION
-          EXCLUDING_KW "excluding"
-          WHITESPACE " "
-          IDENTITY_KW "identity"
-        WHITESPACE " "
-        LIKE_OPTION
-          EXCLUDING_KW "excluding"
-          WHITESPACE " "
-          INDEXES_KW "indexes"
-        WHITESPACE " "
-        LIKE_OPTION
-          EXCLUDING_KW "excluding"
-          WHITESPACE " "
-          STATISTICS_KW "statistics"
-        WHITESPACE " "
-        LIKE_OPTION
+        INCLUDING_PROPERTY
           INCLUDING_KW "including"
           WHITESPACE " "
-          STORAGE_KW "storage"
+          PROPERTY_CONSTRAINTS
+            CONSTRAINTS_KW "constraints"
         WHITESPACE " "
-        LIKE_OPTION
+        EXCLUDING_PROPERTY
           EXCLUDING_KW "excluding"
           WHITESPACE " "
-          ALL_KW "all"
+          PROPERTY_DEFAULTS
+            DEFAULTS_KW "defaults"
+        WHITESPACE " "
+        EXCLUDING_PROPERTY
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          PROPERTY_GENERATED
+            GENERATED_KW "generated"
+        WHITESPACE " "
+        EXCLUDING_PROPERTY
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          PROPERTY_IDENTITY
+            IDENTITY_KW "identity"
+        WHITESPACE " "
+        EXCLUDING_PROPERTY
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          PROPERTY_INDEXES
+            INDEXES_KW "indexes"
+        WHITESPACE " "
+        EXCLUDING_PROPERTY
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          PROPERTY_STATISTICS
+            STATISTICS_KW "statistics"
+        WHITESPACE " "
+        INCLUDING_PROPERTY
+          INCLUDING_KW "including"
+          WHITESPACE " "
+          PROPERTY_STORAGE
+            STORAGE_KW "storage"
+        WHITESPACE " "
+        EXCLUDING_PROPERTY
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          PROPERTY_ALL
+            ALL_KW "all"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -4418,7 +4434,7 @@ SOURCE_FILE
             WHITESPACE " "
             SEQUENCE_OPTION_LIST
               L_PAREN "("
-              SEQUENCE_OPTION
+              OPTION_SEQUENCE_NAME
                 SEQUENCE_KW "SEQUENCE"
                 WHITESPACE " "
                 NAME_KW "NAME"
@@ -4434,7 +4450,7 @@ SOURCE_FILE
                       NAME
                         IDENT "myseq"
               WHITESPACE " "
-              SEQUENCE_OPTION
+              OPTION_START
                 START_KW "START"
                 WHITESPACE " "
                 LITERAL

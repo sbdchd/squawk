@@ -74,7 +74,7 @@ SOURCE_FILE
                       INTEGER_KW "integer"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
-                XML_COLUMN_OPTION
+                OPTION_PATH
                   PATH_KW "path"
                   WHITESPACE " "
                   LITERAL
@@ -92,7 +92,7 @@ SOURCE_FILE
                       TEXT_KW "text"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
-                XML_COLUMN_OPTION
+                OPTION_PATH
                   PATH_KW "path"
                   WHITESPACE " "
                   LITERAL
@@ -110,7 +110,7 @@ SOURCE_FILE
                       TEXT_KW "text"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
-                XML_COLUMN_OPTION
+                OPTION_PATH
                   PATH_KW "path"
                   WHITESPACE " "
                   LITERAL
@@ -128,7 +128,7 @@ SOURCE_FILE
                       INTEGER_KW "integer"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
-                XML_COLUMN_OPTION
+                OPTION_PATH
                   PATH_KW "path"
                   WHITESPACE " "
                   LITERAL
@@ -156,13 +156,13 @@ SOURCE_FILE
                   R_PAREN ")"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
-                XML_COLUMN_OPTION
+                OPTION_PATH
                   PATH_KW "path"
                   WHITESPACE " "
                   LITERAL
                     STRING "'bk:price'"
                 WHITESPACE " "
-                XML_COLUMN_OPTION
+                OPTION_DEFAULT
                   DEFAULT_KW "default"
                   WHITESPACE " "
                   LITERAL
@@ -190,13 +190,13 @@ SOURCE_FILE
                   R_PAREN ")"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
-                XML_COLUMN_OPTION
+                OPTION_DEFAULT
                   DEFAULT_KW "default"
                   WHITESPACE " "
                   LITERAL
                     NUMERIC_NUMBER "0.00"
                 WHITESPACE " "
-                XML_COLUMN_OPTION
+                OPTION_NULL
                   NULL_KW "null"
           WHITESPACE "\n"
           R_PAREN ")"

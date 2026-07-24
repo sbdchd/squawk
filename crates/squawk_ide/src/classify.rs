@@ -279,8 +279,9 @@ fn classify_ddl_function_option_value(ty_node: &SyntaxNode) -> Option<NameRefCla
     None
 }
 
-fn is_search_path(path: Option<ast::PathRef>) -> bool {
-    let Some(path) = path else {
+fn is_search_path(config_parameter: Option<ast::ConfigParameterRef>) -> bool {
+    let Some(path) = config_parameter.and_then(|config_parameter| config_parameter.path_ref())
+    else {
         return false;
     };
     if path.qualifier().is_some() {
@@ -358,7 +359,7 @@ fn classify_call_expr_name_ref(
 
 fn classify_object_column_path(node: &SyntaxNode) -> Option<NameRefClass> {
     let object_column = node.ancestors().find_map(ast::ObjectColumn::cast)?;
-    let mut path = object_column.path_ref()?;
+    let mut path = object_column.name()?.path_ref()?;
     let mut name_refs = Vec::new();
 
     loop {
@@ -388,14 +389,14 @@ fn classify_object_column_path(node: &SyntaxNode) -> Option<NameRefClass> {
 
 pub(crate) fn classify_config_value_name(node: &SyntaxNode) -> Option<NameRefClass> {
     let parent = node.parent()?;
-    let path = if let Some(set_config) = ast::SetConfig::cast(parent.clone()) {
-        set_config.path_ref()
+    let config_parameter = if let Some(set_config) = ast::SetConfig::cast(parent.clone()) {
+        set_config.config_parameter_ref()
     } else if let Some(set_config_param) = ast::SetConfigParam::cast(parent) {
-        set_config_param.path_ref()
+        set_config_param.config_parameter_ref()
     } else {
         return None;
     };
-    if is_search_path(path) {
+    if is_search_path(config_parameter) {
         Some(NameRefClass::Schema)
     } else {
         None
@@ -408,7 +409,7 @@ pub(crate) fn classify_literal(node: &SyntaxNode) -> Option<NameRefClass> {
         return Some(NameRefClass::Schema);
     }
     if let Some(set_config) = ast::SetConfig::cast(parent.clone())
-        && is_search_path(set_config.path_ref())
+        && is_search_path(set_config.config_parameter_ref())
         && set_config
             .config_values()
             .any(|config_value| config_value.syntax() == node)
@@ -416,7 +417,7 @@ pub(crate) fn classify_literal(node: &SyntaxNode) -> Option<NameRefClass> {
         return Some(NameRefClass::Schema);
     }
     if let Some(set_config_param) = ast::SetConfigParam::cast(parent)
-        && is_search_path(set_config_param.path_ref())
+        && is_search_path(set_config_param.config_parameter_ref())
         && set_config_param
             .literals()
             .any(|literal| literal.syntax() == node)
@@ -700,9 +701,10 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
                 _ => None,
             };
         }
-        if let Some(sequence_option) = path.syntax().parent().and_then(ast::SequenceOption::cast)
-            && sequence_option.owned_token().is_some()
-            && sequence_option.by_token().is_some()
+        if path
+            .syntax()
+            .parent()
+            .is_some_and(|parent| ast::QualifiedColumnNameRef::can_cast(parent.kind()))
         {
             return match hops_up {
                 0 => Some(NameRefClass::QualifiedColumn),

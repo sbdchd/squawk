@@ -9,10 +9,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "statement_timeout"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "statement_timeout"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -24,10 +25,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "lock_timeout"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "lock_timeout"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "

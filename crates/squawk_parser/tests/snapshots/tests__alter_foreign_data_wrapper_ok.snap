@@ -18,7 +18,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_CONNECTION
         CONNECTION_KW "connection"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -43,7 +43,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_NO_CONNECTION
         NO_KW "no"
         WHITESPACE " "
         CONNECTION_KW "connection"
@@ -64,7 +64,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_HANDLER
         HANDLER_KW "handler"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -89,7 +89,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_NO_HANDLER
         NO_KW "no"
         WHITESPACE " "
         HANDLER_KW "handler"
@@ -110,7 +110,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_VALIDATOR
         VALIDATOR_KW "validator"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -135,7 +135,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_NO_VALIDATOR
         NO_KW "no"
         WHITESPACE " "
         VALIDATOR_KW "validator"
@@ -156,37 +156,36 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
-        ALTER_OPTION_LIST
-          OPTIONS_KW "options"
+      OPTION_ALTER_OPTION_LIST
+        OPTIONS_KW "options"
+        WHITESPACE " "
+        L_PAREN "("
+        ALTER_OPTION
+          ADD_KW "add"
           WHITESPACE " "
-          L_PAREN "("
-          ALTER_OPTION
-            ADD_KW "add"
-            WHITESPACE " "
-            FOREIGN_OPTION_NAME
-              IDENT "o"
-            WHITESPACE " "
-            LITERAL
-              STRING "'v'"
-          COMMA ","
+          FOREIGN_OPTION_NAME
+            IDENT "o"
           WHITESPACE " "
-          ALTER_OPTION
-            SET_KW "set"
-            WHITESPACE " "
-            FOREIGN_OPTION_NAME
-              IDENT "o"
-            WHITESPACE " "
-            LITERAL
-              STRING "'v'"
-          COMMA ","
+          LITERAL
+            STRING "'v'"
+        COMMA ","
+        WHITESPACE " "
+        ALTER_OPTION
+          SET_KW "set"
           WHITESPACE " "
-          ALTER_OPTION
-            DROP_KW "drop"
-            WHITESPACE " "
-            FOREIGN_OPTION_NAME
-              IDENT "o"
-          R_PAREN ")"
+          FOREIGN_OPTION_NAME
+            IDENT "o"
+          WHITESPACE " "
+          LITERAL
+            STRING "'v'"
+        COMMA ","
+        WHITESPACE " "
+        ALTER_OPTION
+          DROP_KW "drop"
+          WHITESPACE " "
+          FOREIGN_OPTION_NAME
+            IDENT "o"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
@@ -204,7 +203,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_CONNECTION
         CONNECTION_KW "connection"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -218,12 +217,12 @@ SOURCE_FILE
               NAME_REF
                 IDENT "c"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_NO_CONNECTION
         NO_KW "no"
         WHITESPACE " "
         CONNECTION_KW "connection"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_HANDLER
         HANDLER_KW "handler"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -237,12 +236,12 @@ SOURCE_FILE
               NAME_REF
                 IDENT "h"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_NO_HANDLER
         NO_KW "no"
         WHITESPACE " "
         HANDLER_KW "handler"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_VALIDATOR
         VALIDATOR_KW "validator"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -256,42 +255,41 @@ SOURCE_FILE
               NAME_REF
                 IDENT "v"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_NO_VALIDATOR
         NO_KW "no"
         WHITESPACE " "
         VALIDATOR_KW "validator"
       WHITESPACE "\n  "
-      FDW_OPTION
-        ALTER_OPTION_LIST
-          OPTIONS_KW "options"
+      OPTION_ALTER_OPTION_LIST
+        OPTIONS_KW "options"
+        WHITESPACE " "
+        L_PAREN "("
+        ALTER_OPTION
+          ADD_KW "add"
           WHITESPACE " "
-          L_PAREN "("
-          ALTER_OPTION
-            ADD_KW "add"
-            WHITESPACE " "
-            FOREIGN_OPTION_NAME
-              IDENT "o"
-            WHITESPACE " "
-            LITERAL
-              STRING "'v'"
-          COMMA ","
+          FOREIGN_OPTION_NAME
+            IDENT "o"
           WHITESPACE " "
-          ALTER_OPTION
-            SET_KW "set"
-            WHITESPACE " "
-            FOREIGN_OPTION_NAME
-              IDENT "o"
-            WHITESPACE " "
-            LITERAL
-              STRING "''"
-          COMMA ","
+          LITERAL
+            STRING "'v'"
+        COMMA ","
+        WHITESPACE " "
+        ALTER_OPTION
+          SET_KW "set"
           WHITESPACE " "
-          ALTER_OPTION
-            DROP_KW "drop"
-            WHITESPACE " "
-            FOREIGN_OPTION_NAME
-              IDENT "d"
-          R_PAREN ")"
+          FOREIGN_OPTION_NAME
+            IDENT "o"
+          WHITESPACE " "
+          LITERAL
+            STRING "''"
+        COMMA ","
+        WHITESPACE " "
+        ALTER_OPTION
+          DROP_KW "drop"
+          WHITESPACE " "
+          FOREIGN_OPTION_NAME
+            IDENT "d"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

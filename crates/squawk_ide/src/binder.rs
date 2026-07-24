@@ -1774,7 +1774,7 @@ enum SearchPathOverride {
 fn search_path_from_set_config_param(
     set_config_param: &ast::SetConfigParam,
 ) -> Option<SearchPathOverride> {
-    let path = set_config_param.path_ref()?;
+    let path = set_config_param.config_parameter_ref()?.path_ref()?;
     if path.qualifier().is_some() {
         return None;
     }
@@ -1833,7 +1833,10 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
 }
 
 fn bind_set_config(b: &mut Binder, set_config: ast::SetConfig, position: TextSize) {
-    let Some(path) = set_config.path_ref() else {
+    let Some(path) = set_config
+        .config_parameter_ref()
+        .and_then(|config_parameter| config_parameter.path_ref())
+    else {
         return;
     };
 

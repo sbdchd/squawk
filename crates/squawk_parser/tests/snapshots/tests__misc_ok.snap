@@ -3327,7 +3327,7 @@ SOURCE_FILE
       IDENT "wasm_wrapper"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_HANDLER
         HANDLER_KW "handler"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -3336,7 +3336,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "wasm_fdw_handler"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_VALIDATOR
         VALIDATOR_KW "validator"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -5561,10 +5561,11 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "max_parallel_workers_per_gather"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "max_parallel_workers_per_gather"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -5578,10 +5579,11 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "parallel_setup_cost"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "parallel_setup_cost"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -5595,10 +5597,11 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "parallel_tuple_cost"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "parallel_tuple_cost"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -5612,10 +5615,11 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "min_parallel_table_scan_size"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "min_parallel_table_scan_size"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "

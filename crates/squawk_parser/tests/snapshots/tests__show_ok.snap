@@ -42,47 +42,50 @@ SOURCE_FILE
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SHOW
-    SHOW_KW "show"
-    WHITESPACE " "
-    PATH_REF
+    CONFIG_PARAMETER_REF
       PATH_REF
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "a"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+            IDENT "v"
     SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    PATH_REF
+    CONFIG_PARAMETER_REF
       PATH_REF
         PATH_REF
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
-          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "b"
+              IDENT "a"
         DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "c"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+            IDENT "b"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    CONFIG_PARAMETER_REF
+      PATH_REF
+        PATH_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "a"
+            DOT "."
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
+          DOT "."
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
+        DOT "."
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n"

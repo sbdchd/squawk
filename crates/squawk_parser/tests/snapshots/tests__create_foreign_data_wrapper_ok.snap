@@ -33,7 +33,7 @@ SOURCE_FILE
       IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
-      FDW_OPTION
+      OPTION_CONNECTION
         CONNECTION_KW "connection"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -47,12 +47,12 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_NO_CONNECTION
         NO_KW "no"
         WHITESPACE " "
         CONNECTION_KW "connection"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_HANDLER
         HANDLER_KW "handler"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -66,12 +66,12 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_NO_HANDLER
         NO_KW "no"
         WHITESPACE " "
         HANDLER_KW "handler"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_VALIDATOR
         VALIDATOR_KW "validator"
         WHITESPACE " "
         FUNCTION_NAME_REF
@@ -85,30 +85,29 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
       WHITESPACE "\n  "
-      FDW_OPTION
+      OPTION_NO_VALIDATOR
         NO_KW "no"
         WHITESPACE " "
         VALIDATOR_KW "validator"
       WHITESPACE "\n  "
-      FDW_OPTION
-        ALTER_OPTION_LIST
-          OPTIONS_KW "options"
+      OPTION_ALTER_OPTION_LIST
+        OPTIONS_KW "options"
+        WHITESPACE " "
+        L_PAREN "("
+        ALTER_OPTION
+          FOREIGN_OPTION_NAME
+            IDENT "a"
           WHITESPACE " "
-          L_PAREN "("
-          ALTER_OPTION
-            FOREIGN_OPTION_NAME
-              IDENT "a"
-            WHITESPACE " "
-            LITERAL
-              STRING "'foo'"
-          COMMA ","
+          LITERAL
+            STRING "'foo'"
+        COMMA ","
+        WHITESPACE " "
+        ALTER_OPTION
+          FOREIGN_OPTION_NAME
+            IDENT "b"
           WHITESPACE " "
-          ALTER_OPTION
-            FOREIGN_OPTION_NAME
-              IDENT "b"
-            WHITESPACE " "
-            LITERAL
-              STRING "'bar'"
-          R_PAREN ")"
+          LITERAL
+            STRING "'bar'"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

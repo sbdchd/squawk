@@ -393,10 +393,9 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
 }
 
 fn build_json_keys_unique_clause<'a>(clause: ast::JsonKeysUniqueClause) -> Doc<'a> {
-    let prefix = if clause.with_token().is_some() {
-        "with"
-    } else {
-        "without"
+    let prefix = match clause {
+        ast::JsonKeysUniqueClause::JsonWithoutUniqueKeys(_) => "without",
+        ast::JsonKeysUniqueClause::JsonWithUniqueKeys(_) => "with",
     };
     Doc::text(prefix)
         .append(Doc::space())
