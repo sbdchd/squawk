@@ -394,19 +394,20 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ADD_ATTRIBUTE
-      ADD_KW "add"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME
-        IDENT "a"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ADD_ATTRIBUTE
+        ADD_KW "add"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute_collate"
@@ -422,28 +423,29 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ADD_ATTRIBUTE
-      ADD_KW "add"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME
-        IDENT "a"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
-      WHITESPACE " "
-      COLLATE
-        COLLATE_KW "collate"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ADD_ATTRIBUTE
+        ADD_KW "add"
         WHITESPACE " "
-        COLLATION_REF
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "c"
+                IDENT "b"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          COLLATION_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute_cascade"
@@ -459,21 +461,22 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ADD_ATTRIBUTE
-      ADD_KW "add"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME
-        IDENT "a"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              TEXT_KW "text"
-      WHITESPACE " "
-      CASCADE_KW "cascade"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ADD_ATTRIBUTE
+        ADD_KW "add"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -487,24 +490,25 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ADD_ATTRIBUTE
-      ADD_KW "add"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME
-        IDENT "a"
-      WHITESPACE " "
-      CHAR_TYPE
-        VARCHAR_KW "varchar"
-        ARG_LIST
-          L_PAREN "("
-          ARG
-            LITERAL
-              INT_NUMBER "100"
-          R_PAREN ")"
-      WHITESPACE " "
-      RESTRICT_KW "restrict"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ADD_ATTRIBUTE
+        ADD_KW "add"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          ARG_LIST
+            L_PAREN "("
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+        WHITESPACE " "
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_attribute"
@@ -520,13 +524,14 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    DROP_ATTRIBUTE
-      DROP_KW "drop"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "a"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      DROP_ATTRIBUTE
+        DROP_KW "drop"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -540,20 +545,21 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    DROP_ATTRIBUTE
-      DROP_KW "drop"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      IF_EXISTS
-        IF_KW "if"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      DROP_ATTRIBUTE
+        DROP_KW "drop"
         WHITESPACE " "
-        EXISTS_KW "exists"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      CASCADE_KW "cascade"
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        IF_EXISTS
+          IF_KW "if"
+          WHITESPACE " "
+          EXISTS_KW "exists"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -567,20 +573,21 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    DROP_ATTRIBUTE
-      DROP_KW "drop"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      IF_EXISTS
-        IF_KW "if"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      DROP_ATTRIBUTE
+        DROP_KW "drop"
         WHITESPACE " "
-        EXISTS_KW "exists"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      RESTRICT_KW "restrict"
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        IF_EXISTS
+          IF_KW "if"
+          WHITESPACE " "
+          EXISTS_KW "exists"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_attribute"
@@ -596,21 +603,22 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ALTER_ATTRIBUTE
-      ALTER_KW "alter"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      TYPE_KW "type"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ALTER_ATTRIBUTE
+        ALTER_KW "alter"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_attribute_set_data"
@@ -631,39 +639,40 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ALTER_ATTRIBUTE
-      ALTER_KW "alter"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      SET_KW "set"
-      WHITESPACE " "
-      DATA_KW "data"
-      WHITESPACE " "
-      TYPE_KW "type"
-      WHITESPACE " "
-      CHAR_TYPE
-        VARCHAR_KW "varchar"
-        ARG_LIST
-          L_PAREN "("
-          ARG
-            LITERAL
-              INT_NUMBER "100"
-          R_PAREN ")"
-      WHITESPACE " "
-      COLLATE
-        COLLATE_KW "collate"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ALTER_ATTRIBUTE
+        ALTER_KW "alter"
         WHITESPACE " "
-        COLLATION_REF
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
-      WHITESPACE " "
-      CASCADE_KW "cascade"
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        DATA_KW "data"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          ARG_LIST
+            L_PAREN "("
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          COLLATION_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
+        WHITESPACE " "
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -677,23 +686,24 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ALTER_ATTRIBUTE
-      ALTER_KW "alter"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      TYPE_KW "type"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
-      WHITESPACE " "
-      RESTRICT_KW "restrict"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ALTER_ATTRIBUTE
+        ALTER_KW "alter"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
+        WHITESPACE " "
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
@@ -709,27 +719,28 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ADD_ATTRIBUTE
-      ADD_KW "add"
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ADD_ATTRIBUTE
+        ADD_KW "add"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
+      COMMA ","
       WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME
-        IDENT "a"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    DROP_ATTRIBUTE
-      DROP_KW "drop"
-      WHITESPACE " "
-      ATTRIBUTE_KW "attribute"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "c"
+      DROP_ATTRIBUTE
+        DROP_KW "drop"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"

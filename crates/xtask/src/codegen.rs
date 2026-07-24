@@ -594,6 +594,15 @@ fn lower(grammar: &Grammar) -> AstSrc {
         }
     }
 
+    // Path-based nodes contain a NameRef, so we skip those.
+    res.enums.push(AstEnumSrc {
+        name: "AnyNameRef".to_owned(),
+        variants: name_like_nodes
+            .iter()
+            .filter(|name| name.ends_with("Ref"))
+            .cloned()
+            .collect(),
+    });
     res.enums.push(AstEnumSrc {
         name: "AnyName".to_owned(),
         variants: name_like_nodes,

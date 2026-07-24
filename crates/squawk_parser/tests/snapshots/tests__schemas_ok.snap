@@ -399,20 +399,22 @@ SOURCE_FILE
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "search_path"
+    CONFIG_PARAMETER_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "search_path"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "search_path"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "search_path"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -427,10 +429,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "search_path"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "search_path"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -442,10 +445,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -532,10 +536,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
@@ -546,15 +551,16 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
+      CONFIG_PARAMETER_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "foo"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+              IDENT "bar"
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
@@ -565,10 +571,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -579,10 +586,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -614,10 +622,11 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "

@@ -16,7 +16,7 @@ pub(crate) fn require_enum_value_ordering(ctx: &mut Linter, parse: &Parse<Source
     let file = parse.tree();
     for stmt in file.stmts() {
         if let ast::Stmt::AlterType(alter_type) = stmt
-            && let Some(add_value) = alter_type.add_value()
+            && let Some(ast::AlterTypeAction::AddValue(add_value)) = alter_type.action()
             && add_value.value_position().is_none()
         {
             let fix = create_fix(&add_value);

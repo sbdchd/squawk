@@ -139,10 +139,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "SET"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "search_path"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "search_path"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -858,7 +859,7 @@ SOURCE_FILE
               IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      LEAKPROOF_FUNC_OPTION
+      NOT_LEAKPROOF_FUNC_OPTION
         NOT_KW "not"
         WHITESPACE " "
         LEAKPROOF_KW "leakproof"
@@ -942,7 +943,7 @@ SOURCE_FILE
               IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      STRICT_FUNC_OPTION
+      CALLED_ON_NULL_INPUT_FUNC_OPTION
         CALLED_KW "called"
         WHITESPACE " "
         ON_KW "on"
@@ -988,7 +989,7 @@ SOURCE_FILE
               IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      STRICT_FUNC_OPTION
+      RETURNS_NULL_ON_NULL_INPUT_FUNC_OPTION
         RETURNS_KW "returns"
         WHITESPACE " "
         NULL_KW "null"
@@ -1616,15 +1617,16 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
+          CONFIG_PARAMETER_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+                  IDENT "bar"
           WHITESPACE " "
           FROM_KW "from"
           WHITESPACE " "
@@ -1671,10 +1673,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
           WHITESPACE " "
           TO_KW "to"
           WHITESPACE " "
@@ -1722,10 +1725,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -2111,7 +2115,7 @@ SOURCE_FILE
       VOLATILITY_FUNC_OPTION
         IMMUTABLE_KW "immutable"
       WHITESPACE "\n  "
-      LEAKPROOF_FUNC_OPTION
+      NOT_LEAKPROOF_FUNC_OPTION
         NOT_KW "not"
         WHITESPACE " "
         LEAKPROOF_KW "leakproof"
@@ -2161,15 +2165,16 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
+          CONFIG_PARAMETER_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "a"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "a"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+                  IDENT "b"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "

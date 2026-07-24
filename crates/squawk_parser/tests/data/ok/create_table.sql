@@ -31,7 +31,7 @@ create table t (
 -- like options
 create table t (
   a text,
-  like bar.b including comments including constraints excluding defaults excluding generated excluding identity excluding indexes excluding statistics including storage excluding all
+  like bar.b including comments including compression including constraints excluding defaults excluding generated excluding identity excluding indexes excluding statistics including storage excluding all
 );
 
 -- with prefix options

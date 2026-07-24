@@ -208,10 +208,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -222,10 +223,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "d"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "d"
           WHITESPACE " "
           FROM_KW "from"
           WHITESPACE " "
@@ -267,10 +269,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           TO_KW "to"
           WHITESPACE " "
@@ -295,10 +298,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -323,10 +327,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -350,10 +355,11 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+          CONFIG_PARAMETER_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
           WHITESPACE " "
           FROM_KW "from"
           WHITESPACE " "

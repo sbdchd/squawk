@@ -409,6 +409,12 @@ select json_serialize(a format json returning foo format json);
 
 -- json_query
 select json_query(a, b with wrapper);
+select json_query(a, b with array wrapper);
+select json_query(a, b with unconditional wrapper);
+select json_query(a, b with conditional wrapper);
+select json_query(a, b with conditional array wrapper);
+select json_query(a, b without wrapper);
+select json_query(a, b without array wrapper);
 select json_query(
   a format json, 
   b passing c as foo, 

@@ -646,7 +646,7 @@ SOURCE_FILE
         SEQUENCE_OPTION_LIST
           L_PAREN "("
           WHITESPACE " "
-          SEQUENCE_OPTION
+          OPTION_SEQUENCE_NAME
             SEQUENCE_KW "sequence"
             WHITESPACE " "
             NAME_KW "name"
@@ -657,7 +657,7 @@ SOURCE_FILE
                   NAME
                     IDENT "foo"
           WHITESPACE " "
-          SEQUENCE_OPTION
+          OPTION_CYCLE
             CYCLE_KW "cycle"
           WHITESPACE " "
           R_PAREN ")"
@@ -692,7 +692,7 @@ SOURCE_FILE
         SET_SEQUENCE_OPTION
           SET_KW "set"
           WHITESPACE " "
-          SEQUENCE_OPTION
+          OPTION_SEQUENCE_NAME
             SEQUENCE_KW "sequence"
             WHITESPACE " "
             NAME_KW "name"
@@ -739,7 +739,7 @@ SOURCE_FILE
         SET_SEQUENCE_OPTION
           SET_KW "set"
           WHITESPACE " "
-          SEQUENCE_OPTION
+          OPTION_SEQUENCE_NAME
             SEQUENCE_KW "sequence"
             WHITESPACE " "
             NAME_KW "name"

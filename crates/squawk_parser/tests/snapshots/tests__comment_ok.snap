@@ -237,15 +237,16 @@ SOURCE_FILE
     OBJECT_COLUMN
       COLUMN_KW "column"
       WHITESPACE " "
-      PATH_REF
+      QUALIFIED_COLUMN_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "a"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+              IDENT "b"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "

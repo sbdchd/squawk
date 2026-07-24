@@ -1669,8 +1669,35 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      PAREN_FROM_ITEM
+        ONLY_KW "only"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          RELATION_FROM_ITEM
+            FIELD_EXPR
+              NAME_REF
+                IDENT "foo"
+              DOT "."
+              NAME_REF
+                IDENT "bar"
+          R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMENT "-- from field expr"
+  COMMENT "-- from qualified table name"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1691,6 +1718,31 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "bar"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        FIELD_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "database_name"
+            DOT "."
+            NAME_REF
+              IDENT "schema_name"
+          DOT "."
+          NAME_REF
+            IDENT "table_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from with everything"

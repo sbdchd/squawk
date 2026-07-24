@@ -1495,22 +1495,25 @@ SOURCE_FILE
     PRIVILEGE_PARAMETER
       PARAMETER_KW "parameter"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "buzz"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1534,10 +1537,11 @@ SOURCE_FILE
     PRIVILEGE_PARAMETER
       PARAMETER_KW "parameter"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            BEGIN_KW "begin"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              BEGIN_KW "begin"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1557,10 +1561,11 @@ SOURCE_FILE
     PRIVILEGE_PARAMETER
       PARAMETER_KW "parameter"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            BEGIN_KW "begin"
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              BEGIN_KW "begin"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "

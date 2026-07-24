@@ -742,30 +742,35 @@ SOURCE_FILE
               NAME_REF
                 IDENT "local_users"
         WHITESPACE "\n    "
-        LIKE_OPTION
+        INCLUDING_PROPERTY
           INCLUDING_KW "including"
           WHITESPACE " "
-          DEFAULTS_KW "defaults"
+          PROPERTY_DEFAULTS
+            DEFAULTS_KW "defaults"
         WHITESPACE "\n    "
-        LIKE_OPTION
+        INCLUDING_PROPERTY
           INCLUDING_KW "including"
           WHITESPACE " "
-          CONSTRAINTS_KW "constraints"
+          PROPERTY_CONSTRAINTS
+            CONSTRAINTS_KW "constraints"
         WHITESPACE "\n    "
-        LIKE_OPTION
+        EXCLUDING_PROPERTY
           EXCLUDING_KW "excluding"
           WHITESPACE " "
-          GENERATED_KW "generated"
+          PROPERTY_GENERATED
+            GENERATED_KW "generated"
         WHITESPACE "\n    "
-        LIKE_OPTION
+        EXCLUDING_PROPERTY
           EXCLUDING_KW "excluding"
           WHITESPACE " "
-          STATISTICS_KW "statistics"
+          PROPERTY_STATISTICS
+            STATISTICS_KW "statistics"
         WHITESPACE "\n    "
-        LIKE_OPTION
+        EXCLUDING_PROPERTY
           EXCLUDING_KW "excluding"
           WHITESPACE " "
-          ALL_KW "all"
+          PROPERTY_ALL
+            ALL_KW "all"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "

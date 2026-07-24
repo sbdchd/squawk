@@ -474,14 +474,23 @@ fn opt_json_returning_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 //   | /* EMPTY */
 fn opt_json_null_clause(p: &mut Parser<'_>) {
     let m = p.start();
-    if p.at(NULL_KW) || p.at(ABSENT_KW) {
-        p.bump_any();
-        p.expect(ON_KW);
-        p.expect(NULL_KW);
-        m.complete(p, JSON_NULL_CLAUSE);
-    } else {
-        m.abandon(p);
-    }
+    let kind = match p.current() {
+        ABSENT_KW => {
+            p.bump(ABSENT_KW);
+            JSON_ABSENT_ON_NULL
+        }
+        NULL_KW => {
+            p.bump(NULL_KW);
+            JSON_NULL_ON_NULL
+        }
+        _ => {
+            m.abandon(p);
+            return;
+        }
+    };
+    p.expect(ON_KW);
+    p.expect(NULL_KW);
+    m.complete(p, kind);
 }
 
 // json_key_uniqueness_constraint_opt:
@@ -491,13 +500,24 @@ fn opt_json_null_clause(p: &mut Parser<'_>) {
 //   | WITHOUT UNIQUE
 //   | /* EMPTY */
 pub(crate) fn opt_json_keys_unique_clause(p: &mut Parser<'_>) {
-    if p.at(WITH_KW) || p.at(WITHOUT_KW) {
-        let m = p.start();
-        p.bump_any();
-        p.expect(UNIQUE_KW);
-        p.eat(KEYS_KW);
-        m.complete(p, JSON_KEYS_UNIQUE_CLAUSE);
-    }
+    let m = p.start();
+    let kind = match p.current() {
+        WITHOUT_KW => {
+            p.bump(WITHOUT_KW);
+            JSON_WITHOUT_UNIQUE_KEYS
+        }
+        WITH_KW => {
+            p.bump(WITH_KW);
+            JSON_WITH_UNIQUE_KEYS
+        }
+        _ => {
+            m.abandon(p);
+            return;
+        }
+    };
+    p.expect(UNIQUE_KW);
+    p.eat(KEYS_KW);
+    m.complete(p, kind);
 }
 
 const JSON_OBJECT_FN_ARG_FOLLOW: TokenSet = TokenSet::new(&[
@@ -1447,36 +1467,31 @@ fn opt_json_behavior_clause(p: &mut Parser<'_>) {
 
 fn opt_json_wrapper_behavior(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
-    match (p.current(), p.nth(1)) {
-        // WITHOUT WRAPPER
-        // WITHOUT ARRAY
-        // WITH WRAPPER
-        (WITHOUT_KW, WRAPPER_KW) | (WITH_KW, WRAPPER_KW) | (WITHOUT_KW, ARRAY_KW) => {
-            p.bump_any();
-            p.bump_any();
-        }
-        // WITH ARRAY WRAPPER
-        (WITH_KW, ARRAY_KW) => {
-            p.bump_any();
-            p.bump_any();
-            p.expect(WRAPPER_KW);
-        }
-        // WITH UNCONDITIONAL ARRAY WRAPPER
-        // WITH UNCONDITIONAL WRAPPER
-        // WITH CONDITIONAL ARRAY WRAPPER
-        // WITH CONDITIONAL WRAPPER
-        (WITH_KW, UNCONDITIONAL_KW) | (WITH_KW, CONDITIONAL_KW) => {
-            p.bump_any();
-            p.bump_any();
+    let kind = match (p.current(), p.nth(1)) {
+        (WITH_KW, CONDITIONAL_KW) => {
+            p.bump(WITH_KW);
+            p.bump(CONDITIONAL_KW);
             p.eat(ARRAY_KW);
-            p.expect(WRAPPER_KW);
+            JSON_WITH_CONDITIONAL_WRAPPER
+        }
+        (WITH_KW, UNCONDITIONAL_KW | ARRAY_KW | WRAPPER_KW) => {
+            p.bump(WITH_KW);
+            p.eat(UNCONDITIONAL_KW);
+            p.eat(ARRAY_KW);
+            JSON_WITH_UNCONDITIONAL_WRAPPER
+        }
+        (WITHOUT_KW, ARRAY_KW | WRAPPER_KW) => {
+            p.bump(WITHOUT_KW);
+            p.eat(ARRAY_KW);
+            JSON_WITHOUT_WRAPPER
         }
         _ => {
             m.abandon(p);
             return None;
         }
-    }
-    Some(m.complete(p, JSON_WRAPPER_BEHAVIOR_CLAUSE))
+    };
+    p.expect(WRAPPER_KW);
+    Some(m.complete(p, kind))
 }
 
 // json_exists (
@@ -1912,6 +1927,12 @@ fn path_name_ref(p: &mut Parser<'_>) {
     if opt_path_name_ref(p).is_none() {
         p.error("expected path name");
     }
+}
+
+fn qualified_column_name_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_name_ref(p);
+    m.complete(p, QUALIFIED_COLUMN_NAME_REF);
 }
 
 fn path_kind(p: &Parser<'_>, kind: SyntaxKind) -> SyntaxKind {
@@ -3516,26 +3537,43 @@ fn opt_xmltable_column_option_list(p: &mut Parser<'_>) {
 
 fn opt_xmltable_column_option_el(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
-    match p.current() {
-        DEFAULT_KW | PATH_KW | IDENT => {
-            p.bump_any();
+    let kind = match p.current() {
+        DEFAULT_KW => {
+            p.bump(DEFAULT_KW);
             if expr(p).is_none() {
                 p.error("expected expression");
             }
+            OPTION_DEFAULT
+        }
+        PATH_KW => {
+            p.bump(PATH_KW);
+            if expr(p).is_none() {
+                p.error("expected expression");
+            }
+            OPTION_PATH
+        }
+        IDENT => {
+            p.bump(IDENT);
+            if expr(p).is_none() {
+                p.error("expected expression");
+            }
+            OPTION_IDENT
         }
         NOT_KW => {
             p.bump(NOT_KW);
             p.expect(NULL_KW);
+            OPTION_NOT_NULL
         }
         NULL_KW => {
             p.bump(NULL_KW);
+            OPTION_NULL
         }
         _ => {
             m.abandon(p);
             return None;
         }
-    }
-    Some(m.complete(p, XML_COLUMN_OPTION))
+    };
+    Some(m.complete(p, kind))
 }
 
 fn xml_namespace_list(p: &mut Parser<'_>) {
@@ -3785,10 +3823,18 @@ fn opt_sequence_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    match p.current() {
+    let kind = match p.current() {
         AS_KW => {
             p.bump(AS_KW);
             type_name(p);
+            OPTION_AS_TYPE
+        }
+        CACHE_KW => {
+            p.bump(CACHE_KW);
+            if opt_numeric_literal(p).is_none() {
+                p.error("expected numeric");
+            }
+            OPTION_CACHE
         }
         INCREMENT_KW => {
             p.bump(INCREMENT_KW);
@@ -3796,11 +3842,13 @@ fn opt_sequence_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected numeric literal");
             }
+            OPTION_INCREMENT
         }
         SEQUENCE_KW => {
             p.bump(SEQUENCE_KW);
             p.expect(NAME_KW);
             sequence(p);
+            OPTION_SEQUENCE_NAME
         }
         RESTART_KW => {
             p.bump(RESTART_KW);
@@ -3811,9 +3859,15 @@ fn opt_sequence_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             } else {
                 let _ = opt_numeric_literal(p);
             }
+            OPTION_RESTART
         }
-        LOGGED_KW | UNLOGGED_KW => {
-            p.bump_any();
+        LOGGED_KW => {
+            p.bump(LOGGED_KW);
+            OPTION_LOGGED
+        }
+        UNLOGGED_KW => {
+            p.bump(UNLOGGED_KW);
+            OPTION_UNLOGGED
         }
         START_KW => {
             p.bump(START_KW);
@@ -3821,35 +3875,53 @@ fn opt_sequence_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected numeric");
             }
+            OPTION_START
         }
         OWNED_KW => {
             p.bump(OWNED_KW);
             p.expect(BY_KW);
             if !p.eat(NONE_KW) {
-                path_name_ref(p);
+                qualified_column_name_ref(p);
             }
+            OPTION_OWNED_BY
         }
-        MINVALUE_KW | MAXVALUE_KW | CACHE_KW => {
-            p.bump_any();
+        MAXVALUE_KW => {
+            p.bump(MAXVALUE_KW);
             if opt_numeric_literal(p).is_none() {
                 p.error("expected numeric");
             }
+            OPTION_MAX_VALUE
+        }
+        MINVALUE_KW => {
+            p.bump(MINVALUE_KW);
+            if opt_numeric_literal(p).is_none() {
+                p.error("expected numeric");
+            }
+            OPTION_MIN_VALUE
         }
         NO_KW => {
             p.bump(NO_KW);
-            if !p.eat(MINVALUE_KW) && !p.eat(CYCLE_KW) && !p.eat(MAXVALUE_KW) {
+            if p.eat(MAXVALUE_KW) {
+                OPTION_NO_MAX_VALUE
+            } else if p.eat(MINVALUE_KW) {
+                OPTION_NO_MIN_VALUE
+            } else if p.eat(CYCLE_KW) {
+                OPTION_NO_CYCLE
+            } else {
                 p.error("expected MINVALUE, MAXVALUE, or CYCLE");
+                OPTION_NO_CYCLE
             }
         }
         CYCLE_KW => {
             p.bump(CYCLE_KW);
+            OPTION_CYCLE
         }
         _ => {
             m.abandon(p);
             return None;
         }
-    }
-    Some(m.complete(p, SEQUENCE_OPTION))
+    };
+    Some(m.complete(p, kind))
 }
 
 fn opt_sequence_options(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -4304,34 +4376,79 @@ fn on_delete_action(p: &mut Parser<'_>) {
     m.complete(p, ON_DELETE_ACTION);
 }
 
-const LIKE_OPTION_FIRST: TokenSet = TokenSet::new(&[
-    COMMENTS_KW,
-    COMPRESSION_KW,
-    CONSTRAINTS_KW,
-    DEFAULTS_KW,
-    GENERATED_KW,
-    IDENTITY_KW,
-    INDEXES_KW,
-    STATISTICS_KW,
-    STORAGE_KW,
-    ALL_KW,
-]);
-
 // where like_option is:
 //   { INCLUDING | EXCLUDING } { COMMENTS | COMPRESSION | CONSTRAINTS | DEFAULTS | GENERATED | IDENTITY | INDEXES | STATISTICS | STORAGE | ALL }
 fn opt_like_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at(INCLUDING_KW) || p.at(EXCLUDING_KW) {
-        let m = p.start();
-        p.bump_any();
-        if p.at_ts(LIKE_OPTION_FIRST) {
-            p.bump_any();
-        } else {
-            p.err_and_bump(&format!("expected like option, got {:?}", p.current()));
+    let m = p.start();
+    let kind = match p.current() {
+        EXCLUDING_KW => {
+            p.bump(EXCLUDING_KW);
+            table_property(p);
+            EXCLUDING_PROPERTY
         }
-        Some(m.complete(p, LIKE_OPTION))
-    } else {
-        None
-    }
+        INCLUDING_KW => {
+            p.bump(INCLUDING_KW);
+            table_property(p);
+            INCLUDING_PROPERTY
+        }
+        _ => {
+            m.abandon(p);
+            return None;
+        }
+    };
+    Some(m.complete(p, kind))
+}
+
+fn table_property(p: &mut Parser<'_>) {
+    let m = p.start();
+    let kind = match p.current() {
+        ALL_KW => {
+            p.bump(ALL_KW);
+            PROPERTY_ALL
+        }
+        COMMENTS_KW => {
+            p.bump(COMMENTS_KW);
+            PROPERTY_COMMENTS
+        }
+        COMPRESSION_KW => {
+            p.bump(COMPRESSION_KW);
+            PROPERTY_COMPRESSION
+        }
+        CONSTRAINTS_KW => {
+            p.bump(CONSTRAINTS_KW);
+            PROPERTY_CONSTRAINTS
+        }
+        DEFAULTS_KW => {
+            p.bump(DEFAULTS_KW);
+            PROPERTY_DEFAULTS
+        }
+        GENERATED_KW => {
+            p.bump(GENERATED_KW);
+            PROPERTY_GENERATED
+        }
+        IDENTITY_KW => {
+            p.bump(IDENTITY_KW);
+            PROPERTY_IDENTITY
+        }
+        INDEXES_KW => {
+            p.bump(INDEXES_KW);
+            PROPERTY_INDEXES
+        }
+        STATISTICS_KW => {
+            p.bump(STATISTICS_KW);
+            PROPERTY_STATISTICS
+        }
+        STORAGE_KW => {
+            p.bump(STORAGE_KW);
+            PROPERTY_STORAGE
+        }
+        _ => {
+            m.abandon(p);
+            p.err_and_bump(&format!("expected like option, got {:?}", p.current()));
+            return;
+        }
+    };
+    m.complete(p, kind);
 }
 
 fn opt_operator(p: &mut Parser<'_>) -> bool {
@@ -8666,7 +8783,7 @@ fn alter_database(p: &mut Parser<'_>) -> CompletedMarker {
             let m = p.start();
             p.bump(RESET_KW);
             if !p.eat(ALL_KW) {
-                path_name_ref(p);
+                config_parameter_ref(p);
             }
             m.complete(p, RESET_CONFIG_PARAM);
         }
@@ -9217,10 +9334,10 @@ fn type_name_ref_list(p: &mut Parser<'_>) {
     }
 }
 
-fn path_name_ref_list(p: &mut Parser<'_>) {
-    path_name_ref(p);
+fn config_parameter_ref_list(p: &mut Parser<'_>) {
+    config_parameter_ref(p);
     while !p.at(EOF) && p.eat(COMMA) {
-        path_name_ref(p);
+        config_parameter_ref(p);
     }
 }
 
@@ -9359,7 +9476,7 @@ fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, ALTER_TRIGGER)
 }
 
-fn alter_type_action(p: &mut Parser<'_>) {
+fn alter_type_attribute_action(p: &mut Parser<'_>) {
     let m = p.start();
     let kind = if p.eat(ADD_KW) {
         p.expect(ATTRIBUTE_KW);
@@ -9411,10 +9528,12 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
     type_name_ref(p);
     match p.current() {
         ADD_KW | DROP_KW | ALTER_KW if p.nth_at(1, ATTRIBUTE_KW) => {
-            alter_type_action(p);
+            let m = p.start();
+            alter_type_attribute_action(p);
             while !p.at(EOF) && p.eat(COMMA) {
-                alter_type_action(p);
+                alter_type_attribute_action(p);
             }
+            m.complete(p, ALTER_TYPE_ATTRIBUTE_ACTION_LIST);
         }
         OWNER_KW => {
             owner_to(p);
@@ -9853,7 +9972,7 @@ fn comment_object(p: &mut Parser<'_>) {
         }
         COLUMN_KW => {
             p.bump(COLUMN_KW);
-            path_name_ref(p);
+            qualified_column_name_ref(p);
             m.complete(p, OBJECT_COLUMN);
         }
         CONSTRAINT_KW => {
@@ -11072,32 +11191,46 @@ fn opt_fdw_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
     let m = p.start();
-    let ret = match p.current() {
+    let kind = match p.current() {
         OPTIONS_KW => {
-            if !opt_alter_option_list(p) {
-                p.error("expected options");
-            }
-            true
+            alter_option_list_contents(p);
+            OPTION_ALTER_OPTION_LIST
         }
-        CONNECTION_KW | HANDLER_KW | VALIDATOR_KW => {
-            p.bump_any();
+        CONNECTION_KW => {
+            p.bump(CONNECTION_KW);
             function_name_ref(p);
-            true
+            OPTION_CONNECTION
+        }
+        HANDLER_KW => {
+            p.bump(HANDLER_KW);
+            function_name_ref(p);
+            OPTION_HANDLER
+        }
+        VALIDATOR_KW => {
+            p.bump(VALIDATOR_KW);
+            function_name_ref(p);
+            OPTION_VALIDATOR
         }
         NO_KW => {
             p.bump(NO_KW);
-            if !p.eat(CONNECTION_KW) && !p.eat(HANDLER_KW) && !p.eat(VALIDATOR_KW) {
-                p.error("expected CONNECTION, HANDLER or VALIDATOR")
+            if p.eat(CONNECTION_KW) {
+                OPTION_NO_CONNECTION
+            } else if p.eat(HANDLER_KW) {
+                OPTION_NO_HANDLER
+            } else if p.eat(VALIDATOR_KW) {
+                OPTION_NO_VALIDATOR
+            } else {
+                p.error("expected CONNECTION, HANDLER or VALIDATOR");
+                OPTION_NO_CONNECTION
             }
-            true
         }
         _ => {
             m.abandon(p);
             return false;
         }
     };
-    m.complete(p, FDW_OPTION);
-    ret
+    m.complete(p, kind);
+    true
 }
 
 // CREATE GROUP name [ [ WITH ] option [ ... ] ]
@@ -12792,6 +12925,11 @@ fn opt_alter_option_list(p: &mut Parser<'_>) -> bool {
 fn alter_option_list(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(OPTIONS_KW));
     let m = p.start();
+    alter_option_list_contents(p);
+    m.complete(p, ALTER_OPTION_LIST)
+}
+
+fn alter_option_list_contents(p: &mut Parser<'_>) {
     p.expect(OPTIONS_KW);
     delimited(
         p,
@@ -12802,7 +12940,6 @@ fn alter_option_list(p: &mut Parser<'_>) -> CompletedMarker {
         EXPR_FIRST,
         |p| opt_alter_option(p).is_some(),
     );
-    m.complete(p, ALTER_OPTION_LIST)
 }
 
 // IMPORT FOREIGN SCHEMA remote_schema
@@ -13260,7 +13397,7 @@ fn privilege_target(p: &mut Parser<'_>) {
         match p.current() {
             PARAMETER_KW => {
                 p.bump(PARAMETER_KW);
-                path_name_ref_list(p);
+                config_parameter_ref_list(p);
                 m.complete(p, PRIVILEGE_PARAMETER);
             }
             FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
@@ -13606,7 +13743,7 @@ fn security_label_object(p: &mut Parser<'_>) {
         }
         COLUMN_KW => {
             p.bump(COLUMN_KW);
-            path_name_ref(p);
+            qualified_column_name_ref(p);
             m.complete(p, OBJECT_COLUMN);
         }
         EVENT_KW => {
@@ -14208,7 +14345,7 @@ fn reset(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, RESET_TIME_ZONE);
         }
         _ => {
-            path_name_ref(p);
+            config_parameter_ref(p);
         }
     }
     p.eat(SEMICOLON);
@@ -16022,9 +16159,13 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
             VOLATILITY_FUNC_OPTION
         }
         // [ NOT ] LEAKPROOF
-        NOT_KW | LEAKPROOF_KW => {
-            p.eat(NOT_KW);
+        NOT_KW => {
+            p.bump(NOT_KW);
             p.expect(LEAKPROOF_KW);
+            NOT_LEAKPROOF_FUNC_OPTION
+        }
+        LEAKPROOF_KW => {
+            p.bump(LEAKPROOF_KW);
             LEAKPROOF_FUNC_OPTION
         }
         // RESET configuration_parameter
@@ -16037,19 +16178,23 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
             RESET_FUNC_OPTION
         }
         // { CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT }
-        CALLED_KW | RETURNS_KW | STRICT_KW => {
-            if p.eat(CALLED_KW) {
-                p.expect(ON_KW);
-                p.expect(NULL_KW);
-                p.expect(INPUT_KW);
-            } else if p.eat(RETURNS_KW) {
-                p.expect(NULL_KW);
-                p.expect(ON_KW);
-                p.expect(NULL_KW);
-                p.expect(INPUT_KW);
-            } else {
-                p.expect(STRICT_KW);
-            }
+        CALLED_KW => {
+            p.bump(CALLED_KW);
+            p.expect(ON_KW);
+            p.expect(NULL_KW);
+            p.expect(INPUT_KW);
+            CALLED_ON_NULL_INPUT_FUNC_OPTION
+        }
+        RETURNS_KW => {
+            p.bump(RETURNS_KW);
+            p.expect(NULL_KW);
+            p.expect(ON_KW);
+            p.expect(NULL_KW);
+            p.expect(INPUT_KW);
+            RETURNS_NULL_ON_NULL_INPUT_FUNC_OPTION
+        }
+        STRICT_KW => {
+            p.bump(STRICT_KW);
             STRICT_FUNC_OPTION
         }
         // { [ EXTERNAL ] SECURITY INVOKER | [ EXTERNAL ] SECURITY DEFINER }
@@ -16167,7 +16312,7 @@ fn set_configuration_param(p: &mut Parser<'_>) {
     let m = p.start();
     p.bump(SET_KW);
     // configuration_parameter
-    path_name_ref(p);
+    config_parameter_ref(p);
     // { TO value | = value | FROM CURRENT }
     if p.eat(FROM_KW) {
         p.expect(CURRENT_KW);
@@ -16184,7 +16329,7 @@ fn reset_config_param(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(RESET_KW);
     if !p.eat(ALL_KW) {
-        path_name_ref(p);
+        config_parameter_ref(p);
     }
     m.complete(p, RESET_CONFIG_PARAM)
 }
@@ -16529,7 +16674,7 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         let m = p.start();
         // configuration_parameter
-        path_name_ref(p);
+        config_parameter_ref(p);
         if p.eat(FROM_KW) {
             p.expect(CURRENT_KW);
         } else {
@@ -16580,7 +16725,7 @@ fn show(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, TIME_ZONE);
         }
         _ => {
-            path_name_ref(p);
+            config_parameter_ref(p);
         }
     }
     p.eat(SEMICOLON);
