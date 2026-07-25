@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.61.0 - 2026-07-24
+
+### Changed
+
+- ide: refactor to use AnyName node (#1250)
+- parser: refactor ast::RelationFromItem to use ast::RelationNameRef (#1251)
+- parser: add more nodes for ast on top of cst -> more enums (#1248)
+- parser: refactor Name/NameRef to more specific nodes (#1246, #1247)
+
+  This also fixes schema qualified sequence names:
+
+  ```sql
+  CREATE TABLE foo (
+      id int GENERATED ALWAYS AS IDENTITY (SEQUENCE NAME public.myseq START 1)
+  );
+  ```
+
 ## v2.60.0 - 2026-07-18
 
 ### Added
