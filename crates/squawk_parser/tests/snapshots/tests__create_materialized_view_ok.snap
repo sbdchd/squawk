@@ -49,8 +49,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "bar"
@@ -168,8 +167,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "u"
+              IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"
@@ -223,8 +221,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "\"public\""
+            IDENT "\"public\""
         DOT "."
         PATH_SEGMENT
           IDENT "\"user_countries_view\""
@@ -271,8 +268,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "\"users\""
+                  IDENT "\"users\""
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "where"

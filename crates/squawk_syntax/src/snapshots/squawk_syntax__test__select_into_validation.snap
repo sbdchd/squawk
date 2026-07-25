@@ -378,8 +378,7 @@ SOURCE_FILE@0..858
         RELATION_NAME_REF@476..477
           PATH_REF@476..477
             PATH_SEGMENT_REF@476..477
-              NAME_REF@476..477
-                IDENT@476..477 "t"
+              IDENT@476..477 "t"
     SEMICOLON@477..478 ";"
   WHITESPACE@478..479 "\n"
   SELECT@479..538
@@ -437,8 +436,7 @@ SOURCE_FILE@0..858
         RELATION_NAME_REF@536..537
           PATH_REF@536..537
             PATH_SEGMENT_REF@536..537
-              NAME_REF@536..537
-                IDENT@536..537 "t"
+              IDENT@536..537 "t"
     SEMICOLON@537..538 ";"
   WHITESPACE@538..540 "\n\n"
   COMMENT@540..556 "-- error, nested"
@@ -458,8 +456,7 @@ SOURCE_FILE@0..858
         RELATION_NAME_REF@571..572
           PATH_REF@571..572
             PATH_SEGMENT_REF@571..572
-              NAME_REF@571..572
-                IDENT@571..572 "u"
+              IDENT@571..572 "u"
     WHITESPACE@572..575 "\n  "
     WHERE_CLAUSE@575..605
       WHERE_KW@575..580 "where"
@@ -525,8 +522,7 @@ SOURCE_FILE@0..858
                       RELATION_NAME_REF@644..645
                         PATH_REF@644..645
                           PATH_SEGMENT_REF@644..645
-                            NAME_REF@644..645
-                              IDENT@644..645 "u"
+                            IDENT@644..645 "u"
               R_PAREN@645..646 ")"
     SEMICOLON@646..647 ";"
   WHITESPACE@647..649 "\n\n"
@@ -540,8 +536,7 @@ SOURCE_FILE@0..858
     RELATION_NAME_REF@678..679
       PATH_REF@678..679
         PATH_SEGMENT_REF@678..679
-          NAME_REF@678..679
-            IDENT@678..679 "x"
+          IDENT@678..679 "x"
     WHITESPACE@679..680 " "
     SELECT_INTO@680..695
       SELECT_CLAUSE@680..688

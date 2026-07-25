@@ -13,8 +13,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "kinds"
+          IDENT "kinds"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -32,22 +31,19 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+          IDENT "foo"
     COMMA ","
     WHITESPACE " "
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     COMMA ","
     WHITESPACE " "
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "buzz"
+          IDENT "buzz"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -60,8 +56,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+          IDENT "foo"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

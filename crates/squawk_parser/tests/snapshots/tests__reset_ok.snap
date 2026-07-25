@@ -11,8 +11,7 @@ SOURCE_FILE
     CONFIG_PARAMETER_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "some_config_param"
+          IDENT "some_config_param"
     SEMICOLON ";"
   WHITESPACE "\n"
   RESET
@@ -30,16 +29,13 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "buzz"
+          IDENT "buzz"
     SEMICOLON ";"
   WHITESPACE "\n"
   RESET

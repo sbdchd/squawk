@@ -83,8 +83,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "v"
+                  IDENT "v"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -113,8 +112,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "v1"
+                  IDENT "v1"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
@@ -127,8 +125,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "v2"
+                  IDENT "v2"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

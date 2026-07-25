@@ -348,7 +348,7 @@ fn table_query_columns_with_types(
     let Some((schema, table_name)) = name::schema_and_name_path(&path) else {
         return vec![];
     };
-    let Some(name_ref) = path.segment().and_then(|s| s.name_ref()) else {
+    let Some(name_ref) = path.segment() else {
         return vec![];
     };
     let position = name_ref.syntax().text_range().start();

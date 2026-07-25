@@ -13,8 +13,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+          IDENT "products"
     WHITESPACE " "
     VALUES
       VALUES_KW "values"
@@ -43,8 +42,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+          IDENT "products"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -90,8 +88,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+          IDENT "products"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -137,8 +134,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+          IDENT "products"
     WHITESPACE " "
     DEFAULT_KW "default"
     WHITESPACE " "
@@ -153,8 +149,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+          IDENT "products"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -230,8 +225,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+          IDENT "products"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -276,8 +270,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "new_products"
+                IDENT "new_products"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -325,8 +318,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     REQUIRED_AS_ALIAS
       AS_KW "as"
@@ -376,8 +368,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     VALUES
       VALUES_KW "VALUES"
@@ -418,8 +409,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -483,8 +473,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     VALUES
       VALUES_KW "VALUES"
@@ -525,8 +514,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -590,8 +578,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     DEFAULT_KW "DEFAULT"
     WHITESPACE " "
@@ -606,8 +593,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -694,8 +680,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -712,8 +697,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "tmp_films"
+                IDENT "tmp_films"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -738,8 +722,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "tictactoe"
+          IDENT "tictactoe"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -794,8 +777,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "tictactoe"
+          IDENT "tictactoe"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -832,8 +814,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "distributors"
+          IDENT "distributors"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -889,8 +870,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "employees"
+                  IDENT "employees"
           WHITESPACE " "
           SET_CLAUSE
             SET_KW "SET"
@@ -940,8 +920,7 @@ SOURCE_FILE
                       RELATION_NAME_REF
                         PATH_REF
                           PATH_SEGMENT_REF
-                            NAME_REF
-                              IDENT "accounts"
+                            IDENT "accounts"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -972,8 +951,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "employees_log"
+          IDENT "employees_log"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -995,8 +973,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "upd"
+                IDENT "upd"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -1007,8 +984,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "distributors"
+          IDENT "distributors"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1093,8 +1069,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "distributors"
+          IDENT "distributors"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1149,8 +1124,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1219,8 +1193,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1255,12 +1228,10 @@ SOURCE_FILE
               PATH_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "public"
+                    IDENT "public"
                 DOT "."
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "gin__int_ops"
+                  IDENT "gin__int_ops"
           R_PAREN ")"
       WHITESPACE " "
       CONFLICT_DO_NOTHING
@@ -1277,8 +1248,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1312,8 +1282,7 @@ SOURCE_FILE
             OP_CLASS_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    NULLS_KW "nulls"
+                  NULLS_KW "nulls"
           R_PAREN ")"
       WHITESPACE " "
       CONFLICT_DO_NOTHING
@@ -1332,8 +1301,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "distributors"
+          IDENT "distributors"
     WHITESPACE " "
     REQUIRED_AS_ALIAS
       AS_KW "AS"
@@ -1461,8 +1429,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "distributors"
+          IDENT "distributors"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1503,8 +1470,7 @@ SOURCE_FILE
         CONSTRAINT_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "distributors_pkey"
+              IDENT "distributors_pkey"
       WHITESPACE " "
       CONFLICT_DO_NOTHING
         DO_KW "DO"
@@ -1526,8 +1492,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "distributors"
+          IDENT "distributors"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1591,12 +1556,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1628,8 +1591,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE "\n"
     SELECT
       SELECT_CLAUSE
@@ -1647,8 +1609,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
           WHITESPACE "\n"
           JOIN
             JOIN_CROSS
@@ -1660,8 +1621,7 @@ SOURCE_FILE
               RELATION_NAME_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "f"
+                    IDENT "f"
     WHITESPACE "\n"
     ON_CONFLICT_CLAUSE
       ON_KW "ON"
@@ -1682,8 +1642,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n"
     SELECT
       SELECT_CLAUSE
@@ -1701,8 +1660,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
           WHITESPACE " "
           JOIN
             JOIN_INNER
@@ -1712,8 +1670,7 @@ SOURCE_FILE
               RELATION_NAME_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "i"
+                    IDENT "i"
             WHITESPACE " \n"
             ON_CLAUSE
               ON_KW "on"
@@ -1746,8 +1703,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n"
     SELECT
       SELECT_CLAUSE
@@ -1765,8 +1721,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
           WHITESPACE " "
           JOIN
             JOIN_INNER
@@ -1776,8 +1731,7 @@ SOURCE_FILE
               RELATION_NAME_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "i"
+                    IDENT "i"
             WHITESPACE " \n"
             ON_CLAUSE
               ON_KW "on"
@@ -1818,8 +1772,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n"
     SELECT
       SELECT_CLAUSE
@@ -1837,8 +1790,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
           WHITESPACE " "
           JOIN
             JOIN_INNER
@@ -1848,8 +1800,7 @@ SOURCE_FILE
               RELATION_NAME_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "i"
+                    IDENT "i"
             WHITESPACE " \n"
             ON_CLAUSE
               ON_KW "on"
@@ -1876,8 +1827,7 @@ SOURCE_FILE
         CONSTRAINT_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "temporal_rng_pk"
+              IDENT "temporal_rng_pk"
       WHITESPACE " "
       CONFLICT_DO_NOTHING
         DO_KW "do"
@@ -1895,8 +1845,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1969,8 +1918,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -1994,8 +1942,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -2032,8 +1979,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COMPOUND_SELECT
       VALUES
@@ -2067,8 +2013,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -2091,8 +2036,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -2127,8 +2071,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COMPOUND_SELECT
       SELECT

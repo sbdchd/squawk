@@ -17,30 +17,26 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
       WHITESPACE "  "
       PARAM
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
       WHITESPACE "  "
       PARAM
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bool"
+              IDENT "bool"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                NUMERIC_KW "numeric"
+              NUMERIC_KW "numeric"
       R_PAREN ")"
     WHITESPACE " "
     AS_KW "AS"
@@ -53,8 +49,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE " "
       VALUES
         VALUES_KW "VALUES"

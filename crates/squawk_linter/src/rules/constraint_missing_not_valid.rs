@@ -54,7 +54,6 @@ fn not_valid_validate_in_transaction(
                                 .constraint_name_ref()
                                 .and_then(|constraint| constraint.path_ref())
                                 .and_then(|path| path.segment())
-                                .and_then(|segment| segment.name_ref())
                                 .map(|name| name.text())
                             {
                                 if inside_transaction && not_valid_names.contains(&constraint_name)
@@ -110,7 +109,6 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
                 .and_then(|x| x.segment())
-                .and_then(|x| x.name_ref())
                 .map(|x| x.text())
             else {
                 continue;

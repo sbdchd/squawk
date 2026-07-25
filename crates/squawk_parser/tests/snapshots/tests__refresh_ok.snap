@@ -15,8 +15,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "order_summary"
+          IDENT "order_summary"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REFRESH
@@ -29,8 +28,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "annual_statistics_basis"
+          IDENT "annual_statistics_basis"
     WHITESPACE " "
     WITH_NO_DATA
       WITH_KW "WITH"
@@ -52,8 +50,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     WITH_DATA
       WITH_KW "with"

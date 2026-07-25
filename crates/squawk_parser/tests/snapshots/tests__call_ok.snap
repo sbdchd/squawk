@@ -11,8 +11,7 @@ SOURCE_FILE
     PROCEDURE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "do_db_maintenance"
+          IDENT "do_db_maintenance"
     ARG_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -27,12 +26,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "partman"
+            IDENT "partman"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "partition_data_proc"
+          IDENT "partition_data_proc"
     ARG_LIST
       L_PAREN "("
       ARG
@@ -49,8 +46,7 @@ SOURCE_FILE
     PROCEDURE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "do_db_maintenance"
+          IDENT "do_db_maintenance"
     ARG_LIST
       L_PAREN "("
       ARG

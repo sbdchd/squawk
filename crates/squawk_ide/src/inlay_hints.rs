@@ -96,7 +96,6 @@ fn inlay_hint_insert(
         .relation_name_ref()?
         .path_ref()?
         .segment()?
-        .name_ref()?
         .syntax()
         .text_range()
         .start();

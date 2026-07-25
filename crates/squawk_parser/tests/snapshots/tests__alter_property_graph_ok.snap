@@ -21,12 +21,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     PROPERTY_GRAPH_RENAME_TO
       RENAME_KW "rename"
@@ -57,12 +55,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -91,12 +87,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"
@@ -125,12 +119,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     ADD_VERTEX_EDGE_TABLES
       ADD_KW "add"
@@ -146,8 +138,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "a"
+                IDENT "a"
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
@@ -168,8 +159,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "d"
+                IDENT "d"
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
@@ -205,8 +195,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "a"
+                IDENT "a"
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
@@ -346,8 +335,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE "\n  "
     ADD_VERTEX_EDGE_TABLES
       ADD_KW "add"
@@ -363,8 +351,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "d"
+                IDENT "d"
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
@@ -397,8 +384,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "a"
+                IDENT "a"
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
@@ -479,8 +465,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE " "
     ALTER_VERTEX_EDGE_LABELS
       ALTER_KW "alter"
@@ -511,8 +496,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE " "
     DROP_VERTEX_EDGE_LABEL
       ALTER_KW "alter"
@@ -542,8 +526,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE " "
     ADD_VERTEX_EDGE_LABEL_PROPERTIES
       ALTER_KW "alter"
@@ -584,8 +567,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE " "
     DROP_VERTEX_EDGE_LABEL_PROPERTIES
       ALTER_KW "alter"
@@ -626,8 +608,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE " "
     DROP_VERTEX_TABLES
       DROP_KW "drop"
@@ -656,8 +637,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE " "
     DROP_EDGE_TABLES
       DROP_KW "drop"

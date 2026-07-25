@@ -35,13 +35,14 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
 }
 
 fn get_table_name(alter_table: &ast::AlterTable) -> Option<String> {
-    alter_table
-        .table_relation_name()?
-        .table_name_ref()?
-        .path_ref()?
-        .segment()?
-        .name_ref()
-        .map(|x| x.text())
+    Some(
+        alter_table
+            .table_relation_name()?
+            .table_name_ref()?
+            .path_ref()?
+            .segment()?
+            .text(),
+    )
 }
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
@@ -92,7 +93,6 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             .constraint_name_ref()
                             .and_then(|constraint| constraint.path_ref())
                             .and_then(|path| path.segment())
-                            .and_then(|segment| segment.name_ref())
                             .map(|name| name.text())
                         {
                             if let Some(table_column) = not_null_constraints.get(&constraint_name)

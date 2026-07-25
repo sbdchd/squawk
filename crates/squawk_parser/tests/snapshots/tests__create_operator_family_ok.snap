@@ -37,8 +37,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
         DOT "."
         PATH_SEGMENT
           IDENT "b"

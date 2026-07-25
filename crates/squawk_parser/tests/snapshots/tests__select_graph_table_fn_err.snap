@@ -22,8 +22,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "

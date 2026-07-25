@@ -19,15 +19,13 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INTEGER_KW "integer"
+              INTEGER_KW "integer"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INTEGER_KW "integer"
+              INTEGER_KW "integer"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -45,12 +43,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "foo"
+                  IDENT "foo"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
           CARET "^"
@@ -60,24 +56,20 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                SMALLINT_KW "smallint"
+              SMALLINT_KW "smallint"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                SMALLINT_KW "smallint"
+              SMALLINT_KW "smallint"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -133,15 +125,13 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INTEGER_KW "integer"
+              INTEGER_KW "integer"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INTEGER_KW "integer"
+              INTEGER_KW "integer"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -170,8 +160,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                BIGINT_KW "bigint"
+              BIGINT_KW "bigint"
         R_PAREN ")"
       COMMA ","
       WHITESPACE " "
@@ -184,15 +173,13 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
         R_PAREN ")"
       COMMA ","
       WHITESPACE " "
@@ -209,8 +196,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INTEGER_KW "integer"
+              INTEGER_KW "integer"
         R_PAREN ")"
     WHITESPACE " "
     CASCADE_KW "cascade"
@@ -236,15 +222,13 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"
@@ -290,15 +274,13 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"
@@ -316,12 +298,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "bar"
+                  IDENT "bar"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
             DOT "."
             PATH_SEGMENT_REF
           CUSTOM_OP
@@ -347,15 +327,13 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"

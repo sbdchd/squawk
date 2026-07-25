@@ -13,8 +13,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     ALTER_VIEW_COLUMN
       ALTER_KW "alter"
@@ -44,8 +43,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     ALTER_VIEW_COLUMN
       ALTER_KW "alter"
@@ -74,8 +72,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     ALTER_VIEW_COLUMN
       ALTER_KW "alter"
@@ -101,8 +98,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -129,12 +125,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -155,8 +149,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -177,8 +170,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -199,8 +191,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     VIEW_RENAME_TO
       RENAME_KW "rename"
@@ -223,8 +214,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     RENAME_COLUMN
       RENAME_KW "rename"
@@ -248,8 +238,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     RENAME_COLUMN
       RENAME_KW "rename"
@@ -273,8 +262,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
@@ -295,8 +283,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -352,8 +339,7 @@ SOURCE_FILE
     VIEW_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     RESET_OPTIONS
       RESET_KW "reset"

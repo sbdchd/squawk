@@ -32,8 +32,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  TEXT_KW "text"
+                TEXT_KW "text"
         WHITESPACE "  "
         COLUMN
           COLUMN_NAME
@@ -42,8 +41,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  INT_KW "int"
+                INT_KW "int"
         R_PAREN ")"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
@@ -78,8 +76,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                FLOAT_KW "float"
+              FLOAT_KW "float"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -91,8 +88,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int4"
+              IDENT "int4"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -109,8 +105,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION

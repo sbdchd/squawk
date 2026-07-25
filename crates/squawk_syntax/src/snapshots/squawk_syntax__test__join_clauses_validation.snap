@@ -21,8 +21,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@22..23
             PATH_REF@22..23
               PATH_SEGMENT_REF@22..23
-                NAME_REF@22..23
-                  IDENT@22..23 "t"
+                IDENT@22..23 "t"
         WHITESPACE@23..24 " "
         JOIN@24..30
           JOIN_INNER@24..28
@@ -32,8 +31,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@29..30
               PATH_REF@29..30
                 PATH_SEGMENT_REF@29..30
-                  NAME_REF@29..30
-                    IDENT@29..30 "u"
+                  IDENT@29..30 "u"
     SEMICOLON@30..31 ";"
   WHITESPACE@31..33 "\n\n"
   SELECT@33..61
@@ -52,8 +50,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@47..48
             PATH_REF@47..48
               PATH_SEGMENT_REF@47..48
-                NAME_REF@47..48
-                  IDENT@47..48 "t"
+                IDENT@47..48 "t"
         WHITESPACE@48..49 " "
         JOIN@49..60
           JOIN_LEFT@49..58
@@ -65,8 +62,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@59..60
               PATH_REF@59..60
                 PATH_SEGMENT_REF@59..60
-                  NAME_REF@59..60
-                    IDENT@59..60 "u"
+                  IDENT@59..60 "u"
     SEMICOLON@60..61 ";"
   WHITESPACE@61..63 "\n\n"
   SELECT@63..92
@@ -85,8 +81,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@77..78
             PATH_REF@77..78
               PATH_SEGMENT_REF@77..78
-                NAME_REF@77..78
-                  IDENT@77..78 "t"
+                IDENT@77..78 "t"
         WHITESPACE@78..79 " "
         JOIN@79..91
           JOIN_RIGHT@79..89
@@ -98,8 +93,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@90..91
               PATH_REF@90..91
                 PATH_SEGMENT_REF@90..91
-                  NAME_REF@90..91
-                    IDENT@90..91 "u"
+                  IDENT@90..91 "u"
     SEMICOLON@91..92 ";"
   WHITESPACE@92..94 "\n\n"
   SELECT@94..122
@@ -118,8 +112,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@108..109
             PATH_REF@108..109
               PATH_SEGMENT_REF@108..109
-                NAME_REF@108..109
-                  IDENT@108..109 "t"
+                IDENT@108..109 "t"
         WHITESPACE@109..110 " "
         JOIN@110..121
           JOIN_FULL@110..119
@@ -131,8 +124,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@120..121
               PATH_REF@120..121
                 PATH_SEGMENT_REF@120..121
-                  NAME_REF@120..121
-                    IDENT@120..121 "u"
+                  IDENT@120..121 "u"
     SEMICOLON@121..122 ";"
   WHITESPACE@122..125 "\n\n\n"
   COMMENT@125..171 "-- err, can't use con ..."
@@ -153,8 +145,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@186..187
             PATH_REF@186..187
               PATH_SEGMENT_REF@186..187
-                NAME_REF@186..187
-                  IDENT@186..187 "t"
+                IDENT@186..187 "t"
         WHITESPACE@187..188 " "
         JOIN@188..213
           NATURAL_KW@188..195 "natural"
@@ -166,8 +157,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@201..202
               PATH_REF@201..202
                 PATH_SEGMENT_REF@201..202
-                  NAME_REF@201..202
-                    IDENT@201..202 "u"
+                  IDENT@201..202 "u"
           WHITESPACE@202..203 " "
           JOIN_USING_CLAUSE@203..213
             USING_KW@203..208 "using"
@@ -198,8 +188,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@276..277
             PATH_REF@276..277
               PATH_SEGMENT_REF@276..277
-                NAME_REF@276..277
-                  IDENT@276..277 "t"
+                IDENT@276..277 "t"
         WHITESPACE@277..278 " "
         JOIN@278..301
           JOIN_CROSS@278..288
@@ -211,8 +200,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@289..290
               PATH_REF@289..290
                 PATH_SEGMENT_REF@289..290
-                  NAME_REF@289..290
-                    IDENT@289..290 "u"
+                  IDENT@289..290 "u"
           WHITESPACE@290..291 " "
           JOIN_USING_CLAUSE@291..301
             USING_KW@291..296 "using"
@@ -243,8 +231,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@324..325
             PATH_REF@324..325
               PATH_SEGMENT_REF@324..325
-                NAME_REF@324..325
-                  IDENT@324..325 "t"
+                IDENT@324..325 "t"
         WHITESPACE@325..326 " "
         JOIN@326..340
           NATURAL_KW@326..333 "natural"
@@ -256,8 +243,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@339..340
               PATH_REF@339..340
                 PATH_SEGMENT_REF@339..340
-                  NAME_REF@339..340
-                    IDENT@339..340 "u"
+                  IDENT@339..340 "u"
     SEMICOLON@340..341 ";"
   WHITESPACE@341..343 "\n\n"
   SELECT@343..392
@@ -276,8 +262,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@357..358
             PATH_REF@357..358
               PATH_SEGMENT_REF@357..358
-                NAME_REF@357..358
-                  IDENT@357..358 "t"
+                IDENT@357..358 "t"
         WHITESPACE@358..359 " "
         JOIN@359..371
           JOIN_CROSS@359..369
@@ -289,8 +274,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@370..371
               PATH_REF@370..371
                 PATH_SEGMENT_REF@370..371
-                  NAME_REF@370..371
-                    IDENT@370..371 "u"
+                  IDENT@370..371 "u"
       COMMA@371..372 ","
       WHITESPACE@372..373 " "
       JOIN_EXPR@373..391
@@ -298,8 +282,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@373..374
             PATH_REF@373..374
               PATH_SEGMENT_REF@373..374
-                NAME_REF@373..374
-                  IDENT@373..374 "b"
+                IDENT@373..374 "b"
         WHITESPACE@374..375 " "
         JOIN@375..391
           JOIN_INNER@375..379
@@ -309,8 +292,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@380..381
               PATH_REF@380..381
                 PATH_SEGMENT_REF@380..381
-                  NAME_REF@380..381
-                    IDENT@380..381 "c"
+                  IDENT@380..381 "c"
           WHITESPACE@381..382 " "
           JOIN_USING_CLAUSE@382..391
             USING_KW@382..387 "using"
@@ -338,8 +320,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@408..409
             PATH_REF@408..409
               PATH_SEGMENT_REF@408..409
-                NAME_REF@408..409
-                  IDENT@408..409 "t"
+                IDENT@408..409 "t"
         WHITESPACE@409..410 " "
         JOIN@410..431
           JOIN_INNER@410..414
@@ -349,8 +330,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@415..416
               PATH_REF@415..416
                 PATH_SEGMENT_REF@415..416
-                  NAME_REF@415..416
-                    IDENT@415..416 "u"
+                  IDENT@415..416 "u"
           WHITESPACE@416..417 " "
           ON_CLAUSE@417..431
             ON_KW@417..419 "on"
@@ -389,8 +369,7 @@ SOURCE_FILE@0..523
           RELATION_NAME_REF@447..448
             PATH_REF@447..448
               PATH_SEGMENT_REF@447..448
-                NAME_REF@447..448
-                  IDENT@447..448 "t"
+                IDENT@447..448 "t"
         WHITESPACE@448..449 " "
         JOIN@449..463
           JOIN_INNER@449..453
@@ -400,8 +379,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@454..455
               PATH_REF@454..455
                 PATH_SEGMENT_REF@454..455
-                  NAME_REF@454..455
-                    IDENT@454..455 "u"
+                  IDENT@454..455 "u"
           WHITESPACE@455..456 " "
           ON_CLAUSE@456..463
             ON_KW@456..458 "on"
@@ -427,8 +405,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@480..481
               PATH_REF@480..481
                 PATH_SEGMENT_REF@480..481
-                  NAME_REF@480..481
-                    IDENT@480..481 "t"
+                  IDENT@480..481 "t"
           WHITESPACE@481..484 "\n  "
           JOIN@484..501
             JOIN_INNER@484..488
@@ -438,8 +415,7 @@ SOURCE_FILE@0..523
               RELATION_NAME_REF@489..490
                 PATH_REF@489..490
                   PATH_SEGMENT_REF@489..490
-                    NAME_REF@489..490
-                      IDENT@489..490 "u"
+                    IDENT@489..490 "u"
             WHITESPACE@490..491 " "
             JOIN_USING_CLAUSE@491..501
               USING_KW@491..496 "using"
@@ -459,8 +435,7 @@ SOURCE_FILE@0..523
             RELATION_NAME_REF@509..510
               PATH_REF@509..510
                 PATH_SEGMENT_REF@509..510
-                  NAME_REF@509..510
-                    IDENT@509..510 "c"
+                  IDENT@509..510 "c"
           WHITESPACE@510..511 " "
           JOIN_USING_CLAUSE@511..521
             USING_KW@511..516 "using"

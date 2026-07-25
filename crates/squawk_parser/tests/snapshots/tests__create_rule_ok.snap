@@ -26,8 +26,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     RULE_DO
       DO_KW "do"
@@ -65,12 +64,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
       WHITESPACE "\n  "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -136,8 +133,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
           WHITESPACE " "
           VALUES
             VALUES_KW "values"
@@ -163,8 +159,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
           SEMICOLON ";"
         WHITESPACE "\n    "
         VALUES
@@ -189,8 +184,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
           WHITESPACE " "
           SET_CLAUSE
             SET_KW "set"
@@ -241,8 +235,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -286,8 +279,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -331,8 +323,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -384,8 +375,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -445,8 +435,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -496,8 +485,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -551,8 +539,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -566,8 +553,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_RULE
@@ -591,8 +577,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RULE_DO
       DO_KW "do"
@@ -608,8 +593,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
           SEMICOLON ";"
         R_PAREN ")"
     SEMICOLON ";"
@@ -637,8 +621,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+            IDENT "t1"
     WHITESPACE "\n    "
     RULE_DO
       DO_KW "DO"
@@ -660,8 +643,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t2"
+                  IDENT "t2"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_RULE
@@ -685,8 +667,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t2"
+            IDENT "t2"
     WHITESPACE "\n    "
     RULE_DO
       DO_KW "DO"
@@ -708,8 +689,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t1"
+                  IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -727,8 +707,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t1"
+              IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_2"
@@ -754,8 +733,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "mytable"
+            IDENT "mytable"
     WHITESPACE " "
     RULE_DO
       DO_KW "DO"
@@ -776,8 +754,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "mytable"
+            IDENT "mytable"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"

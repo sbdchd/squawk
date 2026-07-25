@@ -23,8 +23,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explain_analyze"
@@ -50,8 +49,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explain_analyze_verbose"
@@ -79,8 +77,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explain_parenthesized_options"
@@ -313,8 +310,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
@@ -337,8 +333,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -383,8 +378,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -428,8 +422,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -472,8 +465,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -501,16 +493,14 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
       R_PAREN ")"
     WHITESPACE " "
     AS_KW "AS"
@@ -538,8 +528,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "test"
+                IDENT "test"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -634,8 +623,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "test"
+                IDENT "test"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -707,8 +695,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "test"
+                IDENT "test"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -729,8 +716,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      INTEGER_KW "integer"
+                    INTEGER_KW "integer"
           WHITESPACE " "
           AND_KW "AND"
           WHITESPACE " "
@@ -749,8 +735,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      INTEGER_KW "integer"
+                    INTEGER_KW "integer"
       WHITESPACE "\n    "
       GROUP_BY_CLAUSE
         GROUP_KW "GROUP"
@@ -932,8 +917,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -979,8 +963,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -1026,8 +1009,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -1073,8 +1055,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -1155,8 +1136,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t2"
+                IDENT "t2"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- paren select"
@@ -1189,8 +1169,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"
@@ -1229,8 +1208,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
       WHITESPACE " "
       VALUES
         VALUES_KW "values"
@@ -1270,8 +1248,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       WHITESPACE " "
       SET_CLAUSE
         SET_KW "set"
@@ -1315,8 +1292,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -1345,8 +1321,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       WHITESPACE "\n  "
       USING_ON_CLAUSE
         USING_KW "using"
@@ -1355,8 +1330,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
         WHITESPACE "\n    "
         ON_CLAUSE
           ON_KW "on"
@@ -1460,8 +1434,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "where"

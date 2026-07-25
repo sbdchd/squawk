@@ -17,8 +17,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE "\n"
     RESTART_KW "restart"
     WHITESPACE " "
@@ -39,16 +38,14 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
       COMMA ","
       WHITESPACE " "
       TABLE_RELATION_NAME
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
         WHITESPACE " "
         STAR "*"
       COMMA ","
@@ -57,8 +54,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+              IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rest"
@@ -71,8 +67,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   TRUNCATE
@@ -83,8 +78,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
     WHITESPACE " "
     CONTINUE_KW "continue"
     WHITESPACE " "
@@ -99,8 +93,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
     WHITESPACE " "
     CONTINUE_KW "continue"
     WHITESPACE " "

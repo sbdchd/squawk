@@ -69,12 +69,8 @@ impl ColumnName {
 fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, SyntaxNode)> {
     match ty {
         ast::Type::PathType(path_type) => {
-            if let Some(name_ref) = path_type
-                .path_ref()
-                .and_then(|x| x.segment())
-                .and_then(|x| x.name_ref())
-            {
-                return name_from_name_ref(name_ref, true, path_type.arg_list().as_ref()).map(
+            if let Some(name_ref) = path_type.path_ref().and_then(|x| x.segment()) {
+                return name_from_name_ref(&name_ref, true, path_type.arg_list().as_ref()).map(
                     |(column, node)| {
                         let column = match column {
                             ColumnName::Column(c) => ColumnName::new(c, unknown_column),
@@ -160,7 +156,7 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
 }
 
 fn name_from_name_ref(
-    name_ref: ast::NameRef,
+    name_ref: &impl ast::NameLike,
     in_type: bool,
     arg_list: Option<&ast::ArgList>,
 ) -> Option<(ColumnName, SyntaxNode)> {
@@ -436,11 +432,11 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     | ast::Expr::SliceExpr(_) => unreachable!("not possible in the grammar"),
                     ast::Expr::FieldExpr(field_expr) => {
                         if let Some(name_ref) = field_expr.field() {
-                            return name_from_name_ref(name_ref, in_type, None);
+                            return name_from_name_ref(&name_ref, in_type, None);
                         }
                     }
                     ast::Expr::NameRef(name_ref) => {
-                        return name_from_name_ref(name_ref, in_type, None);
+                        return name_from_name_ref(&name_ref, in_type, None);
                     }
                 }
             }
@@ -476,7 +472,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
         }
         ast::Expr::FieldExpr(field_expr) => {
             if let Some(name_ref) = field_expr.field() {
-                return name_from_name_ref(name_ref, in_type, None);
+                return name_from_name_ref(&name_ref, in_type, None);
             }
         }
         ast::Expr::IndexExpr(index_expr) => {
@@ -512,7 +508,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             _ => return Some((ColumnName::UnknownColumn(None), node)),
         },
         ast::Expr::NameRef(name_ref) => {
-            return name_from_name_ref(name_ref, in_type, None);
+            return name_from_name_ref(&name_ref, in_type, None);
         }
         ast::Expr::ParenExpr(paren_expr) => {
             if let Some(expr) = paren_expr.expr() {

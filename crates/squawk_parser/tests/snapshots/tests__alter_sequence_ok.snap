@@ -19,12 +19,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     WHITESPACE "\n  "
     OPTION_AS_TYPE
       AS_KW "as"
@@ -122,12 +120,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
     WHITESPACE "\n  "
     OPTION_OWNED_BY
       OWNED_KW "owned"
@@ -147,8 +143,7 @@ SOURCE_FILE
     SEQUENCE_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     WHITESPACE "\n  "
     SET_LOGGED
       SET_KW "set"
@@ -164,8 +159,7 @@ SOURCE_FILE
     SEQUENCE_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     WHITESPACE "\n  "
     SET_UNLOGGED
       SET_KW "set"
@@ -183,8 +177,7 @@ SOURCE_FILE
     SEQUENCE_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -203,8 +196,7 @@ SOURCE_FILE
     SEQUENCE_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -225,8 +217,7 @@ SOURCE_FILE
     SEQUENCE_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     WHITESPACE "\n  "
     SEQUENCE_RENAME_TO
       RENAME_KW "rename"
@@ -249,8 +240,7 @@ SOURCE_FILE
     SEQUENCE_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"

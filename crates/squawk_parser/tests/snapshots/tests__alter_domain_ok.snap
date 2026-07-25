@@ -13,8 +13,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     SET_DEFAULT
       SET_KW "set"
@@ -36,12 +35,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     DROP_DEFAULT
       DROP_KW "drop"
@@ -59,8 +56,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     SET_NOT_NULL
       SET_KW "set"
@@ -80,8 +76,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     DROP_NOT_NULL
       DROP_KW "drop"
@@ -101,8 +96,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -136,8 +130,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -170,8 +163,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -207,8 +199,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     DROP_CONSTRAINT
       DROP_KW "drop"
@@ -218,8 +209,7 @@ SOURCE_FILE
       CONSTRAINT_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
       WHITESPACE " "
       CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -232,8 +222,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     DROP_CONSTRAINT
       DROP_KW "drop"
@@ -248,8 +237,7 @@ SOURCE_FILE
       CONSTRAINT_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
       WHITESPACE " "
       RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -264,8 +252,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     RENAME_CONSTRAINT
       RENAME_KW "rename"
@@ -275,8 +262,7 @@ SOURCE_FILE
       CONSTRAINT_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -294,8 +280,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     VALIDATE_CONSTRAINT
       VALIDATE_KW "validate"
@@ -305,8 +290,7 @@ SOURCE_FILE
       CONSTRAINT_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
@@ -319,8 +303,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -339,8 +322,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -361,8 +343,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     DOMAIN_RENAME_TO
       RENAME_KW "rename"
@@ -385,8 +366,7 @@ SOURCE_FILE
     DOMAIN_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"

@@ -1687,7 +1687,7 @@ fn item_name(path: &ast::Path) -> Option<Name> {
 }
 
 fn item_name_ref(path: &ast::PathRef) -> Option<Name> {
-    Some(Name::from_node(&path.segment()?.name_ref()?))
+    Some(Name::from_node(&path.segment()?))
 }
 
 fn path_to_ptr(path: &ast::Path) -> SyntaxNodePtr {
@@ -1710,10 +1710,7 @@ fn schema_name_from_qualifier(
     qualifier: Option<ast::PathRef>,
     is_temp: bool,
 ) -> Option<Schema> {
-    if let Some(name_ref) = qualifier
-        .and_then(|q| q.segment())
-        .and_then(|s| s.name_ref())
-    {
+    if let Some(name_ref) = qualifier.and_then(|q| q.segment()) {
         return Some(Schema(Name::from_node(&name_ref)));
     }
 
@@ -1777,8 +1774,7 @@ fn search_path_from_set_config_param(
         return None;
     }
 
-    let segment = path.segment()?;
-    let param_name = segment.name_ref()?.syntax().text().to_string();
+    let param_name = path.segment()?.syntax().text().to_string();
     if !param_name.eq_ignore_ascii_case("search_path") {
         return None;
     }
@@ -1846,11 +1842,7 @@ fn bind_set_config(b: &mut Binder, set_config: ast::SetConfig, position: TextSiz
         return;
     };
 
-    let param_name = if let Some(name_ref) = segment.name_ref() {
-        name_ref.syntax().text().to_string()
-    } else {
-        return;
-    };
+    let param_name = segment.syntax().text().to_string();
 
     if !param_name.eq_ignore_ascii_case("search_path") {
         return;
@@ -1991,9 +1983,8 @@ fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Nam
             && let ast::Type::PathType(path_type) = ty
             && let Some(path) = path_type.path_ref()
             && let Some(segment) = path.segment()
-            && let Some(name_ref) = segment.name_ref()
         {
-            params.push(Name::from_node(&name_ref));
+            params.push(Name::from_node(&segment));
         }
     }
     (!params.is_empty()).then_some(params)

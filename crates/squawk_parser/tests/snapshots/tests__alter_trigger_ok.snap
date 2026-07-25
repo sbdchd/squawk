@@ -19,8 +19,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "x"
+            IDENT "x"
     WHITESPACE " "
     TRIGGER_RENAME_TO
       RENAME_KW "rename"
@@ -47,8 +46,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "x"
+            IDENT "x"
     WHITESPACE " "
     DEPENDS_ON_EXTENSION
       DEPENDS_KW "depends"
@@ -78,12 +76,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"

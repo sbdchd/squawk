@@ -288,11 +288,10 @@ fn is_search_path(config_parameter: Option<ast::ConfigParameterRef>) -> bool {
         return false;
     }
     path.segment()
-        .and_then(|segment| segment.name_ref())
         .is_some_and(|name_ref| Name::from_node(&name_ref).0.as_str() == "search_path")
 }
 
-fn is_rule_old_new_ref(name_ref: &ast::NameRef) -> bool {
+fn is_rule_old_new_ref(name_ref: &impl ast::NameLike) -> bool {
     name_ref
         .syntax()
         .first_token()
@@ -363,7 +362,7 @@ fn classify_object_column_path(node: &SyntaxNode) -> Option<NameRefClass> {
     let mut name_refs = Vec::new();
 
     loop {
-        if let Some(name_ref) = path.segment().and_then(|segment| segment.name_ref()) {
+        if let Some(name_ref) = path.segment() {
             name_refs.push(name_ref);
         }
         let Some(qualifier) = path.qualifier() else {
@@ -680,9 +679,8 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
 
     // %type clause paths (max 3 segments):
     //   column%type, table.column%type, schema.table.column%type
-    if let Some(parent) = node.parent()
-        && let Some(mut path) = ast::PathSegmentRef::cast(parent)
-            .and_then(|p| p.syntax().parent().and_then(ast::PathRef::cast))
+    if ast::PathSegmentRef::can_cast(node.kind())
+        && let Some(mut path) = node.parent().and_then(ast::PathRef::cast)
     {
         let mut hops_up = 0;
         while let Some(next) = path.syntax().parent().and_then(ast::PathRef::cast) {
@@ -715,9 +713,8 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
     }
 
-    if let Some(parent) = node.parent()
-        && let Some(inner_path) = ast::PathSegmentRef::cast(parent)
-            .and_then(|p| p.syntax().parent().and_then(ast::PathRef::cast))
+    if ast::PathSegmentRef::can_cast(node.kind())
+        && let Some(inner_path) = node.parent().and_then(ast::PathRef::cast)
         && let Some(outer_path) = inner_path.syntax().parent().and_then(|p| {
             ast::PathRef::cast(p.clone())
                 .and_then(|p| p.qualifier())

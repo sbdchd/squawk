@@ -24,7 +24,6 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
                 .and_then(|x| x.segment())
-                .and_then(|x| x.name_ref())
             {
                 if create_index.concurrently_token().is_none()
                     && !tables_created.contains(&table_name.text())

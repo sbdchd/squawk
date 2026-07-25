@@ -14,8 +14,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     USING_ON_CLAUSE
       USING_KW "using"
@@ -25,8 +24,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
         WHITESPACE " "
         JOIN
           NATURAL_KW "natural"
@@ -50,8 +48,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "a"
+                IDENT "a"
         WHITESPACE " "
         JOIN
           NATURAL_KW "natural"
@@ -74,8 +71,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "a"
+                  IDENT "a"
           WHITESPACE " "
           JOIN
             JOIN_INNER

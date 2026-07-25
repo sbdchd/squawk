@@ -17974,8 +17974,8 @@ pub struct PathSegmentRef {
 }
 impl PathSegmentRef {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -25893,6 +25893,7 @@ pub enum AnyName {
     ParamName(ParamName),
     ParamNameRef(ParamNameRef),
     PathSegment(PathSegment),
+    PathSegmentRef(PathSegmentRef),
     Policy(Policy),
     PolicyRef(PolicyRef),
     PreparedStatement(PreparedStatement),
@@ -25944,6 +25945,7 @@ pub enum AnyNameRef {
     LanguageRef(LanguageRef),
     NameRef(NameRef),
     ParamNameRef(ParamNameRef),
+    PathSegmentRef(PathSegmentRef),
     PolicyRef(PolicyRef),
     PreparedStatementRef(PreparedStatementRef),
     PublicationRef(PublicationRef),
@@ -50033,6 +50035,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::PARAM_NAME
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT
+                | SyntaxKind::PATH_SEGMENT_REF
                 | SyntaxKind::POLICY
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT
@@ -50127,6 +50130,7 @@ impl AstNode for AnyName {
             SyntaxKind::PARAM_NAME => AnyName::ParamName(ParamName { syntax }),
             SyntaxKind::PARAM_NAME_REF => AnyName::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::PATH_SEGMENT => AnyName::PathSegment(PathSegment { syntax }),
+            SyntaxKind::PATH_SEGMENT_REF => AnyName::PathSegmentRef(PathSegmentRef { syntax }),
             SyntaxKind::POLICY => AnyName::Policy(Policy { syntax }),
             SyntaxKind::POLICY_REF => AnyName::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT => {
@@ -50221,6 +50225,7 @@ impl AstNode for AnyName {
             AnyName::ParamName(it) => &it.syntax,
             AnyName::ParamNameRef(it) => &it.syntax,
             AnyName::PathSegment(it) => &it.syntax,
+            AnyName::PathSegmentRef(it) => &it.syntax,
             AnyName::Policy(it) => &it.syntax,
             AnyName::PolicyRef(it) => &it.syntax,
             AnyName::PreparedStatement(it) => &it.syntax,
@@ -50480,6 +50485,12 @@ impl From<PathSegment> for AnyName {
         AnyName::PathSegment(node)
     }
 }
+impl From<PathSegmentRef> for AnyName {
+    #[inline]
+    fn from(node: PathSegmentRef) -> AnyName {
+        AnyName::PathSegmentRef(node)
+    }
+}
 impl From<Policy> for AnyName {
     #[inline]
     fn from(node: Policy) -> AnyName {
@@ -50702,6 +50713,7 @@ impl AstNode for AnyNameRef {
                 | SyntaxKind::LANGUAGE_REF
                 | SyntaxKind::NAME_REF
                 | SyntaxKind::PARAM_NAME_REF
+                | SyntaxKind::PATH_SEGMENT_REF
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT_REF
                 | SyntaxKind::PUBLICATION_REF
@@ -50744,6 +50756,7 @@ impl AstNode for AnyNameRef {
             SyntaxKind::LANGUAGE_REF => AnyNameRef::LanguageRef(LanguageRef { syntax }),
             SyntaxKind::NAME_REF => AnyNameRef::NameRef(NameRef { syntax }),
             SyntaxKind::PARAM_NAME_REF => AnyNameRef::ParamNameRef(ParamNameRef { syntax }),
+            SyntaxKind::PATH_SEGMENT_REF => AnyNameRef::PathSegmentRef(PathSegmentRef { syntax }),
             SyntaxKind::POLICY_REF => AnyNameRef::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT_REF => {
                 AnyNameRef::PreparedStatementRef(PreparedStatementRef { syntax })
@@ -50784,6 +50797,7 @@ impl AstNode for AnyNameRef {
             AnyNameRef::LanguageRef(it) => &it.syntax,
             AnyNameRef::NameRef(it) => &it.syntax,
             AnyNameRef::ParamNameRef(it) => &it.syntax,
+            AnyNameRef::PathSegmentRef(it) => &it.syntax,
             AnyNameRef::PolicyRef(it) => &it.syntax,
             AnyNameRef::PreparedStatementRef(it) => &it.syntax,
             AnyNameRef::PublicationRef(it) => &it.syntax,
@@ -50877,6 +50891,12 @@ impl From<ParamNameRef> for AnyNameRef {
     #[inline]
     fn from(node: ParamNameRef) -> AnyNameRef {
         AnyNameRef::ParamNameRef(node)
+    }
+}
+impl From<PathSegmentRef> for AnyNameRef {
+    #[inline]
+    fn from(node: PathSegmentRef) -> AnyNameRef {
+        AnyNameRef::PathSegmentRef(node)
     }
 }
 impl From<PolicyRef> for AnyNameRef {

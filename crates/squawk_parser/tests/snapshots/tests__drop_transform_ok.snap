@@ -15,8 +15,7 @@ SOURCE_FILE
     PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            TEXT_KW "text"
+          TEXT_KW "text"
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
@@ -41,8 +40,7 @@ SOURCE_FILE
     PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "

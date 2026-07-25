@@ -28,8 +28,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "films"
+              IDENT "films"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -80,7 +79,6 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t2"
+              IDENT "t2"
     SEMICOLON ";"
   WHITESPACE "\n\n"

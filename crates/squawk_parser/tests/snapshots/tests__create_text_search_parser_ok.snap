@@ -32,8 +32,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "start_function"
+                IDENT "start_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -46,8 +45,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "gettoken_function"
+                IDENT "gettoken_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -60,8 +58,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "end_function"
+                IDENT "end_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -74,8 +71,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "lextypes_function"
+                IDENT "lextypes_function"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -95,8 +91,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           NAME_KW "name"
@@ -114,8 +109,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "start_function"
+                IDENT "start_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -128,8 +122,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "gettoken_function"
+                IDENT "gettoken_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -142,8 +135,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "end_function"
+                IDENT "end_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -156,8 +148,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "lextypes_function"
+                IDENT "lextypes_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -170,8 +161,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "headline_function"
+                IDENT "headline_function"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"

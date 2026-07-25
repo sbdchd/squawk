@@ -70,8 +70,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      INTEGER_KW "integer"
+                    INTEGER_KW "integer"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
                 OPTION_PATH
@@ -88,8 +87,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
                 OPTION_PATH
@@ -106,8 +104,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
                 OPTION_PATH
@@ -124,8 +121,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      INTEGER_KW "integer"
+                    INTEGER_KW "integer"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
                 OPTION_PATH
@@ -142,8 +138,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      NUMERIC_KW "numeric"
+                    NUMERIC_KW "numeric"
                 ARG_LIST
                   L_PAREN "("
                   ARG
@@ -176,8 +171,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      NUMERIC_KW "numeric"
+                    NUMERIC_KW "numeric"
                 ARG_LIST
                   L_PAREN "("
                   ARG

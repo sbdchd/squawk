@@ -49,8 +49,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
               WHITESPACE " "
               LITERAL
                 STRING "'Hello World'"
@@ -89,8 +88,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "films"
+                IDENT "films"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -132,8 +130,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "comedies"
+                IDENT "comedies"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -183,8 +180,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "comedies"
+                IDENT "comedies"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -284,8 +280,7 @@ SOURCE_FILE
                     RELATION_NAME_REF
                       PATH_REF
                         PATH_SEGMENT_REF
-                          NAME_REF
-                            IDENT "user_ratings"
+                          IDENT "user_ratings"
                     WHITESPACE " "
                     FROM_ALIAS
                       TABLE_ALIAS
@@ -325,8 +320,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "films"
+                IDENT "films"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -360,8 +354,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "public"
+            IDENT "public"
         DOT "."
         PATH_SEGMENT
           IDENT "nums_1_100"
@@ -410,8 +403,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "nums_1_100"
+                  IDENT "nums_1_100"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "WHERE"
@@ -480,8 +472,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "bar"
+                  IDENT "bar"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
@@ -589,8 +580,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- parenthesized / compound queries"
@@ -751,8 +741,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -868,8 +857,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "x"
+                  IDENT "x"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

@@ -13,8 +13,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_PROPERTY_GRAPH
@@ -33,12 +32,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -53,8 +50,7 @@ SOURCE_FILE
     PROPERTY_GRAPH_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "g"
+          IDENT "g"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

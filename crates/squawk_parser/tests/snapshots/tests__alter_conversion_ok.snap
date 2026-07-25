@@ -13,8 +13,7 @@ SOURCE_FILE
     CONVERSION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     CONVERSION_RENAME_TO
       RENAME_KW "rename"
@@ -37,8 +36,7 @@ SOURCE_FILE
     CONVERSION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -57,8 +55,7 @@ SOURCE_FILE
     CONVERSION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -79,8 +76,7 @@ SOURCE_FILE
     CONVERSION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
@@ -102,12 +98,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"

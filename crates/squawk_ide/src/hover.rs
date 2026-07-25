@@ -217,6 +217,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::LanguageRef(_)
             | ast::AnyName::NameRef(_)
             | ast::AnyName::ParamNameRef(_)
+            | ast::AnyName::PathSegmentRef(_)
             | ast::AnyName::PolicyRef(_)
             | ast::AnyName::PreparedStatementRef(_)
             | ast::AnyName::PropertyName(_)
@@ -2086,7 +2087,7 @@ fn table_or_view_or_cte_ptrs(
     let path = path.value;
     let (schema, table_name) = name::schema_and_name_path(path)?;
     let mut results = vec![];
-    let name_ref = path.segment().and_then(|x| x.name_ref());
+    let name_ref = path.segment();
     let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
 
     if let Some((table_like_ptr, _kind)) =

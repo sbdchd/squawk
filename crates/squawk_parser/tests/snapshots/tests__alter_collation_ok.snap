@@ -13,8 +13,7 @@ SOURCE_FILE
     COLLATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE "\n  "
     REFRESH_VERSION
       REFRESH_KW "refresh"
@@ -32,8 +31,7 @@ SOURCE_FILE
     COLLATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE "\n  "
     COLLATION_RENAME_TO
       RENAME_KW "rename"
@@ -56,8 +54,7 @@ SOURCE_FILE
     COLLATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -77,12 +74,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -103,8 +98,7 @@ SOURCE_FILE
     COLLATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"

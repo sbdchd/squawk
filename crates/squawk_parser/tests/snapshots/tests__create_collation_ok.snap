@@ -21,8 +21,7 @@ SOURCE_FILE
       COLLATION_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from_full"
@@ -43,8 +42,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "c"
@@ -56,12 +54,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_options"
@@ -82,8 +78,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "c"
@@ -156,8 +151,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "r"
+                IDENT "r"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION

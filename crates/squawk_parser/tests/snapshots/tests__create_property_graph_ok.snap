@@ -139,8 +139,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "bar"
@@ -159,8 +158,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "bar"
@@ -176,12 +174,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "buzz"
+                IDENT "buzz"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "boo"
+              IDENT "boo"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -219,12 +215,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -346,8 +340,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "e"
+              IDENT "e"
         WHITESPACE "\n    "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
@@ -390,8 +383,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "e"
+              IDENT "e"
         WHITESPACE "\n    "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
@@ -445,8 +437,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "bar"
@@ -461,8 +452,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "boo"
+              IDENT "boo"
       R_PAREN ")"
     WHITESPACE "\n  "
     EDGE_TABLES
@@ -476,8 +466,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
@@ -519,8 +508,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "e"
+              IDENT "e"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
@@ -562,8 +550,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "e"
+              IDENT "e"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
@@ -593,8 +580,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "bar"
@@ -609,16 +595,14 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "boo"
+              IDENT "boo"
       COMMA ","
       WHITESPACE " "
       VERTEX_TABLE_DEF
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "buzz"
+              IDENT "buzz"
       R_PAREN ")"
     WHITESPACE "\n  "
     EDGE_TABLES
@@ -632,8 +616,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
@@ -652,8 +635,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"

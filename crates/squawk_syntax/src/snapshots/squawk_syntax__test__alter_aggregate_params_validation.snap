@@ -23,8 +23,7 @@ SOURCE_FILE@0..101
         PATH_TYPE@61..62
           PATH_REF@61..62
             PATH_SEGMENT_REF@61..62
-              NAME_REF@61..62
-                IDENT@61..62 "x"
+              IDENT@61..62 "x"
       COMMA@62..63 ","
       WHITESPACE@63..64 " "
       PARAM@64..69
@@ -34,8 +33,7 @@ SOURCE_FILE@0..101
         PATH_TYPE@68..69
           PATH_REF@68..69
             PATH_SEGMENT_REF@68..69
-              NAME_REF@68..69
-                IDENT@68..69 "y"
+              IDENT@68..69 "y"
       R_PAREN@69..70 ")"
     WHITESPACE@70..71 " "
     ATTRIBUTE_LIST@71..99
@@ -51,8 +49,7 @@ SOURCE_FILE@0..101
           PATH_TYPE@83..84
             PATH_REF@83..84
               PATH_SEGMENT_REF@83..84
-                NAME_REF@83..84
-                  IDENT@83..84 "f"
+                IDENT@83..84 "f"
       COMMA@84..85 ","
       WHITESPACE@85..88 "\n  "
       ATTRIBUTE_OPTION@88..97
@@ -65,8 +62,7 @@ SOURCE_FILE@0..101
           PATH_TYPE@96..97
             PATH_REF@96..97
               PATH_SEGMENT_REF@96..97
-                NAME_REF@96..97
-                  IDENT@96..97 "t"
+                IDENT@96..97 "t"
       WHITESPACE@97..98 "\n"
       R_PAREN@98..99 ")"
     SEMICOLON@99..100 ";"

@@ -26,8 +26,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -56,8 +55,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "p"
+                IDENT "p"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -74,12 +72,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
         DOT "."
         PATH_SEGMENT_REF
       CUSTOM_OP
@@ -103,16 +99,13 @@ SOURCE_FILE
               PATH_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "foo"
+                    IDENT "foo"
                 DOT "."
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "bar"
+                  IDENT "bar"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -143,12 +136,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "foo"
+                  IDENT "foo"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  BIGINT_KW "bigint"
+                BIGINT_KW "bigint"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -188,8 +179,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "r"
+                IDENT "r"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -202,8 +192,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "j"
+                IDENT "j"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION

@@ -27,8 +27,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n"
 ---

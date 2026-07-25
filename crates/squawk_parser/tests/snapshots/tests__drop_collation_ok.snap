@@ -13,8 +13,7 @@ SOURCE_FILE
     COLLATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -33,12 +32,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+          IDENT "b"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -56,8 +53,7 @@ SOURCE_FILE
     COLLATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

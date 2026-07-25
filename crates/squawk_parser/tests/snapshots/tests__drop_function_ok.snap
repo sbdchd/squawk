@@ -15,8 +15,7 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -36,24 +35,21 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
       COMMA ","
       WHITESPACE " "
       FUNCTION_SIG
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
         PARAM_LIST
           L_PAREN "("
           PARAM
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    TEXT_KW "text"
+                  TEXT_KW "text"
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
@@ -62,12 +58,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+              IDENT "c"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -80,8 +74,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    INT_KW "int"
+                  INT_KW "int"
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
@@ -89,8 +82,7 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -100,8 +92,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    TEXT_KW "text"
+                  TEXT_KW "text"
           R_PAREN ")"
     WHITESPACE " "
     CASCADE_KW "cascade"
@@ -122,8 +113,7 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

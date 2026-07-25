@@ -13,8 +13,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     INDEX_RENAME_TO
       RENAME_KW "rename"
@@ -41,12 +40,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     INDEX_RENAME_TO
       RENAME_KW "rename"
@@ -69,8 +66,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     SET_TABLESPACE
       SET_KW "set"
@@ -95,12 +91,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     SET_TABLESPACE
       SET_KW "set"
@@ -121,8 +115,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -149,12 +142,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -190,8 +181,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     RESET_OPTIONS
       RESET_KW "reset"
@@ -218,12 +208,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     RESET_OPTIONS
       RESET_KW "reset"
@@ -251,8 +239,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ATTACH_INDEX_PARTITION
       ATTACH_KW "attach"
@@ -262,8 +249,7 @@ SOURCE_FILE
       INDEX_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -275,12 +261,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ATTACH_INDEX_PARTITION
       ATTACH_KW "attach"
@@ -291,12 +275,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
@@ -309,8 +291,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"
@@ -334,12 +315,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     DEPENDS_ON_EXTENSION
       DEPENDS_KW "depends"
@@ -362,8 +341,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ALTER_SET_STATISTICS
       ALTER_KW "alter"
@@ -393,12 +371,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ALTER_SET_STATISTICS
       ALTER_KW "alter"
@@ -424,8 +400,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ALTER_SET_STATISTICS
       ALTER_KW "alter"

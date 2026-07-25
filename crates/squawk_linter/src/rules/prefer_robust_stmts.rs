@@ -40,7 +40,6 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                 .constraint_name_ref()
                                 .and_then(|constraint| constraint.path_ref())
                                 .and_then(|path| path.segment())
-                                .and_then(|segment| segment.name_ref())
                             {
                                 constraint_names
                                     .insert(constraint_name.text(), Constraint::Dropped);
@@ -74,7 +73,6 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                 .constraint_name_ref()
                                 .and_then(|constraint| constraint.path_ref())
                                 .and_then(|path| path.segment())
-                                .and_then(|segment| segment.name_ref())
                                 && constraint_names.contains_key(&constraint_name.text())
                             {
                                 continue;

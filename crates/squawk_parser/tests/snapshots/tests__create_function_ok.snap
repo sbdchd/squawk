@@ -23,8 +23,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -37,8 +36,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -51,8 +49,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
       R_PAREN ")"
     WHITESPACE "\n    "
     FUNC_OPTION_LIST
@@ -89,8 +86,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "TEXT"
+              TEXT_KW "TEXT"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -100,8 +96,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "TEXT"
+              TEXT_KW "TEXT"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -110,8 +105,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              BOOLEAN_KW "BOOLEAN"
+            BOOLEAN_KW "BOOLEAN"
     WHITESPACE " "
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -140,8 +134,7 @@ SOURCE_FILE
           CONFIG_PARAMETER_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "search_path"
+                IDENT "search_path"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -176,12 +169,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+              IDENT "c"
           PERCENT_TYPE_CLAUSE
             PERCENT "%"
             TYPE_KW "type"
@@ -194,12 +185,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
         PERCENT_TYPE_CLAUSE
           PERCENT "%"
           TYPE_KW "type"
@@ -235,8 +224,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -248,12 +236,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -286,8 +272,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -296,8 +281,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -353,8 +337,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "public"
+            IDENT "public"
         DOT "."
         PATH_SEGMENT
           IDENT "f"
@@ -368,8 +351,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              INT_KW "int"
+            INT_KW "int"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -396,16 +378,13 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "a"
+                IDENT "a"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
         DOT "."
         PATH_SEGMENT
           IDENT "d"
@@ -419,8 +398,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              INT_KW "int"
+            INT_KW "int"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -445,8 +423,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "public"
+            IDENT "public"
         DOT "."
         PATH_SEGMENT
           IDENT "a"
@@ -461,8 +438,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                NUMERIC_KW "numeric"
+              NUMERIC_KW "numeric"
         L_BRACK "["
         R_BRACK "]"
     WHITESPACE "\n"
@@ -509,8 +485,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  TEXT_KW "text"
+                TEXT_KW "text"
         COMMA ","
         WHITESPACE " "
         COLUMN
@@ -520,8 +495,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  INT_KW "int"
+                INT_KW "int"
         R_PAREN ")"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
@@ -559,8 +533,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       TRANSFORM_FUNC_OPTION
@@ -573,8 +546,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
         COMMA ","
         WHITESPACE " "
         FOR_KW "for"
@@ -584,8 +556,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -678,8 +649,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       WINDOW_FUNC_OPTION
@@ -719,8 +689,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION
@@ -758,8 +727,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION
@@ -797,8 +765,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION
@@ -838,8 +805,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       NOT_LEAKPROOF_FUNC_OPTION
@@ -879,8 +845,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       LEAKPROOF_FUNC_OPTION
@@ -920,8 +885,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       CALLED_ON_NULL_INPUT_FUNC_OPTION
@@ -965,8 +929,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       RETURNS_NULL_ON_NULL_INPUT_FUNC_OPTION
@@ -1054,8 +1017,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       STRICT_FUNC_OPTION
@@ -1095,8 +1057,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SECURITY_FUNC_OPTION
@@ -1138,8 +1099,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SECURITY_FUNC_OPTION
@@ -1179,8 +1139,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SECURITY_FUNC_OPTION
@@ -1222,8 +1181,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SECURITY_FUNC_OPTION
@@ -1265,8 +1223,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       PARALLEL_FUNC_OPTION
@@ -1306,8 +1263,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       PARALLEL_FUNC_OPTION
@@ -1347,8 +1303,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       PARALLEL_FUNC_OPTION
@@ -1390,8 +1345,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       COST_FUNC_OPTION
@@ -1434,8 +1388,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       ROWS_FUNC_OPTION
@@ -1478,8 +1431,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SUPPORT_FUNC_OPTION
@@ -1489,12 +1441,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -1528,8 +1478,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SUPPORT_FUNC_OPTION
@@ -1538,8 +1487,7 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -1575,8 +1523,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
@@ -1587,12 +1534,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "foo"
+                  IDENT "foo"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
           WHITESPACE " "
           FROM_KW "from"
           WHITESPACE " "
@@ -1630,8 +1575,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
@@ -1641,8 +1585,7 @@ SOURCE_FILE
           CONFIG_PARAMETER_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
           WHITESPACE " "
           TO_KW "to"
           WHITESPACE " "
@@ -1681,8 +1624,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
@@ -1692,8 +1634,7 @@ SOURCE_FILE
           CONFIG_PARAMETER_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -1734,8 +1675,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -1772,8 +1712,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -1814,8 +1753,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       LANGUAGE_FUNC_OPTION
@@ -1861,8 +1799,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       LANGUAGE_FUNC_OPTION
@@ -1918,8 +1855,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       LANGUAGE_FUNC_OPTION
@@ -1971,8 +1907,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       LANGUAGE_FUNC_OPTION
@@ -2043,8 +1978,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       LANGUAGE_FUNC_OPTION
@@ -2063,8 +1997,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
       WHITESPACE "\n  "
       WINDOW_FUNC_OPTION
         WINDOW_KW "window"
@@ -2111,12 +2044,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
         SET_CONFIG_PARAM
@@ -2126,12 +2057,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "a"
+                  IDENT "a"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "b"
+                IDENT "b"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -2187,8 +2116,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2197,8 +2125,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              INT_KW "int"
+            INT_KW "int"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2245,8 +2172,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              BOOLEAN_KW "boolean"
+            BOOLEAN_KW "boolean"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2282,8 +2208,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2292,8 +2217,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2327,8 +2251,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2337,8 +2260,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2374,8 +2296,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2384,8 +2305,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2419,8 +2339,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2429,8 +2348,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2464,8 +2382,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2474,8 +2391,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2513,8 +2429,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2523,8 +2438,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2560,8 +2474,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                FLOAT_KW "float"
+              FLOAT_KW "float"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -2571,8 +2484,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int4"
+              IDENT "int4"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2581,8 +2493,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2618,16 +2529,14 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                FLOAT_KW "float"
+              FLOAT_KW "float"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int4"
+              IDENT "int4"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2636,8 +2545,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2675,8 +2583,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                FLOAT_KW "float"
+              FLOAT_KW "float"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -2689,8 +2596,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int4"
+              IDENT "int4"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -2705,8 +2611,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2742,8 +2647,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                FLOAT_KW "float"
+              FLOAT_KW "float"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -2756,8 +2660,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int4"
+              IDENT "int4"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2766,8 +2669,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2803,8 +2705,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         WHITESPACE " "
         PARAM_DEFAULT
           DEFAULT_KW "default"
@@ -2819,8 +2720,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2856,8 +2756,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         WHITESPACE " "
         PARAM_DEFAULT
           DEFAULT_KW "default"
@@ -2878,8 +2777,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2915,8 +2813,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                INT_KW "int"
+              INT_KW "int"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -2937,8 +2834,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -2979,8 +2875,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -2989,8 +2884,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3026,8 +2920,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -3036,8 +2929,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3076,8 +2968,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -3086,8 +2977,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3123,8 +3013,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -3133,8 +3022,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3167,8 +3055,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "int8"
+              IDENT "int8"
       R_PAREN ")"
     WHITESPACE "\n"
     RET_TYPE
@@ -3177,8 +3064,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3212,8 +3098,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "internal"
+              IDENT "internal"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -3221,8 +3106,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  TEXT_KW "text"
+                TEXT_KW "text"
           L_BRACK "["
           R_BRACK "]"
       COMMA ","
@@ -3231,8 +3115,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bool"
+              IDENT "bool"
       R_PAREN ")"
     WHITESPACE " \n"
     RET_TYPE
@@ -3241,8 +3124,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3279,20 +3161,16 @@ SOURCE_FILE
               PATH_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "foo"
+                    IDENT "foo"
                 DOT "."
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "bar"
+                  IDENT "bar"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "buzz"
+                IDENT "buzz"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "boo"
+              IDENT "boo"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -3301,12 +3179,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
           L_BRACK "["
           R_BRACK "]"
       COMMA ","
@@ -3315,8 +3191,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bool"
+              IDENT "bool"
       R_PAREN ")"
     WHITESPACE " \n"
     RET_TYPE
@@ -3325,8 +3200,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "void"
+            IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3363,8 +3237,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "int8"
+            IDENT "int8"
     WHITESPACE " "
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3401,8 +3274,7 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "int8"
+            IDENT "int8"
     WHITESPACE " "
     FUNC_OPTION_LIST
       AS_FUNC_OPTION

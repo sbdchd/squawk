@@ -16,8 +16,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -38,8 +37,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -61,12 +59,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -86,12 +82,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_multiple"
@@ -107,8 +101,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -137,8 +130,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -158,8 +150,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "p"
+            IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_all"

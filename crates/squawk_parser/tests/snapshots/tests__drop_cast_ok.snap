@@ -15,16 +15,14 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              TEXT_KW "text"
+            TEXT_KW "text"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              INT_KW "int"
+            INT_KW "int"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -45,16 +43,14 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
       R_PAREN ")"
     WHITESPACE " "
     CASCADE_KW "cascade"
@@ -76,12 +72,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -89,12 +83,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
       R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"

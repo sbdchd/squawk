@@ -54,8 +54,7 @@ SOURCE_FILE
                       RELATION_NAME_REF
                         PATH_REF
                           PATH_SEGMENT_REF
-                            NAME_REF
-                              IDENT "bar"
+                            IDENT "bar"
                 WHITESPACE " "
                 R_PAREN ")"
             R_PAREN ")"

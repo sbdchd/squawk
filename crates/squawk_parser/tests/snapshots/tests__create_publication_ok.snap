@@ -46,8 +46,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "bar"
+                  IDENT "bar"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
@@ -77,12 +76,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
     COMMA ","
     WHITESPACE " \n  "
     PUBLICATION_OBJECT
@@ -93,16 +90,13 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "buzz"
+            IDENT "buzz"
       WHITESPACE " "
       STAR "*"
     COMMA ","
@@ -113,8 +107,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
     COMMA ","
     WHITESPACE " \n  "
     PUBLICATION_OBJECT
@@ -123,8 +116,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       COLUMN_REF_LIST
         L_PAREN "("
         COLUMN_REF
@@ -178,8 +170,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       R_PAREN ")"
     WHITESPACE "\n  "
     WITH_PARAMS
@@ -197,8 +188,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "bar"
+                  IDENT "bar"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
@@ -234,16 +224,14 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
     COMMA ","
     WHITESPACE " "
     PUBLICATION_OBJECT
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
     COMMA ","
     WHITESPACE " "
     PUBLICATION_OBJECT
@@ -268,16 +256,14 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "chats"
+            IDENT "chats"
     COMMA ","
     WHITESPACE " "
     PUBLICATION_OBJECT
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "users"
+            IDENT "users"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PUBLICATION
@@ -308,8 +294,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -339,8 +324,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
@@ -348,8 +332,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
@@ -359,8 +342,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "k"
+                  IDENT "k"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

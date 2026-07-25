@@ -13,8 +13,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
@@ -26,12 +25,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
@@ -49,22 +46,19 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
     COMMA ","
     WHITESPACE " "
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+          IDENT "b"
     COMMA ","
     WHITESPACE " "
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -82,8 +76,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -101,8 +94,7 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "\"field_name_idx\""
+          IDENT "\"field_name_idx\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
@@ -120,7 +112,6 @@ SOURCE_FILE
     INDEX_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "\"field_name_idx\""
+          IDENT "\"field_name_idx\""
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -13,8 +13,7 @@ SOURCE_FILE
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_TYPE
@@ -26,12 +25,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_TYPE
@@ -42,22 +39,19 @@ SOURCE_FILE
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
     COMMA ","
     WHITESPACE " "
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+          IDENT "b"
     COMMA ","
     WHITESPACE " "
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_TYPE
@@ -73,22 +67,19 @@ SOURCE_FILE
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
     COMMA ","
     WHITESPACE " "
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+          IDENT "b"
     COMMA ","
     WHITESPACE " "
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+          IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TYPE
@@ -104,8 +95,7 @@ SOURCE_FILE
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -118,8 +108,7 @@ SOURCE_FILE
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -137,7 +126,6 @@ SOURCE_FILE
     TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"

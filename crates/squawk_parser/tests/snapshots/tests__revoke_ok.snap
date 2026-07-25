@@ -53,8 +53,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -87,22 +86,19 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
       COMMA ","
       WHITESPACE " "
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
       COMMA ","
       WHITESPACE " "
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -147,12 +143,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -194,8 +188,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -225,24 +218,20 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
       COMMA ","
       WHITESPACE " "
       RELATION_NAME_REF
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -326,8 +315,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -367,8 +355,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -408,8 +395,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -448,8 +434,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -478,8 +463,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -506,8 +490,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -534,8 +517,7 @@ SOURCE_FILE
       SEQUENCE_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -561,22 +543,19 @@ SOURCE_FILE
       SEQUENCE_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
       COMMA ","
       WHITESPACE " "
       SEQUENCE_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
       COMMA ","
       WHITESPACE " "
       SEQUENCE_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -602,8 +581,7 @@ SOURCE_FILE
       SEQUENCE_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "x"
+            IDENT "x"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -799,22 +777,19 @@ SOURCE_FILE
       DOMAIN_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
       COMMA ","
       WHITESPACE " "
       DOMAIN_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
       COMMA ","
       WHITESPACE " "
       DOMAIN_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -839,8 +814,7 @@ SOURCE_FILE
       DOMAIN_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1014,16 +988,14 @@ SOURCE_FILE
           FUNCTION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
         COMMA ","
         WHITESPACE " "
         FUNCTION_SIG
           FUNCTION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1051,8 +1023,7 @@ SOURCE_FILE
           PROCEDURE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1065,8 +1036,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
@@ -1079,16 +1049,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      NUMERIC_KW "numeric"
+                    NUMERIC_KW "numeric"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      BIGINT_KW "bigint"
+                    BIGINT_KW "bigint"
             R_PAREN ")"
         COMMA ","
         WHITESPACE " "
@@ -1096,8 +1064,7 @@ SOURCE_FILE
           PROCEDURE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
           PARAM_LIST
             L_PAREN "("
             R_PAREN ")"
@@ -1107,16 +1074,14 @@ SOURCE_FILE
           PROCEDURE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "z"
+                IDENT "z"
           PARAM_LIST
             L_PAREN "("
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      INT_KW "int"
+                    INT_KW "int"
             R_PAREN ")"
     WHITESPACE "\n  "
     FROM_KW "from"
@@ -1142,8 +1107,7 @@ SOURCE_FILE
           ROUTINE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "r"
+                IDENT "r"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1259,8 +1223,7 @@ SOURCE_FILE
           PROCEDURE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1273,8 +1236,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
@@ -1287,16 +1249,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      NUMERIC_KW "numeric"
+                    NUMERIC_KW "numeric"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      BIGINT_KW "bigint"
+                    BIGINT_KW "bigint"
             R_PAREN ")"
         COMMA ","
         WHITESPACE " "
@@ -1304,8 +1264,7 @@ SOURCE_FILE
           PROCEDURE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1498,22 +1457,19 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       COMMA ","
       WHITESPACE " "
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
       COMMA ","
       WHITESPACE " "
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "buzz"
+            IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1540,8 +1496,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              BEGIN_KW "begin"
+            BEGIN_KW "begin"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1564,8 +1519,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              BEGIN_KW "begin"
+            BEGIN_KW "begin"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1805,22 +1759,19 @@ SOURCE_FILE
       TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
       COMMA ","
       WHITESPACE " "
       TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
       COMMA ","
       WHITESPACE " "
       TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1843,8 +1794,7 @@ SOURCE_FILE
       TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1868,12 +1818,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "

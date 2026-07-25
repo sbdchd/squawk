@@ -52,7 +52,9 @@ pub(crate) fn schema_and_name_definition(path: &ast::Path) -> Option<(Option<Sch
     Some((schema_definition_name(path), table_definition_name(path)?))
 }
 
-pub(crate) fn schema_and_table_name(name_ref: &ast::NameRef) -> Option<(Option<Schema>, Name)> {
+pub(crate) fn schema_and_table_name(
+    name_ref: &impl ast::NameLike,
+) -> Option<(Option<Schema>, Name)> {
     if let Some(path) = name_ref.syntax().ancestors().find_map(ast::PathRef::cast) {
         return schema_and_name_path(&path);
     }
@@ -60,7 +62,7 @@ pub(crate) fn schema_and_table_name(name_ref: &ast::NameRef) -> Option<(Option<S
     Some((None, Name::from_node(name_ref)))
 }
 
-pub(crate) fn schema_and_name(name_ref: &ast::NameRef) -> (Option<Schema>, Name) {
+pub(crate) fn schema_and_name(name_ref: &impl ast::NameLike) -> (Option<Schema>, Name) {
     let table_name = Name::from_node(name_ref);
     let schema = if let Some(parent) = name_ref.syntax().parent()
         && let Some(base) = ast::FieldExpr::cast(parent).and_then(|x| x.base())
@@ -90,7 +92,7 @@ pub(crate) fn schema_and_func_name(call_expr: &ast::CallExpr) -> Option<(Option<
 }
 
 pub(crate) fn table_name(path: &ast::PathRef) -> Option<Name> {
-    Some(Name::from_node(&path.segment()?.name_ref()?))
+    Some(Name::from_node(&path.segment()?))
 }
 
 pub(crate) fn table_definition_name(path: &ast::Path) -> Option<Name> {
@@ -108,7 +110,6 @@ pub(crate) fn schema_definition_name(path: &ast::Path) -> Option<Schema> {
 fn schema_name_from_qualifier(qualifier: Option<ast::PathRef>) -> Option<Schema> {
     qualifier
         .and_then(|q| q.segment())
-        .and_then(|s| s.name_ref())
         .map(|name_ref| Schema(Name::from_node(&name_ref)))
 }
 

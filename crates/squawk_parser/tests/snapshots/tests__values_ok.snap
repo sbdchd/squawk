@@ -119,8 +119,7 @@ SOURCE_FILE
     RELATION_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+          IDENT "films"
     WHITESPACE " "
     VALUES
       VALUES_KW "VALUES"
@@ -201,8 +200,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "films"
+              IDENT "films"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -305,8 +303,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "employees"
+            IDENT "employees"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -453,8 +450,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "machines"
+              IDENT "machines"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -481,8 +477,7 @@ SOURCE_FILE
                   PATH_TYPE
                     PATH_REF
                       PATH_SEGMENT_REF
-                        NAME_REF
-                          IDENT "inet"
+                        IDENT "inet"
                 R_PAREN ")"
               COMMA ","
               WHITESPACE " "

@@ -24,8 +24,7 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+              IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_connection"
@@ -70,8 +69,7 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "h"
+              IDENT "h"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_handler"
@@ -116,8 +114,7 @@ SOURCE_FILE
         FUNCTION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "v"
+              IDENT "v"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_validator"
@@ -210,12 +207,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "c"
+              IDENT "c"
       WHITESPACE "\n  "
       OPTION_NO_CONNECTION
         NO_KW "no"
@@ -229,12 +224,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "h"
+              IDENT "h"
       WHITESPACE "\n  "
       OPTION_NO_HANDLER
         NO_KW "no"
@@ -248,12 +241,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "v"
+              IDENT "v"
       WHITESPACE "\n  "
       OPTION_NO_VALIDATOR
         NO_KW "no"

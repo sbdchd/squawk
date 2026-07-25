@@ -25,8 +25,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -69,8 +68,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -161,8 +159,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -206,8 +203,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -298,8 +294,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -343,8 +338,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -420,8 +414,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -464,8 +457,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -527,8 +519,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -600,8 +591,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -650,8 +640,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -699,8 +688,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -750,8 +738,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -801,8 +788,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -868,8 +854,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
           WHITESPACE "\n  "
           MATCH_KW "match"
           WHITESPACE " "
@@ -931,8 +916,7 @@ SOURCE_FILE
                         PATH_TYPE
                           PATH_REF
                             PATH_SEGMENT_REF
-                              NAME_REF
-                                IDENT "date"
+                              IDENT "date"
                         WHITESPACE " "
                         LITERAL
                           STRING "'2024-01-02'"
@@ -984,8 +968,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "myshop"
+                IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1065,8 +1048,7 @@ SOURCE_FILE
                         PATH_TYPE
                           PATH_REF
                             PATH_SEGMENT_REF
-                              NAME_REF
-                                IDENT "date"
+                              IDENT "date"
                         WHITESPACE " "
                         LITERAL
                           STRING "'2024-01-01'"
@@ -1207,8 +1189,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "myshop"
+                IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1391,8 +1372,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "myshop"
+                IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1465,8 +1445,7 @@ SOURCE_FILE
                               PATH_TYPE
                                 PATH_REF
                                   PATH_SEGMENT_REF
-                                    NAME_REF
-                                      IDENT "date"
+                                    IDENT "date"
                               WHITESPACE " "
                               LITERAL
                                 STRING "'2024-06-01'"
@@ -1579,8 +1558,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "myshop"
+                IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1784,8 +1762,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "myshop"
+                IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1905,8 +1882,7 @@ SOURCE_FILE
                         PATH_TYPE
                           PATH_REF
                             PATH_SEGMENT_REF
-                              NAME_REF
-                                IDENT "date"
+                              IDENT "date"
                         WHITESPACE " "
                         LITERAL
                           STRING "'2023-01-01'"
@@ -1957,8 +1933,7 @@ SOURCE_FILE
           PROPERTY_GRAPH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "myshop"
+                IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
