@@ -30,8 +30,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     ALTER_CONSTRAINT
       ALTER_KW "alter"
@@ -41,8 +40,7 @@ SOURCE_FILE
       CONSTRAINT_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
       WHITESPACE " "
       NOT_DEFERRABLE_CONSTRAINT_OPTION
         NOT_KW "not"
@@ -64,8 +62,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " \n"
     VALIDATE_CONSTRAINT
       VALIDATE_KW "validate"
@@ -75,8 +72,7 @@ SOURCE_FILE
       CONSTRAINT_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
     WHITESPACE " "
     VALIDATE_CONSTRAINT
       VALIDATE_KW "validate"
@@ -86,8 +82,7 @@ SOURCE_FILE
       CONSTRAINT_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+            IDENT "b"
     WHITESPACE " "
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -105,12 +100,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "public"
+              IDENT "public"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "copy_2"
+            IDENT "copy_2"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -148,8 +141,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -191,8 +183,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"

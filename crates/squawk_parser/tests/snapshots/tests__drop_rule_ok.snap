@@ -19,8 +19,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     SEMICOLON ";"
   EMPTY_STMT
     SEMICOLON ";"
@@ -47,12 +46,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t_name"
+            IDENT "t_name"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -76,8 +73,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

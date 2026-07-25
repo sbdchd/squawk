@@ -26,8 +26,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "core_recipe"
+            IDENT "core_recipe"
     WHITESPACE "\n"
     FOR_KW "FOR"
     WHITESPACE " "
@@ -84,16 +83,13 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "buzz"
+            IDENT "buzz"
     WHITESPACE "\n"
     REFERENCING
       REFERENCING_KW "referencing"
@@ -214,8 +210,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
     WHITESPACE "\n"
     FOR_KW "for"
     WHITESPACE " "
@@ -272,8 +267,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
     WHITESPACE "\n"
     REFERENCING
       REFERENCING_KW "referencing"
@@ -346,8 +340,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "buzz"
+            IDENT "buzz"
     WHITESPACE "\n"
     EXECUTE_KW "execute"
     WHITESPACE " "

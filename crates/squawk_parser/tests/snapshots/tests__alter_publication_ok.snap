@@ -22,8 +22,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -43,8 +42,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t1"
+              IDENT "t1"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
@@ -53,8 +51,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t2"
+              IDENT "t2"
         WHITESPACE " "
         WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
@@ -79,8 +76,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
@@ -89,8 +85,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -169,8 +164,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -190,8 +184,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t1"
+              IDENT "t1"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
@@ -200,8 +193,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t2"
+              IDENT "t2"
         WHITESPACE " "
         WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
@@ -226,8 +218,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
@@ -236,8 +227,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -282,8 +272,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    VALUE_KW "value"
+                  VALUE_KW "value"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -306,8 +295,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -327,8 +315,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t1"
+              IDENT "t1"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
@@ -337,8 +324,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t2"
+              IDENT "t2"
         WHITESPACE " "
         WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
@@ -363,8 +349,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
@@ -373,8 +358,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -470,8 +454,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
@@ -479,8 +462,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
@@ -490,8 +472,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "k"
+                  IDENT "k"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

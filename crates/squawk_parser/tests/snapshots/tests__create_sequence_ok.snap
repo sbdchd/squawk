@@ -108,12 +108,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unlogged"

@@ -27,12 +27,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE " "
     CLUSTER_USING_INDEX
       USING_KW "using"
@@ -40,8 +38,7 @@ SOURCE_FILE
       INDEX_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "idx"
+            IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options_only"
@@ -70,12 +67,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE " "
     CLUSTER_USING_INDEX
       USING_KW "using"
@@ -83,8 +78,7 @@ SOURCE_FILE
       INDEX_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "idx"
+            IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_17"
@@ -106,8 +100,7 @@ SOURCE_FILE
       INDEX_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
       WHITESPACE " "
       ON_PATH
         ON_KW "on"
@@ -116,11 +109,9 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"

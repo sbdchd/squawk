@@ -19,8 +19,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     POLICY_RENAME_TO
       RENAME_KW "rename"
@@ -47,8 +46,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       TO_KW "to"
@@ -74,8 +72,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       TO_KW "to"
@@ -109,8 +106,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       USING_EXPR_CLAUSE
@@ -144,8 +140,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       WITH_CHECK_EXPR_CLAUSE
@@ -181,8 +176,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       TO_KW "to"

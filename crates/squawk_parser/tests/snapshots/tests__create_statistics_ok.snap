@@ -24,8 +24,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -46,8 +45,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "s"
@@ -101,12 +99,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_1"
@@ -142,8 +138,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+            IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_2"
@@ -179,8 +174,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t2"
+            IDENT "t2"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_3"
@@ -240,7 +234,6 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t3"
+            IDENT "t3"
     SEMICOLON ";"
   WHITESPACE "\n\n"

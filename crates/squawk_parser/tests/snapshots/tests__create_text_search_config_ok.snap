@@ -32,8 +32,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "parser_name"
+                IDENT "parser_name"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -53,8 +52,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           NAME_KW "name"
@@ -72,8 +70,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "source_config"
+                IDENT "source_config"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"

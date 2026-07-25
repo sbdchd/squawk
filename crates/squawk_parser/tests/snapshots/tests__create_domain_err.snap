@@ -20,8 +20,7 @@ SOURCE_FILE
     PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            INT_KW "int"
+          INT_KW "int"
     WHITESPACE " "
     CHECK_CONSTRAINT
       CHECK_KW "check"

@@ -32,8 +32,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -53,8 +52,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           NAME_KW "name"
@@ -72,8 +70,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -86,8 +83,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -100,8 +96,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "b"
+                IDENT "b"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"

@@ -22,8 +22,7 @@ SOURCE_FILE@0..239
       PATH_TYPE@28..32
         PATH_REF@28..32
           PATH_SEGMENT_REF@28..32
-            NAME_REF@28..32
-              IDENT@28..32 "void"
+            IDENT@28..32 "void"
     WHITESPACE@32..33 "\n"
     FUNC_OPTION_LIST@33..117
       LANGUAGE_FUNC_OPTION@33..45
@@ -45,8 +44,7 @@ SOURCE_FILE@0..239
           RELATION_NAME_REF@73..74
             PATH_REF@73..74
               PATH_SEGMENT_REF@73..74
-                NAME_REF@73..74
-                  IDENT@73..74 "t"
+                IDENT@73..74 "t"
           WHITESPACE@74..75 " "
           VALUES@75..85
             VALUES_KW@75..81 "values"
@@ -67,8 +65,7 @@ SOURCE_FILE@0..239
           RELATION_NAME_REF@101..102
             PATH_REF@101..102
               PATH_SEGMENT_REF@101..102
-                NAME_REF@101..102
-                  IDENT@101..102 "t"
+                IDENT@101..102 "t"
           WHITESPACE@102..103 " "
           VALUES@103..113
             VALUES_KW@103..109 "values"
@@ -102,8 +99,7 @@ SOURCE_FILE@0..239
       PATH_TYPE@148..152
         PATH_REF@148..152
           PATH_SEGMENT_REF@148..152
-            NAME_REF@148..152
-              IDENT@148..152 "void"
+            IDENT@148..152 "void"
     WHITESPACE@152..153 "\n"
     FUNC_OPTION_LIST@153..237
       LANGUAGE_FUNC_OPTION@153..165
@@ -125,8 +121,7 @@ SOURCE_FILE@0..239
           RELATION_NAME_REF@193..194
             PATH_REF@193..194
               PATH_SEGMENT_REF@193..194
-                NAME_REF@193..194
-                  IDENT@193..194 "t"
+                IDENT@193..194 "t"
           WHITESPACE@194..195 " "
           VALUES@195..205
             VALUES_KW@195..201 "values"
@@ -146,8 +141,7 @@ SOURCE_FILE@0..239
           RELATION_NAME_REF@220..221
             PATH_REF@220..221
               PATH_SEGMENT_REF@220..221
-                NAME_REF@220..221
-                  IDENT@220..221 "t"
+                IDENT@220..221 "t"
           WHITESPACE@221..222 " "
           VALUES@222..232
             VALUES_KW@222..228 "values"

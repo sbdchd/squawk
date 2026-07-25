@@ -40,12 +40,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "c"
+                IDENT "c"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
       WHITESPACE "\n  "
       OPTION_NO_CONNECTION
         NO_KW "no"
@@ -59,12 +57,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
       WHITESPACE "\n  "
       OPTION_NO_HANDLER
         NO_KW "no"
@@ -78,12 +74,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
       WHITESPACE "\n  "
       OPTION_NO_VALIDATOR
         NO_KW "no"

@@ -130,8 +130,7 @@ SOURCE_FILE
         AGGREGATE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
           WHITESPACE " "
           PARAM_LIST
             L_PAREN "("
@@ -146,8 +145,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             WHITESPACE " "
             ORDER_KW "order"
             WHITESPACE " "
@@ -157,16 +155,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "b"
+                    IDENT "b"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "c"
+                    IDENT "c"
             WHITESPACE " "
             R_PAREN ")"
     SEMICOLON ";"
@@ -188,8 +184,7 @@ SOURCE_FILE
         AGGREGATE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
           WHITESPACE " "
           PARAM_LIST
             L_PAREN "("
@@ -218,16 +213,14 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  BIGINT_KW "bigint"
+                BIGINT_KW "bigint"
           WHITESPACE " "
           AS_KW "as"
           WHITESPACE " "
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  TEXT_KW "text"
+                TEXT_KW "text"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -261,8 +254,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  SMALLINT_KW "smallint"
+                SMALLINT_KW "smallint"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -285,8 +277,7 @@ SOURCE_FILE
         COLLATION_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -307,12 +298,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -332,8 +321,7 @@ SOURCE_FILE
         COLLATION_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -354,12 +342,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_conversion"
@@ -381,8 +367,7 @@ SOURCE_FILE
         CONVERSION_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -403,12 +388,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -428,8 +411,7 @@ SOURCE_FILE
         CONVERSION_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -450,12 +432,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_domain"
@@ -477,8 +457,7 @@ SOURCE_FILE
         DOMAIN_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -498,8 +477,7 @@ SOURCE_FILE
         DOMAIN_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_event_trigger"
@@ -611,8 +589,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -635,12 +612,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -662,8 +637,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -686,12 +660,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_function"
@@ -714,8 +686,7 @@ SOURCE_FILE
           FUNCTION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -737,12 +708,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "s"
+                  IDENT "s"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -763,8 +732,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      BIGINT_KW "bigint"
+                    BIGINT_KW "bigint"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -786,8 +754,7 @@ SOURCE_FILE
           FUNCTION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -809,12 +776,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "s"
+                  IDENT "s"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -827,8 +792,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
@@ -870,8 +834,7 @@ SOURCE_FILE
         VIEW_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -894,12 +857,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -921,8 +882,7 @@ SOURCE_FILE
         VIEW_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -945,12 +905,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator"
@@ -978,8 +936,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
         COMMA ","
         WHITESPACE " "
         CHAR_TYPE
@@ -1016,8 +973,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "u"
+              IDENT "u"
         COMMA ","
         WHITESPACE " "
         CHAR_TYPE
@@ -1052,8 +1008,7 @@ SOURCE_FILE
         OP_CLASS_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
         WHITESPACE " "
         USING_METHOD
           USING_KW "using"
@@ -1081,8 +1036,7 @@ SOURCE_FILE
         OP_CLASS_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
         WHITESPACE " "
         USING_METHOD
           USING_KW "using"
@@ -1112,8 +1066,7 @@ SOURCE_FILE
         OP_FAMILY_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
         WHITESPACE " "
         USING_METHOD
           USING_KW "using"
@@ -1141,8 +1094,7 @@ SOURCE_FILE
         OP_FAMILY_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
         WHITESPACE " "
         USING_METHOD
           USING_KW "using"
@@ -1249,8 +1201,7 @@ SOURCE_FILE
           PROCEDURE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1272,12 +1223,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "s"
+                  IDENT "s"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1298,8 +1247,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      BIGINT_KW "bigint"
+                    BIGINT_KW "bigint"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1321,8 +1269,7 @@ SOURCE_FILE
           PROCEDURE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1344,12 +1291,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "s"
+                  IDENT "s"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1362,8 +1307,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
@@ -1404,8 +1348,7 @@ SOURCE_FILE
           ROUTINE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1427,12 +1370,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "s"
+                  IDENT "s"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1453,8 +1394,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      BIGINT_KW "bigint"
+                    BIGINT_KW "bigint"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1476,8 +1416,7 @@ SOURCE_FILE
           ROUTINE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1499,12 +1438,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "s"
+                  IDENT "s"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+                IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1517,8 +1454,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
@@ -1558,8 +1494,7 @@ SOURCE_FILE
         SEQUENCE_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1580,12 +1515,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1605,8 +1538,7 @@ SOURCE_FILE
         SEQUENCE_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1627,12 +1559,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_table"
@@ -1654,8 +1584,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1675,8 +1604,7 @@ SOURCE_FILE
         TABLE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1697,12 +1625,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "public"
+                IDENT "public"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_configuration"
@@ -1728,8 +1654,7 @@ SOURCE_FILE
         TEXT_SEARCH_CONFIGURATION_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1754,12 +1679,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1783,8 +1706,7 @@ SOURCE_FILE
         TEXT_SEARCH_CONFIGURATION_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1809,12 +1731,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_dictionary"
@@ -1840,8 +1760,7 @@ SOURCE_FILE
         TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1866,12 +1785,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1895,8 +1812,7 @@ SOURCE_FILE
         TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1921,12 +1837,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_parser"
@@ -1952,8 +1866,7 @@ SOURCE_FILE
         TEXT_SEARCH_PARSER_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1978,12 +1891,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2007,8 +1918,7 @@ SOURCE_FILE
         TEXT_SEARCH_PARSER_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2033,12 +1943,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_template"
@@ -2064,8 +1972,7 @@ SOURCE_FILE
         TEXT_SEARCH_TEMPLATE_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2090,12 +1997,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2119,8 +2024,7 @@ SOURCE_FILE
         TEXT_SEARCH_TEMPLATE_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2145,12 +2049,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_transform"
@@ -2174,8 +2076,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "type_name"
+              IDENT "type_name"
         WHITESPACE " "
         LANGUAGE_KW "language"
         WHITESPACE " "
@@ -2202,8 +2103,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "type_name"
+              IDENT "type_name"
         WHITESPACE " "
         LANGUAGE_KW "language"
         WHITESPACE " "
@@ -2230,8 +2130,7 @@ SOURCE_FILE
         TYPE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2251,8 +2150,7 @@ SOURCE_FILE
         TYPE_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_view"
@@ -2274,8 +2172,7 @@ SOURCE_FILE
         VIEW_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2296,12 +2193,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2321,8 +2216,7 @@ SOURCE_FILE
         VIEW_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2343,12 +2237,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_extension"
@@ -2560,8 +2452,7 @@ SOURCE_FILE
         INDEX_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2582,12 +2473,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2607,8 +2496,7 @@ SOURCE_FILE
         INDEX_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2629,12 +2517,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_statistics"
@@ -2656,8 +2542,7 @@ SOURCE_FILE
         STATISTICS_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2678,12 +2563,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2703,8 +2586,7 @@ SOURCE_FILE
         STATISTICS_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2725,12 +2607,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "o"
+              IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_role"

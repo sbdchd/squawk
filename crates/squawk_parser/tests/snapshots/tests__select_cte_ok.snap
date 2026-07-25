@@ -26,8 +26,7 @@ SOURCE_FILE
             TABLE_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
           WHITESPACE "\n    "
           USING_ON_CLAUSE
             USING_KW "using"
@@ -36,8 +35,7 @@ SOURCE_FILE
               RELATION_NAME_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "u"
+                    IDENT "u"
             WHITESPACE " "
             ON_CLAUSE
               ON_KW "on"
@@ -73,8 +71,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_values"
@@ -117,8 +114,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with"
@@ -162,8 +158,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column names"
@@ -221,8 +216,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- adjacent quoted aliases"
@@ -304,8 +298,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- materialized "
@@ -350,8 +343,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not materialized "
@@ -398,8 +390,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested"
@@ -471,8 +462,7 @@ SOURCE_FILE
                   RELATION_NAME_REF
                     PATH_REF
                       PATH_SEGMENT_REF
-                        NAME_REF
-                          IDENT "t"
+                        IDENT "t"
             WHITESPACE "\n"
             R_PAREN ")"
     SEMICOLON ";"
@@ -548,8 +538,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "tree"
+                      IDENT "tree"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -597,8 +586,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "tree"
+                      IDENT "tree"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -609,8 +597,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "search_tree"
+                      IDENT "search_tree"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -671,8 +658,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "search_tree"
+              IDENT "search_tree"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
@@ -756,8 +742,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "tree"
+                      IDENT "tree"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -805,8 +790,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "tree"
+                      IDENT "tree"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -817,8 +801,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "search_tree"
+                      IDENT "search_tree"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -879,8 +862,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "search_tree"
+              IDENT "search_tree"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
@@ -974,8 +956,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        GRAPH_KW "graph"
+                      GRAPH_KW "graph"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -1038,8 +1019,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        GRAPH_KW "graph"
+                      GRAPH_KW "graph"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -1050,8 +1030,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "search_graph"
+                      IDENT "search_graph"
                 WHITESPACE " "
                 FROM_ALIAS
                   TABLE_ALIAS
@@ -1112,8 +1091,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "search_graph"
+              IDENT "search_graph"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search cycle with to and default values"
@@ -1214,8 +1192,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "search_graph"
+              IDENT "search_graph"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi"
@@ -1277,16 +1254,14 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
       RELATION_FROM_ITEM
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- recursive"
@@ -1330,8 +1305,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1383,8 +1357,7 @@ SOURCE_FILE
               RELATION_NAME_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -1402,8 +1375,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t2"
+              IDENT "t2"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- timestamp_edge_cases"
@@ -1450,8 +1422,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1496,8 +1467,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- regression gh issue #509"
@@ -1573,12 +1543,10 @@ SOURCE_FILE
                 PATH_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "public"
+                      IDENT "public"
                   DOT "."
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "notification"
+                    IDENT "notification"
           WHITESPACE "\n  "
           WHERE_CLAUSE
             WHERE_KW "WHERE"
@@ -1601,12 +1569,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "public"
+              IDENT "public"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "notification"
+            IDENT "notification"
     WHITESPACE "\n"
     SET_CLAUSE
       SET_KW "SET"
@@ -1651,8 +1617,7 @@ SOURCE_FILE
                 RELATION_NAME_REF
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "ranked_notifications"
+                      IDENT "ranked_notifications"
             WHITESPACE " "
             WHERE_CLAUSE
               WHERE_KW "WHERE"
@@ -1733,8 +1698,7 @@ SOURCE_FILE
               RELATION_NAME_REF
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
           WHITESPACE " "
           GROUP_BY_CLAUSE
             GROUP_KW "group"
@@ -1759,7 +1723,6 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "x"
+              IDENT "x"
     SEMICOLON ";"
   WHITESPACE "\n"

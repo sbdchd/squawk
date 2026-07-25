@@ -13,21 +13,18 @@ SOURCE_FILE
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+          IDENT "foo"
     COMMA ","
     WHITESPACE " "
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE " "
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "buzz"
+          IDENT "buzz"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -42,8 +39,7 @@ SOURCE_FILE
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+          IDENT "foo"
     COMMA ","
     WHITESPACE "   "
     ERROR
@@ -52,8 +48,7 @@ SOURCE_FILE
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "buzz"
+          IDENT "buzz"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"

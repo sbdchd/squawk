@@ -338,10 +338,8 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                     if path.qualifier().is_some() {
                         continue;
                     }
-                    if let Some(segment) = path.segment()
-                        && let Some(name_ref) = segment.name_ref()
-                    {
-                        let name = name_ref.text();
+                    if let Some(segment) = path.segment() {
+                        let name = segment.text();
                         if name == "lock_timeout" {
                             lock_timeout = ReportOnce::Present;
                         } else if name == "statement_timeout" {

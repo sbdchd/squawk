@@ -77,8 +77,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -131,8 +130,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--          ^ ^ comma missing"
@@ -180,8 +178,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE "\n    "
     ORDER_BY_CLAUSE
       ORDER_KW "order"
@@ -219,8 +216,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -258,8 +254,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -297,8 +292,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "u"
+              IDENT "u"
     WHITESPACE "\n  "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -514,8 +508,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -616,8 +609,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "t"
+                  IDENT "t"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -667,8 +659,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- case missing then expr"
@@ -799,8 +790,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
@@ -822,8 +812,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -852,8 +841,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -923,8 +911,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
@@ -934,8 +921,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
           WHITESPACE " "
           ON_CLAUSE
             ON_KW "on"
@@ -959,8 +945,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
@@ -970,8 +955,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "u"
+                  IDENT "u"
           WHITESPACE " "
           ON_CLAUSE
             ON_KW "on"
@@ -1000,8 +984,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -1024,8 +1007,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "k"
+                IDENT "k"
         WHITESPACE " "
         ON_CLAUSE
           ON_KW "on"
@@ -1080,8 +1062,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE "\n"
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -1186,8 +1167,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"

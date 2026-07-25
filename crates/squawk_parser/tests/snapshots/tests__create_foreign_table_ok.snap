@@ -57,8 +57,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
@@ -69,12 +68,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                BIGINT_KW "bigint"
+              BIGINT_KW "bigint"
         WHITESPACE " \n    "
         ALTER_OPTION_LIST
           OPTIONS_KW "options"
@@ -102,8 +99,7 @@ SOURCE_FILE
           COLLATION_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "\"fr_FR\""
+                IDENT "\"fr_FR\""
         WHITESPACE "\n    "
         NOT_NULL_CONSTRAINT
           CONSTRAINT_NAME_CLAUSE
@@ -202,19 +198,16 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
       COMMA ","
       WHITESPACE " "
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
       R_PAREN ")"
     WHITESPACE "\n  "
     SERVER_NAME
@@ -265,8 +258,7 @@ SOURCE_FILE
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "u"
+          IDENT "u"
     WHITESPACE "\n    "
     PARTITION_DEFAULT
       DEFAULT_KW "default"
@@ -307,12 +299,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "u"
+          IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
@@ -433,8 +423,7 @@ SOURCE_FILE
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "u"
+          IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
@@ -497,8 +486,7 @@ SOURCE_FILE
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "u"
+          IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
@@ -580,8 +568,7 @@ SOURCE_FILE
     TABLE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "u"
+          IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
@@ -629,8 +616,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "cal"
+            IDENT "cal"
         DOT "."
         PATH_SEGMENT
           IDENT "event_types"
@@ -645,8 +631,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "jsonb"
+              IDENT "jsonb"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE "\n  "
@@ -694,8 +679,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
@@ -729,8 +713,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "local_users"
+              IDENT "local_users"
         WHITESPACE "\n    "
         INCLUDING_PROPERTY
           INCLUDING_KW "including"

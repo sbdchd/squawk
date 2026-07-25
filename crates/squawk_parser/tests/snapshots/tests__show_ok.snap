@@ -45,8 +45,7 @@ SOURCE_FILE
     CONFIG_PARAMETER_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "v"
+          IDENT "v"
     SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
@@ -56,12 +55,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+            IDENT "a"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+          IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
@@ -73,19 +70,15 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "a"
+                IDENT "a"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "b"
+              IDENT "b"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+            IDENT "c"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+          IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n"

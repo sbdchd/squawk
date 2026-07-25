@@ -10,8 +10,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "set"
@@ -53,8 +52,7 @@ SOURCE_FILE
       RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "set"

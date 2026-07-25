@@ -20,7 +20,6 @@ pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
             let Some(ty_name) = path_type
                 .path_ref()
                 .and_then(|x| x.segment())
-                .and_then(|x| x.name_ref())
                 .map(|x| x.text())
             else {
                 return false;

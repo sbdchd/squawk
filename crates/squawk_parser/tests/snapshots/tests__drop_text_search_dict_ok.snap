@@ -17,8 +17,7 @@ SOURCE_FILE
     TEXT_SEARCH_DICTIONARY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -40,8 +39,7 @@ SOURCE_FILE
     TEXT_SEARCH_DICTIONARY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -60,8 +58,7 @@ SOURCE_FILE
     TEXT_SEARCH_DICTIONARY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

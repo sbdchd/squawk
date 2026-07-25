@@ -15,8 +15,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -43,12 +42,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -75,12 +72,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+          IDENT "b"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"

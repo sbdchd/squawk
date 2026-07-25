@@ -19,7 +19,6 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
                 .and_then(|x| x.segment())
-                .and_then(|x| x.name_ref())
                 .map(|x| x.text())
             else {
                 continue;

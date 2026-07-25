@@ -22,7 +22,7 @@ PathSegment =
   '#name'?
 
 PathSegmentRef =
-  NameRef
+  '#name'?
 
 Path =
   qualifier:PathRef?

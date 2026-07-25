@@ -24,8 +24,7 @@ SOURCE_FILE
     PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE "\n  "
     USING_METHOD
       USING_KW "using"
@@ -42,8 +41,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -59,8 +57,7 @@ SOURCE_FILE
       PATH
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT
           IDENT "c"
@@ -91,12 +88,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " \n    "
@@ -107,8 +102,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "s"
+              IDENT "s"
       COMMA ","
       WHITESPACE "\n    "
       OP_CLASS_OPTION
@@ -140,20 +134,17 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                BIGINT_KW "bigint"
+              BIGINT_KW "bigint"
         R_PAREN ")"
         WHITESPACE " "
         FOR_KW "for"
@@ -202,12 +193,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
       COMMA ","
       WHITESPACE "\n    "
       OP_CLASS_OPTION
@@ -220,8 +209,7 @@ SOURCE_FILE
           FUNCTION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       COMMA ","
       WHITESPACE "\n    "
       OP_CLASS_OPTION
@@ -236,8 +224,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    BIGINT_KW "bigint"
+                  BIGINT_KW "bigint"
           R_PAREN ")"
         WHITESPACE " "
         FUNCTION_SIG
@@ -245,12 +232,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "foo"
+                  IDENT "foo"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -263,8 +248,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
@@ -277,16 +261,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             R_PAREN ")"
       COMMA ","
       WHITESPACE "\n    "
@@ -302,16 +284,14 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    BIGINT_KW "bigint"
+                  BIGINT_KW "bigint"
           COMMA ","
           WHITESPACE " "
           PARAM
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    SMALLINT_KW "smallint"
+                  SMALLINT_KW "smallint"
           R_PAREN ")"
         WHITESPACE " "
         FUNCTION_SIG
@@ -319,28 +299,24 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "foo"
+                  IDENT "foo"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
           PARAM_LIST
             L_PAREN "("
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      TEXT_KW "text"
+                    TEXT_KW "text"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

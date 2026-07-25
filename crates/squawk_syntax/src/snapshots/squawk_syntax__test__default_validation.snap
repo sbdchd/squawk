@@ -11,8 +11,7 @@ SOURCE_FILE@0..170
     RELATION_NAME_REF@12..13
       PATH_REF@12..13
         PATH_SEGMENT_REF@12..13
-          NAME_REF@12..13
-            IDENT@12..13 "t"
+          IDENT@12..13 "t"
     WHITESPACE@13..14 " "
     VALUES@14..35
       VALUES_KW@14..20 "VALUES"
@@ -39,8 +38,7 @@ SOURCE_FILE@0..170
       RELATION_NAME_REF@45..46
         PATH_REF@45..46
           PATH_SEGMENT_REF@45..46
-            NAME_REF@45..46
-              IDENT@45..46 "t"
+            IDENT@45..46 "t"
     WHITESPACE@46..47 " "
     SET_CLAUSE@47..67
       SET_KW@47..50 "SET"
@@ -69,8 +67,7 @@ SOURCE_FILE@0..170
       RELATION_NAME_REF@77..78
         PATH_REF@77..78
           PATH_SEGMENT_REF@77..78
-            NAME_REF@77..78
-              IDENT@77..78 "t"
+            IDENT@77..78 "t"
     WHITESPACE@78..79 " "
     SET_CLAUSE@79..103
       SET_KW@79..82 "SET"

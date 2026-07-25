@@ -15,8 +15,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -41,15 +40,13 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -65,8 +62,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -93,15 +89,13 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
           R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
@@ -115,8 +109,7 @@ SOURCE_FILE
             FUNCTION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "f"
+                  IDENT "f"
         COMMA ","
         WHITESPACE "\n  "
         OP_CLASS_OPTION
@@ -131,16 +124,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
             FUNCTION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "f"
+                  IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
@@ -153,8 +144,7 @@ SOURCE_FILE
                 PATH_TYPE
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        TEXT_KW "text"
+                      TEXT_KW "text"
               R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
@@ -170,8 +160,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
@@ -189,8 +178,7 @@ SOURCE_FILE
             FUNCTION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "f"
+                  IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_search"
@@ -205,8 +193,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -231,15 +218,13 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
           R_PAREN ")"
           WHITESPACE " "
           FOR_KW "for"
@@ -259,8 +244,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -285,15 +269,13 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
           R_PAREN ")"
           WHITESPACE " "
           FOR_KW "for"
@@ -305,8 +287,7 @@ SOURCE_FILE
           OP_FAMILY_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "s"
+                IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func"
@@ -321,8 +302,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -344,16 +324,14 @@ SOURCE_FILE
             FUNCTION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "f"
+                  IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
                 PATH_TYPE
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "t"
+                      IDENT "t"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -369,8 +347,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -394,40 +371,35 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "u"
+                    IDENT "u"
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
             FUNCTION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "f"
+                  IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
                 PATH_TYPE
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "a"
+                      IDENT "a"
               COMMA ","
               WHITESPACE " "
               PARAM
                 PATH_TYPE
                   PATH_REF
                     PATH_SEGMENT_REF
-                      NAME_REF
-                        IDENT "b"
+                      IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -443,8 +415,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -468,16 +439,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "u"
+                    IDENT "u"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -493,8 +462,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -518,8 +486,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -535,8 +502,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -560,16 +526,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "u"
+                    IDENT "u"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -585,8 +549,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -610,8 +573,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -627,8 +589,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -652,16 +613,14 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "u"
+                    IDENT "u"
             R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
@@ -677,8 +636,7 @@ SOURCE_FILE
               PATH_TYPE
                 PATH_REF
                   PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                    IDENT "t"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -694,8 +652,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -726,8 +683,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -754,8 +710,7 @@ SOURCE_FILE
     OP_FAMILY_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -785,12 +740,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"

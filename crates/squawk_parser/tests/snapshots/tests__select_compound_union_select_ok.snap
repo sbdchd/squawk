@@ -31,8 +31,7 @@ SOURCE_FILE
                       RELATION_NAME_REF
                         PATH_REF
                           PATH_SEGMENT_REF
-                            NAME_REF
-                              IDENT "code_categories"
+                            IDENT "code_categories"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -101,8 +100,7 @@ SOURCE_FILE
                       RELATION_NAME_REF
                         PATH_REF
                           PATH_SEGMENT_REF
-                            NAME_REF
-                              IDENT "code_categories"
+                            IDENT "code_categories"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -175,8 +173,7 @@ SOURCE_FILE
                       RELATION_NAME_REF
                         PATH_REF
                           PATH_SEGMENT_REF
-                            NAME_REF
-                              IDENT "code_categories"
+                            IDENT "code_categories"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -243,8 +240,7 @@ SOURCE_FILE
                     RELATION_NAME_REF
                       PATH_REF
                         PATH_SEGMENT_REF
-                          NAME_REF
-                            IDENT "code_categories"
+                          IDENT "code_categories"
                 WHITESPACE " "
                 WHERE_CLAUSE
                   WHERE_KW "WHERE"
@@ -302,8 +298,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
     WHITESPACE " "
     UNION_KW "union"
     WHITESPACE " "
@@ -314,8 +309,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
@@ -326,8 +320,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     UNION_KW "union"
     WHITESPACE " "
@@ -338,8 +331,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
@@ -366,8 +358,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -406,8 +397,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t2"
+                IDENT "t2"
     WHITESPACE " "
     UNION_KW "union"
     WHITESPACE " "

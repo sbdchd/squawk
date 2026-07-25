@@ -15,16 +15,14 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "u"
+            IDENT "u"
       R_PAREN ")"
     WHITESPACE "\n  "
     WITHOUT_FUNCTION
@@ -45,16 +43,14 @@ SOURCE_FILE
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "u"
+            IDENT "u"
       R_PAREN ")"
     WHITESPACE "\n  "
     WITH_INOUT
@@ -80,12 +76,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -93,12 +87,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "u"
+            IDENT "u"
       R_PAREN ")"
     WHITESPACE "\n  "
     WITH_FUNCTION
@@ -111,12 +103,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+              IDENT "bar"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -129,8 +119,7 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    TEXT_KW "text"
+                  TEXT_KW "text"
           COMMA ","
           WHITESPACE " "
           PARAM
@@ -143,16 +132,14 @@ SOURCE_FILE
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    BIGINT_KW "bigint"
+                  BIGINT_KW "bigint"
           COMMA ","
           WHITESPACE " "
           PARAM
             PATH_TYPE
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    TEXT_KW "text"
+                  TEXT_KW "text"
           R_PAREN ")"
     WHITESPACE "\n  "
     AS_KW "as"

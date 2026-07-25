@@ -173,8 +173,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  INT_KW "int"
+                INT_KW "int"
         COMMA ","
         WHITESPACE " "
         COLUMN
@@ -184,8 +183,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  TEXT_KW "text"
+                TEXT_KW "text"
         R_PAREN ")"
     WHITESPACE "\n  "
     CREATE_TABLE
@@ -207,8 +205,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "int8"
+                IDENT "int8"
         R_PAREN ")"
       SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -220,12 +217,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                SCHEMA_KW "schema"
+              SCHEMA_KW "schema"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              TABLE_KW "table"
+            TABLE_KW "table"
     SEMICOLON ";"
   WHITESPACE "\n"
   TABLE
@@ -237,16 +232,13 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  DATABASE_KW "database"
+                DATABASE_KW "database"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                SCHEMA_KW "schema"
+              SCHEMA_KW "schema"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              TABLE_KW "table"
+            TABLE_KW "table"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_SCHEMA
@@ -376,8 +368,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "u"
+              IDENT "u"
       WHITESPACE "\n    "
       EXECUTE_KW "execute"
       WHITESPACE " "
@@ -399,8 +390,7 @@ SOURCE_FILE
     CONFIG_PARAMETER_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "search_path"
+          IDENT "search_path"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -410,8 +400,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "search_path"
+            IDENT "search_path"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -429,8 +418,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "search_path"
+            IDENT "search_path"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -445,8 +433,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -536,8 +523,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
@@ -552,12 +538,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
@@ -571,8 +555,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
@@ -586,8 +569,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -622,8 +604,7 @@ SOURCE_FILE
       CONFIG_PARAMETER_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "

@@ -13,8 +13,7 @@ SOURCE_FILE
     AGGREGATE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
       WHITESPACE " "
       PARAM_LIST
         L_PAREN "("
@@ -42,8 +41,7 @@ SOURCE_FILE
     AGGREGATE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
       WHITESPACE " "
       PARAM_LIST
         L_PAREN "("
@@ -51,8 +49,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
         R_PAREN ")"
     WHITESPACE " "
     SET_SCHEMA
@@ -74,8 +71,7 @@ SOURCE_FILE
     AGGREGATE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
       WHITESPACE " "
       PARAM_LIST
         L_PAREN "("
@@ -89,8 +85,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  TEXT_KW "text"
+                TEXT_KW "text"
         COMMA ","
         WHITESPACE " "
         PARAM
@@ -100,8 +95,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  NUMERIC_KW "numeric"
+                NUMERIC_KW "numeric"
         R_PAREN ")"
     WHITESPACE " \n    "
     OWNER_TO
@@ -123,8 +117,7 @@ SOURCE_FILE
     AGGREGATE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+          IDENT "a"
       WHITESPACE " "
       PARAM_LIST
         L_PAREN "("
@@ -132,8 +125,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "x"
+                IDENT "x"
         WHITESPACE " "
         ORDER_KW "order"
         WHITESPACE " "
@@ -143,8 +135,7 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "y"
+                IDENT "y"
         R_PAREN ")"
     WHITESPACE " \n    "
     AGGREGATE_RENAME_TO
@@ -169,12 +160,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
       WHITESPACE " "
       PARAM_LIST
         L_PAREN "("
@@ -185,16 +174,14 @@ SOURCE_FILE
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+                IDENT "t"
         COMMA ","
         WHITESPACE " "
         PARAM
           PATH_TYPE
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
         R_PAREN ")"
     WHITESPACE " \n    "
     SET_SCHEMA

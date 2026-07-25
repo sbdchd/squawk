@@ -17,8 +17,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ADD_MAPPING
       ADD_KW "add"
@@ -35,8 +34,7 @@ SOURCE_FILE
       TEXT_SEARCH_DICTIONARY_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -52,12 +50,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ADD_MAPPING
       ADD_KW "add"
@@ -79,24 +75,20 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
       COMMA ","
       WHITESPACE " "
       TEXT_SEARCH_DICTIONARY_REF
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+              IDENT "foo"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "e"
+            IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_mapping"
@@ -113,8 +105,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ALTER_MAPPING
       ALTER_KW "alter"
@@ -131,8 +122,7 @@ SOURCE_FILE
       TEXT_SEARCH_DICTIONARY_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -148,12 +138,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ALTER_MAPPING
       ALTER_KW "alter"
@@ -171,12 +159,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+              IDENT "f"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_mapping_replace"
@@ -193,8 +179,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ALTER_MAPPING
       ALTER_KW "alter"
@@ -206,16 +191,14 @@ SOURCE_FILE
       TEXT_SEARCH_DICTIONARY_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+            IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
       TEXT_SEARCH_DICTIONARY_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -231,12 +214,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ALTER_MAPPING
       ALTER_KW "alter"
@@ -249,12 +230,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+              IDENT "f"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+            IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
@@ -262,12 +241,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+              IDENT "f"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_mapping_for_replace"
@@ -284,8 +261,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ALTER_MAPPING
       ALTER_KW "alter"
@@ -302,16 +278,14 @@ SOURCE_FILE
       TEXT_SEARCH_DICTIONARY_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+            IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
       TEXT_SEARCH_DICTIONARY_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -327,12 +301,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     ALTER_MAPPING
       ALTER_KW "alter"
@@ -350,12 +322,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+              IDENT "f"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+            IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
@@ -363,12 +333,10 @@ SOURCE_FILE
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+              IDENT "f"
           DOT "."
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_mapping"
@@ -385,8 +353,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     DROP_MAPPING
       DROP_KW "drop"
@@ -412,12 +379,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE "\n    "
     DROP_MAPPING
       DROP_KW "drop"
@@ -453,8 +418,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE " "
     TEXT_SEARCH_CONFIGURATION_RENAME_TO
       RENAME_KW "rename"
@@ -480,12 +444,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE " "
     TEXT_SEARCH_CONFIGURATION_RENAME_TO
       RENAME_KW "rename"
@@ -512,8 +474,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -537,12 +498,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -567,8 +526,7 @@ SOURCE_FILE
     TEXT_SEARCH_CONFIGURATION_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
@@ -592,12 +550,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"

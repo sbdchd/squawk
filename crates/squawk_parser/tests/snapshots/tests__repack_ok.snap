@@ -27,8 +27,7 @@ SOURCE_FILE
       INDEX_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "idx"
+            IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -52,12 +51,10 @@ SOURCE_FILE
             PATH_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "foo"
+                  IDENT "foo"
               DOT "."
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -79,7 +76,6 @@ SOURCE_FILE
       INDEX_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "idx"
+            IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -55,8 +55,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
         WHITESPACE " "
         PARAM_DEFAULT
           DEFAULT_KW "DEFAULT"
@@ -75,8 +74,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                BIGINT_KW "bigint"
+              BIGINT_KW "bigint"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -89,8 +87,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                BIGINT_KW "bigint"
+              BIGINT_KW "bigint"
         WHITESPACE " "
         PARAM_DEFAULT
           EQ "="
@@ -118,12 +115,10 @@ SOURCE_FILE
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+              IDENT "t"
         COMMA ","
         WHITESPACE " "
         FOR_KW "for"
@@ -133,8 +128,7 @@ SOURCE_FILE
         PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                TEXT_KW "text"
+              TEXT_KW "text"
       WHITESPACE "\n"
       SECURITY_FUNC_OPTION
         EXTERNAL_KW "external"
@@ -167,8 +161,7 @@ SOURCE_FILE
           CONFIG_PARAMETER_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
           WHITESPACE " "
           TO_KW "to"
           WHITESPACE " "
@@ -182,8 +175,7 @@ SOURCE_FILE
           CONFIG_PARAMETER_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
@@ -197,8 +189,7 @@ SOURCE_FILE
           CONFIG_PARAMETER_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "buzz"
+                IDENT "buzz"
           WHITESPACE " "
           FROM_KW "from"
           WHITESPACE " "

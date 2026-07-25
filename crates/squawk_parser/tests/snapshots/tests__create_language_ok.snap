@@ -39,12 +39,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     INLINE_KW "inline"
     WHITESPACE " "
@@ -52,12 +50,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+          IDENT "b"
     WHITESPACE "\n  "
     VALIDATOR_KW "validator"
     WHITESPACE " "
@@ -65,11 +61,9 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "x"
+            IDENT "x"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "y"
+          IDENT "y"
     SEMICOLON ";"
   WHITESPACE "\n\n"

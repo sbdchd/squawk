@@ -10,7 +10,7 @@ use std::iter;
 use crate::symbols::Name;
 
 pub(crate) fn find_cte_with_table(
-    name_ref: &ast::NameRef,
+    name_ref: &impl ast::NameLike,
     cte_name: &Name,
 ) -> Option<ast::WithTable> {
     let ref_start = name_ref.syntax().text_range().start();

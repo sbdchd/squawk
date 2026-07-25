@@ -18,8 +18,7 @@ SOURCE_FILE
     PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            INT_KW "int"
+          INT_KW "int"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -51,8 +50,7 @@ SOURCE_FILE
       COLLATION_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "\"fr_FR\""
+            IDENT "\"fr_FR\""
     WHITESPACE "\n  "
     DEFAULT_CONSTRAINT
       DEFAULT_KW "default"

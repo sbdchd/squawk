@@ -130,8 +130,8 @@ impl ast::RelationFromItem {
         self.relation_name_ref()?.path_ref()
     }
 
-    pub fn name_ref(&self) -> Option<ast::NameRef> {
-        self.path_ref()?.segment()?.name_ref()
+    pub fn name_ref(&self) -> Option<ast::PathSegmentRef> {
+        self.path_ref()?.segment()
     }
 }
 

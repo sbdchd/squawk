@@ -17,8 +17,7 @@ SOURCE_FILE
     TEXT_SEARCH_TEMPLATE_REF
       PATH_REF
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TEXT_SEARCH_TEMPLATE_RENAME_TO
       RENAME_KW "rename"
@@ -46,12 +45,10 @@ SOURCE_FILE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
         DOT "."
         PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"

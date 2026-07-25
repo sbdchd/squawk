@@ -21,7 +21,6 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                     .and_then(|relation| relation.table_name_ref())
                     .and_then(|table| table.path_ref())
                     .and_then(|x| x.segment())
-                    .and_then(|x| x.name_ref())
                 {
                     for action in alter_table.actions() {
                         match action {

@@ -12,8 +12,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "copytest"
+            IDENT "copytest"
     WHITESPACE " "
     COPY_FROM
       FROM_KW "from"
@@ -31,8 +30,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "country"
+            IDENT "country"
     WHITESPACE " "
     COPY_TO
       TO_KW "TO"
@@ -59,8 +57,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "country"
+            IDENT "country"
     WHITESPACE " "
     COPY_FROM
       FROM_KW "FROM"
@@ -91,8 +88,7 @@ SOURCE_FILE
             RELATION_NAME_REF
               PATH_REF
                 PATH_SEGMENT_REF
-                  NAME_REF
-                    IDENT "country"
+                  IDENT "country"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "WHERE"
@@ -123,8 +119,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "country"
+            IDENT "country"
     WHITESPACE " "
     COPY_TO
       TO_KW "TO"
@@ -144,8 +139,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "x"
+            IDENT "x"
       WHITESPACE " "
       COLUMN_REF_LIST
         L_PAREN "("
@@ -193,8 +187,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "copytest"
+            IDENT "copytest"
     WHITESPACE " "
     COPY_FROM
       FROM_KW "from"
@@ -223,8 +216,7 @@ SOURCE_FILE
       TABLE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     COPY_FROM
       FROM_KW "from"

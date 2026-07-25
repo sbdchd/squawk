@@ -1870,10 +1870,9 @@ enum PathSegmentKind {
 
 /// ```sql
 /// create type a . b as ();
-/// --          ^ ^ ^ then name_ref
-/// --          |   |
-/// --              | ^ then name
-/// --              |
+/// --          ^   ^ then path_segment
+/// --          |
+/// --          | path_segment_ref
 /// ```
 fn path_segment(p: &mut Parser<'_>, kind: PathSegmentKind) {
     let m = p.start();
@@ -1886,14 +1885,7 @@ fn path_segment(p: &mut Parser<'_>, kind: PathSegmentKind) {
 
         // skip
     } else if p.at_ts(COL_LABEL_FIRST) {
-        let name = p.start();
         pg_name(p);
-        if kind == PathSegmentKind::NameRef || p.at(DOT) {
-            name.complete(p, NAME_REF);
-        } else {
-            // PATH_SEGMENT holds the name token itself.
-            name.abandon(p);
-        }
     } else {
         p.error(format!("expected name, got {:?}", p.current()));
         m.abandon(p);
@@ -2324,8 +2316,14 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             NAME_REF
         }
     };
+    // A type name followed by a string is a type cast so we insert a CAST_EXPR
+    // preceding it to wrap the previously parsed data.
+    // e.g., `select numeric '12312'`
+    let is_type_cast = kind == NAME_REF && p.at_ts(STRING_FIRST);
     let node_kind = if p.at(FAT_ARROW) || p.at(COLON_EQ) {
         PARAM_NAME_REF
+    } else if is_type_cast {
+        PATH_SEGMENT_REF
     } else if p.at(STRING) {
         kind
     } else {
@@ -2333,15 +2331,11 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     };
     let cm = m.complete(p, node_kind);
 
-    // A type name followed by a string is a type cast so we insert a CAST_EXPR
-    // preceding it to wrap the previously parsed data.
-    // e.g., `select numeric '12312'`
     if p.at_ts(STRING_FIRST) {
         // Wrap expr in type.
         // TODO: can we unify types & exprs?
-        let cm = if kind == NAME_REF {
-            let path_segment = cm.precede(p).complete(p, PATH_SEGMENT_REF);
-            let path = path_segment.precede(p).complete(p, PATH_REF);
+        let cm = if is_type_cast {
+            let path = cm.precede(p).complete(p, PATH_REF);
             path.precede(p).complete(p, PATH_TYPE)
         } else {
             cm

@@ -32,8 +32,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "onek"
+                IDENT "onek"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -314,8 +313,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t1"
+                IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_pg_9_syntax"
@@ -337,8 +335,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "foo"
+                IDENT "foo"
       COMMA ","
       WHITESPACE " "
       TABLE_AND_COLUMNS
@@ -346,8 +343,7 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "bar"
+                IDENT "bar"
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
@@ -366,7 +362,6 @@ SOURCE_FILE
           TABLE_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "c"
+                IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"

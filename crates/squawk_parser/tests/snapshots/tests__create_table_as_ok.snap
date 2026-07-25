@@ -70,8 +70,7 @@ SOURCE_FILE
           RELATION_NAME_REF
             PATH_REF
               PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+                IDENT "u"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -107,8 +106,7 @@ SOURCE_FILE
         RELATION_NAME_REF
           PATH_REF
             PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "u"
+              IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- more fields"
