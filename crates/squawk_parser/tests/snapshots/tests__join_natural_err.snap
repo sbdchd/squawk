@@ -22,8 +22,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "u"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "u"
         WHITESPACE " "
         JOIN
           NATURAL_KW "natural"
@@ -44,8 +47,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "a"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "a"
         WHITESPACE " "
         JOIN
           NATURAL_KW "natural"
@@ -65,8 +71,11 @@ SOURCE_FILE
       JOIN_EXPR
         JOIN_EXPR
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "a"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "a"
           WHITESPACE " "
           JOIN
             JOIN_INNER

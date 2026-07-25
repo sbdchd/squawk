@@ -110,8 +110,11 @@ SOURCE_FILE@0..492
       USING_KW@120..125 "USING"
       WHITESPACE@125..126 " "
       RELATION_FROM_ITEM@126..134
-        NAME_REF@126..132
-          SOURCE_KW@126..132 "source"
+        RELATION_NAME_REF@126..132
+          PATH_REF@126..132
+            PATH_SEGMENT_REF@126..132
+              NAME_REF@126..132
+                SOURCE_KW@126..132 "source"
         WHITESPACE@132..133 " "
         FROM_ALIAS@133..134
           TABLE_ALIAS@133..134
@@ -209,8 +212,11 @@ SOURCE_FILE@0..492
       USING_KW@264..269 "USING"
       WHITESPACE@269..270 " "
       RELATION_FROM_ITEM@270..278
-        NAME_REF@270..276
-          SOURCE_KW@270..276 "source"
+        RELATION_NAME_REF@270..276
+          PATH_REF@270..276
+            PATH_SEGMENT_REF@270..276
+              NAME_REF@270..276
+                SOURCE_KW@270..276 "source"
         WHITESPACE@276..277 " "
         FROM_ALIAS@277..278
           TABLE_ALIAS@277..278

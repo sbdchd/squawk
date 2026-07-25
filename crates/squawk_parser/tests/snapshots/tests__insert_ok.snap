@@ -273,8 +273,11 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "new_products"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "new_products"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -706,8 +709,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "tmp_films"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "tmp_films"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -931,8 +937,11 @@ SOURCE_FILE
                     FROM_KW "FROM"
                     WHITESPACE " "
                     RELATION_FROM_ITEM
-                      NAME_REF
-                        IDENT "accounts"
+                      RELATION_NAME_REF
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            NAME_REF
+                              IDENT "accounts"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -983,8 +992,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "upd"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "upd"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -1632,8 +1644,11 @@ SOURCE_FILE
         WHITESPACE " "
         JOIN_EXPR
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t"
           WHITESPACE "\n"
           JOIN
             JOIN_CROSS
@@ -1642,8 +1657,11 @@ SOURCE_FILE
               JOIN_KW "JOIN"
             WHITESPACE " "
             RELATION_FROM_ITEM
-              NAME_REF
-                IDENT "f"
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "f"
     WHITESPACE "\n"
     ON_CONFLICT_CLAUSE
       ON_KW "ON"
@@ -1680,16 +1698,22 @@ SOURCE_FILE
         WHITESPACE " "
         JOIN_EXPR
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "u"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "u"
           WHITESPACE " "
           JOIN
             JOIN_INNER
               JOIN_KW "join"
             WHITESPACE " "
             RELATION_FROM_ITEM
-              NAME_REF
-                IDENT "i"
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "i"
             WHITESPACE " \n"
             ON_CLAUSE
               ON_KW "on"
@@ -1738,16 +1762,22 @@ SOURCE_FILE
         WHITESPACE " "
         JOIN_EXPR
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "u"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "u"
           WHITESPACE " "
           JOIN
             JOIN_INNER
               JOIN_KW "join"
             WHITESPACE " "
             RELATION_FROM_ITEM
-              NAME_REF
-                IDENT "i"
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "i"
             WHITESPACE " \n"
             ON_CLAUSE
               ON_KW "on"
@@ -1804,16 +1834,22 @@ SOURCE_FILE
         WHITESPACE " "
         JOIN_EXPR
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "u"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "u"
           WHITESPACE " "
           JOIN
             JOIN_INNER
               JOIN_KW "join"
             WHITESPACE " "
             RELATION_FROM_ITEM
-              NAME_REF
-                IDENT "i"
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "i"
             WHITESPACE " \n"
             ON_CLAUSE
               ON_KW "on"

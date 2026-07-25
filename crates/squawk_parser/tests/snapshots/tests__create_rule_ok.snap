@@ -657,8 +657,11 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_RULE
@@ -702,8 +705,11 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t1"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -718,8 +724,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t1"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_2"

@@ -19409,11 +19409,7 @@ impl RelationFromItem {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn field_expr(&self) -> Option<FieldExpr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn relation_name_ref(&self) -> Option<RelationNameRef> {
         support::child(&self.syntax)
     }
     #[inline]

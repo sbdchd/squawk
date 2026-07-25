@@ -862,7 +862,10 @@ fn target_has_schema_qualified_from_item(target: &ast::Target) -> bool {
 
     for from_item in from_clause.from_items() {
         if let ast::FromItem::RelationFromItem(relation) = from_item
-            && relation.field_expr().is_some()
+            && relation
+                .path_ref()
+                .and_then(|path| path.qualifier())
+                .is_some()
         {
             return true;
         }

@@ -212,8 +212,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "bar"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -291,8 +294,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "bar"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -382,8 +388,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "bar"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -546,8 +555,11 @@ SOURCE_FILE
                 FROM_KW "from"
                 WHITESPACE " "
                 RELATION_FROM_ITEM
-                  NAME_REF
-                    IDENT "pg_proc"
+                  RELATION_NAME_REF
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          IDENT "pg_proc"
               WHITESPACE " "
               WHERE_CLAUSE
                 WHERE_KW "where"
@@ -613,8 +625,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -645,8 +660,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -680,8 +698,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -713,8 +734,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -821,8 +845,11 @@ SOURCE_FILE
                     FROM_KW "from"
                     WHITESPACE " "
                     RELATION_FROM_ITEM
-                      NAME_REF
-                        IDENT "t"
+                      RELATION_NAME_REF
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            NAME_REF
+                              IDENT "t"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1010,8 +1037,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -1063,8 +1093,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -1294,8 +1327,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- generic conditional case"
@@ -1361,8 +1397,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "test"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "test"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ommitted else"
@@ -1422,8 +1461,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "test"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "test"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- switch style case"
@@ -1480,8 +1522,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "test"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "test"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- col_labels"
@@ -1505,8 +1550,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1526,8 +1574,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1561,8 +1612,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select"
@@ -1624,8 +1678,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_from_clause"
@@ -1645,8 +1702,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "bar"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from only"
@@ -1666,8 +1726,11 @@ SOURCE_FILE
       RELATION_FROM_ITEM
         ONLY_KW "only"
         WHITESPACE " "
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1688,12 +1751,16 @@ SOURCE_FILE
         PAREN_EXPR
           L_PAREN "("
           RELATION_FROM_ITEM
-            FIELD_EXPR
-              NAME_REF
-                IDENT "foo"
-              DOT "."
-              NAME_REF
-                IDENT "bar"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "foo"
+                DOT "."
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "bar"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1712,12 +1779,16 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        FIELD_EXPR
-          NAME_REF
-            IDENT "foo"
-          DOT "."
-          NAME_REF
-            IDENT "bar"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1733,16 +1804,21 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        FIELD_EXPR
-          FIELD_EXPR
-            NAME_REF
-              IDENT "database_name"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "database_name"
+              DOT "."
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "schema_name"
             DOT "."
-            NAME_REF
-              IDENT "schema_name"
-          DOT "."
-          NAME_REF
-            IDENT "table_name"
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "table_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from with everything"
@@ -1759,8 +1835,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         STAR "*"
         WHITESPACE " "
@@ -2447,13 +2526,19 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "a"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
       COMMA ","
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "b"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2468,8 +2553,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "bar"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -2477,8 +2565,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "buzz"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "buzz"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -2497,8 +2588,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "foo"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "foo"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -2508,8 +2602,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "boo"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "boo"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -2536,8 +2633,11 @@ SOURCE_FILE
       RELATION_FROM_ITEM
         ONLY_KW "only"
         WHITESPACE " "
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -2574,8 +2674,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         STAR "*"
         WHITESPACE " "
@@ -2614,8 +2717,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -2650,8 +2756,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -2670,12 +2779,16 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        FIELD_EXPR
-          NAME_REF
-            IDENT "foo"
-          DOT "."
-          NAME_REF
-            IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -2694,8 +2807,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_query_name"
@@ -2712,8 +2828,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2728,8 +2847,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -2766,8 +2888,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -2788,8 +2913,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -4571,8 +4699,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -4663,16 +4794,22 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
             WHITESPACE " "
             FROM_ALIAS
               AS_KW "as"
@@ -4716,8 +4853,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_LEFT
@@ -4726,8 +4866,11 @@ SOURCE_FILE
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "using"
@@ -4753,8 +4896,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_LEFT
@@ -4763,8 +4909,11 @@ SOURCE_FILE
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "using"
@@ -4797,8 +4946,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_RIGHT
@@ -4807,8 +4959,11 @@ SOURCE_FILE
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "using"
@@ -4836,8 +4991,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_FULL
@@ -4846,8 +5004,11 @@ SOURCE_FILE
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "using"
@@ -4875,16 +5036,22 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
           WHITESPACE " "
           ON_CLAUSE
             ON_KW "on"
@@ -4953,8 +5120,11 @@ SOURCE_FILE
       WHITESPACE "\n"
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t1"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t1"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -4981,8 +5151,11 @@ SOURCE_FILE
               L_PAREN "("
               JOIN_EXPR
                 RELATION_FROM_ITEM
-                  NAME_REF
-                    IDENT "t1"
+                  RELATION_NAME_REF
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          IDENT "t1"
                 WHITESPACE " "
                 JOIN
                   JOIN_LEFT
@@ -4991,8 +5164,11 @@ SOURCE_FILE
                     JOIN_KW "join"
                   WHITESPACE " "
                   RELATION_FROM_ITEM
-                    NAME_REF
-                      IDENT "t2"
+                    RELATION_NAME_REF
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          NAME_REF
+                            IDENT "t2"
                   WHITESPACE " "
                   JOIN_USING_CLAUSE
                     USING_KW "using"
@@ -5045,16 +5221,22 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "using"
@@ -5102,8 +5284,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "colors"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "colors"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -5116,8 +5301,11 @@ SOURCE_FILE
             JOIN_KW "JOIN"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "sizes"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "sizes"
             WHITESPACE " "
             FROM_ALIAS
               TABLE_ALIAS
@@ -5153,8 +5341,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "fruits"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "fruits"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -5167,8 +5358,11 @@ SOURCE_FILE
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "colors"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "colors"
             WHITESPACE " "
             FROM_ALIAS
               TABLE_ALIAS
@@ -5201,8 +5395,11 @@ SOURCE_FILE
       JOIN_EXPR
         JOIN_EXPR
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t"
           WHITESPACE "\n"
           JOIN
             JOIN_LEFT
@@ -5211,8 +5408,11 @@ SOURCE_FILE
               JOIN_KW "join"
             WHITESPACE " "
             RELATION_FROM_ITEM
-              NAME_REF
-                IDENT "u"
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "u"
             WHITESPACE " "
             JOIN_USING_CLAUSE
               USING_KW "using"
@@ -5231,8 +5431,11 @@ SOURCE_FILE
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "k"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "k"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "using"
@@ -5260,8 +5463,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "employees"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "employees"
         WHITESPACE " "
         JOIN
           NATURAL_KW "NATURAL"
@@ -5270,8 +5476,11 @@ SOURCE_FILE
             JOIN_KW "JOIN"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "departments"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "departments"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg docs"
@@ -5332,8 +5541,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "distributors"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "distributors"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -5344,8 +5556,11 @@ SOURCE_FILE
             JOIN_KW "JOIN"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "films"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "films"
             WHITESPACE " "
             FROM_ALIAS
               TABLE_ALIAS
@@ -5375,16 +5590,22 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "t2"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t2"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "using"
@@ -5428,8 +5649,11 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "manufacturers"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "manufacturers"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -6165,8 +6389,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "order"
@@ -6262,8 +6489,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "sensors_uncompressed"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "sensors_uncompressed"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -6404,8 +6634,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select with uescape on qualified field"
@@ -6431,8 +6664,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_from_user_table"
@@ -6449,8 +6685,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          USER_KW "user"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                USER_KW "user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select with aggregates"
@@ -6519,7 +6758,10 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "varchar_tbl"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "varchar_tbl"
     SEMICOLON ";"
   WHITESPACE "\n\n"

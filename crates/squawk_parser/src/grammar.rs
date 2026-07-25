@@ -3362,41 +3362,58 @@ const FROM_ITEM_FIRST: TokenSet = TokenSet::new(&[
 ])
 .union(FROM_ITEM_KEYWORDS_FIRST);
 
+fn from_item_is_function(p: &Parser<'_>) -> bool {
+    let mut n = 1;
+    while p.nth_at(n, DOT) {
+        n += 2;
+    }
+    p.nth_at(n, L_PAREN)
+}
+
+fn from_item_relation_name_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    let seg = p.start();
+    path_segment(p, NAME_REF);
+    let qual = seg.complete(p, path_kind(p, NAME_REF));
+    path_for_qualifier(p, qual, NAME_REF);
+    m.complete(p, RELATION_NAME_REF);
+}
+
 fn from_item_name(p: &mut Parser<'_>) -> SyntaxKind {
-    match name_ref_(p).map(|lhs| postfix_expr(p, lhs)) {
-        Some(val) => match val.kind() {
-            CALL_EXPR => {
-                // [ WITH ORDINALITY ]
-                //    [ [ AS ] alias [ ( column_alias [, ...] ) ] ]
-                // [ AS ] alias ( column_definition [, ...] )
-                // AS ( column_definition [, ...] )
-                // TODO: we should use this to inform parsing down below
+    if from_item_is_function(p) {
+        // [ WITH ORDINALITY ]
+        //    [ [ AS ] alias [ ( column_alias [, ...] ) ] ]
+        // [ AS ] alias ( column_definition [, ...] )
+        // AS ( column_definition [, ...] )
+        // TODO: we should use this to inform parsing down below
+        match name_ref_(p).map(|lhs| postfix_expr(p, lhs)) {
+            Some(val) if val.kind() == CALL_EXPR => {
                 if p.eat(WITH_KW) {
                     p.expect(ORDINALITY_KW);
                 }
                 opt_from_alias(p);
                 FUNCTION_FROM_ITEM
             }
-            NAME_REF | FIELD_EXPR => {
-                //  [ * ] [ [ AS ] alias [ ( column_alias [, ...] ) ] ]
-                //              [ TABLESAMPLE sampling_method ( argument [, ...] ) [ REPEATABLE ( seed ) ] ]
-                //
-                //  [ [ AS ] alias [ ( column_alias [, ...] ) ] ]
-                // we're at a table_name
-                p.eat(STAR);
-                opt_from_alias(p);
-                opt_tablesample_clause(p);
-                RELATION_FROM_ITEM
+            Some(got) => {
+                p.error(format!("expected a function call, got {:?}", got.kind()));
+                FUNCTION_FROM_ITEM
             }
-            got => {
-                p.error(format!("expected a name, got {got:?}"));
-                RELATION_FROM_ITEM
+            None => {
+                p.error("expected name");
+                FUNCTION_FROM_ITEM
             }
-        },
-        None => {
-            p.error("expected name");
-            RELATION_FROM_ITEM
         }
+    } else {
+        //  [ * ] [ [ AS ] alias [ ( column_alias [, ...] ) ] ]
+        //              [ TABLESAMPLE sampling_method ( argument [, ...] ) [ REPEATABLE ( seed ) ] ]
+        //
+        //  [ [ AS ] alias [ ( column_alias [, ...] ) ] ]
+        // we're at a table_name
+        from_item_relation_name_ref(p);
+        p.eat(STAR);
+        opt_from_alias(p);
+        opt_tablesample_clause(p);
+        RELATION_FROM_ITEM
     }
 }
 
