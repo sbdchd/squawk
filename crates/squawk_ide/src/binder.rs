@@ -1683,7 +1683,7 @@ fn bind_savepoint(b: &mut Binder, savepoint: ast::SavepointCreate) {
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
-    Some(Name::from_node(&path.segment()?.name()?))
+    Some(Name::from_node(&path.segment()?))
 }
 
 fn item_name_ref(path: &ast::PathRef) -> Option<Name> {
@@ -1691,12 +1691,10 @@ fn item_name_ref(path: &ast::PathRef) -> Option<Name> {
 }
 
 fn path_to_ptr(path: &ast::Path) -> SyntaxNodePtr {
-    path.segment()
-        .and_then(|segment| segment.name())
-        .map_or_else(
-            || SyntaxNodePtr::new(path.syntax()),
-            |name| SyntaxNodePtr::new(name.syntax()),
-        )
+    path.segment().map_or_else(
+        || SyntaxNodePtr::new(path.syntax()),
+        |segment| SyntaxNodePtr::new(segment.syntax()),
+    )
 }
 
 fn schema_name(b: &Binder, path: &ast::Path, is_temp: bool) -> Option<Schema> {

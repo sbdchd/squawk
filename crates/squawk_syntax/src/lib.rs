@@ -225,7 +225,7 @@ fn api_walkthrough() {
     // usually exists. By convention, all ast types should be used with `ast::`
     // qualifier.
     let path: Option<ast::Path> = func.name().and_then(|name| name.path());
-    let name: ast::Name = path.unwrap().segment().unwrap().name().unwrap();
+    let name: ast::PathSegment = path.unwrap().segment().unwrap();
     assert_eq!(name.text(), "foo");
 
     // return

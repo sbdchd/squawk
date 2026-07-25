@@ -760,8 +760,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "users"
+          IDENT "users"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("

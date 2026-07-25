@@ -13,8 +13,7 @@ SOURCE_FILE
     PROCEDURE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "p"
+          IDENT "p"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -42,8 +41,7 @@ SOURCE_FILE
     PROCEDURE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "p"
+          IDENT "p"
     PARAM_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -250,8 +248,7 @@ SOURCE_FILE
     PROCEDURE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "p"
+          IDENT "p"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"

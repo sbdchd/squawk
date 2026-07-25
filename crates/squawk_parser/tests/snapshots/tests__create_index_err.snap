@@ -13,8 +13,7 @@ SOURCE_FILE
     INDEX
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "

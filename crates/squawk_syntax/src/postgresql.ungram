@@ -18,11 +18,8 @@
 NameRef =
   '#name'?
 
-Name =
-  '#name'?
-
 PathSegment =
-  Name
+  '#name'?
 
 PathSegmentRef =
   NameRef

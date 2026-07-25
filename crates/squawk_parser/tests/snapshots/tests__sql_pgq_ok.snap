@@ -53,8 +53,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "products"
+          IDENT "products"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -105,8 +104,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "customers"
+          IDENT "customers"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -154,8 +152,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "orders"
+          IDENT "orders"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -198,8 +195,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "order_items"
+          IDENT "order_items"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -292,8 +288,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "customer_orders"
+          IDENT "customer_orders"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -377,8 +372,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "myshop"
+          IDENT "myshop"
     WHITESPACE "\n    "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"
@@ -661,8 +655,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "myshop"
+          IDENT "myshop"
     WHITESPACE "\n    "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"
@@ -876,8 +869,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "myshop"
+          IDENT "myshop"
     WHITESPACE "\n    "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"
@@ -1223,8 +1215,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "Persons"
+          IDENT "Persons"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1286,8 +1277,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "Companies"
+          IDENT "Companies"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1329,8 +1319,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "Accounts"
+          IDENT "Accounts"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1412,8 +1401,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "Transactions"
+          IDENT "Transactions"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1508,8 +1496,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "financial_transactions"
+          IDENT "financial_transactions"
     WHITESPACE "\n  "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"

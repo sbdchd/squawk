@@ -152,7 +152,9 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::TableAlias(_)
             | ast::AnyName::Tablespace(_)
             | ast::AnyName::TransitionRelationName(_) => return hover_position(db, position),
-            ast::AnyName::Name(name) => return hover_name(db, InFile::new(file, name)),
+            ast::AnyName::PathSegment(_) => {
+                return hover_name(db, Location::from_node(file, &parent)?);
+            }
             ast::AnyName::AccessMethod(_) => {
                 return hover_access_method(db, Location::from_node(file, &parent)?);
             }
@@ -334,10 +336,7 @@ fn markdown_inline_code(text: &str) -> String {
     format!("{fence} {text} {fence}")
 }
 
-fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
-    let file = name.file_id;
-    let name = name.value;
-    let def = Location::from_node(file, name.syntax())?;
+fn hover_name(db: &dyn Db, def: Location) -> Option<Hover> {
     match def.kind {
         LocationKind::AccessMethod => hover_access_method(db, def),
         LocationKind::Aggregate => hover_aggregate(db, def),
@@ -1654,7 +1653,6 @@ fn format_create_index(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> O
         .index()?
         .path()?
         .segment()?
-        .name()?
         .syntax()
         .text()
         .to_string();

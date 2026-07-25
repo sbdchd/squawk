@@ -654,8 +654,7 @@ SOURCE_FILE
             SEQUENCE
               PATH
                 PATH_SEGMENT
-                  NAME
-                    IDENT "foo"
+                  IDENT "foo"
           WHITESPACE " "
           OPTION_CYCLE
             CYCLE_KW "cycle"
@@ -700,8 +699,7 @@ SOURCE_FILE
             SEQUENCE
               PATH
                 PATH_SEGMENT
-                  NAME
-                    IDENT "bar"
+                  IDENT "bar"
         WHITESPACE " "
         RESTART
           RESTART_KW "restart"
@@ -747,8 +745,7 @@ SOURCE_FILE
             SEQUENCE
               PATH
                 PATH_SEGMENT
-                  NAME
-                    IDENT "bar"
+                  IDENT "bar"
         WHITESPACE " "
         RESTART
           RESTART_KW "restart"
@@ -3672,8 +3669,7 @@ SOURCE_FILE
       TABLE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "items"
+            IDENT "items"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -3700,8 +3696,7 @@ SOURCE_FILE
       TABLE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "b"
+            IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename constraint"

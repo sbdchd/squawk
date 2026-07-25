@@ -11,8 +11,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -69,8 +68,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM

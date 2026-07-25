@@ -32,8 +32,7 @@ SOURCE_FILE
       OP_CLASS_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_OPERATOR_CLASS
@@ -68,8 +67,7 @@ SOURCE_FILE
       OP_CLASS_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

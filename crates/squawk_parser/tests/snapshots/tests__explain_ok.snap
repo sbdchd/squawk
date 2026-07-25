@@ -1146,8 +1146,7 @@ SOURCE_FILE
         TABLE_NAME
           PATH
             PATH_SEGMENT
-              NAME
-                IDENT "t"
+              IDENT "t"
       WHITESPACE " "
       FROM_CLAUSE
         FROM_KW "from"
@@ -1442,8 +1441,7 @@ SOURCE_FILE
       TABLE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "t"
+            IDENT "t"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE "\n  "
@@ -1493,8 +1491,7 @@ SOURCE_FILE
       VIEW
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "t"
+            IDENT "t"
       WHITESPACE "\n  "
       AS_KW "as"
       WHITESPACE " "

@@ -50,8 +50,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "s"
+          IDENT "s"
     STAT_TYPES
       L_PAREN "("
       STATISTICS_KIND
@@ -120,8 +119,7 @@ SOURCE_FILE
     STATISTICS
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "s1"
+          IDENT "s1"
     WHITESPACE " "
     STAT_TYPES
       L_PAREN "("
@@ -158,8 +156,7 @@ SOURCE_FILE
     STATISTICS
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "s2"
+          IDENT "s2"
     WHITESPACE " "
     STAT_TYPES
       L_PAREN "("
@@ -196,8 +193,7 @@ SOURCE_FILE
     STATISTICS
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "s3"
+          IDENT "s3"
     WHITESPACE " "
     STAT_TYPES
       L_PAREN "("

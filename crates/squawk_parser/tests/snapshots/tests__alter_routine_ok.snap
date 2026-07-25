@@ -44,8 +44,7 @@ SOURCE_FILE
       ROUTINE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

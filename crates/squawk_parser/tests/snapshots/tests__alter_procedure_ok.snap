@@ -25,8 +25,7 @@ SOURCE_FILE
       PROCEDURE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "q"
+            IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -71,8 +70,7 @@ SOURCE_FILE
       PROCEDURE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "q"
+            IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

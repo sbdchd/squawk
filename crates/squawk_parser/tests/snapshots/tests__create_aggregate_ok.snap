@@ -13,8 +13,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "a"
+          IDENT "a"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -83,8 +82,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "my_aggregate"
+          IDENT "my_aggregate"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -414,8 +412,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "a"
+          IDENT "a"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -474,8 +471,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "a"
+          IDENT "a"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -779,8 +775,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "percentile_disc"
+          IDENT "percentile_disc"
     PARAM_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -951,8 +946,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "array_accum"
+          IDENT "array_accum"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -1018,8 +1012,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "array_agg"
+          IDENT "array_agg"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -1093,8 +1086,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "percentile_disc"
+          IDENT "percentile_disc"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -1179,8 +1171,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "sum"
+          IDENT "sum"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -1299,8 +1290,7 @@ SOURCE_FILE
     AGGREGATE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "unsafe_sum"
+          IDENT "unsafe_sum"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("

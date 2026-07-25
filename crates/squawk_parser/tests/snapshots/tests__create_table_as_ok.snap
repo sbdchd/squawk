@@ -16,8 +16,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     ON_COMMIT
       ON_KW "on"
@@ -52,8 +51,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -98,8 +96,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -129,8 +126,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -229,8 +225,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "u"
+          IDENT "u"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -298,8 +293,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "u"
+          IDENT "u"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -326,8 +320,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -353,8 +346,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "

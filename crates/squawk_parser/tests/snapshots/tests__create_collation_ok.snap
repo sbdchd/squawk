@@ -13,8 +13,7 @@ SOURCE_FILE
     COLLATION
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     COLLATION_FROM
       FROM_KW "from"
@@ -48,8 +47,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     COLLATION_FROM
       FROM_KW "from"
@@ -88,8 +86,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("

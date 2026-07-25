@@ -94,7 +94,7 @@ pub(crate) fn table_name(path: &ast::PathRef) -> Option<Name> {
 }
 
 pub(crate) fn table_definition_name(path: &ast::Path) -> Option<Name> {
-    Some(Name::from_node(&path.segment()?.name()?))
+    Some(Name::from_node(&path.segment()?))
 }
 
 pub(crate) fn schema_name(path: &ast::PathRef) -> Option<Schema> {

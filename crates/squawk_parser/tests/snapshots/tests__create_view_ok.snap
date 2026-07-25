@@ -13,8 +13,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "vista"
+          IDENT "vista"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE " "
@@ -36,8 +35,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "vista"
+          IDENT "vista"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE " "
@@ -72,8 +70,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "comedies"
+          IDENT "comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -116,8 +113,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "universal_comedies"
+          IDENT "universal_comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -168,8 +164,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "pg_comedies"
+          IDENT "pg_comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -220,8 +215,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "comedies"
+          IDENT "comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -370,8 +364,7 @@ SOURCE_FILE
               IDENT "public"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "nums_1_100"
+          IDENT "nums_1_100"
     WHITESPACE " "
     COLUMN_LIST
       L_PAREN "("
@@ -453,8 +446,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     WHITESPACE " "
     COLUMN_LIST
       L_PAREN "("
@@ -530,8 +522,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     WHITESPACE "\n"
     AS_KW "as"
     WHITESPACE " "
@@ -578,8 +569,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "my_view"
+          IDENT "my_view"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n"
@@ -613,8 +603,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -639,8 +628,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -666,8 +654,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -704,8 +691,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -752,8 +738,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -779,8 +764,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -815,8 +799,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -844,8 +827,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "v"
+          IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "

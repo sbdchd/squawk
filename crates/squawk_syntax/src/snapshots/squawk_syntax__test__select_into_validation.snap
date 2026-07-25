@@ -24,8 +24,7 @@ SOURCE_FILE@0..858
       TABLE_NAME@35..36
         PATH@35..36
           PATH_SEGMENT@35..36
-            NAME@35..36
-              IDENT@35..36 "t"
+            IDENT@35..36 "t"
     SEMICOLON@36..37 ";"
   WHITESPACE@37..38 "\n"
   COMPOUND_SELECT@38..73
@@ -48,8 +47,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@54..55
           PATH@54..55
             PATH_SEGMENT@54..55
-              NAME@54..55
-                IDENT@54..55 "t"
+              IDENT@54..55 "t"
     WHITESPACE@55..56 " "
     UNION_KW@56..61 "union"
     WHITESPACE@61..62 " "
@@ -90,8 +88,7 @@ SOURCE_FILE@0..858
           TABLE_NAME@92..93
             PATH@92..93
               PATH_SEGMENT@92..93
-                NAME@92..93
-                  IDENT@92..93 "t"
+                IDENT@92..93 "t"
       R_PAREN@93..94 ")"
     R_PAREN@94..95 ")"
     SEMICOLON@95..96 ";"
@@ -114,8 +111,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@119..120
           PATH@119..120
             PATH_SEGMENT@119..120
-              NAME@119..120
-                IDENT@119..120 "x"
+              IDENT@119..120 "x"
     SEMICOLON@120..121 ";"
   WHITESPACE@121..123 " \n"
   PREPARE@123..152
@@ -141,8 +137,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@150..151
           PATH@150..151
             PATH_SEGMENT@150..151
-              NAME@150..151
-                IDENT@150..151 "x"
+              IDENT@150..151 "x"
     SEMICOLON@151..152 ";"
   WHITESPACE@152..154 "\n\n"
   COMMENT@154..231 "-- error, only the le ..."
@@ -183,8 +178,7 @@ SOURCE_FILE@0..858
           TABLE_NAME@265..266
             PATH@265..266
               PATH_SEGMENT@265..266
-                NAME@265..266
-                  IDENT@265..266 "t"
+                IDENT@265..266 "t"
       WHITESPACE@266..267 " "
       UNION_KW@267..272 "union"
       WHITESPACE@272..273 " "
@@ -237,8 +231,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@318..319
           PATH@318..319
             PATH_SEGMENT@318..319
-              NAME@318..319
-                IDENT@318..319 "t"
+              IDENT@318..319 "t"
     SEMICOLON@319..320 ";"
   WHITESPACE@320..321 "\n"
   COMPOUND_SELECT@321..362
@@ -282,8 +275,7 @@ SOURCE_FILE@0..858
               TABLE_NAME@357..358
                 PATH@357..358
                   PATH_SEGMENT@357..358
-                    NAME@357..358
-                      IDENT@357..358 "t"
+                    IDENT@357..358 "t"
           R_PAREN@358..359 ")"
         R_PAREN@359..360 ")"
       R_PAREN@360..361 ")"
@@ -321,8 +313,7 @@ SOURCE_FILE@0..858
               TABLE_NAME@394..395
                 PATH@394..395
                   PATH_SEGMENT@394..395
-                    NAME@394..395
-                      IDENT@394..395 "x"
+                    IDENT@394..395 "x"
           R_PAREN@395..396 ")"
         WHITESPACE@396..397 " "
         UNION_KW@397..402 "union"
@@ -370,8 +361,7 @@ SOURCE_FILE@0..858
             TABLE_NAME@459..460
               PATH@459..460
                 PATH_SEGMENT@459..460
-                  NAME@459..460
-                    IDENT@459..460 "t"
+                  IDENT@459..460 "t"
         R_PAREN@460..461 ")"
     WHITESPACE@461..462 " "
     SELECT_CLAUSE@462..470
@@ -419,8 +409,7 @@ SOURCE_FILE@0..858
               TABLE_NAME@504..505
                 PATH@504..505
                   PATH_SEGMENT@504..505
-                    NAME@504..505
-                      IDENT@504..505 "x"
+                    IDENT@504..505 "x"
           WHITESPACE@505..506 " "
           UNION_KW@506..511 "union"
           WHITESPACE@511..512 " "
@@ -502,8 +491,7 @@ SOURCE_FILE@0..858
               TABLE_NAME@603..604
                 PATH@603..604
                   PATH_SEGMENT@603..604
-                    NAME@603..604
-                      IDENT@603..604 "t"
+                    IDENT@603..604 "t"
           R_PAREN@604..605 ")"
     SEMICOLON@605..606 ";"
   WHITESPACE@606..607 "\n"
@@ -528,8 +516,7 @@ SOURCE_FILE@0..858
                     TABLE_NAME@637..638
                       PATH@637..638
                         PATH_SEGMENT@637..638
-                          NAME@637..638
-                            IDENT@637..638 "t"
+                          IDENT@637..638 "t"
                   WHITESPACE@638..639 " "
                   FROM_CLAUSE@639..645
                     FROM_KW@639..643 "from"
@@ -571,8 +558,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@694..695
           PATH@694..695
             PATH_SEGMENT@694..695
-              NAME@694..695
-                IDENT@694..695 "t"
+              IDENT@694..695 "t"
     SEMICOLON@695..696 ";"
   WHITESPACE@696..698 "\n\n"
   COMMENT@698..714 "-- error, nested"
@@ -602,8 +588,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@750..751
           PATH@750..751
             PATH_SEGMENT@750..751
-              NAME@750..751
-                IDENT@750..751 "t"
+              IDENT@750..751 "t"
     SEMICOLON@751..752 ";"
   WHITESPACE@752..754 "\n\n"
   COMMENT@754..770 "-- error, nested"
@@ -616,8 +601,7 @@ SOURCE_FILE@0..858
     TABLE_NAME@784..785
       PATH@784..785
         PATH_SEGMENT@784..785
-          NAME@784..785
-            IDENT@784..785 "k"
+          IDENT@784..785 "k"
     WHITESPACE@785..786 " "
     AS_KW@786..788 "as"
     WHITESPACE@788..789 " "
@@ -636,8 +620,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@803..804
           PATH@803..804
             PATH_SEGMENT@803..804
-              NAME@803..804
-                IDENT@803..804 "t"
+              IDENT@803..804 "t"
     SEMICOLON@804..805 ";"
   WHITESPACE@805..807 "\n\n"
   COMMENT@807..823 "-- error, nested"
@@ -650,8 +633,7 @@ SOURCE_FILE@0..858
     VIEW@836..837
       PATH@836..837
         PATH_SEGMENT@836..837
-          NAME@836..837
-            IDENT@836..837 "k"
+          IDENT@836..837 "k"
     WHITESPACE@837..838 " "
     AS_KW@838..840 "as"
     WHITESPACE@840..841 " "
@@ -670,8 +652,7 @@ SOURCE_FILE@0..858
         TABLE_NAME@855..856
           PATH@855..856
             PATH_SEGMENT@855..856
-              NAME@855..856
-                IDENT@855..856 "t"
+              IDENT@855..856 "t"
     SEMICOLON@856..857 ";"
   WHITESPACE@857..858 "\n"
 

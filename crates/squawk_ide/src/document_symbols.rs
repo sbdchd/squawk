@@ -299,7 +299,7 @@ fn create_table_symbol(
     let file = create_table.file_id;
     let create_table = create_table.value;
     let path = create_table.table_name()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, table_name);
@@ -333,7 +333,7 @@ fn create_table_as_symbol(
     let file = create_table_as.file_id;
     let create_table_as = create_table_as.value;
     let path = create_table_as.table_name()?.path()?;
-    let name_node = path.segment()?.name()?.syntax().clone();
+    let name_node = path.segment()?.syntax().clone();
 
     let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, table_name);
@@ -357,7 +357,7 @@ fn create_view_symbol(db: &dyn Db, create_view: InFile<ast::CreateView>) -> Opti
     let file = create_view.file_id;
     let create_view = create_view.value;
     let path = create_view.view()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, view_name);
@@ -408,7 +408,7 @@ fn create_materialized_view_symbol(
     let file = create_view.file_id;
     let create_view = create_view.value;
     let path = create_view.view()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, view_name);
@@ -432,7 +432,7 @@ fn create_function_symbol(
     let file = create_function.file_id;
     let create_function = create_function.value;
     let path = create_function.name()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, function_name) = resolve_function_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, function_name);
@@ -457,7 +457,7 @@ fn create_aggregate_symbol(
     let file = create_aggregate.file_id;
     let create_aggregate = create_aggregate.value;
     let path = create_aggregate.aggregate_name()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, aggregate_name) = resolve_aggregate_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, aggregate_name);
@@ -482,7 +482,7 @@ fn create_procedure_symbol(
     let file = create_procedure.file_id;
     let create_procedure = create_procedure.value;
     let path = create_procedure.name()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, procedure_name) = resolve_procedure_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, procedure_name);
@@ -502,7 +502,7 @@ fn create_procedure_symbol(
 
 fn create_index_symbol(create_index: ast::CreateIndex) -> Option<DocumentSymbol> {
     let path = create_index.index()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
     let name = path.syntax().text().to_string();
 
     let full_range = create_index.syntax().text_range();
@@ -525,7 +525,7 @@ fn create_domain_symbol(
     let file = create_domain.file_id;
     let create_domain = create_domain.value;
     let path = create_domain.domain()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, domain_name) = resolve_type_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, domain_name);
@@ -550,7 +550,7 @@ fn create_sequence_symbol(
     let file = create_sequence.file_id;
     let create_sequence = create_sequence.value;
     let path = create_sequence.sequence()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, sequence_name) = resolve_sequence_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, sequence_name);
@@ -575,7 +575,7 @@ fn create_statistics_symbol(
     let file = create_statistics.file_id;
     let create_statistics = create_statistics.value;
     let path = create_statistics.statistics()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, statistics_name) = resolve_statistics_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, statistics_name);
@@ -752,7 +752,7 @@ fn create_property_graph_symbol(
     create_property_graph: ast::CreatePropertyGraph,
 ) -> Option<DocumentSymbol> {
     let path = create_property_graph.property_graph()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let name = path.syntax().text().to_string();
 
@@ -773,7 +773,7 @@ fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
     let file = create_type.file_id;
     let create_type = create_type.value;
     let path = create_type.type_name()?.path()?;
-    let name_node = path.segment()?.name()?;
+    let name_node = path.segment()?;
 
     let (schema, type_name) = resolve_type_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, type_name);

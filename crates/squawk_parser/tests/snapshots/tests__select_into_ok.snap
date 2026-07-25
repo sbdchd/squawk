@@ -19,8 +19,7 @@ SOURCE_FILE
       TABLE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "films_recent"
+            IDENT "films_recent"
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -72,8 +71,7 @@ SOURCE_FILE
       TABLE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"

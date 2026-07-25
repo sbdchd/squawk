@@ -43,8 +43,7 @@ SOURCE_FILE
       COLLATION
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "d"
+            IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

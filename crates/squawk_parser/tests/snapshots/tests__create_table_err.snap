@@ -37,8 +37,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -58,8 +57,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -87,8 +85,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -115,8 +112,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -159,8 +155,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -325,8 +320,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -412,8 +406,7 @@ SOURCE_FILE
                 SEQUENCE
                   PATH
                     PATH_SEGMENT
-                      NAME
-                        IDENT "foo"
+                      IDENT "foo"
               WHITESPACE "\n    "
               OPTION_RESTART
                 RESTART_KW "restart"
@@ -509,8 +502,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     PARTITION_OF
       PARTITION_KW "partition"
@@ -559,8 +551,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     PARTITION_OF
       PARTITION_KW "partition"
@@ -604,8 +595,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -681,8 +671,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "z"
+          IDENT "z"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("

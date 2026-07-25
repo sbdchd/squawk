@@ -490,7 +490,19 @@ impl ast::ColumnName {
     }
 }
 
-impl ast::Name {
+impl ast::PathSegment {
+    #[inline]
+    pub fn text(&self) -> String {
+        normalize_name_node(self.syntax())
+    }
+
+    #[inline]
+    pub fn is_quoted(&self) -> bool {
+        is_quoted(self.syntax())
+    }
+}
+
+impl ast::PathSegmentRef {
     #[inline]
     pub fn text(&self) -> String {
         normalize_name_node(self.syntax())

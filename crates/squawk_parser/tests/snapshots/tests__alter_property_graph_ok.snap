@@ -36,8 +36,7 @@ SOURCE_FILE
       PROPERTY_GRAPH
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "r"
+            IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set owner"

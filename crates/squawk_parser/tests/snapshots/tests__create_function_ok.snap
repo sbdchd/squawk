@@ -13,8 +13,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "dup"
+          IDENT "dup"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -80,8 +79,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "check_password"
+          IDENT "check_password"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -167,8 +165,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -231,8 +228,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -283,8 +279,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -328,8 +323,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -363,8 +357,7 @@ SOURCE_FILE
               IDENT "public"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -415,8 +408,7 @@ SOURCE_FILE
               IDENT "c"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "d"
+          IDENT "d"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -457,8 +449,7 @@ SOURCE_FILE
               IDENT "public"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "a"
+          IDENT "a"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -499,8 +490,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -558,8 +548,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -621,8 +610,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -679,8 +667,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -721,8 +708,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -761,8 +747,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -801,8 +786,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -843,8 +827,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -885,8 +868,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -927,8 +909,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -973,8 +954,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1023,8 +1003,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENTITY_KW "identity"
+          IDENTITY_KW "identity"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -1064,8 +1043,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1106,8 +1084,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1150,8 +1127,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1192,8 +1168,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1236,8 +1211,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1280,8 +1254,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1322,8 +1295,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1364,8 +1336,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1408,8 +1379,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1453,8 +1423,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1498,8 +1467,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1549,8 +1517,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1597,8 +1564,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1653,8 +1619,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1705,8 +1670,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1759,8 +1723,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1798,8 +1761,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1841,8 +1803,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1889,8 +1850,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -1947,8 +1907,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -2001,8 +1960,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -2074,8 +2032,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -2223,8 +2180,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2266,8 +2222,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2317,8 +2272,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2363,8 +2317,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2409,8 +2362,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2457,8 +2409,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2503,8 +2454,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2553,8 +2503,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2601,8 +2550,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2660,8 +2608,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2718,8 +2665,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2786,8 +2732,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2848,8 +2793,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2902,8 +2846,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2962,8 +2905,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3024,8 +2966,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3075,8 +3016,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3123,8 +3063,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3174,8 +3113,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3222,8 +3160,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3267,8 +3204,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -3332,8 +3268,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -3417,8 +3352,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            OVERLAPS_KW "overlaps"
+          OVERLAPS_KW "overlaps"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -3456,8 +3390,7 @@ SOURCE_FILE
     FUNCTION_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            LIKE_KW "like"
+          LIKE_KW "like"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"

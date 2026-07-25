@@ -17,8 +17,7 @@ SOURCE_FILE
     TEXT_SEARCH_PARSER
       PATH
         PATH_SEGMENT
-          NAME
-            NAME_KW "name"
+          NAME_KW "name"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -100,8 +99,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            NAME_KW "name"
+          NAME_KW "name"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("

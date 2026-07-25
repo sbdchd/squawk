@@ -13,8 +13,7 @@ SOURCE_FILE
     DOMAIN
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "d"
+          IDENT "d"
     WHITESPACE " "
     PATH_TYPE
       PATH_REF
@@ -33,8 +32,7 @@ SOURCE_FILE
     DOMAIN
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "d"
+          IDENT "d"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "

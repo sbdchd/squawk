@@ -65,8 +65,7 @@ SOURCE_FILE
     OP_CLASS_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "

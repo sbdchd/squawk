@@ -15,8 +15,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -54,8 +53,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     COLUMN_LIST
       L_PAREN "("
@@ -159,8 +157,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -187,8 +184,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -231,8 +227,7 @@ SOURCE_FILE
               IDENT "\"public\""
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "\"user_countries_view\""
+          IDENT "\"user_countries_view\""
     WHITESPACE " \n"
     AS_KW "AS"
     WHITESPACE " "
