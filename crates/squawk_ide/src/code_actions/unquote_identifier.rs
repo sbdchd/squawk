@@ -17,15 +17,7 @@ pub(super) fn unquote_identifier(
     let token = token_from_offset(db, position)?;
     let parent = token.parent()?;
 
-    let name_node = if let Some(column_name) = ast::ColumnName::cast(parent.clone()) {
-        column_name.syntax().clone()
-    } else if let Some(name) = ast::Name::cast(parent.clone()) {
-        name.syntax().clone()
-    } else if let Some(name_ref) = ast::NameRef::cast(parent) {
-        name_ref.syntax().clone()
-    } else {
-        return None;
-    };
+    let name_node = ast::AnyName::cast(parent)?.syntax().clone();
 
     let unquoted = unquote_ident(&name_node)?;
 
@@ -152,6 +144,15 @@ mod test {
             unquote_identifier,
             r#"select "select"$0 from t;"#
         ));
+    }
+
+    #[test]
+    fn unquote_identifier_on_role() {
+        assert_snapshot!(apply_code_action(
+            unquote_identifier,
+            r#"create role "my_role"$0;"#),
+            @"create role my_role;"
+        );
     }
 
     #[test]

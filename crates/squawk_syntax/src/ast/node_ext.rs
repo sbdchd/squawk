@@ -813,6 +813,11 @@ where
     fn text(&self) -> String {
         normalize_name_node(self.syntax())
     }
+
+    #[inline]
+    fn is_quoted(&self) -> bool {
+        is_quoted(self.syntax())
+    }
 }
 
 impl ast::HasWithClause for ast::Select {}

@@ -1,7 +1,7 @@
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_linter::Edit;
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::ast::{self, AstNode, NameLike};
 
 use crate::{file::InFile, offsets::token_from_offset};
 
@@ -15,34 +15,17 @@ pub(super) fn quote_identifier(
     let token = token_from_offset(db, position)?;
     let parent = token.parent()?;
 
-    let (is_quoted, text, text_range) =
-        if let Some(column_name) = ast::ColumnName::cast(parent.clone()) {
-            (
-                column_name.is_quoted(),
-                column_name.text(),
-                column_name.syntax().text_range(),
-            )
-        } else if let Some(name) = ast::Name::cast(parent.clone()) {
-            (name.is_quoted(), name.text(), name.syntax().text_range())
-        } else if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-            (
-                name_ref.is_quoted(),
-                name_ref.text(),
-                name_ref.syntax().text_range(),
-            )
-        } else {
-            return None;
-        };
+    let name = ast::AnyName::cast(parent)?;
 
-    if is_quoted {
+    if name.is_quoted() {
         return None;
     }
 
-    let quoted = format!(r#""{text}""#);
+    let quoted = format!(r#""{}""#, name.text());
 
     actions.push(CodeAction {
         title: "Quote identifier".to_owned(),
-        edits: vec![Edit::replace(text_range, quoted)],
+        edits: vec![Edit::replace(name.syntax().text_range(), quoted)],
         kind: ActionKind::RefactorRewrite,
     });
 
@@ -80,6 +63,15 @@ mod test {
             quote_identifier,
             "create table T(X$0 int);"),
             @r#"create table T("x" int);"#
+        );
+    }
+
+    #[test]
+    fn quote_identifier_on_role_ref() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "drop role my_role$0;"),
+            @r#"drop role "my_role";"#
         );
     }
 
