@@ -236,8 +236,7 @@ SOURCE_FILE
       SEQUENCE
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "t"
+            IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"

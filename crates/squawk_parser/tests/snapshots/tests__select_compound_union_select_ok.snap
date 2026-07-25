@@ -397,8 +397,7 @@ SOURCE_FILE
         TABLE_NAME
           PATH
             PATH_SEGMENT
-              NAME
-                IDENT "t"
+              IDENT "t"
       WHITESPACE " "
       FROM_CLAUSE
         FROM_KW "from"
@@ -633,8 +632,7 @@ SOURCE_FILE
           TABLE_NAME
             PATH
               PATH_SEGMENT
-                NAME
-                  IDENT "t"
+                IDENT "t"
       WHITESPACE " "
       UNION_KW "union"
       WHITESPACE " "

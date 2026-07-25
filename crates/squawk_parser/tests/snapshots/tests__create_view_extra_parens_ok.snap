@@ -11,8 +11,7 @@ SOURCE_FILE
     VIEW
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " \n  "

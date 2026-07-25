@@ -71,8 +71,7 @@ SOURCE_FILE
       TEXT_SEARCH_DICTIONARY
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

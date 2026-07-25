@@ -66,8 +66,7 @@ SOURCE_FILE
       TYPE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "u"
+            IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"

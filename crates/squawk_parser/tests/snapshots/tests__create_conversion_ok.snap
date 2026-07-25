@@ -13,8 +13,7 @@ SOURCE_FILE
     CONVERSION
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " \n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -57,8 +56,7 @@ SOURCE_FILE
               IDENT "bar"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "c"
+          IDENT "c"
     WHITESPACE " \n  "
     FOR_KW "for"
     WHITESPACE " "

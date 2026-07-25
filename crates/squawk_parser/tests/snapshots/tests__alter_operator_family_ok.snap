@@ -711,8 +711,7 @@ SOURCE_FILE
       OP_FAMILY_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

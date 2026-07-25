@@ -28,8 +28,7 @@ SOURCE_FILE
       TEXT_SEARCH_TEMPLATE
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "u"
+            IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"

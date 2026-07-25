@@ -28,8 +28,7 @@ SOURCE_FILE
       TEXT_SEARCH_PARSER
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "q"
+            IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"

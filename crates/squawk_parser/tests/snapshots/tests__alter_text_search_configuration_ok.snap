@@ -464,8 +464,7 @@ SOURCE_FILE
       TEXT_SEARCH_CONFIGURATION
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "m"
+            IDENT "m"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -496,8 +495,7 @@ SOURCE_FILE
       TEXT_SEARCH_CONFIGURATION
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "m"
+            IDENT "m"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"

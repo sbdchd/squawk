@@ -372,8 +372,7 @@ SOURCE_FILE
       DOMAIN
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"

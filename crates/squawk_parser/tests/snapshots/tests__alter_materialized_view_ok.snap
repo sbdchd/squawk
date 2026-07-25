@@ -26,8 +26,7 @@ SOURCE_FILE
       VIEW
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -61,8 +60,7 @@ SOURCE_FILE
       VIEW
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"

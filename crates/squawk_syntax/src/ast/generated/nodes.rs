@@ -14788,17 +14788,6 @@ impl Move {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Name {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Name {
-    #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NameRef {
     pub(crate) syntax: SyntaxNode,
 }
@@ -17974,8 +17963,8 @@ pub struct PathSegment {
 }
 impl PathSegment {
     #[inline]
-    pub fn name(&self) -> Option<Name> {
-        support::child(&self.syntax)
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -25900,10 +25889,10 @@ pub enum AnyName {
     JsonVariableName(JsonVariableName),
     Language(Language),
     LanguageRef(LanguageRef),
-    Name(Name),
     NameRef(NameRef),
     ParamName(ParamName),
     ParamNameRef(ParamNameRef),
+    PathSegment(PathSegment),
     Policy(Policy),
     PolicyRef(PolicyRef),
     PreparedStatement(PreparedStatement),
@@ -37003,24 +36992,6 @@ impl AstNode for Move {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::MOVE
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for Name {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -50058,10 +50029,10 @@ impl AstNode for AnyName {
                 | SyntaxKind::JSON_VARIABLE_NAME
                 | SyntaxKind::LANGUAGE
                 | SyntaxKind::LANGUAGE_REF
-                | SyntaxKind::NAME
                 | SyntaxKind::NAME_REF
                 | SyntaxKind::PARAM_NAME
                 | SyntaxKind::PARAM_NAME_REF
+                | SyntaxKind::PATH_SEGMENT
                 | SyntaxKind::POLICY
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT
@@ -50152,10 +50123,10 @@ impl AstNode for AnyName {
             }
             SyntaxKind::LANGUAGE => AnyName::Language(Language { syntax }),
             SyntaxKind::LANGUAGE_REF => AnyName::LanguageRef(LanguageRef { syntax }),
-            SyntaxKind::NAME => AnyName::Name(Name { syntax }),
             SyntaxKind::NAME_REF => AnyName::NameRef(NameRef { syntax }),
             SyntaxKind::PARAM_NAME => AnyName::ParamName(ParamName { syntax }),
             SyntaxKind::PARAM_NAME_REF => AnyName::ParamNameRef(ParamNameRef { syntax }),
+            SyntaxKind::PATH_SEGMENT => AnyName::PathSegment(PathSegment { syntax }),
             SyntaxKind::POLICY => AnyName::Policy(Policy { syntax }),
             SyntaxKind::POLICY_REF => AnyName::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT => {
@@ -50246,10 +50217,10 @@ impl AstNode for AnyName {
             AnyName::JsonVariableName(it) => &it.syntax,
             AnyName::Language(it) => &it.syntax,
             AnyName::LanguageRef(it) => &it.syntax,
-            AnyName::Name(it) => &it.syntax,
             AnyName::NameRef(it) => &it.syntax,
             AnyName::ParamName(it) => &it.syntax,
             AnyName::ParamNameRef(it) => &it.syntax,
+            AnyName::PathSegment(it) => &it.syntax,
             AnyName::Policy(it) => &it.syntax,
             AnyName::PolicyRef(it) => &it.syntax,
             AnyName::PreparedStatement(it) => &it.syntax,
@@ -50485,12 +50456,6 @@ impl From<LanguageRef> for AnyName {
         AnyName::LanguageRef(node)
     }
 }
-impl From<Name> for AnyName {
-    #[inline]
-    fn from(node: Name) -> AnyName {
-        AnyName::Name(node)
-    }
-}
 impl From<NameRef> for AnyName {
     #[inline]
     fn from(node: NameRef) -> AnyName {
@@ -50507,6 +50472,12 @@ impl From<ParamNameRef> for AnyName {
     #[inline]
     fn from(node: ParamNameRef) -> AnyName {
         AnyName::ParamNameRef(node)
+    }
+}
+impl From<PathSegment> for AnyName {
+    #[inline]
+    fn from(node: PathSegment) -> AnyName {
+        AnyName::PathSegment(node)
     }
 }
 impl From<Policy> for AnyName {

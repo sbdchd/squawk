@@ -13,8 +13,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COMPOSITE_TYPE
       AS_KW "as"
@@ -32,8 +31,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COMPOSITE_TYPE
       AS_KW "as"
@@ -71,8 +69,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     COMPOSITE_TYPE
       AS_KW "as"
@@ -134,8 +131,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     ENUM_TYPE
       AS_KW "as"
@@ -155,8 +151,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     ENUM_TYPE
       AS_KW "as"
@@ -179,8 +174,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     ENUM_TYPE
       AS_KW "as"
@@ -215,8 +209,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     RANGE_TYPE
       AS_KW "as"
@@ -257,8 +250,7 @@ SOURCE_FILE
               IDENT "public"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TYPE
@@ -284,8 +276,7 @@ SOURCE_FILE
               IDENT "c"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "d"
+          IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_type_name"
@@ -298,8 +289,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TYPE
@@ -310,8 +300,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     BASE_TYPE
       ATTRIBUTE_LIST
@@ -365,8 +354,7 @@ SOURCE_FILE
     TYPE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " "
     BASE_TYPE
       ATTRIBUTE_LIST

@@ -26,7 +26,6 @@ pub fn tables_created_in_transaction(
                     .table_name()
                     .and_then(|table| table.path())
                     .and_then(|x| x.segment())
-                    .and_then(|x| x.name())
                 else {
                     continue;
                 };

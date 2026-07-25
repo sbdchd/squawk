@@ -71,8 +71,7 @@ SOURCE_FILE
       STATISTICS
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "n"
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"

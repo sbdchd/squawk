@@ -11,8 +11,7 @@ SOURCE_FILE@0..239
     FUNCTION_NAME@16..17
       PATH@16..17
         PATH_SEGMENT@16..17
-          NAME@16..17
-            IDENT@16..17 "f"
+          IDENT@16..17 "f"
     PARAM_LIST@17..19
       L_PAREN@17..18 "("
       R_PAREN@18..19 ")"
@@ -92,8 +91,7 @@ SOURCE_FILE@0..239
     FUNCTION_NAME@136..137
       PATH@136..137
         PATH_SEGMENT@136..137
-          NAME@136..137
-            IDENT@136..137 "g"
+          IDENT@136..137 "g"
     PARAM_LIST@137..139
       L_PAREN@137..138 "("
       R_PAREN@138..139 ")"

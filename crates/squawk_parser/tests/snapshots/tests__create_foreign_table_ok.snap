@@ -15,8 +15,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     TABLE_ARG_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -47,8 +46,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -258,8 +256,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n  "
     PARTITION_KW "partition"
     WHITESPACE " "
@@ -300,8 +297,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n  "
     PARTITION_KW "partition"
     WHITESPACE " "
@@ -428,8 +424,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n  "
     PARTITION_KW "partition"
     WHITESPACE " "
@@ -493,8 +488,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n  "
     PARTITION_KW "partition"
     WHITESPACE " "
@@ -577,8 +571,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "t"
+          IDENT "t"
     WHITESPACE " \n  "
     PARTITION_KW "partition"
     WHITESPACE " "
@@ -640,8 +633,7 @@ SOURCE_FILE
               IDENT "cal"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "event_types"
+          IDENT "event_types"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -691,8 +683,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "u"
+          IDENT "u"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -727,8 +718,7 @@ SOURCE_FILE
     TABLE_NAME
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "remote_users"
+          IDENT "remote_users"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("

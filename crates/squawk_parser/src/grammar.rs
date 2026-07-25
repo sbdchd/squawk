@@ -1862,6 +1862,12 @@ fn opt_name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     name_ref_(p)
 }
 
+#[derive(PartialEq, Clone, Copy)]
+enum PathSegmentKind {
+    Name,
+    NameRef,
+}
+
 /// ```sql
 /// create type a . b as ();
 /// --          ^ ^ ^ then name_ref
@@ -1869,7 +1875,7 @@ fn opt_name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 /// --              | ^ then name
 /// --              |
 /// ```
-fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
+fn path_segment(p: &mut Parser<'_>, kind: PathSegmentKind) {
     let m = p.start();
     // TODO: does this need to be flagged?
     // Might want to disallow operators in some paths.
@@ -1880,16 +1886,20 @@ fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
 
         // skip
     } else if p.at_ts(COL_LABEL_FIRST) {
-        let m = p.start();
+        let name = p.start();
         pg_name(p);
-        let kind = if p.at(DOT) { NAME_REF } else { kind };
-        m.complete(p, kind);
+        if kind == PathSegmentKind::NameRef || p.at(DOT) {
+            name.complete(p, NAME_REF);
+        } else {
+            // PATH_SEGMENT holds the name token itself.
+            name.abandon(p);
+        }
     } else {
         p.error(format!("expected name, got {:?}", p.current()));
         m.abandon(p);
         return;
     }
-    let kind = if kind == NAME_REF || p.at(DOT) {
+    let kind = if kind == PathSegmentKind::NameRef || p.at(DOT) {
         PATH_SEGMENT_REF
     } else {
         PATH_SEGMENT
@@ -1899,7 +1909,7 @@ fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
 
 const PATH_FIRST: TokenSet = NON_RESERVED_WORD;
 
-fn opt_path(p: &mut Parser<'_>, kind: SyntaxKind) -> Option<CompletedMarker> {
+fn opt_path(p: &mut Parser<'_>, kind: PathSegmentKind) -> Option<CompletedMarker> {
     if !p.at_ts(PATH_FIRST) {
         return None;
     }
@@ -1910,7 +1920,7 @@ fn opt_path(p: &mut Parser<'_>, kind: SyntaxKind) -> Option<CompletedMarker> {
 }
 
 fn opt_path_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    opt_path(p, NAME)
+    opt_path(p, PathSegmentKind::Name)
 }
 
 fn path_name(p: &mut Parser<'_>) {
@@ -1920,7 +1930,7 @@ fn path_name(p: &mut Parser<'_>) {
 }
 
 fn opt_path_name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    opt_path(p, NAME_REF)
+    opt_path(p, PathSegmentKind::NameRef)
 }
 
 fn path_name_ref(p: &mut Parser<'_>) {
@@ -1935,8 +1945,8 @@ fn qualified_column_name_ref(p: &mut Parser<'_>) {
     m.complete(p, QUALIFIED_COLUMN_NAME_REF);
 }
 
-fn path_kind(p: &Parser<'_>, kind: SyntaxKind) -> SyntaxKind {
-    if kind == NAME && !p.at(DOT) {
+fn path_kind(p: &Parser<'_>, kind: PathSegmentKind) -> SyntaxKind {
+    if kind == PathSegmentKind::Name && !p.at(DOT) {
         PATH
     } else {
         PATH_REF
@@ -1946,7 +1956,7 @@ fn path_kind(p: &Parser<'_>, kind: SyntaxKind) -> SyntaxKind {
 fn path_for_qualifier(
     p: &mut Parser<'_>,
     mut qual: CompletedMarker,
-    kind: SyntaxKind,
+    kind: PathSegmentKind,
 ) -> CompletedMarker {
     loop {
         if p.at(DOT) {
@@ -3373,9 +3383,9 @@ fn from_item_is_function(p: &Parser<'_>) -> bool {
 fn from_item_relation_name_ref(p: &mut Parser<'_>) {
     let m = p.start();
     let seg = p.start();
-    path_segment(p, NAME_REF);
-    let qual = seg.complete(p, path_kind(p, NAME_REF));
-    path_for_qualifier(p, qual, NAME_REF);
+    path_segment(p, PathSegmentKind::NameRef);
+    let qual = seg.complete(p, path_kind(p, PathSegmentKind::NameRef));
+    path_for_qualifier(p, qual, PathSegmentKind::NameRef);
     m.complete(p, RELATION_NAME_REF);
 }
 

@@ -29,8 +29,7 @@ SOURCE_FILE
       AGGREGATE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "b"
+            IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple_args"
@@ -156,8 +155,7 @@ SOURCE_FILE
       AGGREGATE_NAME
         PATH
           PATH_SEGMENT
-            NAME
-              IDENT "b"
+            IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- qualified_names"

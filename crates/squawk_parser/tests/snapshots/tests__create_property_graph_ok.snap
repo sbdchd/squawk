@@ -18,8 +18,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
@@ -35,8 +34,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
@@ -54,8 +52,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
@@ -73,8 +70,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
@@ -92,8 +88,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
@@ -111,8 +106,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
@@ -128,8 +122,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "f"
+          IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PROPERTY_GRAPH
@@ -150,8 +143,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "bar"
+          IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- vertex & table edges"
@@ -171,8 +163,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     VERTEX_TABLES
       VERTEX_KW "vertex"
@@ -343,8 +334,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "g"
+          IDENT "g"
     WHITESPACE "\n  "
     EDGE_TABLES
       EDGE_KW "edge"
@@ -388,8 +378,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "g"
+          IDENT "g"
     WHITESPACE "\n  "
     EDGE_TABLES
       EDGE_KW "edge"
@@ -460,8 +449,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     VERTEX_TABLES
       VERTEX_KW "vertex"
@@ -518,8 +506,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "foo"
+          IDENT "foo"
     WHITESPACE "\n  "
     EDGE_TABLES
       EDGE_KW "edge"
@@ -562,8 +549,7 @@ SOURCE_FILE
     PROPERTY_GRAPH
       PATH
         PATH_SEGMENT
-          NAME
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     EDGE_TABLES
       EDGE_KW "edge"
@@ -611,8 +597,7 @@ SOURCE_FILE
               IDENT "foo"
         DOT "."
         PATH_SEGMENT
-          NAME
-            IDENT "bar"
+          IDENT "bar"
     WHITESPACE "\n  "
     VERTEX_TABLES
       VERTEX_KW "vertex"
