@@ -187,7 +187,6 @@ macro_rules! match_ast {
 /// API.
 #[test]
 fn api_walkthrough() {
-    use ast::NameLike;
     use ast::SourceFile;
     use rowan::{Direction, NodeOrToken, SyntaxText, TextRange, WalkEvent};
     use std::fmt::Write;
