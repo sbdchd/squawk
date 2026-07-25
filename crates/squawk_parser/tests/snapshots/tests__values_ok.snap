@@ -198,8 +198,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "films"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "films"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -447,8 +450,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "machines"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "machines"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"

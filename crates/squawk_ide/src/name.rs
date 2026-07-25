@@ -119,18 +119,7 @@ pub(crate) fn schema_and_table_from_from_item(
     let ast::FromItem::RelationFromItem(relation) = from_item else {
         return None;
     };
-    if let Some(name_ref_node) = relation.name_ref() {
-        Some((None, Name::from_node(&name_ref_node)))
-    } else if let Some(from_field_expr) = relation.field_expr() {
-        let table_name = Name::from_node(&from_field_expr.field()?);
-        let ast::Expr::NameRef(schema_name_ref) = from_field_expr.base()? else {
-            return None;
-        };
-        let schema = Schema(Name::from_node(&schema_name_ref));
-        Some((Some(schema), table_name))
-    } else {
-        None
-    }
+    schema_and_name_path(&relation.path_ref()?)
 }
 
 pub(crate) fn schema_and_table_from_field_expr(

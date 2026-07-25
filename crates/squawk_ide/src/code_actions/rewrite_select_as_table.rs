@@ -25,13 +25,7 @@ pub(super) fn rewrite_select_as_table(
     let ast::FromItem::RelationFromItem(relation) = from_item else {
         return None;
     };
-    let table_name = if let Some(name_ref) = relation.name_ref() {
-        name_ref.syntax().text().to_string()
-    } else if let Some(field_expr) = relation.field_expr() {
-        field_expr.syntax().text().to_string()
-    } else {
-        return None;
-    };
+    let table_name = relation.relation_name_ref()?.syntax().text().to_string();
 
     let mut replacement = format!("table {table_name}");
     if select.semicolon_token().is_some() {
@@ -114,7 +108,7 @@ fn can_transform_select_to_table(select: &ast::Select) -> bool {
         return false;
     }
 
-    relation.name_ref().is_some() || relation.field_expr().is_some()
+    relation.relation_name_ref().is_some()
 }
 
 #[cfg(test)]

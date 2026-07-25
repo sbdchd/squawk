@@ -584,16 +584,22 @@ SOURCE_FILE
       JOIN_EXPR
         JOIN_EXPR
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "customers"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "customers"
           WHITESPACE " "
           JOIN
             JOIN_INNER
               JOIN_KW "JOIN"
             WHITESPACE " "
             RELATION_FROM_ITEM
-              NAME_REF
-                IDENT "customer_orders"
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "customer_orders"
             WHITESPACE " "
             JOIN_USING_CLAUSE
               USING_KW "USING"
@@ -610,8 +616,11 @@ SOURCE_FILE
             JOIN_KW "JOIN"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "orders"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "orders"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "USING"

@@ -234,8 +234,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t1"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -385,13 +388,19 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "a"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
       COMMA ","
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "b"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -768,8 +777,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "accounts"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "accounts"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -863,8 +875,11 @@ SOURCE_FILE
               FROM_KW "FROM"
               WHITESPACE " "
               RELATION_FROM_ITEM
-                NAME_REF
-                  IDENT "accounts"
+                RELATION_NAME_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      NAME_REF
+                        IDENT "accounts"
             WHITESPACE " "
             WHERE_CLAUSE
               WHERE_KW "WHERE"
@@ -929,8 +944,11 @@ SOURCE_FILE
                 FROM_KW "FROM"
                 WHITESPACE " "
                 RELATION_FROM_ITEM
-                  NAME_REF
-                    IDENT "employees"
+                  RELATION_NAME_REF
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          IDENT "employees"
               WHITESPACE "\n     "
               WHERE_CLAUSE
                 WHERE_KW "WHERE"
@@ -995,8 +1013,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "employees"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "employees"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -1120,8 +1141,11 @@ SOURCE_FILE
                 FROM_KW "FROM"
                 WHITESPACE " "
                 RELATION_FROM_ITEM
-                  NAME_REF
-                    DATA_KW "data"
+                  RELATION_NAME_REF
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          DATA_KW "data"
                   WHITESPACE " "
                   FROM_ALIAS
                     TABLE_ALIAS
@@ -1315,8 +1339,11 @@ SOURCE_FILE
             FROM_KW "FROM"
             WHITESPACE " "
             RELATION_FROM_ITEM
-              NAME_REF
-                IDENT "work_item"
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "work_item"
               WHITESPACE " "
               FROM_ALIAS
                 AS_KW "AS"
@@ -1412,8 +1439,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "exceeded_max_retries"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "exceeded_max_retries"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "AS"

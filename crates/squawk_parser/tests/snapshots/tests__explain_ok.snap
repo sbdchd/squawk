@@ -20,8 +20,11 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explain_analyze"
@@ -44,8 +47,11 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explain_analyze_verbose"
@@ -70,8 +76,11 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explain_parenthesized_options"
@@ -301,8 +310,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
@@ -322,8 +334,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -365,8 +380,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -407,8 +425,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -448,8 +469,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -511,8 +535,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "test"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "test"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -604,8 +631,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "test"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "test"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -674,8 +704,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "test"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "test"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -896,8 +929,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -940,8 +976,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -984,8 +1023,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -1028,8 +1070,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -1108,8 +1153,11 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t2"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t2"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- paren select"
@@ -1305,8 +1353,11 @@ SOURCE_FILE
         USING_KW "using"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "u"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "u"
         WHITESPACE "\n    "
         ON_CLAUSE
           ON_KW "on"
@@ -1408,8 +1459,11 @@ SOURCE_FILE
           FROM_KW "from"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "u"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "u"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "where"

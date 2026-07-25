@@ -2302,8 +2302,11 @@ SOURCE_FILE
                     FROM_KW "from"
                     WHITESPACE " "
                     RELATION_FROM_ITEM
-                      NAME_REF
-                        IDENT "t"
+                      RELATION_NAME_REF
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            NAME_REF
+                              IDENT "t"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2552,8 +2555,11 @@ SOURCE_FILE
                   FROM_KW "from"
                   WHITESPACE " "
                   RELATION_FROM_ITEM
-                    NAME_REF
-                      IDENT "t"
+                    RELATION_NAME_REF
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          NAME_REF
+                            IDENT "t"
                 WHITESPACE " "
                 WHERE_CLAUSE
                   WHERE_KW "where"
@@ -2726,8 +2732,11 @@ SOURCE_FILE
                   FROM_KW "from"
                   WHITESPACE " "
                   RELATION_FROM_ITEM
-                    NAME_REF
-                      IDENT "t"
+                    RELATION_NAME_REF
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          NAME_REF
+                            IDENT "t"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2769,8 +2778,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -3456,8 +3468,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "vals"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "vals"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 2"
@@ -3497,8 +3512,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "vals"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "vals"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 2 const"
@@ -3538,8 +3556,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 1"
@@ -3579,8 +3600,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "\"table\""
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "\"table\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distinct with multiple args"
@@ -3612,8 +3636,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distinct with order by"
@@ -3650,8 +3677,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "vals"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "vals"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- within group"
@@ -3693,8 +3723,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- filter expr simple"
@@ -3733,8 +3766,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- filter expr"
@@ -4081,8 +4117,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- window name"
@@ -4113,8 +4152,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- window clause"
@@ -4131,8 +4173,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WINDOW_CLAUSE
       WINDOW_KW "window"
@@ -4197,8 +4242,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE "\n "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "my_films"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "my_films"
       COMMA ","
       WHITESPACE "\n "
       JSON_TABLE_FROM_ITEM
@@ -4314,8 +4362,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE "\n "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "my_films"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "my_films"
       COMMA ","
       WHITESPACE "\n "
       JSON_TABLE_FROM_ITEM
@@ -4463,8 +4514,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE "\n "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "my_films"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "my_films"
       COMMA ","
       WHITESPACE "\n "
       JSON_TABLE_FROM_ITEM

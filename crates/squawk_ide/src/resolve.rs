@@ -3108,15 +3108,9 @@ fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
             .call_expr()
             .and_then(|x| name::schema_and_func_name(&x))
             .is_some_and(|(_schema, function_name)| function_name == *qualifier),
-        ast::FromItem::RelationFromItem(relation) => {
-            if let Some(name_ref) = relation.name_ref() {
-                Name::from_node(&name_ref) == *qualifier
-            } else if let Some(field) = relation.field_expr().and_then(|x| x.field()) {
-                Name::from_node(&field) == *qualifier
-            } else {
-                false
-            }
-        }
+        ast::FromItem::RelationFromItem(relation) => relation
+            .name_ref()
+            .is_some_and(|name_ref| Name::from_node(&name_ref) == *qualifier),
         _ => false,
     }
 }
@@ -3822,11 +3816,7 @@ fn relation_name_ref_from_from_item(from_item: &ast::FromItem) -> Option<ast::Na
     let ast::FromItem::RelationFromItem(relation) = from_item else {
         return None;
     };
-    relation.name_ref().or_else(|| {
-        relation
-            .field_expr()
-            .and_then(|field_expr| field_expr.field())
-    })
+    relation.name_ref()
 }
 
 fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {

@@ -74,8 +74,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -125,8 +128,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--          ^ ^ comma missing"
@@ -171,8 +177,11 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE "\n    "
     ORDER_BY_CLAUSE
       ORDER_KW "order"
@@ -207,8 +216,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -243,8 +255,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -279,8 +294,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "u"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "u"
     WHITESPACE "\n  "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -493,8 +511,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -643,8 +664,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- case missing then expr"
@@ -796,8 +820,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -823,8 +850,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -891,16 +921,22 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "u"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "u"
           WHITESPACE " "
           ON_CLAUSE
             ON_KW "on"
@@ -921,16 +957,22 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
         WHITESPACE " "
         JOIN
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "u"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "u"
           WHITESPACE " "
           ON_CLAUSE
             ON_KW "on"
@@ -956,8 +998,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -977,8 +1022,11 @@ SOURCE_FILE
           JOIN_KW "join"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "k"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "k"
         WHITESPACE " "
         ON_CLAUSE
           ON_KW "on"
@@ -1030,8 +1078,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE "\n"
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -1133,8 +1184,11 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_FROM_ITEM
-        NAME_REF
-          IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"

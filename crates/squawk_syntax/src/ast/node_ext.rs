@@ -125,6 +125,16 @@ impl ast::FromItem {
     }
 }
 
+impl ast::RelationFromItem {
+    pub fn path_ref(&self) -> Option<ast::PathRef> {
+        self.relation_name_ref()?.path_ref()
+    }
+
+    pub fn name_ref(&self) -> Option<ast::NameRef> {
+        self.path_ref()?.segment()?.name_ref()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinOp {
     And(SyntaxToken),

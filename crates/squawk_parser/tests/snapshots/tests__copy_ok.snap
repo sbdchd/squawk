@@ -88,8 +88,11 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "country"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "country"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "WHERE"

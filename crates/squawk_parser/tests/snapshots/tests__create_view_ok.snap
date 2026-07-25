@@ -89,8 +89,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "films"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "films"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -130,8 +133,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "comedies"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "comedies"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -179,8 +185,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "comedies"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "comedies"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -278,8 +287,11 @@ SOURCE_FILE
                   FROM_KW "FROM"
                   WHITESPACE " "
                   RELATION_FROM_ITEM
-                    NAME_REF
-                      IDENT "user_ratings"
+                    RELATION_NAME_REF
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          NAME_REF
+                            IDENT "user_ratings"
                     WHITESPACE " "
                     FROM_ALIAS
                       TABLE_ALIAS
@@ -316,8 +328,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "films"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "films"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -399,8 +414,11 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "nums_1_100"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "nums_1_100"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "WHERE"
@@ -578,8 +596,11 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "foo"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- parenthesized / compound queries"
@@ -862,8 +883,11 @@ SOURCE_FILE
           FROM_KW "from"
           WHITESPACE " "
           RELATION_FROM_ITEM
-            NAME_REF
-              IDENT "x"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "x"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

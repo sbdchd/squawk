@@ -112,8 +112,11 @@ SOURCE_FILE
         FROM_KW "FROM"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "users"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "users"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -121,8 +124,11 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "logs"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "logs"
           WHITESPACE " "
           FROM_ALIAS
             TABLE_ALIAS
@@ -217,8 +223,11 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- update"
@@ -330,8 +339,11 @@ SOURCE_FILE
         USING_KW "using"
         WHITESPACE " "
         RELATION_FROM_ITEM
-          NAME_REF
-            IDENT "t2"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t2"
         WHITESPACE " "
         ON_CLAUSE
           ON_KW "on"
