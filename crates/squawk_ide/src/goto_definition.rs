@@ -1,4 +1,4 @@
-use crate::db::{list_files, parse};
+use crate::db::{File, list_files, parse};
 use crate::file::InFile;
 use crate::location::{Location, LocationKind};
 use crate::offsets::token_from_offset;
@@ -10,6 +10,19 @@ use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
+
+fn resolve_in_files(
+    db: &dyn Db,
+    origin_file: File,
+    mut resolve: impl FnMut(File) -> Option<SmallVec<[Location; 1]>>,
+) -> Option<SmallVec<[Location; 1]>> {
+    for definition_file in list_files(db, origin_file) {
+        if let Some(locations) = resolve(definition_file) {
+            return Some(locations);
+        }
+    }
+    None
+}
 
 pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Location; 1]> {
     let file = position.file_id;
@@ -59,276 +72,166 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
         return smallvec![Location::new(file, end_range, LocationKind::CommitEnd)];
     }
 
-    if let Some(name) = ast::Name::cast(parent.clone())
+    if let Some(name) = ast::AnyName::cast(parent.clone())
+        && matches!(
+            &name,
+            ast::AnyName::AccessMethod(_)
+                | ast::AnyName::Channel(_)
+                | ast::AnyName::ColumnName(_)
+                | ast::AnyName::ConstraintName(_)
+                | ast::AnyName::CteName(_)
+                | ast::AnyName::Cursor(_)
+                | ast::AnyName::Database(_)
+                | ast::AnyName::EventTrigger(_)
+                | ast::AnyName::Extension(_)
+                | ast::AnyName::ForeignDataWrapper(_)
+                | ast::AnyName::JsonPathName(_)
+                | ast::AnyName::Language(_)
+                | ast::AnyName::Name(_)
+                | ast::AnyName::ParamName(_)
+                | ast::AnyName::Policy(_)
+                | ast::AnyName::PreparedStatement(_)
+                | ast::AnyName::Publication(_)
+                | ast::AnyName::Role(_)
+                | ast::AnyName::Rule(_)
+                | ast::AnyName::Savepoint(_)
+                | ast::AnyName::Schema(_)
+                | ast::AnyName::Server(_)
+                | ast::AnyName::Subscription(_)
+                | ast::AnyName::TableAlias(_)
+                | ast::AnyName::Tablespace(_)
+                | ast::AnyName::TransitionRelationName(_)
+                | ast::AnyName::Trigger(_)
+                | ast::AnyName::Window(_)
+        )
         && let Some(location) = Location::from_node(file, name.syntax())
     {
         return smallvec![location];
     }
 
-    if (ast::AccessMethod::can_cast(parent.kind())
-        || ast::Channel::can_cast(parent.kind())
-        || ast::ColumnName::can_cast(parent.kind())
-        || ast::ConstraintName::can_cast(parent.kind())
-        || ast::CteName::can_cast(parent.kind())
-        || ast::Cursor::can_cast(parent.kind())
-        || ast::Database::can_cast(parent.kind())
-        || ast::EventTrigger::can_cast(parent.kind())
-        || ast::Extension::can_cast(parent.kind())
-        || ast::ForeignDataWrapper::can_cast(parent.kind())
-        || ast::JsonPathName::can_cast(parent.kind())
-        || ast::Language::can_cast(parent.kind())
-        || ast::ParamName::can_cast(parent.kind())
-        || ast::Policy::can_cast(parent.kind())
-        || ast::PreparedStatement::can_cast(parent.kind())
-        || ast::Publication::can_cast(parent.kind())
-        || ast::Role::can_cast(parent.kind())
-        || ast::Rule::can_cast(parent.kind())
-        || ast::Savepoint::can_cast(parent.kind())
-        || ast::Schema::can_cast(parent.kind())
-        || ast::Server::can_cast(parent.kind())
-        || ast::Subscription::can_cast(parent.kind())
-        || ast::TableAlias::can_cast(parent.kind())
-        || ast::Tablespace::can_cast(parent.kind())
-        || ast::TransitionRelationName::can_cast(parent.kind())
-        || ast::Trigger::can_cast(parent.kind())
-        || ast::Window::can_cast(parent.kind()))
-        && let Some(location) = Location::from_node(file, &parent)
-    {
-        return smallvec![location];
-    }
-
-    if let Some(access_method_ref) = ast::AccessMethodRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) = resolve::resolve_access_method_ref(
-                db,
-                InFile::new(definition_file, &access_method_ref),
-            ) {
-                return locations;
+    if let Some(name_ref) = ast::AnyNameRef::cast(parent.clone()) {
+        // TODO: these nodes come from the origin file, but we wrap them in each
+        // definition file below. Probably a bug.
+        let locations = match name_ref {
+            ast::AnyNameRef::AccessMethodRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_access_method_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(channel_ref) = ast::ChannelRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_channel_ref(db, InFile::new(definition_file, &channel_ref))
-            {
-                return locations;
+            ast::AnyNameRef::BindParamNameRef(_) => None,
+            ast::AnyNameRef::ChannelRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_channel_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(cursor_ref) = ast::CursorRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_cursor_ref(db, InFile::new(definition_file, &cursor_ref))
-            {
-                return locations;
+            ast::AnyNameRef::ColumnNameRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_column_name_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(event_trigger_ref) = ast::EventTriggerRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) = resolve::resolve_event_trigger_ref(
-                db,
-                InFile::new(definition_file, &event_trigger_ref),
-            ) {
-                return locations;
+            ast::AnyNameRef::CursorRef(name_ref) => resolve_in_files(db, file, |definition_file| {
+                resolve::resolve_cursor_ref(db, InFile::new(definition_file, &name_ref))
+            }),
+            ast::AnyNameRef::DatabaseRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_database_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(extension_ref) = ast::ExtensionRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_extension_ref(db, InFile::new(definition_file, &extension_ref))
-            {
-                return locations;
+            ast::AnyNameRef::EventTriggerRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_event_trigger_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(foreign_data_wrapper_ref) = ast::ForeignDataWrapperRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) = resolve::resolve_foreign_data_wrapper_ref(
-                db,
-                InFile::new(definition_file, &foreign_data_wrapper_ref),
-            ) {
-                return locations;
+            ast::AnyNameRef::ExtensionRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_extension_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(json_path_name_ref) = ast::JsonPathNameRef::cast(parent.clone()) {
-        return resolve::resolve_json_path_name_ref(file, &json_path_name_ref).unwrap_or_default();
-    }
-
-    if let Some(param_name_ref) = ast::ParamNameRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_param_name_ref(db, InFile::new(definition_file, &param_name_ref))
-            {
-                return locations;
+            ast::AnyNameRef::ForeignDataWrapperRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_foreign_data_wrapper_ref(
+                        db,
+                        InFile::new(definition_file, &name_ref),
+                    )
+                })
             }
-        }
-    }
-
-    if let Some(column_name_ref) = ast::ColumnNameRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_column_name_ref(db, InFile::new(definition_file, &column_name_ref))
-            {
-                return locations;
+            ast::AnyNameRef::JsonPathNameRef(name_ref) => {
+                return resolve::resolve_json_path_name_ref(file, &name_ref).unwrap_or_default();
             }
-        }
-    }
-
-    if let Some(database_ref) = ast::DatabaseRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_database_ref(db, InFile::new(definition_file, &database_ref))
-            {
-                return locations;
+            ast::AnyNameRef::LanguageRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_language_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(language_ref) = ast::LanguageRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_language_ref(db, InFile::new(definition_file, &language_ref))
-            {
-                return locations;
+            ast::AnyNameRef::NameRef(name_ref) => resolve_in_files(db, file, |definition_file| {
+                resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
+            }),
+            ast::AnyNameRef::ParamNameRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_param_name_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(policy_ref) = ast::PolicyRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_policy_ref(db, InFile::new(definition_file, &policy_ref))
-            {
-                return locations;
+            ast::AnyNameRef::PolicyRef(name_ref) => resolve_in_files(db, file, |definition_file| {
+                resolve::resolve_policy_ref(db, InFile::new(definition_file, &name_ref))
+            }),
+            ast::AnyNameRef::PreparedStatementRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_prepared_statement_ref(
+                        db,
+                        InFile::new(definition_file, &name_ref),
+                    )
+                })
             }
-        }
-    }
-
-    if let Some(publication_ref) = ast::PublicationRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_publication_ref(db, InFile::new(definition_file, &publication_ref))
-            {
-                return locations;
+            ast::AnyNameRef::PublicationRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_publication_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(role_ref) = ast::RoleRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_role_ref(db, InFile::new(definition_file, &role_ref))
-            {
-                return locations;
+            ast::AnyNameRef::RemoteTableNameRef(_) => None,
+            ast::AnyNameRef::RoleRef(name_ref) => resolve_in_files(db, file, |definition_file| {
+                resolve::resolve_role_ref(db, InFile::new(definition_file, &name_ref))
+            }),
+            ast::AnyNameRef::RuleRef(name_ref) => resolve_in_files(db, file, |definition_file| {
+                resolve::resolve_rule_ref(db, InFile::new(definition_file, &name_ref))
+            }),
+            ast::AnyNameRef::SavepointRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_savepoint_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(rule_ref) = ast::RuleRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_rule_ref(db, InFile::new(definition_file, &rule_ref))
-            {
-                return locations;
+            ast::AnyNameRef::SchemaRef(name_ref) => resolve_in_files(db, file, |definition_file| {
+                resolve::resolve_schema_ref(db, InFile::new(definition_file, &name_ref))
+            }),
+            ast::AnyNameRef::ServerRef(name_ref) => resolve_in_files(db, file, |definition_file| {
+                resolve::resolve_server_ref(db, InFile::new(definition_file, &name_ref))
+            }),
+            ast::AnyNameRef::SubscriptionRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_subscription_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(schema_ref) = ast::SchemaRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_schema_ref(db, InFile::new(definition_file, &schema_ref))
-            {
-                return locations;
+            ast::AnyNameRef::TablespaceRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_tablespace_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(server_ref) = ast::ServerRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_server_ref(db, InFile::new(definition_file, &server_ref))
-            {
-                return locations;
+            ast::AnyNameRef::TriggerRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_trigger_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(statement_ref) = ast::PreparedStatementRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) = resolve::resolve_prepared_statement_ref(
-                db,
-                InFile::new(definition_file, &statement_ref),
-            ) {
-                return locations;
+            ast::AnyNameRef::VertexTableRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_vertex_table_ref(db, InFile::new(definition_file, &name_ref))
+                })
             }
-        }
-    }
-
-    if let Some(savepoint_ref) = ast::SavepointRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_savepoint_ref(db, InFile::new(definition_file, &savepoint_ref))
-            {
-                return locations;
+            ast::AnyNameRef::WindowRef(name_ref) => {
+                return resolve::resolve_window_ref(file, &name_ref).unwrap_or_default();
             }
+        };
+        if let Some(locations) = locations {
+            return locations;
         }
-    }
-
-    if let Some(subscription_ref) = ast::SubscriptionRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) = resolve::resolve_subscription_ref(
-                db,
-                InFile::new(definition_file, &subscription_ref),
-            ) {
-                return locations;
-            }
-        }
-    }
-
-    if let Some(tablespace_ref) = ast::TablespaceRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_tablespace_ref(db, InFile::new(definition_file, &tablespace_ref))
-            {
-                return locations;
-            }
-        }
-    }
-
-    if let Some(trigger_ref) = ast::TriggerRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_trigger_ref(db, InFile::new(definition_file, &trigger_ref))
-            {
-                return locations;
-            }
-        }
-    }
-
-    if let Some(vertex_table_ref) = ast::VertexTableRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) = resolve::resolve_vertex_table_ref(
-                db,
-                InFile::new(definition_file, &vertex_table_ref),
-            ) {
-                return locations;
-            }
-        }
-    }
-
-    if let Some(window_ref) = ast::WindowRef::cast(parent.clone()) {
-        return resolve::resolve_window_ref(file, &window_ref).unwrap_or_default();
     }
 
     if let Some(config_value_name) = ast::ConfigValueName::cast(parent.clone()) {
@@ -337,18 +240,6 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
                 db,
                 InFile::new(definition_file, &config_value_name),
             ) {
-                return locations;
-            }
-        }
-    }
-
-    if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                // TODO: we shouldn't be wrapping name_ref like this since it's
-                // a different file. Probably a bug.
-                resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
-            {
                 return locations;
             }
         }

@@ -132,103 +132,110 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         return None;
     }
 
-    if ast::AccessMethodRef::can_cast(parent.kind())
-        || ast::ChannelRef::can_cast(parent.kind())
-        || ast::ColumnName::can_cast(parent.kind())
-        || ast::ColumnNameRef::can_cast(parent.kind())
-        || ast::ConstraintName::can_cast(parent.kind())
-        || ast::CteName::can_cast(parent.kind())
-        || ast::CursorRef::can_cast(parent.kind())
-        || ast::Database::can_cast(parent.kind())
-        || ast::DatabaseRef::can_cast(parent.kind())
-        || ast::EventTriggerRef::can_cast(parent.kind())
-        || ast::ExtensionRef::can_cast(parent.kind())
-        || ast::ForeignDataWrapperRef::can_cast(parent.kind())
-        || ast::JsonPathNameRef::can_cast(parent.kind())
-        || ast::LanguageRef::can_cast(parent.kind())
-        || ast::NameRef::can_cast(parent.kind())
-        || ast::ParamName::can_cast(parent.kind())
-        || ast::ParamNameRef::can_cast(parent.kind())
-        || ast::PolicyRef::can_cast(parent.kind())
-        || ast::PreparedStatementRef::can_cast(parent.kind())
-        || ast::Publication::can_cast(parent.kind())
-        || ast::PublicationRef::can_cast(parent.kind())
-        || ast::Role::can_cast(parent.kind())
-        || ast::RoleRef::can_cast(parent.kind())
-        || ast::Rule::can_cast(parent.kind())
-        || ast::RuleRef::can_cast(parent.kind())
-        || ast::SavepointRef::can_cast(parent.kind())
-        || ast::Schema::can_cast(parent.kind())
-        || ast::SchemaRef::can_cast(parent.kind())
-        || ast::Server::can_cast(parent.kind())
-        || ast::ServerRef::can_cast(parent.kind())
-        || ast::Subscription::can_cast(parent.kind())
-        || ast::SubscriptionRef::can_cast(parent.kind())
-        || ast::TableAlias::can_cast(parent.kind())
-        || ast::Tablespace::can_cast(parent.kind())
-        || ast::TablespaceRef::can_cast(parent.kind())
-        || ast::TransitionRelationName::can_cast(parent.kind())
-        || ast::TriggerRef::can_cast(parent.kind())
-        || ast::VertexTableRef::can_cast(parent.kind())
-        || ast::WindowRef::can_cast(parent.kind())
-    {
+    if ast::AnyNameRef::can_cast(parent.kind()) {
         return hover_position(db, position);
     }
 
-    if let Some(name) = ast::Name::cast(parent.clone()) {
-        return hover_name(db, InFile::new(file, name));
-    }
-
-    if ast::AccessMethod::can_cast(parent.kind()) {
-        return hover_access_method(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Channel::can_cast(parent.kind()) {
-        return hover_channel(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Cursor::can_cast(parent.kind()) {
-        return hover_cursor(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::EventTrigger::can_cast(parent.kind()) {
-        return hover_event_trigger(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Extension::can_cast(parent.kind()) {
-        return hover_extension(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::ForeignDataWrapper::can_cast(parent.kind()) {
-        return hover_foreign_data_wrapper(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::JsonPathName::can_cast(parent.kind()) {
-        return hover_json_path(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Language::can_cast(parent.kind()) {
-        return hover_language(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Policy::can_cast(parent.kind()) {
-        return hover_policy(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::PreparedStatement::can_cast(parent.kind()) {
-        return hover_prepared_statement(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Savepoint::can_cast(parent.kind()) {
-        return hover_savepoint(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Trigger::can_cast(parent.kind()) {
-        return hover_trigger(db, Location::from_node(file, &parent)?);
-    }
-
-    if ast::Window::can_cast(parent.kind()) {
-        return hover_window(db, Location::from_node(file, &parent)?);
+    if let Some(name) = ast::AnyName::cast(parent.clone()) {
+        match name {
+            ast::AnyName::ColumnName(_)
+            | ast::AnyName::ConstraintName(_)
+            | ast::AnyName::CteName(_)
+            | ast::AnyName::Database(_)
+            | ast::AnyName::ParamName(_)
+            | ast::AnyName::Publication(_)
+            | ast::AnyName::Role(_)
+            | ast::AnyName::Rule(_)
+            | ast::AnyName::Schema(_)
+            | ast::AnyName::Server(_)
+            | ast::AnyName::Subscription(_)
+            | ast::AnyName::TableAlias(_)
+            | ast::AnyName::Tablespace(_)
+            | ast::AnyName::TransitionRelationName(_) => return hover_position(db, position),
+            ast::AnyName::Name(name) => return hover_name(db, InFile::new(file, name)),
+            ast::AnyName::AccessMethod(_) => {
+                return hover_access_method(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Channel(_) => {
+                return hover_channel(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Cursor(_) => {
+                return hover_cursor(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::EventTrigger(_) => {
+                return hover_event_trigger(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Extension(_) => {
+                return hover_extension(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::ForeignDataWrapper(_) => {
+                return hover_foreign_data_wrapper(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::JsonPathName(_) => {
+                return hover_json_path(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Language(_) => {
+                return hover_language(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Policy(_) => {
+                return hover_policy(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::PreparedStatement(_) => {
+                return hover_prepared_statement(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Savepoint(_) => {
+                return hover_savepoint(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Trigger(_) => {
+                return hover_trigger(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::Window(_) => {
+                return hover_window(db, Location::from_node(file, &parent)?);
+            }
+            ast::AnyName::AccessMethodRef(_)
+            | ast::AnyName::AttributeName(_)
+            | ast::AnyName::AttributeNamespace(_)
+            | ast::AnyName::BindParamNameRef(_)
+            | ast::AnyName::ChannelRef(_)
+            | ast::AnyName::ColumnNameRef(_)
+            | ast::AnyName::ConfigValueName(_)
+            | ast::AnyName::CopyOptionName(_)
+            | ast::AnyName::CursorRef(_)
+            | ast::AnyName::DatabaseRef(_)
+            | ast::AnyName::ElementTableAlias(_)
+            | ast::AnyName::ElementTag(_)
+            | ast::AnyName::EventTriggerRef(_)
+            | ast::AnyName::ExplainOptionName(_)
+            | ast::AnyName::ExtensionRef(_)
+            | ast::AnyName::ForeignDataWrapperRef(_)
+            | ast::AnyName::ForeignOptionName(_)
+            | ast::AnyName::GrantRoleOptionName(_)
+            | ast::AnyName::JsonPathNameRef(_)
+            | ast::AnyName::JsonVariableName(_)
+            | ast::AnyName::LanguageRef(_)
+            | ast::AnyName::NameRef(_)
+            | ast::AnyName::ParamNameRef(_)
+            | ast::AnyName::PolicyRef(_)
+            | ast::AnyName::PreparedStatementRef(_)
+            | ast::AnyName::PropertyName(_)
+            | ast::AnyName::PublicationRef(_)
+            | ast::AnyName::RemoteTableNameRef(_)
+            | ast::AnyName::RoleRef(_)
+            | ast::AnyName::RuleRef(_)
+            | ast::AnyName::SavepointRef(_)
+            | ast::AnyName::SchemaRef(_)
+            | ast::AnyName::ServerRef(_)
+            | ast::AnyName::SubscriptionRef(_)
+            | ast::AnyName::TablespaceRef(_)
+            | ast::AnyName::TriggerRef(_)
+            | ast::AnyName::VacuumOptionName(_)
+            | ast::AnyName::VacuumOptionValueName(_)
+            | ast::AnyName::VertexTableRef(_)
+            | ast::AnyName::WindowRef(_)
+            | ast::AnyName::XmlAttr(_)
+            | ast::AnyName::XmlNamespacePrefix(_)
+            | ast::AnyName::XmlPiTarget(_) => (),
+        }
     }
 
     if let Some(literal) = ast::Literal::cast(parent) {
@@ -1237,7 +1244,7 @@ fn hover_index(db: &dyn Db, def: Location) -> Option<Hover> {
 
 fn hover_constraint(db: &dyn Db, def: Location) -> Option<Hover> {
     let def_node = def.to_node(db)?;
-    let name = ast::Name::cast(def_node.clone())
+    let name = ast::AnyName::cast(def_node.clone())
         .map(|name| Name::from_node(&name).to_string())
         .unwrap_or_else(|| def_node.text().to_string());
     Some(hover_with_preceding_comment(

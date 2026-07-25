@@ -5,6 +5,7 @@ use crate::ast::{AstNode, support};
 
 pub trait NameLike: AstNode {
     fn text(&self) -> String;
+    fn is_quoted(&self) -> bool;
 }
 
 pub trait HasCreateTable: AstNode {
