@@ -928,23 +928,23 @@ Column =
   NotEnforced? Enforced?
 
 ColumnRef =
-  'period'? ColumnNameRef Indirection*
+  'period'? name:ColumnNameRef Accessor*
 
-Indirection =
-  IndirectionField
-| IndirectionIndex
-| IndirectionSlice
+Accessor =
+  FieldAccessor
+| IndexAccessor
+| SliceAccessor
 
-IndirectionField =
+FieldAccessor =
   '.' (CompositeFieldRef | '*')
 
 CompositeFieldRef =
   '#name'?
 
-IndirectionIndex =
+IndexAccessor =
   '[' index:Expr ']'
 
-IndirectionSlice =
+SliceAccessor =
   '[' start:Expr? ':' end:Expr? ']'
 
 ColumnConstraint =

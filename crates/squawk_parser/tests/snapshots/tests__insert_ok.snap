@@ -734,7 +734,7 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "board"
-        INDIRECTION_SLICE
+        SLICE_ACCESSOR
           L_BRACK "["
           LITERAL
             INT_NUMBER "1"
@@ -742,7 +742,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "3"
           R_BRACK "]"
-        INDIRECTION_SLICE
+        SLICE_ACCESSOR
           L_BRACK "["
           LITERAL
             INT_NUMBER "1"
@@ -806,7 +806,7 @@ SOURCE_FILE
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMENT "-- every indirection form a column list entry accepts"
+  COMMENT "-- every accessor form a column list entry accepts"
   WHITESPACE "\n"
   INSERT
     INSERT_KW "INSERT"
@@ -828,7 +828,7 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "b"
-        INDIRECTION_FIELD
+        FIELD_ACCESSOR
           DOT "."
           COMPOSITE_FIELD_REF
             IDENT "c"
@@ -837,11 +837,11 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "x"
-        INDIRECTION_FIELD
+        FIELD_ACCESSOR
           DOT "."
           COMPOSITE_FIELD_REF
             IDENT "y"
-        INDIRECTION_FIELD
+        FIELD_ACCESSOR
           DOT "."
           COMPOSITE_FIELD_REF
             IDENT "z"
@@ -850,7 +850,7 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "d"
-        INDIRECTION_INDEX
+        INDEX_ACCESSOR
           L_BRACK "["
           LITERAL
             INT_NUMBER "1"
@@ -860,7 +860,7 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "e"
-        INDIRECTION_SLICE
+        SLICE_ACCESSOR
           L_BRACK "["
           LITERAL
             INT_NUMBER "1"
@@ -873,7 +873,7 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "f"
-        INDIRECTION_SLICE
+        SLICE_ACCESSOR
           L_BRACK "["
           COLON ":"
           R_BRACK "]"
@@ -882,7 +882,7 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "g"
-        INDIRECTION_SLICE
+        SLICE_ACCESSOR
           L_BRACK "["
           LITERAL
             INT_NUMBER "1"
@@ -893,7 +893,7 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "h"
-        INDIRECTION_SLICE
+        SLICE_ACCESSOR
           L_BRACK "["
           COLON ":"
           LITERAL
@@ -904,16 +904,16 @@ SOURCE_FILE
       COLUMN_REF
         COLUMN_NAME_REF
           IDENT "i"
-        INDIRECTION_FIELD
+        FIELD_ACCESSOR
           DOT "."
           COMPOSITE_FIELD_REF
             IDENT "j"
-        INDIRECTION_INDEX
+        INDEX_ACCESSOR
           L_BRACK "["
           LITERAL
             INT_NUMBER "1"
           R_BRACK "]"
-        INDIRECTION_FIELD
+        FIELD_ACCESSOR
           DOT "."
           COMPOSITE_FIELD_REF
             IDENT "k"

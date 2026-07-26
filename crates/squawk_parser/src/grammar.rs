@@ -4019,7 +4019,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
             column_name_ref(p);
-            indirections(p);
+            accessors(p);
             m.complete(p, COLUMN_REF)
         }
         ColumnDefKind::WithData => {
@@ -4035,17 +4035,17 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
     }
 }
 
-fn indirections(p: &mut Parser<'_>) {
+fn accessors(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         match p.current() {
-            DOT => indirection_field(p),
-            L_BRACK => indirection_subscript(p),
+            DOT => field_accessor(p),
+            L_BRACK => subscript_accessor(p),
             _ => break,
         }
     }
 }
 
-fn indirection_field(p: &mut Parser<'_>) {
+fn field_accessor(p: &mut Parser<'_>) {
     assert!(p.at(DOT));
     let m = p.start();
     p.bump(DOT);
@@ -4056,10 +4056,10 @@ fn indirection_field(p: &mut Parser<'_>) {
     } else if !p.eat(STAR) {
         p.error(format!("expected field name, got {:?}", p.current()));
     }
-    m.complete(p, INDIRECTION_FIELD);
+    m.complete(p, FIELD_ACCESSOR);
 }
 
-fn indirection_subscript(p: &mut Parser<'_>) {
+fn subscript_accessor(p: &mut Parser<'_>) {
     assert!(p.at(L_BRACK));
     let m = p.start();
     p.bump(L_BRACK);
@@ -4067,7 +4067,7 @@ fn indirection_subscript(p: &mut Parser<'_>) {
     if p.eat(COLON) {
         opt_expr(p);
         p.expect(R_BRACK);
-        m.complete(p, INDIRECTION_SLICE);
+        m.complete(p, SLICE_ACCESSOR);
         return;
     }
     expr(p);
@@ -4075,12 +4075,12 @@ fn indirection_subscript(p: &mut Parser<'_>) {
     if p.eat(COLON) {
         opt_expr(p);
         p.expect(R_BRACK);
-        m.complete(p, INDIRECTION_SLICE);
+        m.complete(p, SLICE_ACCESSOR);
         return;
     }
     // foo[a]
     p.expect(R_BRACK);
-    m.complete(p, INDIRECTION_INDEX);
+    m.complete(p, INDEX_ACCESSOR);
 }
 
 // [ ( column_name [, ... ] ) ]

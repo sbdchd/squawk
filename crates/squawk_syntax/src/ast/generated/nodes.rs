@@ -3770,12 +3770,12 @@ pub struct ColumnRef {
 }
 impl ColumnRef {
     #[inline]
-    pub fn column_name_ref(&self) -> Option<ColumnNameRef> {
-        support::child(&self.syntax)
+    pub fn accessors(&self) -> AstChildren<Accessor> {
+        support::children(&self.syntax)
     }
     #[inline]
-    pub fn indirections(&self) -> AstChildren<Indirection> {
-        support::children(&self.syntax)
+    pub fn name(&self) -> Option<ColumnNameRef> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn period_token(&self) -> Option<SyntaxToken> {
@@ -10863,6 +10863,25 @@ impl FetchClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FieldAccessor {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FieldAccessor {
+    #[inline]
+    pub fn composite_field_ref(&self) -> Option<CompositeFieldRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn star_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STAR)
+    }
+    #[inline]
+    pub fn dot_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FieldExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -12088,6 +12107,21 @@ impl Index {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IndexAccessor {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IndexAccessor {
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IndexExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -12175,59 +12209,6 @@ impl IndexRenameTo {
     #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IndirectionField {
-    pub(crate) syntax: SyntaxNode,
-}
-impl IndirectionField {
-    #[inline]
-    pub fn composite_field_ref(&self) -> Option<CompositeFieldRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn star_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::STAR)
-    }
-    #[inline]
-    pub fn dot_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOT)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IndirectionIndex {
-    pub(crate) syntax: SyntaxNode,
-}
-impl IndirectionIndex {
-    #[inline]
-    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_BRACK)
-    }
-    #[inline]
-    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_BRACK)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IndirectionSlice {
-    pub(crate) syntax: SyntaxNode,
-}
-impl IndirectionSlice {
-    #[inline]
-    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_BRACK)
-    }
-    #[inline]
-    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_BRACK)
-    }
-    #[inline]
-    pub fn colon_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COLON)
     }
 }
 
@@ -22510,6 +22491,25 @@ impl SkipSubscription {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SliceAccessor {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SliceAccessor {
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SliceExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -25488,6 +25488,13 @@ impl XmlTableFromItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Accessor {
+    FieldAccessor(FieldAccessor),
+    IndexAccessor(IndexAccessor),
+    SliceAccessor(SliceAccessor),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AlterAggregateAction {
     AggregateRenameTo(AggregateRenameTo),
     OwnerTo(OwnerTo),
@@ -26291,13 +26298,6 @@ pub enum HasParamList {
     FunctionSig(FunctionSig),
     ProcedureSig(ProcedureSig),
     RoutineSig(RoutineSig),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Indirection {
-    IndirectionField(IndirectionField),
-    IndirectionIndex(IndirectionIndex),
-    IndirectionSlice(IndirectionSlice),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -33869,6 +33869,24 @@ impl AstNode for FetchClause {
         &self.syntax
     }
 }
+impl AstNode for FieldAccessor {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FIELD_ACCESSOR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for FieldExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -34931,6 +34949,24 @@ impl AstNode for Index {
         &self.syntax
     }
 }
+impl AstNode for IndexAccessor {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INDEX_ACCESSOR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for IndexExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -35007,60 +35043,6 @@ impl AstNode for IndexRenameTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::INDEX_RENAME_TO
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for IndirectionField {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::INDIRECTION_FIELD
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for IndirectionIndex {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::INDIRECTION_INDEX
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for IndirectionSlice {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::INDIRECTION_SLICE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -43877,6 +43859,24 @@ impl AstNode for SkipSubscription {
         &self.syntax
     }
 }
+impl AstNode for SliceAccessor {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SLICE_ACCESSOR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SliceExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -46647,6 +46647,53 @@ impl AstNode for XmlTableFromItem {
     #[inline]
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
+    }
+}
+impl AstNode for Accessor {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::FIELD_ACCESSOR | SyntaxKind::INDEX_ACCESSOR | SyntaxKind::SLICE_ACCESSOR
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::FIELD_ACCESSOR => Accessor::FieldAccessor(FieldAccessor { syntax }),
+            SyntaxKind::INDEX_ACCESSOR => Accessor::IndexAccessor(IndexAccessor { syntax }),
+            SyntaxKind::SLICE_ACCESSOR => Accessor::SliceAccessor(SliceAccessor { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Accessor::FieldAccessor(it) => &it.syntax,
+            Accessor::IndexAccessor(it) => &it.syntax,
+            Accessor::SliceAccessor(it) => &it.syntax,
+        }
+    }
+}
+impl From<FieldAccessor> for Accessor {
+    #[inline]
+    fn from(node: FieldAccessor) -> Accessor {
+        Accessor::FieldAccessor(node)
+    }
+}
+impl From<IndexAccessor> for Accessor {
+    #[inline]
+    fn from(node: IndexAccessor) -> Accessor {
+        Accessor::IndexAccessor(node)
+    }
+}
+impl From<SliceAccessor> for Accessor {
+    #[inline]
+    fn from(node: SliceAccessor) -> Accessor {
+        Accessor::SliceAccessor(node)
     }
 }
 impl AstNode for AlterAggregateAction {
@@ -53477,61 +53524,6 @@ impl From<RoutineSig> for HasParamList {
     #[inline]
     fn from(node: RoutineSig) -> HasParamList {
         HasParamList::RoutineSig(node)
-    }
-}
-impl AstNode for Indirection {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(
-            kind,
-            SyntaxKind::INDIRECTION_FIELD
-                | SyntaxKind::INDIRECTION_INDEX
-                | SyntaxKind::INDIRECTION_SLICE
-        )
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        let res = match syntax.kind() {
-            SyntaxKind::INDIRECTION_FIELD => {
-                Indirection::IndirectionField(IndirectionField { syntax })
-            }
-            SyntaxKind::INDIRECTION_INDEX => {
-                Indirection::IndirectionIndex(IndirectionIndex { syntax })
-            }
-            SyntaxKind::INDIRECTION_SLICE => {
-                Indirection::IndirectionSlice(IndirectionSlice { syntax })
-            }
-            _ => {
-                return None;
-            }
-        };
-        Some(res)
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            Indirection::IndirectionField(it) => &it.syntax,
-            Indirection::IndirectionIndex(it) => &it.syntax,
-            Indirection::IndirectionSlice(it) => &it.syntax,
-        }
-    }
-}
-impl From<IndirectionField> for Indirection {
-    #[inline]
-    fn from(node: IndirectionField) -> Indirection {
-        Indirection::IndirectionField(node)
-    }
-}
-impl From<IndirectionIndex> for Indirection {
-    #[inline]
-    fn from(node: IndirectionIndex) -> Indirection {
-        Indirection::IndirectionIndex(node)
-    }
-}
-impl From<IndirectionSlice> for Indirection {
-    #[inline]
-    fn from(node: IndirectionSlice) -> Indirection {
-        Indirection::IndirectionSlice(node)
     }
 }
 impl AstNode for JoinType {

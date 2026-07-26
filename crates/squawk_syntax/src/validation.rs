@@ -304,12 +304,12 @@ fn validate_set_single_column(it: ast::SetSingleColumn, acc: &mut Vec<SyntaxErro
     let Some(column_ref) = it.column_ref() else {
         return;
     };
-    let Some(indirection) = column_ref.indirections().next() else {
+    let Some(accessor) = column_ref.accessors().next() else {
         return;
     };
-    let message = match indirection {
-        ast::Indirection::IndirectionField(_) => "cannot set a subfield to DEFAULT",
-        ast::Indirection::IndirectionIndex(_) | ast::Indirection::IndirectionSlice(_) => {
+    let message = match accessor {
+        ast::Accessor::FieldAccessor(_) => "cannot set a subfield to DEFAULT",
+        ast::Accessor::IndexAccessor(_) | ast::Accessor::SliceAccessor(_) => {
             "cannot set an array element to DEFAULT"
         }
     };

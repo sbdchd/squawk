@@ -5066,8 +5066,8 @@ fn resolve_composite_type_field_ptr(
     let field_name = Name::from_node(field_name_ref);
     let parent = field_name_ref.syntax().parent()?;
 
-    let column_locs = if let Some(indirection_field) = ast::IndirectionField::cast(parent.clone()) {
-        resolve_indirection_base_column(db, file, &indirection_field)?
+    let column_locs = if let Some(field_accessor) = ast::FieldAccessor::cast(parent.clone()) {
+        resolve_accessor_base_column(db, file, &field_accessor)?
     } else {
         let field_expr = ast::FieldExpr::cast(parent)?;
         let base = field_expr.base()?;
@@ -5145,18 +5145,18 @@ fn composite_type_field_location(
     None
 }
 
-// only the first indirection refers to the column itself, i.e., the `x` in
+// only the first accessor refers to the column itself, i.e., the `x` in
 // `a.x` but not the `y` in `a.x.y`
-fn resolve_indirection_base_column(
+fn resolve_accessor_base_column(
     db: &dyn Db,
     file: File,
-    indirection_field: &ast::IndirectionField,
+    field_accessor: &ast::FieldAccessor,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let column_ref = ast::ColumnRef::cast(indirection_field.syntax().parent()?)?;
-    if column_ref.indirections().next()?.syntax() != indirection_field.syntax() {
+    let column_ref = ast::ColumnRef::cast(field_accessor.syntax().parent()?)?;
+    if column_ref.accessors().next()?.syntax() != field_accessor.syntax() {
         return None;
     }
-    resolve_name_ref(db, InFile::new(file, &column_ref.column_name_ref()?))
+    resolve_name_ref(db, InFile::new(file, &column_ref.name()?))
 }
 
 fn resolve_composite_type_from_column_node(
