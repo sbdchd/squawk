@@ -938,6 +938,9 @@ Accessor =
 FieldAccessor =
   '.' (CompositeFieldRef | '*')
 
+CompositeField =
+  '#name'?
+
 CompositeFieldRef =
   '#name'?
 
@@ -3347,13 +3350,13 @@ AlterTypeAttributeAction =
 | DropAttribute
 
 RenameAttribute =
-  'rename' 'attribute' CompositeFieldRef 'to' ColumnName (Cascade | Restrict)?
+  'rename' 'attribute' CompositeFieldRef 'to' CompositeField (Cascade | Restrict)?
 
 RenameValue =
   'rename' 'value' from:Literal 'to' to:Literal
 
 AddAttribute =
-  'add' 'attribute' ColumnName Type Collate? (Cascade | Restrict)?
+  'add' 'attribute' CompositeField Type Collate? (Cascade | Restrict)?
 
 DropAttribute =
   'drop' 'attribute' IfExists? CompositeFieldRef (Cascade | Restrict)?
@@ -4760,7 +4763,13 @@ BaseType =
   AttributeList
 
 CompositeType =
-  'as' ColumnList
+  'as' CompositeFieldList
+
+CompositeFieldList =
+  '(' (CompositeFieldDef (',' CompositeFieldDef)*) ')'
+
+CompositeFieldDef =
+  name:CompositeField Type? Collate?
 
 EnumType =
   'as' 'enum' VariantList

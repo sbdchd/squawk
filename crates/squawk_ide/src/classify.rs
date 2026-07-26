@@ -1119,10 +1119,10 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         if ast::Param::can_cast(ancestor.kind()) {
             return Some(LocationKind::NamedArgParameter);
         }
-        if in_column
-            && (ast::CreateTableLike::can_cast(ancestor.kind())
-                || ast::CreateType::can_cast(ancestor.kind()))
-        {
+        if ast::CompositeFieldDef::can_cast(ancestor.kind()) {
+            return Some(LocationKind::Column);
+        }
+        if in_column && ast::CreateTableLike::can_cast(ancestor.kind()) {
             return Some(LocationKind::Column);
         }
         if ast::WithTable::can_cast(ancestor.kind()) {

@@ -139,6 +139,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
     if let Some(name) = ast::AnyName::cast(parent.clone()) {
         match name {
             ast::AnyName::ColumnName(_)
+            | ast::AnyName::CompositeField(_)
             | ast::AnyName::ConstraintName(_)
             | ast::AnyName::CteName(_)
             | ast::AnyName::Database(_)
@@ -707,14 +708,14 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
 }
 
 fn hover_composite_type_field(db: &dyn Db, def: Location) -> Option<Hover> {
-    let column = def.to_node(db)?.ancestors().find_map(ast::Column::cast)?;
-    let field_name = column.name()?.syntax().text().to_string();
-    let ty = column.ty()?;
-
-    let create_type = column
-        .syntax()
+    let field = def
+        .to_node(db)?
         .ancestors()
-        .find_map(ast::CreateType::cast)?;
+        .find_map(ast::CompositeFieldDef::cast)?;
+    let field_name = field.name()?.syntax().text().to_string();
+    let ty = field.ty()?;
+
+    let create_type = field.syntax().ancestors().find_map(ast::CreateType::cast)?;
     let type_path = create_type.type_name()?.path()?;
     let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(def.file, &type_path))?;
 
@@ -726,7 +727,7 @@ fn hover_composite_type_field(db: &dyn Db, def: Location) -> Option<Hover> {
             field_name,
             ty.syntax().text()
         ),
-        column.syntax(),
+        field.syntax(),
     ))
 }
 
@@ -1815,7 +1816,11 @@ fn format_create_type(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
             format!("type {schema}.{type_name} as enum {variants}")
         }
         Some(ast::CreateTypeKind::CompositeType(composite_type)) => {
-            let columns = composite_type.column_list()?.syntax().text().to_string();
+            let columns = composite_type
+                .composite_field_list()?
+                .syntax()
+                .text()
+                .to_string();
             format!("type {schema}.{type_name} as {columns}")
         }
         Some(ast::CreateTypeKind::RangeType(range_type)) => {

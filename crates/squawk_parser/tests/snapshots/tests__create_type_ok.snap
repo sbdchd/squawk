@@ -18,7 +18,7 @@ SOURCE_FILE
     COMPOSITE_TYPE
       AS_KW "as"
       WHITESPACE " "
-      COLUMN_LIST
+      COMPOSITE_FIELD_LIST
         L_PAREN "("
         R_PAREN ")"
     SEMICOLON ";"
@@ -36,11 +36,11 @@ SOURCE_FILE
     COMPOSITE_TYPE
       AS_KW "as"
       WHITESPACE " "
-      COLUMN_LIST
+      COMPOSITE_FIELD_LIST
         L_PAREN "("
         WHITESPACE "\n  "
-        COLUMN
-          COLUMN_NAME
+        COMPOSITE_FIELD_DEF
+          COMPOSITE_FIELD
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -72,11 +72,11 @@ SOURCE_FILE
     COMPOSITE_TYPE
       AS_KW "as"
       WHITESPACE " "
-      COLUMN_LIST
+      COMPOSITE_FIELD_LIST
         L_PAREN "("
         WHITESPACE "\n  "
-        COLUMN
-          COLUMN_NAME
+        COMPOSITE_FIELD_DEF
+          COMPOSITE_FIELD
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -93,8 +93,8 @@ SOURCE_FILE
                   IDENT "\"fr_FR\""
         COMMA ","
         WHITESPACE "\n  "
-        COLUMN
-          COLUMN_NAME
+        COMPOSITE_FIELD_DEF
+          COMPOSITE_FIELD
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
@@ -103,8 +103,8 @@ SOURCE_FILE
                 INT_KW "int"
         COMMA ","
         WHITESPACE "\n  "
-        COLUMN
-          COLUMN_NAME
+        COMPOSITE_FIELD_DEF
+          COMPOSITE_FIELD
             IDENT "c"
           WHITESPACE " "
           PATH_TYPE

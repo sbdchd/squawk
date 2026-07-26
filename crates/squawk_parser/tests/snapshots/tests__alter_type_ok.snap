@@ -109,7 +109,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      COLUMN_NAME
+      COMPOSITE_FIELD
         IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -139,7 +139,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      COLUMN_NAME
+      COMPOSITE_FIELD
         IDENT "b"
       WHITESPACE " "
       CASCADE_KW "cascade"
@@ -169,7 +169,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      COLUMN_NAME
+      COMPOSITE_FIELD
         IDENT "b"
       WHITESPACE " "
       RESTRICT_KW "restrict"
@@ -381,7 +381,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME
+        COMPOSITE_FIELD
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -408,7 +408,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME
+        COMPOSITE_FIELD
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -443,7 +443,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME
+        COMPOSITE_FIELD
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -470,7 +470,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME
+        COMPOSITE_FIELD
           IDENT "a"
         WHITESPACE " "
         CHAR_TYPE
@@ -688,7 +688,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME
+        COMPOSITE_FIELD
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE

@@ -78,6 +78,7 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
             ast::AnyName::AccessMethod(_)
                 | ast::AnyName::Channel(_)
                 | ast::AnyName::ColumnName(_)
+                | ast::AnyName::CompositeField(_)
                 | ast::AnyName::ConstraintName(_)
                 | ast::AnyName::CteName(_)
                 | ast::AnyName::Cursor(_)
@@ -5505,6 +5506,23 @@ select ((((member))).name$0) from team;
           ‡
         6 │ select ((((member))).name) from team;
           ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_composite_type_field() {
+        assert_snapshot!(goto("
+create type inner_t as (x int);
+create type outer_t as (i inner_t);
+create table t (v outer_t);
+select ((v).i).x$0 from t;
+"), @"
+          ╭▸ 
+        2 │ create type inner_t as (x int);
+          │                         ─ 2. destination
+          ‡
+        5 │ select ((v).i).x from t;
+          ╰╴               ─ 1. source
         ");
     }
 
