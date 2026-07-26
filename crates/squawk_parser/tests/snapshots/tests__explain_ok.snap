@@ -1256,7 +1256,7 @@ SOURCE_FILE
         SET_COLUMN_LIST
           SET_SINGLE_COLUMN
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             WHITESPACE " "
             EQ "="

@@ -46,9 +46,9 @@ SOURCE_FILE@0..170
       SET_COLUMN_LIST@51..67
         SET_SINGLE_COLUMN@51..67
           COLUMN_REF@51..57
-            INDEX_EXPR@51..57
-              NAME_REF@51..54
-                IDENT@51..54 "arr"
+            COLUMN_NAME_REF@51..54
+              IDENT@51..54 "arr"
+            INDEX_ACCESSOR@54..57
               L_BRACK@54..55 "["
               LITERAL@55..56
                 INT_NUMBER@55..56 "1"
@@ -75,11 +75,11 @@ SOURCE_FILE@0..170
       SET_COLUMN_LIST@83..103
         SET_SINGLE_COLUMN@83..103
           COLUMN_REF@83..93
-            FIELD_EXPR@83..93
-              NAME_REF@83..87
-                IDENT@83..87 "comp"
+            COLUMN_NAME_REF@83..87
+              IDENT@83..87 "comp"
+            FIELD_ACCESSOR@87..93
               DOT@87..88 "."
-              NAME_REF@88..93
+              COMPOSITE_FIELD_REF@88..93
                 IDENT@88..93 "field"
           WHITESPACE@93..94 " "
           EQ@94..95 "="
@@ -136,11 +136,11 @@ error[syntax-error]: DEFAULT is not allowed in this context
   ╭▸ 
 1 │ insert into t VALUES (foo(DEFAULT));
   ╰╴                          ━━━━━━━
-error[syntax-error]: DEFAULT may only assign to a simple column name
+error[syntax-error]: cannot set an array element to DEFAULT
   ╭▸ 
 3 │ UPDATE t SET arr[1] = DEFAULT;
   ╰╴             ━━━━━━
-error[syntax-error]: DEFAULT may only assign to a simple column name
+error[syntax-error]: cannot set a subfield to DEFAULT
   ╭▸ 
 5 │ UPDATE t SET comp.field = DEFAULT;
   ╰╴             ━━━━━━━━━━

@@ -1851,17 +1851,6 @@ fn separated(
     }
 }
 
-fn name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    opt_name_ref(p).or_else(|| {
-        p.error("expected name");
-        None
-    })
-}
-
-fn opt_name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    name_ref_(p)
-}
-
 #[derive(PartialEq, Clone, Copy)]
 enum PathSegmentKind {
     Name,
@@ -4029,7 +4018,8 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
             }
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
-            name_ref(p).map(|lhs| postfix_expr(p, lhs));
+            column_name_ref(p);
+            accessors(p);
             m.complete(p, COLUMN_REF)
         }
         ColumnDefKind::WithData => {
@@ -4043,6 +4033,54 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
             m.complete(p, COLUMN)
         }
     }
+}
+
+fn accessors(p: &mut Parser<'_>) {
+    while !p.at(EOF) {
+        match p.current() {
+            DOT => field_accessor(p),
+            L_BRACK => subscript_accessor(p),
+            _ => break,
+        }
+    }
+}
+
+fn field_accessor(p: &mut Parser<'_>) {
+    assert!(p.at(DOT));
+    let m = p.start();
+    p.bump(DOT);
+    if p.at_ts(COL_LABEL_FIRST) {
+        composite_field_ref(p);
+    } else if p.at(INT_NUMBER) || p.at(NUMERIC_NUMBER) {
+        p.err_and_bump("expected field name");
+    } else if !p.eat(STAR) {
+        p.error(format!("expected field name, got {:?}", p.current()));
+    }
+    m.complete(p, FIELD_ACCESSOR);
+}
+
+fn subscript_accessor(p: &mut Parser<'_>) {
+    assert!(p.at(L_BRACK));
+    let m = p.start();
+    p.bump(L_BRACK);
+    // foo[:] foo[:b]
+    if p.eat(COLON) {
+        opt_expr(p);
+        p.expect(R_BRACK);
+        m.complete(p, SLICE_ACCESSOR);
+        return;
+    }
+    expr(p);
+    // foo[a:] foo[a:b]
+    if p.eat(COLON) {
+        opt_expr(p);
+        p.expect(R_BRACK);
+        m.complete(p, SLICE_ACCESSOR);
+        return;
+    }
+    // foo[a]
+    p.expect(R_BRACK);
+    m.complete(p, INDEX_ACCESSOR);
 }
 
 // [ ( column_name [, ... ] ) ]

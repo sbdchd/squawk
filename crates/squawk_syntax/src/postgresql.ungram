@@ -928,13 +928,24 @@ Column =
   NotEnforced? Enforced?
 
 ColumnRef =
-  'period'? NameRef
-| FieldExpr
-| IndexExpr
-| SliceExpr
+  'period'? name:ColumnNameRef Accessor*
+
+Accessor =
+  FieldAccessor
+| IndexAccessor
+| SliceAccessor
+
+FieldAccessor =
+  '.' (CompositeFieldRef | '*')
 
 CompositeFieldRef =
   '#name'?
+
+IndexAccessor =
+  '[' index:Expr ']'
+
+SliceAccessor =
+  '[' start:Expr? ':' end:Expr? ']'
 
 ColumnConstraint =
   CheckConstraint

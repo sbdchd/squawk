@@ -63,17 +63,17 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "ts"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "sensorid"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           VALUE_KW "value"
       R_PAREN ")"
     WHITESPACE " \n  "
@@ -158,17 +158,17 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "sensorid"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "ts"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           VALUE_KW "value"
       R_PAREN ")"
     WHITESPACE "\n"
@@ -240,7 +240,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "embedding"
           WHITESPACE " "
           EQ "="
@@ -1291,7 +1291,7 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
     WHITESPACE " "
@@ -1363,7 +1363,7 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
     WHITESPACE " "
@@ -1557,17 +1557,17 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col1"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col2"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
     WHITESPACE " "
@@ -1696,17 +1696,17 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col1"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col2"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
     WHITESPACE " "
@@ -2036,12 +2036,12 @@ SOURCE_FILE
       COLUMN_REF_LIST
         L_PAREN "("
         COLUMN_REF
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "title"
         COMMA ","
         WHITESPACE " "
         COLUMN_REF
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "plot"
         R_PAREN ")"
     WHITESPACE "\n    "
@@ -2130,7 +2130,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "vec"
           WHITESPACE " "
           EQ "="
@@ -2420,12 +2420,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 DAY_KW "day"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "user_id"
             R_PAREN ")"
       R_PAREN ")"
@@ -2475,17 +2475,17 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "event_time"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "user_id"
       COMMA ","
       WHITESPACE " "
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "response_time"
       R_PAREN ")"
     WHITESPACE "\n"
@@ -2824,7 +2824,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 HOUR_KW "hour"
             R_PAREN ")"
       R_PAREN ")"
@@ -3206,7 +3206,7 @@ SOURCE_FILE
             COLUMN_REF_LIST
               L_PAREN "("
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "jobid"
               R_PAREN ")"
     WHITESPACE "\n"
@@ -3786,7 +3786,7 @@ SOURCE_FILE
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "attrs"
       R_PAREN ")"
     WHITESPACE "\n"
@@ -6771,7 +6771,7 @@ SOURCE_FILE
             COLUMN_REF_LIST
               L_PAREN "("
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "turbine_id"
               R_PAREN ")"
     WHITESPACE "\n"

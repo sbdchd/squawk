@@ -52,6 +52,10 @@ INSERT INTO tictactoe (game, board[1:3][1:3])
 INSERT INTO tictactoe (game, board)
     VALUES (2, '{{X," "," "},{" ",O," "},{" ",X," "}}');
 
+-- every accessor form a column list entry accepts
+INSERT INTO t (a, b.c, x.y.z, d[1], e[1:2], f[:], g[1:], h[:2], i.j[1].k)
+    VALUES (1, 2, 3, 4, 5, 6, 7, 8, 9);
+
 INSERT INTO distributors (did, dname) VALUES (DEFAULT, 'XYZ Widgets')
    RETURNING did;
 

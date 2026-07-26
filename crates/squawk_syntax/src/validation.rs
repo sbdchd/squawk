@@ -304,15 +304,16 @@ fn validate_set_single_column(it: ast::SetSingleColumn, acc: &mut Vec<SyntaxErro
     let Some(column_ref) = it.column_ref() else {
         return;
     };
-    if column_ref.index_expr().is_some()
-        || column_ref.field_expr().is_some()
-        || column_ref.slice_expr().is_some()
-    {
-        acc.push(SyntaxError::new(
-            "DEFAULT may only assign to a simple column name",
-            column_ref.syntax().text_range(),
-        ));
-    }
+    let Some(accessor) = column_ref.accessors().next() else {
+        return;
+    };
+    let message = match accessor {
+        ast::Accessor::FieldAccessor(_) => "cannot set a subfield to DEFAULT",
+        ast::Accessor::IndexAccessor(_) | ast::Accessor::SliceAccessor(_) => {
+            "cannot set an array element to DEFAULT"
+        }
+    };
+    acc.push(SyntaxError::new(message, column_ref.syntax().text_range()));
 }
 
 #[derive(Clone, Copy)]

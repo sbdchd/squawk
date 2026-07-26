@@ -22,7 +22,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "price"
           WHITESPACE " "
           EQ "="
@@ -61,7 +61,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "price"
           WHITESPACE " "
           EQ "="
@@ -94,7 +94,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
           WHITESPACE " "
           EQ "="
@@ -106,7 +106,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "b"
           WHITESPACE " "
           EQ "="
@@ -118,7 +118,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "c"
           WHITESPACE " "
           EQ "="
@@ -159,7 +159,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "z"
             R_PAREN ")"
           WHITESPACE " "
@@ -217,7 +217,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "foo"
           WHITESPACE " "
           EQ "="
@@ -282,7 +282,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "bar"
           WHITESPACE " "
           EQ "="
@@ -300,7 +300,7 @@ SOURCE_FILE
         WHITESPACE "\n  "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "foo"
           WHITESPACE " "
           EQ "="
@@ -313,7 +313,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             R_PAREN ")"
           WHITESPACE " "
@@ -331,12 +331,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "c"
             R_PAREN ")"
           WHITESPACE " "
@@ -359,7 +359,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "z"
             R_PAREN ")"
           WHITESPACE " "
@@ -447,7 +447,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "kind"
           WHITESPACE " "
           EQ "="
@@ -484,7 +484,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "temp_lo"
           WHITESPACE " "
           EQ "="
@@ -500,7 +500,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "temp_hi"
           WHITESPACE " "
           EQ "="
@@ -516,7 +516,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "prcp"
           WHITESPACE " "
           EQ "="
@@ -564,7 +564,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "temp_lo"
           WHITESPACE " "
           EQ "="
@@ -580,7 +580,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "temp_hi"
           WHITESPACE " "
           EQ "="
@@ -596,7 +596,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "prcp"
           WHITESPACE " "
           EQ "="
@@ -664,17 +664,17 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "temp_lo"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "temp_hi"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "prcp"
             R_PAREN ")"
           WHITESPACE " "
@@ -744,7 +744,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "sales_count"
           WHITESPACE " "
           EQ "="
@@ -820,7 +820,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "sales_count"
           WHITESPACE " "
           EQ "="
@@ -895,12 +895,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "contact_first_name"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "contact_last_name"
             R_PAREN ")"
           WHITESPACE " "
@@ -968,7 +968,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "contact_first_name"
           WHITESPACE " "
           EQ "="
@@ -980,7 +980,7 @@ SOURCE_FILE
         WHITESPACE "\n                    "
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "contact_last_name"
           WHITESPACE " "
           EQ "="
@@ -1040,22 +1040,22 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "sum_x"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "sum_y"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "avg_x"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "avg_y"
             R_PAREN ")"
           WHITESPACE " "
@@ -1215,7 +1215,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "stock"
           WHITESPACE " "
           EQ "="
@@ -1264,7 +1264,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "kind"
           WHITESPACE " "
           EQ "="
@@ -1398,7 +1398,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "status"
           WHITESPACE " "
           EQ "="
@@ -1460,7 +1460,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "quantity"
           WHITESPACE " "
           EQ "="
@@ -1583,7 +1583,7 @@ SOURCE_FILE
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "x"
           WHITESPACE " "
           EQ "="
