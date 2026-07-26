@@ -122,7 +122,7 @@ fn inlay_hint_insert(
             column_list
                 .column_refs()
                 .filter_map(|col| {
-                    let col_name = col.name_ref().map(|x| Name::from_node(&x))?;
+                    let col_name = col.column_name_ref().map(|x| Name::from_node(&x))?;
                     let target = create_table
                         .as_ref()
                         .and_then(|x| {

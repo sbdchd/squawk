@@ -1874,12 +1874,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "b"
             R_PAREN ")"
           WHITESPACE " "
@@ -1946,7 +1946,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             R_PAREN ")"
       WHITESPACE " "
@@ -2005,12 +2005,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "b"
             R_PAREN ")"
           WHITESPACE " "
@@ -2283,12 +2283,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "b"
             R_PAREN ")"
         WHITESPACE "\n    "
@@ -2401,12 +2401,12 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
@@ -2426,12 +2426,12 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
@@ -2529,12 +2529,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "b"
             R_PAREN ")"
           WHITESPACE " "
@@ -2566,12 +2566,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "b"
             R_PAREN ")"
           WHITESPACE " "
@@ -2641,12 +2641,12 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
@@ -2666,12 +2666,12 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
@@ -2684,7 +2684,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             R_PAREN ")"
       WHITESPACE " "
@@ -3586,12 +3586,12 @@ SOURCE_FILE
                 L_PAREN "("
                 WHITESPACE " "
                 COLUMN_REF
-                  NAME_REF
+                  COLUMN_NAME_REF
                     IDENT "a"
                 COMMA ","
                 WHITESPACE " "
                 COLUMN_REF
-                  NAME_REF
+                  COLUMN_NAME_REF
                     IDENT "b"
                 WHITESPACE " "
                 R_PAREN ")"
@@ -3691,14 +3691,14 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "address_id"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
             PERIOD_KW "PERIOD"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "address_valid_at"
           WHITESPACE " "
           R_PAREN ")"
@@ -3714,14 +3714,14 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "id"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
             PERIOD_KW "PERIOD"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "valid_range"
           WHITESPACE " "
           R_PAREN ")"
@@ -3771,7 +3771,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             WHITESPACE " "
             WITHOUT_KW "without"
@@ -3842,17 +3842,17 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "c"
             WHITESPACE " "
             WITHOUT_KW "without"
@@ -3966,12 +3966,12 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "id"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "valid_range"
             WHITESPACE " "
             WITHOUT_KW "WITHOUT"
@@ -4048,22 +4048,22 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "symbol"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 PERIOD_KW "period"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 YEAR_KW "year"
             COMMA ","
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "quarter"
             R_PAREN ")"
       WHITESPACE "\n"

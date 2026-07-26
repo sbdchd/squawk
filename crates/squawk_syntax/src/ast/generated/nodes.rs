@@ -3770,20 +3770,12 @@ pub struct ColumnRef {
 }
 impl ColumnRef {
     #[inline]
-    pub fn field_expr(&self) -> Option<FieldExpr> {
+    pub fn column_name_ref(&self) -> Option<ColumnNameRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn index_expr(&self) -> Option<IndexExpr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn slice_expr(&self) -> Option<SliceExpr> {
-        support::child(&self.syntax)
+    pub fn indirections(&self) -> AstChildren<Indirection> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn period_token(&self) -> Option<SyntaxToken> {
@@ -12183,6 +12175,59 @@ impl IndexRenameTo {
     #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IndirectionField {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IndirectionField {
+    #[inline]
+    pub fn composite_field_ref(&self) -> Option<CompositeFieldRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn star_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STAR)
+    }
+    #[inline]
+    pub fn dot_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IndirectionIndex {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IndirectionIndex {
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IndirectionSlice {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IndirectionSlice {
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON)
     }
 }
 
@@ -26249,6 +26294,13 @@ pub enum HasParamList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Indirection {
+    IndirectionField(IndirectionField),
+    IndirectionIndex(IndirectionIndex),
+    IndirectionSlice(IndirectionSlice),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoinType {
     JoinCross(JoinCross),
     JoinFull(JoinFull),
@@ -34955,6 +35007,60 @@ impl AstNode for IndexRenameTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::INDEX_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IndirectionField {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INDIRECTION_FIELD
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IndirectionIndex {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INDIRECTION_INDEX
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IndirectionSlice {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INDIRECTION_SLICE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -53371,6 +53477,61 @@ impl From<RoutineSig> for HasParamList {
     #[inline]
     fn from(node: RoutineSig) -> HasParamList {
         HasParamList::RoutineSig(node)
+    }
+}
+impl AstNode for Indirection {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::INDIRECTION_FIELD
+                | SyntaxKind::INDIRECTION_INDEX
+                | SyntaxKind::INDIRECTION_SLICE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::INDIRECTION_FIELD => {
+                Indirection::IndirectionField(IndirectionField { syntax })
+            }
+            SyntaxKind::INDIRECTION_INDEX => {
+                Indirection::IndirectionIndex(IndirectionIndex { syntax })
+            }
+            SyntaxKind::INDIRECTION_SLICE => {
+                Indirection::IndirectionSlice(IndirectionSlice { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Indirection::IndirectionField(it) => &it.syntax,
+            Indirection::IndirectionIndex(it) => &it.syntax,
+            Indirection::IndirectionSlice(it) => &it.syntax,
+        }
+    }
+}
+impl From<IndirectionField> for Indirection {
+    #[inline]
+    fn from(node: IndirectionField) -> Indirection {
+        Indirection::IndirectionField(node)
+    }
+}
+impl From<IndirectionIndex> for Indirection {
+    #[inline]
+    fn from(node: IndirectionIndex) -> Indirection {
+        Indirection::IndirectionIndex(node)
+    }
+}
+impl From<IndirectionSlice> for Indirection {
+    #[inline]
+    fn from(node: IndirectionSlice) -> Indirection {
+        Indirection::IndirectionSlice(node)
     }
 }
 impl AstNode for JoinType {

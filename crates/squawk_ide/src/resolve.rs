@@ -5064,31 +5064,34 @@ fn resolve_composite_type_field_ptr(
     let tree = parse(db, file).tree();
     let root = tree.syntax();
     let field_name = Name::from_node(field_name_ref);
-    let field_expr = field_name_ref
-        .syntax()
-        .parent()
-        .and_then(ast::FieldExpr::cast)?;
-    let base = field_expr.base()?;
+    let parent = field_name_ref.syntax().parent()?;
 
-    if let ast::Expr::ParenExpr(ref paren_expr) = base
-        && let Some(result) = resolve_column_from_paren_expr(
-            db,
-            InFile::new(file, paren_expr),
-            field_name_ref,
-            &field_name,
-        )
-    {
-        return Some(result);
-    }
+    let column_locs = if let Some(indirection_field) = ast::IndirectionField::cast(parent.clone()) {
+        resolve_indirection_base_column(db, file, &indirection_field)?
+    } else {
+        let field_expr = ast::FieldExpr::cast(parent)?;
+        let base = field_expr.base()?;
 
-    let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
-        ast::Expr::NameRef(nr) => Some(nr),
-        ast::Expr::FieldExpr(field_expr) => field_expr.field(),
-        _ => None,
-    })?;
+        if let ast::Expr::ParenExpr(ref paren_expr) = base
+            && let Some(result) = resolve_column_from_paren_expr(
+                db,
+                InFile::new(file, paren_expr),
+                field_name_ref,
+                &field_name,
+            )
+        {
+            return Some(result);
+        }
 
-    let column_locs = resolve_select_column_ptr(db, InFile::new(file, &base_name_ref))
-        .or_else(|| resolve_name_ref(db, InFile::new(file, &base_name_ref)))?;
+        let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
+            ast::Expr::NameRef(nr) => Some(nr),
+            ast::Expr::FieldExpr(field_expr) => field_expr.field(),
+            _ => None,
+        })?;
+
+        resolve_select_column_ptr(db, InFile::new(file, &base_name_ref))
+            .or_else(|| resolve_name_ref(db, InFile::new(file, &base_name_ref)))?
+    };
     let column_node = column_locs.first()?.to_node(db)?;
 
     let (schema, type_name) = resolve_composite_type_from_column_node(&column_node)
@@ -5140,6 +5143,20 @@ fn composite_type_field_location(
     }
 
     None
+}
+
+// only the first indirection refers to the column itself, i.e., the `x` in
+// `a.x` but not the `y` in `a.x.y`
+fn resolve_indirection_base_column(
+    db: &dyn Db,
+    file: File,
+    indirection_field: &ast::IndirectionField,
+) -> Option<SmallVec<[Location; 1]>> {
+    let column_ref = ast::ColumnRef::cast(indirection_field.syntax().parent()?)?;
+    if column_ref.indirections().next()?.syntax() != indirection_field.syntax() {
+        return None;
+    }
+    resolve_name_ref(db, InFile::new(file, &column_ref.column_name_ref()?))
 }
 
 fn resolve_composite_type_from_column_node(

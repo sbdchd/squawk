@@ -17,11 +17,11 @@ SOURCE_FILE
       COLUMN_REF_LIST
         L_PAREN "("
         COLUMN_REF
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "i"
         WHITESPACE " "
         COLUMN_REF
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "y"
         R_PAREN ")"
     WHITESPACE " "

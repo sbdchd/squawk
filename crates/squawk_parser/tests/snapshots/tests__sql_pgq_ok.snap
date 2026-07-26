@@ -575,7 +575,7 @@ SOURCE_FILE
               COLUMN_REF_LIST
                 L_PAREN "("
                 COLUMN_REF
-                  NAME_REF
+                  COLUMN_NAME_REF
                     IDENT "customer_id"
                 R_PAREN ")"
         WHITESPACE " "
@@ -595,7 +595,7 @@ SOURCE_FILE
             COLUMN_REF_LIST
               L_PAREN "("
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "order_id"
               R_PAREN ")"
     WHITESPACE " "
@@ -648,7 +648,7 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "product_no"
           R_PAREN ")"
       COMMA ","
@@ -664,7 +664,7 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "customer_id"
           R_PAREN ")"
       COMMA ","
@@ -680,7 +680,7 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "order_id"
           R_PAREN ")"
       WHITESPACE "\n    "
@@ -704,7 +704,7 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "order_items_id"
           R_PAREN ")"
         WHITESPACE "\n            "
@@ -716,7 +716,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "order_id"
             R_PAREN ")"
           WHITESPACE " "
@@ -729,7 +729,7 @@ SOURCE_FILE
             COLUMN_REF_LIST
               L_PAREN "("
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "order_id"
               R_PAREN ")"
         WHITESPACE "\n            "
@@ -741,7 +741,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "product_no"
             R_PAREN ")"
           WHITESPACE " "
@@ -754,7 +754,7 @@ SOURCE_FILE
             COLUMN_REF_LIST
               L_PAREN "("
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "product_no"
               R_PAREN ")"
       COMMA ","
@@ -770,7 +770,7 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "customer_orders_id"
           R_PAREN ")"
         WHITESPACE "\n            "
@@ -782,7 +782,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "customer_id"
             R_PAREN ")"
           WHITESPACE " "
@@ -795,7 +795,7 @@ SOURCE_FILE
             COLUMN_REF_LIST
               L_PAREN "("
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "customer_id"
               R_PAREN ")"
         WHITESPACE "\n            "
@@ -807,7 +807,7 @@ SOURCE_FILE
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "order_id"
             R_PAREN ")"
           WHITESPACE " "
@@ -820,7 +820,7 @@ SOURCE_FILE
             COLUMN_REF_LIST
               L_PAREN "("
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "order_id"
               R_PAREN ")"
       WHITESPACE "\n    "
@@ -1550,7 +1550,7 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "from_account"
             WHITESPACE " "
             R_PAREN ")"
@@ -1565,7 +1565,7 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE " "
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "number"
               WHITESPACE " "
               R_PAREN ")"
@@ -1579,7 +1579,7 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "to_account"
             WHITESPACE " "
             R_PAREN ")"
@@ -1594,7 +1594,7 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE " "
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "number"
               WHITESPACE " "
               R_PAREN ")"
@@ -1639,7 +1639,7 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "number"
             WHITESPACE " "
             R_PAREN ")"
@@ -1654,7 +1654,7 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE " "
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "number"
               WHITESPACE " "
               R_PAREN ")"
@@ -1698,7 +1698,7 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "number"
             WHITESPACE " "
             R_PAREN ")"
@@ -1713,7 +1713,7 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE " "
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "number"
               WHITESPACE " "
               R_PAREN ")"
@@ -1757,7 +1757,7 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN_REF
-              NAME_REF
+              COLUMN_NAME_REF
                 IDENT "id"
             WHITESPACE " "
             R_PAREN ")"
@@ -1772,7 +1772,7 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE " "
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "id"
               WHITESPACE " "
               R_PAREN ")"

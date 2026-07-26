@@ -1222,17 +1222,17 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "c"
           R_PAREN ")"
         WHITESPACE "\n    "
@@ -1404,7 +1404,7 @@ SOURCE_FILE
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "a"
               WHITESPACE " "
               EQ "="
@@ -1415,7 +1415,7 @@ SOURCE_FILE
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "b"
               WHITESPACE " "
               EQ "="
@@ -1427,7 +1427,7 @@ SOURCE_FILE
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "c"
               WHITESPACE " "
               EQ "="
@@ -1439,7 +1439,7 @@ SOURCE_FILE
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "e"
               WHITESPACE " "
               EQ "="
@@ -1460,7 +1460,7 @@ SOURCE_FILE
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "h"
               WHITESPACE " "
               EQ "="
@@ -1494,7 +1494,7 @@ SOURCE_FILE
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "foo"
               WHITESPACE " "
               EQ "="
@@ -1724,7 +1724,7 @@ SOURCE_FILE
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "balance"
               WHITESPACE " "
               EQ "="
@@ -1754,12 +1754,12 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "customer_id"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "balance"
           R_PAREN ")"
         WHITESPACE "\n  "
@@ -1875,7 +1875,7 @@ SOURCE_FILE
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "balance"
               WHITESPACE " "
               EQ "="
@@ -1905,12 +1905,12 @@ SOURCE_FILE
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "customer_id"
           COMMA ","
           WHITESPACE " "
           COLUMN_REF
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "balance"
           R_PAREN ")"
         WHITESPACE "\n  "
@@ -2076,7 +2076,7 @@ SOURCE_FILE
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "stock"
               WHITESPACE " "
               EQ "="
@@ -2252,7 +2252,7 @@ SOURCE_FILE
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
               COLUMN_REF
-                NAME_REF
+                COLUMN_NAME_REF
                   IDENT "stock"
               WHITESPACE " "
               EQ "="

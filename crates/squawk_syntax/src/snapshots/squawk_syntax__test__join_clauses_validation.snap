@@ -165,7 +165,7 @@ SOURCE_FILE@0..523
             COLUMN_REF_LIST@209..213
               L_PAREN@209..210 "("
               COLUMN_REF@210..212
-                NAME_REF@210..212
+                COLUMN_NAME_REF@210..212
                   IDENT@210..212 "id"
               R_PAREN@212..213 ")"
     SEMICOLON@213..214 ";"
@@ -208,7 +208,7 @@ SOURCE_FILE@0..523
             COLUMN_REF_LIST@297..301
               L_PAREN@297..298 "("
               COLUMN_REF@298..300
-                NAME_REF@298..300
+                COLUMN_NAME_REF@298..300
                   IDENT@298..300 "id"
               R_PAREN@300..301 ")"
     SEMICOLON@301..302 ";"
@@ -299,7 +299,7 @@ SOURCE_FILE@0..523
             COLUMN_REF_LIST@387..391
               L_PAREN@387..388 "("
               COLUMN_REF@388..390
-                NAME_REF@388..390
+                COLUMN_NAME_REF@388..390
                   IDENT@388..390 "id"
               R_PAREN@390..391 ")"
     SEMICOLON@391..392 ";"
@@ -423,7 +423,7 @@ SOURCE_FILE@0..523
               COLUMN_REF_LIST@497..501
                 L_PAREN@497..498 "("
                 COLUMN_REF@498..500
-                  NAME_REF@498..500
+                  COLUMN_NAME_REF@498..500
                     IDENT@498..500 "id"
                 R_PAREN@500..501 ")"
         WHITESPACE@501..504 "\n  "
@@ -443,7 +443,7 @@ SOURCE_FILE@0..523
             COLUMN_REF_LIST@517..521
               L_PAREN@517..518 "("
               COLUMN_REF@518..520
-                NAME_REF@518..520
+                COLUMN_NAME_REF@518..520
                   IDENT@518..520 "id"
               R_PAREN@520..521 ")"
     SEMICOLON@521..522 ";"

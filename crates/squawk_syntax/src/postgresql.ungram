@@ -928,13 +928,24 @@ Column =
   NotEnforced? Enforced?
 
 ColumnRef =
-  'period'? NameRef
-| FieldExpr
-| IndexExpr
-| SliceExpr
+  'period'? ColumnNameRef Indirection*
+
+Indirection =
+  IndirectionField
+| IndirectionIndex
+| IndirectionSlice
+
+IndirectionField =
+  '.' (CompositeFieldRef | '*')
 
 CompositeFieldRef =
   '#name'?
+
+IndirectionIndex =
+  '[' index:Expr ']'
+
+IndirectionSlice =
+  '[' start:Expr? ':' end:Expr? ']'
 
 ColumnConstraint =
   CheckConstraint

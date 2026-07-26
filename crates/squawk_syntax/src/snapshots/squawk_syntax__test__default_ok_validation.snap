@@ -18,7 +18,7 @@ SOURCE_FILE@0..492
       SET_COLUMN_LIST@13..26
         SET_SINGLE_COLUMN@13..26
           COLUMN_REF@13..16
-            NAME_REF@13..16
+            COLUMN_NAME_REF@13..16
               IDENT@13..16 "col"
           WHITESPACE@16..17 " "
           EQ@17..18 "="
@@ -44,11 +44,11 @@ SOURCE_FILE@0..492
           COLUMN_REF_LIST@42..47
             L_PAREN@42..43 "("
             COLUMN_REF@43..44
-              NAME_REF@43..44
+              COLUMN_NAME_REF@43..44
                 IDENT@43..44 "a"
             COMMA@44..45 ","
             COLUMN_REF@45..46
-              NAME_REF@45..46
+              COLUMN_NAME_REF@45..46
                 IDENT@45..46 "b"
             R_PAREN@46..47 ")"
           WHITESPACE@47..48 " "
@@ -150,17 +150,17 @@ SOURCE_FILE@0..492
         COLUMN_REF_LIST@192..207
           L_PAREN@192..193 "("
           COLUMN_REF@193..195
-            NAME_REF@193..195
+            COLUMN_NAME_REF@193..195
               IDENT@193..195 "id"
           COMMA@195..196 ","
           WHITESPACE@196..197 " "
           COLUMN_REF@197..201
-            NAME_REF@197..201
+            COLUMN_NAME_REF@197..201
               NAME_KW@197..201 "name"
           COMMA@201..202 ","
           WHITESPACE@202..203 " "
           COLUMN_REF@203..206
-            NAME_REF@203..206
+            COLUMN_NAME_REF@203..206
               IDENT@203..206 "qty"
           R_PAREN@206..207 ")"
         WHITESPACE@207..208 " "
@@ -251,7 +251,7 @@ SOURCE_FILE@0..492
           SET_COLUMN_LIST@336..350
             SET_SINGLE_COLUMN@336..350
               COLUMN_REF@336..340
-                NAME_REF@336..340
+                COLUMN_NAME_REF@336..340
                   IDENT@336..340 "qty2"
               WHITESPACE@340..341 " "
               EQ@341..342 "="
@@ -275,7 +275,7 @@ SOURCE_FILE@0..492
       SET_COLUMN_LIST@366..381
         SET_SINGLE_COLUMN@366..381
           COLUMN_REF@366..369
-            NAME_REF@366..369
+            COLUMN_NAME_REF@366..369
               IDENT@366..369 "col"
           WHITESPACE@369..370 " "
           EQ@370..371 "="
@@ -303,7 +303,7 @@ SOURCE_FILE@0..492
       SET_COLUMN_LIST@397..416
         SET_SINGLE_COLUMN@397..416
           COLUMN_REF@397..400
-            NAME_REF@397..400
+            COLUMN_NAME_REF@397..400
               IDENT@397..400 "col"
           WHITESPACE@400..401 " "
           EQ@401..402 "="
@@ -339,12 +339,12 @@ SOURCE_FILE@0..492
           COLUMN_REF_LIST@432..438
             L_PAREN@432..433 "("
             COLUMN_REF@433..434
-              NAME_REF@433..434
+              COLUMN_NAME_REF@433..434
                 IDENT@433..434 "a"
             COMMA@434..435 ","
             WHITESPACE@435..436 " "
             COLUMN_REF@436..437
-              NAME_REF@436..437
+              COLUMN_NAME_REF@436..437
                 IDENT@436..437 "b"
             R_PAREN@437..438 ")"
           WHITESPACE@438..439 " "
