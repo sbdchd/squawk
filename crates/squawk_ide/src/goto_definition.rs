@@ -12666,15 +12666,70 @@ returning t$0.*;"
 
     #[test]
     fn goto_update_alias_in_set_clause() {
-        assert_snapshot!(goto("
+        // Query 1: ERROR:  column "f" of relation "t" does not exist
+        // LINE 1: update t as f set f.a = 10;
+        //                           ^
+        // HINT:  SET target columns cannot be qualified with the relation name.
+        goto_not_found(
+            "
 create table t(a int, b int);
-update t as f set f$0.a = 10;"
-        ), @r"
-          ╭▸ 
-        3 │ update t as f set f.a = 10;
-          │             ┬     ─ 1. source
-          │             │
-          ╰╴            2. destination
+update t as f set f$0.a = 10;",
+        );
+    }
+
+    #[test]
+    fn goto_update_set_clause_subfield() {
+        // point isn't a composite type so we can't update it like this
+        goto_not_found(
+            "
+create table t(a point, b int);
+update t set a.x$0 = 10;",
+        );
+    }
+
+    #[test]
+    fn goto_update_set_clause_composite_type_subfield() {
+        assert_snapshot!(goto(
+            "
+create type coordinate as (
+  x double precision,
+  y double precision
+); 
+create table t (
+  a coordinate,
+  b integer
+);
+update t set a.x$0 = 10;",
+        ), @"
+           ╭▸ 
+         3 │   x double precision,
+           │   ─ 2. destination
+           ‡
+        10 │ update t set a.x = 10;
+           ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_clause_composite_type_col_name() {
+        assert_snapshot!(goto(
+            "
+create type coordinate as (
+  x double precision,
+  y double precision
+); 
+create table t (
+  a coordinate,
+  b integer
+);
+update t set a$0.x = 10;",
+        ), @"
+           ╭▸ 
+         7 │   a coordinate,
+           │   ─ 2. destination
+           ‡
+        10 │ update t set a.x = 10;
+           ╰╴             ─ 1. source
         ");
     }
 
