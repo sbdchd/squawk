@@ -88,7 +88,7 @@ impl AddAttribute {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn column_name(&self) -> Option<ColumnName> {
+    pub fn composite_field(&self) -> Option<CompositeField> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3885,6 +3885,55 @@ impl Commit {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CompositeField {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CompositeField {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CompositeFieldDef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CompositeFieldDef {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<CompositeField> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CompositeFieldList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CompositeFieldList {
+    #[inline]
+    pub fn composite_field_defs(&self) -> AstChildren<CompositeFieldDef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CompositeFieldRef {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3901,7 +3950,7 @@ pub struct CompositeType {
 }
 impl CompositeType {
     #[inline]
-    pub fn column_list(&self) -> Option<ColumnList> {
+    pub fn composite_field_list(&self) -> Option<CompositeFieldList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19560,7 +19609,7 @@ impl RenameAttribute {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn column_name(&self) -> Option<ColumnName> {
+    pub fn composite_field(&self) -> Option<CompositeField> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25928,6 +25977,7 @@ pub enum AnyName {
     ChannelRef(ChannelRef),
     ColumnName(ColumnName),
     ColumnNameRef(ColumnNameRef),
+    CompositeField(CompositeField),
     CompositeFieldRef(CompositeFieldRef),
     ConfigValueName(ConfigValueName),
     ConstraintName(ConstraintName),
@@ -29499,6 +29549,60 @@ impl AstNode for Commit {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::COMMIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CompositeField {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COMPOSITE_FIELD
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CompositeFieldDef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COMPOSITE_FIELD_DEF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CompositeFieldList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COMPOSITE_FIELD_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -50191,6 +50295,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::CHANNEL_REF
                 | SyntaxKind::COLUMN_NAME
                 | SyntaxKind::COLUMN_NAME_REF
+                | SyntaxKind::COMPOSITE_FIELD
                 | SyntaxKind::COMPOSITE_FIELD_REF
                 | SyntaxKind::CONFIG_VALUE_NAME
                 | SyntaxKind::CONSTRAINT_NAME
@@ -50273,6 +50378,7 @@ impl AstNode for AnyName {
             SyntaxKind::CHANNEL_REF => AnyName::ChannelRef(ChannelRef { syntax }),
             SyntaxKind::COLUMN_NAME => AnyName::ColumnName(ColumnName { syntax }),
             SyntaxKind::COLUMN_NAME_REF => AnyName::ColumnNameRef(ColumnNameRef { syntax }),
+            SyntaxKind::COMPOSITE_FIELD => AnyName::CompositeField(CompositeField { syntax }),
             SyntaxKind::COMPOSITE_FIELD_REF => {
                 AnyName::CompositeFieldRef(CompositeFieldRef { syntax })
             }
@@ -50385,6 +50491,7 @@ impl AstNode for AnyName {
             AnyName::ChannelRef(it) => &it.syntax,
             AnyName::ColumnName(it) => &it.syntax,
             AnyName::ColumnNameRef(it) => &it.syntax,
+            AnyName::CompositeField(it) => &it.syntax,
             AnyName::CompositeFieldRef(it) => &it.syntax,
             AnyName::ConfigValueName(it) => &it.syntax,
             AnyName::ConstraintName(it) => &it.syntax,
@@ -50504,6 +50611,12 @@ impl From<ColumnNameRef> for AnyName {
     #[inline]
     fn from(node: ColumnNameRef) -> AnyName {
         AnyName::ColumnNameRef(node)
+    }
+}
+impl From<CompositeField> for AnyName {
+    #[inline]
+    fn from(node: CompositeField) -> AnyName {
+        AnyName::CompositeField(node)
     }
 }
 impl From<CompositeFieldRef> for AnyName {

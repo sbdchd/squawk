@@ -793,10 +793,10 @@ fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
             }
         }
         Some(ast::CreateTypeKind::CompositeType(composite_type)) => {
-            if let Some(column_list) = composite_type.column_list() {
-                for column in column_list.columns() {
-                    if let Some(column_symbol) = create_column_symbol(column) {
-                        children.push(column_symbol);
+            if let Some(field_list) = composite_type.composite_field_list() {
+                for field in field_list.composite_field_defs() {
+                    if let Some(field_symbol) = create_composite_field_symbol(field) {
+                        children.push(field_symbol);
                     }
                 }
             }
@@ -825,6 +825,25 @@ fn create_column_symbol(column: ast::Column) -> Option<DocumentSymbol> {
     let detail = column.ty().map(|t| t.syntax().text().to_string());
 
     let full_range = column.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail,
+        kind: DocumentSymbolKind::Column,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_composite_field_symbol(field: ast::CompositeFieldDef) -> Option<DocumentSymbol> {
+    let name_node = field.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let detail = field.ty().map(|t| t.syntax().text().to_string());
+
+    let full_range = field.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
     Some(DocumentSymbol {

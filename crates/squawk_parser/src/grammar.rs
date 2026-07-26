@@ -3953,6 +3953,7 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 #[derive(Clone, Copy)]
 enum ColumnDefKind {
+    CompositeFieldDef,
     Name,
     NameRef,
     WithData,
@@ -3995,6 +3996,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     opt_without_overlaps(p);
     p.expect(R_PAREN);
     let list_kind = match kind {
+        ColumnDefKind::CompositeFieldDef => COMPOSITE_FIELD_LIST,
         ColumnDefKind::NameRef => COLUMN_REF_LIST,
         ColumnDefKind::Name | ColumnDefKind::WithData => COLUMN_LIST,
     };
@@ -4006,6 +4008,16 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
     assert!(p.at_ts(COLUMN_FIRST));
     let m = p.start();
     match kind {
+        ColumnDefKind::CompositeFieldDef => {
+            composite_field(p);
+            if !p.at(COMMA) && !p.at(R_PAREN) {
+                if !opt_type_name(p) {
+                    return m.complete(p, COMPOSITE_FIELD_DEF);
+                }
+                opt_collate(p);
+            }
+            m.complete(p, COMPOSITE_FIELD_DEF)
+        }
         ColumnDefKind::Name => {
             column_name(p);
             m.complete(p, COLUMN)
@@ -5893,6 +5905,12 @@ fn column_name_ref(p: &mut Parser<'_>) {
     let m = p.start();
     pg_name(p);
     m.complete(p, COLUMN_NAME_REF);
+}
+
+fn composite_field(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, COMPOSITE_FIELD);
 }
 
 fn composite_field_ref(p: &mut Parser<'_>) {
@@ -9545,7 +9563,7 @@ fn alter_type_attribute_action(p: &mut Parser<'_>) {
     let m = p.start();
     let kind = if p.eat(ADD_KW) {
         p.expect(ATTRIBUTE_KW);
-        column_name(p);
+        composite_field(p);
         type_name(p);
         opt_collate(p);
         opt_cascade_or_restrict(p);
@@ -9618,7 +9636,7 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             if p.eat(ATTRIBUTE_KW) {
                 composite_field_ref(p);
                 p.expect(TO_KW);
-                column_name(p);
+                composite_field(p);
                 opt_cascade_or_restrict(p);
                 m.complete(p, RENAME_ATTRIBUTE);
             } else if p.eat(VALUE_KW) {
@@ -16580,7 +16598,7 @@ fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, RANGE_TYPE);
             // AS
         } else {
-            if !opt_column_list_with(p, ColumnDefKind::WithData) {
+            if !opt_column_list_with(p, ColumnDefKind::CompositeFieldDef) {
                 p.error("expected column list");
             }
             m.complete(p, COMPOSITE_TYPE);

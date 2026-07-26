@@ -5130,13 +5130,13 @@ fn composite_type_field_location(
     let ast::CreateTypeKind::CompositeType(composite) = create_type.kind()? else {
         return None;
     };
-    for column in composite.column_list()?.columns() {
-        if let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == *field_name
+    for field in composite.composite_field_list()?.composite_field_defs() {
+        if let Some(name) = field.name()
+            && Name::from_node(&name) == *field_name
         {
             return Some(smallvec![Location::new(
                 file,
-                col_name.syntax().text_range(),
+                name.syntax().text_range(),
                 LocationKind::Column
             )]);
         }
@@ -5162,8 +5162,13 @@ fn resolve_accessor_base_column(
 fn resolve_composite_type_from_column_node(
     column_node: &SyntaxNode,
 ) -> Option<(Option<Schema>, Name)> {
-    let column = column_node.ancestors().find_map(ast::Column::cast)?;
-    let ty = column.ty()?;
+    let ty = column_node.ancestors().find_map(|node| {
+        if let Some(column) = ast::Column::cast(node.clone()) {
+            column.ty()
+        } else {
+            ast::CompositeFieldDef::cast(node)?.ty()
+        }
+    })?;
     name::schema_and_type_name(&ty)
 }
 
