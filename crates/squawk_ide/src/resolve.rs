@@ -5071,19 +5071,19 @@ fn resolve_composite_type_field_ptr(
     let base = field_expr.base()?;
 
     if let ast::Expr::ParenExpr(ref paren_expr) = base
-            && let Some(result) = resolve_column_from_paren_expr(
-                db,
-                InFile::new(file, paren_expr),
-                field_name_ref,
-                &field_name,
-            )
-        {
-            return Some(result);
-        }
+        && let Some(result) = resolve_column_from_paren_expr(
+            db,
+            InFile::new(file, paren_expr),
+            field_name_ref,
+            &field_name,
+        )
+    {
+        return Some(result);
+    }
 
-        let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
-            ast::Expr::NameRef(nr) => Some(nr),
-            ast::Expr::FieldExpr(field_expr) => field_expr.field(),
+    let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
+        ast::Expr::NameRef(nr) => Some(nr),
+        ast::Expr::FieldExpr(field_expr) => field_expr.field(),
         _ => None,
     })?;
 
