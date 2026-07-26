@@ -476,6 +476,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         let mut in_on_clause = false;
         let mut in_returning_clause = false;
         let mut in_set_clause = false;
+        let mut in_set_expr = false;
         let mut in_where_clause = false;
         let mut in_when_clause = false;
         let mut in_when_condition = false;
@@ -501,6 +502,9 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             if ast::SetClause::can_cast(ancestor.kind()) {
                 in_set_clause = true;
             }
+            if ast::SetExpr::can_cast(ancestor.kind()) {
+                in_set_expr = true;
+            }
             if ast::WhereClause::can_cast(ancestor.kind()) {
                 in_where_clause = true;
             }
@@ -508,6 +512,11 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
                 in_when_clause = true;
             }
             if ast::Update::can_cast(ancestor.kind()) {
+                // a set target can't be qualified with the relation name, so
+                // `a` in `update t set a.b = 1` is a composite type column
+                if in_set_clause && !in_set_expr {
+                    return Some(NameRefClass::UpdateColumn);
+                }
                 if in_returning_clause || in_set_clause || in_where_clause || in_from_clause {
                     if is_function_call || is_schema_table_col {
                         return Some(NameRefClass::Schema);
@@ -604,6 +613,8 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         let mut in_when_clause = false;
         let mut in_when_condition = false;
         let mut in_returning_clause = false;
+        let mut in_set_clause = false;
+        let mut in_set_expr = false;
         for ancestor in parent.ancestors() {
             if ast::OnClause::can_cast(ancestor.kind()) {
                 in_on_clause = true;
@@ -625,6 +636,17 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             }
             if ast::ReturningClause::can_cast(ancestor.kind()) {
                 in_returning_clause = true;
+            }
+            if ast::SetClause::can_cast(ancestor.kind()) {
+                in_set_clause = true;
+            }
+            if ast::SetExpr::can_cast(ancestor.kind()) {
+                in_set_expr = true;
+            }
+            // `x` in `update t set a.x = 1` is a field of the composite type of
+            // the column `a`
+            if ast::Update::can_cast(ancestor.kind()) && in_set_clause && !in_set_expr {
+                return Some(NameRefClass::CompositeTypeField);
             }
             if ast::Merge::can_cast(ancestor.kind())
                 && (in_on_clause || in_when_clause || in_returning_clause)
