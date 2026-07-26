@@ -126,7 +126,12 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
             }
             ast::AnyNameRef::ColumnNameRef(name_ref) => {
                 resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_column_name_ref(db, InFile::new(definition_file, &name_ref))
+                    resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
+                })
+            }
+            ast::AnyNameRef::CompositeFieldRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
                 })
             }
             ast::AnyNameRef::CursorRef(name_ref) => resolve_in_files(db, file, |definition_file| {

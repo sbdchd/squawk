@@ -546,18 +546,26 @@ pub(crate) fn resolve_name_ref(
             }
             resolve_composite_type_field_for_path(db, InFile::new(file, &table_path), &column_name)
         }
-        NameRefClass::CompositeTypeAttribute => {
-            let attribute_name = Name::from_node(name_ref);
-            let alter_type = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::AlterType::cast)?;
-            let type_path = alter_type.type_name_ref()?.path_ref()?;
-            resolve_composite_type_field_for_path(
-                db,
-                InFile::new(file, &type_path),
-                &attribute_name,
-            )
+        NameRefClass::CompositeField => {
+            // ALTER TYPE names the type directly, everywhere else we infer it
+            // from the base column
+            if let Some(parent) = name_ref.syntax().parent()
+                && (ast::AlterAttribute::can_cast(parent.kind())
+                    || ast::DropAttribute::can_cast(parent.kind())
+                    || ast::RenameAttribute::can_cast(parent.kind()))
+            {
+                let alter_type = name_ref
+                    .syntax()
+                    .ancestors()
+                    .find_map(ast::AlterType::cast)?;
+                let type_path = alter_type.type_name_ref()?.path_ref()?;
+                return resolve_composite_type_field_for_path(
+                    db,
+                    InFile::new(file, &type_path),
+                    &Name::from_node(name_ref),
+                );
+            }
+            resolve_composite_type_field_ptr(db, InFile::new(file, name_ref))
         }
         NameRefClass::TableAndColumnsColumn => {
             let column_name = Name::from_node(name_ref);
@@ -864,9 +872,6 @@ pub(crate) fn resolve_name_ref(
         }
         NameRefClass::SelectQualifiedColumn => {
             resolve_select_qualified_column_ptr(db, InFile::new(file, name_ref))
-        }
-        NameRefClass::CompositeTypeField => {
-            resolve_composite_type_field_ptr(db, InFile::new(file, name_ref))
         }
         NameRefClass::InsertColumn => {
             let column_name = Name::from_node(name_ref);
@@ -1401,100 +1406,6 @@ fn resolve_unqualified_ref(
         ptr.text_range(),
         location_kind
     )])
-}
-
-pub(crate) fn resolve_column_name_ref(
-    db: &dyn Db,
-    column_name_ref: InFile<&ast::ColumnNameRef>,
-) -> Option<SmallVec<[Location; 1]>> {
-    let file = column_name_ref.file_id;
-    let column_name_ref = column_name_ref.value;
-    let node = column_name_ref.syntax();
-    let column_name = Name::from_node(column_name_ref);
-
-    match classify_name_ref(node)? {
-        NameRefClass::AlterColumn => {
-            let table_path = resolve_alter_column_relation_path(node)?;
-            resolve_column_for_path(db, InFile::new(file, &table_path), column_name)
-        }
-        NameRefClass::CompositeTypeAttribute => {
-            let alter_type = node.ancestors().find_map(ast::AlterType::cast)?;
-            let type_path = alter_type.type_name_ref()?.path_ref()?;
-            resolve_composite_type_field_for_path(db, InFile::new(file, &type_path), &column_name)
-        }
-        NameRefClass::ConstraintColumn => {
-            for ancestor in node.ancestors() {
-                if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
-                    return find_column_in_create_table(
-                        db,
-                        InFile::new(file, &create_table),
-                        &column_name,
-                    );
-                }
-                if let Some(alter_table) = ast::AlterTable::cast(ancestor) {
-                    let table_path = alter_table
-                        .table_relation_name()?
-                        .table_name_ref()?
-                        .path_ref()?;
-                    return resolve_column_for_path(
-                        db,
-                        InFile::new(file, &table_path),
-                        column_name,
-                    );
-                }
-            }
-            None
-        }
-        NameRefClass::CopyColumn => {
-            let copy = node.ancestors().find_map(ast::Copy::cast)?;
-            let path = copy.copy_table()?.table_name_ref()?.path_ref()?;
-            resolve_column_for_path(db, InFile::new(file, &path), column_name)
-        }
-        NameRefClass::ForeignKeyColumn => {
-            let path = if let Some(foreign_key) =
-                node.ancestors().find_map(ast::ForeignKeyConstraint::cast)
-            {
-                foreign_key.table_name_ref()?.path_ref()?
-            } else if let Some(references_constraint) =
-                node.ancestors().find_map(ast::ReferencesConstraint::cast)
-            {
-                references_constraint.table()?.path_ref()?
-            } else {
-                return None;
-            };
-            resolve_column_for_path(db, InFile::new(file, &path), column_name)
-        }
-        NameRefClass::PublicationColumn => {
-            let publication_object = node.ancestors().find_map(ast::PublicationObject::cast)?;
-            let path = publication_object.table_name_ref()?.path_ref()?;
-            resolve_column_for_path(db, InFile::new(file, &path), column_name)
-        }
-        NameRefClass::StatisticsColumn => {
-            let create_statistics = node.ancestors().find_map(ast::CreateStatistics::cast)?;
-            let path = create_statistics
-                .from_table()?
-                .table_name_ref()?
-                .path_ref()?;
-            resolve_column_for_path(db, InFile::new(file, &path), column_name)
-        }
-        NameRefClass::TableAndColumnsColumn => {
-            let table_and_columns = node.ancestors().find_map(ast::TableAndColumns::cast)?;
-            let path = table_and_columns
-                .table_relation_name()?
-                .table_name_ref()?
-                .path_ref()?;
-            resolve_column_for_path(db, InFile::new(file, &path), column_name)
-        }
-        NameRefClass::TriggerEventColumn => {
-            let create_trigger = node.ancestors().find_map(ast::CreateTrigger::cast)?;
-            let path = create_trigger
-                .on_relation()?
-                .relation_name_ref()?
-                .path_ref()?;
-            resolve_column_for_path(db, InFile::new(file, &path), column_name)
-        }
-        _ => None,
-    }
 }
 
 pub(crate) fn resolve_database_ref(
@@ -5160,19 +5071,19 @@ fn resolve_composite_type_field_ptr(
     let base = field_expr.base()?;
 
     if let ast::Expr::ParenExpr(ref paren_expr) = base
-        && let Some(result) = resolve_column_from_paren_expr(
-            db,
-            InFile::new(file, paren_expr),
-            field_name_ref,
-            &field_name,
-        )
-    {
-        return Some(result);
-    }
+            && let Some(result) = resolve_column_from_paren_expr(
+                db,
+                InFile::new(file, paren_expr),
+                field_name_ref,
+                &field_name,
+            )
+        {
+            return Some(result);
+        }
 
-    let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
-        ast::Expr::NameRef(nr) => Some(nr),
-        ast::Expr::FieldExpr(field_expr) => field_expr.field(),
+        let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
+            ast::Expr::NameRef(nr) => Some(nr),
+            ast::Expr::FieldExpr(field_expr) => field_expr.field(),
         _ => None,
     })?;
 

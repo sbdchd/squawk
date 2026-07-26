@@ -685,7 +685,7 @@ impl AlterAttribute {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn column_name_ref(&self) -> Option<ColumnNameRef> {
+    pub fn composite_field_ref(&self) -> Option<CompositeFieldRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3889,6 +3889,17 @@ impl Commit {
     #[inline]
     pub fn work_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WORK_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CompositeFieldRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CompositeFieldRef {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -7536,7 +7547,7 @@ impl DropAttribute {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn column_name_ref(&self) -> Option<ColumnNameRef> {
+    pub fn composite_field_ref(&self) -> Option<CompositeFieldRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19527,7 +19538,7 @@ impl RenameAttribute {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn column_name_ref(&self) -> Option<ColumnNameRef> {
+    pub fn composite_field_ref(&self) -> Option<CompositeFieldRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25865,6 +25876,7 @@ pub enum AnyName {
     ChannelRef(ChannelRef),
     ColumnName(ColumnName),
     ColumnNameRef(ColumnNameRef),
+    CompositeFieldRef(CompositeFieldRef),
     ConfigValueName(ConfigValueName),
     ConstraintName(ConstraintName),
     CopyOptionName(CopyOptionName),
@@ -25936,6 +25948,7 @@ pub enum AnyNameRef {
     BindParamNameRef(BindParamNameRef),
     ChannelRef(ChannelRef),
     ColumnNameRef(ColumnNameRef),
+    CompositeFieldRef(CompositeFieldRef),
     CursorRef(CursorRef),
     DatabaseRef(DatabaseRef),
     EventTriggerRef(EventTriggerRef),
@@ -29434,6 +29447,24 @@ impl AstNode for Commit {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::COMMIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CompositeFieldRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COMPOSITE_FIELD_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -50007,6 +50038,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::CHANNEL_REF
                 | SyntaxKind::COLUMN_NAME
                 | SyntaxKind::COLUMN_NAME_REF
+                | SyntaxKind::COMPOSITE_FIELD_REF
                 | SyntaxKind::CONFIG_VALUE_NAME
                 | SyntaxKind::CONSTRAINT_NAME
                 | SyntaxKind::COPY_OPTION_NAME
@@ -50088,6 +50120,9 @@ impl AstNode for AnyName {
             SyntaxKind::CHANNEL_REF => AnyName::ChannelRef(ChannelRef { syntax }),
             SyntaxKind::COLUMN_NAME => AnyName::ColumnName(ColumnName { syntax }),
             SyntaxKind::COLUMN_NAME_REF => AnyName::ColumnNameRef(ColumnNameRef { syntax }),
+            SyntaxKind::COMPOSITE_FIELD_REF => {
+                AnyName::CompositeFieldRef(CompositeFieldRef { syntax })
+            }
             SyntaxKind::CONFIG_VALUE_NAME => AnyName::ConfigValueName(ConfigValueName { syntax }),
             SyntaxKind::CONSTRAINT_NAME => AnyName::ConstraintName(ConstraintName { syntax }),
             SyntaxKind::COPY_OPTION_NAME => AnyName::CopyOptionName(CopyOptionName { syntax }),
@@ -50197,6 +50232,7 @@ impl AstNode for AnyName {
             AnyName::ChannelRef(it) => &it.syntax,
             AnyName::ColumnName(it) => &it.syntax,
             AnyName::ColumnNameRef(it) => &it.syntax,
+            AnyName::CompositeFieldRef(it) => &it.syntax,
             AnyName::ConfigValueName(it) => &it.syntax,
             AnyName::ConstraintName(it) => &it.syntax,
             AnyName::CopyOptionName(it) => &it.syntax,
@@ -50315,6 +50351,12 @@ impl From<ColumnNameRef> for AnyName {
     #[inline]
     fn from(node: ColumnNameRef) -> AnyName {
         AnyName::ColumnNameRef(node)
+    }
+}
+impl From<CompositeFieldRef> for AnyName {
+    #[inline]
+    fn from(node: CompositeFieldRef) -> AnyName {
+        AnyName::CompositeFieldRef(node)
     }
 }
 impl From<ConfigValueName> for AnyName {
@@ -50704,6 +50746,7 @@ impl AstNode for AnyNameRef {
                 | SyntaxKind::BIND_PARAM_NAME_REF
                 | SyntaxKind::CHANNEL_REF
                 | SyntaxKind::COLUMN_NAME_REF
+                | SyntaxKind::COMPOSITE_FIELD_REF
                 | SyntaxKind::CURSOR_REF
                 | SyntaxKind::DATABASE_REF
                 | SyntaxKind::EVENT_TRIGGER_REF
@@ -50741,6 +50784,9 @@ impl AstNode for AnyNameRef {
             }
             SyntaxKind::CHANNEL_REF => AnyNameRef::ChannelRef(ChannelRef { syntax }),
             SyntaxKind::COLUMN_NAME_REF => AnyNameRef::ColumnNameRef(ColumnNameRef { syntax }),
+            SyntaxKind::COMPOSITE_FIELD_REF => {
+                AnyNameRef::CompositeFieldRef(CompositeFieldRef { syntax })
+            }
             SyntaxKind::CURSOR_REF => AnyNameRef::CursorRef(CursorRef { syntax }),
             SyntaxKind::DATABASE_REF => AnyNameRef::DatabaseRef(DatabaseRef { syntax }),
             SyntaxKind::EVENT_TRIGGER_REF => {
@@ -50788,6 +50834,7 @@ impl AstNode for AnyNameRef {
             AnyNameRef::BindParamNameRef(it) => &it.syntax,
             AnyNameRef::ChannelRef(it) => &it.syntax,
             AnyNameRef::ColumnNameRef(it) => &it.syntax,
+            AnyNameRef::CompositeFieldRef(it) => &it.syntax,
             AnyNameRef::CursorRef(it) => &it.syntax,
             AnyNameRef::DatabaseRef(it) => &it.syntax,
             AnyNameRef::EventTriggerRef(it) => &it.syntax,
@@ -50837,6 +50884,12 @@ impl From<ColumnNameRef> for AnyNameRef {
     #[inline]
     fn from(node: ColumnNameRef) -> AnyNameRef {
         AnyNameRef::ColumnNameRef(node)
+    }
+}
+impl From<CompositeFieldRef> for AnyNameRef {
+    #[inline]
+    fn from(node: CompositeFieldRef) -> AnyNameRef {
+        AnyNameRef::CompositeFieldRef(node)
     }
 }
 impl From<CursorRef> for AnyNameRef {

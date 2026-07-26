@@ -104,7 +104,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      COLUMN_NAME_REF
+      COMPOSITE_FIELD_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
@@ -134,7 +134,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      COLUMN_NAME_REF
+      COMPOSITE_FIELD_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
@@ -164,7 +164,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      COLUMN_NAME_REF
+      COMPOSITE_FIELD_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
@@ -503,7 +503,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME_REF
+        COMPOSITE_FIELD_REF
           IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -528,7 +528,7 @@ SOURCE_FILE
           WHITESPACE " "
           EXISTS_KW "exists"
         WHITESPACE " "
-        COLUMN_NAME_REF
+        COMPOSITE_FIELD_REF
           IDENT "a"
         WHITESPACE " "
         CASCADE_KW "cascade"
@@ -555,7 +555,7 @@ SOURCE_FILE
           WHITESPACE " "
           EXISTS_KW "exists"
         WHITESPACE " "
-        COLUMN_NAME_REF
+        COMPOSITE_FIELD_REF
           IDENT "a"
         WHITESPACE " "
         RESTRICT_KW "restrict"
@@ -579,7 +579,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME_REF
+        COMPOSITE_FIELD_REF
           IDENT "a"
         WHITESPACE " "
         TYPE_KW "type"
@@ -612,7 +612,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME_REF
+        COMPOSITE_FIELD_REF
           IDENT "a"
         WHITESPACE " "
         SET_KW "set"
@@ -657,7 +657,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME_REF
+        COMPOSITE_FIELD_REF
           IDENT "a"
         WHITESPACE " "
         TYPE_KW "type"
@@ -702,7 +702,7 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_KW "attribute"
         WHITESPACE " "
-        COLUMN_NAME_REF
+        COMPOSITE_FIELD_REF
           IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -5857,6 +5857,12 @@ fn column_name_ref(p: &mut Parser<'_>) {
     m.complete(p, COLUMN_NAME_REF);
 }
 
+fn composite_field_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, COMPOSITE_FIELD_REF);
+}
+
 fn opt_column_name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at_ts(COL_LABEL_FIRST) {
         return None;
@@ -9509,13 +9515,13 @@ fn alter_type_attribute_action(p: &mut Parser<'_>) {
     } else if p.eat(DROP_KW) {
         p.expect(ATTRIBUTE_KW);
         opt_if_exists(p);
-        column_name_ref(p);
+        composite_field_ref(p);
         opt_cascade_or_restrict(p);
         DROP_ATTRIBUTE
     } else {
         p.expect(ALTER_KW);
         p.expect(ATTRIBUTE_KW);
-        column_name_ref(p);
+        composite_field_ref(p);
         if p.eat(SET_KW) {
             p.eat(DATA_KW);
         }
@@ -9572,7 +9578,7 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             let m = p.start();
             p.bump(RENAME_KW);
             if p.eat(ATTRIBUTE_KW) {
-                column_name_ref(p);
+                composite_field_ref(p);
                 p.expect(TO_KW);
                 column_name(p);
                 opt_cascade_or_restrict(p);
