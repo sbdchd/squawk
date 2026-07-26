@@ -200,6 +200,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::BindParamNameRef(_)
             | ast::AnyName::ChannelRef(_)
             | ast::AnyName::ColumnNameRef(_)
+            | ast::AnyName::CompositeFieldRef(_)
             | ast::AnyName::ConfigValueName(_)
             | ast::AnyName::CopyOptionName(_)
             | ast::AnyName::CursorRef(_)

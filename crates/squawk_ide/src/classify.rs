@@ -11,8 +11,7 @@ pub(crate) enum NameRefClass {
     AlterColumn,
     Channel,
     Collation,
-    CompositeTypeAttribute,
-    CompositeTypeField,
+    CompositeField,
     Constraint,
     ConstraintColumn,
     Conversion,
@@ -143,6 +142,7 @@ fn classify_object_ref(kind: SyntaxKind) -> Option<NameRefClass> {
         SyntaxKind::ACCESS_METHOD_REF => NameRefClass::AccessMethod,
         SyntaxKind::CHANNEL_REF => NameRefClass::Channel,
         SyntaxKind::COLLATION_REF => NameRefClass::Collation,
+        SyntaxKind::COMPOSITE_FIELD_REF => NameRefClass::CompositeField,
         SyntaxKind::CONSTRAINT_NAME_REF => NameRefClass::Constraint,
         SyntaxKind::CONVERSION_REF => NameRefClass::Conversion,
         SyntaxKind::CURSOR_REF => NameRefClass::Cursor,
@@ -604,7 +604,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
 
         // i.e., `(expr).field`
         if !is_base_of_outer_field_expr && let Some(ast::Expr::ParenExpr(_)) = field_expr.base() {
-            return Some(NameRefClass::CompositeTypeField);
+            return Some(NameRefClass::CompositeField);
         }
 
         let mut in_from_clause = false;
@@ -646,7 +646,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             // `x` in `update t set a.x = 1` is a field of the composite type of
             // the column `a`
             if ast::Update::can_cast(ancestor.kind()) && in_set_clause && !in_set_expr {
-                return Some(NameRefClass::CompositeTypeField);
+                return Some(NameRefClass::CompositeField);
             }
             if ast::Merge::can_cast(ancestor.kind())
                 && (in_on_clause || in_when_clause || in_returning_clause)
@@ -837,12 +837,6 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             || ast::RenameColumn::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::AlterColumn);
-        }
-        if ast::RenameAttribute::can_cast(ancestor.kind())
-            || ast::DropAttribute::can_cast(ancestor.kind())
-            || ast::AlterAttribute::can_cast(ancestor.kind())
-        {
-            return Some(NameRefClass::CompositeTypeAttribute);
         }
         if ast::ObjectAggregate::can_cast(ancestor.kind()) {
             return Some(NameRefClass::Aggregate);

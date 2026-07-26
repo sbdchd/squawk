@@ -932,6 +932,10 @@ ColumnRef =
 | FieldExpr
 | IndexExpr
 | SliceExpr
+
+CompositeFieldRef =
+  '#name'?
+
 ColumnConstraint =
   CheckConstraint
 | DefaultConstraint
@@ -3332,7 +3336,7 @@ AlterTypeAttributeAction =
 | DropAttribute
 
 RenameAttribute =
-  'rename' 'attribute' ColumnNameRef 'to' ColumnName (Cascade | Restrict)?
+  'rename' 'attribute' CompositeFieldRef 'to' ColumnName (Cascade | Restrict)?
 
 RenameValue =
   'rename' 'value' from:Literal 'to' to:Literal
@@ -3341,10 +3345,10 @@ AddAttribute =
   'add' 'attribute' ColumnName Type Collate? (Cascade | Restrict)?
 
 DropAttribute =
-  'drop' 'attribute' IfExists? ColumnNameRef (Cascade | Restrict)?
+  'drop' 'attribute' IfExists? CompositeFieldRef (Cascade | Restrict)?
 
 AlterAttribute =
-  'alter' 'attribute' ColumnNameRef ('set' 'data'?)? 'type' Type Collate? (Cascade | Restrict)?
+  'alter' 'attribute' CompositeFieldRef ('set' 'data'?)? 'type' Type Collate? (Cascade | Restrict)?
 
 AddValue =
   'add' 'value' IfNotExists? Literal ValuePosition?
