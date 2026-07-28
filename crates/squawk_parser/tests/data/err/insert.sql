@@ -12,3 +12,6 @@ insert into t (a,,c,)
 insert into t (a, b, c)
   values (4, 5  6,)
   on conflict do nothing;
+
+-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint
+insert into t (a without overlaps) values (1);

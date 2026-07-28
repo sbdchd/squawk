@@ -404,6 +404,57 @@ SOURCE_FILE
           INT_NUMBER "2"
         R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        CTE_NAME
+          IDENT "t"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN_NAME
+            IDENT "a"
+          WHITESPACE " "
+          ERROR
+            WITHOUT_KW "without"
+            WHITESPACE " "
+            OVERLAPS_KW "overlaps"
+          R_PAREN ")"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+    WHITESPACE " "
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected comma
@@ -434,3 +485,7 @@ error[syntax-error]: unexpected comma
    ╭▸ 
 43 │    ), -- <-- extra comma
    ╰╴    ━
+error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+   ╭▸ 
+47 │ with t (a without overlaps) as (select 1) select * from t;
+   ╰╴          ━

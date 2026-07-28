@@ -402,11 +402,11 @@ impl ast::RenameValue {
 
 impl ast::ForeignKeyConstraint {
     #[inline]
-    pub fn from_columns(&self) -> Option<ast::ColumnRefList> {
+    pub fn from_columns(&self) -> Option<ast::ForeignKeyColumnList> {
         support::children(&self.syntax).nth(0)
     }
     #[inline]
-    pub fn to_columns(&self) -> Option<ast::ColumnRefList> {
+    pub fn to_columns(&self) -> Option<ast::ForeignKeyColumnList> {
         support::children(&self.syntax).nth(1)
     }
 }

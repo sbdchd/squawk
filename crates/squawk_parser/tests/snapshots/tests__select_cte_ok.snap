@@ -172,14 +172,12 @@ SOURCE_FILE
           IDENT "t"
         COLUMN_LIST
           L_PAREN "("
-          COLUMN
-            COLUMN_NAME
-              IDENT "a"
+          COLUMN_NAME
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              IDENT "b"
+          COLUMN_NAME
+            IDENT "b"
           R_PAREN ")"
         WHITESPACE " "
         AS_KW "as"
@@ -480,19 +478,16 @@ SOURCE_FILE
           IDENT "search_tree"
         COLUMN_LIST
           L_PAREN "("
-          COLUMN
-            COLUMN_NAME
-              IDENT "id"
+          COLUMN_NAME
+            IDENT "id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              IDENT "link"
+          COLUMN_NAME
+            IDENT "link"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              DATA_KW "data"
+          COLUMN_NAME
+            DATA_KW "data"
           R_PAREN ")"
         WHITESPACE " "
         AS_KW "AS"
@@ -684,19 +679,16 @@ SOURCE_FILE
           IDENT "search_tree"
         COLUMN_LIST
           L_PAREN "("
-          COLUMN
-            COLUMN_NAME
-              IDENT "id"
+          COLUMN_NAME
+            IDENT "id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              IDENT "link"
+          COLUMN_NAME
+            IDENT "link"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              DATA_KW "data"
+          COLUMN_NAME
+            DATA_KW "data"
           R_PAREN ")"
         WHITESPACE " "
         AS_KW "AS"
@@ -888,24 +880,20 @@ SOURCE_FILE
           IDENT "search_graph"
         COLUMN_LIST
           L_PAREN "("
-          COLUMN
-            COLUMN_NAME
-              IDENT "id"
+          COLUMN_NAME
+            IDENT "id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              IDENT "link"
+          COLUMN_NAME
+            IDENT "link"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              DATA_KW "data"
+          COLUMN_NAME
+            DATA_KW "data"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              DEPTH_KW "depth"
+          COLUMN_NAME
+            DEPTH_KW "depth"
           R_PAREN ")"
         WHITESPACE " "
         AS_KW "AS"
@@ -1107,29 +1095,24 @@ SOURCE_FILE
           IDENT "search_graph"
         COLUMN_LIST
           L_PAREN "("
-          COLUMN
-            COLUMN_NAME
-              IDENT "id"
+          COLUMN_NAME
+            IDENT "id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              IDENT "link"
+          COLUMN_NAME
+            IDENT "link"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              DATA_KW "data"
+          COLUMN_NAME
+            DATA_KW "data"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              DEPTH_KW "depth"
+          COLUMN_NAME
+            DEPTH_KW "depth"
           COMMA ","
           WHITESPACE " "
-          COLUMN
-            COLUMN_NAME
-              PATH_KW "path"
+          COLUMN_NAME
+            PATH_KW "path"
           R_PAREN ")"
         WHITESPACE " "
         AS_KW "AS"
@@ -1389,9 +1372,8 @@ SOURCE_FILE
           IDENT "t"
         COLUMN_LIST
           L_PAREN "("
-          COLUMN
-            COLUMN_NAME
-              TIMESTAMP_KW "timestamp"
+          COLUMN_NAME
+            TIMESTAMP_KW "timestamp"
           R_PAREN ")"
         WHITESPACE " "
         AS_KW "as"
@@ -1434,9 +1416,8 @@ SOURCE_FILE
           IDENT "t"
         COLUMN_LIST
           L_PAREN "("
-          COLUMN
-            COLUMN_NAME
-              TIME_KW "time"
+          COLUMN_NAME
+            TIME_KW "time"
           R_PAREN ")"
         WHITESPACE " "
         AS_KW "as"
@@ -1579,7 +1560,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "dismissed_at"
           WHITESPACE " "

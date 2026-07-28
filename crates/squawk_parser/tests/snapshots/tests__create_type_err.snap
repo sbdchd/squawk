@@ -1,0 +1,43 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/create_type.sql
+---
+SOURCE_FILE
+  COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
+  WHITESPACE "\n"
+  CREATE_TYPE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TYPE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "ty"
+    WHITESPACE " "
+    COMPOSITE_TYPE
+      AS_KW "as"
+      WHITESPACE " "
+      COMPOSITE_FIELD_LIST
+        L_PAREN "("
+        COMPOSITE_FIELD_DEF
+          COMPOSITE_FIELD
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+        WHITESPACE " "
+        ERROR
+          WITHOUT_KW "without"
+          WHITESPACE " "
+          OVERLAPS_KW "overlaps"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+  ╭▸ 
+2 │ create type ty as (a int without overlaps);
+  ╰╴                         ━

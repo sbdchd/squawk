@@ -3951,12 +3951,15 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 enum ColumnDefKind {
+    Alias,
+    ColumnTarget,
     CompositeFieldDef,
+    ConstraintColumnRef,
+    ForeignKeyColumnRef,
     Name,
     NameRef,
-    WithData,
 }
 
 // select * from f() as t(a, b);
@@ -3967,12 +3970,13 @@ enum ColumnDefKind {
 fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     if !p.at(L_PAREN) ||
         // we're probably at (select)
-        !p.nth_at_ts(1, COLUMN_FIRST) && !p.nth_at(1, R_PAREN)
+        !p.nth_at_ts(1, COLUMN_FIRST) && !p.nth_at(1, R_PAREN) && !p.nth_at(1, COMMA)
     {
         return false;
     }
     let m = p.start();
     p.expect(L_PAREN);
+    let mut seen_period = false;
     while !p.at(EOF) && !p.at(R_PAREN) {
         if p.at(COMMA) {
             p.err_and_bump("missing column");
@@ -3981,6 +3985,10 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
         if !p.at_ts(COLUMN_FIRST) {
             break;
         }
+        if seen_period {
+            p.error("PERIOD must be the last column in the list");
+        }
+        seen_period |= kind == ColumnDefKind::ForeignKeyColumnRef && at_period_column(p);
         column(p, kind);
         if p.at(COMMA) && p.nth_at(1, R_PAREN) {
             p.err_and_bump("unexpected trailing comma");
@@ -3993,58 +4001,79 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
             }
         }
     }
-    opt_without_overlaps(p);
+    opt_without_overlaps(p, kind);
     p.expect(R_PAREN);
     let list_kind = match kind {
+        ColumnDefKind::Alias => ALIAS_COLUMN_LIST,
+        ColumnDefKind::ColumnTarget => COLUMN_TARGET_LIST,
         ColumnDefKind::CompositeFieldDef => COMPOSITE_FIELD_LIST,
+        ColumnDefKind::ConstraintColumnRef => CONSTRAINT_COLUMN_REF_LIST,
+        ColumnDefKind::ForeignKeyColumnRef => FOREIGN_KEY_COLUMN_LIST,
+        ColumnDefKind::Name => COLUMN_LIST,
         ColumnDefKind::NameRef => COLUMN_REF_LIST,
-        ColumnDefKind::Name | ColumnDefKind::WithData => COLUMN_LIST,
     };
     m.complete(p, list_kind);
     return true;
 }
 
-fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
+fn column(p: &mut Parser<'_>, kind: ColumnDefKind) {
     assert!(p.at_ts(COLUMN_FIRST));
-    let m = p.start();
     match kind {
-        ColumnDefKind::CompositeFieldDef => {
-            composite_field(p);
-            if !p.at(COMMA) && !p.at(R_PAREN) {
-                if !opt_type_name(p) {
-                    return m.complete(p, COMPOSITE_FIELD_DEF);
-                }
+        ColumnDefKind::Alias => {
+            let m = p.start();
+            column_name(p);
+            if !p.at(COMMA) && !p.at(R_PAREN) && opt_type_name(p) {
                 opt_collate(p);
             }
-            m.complete(p, COMPOSITE_FIELD_DEF)
+            m.complete(p, ALIAS_COLUMN);
         }
-        ColumnDefKind::Name => {
-            column_name(p);
-            m.complete(p, COLUMN)
-        }
-        ColumnDefKind::NameRef => {
-            // https://www.depesz.com/2024/10/03/waiting-for-postgresql-18-add-temporal-foreign-key-contraints/
-            // TODO: add validation to ensure this is in the right position
-            if p.at(PERIOD_KW) && p.nth_at_ts(1, NAME_REF_FIRST) {
-                p.bump(PERIOD_KW);
+        ColumnDefKind::CompositeFieldDef => {
+            let m = p.start();
+            composite_field(p);
+            if !p.at(COMMA) && !p.at(R_PAREN) && opt_type_name(p) {
+                opt_collate(p);
             }
+            m.complete(p, COMPOSITE_FIELD_DEF);
+        }
+        ColumnDefKind::ColumnTarget => {
+            let m = p.start();
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
             column_name_ref(p);
             accessors(p);
-            m.complete(p, COLUMN_REF)
+            m.complete(p, COLUMN_TARGET);
         }
-        ColumnDefKind::WithData => {
-            column_name(p);
-            if !p.at(COMMA) && !p.at(R_PAREN) {
-                if !opt_type_name(p) {
-                    return m.complete(p, COLUMN);
-                }
-                opt_collate(p);
+        ColumnDefKind::Name => column_name(p),
+        ColumnDefKind::ConstraintColumnRef
+        | ColumnDefKind::ForeignKeyColumnRef
+        | ColumnDefKind::NameRef => {
+            // https://www.depesz.com/2024/10/03/waiting-for-postgresql-18-add-temporal-foreign-key-contraints/
+            if at_period_column(p) {
+                let m = p.start();
+                let node_kind = if kind == ColumnDefKind::ForeignKeyColumnRef {
+                    PERIOD_COLUMN
+                } else {
+                    p.error("PERIOD is only allowed in FOREIGN KEY column lists");
+                    ERROR
+                };
+                p.bump(PERIOD_KW);
+                column_name_ref(p);
+                m.complete(p, node_kind);
+            } else {
+                column_name_ref(p);
             }
-            m.complete(p, COLUMN)
+            if p.at(DOT) || p.at(L_BRACK) {
+                let m = p.start();
+                p.error("field access and subscripts are only allowed in INSERT and UPDATE column lists");
+                accessors(p);
+                m.complete(p, ERROR);
+            }
         }
     }
+}
+
+fn at_period_column(p: &Parser<'_>) -> bool {
+    p.at(PERIOD_KW) && p.nth_at_ts(1, NAME_REF_FIRST)
 }
 
 fn accessors(p: &mut Parser<'_>) {
@@ -4102,6 +4131,32 @@ fn opt_column_ref_list(p: &mut Parser<'_>) -> bool {
 
 fn column_ref_list(p: &mut Parser<'_>) {
     if !opt_column_ref_list(p) {
+        p.error("expected column list");
+    }
+}
+
+fn constraint_column_ref_list(p: &mut Parser<'_>) {
+    if !opt_column_list_with(p, ColumnDefKind::ConstraintColumnRef) {
+        p.error("expected column list");
+    }
+}
+
+fn opt_column_target_list(p: &mut Parser<'_>) -> bool {
+    opt_column_list_with(p, ColumnDefKind::ColumnTarget)
+}
+
+fn column_target_list(p: &mut Parser<'_>) {
+    if !opt_column_target_list(p) {
+        p.error("expected column list");
+    }
+}
+
+fn opt_foreign_key_column_list(p: &mut Parser<'_>) -> bool {
+    opt_column_list_with(p, ColumnDefKind::ForeignKeyColumnRef)
+}
+
+fn foreign_key_column_list(p: &mut Parser<'_>) {
+    if !opt_foreign_key_column_list(p) {
         p.error("expected column list");
     }
 }
@@ -4612,7 +4667,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             } else {
                 let m = p.start();
                 opt_nulls_not_distinct(p);
-                column_ref_list(p);
+                constraint_column_ref_list(p);
                 opt_index_parameters(p);
                 m.complete(p, INDEX_PARAMETERS);
             }
@@ -4629,7 +4684,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             // ( column_name [, ... ] ) index_parameters
             } else {
                 let m = p.start();
-                column_ref_list(p);
+                constraint_column_ref_list(p);
                 opt_index_parameters(p);
                 m.complete(p, INDEX_PARAMETERS);
             }
@@ -4656,10 +4711,10 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             // must be in a foreign key constraint
             p.expect(FOREIGN_KW);
             p.expect(KEY_KW);
-            column_ref_list(p);
+            foreign_key_column_list(p);
             p.expect(REFERENCES_KW);
             table_name_ref(p);
-            opt_column_ref_list(p);
+            opt_foreign_key_column_list(p);
             opt_match_type(p);
             opt_foreign_key_actions(p);
             FOREIGN_KEY_CONSTRAINT
@@ -4737,10 +4792,20 @@ fn opt_constraint_index_method(p: &mut Parser<'_>) {
     }
 }
 
-fn opt_without_overlaps(p: &mut Parser<'_>) {
-    if p.eat(WITHOUT_KW) {
-        p.expect(OVERLAPS_KW);
+fn opt_without_overlaps(p: &mut Parser<'_>, kind: ColumnDefKind) {
+    if !p.at(WITHOUT_KW) || !p.nth_at(1, OVERLAPS_KW) {
+        return;
     }
+    let m = p.start();
+    let node_kind = if kind == ColumnDefKind::ConstraintColumnRef {
+        WITHOUT_OVERLAPS
+    } else {
+        p.error("WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints");
+        ERROR
+    };
+    p.bump(WITHOUT_KW);
+    p.bump(OVERLAPS_KW);
+    m.complete(p, node_kind);
 }
 
 // [ NOT DEFERRABLE | [ DEFERRABLE ] [ INITIALLY IMMEDIATE | INITIALLY DEFERRED ] ]
@@ -4899,7 +4964,7 @@ fn opt_from_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         table_alias(p);
     }
     if p.at(L_PAREN) {
-        if !opt_column_list_with(p, ColumnDefKind::WithData) {
+        if !opt_column_list_with(p, ColumnDefKind::Alias) {
             p.error("expected column list");
         }
     }
@@ -13288,7 +13353,7 @@ fn merge_action(p: &mut Parser<'_>) {
         INSERT_KW => {
             p.bump(INSERT_KW);
             // [ ( column_name [, ...] ) ]
-            opt_column_ref_list(p);
+            opt_column_target_list(p);
             // [ OVERRIDING { SYSTEM | USER } VALUE ]
             if p.eat(OVERRIDING_KW) {
                 if !p.eat(SYSTEM_KW) && !p.eat(USER_KW) {
@@ -15432,7 +15497,7 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Complete
     // [ ( column_name [, ...] ) ]
     // a leading `(` may open a parenthesized query instead of a column list
     if !(p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST)) {
-        opt_column_ref_list(p);
+        opt_column_target_list(p);
     }
     // [ OVERRIDING { SYSTEM | USER } VALUE ]
     if p.eat(OVERRIDING_KW) {
@@ -15585,13 +15650,13 @@ fn opt_set_column(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // ( column_name [, ...] ) = [ ROW ] ( { expression | DEFAULT } [, ...] ) |
     // ( column_name [, ...] ) = ( sub-SELECT )
     if p.at(L_PAREN) {
-        column_ref_list(p);
+        column_target_list(p);
         p.expect(EQ);
         set_expr_list_or_paren_select(p);
         Some(m.complete(p, SET_MULTIPLE_COLUMNS))
     } else {
         // column_name = { expression | DEFAULT }
-        column(p, ColumnDefKind::NameRef);
+        column(p, ColumnDefKind::ColumnTarget);
         p.expect(EQ);
         set_expr(p);
         Some(m.complete(p, SET_SINGLE_COLUMN))

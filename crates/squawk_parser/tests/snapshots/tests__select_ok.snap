@@ -179,19 +179,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -265,14 +265,14 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             TARGET_KW "target"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 TARGET_KW "target"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 FUNCTION_KW "function"
             R_PAREN ")"
@@ -303,14 +303,14 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "col1"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "col2"
             R_PAREN ")"
@@ -355,14 +355,14 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             TARGET_KW "target"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 TARGET_KW "target"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 FUNCTION_KW "function"
             R_PAREN ")"
@@ -1819,19 +1819,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "r"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -1927,19 +1927,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -1989,14 +1989,14 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
@@ -2042,14 +2042,14 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
@@ -2155,14 +2155,14 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
@@ -2198,14 +2198,14 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             R_PAREN ")"
@@ -2238,9 +2238,9 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
@@ -2250,7 +2250,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
@@ -2285,9 +2285,9 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
@@ -2297,7 +2297,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
@@ -2330,9 +2330,9 @@ SOURCE_FILE
         FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
@@ -2342,7 +2342,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
@@ -2377,9 +2377,9 @@ SOURCE_FILE
         FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
@@ -2389,7 +2389,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
@@ -2438,9 +2438,9 @@ SOURCE_FILE
         FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
@@ -2450,7 +2450,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
@@ -2594,19 +2594,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "z"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -2636,19 +2636,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "z"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -2674,19 +2674,19 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "z"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -2800,19 +2800,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "b"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "x"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "y"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "z"
             R_PAREN ")"
@@ -2897,19 +2897,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -2944,19 +2944,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -3092,19 +3092,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -3134,19 +3134,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -3174,19 +3174,19 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -3246,9 +3246,9 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
@@ -3258,7 +3258,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
@@ -3291,9 +3291,9 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
               WHITESPACE " "
@@ -3303,7 +3303,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
               WHITESPACE " "
@@ -3353,9 +3353,9 @@ SOURCE_FILE
         FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "x"
               WHITESPACE " "
@@ -3365,7 +3365,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "y"
               WHITESPACE " "
@@ -3375,7 +3375,7 @@ SOURCE_FILE
                     TEXT_KW "text"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "z"
               WHITESPACE " "
@@ -3537,19 +3537,19 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -3582,19 +3582,19 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "t"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "c"
             R_PAREN ")"
@@ -4805,9 +4805,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "id"
+              COLUMN_NAME_REF
+                IDENT "id"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -4846,14 +4845,12 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "id"
+              COLUMN_NAME_REF
+                IDENT "id"
               COMMA ","
               WHITESPACE " "
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "foo"
+              COLUMN_NAME_REF
+                IDENT "foo"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -4894,9 +4891,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "id"
+              COLUMN_NAME_REF
+                IDENT "id"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -4937,9 +4933,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "id"
+              COLUMN_NAME_REF
+                IDENT "id"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5048,13 +5043,13 @@ SOURCE_FILE
           FROM_ALIAS
             TABLE_ALIAS
               IDENT "x"
-            COLUMN_LIST
+            ALIAS_COLUMN_LIST
               L_PAREN "("
-              COLUMN
+              ALIAS_COLUMN
                 COLUMN_NAME
                   IDENT "x0"
               COMMA ","
-              COLUMN
+              ALIAS_COLUMN
                 COLUMN_NAME
                   IDENT "x1"
               R_PAREN ")"
@@ -5091,9 +5086,8 @@ SOURCE_FILE
                     USING_KW "using"
                     COLUMN_REF_LIST
                       L_PAREN "("
-                      COLUMN_REF
-                        COLUMN_NAME_REF
-                          IDENT "f1"
+                      COLUMN_NAME_REF
+                        IDENT "f1"
                       R_PAREN ")"
               R_PAREN ")"
           WHITESPACE " "
@@ -5158,9 +5152,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "id"
+              COLUMN_NAME_REF
+                IDENT "id"
               R_PAREN ")"
             WHITESPACE " "
             REQUIRED_AS_ALIAS
@@ -5328,9 +5321,8 @@ SOURCE_FILE
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "id"
+                COLUMN_NAME_REF
+                  IDENT "id"
                 R_PAREN ")"
         WHITESPACE "\n"
         JOIN
@@ -5350,9 +5342,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  EVENT_KW "event"
+              COLUMN_NAME_REF
+                EVENT_KW "event"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5475,9 +5466,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "did"
+              COLUMN_NAME_REF
+                IDENT "did"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5514,9 +5504,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "a_id"
+              COLUMN_NAME_REF
+                IDENT "a_id"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -4,6 +4,12 @@ use crate::{
     ast::{self, AstNode, support},
 };
 
+impl ast::AliasColumnList {
+    pub fn column_names(self) -> impl Iterator<Item = ast::ColumnName> {
+        self.alias_columns().filter_map(|column| column.name())
+    }
+}
+
 // TODO: Initial attempt to try and unify the CreateTable and
 // CreateForeignTable. Not sure this is the right approach, we may want to be
 // more general, like TableSource, which can be a View, CTE, Table,

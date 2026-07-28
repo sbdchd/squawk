@@ -143,14 +143,12 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "i"
+        COLUMN_NAME_REF
+          IDENT "i"
         COMMA ","
         WHITESPACE " "
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "y"
+        COLUMN_NAME_REF
+          IDENT "y"
         R_PAREN ")"
     WHITESPACE " "
     COPY_FROM

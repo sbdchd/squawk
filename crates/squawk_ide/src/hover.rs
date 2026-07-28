@@ -612,7 +612,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         }
         ast_nav::ParentSouce::Alias(alias) => {
             let alias_name = alias.table_alias()?;
-            alias.column_list()?;
+            alias.alias_column_list()?;
             let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
             let table_name = Name::from_node(&alias_name);
             let column_name = Name::from_string(def_node.text().to_string());
@@ -783,7 +783,7 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> 
     let alias_name = alias.table_alias()?;
     let name = Name::from_node(&alias_name);
 
-    let Some(column_list) = alias.column_list() else {
+    let Some(column_list) = alias.alias_column_list() else {
         let name = Name::from_node(&alias.table_alias()?);
         let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
         let ast::FromItem::ParenFromItem(paren) = from_item else {
@@ -794,12 +794,8 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> 
     };
 
     let mut columns: Vec<Name> = column_list
-        .columns()
-        .filter_map(|column| {
-            column
-                .name()
-                .map(|column_name| Name::from_node(&column_name))
-        })
+        .column_names()
+        .map(|column_name| Name::from_node(&column_name))
         .collect();
 
     if let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast)
@@ -939,7 +935,7 @@ fn hover_qualified_star_columns_from_alias(
     let file = alias.file_id;
     let alias = alias.value;
     let alias_name = Name::from_node(&alias.table_alias()?);
-    alias.column_list()?;
+    alias.alias_column_list()?;
     let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let columns = collect::columns_for_star_from_alias(db, file, &from_item, alias);
 
@@ -2019,7 +2015,7 @@ fn qualified_star_from_clause_table_ptr(
     let from_item = resolve::find_from_item_in_from_clause(&from_clause, table_name)?;
 
     if let Some(alias) = from_item.alias()
-        && alias.column_list().is_some()
+        && alias.alias_column_list().is_some()
     {
         return Some(SyntaxNodePtr::new(alias.syntax()));
     }

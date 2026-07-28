@@ -927,8 +927,12 @@ Column =
   InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
   NotEnforced? Enforced?
 
-ColumnRef =
-  'period'? name:ColumnNameRef Accessor*
+// Used by Insert / Update
+ColumnTarget =
+  name:ColumnNameRef Accessor*
+
+ColumnTargetList =
+  '(' (ColumnTarget (',' ColumnTarget)*) ')'
 
 Accessor =
   FieldAccessor
@@ -979,7 +983,7 @@ PrimaryKeyConstraint =
 
 IndexParameters =
   (NullsNotDistinct | NullsDistinct)?
-  ColumnRefList?
+  column_list:ConstraintColumnRefList?
   ConstraintIncludeClause?
   WithParams?
   ConstraintIndexTablespace?
@@ -1030,7 +1034,7 @@ MatchType =
 
 ForeignKeyConstraint =
   ConstraintNameClause?
-  'foreign' 'key' from_columns:ColumnRefList 'references' TableNameRef to_columns:ColumnRefList?
+  'foreign' 'key' from_columns:ForeignKeyColumnList 'references' TableNameRef to_columns:ForeignKeyColumnList?
   MatchType?
   OnDeleteAction?
   OnUpdateAction?
@@ -1311,7 +1315,7 @@ TableAlias =
   '#name'?
 
 FromAlias =
-  'as'? TableAlias ColumnList?
+  'as'? TableAlias AliasColumnList?
 
 OptionalAsAlias =
   'as'? TableAlias
@@ -1385,10 +1389,28 @@ OptionCycle =
   'cycle'
 
 ColumnList =
-  '(' (Column (',' Column)*) ')'
+  '(' (ColumnName (',' ColumnName)*) ')'
+
+AliasColumnList =
+  '(' (AliasColumn (',' AliasColumn)*) ')'
+
+AliasColumn =
+  name:ColumnName Type? Collate?
 
 ColumnRefList =
-  '(' (ColumnRef (',' ColumnRef)*) ')'
+  '(' (ColumnNameRef (',' ColumnNameRef)*) ')'
+
+ConstraintColumnRefList =
+  '(' (ColumnNameRef (',' ColumnNameRef)*) WithoutOverlaps? ')'
+
+ForeignKeyColumnList =
+  '(' (ColumnNameRef (',' ColumnNameRef)*) PeriodColumn? ')'
+
+PeriodColumn =
+  'period' name:ColumnNameRef
+
+WithoutOverlaps =
+  'without' 'overlaps'
 
 ConstraintIncludeClause =
   'include' ColumnRefList
@@ -1934,7 +1956,7 @@ Table =
 
 Insert =
   WithClause?
-  'insert' 'into' RelationNameRef alias:RequiredAsAlias? ColumnRefList?
+  'insert' 'into' RelationNameRef alias:RequiredAsAlias? ColumnTargetList?
   ('overriding' ('system' | 'user') 'value')?
   ('default' 'values' | SelectVariant)
   OnConflictClause?
@@ -1984,12 +2006,12 @@ SetColumn =
 | SetMultipleColumns
 
 SetSingleColumn =
-  ColumnRef
+  ColumnTarget
   '='
   SetExpr
 
 SetMultipleColumns =
-  ColumnRefList
+  ColumnTargetList
   '='
   (SetExprList | ParenSelect)
 
@@ -2067,7 +2089,7 @@ MergeUpdate =
   'update' 'set' SetClause
 
 MergeInsert =
-  'insert' ColumnRefList?
+  'insert' ColumnTargetList?
   ('overriding' ('system' | 'user'))?
   (Values | 'default' 'values')
 
@@ -4766,7 +4788,7 @@ CompositeType =
   'as' CompositeFieldList
 
 CompositeFieldList =
-  '(' (CompositeFieldDef (',' CompositeFieldDef)*) ')'
+  '(' (CompositeFieldDef (',' CompositeFieldDef)*)? ')'
 
 CompositeFieldDef =
   name:CompositeField Type? Collate?

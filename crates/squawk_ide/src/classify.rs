@@ -982,8 +982,10 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         {
             return Some(NameRefClass::SelectOrderByAliasOrColumn);
         }
-        if ast::ColumnList::can_cast(ancestor.kind())
-            || ast::ColumnRefList::can_cast(ancestor.kind())
+        if ast::ColumnRefList::can_cast(ancestor.kind())
+            || ast::ColumnTargetList::can_cast(ancestor.kind())
+            || ast::ConstraintColumnRefList::can_cast(ancestor.kind())
+            || ast::ForeignKeyColumnList::can_cast(ancestor.kind())
         {
             in_column_list = true;
         }
@@ -1110,7 +1112,7 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         if let Some(class) = classify_object_definition(ancestor.kind()) {
             return Some(class);
         }
-        if ast::Column::can_cast(ancestor.kind()) {
+        if ast::Column::can_cast(ancestor.kind()) || ast::AliasColumn::can_cast(ancestor.kind()) {
             in_column = true;
         }
         if ast::ColumnList::can_cast(ancestor.kind()) {

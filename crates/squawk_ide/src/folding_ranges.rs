@@ -120,6 +120,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         SyntaxKind::PAREN_SELECT => Some(FoldKind::Subquery),
         SyntaxKind::TUPLE_EXPR => Some(FoldKind::Tuple),
         SyntaxKind::WHEN_CLAUSE_LIST
+        | SyntaxKind::ALIAS_COLUMN_LIST
         | SyntaxKind::ALTER_OPTION_LIST
         | SyntaxKind::ALTER_TYPE_ATTRIBUTE_ACTION_LIST
         | SyntaxKind::ATTRIBUTE_LIST
@@ -127,14 +128,17 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::CHECKPOINT_OPTION_LIST
         | SyntaxKind::COLUMN_LIST
         | SyntaxKind::COLUMN_REF_LIST
+        | SyntaxKind::COLUMN_TARGET_LIST
         | SyntaxKind::COMPOSITE_FIELD_LIST
         | SyntaxKind::CONFLICT_INDEX_ITEM_LIST
+        | SyntaxKind::CONSTRAINT_COLUMN_REF_LIST
         | SyntaxKind::CONSTRAINT_EXCLUSION_LIST
         | SyntaxKind::COPY_OPTION_LIST
         | SyntaxKind::DATABASE_OPTION_LIST
         | SyntaxKind::EXPLAIN_OPTION_LIST
         | SyntaxKind::DROP_OP_CLASS_OPTION_LIST
         | SyntaxKind::FDW_OPTION_LIST
+        | SyntaxKind::FOREIGN_KEY_COLUMN_LIST
         | SyntaxKind::FUNCTION_SIG_LIST
         | SyntaxKind::PROCEDURE_SIG_LIST
         | SyntaxKind::ROUTINE_SIG_LIST

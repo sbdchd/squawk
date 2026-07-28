@@ -119,19 +119,16 @@ SOURCE_FILE
             IDENT "foo"
       COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "a"
+        COLUMN_NAME_REF
+          IDENT "a"
         COMMA ","
         WHITESPACE " "
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "b"
+        COLUMN_NAME_REF
+          IDENT "b"
         COMMA ","
         WHITESPACE " "
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "c"
+        COLUMN_NAME_REF
+          IDENT "c"
         R_PAREN ")"
       WHITESPACE " "
       WHERE_CONDITION_CLAUSE
