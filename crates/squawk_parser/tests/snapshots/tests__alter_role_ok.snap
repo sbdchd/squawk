@@ -16,7 +16,7 @@ SOURCE_FILE
     ROLE_OPTION_LIST
       WITH_KW "with"
       WHITESPACE " "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "superuser"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -33,52 +33,52 @@ SOURCE_FILE
     ROLE_OPTION_LIST
       WITH_KW "with"
       WHITESPACE " "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "superuser"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "nosuperuser"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "nosuperuser"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "createdb"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "nocreatedb"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "createrole"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "nocreaterole"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_INHERIT
         INHERIT_KW "inherit"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "noinherit"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "login"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "nologin"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "replication"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "noreplication"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "bypassrls"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "nobypassrls"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_CONNECTION_LIMIT
         CONNECTION_KW "connection"
         WHITESPACE " "
         LIMIT_KW "limit"
@@ -86,7 +86,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "100"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_ENCRYPTED_PASSWORD
         ENCRYPTED_KW "encrypted"
         WHITESPACE " "
         PASSWORD_KW "password"
@@ -94,18 +94,18 @@ SOURCE_FILE
         LITERAL
           STRING "'foo'"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_PASSWORD
         PASSWORD_KW "password"
         WHITESPACE " "
         LITERAL
           STRING "'bar'"
       WHITESPACE " "
-      ROLE_OPTION
+      ROLE_OPTION_PASSWORD
         PASSWORD_KW "password"
         WHITESPACE " "
         NULL_KW "null"
       WHITESPACE "\n  "
-      ROLE_OPTION
+      ROLE_OPTION_VALID_UNTIL
         VALID_KW "valid"
         WHITESPACE " "
         UNTIL_KW "until"
@@ -320,7 +320,7 @@ SOURCE_FILE
     ROLE_OPTION_LIST
       WITH_KW "with"
       WHITESPACE " "
-      ROLE_OPTION
+      ROLE_OPTION_GENERIC
         IDENT "nologin"
     SEMICOLON ";"
   WHITESPACE "\n\n"

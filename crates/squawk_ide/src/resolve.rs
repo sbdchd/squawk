@@ -669,7 +669,7 @@ pub(crate) fn resolve_name_ref(
             let publication_object = name_ref
                 .syntax()
                 .ancestors()
-                .find_map(ast::PublicationObject::cast)?;
+                .find_map(ast::PublicationObjectTable::cast)?;
             let path = publication_object.table_name_ref()?.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
@@ -885,7 +885,7 @@ pub(crate) fn resolve_name_ref(
             resolve_table_in_returning_clause(
                 db,
                 InFile::new(file, name_ref),
-                insert.alias().and_then(|alias| alias.table_alias()),
+                insert.alias().and_then(|alias| alias.name()),
                 &path,
                 insert.returning_clause(),
             )
@@ -1771,7 +1771,7 @@ pub(crate) fn resolve_vertex_table_ref(
     let file = vertex_table_ref.file_id;
     let vertex_table_ref = vertex_table_ref.value;
     let vertex_table = property_graph_vertex_table(vertex_table_ref)?;
-    if let Some(alias) = vertex_table.element_table_alias() {
+    if let Some(alias) = vertex_table.alias() {
         return Some(smallvec![Location::new(
             file,
             alias.syntax().text_range(),
@@ -1829,7 +1829,7 @@ fn property_graph_vertex_table(
         .find_map(|vertex_table| {
             let path = vertex_table.table_name_ref()?.path_ref()?;
             let matches_alias = vertex_table
-                .element_table_alias()
+                .alias()
                 .is_some_and(|alias| Name::from_node(&alias) == vertex_table_name);
             let matches_table = path
                 .segment()
@@ -1909,7 +1909,7 @@ fn resolve_select_qualified_column_table_name_ptr(
 
     let from_item = find_from_item_for_select_qualified_name_ref(table_name_ref, &table_name)?;
 
-    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias())
+    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name())
         && Name::from_node(&alias_name) == table_name
     {
         return Some(smallvec![Location::new(
@@ -1957,7 +1957,7 @@ fn match_table_in_returning_clause(
     // Check `returning with (old as alias, new as alias)`
     if let Some(option_list) = returning_clause.and_then(|x| x.returning_option_list()) {
         for option in option_list.returning_options() {
-            if let Some(alias) = option.table_alias()
+            if let Some(alias) = option.name()
                 && Name::from_node(&alias) == *table_name
             {
                 return Some(ReturningClauseMatch::ReturningAlias(alias));
@@ -2049,10 +2049,7 @@ fn resolve_select_qualified_column_ptr(
                     return Some(ptr);
                 }
 
-                if from_item
-                    .alias()
-                    .and_then(|a| a.alias_column_list())
-                    .is_none()
+                if from_item.alias().and_then(|a| a.column_list()).is_none()
                     && column_name == Name::from_string("ordinality")
                     && let Some(ordinality_token) = from_item.ordinality_token()
                 {
@@ -2066,7 +2063,7 @@ fn resolve_select_qualified_column_ptr(
                 // `from t as u`
                 // `from t as u(a, b, c)`
                 if let Some(alias) = from_item.alias()
-                    && let Some(alias_name) = alias.table_alias()
+                    && let Some(alias_name) = alias.name()
                     && Name::from_node(&alias_name) == column_table_name
                 {
                     if let ast::FromItem::ParenFromItem(paren) = &from_item {
@@ -2091,7 +2088,7 @@ fn resolve_select_qualified_column_ptr(
                     }
 
                     // `from t as u(a, b, c)`
-                    if let Some(column_list) = alias.alias_column_list() {
+                    if let Some(column_list) = alias.column_list() {
                         for col_name in column_list.column_names() {
                             if Name::from_node(&col_name) == column_name {
                                 return Some(smallvec![Location::new(
@@ -2143,7 +2140,7 @@ fn resolve_select_qualified_column_ptr(
                     && let Some(from_item) = using_on.from_item()
                 {
                     let matches_source = if let Some(alias_name) =
-                        from_item.alias().and_then(|alias| alias.table_alias())
+                        from_item.alias().and_then(|alias| alias.name())
                     {
                         Name::from_node(&alias_name) == column_table_name
                     } else if let Some((_, item_name)) =
@@ -2293,7 +2290,7 @@ fn resolve_merge_alias(name_ref: &impl ast::NameLike, table_name: &Name) -> Opti
             .using_on_clause()
             .and_then(|c| c.from_item())
     })?;
-    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias())
+    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name())
         && Name::from_node(&alias_name) == *table_name
         && let ast::FromItem::RelationFromItem(relation) = &from_item
     {
@@ -2347,7 +2344,7 @@ fn resolve_from_item_column_by_name_after_index(
             return Some(ptr);
         }
         if original_skip == 0
-            && let Some(alias_name) = alias.and_then(|alias| alias.table_alias())
+            && let Some(alias_name) = alias.and_then(|alias| alias.name())
             && Name::from_node(&alias_name) == *column_name
         {
             return Some(smallvec![Location::new(
@@ -2383,7 +2380,7 @@ fn resolve_from_item_column_by_name_after_index(
             return Some(ptr);
         }
         if original_skip == 0
-            && let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias())
+            && let Some(alias_name) = from_item.alias().and_then(|alias| alias.name())
             && Name::from_node(&alias_name) == *column_name
         {
             return Some(smallvec![Location::new(
@@ -2482,7 +2479,7 @@ fn resolve_from_item_column_by_name_after_index(
     }
 
     if original_skip == 0
-        && let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias())
+        && let Some(alias_name) = from_item.alias().and_then(|alias| alias.name())
         && Name::from_node(&alias_name) == *column_name
     {
         return Some(smallvec![Location::new(
@@ -2507,10 +2504,7 @@ fn resolve_from_item_column_by_name_after_index(
     }
 
     if original_skip == 0
-        && from_item
-            .alias()
-            .and_then(|a| a.alias_column_list())
-            .is_none()
+        && from_item.alias().and_then(|a| a.column_list()).is_none()
         && *column_name == Name::from_string("ordinality")
         && let Some(ordinality_token) = from_item.ordinality_token()
     {
@@ -3022,7 +3016,7 @@ fn resolve_fn_call_column(
 }
 
 fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
-    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias()) {
+    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name()) {
         return Name::from_node(&alias_name) == *qualifier;
     }
 
@@ -3079,7 +3073,7 @@ fn find_join_expr_by_using_alias(
     qualifier: &Name,
 ) -> Option<ast::JoinExpr> {
     if let Some(using_clause) = join_expr.join().and_then(|join| join.using_clause())
-        && let Some(alias_name) = using_clause.alias().and_then(|alias| alias.table_alias())
+        && let Some(alias_name) = using_clause.alias().and_then(|alias| alias.name())
         && Name::from_node(&alias_name) == *qualifier
     {
         return Some(join_expr.clone());
@@ -3106,7 +3100,7 @@ fn resolve_join_using_alias_table_ptr(
     qualifier: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
     let join_expr = find_using_alias_join_expr_for_name_ref(name_ref.value, qualifier)?;
-    let alias_name = join_expr.join()?.using_clause()?.alias()?.table_alias()?;
+    let alias_name = join_expr.join()?.using_clause()?.alias()?.name()?;
     Some(smallvec![Location::new(
         name_ref.file_id,
         alias_name.syntax().text_range(),
@@ -3329,7 +3323,7 @@ fn column_list_names(
 
 fn alias_column_names(alias: Option<ast::FromAlias>) -> impl Iterator<Item = ast::ColumnName> {
     alias
-        .and_then(|alias| alias.alias_column_list())
+        .and_then(|alias| alias.column_list())
         .into_iter()
         .flat_map(|column_list| column_list.column_names())
 }
@@ -4231,22 +4225,22 @@ fn column_in_with_query(
     let (returning_clause, alias, path) = match query {
         ast::WithQuery::Delete(delete) => (
             delete.returning_clause(),
-            delete.alias().and_then(|alias| alias.table_alias()),
+            delete.alias().and_then(|alias| alias.name()),
             delete.relation_name()?.relation_name_ref()?.path_ref()?,
         ),
         ast::WithQuery::Insert(insert) => (
             insert.returning_clause(),
-            insert.alias().and_then(|alias| alias.table_alias()),
+            insert.alias().and_then(|alias| alias.name()),
             insert.relation_name_ref()?.path_ref()?,
         ),
         ast::WithQuery::Merge(merge) => (
             merge.returning_clause(),
-            merge.alias().and_then(|alias| alias.table_alias()),
+            merge.alias().and_then(|alias| alias.name()),
             merge.table_relation_name()?.table_name_ref()?.path_ref()?,
         ),
         ast::WithQuery::Update(update) => (
             update.returning_clause(),
-            update.alias().and_then(|alias| alias.table_alias()),
+            update.alias().and_then(|alias| alias.name()),
             update.relation_name()?.relation_name_ref()?.path_ref()?,
         ),
         ast::WithQuery::Select(_)
@@ -4447,7 +4441,7 @@ pub(crate) fn table_ptrs_from_clause(
 
     for from_item in ast_nav::iter_from_clause(from_clause) {
         if let Some(alias) = from_item.alias()
-            && alias.alias_column_list().is_some()
+            && alias.column_list().is_some()
         {
             results.push(SyntaxNodePtr::new(alias.syntax()));
             continue;
@@ -5222,7 +5216,7 @@ fn resolve_update_table_name_ptr(
     resolve_table_in_returning_clause(
         db,
         InFile::new(file, table_name_ref),
-        update.alias().and_then(|alias| alias.table_alias()),
+        update.alias().and_then(|alias| alias.name()),
         &path,
         update.returning_clause(),
     )
@@ -5237,7 +5231,7 @@ fn resolve_from_item_table_name_ptr(
     let file = table_name_ref.file_id;
     let table_name_ref = table_name_ref.value;
 
-    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias()) {
+    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name()) {
         if Name::from_node(&alias_name) == *table_name {
             return Some(smallvec![Location::new(
                 file,
@@ -5332,10 +5326,7 @@ fn resolve_update_column_ptr(
         match_table_in_returning_clause(
             &qualifier,
             &stmt_table_name,
-            update
-                .alias()
-                .and_then(|alias| alias.table_alias())
-                .as_ref(),
+            update.alias().and_then(|alias| alias.name()).as_ref(),
             update.returning_clause().as_ref(),
         )?;
     }
@@ -5372,10 +5363,7 @@ fn resolve_delete_column_ptr(
         match_table_in_returning_clause(
             &qualifier,
             &stmt_table_name,
-            delete
-                .alias()
-                .and_then(|alias| alias.table_alias())
-                .as_ref(),
+            delete.alias().and_then(|alias| alias.name()).as_ref(),
             delete.returning_clause().as_ref(),
         )?;
     }
@@ -5397,7 +5385,7 @@ fn resolve_delete_table_name_ptr(
 
     if let Some(using_clause) = delete.using_clause() {
         for from_item in using_clause.from_items() {
-            if let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias()) {
+            if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name()) {
                 if Name::from_node(&alias_name) == table_name {
                     return Some(smallvec![Location::new(
                         file,
@@ -5424,7 +5412,7 @@ fn resolve_delete_table_name_ptr(
     resolve_table_in_returning_clause(
         db,
         InFile::new(file, table_name_ref),
-        delete.alias().and_then(|alias| alias.table_alias()),
+        delete.alias().and_then(|alias| alias.name()),
         &path,
         delete.returning_clause(),
     )
@@ -5542,7 +5530,7 @@ fn resolve_merge_table_name_ptr(
     // Check USING clause for the source table - MERGE-specific.
     // A source alias hides the underlying table name.
     if let Some(from_item) = merge.using_on_clause().and_then(|x| x.from_item()) {
-        if let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias()) {
+        if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name()) {
             if Name::from_node(&alias_name) == table_name {
                 return Some(smallvec![Location::new(
                     file,
@@ -5567,7 +5555,7 @@ fn resolve_merge_table_name_ptr(
     resolve_table_in_returning_clause(
         db,
         InFile::new(file, table_name_ref),
-        merge.alias().and_then(|alias| alias.table_alias()),
+        merge.alias().and_then(|alias| alias.name()),
         &path,
         merge.returning_clause(),
     )

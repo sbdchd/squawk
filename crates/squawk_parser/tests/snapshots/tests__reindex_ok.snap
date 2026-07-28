@@ -8,36 +8,39 @@ SOURCE_FILE
   REINDEX
     REINDEX_KW "REINDEX"
     WHITESPACE " "
-    INDEX_KW "INDEX"
-    WHITESPACE " "
-    INDEX_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "my_index"
+    REINDEX_TARGET_INDEX
+      INDEX_KW "INDEX"
+      WHITESPACE " "
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "my_index"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
     REINDEX_KW "REINDEX"
     WHITESPACE " "
-    TABLE_KW "TABLE"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "my_table"
+    REINDEX_TARGET_TABLE
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "my_table"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
     REINDEX_KW "REINDEX"
     WHITESPACE " "
-    TABLE_KW "TABLE"
-    WHITESPACE " "
-    CONCURRENTLY_KW "CONCURRENTLY"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "my_broken_table"
+    REINDEX_TARGET_TABLE
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      CONCURRENTLY_KW "CONCURRENTLY"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "my_broken_table"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complete_syntax"
@@ -47,33 +50,34 @@ SOURCE_FILE
     WHITESPACE " "
     REINDEX_OPTION_LIST
       L_PAREN "("
-      REINDEX_OPTION
+      REINDEX_OPTION_CONCURRENTLY
         CONCURRENTLY_KW "concurrently"
         WHITESPACE " "
         LITERAL
           TRUE_KW "true"
       COMMA ","
       WHITESPACE " "
-      REINDEX_OPTION
+      REINDEX_OPTION_TABLESPACE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
           IDENT "fooo"
       COMMA ","
       WHITESPACE " "
-      REINDEX_OPTION
+      REINDEX_OPTION_VERBOSE
         VERBOSE_KW "verbose"
         WHITESPACE " "
         LITERAL
           FALSE_KW "false"
       R_PAREN ")"
     WHITESPACE " "
-    DATABASE_KW "database"
-    WHITESPACE " "
-    CONCURRENTLY_KW "concurrently"
-    WHITESPACE " "
-    DATABASE_REF
-      IDENT "foo"
+    REINDEX_TARGET_DATABASE
+      DATABASE_KW "database"
+      WHITESPACE " "
+      CONCURRENTLY_KW "concurrently"
+      WHITESPACE " "
+      DATABASE_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
@@ -81,64 +85,69 @@ SOURCE_FILE
     WHITESPACE " "
     REINDEX_OPTION_LIST
       L_PAREN "("
-      REINDEX_OPTION
+      REINDEX_OPTION_CONCURRENTLY
         CONCURRENTLY_KW "concurrently"
         WHITESPACE " "
         LITERAL
           STRING "'off'"
       COMMA ","
       WHITESPACE " "
-      REINDEX_OPTION
+      REINDEX_OPTION_VERBOSE
         VERBOSE_KW "verbose"
         WHITESPACE " "
         YES_KW "yes"
       R_PAREN ")"
     WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "foo"
+    REINDEX_TARGET_TABLE
+      TABLE_KW "table"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
-    SYSTEM_KW "system"
-    WHITESPACE " "
-    DATABASE_REF
-      IDENT "foo"
+    REINDEX_TARGET_SYSTEM
+      SYSTEM_KW "system"
+      WHITESPACE " "
+      DATABASE_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
-    INDEX_KW "index"
-    WHITESPACE " "
-    INDEX_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "foo"
+    REINDEX_TARGET_INDEX
+      INDEX_KW "index"
+      WHITESPACE " "
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "foo"
+    REINDEX_TARGET_TABLE
+      TABLE_KW "table"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "foo"
+    REINDEX_TARGET_SCHEMA
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"

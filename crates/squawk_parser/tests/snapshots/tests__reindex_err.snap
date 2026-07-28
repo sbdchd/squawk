@@ -10,24 +10,25 @@ SOURCE_FILE
     WHITESPACE " "
     REINDEX_OPTION_LIST
       L_PAREN "("
-      REINDEX_OPTION
+      REINDEX_OPTION_CONCURRENTLY
         CONCURRENTLY_KW "concurrently"
         WHITESPACE " "
         VERBOSE_KW "verbose"
       WHITESPACE " "
-      REINDEX_OPTION
+      REINDEX_OPTION_TABLESPACE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
           IDENT "t"
       R_PAREN ")"
     WHITESPACE " "
-    INDEX_KW "index"
-    WHITESPACE " "
-    INDEX_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "i"
+    REINDEX_TARGET_INDEX
+      INDEX_KW "index"
+      WHITESPACE " "
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n"
 ---

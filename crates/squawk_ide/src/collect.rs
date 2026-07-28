@@ -687,7 +687,7 @@ fn columns_for_star_from_from_item(
     from_item: &ast::FromItem,
 ) -> Vec<(Name, Option<Type>)> {
     if let Some(alias) = from_item.alias()
-        && alias.alias_column_list().is_some()
+        && alias.column_list().is_some()
     {
         return columns_for_star_from_alias(db, file, from_item, &alias);
     }
@@ -706,7 +706,7 @@ pub(crate) fn columns_for_star_from_alias(
     alias: &ast::FromAlias,
 ) -> Vec<(Name, Option<Type>)> {
     let alias_columns: Vec<Name> = alias
-        .alias_column_list()
+        .column_list()
         .into_iter()
         .flat_map(|column_list| column_list.column_names())
         .map(|name| Name::from_node(&name))
@@ -833,7 +833,7 @@ pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodeP
 
     match ast_nav::parent_source(&table_name_node) {
         Some(ast_nav::ParentSouce::Alias(alias)) => alias
-            .alias_column_list()
+            .column_list()
             .into_iter()
             .flat_map(|column_list| column_list.column_names())
             .map(|name| Name::from_node(&name))

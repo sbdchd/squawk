@@ -28,13 +28,13 @@ SOURCE_FILE
     DATABASE_OPTION_LIST
       WITH_KW "with"
       WHITESPACE " "
-      DATABASE_OPTION
+      DATABASE_OPTION_OWNER
         OWNER_KW "owner"
         WHITESPACE " "
         LITERAL
           STRING "'foo'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_TEMPLATE
         TEMPLATE_KW "template"
         WHITESPACE " "
         EQ "="
@@ -42,7 +42,7 @@ SOURCE_FILE
         LITERAL
           STRING "'foo'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_ENCODING
         ENCODING_KW "encoding"
         WHITESPACE " "
         EQ "="
@@ -50,7 +50,7 @@ SOURCE_FILE
         LITERAL
           STRING "'utf-8'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "strategy"
         WHITESPACE " "
         EQ "="
@@ -58,7 +58,7 @@ SOURCE_FILE
         CONFIG_VALUE_NAME
           IDENT "wal_log"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "locale"
         WHITESPACE " "
         EQ "="
@@ -66,7 +66,7 @@ SOURCE_FILE
         LITERAL
           STRING "'fr_FR'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "lc_collate"
         WHITESPACE " "
         EQ "="
@@ -74,7 +74,7 @@ SOURCE_FILE
         LITERAL
           STRING "'fr_FR'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "lc_ctyep"
         WHITESPACE " "
         EQ "="
@@ -82,7 +82,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "10"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "builtin_locale"
         WHITESPACE " "
         EQ "="
@@ -90,7 +90,7 @@ SOURCE_FILE
         LITERAL
           STRING "'en'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "icu_locale"
         WHITESPACE " "
         EQ "="
@@ -98,7 +98,7 @@ SOURCE_FILE
         LITERAL
           STRING "'en'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "icu_rules"
         WHITESPACE " "
         EQ "="
@@ -106,7 +106,7 @@ SOURCE_FILE
         LITERAL
           STRING "''"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "locale_provider"
         WHITESPACE " "
         EQ "="
@@ -114,7 +114,7 @@ SOURCE_FILE
         LITERAL
           STRING "'./foo/bar'"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "collation_version"
         WHITESPACE " "
         EQ "="
@@ -122,7 +122,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "10"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_TABLESPACE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         EQ "="
@@ -130,7 +130,7 @@ SOURCE_FILE
         TABLESPACE_REF
           FULL_KW "full"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "allow_connections"
         WHITESPACE " "
         EQ "="
@@ -138,7 +138,7 @@ SOURCE_FILE
         LITERAL
           FALSE_KW "false"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_CONNECTION_LIMIT
         CONNECTION_KW "connection"
         WHITESPACE " "
         LIMIT_KW "limit"
@@ -148,7 +148,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "1000"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "is_template"
         WHITESPACE " "
         EQ "="
@@ -156,7 +156,7 @@ SOURCE_FILE
         LITERAL
           FALSE_KW "false"
       WHITESPACE "\n  "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "oid"
         WHITESPACE " "
         LITERAL

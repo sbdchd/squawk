@@ -1053,17 +1053,26 @@ fn xmlparse_fn(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn opt_xml_passing_mech(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if p.eat(BY_KW) {
-        if !p.eat(REF_KW) && !p.eat(VALUE_KW) {
-            p.error("expected REF or VALUE");
-        }
-        m.complete(p, XML_PASSING_MECH);
-        true
-    } else {
-        m.abandon(p);
-        false
+    if !p.at(BY_KW) {
+        return false;
     }
+    let m = p.start();
+    p.bump(BY_KW);
+    match p.current() {
+        REF_KW => {
+            p.bump(REF_KW);
+            m.complete(p, XML_PASSING_MECH_BY_REF);
+        }
+        VALUE_KW => {
+            p.bump(VALUE_KW);
+            m.complete(p, XML_PASSING_MECH_BY_VALUE);
+        }
+        _ => {
+            p.error("expected REF or VALUE");
+            m.abandon(p);
+        }
+    }
+    true
 }
 
 // XMLEXISTS '(' c_expr xmlexists_argument ')'
@@ -8534,14 +8543,16 @@ fn extension_member_object(p: &mut Parser<'_>) {
         }
         OPERATOR_KW if matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
             p.bump(OPERATOR_KW);
-            if p.eat(FAMILY_KW) {
+            let kind = if p.eat(FAMILY_KW) {
                 op_family_ref(p);
+                OBJECT_OPERATOR_FAMILY
             } else {
                 p.bump(CLASS_KW);
                 op_class_ref(p);
-            }
+                OBJECT_OPERATOR_CLASS
+            };
             opt_using_method(p);
-            m.complete(p, OBJECT_OPERATOR);
+            m.complete(p, kind);
         }
         OPERATOR_KW => {
             p.bump(OPERATOR_KW);
@@ -8566,26 +8577,30 @@ fn extension_member_object(p: &mut Parser<'_>) {
                 CONFIGURATION_KW => {
                     p.bump(CONFIGURATION_KW);
                     text_search_configuration_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_CONFIG);
                 }
                 DICTIONARY_KW => {
                     p.bump(DICTIONARY_KW);
                     text_search_dictionary_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_DICT);
                 }
                 PARSER_KW => {
                     p.bump(PARSER_KW);
                     text_search_parser_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_PARSER);
                 }
                 TEMPLATE_KW => {
                     p.bump(TEMPLATE_KW);
                     text_search_template_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_TEMPLATE);
                 }
                 _ => {
                     p.error(
                         "expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE after TEXT SEARCH",
                     );
+                    m.abandon(p);
                 }
             }
-            m.complete(p, OBJECT_TEXT_SEARCH);
         }
         TRANSFORM_KW => {
             p.bump(TRANSFORM_KW);
@@ -8881,12 +8896,21 @@ fn privilege_target_type(p: &mut Parser<'_>) {
             let m = p.start();
             p.bump(LARGE_KW);
             p.expect(OBJECTS_KW);
-            m.complete(p, PRIVILEGE_TARGET);
+            m.complete(p, PRIVILEGE_TARGET_LARGE_OBJECTS);
         }
-        TABLES_KW | FUNCTIONS_KW | ROUTINES_KW | SEQUENCES_KW | TYPES_KW | SCHEMAS_KW => {
+        FUNCTIONS_KW | ROUTINES_KW | SCHEMAS_KW | SEQUENCES_KW | TABLES_KW | TYPES_KW => {
+            let kind = match p.current() {
+                FUNCTIONS_KW => PRIVILEGE_TARGET_FUNCTIONS,
+                ROUTINES_KW => PRIVILEGE_TARGET_ROUTINES,
+                SCHEMAS_KW => PRIVILEGE_TARGET_SCHEMAS,
+                SEQUENCES_KW => PRIVILEGE_TARGET_SEQUENCES,
+                TABLES_KW => PRIVILEGE_TARGET_TABLES,
+                TYPES_KW => PRIVILEGE_TARGET_TYPES,
+                _ => unreachable!(),
+            };
             let m = p.start();
             p.bump_any();
-            m.complete(p, PRIVILEGE_TARGET);
+            m.complete(p, kind);
         }
         _ => p.error(
             "expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS, LARGE OBJECTS",
@@ -10173,14 +10197,16 @@ fn comment_object(p: &mut Parser<'_>) {
         }
         OPERATOR_KW if matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
             p.bump(OPERATOR_KW);
-            if p.eat(FAMILY_KW) {
+            let kind = if p.eat(FAMILY_KW) {
                 op_family_ref(p);
+                OBJECT_OPERATOR_FAMILY
             } else {
                 p.bump(CLASS_KW);
                 op_class_ref(p);
-            }
+                OBJECT_OPERATOR_CLASS
+            };
             opt_using_method(p);
-            m.complete(p, OBJECT_OPERATOR);
+            m.complete(p, kind);
         }
         OPERATOR_KW => {
             p.bump(OPERATOR_KW);
@@ -10232,22 +10258,28 @@ fn comment_object(p: &mut Parser<'_>) {
                 CONFIGURATION_KW => {
                     p.bump(CONFIGURATION_KW);
                     text_search_configuration_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_CONFIG);
                 }
                 DICTIONARY_KW => {
                     p.bump(DICTIONARY_KW);
                     text_search_dictionary_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_DICT);
                 }
                 PARSER_KW => {
                     p.bump(PARSER_KW);
                     text_search_parser_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_PARSER);
                 }
                 TEMPLATE_KW => {
                     p.bump(TEMPLATE_KW);
                     text_search_template_ref(p);
+                    m.complete(p, OBJECT_TEXT_SEARCH_TEMPLATE);
                 }
-                _ => p.error("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE"),
+                _ => {
+                    p.error("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                    m.abandon(p);
+                }
             }
-            m.complete(p, OBJECT_TEXT_SEARCH);
         }
         TRANSFORM_KW => {
             p.bump(TRANSFORM_KW);
@@ -11064,29 +11096,24 @@ fn opt_option_value(p: &mut Parser<'_>) -> bool {
     true
 }
 
-fn opt_database_option_value(
-    p: &mut Parser<'_>,
-    is_database_ref: bool,
-    is_role_ref: bool,
-    is_tablespace_ref: bool,
-) -> bool {
+fn opt_database_option_value(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
     if opt_numeric_literal(p).is_none()
         && opt_string_literal(p).is_none()
         && !opt_bool_literal(p)
         && !p.eat(DEFAULT_KW)
     {
-        if is_role_ref {
+        if kind == DATABASE_OPTION_OWNER {
             return opt_role_ref(p);
         }
         if p.at_ts(NON_RESERVED_WORD) {
-            if is_database_ref {
-                database_ref(p);
-            } else if is_tablespace_ref {
-                tablespace_ref(p);
-            } else {
-                let m = p.start();
-                p.bump_any();
-                m.complete(p, CONFIG_VALUE_NAME);
+            match kind {
+                DATABASE_OPTION_TEMPLATE => database_ref(p),
+                DATABASE_OPTION_TABLESPACE => tablespace_ref(p),
+                _ => {
+                    let m = p.start();
+                    p.bump_any();
+                    m.complete(p, CONFIG_VALUE_NAME);
+                }
             }
             return true;
         } else {
@@ -11098,30 +11125,45 @@ fn opt_database_option_value(
 
 fn opt_database_option(p: &mut Parser<'_>) -> bool {
     let m = p.start();
-    let is_database_ref = p.at(TEMPLATE_KW);
-    let is_role_ref = p.at(OWNER_KW);
-    let is_tablespace_ref = p.at(TABLESPACE_KW);
     // option name
-    match p.current() {
-        OWNER_KW | TEMPLATE_KW | ENCODING_KW | IDENT | TABLESPACE_KW => {
-            p.bump_any();
+    let kind = match p.current() {
+        ENCODING_KW => {
+            p.bump(ENCODING_KW);
+            DATABASE_OPTION_ENCODING
+        }
+        IDENT => {
+            p.bump(IDENT);
+            DATABASE_OPTION_GENERIC
+        }
+        OWNER_KW => {
+            p.bump(OWNER_KW);
+            DATABASE_OPTION_OWNER
+        }
+        TABLESPACE_KW => {
+            p.bump(TABLESPACE_KW);
+            DATABASE_OPTION_TABLESPACE
+        }
+        TEMPLATE_KW => {
+            p.bump(TEMPLATE_KW);
+            DATABASE_OPTION_TEMPLATE
         }
         CONNECTION_KW => {
             p.bump(CONNECTION_KW);
             p.expect(LIMIT_KW);
+            DATABASE_OPTION_CONNECTION_LIMIT
         }
         _ => {
             m.abandon(p);
             return false;
         }
-    }
+    };
     p.eat(EQ);
-    if !opt_database_option_value(p, is_database_ref, is_role_ref, is_tablespace_ref) {
+    if !opt_database_option_value(p, kind) {
         p.error("expected create database option value");
-        m.complete(p, DATABASE_OPTION);
+        m.complete(p, kind);
         return false;
     }
-    m.complete(p, DATABASE_OPTION);
+    m.complete(p, kind);
     true
 }
 
@@ -11553,7 +11595,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
                     p.error("expected SEARCH or ORDER BY");
                 }
             }
-            m.complete(p, OP_CLASS_OPTION);
+            m.complete(p, OP_CLASS_OPTION_OPERATOR);
         }
         FUNCTION_KW => {
             p.bump(FUNCTION_KW);
@@ -11562,12 +11604,12 @@ fn operator_class_option(p: &mut Parser<'_>) {
             }
             opt_param_list(p, ParamKind::TypeOnly);
             function_sig(p);
-            m.complete(p, OP_CLASS_OPTION);
+            m.complete(p, OP_CLASS_OPTION_FUNCTION);
         }
         STORAGE_KW => {
             p.bump(STORAGE_KW);
             type_name(p);
-            m.complete(p, OP_CLASS_OPTION);
+            m.complete(p, OP_CLASS_OPTION_STORAGE);
         }
         _ => {
             p.error("expected OPERATOR, FUNCTION, or STORAGE");
@@ -11580,14 +11622,19 @@ fn operator_class_option(p: &mut Parser<'_>) {
 // | FUNCTION support_number ( op_type [ , op_type ] )
 fn operator_drop_class_option(p: &mut Parser<'_>) {
     match p.current() {
-        OPERATOR_KW | FUNCTION_KW => {
+        FUNCTION_KW | OPERATOR_KW => {
+            let kind = if p.at(FUNCTION_KW) {
+                DROP_OP_CLASS_OPTION_FUNCTION
+            } else {
+                DROP_OP_CLASS_OPTION_OPERATOR
+            };
             let m = p.start();
             p.bump_any();
             if opt_numeric_literal(p).is_none() {
                 p.error("expected number");
             }
             opt_param_list(p, ParamKind::TypeOnly);
-            m.complete(p, DROP_OP_CLASS_OPTION);
+            m.complete(p, kind);
         }
         _ => p.error("expected OPERATOR, or FUNCTION"),
     }
@@ -11695,8 +11742,9 @@ fn publication_object(p: &mut Parser<'_>) {
             schema_ref(p);
         }
         opt_constraint_where_clause(p);
+        m.complete(p, PUBLICATION_OBJECT_TABLES_IN_SCHEMA);
     } else if p.eat(CURRENT_SCHEMA_KW) {
-        // pass
+        m.complete(p, PUBLICATION_OBJECT_CURRENT_SCHEMA);
     } else {
         p.eat(TABLE_KW);
         p.eat(ONLY_KW);
@@ -11709,8 +11757,8 @@ fn publication_object(p: &mut Parser<'_>) {
         p.eat(STAR);
         opt_column_ref_list(p);
         opt_constraint_where_clause(p);
+        m.complete(p, PUBLICATION_OBJECT_TABLE);
     }
-    m.complete(p, PUBLICATION_OBJECT);
 }
 
 // CREATE PUBLICATION name
@@ -12219,8 +12267,13 @@ fn opt_role_option(p: &mut Parser<'_>) -> bool {
         // NOREPLICATION
         // BYPASSRLS
         // NOBYPASSRLS
-        INHERIT_KW | IDENT => {
-            p.bump_any();
+        INHERIT_KW => {
+            p.bump(INHERIT_KW);
+            m.complete(p, ROLE_OPTION_INHERIT);
+        }
+        IDENT => {
+            p.bump(IDENT);
+            m.complete(p, ROLE_OPTION_GENERIC);
         }
         CONNECTION_KW => {
             p.bump(CONNECTION_KW);
@@ -12228,41 +12281,68 @@ fn opt_role_option(p: &mut Parser<'_>) -> bool {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected number literal");
             }
+            m.complete(p, ROLE_OPTION_CONNECTION_LIMIT);
         }
         ENCRYPTED_KW => {
             p.bump(ENCRYPTED_KW);
             p.expect(PASSWORD_KW);
             string_literal(p);
+            m.complete(p, ROLE_OPTION_ENCRYPTED_PASSWORD);
         }
         PASSWORD_KW => {
             p.bump(PASSWORD_KW);
             if !p.eat(NULL_KW) {
                 string_literal(p);
             }
+            m.complete(p, ROLE_OPTION_PASSWORD);
         }
         VALID_KW => {
             p.bump(VALID_KW);
             p.expect(UNTIL_KW);
             string_literal(p);
+            m.complete(p, ROLE_OPTION_VALID_UNTIL);
         }
         IN_KW => {
             p.bump(IN_KW);
-            if p.at(GROUP_KW) || p.at(ROLE_KW) {
-                p.bump_any();
-            } else {
-                p.error("expected GROUP or ROLE");
+            match p.current() {
+                GROUP_KW => {
+                    p.bump(GROUP_KW);
+                    role_list(p);
+                    m.complete(p, ROLE_OPTION_IN_GROUP);
+                }
+                ROLE_KW => {
+                    p.bump(ROLE_KW);
+                    role_list(p);
+                    m.complete(p, ROLE_OPTION_IN_ROLE);
+                }
+                _ => {
+                    p.error("expected GROUP or ROLE");
+                    m.abandon(p);
+                    role_list(p);
+                }
             }
-            role_list(p);
         }
-        ROLE_KW | ADMIN_KW | USER_KW => {
-            p.bump_any();
+        ADMIN_KW => {
+            p.bump(ADMIN_KW);
             role_list(p);
+            m.complete(p, ROLE_OPTION_ADMIN);
+        }
+        ROLE_KW => {
+            p.bump(ROLE_KW);
+            role_list(p);
+            m.complete(p, ROLE_OPTION_ROLE);
+        }
+        USER_KW => {
+            p.bump(USER_KW);
+            role_list(p);
+            m.complete(p, ROLE_OPTION_USER);
         }
         SYSID_KW => {
             p.bump(SYSID_KW);
             if opt_numeric_literal(p).is_none() {
                 p.error("expected string literal");
             }
+            m.complete(p, ROLE_OPTION_SYSID);
         }
         _ => {
             m.abandon(p);
@@ -12270,7 +12350,6 @@ fn opt_role_option(p: &mut Parser<'_>) -> bool {
             return false;
         }
     }
-    m.complete(p, ROLE_OPTION);
     true
 }
 
@@ -12406,24 +12485,6 @@ fn procedure_sig_list(p: &mut Parser<'_>) {
 
 fn routine_sig_list(p: &mut Parser<'_>) {
     signature_list(p, routine_sig, ROUTINE_SIG_LIST);
-}
-
-fn routine_sig_list_with_keyword(p: &mut Parser<'_>) {
-    match p.current() {
-        FUNCTION_KW => {
-            p.bump(FUNCTION_KW);
-            function_sig_list(p);
-        }
-        PROCEDURE_KW => {
-            p.bump(PROCEDURE_KW);
-            procedure_sig_list(p);
-        }
-        ROUTINE_KW => {
-            p.bump(ROUTINE_KW);
-            routine_sig_list(p);
-        }
-        _ => p.error("expected FUNCTION, PROCEDURE, or ROUTINE"),
-    }
 }
 
 fn signature_list(p: &mut Parser<'_>, signature: fn(&mut Parser<'_>), kind: SyntaxKind) {
@@ -13530,17 +13591,24 @@ fn grant_role_option_name(p: &mut Parser<'_>) {
 fn privilege_target(p: &mut Parser<'_>) {
     let m = p.start();
     if p.eat(ALL_KW) {
-        match p.current() {
-            TABLES_KW | SEQUENCES_KW | FUNCTIONS_KW | PROCEDURES_KW | ROUTINES_KW => {
-                p.bump_any();
-                p.expect(IN_KW);
-                p.expect(SCHEMA_KW);
-                // schema_name [, ...]
-                schema_ref_list(p);
+        let kind = match p.current() {
+            FUNCTIONS_KW => PRIVILEGE_ALL_FUNCTIONS_IN_SCHEMA,
+            PROCEDURES_KW => PRIVILEGE_ALL_PROCEDURES_IN_SCHEMA,
+            ROUTINES_KW => PRIVILEGE_ALL_ROUTINES_IN_SCHEMA,
+            SEQUENCES_KW => PRIVILEGE_ALL_SEQUENCES_IN_SCHEMA,
+            TABLES_KW => PRIVILEGE_ALL_TABLES_IN_SCHEMA,
+            _ => {
+                p.error("expected TABLE");
+                m.abandon(p);
+                return;
             }
-            _ => p.error("expected TABLE"),
-        }
-        m.complete(p, PRIVILEGE_ALL_IN_SCHEMA);
+        };
+        p.bump_any();
+        p.expect(IN_KW);
+        p.expect(SCHEMA_KW);
+        // schema_name [, ...]
+        schema_ref_list(p);
+        m.complete(p, kind);
     } else {
         match p.current() {
             PARAMETER_KW => {
@@ -13548,8 +13616,19 @@ fn privilege_target(p: &mut Parser<'_>) {
                 config_parameter_ref_list(p);
                 m.complete(p, PRIVILEGE_PARAMETER);
             }
-            FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
-                routine_sig_list_with_keyword(p);
+            FUNCTION_KW => {
+                p.bump(FUNCTION_KW);
+                function_sig_list(p);
+                m.complete(p, PRIVILEGE_FUNCTION);
+            }
+            PROCEDURE_KW => {
+                p.bump(PROCEDURE_KW);
+                procedure_sig_list(p);
+                m.complete(p, PRIVILEGE_PROCEDURE);
+            }
+            ROUTINE_KW => {
+                p.bump(ROUTINE_KW);
+                routine_sig_list(p);
                 m.complete(p, PRIVILEGE_ROUTINE);
             }
             // TYPE type_name [, ...]
@@ -13562,33 +13641,33 @@ fn privilege_target(p: &mut Parser<'_>) {
             DATABASE_KW => {
                 p.bump(DATABASE_KW);
                 database_ref_list(p);
-                m.complete(p, PRIVILEGE_NAME);
+                m.complete(p, PRIVILEGE_DATABASE);
             }
             LANGUAGE_KW => {
                 p.bump(LANGUAGE_KW);
                 language_ref_list(p);
-                m.complete(p, PRIVILEGE_NAME);
+                m.complete(p, PRIVILEGE_LANGUAGE);
             }
             SCHEMA_KW => {
                 p.bump(SCHEMA_KW);
                 schema_ref_list(p);
-                m.complete(p, PRIVILEGE_NAME);
+                m.complete(p, PRIVILEGE_SCHEMA);
             }
             TABLESPACE_KW => {
                 p.bump(TABLESPACE_KW);
                 tablespace_ref_list(p);
-                m.complete(p, PRIVILEGE_NAME);
+                m.complete(p, PRIVILEGE_TABLESPACE);
             }
             // these allow schema
             SEQUENCE_KW => {
                 p.bump(SEQUENCE_KW);
                 sequence_ref_list(p);
-                m.complete(p, PRIVILEGE_TABLE);
+                m.complete(p, PRIVILEGE_SEQUENCE);
             }
             DOMAIN_KW => {
                 p.bump(DOMAIN_KW);
                 domain_ref_list(p);
-                m.complete(p, PRIVILEGE_TABLE);
+                m.complete(p, PRIVILEGE_DOMAIN);
             }
             TABLE_KW => {
                 p.bump(TABLE_KW);
@@ -13600,11 +13679,12 @@ fn privilege_target(p: &mut Parser<'_>) {
                 if p.eat(DATA_KW) {
                     p.expect(WRAPPER_KW);
                     foreign_data_wrapper_ref_list(p);
+                    m.complete(p, PRIVILEGE_FOREIGN_DATA_WRAPPER);
                 } else {
                     p.expect(SERVER_KW);
                     server_ref_list(p);
+                    m.complete(p, PRIVILEGE_FOREIGN_SERVER);
                 }
-                m.complete(p, PRIVILEGE_FOREIGN);
             }
             LARGE_KW => {
                 p.bump(LARGE_KW);
@@ -14217,25 +14297,30 @@ const REINDEX_OPTION_FIRST: TokenSet = TokenSet::new(&[CONCURRENTLY_KW, VERBOSE_
 //     VERBOSE [ boolean ]
 fn opt_reindex_option(p: &mut Parser<'_>) -> bool {
     let m = p.start();
-    let parsed = match p.current() {
-        CONCURRENTLY_KW | VERBOSE_KW => {
-            p.bump_any();
+    match p.current() {
+        CONCURRENTLY_KW => {
+            p.bump(CONCURRENTLY_KW);
             opt_utility_option_arg(p);
+            m.complete(p, REINDEX_OPTION_CONCURRENTLY);
             true
         }
         TABLESPACE_KW => {
             p.bump(TABLESPACE_KW);
             tablespace_ref(p);
+            m.complete(p, REINDEX_OPTION_TABLESPACE);
             true
         }
-        _ => false,
-    };
-    if parsed {
-        m.complete(p, REINDEX_OPTION);
-    } else {
-        m.abandon(p);
+        VERBOSE_KW => {
+            p.bump(VERBOSE_KW);
+            opt_utility_option_arg(p);
+            m.complete(p, REINDEX_OPTION_VERBOSE);
+            true
+        }
+        _ => {
+            m.abandon(p);
+            false
+        }
     }
-    parsed
 }
 
 // REINDEX [ ( option [, ...] ) ] { INDEX | TABLE | SCHEMA } [ CONCURRENTLY ] name
@@ -14259,27 +14344,41 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
     }
     match p.current() {
         INDEX_KW => {
+            let m = p.start();
             p.bump(INDEX_KW);
             p.eat(CONCURRENTLY_KW);
             index_ref(p);
+            m.complete(p, REINDEX_TARGET_INDEX);
         }
         TABLE_KW => {
+            let m = p.start();
             p.bump(TABLE_KW);
             p.eat(CONCURRENTLY_KW);
             if opt_table_name_ref(p).is_none() {
                 p.error("expected name");
             }
+            m.complete(p, REINDEX_TARGET_TABLE);
         }
         SCHEMA_KW => {
+            let m = p.start();
             p.bump(SCHEMA_KW);
             p.eat(CONCURRENTLY_KW);
             schema_ref(p);
+            m.complete(p, REINDEX_TARGET_SCHEMA);
         }
-        // { DATABASE | SYSTEM }
-        DATABASE_KW | SYSTEM_KW => {
-            p.bump_any();
+        DATABASE_KW => {
+            let m = p.start();
+            p.bump(DATABASE_KW);
             p.eat(CONCURRENTLY_KW);
             opt_database_ref(p);
+            m.complete(p, REINDEX_TARGET_DATABASE);
+        }
+        SYSTEM_KW => {
+            let m = p.start();
+            p.bump(SYSTEM_KW);
+            p.eat(CONCURRENTLY_KW);
+            opt_database_ref(p);
+            m.complete(p, REINDEX_TARGET_SYSTEM);
         }
         _ => {
             p.error("expected INDEX, TABLE, SCHEMA, DATABASE, or SYSTEM");
@@ -15274,29 +15373,56 @@ fn trigger_event_list(p: &mut Parser<'_>) {
 
 fn trigger_event(p: &mut Parser<'_>) {
     let m = p.start();
-    if p.at(UPDATE_KW) {
-        let m = p.start();
-        p.bump(UPDATE_KW);
-        // [ OF column_name [, ... ] ]
-        if p.eat(OF_KW) {
-            column_name_ref_list(p);
+    match p.current() {
+        DELETE_KW => {
+            p.bump(DELETE_KW);
+            m.complete(p, TRIGGER_EVENT_DELETE);
         }
-        m.complete(p, TRIGGER_EVENT_UPDATE);
-    } else if !(p.eat(INSERT_KW) || p.eat(DELETE_KW) || p.eat(TRUNCATE_KW)) {
-        p.error("expected INSERT, UPDATE, DELETE, or TRUNCATE");
+        INSERT_KW => {
+            p.bump(INSERT_KW);
+            m.complete(p, TRIGGER_EVENT_INSERT);
+        }
+        TRUNCATE_KW => {
+            p.bump(TRUNCATE_KW);
+            m.complete(p, TRIGGER_EVENT_TRUNCATE);
+        }
+        UPDATE_KW => {
+            p.bump(UPDATE_KW);
+            // [ OF column_name [, ... ] ]
+            if p.eat(OF_KW) {
+                column_name_ref_list(p);
+            }
+            m.complete(p, TRIGGER_EVENT_UPDATE);
+        }
+        _ => {
+            p.error("expected INSERT, UPDATE, DELETE, or TRUNCATE");
+            m.abandon(p);
+        }
     }
-    m.complete(p, TRIGGER_EVENT);
 }
 
 fn timing(p: &mut Parser<'_>) {
     let m = p.start();
     // { BEFORE | AFTER | INSTEAD OF }
-    if p.eat(INSTEAD_KW) {
-        p.expect(OF_KW);
-    } else if !p.eat(BEFORE_KW) && !p.eat(AFTER_KW) {
-        p.error("expected BEFORE, AFTER, or INSTEAD OF");
+    match p.current() {
+        AFTER_KW => {
+            p.bump(AFTER_KW);
+            m.complete(p, TIMING_AFTER);
+        }
+        BEFORE_KW => {
+            p.bump(BEFORE_KW);
+            m.complete(p, TIMING_BEFORE);
+        }
+        INSTEAD_KW => {
+            p.bump(INSTEAD_KW);
+            p.expect(OF_KW);
+            m.complete(p, TIMING_INSTEAD_OF);
+        }
+        _ => {
+            p.error("expected BEFORE, AFTER, or INSTEAD OF");
+            m.abandon(p);
+        }
     }
-    m.complete(p, TIMING);
 }
 
 fn call_expr(p: &mut Parser<'_>) {
