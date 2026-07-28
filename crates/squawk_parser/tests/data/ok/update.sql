@@ -101,3 +101,7 @@ RETURNING WITH (OLD AS before, NEW AS after)
 
 update t set x = 1 
 returning with (old as o, new as n) o.*, n.*;
+
+-- subscripts and field access in set targets
+UPDATE t SET a[1] = 2, b[1:2] = '{1,2}', c.d = 3;
+UPDATE t SET (a[1], b.c, d) = ROW(1, 2, 3);

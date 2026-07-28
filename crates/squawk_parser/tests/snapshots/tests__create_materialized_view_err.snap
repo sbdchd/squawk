@@ -1,0 +1,47 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/create_materialized_view.sql
+---
+SOURCE_FILE
+  COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "mv"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN_NAME
+        IDENT "a"
+      WHITESPACE " "
+      ERROR
+        WITHOUT_KW "without"
+        WHITESPACE " "
+        OVERLAPS_KW "overlaps"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+  ╭▸ 
+2 │ create materialized view mv (a without overlaps) as select 1;
+  ╰╴                               ━

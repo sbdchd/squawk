@@ -188,14 +188,12 @@ SOURCE_FILE
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           R_PAREN ")"
         WHITESPACE " "
         NO_PROPERTIES
@@ -229,14 +227,12 @@ SOURCE_FILE
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "x"
+          COLUMN_NAME_REF
+            IDENT "x"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "y"
+          COLUMN_NAME_REF
+            IDENT "y"
           R_PAREN ")"
         WHITESPACE "\n    "
         SOURCE_VERTEX_TABLE
@@ -246,14 +242,12 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "a"
+            COLUMN_NAME_REF
+              IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "b"
+            COLUMN_NAME_REF
+              IDENT "b"
             R_PAREN ")"
           WHITESPACE " "
           REFERENCES_TABLE
@@ -264,14 +258,12 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "t"
+              COLUMN_NAME_REF
+                IDENT "t"
               COMMA ","
               WHITESPACE " "
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "y"
+              COLUMN_NAME_REF
+                IDENT "y"
               R_PAREN ")"
         WHITESPACE "\n    "
         DEST_VERTEX_TABLE
@@ -281,14 +273,12 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "q"
+            COLUMN_NAME_REF
+              IDENT "q"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "t"
+            COLUMN_NAME_REF
+              IDENT "t"
             R_PAREN ")"
           WHITESPACE " "
           REFERENCES_TABLE
@@ -299,14 +289,12 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "r"
+              COLUMN_NAME_REF
+                IDENT "r"
               COMMA ","
               WHITESPACE " "
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "j"
+              COLUMN_NAME_REF
+                IDENT "j"
               R_PAREN ")"
         WHITESPACE "\n    "
         ALL_PROPERTIES

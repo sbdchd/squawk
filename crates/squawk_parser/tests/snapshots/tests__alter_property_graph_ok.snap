@@ -144,14 +144,12 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "c"
+            COLUMN_NAME_REF
+              IDENT "c"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "k"
+            COLUMN_NAME_REF
+              IDENT "k"
             R_PAREN ")"
         COMMA ","
         WHITESPACE "\n    "
@@ -165,14 +163,12 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "l"
+            COLUMN_NAME_REF
+              IDENT "l"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "u"
+            COLUMN_NAME_REF
+              IDENT "u"
             R_PAREN ")"
           WHITESPACE " \n      "
           NO_PROPERTIES
@@ -201,14 +197,12 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "x"
+            COLUMN_NAME_REF
+              IDENT "x"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "y"
+            COLUMN_NAME_REF
+              IDENT "y"
             R_PAREN ")"
           WHITESPACE "\n      "
           SOURCE_VERTEX_TABLE
@@ -218,9 +212,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "s"
+              COLUMN_NAME_REF
+                IDENT "s"
               R_PAREN ")"
             WHITESPACE " "
             REFERENCES_TABLE
@@ -231,9 +224,8 @@ SOURCE_FILE
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "id"
+                COLUMN_NAME_REF
+                  IDENT "id"
                 R_PAREN ")"
           WHITESPACE "\n      "
           DEST_VERTEX_TABLE
@@ -243,9 +235,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "d"
+              COLUMN_NAME_REF
+                IDENT "d"
               R_PAREN ")"
             WHITESPACE " "
             REFERENCES_TABLE
@@ -256,9 +247,8 @@ SOURCE_FILE
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "id"
+                COLUMN_NAME_REF
+                  IDENT "id"
                 R_PAREN ")"
           WHITESPACE "\n      "
           LABEL_AND_PROPERTIES_LIST
@@ -357,9 +347,8 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "l"
+            COLUMN_NAME_REF
+              IDENT "l"
             R_PAREN ")"
           WHITESPACE " \n      "
           ALL_PROPERTIES
@@ -390,14 +379,12 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "x"
+            COLUMN_NAME_REF
+              IDENT "x"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "y"
+            COLUMN_NAME_REF
+              IDENT "y"
             R_PAREN ")"
           WHITESPACE "\n      "
           SOURCE_VERTEX_TABLE
@@ -407,9 +394,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "s"
+              COLUMN_NAME_REF
+                IDENT "s"
               R_PAREN ")"
             WHITESPACE " "
             REFERENCES_TABLE
@@ -420,9 +406,8 @@ SOURCE_FILE
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "id"
+                COLUMN_NAME_REF
+                  IDENT "id"
                 R_PAREN ")"
           WHITESPACE "\n      "
           DEST_VERTEX_TABLE
@@ -432,9 +417,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "d"
+              COLUMN_NAME_REF
+                IDENT "d"
               R_PAREN ")"
             WHITESPACE " "
             REFERENCES_TABLE
@@ -445,9 +429,8 @@ SOURCE_FILE
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "id"
+                COLUMN_NAME_REF
+                  IDENT "id"
                 R_PAREN ")"
         WHITESPACE "\n  "
         R_PAREN ")"

@@ -222,19 +222,16 @@ SOURCE_FILE
         SELECT_KW "select"
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "c"
+          COLUMN_NAME_REF
+            IDENT "c"
           R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
@@ -261,19 +258,16 @@ SOURCE_FILE
           INSERT_KW "insert"
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "c"
+          COLUMN_NAME_REF
+            IDENT "c"
           R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
@@ -300,19 +294,16 @@ SOURCE_FILE
           UPDATE_KW "update"
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "c"
+          COLUMN_NAME_REF
+            IDENT "c"
           R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
@@ -338,19 +329,16 @@ SOURCE_FILE
         REFERENCES_KW "references"
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "c"
+          COLUMN_NAME_REF
+            IDENT "c"
           R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
@@ -377,9 +365,8 @@ SOURCE_FILE
       PRIVILEGES_KW "privileges"
       COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "a"
+        COLUMN_NAME_REF
+          IDENT "a"
         R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
@@ -404,9 +391,8 @@ SOURCE_FILE
       ALL_KW "all"
       COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "a"
+        COLUMN_NAME_REF
+          IDENT "a"
         R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
@@ -1935,14 +1921,12 @@ SOURCE_FILE
           IDENT "t"
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           R_PAREN ")"
     WHITESPACE "\n  "
     TO_KW "to"

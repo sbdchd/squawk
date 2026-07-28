@@ -1,0 +1,119 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/create_view.sql
+---
+SOURCE_FILE
+  COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
+  WHITESPACE "\n"
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN_NAME
+        IDENT "a"
+      WHITESPACE " "
+      ERROR
+        WITHOUT_KW "without"
+        WHITESPACE " "
+        OVERLAPS_KW "overlaps"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- leading comma in column list"
+  WHITESPACE "\n"
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      ERROR
+        COMMA ","
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- leading comma with columns"
+  WHITESPACE "\n"
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      ERROR
+        COMMA ","
+      COLUMN_NAME
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN_NAME
+        IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+  ╭▸ 
+2 │ create view v (a without overlaps) as select 1;
+  ╰╴                 ━
+error[syntax-error]: missing column
+  ╭▸ 
+5 │ create view v (,) as select 1;
+  ╰╴               ━
+error[syntax-error]: missing column
+  ╭▸ 
+8 │ create view v (,a, b) as select 1;
+  ╰╴               ━

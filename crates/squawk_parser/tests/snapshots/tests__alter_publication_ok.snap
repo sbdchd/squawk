@@ -89,14 +89,12 @@ SOURCE_FILE
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -231,14 +229,12 @@ SOURCE_FILE
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -362,14 +358,12 @@ SOURCE_FILE
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "a"
+          COLUMN_NAME_REF
+            IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
-            COLUMN_NAME_REF
-              IDENT "b"
+          COLUMN_NAME_REF
+            IDENT "b"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

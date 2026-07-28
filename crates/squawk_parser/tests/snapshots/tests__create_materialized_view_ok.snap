@@ -56,19 +56,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     COLUMN_LIST
       L_PAREN "("
-      COLUMN
-        COLUMN_NAME
-          IDENT "a"
+      COLUMN_NAME
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN
-        COLUMN_NAME
-          IDENT "b"
+      COLUMN_NAME
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
-      COLUMN
-        COLUMN_NAME
-          IDENT "c"
+      COLUMN_NAME
+        IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
     USING_METHOD

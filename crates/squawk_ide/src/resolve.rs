@@ -1341,9 +1341,7 @@ fn resolve_property_graph_column_ptr(
     let column_name = Name::from_node(column_name_ref);
     let parent = column_name_ref.syntax().parent()?;
 
-    if let Some(column_ref) = ast::ColumnRef::cast(parent.clone())
-        && let Some(column_list) = ast::ColumnRefList::cast(column_ref.syntax().parent()?)
-    {
+    if let Some(column_list) = ast::ColumnRefList::cast(parent.clone()) {
         if let Some(references_table) = ast::ReferencesTable::cast(column_list.syntax().parent()?) {
             let path = property_graph_vertex_table(&references_table.vertex_table_ref()?)?
                 .table_name_ref()?
@@ -2051,7 +2049,10 @@ fn resolve_select_qualified_column_ptr(
                     return Some(ptr);
                 }
 
-                if from_item.alias().and_then(|a| a.column_list()).is_none()
+                if from_item
+                    .alias()
+                    .and_then(|a| a.alias_column_list())
+                    .is_none()
                     && column_name == Name::from_string("ordinality")
                     && let Some(ordinality_token) = from_item.ordinality_token()
                 {
@@ -2090,11 +2091,9 @@ fn resolve_select_qualified_column_ptr(
                     }
 
                     // `from t as u(a, b, c)`
-                    if let Some(column_list) = alias.column_list() {
-                        for column in column_list.columns() {
-                            if let Some(col_name) = column.name()
-                                && Name::from_node(&col_name) == column_name
-                            {
+                    if let Some(column_list) = alias.alias_column_list() {
+                        for col_name in column_list.column_names() {
+                            if Name::from_node(&col_name) == column_name {
                                 return Some(smallvec![Location::new(
                                     file,
                                     col_name.syntax().text_range(),
@@ -2365,7 +2364,7 @@ fn resolve_from_item_column_by_name_after_index(
     {
         let (alias_len, alias_column) = resolve_column_list_column(
             file,
-            from_item.alias().and_then(|x| x.column_list()),
+            alias_column_names(from_item.alias()),
             column_name,
             skip_column_count,
         );
@@ -2413,7 +2412,7 @@ fn resolve_from_item_column_by_name_after_index(
 
     let (alias_len, alias_column) = resolve_column_list_column(
         file,
-        from_item.alias().and_then(|x| x.column_list()),
+        alias_column_names(from_item.alias()),
         column_name,
         skip_column_count,
     );
@@ -2508,7 +2507,10 @@ fn resolve_from_item_column_by_name_after_index(
     }
 
     if original_skip == 0
-        && from_item.alias().and_then(|a| a.column_list()).is_none()
+        && from_item
+            .alias()
+            .and_then(|a| a.alias_column_list())
+            .is_none()
         && *column_name == Name::from_string("ordinality")
         && let Some(ordinality_token) = from_item.ordinality_token()
     {
@@ -3317,23 +3319,31 @@ fn find_column_in_resolved(
     }
 }
 
+fn column_list_names(
+    column_list: Option<ast::ColumnList>,
+) -> impl Iterator<Item = ast::ColumnName> {
+    column_list
+        .into_iter()
+        .flat_map(|column_list| column_list.column_names())
+}
+
+fn alias_column_names(alias: Option<ast::FromAlias>) -> impl Iterator<Item = ast::ColumnName> {
+    alias
+        .and_then(|alias| alias.alias_column_list())
+        .into_iter()
+        .flat_map(|column_list| column_list.column_names())
+}
+
 fn resolve_column_list_column(
     file: File,
-    column_list: Option<ast::ColumnList>,
+    column_names: impl Iterator<Item = ast::ColumnName>,
     column_name: &Name,
     skip_column_count: usize,
 ) -> (usize, Option<SmallVec<[Location; 1]>>) {
-    let Some(column_list) = column_list else {
-        return (0, None);
-    };
-
     let mut column_list_len = 0usize;
-    for (idx, column) in column_list.columns().enumerate() {
+    for (idx, col_name) in column_names.enumerate() {
         column_list_len = idx + 1;
-        if idx >= skip_column_count
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == *column_name
-        {
+        if idx >= skip_column_count && Name::from_node(&col_name) == *column_name {
             return (
                 column_list_len,
                 Some(smallvec![Location::new(
@@ -3580,7 +3590,7 @@ fn find_column_in_create_view_like_with_skip(
 ) -> Option<SmallVec<[Location; 1]>> {
     let (column_list_len, alias_column) = resolve_column_list_column(
         file,
-        create_view.column_list(),
+        column_list_names(create_view.column_list()),
         column_name,
         skip_column_count,
     );
@@ -3833,7 +3843,7 @@ fn count_columns_for_table_name(
                 .ancestors()
                 .find_map(ast::CreateViewLike::cast)?;
             if let Some(column_list) = create_view.column_list() {
-                return Some(column_list.columns().count());
+                return Some(column_list.column_names().count());
             }
 
             count_columns_for_select_variant(db, file, &create_view.query()?)
@@ -3848,7 +3858,7 @@ fn count_columns_for_with_table(
     with_table: ast::WithTable,
 ) -> Option<usize> {
     if let Some(column_list) = with_table.column_list() {
-        return Some(column_list.columns().count());
+        return Some(column_list.column_names().count());
     }
 
     count_columns_for_with_query(db, file, with_table.query()?)
@@ -3950,7 +3960,7 @@ fn resolve_cte_column_with_skip_impl(
 
     let (column_list_len, alias_column) = resolve_column_list_column(
         file,
-        with_table.column_list(),
+        column_list_names(with_table.column_list()),
         column_name,
         skip_column_count,
     );
@@ -4351,7 +4361,7 @@ fn resolve_subquery_column_ptr_with_skip(
 
     let (column_list_len, alias_column) = resolve_column_list_column(
         file,
-        alias.and_then(|x| x.column_list()),
+        alias_column_names(alias.cloned()),
         column_name,
         skip_column_count,
     );
@@ -4437,7 +4447,7 @@ pub(crate) fn table_ptrs_from_clause(
 
     for from_item in ast_nav::iter_from_clause(from_clause) {
         if let Some(alias) = from_item.alias()
-            && alias.column_list().is_some()
+            && alias.alias_column_list().is_some()
         {
             results.push(SyntaxNodePtr::new(alias.syntax()));
             continue;
@@ -5152,11 +5162,11 @@ fn resolve_accessor_base_column(
     file: File,
     field_accessor: &ast::FieldAccessor,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let column_ref = ast::ColumnRef::cast(field_accessor.syntax().parent()?)?;
-    if column_ref.accessors().next()?.syntax() != field_accessor.syntax() {
+    let column_target = ast::ColumnTarget::cast(field_accessor.syntax().parent()?)?;
+    if column_target.accessors().next()?.syntax() != field_accessor.syntax() {
         return None;
     }
-    resolve_name_ref(db, InFile::new(file, &column_ref.name()?))
+    resolve_name_ref(db, InFile::new(file, &column_target.name()?))
 }
 
 fn resolve_composite_type_from_column_node(
@@ -5442,7 +5452,7 @@ fn resolve_merge_column_ptr(
         if ast::SetExpr::can_cast(ancestor.kind()) {
             in_set_expr = true;
         }
-        if ast::ColumnRefList::can_cast(ancestor.kind()) {
+        if ast::ColumnTargetList::can_cast(ancestor.kind()) {
             in_insert_column_list = true;
         }
     }

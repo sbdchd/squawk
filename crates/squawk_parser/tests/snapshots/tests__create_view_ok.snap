@@ -361,9 +361,8 @@ SOURCE_FILE
     WHITESPACE " "
     COLUMN_LIST
       L_PAREN "("
-      COLUMN
-        COLUMN_NAME
-          IDENT "n"
+      COLUMN_NAME
+        IDENT "n"
       R_PAREN ")"
     WHITESPACE " "
     AS_KW "AS"
@@ -442,19 +441,16 @@ SOURCE_FILE
     WHITESPACE " "
     COLUMN_LIST
       L_PAREN "("
-      COLUMN
-        COLUMN_NAME
-          IDENT "a"
+      COLUMN_NAME
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN
-        COLUMN_NAME
-          IDENT "b"
+      COLUMN_NAME
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
-      COLUMN
-        COLUMN_NAME
-          IDENT "c"
+      COLUMN_NAME
+        IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n"
     WITH_PARAMS

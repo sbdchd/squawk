@@ -44,19 +44,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "products"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "product_no"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           NAME_KW "name"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "price"
       R_PAREN ")"
@@ -90,19 +90,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "products"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           NAME_KW "name"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "price"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "product_no"
       R_PAREN ")"
@@ -151,19 +151,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "products"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "product_no"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           NAME_KW "name"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "price"
       R_PAREN ")"
@@ -227,19 +227,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "products"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "product_no"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           NAME_KW "name"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "price"
       R_PAREN ")"
@@ -325,19 +325,19 @@ SOURCE_FILE
       WHITESPACE " "
       TABLE_ALIAS
         IDENT "foo"
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "b"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -411,29 +411,29 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "films"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "code"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "title"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "date_prod"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "kind"
       R_PAREN ")"
@@ -516,29 +516,29 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "films"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "code"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "title"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "date_prod"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "kind"
       R_PAREN ")"
@@ -595,29 +595,29 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "films"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "code"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "title"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "date_prod"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "kind"
       R_PAREN ")"
@@ -724,14 +724,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "tictactoe"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "game"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "board"
         SLICE_ACCESSOR
@@ -779,14 +779,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "tictactoe"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "game"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "board"
       R_PAREN ")"
@@ -818,14 +818,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "b"
         FIELD_ACCESSOR
@@ -834,7 +834,7 @@ SOURCE_FILE
             IDENT "c"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "x"
         FIELD_ACCESSOR
@@ -847,7 +847,7 @@ SOURCE_FILE
             IDENT "z"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "d"
         INDEX_ACCESSOR
@@ -857,7 +857,7 @@ SOURCE_FILE
           R_BRACK "]"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "e"
         SLICE_ACCESSOR
@@ -870,7 +870,7 @@ SOURCE_FILE
           R_BRACK "]"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "f"
         SLICE_ACCESSOR
@@ -879,7 +879,7 @@ SOURCE_FILE
           R_BRACK "]"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "g"
         SLICE_ACCESSOR
@@ -890,7 +890,7 @@ SOURCE_FILE
           R_BRACK "]"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "h"
         SLICE_ACCESSOR
@@ -901,7 +901,7 @@ SOURCE_FILE
           R_BRACK "]"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "i"
         FIELD_ACCESSOR
@@ -972,14 +972,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "distributors"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "dname"
       R_PAREN ")"
@@ -1033,7 +1033,7 @@ SOURCE_FILE
             WHITESPACE " "
             SET_COLUMN_LIST
               SET_SINGLE_COLUMN
-                COLUMN_REF
+                COLUMN_TARGET
                   COLUMN_NAME_REF
                     IDENT "sales_count"
                 WHITESPACE " "
@@ -1142,14 +1142,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "distributors"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "dname"
       R_PAREN ")"
@@ -1202,7 +1202,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "dname"
               WHITESPACE " "
@@ -1227,14 +1227,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "distributors"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "dname"
       R_PAREN ")"
@@ -1282,19 +1282,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "b"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -1351,9 +1351,9 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -1406,9 +1406,9 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -1465,14 +1465,14 @@ SOURCE_FILE
       TABLE_ALIAS
         IDENT "d"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "dname"
       R_PAREN ")"
@@ -1514,7 +1514,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "dname"
               WHITESPACE " "
@@ -1587,14 +1587,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "distributors"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "dname"
       R_PAREN ")"
@@ -1650,14 +1650,14 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "distributors"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "did"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "dname"
       R_PAREN ")"
@@ -1717,9 +1717,9 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -2003,9 +2003,9 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "a"
       R_PAREN ")"

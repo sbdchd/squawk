@@ -21,7 +21,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "price"
           WHITESPACE " "
@@ -60,7 +60,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "price"
           WHITESPACE " "
@@ -93,7 +93,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "a"
           WHITESPACE " "
@@ -105,7 +105,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "b"
           WHITESPACE " "
@@ -117,7 +117,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "c"
           WHITESPACE " "
@@ -156,9 +156,9 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_REF_LIST
+          COLUMN_TARGET_LIST
             L_PAREN "("
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "z"
             R_PAREN ")"
@@ -216,7 +216,7 @@ SOURCE_FILE
       WHITESPACE " \n  "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "foo"
           WHITESPACE " "
@@ -281,7 +281,7 @@ SOURCE_FILE
       WHITESPACE " \n  "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "bar"
           WHITESPACE " "
@@ -299,7 +299,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "foo"
           WHITESPACE " "
@@ -310,9 +310,9 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_MULTIPLE_COLUMNS
-          COLUMN_REF_LIST
+          COLUMN_TARGET_LIST
             L_PAREN "("
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -328,14 +328,14 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_MULTIPLE_COLUMNS
-          COLUMN_REF_LIST
+          COLUMN_TARGET_LIST
             L_PAREN "("
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "c"
             R_PAREN ")"
@@ -356,9 +356,9 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_MULTIPLE_COLUMNS
-          COLUMN_REF_LIST
+          COLUMN_TARGET_LIST
             L_PAREN "("
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "z"
             R_PAREN ")"
@@ -446,7 +446,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "kind"
           WHITESPACE " "
@@ -483,7 +483,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "temp_lo"
           WHITESPACE " "
@@ -499,7 +499,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "temp_hi"
           WHITESPACE " "
@@ -515,7 +515,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "prcp"
           WHITESPACE " "
@@ -563,7 +563,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "temp_lo"
           WHITESPACE " "
@@ -579,7 +579,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "temp_hi"
           WHITESPACE " "
@@ -595,7 +595,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "prcp"
           WHITESPACE " "
@@ -661,19 +661,19 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_REF_LIST
+          COLUMN_TARGET_LIST
             L_PAREN "("
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "temp_lo"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "temp_hi"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "prcp"
             R_PAREN ")"
@@ -743,7 +743,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "sales_count"
           WHITESPACE " "
@@ -819,7 +819,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "sales_count"
           WHITESPACE " "
@@ -892,14 +892,14 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_REF_LIST
+          COLUMN_TARGET_LIST
             L_PAREN "("
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "contact_first_name"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "contact_last_name"
             R_PAREN ")"
@@ -967,7 +967,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "contact_first_name"
           WHITESPACE " "
@@ -979,7 +979,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n                    "
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "contact_last_name"
           WHITESPACE " "
@@ -1037,24 +1037,24 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_REF_LIST
+          COLUMN_TARGET_LIST
             L_PAREN "("
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "sum_x"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "sum_y"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "avg_x"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "avg_y"
             R_PAREN ")"
@@ -1214,7 +1214,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "stock"
           WHITESPACE " "
@@ -1263,7 +1263,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "kind"
           WHITESPACE " "
@@ -1397,7 +1397,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "status"
           WHITESPACE " "
@@ -1459,7 +1459,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "quantity"
           WHITESPACE " "
@@ -1582,7 +1582,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "x"
           WHITESPACE " "
@@ -1632,5 +1632,134 @@ SOURCE_FILE
               IDENT "n"
             DOT "."
             STAR "*"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- subscripts and field access in set targets"
+  WHITESPACE "\n"
+  UPDATE
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "SET"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_SINGLE_COLUMN
+          COLUMN_TARGET
+            COLUMN_NAME_REF
+              IDENT "a"
+            INDEX_ACCESSOR
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              R_BRACK "]"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR
+            LITERAL
+              INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        SET_SINGLE_COLUMN
+          COLUMN_TARGET
+            COLUMN_NAME_REF
+              IDENT "b"
+            SLICE_ACCESSOR
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COLON ":"
+              LITERAL
+                INT_NUMBER "2"
+              R_BRACK "]"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR
+            LITERAL
+              STRING "'{1,2}'"
+        COMMA ","
+        WHITESPACE " "
+        SET_SINGLE_COLUMN
+          COLUMN_TARGET
+            COLUMN_NAME_REF
+              IDENT "c"
+            FIELD_ACCESSOR
+              DOT "."
+              COMPOSITE_FIELD_REF
+                IDENT "d"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR
+            LITERAL
+              INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "SET"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_MULTIPLE_COLUMNS
+          COLUMN_TARGET_LIST
+            L_PAREN "("
+            COLUMN_TARGET
+              COLUMN_NAME_REF
+                IDENT "a"
+              INDEX_ACCESSOR
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "1"
+                R_BRACK "]"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_TARGET
+              COLUMN_NAME_REF
+                IDENT "b"
+              FIELD_ACCESSOR
+                DOT "."
+                COMPOSITE_FIELD_REF
+                  IDENT "c"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_TARGET
+              COLUMN_NAME_REF
+                IDENT "d"
+            R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR_LIST
+            ROW_KW "ROW"
+            L_PAREN "("
+            SET_EXPR
+              LITERAL
+                INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            SET_EXPR
+              LITERAL
+                INT_NUMBER "2"
+            COMMA ","
+            WHITESPACE " "
+            SET_EXPR
+              LITERAL
+                INT_NUMBER "3"
+            R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

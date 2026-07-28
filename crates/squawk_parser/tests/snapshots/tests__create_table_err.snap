@@ -277,19 +277,16 @@ SOURCE_FILE
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "a"
+                COLUMN_NAME_REF
+                  IDENT "a"
                 COMMA ","
                 WHITESPACE " "
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "b"
+                COLUMN_NAME_REF
+                  IDENT "b"
                 COMMA ","
                 WHITESPACE " "
-                COLUMN_REF
-                  COLUMN_NAME_REF
-                    IDENT "c"
+                COLUMN_NAME_REF
+                  IDENT "c"
                 R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
@@ -706,6 +703,135 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        FOREIGN_KEY_COLUMN_LIST
+          L_PAREN "("
+          COLUMN_NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          ERROR
+            WITHOUT_KW "without"
+            WHITESPACE " "
+            OVERLAPS_KW "overlaps"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "u"
+        WHITESPACE " "
+        FOREIGN_KEY_COLUMN_LIST
+          L_PAREN "("
+          COLUMN_NAME_REF
+            IDENT "c"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- PERIOD must be the last column in a FOREIGN KEY column list"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        COLUMN_NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "daterange"
+      COMMA ","
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        FOREIGN_KEY_COLUMN_LIST
+          L_PAREN "("
+          PERIOD_COLUMN
+            PERIOD_KW "period"
+            WHITESPACE " "
+            COLUMN_NAME_REF
+              IDENT "b"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN_NAME_REF
+            IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "u"
+        WHITESPACE " "
+        FOREIGN_KEY_COLUMN_LIST
+          L_PAREN "("
+          COLUMN_NAME_REF
+            IDENT "c"
+          COMMA ","
+          WHITESPACE " "
+          PERIOD_COLUMN
+            PERIOD_KW "period"
+            WHITESPACE " "
+            COLUMN_NAME_REF
+              IDENT "d"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected path name
@@ -764,3 +890,11 @@ error[syntax-error]: expected COMMA
    ╭▸ 
 64 │   exclude using btree ( a with buzz.> b with <) 
    ╰╴                                     ━
+error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+   ╭▸ 
+78 │ create table t (a int, foreign key (a without overlaps) references u (c));
+   ╰╴                                      ━
+error[syntax-error]: PERIOD must be the last column in the list
+   ╭▸ 
+81 │ create table t (a int, b daterange, foreign key (period b, a) references u (c, period d));
+   ╰╴                                                          ━

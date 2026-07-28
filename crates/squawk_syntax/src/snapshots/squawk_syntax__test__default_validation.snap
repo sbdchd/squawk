@@ -45,7 +45,7 @@ SOURCE_FILE@0..170
       WHITESPACE@50..51 " "
       SET_COLUMN_LIST@51..67
         SET_SINGLE_COLUMN@51..67
-          COLUMN_REF@51..57
+          COLUMN_TARGET@51..57
             COLUMN_NAME_REF@51..54
               IDENT@51..54 "arr"
             INDEX_ACCESSOR@54..57
@@ -74,7 +74,7 @@ SOURCE_FILE@0..170
       WHITESPACE@82..83 " "
       SET_COLUMN_LIST@83..103
         SET_SINGLE_COLUMN@83..103
-          COLUMN_REF@83..93
+          COLUMN_TARGET@83..93
             COLUMN_NAME_REF@83..87
               IDENT@83..87 "comp"
             FIELD_ACCESSOR@87..93

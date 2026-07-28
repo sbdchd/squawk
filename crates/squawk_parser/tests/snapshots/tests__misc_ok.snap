@@ -60,19 +60,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "sensors"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "ts"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "sensorid"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           VALUE_KW "value"
       R_PAREN ")"
@@ -155,19 +155,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "sensors"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "sensorid"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "ts"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           VALUE_KW "value"
       R_PAREN ")"
@@ -239,7 +239,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "embedding"
           WHITESPACE " "
@@ -760,9 +760,9 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "x"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "\"index\""
               WHITESPACE " "
@@ -772,7 +772,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "\"document\""
               WHITESPACE " "
@@ -782,7 +782,7 @@ SOURCE_FILE
                     IDENT "jsonb"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "relevance_score"
               WHITESPACE " "
@@ -1288,9 +1288,9 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -1360,9 +1360,9 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -1554,19 +1554,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "clean_default_temp"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col1"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col2"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -1693,19 +1693,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col1"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col2"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -2035,14 +2035,12 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "title"
+        COLUMN_NAME_REF
+          IDENT "title"
         COMMA ","
         WHITESPACE " "
-        COLUMN_REF
-          COLUMN_NAME_REF
-            IDENT "plot"
+        COLUMN_NAME_REF
+          IDENT "plot"
         R_PAREN ")"
     WHITESPACE "\n    "
     COPY_FROM
@@ -2129,7 +2127,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "vec"
           WHITESPACE " "
@@ -2417,16 +2415,14 @@ SOURCE_FILE
         KEY_KW "key"
         WHITESPACE " "
         INDEX_PARAMETERS
-          COLUMN_REF_LIST
+          CONSTRAINT_COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                DAY_KW "day"
+            COLUMN_NAME_REF
+              DAY_KW "day"
             COMMA ","
             WHITESPACE " "
-            COLUMN_REF
-              COLUMN_NAME_REF
-                IDENT "user_id"
+            COLUMN_NAME_REF
+              IDENT "user_id"
             R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
@@ -2472,19 +2468,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "events"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "event_time"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "user_id"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "response_time"
       R_PAREN ")"
@@ -2821,11 +2817,10 @@ SOURCE_FILE
         KEY_KW "key"
         WHITESPACE " "
         INDEX_PARAMETERS
-          COLUMN_REF_LIST
+          CONSTRAINT_COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN_REF
-              COLUMN_NAME_REF
-                HOUR_KW "hour"
+            COLUMN_NAME_REF
+              HOUR_KW "hour"
             R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
@@ -3205,9 +3200,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "jobid"
+              COLUMN_NAME_REF
+                IDENT "jobid"
               R_PAREN ")"
     WHITESPACE "\n"
     WHERE_CLAUSE
@@ -3783,9 +3777,9 @@ SOURCE_FILE
         DOT "."
         PATH_SEGMENT_REF
           IDENT "bookings"
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "attrs"
       R_PAREN ")"
@@ -6770,9 +6764,8 @@ SOURCE_FILE
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN_REF
-                COLUMN_NAME_REF
-                  IDENT "turbine_id"
+              COLUMN_NAME_REF
+                IDENT "turbine_id"
               R_PAREN ")"
     WHITESPACE "\n"
     WHERE_CLAUSE

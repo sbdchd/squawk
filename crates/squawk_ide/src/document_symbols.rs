@@ -383,10 +383,8 @@ fn symbols_from_column_list(
 ) -> Option<DocumentSymbol> {
     let mut children = vec![];
     if let Some(column_list) = column_list {
-        for column in column_list.columns() {
-            if let Some(column_symbol) = create_column_symbol(column) {
-                children.push(column_symbol);
-            }
+        for column_name in column_list.column_names() {
+            children.push(create_column_name_symbol(&column_name));
         }
     }
 
@@ -816,6 +814,19 @@ fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
         focus_range,
         children,
     })
+}
+
+fn create_column_name_symbol(column_name: &ast::ColumnName) -> DocumentSymbol {
+    let range = column_name.syntax().text_range();
+
+    DocumentSymbol {
+        name: column_name.syntax().text().to_string(),
+        detail: None,
+        kind: DocumentSymbolKind::Column,
+        full_range: range,
+        focus_range: range,
+        children: vec![],
+    }
 }
 
 fn create_column_symbol(column: ast::Column) -> Option<DocumentSymbol> {

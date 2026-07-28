@@ -1219,19 +1219,19 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "insert"
         WHITESPACE " "
-        COLUMN_REF_LIST
+        COLUMN_TARGET_LIST
           L_PAREN "("
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "c"
           R_PAREN ")"
@@ -1403,7 +1403,7 @@ SOURCE_FILE
           WHITESPACE "\n      "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "a"
               WHITESPACE " "
@@ -1414,7 +1414,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "b"
               WHITESPACE " "
@@ -1426,7 +1426,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "c"
               WHITESPACE " "
@@ -1438,7 +1438,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "e"
               WHITESPACE " "
@@ -1459,7 +1459,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "h"
               WHITESPACE " "
@@ -1493,7 +1493,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "foo"
               WHITESPACE " "
@@ -1723,7 +1723,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "balance"
               WHITESPACE " "
@@ -1751,14 +1751,14 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "INSERT"
         WHITESPACE " "
-        COLUMN_REF_LIST
+        COLUMN_TARGET_LIST
           L_PAREN "("
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "customer_id"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "balance"
           R_PAREN ")"
@@ -1874,7 +1874,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "balance"
               WHITESPACE " "
@@ -1902,14 +1902,14 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "INSERT"
         WHITESPACE " "
-        COLUMN_REF_LIST
+        COLUMN_TARGET_LIST
           L_PAREN "("
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "customer_id"
           COMMA ","
           WHITESPACE " "
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "balance"
           R_PAREN ")"
@@ -2075,7 +2075,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "stock"
               WHITESPACE " "
@@ -2251,7 +2251,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN_REF
+              COLUMN_TARGET
                 COLUMN_NAME_REF
                   IDENT "stock"
               WHITESPACE " "

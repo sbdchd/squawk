@@ -3824,9 +3824,9 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "s"
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "i"
             R_PAREN ")"

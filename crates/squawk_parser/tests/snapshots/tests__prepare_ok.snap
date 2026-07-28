@@ -245,7 +245,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_COLUMN_LIST
           SET_SINGLE_COLUMN
-            COLUMN_REF
+            COLUMN_TARGET
               COLUMN_NAME_REF
                 IDENT "x"
             WHITESPACE " "

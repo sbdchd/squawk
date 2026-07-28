@@ -15,18 +15,18 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "b"
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -72,15 +72,15 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "a"
       COMMA ","
       ERROR
         COMMA ","
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       ERROR
@@ -128,19 +128,19 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_REF_LIST
+    COLUMN_TARGET_LIST
       L_PAREN "("
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "b"
       COMMA ","
       WHITESPACE " "
-      COLUMN_REF
+      COLUMN_TARGET
         COLUMN_NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -174,6 +174,41 @@ SOURCE_FILE
         WHITESPACE " "
         NOTHING_KW "nothing"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
+  WHITESPACE "\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_TARGET_LIST
+      L_PAREN "("
+      COLUMN_TARGET
+        COLUMN_NAME_REF
+          IDENT "a"
+      WHITESPACE " "
+      ERROR
+        WITHOUT_KW "without"
+        WHITESPACE " "
+        OVERLAPS_KW "overlaps"
+      R_PAREN ")"
+    WHITESPACE " "
+    VALUES
+      VALUES_KW "values"
+      WHITESPACE " "
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA
@@ -195,4 +230,8 @@ error[syntax-error]: expected COMMA
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
 13 │   values (4, 5  6,)
+   ╰╴                 ━
+error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+   ╭▸ 
+17 │ insert into t (a without overlaps) values (1);
    ╰╴                 ━

@@ -241,14 +241,14 @@ SOURCE_FILE
           TABLE_ALIAS
             IDENT "t"
           WHITESPACE " "
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "studio"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "kind"
             R_PAREN ")"
@@ -310,7 +310,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN_REF
+          COLUMN_TARGET
             COLUMN_NAME_REF
               IDENT "salary"
           WHITESPACE " "
@@ -375,19 +375,19 @@ SOURCE_FILE
           TABLE_ALIAS
             IDENT "v"
           WHITESPACE " "
-          COLUMN_LIST
+          ALIAS_COLUMN_LIST
             L_PAREN "("
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "depno"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 TARGET_KW "target"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            ALIAS_COLUMN
               COLUMN_NAME
                 IDENT "increase"
             R_PAREN ")"

@@ -534,6 +534,44 @@ impl AggregateRenameTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AliasColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AliasColumn {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<ColumnName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AliasColumnList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AliasColumnList {
+    #[inline]
+    pub fn alias_columns(&self) -> AstChildren<AliasColumn> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct All {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3729,7 +3767,7 @@ pub struct ColumnList {
 }
 impl ColumnList {
     #[inline]
-    pub fn columns(&self) -> AstChildren<Column> {
+    pub fn column_names(&self) -> AstChildren<ColumnName> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -3765,10 +3803,29 @@ impl ColumnNameRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ColumnRef {
+pub struct ColumnRefList {
     pub(crate) syntax: SyntaxNode,
 }
-impl ColumnRef {
+impl ColumnRefList {
+    #[inline]
+    pub fn column_name_refs(&self) -> AstChildren<ColumnNameRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ColumnTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ColumnTarget {
     #[inline]
     pub fn accessors(&self) -> AstChildren<Accessor> {
         support::children(&self.syntax)
@@ -3777,19 +3834,15 @@ impl ColumnRef {
     pub fn name(&self) -> Option<ColumnNameRef> {
         support::child(&self.syntax)
     }
-    #[inline]
-    pub fn period_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PERIOD_KW)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ColumnRefList {
+pub struct ColumnTargetList {
     pub(crate) syntax: SyntaxNode,
 }
-impl ColumnRefList {
+impl ColumnTargetList {
     #[inline]
-    pub fn column_refs(&self) -> AstChildren<ColumnRef> {
+    pub fn column_targets(&self) -> AstChildren<ColumnTarget> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -4192,6 +4245,29 @@ impl ConflictOnIndex {
     #[inline]
     pub fn where_clause(&self) -> Option<WhereClause> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConstraintColumnRefList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConstraintColumnRefList {
+    #[inline]
+    pub fn column_name_refs(&self) -> AstChildren<ColumnNameRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn without_overlaps(&self) -> Option<WithoutOverlaps> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -11189,6 +11265,29 @@ impl ForeignDataWrapperRenameTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ForeignKeyColumnList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ForeignKeyColumnList {
+    #[inline]
+    pub fn column_name_refs(&self) -> AstChildren<ColumnNameRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn period_column(&self) -> Option<PeriodColumn> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ForeignKeyConstraint {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11336,7 +11435,7 @@ pub struct FromAlias {
 }
 impl FromAlias {
     #[inline]
-    pub fn column_list(&self) -> Option<ColumnList> {
+    pub fn alias_column_list(&self) -> Option<AliasColumnList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12206,7 +12305,7 @@ pub struct IndexParameters {
 }
 impl IndexParameters {
     #[inline]
-    pub fn column_ref_list(&self) -> Option<ColumnRefList> {
+    pub fn column_list(&self) -> Option<ConstraintColumnRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12350,7 +12449,7 @@ impl Insert {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn column_ref_list(&self) -> Option<ColumnRefList> {
+    pub fn column_target_list(&self) -> Option<ColumnTargetList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14610,7 +14709,7 @@ pub struct MergeInsert {
 }
 impl MergeInsert {
     #[inline]
-    pub fn column_ref_list(&self) -> Option<ColumnRefList> {
+    pub fn column_target_list(&self) -> Option<ColumnTargetList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18115,6 +18214,21 @@ impl PercentTypeClause {
     #[inline]
     pub fn type_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TYPE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PeriodColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PeriodColumn {
+    #[inline]
+    pub fn name(&self) -> Option<ColumnNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn period_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PERIOD_KW)
     }
 }
 
@@ -21908,7 +22022,7 @@ pub struct SetMultipleColumns {
 }
 impl SetMultipleColumns {
     #[inline]
-    pub fn column_ref_list(&self) -> Option<ColumnRefList> {
+    pub fn column_target_list(&self) -> Option<ColumnTargetList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -22183,7 +22297,7 @@ pub struct SetSingleColumn {
 }
 impl SetSingleColumn {
     #[inline]
-    pub fn column_ref(&self) -> Option<ColumnRef> {
+    pub fn column_target(&self) -> Option<ColumnTarget> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25025,6 +25139,21 @@ impl WithoutOids {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WithoutOverlaps {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WithoutOverlaps {
+    #[inline]
+    pub fn overlaps_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OVERLAPS_KW)
+    }
+    #[inline]
+    pub fn without_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WITHOUT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WithoutTimezone {
     pub(crate) syntax: SyntaxNode,
 }
@@ -27295,6 +27424,42 @@ impl AstNode for AggregateRenameTo {
         &self.syntax
     }
 }
+impl AstNode for AliasColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALIAS_COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AliasColumnList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALIAS_COLUMN_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for All {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -29491,10 +29656,10 @@ impl AstNode for ColumnNameRef {
         &self.syntax
     }
 }
-impl AstNode for ColumnRef {
+impl AstNode for ColumnRefList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::COLUMN_REF
+        kind == SyntaxKind::COLUMN_REF_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -29509,10 +29674,28 @@ impl AstNode for ColumnRef {
         &self.syntax
     }
 }
-impl AstNode for ColumnRefList {
+impl AstNode for ColumnTarget {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::COLUMN_REF_LIST
+        kind == SyntaxKind::COLUMN_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ColumnTargetList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COLUMN_TARGET_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -29855,6 +30038,24 @@ impl AstNode for ConflictOnIndex {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::CONFLICT_ON_INDEX
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConstraintColumnRefList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONSTRAINT_COLUMN_REF_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -34229,6 +34430,24 @@ impl AstNode for ForeignDataWrapperRenameTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::FOREIGN_DATA_WRAPPER_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ForeignKeyColumnList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FOREIGN_KEY_COLUMN_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -40223,6 +40442,24 @@ impl AstNode for PercentTypeClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PERCENT_TYPE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PeriodColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PERIOD_COLUMN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -46379,6 +46616,24 @@ impl AstNode for WithoutOids {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::WITHOUT_OIDS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for WithoutOverlaps {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WITHOUT_OVERLAPS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
