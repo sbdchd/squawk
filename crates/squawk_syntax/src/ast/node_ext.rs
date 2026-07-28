@@ -623,18 +623,33 @@ fn is_falsey_vacuum_option_value(value: &ast::VacuumOptionValue) -> bool {
         .is_some_and(|token| is_falsey_token(&token))
 }
 
+impl ast::ReindexTarget {
+    pub fn concurrently_token(&self) -> Option<SyntaxToken> {
+        match self {
+            ast::ReindexTarget::ReindexTargetDatabase(it) => it.concurrently_token(),
+            ast::ReindexTarget::ReindexTargetIndex(it) => it.concurrently_token(),
+            ast::ReindexTarget::ReindexTargetSchema(it) => it.concurrently_token(),
+            ast::ReindexTarget::ReindexTargetSystem(it) => it.concurrently_token(),
+            ast::ReindexTarget::ReindexTargetTable(it) => it.concurrently_token(),
+        }
+    }
+}
+
 impl ast::Reindex {
     pub fn is_concurrently(&self) -> bool {
-        self.concurrently_token().is_some()
+        self.reindex_target()
+            .is_some_and(|target| target.concurrently_token().is_some())
             || self.reindex_option_list().is_some_and(|options| {
-                options.reindex_options().any(|option| {
-                    option.concurrently_token().is_some()
-                        && !option.literal().is_some_and(|literal| {
+                options.reindex_options().any(|option| match option {
+                    ast::ReindexOption::ReindexOptionConcurrently(option) => {
+                        !option.literal().is_some_and(|literal| {
                             literal
                                 .syntax()
                                 .first_token()
                                 .is_some_and(|token| is_falsey_token(&token))
                         })
+                    }
+                    _ => false,
                 })
             })
     }

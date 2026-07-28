@@ -16,7 +16,7 @@ SOURCE_FILE
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -36,7 +36,7 @@ SOURCE_FILE
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -45,7 +45,7 @@ SOURCE_FILE
               IDENT "t1"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -68,7 +68,7 @@ SOURCE_FILE
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         ONLY_KW "only"
@@ -79,7 +79,7 @@ SOURCE_FILE
               IDENT "t"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -111,7 +111,7 @@ SOURCE_FILE
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLES_IN_SCHEMA
         TABLES_KW "tables"
         WHITESPACE " "
         IN_KW "in"
@@ -133,7 +133,7 @@ SOURCE_FILE
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLES_IN_SCHEMA
         TABLES_KW "tables"
         WHITESPACE " "
         IN_KW "in"
@@ -156,7 +156,7 @@ SOURCE_FILE
     SET_PUBLICATION_OBJECTS
       SET_KW "set"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -176,7 +176,7 @@ SOURCE_FILE
     SET_PUBLICATION_OBJECTS
       SET_KW "set"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -185,7 +185,7 @@ SOURCE_FILE
               IDENT "t1"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -208,7 +208,7 @@ SOURCE_FILE
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         ONLY_KW "only"
@@ -219,7 +219,7 @@ SOURCE_FILE
               IDENT "t"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -285,7 +285,7 @@ SOURCE_FILE
     DROP_PUBLICATION_OBJECTS
       DROP_KW "drop"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -305,7 +305,7 @@ SOURCE_FILE
     DROP_PUBLICATION_OBJECTS
       DROP_KW "drop"
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -314,7 +314,7 @@ SOURCE_FILE
               IDENT "t1"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF
@@ -337,7 +337,7 @@ SOURCE_FILE
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         ONLY_KW "only"
@@ -348,7 +348,7 @@ SOURCE_FILE
               IDENT "t"
       COMMA ","
       WHITESPACE " "
-      PUBLICATION_OBJECT
+      PUBLICATION_OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
         TABLE_NAME_REF

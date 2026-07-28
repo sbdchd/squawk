@@ -1015,7 +1015,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "bar"
                 WHITESPACE " "
-                XML_PASSING_MECH
+                XML_PASSING_MECH_BY_REF
                   BY_KW "by"
                   WHITESPACE " "
                   REF_KW "ref"
@@ -1038,7 +1038,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 PASSING_KW "passing"
                 WHITESPACE " "
-                XML_PASSING_MECH
+                XML_PASSING_MECH_BY_REF
                   BY_KW "by"
                   WHITESPACE " "
                   REF_KW "ref"
@@ -1064,7 +1064,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 PASSING_KW "passing"
                 WHITESPACE " "
-                XML_PASSING_MECH
+                XML_PASSING_MECH_BY_REF
                   BY_KW "by"
                   WHITESPACE " "
                   REF_KW "ref"
@@ -1072,7 +1072,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "foo"
                 WHITESPACE " "
-                XML_PASSING_MECH
+                XML_PASSING_MECH_BY_VALUE
                   BY_KW "by"
                   WHITESPACE " "
                   VALUE_KW "value"

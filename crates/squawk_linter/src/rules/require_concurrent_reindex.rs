@@ -6,22 +6,26 @@ use squawk_syntax::{
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
 fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
-    let kw_token = reindex
-        .table_token()
-        .or_else(|| reindex.index_token())
-        .or_else(|| reindex.schema_token())
-        .or_else(|| reindex.database_token())?;
+    let kw_token = match reindex.reindex_target()? {
+        ast::ReindexTarget::ReindexTargetDatabase(it) => it.database_token(),
+        ast::ReindexTarget::ReindexTargetIndex(it) => it.index_token(),
+        ast::ReindexTarget::ReindexTargetSchema(it) => it.schema_token(),
+        ast::ReindexTarget::ReindexTargetSystem(it) => it.system_token(),
+        ast::ReindexTarget::ReindexTargetTable(it) => it.table_token(),
+    }?;
     let at = kw_token.text_range().end();
     let edit = Edit::insert(" concurrently", at);
     Some(Fix::new("Add `concurrently`", vec![edit]))
 }
 
 fn has_concurrently(reindex: &ast::Reindex) -> bool {
-    reindex.concurrently_token().is_some()
+    reindex
+        .reindex_target()
+        .is_some_and(|target| target.concurrently_token().is_some())
         || reindex.reindex_option_list().is_some_and(|option_list| {
             option_list
                 .reindex_options()
-                .any(|option| option.concurrently_token().is_some())
+                .any(|option| matches!(option, ast::ReindexOption::ReindexOptionConcurrently(_)))
         })
 }
 
@@ -29,7 +33,10 @@ pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, parse: &Parse<SourceF
     for stmt in parse.tree().stmts() {
         if let ast::Stmt::Reindex(reindex) = stmt {
             // REINDEX SYSTEM does not support CONCURRENTLY
-            if reindex.system_token().is_some() {
+            if matches!(
+                reindex.reindex_target(),
+                Some(ast::ReindexTarget::ReindexTargetSystem(_))
+            ) {
                 continue;
             }
             if !has_concurrently(&reindex) {

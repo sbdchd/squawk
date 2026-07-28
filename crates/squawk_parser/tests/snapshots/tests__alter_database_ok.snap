@@ -229,7 +229,7 @@ SOURCE_FILE
     DATABASE_OPTION_LIST
       WITH_KW "with"
       WHITESPACE " "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "allow_connections"
         WHITESPACE " "
         LITERAL
@@ -247,7 +247,7 @@ SOURCE_FILE
       IDENT "d"
     WHITESPACE " "
     DATABASE_OPTION_LIST
-      DATABASE_OPTION
+      DATABASE_OPTION_CONNECTION_LIMIT
         CONNECTION_KW "connection"
         WHITESPACE " "
         LIMIT_KW "limit"
@@ -267,7 +267,7 @@ SOURCE_FILE
       IDENT "d"
     WHITESPACE " "
     DATABASE_OPTION_LIST
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "is_template"
         WHITESPACE " "
         LITERAL
@@ -287,13 +287,13 @@ SOURCE_FILE
     DATABASE_OPTION_LIST
       WITH_KW "with"
       WHITESPACE " "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "allow_connections"
         WHITESPACE " "
         LITERAL
           TRUE_KW "true"
       WHITESPACE " "
-      DATABASE_OPTION
+      DATABASE_OPTION_CONNECTION_LIMIT
         CONNECTION_KW "connection"
         WHITESPACE " "
         LIMIT_KW "limit"
@@ -301,7 +301,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "10"
       WHITESPACE " "
-      DATABASE_OPTION
+      DATABASE_OPTION_GENERIC
         IDENT "is_template"
         WHITESPACE " "
         LITERAL

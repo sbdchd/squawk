@@ -22,7 +22,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -78,7 +78,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -120,7 +120,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -149,7 +149,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -179,7 +179,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -209,7 +209,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -253,7 +253,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -281,7 +281,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -308,7 +308,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -336,7 +336,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -364,7 +364,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -425,7 +425,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -450,7 +450,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -477,7 +477,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n    "
       TO_KW "to"
@@ -516,7 +516,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SEQUENCES
         SEQUENCES_KW "sequences"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -568,7 +568,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SEQUENCES
         SEQUENCES_KW "sequences"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -598,7 +598,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_FUNCTIONS
         FUNCTIONS_KW "functions"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -623,7 +623,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_ROUTINES
         ROUTINES_KW "routines"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -650,7 +650,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_ROUTINES
         ROUTINES_KW "routines"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -686,7 +686,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TYPES
         TYPES_KW "types"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -713,7 +713,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TYPES
         TYPES_KW "types"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -763,7 +763,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SCHEMAS
         SCHEMAS_KW "schemas"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -790,7 +790,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SCHEMAS
         SCHEMAS_KW "schemas"
       WHITESPACE "\n  "
       TO_KW "to"
@@ -875,7 +875,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -910,7 +910,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TABLES
         TABLES_KW "tables"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -957,7 +957,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SEQUENCES
         SEQUENCES_KW "sequences"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -992,7 +992,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SEQUENCES
         SEQUENCES_KW "sequences"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -1030,7 +1030,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_FUNCTIONS
         FUNCTIONS_KW "functions"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -1065,7 +1065,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_ROUTINES
         ROUTINES_KW "routines"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -1103,7 +1103,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TYPES
         TYPES_KW "types"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -1138,7 +1138,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_TYPES
         TYPES_KW "types"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -1180,7 +1180,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SCHEMAS
         SCHEMAS_KW "schemas"
       WHITESPACE "\n  "
       FROM_KW "from"
@@ -1215,7 +1215,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       ON_KW "on"
       WHITESPACE " "
-      PRIVILEGE_TARGET
+      PRIVILEGE_TARGET_SCHEMAS
         SCHEMAS_KW "schemas"
       WHITESPACE "\n  "
       FROM_KW "from"

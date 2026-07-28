@@ -35,7 +35,7 @@ SOURCE_FILE
     AS_KW "as"
     WHITESPACE " "
     OPERATOR_CLASS_OPTION_LIST
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_STORAGE
         STORAGE_KW "storage"
         WHITESPACE " "
         PATH_TYPE
@@ -96,7 +96,7 @@ SOURCE_FILE
     AS_KW "as"
     WHITESPACE " \n    "
     OPERATOR_CLASS_OPTION_LIST
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_STORAGE
         STORAGE_KW "storage"
         WHITESPACE " "
         PATH_TYPE
@@ -105,7 +105,7 @@ SOURCE_FILE
               IDENT "s"
       COMMA ","
       WHITESPACE "\n    "
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_OPERATOR
         OPERATOR_KW "operator"
         WHITESPACE " "
         LITERAL
@@ -117,7 +117,7 @@ SOURCE_FILE
             AMP "&"
       COMMA ","
       WHITESPACE "\n    "
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_OPERATOR
         OPERATOR_KW "operator"
         WHITESPACE " "
         LITERAL
@@ -152,7 +152,7 @@ SOURCE_FILE
         SEARCH_KW "search"
       COMMA ","
       WHITESPACE "\n    "
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_OPERATOR
         OPERATOR_KW "operator"
         WHITESPACE " "
         LITERAL
@@ -199,7 +199,7 @@ SOURCE_FILE
               IDENT "bar"
       COMMA ","
       WHITESPACE "\n    "
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         LITERAL
@@ -212,7 +212,7 @@ SOURCE_FILE
                 IDENT "foo"
       COMMA ","
       WHITESPACE "\n    "
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         LITERAL
@@ -272,7 +272,7 @@ SOURCE_FILE
             R_PAREN ")"
       COMMA ","
       WHITESPACE "\n    "
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         LITERAL

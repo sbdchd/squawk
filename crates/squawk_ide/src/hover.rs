@@ -611,8 +611,8 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
             ));
         }
         ast_nav::ParentSouce::Alias(alias) => {
-            let alias_name = alias.table_alias()?;
-            alias.alias_column_list()?;
+            let alias_name = alias.name()?;
+            alias.column_list()?;
             let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
             let table_name = Name::from_node(&alias_name);
             let column_name = Name::from_string(def_node.text().to_string());
@@ -780,11 +780,11 @@ fn hover_table(db: &dyn Db, def: Location) -> Option<Hover> {
 fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> Option<Hover> {
     let file = alias.file_id;
     let alias = alias.value;
-    let alias_name = alias.table_alias()?;
+    let alias_name = alias.name()?;
     let name = Name::from_node(&alias_name);
 
-    let Some(column_list) = alias.alias_column_list() else {
-        let name = Name::from_node(&alias.table_alias()?);
+    let Some(column_list) = alias.column_list() else {
+        let name = Name::from_node(&alias.name()?);
         let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
         let ast::FromItem::ParenFromItem(paren) = from_item else {
             return None;
@@ -934,8 +934,8 @@ fn hover_qualified_star_columns_from_alias(
 ) -> Option<Hover> {
     let file = alias.file_id;
     let alias = alias.value;
-    let alias_name = Name::from_node(&alias.table_alias()?);
-    alias.alias_column_list()?;
+    let alias_name = Name::from_node(&alias.name()?);
+    alias.column_list()?;
     let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let columns = collect::columns_for_star_from_alias(db, file, &from_item, alias);
 
@@ -1182,7 +1182,7 @@ fn subquery_alias_name(paren_select: &ast::ParenSelect) -> Option<Name> {
         .syntax()
         .ancestors()
         .find_map(ast::FromItem::cast)?;
-    let alias_name = from_item.alias()?.table_alias()?;
+    let alias_name = from_item.alias()?.name()?;
     Some(Name::from_node(&alias_name))
 }
 
@@ -2015,7 +2015,7 @@ fn qualified_star_from_clause_table_ptr(
     let from_item = resolve::find_from_item_in_from_clause(&from_clause, table_name)?;
 
     if let Some(alias) = from_item.alias()
-        && alias.alias_column_list().is_some()
+        && alias.column_list().is_some()
     {
         return Some(SyntaxNodePtr::new(alias.syntax()));
     }

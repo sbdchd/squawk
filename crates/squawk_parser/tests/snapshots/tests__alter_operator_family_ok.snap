@@ -27,7 +27,7 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE "\n  "
       OPERATOR_CLASS_OPTION_LIST
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_OPERATOR
           OPERATOR_KW "operator"
           WHITESPACE " "
           LITERAL
@@ -74,7 +74,7 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE "\n  "
       OPERATOR_CLASS_OPTION_LIST
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_OPERATOR
           OPERATOR_KW "operator"
           WHITESPACE " "
           LITERAL
@@ -99,7 +99,7 @@ SOURCE_FILE
           R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -112,7 +112,7 @@ SOURCE_FILE
                   IDENT "f"
         COMMA ","
         WHITESPACE "\n  "
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -148,7 +148,7 @@ SOURCE_FILE
               R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -205,7 +205,7 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE "\n  "
       OPERATOR_CLASS_OPTION_LIST
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_OPERATOR
           OPERATOR_KW "operator"
           WHITESPACE " "
           LITERAL
@@ -256,7 +256,7 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE "\n  "
       OPERATOR_CLASS_OPTION_LIST
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_OPERATOR
           OPERATOR_KW "operator"
           WHITESPACE " "
           LITERAL
@@ -314,7 +314,7 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE "\n  "
       OPERATOR_CLASS_OPTION_LIST
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -359,7 +359,7 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE "\n  "
       OPERATOR_CLASS_OPTION_LIST
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -427,7 +427,7 @@ SOURCE_FILE
       DROP_KW "drop"
       WHITESPACE "\n  "
       DROP_OP_CLASS_OPTION_LIST
-        DROP_OP_CLASS_OPTION
+        DROP_OP_CLASS_OPTION_OPERATOR
           OPERATOR_KW "operator"
           WHITESPACE " "
           LITERAL
@@ -474,7 +474,7 @@ SOURCE_FILE
       DROP_KW "drop"
       WHITESPACE "\n  "
       DROP_OP_CLASS_OPTION_LIST
-        DROP_OP_CLASS_OPTION
+        DROP_OP_CLASS_OPTION_OPERATOR
           OPERATOR_KW "operator"
           WHITESPACE " "
           LITERAL
@@ -514,7 +514,7 @@ SOURCE_FILE
       DROP_KW "drop"
       WHITESPACE "\n  "
       DROP_OP_CLASS_OPTION_LIST
-        DROP_OP_CLASS_OPTION
+        DROP_OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -561,7 +561,7 @@ SOURCE_FILE
       DROP_KW "drop"
       WHITESPACE "\n  "
       DROP_OP_CLASS_OPTION_LIST
-        DROP_OP_CLASS_OPTION
+        DROP_OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -601,7 +601,7 @@ SOURCE_FILE
       DROP_KW "drop"
       WHITESPACE "\n  "
       DROP_OP_CLASS_OPTION_LIST
-        DROP_OP_CLASS_OPTION
+        DROP_OP_CLASS_OPTION_OPERATOR
           OPERATOR_KW "operator"
           WHITESPACE " "
           LITERAL
@@ -624,7 +624,7 @@ SOURCE_FILE
             R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
-        DROP_OP_CLASS_OPTION
+        DROP_OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL

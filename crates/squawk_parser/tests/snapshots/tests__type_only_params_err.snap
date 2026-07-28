@@ -85,7 +85,7 @@ SOURCE_FILE
     AS_KW "as"
     WHITESPACE " "
     OPERATOR_CLASS_OPTION_LIST
-      OP_CLASS_OPTION
+      OP_CLASS_OPTION_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         LITERAL
@@ -135,7 +135,7 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE " "
       OPERATOR_CLASS_OPTION_LIST
-        OP_CLASS_OPTION
+        OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL
@@ -185,7 +185,7 @@ SOURCE_FILE
       DROP_KW "drop"
       WHITESPACE " "
       DROP_OP_CLASS_OPTION_LIST
-        DROP_OP_CLASS_OPTION
+        DROP_OP_CLASS_OPTION_FUNCTION
           FUNCTION_KW "function"
           WHITESPACE " "
           LITERAL

@@ -668,7 +668,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OBJECT_OPERATOR
+    OBJECT_OPERATOR_CLASS
       OPERATOR_KW "operator"
       WHITESPACE " "
       CLASS_KW "class"
@@ -697,7 +697,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OBJECT_OPERATOR
+    OBJECT_OPERATOR_FAMILY
       OPERATOR_KW "operator"
       WHITESPACE " "
       FAMILY_KW "family"
@@ -1174,7 +1174,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OBJECT_TEXT_SEARCH
+    OBJECT_TEXT_SEARCH_CONFIG
       TEXT_KW "text"
       WHITESPACE " "
       SEARCH_KW "search"
@@ -1199,7 +1199,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OBJECT_TEXT_SEARCH
+    OBJECT_TEXT_SEARCH_DICT
       TEXT_KW "text"
       WHITESPACE " "
       SEARCH_KW "search"
@@ -1224,7 +1224,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OBJECT_TEXT_SEARCH
+    OBJECT_TEXT_SEARCH_PARSER
       TEXT_KW "text"
       WHITESPACE " "
       SEARCH_KW "search"
@@ -1249,7 +1249,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OBJECT_TEXT_SEARCH
+    OBJECT_TEXT_SEARCH_TEMPLATE
       TEXT_KW "text"
       WHITESPACE " "
       SEARCH_KW "search"

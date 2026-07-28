@@ -819,9 +819,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         if ast::CreateStatistics::can_cast(ancestor.kind()) {
             return Some(NameRefClass::StatisticsColumn);
         }
-        if let Some(publication_object) = ast::PublicationObject::cast(ancestor.clone())
-            && publication_object.table_token().is_some()
-        {
+        if ast::PublicationObjectTable::can_cast(ancestor.kind()) {
             return Some(if has_table_name_ref {
                 NameRefClass::Table
             } else {

@@ -13,11 +13,11 @@ SOURCE_FILE
     TRIGGER
       IDENT "update_foo_column"
     WHITESPACE "\n"
-    TIMING
+    TIMING_BEFORE
       BEFORE_KW "BEFORE"
     WHITESPACE " "
     TRIGGER_EVENT_LIST
-      TRIGGER_EVENT
+      TRIGGER_EVENT_INSERT
         INSERT_KW "INSERT"
     WHITESPACE " "
     ON_RELATION
@@ -61,18 +61,18 @@ SOURCE_FILE
     TRIGGER
       IDENT "buzz"
     WHITESPACE " "
-    TIMING
+    TIMING_INSTEAD_OF
       INSTEAD_KW "instead"
       WHITESPACE " "
       OF_KW "of"
     WHITESPACE " "
     TRIGGER_EVENT_LIST
-      TRIGGER_EVENT
+      TRIGGER_EVENT_INSERT
         INSERT_KW "insert"
       WHITESPACE " "
       OR_KW "or"
       WHITESPACE " "
-      TRIGGER_EVENT
+      TRIGGER_EVENT_DELETE
         DELETE_KW "delete"
     WHITESPACE " \n"
     ON_RELATION
@@ -192,16 +192,16 @@ SOURCE_FILE
     TRIGGER
       IDENT "t"
     WHITESPACE " "
-    TIMING
+    TIMING_AFTER
       AFTER_KW "after"
     WHITESPACE " "
     TRIGGER_EVENT_LIST
-      TRIGGER_EVENT
+      TRIGGER_EVENT_INSERT
         INSERT_KW "insert"
       WHITESPACE " "
       OR_KW "or"
       WHITESPACE " "
-      TRIGGER_EVENT
+      TRIGGER_EVENT_DELETE
         DELETE_KW "delete"
     WHITESPACE " \n"
     ON_RELATION
@@ -240,26 +240,25 @@ SOURCE_FILE
     TRIGGER
       IDENT "bar"
     WHITESPACE " "
-    TIMING
+    TIMING_AFTER
       AFTER_KW "after"
     WHITESPACE " "
     TRIGGER_EVENT_LIST
-      TRIGGER_EVENT
-        TRIGGER_EVENT_UPDATE
-          UPDATE_KW "update"
-          WHITESPACE " "
-          OF_KW "of"
-          WHITESPACE " "
-          COLUMN_NAME_REF
-            IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN_NAME_REF
-            IDENT "b"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN_NAME_REF
-            IDENT "c"
+      TRIGGER_EVENT_UPDATE
+        UPDATE_KW "update"
+        WHITESPACE " "
+        OF_KW "of"
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          IDENT "c"
     WHITESPACE "\n"
     ON_RELATION
       ON_KW "on"
@@ -317,21 +316,21 @@ SOURCE_FILE
     TRIGGER
       IDENT "bar"
     WHITESPACE " "
-    TIMING
+    TIMING_BEFORE
       BEFORE_KW "before"
     WHITESPACE " "
     TRIGGER_EVENT_LIST
-      TRIGGER_EVENT
+      TRIGGER_EVENT_TRUNCATE
         TRUNCATE_KW "truncate"
       WHITESPACE " "
       OR_KW "or"
       WHITESPACE " "
-      TRIGGER_EVENT
+      TRIGGER_EVENT_DELETE
         DELETE_KW "delete"
       WHITESPACE " "
       OR_KW "or"
       WHITESPACE " "
-      TRIGGER_EVENT
+      TRIGGER_EVENT_INSERT
         INSERT_KW "insert"
     WHITESPACE "\n"
     ON_RELATION

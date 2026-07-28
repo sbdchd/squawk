@@ -221,8 +221,14 @@ XmlNamespacePrefix =
   '#name'?
 
 XmlPassingMech =
+  XmlPassingMechByRef
+| XmlPassingMechByValue
+
+XmlPassingMechByRef =
   'by' 'ref'
-| 'by' 'value'
+
+XmlPassingMechByValue =
+  'by' 'value'
 
 JsonPathName =
   '#name'?
@@ -1315,13 +1321,13 @@ TableAlias =
   '#name'?
 
 FromAlias =
-  'as'? TableAlias AliasColumnList?
+  'as'? name:TableAlias column_list:AliasColumnList?
 
 OptionalAsAlias =
-  'as'? TableAlias
+  'as'? name:TableAlias
 
 RequiredAsAlias =
-  'as' TableAlias
+  'as' name:TableAlias
 
 SequenceOptionList =
   '(' (SequenceOption (',' SequenceOption)*) ')'
@@ -2048,7 +2054,7 @@ ReturningOptionList =
 ReturningOption =
   ('old' | 'new')
   'as'
-  TableAlias
+  name:TableAlias
 
 Delete =
   WithClause?
@@ -2661,7 +2667,7 @@ PartitionByClause =
   'partition' 'by' (Expr (',' Expr)*)
 
 AlterStatistics =
-  'alter' 'statistics' StatisticsRef AlterStatisticsAction ';'?
+  'alter' 'statistics' StatisticsRef action:AlterStatisticsAction ';'?
 
 AlterStatisticsAction =
   OwnerTo
@@ -2703,7 +2709,7 @@ AlterSequenceAction =
 | SetUnlogged
 
 AlterSchema =
-  'alter' 'schema' SchemaRef AlterSchemaAction ';'?
+  'alter' 'schema' SchemaRef action:AlterSchemaAction ';'?
 
 AlterSchemaAction =
   OwnerTo
@@ -2713,7 +2719,7 @@ AlterRule =
   'alter' 'rule' RuleRef OnRelation RuleRenameTo ';'?
 
 AlterRoutine =
-  'alter' 'routine' RoutineSig AlterRoutineAction
+  'alter' 'routine' RoutineSig action:AlterRoutineAction
   'restrict'? ';'?
 
 AlterRoutineAction =
@@ -2725,7 +2731,7 @@ AlterRoutineAction =
 | SetSchema
 
 AlterRole =
-  'alter' 'role' ('all' | RoleRef) InDatabase? AlterRoleAction? ';'?
+  'alter' 'role' ('all' | RoleRef) InDatabase? action:AlterRoleAction? ';'?
 
 AlterRoleAction =
   ResetConfigParam
@@ -2737,7 +2743,7 @@ InDatabase =
   'in' 'database' DatabaseRef
 
 AlterPublication =
-  'alter' 'publication' PublicationRef AlterPublicationAction ';'?
+  'alter' 'publication' PublicationRef action:AlterPublicationAction ';'?
 
 AlterPublicationAction =
   AddPublicationObjects
@@ -2761,7 +2767,7 @@ SetPublicationObjects =
   'set' (PublicationObject (',' PublicationObject)*)
 
 AlterProcedure =
-  'alter' 'procedure' ProcedureSig AlterProcedureAction
+  'alter' 'procedure' ProcedureSig action:AlterProcedureAction
   'restrict'? ';'?
 
 AlterProcedureAction =
@@ -2773,7 +2779,7 @@ AlterProcedureAction =
 | SetSchema
 
 AlterPolicy =
-  'alter' 'policy' PolicyRef OnTable AlterPolicyAction ';'?
+  'alter' 'policy' PolicyRef OnTable action:AlterPolicyAction ';'?
 
 AlterPolicyAction =
   AlterPolicyTo
@@ -2786,7 +2792,7 @@ AlterPolicyTo =
 
 
 AlterOperatorFamily =
-  'alter' 'operator' 'family' OpFamilyRef UsingMethod AlterOperatorFamilyAction ';'?
+  'alter' 'operator' 'family' OpFamilyRef UsingMethod action:AlterOperatorFamilyAction ';'?
 
 AlterOperatorFamilyAction =
   AddOpClassOptions
@@ -2802,19 +2808,34 @@ DropOpClassOptionList =
   (DropOpClassOption (',' DropOpClassOption)*)
 
 DropOpClassOption =
+  DropOpClassOptionFunction
+| DropOpClassOptionOperator
+
+DropOpClassOptionFunction =
+  'function' Literal ParamList?
+
+DropOpClassOptionOperator =
   'operator' Literal ParamList?
-| 'function' Literal ParamList?
 
 AddOpClassOptions =
   'add' OperatorClassOptionList
 
 OpClassOption =
+  OpClassOptionFunction
+| OpClassOptionOperator
+| OpClassOptionStorage
+
+OpClassOptionFunction =
+  'function' Literal ParamList? FunctionSig
+
+OpClassOptionOperator =
   'operator' Literal Op ('(' Type ',' Type ')')? ('for' 'search' | 'for' 'order' 'by' OpFamilyRef)
-| 'function' Literal ParamList? FunctionSig
-| 'storage' Type
+
+OpClassOptionStorage =
+  'storage' Type
 
 AlterOperatorClass =
-  'alter' 'operator' 'class' OpClassRef UsingMethod AlterOperatorClassAction ';'?
+  'alter' 'operator' 'class' OpClassRef UsingMethod action:AlterOperatorClassAction ';'?
 
 AlterOperatorClassAction =
   OpClassRenameTo
@@ -2822,7 +2843,7 @@ AlterOperatorClassAction =
 | SetSchema
 
 AlterOperator =
-  'alter' 'operator' OpSig AlterOperatorAction ';'?
+  'alter' 'operator' OpSig action:AlterOperatorAction ';'?
 
 AlterOperatorAction =
   OwnerTo
@@ -2854,7 +2875,7 @@ AlterLargeObject =
   'alter' 'large' 'object' Literal 'owner' 'to' RoleRef ';'?
 
 AlterLanguage =
-  'alter' 'language' LanguageRef AlterLanguageAction? ';'?
+  'alter' 'language' LanguageRef action:AlterLanguageAction? ';'?
 
 AlterLanguageAction =
   LanguageRenameTo
@@ -2863,7 +2884,7 @@ AlterLanguageAction =
 AlterIndex =
   'alter' 'index' (
   AllInTablespace
-| IfExists? IndexRef AlterIndexAction
+| IfExists? IndexRef action:AlterIndexAction
 ) ';'?
 
 OwnedByRoles =
@@ -2880,7 +2901,7 @@ AlterIndexAction =
 | AlterSetStatistics
 
 AlterGroup =
-  'alter' 'group' RoleRef AlterGroupAction ';'?
+  'alter' 'group' RoleRef action:AlterGroupAction ';'?
 
 AlterGroupAction =
   AddUsers
@@ -2894,7 +2915,7 @@ DropUsers =
   'drop' 'user' (RoleRef (',' RoleRef)*)
 
 AlterFunction =
-  'alter' 'function' FunctionSig AlterFunctionAction
+  'alter' 'function' FunctionSig action:AlterFunctionAction
   'restrict'? ';'?
 
 AlterFunctionAction =
@@ -2907,17 +2928,11 @@ AlterFunctionAction =
 
 AlterForeignTable =
   'alter' 'foreign' 'table' IfExists? TableRelationName
-  actions:AlterForeignTableAction* ';'?
-
-AlterForeignTableAction =
-  AlterTableAction
-| RenameColumn
-| SetSchema
-| TableRenameTo
+  actions:AlterTableAction* ';'?
 
 AlterForeignDataWrapper =
   'alter' 'foreign' 'data' 'wrapper' ForeignDataWrapperRef
-  AlterForeignDataWrapperAction? ';'?
+  action:AlterForeignDataWrapperAction? ';'?
 
 AlterForeignDataWrapperAction =
   FdwOptionList
@@ -2958,7 +2973,7 @@ OptionNoValidator =
   'no' 'validator'
 
 AlterEventTrigger =
-  'alter' 'event' 'trigger' EventTriggerRef AlterEventTriggerAction? ';'?
+  'alter' 'event' 'trigger' EventTriggerRef action:AlterEventTriggerAction? ';'?
 
 AlterEventTriggerAction =
   Disable
@@ -2981,7 +2996,7 @@ EnableReplica =
   'enable' 'replica'
 
 AlterExtension =
-  'alter' 'extension' ExtensionRef AlterExtensionAction? ';'?
+  'alter' 'extension' ExtensionRef action:AlterExtensionAction? ';'?
 
 AlterExtensionAction =
   AlterExtensionAdd
@@ -3015,6 +3030,8 @@ ExtensionMemberObject =
 | ObjectLanguage
 | ObjectMaterializedView
 | ObjectOperator
+| ObjectOperatorClass
+| ObjectOperatorFamily
 | ObjectProcedure
 | ObjectPublication
 | ObjectRole
@@ -3026,7 +3043,10 @@ ExtensionMemberObject =
 | ObjectSubscription
 | ObjectTable
 | ObjectTablespace
-| ObjectTextSearch
+| ObjectTextSearchConfig
+| ObjectTextSearchDict
+| ObjectTextSearchParser
+| ObjectTextSearchTemplate
 | ObjectTransform
 | ObjectType
 | ObjectView
@@ -3113,24 +3133,28 @@ ObjectMaterializedView =
   'materialized' 'view' ViewRef
 
 ObjectOperator =
-  'operator'
-  (
-    Op '(' Type ',' Type ')'
-  | 'class' OpClassRef UsingMethod
-  | 'family' OpFamilyRef UsingMethod
-  )
+  'operator' Op '(' Type ',' Type ')'
+
+ObjectOperatorClass =
+  'operator' 'class' OpClassRef UsingMethod
+
+ObjectOperatorFamily =
+  'operator' 'family' OpFamilyRef UsingMethod
 
 ObjectLanguage =
   'procedural'? 'language' LanguageRef
 
-ObjectTextSearch =
-  'text' 'search'
-  (
-    'configuration' TextSearchConfigurationRef
-  | 'dictionary' TextSearchDictionaryRef
-  | 'parser' TextSearchParserRef
-  | 'template' TextSearchTemplateRef
-  )
+ObjectTextSearchConfig =
+  'text' 'search' 'configuration' TextSearchConfigurationRef
+
+ObjectTextSearchDict =
+  'text' 'search' 'dictionary' TextSearchDictionaryRef
+
+ObjectTextSearchParser =
+  'text' 'search' 'parser' TextSearchParserRef
+
+ObjectTextSearchTemplate =
+  'text' 'search' 'template' TextSearchTemplateRef
 
 ObjectTransform =
   'transform' 'for' Type 'language' LanguageRef
@@ -3139,7 +3163,7 @@ AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
   ('for' ('role' | 'user') RoleRefList)?
   ('in' 'schema' (SchemaRef (',' SchemaRef)*))?
-  AlterDefaultPrivilegesAction? ';'?
+  action:AlterDefaultPrivilegesAction? ';'?
 
 AlterDefaultPrivilegesAction =
   GrantDefaultPrivileges
@@ -3156,16 +3180,37 @@ Privileges =
 | RevokeCommandList
 
 PrivilegeTarget  =
+  PrivilegeTargetFunctions
+| PrivilegeTargetLargeObjects
+| PrivilegeTargetRoutines
+| PrivilegeTargetSchemas
+| PrivilegeTargetSequences
+| PrivilegeTargetTables
+| PrivilegeTargetTypes
+
+PrivilegeTargetFunctions =
+  'functions'
+
+PrivilegeTargetLargeObjects =
   'large' 'objects'
-| 'tables'
-| 'functions'
-| 'routines'
-| 'sequences'
-| 'types'
-| 'schemas'
+
+PrivilegeTargetRoutines =
+  'routines'
+
+PrivilegeTargetSchemas =
+  'schemas'
+
+PrivilegeTargetSequences =
+  'sequences'
+
+PrivilegeTargetTables =
+  'tables'
+
+PrivilegeTargetTypes =
+  'types'
 
 AlterDatabase =
-  'alter' 'database' DatabaseRef AlterDatabaseAction? ';'?
+  'alter' 'database' DatabaseRef action:AlterDatabaseAction? ';'?
 
 AlterDatabaseAction =
   DatabaseOptionList
@@ -3180,14 +3225,30 @@ DatabaseOptionList =
   'with'? DatabaseOption*
 
 DatabaseOption =
+  DatabaseOptionConnectionLimit
+| DatabaseOptionEncoding
+| DatabaseOptionGeneric
+| DatabaseOptionOwner
+| DatabaseOptionTablespace
+| DatabaseOptionTemplate
+
+DatabaseOptionConnectionLimit =
+  'connection' 'limit' '='? (Literal | 'default' | ConfigValueName)
+
+DatabaseOptionEncoding =
+  'encoding' '='? (Literal | 'default' | ConfigValueName)
+
+DatabaseOptionGeneric =
+  '#ident' '='? (Literal | 'default' | ConfigValueName)
+
+DatabaseOptionOwner =
   'owner' '='? (Literal | 'default' | RoleRef)
-| 'template' '='? (Literal | 'default' | DatabaseRef)
-| 'tablespace' '='? (Literal | 'default' | TablespaceRef)
-| ('encoding'
-| '#ident'
-| 'connection' 'limit')
-  '='?
-  (Literal | 'default' | ConfigValueName)
+
+DatabaseOptionTablespace =
+  'tablespace' '='? (Literal | 'default' | TablespaceRef)
+
+DatabaseOptionTemplate =
+  'template' '='? (Literal | 'default' | DatabaseRef)
 
 SetConfigParam =
   'set' ConfigParameterRef
@@ -3203,7 +3264,7 @@ RefreshCollationVersion =
   'refresh' 'collation' 'version'
 
 AlterConversion =
-  'alter' 'conversion' ConversionRef AlterConversionAction ';'?
+  'alter' 'conversion' ConversionRef action:AlterConversionAction ';'?
 
 AlterConversionAction =
   ConversionRenameTo
@@ -3211,7 +3272,7 @@ AlterConversionAction =
 | SetSchema
 
 AlterCollation =
-  'alter' 'collation' CollationRef AlterCollationAction ';'?
+  'alter' 'collation' CollationRef action:AlterCollationAction ';'?
 
 AlterCollationAction =
   CollationRenameTo
@@ -3223,7 +3284,7 @@ RefreshVersion =
   'refresh' 'version'
 
 AlterAggregate =
-  'alter' 'aggregate' Aggregate AlterAggregateAction ';'?
+  'alter' 'aggregate' Aggregate action:AlterAggregateAction ';'?
 
 AlterAggregateAction =
   AggregateRenameTo
@@ -3275,14 +3336,14 @@ SkipSubscription =
   'skip' AttributeList
 
 AlterSystem =
-  'alter' 'system' AlterSystemAction ';'?
+  'alter' 'system' action:AlterSystemAction ';'?
 
 AlterSystemAction =
   ResetConfigParam
 | SetConfigParam
 
 AlterTablespace =
-  'alter' 'tablespace' TablespaceRef AlterTablespaceAction ';'?
+  'alter' 'tablespace' TablespaceRef action:AlterTablespaceAction ';'?
 
 AlterTablespaceAction =
   OwnerTo
@@ -3292,7 +3353,7 @@ AlterTablespaceAction =
 
 AlterTextSearchParser =
   'alter' 'text' 'search' 'parser' TextSearchParserRef
-  AlterTextSearchParserAction ';'?
+  action:AlterTextSearchParserAction ';'?
 
 AlterTextSearchParserAction =
   SetSchema
@@ -3300,7 +3361,7 @@ AlterTextSearchParserAction =
 
 AlterTextSearchDictionary =
   'alter' 'text' 'search' 'dictionary' TextSearchDictionaryRef
-  AlterTextSearchDictionaryAction ';'?
+  action:AlterTextSearchDictionaryAction ';'?
 
 AlterTextSearchDictionaryAction =
   AttributeList
@@ -3310,7 +3371,7 @@ AlterTextSearchDictionaryAction =
 
 AlterTextSearchConfiguration =
   'alter' 'text' 'search' 'configuration' TextSearchConfigurationRef
-  AlterTextSearchConfigurationAction ';'?
+  action:AlterTextSearchConfigurationAction ';'?
 
 AlterTextSearchConfigurationAction =
   AddMapping
@@ -3321,13 +3382,15 @@ AlterTextSearchConfigurationAction =
 | TextSearchConfigurationRenameTo
 
 AddMapping =
-  'add' 'mapping' 'for' (TextSearchTokenKind (',' TextSearchTokenKind)*) 'with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*)
+  'add' 'mapping' 'for' (TextSearchTokenKind (',' TextSearchTokenKind)*)
+  'with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*)
 
 AlterMapping =
   'alter' 'mapping'
   (
     'for' (TextSearchTokenKind (',' TextSearchTokenKind)*)
-      ('with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*) | 'replace' TextSearchDictionaryRef 'with' TextSearchDictionaryRef)
+      ('with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*)
+        | 'replace' TextSearchDictionaryRef 'with' TextSearchDictionaryRef)
   | 'replace' TextSearchDictionaryRef 'with' TextSearchDictionaryRef
   )
 
@@ -3336,14 +3399,14 @@ DropMapping =
 
 AlterTextSearchTemplate =
   'alter' 'text' 'search' 'template' TextSearchTemplateRef
-  AlterTextSearchTemplateAction ';'?
+  action:AlterTextSearchTemplateAction ';'?
 
 AlterTextSearchTemplateAction =
   SetSchema
 | TextSearchTemplateRenameTo
 
 AlterTrigger =
-  'alter' 'trigger' TriggerRef OnRelation AlterTriggerAction ';'?
+  'alter' 'trigger' TriggerRef OnRelation action:AlterTriggerAction ';'?
 
 AlterTriggerAction =
   DependsOnExtension
@@ -3400,7 +3463,7 @@ AfterValue =
   'after' Literal
 
 AlterUser =
-  'alter' 'user' ('all' | RoleRef) InDatabase? AlterUserAction? ';'?
+  'alter' 'user' ('all' | RoleRef) InDatabase? action:AlterUserAction? ';'?
 
 AlterUserAction =
   ResetConfigParam
@@ -3412,7 +3475,7 @@ AlterUserMapping =
   'alter' 'user' 'mapping' 'for' RoleRef ServerName AlterOptionList ';'?
 
 AlterView =
-  'alter' 'view' IfExists? ViewRef AlterViewAction ';'?
+  'alter' 'view' IfExists? ViewRef action:AlterViewAction ';'?
 
 AlterViewAction =
   AlterViewColumn
@@ -3465,13 +3528,18 @@ CommentObject =
 | ObjectSubscription
 | ObjectTable
 | ObjectTablespace
-| ObjectTextSearch
+| ObjectTextSearchConfig
+| ObjectTextSearchDict
+| ObjectTextSearchParser
+| ObjectTextSearchTemplate
 | ObjectType
 | ObjectView
 | ObjectColumn
 | ObjectConstraint
 | ObjectLargeObject
 | ObjectOperator
+| ObjectOperatorClass
+| ObjectOperatorFamily
 | ObjectPolicy
 | ObjectPropertyGraph
 | ObjectRule
@@ -3547,7 +3615,7 @@ VertexTables =
 
 VertexTableDef =
   TableNameRef
-  ('as' ElementTableAlias)?
+  ('as' alias:ElementTableAlias)?
   ('key' ColumnRefList)?
   ElementTableLabelAndProperties?
 
@@ -3590,7 +3658,7 @@ EdgeTables =
 
 EdgeTableDef =
   TableNameRef
-  ('as' ElementTableAlias)?
+  ('as' alias:ElementTableAlias)?
   ('key' ColumnRefList)?
   SourceVertexTable
   DestVertexTable
@@ -3628,7 +3696,7 @@ PropertyNameRef =
 
 AlterPropertyGraph =
   'alter' 'property' 'graph' IfExists? PropertyGraphRef
-  AlterPropertyGraphAction ';'?
+  action:AlterPropertyGraphAction ';'?
 
 AlterPropertyGraphAction =
   PropertyGraphRenameTo
@@ -3817,19 +3885,60 @@ RoleOptionList =
   'with'? RoleOption*
 
 RoleOption =
+  RoleOptionAdmin
+| RoleOptionConnectionLimit
+| RoleOptionEncryptedPassword
+| RoleOptionGeneric
+| RoleOptionInGroup
+| RoleOptionInRole
+| RoleOptionInherit
+| RoleOptionPassword
+| RoleOptionRole
+| RoleOptionSysid
+| RoleOptionUser
+| RoleOptionValidUntil
+
+RoleOptionAdmin =
+  'admin' RoleRefList
+
+RoleOptionConnectionLimit =
+  'connection' 'limit' Literal
+
+RoleOptionEncryptedPassword =
+  'encrypted' 'password' Literal
+
+RoleOptionGeneric =
   '#ident'
-| 'inherit'
-| 'connection' 'limit' Literal
-| 'encrypted' 'password' Literal
-| 'password' ('null' | Literal)
-| 'valid' 'until' Literal
-| 'in' ('group' | 'role') RoleRefList
-| ('admin' | 'role' | 'user') RoleRefList
-| 'sysid' Literal
+
+RoleOptionInGroup =
+  'in' 'group' RoleRefList
+
+RoleOptionInRole =
+  'in' 'role' RoleRefList
+
+RoleOptionInherit =
+  'inherit'
+
+RoleOptionPassword =
+  'password' ('null' | Literal)
+
+RoleOptionRole =
+  'role' RoleRefList
+
+RoleOptionSysid =
+  'sysid' Literal
+
+RoleOptionUser =
+  'user' RoleRefList
+
+RoleOptionValidUntil =
+  'valid' 'until' Literal
 
 CreateLanguage =
   'create' OrReplace? 'trusted'? 'procedural'? 'language' Language
-  ('handler' FunctionNameRef ('inline' FunctionNameRef)? ('validator' FunctionNameRef)?)? ';'?
+  ('handler' FunctionNameRef
+  ('inline' FunctionNameRef)?
+  ('validator' FunctionNameRef)?)? ';'?
 
 CreateOperator =
   'create' 'operator' Op AttributeList ';'?
@@ -3903,9 +4012,18 @@ ExceptTableName =
   TableRelationName
 
 PublicationObject  =
+  PublicationObjectCurrentSchema
+| PublicationObjectTable
+| PublicationObjectTablesInSchema
+
+PublicationObjectCurrentSchema =
+  'current_schema'
+
+PublicationObjectTable =
   'table' 'only'? (TableNameRef | '(' TableNameRef ')') '*'? ColumnRefList?  WhereConditionClause?
-| 'tables' 'in' 'schema' ('current_schema' | SchemaRef) WhereConditionClause?
-| 'current_schema'
+
+PublicationObjectTablesInSchema =
+  'tables' 'in' 'schema' ('current_schema' | SchemaRef) WhereConditionClause?
 
 CreateRole =
   'create' 'role' Role RoleOptionList? ';'?
@@ -4330,49 +4448,85 @@ GrantRoleOptionName =
   '#name'?
 
 PrivilegeObjects =
-  PrivilegeAllInSchema
+  PrivilegeAllFunctionsInSchema
+| PrivilegeAllProceduresInSchema
+| PrivilegeAllRoutinesInSchema
+| PrivilegeAllSequencesInSchema
+| PrivilegeAllTablesInSchema
+| PrivilegeDatabase
 | PrivilegeDefault
-| PrivilegeForeign
+| PrivilegeDomain
+| PrivilegeForeignDataWrapper
+| PrivilegeForeignServer
+| PrivilegeFunction
+| PrivilegeLanguage
 | PrivilegeLargeObject
-| PrivilegeName
 | PrivilegeParameter
+| PrivilegeProcedure
 | PrivilegePropertyGraph
 | PrivilegeRoutine
+| PrivilegeSchema
+| PrivilegeSequence
 | PrivilegeTable
+| PrivilegeTablespace
 | PrivilegeType
 
-PrivilegeAllInSchema =
-  'all' ('tables' | 'sequences' | 'functions' | 'procedures' | 'routines')
-  'in' 'schema' (SchemaRef (',' SchemaRef)*)
+PrivilegeAllFunctionsInSchema =
+  'all' 'functions' 'in' 'schema' (SchemaRef (',' SchemaRef)*)
+
+PrivilegeAllProceduresInSchema =
+  'all' 'procedures' 'in' 'schema' (SchemaRef (',' SchemaRef)*)
+
+PrivilegeAllRoutinesInSchema =
+  'all' 'routines' 'in' 'schema' (SchemaRef (',' SchemaRef)*)
+
+PrivilegeAllSequencesInSchema =
+  'all' 'sequences' 'in' 'schema' (SchemaRef (',' SchemaRef)*)
+
+PrivilegeAllTablesInSchema =
+  'all' 'tables' 'in' 'schema' (SchemaRef (',' SchemaRef)*)
 
 PrivilegeParameter =
   'parameter' (ConfigParameterRef (',' ConfigParameterRef)*)
 
-PrivilegeRoutine =
+PrivilegeFunction =
   'function' FunctionSigList
-| 'procedure' ProcedureSigList
-| 'routine' RoutineSigList
+
+PrivilegeProcedure =
+  'procedure' ProcedureSigList
+
+PrivilegeRoutine =
+  'routine' RoutineSigList
 
 PrivilegeType =
   'type' (TypeNameRef (',' TypeNameRef)*)
 
-PrivilegeName =
+PrivilegeDatabase =
   'database' (DatabaseRef (',' DatabaseRef)*)
-| 'language' (LanguageRef (',' LanguageRef)*)
-| 'schema' (SchemaRef (',' SchemaRef)*)
-| 'tablespace' (TablespaceRef (',' TablespaceRef)*)
+
+PrivilegeLanguage =
+  'language' (LanguageRef (',' LanguageRef)*)
+
+PrivilegeSchema =
+  'schema' (SchemaRef (',' SchemaRef)*)
+
+PrivilegeTablespace =
+  'tablespace' (TablespaceRef (',' TablespaceRef)*)
+
+PrivilegeDomain =
+  'domain' (DomainRef (',' DomainRef)*)
+
+PrivilegeSequence =
+  'sequence' (SequenceRef (',' SequenceRef)*)
 
 PrivilegeTable =
-  'domain' (DomainRef (',' DomainRef)*)
-| 'sequence' (SequenceRef (',' SequenceRef)*)
-| 'table' (RelationNameRef (',' RelationNameRef)*)
+  'table' (RelationNameRef (',' RelationNameRef)*)
 
-PrivilegeForeign =
-  'foreign'
-  (
-    'data' 'wrapper' (ForeignDataWrapperRef (',' ForeignDataWrapperRef)*)
-  | 'server' (ServerRef (',' ServerRef)*)
-  )
+PrivilegeForeignDataWrapper =
+  'foreign' 'data' 'wrapper' (ForeignDataWrapperRef (',' ForeignDataWrapperRef)*)
+
+PrivilegeForeignServer =
+  'foreign' 'server' (ServerRef (',' ServerRef)*)
 
 PrivilegeLargeObject =
   'large' 'object' (Literal (',' Literal)*)
@@ -4464,20 +4618,46 @@ TransactionSnapshot =
   'transaction' 'snapshot' Literal
 
 Reindex =
-  'reindex' ReindexOptionList?
-  (
-    'table'? 'concurrently'? TableNameRef?
-  | 'index' 'concurrently'? IndexRef?
-  | 'schema' 'concurrently'? SchemaRef
-  | ('database' | 'system') 'concurrently'? DatabaseRef?
-  ) ';'?
+  'reindex' ReindexOptionList? ReindexTarget ';'?
+
+ReindexTarget =
+  ReindexTargetDatabase
+| ReindexTargetIndex
+| ReindexTargetSchema
+| ReindexTargetSystem
+| ReindexTargetTable
+
+ReindexTargetDatabase =
+  'database' 'concurrently'? DatabaseRef?
+
+ReindexTargetIndex =
+  'index' 'concurrently'? IndexRef?
+
+ReindexTargetSchema =
+  'schema' 'concurrently'? SchemaRef
+
+ReindexTargetSystem =
+  'system' 'concurrently'? DatabaseRef?
+
+ReindexTargetTable =
+  'table' 'concurrently'? TableNameRef?
 
 ReindexOptionList =
   '(' (ReindexOption (',' ReindexOption)*)? ')'
 
 ReindexOption =
-  ('concurrently' | 'verbose') (Literal | '#ident' | 'no' | 'yes')?
-| 'tablespace' TablespaceRef
+  ReindexOptionConcurrently
+| ReindexOptionTablespace
+| ReindexOptionVerbose
+
+ReindexOptionConcurrently =
+  'concurrently' (Literal | '#ident' | 'no' | 'yes')?
+
+ReindexOptionTablespace =
+  'tablespace' TablespaceRef
+
+ReindexOptionVerbose =
+  'verbose' (Literal | '#ident' | 'no' | 'yes')?
 
 CreateView =
   'create' OrReplace? Persistence? 'recursive'? 'view' View ColumnList?
@@ -4545,36 +4725,22 @@ Do =
   'do' ('language' (LanguageRef | Literal))? Literal ('language' (LanguageRef | Literal))? ';'?
 
 Move =
-  'move'
-  (
-    Next
-  | Prior
-  | First
-  | Last
-  | All
-  | Relative
-  | Absolute
-  | Forward
-  | Backward
-  | Expr
-  )?
-  ('from' | 'in')? CursorRef ';'?
+  'move' CursorAction? ('from' | 'in')? CursorRef ';'?
 
 Fetch =
-  'fetch'
-  (
-    Next
-  | Prior
-  | First
-  | Last
-  | All
-  | Relative
-  | Absolute
-  | Forward
-  | Backward
-  | Expr
-  )?
-  ('from' | 'in')? CursorRef ';'?
+  'fetch' CursorAction? ('from' | 'in')? CursorRef ';'?
+
+CursorAction =
+  Absolute
+| All
+| Backward
+| Expr
+| First
+| Forward
+| Last
+| Next
+| Prior
+| Relative
 
 Next =
   'next'
@@ -4678,20 +4844,38 @@ CopyLegacyOption =
 Call =
   'call' ProcedureNameRef ArgList ';'?
 
+TriggerEvent =
+  TriggerEventDelete
+| TriggerEventInsert
+| TriggerEventTruncate
+| TriggerEventUpdate
+
+TriggerEventDelete =
+  'delete'
+
+TriggerEventInsert =
+  'insert'
+
+TriggerEventTruncate =
+  'truncate'
+
 TriggerEventUpdate =
   'update'
   ('of' (ColumnNameRef (',' ColumnNameRef)*))?
 
-TriggerEvent =
-  'insert'
-| 'delete'
-| 'truncate'
-| TriggerEventUpdate
-
 Timing =
+  TimingAfter
+| TimingBefore
+| TimingInsteadOf
+
+TimingAfter =
+  'after'
+
+TimingBefore =
   'before'
-| 'after'
-| 'instead' 'of'
+
+TimingInsteadOf =
+  'instead' 'of'
 
 TransitionRelationName =
   '#name'?
@@ -4852,14 +5036,14 @@ ConfigValueName =
   '#name'?
 
 Show =
-  'show'
-  (
-    All
-  | SessionAuthorization
-  | TransactionIsolationLevel
-  | TimeZone
-  | ConfigParameterRef
-  ) ';'?
+  'show' ShowAction ';'?
+
+ShowAction =
+  All
+| ConfigParameterRef
+| SessionAuthorization
+| TimeZone
+| TransactionIsolationLevel
 
 All =
   'all'
