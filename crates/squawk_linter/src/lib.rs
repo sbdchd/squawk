@@ -39,6 +39,7 @@ use rules::ban_drop_column;
 use rules::ban_drop_database;
 use rules::ban_drop_not_null;
 use rules::ban_drop_table;
+use rules::ban_duplicate_column_assignments;
 use rules::ban_truncate_cascade;
 use rules::ban_uncommitted_transaction;
 use rules::changing_column_type;
@@ -105,6 +106,7 @@ pub enum Rule {
     RequireConcurrentReindex,
     RequireLockTimeout,
     RequireStatementTimeout,
+    BanDuplicateColumnAssignments,
     // xtask:new-rule:error-name
 }
 
@@ -177,6 +179,7 @@ impl TryFrom<&str> for Rule {
             "require-concurrent-reindex" => Ok(Rule::RequireConcurrentReindex),
             "require-lock-timeout" => Ok(Rule::RequireLockTimeout),
             "require-statement-timeout" => Ok(Rule::RequireStatementTimeout),
+            "ban-duplicate-column-assignments" => Ok(Rule::BanDuplicateColumnAssignments),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -247,6 +250,7 @@ impl fmt::Display for Rule {
             Rule::RequireConcurrentReindex => "require-concurrent-reindex",
             Rule::RequireLockTimeout => "require-lock-timeout",
             Rule::RequireStatementTimeout => "require-statement-timeout",
+            Rule::BanDuplicateColumnAssignments => "ban-duplicate-column-assignments",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -497,6 +501,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::RequireConcurrentReindex) {
             require_concurrent_reindex(self, file);
+        }
+        if self.rules.contains(&Rule::BanDuplicateColumnAssignments) {
+            ban_duplicate_column_assignments(self, file);
         }
         // xtask:new-rule:rule-call
 

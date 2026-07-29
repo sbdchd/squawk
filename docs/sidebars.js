@@ -42,6 +42,7 @@ module.exports = {
       "require-concurrent-partition-detach",
       "require-concurrent-reindex",
       "prefer-repack",
+      "ban-duplicate-column-assignments",
       // xtask:new-rule:error-name
     ],
   },

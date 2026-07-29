@@ -9,7 +9,7 @@ use crate::{Edit, Fix, Linter, Rule, Violation};
 
 // via: https://github.com/postgres/postgres/blob/228a1f9542792c6533ef74c2e7aefad0da1d9a7a/src/include/pg_config_manual.h#L39C6-L39C6
 const NAMEDATALEN: usize = 64;
-const MAX_IDENT_BYTES: usize = NAMEDATALEN - 1;
+pub(crate) const MAX_IDENT_BYTES: usize = NAMEDATALEN - 1;
 
 pub(crate) fn identifier_too_long(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for name in parse
