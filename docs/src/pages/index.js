@@ -237,6 +237,11 @@ const rules = [
     tags: ["locking"],
     description: "Prevent blocking reads/writes to table when rebuilding.",
   },
+  {
+    name: "ban-duplicate-column-assignments",
+    tags: ["queries"],
+    description: "Prevent invalid assignments to the same column more than once.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
