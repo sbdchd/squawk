@@ -32,14 +32,59 @@ struct Assignment {
     set_column: ast::SetColumn,
 }
 
+#[derive(Debug)]
+struct InsertAssignment {
+    column: ast::ColumnNameRef,
+    is_partial: bool,
+}
+
 pub(crate) fn ban_duplicate_column_assignments(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for set_clause in parse
-        .tree()
-        .syntax()
-        .descendants()
-        .filter_map(ast::SetClause::cast)
-    {
-        check_set_clause(ctx, &set_clause);
+    for node in parse.tree().syntax().descendants() {
+        if let Some(set_clause) = ast::SetClause::cast(node.clone()) {
+            check_set_clause(ctx, &set_clause);
+        } else if let Some(insert) = ast::Insert::cast(node.clone())
+            && let Some(column_target_list) = insert.column_target_list()
+        {
+            check_insert_column_target_list(ctx, &column_target_list);
+        } else if let Some(merge_insert) = ast::MergeInsert::cast(node)
+            && let Some(column_target_list) = merge_insert.column_target_list()
+        {
+            check_insert_column_target_list(ctx, &column_target_list);
+        }
+    }
+}
+
+fn check_insert_column_target_list(ctx: &mut Linter, column_target_list: &ast::ColumnTargetList) {
+    let mut assigned_columns: FxHashMap<Name, Vec<InsertAssignment>> = FxHashMap::default();
+
+    for target in column_target_list.column_targets() {
+        let Some(column) = target.name() else {
+            continue;
+        };
+        assigned_columns
+            .entry(Name::from_node(&column))
+            .or_default()
+            .push(InsertAssignment {
+                column,
+                is_partial: target.accessors().next().is_some(),
+            });
+    }
+
+    for (name, assignments) in assigned_columns {
+        if assignments.len() < 2 || assignments.iter().all(|assignment| assignment.is_partial) {
+            continue;
+        }
+
+        for assignment in assignments {
+            ctx.report(Violation::for_node(
+                Rule::BanDuplicateColumnAssignments,
+                format!(
+                    "Multiple assignments to the same column `{}`.",
+                    name.as_str()
+                ),
+                assignment.column.syntax(),
+            ));
+        }
     }
 }
 
@@ -72,7 +117,7 @@ fn check_set_clause(ctx: &mut Linter, set_clause: &ast::SetClause) {
         if assignments.len() < 2 || assignments.iter().all(|assignment| assignment.is_partial) {
             continue;
         }
-        let fix = create_fix(&name, &assignments, &set_columns);
+        let mut fix = create_fix(&name, &assignments, &set_columns);
         let last_index = assignments.len() - 1;
 
         for (index, assignment) in assignments.iter().enumerate() {
@@ -85,7 +130,7 @@ fn check_set_clause(ctx: &mut Linter, set_clause: &ast::SetClause) {
                 assignment.column.syntax(),
             );
             ctx.report(if index == last_index {
-                violation.fix(fix.clone())
+                violation.fix(fix.take())
             } else {
                 violation
             });
@@ -347,6 +392,45 @@ set
     }
 
     #[test]
+    fn insert_err() {
+        let sql = r#"
+insert into t (a, a)
+values (1, 2);
+"#;
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+          ╭▸ 
+        2 │ insert into t (a, a)
+          ╰╴               ━
+        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+          ╭▸ 
+        2 │ insert into t (a, a)
+          ╰╴                  ━
+        ");
+    }
+
+    #[test]
+    fn merge_insert_err() {
+        let sql = r#"
+merge into t
+using s on t.id = s.id
+when not matched then
+  insert (a, a)
+  values (1, 2);
+"#;
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+          ╭▸ 
+        5 │   insert (a, a)
+          ╰╴          ━
+        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+          ╭▸ 
+        5 │   insert (a, a)
+          ╰╴             ━
+        ");
+    }
+
+    #[test]
     fn conflict_update_err() {
         let sql = r#"
 insert into k
@@ -417,6 +501,15 @@ update k
 set
   "A" = 1,
   A = 2;
+insert into k (a, b)
+values (1, 2);
+insert into k (a.x, a.y)
+values (1, 2);
+merge into k
+using j on k.id = j.id
+when not matched then
+  insert (a.x, a.y)
+  values (1, 2);
 "#;
         lint_ok(sql, Rule::BanDuplicateColumnAssignments);
     }
