@@ -47,6 +47,7 @@ pub enum FoldKind {
     Statement,
     Subquery,
     Tuple,
+    WhereClause,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -119,6 +120,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         SyntaxKind::JOIN => Some(FoldKind::Join),
         SyntaxKind::PAREN_SELECT => Some(FoldKind::Subquery),
         SyntaxKind::TUPLE_EXPR => Some(FoldKind::Tuple),
+        SyntaxKind::WHERE_CLAUSE => Some(FoldKind::WhereClause),
         SyntaxKind::WHEN_CLAUSE_LIST
         | SyntaxKind::ALIAS_COLUMN_LIST
         | SyntaxKind::ALTER_OPTION_LIST
@@ -252,6 +254,7 @@ mod tests {
             FoldKind::Statement => "statement",
             FoldKind::Subquery => "subquery",
             FoldKind::Tuple => "tuple",
+            FoldKind::WhereClause => "where_clause",
         }
     }
 
@@ -457,6 +460,22 @@ join b
     }
 
     #[test]
+    fn fold_where_clause() {
+        assert_snapshot!(check("
+select *
+from t
+where
+  a = 1
+  and b = 2;"), @"
+        <fold statement>select *
+        from t
+        <fold where_clause>where
+          a = 1
+          and b = 2</fold>;</fold>
+        ");
+    }
+
+    #[test]
     fn fold_array_literal() {
         assert_snapshot!(check("
 select * from t where
@@ -465,12 +484,12 @@ select * from t where
     2,
     3
   ]);"), @"
-        <fold statement>select * from t where
+        <fold statement>select * from t <fold where_clause>where
           x = <fold function_call>any(<fold array>array[
             1,
             2,
             3
-          ]</fold>)</fold>;</fold>
+          ]</fold>)</fold></fold>;</fold>
         ");
     }
 
@@ -503,13 +522,13 @@ select * from x
   );
 "), @"
         <fold statement>select * from x
-          where z in <fold tuple>(
+          <fold where_clause>where z in <fold tuple>(
             1,
             2,
             3,
             4,
             5
-          )</fold>;</fold>
+          )</fold></fold>;</fold>
         ");
     }
 
