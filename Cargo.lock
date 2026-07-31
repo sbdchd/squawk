@@ -834,9 +834,9 @@ dependencies = [
 
 [[package]]
 name = "gen-lsp-types"
-version = "0.9.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "946cd448051e8061e4e17d88ecaceea8d84c33da52b93a9391b4a657def1b8bd"
+checksum = "b64887ac3a8083427ae935a7296db876871582cd57eac077564f8bc18fa49116"
 dependencies = [
  "serde",
  "serde_json",
