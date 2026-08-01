@@ -5,6 +5,8 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
+use crate::literals::normalize_integer_literal;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Type {
     Array(Box<Type>),
@@ -68,18 +70,8 @@ pub(crate) fn infer_type_from_ty(ty: &ast::Type) -> Option<Type> {
 }
 
 fn infer_int_type(text: &str) -> Type {
-    let cleaned = text.replace('_', "");
-    let lower = cleaned.to_ascii_lowercase();
-    let (digits, radix) = if let Some(rest) = lower.strip_prefix("0x") {
-        (rest, 16)
-    } else if let Some(rest) = lower.strip_prefix("0o") {
-        (rest, 8)
-    } else if let Some(rest) = lower.strip_prefix("0b") {
-        (rest, 2)
-    } else {
-        (lower.as_str(), 10)
-    };
-    match u64::from_str_radix(digits, radix) {
+    let (radix, digits) = normalize_integer_literal(text);
+    match u64::from_str_radix(&digits, radix.base()) {
         Ok(n) if n <= i32::MAX as u64 => Type::Integer,
         Ok(n) if n <= i64::MAX as u64 => Type::Bigint,
         _ => Type::Numeric,
