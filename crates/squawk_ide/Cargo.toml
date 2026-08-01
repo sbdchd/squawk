@@ -23,6 +23,7 @@ annotate-snippets.workspace = true
 url.workspace = true
 salsa.workspace = true
 log.workspace = true
+num-bigint.workspace = true
 smol_str.workspace = true
 la-arena.workspace = true
 smallvec.workspace = true

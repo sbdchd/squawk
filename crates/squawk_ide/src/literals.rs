@@ -5,6 +5,41 @@ use squawk_syntax::{
     unescape::{decode_esc_string, decode_plain_string, decode_unicode_esc_string, uescape_char},
 };
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum IntegerRadix {
+    Binary,
+    Decimal,
+    Hexadecimal,
+    Octal,
+}
+
+impl IntegerRadix {
+    pub(crate) fn base(self) -> u32 {
+        match self {
+            Self::Binary => 2,
+            Self::Decimal => 10,
+            Self::Hexadecimal => 16,
+            Self::Octal => 8,
+        }
+    }
+}
+
+pub(crate) fn normalize_integer_literal(text: &str) -> (IntegerRadix, String) {
+    let (radix, digits) = match text.as_bytes() {
+        [b'0', b'b' | b'B', ..] => (IntegerRadix::Binary, &text[2..]),
+        [b'0', b'o' | b'O', ..] => (IntegerRadix::Octal, &text[2..]),
+        [b'0', b'x' | b'X', ..] => (IntegerRadix::Hexadecimal, &text[2..]),
+        _ => (IntegerRadix::Decimal, text),
+    };
+    let digits = if radix == IntegerRadix::Decimal {
+        digits
+    } else {
+        digits.strip_prefix('_').unwrap_or(digits)
+    };
+
+    (radix, digits.replace('_', ""))
+}
+
 pub(crate) fn binary_digits_to_hex(digits: &str) -> Option<String> {
     const HEX_DIGITS: &[u8; 16] = b"0123456789ABCDEF";
 
