@@ -663,6 +663,64 @@ mod tests {
     }
 
     #[test]
+    fn line_comment_crlf_newline() {
+        assert_debug_snapshot!(lex("select 1; -- comment\r\nselect 2;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            " " @ Whitespace,
+            "-- comment" @ LineComment,
+            "\r\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn line_comment_lf_newline() {
+        assert_debug_snapshot!(lex("select 1; -- comment\nselect 2;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            " " @ Whitespace,
+            "-- comment" @ LineComment,
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    /// LF, CRLF, and CR should all lex to the same tokens, with the line
+    /// ending itself showing up as whitespace.
+    #[test]
+    fn line_endings_lex_the_same() {
+        let sql = "select 1;\n-- a comment\nselect 2;\n";
+        let lf = sql.to_string();
+        let crlf = sql.replace('\n', "\r\n");
+        let cr = sql.replace('\n', "\r");
+
+        let kinds = |text: &str| {
+            lex(text)
+                .into_iter()
+                .map(|it| it.token.kind)
+                .collect::<Vec<_>>()
+        };
+
+        assert_eq!(kinds(&lf), kinds(&crlf));
+        assert_eq!(kinds(&lf), kinds(&cr));
+    }
+
+    #[test]
     fn line_comment_whitespace() {
         assert_debug_snapshot!(lex(r#"
 select 'Hello' -- This is a comment
