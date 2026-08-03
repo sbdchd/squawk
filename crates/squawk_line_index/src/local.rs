@@ -1,4 +1,4 @@
-//! Changes mostly ported from Ruff that aren't part of upstream line_index crate in Rust Analyzer
+//! Changes mostly ported from Ruff that aren't part of upstream `line_index` crate in Rust Analyzer
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
