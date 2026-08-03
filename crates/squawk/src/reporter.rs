@@ -1,11 +1,11 @@
 use annotate_snippets::{AnnotationKind, Level, Patch, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
 use console::style;
-use line_index::LineIndex;
-use line_index::TextRange;
 use log::info;
 use rayon::prelude::*;
 use serde::Serialize;
+use squawk_line_index::LineIndex;
+use squawk_line_index::TextRange;
 use squawk_linter::{Fix, Linter, Rule, Version};
 use squawk_syntax::SourceFile;
 use std::hash::DefaultHasher;
@@ -671,5 +671,85 @@ SELECT 1;
 "#;
         let filename = "main.sql";
         assert_debug_snapshot!(check_sql(sql, filename, &[], &[], None, false));
+    }
+
+    fn sql_with_line_ending(line_ending: &str) -> String {
+        [
+            r#"ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;"#,
+            r#"ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;"#,
+            "SELECT 1;",
+            "",
+        ]
+        .join(line_ending)
+    }
+
+    fn report(sql: &str, reporter: Reporter) -> String {
+        let mut buff = Vec::new();
+        print_violations(
+            &mut buff,
+            vec![check_sql(sql, "main.sql", &[], &[], None, false)],
+            &reporter,
+            false,
+        )
+        .unwrap();
+        // make the carriage returns visible instead of mangling the snapshot
+        strip_ansi_codes(&String::from_utf8_lossy(&buff)).replace('\r', "<CR>")
+    }
+
+    #[test]
+    fn line_endings_lf_gcc() {
+        assert_snapshot!(report(&sql_with_line_ending("\n"), Reporter::Gcc), @"
+        main.sql:0:0: warning: require-lock-timeout Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        main.sql:0:0: warning: require-statement-timeout Missing `set statement_timeout` before potentially slow operations
+        main.sql:0:26: warning: adding-required-field Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+        main.sql:0:26: warning: prefer-robust-stmts Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        main.sql:0:43: warning: prefer-bigint-over-int Using 32-bit integer fields can result in hitting the max `int` limit.
+        main.sql:1:23: warning: adding-required-field Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+        main.sql:1:23: warning: prefer-robust-stmts Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        main.sql:1:40: warning: prefer-bigint-over-int Using 32-bit integer fields can result in hitting the max `int` limit.
+        ");
+    }
+
+    #[test]
+    fn line_endings_crlf_gcc() {
+        assert_snapshot!(report(&sql_with_line_ending("\r\n"), Reporter::Gcc), @"
+        main.sql:0:0: warning: require-lock-timeout Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        main.sql:0:0: warning: require-statement-timeout Missing `set statement_timeout` before potentially slow operations
+        main.sql:0:26: warning: adding-required-field Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+        main.sql:0:26: warning: prefer-robust-stmts Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        main.sql:0:43: warning: prefer-bigint-over-int Using 32-bit integer fields can result in hitting the max `int` limit.
+        main.sql:1:23: warning: adding-required-field Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+        main.sql:1:23: warning: prefer-robust-stmts Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        main.sql:1:40: warning: prefer-bigint-over-int Using 32-bit integer fields can result in hitting the max `int` limit.
+        ");
+    }
+
+    #[test]
+    fn line_endings_cr_gcc() {
+        assert_snapshot!(report(&sql_with_line_ending("\r"), Reporter::Gcc), @"
+        main.sql:0:0: warning: require-lock-timeout Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        main.sql:0:0: warning: require-statement-timeout Missing `set statement_timeout` before potentially slow operations
+        main.sql:0:26: warning: adding-required-field Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+        main.sql:0:26: warning: prefer-robust-stmts Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        main.sql:0:43: warning: prefer-bigint-over-int Using 32-bit integer fields can result in hitting the max `int` limit.
+        main.sql:1:23: warning: adding-required-field Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+        main.sql:1:23: warning: prefer-robust-stmts Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        main.sql:1:40: warning: prefer-bigint-over-int Using 32-bit integer fields can result in hitting the max `int` limit.
+        ");
+    }
+
+    #[test]
+    fn line_endings_lf_tty() {
+        assert_snapshot!(report(&sql_with_line_ending("\n"), Reporter::Tty));
+    }
+
+    #[test]
+    fn line_endings_crlf_tty() {
+        assert_snapshot!(report(&sql_with_line_ending("\r\n"), Reporter::Tty));
+    }
+
+    #[test]
+    fn line_endings_cr_tty() {
+        assert_snapshot!(report(&sql_with_line_ending("\r"), Reporter::Tty));
     }
 }

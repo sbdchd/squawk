@@ -37,7 +37,7 @@ glob.workspace = true
 rayon.workspace = true
 anyhow.workspace = true
 annotate-snippets.workspace = true
-line-index.workspace = true
+squawk-line-index.workspace = true
 lsp-server.workspace = true
 
 [dev-dependencies]

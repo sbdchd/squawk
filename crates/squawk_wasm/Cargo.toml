@@ -33,7 +33,7 @@ console_error_panic_hook = { workspace = true, optional = true }
 web-sys = { workspace = true, features = ["Window"] }
 console_log.workspace = true
 log.workspace = true
-line-index.workspace = true
+squawk-line-index.workspace = true
 
 [dev-dependencies]
 wasm-bindgen-test.workspace = true

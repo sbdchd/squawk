@@ -706,4 +706,49 @@ alter table t drop column c cascade;
         let parse = squawk_syntax::SourceFile::parse(sql);
         assert!(!has_disable_assume_in_transaction(&parse.syntax_node()));
     }
+
+    fn lint_line_ignore(line_ending: &str) -> Vec<Rule> {
+        let sql = [
+            "-- squawk-ignore ban-drop-column",
+            "alter table t drop column c cascade;",
+            "alter table u drop column d cascade;",
+            "",
+        ]
+        .join(line_ending);
+
+        let parse = squawk_syntax::SourceFile::parse(&sql);
+        let mut linter = Linter::from([Rule::BanDropColumn]);
+        linter
+            .lint(&parse, &sql)
+            .into_iter()
+            .map(|x| x.code)
+            .collect()
+    }
+
+    #[test]
+    fn line_ignore_with_lf_line_endings() {
+        assert_debug_snapshot!(lint_line_ignore("\n"), @"
+        [
+            BanDropColumn,
+        ]
+        ");
+    }
+
+    #[test]
+    fn line_ignore_with_crlf_line_endings() {
+        assert_debug_snapshot!(lint_line_ignore("\r\n"), @"
+        [
+            BanDropColumn,
+        ]
+        ");
+    }
+
+    #[test]
+    fn line_ignore_with_cr_line_endings() {
+        assert_debug_snapshot!(lint_line_ignore("\r"), @"
+        [
+            BanDropColumn,
+        ]
+        ");
+    }
 }

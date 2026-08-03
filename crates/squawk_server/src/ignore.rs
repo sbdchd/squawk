@@ -1,4 +1,4 @@
-use line_index::{LineIndex, TextSize};
+use squawk_line_index::{LineEnding, LineIndex, TextSize};
 use squawk_linter::{
     Edit, Rule, Violation,
     ignore::{IGNORE_FILE_TEXT, IGNORE_LINE_TEXT},
@@ -11,6 +11,7 @@ pub(crate) fn ignore_line_edit(
     violation: &Violation,
     line_index: &LineIndex,
     parse: &Parse<SourceFile>,
+    line_ending: LineEnding,
 ) -> Option<Edit> {
     if UNSUPPORTED_RULES.contains(&violation.code) {
         return None;
@@ -38,7 +39,7 @@ pub(crate) fn ignore_line_edit(
 
         // TODO: we need to handle indenting correctly
         _ => Some(Edit::insert(
-            format!("-- {IGNORE_LINE_TEXT} {rule_name}\n"),
+            format!("-- {IGNORE_LINE_TEXT} {rule_name}{}", line_ending.as_str()),
             line_index.line(violation_line.line)?.start(),
         )),
     }
@@ -48,13 +49,14 @@ pub(crate) fn ignore_file_edit(
     violation: &Violation,
     _line_index: &LineIndex,
     _parse: &Parse<SourceFile>,
+    line_ending: LineEnding,
 ) -> Option<Edit> {
     if UNSUPPORTED_RULES.contains(&violation.code) {
         return None;
     }
     let rule_name = violation.code.to_string();
     Some(Edit::insert(
-        format!("-- {IGNORE_FILE_TEXT} {rule_name}\n"),
+        format!("-- {IGNORE_FILE_TEXT} {rule_name}{}", line_ending.as_str()),
         TextSize::new(0),
     ))
 }
@@ -67,6 +69,7 @@ fn is_ignore_comment(token: &SyntaxToken) -> bool {
 #[cfg(test)]
 mod test {
     use crate::{diagnostic::AssociatedDiagnosticData, lint::lint};
+    use insta::assert_snapshot;
     use squawk_ide::db::{Database, File};
 
     #[test]
@@ -95,7 +98,7 @@ create table c (
                 associated_data.ignore_line_edit
             })
             .collect::<Vec<_>>();
-        insta::assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
+        assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
         -- squawk-ignore prefer-robust-stmts
         create table a (
         -- squawk-ignore prefer-bigint-over-int
@@ -142,7 +145,7 @@ create table c (
                 associated_data.ignore_file_edit
             })
             .collect::<Vec<_>>();
-        insta::assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
+        assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
         -- squawk-ignore-file prefer-bigint-over-int
         -- squawk-ignore-file prefer-robust-stmts
         -- squawk-ignore-file prefer-bigint-over-int
@@ -166,7 +169,7 @@ create table c (
     }
 
     fn apply_text_edits(sql: &str, mut edits: Vec<gen_lsp_types::TextEdit>) -> String {
-        use line_index::{LineCol, LineIndex};
+        use squawk_line_index::{LineCol, LineIndex};
 
         // Sort edits by position (reverse order to apply from end to start)
         edits.sort_by(|a, b| {
@@ -204,5 +207,80 @@ create table c (
         let db = Database::default();
         let file = File::new(&db, sql.to_owned().into());
         lint(&db, file)
+    }
+
+    fn ignore_line_edits_with_line_ending(line_ending: &str) -> String {
+        use squawk_line_index::{LineIndex, find_newline};
+        use squawk_linter::Linter;
+        use squawk_syntax::SourceFile;
+
+        let sql = [
+            "create table a (",
+            "  a int",
+            ");",
+            "",
+            "-- squawk-ignore prefer-text-field",
+            "create table b (",
+            "  b text",
+            ");",
+            "",
+        ]
+        .join(line_ending);
+
+        let parse = SourceFile::parse(&sql);
+        let line_index = LineIndex::new(&sql);
+        let detected = find_newline(&sql)
+            .map(|(_, ending)| ending)
+            .unwrap_or_default();
+        let mut edits = Linter::with_default_rules()
+            .lint(&parse, &sql)
+            .iter()
+            .filter_map(|v| super::ignore_line_edit(v, &line_index, &parse, detected))
+            .collect::<Vec<_>>();
+
+        edits.sort_by_key(|e| std::cmp::Reverse(e.text_range.start()));
+
+        let mut result = sql.clone();
+        for edit in edits {
+            let start: usize = edit.text_range.start().into();
+            let end: usize = edit.text_range.end().into();
+            result.replace_range(start..end, &edit.text.unwrap_or_default());
+        }
+        result.replace('\r', "<CR>")
+    }
+
+    #[test]
+    fn ignore_line_with_lf_line_endings() {
+        assert_snapshot!(ignore_line_edits_with_line_ending("\n"), @"
+        create table a (
+        -- squawk-ignore prefer-bigint-over-int
+          a int
+        );
+
+        -- squawk-ignore prefer-robust-stmts, prefer-text-field
+        create table b (
+          b text
+        );
+        ");
+    }
+
+    #[test]
+    fn ignore_line_with_crlf_line_endings() {
+        assert_snapshot!(ignore_line_edits_with_line_ending("\r\n"), @"
+        create table a (<CR>
+        -- squawk-ignore prefer-bigint-over-int<CR>
+          a int<CR>
+        );<CR>
+        <CR>
+        -- squawk-ignore prefer-robust-stmts, prefer-text-field<CR>
+        create table b (<CR>
+          b text<CR>
+        );<CR>
+        ");
+    }
+
+    #[test]
+    fn ignore_line_with_cr_line_endings() {
+        assert_snapshot!(ignore_line_edits_with_line_ending("\r"), @"create table a (<CR>-- squawk-ignore prefer-bigint-over-int<CR>  a int<CR>);<CR><CR>-- squawk-ignore prefer-robust-stmts, prefer-text-field<CR>create table b (<CR>  b text<CR>);<CR>");
     }
 }

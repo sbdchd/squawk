@@ -1,11 +1,11 @@
 [package]
-name = "squawk-linter"
+name = "squawk-line-index"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
-description.workspace = true
+description = "Maps flat `TextSize` offsets to/from `(line, column)` representation."
 documentation.workspace = true
 homepage.workspace = true
 repository.workspace = true
@@ -14,19 +14,13 @@ repository.workspace = true
 doctest = false
 
 [dependencies]
-squawk-syntax.workspace = true
-
-rowan.workspace = true
-serde.workspace = true
-enum-iterator.workspace = true
-squawk-line-index.workspace = true
-serde_plain.workspace = true
-annotate-snippets.workspace = true
-rustc-hash.workspace = true
+memchr.workspace = true
+nohash-hasher.workspace = true
+text-size.workspace = true
 
 [dev-dependencies]
 insta.workspace = true
-tabled.workspace = true
+oorandom.workspace = true
 
 [lints]
 workspace = true

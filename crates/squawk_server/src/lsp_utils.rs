@@ -2,7 +2,6 @@ use std::ops::Range;
 
 use rustc_hash::FxHashMap;
 
-use ::line_index::{LineIndex, TextRange, TextSize};
 use gen_lsp_types::{
     CodeAction, CodeActionKind, FoldingRange, FoldingRangeKind as LspFoldingRangeKind, Location,
     SemanticToken, TextDocumentContentChangeEvent, WorkspaceEdit,
@@ -14,6 +13,7 @@ use squawk_ide::db::{File, line_index};
 use squawk_ide::file::InFile;
 use squawk_ide::folding_ranges::{Fold, FoldKind};
 use squawk_ide::semantic_tokens::{SemanticTokenModifier, SemanticTokenType};
+use squawk_line_index::{LineIndex, TextRange, TextSize, find_newline};
 use url::Url;
 
 use crate::global_state::Snapshot;
@@ -267,9 +267,8 @@ pub(crate) fn to_semantic_tokens(
         // line semantic token which isn't supported by the LSP spec.
         // see: https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/lsp/to_proto.rs#L781C28-L781C28
         for mut text_range in line_index.lines(token.range) {
-            if text[text_range].ends_with('\n') {
-                text_range =
-                    TextRange::new(text_range.start(), text_range.end() - TextSize::of('\n'));
+            if let Some((index, _)) = find_newline(&text[text_range]) {
+                text_range = TextRange::at(text_range.start(), TextSize::try_from(index).unwrap());
             }
             let lsp_range = range(&line_index, text_range);
             let len = lsp_range.end.character - lsp_range.start.character;
@@ -352,6 +351,7 @@ mod tests {
     use gen_lsp_types::{
         Position, Range, TextDocumentContentChangePartial, TextDocumentContentChangeWholeDocument,
     };
+    use insta::assert_snapshot;
 
     fn partial_change(range: Range, text: &str) -> TextDocumentContentChangeEvent {
         TextDocumentContentChangeEvent::TextDocumentContentChangePartial(
@@ -493,5 +493,37 @@ mod tests {
         )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "sho extendedlong line");
+    }
+
+    fn edit_third_line(line_ending: &str) -> String {
+        let content = ["line 1", "line 2", "line 3"].join(line_ending);
+        let changes = vec![partial_change(
+            Range::new(Position::new(2, 0), Position::new(2, 6)),
+            "replaced",
+        )];
+        apply_incremental_changes(&content, changes).replace('\r', "<CR>")
+    }
+
+    #[test]
+    fn apply_incremental_changes_lf_line_endings() {
+        assert_snapshot!(edit_third_line("\n"), @"
+        line 1
+        line 2
+        replaced
+        ");
+    }
+
+    #[test]
+    fn apply_incremental_changes_crlf_line_endings() {
+        assert_snapshot!(edit_third_line("\r\n"), @"
+        line 1<CR>
+        line 2<CR>
+        replaced
+        ");
+    }
+
+    #[test]
+    fn apply_incremental_changes_cr_line_endings() {
+        assert_snapshot!(edit_third_line("\r"), @"line 1<CR>line 2<CR>replaced");
     }
 }
