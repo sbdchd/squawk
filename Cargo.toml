@@ -47,8 +47,11 @@ smol_str = "0.3.2"
 enum-iterator = "2.1.0"
 jiff = "0.2.24"
 itertools = "0.14.0"
-line-index = "0.1.2"
 lsp-server = "0.7.8"
+memchr = "2.8.0"
+text-size = "1.1.1"
+nohash-hasher = "0.2.0"
+oorandom = "11.1.5"
 gen-lsp-types = { version = "0.11", features = ["url"] }
 serde-wasm-bindgen = "0.6.5"
 wasm-bindgen = "0.2.114"
@@ -83,6 +86,7 @@ rustc-hash = "2.1.1"
 squawk-github = { path = "./crates/squawk_github", version = "2.61.0" }
 squawk-ide = { path = "./crates/squawk_ide", version = "2.61.0" }
 squawk-lexer = { path = "./crates/squawk_lexer", version = "2.61.0" }
+squawk-line-index = { path = "./crates/squawk_line_index", version = "2.61.0" }
 squawk-parser = { path = "./crates/squawk_parser", version = "2.61.0" }
 squawk-syntax = { path = "./crates/squawk_syntax", version = "2.61.0" }
 squawk-linter = { path = "./crates/squawk_linter", version = "2.61.0" }
@@ -108,4 +112,5 @@ insta.opt-level = 3
 similar.opt-level = 3
 # These speed up local tests.
 rowan.opt-level = 3
+squawk-line-index.opt-level = 3
 text-size.opt-level = 3

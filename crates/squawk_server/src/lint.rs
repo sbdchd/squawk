@@ -1,9 +1,9 @@
-use ::line_index::LineIndex;
 use gen_lsp_types::{
     Code, CodeDescription, Diagnostic, DiagnosticSeverity, Message, Position, Range, TextEdit,
 };
 use salsa::Database as Db;
 use squawk_ide::db::{File, line_index as file_line_index, parse};
+use squawk_line_index::{LineIndex, find_newline};
 use squawk_linter::{Edit, Linter};
 use url::Url;
 
@@ -30,6 +30,9 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
     let mut linter = Linter::with_default_rules();
     let violations = linter.lint(&parse, content);
     let line_index = file_line_index(db, file);
+    let line_ending = find_newline(content)
+        .map(|(_, ending)| ending)
+        .unwrap_or_default();
 
     let mut diagnostics = Vec::with_capacity(violations.len() + parse_errors.len());
 
@@ -70,9 +73,9 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
             end_line_col.col += 1;
         }
 
-        let ignore_line_edit = ignore_line_edit(&violation, &line_index, &parse)
+        let ignore_line_edit = ignore_line_edit(&violation, &line_index, &parse, line_ending)
             .and_then(|e| to_text_edit(e, &line_index));
-        let ignore_file_edit = ignore_file_edit(&violation, &line_index, &parse)
+        let ignore_file_edit = ignore_file_edit(&violation, &line_index, &parse, line_ending)
             .and_then(|e| to_text_edit(e, &line_index));
 
         let (title, fix_edits) = if let Some(fix) = violation.fix {

@@ -1,0 +1,79 @@
+---
+source: crates/squawk/src/reporter.rs
+expression: "report(&sql_with_line_ending(\"\\r\"), Reporter::Tty)"
+---
+warning[]8;;https://squawkhq.com/docs/require-lock-timeout\require-lock-timeout]8;;\]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+  ╭▸ main.sql:1:1
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+  ╭╴
+1 + set lock_timeout = '1s';
+  ╰╴
+warning[]8;;https://squawkhq.com/docs/require-statement-timeout\require-statement-timeout]8;;\]: Missing `set statement_timeout` before potentially slow operations
+  ╭▸ main.sql:1:1
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Configure a `statement_timeout` before this statement
+  ╭╴
+1 + set statement_timeout = '5s';
+  ╰╴
+warning[]8;;https://squawkhq.com/docs/adding-required-field\adding-required-field]8;;\]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+  ╭▸ main.sql:1:27
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │                           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: Make the field nullable or add a non-VOLATILE DEFAULT
+warning[]8;;https://squawkhq.com/docs/prefer-robust-stmts\prefer-robust-stmts]8;;\]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ main.sql:1:27
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │                           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+1 │ ALTER TABLE "core_recipe" ADD COLUMN if not exists "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  ╰╴                                     +++++++++++++
+warning[]8;;https://squawkhq.com/docs/prefer-bigint-over-int\prefer-bigint-over-int]8;;\]: Using 32-bit integer fields can result in hitting the max `int` limit.
+  ╭▸ main.sql:1:44
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │                                            ━━━━━━━
+  │
+  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭╴
+1 - ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+1 + ALTER TABLE "core_recipe" ADD COLUMN "foo" bigint NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  ╰╴
+warning[]8;;https://squawkhq.com/docs/adding-required-field\adding-required-field]8;;\]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+  ╭▸ main.sql:1:85
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │                                                                                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: Make the field nullable or add a non-VOLATILE DEFAULT
+warning[]8;;https://squawkhq.com/docs/prefer-robust-stmts\prefer-robust-stmts]8;;\]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ main.sql:1:85
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │                                                                                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN if not exists "bar" integer NOT NULL;␍SELECT 1;␍
+  ╰╴                                                                                               +++++++++++++
+warning[]8;;https://squawkhq.com/docs/prefer-bigint-over-int\prefer-bigint-over-int]8;;\]: Using 32-bit integer fields can result in hitting the max `int` limit.
+  ╭▸ main.sql:1:102
+  │
+1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+  │                                                                                                      ━━━━━━━
+  │
+  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭╴
+1 - ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;␍SELECT 1;␍
+1 + ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;␍ALTER TABLE "core_foo" ADD COLUMN "bar" bigint NOT NULL;␍SELECT 1;␍
+  ╰╴
+
+Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
+Found 8 issues in 1 file (checked 1 source file)

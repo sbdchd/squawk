@@ -363,7 +363,7 @@ mod test_github_comment {
     };
 
     use insta::assert_snapshot;
-    use line_index::{TextRange, TextSize};
+    use squawk_line_index::{TextRange, TextSize};
 
     /// Most cases, hopefully, will be a single migration for a given PR, but
     /// let's check the case of multiple migrations

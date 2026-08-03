@@ -1,8 +1,8 @@
-use ::line_index::LineIndex;
 use salsa::Database as Db;
 #[cfg(test)]
 use salsa::Setter;
 use salsa::Storage;
+use squawk_line_index::LineIndex;
 use squawk_syntax::{Parse, SourceFile};
 use std::sync::Arc;
 

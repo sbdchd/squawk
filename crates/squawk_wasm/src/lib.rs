@@ -1,4 +1,3 @@
-use line_index::LineIndex;
 use log::info;
 use rowan::{TextRange, TextSize};
 use salsa::Setter;
@@ -8,6 +7,7 @@ use squawk_ide::db::{self, Database, File};
 use squawk_ide::file::InFile;
 use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
 use squawk_ide::semantic_tokens::{SemanticTokenType, semantic_tokens};
+use squawk_line_index::{LineIndex, find_newline};
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
 use web_sys::js_sys::Error;
@@ -187,10 +187,10 @@ impl SquawkDatabase {
             let start = line_index.line_col(range_start);
             let end = line_index.line_col(range_end);
             let start = line_index
-                .to_wide(line_index::WideEncoding::Utf16, start)
+                .to_wide(squawk_line_index::WideEncoding::Utf16, start)
                 .unwrap();
             let end = line_index
-                .to_wide(line_index::WideEncoding::Utf16, end)
+                .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                 .unwrap();
             LintError {
                 severity: Severity::Error,
@@ -212,10 +212,10 @@ impl SquawkDatabase {
             let start = line_index.line_col(x.text_range.start());
             let end = line_index.line_col(x.text_range.end());
             let start = line_index
-                .to_wide(line_index::WideEncoding::Utf16, start)
+                .to_wide(squawk_line_index::WideEncoding::Utf16, start)
                 .unwrap();
             let end = line_index
-                .to_wide(line_index::WideEncoding::Utf16, end)
+                .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                 .unwrap();
 
             let messages = x.help.into_iter().collect();
@@ -228,10 +228,10 @@ impl SquawkDatabase {
                         let start_pos = line_index.line_col(edit.text_range.start());
                         let end_pos = line_index.line_col(edit.text_range.end());
                         let start_wide = line_index
-                            .to_wide(line_index::WideEncoding::Utf16, start_pos)
+                            .to_wide(squawk_line_index::WideEncoding::Utf16, start_pos)
                             .unwrap();
                         let end_wide = line_index
-                            .to_wide(line_index::WideEncoding::Utf16, end_pos)
+                            .to_wide(squawk_line_index::WideEncoding::Utf16, end_pos)
                             .unwrap();
 
                         TextEdit {
@@ -285,10 +285,10 @@ impl SquawkDatabase {
                 let start = line_index.line_col(range.start());
                 let end = line_index.line_col(range.end());
                 let start_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, start)
                     .unwrap();
                 let end_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                     .unwrap();
 
                 LocationRange {
@@ -329,10 +329,10 @@ impl SquawkDatabase {
                 let start = line_index.line_col(loc.range.start());
                 let end = line_index.line_col(loc.range.end());
                 let start_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, start)
                     .unwrap();
                 let end_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                     .unwrap();
 
                 LocationRange {
@@ -378,10 +378,10 @@ impl SquawkDatabase {
                             let start_pos = line_index.line_col(edit.text_range.start());
                             let end_pos = line_index.line_col(edit.text_range.end());
                             let start_wide = line_index
-                                .to_wide(line_index::WideEncoding::Utf16, start_pos)
+                                .to_wide(squawk_line_index::WideEncoding::Utf16, start_pos)
                                 .unwrap();
                             let end_wide = line_index
-                                .to_wide(line_index::WideEncoding::Utf16, end_pos)
+                                .to_wide(squawk_line_index::WideEncoding::Utf16, end_pos)
                                 .unwrap();
 
                             TextEdit {
@@ -422,7 +422,7 @@ impl SquawkDatabase {
             .map(|hint| {
                 let position = line_index.line_col(hint.position);
                 let position_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, position)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, position)
                     .unwrap();
 
                 WasmInlayHint {
@@ -452,10 +452,10 @@ impl SquawkDatabase {
                 let start = line_index.line_col(fold.range.start());
                 let end = line_index.line_col(fold.range.end());
                 let start_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, start)
                     .unwrap();
                 let end_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                     .unwrap();
 
                 WasmFoldingRange {
@@ -498,10 +498,10 @@ impl SquawkDatabase {
                 let start = line_index.line_col(next.start());
                 let end = line_index.line_col(next.end());
                 let start_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, start)
                     .unwrap();
                 let end_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                     .unwrap();
 
                 ranges.push(WasmSelectionRange {
@@ -534,17 +534,17 @@ impl SquawkDatabase {
             // multi line semantic token which isn't supported by the LSP spec.
             // see: https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/lsp/to_proto.rs#L781C28-L781C28
             for mut text_range in line_index.lines(token.range) {
-                if content[text_range].ends_with('\n') {
+                if let Some((index, _)) = find_newline(&content[text_range]) {
                     text_range =
-                        TextRange::new(text_range.start(), text_range.end() - TextSize::of('\n'));
+                        TextRange::at(text_range.start(), TextSize::try_from(index).unwrap());
                 }
                 let start_lc = line_index.line_col(text_range.start());
                 let end_lc = line_index.line_col(text_range.end());
                 let start_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, start_lc)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, start_lc)
                     .unwrap();
                 let end_wide = line_index
-                    .to_wide(line_index::WideEncoding::Utf16, end_lc)
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, end_lc)
                     .unwrap();
 
                 encoder.push(EncodedSemanticToken {
@@ -628,10 +628,10 @@ fn position_to_offset(
     col: u32,
 ) -> Result<InFile<rowan::TextSize>, Error> {
     let line_index = db::line_index(db, file);
-    let wide_pos = line_index::WideLineCol { line, col };
+    let wide_pos = squawk_line_index::WideLineCol { line, col };
 
     let pos = line_index
-        .to_utf8(line_index::WideEncoding::Utf16, wide_pos)
+        .to_utf8(squawk_line_index::WideEncoding::Utf16, wide_pos)
         .ok_or_else(|| Error::new("Invalid position"))?;
 
     let offset = line_index
@@ -647,19 +647,19 @@ fn convert_document_symbol(
     let full_start = line_index.line_col(symbol.full_range.start());
     let full_end = line_index.line_col(symbol.full_range.end());
     let full_start_wide = line_index
-        .to_wide(line_index::WideEncoding::Utf16, full_start)
+        .to_wide(squawk_line_index::WideEncoding::Utf16, full_start)
         .unwrap();
     let full_end_wide = line_index
-        .to_wide(line_index::WideEncoding::Utf16, full_end)
+        .to_wide(squawk_line_index::WideEncoding::Utf16, full_end)
         .unwrap();
 
     let focus_start = line_index.line_col(symbol.focus_range.start());
     let focus_end = line_index.line_col(symbol.focus_range.end());
     let focus_start_wide = line_index
-        .to_wide(line_index::WideEncoding::Utf16, focus_start)
+        .to_wide(squawk_line_index::WideEncoding::Utf16, focus_start)
         .unwrap();
     let focus_end_wide = line_index
-        .to_wide(line_index::WideEncoding::Utf16, focus_end)
+        .to_wide(squawk_line_index::WideEncoding::Utf16, focus_end)
         .unwrap();
 
     WasmDocumentSymbol {

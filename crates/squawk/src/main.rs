@@ -70,7 +70,7 @@ pub enum DebugOption {
     Ast,
 }
 
-#[derive(Debug, ValueEnum, Clone, Default)]
+#[derive(Debug, ValueEnum, Clone, Copy, Default)]
 pub enum Reporter {
     #[default]
     Tty,

@@ -1,8 +1,8 @@
-use ::line_index::LineIndex;
 use anyhow::Result;
 use gen_lsp_types::{DocumentSymbol, DocumentSymbolParams, DocumentSymbolResponse, SymbolKind};
 use squawk_ide::db::line_index;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
+use squawk_line_index::LineIndex;
 
 use crate::global_state::Snapshot;
 use crate::lsp_utils;

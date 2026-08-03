@@ -1347,16 +1347,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
 
 [[package]]
-name = "line-index"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e27e0ed5a392a7f5ba0b3808a2afccff16c64933312c84b57618b49d1209bd2"
-dependencies = [
- "nohash-hasher",
- "text-size",
-]
-
-[[package]]
 name = "linux-raw-sys"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2433,7 +2423,6 @@ dependencies = [
  "enum-iterator",
  "glob",
  "insta",
- "line-index",
  "log",
  "lsp-server",
  "rayon",
@@ -2443,6 +2432,7 @@ dependencies = [
  "snapbox",
  "squawk-github",
  "squawk-lexer",
+ "squawk-line-index",
  "squawk-linter",
  "squawk-server",
  "squawk-syntax",
@@ -2487,7 +2477,6 @@ dependencies = [
  "insta",
  "itertools",
  "la-arena",
- "line-index",
  "log",
  "num-bigint",
  "rowan",
@@ -2495,6 +2484,7 @@ dependencies = [
  "salsa",
  "smallvec",
  "smol_str",
+ "squawk-line-index",
  "squawk-linter",
  "squawk-syntax",
  "tabled",
@@ -2509,17 +2499,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "squawk-line-index"
+version = "2.61.0"
+dependencies = [
+ "insta",
+ "memchr",
+ "nohash-hasher",
+ "oorandom",
+ "text-size",
+]
+
+[[package]]
 name = "squawk-linter"
 version = "2.61.0"
 dependencies = [
  "annotate-snippets",
  "enum-iterator",
  "insta",
- "line-index",
  "rowan",
  "rustc-hash 2.1.1",
  "serde",
  "serde_plain",
+ "squawk-line-index",
  "squawk-syntax",
  "tabled",
 ]
@@ -2546,7 +2547,6 @@ dependencies = [
  "etcetera",
  "gen-lsp-types",
  "insta",
- "line-index",
  "log",
  "lsp-server",
  "rowan",
@@ -2557,6 +2557,7 @@ dependencies = [
  "simplelog",
  "squawk-ide",
  "squawk-lexer",
+ "squawk-line-index",
  "squawk-linter",
  "squawk-syntax",
  "squawk-thread",
@@ -2596,7 +2597,6 @@ version = "2.61.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
- "line-index",
  "log",
  "rowan",
  "salsa",
@@ -2604,6 +2604,7 @@ dependencies = [
  "serde-wasm-bindgen",
  "squawk-ide",
  "squawk-lexer",
+ "squawk-line-index",
  "squawk-linter",
  "squawk-syntax",
  "wasm-bindgen",
