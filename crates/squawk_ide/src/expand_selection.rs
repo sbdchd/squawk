@@ -28,6 +28,7 @@
 // simplifications. I imagine there's more we can do to adapt it for SQL.
 
 use rowan::{Direction, NodeOrToken, TextRange, TextSize};
+use squawk_line_index::find_newline;
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxToken,
     ast::{self, AstToken},
@@ -222,7 +223,11 @@ fn adj_comments(comment: &ast::Comment, dir: Direction) -> ast::Comment {
         };
         if let Some(c) = ast::Comment::cast(token.clone()) {
             res = c
-        } else if token.kind() != SyntaxKind::WHITESPACE || token.text().contains("\n\n") {
+        } else if let Some(ws) = ast::Whitespace::cast(token.clone()) {
+            if ws.spans_multiple_lines() {
+                break;
+            }
+        } else {
             break;
         }
     }
@@ -235,22 +240,39 @@ fn extend_ws(root: &SyntaxNode, ws: SyntaxToken, offset: TextSize) -> TextRange 
     let prefix = TextRange::new(ws.text_range().start(), offset) - ws.text_range().start();
     let ws_suffix = &ws_text[suffix];
     let ws_prefix = &ws_text[prefix];
-    if ws_text.contains('\n')
-        && !ws_suffix.contains('\n')
+    if find_newline(ws_text).is_some()
+        && find_newline(ws_suffix).is_none()
         && let Some(node) = ws.next_sibling_or_token()
     {
-        let start = match ws_prefix.rfind('\n') {
-            Some(idx) => ws.text_range().start() + TextSize::from((idx + 1) as u32),
+        let start = match last_newline_end(ws_prefix) {
+            Some(idx) => ws.text_range().start() + TextSize::from(idx as u32),
             None => node.text_range().start(),
         };
-        let end = if root.text().char_at(node.text_range().end()) == Some('\n') {
-            node.text_range().end() + TextSize::of('\n')
-        } else {
-            node.text_range().end()
+        let node_end = node.text_range().end();
+        let line_ending_len = match root.text().char_at(node_end) {
+            Some('\r') if root.text().char_at(node_end + TextSize::of('\r')) == Some('\n') => {
+                TextSize::of("\r\n")
+            }
+            Some('\n' | '\r') => TextSize::of('\n'),
+            _ => TextSize::default(),
         };
-        return TextRange::new(start, end);
+        return TextRange::new(start, node_end + line_ending_len);
     }
     ws.text_range()
+}
+
+fn last_newline_end(text: &str) -> Option<usize> {
+    let mut rest = text;
+    let mut offset = 0;
+    let mut last = None;
+
+    while let Some((idx, line_ending)) = find_newline(rest) {
+        offset += idx + line_ending.as_str().len();
+        last = Some(offset);
+        rest = &text[offset..];
+    }
+
+    last
 }
 
 fn pick_best(l: SyntaxToken, r: SyntaxToken) -> SyntaxToken {
@@ -269,7 +291,7 @@ fn pick_best(l: SyntaxToken, r: SyntaxToken) -> SyntaxToken {
 /// Extend list item selection to include nearby delimiter and whitespace.
 fn extend_list_item(node: &SyntaxNode) -> Option<TextRange> {
     fn is_single_line_ws(node: &SyntaxToken) -> bool {
-        node.kind() == SyntaxKind::WHITESPACE && !node.text().contains('\n')
+        node.kind() == SyntaxKind::WHITESPACE && find_newline(node.text()).is_none()
     }
 
     fn nearby_comma(node: &SyntaxNode, dir: Direction) -> Option<SyntaxToken> {
@@ -411,6 +433,17 @@ select 1
     }
 
     #[test]
+    fn comments_separated_by_cr_blank_line() {
+        assert_debug_snapshot!(expand("-- first\r\r-- sec$0ond\rselect 1;"), @r#"
+        [
+            "second",
+            "-- second",
+            "-- first\r\r-- second\rselect 1;",
+        ]
+        "#);
+    }
+
+    #[test]
     fn comment() {
         assert_debug_snapshot!(expand(r"
 -- foo bar$0
@@ -448,7 +481,7 @@ create table t(
             "x int",
             "x int,",
             "(\n  x int,\n  y text\n)",
-            "-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n);",
+            "create table t(\n  x int,\n  y text\n);",
             "\n-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n);\n",
         ]
         "#);
@@ -495,6 +528,16 @@ $0    select 2;"#), @r#"
         [
             "    select 2;",
             "    \nselect 1;\n\n    select 2;",
+        ]
+        "#);
+    }
+
+    #[test]
+    fn start_of_line_whitespace_select_with_cr_line_endings() {
+        assert_debug_snapshot!(expand("select 1;\r$0    select 2;"), @r#"
+        [
+            "    select 2;",
+            "select 1;\r    select 2;",
         ]
         "#);
     }

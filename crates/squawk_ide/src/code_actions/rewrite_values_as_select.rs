@@ -4,7 +4,7 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{file::InFile, offsets::token_from_offset};
+use crate::{db::line_ending, file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
@@ -20,6 +20,7 @@ pub(super) fn rewrite_values_as_select(
     let values_end = values.syntax().text_range().end();
     // `values` but we skip over the possibly preceeding CTE
     let values_range = TextRange::new(value_token_start, values_end);
+    let line_ending = line_ending(db, position.file_id);
 
     let mut rows = values.row_list()?.rows();
 
@@ -44,10 +45,11 @@ pub(super) fn rewrite_values_as_select(
         if row_targets.is_empty() {
             return None;
         }
-        select_parts.push(format!("union all\nselect {row_targets}"));
+        select_parts.push("union all".to_owned());
+        select_parts.push(format!("select {row_targets}"));
     }
 
-    let mut select_stmt = select_parts.join("\n");
+    let mut select_stmt = select_parts.join(line_ending);
     if values.semicolon_token().is_some() {
         select_stmt.push(';');
     }
@@ -78,6 +80,20 @@ mod test {
         union all
         select 2, 'two';
         "
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_with_cr_line_endings() {
+        assert_snapshot!(
+            format!(
+                "{:?}",
+                apply_code_action(
+                    rewrite_values_as_select,
+                    "select 1;\rval$0ues (1, 'one'), (2, 'two');"
+                )
+            ),
+            @r#""select 1;\rselect 1 as column1, 'one' as column2\runion all\rselect 2, 'two';""#
         );
     }
 

@@ -3,9 +3,9 @@ source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/misc.sql
 ---
 SOURCE_FILE
+  COMMENT "-- https://www.timescale.com/blog/boosting-postgres-insert-performance/"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- https://www.timescale.com/blog/boosting-postgres-insert-performance/"
-    WHITESPACE "\n"
     CREATE_KW "CREATE"
     WHITESPACE " "
     TABLE_KW "TABLE"
@@ -2312,9 +2312,9 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/pg_incremental-incremental-data-processing-in-postgres"
   WHITESPACE "\n\n"
+  COMMENT "/* define the raw data and summary table */"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "/* define the raw data and summary table */"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -2665,9 +2665,9 @@ SOURCE_FILE
         INT_NUMBER "3"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
+  COMMENT "/* create a table with a single JSONB column and a sequence to track new objects */"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "/* create a table with a single JSONB column and a sequence to track new objects */"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -2777,9 +2777,9 @@ SOURCE_FILE
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
+  COMMENT "/* create a table for number of active users per hour */"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "/* create a table for number of active users per hour */"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -6259,11 +6259,11 @@ SOURCE_FILE
           IDENT "recent_product_sales"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
+  COMMENT "-- https://www.timescale.com/blog/iot-renewable-energy-models-building-the-future-with-time-series-data"
+  WHITESPACE "\n"
+  COMMENT "-- Example time series data structure for a solar panel"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- https://www.timescale.com/blog/iot-renewable-energy-models-building-the-future-with-time-series-data"
-    WHITESPACE "\n"
-    COMMENT "-- Example time series data structure for a solar panel"
-    WHITESPACE "\n"
     CREATE_KW "CREATE"
     WHITESPACE " "
     TABLE_KW "TABLE"

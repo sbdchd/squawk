@@ -15,6 +15,7 @@ use crate::symbols::{Name, Schema};
 use crate::{goto_definition, resolve};
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_line_index::find_newline;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::SyntaxNodePtr;
 use squawk_syntax::ast::LitKind;
@@ -276,8 +277,8 @@ fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
         | LitKind::EscString(_)
         | LitKind::NationalString(_)
         | LitKind::UnicodeEscString(_)
-        | LitKind::DollarQuotedString(_) => match value.find('\n') {
-            Some(idx) => {
+        | LitKind::DollarQuotedString(_) => match find_newline(&value) {
+            Some((idx, _)) => {
                 let truncated = &value[..idx];
                 format!(
                     "value of literal (truncated up to newline): {}",
@@ -5984,6 +5985,19 @@ select * from json_table(
     fn hover_esc_string() {
         assert_snapshot!(check_hover_info(r"
 select e'fo$0o\nbar';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal (truncated up to newline): ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string_with_cr() {
+        assert_snapshot!(check_hover_info(r"
+select e'fo$0o\rbar';
 ").markdown(), @"
         ```sql
         text

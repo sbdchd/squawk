@@ -29,6 +29,7 @@ use std::borrow::Cow;
 #[cfg(test)]
 use insta::assert_snapshot;
 use rowan::{GreenNodeData, GreenTokenData, NodeOrToken};
+use squawk_line_index::{LineEnding, find_newline};
 
 #[cfg(test)]
 use crate::SourceFile;
@@ -57,6 +58,14 @@ pub enum LitKind {
     String(SyntaxToken),
     True(SyntaxToken),
     UnicodeEscString(SyntaxToken),
+}
+
+impl ast::SourceFile {
+    pub fn line_ending(&self) -> LineEnding {
+        find_newline(&self.syntax().text().to_string())
+            .map(|(_, line_ending)| line_ending)
+            .unwrap_or_default()
+    }
 }
 
 impl ast::Literal {

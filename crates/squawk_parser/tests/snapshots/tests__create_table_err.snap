@@ -3,9 +3,9 @@ source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/err/create_table.sql
 ---
 SOURCE_FILE
+  COMMENT "-- with missing table name"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- with missing table name"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -26,9 +26,9 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- missing type"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- missing type"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -46,9 +46,9 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- trailing comma"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- trailing comma"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -73,9 +73,9 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- missing columns / constraints"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- missing columns / constraints"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -100,9 +100,9 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- missing inherit"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- missing inherit"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -142,9 +142,9 @@ SOURCE_FILE
             NO_KW "no"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- a column list with SET DEFAULT is only supported for ON DELETE actions"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- a column list with SET DEFAULT is only supported for ON DELETE actions"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -292,9 +292,9 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- conflicting options"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- conflicting options"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     UNLOGGED
@@ -563,9 +563,9 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- exclude missing a comma"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- exclude missing a comma"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -704,9 +704,9 @@ SOURCE_FILE
               IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -759,9 +759,9 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- PERIOD must be the last column in a FOREIGN KEY column list"
+  WHITESPACE "\n"
   CREATE_TABLE
-    COMMENT "-- PERIOD must be the last column in a FOREIGN KEY column list"
-    WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"

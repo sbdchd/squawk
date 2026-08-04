@@ -127,14 +127,22 @@ fn render_lint_error<W: std::io::Write>(
     }
 
     if let Some(fix) = &err.fix {
-        let mut patch_snippet = Snippet::source(sql).path(filename).fold(true);
+        let patches = fix.edits.iter().map(|edit| {
+            let start = edit.text_range.start().into();
+            let end = edit.text_range.end().into();
+            let replacement = edit
+                .text
+                .as_deref()
+                .unwrap_or_default()
+                .replace("\r\n", "\n")
+                .replace('\r', "\n");
 
-        for edit in &fix.edits {
-            let start: usize = edit.text_range.start().into();
-            let end: usize = edit.text_range.end().into();
-            let replacement = edit.text.as_deref().unwrap_or("");
-            patch_snippet = patch_snippet.patch(Patch::new(start..end, replacement));
-        }
+            Patch::new(start..end, replacement)
+        });
+        let patch_snippet = Snippet::source(sql)
+            .path(filename)
+            .fold(true)
+            .patches(patches);
 
         group = group.element(patch_snippet);
     }

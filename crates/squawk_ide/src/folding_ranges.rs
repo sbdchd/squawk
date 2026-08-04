@@ -29,8 +29,9 @@
 
 use rustc_hash::FxHashSet;
 
-use rowan::{Direction, NodeOrToken, TextRange};
+use rowan::{Direction, NodeOrToken, SyntaxText, TextRange};
 use salsa::Database as Db;
+use squawk_line_index::find_newline;
 use squawk_syntax::SyntaxKind;
 use squawk_syntax::ast::{self, AstNode, AstToken};
 
@@ -79,7 +80,7 @@ pub fn folding_ranges(db: &dyn Db, file: File) -> Vec<Fold> {
             }
             NodeOrToken::Node(node) => {
                 if let Some(kind) = fold_kind(node.kind()) {
-                    if !node.text().contains_char('\n') {
+                    if !contains_newline(&node.text()) {
                         continue;
                     }
                     // skip any leading whitespace / comments
@@ -104,6 +105,17 @@ pub fn folding_ranges(db: &dyn Db, file: File) -> Vec<Fold> {
     }
 
     folds
+}
+
+fn contains_newline(text: &SyntaxText) -> bool {
+    text.try_for_each_chunk(|chunk| {
+        if find_newline(chunk).is_some() {
+            Err(())
+        } else {
+            Ok(())
+        }
+    })
+    .is_err()
 }
 
 fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
@@ -408,6 +420,47 @@ select 1;"), @"
         -- a comment</fold>
         select 1;
         ");
+    }
+
+    #[test]
+    fn fold_multiline_comments_with_windows_line_endings() {
+        assert_snapshot!(
+            format!(
+                "{:?}",
+                check("-- this is\r\n-- a comment\r\nselect 1;")
+            ),
+            @r#""<fold comment>-- this is\r\n-- a comment</fold>\r\nselect 1;""#
+        );
+    }
+
+    #[test]
+    fn fold_multiline_comments_with_cr_line_endings() {
+        assert_snapshot!(
+            format!(
+                "{:?}",
+                check("-- this is\r-- a comment\rselect 1;")
+            ),
+            @r#""<fold comment>-- this is\r-- a comment</fold>\rselect 1;""#
+        );
+    }
+
+    #[test]
+    fn fold_comments_with_cr_line_endings_does_not_apply_when_whitespace_between() {
+        assert_snapshot!(
+            format!(
+                "{:?}",
+                check("-- this is\r\r-- a comment\r-- with some more\rselect 1;")
+            ),
+            @r#""-- this is\r\r<fold comment>-- a comment\r-- with some more</fold>\rselect 1;""#
+        );
+    }
+
+    #[test]
+    fn fold_statement_with_cr_line_endings() {
+        assert_snapshot!(
+            format!("{:?}", check("select\r  id,\r  name\rfrom t;")),
+            @r#""<fold statement>select\r  <fold list>id,\r  name</fold>\rfrom t;</fold>""#
+        );
     }
 
     #[test]

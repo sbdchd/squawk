@@ -6,6 +6,7 @@ use annotate_snippets::renderer::DecorStyle;
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet};
 use anyhow::{Context, Result, bail};
 use serde_json::{Value, json};
+use squawk_line_index::{LineCol, LineIndex, TextSize};
 
 use crate::LspEvalArgs;
 
@@ -234,20 +235,16 @@ fn position(value: &Value) -> (u32, u32) {
 // that here instead of utf-16.
 fn position_to_byte(text: &str, position: (u32, u32)) -> usize {
     let (line, col) = position;
-    let line_start = text
-        .split_inclusive('\n')
-        .take(line as usize)
-        .map(str::len)
-        .sum::<usize>();
-    (line_start + col as usize).min(text.len())
+    let line_index = LineIndex::new(text);
+    let offset = line_index
+        .offset(LineCol { line, col })
+        .unwrap_or_else(|| TextSize::of(text));
+    usize::from(offset).min(text.len())
 }
 
 fn byte_to_position(text: &str, byte: usize) -> (u32, u32) {
-    let before = &text[..byte];
-    let line = before.matches('\n').count() as u32;
-    let line_start = before.rfind('\n').map_or(0, |i| i + 1);
-    let col = (byte - line_start) as u32;
-    (line, col)
+    let line_col = LineIndex::new(text).line_col(TextSize::from(byte as u32));
+    (line_col.line, line_col.col)
 }
 
 fn char_span_before(content: &str, marker_offset: usize) -> Range<usize> {
