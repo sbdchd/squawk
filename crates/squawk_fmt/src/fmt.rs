@@ -1,10 +1,12 @@
+use anyhow::{Result, bail};
 use itertools::Itertools;
 use rowan::Direction;
+use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
 use squawk_syntax::ast::{self, AstNode, LitKind};
 use squawk_syntax::quote::quote_column_alias;
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 use tiny_pretty::Doc;
-use tiny_pretty::{PrintOptions, print};
+use tiny_pretty::{LineBreak, PrintOptions, print};
 
 // TODO: anytime we have `syntax().to_string()`, it means we have to do more to
 // actually convert the data into the IR. to_string() is a temp hack
@@ -31,7 +33,7 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                     doc = doc.append(Doc::text(token.text().to_string()));
                 } else if token.kind() == SyntaxKind::WHITESPACE {
                     // TODO: I think we can improve this
-                    let lines = token.text().lines().count();
+                    let lines = token.text().universal_newlines().count();
                     if lines >= 2 {
                         doc = doc.append(Doc::empty_line()).append(Doc::empty_line());
                     } else {
@@ -645,18 +647,32 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
     Some(doc)
 }
 
-pub fn fmt(text: &str) -> String {
+pub fn fmt(text: &str) -> Result<String> {
+    let line_ending = find_newline(text)
+        .map(|(_, ending)| ending)
+        .unwrap_or_default();
+
+    let line_break = match line_ending {
+        // see: https://github.com/g-plane/tiny_pretty/issues/3
+        LineEnding::Cr => bail!("CR line endings aren't supported"),
+        LineEnding::CrLf => LineBreak::Crlf,
+        LineEnding::Lf => LineBreak::Lf,
+    };
+
     let parse = ast::SourceFile::parse(text);
     let file = parse.tree();
-    println!("{text}");
-    println!("---");
-    println!("{:#?}", file.syntax());
-    println!("---");
     debug_assert_eq!(
         parse.errors(),
         vec![],
         "should bail out when there's parse errors"
     );
     let doc = build_source_file(&file);
-    print(&doc, &PrintOptions::default())
+
+    Ok(print(
+        &doc,
+        &PrintOptions {
+            line_break,
+            ..Default::default()
+        },
+    ))
 }

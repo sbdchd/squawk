@@ -2453,6 +2453,7 @@ dependencies = [
  "itertools",
  "rowan",
  "squawk-lexer",
+ "squawk-line-index",
  "squawk-syntax",
  "tiny_pretty",
 ]
@@ -3486,6 +3487,7 @@ dependencies = [
  "rustc-hash 2.1.1",
  "serde",
  "serde_json",
+ "squawk-line-index",
  "toml",
  "ungrammar",
  "xshell",

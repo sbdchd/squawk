@@ -1,6 +1,8 @@
 //! Changes mostly ported from Ruff that aren't part of upstream `line_index` crate in Rust Analyzer
 #![allow(missing_docs)]
 
+use std::iter::FusedIterator;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LineEnding {
     /// Classic Mac, `\r`.
@@ -32,6 +34,7 @@ impl LineEnding {
 }
 
 /// Finds the next newline character. Returns its position and the [`LineEnding`].
+// via: https://github.com/astral-sh/ruff/blob/2742f956d87314cf1522c69c9a95a71d972bd76c/crates/ruff_source_file/src/newlines.rs#L58
 #[inline]
 pub fn find_newline(text: &str) -> Option<(usize, LineEnding)> {
     let bytes = text.as_bytes();
@@ -45,9 +48,54 @@ pub fn find_newline(text: &str) -> Option<(usize, LineEnding)> {
     Some((position, line_ending))
 }
 
+// via: https://github.com/astral-sh/ruff/blob/2742f956d87314cf1522c69c9a95a71d972bd76c/crates/ruff_source_file/src/newlines.rs#L7
+/// Extension trait for [`str`] that provides a [`UniversalNewlineIterator`].
+pub trait UniversalNewlines {
+    fn universal_newlines(&self) -> UniversalNewlineIterator<'_>;
+}
+
+impl UniversalNewlines for str {
+    fn universal_newlines(&self) -> UniversalNewlineIterator<'_> {
+        UniversalNewlineIterator::new(self)
+    }
+}
+
+/// Like [`str::lines`], but accommodates LF, CRLF, and CR line endings,
+/// the latter of which are not supported by [`str::lines`].
+#[derive(Debug, Clone)]
+pub struct UniversalNewlineIterator<'a> {
+    text: &'a str,
+}
+
+impl<'a> UniversalNewlineIterator<'a> {
+    pub fn new(text: &'a str) -> UniversalNewlineIterator<'a> {
+        UniversalNewlineIterator { text }
+    }
+}
+
+impl<'a> Iterator for UniversalNewlineIterator<'a> {
+    type Item = &'a str;
+
+    fn next(&mut self) -> Option<&'a str> {
+        if self.text.is_empty() {
+            return None;
+        }
+        match find_newline(self.text) {
+            Some((position, line_ending)) => {
+                let line = &self.text[..position];
+                self.text = &self.text[position + line_ending.as_str().len()..];
+                Some(line)
+            }
+            None => Some(std::mem::take(&mut self.text)),
+        }
+    }
+}
+
+impl FusedIterator for UniversalNewlineIterator<'_> {}
+
 #[cfg(test)]
 mod tests {
-    use super::{LineEnding, find_newline};
+    use super::{LineEnding, UniversalNewlines, find_newline};
 
     #[test]
     fn finding_the_newline() {
@@ -77,6 +125,28 @@ mod tests {
     }
 
     #[test]
+    fn universal_newlines_matches_str_lines() {
+        let lines = |text: &'static str| text.universal_newlines().collect::<Vec<_>>();
+
+        assert_eq!(lines(""), Vec::<&str>::new());
+        assert_eq!(lines("a"), vec!["a"]);
+        assert_eq!(lines("a\nb"), vec!["a", "b"]);
+        assert_eq!(lines("a\r\nb"), vec!["a", "b"]);
+
+        // `str::lines` doesn't support `\r`
+        assert_eq!(lines("a\rb"), vec!["a", "b"]);
+        assert_eq!(lines("a\rb\r\nc\nd"), vec!["a", "b", "c", "d"]);
+
+        // trailing new lines
+        assert_eq!(lines("a\n"), vec!["a"]);
+        assert_eq!(lines("a\r\n"), vec!["a"]);
+        assert_eq!(lines("a\r"), vec!["a"]);
+
+        assert_eq!(lines("a\n\nb"), vec!["a", "", "b"]);
+        assert_eq!(lines("\n"), vec![""]);
+    }
+
+    #[test]
     fn newline_type_default() {
         let detect = |text| {
             find_newline(text)
@@ -86,7 +156,7 @@ mod tests {
 
         assert_eq!(detect("select 1;"), LineEnding::default());
         assert_eq!(detect(""), LineEnding::default());
-        // anything with a break is detected, never defaulted
+
         assert_eq!(detect("select 1;\n"), LineEnding::Lf);
         assert_eq!(detect("select 1;\r\n"), LineEnding::CrLf);
         assert_eq!(detect("select 1;\r"), LineEnding::Cr);

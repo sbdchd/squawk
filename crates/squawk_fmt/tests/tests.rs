@@ -15,7 +15,7 @@ fn fmt(fixture: Fixture<&str>) {
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let formatted = squawk_fmt::fmt(content);
+    let formatted = squawk_fmt::fmt(content).unwrap();
 
     assert_no_dropped_tokens(content, &formatted);
 
@@ -27,6 +27,63 @@ fn fmt(fixture: Fixture<&str>) {
     }, {
         assert_snapshot!(test_name, formatted);
     });
+}
+
+fn fmt_with_line_ending(line_ending: &str) -> String {
+    let sql = [
+        "-- a comment",
+        "select 1;",
+        "",
+        "/* a comment",
+        " * spanning lines",
+        " */",
+        "select  'a',  'really long string                                                    ';",
+        "",
+    ]
+    .join(line_ending);
+
+    match squawk_fmt::fmt(&sql) {
+        Ok(formatted) => {
+            assert_no_dropped_tokens(&sql, &formatted);
+            formatted.replace('\r', "<CR>")
+        }
+        Err(err) => format!("error: {err}"),
+    }
+}
+
+#[test]
+fn fmt_lf_line_endings() {
+    assert_snapshot!(fmt_with_line_ending("\n"), @"
+    -- a comment
+    select 1;
+
+    /* a comment
+     * spanning lines
+     */
+    select
+      'a',
+      'really long string                                                    ';
+    ");
+}
+
+#[test]
+fn fmt_crlf_line_endings() {
+    assert_snapshot!(fmt_with_line_ending("\r\n"), @"
+    -- a comment<CR>
+    select 1;<CR>
+    <CR>
+    /* a comment<CR>
+     * spanning lines<CR>
+     */<CR>
+    select<CR>
+      'a',<CR>
+      'really long string                                                    ';<CR>
+    ");
+}
+
+#[test]
+fn fmt_cr_line_endings() {
+    assert_snapshot!(fmt_with_line_ending("\r"), @"error: CR line endings aren't supported");
 }
 
 fn meaningful_tokens(text: &str) -> Vec<(TokenKind, &str)> {

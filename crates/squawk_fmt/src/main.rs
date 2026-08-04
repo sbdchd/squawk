@@ -23,6 +23,6 @@ fn main() -> Result<()> {
         }
     };
 
-    print!("{}", squawk_fmt::fmt(&input));
+    print!("{}", squawk_fmt::fmt(&input)?);
     Ok(())
 }

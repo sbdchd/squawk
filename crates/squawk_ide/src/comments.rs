@@ -1,4 +1,5 @@
 use rowan::{Direction, NodeOrToken};
+use squawk_line_index::UniversalNewlines;
 use squawk_syntax::{
     SyntaxNode,
     ast::{self, AstToken},
@@ -54,7 +55,7 @@ fn normalize_comment(comment: &str) -> String {
         .and_then(|comment| comment.strip_suffix("*/"))
     {
         let normalized = comment
-            .lines()
+            .universal_newlines()
             .map(|line| line.trim_start().trim_start_matches('*').trim_start())
             .collect::<Vec<_>>()
             .join("\n");
