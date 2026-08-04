@@ -2577,6 +2577,7 @@ dependencies = [
  "insta",
  "rowan",
  "smol_str",
+ "squawk-line-index",
  "squawk-parser",
 ]
 

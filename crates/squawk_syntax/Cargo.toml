@@ -14,6 +14,7 @@ repository.workspace = true
 doctest = false
 
 [dependencies]
+squawk-line-index.workspace = true
 squawk-parser.workspace = true
 rowan.workspace = true
 smol_str.workspace = true

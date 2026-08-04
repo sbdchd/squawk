@@ -23,7 +23,17 @@ pub(crate) fn ban_uncommitted_transaction(ctx: &mut Linter, parse: &Parse<Source
 
     if let Some(begin) = uncommitted_begin {
         let end_pos = file.syntax().text_range().end();
-        let fix = Fix::new("Add COMMIT", vec![Edit::insert("\nCOMMIT;\n", end_pos)]);
+        let line_ending = file.line_ending();
+        let fix = Fix::new(
+            "Add COMMIT",
+            vec![Edit::insert(
+                format!(
+                    "{line_ending}COMMIT;{line_ending}",
+                    line_ending = line_ending.as_str()
+                ),
+                end_pos,
+            )],
+        );
 
         ctx.report(
             Violation::for_node(
@@ -182,6 +192,20 @@ CREATE TABLE users (id bigint);
                 
         COMMIT;
         ");
+    }
+
+    #[test]
+    fn fix_adds_commit_with_cr_line_endings() {
+        assert_snapshot!(
+            format!(
+                "{:?}",
+                fix_sql(
+                    "BEGIN;\rCREATE TABLE users (id bigint);",
+                    Rule::BanUncommittedTransaction,
+                )
+            ),
+            @r#""BEGIN;\rCREATE TABLE users (id bigint);\rCOMMIT;\r""#
+        );
     }
 
     #[test]

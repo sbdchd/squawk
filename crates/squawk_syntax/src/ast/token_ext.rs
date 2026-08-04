@@ -1,10 +1,13 @@
+use squawk_line_index::find_newline;
+
 use crate::ast::{self, AstToken};
 
 impl ast::Whitespace {
     pub fn spans_multiple_lines(&self) -> bool {
         let text = self.text();
-        text.find('\n')
-            .is_some_and(|idx| text[idx + 1..].contains('\n'))
+        find_newline(text).is_some_and(|(idx, line_ending)| {
+            find_newline(&text[idx + line_ending.as_str().len()..]).is_some()
+        })
     }
 }
 
@@ -21,11 +24,8 @@ pub enum CommentKind {
 }
 
 impl CommentKind {
-    const BY_PREFIX: [(&'static str, CommentKind); 3] = [
-        ("/**/", CommentKind::Block),
-        ("/*", CommentKind::Block),
-        ("--", CommentKind::Line),
-    ];
+    const BY_PREFIX: [(&'static str, CommentKind); 2] =
+        [("/*", CommentKind::Block), ("--", CommentKind::Line)];
     pub(crate) fn from_text(text: &str) -> CommentKind {
         let &(_prefix, kind) = CommentKind::BY_PREFIX
             .iter()

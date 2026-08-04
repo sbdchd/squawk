@@ -68,10 +68,6 @@ impl<'a> LexedStr<'a> {
         self.kind[i]
     }
 
-    pub(crate) fn text(&self, i: usize) -> &str {
-        self.range_text(i..i + 1)
-    }
-
     pub(crate) fn range_text(&self, r: ops::Range<usize>) -> &str {
         assert!(r.start < r.end && r.end <= self.len());
         let lo = self.start[r.start] as usize;

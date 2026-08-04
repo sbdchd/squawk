@@ -29,7 +29,7 @@ pub(crate) fn preceding_comment(node: &SyntaxNode) -> Option<String> {
         // create function foo() returns void
         //   as 'select 1' language sql;
         if let Some(ws) = ast::Whitespace::cast(token)
-            && !ws.text().contains("\n\n")
+            && !ws.spans_multiple_lines()
         {
             continue;
         }
@@ -105,6 +105,13 @@ mod tests {
 
 create function foo() returns int as $$ select 1 $$ language sql;
 ",
+        );
+    }
+
+    #[test]
+    fn not_preceding_func_with_cr_line_endings() {
+        no_comment(
+            "-- not connected\r\rcreate function foo() returns int as $$ select 1 $$ language sql;",
         );
     }
 

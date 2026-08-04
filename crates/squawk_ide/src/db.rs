@@ -2,7 +2,7 @@ use salsa::Database as Db;
 #[cfg(test)]
 use salsa::Setter;
 use salsa::Storage;
-use squawk_line_index::LineIndex;
+use squawk_line_index::{LineIndex, find_newline};
 use squawk_syntax::{Parse, SourceFile};
 use std::sync::Arc;
 
@@ -24,6 +24,13 @@ pub fn parse(db: &dyn Db, file: File) -> Parse<SourceFile> {
 #[salsa::tracked]
 pub fn line_index(db: &dyn Db, file: File) -> LineIndex {
     LineIndex::new(file.content(db))
+}
+
+pub(crate) fn line_ending(db: &dyn Db, file: File) -> &'static str {
+    find_newline(file.content(db))
+        .map(|(_, line_ending)| line_ending)
+        .unwrap_or_default()
+        .as_str()
 }
 
 #[inline]

@@ -76,19 +76,8 @@ impl Builder<'_, '_> {
             State::Normal => (),
         }
 
-        let n_trivias = (self.pos..self.lexed.len())
-            .take_while(|&it| self.lexed.kind(it).is_trivia())
-            .count();
-        let leading_trivias = self.pos..self.pos + n_trivias;
-        let n_attached_trivias = n_attached_trivias(
-            kind,
-            leading_trivias
-                .rev()
-                .map(|it| (self.lexed.kind(it), self.lexed.text(it))),
-        );
-        self.eat_n_trivias(n_trivias - n_attached_trivias);
+        self.eat_trivias();
         (self.sink)(StrStep::Enter { kind });
-        self.eat_n_trivias(n_attached_trivias);
     }
 
     fn exit(&mut self) {
@@ -105,14 +94,6 @@ impl Builder<'_, '_> {
             if !kind.is_trivia() {
                 break;
             }
-            self.do_token(kind, 1);
-        }
-    }
-
-    fn eat_n_trivias(&mut self, n: usize) {
-        for _ in 0..n {
-            let kind = self.lexed.kind(self.pos);
-            assert!(kind.is_trivia());
             self.do_token(kind, 1);
         }
     }
@@ -187,56 +168,4 @@ impl LexedStr<'_> {
         // is_eof?
         builder.pos == builder.lexed.len()
     }
-}
-
-fn n_attached_trivias<'a>(
-    kind: SyntaxKind,
-    trivias: impl Iterator<Item = (SyntaxKind, &'a str)>,
-) -> usize {
-    match kind {
-        // CONST | ENUM | FN | IMPL | MACRO_CALL | MACRO_DEF | MACRO_RULES | MODULE | RECORD_FIELD
-        // | STATIC | STRUCT | TRAIT | TUPLE_FIELD | TYPE_ALIAS | UNION | USE | VARIANT
-        // | EXTERN_CRATE
-        SyntaxKind::CREATE_TABLE => {
-            let mut res = 0;
-            let mut trivias = trivias.enumerate().peekable();
-
-            while let Some((i, (kind, text))) = trivias.next() {
-                match kind {
-                    SyntaxKind::WHITESPACE if text.contains("\n\n") => {
-                        // we check whether the next token is a doc-comment
-                        // and skip the whitespace in this case
-                        if let Some((SyntaxKind::COMMENT, peek_text)) =
-                            trivias.peek().map(|(_, pair)| pair)
-                        {
-                            if is_outer(peek_text) {
-                                continue;
-                            }
-                        }
-                        break;
-                    }
-                    SyntaxKind::COMMENT => {
-                        if is_inner(text) {
-                            break;
-                        }
-                        res = i + 1;
-                    }
-                    _ => (),
-                }
-            }
-            res
-        }
-        _ => 0,
-    }
-}
-
-fn is_outer(text: &str) -> bool {
-    if text.starts_with("////") || text.starts_with("/***") {
-        return false;
-    }
-    text.starts_with("///") || text.starts_with("/**")
-}
-
-fn is_inner(text: &str) -> bool {
-    text.starts_with("//!") || text.starts_with("/*!")
 }
