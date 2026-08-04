@@ -21,6 +21,7 @@ path = "src/main.rs"
 tiny_pretty.workspace = true
 itertools.workspace = true
 squawk-syntax.workspace = true
+squawk-line-index.workspace = true
 rowan.workspace = true
 clap.workspace = true
 anyhow.workspace = true

@@ -7,6 +7,7 @@ use anyhow::{Context, Result, anyhow, bail};
 use console::strip_ansi_codes;
 use log::info;
 use squawk_github::{GitHubApi, actions, app, comment_on_pr};
+use squawk_line_index::UniversalNewlines;
 use std::io;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -201,7 +202,7 @@ fn get_summary_comment_body(
     for file in files {
         let violation_count = file.violations.len();
         let violations_emoji = get_violations_emoji(violation_count);
-        let line_count = file.sql.lines().count();
+        let line_count = file.sql.universal_newlines().count();
 
         let summary = format!(
             r"
@@ -281,7 +282,7 @@ fn format_comment(
 }
 
 fn truncate_sql_if_needed(sql: &str) -> (String, bool) {
-    let lines: Vec<&str> = sql.lines().collect();
+    let lines: Vec<&str> = sql.universal_newlines().collect();
     if lines.len() <= MAX_SQL_PREVIEW_LINES {
         (sql.to_string(), false)
     } else {

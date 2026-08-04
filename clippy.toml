@@ -2,3 +2,7 @@ disallowed-types = [
   { path = "std::collections::HashMap", reason = "Use rustc_hash::FxHashMap instead" },
   { path = "std::collections::HashSet", reason = "Use rustc_hash::FxHashSet instead" },
 ]
+
+disallowed-methods = [
+  { path = "str::lines", reason = "Use squawk_line_index::UniversalNewlines::universal_newlines instead, `str::lines` doesn't handle CR line endings" },
+]

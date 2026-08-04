@@ -2,6 +2,7 @@ use anyhow::{Context, Result, bail};
 use clap::Args;
 use jiff::Zoned;
 use regex::Regex;
+use squawk_line_index::UniversalNewlines;
 use xshell::{Shell, cmd};
 
 use crate::path::project_root;
@@ -42,7 +43,7 @@ pub(crate) fn update_version(args: UpdateVersionArgs) -> Result<()> {
 
     let tags = cmd!(sh, "git tag --sort=-version:refname").read()?;
     let latest_tag = tags
-        .lines()
+        .universal_newlines()
         .next()
         .filter(|t| !t.is_empty())
         .context("No previous git tag found")?;

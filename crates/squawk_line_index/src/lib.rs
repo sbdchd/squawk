@@ -15,7 +15,7 @@ mod tests;
 
 use nohash_hasher::IntMap;
 
-pub use local::{LineEnding, find_newline};
+pub use local::{LineEnding, UniversalNewlineIterator, UniversalNewlines, find_newline};
 pub use text_size::{TextRange, TextSize};
 
 /// `(line, column)` information in the native, UTF-8 encoding.

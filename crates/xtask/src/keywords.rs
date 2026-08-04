@@ -2,6 +2,7 @@ use crate::path::project_root;
 use anyhow::{Context, Ok, Result};
 use enum_iterator::{Sequence, all};
 use rustc_hash::{FxHashMap, FxHashSet};
+use squawk_line_index::UniversalNewlines;
 
 struct KeywordMeta {
     pub(crate) category: KeywordCategory,
@@ -80,7 +81,7 @@ fn parse_header() -> Result<FxHashMap<String, KeywordMeta>> {
 
     let mut keywords = FxHashMap::default();
 
-    for line in data.lines() {
+    for line in data.universal_newlines() {
         if line.starts_with("PG_KEYWORD") {
             let line = line
                 .split(&['(', ')'])
