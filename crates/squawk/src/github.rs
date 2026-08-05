@@ -282,10 +282,7 @@ fn format_comment(
 }
 
 fn truncate_sql_if_needed(sql: &str) -> (String, bool) {
-    let lines: Vec<&str> = sql
-        .universal_newlines()
-        .map(|line| line.as_str())
-        .collect();
+    let lines: Vec<&str> = sql.universal_newlines().map(|line| line.as_str()).collect();
     if lines.len() <= MAX_SQL_PREVIEW_LINES {
         (sql.to_string(), false)
     } else {
