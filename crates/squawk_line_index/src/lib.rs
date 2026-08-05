@@ -5,17 +5,20 @@
 //!
 //! - `\r` and `\r\n` start a new line, not just `\n`. Upstream only breaks on
 //!   `\n`, which leaves a classic Mac file looking like one enormous line.
-//! - [`local`] adds helpers upstream doesn't have.
+//! - [`newlines`] adds helpers upstream doesn't have.
 
 #![deny(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
-mod local;
+#[allow(missing_debug_implementations, missing_docs)]
+mod newlines;
 #[cfg(test)]
 mod tests;
 
 use nohash_hasher::IntMap;
 
-pub use local::{LineEnding, UniversalNewlineIterator, UniversalNewlines, find_newline};
+pub use newlines::{
+    Line, LineEnding, UniversalNewlineIterator, UniversalNewlines, find_newline,
+};
 pub use text_size::{TextRange, TextSize};
 
 /// `(line, column)` information in the native, UTF-8 encoding.

@@ -56,7 +56,12 @@ fn normalize_comment(comment: &str) -> String {
     {
         let normalized = comment
             .universal_newlines()
-            .map(|line| line.trim_start().trim_start_matches('*').trim_start())
+            .map(|line| {
+                line.as_str()
+                    .trim_start()
+                    .trim_start_matches('*')
+                    .trim_start()
+            })
             .collect::<Vec<_>>()
             .join("\n");
 

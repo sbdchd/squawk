@@ -45,6 +45,7 @@ pub(crate) fn update_version(args: UpdateVersionArgs) -> Result<()> {
     let latest_tag = tags
         .universal_newlines()
         .next()
+        .map(|line| line.as_str())
         .filter(|t| !t.is_empty())
         .context("No previous git tag found")?;
     println!("Fetching commits since {latest_tag}...");
