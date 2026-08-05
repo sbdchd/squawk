@@ -6,6 +6,7 @@ use crate::file::InFile;
 
 mod add_explicit_alias;
 mod add_schema;
+mod convert_comment;
 mod quote_identifier;
 mod remove_else_clause;
 mod remove_redundant_alias;
@@ -32,6 +33,7 @@ mod test_utils;
 
 use add_explicit_alias::add_explicit_alias;
 use add_schema::add_schema;
+use convert_comment::convert_comment;
 use quote_identifier::quote_identifier;
 use remove_else_clause::remove_else_clause;
 use remove_redundant_alias::remove_redundant_alias;
@@ -68,6 +70,7 @@ pub struct CodeAction {
 
 pub fn code_actions(db: &dyn Db, position: InFile<TextSize>) -> Option<Vec<CodeAction>> {
     let mut actions = vec![];
+    convert_comment(db, position, &mut actions);
     rewrite_as_regular_string(db, position, &mut actions);
     rewrite_as_dollar_quoted_string(db, position, &mut actions);
     remove_else_clause(db, position, &mut actions);

@@ -168,7 +168,6 @@ pub struct NewlineWithTrailingNewline<'a> {
     underlying: UniversalNewlineIterator<'a>,
 }
 
-#[expect(unused)]
 impl<'a> NewlineWithTrailingNewline<'a> {
     pub fn from(input: &'a str) -> NewlineWithTrailingNewline<'a> {
         Self::with_offset(input, TextSize::default())
