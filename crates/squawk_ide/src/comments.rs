@@ -1,7 +1,7 @@
 use rowan::{Direction, NodeOrToken};
 use squawk_line_index::UniversalNewlines;
 use squawk_syntax::{
-    SyntaxNode,
+    SyntaxNode, SyntaxToken,
     ast::{self, AstToken},
 };
 
@@ -46,22 +46,14 @@ pub(crate) fn preceding_comment(node: &SyntaxNode) -> Option<String> {
 }
 
 fn normalize_comment(comment: &str) -> String {
-    if let Some(comment) = comment.strip_prefix("--") {
-        return comment.trim().to_string();
+    if let Some(content) = line_comment_content(comment) {
+        return content.to_string();
     }
 
-    if let Some(comment) = comment
-        .strip_prefix("/*")
-        .and_then(|comment| comment.strip_suffix("*/"))
-    {
-        let normalized = comment
+    if let Some(content) = block_comment_content(comment) {
+        let normalized = content
             .universal_newlines()
-            .map(|line| {
-                line.as_str()
-                    .trim_start()
-                    .trim_start_matches('*')
-                    .trim_start()
-            })
+            .map(|line| strip_block_decoration(line.as_str()))
             .collect::<Vec<_>>()
             .join("\n");
 
@@ -69,6 +61,68 @@ fn normalize_comment(comment: &str) -> String {
     }
 
     comment.trim().to_string()
+}
+
+pub(crate) fn line_comment_content(comment: &str) -> Option<&str> {
+    comment.strip_prefix("--").map(str::trim)
+}
+
+pub(crate) fn block_comment_content(comment: &str) -> Option<&str> {
+    comment.strip_prefix("/*")?.strip_suffix("*/")
+}
+
+pub(crate) fn strip_block_decoration(line: &str) -> &str {
+    let line = line.trim();
+    let Some(content) = line.strip_prefix('*') else {
+        return line;
+    };
+
+    if content.is_empty() || content.chars().next().is_some_and(char::is_whitespace) {
+        content.trim()
+    } else {
+        line
+    }
+}
+
+pub(crate) fn line_comment_group(comment: &ast::Comment) -> Vec<ast::Comment> {
+    let mut comments = vec![comment.clone()];
+
+    let mut current = comment.clone();
+    while let Some(prev) = adjacent_line_comment(&current, Direction::Prev) {
+        comments.push(prev.clone());
+        current = prev;
+    }
+    comments.reverse();
+
+    let mut current = comment.clone();
+    while let Some(next) = adjacent_line_comment(&current, Direction::Next) {
+        comments.push(next.clone());
+        current = next;
+    }
+
+    comments
+}
+
+fn line_break_count(text: &str) -> usize {
+    text.universal_newlines()
+        .filter(|line| line.line_ending().is_some())
+        .count()
+}
+
+fn adjacent_line_comment(comment: &ast::Comment, direction: Direction) -> Option<ast::Comment> {
+    let whitespace = ast::Whitespace::cast(adjacent_token(comment.syntax(), direction)?)?;
+    if line_break_count(whitespace.text()) != 1 {
+        return None;
+    }
+    let adjacent = ast::Comment::cast(adjacent_token(whitespace.syntax(), direction)?)?;
+    adjacent.kind().is_line().then_some(adjacent)
+}
+
+fn adjacent_token(token: &SyntaxToken, direction: Direction) -> Option<SyntaxToken> {
+    match direction {
+        Direction::Next => token.next_token(),
+        Direction::Prev => token.prev_token(),
+    }
 }
 
 #[cfg(test)]

@@ -29,12 +29,13 @@
 
 use rustc_hash::FxHashSet;
 
-use rowan::{Direction, NodeOrToken, SyntaxText, TextRange};
+use rowan::{NodeOrToken, SyntaxText, TextRange};
 use salsa::Database as Db;
 use squawk_line_index::find_newline;
 use squawk_syntax::SyntaxKind;
 use squawk_syntax::ast::{self, AstNode, AstToken};
 
+use crate::comments::line_comment_group;
 use crate::db::{File, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -201,50 +202,28 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
 }
 
 fn contiguous_range_for_comment(
-    first: ast::Comment,
+    comment: ast::Comment,
     visited: &mut FxHashSet<ast::Comment>,
 ) -> Option<TextRange> {
-    visited.insert(first.clone());
+    visited.insert(comment.clone());
 
     // Only fold comments of the same flavor
-    let group_kind = first.kind();
-    if !group_kind.is_line() {
+    if !comment.kind().is_line() {
         return None;
     }
 
-    let mut last = first.clone();
-    for element in first.syntax().siblings_with_tokens(Direction::Next) {
-        match element {
-            NodeOrToken::Token(token) => {
-                if let Some(ws) = ast::Whitespace::cast(token.clone())
-                    && !ws.spans_multiple_lines()
-                {
-                    // Ignore whitespace without blank lines
-                    continue;
-                }
-                if let Some(c) = ast::Comment::cast(token) {
-                    visited.insert(c.clone());
-                    last = c;
-                    continue;
-                }
-                // The comment group ends because either:
-                // * An element of a different kind was reached
-                // * A comment of a different flavor was reached
-                break;
-            }
-            NodeOrToken::Node(_) => break,
-        }
-    }
+    let group = line_comment_group(&comment);
+    visited.extend(group.iter().cloned());
 
-    if first != last {
-        Some(TextRange::new(
-            first.syntax().text_range().start(),
-            last.syntax().text_range().end(),
-        ))
-    } else {
-        // The group consists of only one element, therefore it cannot be folded
-        None
-    }
+    // A group of one element cannot be folded
+    let [first, .., last] = group.as_slice() else {
+        return None;
+    };
+
+    Some(TextRange::new(
+        first.syntax().text_range().start(),
+        last.syntax().text_range().end(),
+    ))
 }
 
 #[cfg(test)]
@@ -370,6 +349,58 @@ select 1;"), @"
 select 1;"), @"
         /* first part */
         -- second part
+        select 1;
+        ");
+    }
+
+    #[test]
+    fn fold_comments_does_not_apply_when_block_comment_follows() {
+        assert_snapshot!(check("
+-- first part
+/* second part */
+select 1;"), @"
+        -- first part
+        /* second part */
+        select 1;
+        ");
+    }
+
+    #[test]
+    fn fold_comments_groups_across_statements() {
+        assert_snapshot!(check("
+select 1; -- a
+-- b
+select 2;"), @"
+        select 1; <fold comment>-- a
+        -- b</fold>
+        select 2;
+        ");
+    }
+
+    #[test]
+    fn fold_comments_groups_nested_in_a_list() {
+        assert_snapshot!(check("
+select 1, -- a
+  -- b
+  2;"), @"
+        <fold statement>select <fold list>1, <fold comment>-- a
+          -- b</fold>
+          2</fold>;</fold>
+        ");
+    }
+
+    #[test]
+    fn fold_comments_with_cr_line_endings() {
+        assert_snapshot!(check(&"
+-- this is
+-- a comment
+
+-- separate
+select 1;".replace('\n', "\r")).replace('\r', "\n"), @"
+        <fold comment>-- this is
+        -- a comment</fold>
+
+        -- separate
         select 1;
         ");
     }
