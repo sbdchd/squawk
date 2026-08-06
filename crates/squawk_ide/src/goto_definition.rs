@@ -143,6 +143,7 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
                     resolve::resolve_database_ref(db, InFile::new(definition_file, &name_ref))
                 })
             }
+            ast::AnyNameRef::ElementTableRef(_) => None,
             ast::AnyNameRef::EventTriggerRef(name_ref) => {
                 resolve_in_files(db, file, |definition_file| {
                     resolve::resolve_event_trigger_ref(db, InFile::new(definition_file, &name_ref))
@@ -164,6 +165,7 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
             ast::AnyNameRef::JsonPathNameRef(name_ref) => {
                 return resolve::resolve_json_path_name_ref(file, &name_ref).unwrap_or_default();
             }
+            ast::AnyNameRef::LabelRef(_) => None,
             ast::AnyNameRef::LanguageRef(name_ref) => {
                 resolve_in_files(db, file, |definition_file| {
                     resolve::resolve_language_ref(db, InFile::new(definition_file, &name_ref))
@@ -193,6 +195,7 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
                     )
                 })
             }
+            ast::AnyNameRef::PropertyNameRef(_) => None,
             ast::AnyNameRef::PublicationRef(name_ref) => {
                 resolve_in_files(db, file, |definition_file| {
                     resolve::resolve_publication_ref(db, InFile::new(definition_file, &name_ref))

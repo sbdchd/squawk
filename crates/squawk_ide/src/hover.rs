@@ -208,6 +208,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::CursorRef(_)
             | ast::AnyName::DatabaseRef(_)
             | ast::AnyName::ElementTableAlias(_)
+            | ast::AnyName::ElementTableRef(_)
             | ast::AnyName::ElementTag(_)
             | ast::AnyName::EventTriggerRef(_)
             | ast::AnyName::ExplainOptionName(_)
@@ -217,6 +218,8 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::GrantRoleOptionName(_)
             | ast::AnyName::JsonPathNameRef(_)
             | ast::AnyName::JsonVariableName(_)
+            | ast::AnyName::Label(_)
+            | ast::AnyName::LabelRef(_)
             | ast::AnyName::LanguageRef(_)
             | ast::AnyName::NameRef(_)
             | ast::AnyName::ParamNameRef(_)
@@ -224,6 +227,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::PolicyRef(_)
             | ast::AnyName::PreparedStatementRef(_)
             | ast::AnyName::PropertyName(_)
+            | ast::AnyName::PropertyNameRef(_)
             | ast::AnyName::PublicationRef(_)
             | ast::AnyName::RemoteTableNameRef(_)
             | ast::AnyName::RoleRef(_)
@@ -344,7 +348,12 @@ fn hover_name(db: &dyn Db, def: Location) -> Option<Hover> {
     match def.kind {
         LocationKind::AccessMethod => hover_access_method(db, def),
         LocationKind::Aggregate => hover_aggregate(db, def),
-        LocationKind::CaseExpr | LocationKind::CommitBegin | LocationKind::CommitEnd => None,
+        LocationKind::CaseExpr
+        | LocationKind::CommitBegin
+        | LocationKind::CommitEnd
+        | LocationKind::ElementTable
+        | LocationKind::Label
+        | LocationKind::Property => None,
         LocationKind::Channel => hover_channel(db, def),
         LocationKind::Column => hover_name_column(db, def),
         LocationKind::Constraint => hover_constraint(db, def),
@@ -427,7 +436,12 @@ fn hover_position(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
     match def.kind {
         LocationKind::AccessMethod => hover_access_method(db, def),
         LocationKind::Aggregate => hover_aggregate(db, def),
-        LocationKind::CaseExpr | LocationKind::CommitBegin | LocationKind::CommitEnd => None,
+        LocationKind::CaseExpr
+        | LocationKind::CommitBegin
+        | LocationKind::CommitEnd
+        | LocationKind::ElementTable
+        | LocationKind::Label
+        | LocationKind::Property => None,
         LocationKind::Channel => hover_channel(db, def),
         LocationKind::Column => {
             if let Some(result) = hover_composite_type_field(db, def) {
