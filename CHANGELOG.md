@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.62.0 - 2026-08-06
+
+### Added
+
+- linter: add ban-duplicate-column-assignments rule (#1263, #1262)
+- ide: add code action to switch between comment types (#1271)
+- ide: add code action `Rewrite integer as` (#1266)
+- ide: fold where clauses (#1265)
+
+### Changed
+
+- parser: refactor names/name refs into specific nodes (#1272, #1260, #1259, #1258, #1257, #1256, #1254, #1253)
+
+### Fixed
+
+- linter: support all line endings (#1270, #1269, #1268, #1267)
+- ide: fix goto def for composite type subfield (#1255)
+
 ## v2.61.0 - 2026-07-24
 
 ### Changed
