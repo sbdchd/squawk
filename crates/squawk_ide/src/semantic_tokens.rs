@@ -189,13 +189,16 @@ impl TryFrom<LocationKind> for SemanticTokenType {
                 Ok(SemanticTokenType::Function)
             }
             LocationKind::Column => Ok(SemanticTokenType::Column),
-            LocationKind::JsonPath => Ok(SemanticTokenType::Name),
+            LocationKind::JsonPath | LocationKind::Label | LocationKind::Property => {
+                Ok(SemanticTokenType::Name)
+            }
             LocationKind::NamedArgParameter => Ok(SemanticTokenType::Parameter),
             LocationKind::Schema => Ok(SemanticTokenType::Schema),
             LocationKind::PropertyGraph => Ok(SemanticTokenType::PropertyGraph),
-            LocationKind::Sequence | LocationKind::Table | LocationKind::View => {
-                Ok(SemanticTokenType::Table)
-            }
+            LocationKind::ElementTable
+            | LocationKind::Sequence
+            | LocationKind::Table
+            | LocationKind::View => Ok(SemanticTokenType::Table),
             LocationKind::Type => Ok(SemanticTokenType::Type),
             LocationKind::AccessMethod
             | LocationKind::CaseExpr

@@ -26691,6 +26691,7 @@ pub enum AnyName {
     Database(Database),
     DatabaseRef(DatabaseRef),
     ElementTableAlias(ElementTableAlias),
+    ElementTableRef(ElementTableRef),
     ElementTag(ElementTag),
     EventTrigger(EventTrigger),
     EventTriggerRef(EventTriggerRef),
@@ -26704,6 +26705,8 @@ pub enum AnyName {
     JsonPathName(JsonPathName),
     JsonPathNameRef(JsonPathNameRef),
     JsonVariableName(JsonVariableName),
+    Label(Label),
+    LabelRef(LabelRef),
     Language(Language),
     LanguageRef(LanguageRef),
     NameRef(NameRef),
@@ -26716,6 +26719,7 @@ pub enum AnyName {
     PreparedStatement(PreparedStatement),
     PreparedStatementRef(PreparedStatementRef),
     PropertyName(PropertyName),
+    PropertyNameRef(PropertyNameRef),
     Publication(Publication),
     PublicationRef(PublicationRef),
     RemoteTableNameRef(RemoteTableNameRef),
@@ -26756,16 +26760,19 @@ pub enum AnyNameRef {
     CompositeFieldRef(CompositeFieldRef),
     CursorRef(CursorRef),
     DatabaseRef(DatabaseRef),
+    ElementTableRef(ElementTableRef),
     EventTriggerRef(EventTriggerRef),
     ExtensionRef(ExtensionRef),
     ForeignDataWrapperRef(ForeignDataWrapperRef),
     JsonPathNameRef(JsonPathNameRef),
+    LabelRef(LabelRef),
     LanguageRef(LanguageRef),
     NameRef(NameRef),
     ParamNameRef(ParamNameRef),
     PathSegmentRef(PathSegmentRef),
     PolicyRef(PolicyRef),
     PreparedStatementRef(PreparedStatementRef),
+    PropertyNameRef(PropertyNameRef),
     PublicationRef(PublicationRef),
     RemoteTableNameRef(RemoteTableNameRef),
     RoleRef(RoleRef),
@@ -52227,6 +52234,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::DATABASE
                 | SyntaxKind::DATABASE_REF
                 | SyntaxKind::ELEMENT_TABLE_ALIAS
+                | SyntaxKind::ELEMENT_TABLE_REF
                 | SyntaxKind::ELEMENT_TAG
                 | SyntaxKind::EVENT_TRIGGER
                 | SyntaxKind::EVENT_TRIGGER_REF
@@ -52240,6 +52248,8 @@ impl AstNode for AnyName {
                 | SyntaxKind::JSON_PATH_NAME
                 | SyntaxKind::JSON_PATH_NAME_REF
                 | SyntaxKind::JSON_VARIABLE_NAME
+                | SyntaxKind::LABEL
+                | SyntaxKind::LABEL_REF
                 | SyntaxKind::LANGUAGE
                 | SyntaxKind::LANGUAGE_REF
                 | SyntaxKind::NAME_REF
@@ -52252,6 +52262,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::PREPARED_STATEMENT
                 | SyntaxKind::PREPARED_STATEMENT_REF
                 | SyntaxKind::PROPERTY_NAME
+                | SyntaxKind::PROPERTY_NAME_REF
                 | SyntaxKind::PUBLICATION
                 | SyntaxKind::PUBLICATION_REF
                 | SyntaxKind::REMOTE_TABLE_NAME_REF
@@ -52314,6 +52325,7 @@ impl AstNode for AnyName {
             SyntaxKind::ELEMENT_TABLE_ALIAS => {
                 AnyName::ElementTableAlias(ElementTableAlias { syntax })
             }
+            SyntaxKind::ELEMENT_TABLE_REF => AnyName::ElementTableRef(ElementTableRef { syntax }),
             SyntaxKind::ELEMENT_TAG => AnyName::ElementTag(ElementTag { syntax }),
             SyntaxKind::EVENT_TRIGGER => AnyName::EventTrigger(EventTrigger { syntax }),
             SyntaxKind::EVENT_TRIGGER_REF => AnyName::EventTriggerRef(EventTriggerRef { syntax }),
@@ -52339,6 +52351,8 @@ impl AstNode for AnyName {
             SyntaxKind::JSON_VARIABLE_NAME => {
                 AnyName::JsonVariableName(JsonVariableName { syntax })
             }
+            SyntaxKind::LABEL => AnyName::Label(Label { syntax }),
+            SyntaxKind::LABEL_REF => AnyName::LabelRef(LabelRef { syntax }),
             SyntaxKind::LANGUAGE => AnyName::Language(Language { syntax }),
             SyntaxKind::LANGUAGE_REF => AnyName::LanguageRef(LanguageRef { syntax }),
             SyntaxKind::NAME_REF => AnyName::NameRef(NameRef { syntax }),
@@ -52355,6 +52369,7 @@ impl AstNode for AnyName {
                 AnyName::PreparedStatementRef(PreparedStatementRef { syntax })
             }
             SyntaxKind::PROPERTY_NAME => AnyName::PropertyName(PropertyName { syntax }),
+            SyntaxKind::PROPERTY_NAME_REF => AnyName::PropertyNameRef(PropertyNameRef { syntax }),
             SyntaxKind::PUBLICATION => AnyName::Publication(Publication { syntax }),
             SyntaxKind::PUBLICATION_REF => AnyName::PublicationRef(PublicationRef { syntax }),
             SyntaxKind::REMOTE_TABLE_NAME_REF => {
@@ -52423,6 +52438,7 @@ impl AstNode for AnyName {
             AnyName::Database(it) => &it.syntax,
             AnyName::DatabaseRef(it) => &it.syntax,
             AnyName::ElementTableAlias(it) => &it.syntax,
+            AnyName::ElementTableRef(it) => &it.syntax,
             AnyName::ElementTag(it) => &it.syntax,
             AnyName::EventTrigger(it) => &it.syntax,
             AnyName::EventTriggerRef(it) => &it.syntax,
@@ -52436,6 +52452,8 @@ impl AstNode for AnyName {
             AnyName::JsonPathName(it) => &it.syntax,
             AnyName::JsonPathNameRef(it) => &it.syntax,
             AnyName::JsonVariableName(it) => &it.syntax,
+            AnyName::Label(it) => &it.syntax,
+            AnyName::LabelRef(it) => &it.syntax,
             AnyName::Language(it) => &it.syntax,
             AnyName::LanguageRef(it) => &it.syntax,
             AnyName::NameRef(it) => &it.syntax,
@@ -52448,6 +52466,7 @@ impl AstNode for AnyName {
             AnyName::PreparedStatement(it) => &it.syntax,
             AnyName::PreparedStatementRef(it) => &it.syntax,
             AnyName::PropertyName(it) => &it.syntax,
+            AnyName::PropertyNameRef(it) => &it.syntax,
             AnyName::Publication(it) => &it.syntax,
             AnyName::PublicationRef(it) => &it.syntax,
             AnyName::RemoteTableNameRef(it) => &it.syntax,
@@ -52600,6 +52619,12 @@ impl From<ElementTableAlias> for AnyName {
         AnyName::ElementTableAlias(node)
     }
 }
+impl From<ElementTableRef> for AnyName {
+    #[inline]
+    fn from(node: ElementTableRef) -> AnyName {
+        AnyName::ElementTableRef(node)
+    }
+}
 impl From<ElementTag> for AnyName {
     #[inline]
     fn from(node: ElementTag) -> AnyName {
@@ -52678,6 +52703,18 @@ impl From<JsonVariableName> for AnyName {
         AnyName::JsonVariableName(node)
     }
 }
+impl From<Label> for AnyName {
+    #[inline]
+    fn from(node: Label) -> AnyName {
+        AnyName::Label(node)
+    }
+}
+impl From<LabelRef> for AnyName {
+    #[inline]
+    fn from(node: LabelRef) -> AnyName {
+        AnyName::LabelRef(node)
+    }
+}
 impl From<Language> for AnyName {
     #[inline]
     fn from(node: Language) -> AnyName {
@@ -52748,6 +52785,12 @@ impl From<PropertyName> for AnyName {
     #[inline]
     fn from(node: PropertyName) -> AnyName {
         AnyName::PropertyName(node)
+    }
+}
+impl From<PropertyNameRef> for AnyName {
+    #[inline]
+    fn from(node: PropertyNameRef) -> AnyName {
+        AnyName::PropertyNameRef(node)
     }
 }
 impl From<Publication> for AnyName {
@@ -52936,16 +52979,19 @@ impl AstNode for AnyNameRef {
                 | SyntaxKind::COMPOSITE_FIELD_REF
                 | SyntaxKind::CURSOR_REF
                 | SyntaxKind::DATABASE_REF
+                | SyntaxKind::ELEMENT_TABLE_REF
                 | SyntaxKind::EVENT_TRIGGER_REF
                 | SyntaxKind::EXTENSION_REF
                 | SyntaxKind::FOREIGN_DATA_WRAPPER_REF
                 | SyntaxKind::JSON_PATH_NAME_REF
+                | SyntaxKind::LABEL_REF
                 | SyntaxKind::LANGUAGE_REF
                 | SyntaxKind::NAME_REF
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT_REF
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT_REF
+                | SyntaxKind::PROPERTY_NAME_REF
                 | SyntaxKind::PUBLICATION_REF
                 | SyntaxKind::REMOTE_TABLE_NAME_REF
                 | SyntaxKind::ROLE_REF
@@ -52976,6 +53022,9 @@ impl AstNode for AnyNameRef {
             }
             SyntaxKind::CURSOR_REF => AnyNameRef::CursorRef(CursorRef { syntax }),
             SyntaxKind::DATABASE_REF => AnyNameRef::DatabaseRef(DatabaseRef { syntax }),
+            SyntaxKind::ELEMENT_TABLE_REF => {
+                AnyNameRef::ElementTableRef(ElementTableRef { syntax })
+            }
             SyntaxKind::EVENT_TRIGGER_REF => {
                 AnyNameRef::EventTriggerRef(EventTriggerRef { syntax })
             }
@@ -52986,6 +53035,7 @@ impl AstNode for AnyNameRef {
             SyntaxKind::JSON_PATH_NAME_REF => {
                 AnyNameRef::JsonPathNameRef(JsonPathNameRef { syntax })
             }
+            SyntaxKind::LABEL_REF => AnyNameRef::LabelRef(LabelRef { syntax }),
             SyntaxKind::LANGUAGE_REF => AnyNameRef::LanguageRef(LanguageRef { syntax }),
             SyntaxKind::NAME_REF => AnyNameRef::NameRef(NameRef { syntax }),
             SyntaxKind::PARAM_NAME_REF => AnyNameRef::ParamNameRef(ParamNameRef { syntax }),
@@ -52993,6 +53043,9 @@ impl AstNode for AnyNameRef {
             SyntaxKind::POLICY_REF => AnyNameRef::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT_REF => {
                 AnyNameRef::PreparedStatementRef(PreparedStatementRef { syntax })
+            }
+            SyntaxKind::PROPERTY_NAME_REF => {
+                AnyNameRef::PropertyNameRef(PropertyNameRef { syntax })
             }
             SyntaxKind::PUBLICATION_REF => AnyNameRef::PublicationRef(PublicationRef { syntax }),
             SyntaxKind::REMOTE_TABLE_NAME_REF => {
@@ -53024,16 +53077,19 @@ impl AstNode for AnyNameRef {
             AnyNameRef::CompositeFieldRef(it) => &it.syntax,
             AnyNameRef::CursorRef(it) => &it.syntax,
             AnyNameRef::DatabaseRef(it) => &it.syntax,
+            AnyNameRef::ElementTableRef(it) => &it.syntax,
             AnyNameRef::EventTriggerRef(it) => &it.syntax,
             AnyNameRef::ExtensionRef(it) => &it.syntax,
             AnyNameRef::ForeignDataWrapperRef(it) => &it.syntax,
             AnyNameRef::JsonPathNameRef(it) => &it.syntax,
+            AnyNameRef::LabelRef(it) => &it.syntax,
             AnyNameRef::LanguageRef(it) => &it.syntax,
             AnyNameRef::NameRef(it) => &it.syntax,
             AnyNameRef::ParamNameRef(it) => &it.syntax,
             AnyNameRef::PathSegmentRef(it) => &it.syntax,
             AnyNameRef::PolicyRef(it) => &it.syntax,
             AnyNameRef::PreparedStatementRef(it) => &it.syntax,
+            AnyNameRef::PropertyNameRef(it) => &it.syntax,
             AnyNameRef::PublicationRef(it) => &it.syntax,
             AnyNameRef::RemoteTableNameRef(it) => &it.syntax,
             AnyNameRef::RoleRef(it) => &it.syntax,
@@ -53091,6 +53147,12 @@ impl From<DatabaseRef> for AnyNameRef {
         AnyNameRef::DatabaseRef(node)
     }
 }
+impl From<ElementTableRef> for AnyNameRef {
+    #[inline]
+    fn from(node: ElementTableRef) -> AnyNameRef {
+        AnyNameRef::ElementTableRef(node)
+    }
+}
 impl From<EventTriggerRef> for AnyNameRef {
     #[inline]
     fn from(node: EventTriggerRef) -> AnyNameRef {
@@ -53113,6 +53175,12 @@ impl From<JsonPathNameRef> for AnyNameRef {
     #[inline]
     fn from(node: JsonPathNameRef) -> AnyNameRef {
         AnyNameRef::JsonPathNameRef(node)
+    }
+}
+impl From<LabelRef> for AnyNameRef {
+    #[inline]
+    fn from(node: LabelRef) -> AnyNameRef {
+        AnyNameRef::LabelRef(node)
     }
 }
 impl From<LanguageRef> for AnyNameRef {
@@ -53149,6 +53217,12 @@ impl From<PreparedStatementRef> for AnyNameRef {
     #[inline]
     fn from(node: PreparedStatementRef) -> AnyNameRef {
         AnyNameRef::PreparedStatementRef(node)
+    }
+}
+impl From<PropertyNameRef> for AnyNameRef {
+    #[inline]
+    fn from(node: PropertyNameRef) -> AnyNameRef {
+        AnyNameRef::PropertyNameRef(node)
     }
 }
 impl From<PublicationRef> for AnyNameRef {

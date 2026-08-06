@@ -3641,10 +3641,10 @@ LabelAndPropertiesList =
   (LabelAndProperties (',' LabelAndProperties)*)
 
 Label =
-  '#ident'?
+  '#name'?
 
 LabelRef =
-  '#ident'?
+  '#name'?
 
 LabelAndProperties = 
   (
@@ -3680,7 +3680,7 @@ VertexTableRef =
   '#name'?
 
 ElementTableRef =
-  '#ident'?
+  '#name'?
 
 ElementTableAlias =
   '#name'?
@@ -3692,7 +3692,7 @@ PropertyName =
   '#name'?
 
 PropertyNameRef =
-  '#ident'?
+  '#name'?
 
 AlterPropertyGraph =
   'alter' 'property' 'graph' IfExists? PropertyGraphRef
