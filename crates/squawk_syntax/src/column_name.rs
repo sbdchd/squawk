@@ -1,10 +1,10 @@
-use squawk_syntax::{
+use crate::{
     SyntaxKind, SyntaxNode,
     ast::{self, AstNode},
 };
 
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) enum ColumnName {
+pub enum ColumnName {
     Column(String),
     /// There's a fallback mechanism that we need to propagate through the
     /// expressions/types.
@@ -23,7 +23,7 @@ pub(crate) enum ColumnName {
 
 impl ColumnName {
     // Get the alias, otherwise infer the column name.
-    pub(crate) fn from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
+    pub fn from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(as_name) = target.as_name()
             && let Some(name_node) = as_name.name()
         {
@@ -36,7 +36,7 @@ impl ColumnName {
     }
 
     // Ignore any aliases, just infer the what the column name.
-    pub(crate) fn inferred_from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
+    pub fn inferred_from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(expr) = target.expr()
             && let Some(name) = name_from_expr(expr, false)
         {
@@ -55,7 +55,7 @@ impl ColumnName {
         }
     }
 
-    pub(crate) fn to_string(&self) -> Option<String> {
+    pub fn to_string(&self) -> Option<String> {
         match self {
             ColumnName::Column(string) => Some(string.to_string()),
             ColumnName::Star => None,
@@ -695,7 +695,7 @@ fn examples() {
     #[track_caller]
     fn name(sql: &str) -> String {
         let sql = "select ".to_string() + sql;
-        let parse = squawk_syntax::SourceFile::parse(&sql);
+        let parse = crate::SourceFile::parse(&sql);
         assert_eq!(parse.errors(), vec![]);
         let file = parse.tree();
 

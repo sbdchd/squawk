@@ -1,5 +1,4 @@
 use crate::ast_nav;
-use crate::column_name::ColumnName;
 use crate::db::{File, bind, list_files, parse};
 use crate::file::InFile;
 use crate::goto_definition::goto_definition;
@@ -11,6 +10,7 @@ use crate::resolve::{
     resolve_table_like, resolve_table_name, table_ptr_from_from_item,
 };
 use salsa::Database as Db;
+use squawk_syntax::column_name::ColumnName;
 use squawk_syntax::{
     SyntaxNode, SyntaxNodePtr,
     ast::{self, AstNode},

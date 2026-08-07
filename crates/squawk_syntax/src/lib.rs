@@ -25,6 +25,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 pub mod ast;
+pub mod column_name;
 mod generated;
 mod parsing;
 mod ptr;
