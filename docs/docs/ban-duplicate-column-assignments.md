@@ -5,23 +5,21 @@ title: ban-duplicate-column-assignments
 
 ## problem
 
-Assigning to a column more than once in Postgres results in a runtime error.
+Assigning/declaring a column more than once results in a runtime error in
+Postgres.
 
 ```sql
-create table t(a int);
+create table t(a int, a text);
+create view v (a, a) as select 1, 2;
 update t set a = 1, a = 2;
-```
-
-gives:
-
-```
-Query 1 ERROR at Line 1: : ERROR:  multiple assignments to same column "a"
 ```
 
 ## solution
 
-Remove your dupe assignment:
+Remove duplicate assignments/declarations:
 
 ```sql
+create table t(a int);
+create view v (a, b) as select 1, 2;
 update t set a = 2;
 ```

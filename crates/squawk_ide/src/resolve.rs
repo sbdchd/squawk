@@ -7,7 +7,6 @@ use squawk_syntax::{
 };
 
 use crate::binder::ResolvedSchemas;
-use crate::column_name::ColumnName;
 use crate::db::File;
 use crate::file::InFile;
 use crate::location::{Location, LocationKind};
@@ -19,6 +18,7 @@ use crate::{
     db::{bind, parse},
 };
 use salsa::Database as Db;
+use squawk_syntax::column_name::ColumnName;
 
 fn resolve_named_arg_parameter<T>(
     db: &dyn Db,

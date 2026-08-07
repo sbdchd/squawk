@@ -4,7 +4,8 @@ use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 use squawk_syntax::quote::quote_column_alias;
 
-use crate::{column_name::ColumnName, file::InFile, offsets::token_from_offset};
+use crate::{file::InFile, offsets::token_from_offset};
+use squawk_syntax::column_name::ColumnName;
 
 use super::{ActionKind, CodeAction};
 

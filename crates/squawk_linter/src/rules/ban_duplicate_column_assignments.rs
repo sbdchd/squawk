@@ -1,7 +1,8 @@
 use rustc_hash::FxHashMap;
 use squawk_syntax::{
-    Parse, SourceFile, SyntaxKind,
+    Parse, SourceFile, SyntaxKind, SyntaxNode,
     ast::{self, AstNode, NameLike},
+    column_name::ColumnName,
 };
 
 use rowan::TextRange;
@@ -15,7 +16,10 @@ struct Name(String);
 
 impl Name {
     fn from_node(node: &impl NameLike) -> Self {
-        let mut text = node.text();
+        Self::from_string(node.text())
+    }
+
+    fn from_string(mut text: String) -> Self {
         text.truncate(text.floor_char_boundary(MAX_IDENT_BYTES));
         Self(text)
     }
@@ -46,10 +50,81 @@ pub(crate) fn ban_duplicate_column_assignments(ctx: &mut Linter, parse: &Parse<S
             && let Some(column_target_list) = insert.column_target_list()
         {
             check_insert_column_target_list(ctx, &column_target_list);
-        } else if let Some(merge_insert) = ast::MergeInsert::cast(node)
+        } else if let Some(merge_insert) = ast::MergeInsert::cast(node.clone())
             && let Some(column_target_list) = merge_insert.column_target_list()
         {
             check_insert_column_target_list(ctx, &column_target_list);
+        } else if let Some(create_table) = ast::CreateTableLike::cast(node.clone())
+            && let Some(table_arg_list) = create_table.table_arg_list()
+        {
+            check_table_arg_list(ctx, &table_arg_list);
+        } else if let Some(create_table_as) = ast::CreateTableAs::cast(node.clone())
+            && let Some(table_arg_list) = create_table_as.table_arg_list()
+        {
+            check_table_arg_list(ctx, &table_arg_list);
+        } else if let Some(create_view) = ast::CreateViewLike::cast(node.clone()) {
+            if let Some(column_list) = create_view.column_list() {
+                check_defined_columns(ctx, column_list.column_names());
+            } else if let Some(target_list) =
+                create_view.query().and_then(|query| query.target_list())
+            {
+                check_target_aliases(ctx, &target_list);
+            }
+        } else if let Some(select_into) = ast::SelectInto::cast(node)
+            && let Some(target_list) = select_into
+                .select_clause()
+                .and_then(|select_clause| select_clause.target_list())
+        {
+            check_target_aliases(ctx, &target_list);
+        }
+    }
+}
+
+fn check_table_arg_list(ctx: &mut Linter, table_arg_list: &ast::TableArgList) {
+    check_defined_columns(
+        ctx,
+        table_arg_list.args().filter_map(|arg| match arg {
+            ast::TableArg::Column(column) => column.name(),
+            _ => None,
+        }),
+    );
+}
+
+fn check_target_aliases(ctx: &mut Linter, target_list: &ast::TargetList) {
+    check_defined_nodes(
+        ctx,
+        target_list.targets().filter_map(|target| {
+            let (name, node) = ColumnName::from_target(target)?;
+            Some((Name::from_string(name.to_string()?), node))
+        }),
+    );
+}
+
+fn check_defined_columns(ctx: &mut Linter, columns: impl Iterator<Item = ast::ColumnName>) {
+    check_defined_nodes(
+        ctx,
+        columns.map(|column| (Name::from_node(&column), column.syntax().clone())),
+    );
+}
+
+fn check_defined_nodes(ctx: &mut Linter, columns: impl Iterator<Item = (Name, SyntaxNode)>) {
+    let mut defined_columns: FxHashMap<Name, Vec<SyntaxNode>> = FxHashMap::default();
+
+    for (name, column) in columns {
+        defined_columns.entry(name).or_default().push(column);
+    }
+
+    for (name, columns) in defined_columns {
+        if columns.len() < 2 {
+            continue;
+        }
+
+        for column in columns {
+            ctx.report(Violation::for_node(
+                Rule::BanDuplicateColumnAssignments,
+                format!("Column `{}` is specified more than once.", name.as_str()),
+                &column,
+            ));
         }
     }
 }
@@ -431,6 +506,115 @@ when not matched then
     }
 
     #[test]
+    fn create_table_err() {
+        let sql = r#"
+create table t (
+  a int,
+  a text
+);
+"#;
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        3 │   a int,
+          ╰╴  ━
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        4 │   a text
+          ╰╴  ━
+        ");
+    }
+
+    #[test]
+    fn create_foreign_table_err() {
+        let sql = r#"
+create foreign table t (
+  a int,
+  a text
+) server s;
+"#;
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        3 │   a int,
+          ╰╴  ━
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        4 │   a text
+          ╰╴  ━
+        ");
+    }
+
+    #[test]
+    fn create_view_err() {
+        let sql = r#"
+create view v (a, a) as
+select 1, 2;
+"#;
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        2 │ create view v (a, a) as
+          ╰╴               ━
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        2 │ create view v (a, a) as
+          ╰╴                  ━
+        ");
+    }
+
+    #[test]
+    fn create_view_with_duplicate_target_aliases_err() {
+        let sql = r#"
+create view v as
+select 1 a, 2 a;
+"#;
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        3 │ select 1 a, 2 a;
+          ╰╴         ━
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        3 │ select 1 a, 2 a;
+          ╰╴              ━
+        ");
+    }
+
+    #[test]
+    fn create_view_with_duplicate_inferred_names_err() {
+        let sql = r#"
+create view v as
+select 1, 2;
+"#;
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Column `?column?` is specified more than once.
+          ╭▸ 
+        3 │ select 1, 2;
+          ╰╴       ━
+        warning[ban-duplicate-column-assignments]: Column `?column?` is specified more than once.
+          ╭▸ 
+        3 │ select 1, 2;
+          ╰╴          ━
+        ");
+    }
+
+    #[test]
+    fn select_into_err() {
+        let sql = "select 1 a, 2 a into z;";
+        assert_snapshot!(lint(sql), @"
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        1 │ select 1 a, 2 a into z;
+          ╰╴         ━
+        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+          ╭▸ 
+        1 │ select 1 a, 2 a into z;
+          ╰╴              ━
+        ");
+    }
+
+    #[test]
     fn conflict_update_err() {
         let sql = r#"
 insert into k
@@ -503,6 +687,19 @@ set
   A = 2;
 insert into k (a, b)
 values (1, 2);
+create table t (
+  a int,
+  b int
+);
+create foreign table ft (
+  a int,
+  b int
+) server s;
+create view v (a, b) as
+select 1 a, 2 a;
+create view inferred_v as
+select 1 a, 2 b;
+select 1 a, 2 b into z;
 insert into k (a.x, a.y)
 values (1, 2);
 merge into k

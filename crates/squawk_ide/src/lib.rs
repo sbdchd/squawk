@@ -4,7 +4,6 @@ pub mod builtins;
 mod classify;
 pub mod code_actions;
 mod collect;
-pub mod column_name;
 mod comments;
 pub mod completion;
 pub mod db;

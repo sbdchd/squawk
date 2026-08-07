@@ -1,6 +1,5 @@
 use crate::ast_nav;
 use crate::collect;
-use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
 use crate::db::{File, bind, list_files, parse};
 use crate::file::InFile;
@@ -19,6 +18,7 @@ use squawk_line_index::find_newline;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::SyntaxNodePtr;
 use squawk_syntax::ast::LitKind;
+use squawk_syntax::column_name::ColumnName;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
