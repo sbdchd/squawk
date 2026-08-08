@@ -5,7 +5,7 @@ use crate::{
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ColumnName {
-    Column(String),
+    Column(ColumnNameValue),
     /// There's a fallback mechanism that we need to propagate through the
     /// expressions/types.
     //
@@ -17,8 +17,23 @@ pub enum ColumnName {
     /// select case when true then 'a' else 'b' end;
     /// -- column named `case`
     /// ```
-    UnknownColumn(Option<String>),
+    UnknownColumn(Option<ColumnNameValue>),
     Star,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum ColumnNameValue {
+    Static(&'static str),
+    Syntax(SyntaxNode),
+}
+
+impl ColumnNameValue {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Static(name) => (*name).to_owned(),
+            Self::Syntax(node) => ast::normalize_name_node(node),
+        }
+    }
 }
 
 impl ColumnName {
@@ -28,7 +43,7 @@ impl ColumnName {
             && let Some(name_node) = as_name.name()
         {
             return Some((
-                ColumnName::Column(name_node.text()),
+                ColumnName::from_name_node(name_node.syntax()),
                 name_node.syntax().clone(),
             ));
         }
@@ -47,7 +62,7 @@ impl ColumnName {
         None
     }
 
-    fn new(name: String, unknown_column: bool) -> ColumnName {
+    fn new(name: ColumnNameValue, unknown_column: bool) -> ColumnName {
         if unknown_column {
             ColumnName::UnknownColumn(Some(name))
         } else {
@@ -55,13 +70,26 @@ impl ColumnName {
         }
     }
 
+    fn column(name: &'static str) -> ColumnName {
+        ColumnName::Column(ColumnNameValue::Static(name))
+    }
+
+    fn new_static(name: &'static str, unknown_column: bool) -> ColumnName {
+        Self::new(ColumnNameValue::Static(name), unknown_column)
+    }
+
+    fn from_name_node(node: &SyntaxNode) -> ColumnName {
+        ColumnName::Column(ColumnNameValue::Syntax(node.clone()))
+    }
+
     pub fn to_string(&self) -> Option<String> {
         match self {
-            ColumnName::Column(string) => Some(string.to_string()),
+            ColumnName::Column(name) => Some(name.to_string()),
             ColumnName::Star => None,
-            ColumnName::UnknownColumn(c) => {
-                Some(c.clone().unwrap_or_else(|| "?column?".to_string()))
-            }
+            ColumnName::UnknownColumn(name) => Some(
+                name.as_ref()
+                    .map_or_else(|| "?column?".to_owned(), ColumnNameValue::to_string),
+            ),
         }
     }
 }
@@ -88,7 +116,7 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 "bit"
             };
             return Some((
-                ColumnName::new(name.to_string(), unknown_column),
+                ColumnName::new_static(name, unknown_column),
                 bit_type.syntax().clone(),
             ));
         }
@@ -100,35 +128,31 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 "bpchar"
             };
             return Some((
-                ColumnName::new(name.to_string(), unknown_column),
+                ColumnName::new_static(name, unknown_column),
                 char_type.syntax().clone(),
             ));
         }
         ast::Type::DoubleType(double_type) => {
             return Some((
-                ColumnName::new("float8".to_string(), unknown_column),
+                ColumnName::new_static("float8", unknown_column),
                 double_type.syntax().clone(),
             ));
         }
         ast::Type::IntervalType(interval_type) => {
             return Some((
-                ColumnName::new("interval".to_string(), unknown_column),
+                ColumnName::new_static("interval", unknown_column),
                 interval_type.syntax().clone(),
             ));
         }
         ast::Type::TimeType(time_type) => {
-            let mut name = if time_type.timestamp_token().is_some() {
-                "timestamp".to_owned()
-            } else {
-                "time".to_owned()
-            };
-            if let Some(ast::Timezone::WithTimezone(_)) = time_type.timezone() {
-                // time -> timetz
-                // timestamp -> timestamptz
-                name.push_str("tz");
+            let name = match (time_type.timestamp_token().is_some(), time_type.timezone()) {
+                (true, Some(ast::Timezone::WithTimezone(_))) => "timestamptz",
+                (true, _) => "timestamp",
+                (false, Some(ast::Timezone::WithTimezone(_))) => "timetz",
+                (false, _) => "time",
             };
             return Some((
-                ColumnName::new(name, unknown_column),
+                ColumnName::new_static(name, unknown_column),
                 time_type.syntax().clone(),
             ));
         }
@@ -164,28 +188,21 @@ fn name_from_name_ref(
         for node in name_ref.syntax().children_with_tokens() {
             match node.kind() {
                 SyntaxKind::BIGINT_KW => {
-                    return Some((
-                        ColumnName::Column("int8".to_owned()),
-                        name_ref.syntax().clone(),
-                    ));
+                    return Some((ColumnName::column("int8"), name_ref.syntax().clone()));
                 }
                 SyntaxKind::BOOLEAN_KW => {
-                    return Some((
-                        ColumnName::Column("bool".to_owned()),
-                        name_ref.syntax().clone(),
-                    ));
+                    return Some((ColumnName::column("bool"), name_ref.syntax().clone()));
                 }
                 SyntaxKind::DEC_KW | SyntaxKind::DECIMAL_KW => {
-                    return Some((
-                        ColumnName::Column("numeric".to_owned()),
-                        name_ref.syntax().clone(),
-                    ));
+                    return Some((ColumnName::column("numeric"), name_ref.syntax().clone()));
                 }
                 SyntaxKind::FLOAT_KW => {
                     let precision = arg_list.and_then(|arg| {
                         arg.args().find_map(|arg| {
                             if let Some(ast::Expr::Literal(lit)) = arg.expr() {
-                                lit.syntax().text().to_string().parse::<u32>().ok()
+                                lit.syntax()
+                                    .first_token()
+                                    .and_then(|token| token.text().parse::<u32>().ok())
                             } else {
                                 None
                             }
@@ -196,35 +213,23 @@ fn name_from_name_ref(
                     } else {
                         "float8"
                     };
-                    return Some((
-                        ColumnName::Column(name.to_owned()),
-                        name_ref.syntax().clone(),
-                    ));
+                    return Some((ColumnName::column(name), name_ref.syntax().clone()));
                 }
                 SyntaxKind::INT_KW | SyntaxKind::INTEGER_KW => {
-                    return Some((
-                        ColumnName::Column("int4".to_owned()),
-                        name_ref.syntax().clone(),
-                    ));
+                    return Some((ColumnName::column("int4"), name_ref.syntax().clone()));
                 }
                 SyntaxKind::SMALLINT_KW => {
-                    return Some((
-                        ColumnName::Column("int2".to_owned()),
-                        name_ref.syntax().clone(),
-                    ));
+                    return Some((ColumnName::column("int2"), name_ref.syntax().clone()));
                 }
                 SyntaxKind::REAL_KW => {
-                    return Some((
-                        ColumnName::Column("float4".to_owned()),
-                        name_ref.syntax().clone(),
-                    ));
+                    return Some((ColumnName::column("float4"), name_ref.syntax().clone()));
                 }
                 _ => (),
             }
         }
     }
     return Some((
-        ColumnName::Column(name_ref.text()),
+        ColumnName::from_name_node(name_ref.syntax()),
         name_ref.syntax().clone(),
     ));
 }
@@ -248,110 +253,95 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
     let node = expr.syntax().clone();
     match expr {
         ast::Expr::ArrayExpr(_) => {
-            return Some((ColumnName::Column("array".to_string()), node));
+            return Some((ColumnName::column("array"), node));
         }
         ast::Expr::BetweenExpr(_) => {
             return Some((ColumnName::UnknownColumn(None), node));
         }
         ast::Expr::BinExpr(bin_expr) => match bin_expr.op() {
             Some(ast::BinOp::AtTimeZone(_)) => {
-                return Some((ColumnName::Column("timezone".to_string()), node));
+                return Some((ColumnName::column("timezone"), node));
             }
             Some(ast::BinOp::Overlaps(_)) => {
-                return Some((ColumnName::Column("overlaps".to_string()), node));
+                return Some((ColumnName::column("overlaps"), node));
             }
             _ => return Some((ColumnName::UnknownColumn(None), node)),
         },
         ast::Expr::CallExpr(call_expr) => {
             if let Some(exists_fn) = call_expr.exists_fn() {
-                return Some((
-                    ColumnName::Column("exists".to_string()),
-                    exists_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column("exists"), exists_fn.syntax().clone()));
             }
             if let Some(extract_fn) = call_expr.extract_fn() {
-                return Some((
-                    ColumnName::Column("extract".to_string()),
-                    extract_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column("extract"), extract_fn.syntax().clone()));
             }
             if let Some(json_exists_fn) = call_expr.json_exists_fn() {
                 return Some((
-                    ColumnName::Column("json_exists".to_string()),
+                    ColumnName::column("json_exists"),
                     json_exists_fn.syntax().clone(),
                 ));
             }
             if let Some(json_array_fn) = call_expr.json_array_fn() {
                 return Some((
-                    ColumnName::Column("json_array".to_string()),
+                    ColumnName::column("json_array"),
                     json_array_fn.syntax().clone(),
                 ));
             }
             if let Some(json_object_fn) = call_expr.json_object_fn() {
                 return Some((
-                    ColumnName::Column("json_object".to_string()),
+                    ColumnName::column("json_object"),
                     json_object_fn.syntax().clone(),
                 ));
             }
             if let Some(json_object_agg_fn) = call_expr.json_object_agg_fn() {
                 return Some((
-                    ColumnName::Column("json_objectagg".to_string()),
+                    ColumnName::column("json_objectagg"),
                     json_object_agg_fn.syntax().clone(),
                 ));
             }
             if let Some(json_array_agg_fn) = call_expr.json_array_agg_fn() {
                 return Some((
-                    ColumnName::Column("json_arrayagg".to_string()),
+                    ColumnName::column("json_arrayagg"),
                     json_array_agg_fn.syntax().clone(),
                 ));
             }
             if let Some(json_query_fn) = call_expr.json_query_fn() {
                 return Some((
-                    ColumnName::Column("json_query".to_string()),
+                    ColumnName::column("json_query"),
                     json_query_fn.syntax().clone(),
                 ));
             }
             if let Some(json_scalar_fn) = call_expr.json_scalar_fn() {
                 return Some((
-                    ColumnName::Column("json_scalar".to_string()),
+                    ColumnName::column("json_scalar"),
                     json_scalar_fn.syntax().clone(),
                 ));
             }
             if let Some(json_serialize_fn) = call_expr.json_serialize_fn() {
                 return Some((
-                    ColumnName::Column("json_serialize".to_string()),
+                    ColumnName::column("json_serialize"),
                     json_serialize_fn.syntax().clone(),
                 ));
             }
             if let Some(json_value_fn) = call_expr.json_value_fn() {
                 return Some((
-                    ColumnName::Column("json_value".to_string()),
+                    ColumnName::column("json_value"),
                     json_value_fn.syntax().clone(),
                 ));
             }
             if let Some(json_fn) = call_expr.json_fn() {
-                return Some((
-                    ColumnName::Column("json".to_string()),
-                    json_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column("json"), json_fn.syntax().clone()));
             }
             if let Some(substring_fn) = call_expr.substring_fn() {
                 return Some((
-                    ColumnName::Column("substring".to_string()),
+                    ColumnName::column("substring"),
                     substring_fn.syntax().clone(),
                 ));
             }
             if let Some(position_fn) = call_expr.position_fn() {
-                return Some((
-                    ColumnName::Column("position".to_string()),
-                    position_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column("position"), position_fn.syntax().clone()));
             }
             if let Some(overlay_fn) = call_expr.overlay_fn() {
-                return Some((
-                    ColumnName::Column("overlay".to_string()),
-                    overlay_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column("overlay"), overlay_fn.syntax().clone()));
             }
             if let Some(trim_fn) = call_expr.trim_fn() {
                 let name = if trim_fn.leading_token().is_some() {
@@ -361,56 +351,47 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 } else {
                     "btrim"
                 };
-                return Some((
-                    ColumnName::Column(name.to_string()),
-                    trim_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column(name), trim_fn.syntax().clone()));
             }
             if let Some(xml_root_fn) = call_expr.xml_root_fn() {
-                return Some((
-                    ColumnName::Column("xml_root".to_string()),
-                    xml_root_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column("xml_root"), xml_root_fn.syntax().clone()));
             }
             if let Some(xml_serialize_fn) = call_expr.xml_serialize_fn() {
                 return Some((
-                    ColumnName::Column("xml_serialize".to_string()),
+                    ColumnName::column("xml_serialize"),
                     xml_serialize_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_element_fn) = call_expr.xml_element_fn() {
                 return Some((
-                    ColumnName::Column("xml_element".to_string()),
+                    ColumnName::column("xml_element"),
                     xml_element_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_forest_fn) = call_expr.xml_forest_fn() {
                 return Some((
-                    ColumnName::Column("xml_forest".to_string()),
+                    ColumnName::column("xml_forest"),
                     xml_forest_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_exists_fn) = call_expr.xml_exists_fn() {
                 return Some((
-                    ColumnName::Column("xml_exists".to_string()),
+                    ColumnName::column("xml_exists"),
                     xml_exists_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_parse_fn) = call_expr.xml_parse_fn() {
                 return Some((
-                    ColumnName::Column("xml_parse".to_string()),
+                    ColumnName::column("xml_parse"),
                     xml_parse_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_pi_fn) = call_expr.xml_pi_fn() {
-                return Some((
-                    ColumnName::Column("xml_pi".to_string()),
-                    xml_pi_fn.syntax().clone(),
-                ));
+                return Some((ColumnName::column("xml_pi"), xml_pi_fn.syntax().clone()));
             }
             if let Some(collation_for_fn) = call_expr.collation_for_fn() {
                 return Some((
-                    ColumnName::Column("pg_collation_for".to_string()),
+                    ColumnName::column("pg_collation_for"),
                     collation_for_fn.syntax().clone(),
                 ));
             }
@@ -450,7 +431,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     return Some((column, node));
                 }
             }
-            return Some((ColumnName::Column("case".to_string()), node));
+            return Some((ColumnName::column("case"), node));
         }
         ast::Expr::CastExpr(cast_expr) => {
             let mut unknown_column = false;
@@ -491,7 +472,10 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 .first_token()
                 .is_some_and(|token| token.kind() == SyntaxKind::NATIONAL_STRING)
             {
-                return Some((ColumnName::UnknownColumn(Some("bpchar".to_string())), node));
+                return Some((
+                    ColumnName::UnknownColumn(Some(ColumnNameValue::Static("bpchar"))),
+                    node,
+                ));
             }
             return Some((ColumnName::UnknownColumn(None), node));
         }
@@ -500,10 +484,10 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
         }
         ast::Expr::PostfixExpr(postfix_expr) => match postfix_expr.op() {
             Some(ast::PostfixOp::AtLocal(_)) => {
-                return Some((ColumnName::Column("timezone".to_string()), node));
+                return Some((ColumnName::column("timezone"), node));
             }
             Some(ast::PostfixOp::IsNormalized(_)) => {
-                return Some((ColumnName::Column("is_normalized".to_string()), node));
+                return Some((ColumnName::column("is_normalized"), node));
             }
             _ => return Some((ColumnName::UnknownColumn(None), node)),
         },
@@ -524,7 +508,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             }
         }
         ast::Expr::TupleExpr(_) => {
-            return Some((ColumnName::Column("row".to_string()), node));
+            return Some((ColumnName::column("row"), node));
         }
     }
     None
