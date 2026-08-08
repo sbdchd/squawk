@@ -534,7 +534,7 @@ fn is_quoted(node: &SyntaxNode) -> bool {
 }
 
 // TODO: return a NewType wrapper around String?
-fn normalize_name_node(node: &SyntaxNode) -> String {
+pub(crate) fn normalize_name_node(node: &SyntaxNode) -> String {
     let mut tokens = node
         .children_with_tokens()
         .filter_map(|el| el.into_token())
