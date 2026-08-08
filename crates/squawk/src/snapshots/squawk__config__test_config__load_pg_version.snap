@@ -20,6 +20,7 @@ Ok(
             assume_in_transaction: None,
             upload_to_github: UploadToGitHubConfig {
                 fail_on_violations: None,
+                only_comment_on_violations: None,
             },
         },
     ),
