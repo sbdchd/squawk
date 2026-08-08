@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::{
     SyntaxKind, SyntaxNode,
     ast::{self, AstNode},
@@ -27,11 +29,11 @@ pub enum ColumnNameValue {
     Syntax(SyntaxNode),
 }
 
-impl ColumnNameValue {
-    fn to_string(&self) -> String {
+impl fmt::Display for ColumnNameValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Static(name) => (*name).to_owned(),
-            Self::Syntax(node) => ast::normalize_name_node(node),
+            Self::Static(name) => f.write_str(name),
+            Self::Syntax(node) => f.write_str(&ast::normalize_name_node(node)),
         }
     }
 }
