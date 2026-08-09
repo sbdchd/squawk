@@ -26,7 +26,8 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "buzz"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing name"
@@ -50,7 +51,8 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "buzz"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
 ---

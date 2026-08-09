@@ -33,37 +33,40 @@ SOURCE_FILE
     LANGUAGE
       IDENT "l"
     WHITESPACE "\n  "
-    HANDLER_KW "handler"
-    WHITESPACE " "
-    FUNCTION_NAME_REF
-      PATH_REF
+    HANDLER_CLAUSE
+      HANDLER_KW "handler"
+      WHITESPACE " "
+      FUNCTION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "foo"
+          DOT "."
           PATH_SEGMENT_REF
-            IDENT "foo"
-        DOT "."
-        PATH_SEGMENT_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE "\n  "
-    INLINE_KW "inline"
-    WHITESPACE " "
-    FUNCTION_NAME_REF
-      PATH_REF
+    INLINE_CLAUSE
+      INLINE_KW "inline"
+      WHITESPACE " "
+      FUNCTION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "f"
+          DOT "."
           PATH_SEGMENT_REF
-            IDENT "f"
-        DOT "."
-        PATH_SEGMENT_REF
-          IDENT "b"
+            IDENT "b"
     WHITESPACE "\n  "
-    VALIDATOR_KW "validator"
-    WHITESPACE " "
-    FUNCTION_NAME_REF
-      PATH_REF
+    VALIDATOR_CLAUSE
+      VALIDATOR_KW "validator"
+      WHITESPACE " "
+      FUNCTION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "x"
+          DOT "."
           PATH_SEGMENT_REF
-            IDENT "x"
-        DOT "."
-        PATH_SEGMENT_REF
-          IDENT "y"
+            IDENT "y"
     SEMICOLON ";"
   WHITESPACE "\n\n"

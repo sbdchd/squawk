@@ -1194,10 +1194,11 @@ SOURCE_FILE
   ROLLBACK
     ROLLBACK_KW "ROLLBACK"
     WHITESPACE " "
-    TO_KW "TO"
-    WHITESPACE " "
-    SAVEPOINT_REF
-      IDENT "sp1"
+    ROLLBACK_TO_SAVEPOINT
+      TO_KW "TO"
+      WHITESPACE " "
+      SAVEPOINT_REF
+        IDENT "sp1"
     SEMICOLON ";"
   WHITESPACE "\n"
   UPDATE
@@ -1761,5 +1762,53 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "3"
             R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- for_portion_of"
+  WHITESPACE "\n"
+  UPDATE
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    FOR_PORTION_OF
+      FOR_KW "FOR"
+      WHITESPACE " "
+      PORTION_KW "PORTION"
+      WHITESPACE " "
+      OF_KW "OF"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "valid_at"
+      WHITESPACE " "
+      PORTION_FROM_TO
+        FROM_KW "FROM"
+        WHITESPACE " "
+        LITERAL
+          STRING "'2024-01-01'"
+        WHITESPACE " "
+        TO_KW "TO"
+        WHITESPACE " "
+        LITERAL
+          STRING "'2025-01-01'"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "SET"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_SINGLE_COLUMN
+          COLUMN_TARGET
+            COLUMN_NAME_REF
+              IDENT "x"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR
+            LITERAL
+              INT_NUMBER "1"
     SEMICOLON ";"
   WHITESPACE "\n"

@@ -37,7 +37,8 @@ SOURCE_FILE
     EXTENSION_REF
       IDENT "c"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_EXTENSION
@@ -61,6 +62,7 @@ SOURCE_FILE
     EXTENSION_REF
       IDENT "c"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

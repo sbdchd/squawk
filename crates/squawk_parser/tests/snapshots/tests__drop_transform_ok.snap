@@ -47,7 +47,8 @@ SOURCE_FILE
     LANGUAGE_REF
       IDENT "l"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type_args"
@@ -73,6 +74,7 @@ SOURCE_FILE
     LANGUAGE_REF
       IDENT "l"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -4457,7 +4457,8 @@ SOURCE_FILE
       WHITESPACE " "
       ROWS_KW "rows"
       WHITESPACE " "
-      ONLY_KW "only"
+      FETCH_ONLY
+        ONLY_KW "only"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- next"
@@ -4491,9 +4492,10 @@ SOURCE_FILE
       WHITESPACE " "
       ROW_KW "row"
       WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      TIES_KW "ties"
+      WITH_TIES
+        WITH_KW "with"
+        WHITESPACE " "
+        TIES_KW "ties"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple_expr"
@@ -4574,18 +4576,19 @@ SOURCE_FILE
       FOR_SHARE
         SHARE_KW "share"
       WHITESPACE " "
-      OF_KW "of"
-      WHITESPACE " "
-      NAME_REF
-        IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      NAME_REF
-        IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      LOCKING_OF
+        OF_KW "of"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple clauses"
@@ -4605,7 +4608,8 @@ SOURCE_FILE
       FOR_UPDATE
         UPDATE_KW "update"
       WHITESPACE " "
-      NOWAIT_KW "nowait"
+      NOWAIT
+        NOWAIT_KW "nowait"
     WHITESPACE " "
     LOCKING_CLAUSE
       FOR_KW "for"
@@ -4613,9 +4617,10 @@ SOURCE_FILE
       FOR_UPDATE
         UPDATE_KW "update"
       WHITESPACE " "
-      SKIP_KW "skip"
-      WHITESPACE " "
-      LOCKED_KW "locked"
+      SKIP_LOCKED
+        SKIP_KW "skip"
+        WHITESPACE " "
+        LOCKED_KW "locked"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select from"

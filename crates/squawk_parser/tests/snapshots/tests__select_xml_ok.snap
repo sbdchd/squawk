@@ -41,15 +41,17 @@ SOURCE_FILE
             WHITESPACE "\n    "
             PASSING_KW "passing"
             WHITESPACE " "
-            CALL_EXPR
-              XML_PARSE_FN
-                XMLPARSE_KW "xmlparse"
-                L_PAREN "("
-                DOCUMENT_KW "document"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'<library xmlns=\"http://example.com/books\">\n               <book id=\"1\">\n                 <title>the great gatsby</title>\n                 <author>f. scott fitzgerald</author>\n                 <year>1925</year>\n                 <price>12.99</price>\n               </book>\n               <book id=\"2\">\n                 <title>1984</title>\n                 <author>george orwell</author>\n                 <year>1949</year>\n                 <price>14.99</price>\n               </book>\n               <book id=\"3\">\n                 <title>to kill a mockingbird</title>\n                 <author>harper lee</author>\n                 <year>1960</year>\n                 <price>13.99</price>\n               </book>\n             </library>'"
-                R_PAREN ")"
+            XML_PASSING_DOC
+              CALL_EXPR
+                XML_PARSE_FN
+                  XMLPARSE_KW "xmlparse"
+                  L_PAREN "("
+                  XML_DOCUMENT
+                    DOCUMENT_KW "document"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'<library xmlns=\"http://example.com/books\">\n               <book id=\"1\">\n                 <title>the great gatsby</title>\n                 <author>f. scott fitzgerald</author>\n                 <year>1925</year>\n                 <price>12.99</price>\n               </book>\n               <book id=\"2\">\n                 <title>1984</title>\n                 <author>george orwell</author>\n                 <year>1949</year>\n                 <price>14.99</price>\n               </book>\n               <book id=\"3\">\n                 <title>to kill a mockingbird</title>\n                 <author>harper lee</author>\n                 <year>1960</year>\n                 <price>13.99</price>\n               </book>\n             </library>'"
+                  R_PAREN ")"
           WHITESPACE "\n    "
           XML_TABLE_COLUMN_LIST
             COLUMNS_KW "columns"

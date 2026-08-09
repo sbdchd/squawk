@@ -111,3 +111,6 @@ DELETE FROM user_logs AS dl
   USING delete_batch AS del
   WHERE dl.ctid = del.ctid;
 
+
+-- for_portion_of
+DELETE FROM t FOR PORTION OF valid_at FROM '2024-01-01' TO '2025-01-01' WHERE id = 1;

@@ -17,10 +17,11 @@ SOURCE_FILE
   DO
     DO_KW "do"
     WHITESPACE " "
-    LANGUAGE_KW "language"
-    WHITESPACE " "
-    LANGUAGE_REF
-      IDENT "plpgsql"
+    DO_LANGUAGE
+      LANGUAGE_KW "language"
+      WHITESPACE " "
+      LANGUAGE_REF
+        IDENT "plpgsql"
     WHITESPACE " "
     LITERAL
       STRING "'select 1'"

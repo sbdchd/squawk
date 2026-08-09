@@ -1141,4 +1141,51 @@ SOURCE_FILE
           NAME_REF
             IDENT "ctid"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- for_portion_of"
+  WHITESPACE "\n"
+  DELETE
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    FOR_PORTION_OF
+      FOR_KW "FOR"
+      WHITESPACE " "
+      PORTION_KW "PORTION"
+      WHITESPACE " "
+      OF_KW "OF"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "valid_at"
+      WHITESPACE " "
+      PORTION_FROM_TO
+        FROM_KW "FROM"
+        WHITESPACE " "
+        LITERAL
+          STRING "'2024-01-01'"
+        WHITESPACE " "
+        TO_KW "TO"
+        WHITESPACE " "
+        LITERAL
+          STRING "'2025-01-01'"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"

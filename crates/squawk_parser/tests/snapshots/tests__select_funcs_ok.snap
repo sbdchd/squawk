@@ -359,94 +359,97 @@ SOURCE_FILE
             OVERLAY_FN
               OVERLAY_KW "overlay"
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              PLACING_KW "placing"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "b"
-              WHITESPACE " "
-              FROM_KW "from"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "c"
-              WHITESPACE " "
-              FOR_KW "for"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "d"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            OVERLAY_FN
-              OVERLAY_KW "overlay"
-              L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              PLACING_KW "placing"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "b"
-              WHITESPACE " "
-              FROM_KW "from"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "c"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            OVERLAY_FN
-              OVERLAY_KW "overlay"
-              L_PAREN "("
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            OVERLAY_FN
-              OVERLAY_KW "overlay"
-              L_PAREN "("
-              LITERAL
-                INT_NUMBER "1"
-              COMMA ","
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "2"
-              COMMA ","
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "3"
-              COMMA ","
-              WHITESPACE " "
-              NAMED_ARG
-                PARAM_NAME_REF
+              OVERLAY_PLACING
+                NAME_REF
                   IDENT "a"
                 WHITESPACE " "
-                FAT_ARROW "=>"
+                PLACING_KW "placing"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
+                WHITESPACE " "
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
+                WHITESPACE " "
+                FOR_KW "for"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "d"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            OVERLAY_FN
+              OVERLAY_KW "overlay"
+              L_PAREN "("
+              OVERLAY_PLACING
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                PLACING_KW "placing"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
+                WHITESPACE " "
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            OVERLAY_FN
+              OVERLAY_KW "overlay"
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            OVERLAY_FN
+              OVERLAY_KW "overlay"
+              L_PAREN "("
+              OVERLAY_EXPRS
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
                 WHITESPACE " "
                 LITERAL
-                  INT_NUMBER "4"
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "3"
+                COMMA ","
+                WHITESPACE " "
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "4"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -991,8 +994,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 PASSING_KW "passing"
                 WHITESPACE " "
-                LITERAL
-                  STRING "'bar'"
+                XML_PASSING_DOC
+                  LITERAL
+                    STRING "'bar'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1012,39 +1016,14 @@ SOURCE_FILE
                 WHITESPACE " "
                 PASSING_KW "passing"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "bar"
-                WHITESPACE " "
-                XML_PASSING_MECH_BY_REF
-                  BY_KW "by"
+                XML_PASSING_DOC
+                  NAME_REF
+                    IDENT "bar"
                   WHITESPACE " "
-                  REF_KW "ref"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            XML_EXISTS_FN
-              XMLEXISTS_KW "xmlexists"
-              L_PAREN "("
-              XML_ROW_PASSING_CLAUSE
-                LITERAL
-                  STRING "'foo'"
-                WHITESPACE " "
-                PASSING_KW "passing"
-                WHITESPACE " "
-                XML_PASSING_MECH_BY_REF
-                  BY_KW "by"
-                  WHITESPACE " "
-                  REF_KW "ref"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "bar"
+                  XML_PASSING_MECH_BY_REF
+                    BY_KW "by"
+                    WHITESPACE " "
+                    REF_KW "ref"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1069,13 +1048,41 @@ SOURCE_FILE
                   WHITESPACE " "
                   REF_KW "ref"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "foo"
+                XML_PASSING_DOC
+                  NAME_REF
+                    IDENT "bar"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            XML_EXISTS_FN
+              XMLEXISTS_KW "xmlexists"
+              L_PAREN "("
+              XML_ROW_PASSING_CLAUSE
+                LITERAL
+                  STRING "'foo'"
                 WHITESPACE " "
-                XML_PASSING_MECH_BY_VALUE
+                PASSING_KW "passing"
+                WHITESPACE " "
+                XML_PASSING_MECH_BY_REF
                   BY_KW "by"
                   WHITESPACE " "
-                  VALUE_KW "value"
+                  REF_KW "ref"
+                WHITESPACE " "
+                XML_PASSING_DOC
+                  NAME_REF
+                    IDENT "foo"
+                  WHITESPACE " "
+                  XML_PASSING_MECH_BY_VALUE
+                    BY_KW "by"
+                    WHITESPACE " "
+                    VALUE_KW "value"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1142,14 +1149,16 @@ SOURCE_FILE
             XML_PARSE_FN
               XMLPARSE_KW "xmlparse"
               L_PAREN "("
-              DOCUMENT_KW "document"
+              XML_DOCUMENT
+                DOCUMENT_KW "document"
               WHITESPACE " "
               NAME_REF
                 IDENT "x"
               WHITESPACE " "
-              PRESERVE_KW "preserve"
-              WHITESPACE " "
-              WHITESPACE_KW "whitespace"
+              PRESERVE_WHITESPACE
+                PRESERVE_KW "preserve"
+                WHITESPACE " "
+                WHITESPACE_KW "whitespace"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1163,14 +1172,16 @@ SOURCE_FILE
             XML_PARSE_FN
               XMLPARSE_KW "xmlparse"
               L_PAREN "("
-              CONTENT_KW "content"
+              XML_CONTENT
+                CONTENT_KW "content"
               WHITESPACE " "
               NAME_REF
                 IDENT "x"
               WHITESPACE " "
-              STRIP_KW "strip"
-              WHITESPACE " "
-              WHITESPACE_KW "whitespace"
+              STRIP_WHITESPACE
+                STRIP_KW "strip"
+                WHITESPACE " "
+                WHITESPACE_KW "whitespace"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1230,10 +1241,11 @@ SOURCE_FILE
                 IDENT "a"
               COMMA ","
               WHITESPACE " "
-              VERSION_KW "version"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "foo"
+              XML_VERSION_EXPR
+                VERSION_KW "version"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "foo"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1251,11 +1263,12 @@ SOURCE_FILE
                 IDENT "a"
               COMMA ","
               WHITESPACE " "
-              VERSION_KW "version"
-              WHITESPACE " "
-              NO_KW "no"
-              WHITESPACE " "
-              VALUE_KW "value"
+              XML_VERSION_NO_VALUE
+                VERSION_KW "version"
+                WHITESPACE " "
+                NO_KW "no"
+                WHITESPACE " "
+                VALUE_KW "value"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1273,15 +1286,17 @@ SOURCE_FILE
                 IDENT "a"
               COMMA ","
               WHITESPACE " "
-              VERSION_KW "version"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "foo"
-              COMMA ","
-              WHITESPACE " "
-              STANDALONE_KW "standalone"
-              WHITESPACE " "
-              YES_KW "yes"
+              XML_VERSION_EXPR
+                VERSION_KW "version"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "foo"
+              STANDALONE_YES
+                COMMA ","
+                WHITESPACE " "
+                STANDALONE_KW "standalone"
+                WHITESPACE " "
+                YES_KW "yes"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1299,15 +1314,17 @@ SOURCE_FILE
                 IDENT "a"
               COMMA ","
               WHITESPACE " "
-              VERSION_KW "version"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "foo"
-              COMMA ","
-              WHITESPACE " "
-              STANDALONE_KW "standalone"
-              WHITESPACE " "
-              NO_KW "no"
+              XML_VERSION_EXPR
+                VERSION_KW "version"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "foo"
+              STANDALONE_NO
+                COMMA ","
+                WHITESPACE " "
+                STANDALONE_KW "standalone"
+                WHITESPACE " "
+                NO_KW "no"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1325,17 +1342,19 @@ SOURCE_FILE
                 IDENT "a"
               COMMA ","
               WHITESPACE " "
-              VERSION_KW "version"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "foo"
-              COMMA ","
-              WHITESPACE " "
-              STANDALONE_KW "standalone"
-              WHITESPACE " "
-              NO_KW "no"
-              WHITESPACE " "
-              VALUE_KW "value"
+              XML_VERSION_EXPR
+                VERSION_KW "version"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "foo"
+              STANDALONE_NO_VALUE
+                COMMA ","
+                WHITESPACE " "
+                STANDALONE_KW "standalone"
+                WHITESPACE " "
+                NO_KW "no"
+                WHITESPACE " "
+                VALUE_KW "value"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1351,7 +1370,8 @@ SOURCE_FILE
             XML_SERIALIZE_FN
               XMLSERIALIZE_KW "xmlserialize"
               L_PAREN "("
-              DOCUMENT_KW "document"
+              XML_DOCUMENT
+                DOCUMENT_KW "document"
               WHITESPACE " "
               NAME_REF
                 IDENT "x"
@@ -1363,7 +1383,8 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "foo"
               WHITESPACE " "
-              INDENT_KW "indent"
+              INDENT
+                INDENT_KW "indent"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1377,7 +1398,8 @@ SOURCE_FILE
             XML_SERIALIZE_FN
               XMLSERIALIZE_KW "xmlserialize"
               L_PAREN "("
-              DOCUMENT_KW "document"
+              XML_DOCUMENT
+                DOCUMENT_KW "document"
               WHITESPACE " "
               NAME_REF
                 IDENT "x"
@@ -1389,9 +1411,10 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "foo"
               WHITESPACE " "
-              NO_KW "no"
-              WHITESPACE " "
-              INDENT_KW "indent"
+              NO_INDENT
+                NO_KW "no"
+                WHITESPACE " "
+                INDENT_KW "indent"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

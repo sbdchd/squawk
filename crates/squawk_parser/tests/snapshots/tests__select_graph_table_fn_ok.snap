@@ -653,8 +653,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 GRAPH_PATTERN_QUALIFIER
                   L_CURLY "{"
-                  LITERAL
-                    INT_NUMBER "100"
+                  QUALIFIER_MIN
+                    LITERAL
+                      INT_NUMBER "100"
                   R_CURLY "}"
           WHITESPACE " "
           COLUMNS_KW "columns"
@@ -700,11 +701,13 @@ SOURCE_FILE
                 WHITESPACE " "
                 GRAPH_PATTERN_QUALIFIER
                   L_CURLY "{"
-                  LITERAL
-                    INT_NUMBER "1"
+                  QUALIFIER_MIN
+                    LITERAL
+                      INT_NUMBER "1"
                   COMMA ","
-                  LITERAL
-                    INT_NUMBER "2"
+                  QUALIFIER_MAX
+                    LITERAL
+                      INT_NUMBER "2"
                   R_CURLY "}"
           WHITESPACE " "
           COLUMNS_KW "columns"
@@ -751,8 +754,9 @@ SOURCE_FILE
                 GRAPH_PATTERN_QUALIFIER
                   L_CURLY "{"
                   COMMA ","
-                  LITERAL
-                    INT_NUMBER "2"
+                  QUALIFIER_MAX
+                    LITERAL
+                      INT_NUMBER "2"
                   R_CURLY "}"
           WHITESPACE " "
           COLUMNS_KW "columns"
@@ -1582,11 +1586,13 @@ SOURCE_FILE
                   MINUS "-"
                 GRAPH_PATTERN_QUALIFIER
                   L_CURLY "{"
-                  LITERAL
-                    INT_NUMBER "1"
+                  QUALIFIER_MIN
+                    LITERAL
+                      INT_NUMBER "1"
                   COMMA ","
-                  LITERAL
-                    INT_NUMBER "3"
+                  QUALIFIER_MAX
+                    LITERAL
+                      INT_NUMBER "3"
                   R_CURLY "}"
               WHITESPACE "\n    "
               PATH_FACTOR

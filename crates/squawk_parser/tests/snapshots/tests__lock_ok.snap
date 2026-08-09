@@ -252,6 +252,7 @@ SOURCE_FILE
     WHITESPACE " "
     MODE_KW "mode"
     WHITESPACE " "
-    NOWAIT_KW "nowait"
+    NOWAIT
+      NOWAIT_KW "nowait"
     SEMICOLON ";"
   WHITESPACE "\n\n"

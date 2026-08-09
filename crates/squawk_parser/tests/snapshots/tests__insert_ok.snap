@@ -136,9 +136,10 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "products"
     WHITESPACE " "
-    DEFAULT_KW "default"
-    WHITESPACE " "
-    VALUES_KW "values"
+    DEFAULT_VALUES
+      DEFAULT_KW "default"
+      WHITESPACE " "
+      VALUES_KW "values"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -342,11 +343,12 @@ SOURCE_FILE
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n"
-    OVERRIDING_KW "overriding"
-    WHITESPACE " "
-    SYSTEM_KW "system"
-    WHITESPACE " "
-    VALUE_KW "value"
+    OVERRIDING_SYSTEM_VALUE
+      OVERRIDING_KW "overriding"
+      WHITESPACE " "
+      SYSTEM_KW "system"
+      WHITESPACE " "
+      VALUE_KW "value"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -580,9 +582,10 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "films"
     WHITESPACE " "
-    DEFAULT_KW "DEFAULT"
-    WHITESPACE " "
-    VALUES_KW "VALUES"
+    DEFAULT_VALUES
+      DEFAULT_KW "DEFAULT"
+      WHITESPACE " "
+      VALUES_KW "VALUES"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT

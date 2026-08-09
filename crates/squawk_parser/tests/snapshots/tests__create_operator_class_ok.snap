@@ -147,9 +147,10 @@ SOURCE_FILE
               BIGINT_KW "bigint"
         R_PAREN ")"
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        SEARCH_KW "search"
+        OP_CLASS_FOR_SEARCH
+          FOR_KW "for"
+          WHITESPACE " "
+          SEARCH_KW "search"
       COMMA ","
       WHITESPACE "\n    "
       OP_CLASS_OPTION_OPERATOR
@@ -183,20 +184,21 @@ SOURCE_FILE
             R_PAREN ")"
         R_PAREN ")"
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        ORDER_KW "order"
-        WHITESPACE " "
-        BY_KW "by"
-        WHITESPACE " "
-        OP_FAMILY_REF
-          PATH_REF
+        OP_CLASS_FOR_ORDER_BY
+          FOR_KW "for"
+          WHITESPACE " "
+          ORDER_KW "order"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          OP_FAMILY_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "foo"
+              DOT "."
               PATH_SEGMENT_REF
-                IDENT "foo"
-            DOT "."
-            PATH_SEGMENT_REF
-              IDENT "bar"
+                IDENT "bar"
       COMMA ","
       WHITESPACE "\n    "
       OP_CLASS_OPTION_FUNCTION

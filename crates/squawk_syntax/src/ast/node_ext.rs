@@ -706,6 +706,138 @@ impl ast::CastSig {
     }
 }
 
+impl ast::ObjectOperator {
+    #[inline]
+    pub fn lhs(&self) -> Option<ast::Type> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn rhs(&self) -> Option<ast::Type> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::OpClassOptionOperator {
+    #[inline]
+    pub fn lhs(&self) -> Option<ast::Type> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn rhs(&self) -> Option<ast::Type> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::CreateConversion {
+    /// The source encoding.
+    #[inline]
+    pub fn for_(&self) -> Option<ast::Literal> {
+        support::children(self.syntax()).next()
+    }
+
+    /// The destination encoding.
+    #[inline]
+    pub fn to(&self) -> Option<ast::Literal> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::PositionFn {
+    #[inline]
+    pub fn pos(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn string(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::OverlayPlacing {
+    #[inline]
+    pub fn string(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn placing(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+
+    #[inline]
+    pub fn from(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(2)
+    }
+
+    #[inline]
+    pub fn for_(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(3)
+    }
+}
+
+impl ast::PartitionForValuesFrom {
+    #[inline]
+    pub fn from(&self) -> Option<ast::PartitionFromValues> {
+        support::child(self.syntax())
+    }
+
+    #[inline]
+    pub fn to(&self) -> Option<ast::PartitionToValues> {
+        support::child(self.syntax())
+    }
+}
+
+impl ast::PortionFromTo {
+    #[inline]
+    pub fn from(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn to(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::ReplaceDictionary {
+    #[inline]
+    pub fn before(&self) -> Option<ast::TextSearchDictionaryRef> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn after(&self) -> Option<ast::TextSearchDictionaryRef> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::Reassign {
+    #[inline]
+    pub fn before(&self) -> Option<ast::RoleRefList> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn after(&self) -> Option<ast::RoleRefList> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::AsObjFile {
+    #[inline]
+    pub fn obj_file(&self) -> Option<ast::Literal> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn link_symbol(&self) -> Option<ast::Literal> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
 impl ast::ColumnConstraint {
     #[inline]
     pub fn constraint_name(&self) -> Option<ast::ConstraintName> {

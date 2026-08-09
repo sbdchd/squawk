@@ -186,19 +186,20 @@ SOURCE_FILE
       WHITESPACE " "
       MAPPING_KW "mapping"
       WHITESPACE " "
-      REPLACE_KW "replace"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "o"
-      WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "n"
+      REPLACE_DICTIONARY
+        REPLACE_KW "replace"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "o"
+        WHITESPACE " "
+        WITH_KW "with"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -224,27 +225,28 @@ SOURCE_FILE
       WHITESPACE " "
       MAPPING_KW "mapping"
       WHITESPACE " "
-      REPLACE_KW "replace"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
+      REPLACE_DICTIONARY
+        REPLACE_KW "replace"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "f"
+            DOT "."
             PATH_SEGMENT_REF
-              IDENT "f"
-          DOT "."
-          PATH_SEGMENT_REF
-            IDENT "o"
-      WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
+              IDENT "o"
+        WHITESPACE " "
+        WITH_KW "with"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "f"
+            DOT "."
             PATH_SEGMENT_REF
-              IDENT "f"
-          DOT "."
-          PATH_SEGMENT_REF
-            IDENT "n"
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_mapping_for_replace"
@@ -273,19 +275,20 @@ SOURCE_FILE
       TEXT_SEARCH_TOKEN_KIND
         IDENT "t"
       WHITESPACE " "
-      REPLACE_KW "replace"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "o"
-      WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "n"
+      REPLACE_DICTIONARY
+        REPLACE_KW "replace"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "o"
+        WHITESPACE " "
+        WITH_KW "with"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -316,27 +319,28 @@ SOURCE_FILE
       TEXT_SEARCH_TOKEN_KIND
         IDENT "t"
       WHITESPACE " "
-      REPLACE_KW "replace"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
+      REPLACE_DICTIONARY
+        REPLACE_KW "replace"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "f"
+            DOT "."
             PATH_SEGMENT_REF
-              IDENT "f"
-          DOT "."
-          PATH_SEGMENT_REF
-            IDENT "o"
-      WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      TEXT_SEARCH_DICTIONARY_REF
-        PATH_REF
+              IDENT "o"
+        WHITESPACE " "
+        WITH_KW "with"
+        WHITESPACE " "
+        TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "f"
+            DOT "."
             PATH_SEGMENT_REF
-              IDENT "f"
-          DOT "."
-          PATH_SEGMENT_REF
-            IDENT "n"
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_mapping"

@@ -37,7 +37,8 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "b"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_CONVERSION
@@ -59,6 +60,7 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "b"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

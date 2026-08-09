@@ -808,16 +808,17 @@ SOURCE_FILE
       WHITESPACE " "
       MATCHED_KW "matched"
       WHITESPACE " "
-      AND_KW "and"
-      WHITESPACE " "
-      BIN_EXPR
-        NAME_REF
-          IDENT "foo"
+      MERGE_CONDITION
+        AND_KW "and"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        NAME_REF
-          IDENT "bar"
+        BIN_EXPR
+          NAME_REF
+            IDENT "foo"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          NAME_REF
+            IDENT "bar"
       WHITESPACE " "
       THEN_KW "then"
       WHITESPACE "\n    "
@@ -837,16 +838,17 @@ SOURCE_FILE
       WHITESPACE " "
       SOURCE_KW "source"
       WHITESPACE " "
-      AND_KW "and"
-      WHITESPACE " "
-      BIN_EXPR
-        NAME_REF
-          IDENT "bar"
+      MERGE_CONDITION
+        AND_KW "and"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        NAME_REF
-          IDENT "foo"
+        BIN_EXPR
+          NAME_REF
+            IDENT "bar"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
       WHITESPACE " "
       THEN_KW "then"
       WHITESPACE "\n    "
@@ -862,16 +864,17 @@ SOURCE_FILE
       WHITESPACE " "
       MATCHED_KW "matched"
       WHITESPACE " "
-      AND_KW "and"
-      WHITESPACE " "
-      BIN_EXPR
-        NAME_REF
-          IDENT "buzz"
+      MERGE_CONDITION
+        AND_KW "and"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        NAME_REF
-          IDENT "bar"
+        BIN_EXPR
+          NAME_REF
+            IDENT "buzz"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          NAME_REF
+            IDENT "bar"
       WHITESPACE " "
       THEN_KW "then"
       WHITESPACE " \n    "
@@ -1160,9 +1163,10 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "insert"
         WHITESPACE "\n    "
-        DEFAULT_KW "default"
-        WHITESPACE " "
-        VALUES_KW "values"
+        DEFAULT_VALUES
+          DEFAULT_KW "default"
+          WHITESPACE " "
+          VALUES_KW "values"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_default"
@@ -1236,15 +1240,17 @@ SOURCE_FILE
               IDENT "c"
           R_PAREN ")"
         WHITESPACE "\n    "
-        OVERRIDING_KW "overriding"
-        WHITESPACE " "
-        USER_KW "user"
-        WHITESPACE " "
-        VALUE_KW "value"
+        OVERRIDING_USER_VALUE
+          OVERRIDING_KW "overriding"
+          WHITESPACE " "
+          USER_KW "user"
+          WHITESPACE " "
+          VALUE_KW "value"
         WHITESPACE "\n    "
-        DEFAULT_KW "default"
-        WHITESPACE " "
-        VALUES_KW "values"
+        DEFAULT_VALUES
+          DEFAULT_KW "default"
+          WHITESPACE " "
+          VALUES_KW "values"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_values"
@@ -1301,11 +1307,12 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "insert"
         WHITESPACE "\n    "
-        OVERRIDING_KW "overriding"
-        WHITESPACE " "
-        SYSTEM_KW "system"
-        WHITESPACE " "
-        VALUE_KW "value"
+        OVERRIDING_SYSTEM_VALUE
+          OVERRIDING_KW "overriding"
+          WHITESPACE " "
+          SYSTEM_KW "system"
+          WHITESPACE " "
+          VALUE_KW "value"
         WHITESPACE "\n    "
         VALUES
           VALUES_KW "values"
@@ -1994,20 +2001,21 @@ SOURCE_FILE
       WHITESPACE " "
       MATCHED_KW "MATCHED"
       WHITESPACE " "
-      AND_KW "AND"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "s"
-          DOT "."
-          NAME_REF
-            IDENT "stock_delta"
+      MERGE_CONDITION
+        AND_KW "AND"
         WHITESPACE " "
-        R_ANGLE ">"
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "0"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "stock_delta"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "0"
       WHITESPACE " "
       THEN_KW "THEN"
       WHITESPACE "\n  "
@@ -2040,30 +2048,31 @@ SOURCE_FILE
       WHITESPACE " "
       MATCHED_KW "MATCHED"
       WHITESPACE " "
-      AND_KW "AND"
-      WHITESPACE " "
-      BIN_EXPR
+      MERGE_CONDITION
+        AND_KW "AND"
+        WHITESPACE " "
         BIN_EXPR
-          FIELD_EXPR
-            NAME_REF
-              IDENT "w"
-            DOT "."
-            NAME_REF
-              IDENT "stock"
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "w"
+              DOT "."
+              NAME_REF
+                IDENT "stock"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "s"
+              DOT "."
+              NAME_REF
+                IDENT "stock_delta"
           WHITESPACE " "
-          PLUS "+"
+          R_ANGLE ">"
           WHITESPACE " "
-          FIELD_EXPR
-            NAME_REF
-              IDENT "s"
-            DOT "."
-            NAME_REF
-              IDENT "stock_delta"
-        WHITESPACE " "
-        R_ANGLE ">"
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "0"
+          LITERAL
+            INT_NUMBER "0"
       WHITESPACE " "
       THEN_KW "THEN"
       WHITESPACE "\n  "
@@ -2222,24 +2231,25 @@ SOURCE_FILE
       WHITESPACE " "
       MATCHED_KW "MATCHED"
       WHITESPACE " "
-      AND_KW "AND"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "w"
-          DOT "."
-          NAME_REF
-            IDENT "stock"
+      MERGE_CONDITION
+        AND_KW "AND"
         WHITESPACE " "
-        NEQ "!="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "s"
-          DOT "."
-          NAME_REF
-            IDENT "stock"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "w"
+            DOT "."
+            NAME_REF
+              IDENT "stock"
+          WHITESPACE " "
+          NEQ "!="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "stock"
       WHITESPACE " "
       THEN_KW "THEN"
       WHITESPACE "\n  "

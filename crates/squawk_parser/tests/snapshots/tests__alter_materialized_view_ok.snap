@@ -286,7 +286,8 @@ SOURCE_FILE
         TABLESPACE_REF
           IDENT "n"
       WHITESPACE " "
-      NOWAIT_KW "nowait"
+      NOWAIT
+        NOWAIT_KW "nowait"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_stats"

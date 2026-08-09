@@ -258,7 +258,8 @@ SOURCE_FILE
     SCHEMA_REF
       IDENT "myschema"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_SCHEMA
@@ -274,7 +275,8 @@ SOURCE_FILE
     SCHEMA_REF
       IDENT "myschema"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_SCHEMA
@@ -459,7 +461,8 @@ SOURCE_FILE
       WHITESPACE " "
       OPTION_KW "option"
       WHITESPACE " "
-      DOCUMENT_KW "document"
+      XML_DOCUMENT
+        DOCUMENT_KW "document"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
@@ -470,7 +473,8 @@ SOURCE_FILE
       WHITESPACE " "
       OPTION_KW "option"
       WHITESPACE " "
-      CONTENT_KW "content"
+      XML_CONTENT
+        CONTENT_KW "content"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE

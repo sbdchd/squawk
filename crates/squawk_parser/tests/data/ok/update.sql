@@ -105,3 +105,6 @@ returning with (old as o, new as n) o.*, n.*;
 -- subscripts and field access in set targets
 UPDATE t SET a[1] = 2, b[1:2] = '{1,2}', c.d = 3;
 UPDATE t SET (a[1], b.c, d) = ROW(1, 2, 3);
+
+-- for_portion_of
+UPDATE t FOR PORTION OF valid_at FROM '2024-01-01' TO '2025-01-01' SET x = 1;

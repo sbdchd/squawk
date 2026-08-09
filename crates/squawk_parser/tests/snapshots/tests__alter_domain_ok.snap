@@ -211,7 +211,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "c"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DOMAIN
@@ -239,7 +240,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "c"
       WHITESPACE " "
-      RESTRICT_KW "restrict"
+      RESTRICT
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_constraint"

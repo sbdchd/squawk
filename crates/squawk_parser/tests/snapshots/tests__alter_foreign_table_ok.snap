@@ -267,7 +267,8 @@ SOURCE_FILE
       COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -296,7 +297,8 @@ SOURCE_FILE
       COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -325,7 +327,8 @@ SOURCE_FILE
       COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
-      RESTRICT_KW "restrict"
+      RESTRICT
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_column_type"
@@ -1179,7 +1182,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "c"
       WHITESPACE " "
-      RESTRICT_KW "restrict"
+      RESTRICT
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -1205,7 +1209,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "c"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_disable_trigger"
@@ -1544,7 +1549,8 @@ SOURCE_FILE
       COLUMN_NAME_REF
         IDENT "d"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     COMMA ","
     WHITESPACE "\n  "
     ALTER_COLUMN

@@ -53,7 +53,8 @@ SOURCE_FILE
             IDENT "b"
       R_PAREN ")"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_CAST
@@ -89,6 +90,7 @@ SOURCE_FILE
             IDENT "b"
       R_PAREN ")"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

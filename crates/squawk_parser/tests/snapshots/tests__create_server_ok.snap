@@ -40,15 +40,17 @@ SOURCE_FILE
     SERVER
       IDENT "s"
     WHITESPACE " \n  "
-    TYPE_KW "type"
-    WHITESPACE " "
-    LITERAL
-      STRING "'bar'"
+    SERVER_TYPE
+      TYPE_KW "type"
+      WHITESPACE " "
+      LITERAL
+        STRING "'bar'"
     WHITESPACE " \n  "
-    VERSION_KW "version"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
+    SERVER_VERSION
+      VERSION_KW "version"
+      WHITESPACE " "
+      LITERAL
+        STRING "'foo'"
     WHITESPACE "\n  "
     FOREIGN_KW "foreign"
     WHITESPACE " "

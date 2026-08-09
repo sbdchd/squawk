@@ -890,8 +890,9 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "AS"
         WHITESPACE " "
-        LITERAL
-          DOLLAR_QUOTED_STRING "$$\nDECLARE\nBEGIN\n    -- sanity checks\n    IF p_hour < 0 THEN\n        raise exception 'Hour can''t be < 0 : %', p_hour;\n    END IF;\n    IF p_hour > 23 THEN\n        raise exception 'Hour can''t be > 23 : %', p_hour;\n    END IF;\n \n    -- actual count modification\n    p_state[ p_hour ] := p_state[ p_hour ] + p_count;\n \n    RETURN;\nEND;\n$$"
+        AS_DEFINITION
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$\nDECLARE\nBEGIN\n    -- sanity checks\n    IF p_hour < 0 THEN\n        raise exception 'Hour can''t be < 0 : %', p_hour;\n    END IF;\n    IF p_hour > 23 THEN\n        raise exception 'Hour can''t be > 23 : %', p_hour;\n    END IF;\n \n    -- actual count modification\n    p_state[ p_hour ] := p_state[ p_hour ] + p_count;\n \n    RETURN;\nEND;\n$$"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1262,8 +1263,9 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "AS"
         WHITESPACE " "
-        LITERAL
-          DOLLAR_QUOTED_STRING "$$\nDECLARE\n    i int4;\n    v_result int8[];\nBEGIN\n    FOR i IN 0..23 LOOP\n        v_result[i] := p_left[i] + p_right[i];\n    END LOOP;\n    RETURN v_result;\nEND;\n$$"
+        AS_DEFINITION
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$\nDECLARE\n    i int4;\n    v_result int8[];\nBEGIN\n    FOR i IN 0..23 LOOP\n        v_result[i] := p_left[i] + p_right[i];\n    END LOOP;\n    RETURN v_result;\nEND;\n$$"
       WHITESPACE " "
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "LANGUAGE"
@@ -1463,17 +1465,19 @@ SOURCE_FILE
       WHITESPACE " "
       FROM_KW "FROM"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'2024-12-25'"
-      R_PAREN ")"
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'2024-12-25'"
+        R_PAREN ")"
       WHITESPACE " "
       TO_KW "TO"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'2024-12-26'"
-      R_PAREN ")"
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'2024-12-26'"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   BEGIN
@@ -1635,17 +1639,19 @@ SOURCE_FILE
       WHITESPACE " "
       FROM_KW "FROM"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'2024-12-25'"
-      R_PAREN ")"
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'2024-12-25'"
+        R_PAREN ")"
       WHITESPACE " "
       TO_KW "TO"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'2024-12-26'"
-      R_PAREN ")"
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'2024-12-26'"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -2289,8 +2295,9 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "AS"
         WHITESPACE " "
-        LITERAL
-          DOLLAR_QUOTED_STRING "$$\nDECLARE\n    query_embedding VECTOR;\n    context_chunks TEXT;\nBEGIN\n    -- Step 1: Get the embedding vector for the query text\n    query_embedding := openai.vector(query_text)::VECTOR;\n\n    -- Step 2: Find the 5 closest plot summaries to the query embedding\n    -- Step 3: Lump together results into a context lump\n    SELECT string_agg('Episode: { Title: ' || title || ' } Summary: {' || plot, E'}}\\n\\n\\n') INTO context_chunks\n    FROM (\n        SELECT plot, title\n        FROM tng\n        ORDER BY vec <-> query_embedding\n        LIMIT 5\n    ) AS similar_plots;\n\n    -- Step 4: Run the query against the LLM with the augmented context\n    RETURN openai.prompt(context_chunks, query_text);\nEND;\n$$"
+        AS_DEFINITION
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$\nDECLARE\n    query_embedding VECTOR;\n    context_chunks TEXT;\nBEGIN\n    -- Step 1: Get the embedding vector for the query text\n    query_embedding := openai.vector(query_text)::VECTOR;\n\n    -- Step 2: Find the 5 closest plot summaries to the query embedding\n    -- Step 3: Lump together results into a context lump\n    SELECT string_agg('Episode: { Title: ' || title || ' } Summary: {' || plot, E'}}\\n\\n\\n') INTO context_chunks\n    FROM (\n        SELECT plot, title\n        FROM tng\n        ORDER BY vec <-> query_embedding\n        LIMIT 5\n    ) AS similar_plots;\n\n    -- Step 4: Run the query against the LLM with the augmented context\n    RETURN openai.prompt(context_chunks, query_text);\nEND;\n$$"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2692,9 +2699,10 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_IDENTITY
-            BY_KW "by"
-            WHITESPACE " "
-            DEFAULT_KW "default"
+            GENERATED_BY_DEFAULT
+              BY_KW "by"
+              WHITESPACE " "
+              DEFAULT_KW "default"
             WHITESPACE " "
             AS_KW "as"
             WHITESPACE " "
@@ -2980,8 +2988,9 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
-        LITERAL
-          DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* select all rows in a time range and export them to a Parquet file */\n  execute format(\n    'copy (select * from events where event_time >= %L and event_time < %L) to %L',\n    start_time, end_time, format('s3://mybucket/events/%s.parquet', start_time::date)\n  );\n\nend; $function$"
+        AS_DEFINITION
+          LITERAL
+            DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* select all rows in a time range and export them to a Parquet file */\n  execute format(\n    'copy (select * from events where event_time >= %L and event_time < %L) to %L',\n    start_time, end_time, format('s3://mybucket/events/%s.parquet', start_time::date)\n  );\n\nend; $function$"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* export data as 1 file per day, starting at Jan 1st */"
@@ -3104,8 +3113,9 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
-        LITERAL
-          DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* load a file into the events table */\n  execute format('copy events from %L', path);\n\nend; $function$"
+        AS_DEFINITION
+          LITERAL
+            DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* load a file into the events table */\n  execute format('copy events from %L', path);\n\nend; $function$"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* load all the files under a prefix, and automatically load new files, one at a time */"
@@ -3379,7 +3389,7 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -3430,7 +3440,7 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -4483,7 +4493,7 @@ SOURCE_FILE
               NUMERIC_KW "numeric"
       R_PAREN ")"
     WHITESPACE " "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "SERVER"
       WHITESPACE " "
       SERVER_REF
@@ -4556,7 +4566,7 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "SERVER"
       WHITESPACE " "
       SERVER_REF

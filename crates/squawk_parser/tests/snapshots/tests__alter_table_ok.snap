@@ -545,38 +545,10 @@ SOURCE_FILE
         WHITESPACE " "
         GENERATED_KW "generated"
         WHITESPACE " "
-        BY_KW "by"
-        WHITESPACE " "
-        DEFAULT_KW "default"
-        WHITESPACE " "
-        AS_KW "as"
-        WHITESPACE " "
-        IDENTITY_KW "identity"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  ALTER_TABLE
-    ALTER_KW "alter"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    TABLE_RELATION_NAME
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "t"
-    WHITESPACE " "
-    ALTER_COLUMN
-      ALTER_KW "alter"
-      WHITESPACE " "
-      COLUMN_NAME_REF
-        IDENT "c"
-      WHITESPACE " "
-      ADD_GENERATED
-        ADD_KW "add"
-        WHITESPACE " "
-        GENERATED_KW "generated"
-        WHITESPACE " "
-        ALWAYS_KW "always"
+        GENERATED_BY_DEFAULT
+          BY_KW "by"
+          WHITESPACE " "
+          DEFAULT_KW "default"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -605,7 +577,38 @@ SOURCE_FILE
         WHITESPACE " "
         GENERATED_KW "generated"
         WHITESPACE " "
-        ALWAYS_KW "always"
+        GENERATED_ALWAYS
+          ALWAYS_KW "always"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        IDENTITY_KW "identity"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      ADD_GENERATED
+        ADD_KW "add"
+        WHITESPACE " "
+        GENERATED_KW "generated"
+        WHITESPACE " "
+        GENERATED_ALWAYS
+          ALWAYS_KW "always"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -653,7 +656,8 @@ SOURCE_FILE
           WHITESPACE " "
           GENERATED_KW "generated"
           WHITESPACE " "
-          ALWAYS_KW "always"
+          GENERATED_ALWAYS
+            ALWAYS_KW "always"
         WHITESPACE " "
         SET_SEQUENCE_OPTION
           SET_KW "set"
@@ -698,7 +702,8 @@ SOURCE_FILE
           WHITESPACE " "
           GENERATED_KW "generated"
           WHITESPACE " "
-          ALWAYS_KW "always"
+          GENERATED_ALWAYS
+            ALWAYS_KW "always"
         WHITESPACE " "
         SET_SEQUENCE_OPTION
           SET_KW "set"
@@ -1412,7 +1417,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "c"
       WHITESPACE " "
-      RESTRICT_KW "restrict"
+      RESTRICT
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1441,7 +1447,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "c"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- disable_trigger"
@@ -1645,14 +1652,15 @@ SOURCE_FILE
       WHITESPACE " "
       IDENTITY_KW "identity"
       WHITESPACE " "
-      USING_KW "using"
-      WHITESPACE " "
-      INDEX_KW "index"
-      WHITESPACE " "
-      INDEX_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "i"
+      USING_INDEX_NAME
+        USING_KW "using"
+        WHITESPACE " "
+        INDEX_KW "index"
+        WHITESPACE " "
+        INDEX_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2229,7 +2237,8 @@ SOURCE_FILE
       COLUMN_NAME_REF
         IDENT "description"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column restrict"
@@ -2253,7 +2262,8 @@ SOURCE_FILE
       COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
-      RESTRICT_KW "restrict"
+      RESTRICT
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column concise"
@@ -2933,7 +2943,8 @@ SOURCE_FILE
           WHITESPACE " "
           DELETE_KW "delete"
           WHITESPACE " "
-          RESTRICT_KW "restrict"
+          RESTRICT
+            RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2973,7 +2984,8 @@ SOURCE_FILE
           WHITESPACE " "
           DELETE_KW "delete"
           WHITESPACE " "
-          CASCADE_KW "cascade"
+          CASCADE
+            CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -3220,7 +3232,7 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        USING_INDEX
+        USING_INDEX_NAME
           USING_KW "using"
           WHITESPACE " "
           INDEX_KW "index"
@@ -3250,7 +3262,7 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        USING_INDEX
+        USING_INDEX_NAME
           USING_KW "using"
           WHITESPACE " "
           INDEX_KW "index"
@@ -3284,7 +3296,7 @@ SOURCE_FILE
         WHITESPACE " "
         UNIQUE_KW "unique"
         WHITESPACE " "
-        USING_INDEX
+        USING_INDEX_NAME
           USING_KW "using"
           WHITESPACE " "
           INDEX_KW "index"
@@ -3320,7 +3332,7 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        USING_INDEX
+        USING_INDEX_NAME
           USING_KW "using"
           WHITESPACE " "
           INDEX_KW "index"
@@ -3631,7 +3643,8 @@ SOURCE_FILE
         TABLESPACE_REF
           IDENT "bar"
       WHITESPACE " "
-      NOWAIT_KW "nowait"
+      NOWAIT
+        NOWAIT_KW "nowait"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set tablespace owned by"
@@ -3996,14 +4009,16 @@ SOURCE_FILE
           WHITESPACE " "
           UPDATE_KW "update"
           WHITESPACE " "
-          CASCADE_KW "cascade"
+          CASCADE
+            CASCADE_KW "cascade"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
           WHITESPACE " "
           DELETE_KW "delete"
           WHITESPACE " "
-          CASCADE_KW "cascade"
+          CASCADE
+            CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   ALTER_TABLE
