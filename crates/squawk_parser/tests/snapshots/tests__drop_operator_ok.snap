@@ -199,7 +199,8 @@ SOURCE_FILE
               INTEGER_KW "integer"
         R_PAREN ")"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_OPERATOR
@@ -231,7 +232,8 @@ SOURCE_FILE
               INT_KW "int"
         R_PAREN ")"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- non_default_operator"
@@ -283,7 +285,8 @@ SOURCE_FILE
               INT_KW "int"
         R_PAREN ")"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_OPERATOR
@@ -336,6 +339,7 @@ SOURCE_FILE
               INT_KW "int"
         R_PAREN ")"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

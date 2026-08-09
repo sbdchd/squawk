@@ -38,7 +38,8 @@ SOURCE_FILE
       ROLE_REF
         IDENT "c"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_OWNED
@@ -56,6 +57,7 @@ SOURCE_FILE
       ROLE_REF
         CURRENT_USER_KW "current_user"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

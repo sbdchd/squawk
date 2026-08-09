@@ -198,18 +198,20 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
+        AS_DEFINITION
+          LITERAL
+            STRING "'foo'"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          STRING "'bar'"
+        AS_OBJ_FILE
+          LITERAL
+            STRING "'foo'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'bar'"
       WHITESPACE "\n"
       RETURN_FUNC_OPTION
         RETURN_KW "return"

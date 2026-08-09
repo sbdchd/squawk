@@ -126,7 +126,8 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "bar"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cascade is the table name"
@@ -167,6 +168,7 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "t"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n"

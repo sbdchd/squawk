@@ -117,6 +117,7 @@ const TOKENS: &[&str] = &["ERROR", "WHITESPACE", "COMMENT"];
 
 const EOF: &str = "EOF";
 const NAME_TOKEN: &str = "#name";
+const LITERAL_TOKEN: &str = "@";
 
 /// The punctuations of the language.
 const PUNCT: &[(&str, &str)] = &[
@@ -507,6 +508,12 @@ fn token_to_name(tk: &str) -> Option<&'static str> {
     Some(name)
 }
 
+fn literal_token_name(token: &str) -> Option<&str> {
+    token
+        .strip_prefix(LITERAL_TOKEN)
+        .filter(|name| !name.is_empty())
+}
+
 impl Field {
     fn is_many(&self) -> bool {
         matches!(
@@ -519,9 +526,13 @@ impl Field {
     }
     fn token_kind(&self) -> Option<proc_macro2::Ident> {
         match self {
-            Field::Token(token) => match token_to_name(token) {
-                Some(token) => Some(format_ident!("{}", token.to_case(Case::UpperSnake))),
-                None => Some(format_ident!("{}_KW", token.to_case(Case::UpperSnake))),
+            // literals, e.g. `@string`, are their own kind rather than a keyword
+            Field::Token(token) => match literal_token_name(token) {
+                Some(literal) => Some(format_ident!("{}", literal.to_case(Case::UpperSnake))),
+                None => match token_to_name(token) {
+                    Some(token) => Some(format_ident!("{}", token.to_case(Case::UpperSnake))),
+                    None => Some(format_ident!("{}_KW", token.to_case(Case::UpperSnake))),
+                },
             },
             _ => None,
         }
@@ -529,7 +540,9 @@ impl Field {
     fn method_name(&self) -> String {
         match self {
             Field::Token(name) => {
-                let name = token_to_name(name).unwrap_or(name);
+                let name = literal_token_name(name)
+                    .or_else(|| token_to_name(name))
+                    .unwrap_or(name);
                 format!("{name}_token",)
             }
             Field::Node { name, .. } => {
@@ -717,6 +730,9 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
                 | /* case expr  */ "condition" | "then"
                 | /* add foreign key constraint */ "from_columns" | "to_columns"
                 | /* rename column */ "from" | "to"
+                | /* reassign owned, alter mapping replace */ "before" | "after"
+                | /* as func option */ "obj_file" | "link_symbol"
+                | /* position & overlay fields */ "pos" | "string" | "placing" | "for"
             );
             if manually_implemented {
                 return;
@@ -750,7 +766,7 @@ fn clean_token_name(name: &str) -> String {
         return "ident".to_owned();
     }
 
-    let cleaned = name.trim_start_matches(['@', '#', '?']);
+    let cleaned = name.trim_start_matches(['#', '?']);
     if cleaned.is_empty() {
         name.to_owned()
     } else {

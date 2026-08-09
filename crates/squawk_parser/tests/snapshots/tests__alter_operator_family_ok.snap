@@ -227,9 +227,10 @@ SOURCE_FILE
                 IDENT "u"
           R_PAREN ")"
           WHITESPACE " "
-          FOR_KW "for"
-          WHITESPACE " "
-          SEARCH_KW "search"
+          OP_CLASS_FOR_SEARCH
+            FOR_KW "for"
+            WHITESPACE " "
+            SEARCH_KW "search"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_order"
@@ -278,16 +279,17 @@ SOURCE_FILE
                 IDENT "u"
           R_PAREN ")"
           WHITESPACE " "
-          FOR_KW "for"
-          WHITESPACE " "
-          ORDER_KW "order"
-          WHITESPACE " "
-          BY_KW "by"
-          WHITESPACE " "
-          OP_FAMILY_REF
-            PATH_REF
-              PATH_SEGMENT_REF
-                IDENT "s"
+          OP_CLASS_FOR_ORDER_BY
+            FOR_KW "for"
+            WHITESPACE " "
+            ORDER_KW "order"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            OP_FAMILY_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func"

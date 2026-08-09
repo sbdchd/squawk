@@ -95,7 +95,8 @@ SOURCE_FILE
                   TEXT_KW "text"
           R_PAREN ")"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_ROUTINE
@@ -115,6 +116,7 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "a"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

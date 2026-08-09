@@ -20,7 +20,7 @@ SOURCE_FILE
       L_PAREN "("
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -150,7 +150,8 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_STORED
-            ALWAYS_KW "always"
+            GENERATED_ALWAYS
+              ALWAYS_KW "always"
             WHITESPACE " "
             AS_KW "as"
             WHITESPACE " "
@@ -165,7 +166,8 @@ SOURCE_FILE
                 INT_NUMBER "2"
             R_PAREN ")"
             WHITESPACE " "
-            STORED_KW "stored"
+            STORED
+              STORED_KW "stored"
       COMMA ","
       WHITESPACE "\n  "
       CHECK_CONSTRAINT
@@ -210,7 +212,7 @@ SOURCE_FILE
             IDENT "bar"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -263,7 +265,7 @@ SOURCE_FILE
     PARTITION_DEFAULT
       DEFAULT_KW "default"
     WHITESPACE "\n    "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -368,7 +370,7 @@ SOURCE_FILE
     PARTITION_DEFAULT
       DEFAULT_KW "default"
     WHITESPACE "\n    "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -451,7 +453,7 @@ SOURCE_FILE
           IDENT "b"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -503,37 +505,39 @@ SOURCE_FILE
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      BIN_EXPR
-        NAME_REF
-          IDENT "a"
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+        COMMA ","
         WHITESPACE " "
-        R_ANGLE ">"
+        NAME_REF
+          MINVALUE_KW "minvalue"
+        COMMA ","
         WHITESPACE " "
         NAME_REF
-          IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      NAME_REF
-        MINVALUE_KW "minvalue"
-      COMMA ","
-      WHITESPACE " "
-      NAME_REF
-        MAXVALUE_KW "maxvalue"
-      R_PAREN ")"
+          MAXVALUE_KW "maxvalue"
+        R_PAREN ")"
       WHITESPACE " \n      "
       TO_KW "to"
       WHITESPACE " "
-      L_PAREN "("
-      NAME_REF
-        MAXVALUE_KW "maxvalue"
-      COMMA ","
-      WHITESPACE " "
-      NAME_REF
-        MINVALUE_KW "minvalue"
-      R_PAREN ")"
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        NAME_REF
+          MAXVALUE_KW "maxvalue"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          MINVALUE_KW "minvalue"
+        R_PAREN ")"
     WHITESPACE "\n    "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -586,17 +590,19 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("
-      IDENT "modulus"
-      WHITESPACE " "
-      INT_NUMBER "10"
+      PARTITION_MODULUS
+        IDENT "modulus"
+        WHITESPACE " "
+        INT_NUMBER "10"
       COMMA ","
       WHITESPACE " "
-      IDENT "remainder"
-      WHITESPACE " "
-      INT_NUMBER "2"
+      PARTITION_REMAINDER
+        IDENT "remainder"
+        WHITESPACE " "
+        INT_NUMBER "2"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -635,7 +641,7 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -683,7 +689,7 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -747,7 +753,7 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF

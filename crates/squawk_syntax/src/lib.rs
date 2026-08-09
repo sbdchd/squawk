@@ -260,7 +260,11 @@ fn api_walkthrough() {
         ast::FuncOption::AsFuncOption(o) => o,
         _ => unreachable!(),
     };
-    let definition: ast::Literal = option.definition().unwrap();
+    let as_definition: ast::AsDefinition = match option.as_func_target().unwrap() {
+        ast::AsFuncTarget::AsDefinition(d) => d,
+        _ => unreachable!(),
+    };
+    let definition: ast::Literal = as_definition.literal().unwrap();
     assert_eq!(definition.syntax().to_string(), "'select 1 + 1'");
 
     // Besides the "typed" AST API, there's an untyped CST one as well.
@@ -322,9 +326,10 @@ fn api_walkthrough() {
     );
     assert_eq!(
         func_option_syntax.descendants_with_tokens().count(),
-        5, // 5 tokens `1`, ` `, `+`, ` `, `1`
-           // 2 child literal expressions: `1`, `1`
-           // 1 the node itself: `1 + 1`
+        6, // 1 the node itself: `as 'select 1 + 1'`
+           // 2 tokens: `as`, ` `
+           // 2 child nodes: `AsDefinition`, `Literal`
+           // 1 token: `'select 1 + 1'`
     );
 
     // There's also a `preorder` method with a more fine-grained iteration control:
@@ -357,8 +362,9 @@ fn api_walkthrough() {
 "as 'select 1 + 1'" AS_FUNC_OPTION
   "as" AS_KW
   " " WHITESPACE
-  "'select 1 + 1'" LITERAL
-    "'select 1 + 1'" STRING
+  "'select 1 + 1'" AS_DEFINITION
+    "'select 1 + 1'" LITERAL
+      "'select 1 + 1'" STRING
     "#
         .trim()
     );

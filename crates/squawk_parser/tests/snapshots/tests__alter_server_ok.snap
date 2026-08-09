@@ -13,7 +13,7 @@ SOURCE_FILE
     SERVER_REF
       IDENT "s"
     WHITESPACE "\n  "
-    SET_VERSION
+    SERVER_VERSION
       VERSION_KW "version"
       WHITESPACE " "
       LITERAL
@@ -30,7 +30,7 @@ SOURCE_FILE
     SERVER_REF
       IDENT "s"
     WHITESPACE "\n  "
-    SET_VERSION
+    SERVER_VERSION
       VERSION_KW "version"
       WHITESPACE " "
       LITERAL

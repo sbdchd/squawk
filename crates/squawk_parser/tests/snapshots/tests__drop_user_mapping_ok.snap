@@ -16,7 +16,7 @@ SOURCE_FILE
     WHITESPACE " "
     USER_KW "user"
     WHITESPACE " "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
@@ -42,7 +42,7 @@ SOURCE_FILE
     ROLE_REF
       CURRENT_ROLE_KW "current_role"
     WHITESPACE " "
-    SERVER_NAME
+    SERVER_CLAUSE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF

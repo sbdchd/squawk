@@ -86,7 +86,8 @@ SOURCE_FILE
     WHITESPACE " "
     FORCE_KW "force"
     WHITESPACE " "
-    NULL_KW "null"
+    FORCE_NULL
+      NULL_KW "null"
     SEMICOLON ";"
   WHITESPACE "\n"
   COPY

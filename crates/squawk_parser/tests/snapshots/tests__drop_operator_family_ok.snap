@@ -53,7 +53,8 @@ SOURCE_FILE
       ACCESS_METHOD_REF
         IDENT "i"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_OPERATOR_FAMILY
@@ -83,6 +84,7 @@ SOURCE_FILE
       ACCESS_METHOD_REF
         IDENT "i"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

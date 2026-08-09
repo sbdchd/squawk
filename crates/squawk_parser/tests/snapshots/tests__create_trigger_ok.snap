@@ -28,11 +28,12 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "core_recipe"
     WHITESPACE "\n"
-    FOR_KW "FOR"
-    WHITESPACE " "
-    EACH_KW "EACH"
-    WHITESPACE " "
-    ROW_KW "ROW"
+    FOR_EACH_ROW
+      FOR_KW "FOR"
+      WHITESPACE " "
+      EACH_KW "EACH"
+      WHITESPACE " "
+      ROW_KW "ROW"
     WHITESPACE "\n"
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
@@ -114,11 +115,12 @@ SOURCE_FILE
         TRANSITION_RELATION_NAME
           IDENT "bar"
     WHITESPACE "\n"
-    FOR_KW "for"
-    WHITESPACE " "
-    EACH_KW "each"
-    WHITESPACE " "
-    STATEMENT_KW "statement"
+    FOR_EACH_STATEMENT
+      FOR_KW "for"
+      WHITESPACE " "
+      EACH_KW "each"
+      WHITESPACE " "
+      STATEMENT_KW "statement"
     WHITESPACE " \n"
     WHEN_CONDITION
       WHEN_KW "when"
@@ -212,11 +214,12 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "f"
     WHITESPACE "\n"
-    FOR_KW "for"
-    WHITESPACE " "
-    EACH_KW "each"
-    WHITESPACE " "
-    ROW_KW "row"
+    FOR_EACH_ROW
+      FOR_KW "for"
+      WHITESPACE " "
+      EACH_KW "each"
+      WHITESPACE " "
+      ROW_KW "row"
     WHITESPACE "\n"
     EXECUTE_KW "execute"
     WHITESPACE " "
@@ -287,9 +290,10 @@ SOURCE_FILE
         TRANSITION_RELATION_NAME
           IDENT "foo"
     WHITESPACE "\n"
-    FOR_KW "for"
-    WHITESPACE " "
-    ROW_KW "row"
+    FOR_EACH_ROW
+      FOR_KW "for"
+      WHITESPACE " "
+      ROW_KW "row"
     WHITESPACE " \n"
     EXECUTE_KW "execute"
     WHITESPACE " "

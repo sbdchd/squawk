@@ -349,12 +349,13 @@ SOURCE_FILE
       LITERAL
         INT_NUMBER "1"
       WHITESPACE " "
-      SET_KW "set"
-      WHITESPACE " "
-      STATISTICS_KW "statistics"
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "100"
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -384,12 +385,13 @@ SOURCE_FILE
       LITERAL
         INT_NUMBER "1"
       WHITESPACE " "
-      SET_KW "set"
-      WHITESPACE " "
-      STATISTICS_KW "statistics"
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "100"
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -489,6 +491,7 @@ SOURCE_FILE
         TABLESPACE_REF
           IDENT "n"
       WHITESPACE "\n  "
-      NOWAIT_KW "nowait"
+      NOWAIT
+        NOWAIT_KW "nowait"
     SEMICOLON ";"
   WHITESPACE "\n\n"

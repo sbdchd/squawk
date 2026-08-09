@@ -60,7 +60,8 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "c"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
@@ -78,7 +79,8 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "d"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX

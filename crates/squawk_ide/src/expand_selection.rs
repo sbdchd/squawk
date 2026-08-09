@@ -66,6 +66,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::OPTION_ALTER_OPTION_LIST,
     SyntaxKind::OPTION_ITEM_LIST,
     SyntaxKind::OP_SIG_LIST,
+    SyntaxKind::OVERLAY_EXPRS,
     SyntaxKind::PARAM_LIST,
     SyntaxKind::PARTITION_ITEM_LIST,
     SyntaxKind::PARTITION_LIST,

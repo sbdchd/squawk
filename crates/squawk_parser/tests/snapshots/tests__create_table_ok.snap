@@ -1599,7 +1599,8 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_STORED
-            ALWAYS_KW "always"
+            GENERATED_ALWAYS
+              ALWAYS_KW "always"
             WHITESPACE " "
             AS_KW "as"
             WHITESPACE " "
@@ -1616,7 +1617,8 @@ SOURCE_FILE
             WHITESPACE "\n  "
             R_PAREN ")"
             WHITESPACE " "
-            STORED_KW "stored"
+            STORED
+              STORED_KW "stored"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -1659,7 +1661,8 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_STORED
-            ALWAYS_KW "always"
+            GENERATED_ALWAYS
+              ALWAYS_KW "always"
             WHITESPACE " "
             AS_KW "as"
             WHITESPACE " "
@@ -1674,7 +1677,8 @@ SOURCE_FILE
                 INT_NUMBER "1"
             R_PAREN ")"
             WHITESPACE " "
-            VIRTUAL_KW "virtual"
+            VIRTUAL
+              VIRTUAL_KW "virtual"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1690,7 +1694,8 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_STORED
-            ALWAYS_KW "always"
+            GENERATED_ALWAYS
+              ALWAYS_KW "always"
             WHITESPACE " "
             AS_KW "as"
             WHITESPACE " "
@@ -3074,14 +3079,16 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("
-      IDENT "modulus"
-      WHITESPACE " "
-      INT_NUMBER "1"
+      PARTITION_MODULUS
+        IDENT "modulus"
+        WHITESPACE " "
+        INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
-      IDENT "remainder"
-      WHITESPACE " "
-      INT_NUMBER "1"
+      PARTITION_REMAINDER
+        IDENT "remainder"
+        WHITESPACE " "
+        INT_NUMBER "1"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3161,17 +3168,19 @@ SOURCE_FILE
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'bar'"
-      R_PAREN ")"
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'bar'"
+        R_PAREN ")"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'buzz'"
-      R_PAREN ")"
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'buzz'"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -3205,7 +3214,8 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_STORED
-            ALWAYS_KW "always"
+            GENERATED_ALWAYS
+              ALWAYS_KW "always"
             WHITESPACE " "
             AS_KW "as"
             WHITESPACE " "
@@ -3220,7 +3230,8 @@ SOURCE_FILE
                 INT_NUMBER "2"
             R_PAREN ")"
             WHITESPACE " "
-            STORED_KW "stored"
+            STORED
+              STORED_KW "stored"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
@@ -3231,17 +3242,19 @@ SOURCE_FILE
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'2016-09-01'"
-      R_PAREN ")"
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'2016-09-01'"
+        R_PAREN ")"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'2016-10-01'"
-      R_PAREN ")"
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        LITERAL
+          STRING "'2016-10-01'"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing entries"
@@ -3605,9 +3618,10 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_IDENTITY
-            BY_KW "BY"
-            WHITESPACE " "
-            DEFAULT_KW "DEFAULT"
+            GENERATED_BY_DEFAULT
+              BY_KW "BY"
+              WHITESPACE " "
+              DEFAULT_KW "DEFAULT"
             WHITESPACE " "
             AS_KW "AS"
             WHITESPACE " "
@@ -3865,9 +3879,10 @@ SOURCE_FILE
           GENERATED_KW "generated"
           WHITESPACE " "
           GENERATED_IDENTITY
-            BY_KW "BY"
-            WHITESPACE " "
-            DEFAULT_KW "DEFAULT"
+            GENERATED_BY_DEFAULT
+              BY_KW "BY"
+              WHITESPACE " "
+              DEFAULT_KW "DEFAULT"
             WHITESPACE " "
             AS_KW "AS"
             WHITESPACE " "
@@ -4177,7 +4192,8 @@ SOURCE_FILE
           GENERATED_KW "GENERATED"
           WHITESPACE " "
           GENERATED_IDENTITY
-            ALWAYS_KW "ALWAYS"
+            GENERATED_ALWAYS
+              ALWAYS_KW "ALWAYS"
             WHITESPACE " "
             AS_KW "AS"
             WHITESPACE " "

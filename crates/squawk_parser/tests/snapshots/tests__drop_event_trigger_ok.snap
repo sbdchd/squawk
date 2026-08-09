@@ -33,7 +33,8 @@ SOURCE_FILE
     EVENT_TRIGGER_REF
       IDENT "a"
     WHITESPACE " "
-    CASCADE_KW "cascade"
+    CASCADE
+      CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_EVENT_TRIGGER
@@ -51,6 +52,7 @@ SOURCE_FILE
     EVENT_TRIGGER_REF
       IDENT "a"
     WHITESPACE " "
-    RESTRICT_KW "restrict"
+    RESTRICT
+      RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"

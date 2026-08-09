@@ -48,8 +48,9 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
-        LITERAL
-          STRING "''"
+        AS_DEFINITION
+          LITERAL
+            STRING "''"
       WHITESPACE " "
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
@@ -111,8 +112,9 @@ SOURCE_FILE
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
-        LITERAL
-          STRING "''"
+        AS_DEFINITION
+          LITERAL
+            STRING "''"
       WHITESPACE "\n"
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"

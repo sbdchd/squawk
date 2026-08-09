@@ -95,7 +95,8 @@ SOURCE_FILE@0..389
         STAR@155..156 "*"
         R_PAREN@156..157 ")"
     WHITESPACE@157..160 "\n  "
-    CASCADE_KW@160..167 "cascade"
+    CASCADE@160..167
+      CASCADE_KW@160..167 "cascade"
     SEMICOLON@167..168 ";"
   WHITESPACE@168..170 "\n\n"
   COMMENT@170..182 "-- aggregate"
@@ -168,7 +169,8 @@ SOURCE_FILE@0..389
         WHITESPACE@288..289 "\n"
         R_PAREN@289..290 ")"
     WHITESPACE@290..291 " "
-    RESTRICT_KW@291..299 "restrict"
+    RESTRICT@291..299
+      RESTRICT_KW@291..299 "restrict"
     SEMICOLON@299..300 ";"
   WHITESPACE@300..302 "\n\n"
   DROP_AGGREGATE@302..387

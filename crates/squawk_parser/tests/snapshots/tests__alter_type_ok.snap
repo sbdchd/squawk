@@ -142,7 +142,8 @@ SOURCE_FILE
       COMPOSITE_FIELD
         IDENT "b"
       WHITESPACE " "
-      CASCADE_KW "cascade"
+      CASCADE
+        CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -172,7 +173,8 @@ SOURCE_FILE
       COMPOSITE_FIELD
         IDENT "b"
       WHITESPACE " "
-      RESTRICT_KW "restrict"
+      RESTRICT
+        RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_value"
@@ -451,7 +453,8 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               TEXT_KW "text"
         WHITESPACE " "
-        CASCADE_KW "cascade"
+        CASCADE
+          CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -482,7 +485,8 @@ SOURCE_FILE
                 INT_NUMBER "100"
             R_PAREN ")"
         WHITESPACE " "
-        RESTRICT_KW "restrict"
+        RESTRICT
+          RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_attribute"
@@ -531,7 +535,8 @@ SOURCE_FILE
         COMPOSITE_FIELD_REF
           IDENT "a"
         WHITESPACE " "
-        CASCADE_KW "cascade"
+        CASCADE
+          CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -558,7 +563,8 @@ SOURCE_FILE
         COMPOSITE_FIELD_REF
           IDENT "a"
         WHITESPACE " "
-        RESTRICT_KW "restrict"
+        RESTRICT
+          RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_attribute"
@@ -638,7 +644,8 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "c"
         WHITESPACE " "
-        CASCADE_KW "cascade"
+        CASCADE
+          CASCADE_KW "cascade"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -667,7 +674,8 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
         WHITESPACE " "
-        RESTRICT_KW "restrict"
+        RESTRICT
+          RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"

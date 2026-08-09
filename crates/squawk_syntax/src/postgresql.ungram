@@ -208,7 +208,10 @@ XmlTable =
    ')'
 
 XmlRowPassingClause =
-  Expr 'passing' XmlPassingMech? Expr XmlPassingMech?
+  row:Expr 'passing' XmlPassingMech? XmlPassingDoc
+
+XmlPassingDoc =
+  Expr XmlPassingMech?
 
 XmlNamespaceList =
   '(' (XmlNamespace (',' XmlNamespace )*) ')'
@@ -295,15 +298,20 @@ SubstringFn =
   ')'
 
 PositionFn =
-  'position' '(' Expr 'in' Expr ')'
+  'position' '(' pos:Expr 'in' string:Expr ')'
 
 OverlayFn =
-  'overlay' '('
-    (
-      Expr 'placing' Expr 'from' Expr ('for' Expr)?
-    | (Expr (',' Expr)*)?
-    )
-  ')'
+  'overlay' '(' OverlayArgs? ')'
+
+OverlayArgs =
+  OverlayPlacing
+| OverlayExprs
+
+OverlayPlacing =
+  string:Expr 'placing' placing:Expr 'from' from:Expr ('for' for:Expr)?
+
+OverlayExprs =
+  (Expr (',' Expr)*)
 
 TrimFn =
   'trim' '('
@@ -318,22 +326,62 @@ TrimFn =
 XmlRootFn =
   'xmlroot' '('
     Expr ','
-    ('version' 'no' 'value' | 'version' Expr)
-    (
-      ',' 'standalone' 'yes'
-    | ',' 'standalone' 'no'
-    | ',' 'standalone' 'no' 'value'
-    )?
+    XmlRootVersion
+    XmlStandalone?
   ')'
+
+XmlRootVersion =
+  XmlVersionNoValue
+| XmlVersionExpr
+
+XmlVersionNoValue =
+  'version' 'no' 'value'
+
+XmlVersionExpr =
+  'version' Expr
+
+XmlStandalone =
+  StandaloneYes
+| StandaloneNo
+| StandaloneNoValue
+
+StandaloneYes =
+  ',' 'standalone' 'yes'
+
+StandaloneNo =
+  ',' 'standalone' 'no'
+
+StandaloneNoValue =
+  ',' 'standalone' 'no' 'value'
+
+XmlDocumentOrContent =
+  XmlDocument
+| XmlContent
+
+XmlDocument =
+  'document'
+
+XmlContent =
+  'content'
 
 XmlSerializeFn =
   'xmlserialize' '('
-    ('document' | 'content')
+    XmlDocumentOrContent
     Expr
     'as'
     Type
-    ('no' 'indent' | 'indent')?
+    XmlIndent?
   ')'
+
+XmlIndent =
+  Indent
+| NoIndent
+
+Indent =
+  'indent'
+
+NoIndent =
+  'no' 'indent'
 
 XmlElementFn =
   'xmlelement' '('
@@ -382,23 +430,24 @@ XmlForestFn =
   'xmlforest' '(' ExprAsElementTagList ')'
 
 XmlExistsFn =
-  'xmlexists' '('
-    Expr
-    'passing'
-    XmlPassingMech?
-    Expr
-    XmlPassingMech?
-  ')'
+  'xmlexists' '(' XmlRowPassingClause ')'
 
 XmlParseFn =
   'xmlparse' '('
-    ('document' | 'content')
+    XmlDocumentOrContent
     Expr
-    (
-      'preserve' 'whitespace'
-    | 'strip' 'whitespace'
-    )
+    XmlWhitespace?
   ')'
+
+XmlWhitespace =
+  PreserveWhitespace
+| StripWhitespace
+
+PreserveWhitespace =
+  'preserve' 'whitespace'
+
+StripWhitespace =
+  'strip' 'whitespace'
 
 XmlPiFn =
   'xmlpi' '('
@@ -894,8 +943,11 @@ CheckConstraint  =
   'check' '(' Expr ')'
   NoInherit?
 
-UsingIndex =
+UsingIndexName =
   'using' 'index' IndexRef
+
+UsingIndex =
+  'using' 'index' IndexRef?
 
 WithOptions =
   'with' 'options'
@@ -980,12 +1032,12 @@ NullsNotDistinct =
 UniqueConstraint =
   ConstraintNameClause?
   'unique'
-  (UsingIndex | IndexParameters)
+  (using_index:UsingIndexName | IndexParameters)
 
 PrimaryKeyConstraint =
   ConstraintNameClause?
   'primary' 'key'
-  (UsingIndex | IndexParameters)
+  (using_index:UsingIndexName | IndexParameters)
 
 IndexParameters =
   (NullsNotDistinct | NullsDistinct)?
@@ -1005,6 +1057,10 @@ Cascade =
 
 Restrict =
   'restrict'
+
+DropBehavior =
+  Cascade
+| Restrict
 
 NoAction =
   'no' 'action'
@@ -1084,10 +1140,30 @@ GeneratedConstraint =
   (GeneratedIdentity | GeneratedStored)
 
 GeneratedIdentity =
-  ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList?
+  GeneratedWhen 'as' 'identity' SequenceOptionList?
 
 GeneratedStored =
-  ('always' | 'by' 'default') 'as' '(' Expr ')' ('stored' | 'virtual')?
+  GeneratedWhen 'as' '(' Expr ')' GeneratedKind?
+
+GeneratedWhen =
+  GeneratedAlways
+| GeneratedByDefault
+
+GeneratedAlways =
+  'always'
+
+GeneratedByDefault =
+  'by' 'default'
+
+GeneratedKind =
+  Stored
+| Virtual
+
+Stored =
+  'stored'
+
+Virtual =
+  'virtual'
 
 ReferencesConstraint =
   ConstraintNameClause?
@@ -1163,8 +1239,18 @@ TableList =
 
 Truncate =
   'truncate' 'table'? TableList
-  ('restart' 'identity' | 'continue' 'identity')?
-  ('cascade' | 'restrict')? ';'?
+  IdentityAction?
+  DropBehavior? ';'?
+
+IdentityAction =
+  RestartIdentity
+| ContinueIdentity
+
+RestartIdentity =
+  'restart' 'identity'
+
+ContinueIdentity =
+  'continue' 'identity'
 
 EmptyStmt =
   ';'
@@ -1268,7 +1354,17 @@ FetchClause =
   ('first' | 'next')
   Expr?
   ('row' | 'rows')
-  ('only' | 'with' 'ties')
+  FetchQuantity
+
+FetchQuantity =
+  FetchOnly
+| WithTies
+
+FetchOnly =
+  'only'
+
+WithTies =
+  'with' 'ties'
 
 OffsetClause =
   'offset'
@@ -1524,19 +1620,42 @@ TransactionModeList =
   TransactionMode (',' TransactionMode)*
 
 Begin =
-  ('begin' ('work' | 'transaction')? | 'start' 'transaction')
+  ('begin' TransactionUnit? | 'start' 'transaction')
   TransactionModeList? ';'?
+
+TransactionUnit =
+  Work
+| Transaction
+
+Work =
+  'work'
+
+Transaction =
+  'transaction'
+
+ChainOption =
+  AndChain
+| AndNoChain
+
+AndChain =
+  'and' 'chain'
+
+AndNoChain =
+  'and' 'no' 'chain'
 
 Commit =
   (
-    'commit' ('prepared' Literal | ('work' | 'transaction')? ('and' 'no'? 'chain')?)
-  | 'end' ('work' | 'transaction')? ('and' 'no'? 'chain')?
+    'commit' ('prepared' Literal | TransactionUnit? ChainOption?)
+  | 'end' TransactionUnit? ChainOption?
   ) ';'?
 
+RollbackToSavepoint =
+  'to' 'savepoint'? SavepointRef
+
 Rollback =
-  'rollback' ('work' | 'transaction')? ('and' 'no'? 'chain')? ';'?
-| 'abort' ('work' | 'transaction')? ('and' 'no'? 'chain')? ';'?
-| 'rollback' ('work' | 'transaction')? 'to' 'savepoint'? SavepointRef ';'?
+  'rollback' TransactionUnit? ChainOption? ';'?
+| 'abort' TransactionUnit? ChainOption? ';'?
+| 'rollback' TransactionUnit? RollbackToSavepoint ';'?
 | 'rollback' 'prepared' Literal ';'?
 
 CreateAggregate =
@@ -1547,15 +1666,15 @@ IfExists =
 
 DropType =
   'drop' 'type' IfExists? (TypeNameRef (',' TypeNameRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropIndex =
   'drop' 'index' 'concurrently'? IfExists? (IndexRef (',' IndexRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropTable =
   'drop' 'table' IfExists? (TableNameRef (',' TableNameRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropDatabase =
   'drop' 'database' IfExists? DatabaseRef ';'?
@@ -1790,7 +1909,7 @@ AddConstraint =
   Enforced?
 
 DropConstraint =
-  'drop' 'constraint' IfExists? ConstraintNameRef ('restrict' | 'cascade')?
+  'drop' 'constraint' IfExists? ConstraintNameRef DropBehavior?
 
 RenameConstraint =
   'rename' 'constraint' ConstraintNameRef 'to' ConstraintName
@@ -1927,7 +2046,7 @@ AlterTable =
   ) ';'?
 
 AllInTablespace =
-  'all' 'in' 'tablespace' TablespaceRef OwnedByRoles? SetTablespace 'nowait'?
+  'all' 'in' 'tablespace' TablespaceRef OwnedByRoles? SetTablespace Nowait?
 
 Revoke =
   'revoke' (('admin' | 'inherit' | 'grant' | 'set') 'option' 'for')?
@@ -1935,7 +2054,7 @@ Revoke =
   ('on' PrivilegeObjects)?
   'from' RoleRefList
   ('granted' 'by' RoleRef)?
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 Row =
   (Expr (',' Expr)*)
@@ -1963,10 +2082,23 @@ Table =
 Insert =
   WithClause?
   'insert' 'into' RelationNameRef alias:RequiredAsAlias? ColumnTargetList?
-  ('overriding' ('system' | 'user') 'value')?
-  ('default' 'values' | SelectVariant)
+  OverridingClause?
+  (DefaultValues | SelectVariant)
   OnConflictClause?
   ReturningClause? ';'?
+
+OverridingClause =
+  OverridingSystemValue
+| OverridingUserValue
+
+OverridingSystemValue =
+  'overriding' 'system' 'value'
+
+OverridingUserValue =
+  'overriding' 'user' 'value'
+
+DefaultValues =
+  'default' 'values'
 
 OnConflictClause =
   'on' 'conflict' ConflictTarget? ConflictAction
@@ -2040,8 +2172,17 @@ Update =
   ReturningClause? ';'?
 
 ForPortionOf =
-  'for' 'portion' 'of' ColumnNameRef
-  ('from' Expr 'to' Expr | '(' Expr ')')
+  'for' 'portion' 'of' ColumnNameRef range:PortionTarget
+
+PortionTarget =
+  PortionFromTo
+| PortionRange
+
+PortionFromTo =
+  'from' from:Expr 'to' to:Expr
+
+PortionRange =
+  '(' Expr ')'
 
 ReturningClause =
   'returning'
@@ -2073,15 +2214,18 @@ Notify =
 
 MergeWhenMatched =
   'when' 'matched'
-  ('and' Expr)? 'then' MergeAction
+  MergeCondition? 'then' MergeAction
+
+MergeCondition =
+  'and' Expr
 
 MergeWhenNotMatchedSource =
   'when' 'not' 'matched' 'by' 'source'
-  ('and' Expr)? 'then' MergeAction
+  MergeCondition? 'then' MergeAction
 
 MergeWhenNotMatchedTarget =
   'when' 'not' 'matched' ('by' 'target')?
-  ('and' Expr)? 'then' MergeAction
+  MergeCondition? 'then' MergeAction
 
 MergeWhenClause =
   MergeWhenMatched
@@ -2096,8 +2240,8 @@ MergeUpdate =
 
 MergeInsert =
   'insert' ColumnTargetList?
-  ('overriding' ('system' | 'user'))?
-  (Values | 'default' 'values')
+  OverridingClause?
+  (Values | DefaultValues)
 
 MergeDoNothing =
   'do' 'nothing'
@@ -2118,12 +2262,42 @@ Merge =
 Declare =
   'declare' Cursor
   'binary'?
-  ('asensitive' | 'insensitive')?
-  ('no'? 'scroll')?
+  CursorSensitivity?
+  CursorScroll?
   'cursor'
-  (('with' | 'without') 'hold')?
+  CursorHold?
   'for'
   query:SelectVariant ';'?
+
+CursorSensitivity =
+  Asensitive
+| Insensitive
+
+Asensitive =
+  'asensitive'
+
+Insensitive =
+  'insensitive'
+
+CursorScroll =
+  Scroll
+| NoScroll
+
+Scroll =
+  'scroll'
+
+NoScroll =
+  'no' 'scroll'
+
+CursorHold =
+  WithHold
+| WithoutHold
+
+WithHold =
+  'with' 'hold'
+
+WithoutHold =
+  'without' 'hold'
 
 
 Execute =
@@ -2476,8 +2650,21 @@ LockingClause =
   | ForShare
   | ForUpdate
   )
-  ('of' (Expr (',' Expr)*))?
-  ('skip' 'locked' | 'nowait')?
+  LockingOf?
+  LockWait?
+
+LockingOf =
+  'of' (Expr (',' Expr)*)
+
+LockWait =
+  SkipLocked
+| Nowait
+
+SkipLocked =
+  'skip' 'locked'
+
+Nowait =
+  'nowait'
 
 ForNoKeyUpdate =
   'no' 'key' 'update'
@@ -2682,9 +2869,9 @@ AlterServerAction =
   AlterOptionList
 | OwnerTo
 | ServerRenameTo
-| SetVersion
+| ServerVersion
 
-SetVersion =
+ServerVersion =
   'version' Literal
 
 AlterOptionList =
@@ -2829,7 +3016,17 @@ OpClassOptionFunction =
   'function' Literal ParamList? FunctionSig
 
 OpClassOptionOperator =
-  'operator' Literal Op ('(' Type ',' Type ')')? ('for' 'search' | 'for' 'order' 'by' OpFamilyRef)
+  'operator' Literal Op ('(' lhs:Type ',' rhs:Type ')')? OpClassPurpose?
+
+OpClassPurpose =
+  OpClassForSearch
+| OpClassForOrderBy
+
+OpClassForSearch =
+  'for' 'search'
+
+OpClassForOrderBy =
+  'for' 'order' 'by' OpFamilyRef
 
 OpClassOptionStorage =
   'storage' Type
@@ -3133,7 +3330,7 @@ ObjectMaterializedView =
   'materialized' 'view' ViewRef
 
 ObjectOperator =
-  'operator' Op '(' Type ',' Type ')'
+  'operator' Op '(' lhs:Type ',' rhs:Type ')'
 
 ObjectOperatorClass =
   'operator' 'class' OpClassRef UsingMethod
@@ -3173,10 +3370,10 @@ GrantDefaultPrivileges =
   'grant' Privileges 'on' PrivilegeTarget 'to' RoleRefList ('with' 'grant' 'option')?
 
 RevokeDefaultPrivileges =
-  'revoke' ('grant' 'option' 'for')? Privileges 'on' PrivilegeTarget 'from' RoleRefList ('cascade' | 'restrict')?
+  'revoke' ('grant' 'option' 'for')? Privileges 'on' PrivilegeTarget 'from' RoleRefList DropBehavior?
 
 Privileges =
-  'all' 'privileges'? ColumnRefList?
+  AllPrivileges
 | RevokeCommandList
 
 PrivilegeTarget  =
@@ -3295,8 +3492,8 @@ AlterSubscription =
   'alter' 'subscription' SubscriptionRef action:AlterSubscriptionAction ';'?
 
 AlterSubscriptionAction =
-  SetConnection
-| SetServer
+  ConnectionClause
+| ServerClause
 | SetOptions
 | AddPublication
 | SetPublication
@@ -3308,11 +3505,8 @@ AlterSubscriptionAction =
 | OwnerTo
 | SubscriptionRenameTo
 
-SetConnection =
+ConnectionClause =
   'connection' Literal
-
-SetServer =
-  'server' ServerRef
 
 AddPublication =
   'add' 'publication' (PublicationRef (',' PublicationRef)*) ('with' AttributeList)?
@@ -3390,9 +3584,12 @@ AlterMapping =
   (
     'for' (TextSearchTokenKind (',' TextSearchTokenKind)*)
       ('with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*)
-        | 'replace' TextSearchDictionaryRef 'with' TextSearchDictionaryRef)
-  | 'replace' TextSearchDictionaryRef 'with' TextSearchDictionaryRef
+        | ReplaceDictionary)
+  | ReplaceDictionary
   )
+
+ReplaceDictionary =
+  'replace' before:TextSearchDictionaryRef 'with' after:TextSearchDictionaryRef
 
 DropMapping =
   'drop' 'mapping' IfExists? 'for' (TextSearchTokenKind (',' TextSearchTokenKind)*)
@@ -3435,19 +3632,19 @@ AlterTypeAttributeAction =
 | DropAttribute
 
 RenameAttribute =
-  'rename' 'attribute' CompositeFieldRef 'to' CompositeField (Cascade | Restrict)?
+  'rename' 'attribute' CompositeFieldRef 'to' CompositeField DropBehavior?
 
 RenameValue =
   'rename' 'value' from:Literal 'to' to:Literal
 
 AddAttribute =
-  'add' 'attribute' CompositeField Type Collate? (Cascade | Restrict)?
+  'add' 'attribute' CompositeField Type Collate? DropBehavior?
 
 DropAttribute =
-  'drop' 'attribute' IfExists? CompositeFieldRef (Cascade | Restrict)?
+  'drop' 'attribute' IfExists? CompositeFieldRef DropBehavior?
 
 AlterAttribute =
-  'alter' 'attribute' CompositeFieldRef ('set' 'data'?)? 'type' Type Collate? (Cascade | Restrict)?
+  'alter' 'attribute' CompositeFieldRef ('set' 'data'?)? 'type' Type Collate? DropBehavior?
 
 AddValue =
   'add' 'value' IfNotExists? Literal ValuePosition?
@@ -3472,7 +3669,7 @@ AlterUserAction =
 | SetConfigParam
 
 AlterUserMapping =
-  'alter' 'user' 'mapping' 'for' RoleRef ServerName AlterOptionList ';'?
+  'alter' 'user' 'mapping' 'for' RoleRef ServerClause AlterOptionList ';'?
 
 AlterView =
   'alter' 'view' IfExists? ViewRef action:AlterViewAction ';'?
@@ -3586,9 +3783,7 @@ Repack =
   'repack'
   OptionItemList?
   TableAndColumnsList?
-  (
-     'using' 'index' IndexRef?
-  )? ';'?
+  UsingIndex? ';'?
 
 Persistence =
   Temp
@@ -3716,12 +3911,12 @@ AddVertexEdgeTables =
 DropVertexTables =
   'drop' ('vertex' | 'node')
   'tables' '(' (ElementTableRef (',' ElementTableRef)*) ')'
-  ('cascade' | 'restrict')?
+  DropBehavior?
 
 DropEdgeTables =
   'drop' ('edge' | 'relationship')
   'tables' '(' (ElementTableRef (',' ElementTableRef)*) ')'
-  ('cascade' | 'restrict')?
+  DropBehavior?
 
 AlterVertexEdgeLabels =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
@@ -3732,7 +3927,7 @@ AddLabel =
 
 DropVertexEdgeLabel =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
-    'drop' 'label' LabelRef ('cascade' | 'restrict')?
+    'drop' 'label' LabelRef DropBehavior?
 
 AddVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
@@ -3742,10 +3937,10 @@ AddVertexEdgeLabelProperties =
 DropVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
     'alter' 'label' LabelRef
-    'drop' 'properties' '(' (PropertyNameRef (',' PropertyNameRef)*) ')' ('cascade' | 'restrict')?
+    'drop' 'properties' '(' (PropertyNameRef (',' PropertyNameRef)*) ')' DropBehavior?
 
 DropPropertyGraph =
-  'drop' 'property' 'graph' IfExists? PropertyGraphRef ('cascade' | 'restrict')? ';'?
+  'drop' 'property' 'graph' IfExists? PropertyGraphRef DropBehavior? ';'?
 
 GraphTableFn =
   'graph_table' '(' PropertyGraphRef 'match' PathPatternList WhereClause? 'columns' '(' ExprAsColumnNameList ')' ')'
@@ -3789,10 +3984,16 @@ IsLabel =
   'is' Expr
 
 GraphPatternQualifier =
+  '{' min:QualifierMin '}'
+| '{' ',' max:QualifierMax '}'
+| '{' min:QualifierMin ',' max:QualifierMax '}'
+
 // TODO: these should be integers, not Literals
-  '{' Literal '}'
-| '{' ',' Literal '}'
-| '{' Literal ',' Literal '}'
+QualifierMin =
+  Literal
+
+QualifierMax =
+  Literal
 
 CreateAccessMethod =
   'create' 'access' 'method' AccessMethod
@@ -3826,8 +4027,8 @@ CollationFrom =
 
 CreateConversion =
   'create' 'default'? 'conversion' Conversion
-  'for' Literal
-  'to' Literal
+  'for' for:Literal
+  'to' to:Literal
   'from' FunctionNameRef ';'?
 
 CreateDatabase =
@@ -3872,10 +4073,10 @@ CreateForeignTable =
   TableArgList?
   Inherits?
   PartitionType?
-  ServerName
+  ServerClause
   AlterOptionList? ';'?
 
-ServerName =
+ServerClause =
   'server' ServerRef
 
 CreateGroup =
@@ -3936,9 +4137,13 @@ RoleOptionValidUntil =
 
 CreateLanguage =
   'create' OrReplace? 'trusted'? 'procedural'? 'language' Language
-  ('handler' FunctionNameRef
-  ('inline' FunctionNameRef)?
-  ('validator' FunctionNameRef)?)? ';'?
+  (HandlerClause InlineClause? ValidatorClause?)? ';'?
+
+InlineClause =
+  'inline' FunctionNameRef
+
+ValidatorClause =
+  'validator' FunctionNameRef
 
 CreateOperator =
   'create' 'operator' Op AttributeList ';'?
@@ -4073,10 +4278,13 @@ CreateSequence =
 
 CreateServer =
   'create' 'server' IfNotExists? Server
-  ('type' Literal)?
-  ('version' Literal)?
+  ServerType?
+  ServerVersion?
   'foreign' 'data' 'wrapper' ForeignDataWrapperRef
   AlterOptionList? ';'?
+
+ServerType =
+  'type' Literal
 
 
 CreateStatistics =
@@ -4090,7 +4298,7 @@ StatTypes =
 
 CreateSubscription =
   'create' 'subscription' Subscription
-  ('connection' Literal | 'server' ServerRef)
+  (ConnectionClause | ServerClause)
   'publication' (PublicationRef (',' PublicationRef)*)
   WithParams? ';'?
 
@@ -4125,7 +4333,7 @@ TransformToFunc =
 
 CreateUserMapping =
   'create' 'user' 'mapping' IfNotExists? 'for' RoleRef
-  ServerName
+  ServerClause
   AlterOptionList? ';'?
 
 CreateUser =
@@ -4134,14 +4342,14 @@ CreateUser =
 
 DropLanguage =
   'drop' 'procedural'? 'language' IfExists? LanguageRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropGroup =
   'drop' 'group' IfExists? (RoleRef (',' RoleRef)*) ';'?
 
 DropFunction =
   'drop' 'function' IfExists? FunctionSigList
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 FunctionSigList =
   (FunctionSig (',' FunctionSig)*)
@@ -4172,15 +4380,15 @@ HasParamList =
 
 DropForeignDataWrapper =
   'drop' 'foreign' 'data' 'wrapper' IfExists? (ForeignDataWrapperRef (',' ForeignDataWrapperRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropForeignTable =
   'drop' 'foreign' 'table' IfExists? (TableNameRef (',' TableNameRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropAccessMethod =
   'drop' 'access' 'method' IfExists? AccessMethodRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 Aggregate =
   PathRef ParamList
@@ -4190,46 +4398,46 @@ AggregateName =
 
 DropAggregate =
   'drop' 'aggregate' IfExists? (Aggregate (',' Aggregate)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropCast =
   'drop' 'cast' IfExists? CastSig
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 CastSig =
   '(' lhs:Type 'as' rhs:Type ')'
 
 DropCollation =
   'drop' 'collation' IfExists? (CollationRef (',' CollationRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropConversion =
   'drop' 'conversion' IfExists? ConversionRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropDomain =
   'drop' 'domain' IfExists? (DomainRef (',' DomainRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropEventTrigger =
   'drop' 'event' 'trigger' IfExists? EventTriggerRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropExtension =
   'drop' 'extension' IfExists? (ExtensionRef (',' ExtensionRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropMaterializedView =
   'drop' 'materialized' 'view' IfExists? (ViewRef (',' ViewRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropOperatorFamily =
   'drop' 'operator' 'family' IfExists? OpFamilyRef UsingMethod
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropOperator =
   'drop' 'operator' IfExists? OpSigList
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 OpSigList =
   (OpSig (',' OpSig)*)
@@ -4239,83 +4447,83 @@ OpSig =
 
 DropOperatorClass =
   'drop' 'operator' 'class' IfExists? OpClassRef UsingMethod
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropOwned =
   'drop' 'owned' 'by' RoleRefList
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropPolicy =
   'drop' 'policy' IfExists? PolicyRef OnTable
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropProcedure =
   'drop' 'procedure' IfExists? ProcedureSigList
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropPublication =
   'drop' 'publication' IfExists? (PublicationRef (',' PublicationRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropRole =
   'drop' 'role' IfExists? (RoleRef (',' RoleRef)*) ';'?
 
 DropRoutine =
   'drop' 'routine' IfExists? RoutineSigList
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropRule =
   'drop' 'rule' IfExists? RuleRef OnRelation
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropSequence =
   'drop' 'sequence' IfExists? (SequenceRef (',' SequenceRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropServer =
   'drop' 'server' IfExists? (ServerRef (',' ServerRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropStatistics =
   'drop' 'statistics' IfExists? (StatisticsRef (',' StatisticsRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropSubscription =
   'drop' 'subscription' IfExists? SubscriptionRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropTablespace =
   'drop' 'tablespace' IfExists? TablespaceRef ';'?
 
 DropTextSearchParser =
   'drop' 'text' 'search' 'parser' IfExists? TextSearchParserRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropTextSearchConfig =
   'drop' 'text' 'search' 'configuration' IfExists? TextSearchConfigurationRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropTextSearchDict =
   'drop' 'text' 'search' 'dictionary' IfExists? TextSearchDictionaryRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropTextSearchTemplate =
   'drop' 'text' 'search' 'template' IfExists? TextSearchTemplateRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropTransform =
   'drop' 'transform' IfExists? 'for' ty:Type 'language' LanguageRef
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 DropUser =
   'drop' 'user' IfExists? (RoleRef (',' RoleRef)*) ';'?
 
 DropUserMapping =
-  'drop' 'user' 'mapping' IfExists? 'for' RoleRef ServerName ';'?
+  'drop' 'user' 'mapping' IfExists? 'for' RoleRef ServerClause ';'?
 
 DropView =
   'drop' 'view' IfExists? (ViewRef (',' ViewRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 Explain =
   'explain'
@@ -4361,7 +4569,7 @@ ExplainStmt =
 ImportForeignSchema =
   'import' 'foreign' 'schema' SchemaRef
   (LimitToTables | ExceptTables)?
-  'from' ServerName
+  'from' ServerClause
   IntoSchema
   AlterOptionList? ';'?
 
@@ -4377,7 +4585,7 @@ IntoSchema =
 Lock =
   'lock' 'table'? RelationList
   ('in' LockMode 'mode')?
-  'nowait'? ';'?
+  Nowait? ';'?
 
 LockMode =
   AccessShare
@@ -4414,7 +4622,7 @@ Exclusive =
   'exclusive'
 
 Reassign =
-  'reassign' 'owned' 'by' old_roles:RoleRefList 'to' new_roles:RoleRefList ';'?
+  'reassign' 'owned' 'by' before:RoleRefList 'to' after:RoleRefList ';'?
 
 Refresh =
   'refresh' 'materialized' 'view' 'concurrently'? ViewRef
@@ -4422,7 +4630,7 @@ Refresh =
 
 Grant =
   'grant'
-  (AllPrivileges | RevokeCommandList)?
+  Privileges?
   ('on' PrivilegeObjects)?
   'to' RoleRefList
   GrantWithClause?
@@ -4722,7 +4930,10 @@ Discard =
   'discard' ('all' | 'temp' | 'temporary' | 'plans' | 'sequences') ';'?
 
 Do =
-  'do' ('language' (LanguageRef | Literal))? Literal ('language' (LanguageRef | Literal))? ';'?
+  'do' DoLanguage? body:Literal DoLanguage? ';'?
+
+DoLanguage =
+  'language' (LanguageRef | Literal)
 
 Move =
   'move' CursorAction? ('from' | 'in')? CursorRef ';'?
@@ -4839,7 +5050,21 @@ CopyLegacyOption =
 | 'json'
 | ('delimiter' | 'null' | 'quote' | 'escape') 'as'? Literal
 | 'encoding' Literal
-| 'force' ('not' 'null' | 'quote' | 'null') ('*' | (ColumnNameRef (',' ColumnNameRef)*))
+| 'force' CopyForceKind ('*' | (ColumnNameRef (',' ColumnNameRef)*))
+
+CopyForceKind =
+  ForceNotNull
+| ForceQuote
+| ForceNull
+
+ForceNotNull =
+  'not' 'null'
+
+ForceQuote =
+  'quote'
+
+ForceNull =
+  'null'
 
 Call =
   'call' ProcedureNameRef ArgList ';'?
@@ -4897,9 +5122,19 @@ CreateTrigger =
   InitiallyDeferredConstraintOption?
   InitiallyImmediateConstraintOption?
   Referencing?
-  ('for' 'each'? ('row' | 'statement'))?
+  TriggerLevel?
   WhenCondition?
   'execute' ('function' | 'procedure') CallExpr ';'?
+
+TriggerLevel =
+  ForEachRow
+| ForEachStatement
+
+ForEachRow =
+  'for' 'each'? 'row'
+
+ForEachStatement =
+  'for' 'each'? 'statement'
 
 WhenCondition =
   'when' '(' Expr ')'
@@ -4912,7 +5147,7 @@ TriggerEventList =
 
 DropSchema =
   'drop' 'schema' IfExists? (SchemaRef (',' SchemaRef)*)
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 CreateSchema =
   'create' 'schema' IfNotExists? CreateSchemaTarget SchemaElement* ';'?
@@ -4937,7 +5172,7 @@ SchemaElement =
 
 DropTrigger =
   'drop' 'trigger' IfExists? TriggerRef OnRelation
-  ('cascade' | 'restrict')? ';'?
+  DropBehavior? ';'?
 
 OnRelation =
   'on' RelationNameRef
@@ -5011,7 +5246,7 @@ SetTarget =
 | SetXmlOption
 
 SetXmlOption =
-  'xml' 'option' ('document' | 'content')
+  'xml' 'option' XmlDocumentOrContent
 
 SetTimeZone =
   'time' 'zone' (ConfigValue | 'default' | 'local')?
@@ -5109,10 +5344,20 @@ SetFuncOption =
   SetConfigParam
 
 AsFuncOption =
-  'as' (definition:Literal | obj_file:Literal ',' link_symbol:Literal)
+  'as' AsFuncTarget
+
+AsFuncTarget =
+  AsDefinition
+| AsObjFile
+
+AsDefinition =
+  Literal
+
+AsObjFile =
+  obj_file:Literal ',' link_symbol:Literal
 
 ReplicaIdentity =
-  'replica' 'identity' ('default' | 'full' | 'nothing' | 'using' 'index' IndexRef)
+  'replica' 'identity' ('default' | 'full' | 'nothing' | using_index:UsingIndexName)
 
 OfType =
   'of' Type
@@ -5197,19 +5442,31 @@ Partition =
 
 DropColumn =
  'drop' 'column'? IfExists? ColumnNameRef
- ('restrict' | 'cascade')?
+ DropBehavior?
 
 AddColumn =
   'add' 'column'? IfNotExists? ColumnName Type Collate? (Constraint (',' Constraint)*)?
 
 PartitionForValuesWith =
-  'for' 'values' 'with' '(' '#ident' Literal ',' '#ident' Literal ')'
+  'for' 'values' 'with' '(' modulus:PartitionModulus ',' remainder:PartitionRemainder ')'
+
+PartitionModulus =
+  '#ident' '@int_number'
+
+PartitionRemainder =
+  '#ident' '@int_number'
 
 PartitionForValuesIn =
   'for' 'values' 'in' '(' (Expr (',' Expr)*) ')'
 
 PartitionForValuesFrom =
-  'for' 'values' 'from' '(' (Expr (',' Expr)*) ')' 'to' '(' (Expr (',' Expr)*) ')'
+  'for' 'values' 'from' from:PartitionFromValues 'to' to:PartitionToValues
+
+PartitionFromValues =
+  '(' (Expr (',' Expr)*) ')'
+
+PartitionToValues =
+  '(' (Expr (',' Expr)*) ')'
 
 PartitionDefault =
   'default'
@@ -5287,7 +5544,7 @@ SetSequenceOption =
   'set' SequenceOption
 
 SetGenerated =
-  'set' 'generated' ('always' | 'by' 'default')
+  'set' 'generated' GeneratedWhen
 
 DropExpression =
   'drop' 'expression' IfExists?
@@ -5296,7 +5553,7 @@ DropIdentity =
   'drop' 'identity' IfExists?
 
 AddGenerated =
-  'add' 'generated' ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList?
+  'add' 'generated' GeneratedWhen 'as' 'identity' SequenceOptionList?
 
 ResetOptions =
   'reset' AttributeList
@@ -5311,8 +5568,8 @@ SetOptionsList =
   'set' 'options' AlterOptionList
 
 AlterSetStatistics =
-  'set' 'column'? (Literal | ColumnNameRef)
-  'set' 'statistics' Literal
+  'alter' 'column'? (Literal | ColumnNameRef)
+  (SetStatistics | SetOptions)
 
 SetExpression =
   'set' 'expression' Expr
