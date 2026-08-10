@@ -2505,7 +2505,8 @@ SOURCE_FILE
             WHITESPACE " "
             BETWEEN_KW "between"
             WHITESPACE " "
-            ASYMMETRIC_KW "asymmetric"
+            ASYMMETRIC
+              ASYMMETRIC_KW "asymmetric"
             WHITESPACE " "
             LITERAL
               INT_NUMBER "1"
@@ -2532,7 +2533,8 @@ SOURCE_FILE
             WHITESPACE " "
             BETWEEN_KW "between"
             WHITESPACE " "
-            ASYMMETRIC_KW "asymmetric"
+            ASYMMETRIC
+              ASYMMETRIC_KW "asymmetric"
             WHITESPACE " "
             LITERAL
               INT_NUMBER "1"
@@ -2557,7 +2559,8 @@ SOURCE_FILE
             WHITESPACE " "
             BETWEEN_KW "between"
             WHITESPACE " "
-            SYMMETRIC_KW "symmetric"
+            SYMMETRIC
+              SYMMETRIC_KW "symmetric"
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
@@ -2584,7 +2587,8 @@ SOURCE_FILE
             WHITESPACE " "
             BETWEEN_KW "between"
             WHITESPACE " "
-            SYMMETRIC_KW "symmetric"
+            SYMMETRIC
+              SYMMETRIC_KW "symmetric"
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"

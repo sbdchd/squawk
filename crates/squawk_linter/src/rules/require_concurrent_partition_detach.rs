@@ -17,9 +17,7 @@ pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, parse: &Pars
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::DetachPartition(detach_partition) = action {
-                    if detach_partition.concurrently_token().is_none()
-                        && detach_partition.finalize_token().is_none()
-                    {
+                    if detach_partition.detach_partition_option().is_none() {
                         let fix = concurrently_fix(&detach_partition);
                         ctx.report(
                             Violation::for_node(

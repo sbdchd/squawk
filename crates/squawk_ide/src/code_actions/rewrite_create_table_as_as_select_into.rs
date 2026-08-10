@@ -24,10 +24,8 @@ pub(super) fn rewrite_create_table_as_as_select_into(
         || create_table_as.using_method().is_some()
         || create_table_as.on_commit().is_some()
         || create_table_as.tablespace_clause().is_some()
-        || create_table_as.with_data().is_some()
-        || create_table_as.with_no_data().is_some()
-        || create_table_as.with_params().is_some()
-        || create_table_as.without_oids().is_some()
+        || create_table_as.data_option().is_some()
+        || create_table_as.table_params().is_some()
     {
         return None;
     }

@@ -93,13 +93,16 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
     let mut doc = Doc::text("select").append(Doc::line_or_space());
 
     if let Some(select_clause) = select.select_clause() {
-        if let Some(distinct_clause) = select_clause.distinct_clause() {
-            doc = doc.append(leading_comments(distinct_clause.syntax()));
-            doc = doc.append(Doc::text("distinct")).append(Doc::space());
-        }
-        if let Some(all_token) = select_clause.all_token() {
-            doc = doc.append(leading_comments_token(&all_token));
-            doc = doc.append(Doc::text("all")).append(Doc::space());
+        match select_clause.select_quantifier() {
+            Some(ast::SelectQuantifier::DistinctClause(distinct_clause)) => {
+                doc = doc.append(leading_comments(distinct_clause.syntax()));
+                doc = doc.append(Doc::text("distinct")).append(Doc::space());
+            }
+            Some(ast::SelectQuantifier::All(all)) => {
+                doc = doc.append(leading_comments(all.syntax()));
+                doc = doc.append(Doc::text("all")).append(Doc::space());
+            }
+            None => (),
         }
         if let Some(target_list) = select_clause.target_list() {
             doc = doc.append(leading_comments(target_list.syntax()));
@@ -210,10 +213,14 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
                 doc = doc.append(Doc::space()).append(Doc::text("not"));
             }
             doc = doc.append(Doc::space()).append(Doc::text("between"));
-            if between_expr.asymmetric_token().is_some() {
-                doc = doc.append(Doc::space()).append(Doc::text("asymmetric"));
-            } else if between_expr.symmetric_token().is_some() {
-                doc = doc.append(Doc::space()).append(Doc::text("symmetric"));
+            match between_expr.between_symmetry() {
+                Some(ast::BetweenSymmetry::Asymmetric(_)) => {
+                    doc = doc.append(Doc::space()).append(Doc::text("asymmetric"));
+                }
+                Some(ast::BetweenSymmetry::Symmetric(_)) => {
+                    doc = doc.append(Doc::space()).append(Doc::text("symmetric"));
+                }
+                None => (),
             }
             doc.append(Doc::space())
                 .append(build_expr(between_expr.start().unwrap()))

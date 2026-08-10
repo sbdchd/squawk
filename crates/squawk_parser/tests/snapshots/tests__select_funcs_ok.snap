@@ -3642,7 +3642,8 @@ SOURCE_FILE
               IDENT "count"
             ARG_LIST
               L_PAREN "("
-              DISTINCT_KW "distinct"
+              DISTINCT
+                DISTINCT_KW "distinct"
               WHITESPACE " "
               ARG
                 NAME_REF
@@ -3677,7 +3678,8 @@ SOURCE_FILE
               IDENT "array_agg"
             ARG_LIST
               L_PAREN "("
-              DISTINCT_KW "distinct"
+              DISTINCT
+                DISTINCT_KW "distinct"
               WHITESPACE " "
               ARG
                 NAME_REF
@@ -3888,7 +3890,8 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              ALL_KW "all"
+              ALL
+                ALL_KW "all"
               WHITESPACE " "
               ARG
                 NAME_REF
@@ -3907,7 +3910,8 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              DISTINCT_KW "distinct"
+              DISTINCT
+                DISTINCT_KW "distinct"
               WHITESPACE " "
               ARG
                 NAME_REF
@@ -4838,10 +4842,11 @@ SOURCE_FILE
           LITERAL
             STRING "'$.favorites[*]'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          JSON_PATH_NAME
-            IDENT "p0"
+          JSON_PATH_NAME_CLAUSE
+            AS_KW "as"
+            WHITESPACE " "
+            JSON_PATH_NAME
+              IDENT "p0"
           WHITESPACE "\n "
           JSON_TABLE_COLUMN_LIST
             COLUMNS_KW "columns"
@@ -4865,10 +4870,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'$.movies[*]'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              JSON_PATH_NAME
-                IDENT "p1"
+              JSON_PATH_NAME_CLAUSE
+                AS_KW "as"
+                WHITESPACE " "
+                JSON_PATH_NAME
+                  IDENT "p1"
               WHITESPACE " "
               JSON_TABLE_COLUMN_LIST
                 COLUMNS_KW "columns"
@@ -4900,10 +4906,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'$.books[*]'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              JSON_PATH_NAME
-                IDENT "\"p2 x\""
+              JSON_PATH_NAME_CLAUSE
+                AS_KW "as"
+                WHITESPACE " "
+                JSON_PATH_NAME
+                  IDENT "\"p2 x\""
               WHITESPACE " "
               JSON_TABLE_COLUMN_LIST
                 COLUMNS_KW "columns"
@@ -4966,10 +4973,11 @@ SOURCE_FILE
           LITERAL
             STRING "'$.favorites[*]'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          JSON_PATH_NAME
-            IDENT "p0"
+          JSON_PATH_NAME_CLAUSE
+            AS_KW "as"
+            WHITESPACE " "
+            JSON_PATH_NAME
+              IDENT "p0"
           WHITESPACE "\n "
           JSON_TABLE_COLUMN_LIST
             COLUMNS_KW "columns"
@@ -4984,10 +4992,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'$.movies[*]'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              JSON_PATH_NAME
-                IDENT "p1"
+              JSON_PATH_NAME_CLAUSE
+                AS_KW "as"
+                WHITESPACE " "
+                JSON_PATH_NAME
+                  IDENT "p1"
               WHITESPACE " "
               JSON_TABLE_COLUMN_LIST
                 COLUMNS_KW "columns"
@@ -5056,10 +5065,11 @@ SOURCE_FILE
           LITERAL
             STRING "'$.favorites[*]'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          JSON_PATH_NAME
-            IDENT "p0"
+          JSON_PATH_NAME_CLAUSE
+            AS_KW "as"
+            WHITESPACE " "
+            JSON_PATH_NAME
+              IDENT "p0"
           WHITESPACE "\n "
           JSON_TABLE_COLUMN_LIST
             COLUMNS_KW "columns"
@@ -5074,10 +5084,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'$.movies[*]'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              JSON_PATH_NAME
-                IDENT "p1"
+              JSON_PATH_NAME_CLAUSE
+                AS_KW "as"
+                WHITESPACE " "
+                JSON_PATH_NAME
+                  IDENT "p1"
               WHITESPACE " "
               JSON_TABLE_COLUMN_LIST
                 COLUMNS_KW "columns"
@@ -5109,10 +5120,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'$.books[*]'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              JSON_PATH_NAME
-                IDENT "\"p2 x\""
+              JSON_PATH_NAME_CLAUSE
+                AS_KW "as"
+                WHITESPACE " "
+                JSON_PATH_NAME
+                  IDENT "\"p2 x\""
               WHITESPACE " "
               JSON_TABLE_COLUMN_LIST
                 COLUMNS_KW "columns"
@@ -5190,10 +5202,11 @@ SOURCE_FILE
           LITERAL
             STRING "'$.favorites[*]'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          JSON_PATH_NAME
-            IDENT "p0"
+          JSON_PATH_NAME_CLAUSE
+            AS_KW "as"
+            WHITESPACE " "
+            JSON_PATH_NAME
+              IDENT "p0"
           WHITESPACE "\n "
           JSON_TABLE_COLUMN_LIST
             COLUMNS_KW "columns"
@@ -5208,10 +5221,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'$.movies[*]'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              JSON_PATH_NAME
-                IDENT "p1"
+              JSON_PATH_NAME_CLAUSE
+                AS_KW "as"
+                WHITESPACE " "
+                JSON_PATH_NAME
+                  IDENT "p1"
               WHITESPACE " "
               JSON_TABLE_COLUMN_LIST
                 COLUMNS_KW "columns"
@@ -5226,10 +5240,11 @@ SOURCE_FILE
                   LITERAL
                     STRING "'$.actors[*]'"
                   WHITESPACE " "
-                  AS_KW "as"
-                  WHITESPACE " "
-                  JSON_PATH_NAME
-                    IDENT "p11"
+                  JSON_PATH_NAME_CLAUSE
+                    AS_KW "as"
+                    WHITESPACE " "
+                    JSON_PATH_NAME
+                      IDENT "p11"
                   WHITESPACE " "
                   JSON_TABLE_COLUMN_LIST
                     COLUMNS_KW "columns"
@@ -5261,10 +5276,11 @@ SOURCE_FILE
                   LITERAL
                     STRING "'$.directors[*]'"
                   WHITESPACE " "
-                  AS_KW "as"
-                  WHITESPACE " "
-                  JSON_PATH_NAME
-                    IDENT "p12"
+                  JSON_PATH_NAME_CLAUSE
+                    AS_KW "as"
+                    WHITESPACE " "
+                    JSON_PATH_NAME
+                      IDENT "p12"
                   WHITESPACE " "
                   JSON_TABLE_COLUMN_LIST
                     COLUMNS_KW "columns"
@@ -5297,10 +5313,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'$.books[*]'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              JSON_PATH_NAME
-                IDENT "p2"
+              JSON_PATH_NAME_CLAUSE
+                AS_KW "as"
+                WHITESPACE " "
+                JSON_PATH_NAME
+                  IDENT "p2"
               WHITESPACE " "
               JSON_TABLE_COLUMN_LIST
                 COLUMNS_KW "columns"

@@ -3884,7 +3884,8 @@ SOURCE_FILE
                 IDENT "count"
               ARG_LIST
                 L_PAREN "("
-                DISTINCT_KW "distinct"
+                DISTINCT
+                  DISTINCT_KW "distinct"
                 WHITESPACE " "
                 ARG
                   NAME_REF
@@ -4875,7 +4876,8 @@ SOURCE_FILE
                         MONTH_KW "month"
                 WHITESPACE " \n    "
                 FRAME_CLAUSE
-                  ROWS_KW "ROWS"
+                  FRAME_ROWS
+                    ROWS_KW "ROWS"
                   WHITESPACE " "
                   FRAME_BETWEEN
                     BETWEEN_KW "BETWEEN"
@@ -5097,7 +5099,8 @@ SOURCE_FILE
                     IDENT "COUNT"
                   ARG_LIST
                     L_PAREN "("
-                    DISTINCT_KW "DISTINCT"
+                    DISTINCT
+                      DISTINCT_KW "DISTINCT"
                     WHITESPACE " "
                     ARG
                       NAME_REF
@@ -5278,7 +5281,8 @@ SOURCE_FILE
               IDENT "COUNT"
             ARG_LIST
               L_PAREN "("
-              DISTINCT_KW "DISTINCT"
+              DISTINCT
+                DISTINCT_KW "DISTINCT"
               WHITESPACE " "
               ARG
                 FIELD_EXPR
@@ -5433,7 +5437,8 @@ SOURCE_FILE
                 IDENT "COUNT"
               ARG_LIST
                 L_PAREN "("
-                DISTINCT_KW "DISTINCT"
+                DISTINCT
+                  DISTINCT_KW "DISTINCT"
                 WHITESPACE " "
                 ARG
                   NAME_REF

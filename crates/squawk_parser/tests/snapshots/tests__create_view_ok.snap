@@ -385,7 +385,8 @@ SOURCE_FILE
       UNION
         UNION_KW "UNION"
         WHITESPACE " "
-        ALL_KW "ALL"
+        ALL
+          ALL_KW "ALL"
       WHITESPACE "\n    "
       SELECT
         SELECT_CLAUSE

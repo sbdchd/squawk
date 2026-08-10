@@ -72,7 +72,7 @@ ParamList =
 
 ArgList =
  '(' '*' ')'
-| '(' ('distinct' | 'all')? args:(Arg (',' Arg)*)? ')'
+| '(' AllOrDistinct? args:(Arg (',' Arg)*)? ')'
 
 CallExpr =
   Expr ArgList WithinClause? FilterClause? NullTreatment? OverClause?
@@ -239,6 +239,9 @@ XmlPassingMechByValue =
 JsonPathName =
   '#name'?
 
+JsonPathNameClause =
+  'as' JsonPathName
+
 JsonPathNameRef =
   '#name'?
 
@@ -248,7 +251,7 @@ JsonTable =
     JsonFormatClause?
     ','
     Expr
-    ('as' JsonPathName)?
+    JsonPathNameClause?
     JsonPassingClause?
     JsonTableColumnList
     JsonTablePlanClause?
@@ -1057,7 +1060,7 @@ PrimaryKeyConstraint =
   (using_index:UsingIndexName | IndexParameters)
 
 IndexParameters =
-  (NullsNotDistinct | NullsDistinct)?
+  NullsDistinctOption?
   column_list:ConstraintColumnRefList?
   ConstraintIncludeClause?
   WithParams?
@@ -1154,7 +1157,7 @@ DefaultConstraint =
 GeneratedConstraint =
   ConstraintNameClause?
   'generated'
-  (GeneratedIdentity | GeneratedStored)
+  GeneratedAs
 
 GeneratedIdentity =
   GeneratedWhen 'as' 'identity' SequenceOptionList?
@@ -1331,7 +1334,7 @@ WhereClause =
   'where' Expr
 
 GroupByClause =
-  'group' 'by' ('all' | 'distinct')? GroupByList
+  'group' 'by' AllOrDistinct? GroupByList
 
 GroupByList =
   GroupBy (',' GroupBy)*
@@ -1807,7 +1810,7 @@ CreateTable =
   Inherits?
   PartitionBy?
   UsingMethod?
-  (WithParams | WithoutOids)?
+  TableParams?
   OnCommit?
   TablespaceClause? ';'?
 
@@ -1816,7 +1819,7 @@ CreateIndex =
   UsingMethod?
   PartitionItemList
   IndexIncludeClause?
-  (NullsNotDistinct | NullsDistinct)?
+  NullsDistinctOption?
   WithParams?
   TablespaceClause?
   WhereClause? ';'?
@@ -1851,7 +1854,8 @@ FuncOption =
 | RowsFuncOption
 | CostFuncOption
 | ParallelFuncOption
-| SecurityFuncOption
+| SecurityInvokerFuncOption
+| SecurityDefinerFuncOption
 | CalledOnNullInputFuncOption
 | ReturnsNullOnNullInputFuncOption
 | StrictFuncOption
@@ -2308,6 +2312,10 @@ WithoutHold =
 Execute =
   'execute' PreparedStatementRef ArgList? ';'?
 
+DataOption =
+  WithData
+| WithNoData
+
 WithData =
   'with' 'data'
 
@@ -2326,12 +2334,12 @@ CreateTableAs =
   TableName
   TableArgList?
   UsingMethod?
-  (WithParams | WithoutOids)?
+  TableParams?
   OnCommit?
   TablespaceClause?
   'as'
   query:CreateTableAsQuery
-  (WithData | WithNoData)? ';'?
+  DataOption? ';'?
 
 CreateMaterializedView =
   'create' 'materialized' 'view' IfNotExists? View ColumnList?
@@ -2340,7 +2348,7 @@ CreateMaterializedView =
   TablespaceClause?
   'as'
   query:SelectVariant
-  (WithData | WithNoData)? ';'?
+  DataOption? ';'?
 
 SavepointCreate =
   'savepoint' Savepoint ';'?
@@ -2376,7 +2384,17 @@ SliceExpr =
   base:Expr '[' start:Expr? ':' end:Expr? ']'
 
 BetweenExpr =
-  target:Expr 'not'? 'between' ('symmetric' | 'asymmetric')? start:Expr 'and' end:Expr
+  target:Expr 'not'? 'between' BetweenSymmetry? start:Expr 'and' end:Expr
+
+BetweenSymmetry =
+  Symmetric
+| Asymmetric
+
+Symmetric =
+  'symmetric'
+
+Asymmetric =
+  'asymmetric'
 
 JsonTableColumn =
   ColumnName 'for' 'ordinality'
@@ -2390,7 +2408,7 @@ JsonTableColumn =
     'exists'
     JsonPathClause?
     JsonOnErrorClause?
-| 'nested' 'path'? Expr ('as' JsonPathName)? JsonTableColumnList
+| 'nested' 'path'? Expr JsonPathNameClause? JsonTableColumnList
 
 JsonPathClause =
   'path' Expr
@@ -2422,7 +2440,11 @@ JsonWithoutUniqueKeys =
   'without' 'unique' 'keys'
 
 JsonQuotesClause =
-  (KeepQuotes | OmitQuotes) OnScalarString?
+  QuotesBehavior OnScalarString?
+
+QuotesBehavior =
+  KeepQuotes
+| OmitQuotes
 
 KeepQuotes =
   'keep' 'quotes'
@@ -2565,7 +2587,7 @@ CteName =
   '#name'?
 
 WithTable =
-  name:CteName ColumnList? 'as'? (Materialized | NotMaterialized)? '(' query:WithQuery ')'
+  name:CteName ColumnList? 'as'? MaterializedOption? '(' query:WithQuery ')'
   SearchClause?
   CycleClause?
 
@@ -2624,8 +2646,12 @@ WithClause =
 
 SelectClause =
   'select'
-  ('all' | DistinctClause)?
+  SelectQuantifier?
   TargetList?
+
+SelectQuantifier =
+  All
+| DistinctClause
 
 SelectVariant =
   Select
@@ -2652,13 +2678,13 @@ CompoundOp =
 | Except
 
 Union =
-  'union' ('all' | 'distinct')?
+  'union' AllOrDistinct?
 
 Intersect =
-  'intersect' ('all' | 'distinct')?
+  'intersect' AllOrDistinct?
 
 Except =
-  'except' ('all' | 'distinct')?
+  'except' AllOrDistinct?
 
 SelectInto =
   WithClause?
@@ -2680,12 +2706,7 @@ IntoClause =
 
 LockingClause =
   'for'
-  (
-    ForNoKeyUpdate
-  | ForKeyShare
-  | ForShare
-  | ForUpdate
-  )
+  LockStrength
   LockingOf?
   LockWait?
 
@@ -2730,7 +2751,7 @@ SortUsing =
   'using' Op
 
 SortBy =
-  Expr (SortAsc | SortDesc | SortUsing)? (NullsFirst | NullsLast)?
+  Expr SortOrder? NullsOrder?
 
 OrderByClause =
   'order' 'by' SortByList
@@ -2839,9 +2860,23 @@ ExcludeConstraint =
   WhereConditionClause?
 
 FrameClause =
-  ('range' | 'rows' | 'groups')
-  (FrameBetween | FrameBound)
+  FrameUnits
+  FrameExtent
   FrameExclude?
+
+FrameUnits =
+  FrameRange
+| FrameRows
+| FrameGroups
+
+FrameRange =
+  'range'
+
+FrameRows =
+  'rows'
+
+FrameGroups =
+  'groups'
 
 FrameBetween =
   'between' start:FrameBound 'and' end:FrameBound
@@ -2867,12 +2902,7 @@ ExprFollowing =
 
 FrameExclude =
   'exclude'
-  (
-    CurrentRow
-  | Group
-  | Ties
-  | NoOthers
-  )
+  FrameExcludeTarget
 
 CurrentRow =
   'current' 'row'
@@ -3746,7 +3776,7 @@ AlterViewAction =
 | ViewRenameTo
 
 AlterViewColumn =
-  'alter' 'column'? name:ColumnNameRef (SetDefault | DropDefault)
+  'alter' 'column'? name:ColumnNameRef AlterViewColumnAction
 
 Analyze =
   ('analyze' | 'analyse')
@@ -4074,7 +4104,7 @@ HandlerClause =
 
 CreateCast =
   'create' 'cast' CastSig
-  (WithFunction | WithInout | WithoutFunction)
+  CastMethod
   CastContext? ';'?
 
 CastContext =
@@ -4615,8 +4645,13 @@ DropView =
 
 Explain =
   'explain'
-  (ExplainOptionList | ExplainAnalyze | ExplainVerbose)?
+  ExplainMode?
   ExplainStmt ';'?
+
+ExplainMode =
+  ExplainOptionList
+| ExplainAnalyze
+| ExplainVerbose
 
 ExplainAnalyze =
   ('analyze' | 'analyse') ExplainVerbose?
@@ -4662,7 +4697,7 @@ ExplainStmt =
 
 ImportForeignSchema =
   'import' 'foreign' 'schema' SchemaRef
-  (LimitToTables | ExceptTables)?
+  ImportTableFilter?
   'from' ServerClause
   IntoSchema
   AlterOptionList? ';'?
@@ -4720,7 +4755,7 @@ Reassign =
 
 Refresh =
   'refresh' 'materialized' 'view' 'concurrently'? ViewRef
-  (WithData | WithNoData)? ';'?
+  DataOption? ';'?
 
 Grant =
   'grant'
@@ -5132,7 +5167,7 @@ VacuumOptionValueName =
 Copy =
   'copy'
   (CopyQuery | CopyTable)
-  (CopyFrom | CopyTo)?
+  CopyDirection?
   'with'?
   (CopyOptionList | CopyLegacyOption*)?
   WhereClause? ';'?
@@ -5144,10 +5179,10 @@ CopyTable =
   'binary'? TableNameRef ColumnRefList?
 
 CopyFrom =
-  'from' (CopyStdin | CopyStdout | CopyProgram)
+  'from' CopySource
 
 CopyTo =
-  'to' (CopyStdout | CopyProgram)
+  'to' CopyTarget
 
 CopyStdin =
   'stdin'
@@ -5317,8 +5352,8 @@ PartitionItem =
   Collate?
   OpClassRef?
   AttributeList?
-  (SortAsc | SortDesc | SortUsing)?
-  (NullsFirst | NullsLast)?
+  SortOrder?
+  NullsOrder?
 
 PartitionItemList =
   '(' (PartitionItem (',' PartitionItem)*) ')'
@@ -5438,6 +5473,13 @@ ShowAction =
 All =
   'all'
 
+Distinct =
+  'distinct'
+
+AllOrDistinct =
+  All
+| Distinct
+
 SessionAuthorization =
   'session' 'authorization'
 
@@ -5480,8 +5522,11 @@ CalledOnNullInputFuncOption =
 ReturnsNullOnNullInputFuncOption =
   'returns' 'null' 'on' 'null' 'input'
 
-SecurityFuncOption =
-  'security' ('invoker' | 'definer')
+SecurityInvokerFuncOption =
+  'external'? 'security' 'invoker'
+
+SecurityDefinerFuncOption =
+  'external'? 'security' 'definer'
 
 ParallelFuncOption =
   'parallel' '#ident'
@@ -5512,7 +5557,22 @@ AsObjFile =
   obj_file:Literal ',' link_symbol:Literal
 
 ReplicaIdentity =
-  'replica' 'identity' ('default' | 'full' | 'nothing' | using_index:UsingIndexName)
+  'replica' 'identity' ReplicaIdentityOption
+
+ReplicaIdentityOption =
+  ReplicaIdentityDefault
+| ReplicaIdentityFull
+| ReplicaIdentityNothing
+| UsingIndexName
+
+ReplicaIdentityDefault =
+  'default'
+
+ReplicaIdentityFull =
+  'full'
+
+ReplicaIdentityNothing =
+  'nothing'
 
 OfType =
   'of' Type
@@ -5540,7 +5600,15 @@ NoInherit =
   'no' 'inherit'
 
 EnableTrigger =
-  'enable' 'trigger' (TriggerRef | 'all' | 'user')?
+  'enable' 'trigger' TriggerTarget?
+
+TriggerTarget =
+  TriggerRef
+| All
+| User
+
+User =
+  'user'
 
 EnableReplicaTrigger =
   'enable' 'replica' 'trigger' TriggerRef
@@ -5561,7 +5629,7 @@ EnableRls =
   'enable' 'row' 'level' 'security'
 
 DisableTrigger =
-  'disable' 'trigger' (TriggerRef | 'all' | 'user')?
+  'disable' 'trigger' TriggerTarget?
 
 DisableRls =
   'disable' 'row' 'level' 'security'
@@ -5575,7 +5643,17 @@ ClusterOn =
 DetachPartition =
   'detach' 'partition'
   TableNameRef
-  ('concurrently' | 'finalize')?
+  DetachPartitionOption?
+
+DetachPartitionOption =
+  DetachConcurrently
+| DetachFinalize
+
+DetachConcurrently =
+  'concurrently'
+
+DetachFinalize =
+  'finalize'
 
 MergePartitions =
   'merge' 'partitions'
@@ -5946,3 +6024,70 @@ Stmt =
 
 SourceFile =
   Stmt*
+
+NullsDistinctOption =
+  NullsDistinct
+| NullsNotDistinct
+
+TableParams =
+  WithParams
+| WithoutOids
+
+SortOrder =
+  SortAsc
+| SortDesc
+| SortUsing
+
+NullsOrder =
+  NullsFirst
+| NullsLast
+
+MaterializedOption =
+  Materialized
+| NotMaterialized
+
+LockStrength =
+  ForNoKeyUpdate
+| ForKeyShare
+| ForShare
+| ForUpdate
+
+FrameExtent =
+  FrameBetween
+| FrameBound
+
+FrameExcludeTarget =
+  CurrentRow
+| Group
+| Ties
+| NoOthers
+
+GeneratedAs =
+  GeneratedIdentity
+| GeneratedStored
+
+CastMethod =
+  WithFunction
+| WithInout
+| WithoutFunction
+
+CopyDirection =
+  CopyFrom
+| CopyTo
+
+CopySource =
+  CopyStdin
+| CopyStdout
+| CopyProgram
+
+CopyTarget =
+  CopyStdout
+| CopyProgram
+
+AlterViewColumnAction =
+  SetDefault
+| DropDefault
+
+ImportTableFilter =
+  LimitToTables
+| ExceptTables

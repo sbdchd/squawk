@@ -140,7 +140,8 @@ pub(crate) fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
 
     for ancestor in token.parent_ancestors() {
         if let Some(compound_select) = ast::CompoundSelect::cast(ancestor.clone()) {
-            if matches!(compound_select.op(), Some(ast::CompoundOp::Union(union)) if union.all_token().is_some())
+            if let Some(ast::CompoundOp::Union(union)) = compound_select.op()
+                && matches!(union.all_or_distinct(), Some(ast::AllOrDistinct::All(_)))
             {
                 found_compound = Some(SelectContext::Compound(compound_select));
             } else {

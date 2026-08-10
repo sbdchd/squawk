@@ -122,7 +122,7 @@ SOURCE_FILE
         LANGUAGE_REF
           IDENT "plpgsql"
       WHITESPACE "\n    "
-      SECURITY_FUNC_OPTION
+      SECURITY_DEFINER_FUNC_OPTION
         SECURITY_KW "SECURITY"
         WHITESPACE " "
         DEFINER_KW "DEFINER"
@@ -1083,7 +1083,7 @@ SOURCE_FILE
             IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      SECURITY_FUNC_OPTION
+      SECURITY_INVOKER_FUNC_OPTION
         EXTERNAL_KW "external"
         WHITESPACE " "
         SECURITY_KW "security"
@@ -1126,7 +1126,7 @@ SOURCE_FILE
             IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      SECURITY_FUNC_OPTION
+      SECURITY_INVOKER_FUNC_OPTION
         SECURITY_KW "security"
         WHITESPACE " "
         INVOKER_KW "invoker"
@@ -1167,7 +1167,7 @@ SOURCE_FILE
             IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      SECURITY_FUNC_OPTION
+      SECURITY_DEFINER_FUNC_OPTION
         EXTERNAL_KW "external"
         WHITESPACE " "
         SECURITY_KW "security"
@@ -1210,7 +1210,7 @@ SOURCE_FILE
             IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      SECURITY_FUNC_OPTION
+      SECURITY_DEFINER_FUNC_OPTION
         SECURITY_KW "security"
         WHITESPACE " "
         DEFINER_KW "definer"
@@ -2055,7 +2055,7 @@ SOURCE_FILE
       STRICT_FUNC_OPTION
         STRICT_KW "strict"
       WHITESPACE "\n  "
-      SECURITY_FUNC_OPTION
+      SECURITY_INVOKER_FUNC_OPTION
         EXTERNAL_KW "external"
         WHITESPACE " "
         SECURITY_KW "security"

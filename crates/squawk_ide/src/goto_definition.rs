@@ -2136,14 +2136,14 @@ create event trigger et on ddl_command_start execute function f$0();
     #[test]
     fn goto_create_event_trigger_procedure() {
         assert_snapshot!(goto("
-create procedure p() language sql as 'select 1';
+create function p() returns event_trigger language sql as 'select 1';
 create event trigger tr
   on ddl_command_end
   execute procedure p$0();
-"), @r"
+"), @"
           ╭▸ 
-        2 │ create procedure p() language sql as 'select 1';
-          │                  ─ 2. destination
+        2 │ create function p() returns event_trigger language sql as 'select 1';
+          │                 ─ 2. destination
           ‡
         5 │   execute procedure p();
           ╰╴                    ─ 1. source
@@ -2167,14 +2167,14 @@ create trigger tr before insert on t for each row execute function f$0();
     #[test]
     fn goto_create_trigger_procedure() {
         assert_snapshot!(goto("
-create procedure a() language sql as 'select 1';
+create function a() returns trigger language sql as 'select 1';
 create trigger tr before truncate or delete or insert
 on t
 execute procedure a$0();
-"), @r"
+"), @"
           ╭▸ 
-        2 │ create procedure a() language sql as 'select 1';
-          │                  ─ 2. destination
+        2 │ create function a() returns trigger language sql as 'select 1';
+          │                 ─ 2. destination
           ‡
         5 │ execute procedure a();
           ╰╴                  ─ 1. source

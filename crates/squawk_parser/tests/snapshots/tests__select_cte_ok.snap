@@ -542,7 +542,8 @@ SOURCE_FILE
           UNION
             UNION_KW "UNION"
             WHITESPACE " "
-            ALL_KW "ALL"
+            ALL
+              ALL_KW "ALL"
           WHITESPACE "\n    "
           SELECT
             SELECT_CLAUSE
@@ -745,7 +746,8 @@ SOURCE_FILE
           UNION
             UNION_KW "UNION"
             WHITESPACE " "
-            ALL_KW "ALL"
+            ALL
+              ALL_KW "ALL"
           WHITESPACE "\n    "
           SELECT
             SELECT_CLAUSE
@@ -957,7 +959,8 @@ SOURCE_FILE
           UNION
             UNION_KW "UNION"
             WHITESPACE " "
-            ALL_KW "ALL"
+            ALL
+              ALL_KW "ALL"
           WHITESPACE "\n    "
           SELECT
             SELECT_CLAUSE
@@ -1691,7 +1694,8 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "by"
             WHITESPACE " "
-            ALL_KW "all"
+            ALL
+              ALL_KW "all"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"

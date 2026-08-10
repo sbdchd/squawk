@@ -1625,7 +1625,8 @@ SOURCE_FILE
     SELECT_CLAUSE
       SELECT_KW "select"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi columns"
@@ -3839,7 +3840,8 @@ SOURCE_FILE
         L_PAREN "("
         WINDOW_SPEC
           FRAME_CLAUSE
-            RANGE_KW "range"
+            FRAME_RANGE
+              RANGE_KW "range"
             WHITESPACE " "
             EXPR_PRECEDING
               LITERAL
@@ -3870,7 +3872,8 @@ SOURCE_FILE
         L_PAREN "("
         WINDOW_SPEC
           FRAME_CLAUSE
-            ROWS_KW "rows"
+            FRAME_ROWS
+              ROWS_KW "rows"
             WHITESPACE " "
             EXPR_PRECEDING
               LITERAL
@@ -3901,7 +3904,8 @@ SOURCE_FILE
         L_PAREN "("
         WINDOW_SPEC
           FRAME_CLAUSE
-            GROUPS_KW "groups"
+            FRAME_GROUPS
+              GROUPS_KW "groups"
             WHITESPACE " "
             EXPR_PRECEDING
               LITERAL
@@ -3934,7 +3938,8 @@ SOURCE_FILE
         L_PAREN "("
         WINDOW_SPEC
           FRAME_CLAUSE
-            ROWS_KW "rows"
+            FRAME_ROWS
+              ROWS_KW "rows"
             WHITESPACE " "
             EXPR_PRECEDING
               LITERAL
@@ -3973,7 +3978,8 @@ SOURCE_FILE
         L_PAREN "("
         WINDOW_SPEC
           FRAME_CLAUSE
-            ROWS_KW "rows"
+            FRAME_ROWS
+              ROWS_KW "rows"
             WHITESPACE " "
             EXPR_PRECEDING
               LITERAL
@@ -4010,7 +4016,8 @@ SOURCE_FILE
         L_PAREN "("
         WINDOW_SPEC
           FRAME_CLAUSE
-            ROWS_KW "rows"
+            FRAME_ROWS
+              ROWS_KW "rows"
             WHITESPACE " "
             EXPR_PRECEDING
               LITERAL
@@ -4047,7 +4054,8 @@ SOURCE_FILE
         L_PAREN "("
         WINDOW_SPEC
           FRAME_CLAUSE
-            ROWS_KW "rows"
+            FRAME_ROWS
+              ROWS_KW "rows"
             WHITESPACE " "
             EXPR_PRECEDING
               LITERAL
@@ -4180,7 +4188,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
       WHITESPACE " "
       GROUP_BY_LIST
         GROUPING_EXPR
@@ -4204,7 +4213,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      DISTINCT_KW "distinct"
+      DISTINCT
+        DISTINCT_KW "distinct"
       WHITESPACE " "
       GROUP_BY_LIST
         GROUPING_EXPR
@@ -4297,7 +4307,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      DISTINCT_KW "distinct"
+      DISTINCT
+        DISTINCT_KW "distinct"
       WHITESPACE " "
       GROUP_BY_LIST
         GROUPING_CUBE
@@ -5702,7 +5713,8 @@ SOURCE_FILE
     UNION
       UNION_KW "union"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5729,7 +5741,8 @@ SOURCE_FILE
     UNION
       UNION_KW "union"
       WHITESPACE " "
-      DISTINCT_KW "distinct"
+      DISTINCT
+        DISTINCT_KW "distinct"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5821,7 +5834,8 @@ SOURCE_FILE
     INTERSECT
       INTERSECT_KW "intersect"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5848,7 +5862,8 @@ SOURCE_FILE
     INTERSECT
       INTERSECT_KW "intersect"
       WHITESPACE " "
-      DISTINCT_KW "distinct"
+      DISTINCT
+        DISTINCT_KW "distinct"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5902,7 +5917,8 @@ SOURCE_FILE
     EXCEPT
       EXCEPT_KW "except"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5929,7 +5945,8 @@ SOURCE_FILE
     EXCEPT
       EXCEPT_KW "except"
       WHITESPACE " "
-      DISTINCT_KW "distinct"
+      DISTINCT
+        DISTINCT_KW "distinct"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -6621,7 +6638,8 @@ SOURCE_FILE
                 IDENT "string_agg"
               ARG_LIST
                 L_PAREN "("
-                DISTINCT_KW "distinct"
+                DISTINCT
+                  DISTINCT_KW "distinct"
                 WHITESPACE " "
                 ARG
                   NAME_REF

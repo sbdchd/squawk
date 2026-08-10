@@ -516,7 +516,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "order"

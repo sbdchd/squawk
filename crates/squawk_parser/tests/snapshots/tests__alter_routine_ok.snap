@@ -241,24 +241,24 @@ SOURCE_FILE
       LEAKPROOF_FUNC_OPTION
         LEAKPROOF_KW "leakproof"
       WHITESPACE "\n  "
-      SECURITY_FUNC_OPTION
+      SECURITY_INVOKER_FUNC_OPTION
         EXTERNAL_KW "external"
         WHITESPACE " "
         SECURITY_KW "security"
         WHITESPACE " "
         INVOKER_KW "invoker"
       WHITESPACE "\n  "
-      SECURITY_FUNC_OPTION
+      SECURITY_INVOKER_FUNC_OPTION
         SECURITY_KW "security"
         WHITESPACE " "
         INVOKER_KW "invoker"
       WHITESPACE "\n  "
-      SECURITY_FUNC_OPTION
+      SECURITY_DEFINER_FUNC_OPTION
         SECURITY_KW "security"
         WHITESPACE " "
         DEFINER_KW "definer"
       WHITESPACE "\n  "
-      SECURITY_FUNC_OPTION
+      SECURITY_DEFINER_FUNC_OPTION
         EXTERNAL_KW "external"
         WHITESPACE " "
         SECURITY_KW "security"

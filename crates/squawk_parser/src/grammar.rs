@@ -664,9 +664,7 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
         p.error("expected expression");
     }
     // [ AS json_path_name ]
-    if p.eat(AS_KW) {
-        json_path_name(p);
-    }
+    opt_json_path_name_clause(p);
     opt_json_passing_clause(p);
     json_table_column_list(p);
     opt_json_table_plan_clause(p);
@@ -792,9 +790,7 @@ fn opt_json_table_column(p: &mut Parser<'_>) -> bool {
             p.error("expected expression");
         }
         // [ AS json_path_name ]
-        if p.eat(AS_KW) {
-            json_path_name(p);
-        }
+        opt_json_path_name_clause(p);
         json_table_column_list(p);
     } else {
         column_name(p);
@@ -2287,11 +2283,23 @@ fn arg_list(p: &mut Parser<'_>) {
         || "expected expression".into(),
         EXPR_FIRST,
         |p| {
-            let _ = p.eat(DISTINCT_KW) || p.eat(ALL_KW);
+            opt_all_or_distinct(p);
             arg_expr(p).is_some()
         },
     );
     m.complete(p, ARG_LIST);
+}
+
+// [ ALL | DISTINCT ]
+fn opt_all_or_distinct(p: &mut Parser<'_>) {
+    let kind = match p.current() {
+        ALL_KW => ALL,
+        DISTINCT_KW => DISTINCT,
+        _ => return,
+    };
+    let m = p.start();
+    p.bump_any();
+    m.complete(p, kind);
 }
 
 fn interval_second(p: &mut Parser<'_>) {
@@ -2437,12 +2445,24 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
+// [ SYMMETRIC | ASYMMETRIC ]
+fn opt_between_symmetry(p: &mut Parser<'_>) {
+    let kind = match p.current() {
+        SYMMETRIC_KW => SYMMETRIC,
+        ASYMMETRIC_KW => ASYMMETRIC,
+        _ => return,
+    };
+    let m = p.start();
+    p.bump_any();
+    m.complete(p, kind);
+}
+
 fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(NOT_KW) || p.at(BETWEEN_KW));
     let m = p.start();
     p.eat(NOT_KW);
     p.expect(BETWEEN_KW);
-    let _ = p.eat(SYMMETRIC_KW) || p.eat(ASYMMETRIC_KW);
+    opt_between_symmetry(p);
     b_expr(p);
     p.expect(AND_KW);
     b_expr(p);
@@ -3051,13 +3071,14 @@ fn select_clause(p: &mut Parser<'_>) -> CompletedMarker {
     //        ^^^
     // select distinct
     //        ^^^^^^^^
-    opt_all_or_distinct(p);
+    opt_select_all_or_distinct(p);
     opt_target_list(p);
     m.complete(p, SELECT_CLAUSE)
 }
 
 // { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ]
 fn compound_op(p: &mut Parser<'_>) {
+    assert!(p.at_ts(COMPOUND_SELECT_FIRST));
     let kind = match p.current() {
         UNION_KW => UNION,
         INTERSECT_KW => INTERSECT,
@@ -3065,9 +3086,7 @@ fn compound_op(p: &mut Parser<'_>) {
     };
     let m = p.start();
     p.bump_any();
-    if !p.eat(ALL_KW) {
-        p.eat(DISTINCT_KW);
-    }
+    opt_all_or_distinct(p);
     m.complete(p, kind);
 }
 
@@ -4777,6 +4796,49 @@ pub(crate) fn current_operator(p: &Parser<'_>) -> Option<SyntaxKind> {
 }
 
 // USING INDEX index_name
+// [ CONCURRENTLY | FINALIZE ]
+fn opt_detach_partition_option(p: &mut Parser<'_>) {
+    let kind = match p.current() {
+        CONCURRENTLY_KW => DETACH_CONCURRENTLY,
+        FINALIZE_KW => DETACH_FINALIZE,
+        _ => return,
+    };
+    let m = p.start();
+    p.bump_any();
+    m.complete(p, kind);
+}
+
+// { trigger_name | ALL | USER }
+fn trigger_target(p: &mut Parser<'_>) {
+    let kind = match p.current() {
+        ALL_KW => ALL,
+        USER_KW => USER,
+        _ => {
+            trigger_ref(p);
+            return;
+        }
+    };
+    let m = p.start();
+    p.bump_any();
+    m.complete(p, kind);
+}
+
+// { DEFAULT | USING INDEX index_name | FULL | NOTHING }
+fn replica_identity_option(p: &mut Parser<'_>) {
+    let kind = match p.current() {
+        DEFAULT_KW => REPLICA_IDENTITY_DEFAULT,
+        FULL_KW => REPLICA_IDENTITY_FULL,
+        NOTHING_KW => REPLICA_IDENTITY_NOTHING,
+        _ => {
+            using_index_name(p);
+            return;
+        }
+    };
+    let m = p.start();
+    p.bump_any();
+    m.complete(p, kind);
+}
+
 fn using_index_name(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(USING_KW);
@@ -5203,9 +5265,7 @@ fn opt_group_by_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     p.expect(BY_KW);
-    if p.at(ALL_KW) || p.at(DISTINCT_KW) {
-        p.bump_any();
-    }
+    opt_all_or_distinct(p);
     opt_group_by_list(p);
 
     Some(m.complete(p, GROUP_BY_CLAUSE))
@@ -5412,10 +5472,23 @@ fn opt_window_partition_by(p: &mut Parser<'_>) {
     m.complete(p, PARTITION_BY_CLAUSE);
 }
 
+// { RANGE | ROWS | GROUPS }
+fn frame_units(p: &mut Parser<'_>) {
+    assert!(p.at(RANGE_KW) || p.at(ROWS_KW) || p.at(GROUPS_KW));
+    let kind = match p.current() {
+        RANGE_KW => FRAME_RANGE,
+        ROWS_KW => FRAME_ROWS,
+        _ => FRAME_GROUPS,
+    };
+    let m = p.start();
+    p.bump_any();
+    m.complete(p, kind);
+}
+
 fn opt_frame_clause(p: &mut Parser<'_>) {
     if p.at(RANGE_KW) || p.at(ROWS_KW) || p.at(GROUPS_KW) {
         let m = p.start();
-        p.bump_any();
+        frame_units(p);
         if p.at(BETWEEN_KW) {
             let m = p.start();
             p.bump(BETWEEN_KW);
@@ -5484,10 +5557,13 @@ fn opt_offset_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 /// all is the default, distinct removes duplicate rows
-fn opt_all_or_distinct(p: &mut Parser) {
+fn opt_select_all_or_distinct(p: &mut Parser) {
     // TODO: we probably don't want to be so specific here, we can be more
     // generous with parsing and handle error reporting later on.
-    if p.eat(ALL_KW) {
+    if p.at(ALL_KW) {
+        let m = p.start();
+        p.bump(ALL_KW);
+        m.complete(p, ALL);
         return;
     }
     // ```
@@ -6232,6 +6308,17 @@ fn json_path_name(p: &mut Parser<'_>) {
     let m = p.start();
     pg_name(p);
     m.complete(p, JSON_PATH_NAME);
+}
+
+// [ AS json_path_name ]
+fn opt_json_path_name_clause(p: &mut Parser<'_>) {
+    if !p.at(AS_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump(AS_KW);
+    json_path_name(p);
+    m.complete(p, JSON_PATH_NAME_CLAUSE);
 }
 
 fn json_path_name_ref(p: &mut Parser<'_>) -> CompletedMarker {
@@ -16947,8 +17034,12 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
         EXTERNAL_KW | SECURITY_KW => {
             p.eat(EXTERNAL_KW);
             p.expect(SECURITY_KW);
-            let _ = p.eat(INVOKER_KW) || p.expect(DEFINER_KW);
-            SECURITY_FUNC_OPTION
+            if p.eat(INVOKER_KW) {
+                SECURITY_INVOKER_FUNC_OPTION
+            } else {
+                p.expect(DEFINER_KW);
+                SECURITY_DEFINER_FUNC_OPTION
+            }
         }
         // PARALLEL { UNSAFE | RESTRICTED | SAFE }
         PARALLEL_KW => {
@@ -17719,9 +17810,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             let m = p.start();
             p.bump(REPLICA_KW);
             p.expect(IDENTITY_KW);
-            if !p.eat(DEFAULT_KW) && !p.eat(FULL_KW) && !p.eat(NOTHING_KW) {
-                using_index_name(p);
-            }
+            replica_identity_option(p);
             m.complete(p, REPLICA_IDENTITY)
         }
         // OF type_name
@@ -17785,9 +17874,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             let kind = match p.current() {
                 TRIGGER_KW => {
                     p.bump(TRIGGER_KW);
-                    if !p.eat(ALL_KW) && !p.eat(USER_KW) {
-                        trigger_ref(p);
-                    }
+                    trigger_target(p);
                     ENABLE_TRIGGER
                 }
                 REPLICA_KW => {
@@ -17840,9 +17927,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             let kind = match p.current() {
                 TRIGGER_KW => {
                     p.bump(TRIGGER_KW);
-                    if !p.eat(ALL_KW) && !p.eat(USER_KW) {
-                        trigger_ref(p);
-                    }
+                    trigger_target(p);
                     DISABLE_TRIGGER
                 }
                 ROW_KW => {
@@ -17881,9 +17966,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             // partition_name
             table_name_ref(p);
             // [ CONCURRENTLY | FINALIZE ]
-            if !p.eat(CONCURRENTLY_KW) {
-                p.eat(FINALIZE_KW);
-            }
+            opt_detach_partition_option(p);
             m.complete(p, DETACH_PARTITION)
         }
         MERGE_KW => {
