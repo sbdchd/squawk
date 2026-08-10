@@ -2116,7 +2116,8 @@ SOURCE_FILE
                 INT_NUMBER "1"
               R_PAREN ")"
         WHITESPACE " "
-        UNION_KW "union"
+        UNION
+          UNION_KW "union"
         WHITESPACE " "
         VALUES
           VALUES_KW "values"
@@ -2151,7 +2152,8 @@ SOURCE_FILE
               INT_NUMBER "1"
             R_PAREN ")"
       WHITESPACE " "
-      UNION_KW "union"
+      UNION
+        UNION_KW "union"
       WHITESPACE " "
       VALUES
         VALUES_KW "values"
@@ -2209,7 +2211,8 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "1"
         WHITESPACE " "
-        UNION_KW "union"
+        UNION
+          UNION_KW "union"
         WHITESPACE " "
         SELECT
           SELECT_CLAUSE
@@ -2242,7 +2245,8 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
       WHITESPACE " "
-      UNION_KW "union"
+      UNION
+        UNION_KW "union"
       WHITESPACE " "
       SELECT
         SELECT_CLAUSE

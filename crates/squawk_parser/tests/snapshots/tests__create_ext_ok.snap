@@ -38,10 +38,11 @@ SOURCE_FILE
     EXTENSION
       IDENT "hstore"
     WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "addons"
+    EXTENSION_SCHEMA
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "addons"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -54,14 +55,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "bar"
+    EXTENSION_SCHEMA
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "bar"
     WHITESPACE "\n  "
-    VERSION_KW "version"
-    WHITESPACE " "
-    IDENT "foo"
+    EXTENSION_VERSION
+      VERSION_KW "version"
+      WHITESPACE " "
+      IDENT "foo"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -74,14 +77,16 @@ SOURCE_FILE
     EXTENSION
       IDENT "foo"
     WHITESPACE "\n  "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "bar"
+    EXTENSION_SCHEMA
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "bar"
     WHITESPACE "\n  "
-    VERSION_KW "version"
-    WHITESPACE " "
-    LITERAL
-      STRING "'buzz'"
+    EXTENSION_VERSION
+      VERSION_KW "version"
+      WHITESPACE " "
+      LITERAL
+        STRING "'buzz'"
     SEMICOLON ";"
   WHITESPACE "\n\n"

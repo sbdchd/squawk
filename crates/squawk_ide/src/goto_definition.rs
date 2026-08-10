@@ -5665,6 +5665,22 @@ drop table foo.t$0;
     }
 
     #[test]
+    fn goto_with_search_path_from_current() {
+        assert_snapshot!(goto(r#"
+set search_path to foo;
+set search_path from current;
+create table foo.t();
+drop table t$0;
+"#), @"
+          ╭▸ 
+        4 │ create table foo.t();
+          │                  ─ 2. destination
+        5 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_with_search_path_via_set_config() {
         assert_snapshot!(goto(r#"
 select set_config('search_path', 'foo, public', false);

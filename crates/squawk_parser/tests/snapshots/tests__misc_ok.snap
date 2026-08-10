@@ -1050,7 +1050,8 @@ SOURCE_FILE
                       EXTRACT_KW "EXTRACT"
                       L_PAREN "("
                       WHITESPACE " "
-                      STRING "'hour'"
+                      EXTRACT_FIELD
+                        STRING "'hour'"
                       WHITESPACE " "
                       FROM_KW "FROM"
                       WHITESPACE " "
@@ -1109,7 +1110,8 @@ SOURCE_FILE
                       EXTRACT_KW "EXTRACT"
                       L_PAREN "("
                       WHITESPACE " "
-                      STRING "'hour'"
+                      EXTRACT_FIELD
+                        STRING "'hour'"
                       WHITESPACE " "
                       FROM_KW "FROM"
                       WHITESPACE " "
@@ -2052,10 +2054,11 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "FROM"
       WHITESPACE " "
-      PROGRAM_KW "PROGRAM"
-      WHITESPACE " "
-      LITERAL
-        STRING "'curl https://raw.githubusercontent.com/pramsey/pgsql-openai/refs/heads/main/examples/rag/tng.txt'"
+      COPY_PROGRAM
+        PROGRAM_KW "PROGRAM"
+        WHITESPACE " "
+        LITERAL
+          STRING "'curl https://raw.githubusercontent.com/pramsey/pgsql-openai/refs/heads/main/examples/rag/tng.txt'"
     WHITESPACE "\n    "
     WITH_KW "WITH"
     WHITESPACE " "
@@ -5377,7 +5380,8 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    ANALYZE_KW "ANALYZE"
+    EXPLAIN_ANALYZE
+      ANALYZE_KW "ANALYZE"
     WHITESPACE " \n"
     SELECT
       SELECT_CLAUSE
@@ -5473,10 +5477,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "max_parallel_workers_per_gather"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "4"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "4"
     SEMICOLON ";"
   WHITESPACE "  "
   COMMENT "-- Workers per query"
@@ -5490,10 +5495,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "parallel_setup_cost"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "10"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
     SEMICOLON ";"
   WHITESPACE "             "
   COMMENT "-- Lower = more parallelism"
@@ -5507,10 +5513,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "parallel_tuple_cost"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        NUMERIC_NUMBER "0.001"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          NUMERIC_NUMBER "0.001"
     SEMICOLON ";"
   WHITESPACE "          "
   COMMENT "-- Lower = more parallelism"
@@ -5524,10 +5531,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "min_parallel_table_scan_size"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        STRING "'8MB'"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'8MB'"
     SEMICOLON ";"
   WHITESPACE " "
   COMMENT "-- Table size threshold"
@@ -5804,12 +5812,13 @@ SOURCE_FILE
       DISTINCT_CLAUSE
         DISTINCT_KW "DISTINCT"
         WHITESPACE " "
-        ON_KW "ON"
-        WHITESPACE " "
-        L_PAREN "("
-        NAME_REF
-          IDENT "user_id"
-        R_PAREN ")"
+        DISTINCT_ON
+          ON_KW "ON"
+          WHITESPACE " "
+          L_PAREN "("
+          NAME_REF
+            IDENT "user_id"
+          R_PAREN ")"
       WHITESPACE " \n  "
       TARGET_LIST
         TARGET

@@ -171,7 +171,8 @@ SOURCE_FILE
                 INT_NUMBER "1"
               R_PAREN ")"
         WHITESPACE " "
-        UNION_KW "union"
+        UNION
+          UNION_KW "union"
         WHITESPACE " "
         VALUES
           VALUES_KW "values"

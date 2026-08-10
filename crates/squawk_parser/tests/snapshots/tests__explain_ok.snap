@@ -31,7 +31,8 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
-    ANALYZE_KW "analyze"
+    EXPLAIN_ANALYZE
+      ANALYZE_KW "analyze"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -57,9 +58,11 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
-    ANALYZE_KW "analyze"
-    WHITESPACE " "
-    VERBOSE_KW "verbose"
+    EXPLAIN_ANALYZE
+      ANALYZE_KW "analyze"
+      WHITESPACE " "
+      EXPLAIN_VERBOSE
+        VERBOSE_KW "verbose"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -568,7 +571,8 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    ANALYZE_KW "ANALYZE"
+    EXPLAIN_ANALYZE
+      ANALYZE_KW "ANALYZE"
     WHITESPACE " "
     EXECUTE
       EXECUTE_KW "EXECUTE"
@@ -753,7 +757,8 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
-    ANALYZE_KW "analyze"
+    EXPLAIN_ANALYZE
+      ANALYZE_KW "analyze"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -817,7 +822,8 @@ SOURCE_FILE
                     INT_NUMBER "1"
           R_PAREN ")"
         WHITESPACE " "
-        UNION_KW "union"
+        UNION
+          UNION_KW "union"
         WHITESPACE " "
         PAREN_SELECT
           L_PAREN "("
@@ -838,7 +844,8 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
-    ANALYZE_KW "analyze"
+    EXPLAIN_ANALYZE
+      ANALYZE_KW "analyze"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -1085,7 +1092,8 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
       WHITESPACE " "
-      UNION_KW "union"
+      UNION
+        UNION_KW "union"
       WHITESPACE " "
       SELECT
         SELECT_CLAUSE

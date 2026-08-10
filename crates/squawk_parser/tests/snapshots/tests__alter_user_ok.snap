@@ -149,10 +149,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "p"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        STRING "'value'"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'value'"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
@@ -171,10 +172,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "p"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      LITERAL
-        STRING "'value'"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          STRING "'value'"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
@@ -193,9 +195,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "p"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      DEFAULT_KW "default"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_USER
@@ -222,10 +225,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "p"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      LITERAL
-        STRING "'value'"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          STRING "'value'"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
@@ -244,9 +248,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "p"
       WHITESPACE " "
-      FROM_KW "from"
-      WHITESPACE " "
-      CURRENT_KW "current"
+      FROM_CURRENT
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset"

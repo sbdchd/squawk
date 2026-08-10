@@ -168,10 +168,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "param"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        STRING "'value'"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'value'"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_ROLE
@@ -190,10 +191,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "param"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      LITERAL
-        STRING "'value'"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          STRING "'value'"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_ROLE
@@ -212,9 +214,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "param"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      DEFAULT_KW "default"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_config_from_current"
@@ -235,9 +238,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "param"
       WHITESPACE " "
-      FROM_KW "from"
-      WHITESPACE " "
-      CURRENT_KW "current"
+      FROM_CURRENT
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_config"
@@ -301,10 +305,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "param"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      LITERAL
-        STRING "'value'"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          STRING "'value'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using_current_user"

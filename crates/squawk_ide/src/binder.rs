@@ -1779,31 +1779,42 @@ fn search_path_from_set_config_param(
         return None;
     }
 
-    if set_config_param.current_token().is_some() {
-        return Some(SearchPathOverride::FromCurrent);
+    match set_config_param.config_assignment()? {
+        ast::ConfigAssignment::FromCurrent(_) => Some(SearchPathOverride::FromCurrent),
+        ast::ConfigAssignment::ToConfigValue(to_config_value) => Some(
+            SearchPathOverride::Explicit(search_path_from_config_value(&to_config_value)),
+        ),
     }
+}
 
-    if set_config_param.default_token().is_some() {
-        return Some(SearchPathOverride::Explicit(vec![
-            Schema::new("public"),
-            Schema::new("pg_temp"),
-            Schema::new("pg_catalog"),
-        ]));
+fn default_search_path() -> Vec<Schema> {
+    vec![
+        Schema::new("public"),
+        Schema::new("pg_temp"),
+        Schema::new("pg_catalog"),
+    ]
+}
+
+fn search_path_from_config_value(to_config_value: &ast::ToConfigValue) -> Vec<Schema> {
+    if to_config_value.default_token().is_some() {
+        return default_search_path();
     }
-
     let mut search_path = vec![];
-    for literal in set_config_param.literals() {
-        if let Some(string_value) = extract_string_literal(&literal)
-            && !string_value.is_empty()
-        {
-            search_path.push(Schema::new(string_value));
+    for config_value in to_config_value.config_values() {
+        match config_value {
+            ast::ConfigValue::Literal(literal) => {
+                if let Some(string_value) = extract_string_literal(&literal)
+                    && !string_value.is_empty()
+                {
+                    search_path.push(Schema::new(string_value));
+                }
+            }
+            ast::ConfigValue::ConfigValueName(config_value_name) => {
+                search_path.push(Schema::new(config_value_name.syntax().text().to_string()));
+            }
         }
     }
-    for config_value_name in set_config_param.config_value_names() {
-        search_path.push(Schema::new(config_value_name.syntax().text().to_string()));
-    }
-
-    Some(SearchPathOverride::Explicit(search_path))
+    search_path
 }
 
 fn bind_set(b: &mut Binder, set: ast::Set) {
@@ -1849,40 +1860,17 @@ fn bind_set_config(b: &mut Binder, set_config: ast::SetConfig, position: TextSiz
     }
 
     // `set search_path`
-    if set_config.default_token().is_some() {
-        b.search_path_changes.push(SearchPathChange {
-            position,
-            search_path: vec![
-                Schema::new("public"),
-                Schema::new("pg_temp"),
-                Schema::new("pg_catalog"),
-            ],
-        });
-    } else {
-        let mut search_path = vec![];
-        for config_value in set_config.config_values() {
-            match config_value {
-                ast::ConfigValue::Literal(literal) => {
-                    if let Some(string_value) = extract_string_literal(&literal) {
-                        // You can unset the search path via `set search_path = ''`
-                        // so we want to skip over these, otherwise we'll
-                        // have a schema of value `''` which isn't valid.
-                        if !string_value.is_empty() {
-                            search_path.push(Schema::new(string_value));
-                        }
-                    }
-                }
-                ast::ConfigValue::ConfigValueName(config_value_name) => {
-                    let schema_name = config_value_name.syntax().text().to_string();
-                    search_path.push(Schema::new(schema_name));
-                }
-            }
+    let search_path = match set_config.config_assignment() {
+        Some(ast::ConfigAssignment::ToConfigValue(to_config_value)) => {
+            search_path_from_config_value(&to_config_value)
         }
-        b.search_path_changes.push(SearchPathChange {
-            position,
-            search_path,
-        });
-    }
+        // no-op
+        Some(ast::ConfigAssignment::FromCurrent(_)) | None => return,
+    };
+    b.search_path_changes.push(SearchPathChange {
+        position,
+        search_path,
+    });
 }
 
 fn bind_select(b: &mut Binder, select: ast::Select) {

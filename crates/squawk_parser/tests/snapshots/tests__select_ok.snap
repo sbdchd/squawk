@@ -75,7 +75,8 @@ SOURCE_FILE
             LITERAL
               NULL_KW "NULL"
     WHITESPACE " "
-    UNION_KW "UNION"
+    UNION
+      UNION_KW "UNION"
     WHITESPACE " "
     COMPOUND_SELECT
       SELECT
@@ -87,7 +88,8 @@ SOURCE_FILE
               LITERAL
                 NULL_KW "NULL"
       WHITESPACE " "
-      UNION_KW "UNION"
+      UNION
+        UNION_KW "UNION"
       WHITESPACE " "
       SELECT
         SELECT_CLAUSE
@@ -112,7 +114,8 @@ SOURCE_FILE
                 LITERAL
                   NULL_KW "NULL"
         WHITESPACE " "
-        UNION_KW "UNION"
+        UNION
+          UNION_KW "UNION"
         WHITESPACE " "
         SELECT
           SELECT_CLAUSE
@@ -124,7 +127,8 @@ SOURCE_FILE
                   NULL_KW "NULL"
       R_PAREN ")"
     WHITESPACE " "
-    UNION_KW "UNION"
+    UNION
+      UNION_KW "UNION"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -1980,9 +1984,10 @@ SOURCE_FILE
                 IDENT "buzz"
             R_PAREN ")"
         WHITESPACE " "
-        WITH_KW "with"
-        WHITESPACE " "
-        ORDINALITY_KW "ordinality"
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -2035,9 +2040,10 @@ SOURCE_FILE
                 IDENT "buzz"
             R_PAREN ")"
         WHITESPACE " "
-        WITH_KW "with"
-        WHITESPACE " "
-        ORDINALITY_KW "ordinality"
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
         WHITESPACE " "
         FROM_ALIAS
           TABLE_ALIAS
@@ -3083,9 +3089,10 @@ SOURCE_FILE
             L_PAREN "("
             R_PAREN ")"
         WHITESPACE " "
-        WITH_KW "with"
-        WHITESPACE " "
-        ORDINALITY_KW "ordinality"
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -3468,9 +3475,10 @@ SOURCE_FILE
             R_PAREN ")"
         R_PAREN ")"
         WHITESPACE " "
-        WITH_KW "with"
-        WHITESPACE " "
-        ORDINALITY_KW "ordinality"
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3497,9 +3505,10 @@ SOURCE_FILE
             R_PAREN ")"
         R_PAREN ")"
         WHITESPACE " "
-        WITH_KW "with"
-        WHITESPACE " "
-        ORDINALITY_KW "ordinality"
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
         WHITESPACE " "
         FROM_ALIAS
           AS_KW "as"
@@ -5665,7 +5674,8 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5689,9 +5699,10 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    UNION_KW "union"
-    WHITESPACE " "
-    ALL_KW "all"
+    UNION
+      UNION_KW "union"
+      WHITESPACE " "
+      ALL_KW "all"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5715,9 +5726,10 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    UNION_KW "union"
-    WHITESPACE " "
-    DISTINCT_KW "distinct"
+    UNION
+      UNION_KW "union"
+      WHITESPACE " "
+      DISTINCT_KW "distinct"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5741,7 +5753,8 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     COMPOUND_SELECT
       SELECT
@@ -5753,7 +5766,8 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "2"
       WHITESPACE " "
-      UNION_KW "union"
+      UNION
+        UNION_KW "union"
       WHITESPACE " "
       SELECT
         SELECT_CLAUSE
@@ -5779,7 +5793,8 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    INTERSECT_KW "intersect"
+    INTERSECT
+      INTERSECT_KW "intersect"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5803,9 +5818,10 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    INTERSECT_KW "intersect"
-    WHITESPACE " "
-    ALL_KW "all"
+    INTERSECT
+      INTERSECT_KW "intersect"
+      WHITESPACE " "
+      ALL_KW "all"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5829,9 +5845,10 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    INTERSECT_KW "intersect"
-    WHITESPACE " "
-    DISTINCT_KW "distinct"
+    INTERSECT
+      INTERSECT_KW "intersect"
+      WHITESPACE " "
+      DISTINCT_KW "distinct"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5857,7 +5874,8 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    EXCEPT_KW "except"
+    EXCEPT
+      EXCEPT_KW "except"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5881,9 +5899,10 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    EXCEPT_KW "except"
-    WHITESPACE " "
-    ALL_KW "all"
+    EXCEPT
+      EXCEPT_KW "except"
+      WHITESPACE " "
+      ALL_KW "all"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -5907,9 +5926,10 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     WHITESPACE " "
-    EXCEPT_KW "except"
-    WHITESPACE " "
-    DISTINCT_KW "distinct"
+    EXCEPT
+      EXCEPT_KW "except"
+      WHITESPACE " "
+      DISTINCT_KW "distinct"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE

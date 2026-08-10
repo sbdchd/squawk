@@ -2051,7 +2051,9 @@ fn resolve_select_qualified_column_ptr(
 
                 if from_item.alias().and_then(|a| a.column_list()).is_none()
                     && column_name == Name::from_string("ordinality")
-                    && let Some(ordinality_token) = from_item.ordinality_token()
+                    && let Some(ordinality_token) = from_item
+                        .with_ordinality()
+                        .and_then(|it| it.ordinality_token())
                 {
                     return Some(smallvec![Location::new(
                         file,
@@ -2506,7 +2508,9 @@ fn resolve_from_item_column_by_name_after_index(
     if original_skip == 0
         && from_item.alias().and_then(|a| a.column_list()).is_none()
         && *column_name == Name::from_string("ordinality")
-        && let Some(ordinality_token) = from_item.ordinality_token()
+        && let Some(ordinality_token) = from_item
+            .with_ordinality()
+            .and_then(|it| it.ordinality_token())
     {
         return Some(smallvec![Location::new(
             file,

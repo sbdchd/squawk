@@ -2196,9 +2196,10 @@ SOURCE_FILE
       WHITESPACE " "
       MATCHED_KW "MATCHED"
       WHITESPACE " "
-      BY_KW "BY"
-      WHITESPACE " "
-      TARGET_KW "TARGET"
+      BY_TARGET
+        BY_KW "BY"
+        WHITESPACE " "
+        TARGET_KW "TARGET"
       WHITESPACE " "
       THEN_KW "THEN"
       WHITESPACE "\n  "

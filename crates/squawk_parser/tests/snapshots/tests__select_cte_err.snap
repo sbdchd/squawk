@@ -73,9 +73,10 @@ SOURCE_FILE
         SEARCH_CLAUSE
           SEARCH_KW "search"
           WHITESPACE " "
-          DEPTH_KW "depth"
-          WHITESPACE " "
-          FIRST_KW "first"
+          DEPTH_FIRST
+            DEPTH_KW "depth"
+            WHITESPACE " "
+            FIRST_KW "first"
           WHITESPACE " "
           BY_KW "by"
           WHITESPACE " "
@@ -149,9 +150,10 @@ SOURCE_FILE
         SEARCH_CLAUSE
           SEARCH_KW "search"
           WHITESPACE " "
-          DEPTH_KW "depth"
-          WHITESPACE " "
-          FIRST_KW "first"
+          DEPTH_FIRST
+            DEPTH_KW "depth"
+            WHITESPACE " "
+            FIRST_KW "first"
           WHITESPACE " "
           BY_KW "by"
           WHITESPACE " "

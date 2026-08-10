@@ -125,10 +125,10 @@ impl ast::FromItem {
         }
     }
 
-    pub fn ordinality_token(&self) -> Option<SyntaxToken> {
+    pub fn with_ordinality(&self) -> Option<ast::WithOrdinality> {
         match self {
-            ast::FromItem::FunctionFromItem(it) => it.ordinality_token(),
-            ast::FromItem::RowsFromItem(it) => it.ordinality_token(),
+            ast::FromItem::FunctionFromItem(it) => it.with_ordinality(),
+            ast::FromItem::RowsFromItem(it) => it.with_ordinality(),
             _ => None,
         }
     }
@@ -464,6 +464,16 @@ impl ast::WhenClause {
     }
 }
 
+impl ast::ReturningOption {
+    #[inline]
+    pub fn name(&self) -> Option<ast::TableAlias> {
+        match self {
+            ast::ReturningOption::ReturningOld(it) => it.name(),
+            ast::ReturningOption::ReturningNew(it) => it.name(),
+        }
+    }
+}
+
 impl ast::CompoundSelect {
     #[inline]
     pub fn lhs(&self) -> Option<ast::SelectVariant> {
@@ -472,6 +482,10 @@ impl ast::CompoundSelect {
     #[inline]
     pub fn rhs(&self) -> Option<ast::SelectVariant> {
         support::children(&self.syntax).nth(1)
+    }
+    #[inline]
+    pub fn op(&self) -> Option<ast::CompoundOp> {
+        support::child(&self.syntax)
     }
 }
 

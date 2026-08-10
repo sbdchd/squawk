@@ -1194,11 +1194,10 @@ SOURCE_FILE
   ROLLBACK
     ROLLBACK_KW "ROLLBACK"
     WHITESPACE " "
-    ROLLBACK_TO_SAVEPOINT
-      TO_KW "TO"
-      WHITESPACE " "
-      SAVEPOINT_REF
-        IDENT "sp1"
+    TO_KW "TO"
+    WHITESPACE " "
+    SAVEPOINT_REF
+      IDENT "sp1"
     SEMICOLON ";"
   WHITESPACE "\n"
   UPDATE
@@ -1495,7 +1494,7 @@ SOURCE_FILE
         WITH_KW "WITH"
         WHITESPACE " "
         L_PAREN "("
-        RETURNING_OPTION
+        RETURNING_OLD
           OLD_KW "OLD"
           WHITESPACE " "
           AS_KW "AS"
@@ -1504,7 +1503,7 @@ SOURCE_FILE
             BEFORE_KW "before"
         COMMA ","
         WHITESPACE " "
-        RETURNING_OPTION
+        RETURNING_NEW
           NEW_KW "NEW"
           WHITESPACE " "
           AS_KW "AS"
@@ -1600,7 +1599,7 @@ SOURCE_FILE
         WITH_KW "with"
         WHITESPACE " "
         L_PAREN "("
-        RETURNING_OPTION
+        RETURNING_OLD
           OLD_KW "old"
           WHITESPACE " "
           AS_KW "as"
@@ -1609,7 +1608,7 @@ SOURCE_FILE
             IDENT "o"
         COMMA ","
         WHITESPACE " "
-        RETURNING_OPTION
+        RETURNING_NEW
           NEW_KW "new"
           WHITESPACE " "
           AS_KW "as"
@@ -1795,6 +1794,49 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'2025-01-01'"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "SET"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_SINGLE_COLUMN
+          COLUMN_TARGET
+            COLUMN_NAME_REF
+              IDENT "x"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- for_portion_of_range"
+  WHITESPACE "\n"
+  UPDATE
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    FOR_PORTION_OF
+      FOR_KW "FOR"
+      WHITESPACE " "
+      PORTION_KW "PORTION"
+      WHITESPACE " "
+      OF_KW "OF"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "valid_at"
+      WHITESPACE " "
+      PORTION_RANGE
+        L_PAREN "("
+        NAME_REF
+          PERIOD_KW "period"
+        R_PAREN ")"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
