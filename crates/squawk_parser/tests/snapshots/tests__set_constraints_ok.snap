@@ -12,7 +12,8 @@ SOURCE_FILE
     WHITESPACE " "
     ALL_KW "all"
     WHITESPACE " "
-    DEFERRED_KW "deferred"
+    DEFERRED
+      DEFERRED_KW "deferred"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_CONSTRAINTS
@@ -22,7 +23,8 @@ SOURCE_FILE
     WHITESPACE " "
     ALL_KW "all"
     WHITESPACE " "
-    IMMEDIATE_KW "immediate"
+    IMMEDIATE
+      IMMEDIATE_KW "immediate"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_CONSTRAINTS
@@ -51,7 +53,8 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "b"
     WHITESPACE " "
-    IMMEDIATE_KW "immediate"
+    IMMEDIATE
+      IMMEDIATE_KW "immediate"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_CONSTRAINTS
@@ -64,6 +67,7 @@ SOURCE_FILE
         PATH_SEGMENT_REF
           IDENT "bar"
     WHITESPACE " "
-    IMMEDIATE_KW "immediate"
+    IMMEDIATE
+      IMMEDIATE_KW "immediate"
     SEMICOLON ";"
   WHITESPACE "\n\n"

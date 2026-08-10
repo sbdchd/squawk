@@ -80,7 +80,8 @@ SOURCE_FILE
                       INT_NUMBER "1"
                 R_PAREN ")"
               WHITESPACE "\n    "
-              UNION_KW "UNION"
+              UNION
+                UNION_KW "UNION"
               WHITESPACE "\n    "
               PAREN_SELECT
                 L_PAREN "("
@@ -222,7 +223,8 @@ SOURCE_FILE
                       INT_NUMBER "1"
                 R_PAREN ")"
               WHITESPACE "\n    "
-              UNION_KW "UNION"
+              UNION
+                UNION_KW "UNION"
               WHITESPACE "\n    "
               SELECT
                 SELECT_CLAUSE
@@ -300,7 +302,8 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "t"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     TABLE
       TABLE_KW "table"
@@ -322,7 +325,8 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     TABLE
       TABLE_KW "table"
@@ -347,7 +351,8 @@ SOURCE_FILE
                 INT_NUMBER "1"
       R_PAREN ")"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -399,7 +404,8 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "t2"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     PAREN_SELECT
       L_PAREN "("
@@ -432,7 +438,8 @@ SOURCE_FILE
             INT_NUMBER "2"
           R_PAREN ")"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     VALUES
       VALUES_KW "values"
@@ -475,7 +482,8 @@ SOURCE_FILE
             R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
-        UNION_KW "union"
+        UNION
+          UNION_KW "union"
         WHITESPACE " "
         SELECT
           SELECT_CLAUSE
@@ -529,7 +537,8 @@ SOURCE_FILE
                           R_PAREN ")"
                       R_PAREN ")"
                 WHITESPACE " "
-                UNION_KW "union"
+                UNION
+                  UNION_KW "union"
                 WHITESPACE " "
                 SELECT
                   SELECT_CLAUSE
@@ -574,7 +583,8 @@ SOURCE_FILE
                               INT_NUMBER "1"
                     R_PAREN ")"
                   WHITESPACE " "
-                  UNION_KW "union"
+                  UNION
+                    UNION_KW "union"
                   WHITESPACE " "
                   SELECT
                     SELECT_CLAUSE
@@ -624,7 +634,8 @@ SOURCE_FILE
               PATH_SEGMENT
                 IDENT "t"
       WHITESPACE " "
-      UNION_KW "union"
+      UNION
+        UNION_KW "union"
       WHITESPACE " "
       SELECT
         SELECT_CLAUSE

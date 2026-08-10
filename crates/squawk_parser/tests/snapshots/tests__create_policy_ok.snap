@@ -95,27 +95,29 @@ SOURCE_FILE
       WHITESPACE " "
       IDENT "permissive"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    ALL_KW "all"
+    POLICY_COMMAND
+      FOR_KW "for"
+      WHITESPACE " "
+      ALL_KW "all"
     WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    ROLE_REF_LIST
-      ROLE_REF
-        IDENT "public"
-      COMMA ","
+    POLICY_ROLES
+      TO_KW "to"
       WHITESPACE " "
-      ROLE_REF
-        CURRENT_ROLE_KW "current_role"
-      COMMA ","
-      WHITESPACE " "
-      ROLE_REF
-        CURRENT_USER_KW "current_user"
-      COMMA ","
-      WHITESPACE " "
-      ROLE_REF
-        SESSION_USER_KW "session_user"
+      ROLE_REF_LIST
+        ROLE_REF
+          IDENT "public"
+        COMMA ","
+        WHITESPACE " "
+        ROLE_REF
+          CURRENT_ROLE_KW "current_role"
+        COMMA ","
+        WHITESPACE " "
+        ROLE_REF
+          CURRENT_USER_KW "current_user"
+        COMMA ","
+        WHITESPACE " "
+        ROLE_REF
+          SESSION_USER_KW "session_user"
     WHITESPACE "\n  "
     USING_EXPR_CLAUSE
       USING_KW "using"
@@ -179,9 +181,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "t"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    ALL_KW "all"
+    POLICY_COMMAND
+      FOR_KW "for"
+      WHITESPACE " "
+      ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -200,9 +203,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "t"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    SELECT_KW "select"
+    POLICY_COMMAND
+      FOR_KW "for"
+      WHITESPACE " "
+      SELECT_KW "select"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -221,9 +225,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "t"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    INSERT_KW "insert"
+    POLICY_COMMAND
+      FOR_KW "for"
+      WHITESPACE " "
+      INSERT_KW "insert"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -242,9 +247,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "t"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    UPDATE_KW "update"
+    POLICY_COMMAND
+      FOR_KW "for"
+      WHITESPACE " "
+      UPDATE_KW "update"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -263,8 +269,9 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "t"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    DELETE_KW "delete"
+    POLICY_COMMAND
+      FOR_KW "for"
+      WHITESPACE " "
+      DELETE_KW "delete"
     SEMICOLON ";"
   WHITESPACE "\n\n"

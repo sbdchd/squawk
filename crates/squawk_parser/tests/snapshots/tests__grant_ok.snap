@@ -106,9 +106,10 @@ SOURCE_FILE
     GRANT_WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_OPTION
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
     WHITESPACE "\n  "
     GRANTED_KW "granted"
     WHITESPACE " "
@@ -207,9 +208,10 @@ SOURCE_FILE
     GRANT_WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_OPTION
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- columns"
@@ -624,9 +626,10 @@ SOURCE_FILE
     GRANT_WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_OPTION
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -728,9 +731,10 @@ SOURCE_FILE
     GRANT_WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_OPTION
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -826,9 +830,10 @@ SOURCE_FILE
     GRANT_WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_OPTION
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -895,9 +900,10 @@ SOURCE_FILE
     GRANT_WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_OPTION
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -963,9 +969,10 @@ SOURCE_FILE
     GRANT_WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_OPTION
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT

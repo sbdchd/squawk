@@ -253,10 +253,11 @@ SOURCE_FILE
           WHITESPACE "\n      "
           LABEL_AND_PROPERTIES_LIST
             LABEL_AND_PROPERTIES
-              LABEL_KW "label"
-              WHITESPACE " "
-              LABEL
-                IDENT "q"
+              NAMED_LABEL
+                LABEL_KW "label"
+                WHITESPACE " "
+                LABEL
+                  IDENT "q"
               WHITESPACE " "
               PROPERTIES
                 PROPERTIES_KW "properties"
@@ -285,10 +286,11 @@ SOURCE_FILE
                   R_PAREN ")"
             WHITESPACE "\n      "
             LABEL_AND_PROPERTIES
-              LABEL_KW "label"
-              WHITESPACE " "
-              LABEL
-                IDENT "q"
+              NAMED_LABEL
+                LABEL_KW "label"
+                WHITESPACE " "
+                LABEL
+                  IDENT "q"
               WHITESPACE " "
               PROPERTIES
                 PROPERTIES_KW "properties"

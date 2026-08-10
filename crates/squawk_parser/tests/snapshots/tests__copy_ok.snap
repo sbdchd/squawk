@@ -17,8 +17,72 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'/tmp/copy.data'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'/tmp/copy.data'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- copy_from_stdin"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "COPY"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "country"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "FROM"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "STDIN"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- copy_from_stdin_with_options"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "COPY"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "country"
+      WHITESPACE " "
+      COLUMN_REF_LIST
+        L_PAREN "("
+        COLUMN_NAME_REF
+          IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN_NAME_REF
+          NAME_KW "name"
+        R_PAREN ")"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "FROM"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "STDIN"
+    WHITESPACE " "
+    COPY_OPTION_LIST
+      L_PAREN "("
+      COPY_OPTION
+        COPY_OPTION_NAME
+          FORMAT_KW "FORMAT"
+        WHITESPACE " "
+        CSV_KW "csv"
+      COMMA ","
+      WHITESPACE " "
+      COPY_OPTION
+        COPY_OPTION_NAME
+          HEADER_KW "HEADER"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- copy_to"
@@ -35,7 +99,8 @@ SOURCE_FILE
     COPY_TO
       TO_KW "TO"
       WHITESPACE " "
-      STDOUT_KW "STDOUT"
+      COPY_STDOUT
+        STDOUT_KW "STDOUT"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -62,8 +127,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "FROM"
       WHITESPACE " "
-      LITERAL
-        STRING "'/usr1/proj/bray/sql/country_data'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'/usr1/proj/bray/sql/country_data'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- copy_to_file"
@@ -106,8 +172,9 @@ SOURCE_FILE
     COPY_TO
       TO_KW "TO"
       WHITESPACE " "
-      LITERAL
-        STRING "'/usr1/proj/bray/sql/a_list_countries.copy'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'/usr1/proj/bray/sql/a_list_countries.copy'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- copy_to_compress_filed"
@@ -124,10 +191,11 @@ SOURCE_FILE
     COPY_TO
       TO_KW "TO"
       WHITESPACE " "
-      PROGRAM_KW "PROGRAM"
-      WHITESPACE " "
-      LITERAL
-        STRING "'gzip > /usr1/proj/bray/sql/country_data.gz'"
+      COPY_PROGRAM
+        PROGRAM_KW "PROGRAM"
+        WHITESPACE " "
+        LITERAL
+          STRING "'gzip > /usr1/proj/bray/sql/country_data.gz'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- log_setting"
@@ -154,8 +222,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'/tmp/input.file'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'/tmp/input.file'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -190,8 +259,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'/tmp/copy.data'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'/tmp/copy.data'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -219,8 +289,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'foo'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'foo'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -427,5 +498,200 @@ SOURCE_FILE
         VERBOSE_KW "verbose"
       WHITESPACE "\n"
       R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- legacy_force_quote"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "country"
+    WHITESPACE " "
+    COPY_TO
+      TO_KW "to"
+      WHITESPACE " "
+      COPY_STDOUT
+        STDOUT_KW "stdout"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      CSV_KW "csv"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      FORCE_KW "force"
+      WHITESPACE " "
+      FORCE_QUOTE
+        QUOTE_KW "quote"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "b"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- legacy_force_quote_star"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "country"
+    WHITESPACE " "
+    COPY_TO
+      TO_KW "to"
+      WHITESPACE " "
+      COPY_STDOUT
+        STDOUT_KW "stdout"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      CSV_KW "csv"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      FORCE_KW "force"
+      WHITESPACE " "
+      FORCE_QUOTE
+        QUOTE_KW "quote"
+      WHITESPACE " "
+      STAR "*"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- legacy_force_not_null"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "country"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "stdin"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      CSV_KW "csv"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      FORCE_KW "force"
+      WHITESPACE " "
+      FORCE_NOT_NULL
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "b"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- legacy_force_not_null_star"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "country"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "stdin"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      CSV_KW "csv"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      FORCE_KW "force"
+      WHITESPACE " "
+      FORCE_NOT_NULL
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+      WHITESPACE " "
+      STAR "*"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- legacy_options"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "country"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "stdin"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      BINARY_KW "binary"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      DELIMITER_KW "delimiter"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      LITERAL
+        STRING "'|'"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      NULL_KW "null"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      LITERAL
+        STRING "'\\n'"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      QUOTE_KW "quote"
+      WHITESPACE " "
+      LITERAL
+        STRING "'\"'"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      ESCAPE_KW "escape"
+      WHITESPACE " "
+      LITERAL
+        STRING "'\\'"
+    WHITESPACE " "
+    COPY_LEGACY_OPTION
+      ENCODING_KW "encoding"
+      WHITESPACE " "
+      LITERAL
+        STRING "'utf8'"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -146,15 +146,16 @@ SOURCE_FILE
       DISTINCT_CLAUSE
         DISTINCT_KW "DISTINCT"
         WHITESPACE " "
-        ON_KW "ON"
-        WHITESPACE " "
-        L_PAREN "("
-        NAME_REF
-          IDENT "a"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "b"
-        R_PAREN ")"
+        DISTINCT_ON
+          ON_KW "ON"
+          WHITESPACE " "
+          L_PAREN "("
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+          R_PAREN ")"
       WHITESPACE " "
       TARGET_LIST
         TARGET

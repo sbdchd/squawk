@@ -108,3 +108,6 @@ UPDATE t SET (a[1], b.c, d) = ROW(1, 2, 3);
 
 -- for_portion_of
 UPDATE t FOR PORTION OF valid_at FROM '2024-01-01' TO '2025-01-01' SET x = 1;
+
+-- for_portion_of_range
+UPDATE t FOR PORTION OF valid_at (period) SET x = 1;

@@ -40,32 +40,34 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    ROLE_KW "role"
-    WHITESPACE " "
-    ROLE_REF_LIST
-      ROLE_REF
-        IDENT "r"
+    FOR_ROLES
+      FOR_KW "for"
+      WHITESPACE " "
+      ROLE_KW "role"
+      WHITESPACE " "
+      ROLE_REF_LIST
+        ROLE_REF
+          IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE_REF
+          CURRENT_USER_KW "current_user"
+    WHITESPACE "\n  "
+    IN_SCHEMAS
+      IN_KW "in"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "s"
       COMMA ","
       WHITESPACE " "
-      ROLE_REF
-        CURRENT_USER_KW "current_user"
-    WHITESPACE "\n  "
-    IN_KW "in"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "s"
-    COMMA ","
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "s2"
-    COMMA ","
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "s3"
+      SCHEMA_REF
+        IDENT "s2"
+      COMMA ","
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "s3"
     WHITESPACE "\n  "
     GRANT_DEFAULT_PRIVILEGES
       GRANT_KW "grant"
@@ -93,20 +95,22 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    ROLE_REF_LIST
-      ROLE_REF
-        SESSION_USER_KW "session_user"
+    FOR_ROLES
+      FOR_KW "for"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      ROLE_REF_LIST
+        ROLE_REF
+          SESSION_USER_KW "session_user"
     WHITESPACE "\n  "
-    IN_KW "in"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    SCHEMA_REF
-      IDENT "s"
+    IN_SCHEMAS
+      IN_KW "in"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "s"
     WHITESPACE "\n  "
     GRANT_DEFAULT_PRIVILEGES
       GRANT_KW "grant"
@@ -222,11 +226,13 @@ SOURCE_FILE
           WHITESPACE " "
           SESSION_USER_KW "session_user"
       WHITESPACE "\n    "
-      WITH_KW "with"
-      WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_WITH_CLAUSE
+        WITH_KW "with"
+        WHITESPACE " "
+        GRANT_OPTION
+          GRANT_KW "grant"
+          WHITESPACE " "
+          OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -530,11 +536,13 @@ SOURCE_FILE
           WHITESPACE " "
           CURRENT_ROLE_KW "current_role"
       WHITESPACE "\n  "
-      WITH_KW "with"
-      WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_WITH_CLAUSE
+        WITH_KW "with"
+        WHITESPACE " "
+        GRANT_OPTION
+          GRANT_KW "grant"
+          WHITESPACE " "
+          OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -644,11 +652,13 @@ SOURCE_FILE
         ROLE_REF
           IDENT "r"
       WHITESPACE "\n  "
-      WITH_KW "with"
-      WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_WITH_CLAUSE
+        WITH_KW "with"
+        WHITESPACE " "
+        GRANT_OPTION
+          GRANT_KW "grant"
+          WHITESPACE " "
+          OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grant_types"
@@ -716,11 +726,13 @@ SOURCE_FILE
         ROLE_REF
           IDENT "public"
       WHITESPACE "\n  "
-      WITH_KW "with"
-      WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_WITH_CLAUSE
+        WITH_KW "with"
+        WHITESPACE " "
+        GRANT_OPTION
+          GRANT_KW "grant"
+          WHITESPACE " "
+          OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grant_schemas"
@@ -792,11 +804,13 @@ SOURCE_FILE
         ROLE_REF
           IDENT "public"
       WHITESPACE "\n  "
-      WITH_KW "with"
-      WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
+      GRANT_WITH_CLAUSE
+        WITH_KW "with"
+        WHITESPACE " "
+        GRANT_OPTION
+          GRANT_KW "grant"
+          WHITESPACE " "
+          OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- revoke_tables"
@@ -811,11 +825,12 @@ SOURCE_FILE
     REVOKE_DEFAULT_PRIVILEGES
       REVOKE_KW "revoke"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
-      WHITESPACE " "
-      FOR_KW "for"
+      GRANT_OPTION_FOR
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
+        WHITESPACE " "
+        FOR_KW "for"
       WHITESPACE "\n  "
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
@@ -917,11 +932,12 @@ SOURCE_FILE
     REVOKE_DEFAULT_PRIVILEGES
       REVOKE_KW "revoke"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
-      WHITESPACE " "
-      FOR_KW "for"
+      GRANT_OPTION_FOR
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
+        WHITESPACE " "
+        FOR_KW "for"
       WHITESPACE "\n  "
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
@@ -999,11 +1015,12 @@ SOURCE_FILE
     REVOKE_DEFAULT_PRIVILEGES
       REVOKE_KW "revoke"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
-      WHITESPACE " "
-      FOR_KW "for"
+      GRANT_OPTION_FOR
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
+        WHITESPACE " "
+        FOR_KW "for"
       WHITESPACE "\n  "
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
@@ -1073,11 +1090,12 @@ SOURCE_FILE
     REVOKE_DEFAULT_PRIVILEGES
       REVOKE_KW "revoke"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
-      WHITESPACE " "
-      FOR_KW "for"
+      GRANT_OPTION_FOR
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
+        WHITESPACE " "
+        FOR_KW "for"
       WHITESPACE "\n  "
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
@@ -1147,11 +1165,12 @@ SOURCE_FILE
     REVOKE_DEFAULT_PRIVILEGES
       REVOKE_KW "revoke"
       WHITESPACE " "
-      GRANT_KW "grant"
-      WHITESPACE " "
-      OPTION_KW "option"
-      WHITESPACE " "
-      FOR_KW "for"
+      GRANT_OPTION_FOR
+        GRANT_KW "grant"
+        WHITESPACE " "
+        OPTION_KW "option"
+        WHITESPACE " "
+        FOR_KW "for"
       WHITESPACE "\n  "
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND

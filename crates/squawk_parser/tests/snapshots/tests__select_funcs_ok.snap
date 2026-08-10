@@ -543,7 +543,8 @@ SOURCE_FILE
             TRIM_FN
               TRIM_KW "trim"
               L_PAREN "("
-              BOTH_KW "both"
+              TRIM_BOTH
+                BOTH_KW "both"
               WHITESPACE " "
               NAME_REF
                 IDENT "a"
@@ -565,7 +566,8 @@ SOURCE_FILE
             TRIM_FN
               TRIM_KW "trim"
               L_PAREN "("
-              BOTH_KW "both"
+              TRIM_BOTH
+                BOTH_KW "both"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -584,7 +586,8 @@ SOURCE_FILE
             TRIM_FN
               TRIM_KW "trim"
               L_PAREN "("
-              BOTH_KW "both"
+              TRIM_BOTH
+                BOTH_KW "both"
               WHITESPACE " "
               NAME_REF
                 IDENT "a"
@@ -601,7 +604,8 @@ SOURCE_FILE
             TRIM_FN
               TRIM_KW "trim"
               L_PAREN "("
-              LEADING_KW "leading"
+              TRIM_LEADING
+                LEADING_KW "leading"
               WHITESPACE " "
               NAME_REF
                 IDENT "a"
@@ -618,7 +622,8 @@ SOURCE_FILE
             TRIM_FN
               TRIM_KW "trim"
               L_PAREN "("
-              TRAILING_KW "trailing"
+              TRIM_TRAILING
+                TRAILING_KW "trailing"
               WHITESPACE " "
               NAME_REF
                 IDENT "a"
@@ -2659,7 +2664,8 @@ SOURCE_FILE
                             INT_NUMBER "1"
                   R_PAREN ")"
                 WHITESPACE " "
-                UNION_KW "union"
+                UNION
+                  UNION_KW "union"
                 WHITESPACE " "
                 PAREN_SELECT
                   L_PAREN "("
@@ -2974,7 +2980,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "foo"
+              EXTRACT_FIELD
+                IDENT "foo"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3001,7 +3008,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              YEAR_KW "year"
+              EXTRACT_FIELD
+                YEAR_KW "year"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3020,7 +3028,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              MONTH_KW "month"
+              EXTRACT_FIELD
+                MONTH_KW "month"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3039,7 +3048,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              DAY_KW "day"
+              EXTRACT_FIELD
+                DAY_KW "day"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3058,7 +3068,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              HOUR_KW "hour"
+              EXTRACT_FIELD
+                HOUR_KW "hour"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3077,7 +3088,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              MINUTE_KW "minute"
+              EXTRACT_FIELD
+                MINUTE_KW "minute"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3096,7 +3108,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              SECOND_KW "second"
+              EXTRACT_FIELD
+                SECOND_KW "second"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3115,7 +3128,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              STRING "'minute'"
+              EXTRACT_FIELD
+                STRING "'minute'"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3134,7 +3148,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "epoch"
+              EXTRACT_FIELD
+                IDENT "epoch"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3159,7 +3174,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "century"
+              EXTRACT_FIELD
+                IDENT "century"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3182,7 +3198,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "isodow"
+              EXTRACT_FIELD
+                IDENT "isodow"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3205,7 +3222,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "isoyear"
+              EXTRACT_FIELD
+                IDENT "isoyear"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3230,7 +3248,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "julian"
+              EXTRACT_FIELD
+                IDENT "julian"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3255,7 +3274,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "microseconds"
+              EXTRACT_FIELD
+                IDENT "microseconds"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3278,7 +3298,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "millennium"
+              EXTRACT_FIELD
+                IDENT "millennium"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3301,7 +3322,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              IDENT "quarter"
+              EXTRACT_FIELD
+                IDENT "quarter"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -4445,9 +4467,10 @@ SOURCE_FILE
                       STRING "'$.title'"
                   WHITESPACE " "
                   JSON_QUOTES_CLAUSE
-                    OMIT_KW "OMIT"
-                    WHITESPACE " "
-                    QUOTES_KW "QUOTES"
+                    OMIT_QUOTES
+                      OMIT_KW "OMIT"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
                 COMMA ","
                 WHITESPACE "\n      "
                 JSON_TABLE_COLUMN
@@ -4466,9 +4489,10 @@ SOURCE_FILE
                       STRING "'$.director'"
                   WHITESPACE " "
                   JSON_QUOTES_CLAUSE
-                    KEEP_KW "KEEP"
-                    WHITESPACE " "
-                    QUOTES_KW "QUOTES"
+                    KEEP_QUOTES
+                      KEEP_KW "KEEP"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
                 R_PAREN ")"
             R_PAREN ")"
           R_PAREN ")"
@@ -4581,9 +4605,10 @@ SOURCE_FILE
                       STRING "'$.title'"
                   WHITESPACE " "
                   JSON_QUOTES_CLAUSE
-                    OMIT_KW "OMIT"
-                    WHITESPACE " "
-                    QUOTES_KW "QUOTES"
+                    OMIT_QUOTES
+                      OMIT_KW "OMIT"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
                 COMMA ","
                 WHITESPACE "\n      "
                 JSON_TABLE_COLUMN
@@ -4602,9 +4627,10 @@ SOURCE_FILE
                       STRING "'$.director'"
                   WHITESPACE " "
                   JSON_QUOTES_CLAUSE
-                    KEEP_KW "KEEP"
-                    WHITESPACE " "
-                    QUOTES_KW "QUOTES"
+                    KEEP_QUOTES
+                      KEEP_KW "KEEP"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
                 R_PAREN ")"
             R_PAREN ")"
           R_PAREN ")"
@@ -6130,15 +6156,17 @@ SOURCE_FILE
                 WRAPPER_KW "wrapper"
               WHITESPACE "\n  "
               JSON_QUOTES_CLAUSE
-                KEEP_KW "keep"
+                KEEP_QUOTES
+                  KEEP_KW "keep"
+                  WHITESPACE " "
+                  QUOTES_KW "quotes"
                 WHITESPACE " "
-                QUOTES_KW "quotes"
-                WHITESPACE " "
-                ON_KW "on"
-                WHITESPACE " "
-                SCALAR_KW "scalar"
-                WHITESPACE " "
-                STRING_KW "string"
+                ON_SCALAR_STRING
+                  ON_KW "on"
+                  WHITESPACE " "
+                  SCALAR_KW "scalar"
+                  WHITESPACE " "
+                  STRING_KW "string"
               WHITESPACE "\n  "
               JSON_ON_EMPTY_CLAUSE
                 JSON_BEHAVIOR_UNKNOWN

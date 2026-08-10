@@ -29,10 +29,11 @@ SOURCE_FILE
     TABLESPACE
       IDENT "t"
     WHITESPACE " \n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    ROLE_REF
-      CURRENT_ROLE_KW "current_role"
+    TABLESPACE_OWNER
+      OWNER_KW "owner"
+      WHITESPACE " "
+      ROLE_REF
+        CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     LOCATION_KW "location"
     WHITESPACE " "

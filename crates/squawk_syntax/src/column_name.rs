@@ -346,12 +346,10 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 return Some((ColumnName::column("overlay"), overlay_fn.syntax().clone()));
             }
             if let Some(trim_fn) = call_expr.trim_fn() {
-                let name = if trim_fn.leading_token().is_some() {
-                    "ltrim"
-                } else if trim_fn.trailing_token().is_some() {
-                    "rtrim"
-                } else {
-                    "btrim"
+                let name = match trim_fn.trim_side() {
+                    Some(ast::TrimSide::TrimLeading(_)) => "ltrim",
+                    Some(ast::TrimSide::TrimTrailing(_)) => "rtrim",
+                    _ => "btrim",
                 };
                 return Some((ColumnName::column(name), trim_fn.syntax().clone()));
             }

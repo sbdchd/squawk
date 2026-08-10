@@ -66,11 +66,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " \n  "
     ALL_PRIVILEGES
       ALL_KW "all"
@@ -123,11 +124,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " \n  "
     ALL_PRIVILEGES
       ALL_KW "all"
@@ -172,11 +174,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " "
     ALL_PRIVILEGES
       ALL_KW "all"
@@ -201,11 +204,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " "
     ALL_PRIVILEGES
       ALL_KW "all"
@@ -246,11 +250,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " \n  "
     ALL_PRIVILEGES
       ALL_KW "all"
@@ -640,11 +645,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -736,11 +742,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -806,11 +813,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -876,11 +884,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -942,11 +951,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    GRANT_OPTION_FOR
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -1503,11 +1513,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    SET_OPTION_FOR
+      SET_KW "set"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE " \n  "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -1799,11 +1810,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ADMIN_KW "admin"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    ADMIN_OPTION_FOR
+      ADMIN_KW "admin"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE "\n  "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -1820,11 +1832,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    INHERIT_KW "inherit"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    INHERIT_OPTION_FOR
+      INHERIT_KW "inherit"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE "\n  "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
@@ -1841,11 +1854,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
+    SET_OPTION_FOR
+      SET_KW "set"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
     WHITESPACE "\n  "
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND

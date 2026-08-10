@@ -49,7 +49,8 @@ SOURCE_FILE@0..858
             PATH_SEGMENT@54..55
               IDENT@54..55 "t"
     WHITESPACE@55..56 " "
-    UNION_KW@56..61 "union"
+    UNION@56..61
+      UNION_KW@56..61 "union"
     WHITESPACE@61..62 " "
     SELECT@62..72
       SELECT_CLAUSE@62..72
@@ -156,7 +157,8 @@ SOURCE_FILE@0..858
               COLUMN_NAME@241..242
                 IDENT@241..242 "a"
     WHITESPACE@242..243 " "
-    UNION_KW@243..248 "union"
+    UNION@243..248
+      UNION_KW@243..248 "union"
     WHITESPACE@248..249 " "
     COMPOUND_SELECT@249..283
       SELECT_INTO@249..266
@@ -180,7 +182,8 @@ SOURCE_FILE@0..858
               PATH_SEGMENT@265..266
                 IDENT@265..266 "t"
       WHITESPACE@266..267 " "
-      UNION_KW@267..272 "union"
+      UNION@267..272
+        UNION_KW@267..272 "union"
       WHITESPACE@272..273 " "
       SELECT@273..283
         SELECT_CLAUSE@273..283
@@ -210,7 +213,8 @@ SOURCE_FILE@0..858
               COLUMN_NAME@294..295
                 IDENT@294..295 "a"
     WHITESPACE@295..296 " "
-    UNION_KW@296..301 "union"
+    UNION@296..301
+      UNION_KW@296..301 "union"
     WHITESPACE@301..302 " "
     SELECT_INTO@302..319
       SELECT_CLAUSE@302..312
@@ -248,7 +252,8 @@ SOURCE_FILE@0..858
               COLUMN_NAME@330..331
                 IDENT@330..331 "a"
     WHITESPACE@331..332 " "
-    UNION_KW@332..337 "union"
+    UNION@332..337
+      UNION_KW@332..337 "union"
     WHITESPACE@337..338 " "
     PAREN_SELECT@338..361
       L_PAREN@338..339 "("
@@ -291,7 +296,8 @@ SOURCE_FILE@0..858
             LITERAL@370..371
               INT_NUMBER@370..371 "1"
     WHITESPACE@371..372 " "
-    UNION_KW@372..377 "union"
+    UNION@372..377
+      UNION_KW@372..377 "union"
     WHITESPACE@377..378 " "
     PAREN_SELECT@378..412
       L_PAREN@378..379 "("
@@ -316,7 +322,8 @@ SOURCE_FILE@0..858
                     IDENT@394..395 "x"
           R_PAREN@395..396 ")"
         WHITESPACE@396..397 " "
-        UNION_KW@397..402 "union"
+        UNION@397..402
+          UNION_KW@397..402 "union"
         WHITESPACE@402..403 " "
         SELECT@403..411
           SELECT_CLAUSE@403..411
@@ -410,7 +417,8 @@ SOURCE_FILE@0..858
                   PATH_SEGMENT@504..505
                     IDENT@504..505 "x"
           WHITESPACE@505..506 " "
-          UNION_KW@506..511 "union"
+          UNION@506..511
+            UNION_KW@506..511 "union"
           WHITESPACE@511..512 " "
           SELECT@512..520
             SELECT_CLAUSE@512..520

@@ -639,4 +639,106 @@ SOURCE_FILE
       WHITESPACE "\n  "
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- default label"
+  WHITESPACE "\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          IDENT "g"
+    WHITESPACE "\n  "
+    VERTEX_TABLES
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      VERTEX_TABLE_DEF
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "v"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            DEFAULT_LABEL
+              DEFAULT_KW "default"
+              WHITESPACE " "
+              LABEL_KW "label"
+            WHITESPACE " "
+            PROPERTIES
+              PROPERTIES_KW "properties"
+              WHITESPACE " "
+              EXPR_AS_PROPERTY_NAME_LIST
+                L_PAREN "("
+                EXPR_AS_PROPERTY_NAME
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- default label with no properties, plus a named label"
+  WHITESPACE "\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          IDENT "g"
+    WHITESPACE "\n  "
+    VERTEX_TABLES
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      VERTEX_TABLE_DEF
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "v"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            DEFAULT_LABEL
+              DEFAULT_KW "default"
+              WHITESPACE " "
+              LABEL_KW "label"
+            WHITESPACE " "
+            NO_PROPERTIES
+              NO_KW "no"
+              WHITESPACE " "
+              PROPERTIES_KW "properties"
+          WHITESPACE " "
+          LABEL_AND_PROPERTIES
+            NAMED_LABEL
+              LABEL_KW "label"
+              WHITESPACE " "
+              LABEL
+                IDENT "l"
+            WHITESPACE " "
+            PROPERTIES
+              PROPERTIES_KW "properties"
+              WHITESPACE " "
+              EXPR_AS_PROPERTY_NAME_LIST
+                L_PAREN "("
+                EXPR_AS_PROPERTY_NAME
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

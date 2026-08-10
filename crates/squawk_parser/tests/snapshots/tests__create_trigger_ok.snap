@@ -95,7 +95,7 @@ SOURCE_FILE
     REFERENCING
       REFERENCING_KW "referencing"
       WHITESPACE " \n  "
-      REFERENCING_TABLE
+      OLD_TABLE
         OLD_KW "old"
         WHITESPACE " "
         TABLE_KW "table"
@@ -105,7 +105,7 @@ SOURCE_FILE
         TRANSITION_RELATION_NAME
           IDENT "foo"
       WHITESPACE "\n  "
-      REFERENCING_TABLE
+      NEW_TABLE
         NEW_KW "new"
         WHITESPACE " "
         TABLE_KW "table"
@@ -274,7 +274,7 @@ SOURCE_FILE
     REFERENCING
       REFERENCING_KW "referencing"
       WHITESPACE " \n  "
-      REFERENCING_TABLE
+      NEW_TABLE
         NEW_KW "new"
         WHITESPACE " "
         TABLE_KW "table"
@@ -282,7 +282,7 @@ SOURCE_FILE
         TRANSITION_RELATION_NAME
           IDENT "bar"
       WHITESPACE "\n  "
-      REFERENCING_TABLE
+      OLD_TABLE
         OLD_KW "old"
         WHITESPACE " "
         TABLE_KW "table"

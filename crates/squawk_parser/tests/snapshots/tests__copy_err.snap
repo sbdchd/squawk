@@ -26,8 +26,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'/tmp/input.file'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'/tmp/input.file'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -59,8 +60,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'s'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'s'"
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
@@ -79,8 +81,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'s'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'s'"
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
@@ -102,8 +105,9 @@ SOURCE_FILE
     COPY_FROM
       FROM_KW "from"
       WHITESPACE " "
-      LITERAL
-        STRING "'s'"
+      COPY_PROGRAM
+        LITERAL
+          STRING "'s'"
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "

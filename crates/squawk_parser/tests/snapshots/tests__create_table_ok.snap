@@ -513,7 +513,8 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              MONTH_KW "month"
+              EXTRACT_FIELD
+                MONTH_KW "month"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "

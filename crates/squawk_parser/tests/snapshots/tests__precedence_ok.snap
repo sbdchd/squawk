@@ -60,7 +60,8 @@ SOURCE_FILE
                   R_PAREN ")"
                 R_PAREN ")"
               WHITESPACE " "
-              UNION_KW "UNION"
+              UNION
+                UNION_KW "UNION"
               WHITESPACE " "
               SELECT
                 SELECT_CLAUSE
@@ -83,7 +84,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "foo"
     WHITESPACE " "
-    UNION_KW "UNION"
+    UNION
+      UNION_KW "UNION"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -119,7 +121,8 @@ SOURCE_FILE
               NAME_REF
                 IDENT "foo"
       WHITESPACE " "
-      UNION_KW "UNION"
+      UNION
+        UNION_KW "UNION"
       WHITESPACE " "
       SELECT
         SELECT_CLAUSE

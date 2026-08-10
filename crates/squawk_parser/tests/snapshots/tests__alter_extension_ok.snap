@@ -28,9 +28,10 @@ SOURCE_FILE
     ALTER_EXTENSION_UPDATE
       UPDATE_KW "update"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      JSON_KW "json"
+      UPDATE_TO
+        TO_KW "to"
+        WHITESPACE " "
+        JSON_KW "json"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -44,10 +45,11 @@ SOURCE_FILE
     ALTER_EXTENSION_UPDATE
       UPDATE_KW "update"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      LITERAL
-        STRING "'foo'"
+      UPDATE_TO
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"

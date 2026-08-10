@@ -404,13 +404,14 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "search_path"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      CONFIG_VALUE_NAME
-        IDENT "myschema"
-      COMMA ","
-      CONFIG_VALUE_NAME
-        IDENT "public"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        CONFIG_VALUE_NAME
+          IDENT "myschema"
+        COMMA ","
+        CONFIG_VALUE_NAME
+          IDENT "public"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -422,10 +423,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "search_path"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      CONFIG_VALUE_NAME
-        IDENT "myschema"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        CONFIG_VALUE_NAME
+          IDENT "myschema"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -437,10 +439,11 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "foo"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      CONFIG_VALUE_NAME
-        IDENT "bar"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        CONFIG_VALUE_NAME
+          IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -529,9 +532,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "foo"
       WHITESPACE " "
-      FROM_KW "from"
-      WHITESPACE " "
-      CURRENT_KW "current"
+      FROM_CURRENT
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
@@ -547,9 +551,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "bar"
       WHITESPACE " "
-      FROM_KW "from"
-      WHITESPACE " "
-      CURRENT_KW "current"
+      FROM_CURRENT
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -561,9 +566,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "foo"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      DEFAULT_KW "default"
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
@@ -575,30 +581,31 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "foo"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      CONFIG_VALUE_NAME
-        IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        NUMERIC_NUMBER "10.0"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'foo'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        FALSE_KW "false"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        CONFIG_VALUE_NAME
+          IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          NUMERIC_NUMBER "10.0"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
@@ -610,9 +617,10 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "foo"
       WHITESPACE " "
-      TO_KW "to"
-      WHITESPACE " "
-      DEFAULT_KW "default"
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- operator"

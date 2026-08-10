@@ -390,15 +390,7 @@ fn classify_object_column_path(node: &SyntaxNode) -> Option<NameRefClass> {
 }
 
 pub(crate) fn classify_config_value_name(node: &SyntaxNode) -> Option<NameRefClass> {
-    let parent = node.parent()?;
-    let config_parameter = if let Some(set_config) = ast::SetConfig::cast(parent.clone()) {
-        set_config.config_parameter_ref()
-    } else if let Some(set_config_param) = ast::SetConfigParam::cast(parent) {
-        set_config_param.config_parameter_ref()
-    } else {
-        return None;
-    };
-    if is_search_path(config_parameter) {
+    if is_search_path_config_value(node) {
         Some(NameRefClass::Schema)
     } else {
         None
@@ -410,23 +402,34 @@ pub(crate) fn classify_literal(node: &SyntaxNode) -> Option<NameRefClass> {
     if ast::SetSchemaValue::can_cast(parent.kind()) {
         return Some(NameRefClass::Schema);
     }
-    if let Some(set_config) = ast::SetConfig::cast(parent.clone())
-        && is_search_path(set_config.config_parameter_ref())
-        && set_config
-            .config_values()
-            .any(|config_value| config_value.syntax() == node)
-    {
-        return Some(NameRefClass::Schema);
-    }
-    if let Some(set_config_param) = ast::SetConfigParam::cast(parent)
-        && is_search_path(set_config_param.config_parameter_ref())
-        && set_config_param
-            .literals()
-            .any(|literal| literal.syntax() == node)
-    {
+    if is_search_path_config_value(node) {
         return Some(NameRefClass::Schema);
     }
     None
+}
+
+// set search_path to ...
+fn is_search_path_config_value(node: &SyntaxNode) -> bool {
+    let Some(to_config_value) = node.parent().and_then(ast::ToConfigValue::cast) else {
+        return false;
+    };
+    if !to_config_value
+        .config_values()
+        .any(|config_value| config_value.syntax() == node)
+    {
+        return false;
+    }
+    let Some(parent) = to_config_value.syntax().parent() else {
+        return false;
+    };
+    let config_parameter = if let Some(set_config) = ast::SetConfig::cast(parent.clone()) {
+        set_config.config_parameter_ref()
+    } else if let Some(set_config_param) = ast::SetConfigParam::cast(parent) {
+        set_config_param.config_parameter_ref()
+    } else {
+        return false;
+    };
+    is_search_path(config_parameter)
 }
 
 pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
@@ -1092,9 +1095,7 @@ fn is_grouping_or_distinct_el(node: &SyntaxNode) -> bool {
     node.ancestors()
         .skip(1)
         .find(|n| !ast::ParenExpr::can_cast(n.kind()) && !ast::TupleExpr::can_cast(n.kind()))
-        .is_some_and(|n| {
-            ast::GroupBy::can_cast(n.kind()) || ast::DistinctClause::can_cast(n.kind())
-        })
+        .is_some_and(|n| ast::GroupBy::can_cast(n.kind()) || ast::DistinctOn::can_cast(n.kind()))
 }
 
 fn classify_privilege_object(privilege_objects: &ast::PrivilegeObjects) -> Option<NameRefClass> {

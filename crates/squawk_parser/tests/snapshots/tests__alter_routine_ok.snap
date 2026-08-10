@@ -301,10 +301,11 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "c"
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "1"
+          TO_CONFIG_VALUE
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
         SET_CONFIG_PARAM
@@ -315,9 +316,10 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "c"
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          DEFAULT_KW "default"
+          TO_CONFIG_VALUE
+            EQ "="
+            WHITESPACE " "
+            DEFAULT_KW "default"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
         SET_CONFIG_PARAM
@@ -328,10 +330,11 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "c"
           WHITESPACE " "
-          TO_KW "to"
-          WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          TO_CONFIG_VALUE
+            TO_KW "to"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
       WHITESPACE "\n  "
       RESET_FUNC_OPTION
         RESET_KW "reset"

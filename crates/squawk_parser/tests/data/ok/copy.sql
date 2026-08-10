@@ -1,6 +1,12 @@
 -- simple_copy_from
 copy copytest from '/tmp/copy.data';
 
+-- copy_from_stdin
+COPY country FROM STDIN;
+
+-- copy_from_stdin_with_options
+COPY country (id, name) FROM STDIN (FORMAT csv, HEADER true);
+
 -- copy_to
 COPY country TO STDOUT (DELIMITER '|');
 
@@ -45,4 +51,19 @@ copy t from 'foo' (
   encoding 'utf8',
   log_verbosity verbose
 );
+
+-- legacy_force_quote
+copy country to stdout with csv force quote a, b;
+
+-- legacy_force_quote_star
+copy country to stdout with csv force quote *;
+
+-- legacy_force_not_null
+copy country from stdin with csv force not null a, b;
+
+-- legacy_force_not_null_star
+copy country from stdin with csv force not null *;
+
+-- legacy_options
+copy country from stdin with binary delimiter as '|' null as '\n' quote '"' escape '\' encoding 'utf8';
 

@@ -138,14 +138,15 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "search_path"
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          CONFIG_VALUE_NAME
-            ADMIN_KW "admin"
-          COMMA ","
-          WHITESPACE " "
-          CONFIG_VALUE_NAME
-            IDENT "pg_temp"
+          TO_CONFIG_VALUE
+            EQ "="
+            WHITESPACE " "
+            CONFIG_VALUE_NAME
+              ADMIN_KW "admin"
+            COMMA ","
+            WHITESPACE " "
+            CONFIG_VALUE_NAME
+              IDENT "pg_temp"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_function_with_percent_type"
@@ -1572,9 +1573,10 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "bar"
           WHITESPACE " "
-          FROM_KW "from"
-          WHITESPACE " "
-          CURRENT_KW "current"
+          FROM_CURRENT
+            FROM_KW "from"
+            WHITESPACE " "
+            CURRENT_KW "current"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -1621,10 +1623,11 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "bar"
           WHITESPACE " "
-          TO_KW "to"
-          WHITESPACE " "
-          LITERAL
-            STRING "'foo'"
+          TO_CONFIG_VALUE
+            TO_KW "to"
+            WHITESPACE " "
+            LITERAL
+              STRING "'foo'"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -1671,10 +1674,11 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "bar"
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "1"
+          TO_CONFIG_VALUE
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -2100,10 +2104,11 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "b"
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "10"
+          TO_CONFIG_VALUE
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
       WHITESPACE "\n  "
       AS_FUNC_OPTION
         AS_KW "as"

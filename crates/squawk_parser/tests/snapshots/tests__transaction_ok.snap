@@ -14,35 +14,31 @@ SOURCE_FILE
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
-    WORK
-      WORK_KW "work"
+    WORK_KW "work"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
-    TRANSACTION
-      TRANSACTION_KW "transaction"
+    TRANSACTION_KW "transaction"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
-    AND_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
-    AND_NO_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      NO_KW "no"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
@@ -63,15 +59,13 @@ SOURCE_FILE
   BEGIN
     BEGIN_KW "begin"
     WHITESPACE " "
-    TRANSACTION
-      TRANSACTION_KW "transaction"
+    TRANSACTION_KW "transaction"
     SEMICOLON ";"
   WHITESPACE "\n"
   BEGIN
     BEGIN_KW "begin"
     WHITESPACE " "
-    WORK
-      WORK_KW "work"
+    WORK_KW "work"
     SEMICOLON ";"
   WHITESPACE "\n"
   BEGIN
@@ -305,79 +299,69 @@ SOURCE_FILE
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    ROLLBACK_TO_SAVEPOINT
-      TO_KW "to"
-      WHITESPACE " "
-      SAVEPOINT_KW "savepoint"
-      WHITESPACE " "
-      SAVEPOINT_REF
-        IDENT "foo"
+    TO_KW "to"
+    WHITESPACE " "
+    SAVEPOINT_KW "savepoint"
+    WHITESPACE " "
+    SAVEPOINT_REF
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    WORK
-      WORK_KW "work"
+    WORK_KW "work"
     WHITESPACE " "
-    ROLLBACK_TO_SAVEPOINT
-      TO_KW "to"
-      WHITESPACE " "
-      SAVEPOINT_KW "savepoint"
-      WHITESPACE " "
-      SAVEPOINT_REF
-        IDENT "foo"
+    TO_KW "to"
+    WHITESPACE " "
+    SAVEPOINT_KW "savepoint"
+    WHITESPACE " "
+    SAVEPOINT_REF
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    TRANSACTION
-      TRANSACTION_KW "transaction"
+    TRANSACTION_KW "transaction"
     WHITESPACE " "
-    ROLLBACK_TO_SAVEPOINT
-      TO_KW "to"
-      WHITESPACE " "
-      SAVEPOINT_KW "savepoint"
-      WHITESPACE " "
-      SAVEPOINT_REF
-        IDENT "foo"
+    TO_KW "to"
+    WHITESPACE " "
+    SAVEPOINT_KW "savepoint"
+    WHITESPACE " "
+    SAVEPOINT_REF
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    ROLLBACK_TO_SAVEPOINT
-      TO_KW "to"
-      WHITESPACE " "
-      SAVEPOINT_REF
-        IDENT "foo"
+    TO_KW "to"
+    WHITESPACE " "
+    SAVEPOINT_REF
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    WORK
-      WORK_KW "work"
+    WORK_KW "work"
     WHITESPACE " "
-    ROLLBACK_TO_SAVEPOINT
-      TO_KW "to"
-      WHITESPACE " "
-      SAVEPOINT_REF
-        IDENT "foo"
+    TO_KW "to"
+    WHITESPACE " "
+    SAVEPOINT_REF
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    TRANSACTION
-      TRANSACTION_KW "transaction"
+    TRANSACTION_KW "transaction"
     WHITESPACE " "
-    ROLLBACK_TO_SAVEPOINT
-      TO_KW "to"
-      WHITESPACE " "
-      SAVEPOINT_REF
-        IDENT "foo"
+    TO_KW "to"
+    WHITESPACE " "
+    SAVEPOINT_REF
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMIT
@@ -387,35 +371,31 @@ SOURCE_FILE
   COMMIT
     END_KW "end"
     WHITESPACE " "
-    WORK
-      WORK_KW "work"
+    WORK_KW "work"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
     WHITESPACE " "
-    TRANSACTION
-      TRANSACTION_KW "transaction"
+    TRANSACTION_KW "transaction"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
     WHITESPACE " "
-    AND_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
     WHITESPACE " "
-    AND_NO_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      NO_KW "no"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
@@ -425,35 +405,31 @@ SOURCE_FILE
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
-    WORK
-      WORK_KW "work"
+    WORK_KW "work"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
-    TRANSACTION
-      TRANSACTION_KW "transaction"
+    TRANSACTION_KW "transaction"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
-    AND_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
-    AND_NO_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      NO_KW "no"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
@@ -463,35 +439,31 @@ SOURCE_FILE
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    WORK
-      WORK_KW "work"
+    WORK_KW "work"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    TRANSACTION
-      TRANSACTION_KW "transaction"
+    TRANSACTION_KW "transaction"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    AND_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    AND_NO_CHAIN
-      AND_KW "and"
-      WHITESPACE " "
-      NO_KW "no"
-      WHITESPACE " "
-      CHAIN_KW "chain"
+    AND_KW "and"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK

@@ -539,9 +539,10 @@ SOURCE_FILE
                   TABLE_ALIAS
                     IDENT "t"
           WHITESPACE "\n  "
-          UNION_KW "UNION"
-          WHITESPACE " "
-          ALL_KW "ALL"
+          UNION
+            UNION_KW "UNION"
+            WHITESPACE " "
+            ALL_KW "ALL"
           WHITESPACE "\n    "
           SELECT
             SELECT_CLAUSE
@@ -623,9 +624,10 @@ SOURCE_FILE
         SEARCH_CLAUSE
           SEARCH_KW "SEARCH"
           WHITESPACE " "
-          DEPTH_KW "DEPTH"
-          WHITESPACE " "
-          FIRST_KW "FIRST"
+          DEPTH_FIRST
+            DEPTH_KW "DEPTH"
+            WHITESPACE " "
+            FIRST_KW "FIRST"
           WHITESPACE " "
           BY_KW "BY"
           WHITESPACE " "
@@ -740,9 +742,10 @@ SOURCE_FILE
                   TABLE_ALIAS
                     IDENT "t"
           WHITESPACE "\n  "
-          UNION_KW "UNION"
-          WHITESPACE " "
-          ALL_KW "ALL"
+          UNION
+            UNION_KW "UNION"
+            WHITESPACE " "
+            ALL_KW "ALL"
           WHITESPACE "\n    "
           SELECT
             SELECT_CLAUSE
@@ -824,9 +827,10 @@ SOURCE_FILE
         SEARCH_CLAUSE
           SEARCH_KW "SEARCH"
           WHITESPACE " "
-          BREADTH_KW "BREADTH"
-          WHITESPACE " "
-          FIRST_KW "FIRST"
+          BREADTH_FIRST
+            BREADTH_KW "BREADTH"
+            WHITESPACE " "
+            FIRST_KW "FIRST"
           WHITESPACE " "
           BY_KW "BY"
           WHITESPACE " "
@@ -950,9 +954,10 @@ SOURCE_FILE
                   TABLE_ALIAS
                     IDENT "g"
           WHITESPACE "\n  "
-          UNION_KW "UNION"
-          WHITESPACE " "
-          ALL_KW "ALL"
+          UNION
+            UNION_KW "UNION"
+            WHITESPACE " "
+            ALL_KW "ALL"
           WHITESPACE "\n    "
           SELECT
             SELECT_CLAUSE

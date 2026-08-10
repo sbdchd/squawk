@@ -65,3 +65,11 @@ create property graph foo.bar
       source z
       destination y
   );
+
+-- default label
+create property graph g
+  vertex tables (v default label properties (id));
+
+-- default label with no properties, plus a named label
+create property graph g
+  vertex tables (v default label no properties label l properties (id));

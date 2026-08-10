@@ -144,13 +144,15 @@ SOURCE_FILE
           LITERAL
             STRING "'U'"
     WHITESPACE "\n    "
-    WITH_KW "WITH"
-    WHITESPACE " "
-    LOCAL_KW "LOCAL"
-    WHITESPACE " "
-    CHECK_KW "CHECK"
-    WHITESPACE " "
-    OPTION_KW "OPTION"
+    WITH_CHECK_OPTION
+      WITH_KW "WITH"
+      WHITESPACE " "
+      CHECK_OPTION_LEVEL
+        LOCAL_KW "LOCAL"
+      WHITESPACE " "
+      CHECK_KW "CHECK"
+      WHITESPACE " "
+      OPTION_KW "OPTION"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
@@ -194,13 +196,15 @@ SOURCE_FILE
           LITERAL
             STRING "'PG'"
     WHITESPACE "\n    "
-    WITH_KW "WITH"
-    WHITESPACE " "
-    CASCADED_KW "CASCADED"
-    WHITESPACE " "
-    CHECK_KW "CHECK"
-    WHITESPACE " "
-    OPTION_KW "OPTION"
+    WITH_CHECK_OPTION
+      WITH_KW "WITH"
+      WHITESPACE " "
+      CHECK_OPTION_LEVEL
+        CASCADED_KW "CASCADED"
+      WHITESPACE " "
+      CHECK_KW "CHECK"
+      WHITESPACE " "
+      OPTION_KW "OPTION"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
@@ -378,9 +382,10 @@ SOURCE_FILE
               INT_NUMBER "1"
             R_PAREN ")"
       WHITESPACE "\n"
-      UNION_KW "UNION"
-      WHITESPACE " "
-      ALL_KW "ALL"
+      UNION
+        UNION_KW "UNION"
+        WHITESPACE " "
+        ALL_KW "ALL"
       WHITESPACE "\n    "
       SELECT
         SELECT_CLAUSE
@@ -532,13 +537,15 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "3"
     WHITESPACE "\n"
-    WITH_KW "with"
-    WHITESPACE " "
-    LOCAL_KW "local"
-    WHITESPACE " "
-    CHECK_KW "check"
-    WHITESPACE " "
-    OPTION_KW "option"
+    WITH_CHECK_OPTION
+      WITH_KW "with"
+      WHITESPACE " "
+      CHECK_OPTION_LEVEL
+        LOCAL_KW "local"
+      WHITESPACE " "
+      CHECK_KW "check"
+      WHITESPACE " "
+      OPTION_KW "option"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression test"
@@ -656,7 +663,8 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "1"
         WHITESPACE " "
-        UNION_KW "union"
+        UNION
+          UNION_KW "union"
         WHITESPACE " "
         SELECT
           SELECT_CLAUSE
@@ -698,7 +706,8 @@ SOURCE_FILE
                 INT_NUMBER "2"
               R_PAREN ")"
         WHITESPACE " "
-        UNION_KW "union"
+        UNION
+          UNION_KW "union"
         WHITESPACE " "
         VALUES
           VALUES_KW "values"

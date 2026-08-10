@@ -71,9 +71,10 @@ SOURCE_FILE
               COLUMN_NAME
                 IDENT "column2"
     WHITESPACE "\n"
-    UNION_KW "UNION"
-    WHITESPACE " "
-    ALL_KW "ALL"
+    UNION
+      UNION_KW "UNION"
+      WHITESPACE " "
+      ALL_KW "ALL"
     WHITESPACE "\n"
     COMPOUND_SELECT
       SELECT
@@ -90,9 +91,10 @@ SOURCE_FILE
               LITERAL
                 STRING "'two'"
       WHITESPACE "\n"
-      UNION_KW "UNION"
-      WHITESPACE " "
-      ALL_KW "ALL"
+      UNION
+        UNION_KW "UNION"
+        WHITESPACE " "
+        ALL_KW "ALL"
       WHITESPACE "\n"
       SELECT
         SELECT_CLAUSE
@@ -513,7 +515,8 @@ SOURCE_FILE
             INT_NUMBER "2"
           R_PAREN ")"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     VALUES
       VALUES_KW "values"
@@ -543,7 +546,8 @@ SOURCE_FILE
             INT_NUMBER "1"
           R_PAREN ")"
     WHITESPACE " "
-    UNION_KW "union"
+    UNION
+      UNION_KW "union"
     WHITESPACE " "
     COMPOUND_SELECT
       VALUES
@@ -556,7 +560,8 @@ SOURCE_FILE
               INT_NUMBER "2"
             R_PAREN ")"
       WHITESPACE " "
-      UNION_KW "union"
+      UNION
+        UNION_KW "union"
       WHITESPACE " "
       SELECT
         SELECT_CLAUSE
@@ -581,7 +586,8 @@ SOURCE_FILE
                 INT_NUMBER "1"
               R_PAREN ")"
             WHITESPACE " "
-            UNION_KW "union"
+            UNION
+              UNION_KW "union"
             WHITESPACE " "
             COMPOUND_SELECT
               VALUES
@@ -594,7 +600,8 @@ SOURCE_FILE
                       INT_NUMBER "2"
                     R_PAREN ")"
               WHITESPACE " "
-              UNION_KW "union"
+              UNION
+                UNION_KW "union"
               WHITESPACE " "
               SELECT
                 SELECT_CLAUSE
