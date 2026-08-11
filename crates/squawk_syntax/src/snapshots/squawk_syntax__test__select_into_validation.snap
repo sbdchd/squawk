@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_syntax/src/test.rs
+assertion_line: 126
 input_file: crates/squawk_syntax/test_data/validation/select_into.sql
 ---
 SOURCE_FILE@0..858
@@ -144,23 +145,23 @@ SOURCE_FILE@0..858
   COMMENT@154..231 "-- error, only the le ..."
   WHITESPACE@231..232 "\n"
   COMPOUND_SELECT@232..284
-    SELECT@232..242
-      SELECT_CLAUSE@232..242
-        SELECT_KW@232..238 "select"
-        WHITESPACE@238..239 " "
-        TARGET_LIST@239..242
-          TARGET@239..242
-            LITERAL@239..240
-              INT_NUMBER@239..240 "1"
-            WHITESPACE@240..241 " "
-            AS_NAME@241..242
-              COLUMN_NAME@241..242
-                IDENT@241..242 "a"
-    WHITESPACE@242..243 " "
-    UNION@243..248
-      UNION_KW@243..248 "union"
-    WHITESPACE@248..249 " "
-    COMPOUND_SELECT@249..283
+    COMPOUND_SELECT@232..266
+      SELECT@232..242
+        SELECT_CLAUSE@232..242
+          SELECT_KW@232..238 "select"
+          WHITESPACE@238..239 " "
+          TARGET_LIST@239..242
+            TARGET@239..242
+              LITERAL@239..240
+                INT_NUMBER@239..240 "1"
+              WHITESPACE@240..241 " "
+              AS_NAME@241..242
+                COLUMN_NAME@241..242
+                  IDENT@241..242 "a"
+      WHITESPACE@242..243 " "
+      UNION@243..248
+        UNION_KW@243..248 "union"
+      WHITESPACE@248..249 " "
       SELECT_INTO@249..266
         SELECT_CLAUSE@249..259
           SELECT_KW@249..255 "select"
@@ -181,22 +182,22 @@ SOURCE_FILE@0..858
             PATH@265..266
               PATH_SEGMENT@265..266
                 IDENT@265..266 "t"
-      WHITESPACE@266..267 " "
-      UNION@267..272
-        UNION_KW@267..272 "union"
-      WHITESPACE@272..273 " "
-      SELECT@273..283
-        SELECT_CLAUSE@273..283
-          SELECT_KW@273..279 "select"
-          WHITESPACE@279..280 " "
-          TARGET_LIST@280..283
-            TARGET@280..283
-              LITERAL@280..281
-                INT_NUMBER@280..281 "3"
-              WHITESPACE@281..282 " "
-              AS_NAME@282..283
-                COLUMN_NAME@282..283
-                  IDENT@282..283 "a"
+    WHITESPACE@266..267 " "
+    UNION@267..272
+      UNION_KW@267..272 "union"
+    WHITESPACE@272..273 " "
+    SELECT@273..283
+      SELECT_CLAUSE@273..283
+        SELECT_KW@273..279 "select"
+        WHITESPACE@279..280 " "
+        TARGET_LIST@280..283
+          TARGET@280..283
+            LITERAL@280..281
+              INT_NUMBER@280..281 "3"
+            WHITESPACE@281..282 " "
+            AS_NAME@282..283
+              COLUMN_NAME@282..283
+                IDENT@282..283 "a"
     SEMICOLON@283..284 ";"
   WHITESPACE@284..285 "\n"
   COMPOUND_SELECT@285..320

@@ -1,9 +1,10 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
+assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/select_compound_precedence.sql
 ---
 SOURCE_FILE
-  COMMENT "-- INTERSECT binds more tightly than UNION, regardless of which comes first."
+  COMMENT "-- INTERSECT has stronger precedence than UNION"
   WHITESPACE "\n"
   COMPOUND_SELECT
     COMPOUND_SELECT
@@ -41,6 +42,10 @@ SOURCE_FILE
               INT_NUMBER "3"
     SEMICOLON ";"
   WHITESPACE "\n"
+  COMMENT "-- so this is:"
+  WHITESPACE "\n"
+  COMMENT "-- (select 1 intersect select 2) union select 3;"
+  WHITESPACE "\n\n"
   COMPOUND_SELECT
     SELECT
       SELECT_CLAUSE
@@ -76,8 +81,12 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "3"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- and this is:"
+  WHITESPACE "\n"
+  COMMENT "-- select 1 union (select 2 intersect select 3);"
   WHITESPACE "\n\n"
-  COMMENT "-- UNION and EXCEPT have equal precedence and associate to the left."
+  COMMENT "-- UNION and EXCEPT are left associative"
   WHITESPACE "\n"
   COMPOUND_SELECT
     COMPOUND_SELECT
@@ -151,7 +160,7 @@ SOURCE_FILE
               INT_NUMBER "3"
     SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMENT "-- Parentheses override precedence and associativity."
+  COMMENT "-- parens override precedence and associativity"
   WHITESPACE "\n"
   COMPOUND_SELECT
     SELECT
