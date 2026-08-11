@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/select_compound_precedence.sql
 ---
 SOURCE_FILE
@@ -238,5 +237,72 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "3"
       R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing clauses belong to the outermost compound select"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    COMPOUND_SELECT
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+      WHITESPACE " "
+      UNION
+        UNION_KW "union"
+      WHITESPACE " "
+      COMPOUND_SELECT
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+        WHITESPACE " "
+        INTERSECT
+          INTERSECT_KW "intersect"
+        WHITESPACE " "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "3"
+    WHITESPACE " "
+    UNION
+      UNION_KW "union"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "4"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
     SEMICOLON ";"
   WHITESPACE "\n"
