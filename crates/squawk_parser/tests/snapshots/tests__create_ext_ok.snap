@@ -61,10 +61,11 @@ SOURCE_FILE
       SCHEMA_REF
         IDENT "bar"
     WHITESPACE "\n  "
-    EXTENSION_VERSION
+    EXTENSION_VERSION_CLAUSE
       VERSION_KW "version"
       WHITESPACE " "
-      IDENT "foo"
+      EXTENSION_VERSION
+        IDENT "foo"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -83,7 +84,7 @@ SOURCE_FILE
       SCHEMA_REF
         IDENT "bar"
     WHITESPACE "\n  "
-    EXTENSION_VERSION
+    EXTENSION_VERSION_CLAUSE
       VERSION_KW "version"
       WHITESPACE " "
       LITERAL

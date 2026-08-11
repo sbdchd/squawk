@@ -98,6 +98,27 @@ impl ast::Constraint {
         support::child::<ast::ConstraintNameClause>(self.syntax())
             .and_then(|clause| clause.constraint_name())
     }
+
+    #[inline]
+    pub fn constraint_options(&self) -> ast::AstChildren<ast::ConstraintOption> {
+        match self {
+            ast::Constraint::CheckConstraint(it) => it.constraint_options(),
+            ast::Constraint::DefaultConstraint(it) => it.constraint_options(),
+            ast::Constraint::ExcludeConstraint(it) => it.constraint_options(),
+            ast::Constraint::ForeignKeyConstraint(it) => it.constraint_options(),
+            ast::Constraint::GeneratedConstraint(it) => it.constraint_options(),
+            ast::Constraint::NotNullConstraint(it) => it.constraint_options(),
+            ast::Constraint::NullConstraint(it) => it.constraint_options(),
+            ast::Constraint::PrimaryKeyConstraint(it) => it.constraint_options(),
+            ast::Constraint::ReferencesConstraint(it) => it.constraint_options(),
+            ast::Constraint::UniqueConstraint(it) => it.constraint_options(),
+        }
+    }
+
+    pub fn is_not_valid(&self) -> bool {
+        self.constraint_options()
+            .any(|option| matches!(option, ast::ConstraintOption::NotValid(_)))
+    }
 }
 
 impl ast::CreateSchema {
@@ -202,6 +223,15 @@ pub enum PostfixOp {
     NotNull(SyntaxToken),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PrefixOp {
+    CustomOp(ast::CustomOp),
+    Minus(SyntaxToken),
+    Not(SyntaxToken),
+    OperatorCall(ast::OperatorCall),
+    Plus(SyntaxToken),
+}
+
 impl ast::BinExpr {
     #[inline]
     pub fn lhs(&self) -> Option<ast::Expr> {
@@ -272,6 +302,35 @@ impl ast::BinExpr {
                             BinOp::OperatorCall(ast::OperatorCall { syntax: node })
                         }
                         SyntaxKind::SIMILAR_TO => BinOp::SimilarTo(ast::SimilarTo { syntax: node }),
+                        _ => continue,
+                    };
+                    return Some(op);
+                }
+            }
+        }
+        None
+    }
+}
+
+impl ast::PrefixExpr {
+    pub fn op(&self) -> Option<PrefixOp> {
+        for child in self.syntax().children_with_tokens() {
+            match child {
+                NodeOrToken::Token(token) => {
+                    let op = match token.kind() {
+                        SyntaxKind::MINUS => PrefixOp::Minus(token),
+                        SyntaxKind::NOT_KW => PrefixOp::Not(token),
+                        SyntaxKind::PLUS => PrefixOp::Plus(token),
+                        _ => continue,
+                    };
+                    return Some(op);
+                }
+                NodeOrToken::Node(node) => {
+                    let op = match node.kind() {
+                        SyntaxKind::CUSTOM_OP => PrefixOp::CustomOp(ast::CustomOp { syntax: node }),
+                        SyntaxKind::OPERATOR_CALL => {
+                            PrefixOp::OperatorCall(ast::OperatorCall { syntax: node })
+                        }
                         _ => continue,
                     };
                     return Some(op);

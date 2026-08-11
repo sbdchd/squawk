@@ -119,5 +119,19 @@ select
 with t as (select 1)
 select * from t;
 
+-- semicolon not allowed
+(select 1;);
+
+-- compound select requires a select on the left
+select (1 union select 2);
+select ((1) union select 2);
+select (((((1)))) union select 1);
+
+-- compound w/ empty parens
+select 1 union ();
+
+-- compound missing select
+select * from (foo union select 1);
+
 -- trailing comma at EOF
 select 1,

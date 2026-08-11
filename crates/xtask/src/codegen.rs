@@ -921,6 +921,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
                     #[inline]
                     fn can_cast(kind: SyntaxKind) -> bool {
                         matches!(kind, #(SyntaxKind::#kinds)|*)
+                            #(|| #cast_variants::can_cast(kind))*
                     }
                     #[inline]
                     fn cast(syntax: SyntaxNode) -> Option<Self> {

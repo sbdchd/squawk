@@ -179,6 +179,7 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::Checkpoint(_)
         | ast::Stmt::Close(_)
         | ast::Stmt::Commit(_)
+        | ast::Stmt::CompoundSelect(_)
         | ast::Stmt::Copy(_)
         | ast::Stmt::Deallocate(_)
         | ast::Stmt::Declare(_)

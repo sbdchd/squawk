@@ -33,16 +33,20 @@ SOURCE_FILE
     COPY_OPTION_LIST
       L_PAREN "("
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "on_error"
         WHITESPACE " "
-        IGNORE_KW "ignore"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            IGNORE_KW "ignore"
       WHITESPACE "  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "log_verbosity"
         WHITESPACE " "
-        VERBOSE_KW "verbose"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            VERBOSE_KW "verbose"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

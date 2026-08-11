@@ -550,24 +550,26 @@ SOURCE_FILE
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        TYPE_KW "type"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH_REF
-            PATH_SEGMENT_REF
-              IDENT "t"
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "t"
         COMMA ","
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        TYPE_KW "type"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH_REF
-            PATH_SEGMENT_REF
-              IDENT "b"
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "b"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -614,18 +616,19 @@ SOURCE_FILE
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        TYPE_KW "type"
-        WHITESPACE " "
-        CHAR_TYPE
-          VARCHAR_KW "varchar"
-          ARG_LIST
-            L_PAREN "("
-            ARG
-              LITERAL
-                INT_NUMBER "100"
-            R_PAREN ")"
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          CHAR_TYPE
+            VARCHAR_KW "varchar"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "100"
+              R_PAREN ")"
       WHITESPACE "\n"
       AS_FUNC_OPTION
         AS_KW "as"
@@ -2032,14 +2035,15 @@ SOURCE_FILE
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        TYPE_KW "type"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH_REF
-            PATH_SEGMENT_REF
-              IDENT "foo"
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "foo"
       WHITESPACE "\n  "
       WINDOW_FUNC_OPTION
         WINDOW_KW "window"

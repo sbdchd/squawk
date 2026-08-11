@@ -253,14 +253,15 @@ SOURCE_FILE
         PATH_SEGMENT
           IDENT "t"
     WHITESPACE " \n  "
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "u"
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "u"
     WHITESPACE "\n    "
     PARTITION_DEFAULT
       DEFAULT_KW "default"
@@ -293,18 +294,19 @@ SOURCE_FILE
         PATH_SEGMENT
           IDENT "t"
     WHITESPACE " \n  "
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "foo"
+          DOT "."
           PATH_SEGMENT_REF
-            IDENT "foo"
-        DOT "."
-        PATH_SEGMENT_REF
-          IDENT "u"
+            IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
@@ -418,14 +420,15 @@ SOURCE_FILE
         PATH_SEGMENT
           IDENT "t"
     WHITESPACE " \n  "
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "u"
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
@@ -481,14 +484,15 @@ SOURCE_FILE
         PATH_SEGMENT
           IDENT "t"
     WHITESPACE " \n  "
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "u"
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
@@ -565,14 +569,15 @@ SOURCE_FILE
         PATH_SEGMENT
           IDENT "t"
     WHITESPACE " \n  "
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "u"
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "u"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "

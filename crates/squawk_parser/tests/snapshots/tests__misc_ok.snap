@@ -2066,18 +2066,21 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           FORMAT_KW "FORMAT"
         WHITESPACE " "
-        CSV_KW "csv"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            CSV_KW "csv"
       COMMA ","
       WHITESPACE "\n        "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           DELIMITER_KW "DELIMITER"
         WHITESPACE " "
-        LITERAL
-          ESC_STRING "E'\\t'"
+        COPY_OPTION_VALUE
+          LITERAL
+            ESC_STRING "E'\\t'"
       WHITESPACE "\n        "
       R_PAREN ")"
     SEMICOLON ";"

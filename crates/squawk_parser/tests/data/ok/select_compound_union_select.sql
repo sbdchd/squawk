@@ -12,6 +12,7 @@ SELECT (
 ) LIMIT 1;
 
 select * from t union table t;
+select (1) union select 2;
 table t union table t;
 (select 1) union (table t);
 

@@ -68,7 +68,8 @@ ParamNameRef =
   '#name'?
 
 ParamList =
-  (Param (',' Param)*)?
+  '(' '*' ')'
+| '(' (Param (',' Param)*)? ('order' 'by' (Param (',' Param)*))? ')'
 
 ArgList =
  '(' '*' ')'
@@ -118,7 +119,7 @@ JsonScalarFn =
   'json_scalar' '(' Expr ')'
 
 JsonFn =
-  'json' '(' JsonExprFormat JsonKeysUniqueClause? ')'
+  'json' '(' Expr JsonFormatClause? JsonKeysUniqueClause? ')'
 
 JsonSelectFormat =
   SelectVariant JsonFormatClause?
@@ -163,13 +164,13 @@ JsonExistsFn =
 
 JsonObjectFn =
   'json_object' '('
-    (JsonReturningClause
-    | (JsonKeyValue (',' JsonKeyValue)*)
-      JsonNullClause?
-      JsonKeysUniqueClause?
-      JsonReturningClause?
-    )
-
+    ((Expr (',' Expr)*)
+    | ((JsonKeyValue (',' JsonKeyValue)*)
+       JsonNullClause?
+       JsonKeysUniqueClause?
+       JsonReturningClause?)
+    | JsonReturningClause
+    )?
   ')'
 
 JsonObjectAggFn =
@@ -317,15 +318,19 @@ OverlayPlacing =
   string:Expr 'placing' placing:Expr 'from' from:Expr ('for' for:Expr)?
 
 OverlayExprs =
-  (Expr (',' Expr)*)
+  OverlayExpr (',' OverlayExpr)*
+
+OverlayExpr =
+  Expr
+| NamedArg
 
 TrimFn =
   'trim' '('
     TrimSide?
     (
       'from' (Expr (',' Expr)*)
-     | Expr 'from' Expr
-     | (Expr (',' Expr)*)?
+    | (Expr 'from' (Expr (',' Expr)*))
+    | (Expr (',' Expr)*)
     )
   ')'
 
@@ -408,9 +413,7 @@ XmlElementFn =
     'name'
     tag:ElementTag
     (
-      ',' 'xmlattributes' '('
-           ExprAsXmlAttrList
-        ')'
+      ',' 'xmlattributes' ExprAsXmlAttrList
         (',' (Expr (',' Expr)*))?
     | ',' (Expr (',' Expr)*)
     )?
@@ -423,31 +426,31 @@ ExprAsColumnName =
   Expr ('as' ColumnName)?
 
 ExprAsColumnNameList =
-  (ExprAsColumnName (',' ExprAsColumnName)*)
+  '(' (ExprAsColumnName (',' ExprAsColumnName)*) ')'
 
 ExprAsElementTag =
   Expr ('as' tag:ElementTag)?
 
 ExprAsElementTagList =
-  (ExprAsElementTag (',' ExprAsElementTag)*)
+  '(' (ExprAsElementTag (',' ExprAsElementTag)*) ')'
 
 ExprAsPropertyName =
   Expr ('as' PropertyName)?
 
 ExprAsPropertyNameList =
-  (ExprAsPropertyName (',' ExprAsPropertyName)*)
+  '(' (ExprAsPropertyName (',' ExprAsPropertyName)*) ')'
 
 ExprAsXmlAttr =
   Expr ('as' attr:XmlAttr)?
 
 ExprAsXmlAttrList =
-  (ExprAsXmlAttr (',' ExprAsXmlAttr)*)
+  '(' (ExprAsXmlAttr (',' ExprAsXmlAttr)*) ')'
 
 XmlAttr =
   '#name'?
 
 XmlForestFn =
-  'xmlforest' '(' ExprAsElementTagList ')'
+  'xmlforest' ExprAsElementTagList
 
 XmlExistsFn =
   'xmlexists' '(' XmlRowPassingClause ')'
@@ -961,7 +964,7 @@ ConstraintNameRef =
 CheckConstraint  =
   ConstraintNameClause?
   'check' '(' Expr ')'
-  NoInherit?
+  ConstraintOption*
 
 UsingIndexName =
   'using' 'index' IndexRef
@@ -995,15 +998,13 @@ QualifiedColumnNameRef =
 
 Column =
   name:ColumnName
-  WithOptions?
   Type?
   Storage?
   CompressionMethod?
+  WithOptions?
+  AlterOptionList?
   Collate?
   constraints:ColumnConstraint*
-  DeferrableConstraintOption? NotDeferrableConstraintOption?
-  InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
-  NotEnforced? Enforced?
 
 // Used by Insert / Update
 ColumnTarget =
@@ -1053,11 +1054,13 @@ UniqueConstraint =
   ConstraintNameClause?
   'unique'
   (using_index:UsingIndexName | IndexParameters)
+  ConstraintOption*
 
 PrimaryKeyConstraint =
   ConstraintNameClause?
   'primary' 'key'
   (using_index:UsingIndexName | IndexParameters)
+  ConstraintOption*
 
 IndexParameters =
   NullsDistinctOption?
@@ -1120,6 +1123,18 @@ ForeignKeyConstraint =
   MatchType?
   OnDeleteAction?
   OnUpdateAction?
+  ConstraintOption*
+
+ConstraintOption =
+  DeferrableConstraintOption
+| NotDeferrableConstraintOption
+| InitiallyImmediateConstraintOption
+| InitiallyDeferredConstraintOption
+| NotValid
+| NoInherit
+| Inherit
+| NotEnforced
+| Enforced
 
 DeferrableConstraintOption =
   'deferrable'
@@ -1144,20 +1159,23 @@ NotNullConstraint =
   ConstraintNameClause?
   'not' 'null'
   ColumnNameRef?
-  NoInherit?
+  ConstraintOption*
 
 NullConstraint =
   ConstraintNameClause?
   'null'
+  ConstraintOption*
 
 DefaultConstraint =
   ConstraintNameClause?
   'default' Expr
+  ConstraintOption*
 
 GeneratedConstraint =
   ConstraintNameClause?
   'generated'
   GeneratedAs
+  ConstraintOption*
 
 GeneratedIdentity =
   GeneratedWhen 'as' 'identity' SequenceOptionList?
@@ -1191,6 +1209,7 @@ ReferencesConstraint =
   MatchType?
   OnDeleteAction?
   OnUpdateAction?
+  ConstraintOption*
 
 AlterTableAction =
   ValidateConstraint
@@ -1241,7 +1260,18 @@ OptionItemList =
  '(' (OptionItem (',' OptionItem)*) ')'
 
 OptionItem =
- ('default' | Expr)
+  OptionItemKey OptionItemValue?
+
+OptionItemKey =
+  '#name'?
+
+OptionItemValue =
+  Expr
+| OptionItemValueName
+| 'default'
+
+OptionItemValueName =
+  '#name'?
 
 RelationName =
   'only' ( '(' RelationNameRef ')' | RelationNameRef )
@@ -1585,9 +1615,15 @@ JoinExpr =
 
 ParenSelect =
   WithClause?
- '('
+  '('
   select:SelectVariant
- ')' ';'?
+  ')'
+  OrderByClause?
+  LockingClause*
+  LimitClause?
+  OffsetClause?
+  FetchClause?
+  ';'?
 
 Select =
  WithClause?
@@ -1677,7 +1713,13 @@ DropTable =
   DropBehavior? ';'?
 
 DropDatabase =
-  'drop' 'database' IfExists? DatabaseRef ';'?
+  'drop' 'database' IfExists? DatabaseRef DropDatabaseForceClause? ';'?
+
+DropDatabaseForceClause =
+  'with'? '(' (Force (',' Force)*) ')'
+
+Force =
+  'force'
 
 IfNotExists =
   'if' 'not' 'exists'
@@ -1889,6 +1931,7 @@ NotValid =
 
 Constraint =
   DefaultConstraint
+| ExcludeConstraint
 | GeneratedConstraint
 | ReferencesConstraint
 | PrimaryKeyConstraint
@@ -1900,14 +1943,6 @@ Constraint =
 
 AddConstraint =
   'add' Constraint
-  DeferrableConstraintOption?
-  NotDeferrableConstraintOption?
-  InitiallyDeferredConstraintOption?
-  InitiallyImmediateConstraintOption?
-  NotValid?
-  NoInherit?
-  NotEnforced?
-  Enforced?
 
 DropConstraint =
   'drop' 'constraint' IfExists? ConstraintNameRef DropBehavior?
@@ -2043,7 +2078,7 @@ AlterTable =
   'alter' 'table'
   (
     AllInTablespace
-  | IfExists? TableRelationName actions:AlterTableAction*
+  | IfExists? TableRelationName actions:(AlterTableAction (',' AlterTableAction)*)?
   ) ';'?
 
 AllInTablespace =
@@ -2058,7 +2093,7 @@ Revoke =
   DropBehavior? ';'?
 
 Row =
-  (Expr (',' Expr)*)
+  '(' (Expr (',' Expr)*) ')'
 
 RowList =
   (Row (',' Row)*)
@@ -2360,16 +2395,17 @@ ReleaseSavepoint =
   'release' 'savepoint' SavepointRef ';'?
 
 ParenExpr =
-  '(' (Expr | Select | FromItem | JoinExpr) ')'
+  '(' (Expr | Select | CompoundSelect | Table | Values | FromItem | JoinExpr) ')'
 
 TupleExpr =
-  '(' (Expr (',' Expr)*) ')'
+  'row' '(' (Expr (',' Expr)*)? ')'
+| '(' Expr ',' (Expr (',' Expr)*) ')'
 
 PrefixExpr =
-  Expr
+  op:Op Expr
 
 PostfixExpr =
-  Expr
+  Expr op:Op
 
 NonStandardParam =
   ':' name:BindParamNameRef
@@ -2417,7 +2453,7 @@ JsonTableColumnList =
   'columns' '(' (JsonTableColumn (',' JsonTableColumn)*) ')'
 
 JsonReturningClause =
-  'returning' Type
+  'returning' Type JsonFormatClause?
 
 JsonNullClause =
   JsonAbsentOnNull
@@ -2858,6 +2894,7 @@ ExcludeConstraint =
   WithParams?
   ConstraintIndexTablespace?
   WhereConditionClause?
+  ConstraintOption*
 
 FrameClause =
   FrameUnits
@@ -3141,7 +3178,7 @@ AlterLargeObject =
   'alter' 'large' 'object' Literal 'owner' 'to' RoleRef ';'?
 
 AlterLanguage =
-  'alter' 'language' LanguageRef action:AlterLanguageAction? ';'?
+  'alter' 'procedural'? 'language' LanguageRef action:AlterLanguageAction? ';'?
 
 AlterLanguageAction =
   LanguageRenameTo
@@ -3194,7 +3231,7 @@ AlterFunctionAction =
 
 AlterForeignTable =
   'alter' 'foreign' 'table' IfExists? TableRelationName
-  actions:AlterTableAction* ';'?
+  actions:(AlterTableAction (',' AlterTableAction)*)? ';'?
 
 AlterForeignDataWrapper =
   'alter' 'foreign' 'data' 'wrapper' ForeignDataWrapperRef
@@ -3274,7 +3311,7 @@ AlterExtensionUpdate =
   'update' UpdateTo?
 
 UpdateTo =
-  'to' ('#ident' | Literal)
+  'to' (ExtensionVersion | Literal)
 
 AlterExtensionAdd =
   'add' ExtensionMemberObject
@@ -3922,7 +3959,7 @@ AllProperties =
   'properties' 'all' 'columns'
 
 Properties = 
-  'properties' '(' ExprAsPropertyNameList ')'
+  'properties' ExprAsPropertyNameList
 
 LabelAndPropertiesList =
   (LabelAndProperties (',' LabelAndProperties)*)
@@ -4031,7 +4068,7 @@ DropVertexEdgeLabel =
 AddVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
     'alter' 'label' LabelRef
-    'add' 'properties' '(' ExprAsPropertyNameList ')'
+    'add' 'properties' ExprAsPropertyNameList
 
 DropVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
@@ -4042,7 +4079,7 @@ DropPropertyGraph =
   'drop' 'property' 'graph' IfExists? PropertyGraphRef DropBehavior? ';'?
 
 GraphTableFn =
-  'graph_table' '(' PropertyGraphRef 'match' PathPatternList WhereClause? 'columns' '(' ExprAsColumnNameList ')' ')'
+  'graph_table' '(' PropertyGraphRef 'match' PathPatternList WhereClause? 'columns' ExprAsColumnNameList ')'
 
 PathPatternList =
   (PathPattern (',' PathPattern)*)
@@ -4669,7 +4706,7 @@ ExplainOptionName =
   '#name'?
 
 ExplainOptionValue =
-  Literal
+  Expr
 | 'binary'
 | '#ident'
 | 'json'
@@ -4703,10 +4740,10 @@ ImportForeignSchema =
   AlterOptionList? ';'?
 
 LimitToTables =
-  'limit' 'to' (RemoteTableNameRef (',' RemoteTableNameRef)*)
+  'limit' 'to' '(' (RemoteTableNameRef (',' RemoteTableNameRef)*) ')'
 
 ExceptTables =
-  'except' (RemoteTableNameRef (',' RemoteTableNameRef)*)
+  'except' '(' (RemoteTableNameRef (',' RemoteTableNameRef)*) ')'
 
 IntoSchema =
   'into' SchemaRef
@@ -4939,7 +4976,7 @@ Immediate =
   'immediate'
 
 SetRole =
-  'set' SetScope? 'role' (RoleRef | 'none')? ';'?
+  'set' SetScope? 'role' (RoleRef | Literal | 'none') ';'?
 
 ResetRole =
   'reset' 'role' ';'?
@@ -5156,7 +5193,7 @@ VacuumOptionName =
   '#name'?
 
 VacuumOptionValue =
-  Literal
+  Expr
 | VacuumOptionValueName
 | 'no'
 | 'yes'
@@ -5197,9 +5234,21 @@ CopyOptionList =
   '(' (CopyOption (',' CopyOption)*)? ')'
 
 CopyOption =
-  CopyOptionName (CopyOptionList | Literal | 'default' | 'on' | 'off' | '*' | '#ident')?
+  CopyOptionKey CopyOptionValue?
 
-CopyOptionName =
+CopyOptionKey =
+  '#name'?
+
+CopyOptionValue =
+  CopyOptionList
+| CopyOptionValueName
+| Expr
+| 'default'
+| 'on'
+| 'off'
+| '*'
+
+CopyOptionValueName =
   '#name'?
 
 CopyLegacyOption =
@@ -5397,14 +5446,17 @@ CreateExtension =
   'create' 'extension' IfNotExists? Extension
   'with'?
   ExtensionSchema?
-  ExtensionVersion?
+  ExtensionVersionClause?
   'cascade'? ';'?
 
 ExtensionSchema =
   'schema' SchemaRef
 
+ExtensionVersionClause =
+  'version' (Literal | ExtensionVersion)
+
 ExtensionVersion =
-  'version' (Literal | '#ident')
+  '#name'?
 
 Set =
   'set'
@@ -5493,7 +5545,10 @@ LanguageFuncOption =
   'language' (LanguageRef | Literal)
 
 TransformFuncOption =
-  'transform' Type*
+  'transform' (TransformForType (',' TransformForType)*)
+
+TransformForType =
+  'for' 'type' Type
 
 WindowFuncOption =
   'window'
@@ -5678,7 +5733,7 @@ DropColumn =
  DropBehavior?
 
 AddColumn =
-  'add' 'column'? IfNotExists? ColumnName Type Collate? (Constraint (',' Constraint)*)?
+  'add' 'column'? IfNotExists? ColumnName Type AlterOptionList? Collate? constraints:Constraint*
 
 PartitionForValuesWith =
   'for' 'values' 'with' '(' modulus:PartitionModulus ',' remainder:PartitionRemainder ')'
@@ -5726,7 +5781,7 @@ SetWithoutOids =
   'set' 'without' 'oids'
 
 SetAccessMethod =
-  'set' 'access' 'method' AccessMethodRef
+  'set' 'access' 'method' (AccessMethodRef | 'default')
 
 SetLogged =
   'set' 'logged'
@@ -5792,10 +5847,15 @@ ResetOptions =
   'reset' AttributeList
 
 SetType =
-  'set' 'type' Type Collate?
+  ('set' 'data')? 'type' Type Collate? ('using' Expr)?
 
 SetGeneratedOptions =
-  'set' 'generated'
+  SetGeneratedOption*
+
+SetGeneratedOption =
+  SetGenerated
+| SetSequenceOption
+| Restart
 
 SetOptionsList =
   'set' 'options' AlterOptionList
@@ -5805,10 +5865,10 @@ AlterSetStatistics =
   (SetStatistics | SetOptions)
 
 SetExpression =
-  'set' 'expression' Expr
+  'set' 'expression' 'as' '(' Expr ')'
 
 SetStatistics =
-  'set' 'statistics' ('default' | Literal)
+  'set' 'statistics' ('default' | Expr)
 
 SetOptions =
   'set' AttributeList
@@ -6018,6 +6078,7 @@ Stmt =
 | Update
 | Vacuum
 | Values
+| CompoundSelect
 | ParenSelect
 | EmptyStmt
 

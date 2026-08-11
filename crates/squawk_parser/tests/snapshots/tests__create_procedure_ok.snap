@@ -107,28 +107,30 @@ SOURCE_FILE
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        TYPE_KW "type"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH_REF
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "foo"
+              DOT "."
               PATH_SEGMENT_REF
-                IDENT "foo"
-            DOT "."
-            PATH_SEGMENT_REF
-              IDENT "t"
+                IDENT "t"
         COMMA ","
         WHITESPACE " "
-        FOR_KW "for"
-        WHITESPACE " "
-        TYPE_KW "type"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH_REF
-            PATH_SEGMENT_REF
-              TEXT_KW "text"
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                TEXT_KW "text"
       WHITESPACE "\n"
       SECURITY_INVOKER_FUNC_OPTION
         EXTERNAL_KW "external"

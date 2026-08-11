@@ -3388,11 +3388,11 @@ SOURCE_FILE
           LITERAL
             NULL_KW "null"
         R_PAREN ")"
-      WHITESPACE " "
-      NOT_VALID
-        NOT_KW "not"
         WHITESPACE " "
-        VALID_KW "valid"
+        NOT_VALID
+          NOT_KW "not"
+          WHITESPACE " "
+          VALID_KW "valid"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- rename column"

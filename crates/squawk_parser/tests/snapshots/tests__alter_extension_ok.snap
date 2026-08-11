@@ -31,7 +31,8 @@ SOURCE_FILE
       UPDATE_TO
         TO_KW "to"
         WHITESPACE " "
-        JSON_KW "json"
+        EXTENSION_VERSION
+          JSON_KW "json"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION

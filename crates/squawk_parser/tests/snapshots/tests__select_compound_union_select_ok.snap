@@ -316,6 +316,32 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            PAREN_EXPR
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+    WHITESPACE " "
+    UNION
+      UNION_KW "union"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
     TABLE
       TABLE_KW "table"
       WHITESPACE " "

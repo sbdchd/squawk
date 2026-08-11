@@ -68,8 +68,8 @@ fn not_valid_validate_in_transaction(
                             }
                         }
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
-                            if add_constraint.not_valid().is_some()
-                                && let Some(constraint) = add_constraint.constraint()
+                            if let Some(constraint) = add_constraint.constraint()
+                                && constraint.is_not_valid()
                                 && let Some(constraint_name) = constraint.constraint_name()
                             {
                                 not_valid_names.insert(constraint_name.text());
@@ -115,18 +115,16 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
             };
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddConstraint(add_constraint) = action {
-                    if !tables_created.contains(&table_name) && add_constraint.not_valid().is_none()
+                    if !tables_created.contains(&table_name)
+                        && let Some(constraint) = add_constraint.constraint()
+                        && !constraint.is_not_valid()
                     {
-                        if let Some(ast::Constraint::UniqueConstraint(uc)) =
-                            add_constraint.constraint()
-                        {
+                        if let ast::Constraint::UniqueConstraint(uc) = &constraint {
                             if uc.using_index().is_some() {
                                 continue;
                             }
                         }
-                        if let Some(ast::Constraint::PrimaryKeyConstraint(pk)) =
-                            add_constraint.constraint()
-                        {
+                        if let ast::Constraint::PrimaryKeyConstraint(pk) = &constraint {
                             if pk.using_index().is_some() {
                                 continue;
                             }

@@ -22,10 +22,12 @@ SOURCE_FILE
     DATABASE_REF
       IDENT "d"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE " "
-    FORCE_KW "force"
-    R_PAREN ")"
+    DROP_DATABASE_FORCE_CLAUSE
+      L_PAREN "("
+      WHITESPACE " "
+      FORCE
+        FORCE_KW "force"
+      R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_DATABASE
@@ -36,16 +38,19 @@ SOURCE_FILE
     DATABASE_REF
       IDENT "d"
     WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE " "
-    FORCE_KW "force"
-    COMMA ","
-    WHITESPACE " "
-    FORCE_KW "force"
-    WHITESPACE " "
-    R_PAREN ")"
+    DROP_DATABASE_FORCE_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE " "
+      FORCE
+        FORCE_KW "force"
+      COMMA ","
+      WHITESPACE " "
+      FORCE
+        FORCE_KW "force"
+      WHITESPACE " "
+      R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_DATABASE
