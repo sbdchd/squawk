@@ -94,10 +94,15 @@ impl Default for SelectRestrictions {
     }
 }
 
+#[derive(Default)]
+struct ParenSelectRestrictions {
+    semi_allowed: bool,
+}
+
 fn opt_paren_select(
     p: &mut Parser<'_>,
     m: Option<Marker>,
-    semi_allowed: bool,
+    r: &ParenSelectRestrictions,
 ) -> Option<CompletedMarker> {
     let m = m.unwrap_or_else(|| p.start());
     if !p.eat(L_PAREN) {
@@ -118,7 +123,7 @@ fn opt_paren_select(
         {
             break;
         }
-        if opt_paren_select(p, None, false).is_none() {
+        if opt_paren_select(p, None, &ParenSelectRestrictions::default()).is_none() {
             break;
         }
         if !p.at(R_PAREN) {
@@ -128,10 +133,10 @@ fn opt_paren_select(
     p.expect(R_PAREN);
     if p.at_ts(COMPOUND_SELECT_FIRST) {
         let cm = m.complete(p, PAREN_SELECT);
-        Some(compound_select(p, cm, semi_allowed))
+        Some(compound_select(p, cm, r.semi_allowed))
     } else {
         opt_select_trailing_clauses(p);
-        if semi_allowed {
+        if r.semi_allowed {
             p.eat(SEMICOLON);
         }
         Some(m.complete(p, PAREN_SELECT))
@@ -3125,7 +3130,7 @@ fn compound_select_rhs(p: &mut Parser<'_>) {
     assert!(p.at_ts(COMPOUND_SELECT_FIRST));
     compound_op(p);
     if p.at(L_PAREN) {
-        opt_paren_select(p, None, false);
+        opt_paren_select(p, None, &ParenSelectRestrictions::default());
     } else if p.at_ts(SELECT_FIRST) {
         select(
             p,
@@ -3841,7 +3846,8 @@ fn xml_namespace_prefix(p: &mut Parser<'_>) {
 fn paren_data_source(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     assert!(p.at(L_PAREN));
     if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
-        return opt_paren_select(p, None, false).map(|cm| (cm, ExprKind::Select));
+        return opt_paren_select(p, None, &ParenSelectRestrictions::default())
+            .map(|cm| (cm, ExprKind::Select));
     }
     let m = p.start();
     p.bump(L_PAREN);
@@ -7547,7 +7553,13 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (INSERT_KW, _) => Some(insert(p, None, r.semi_allowed)),
         (L_PAREN, _) if p.nth_at_ts(1, PAREN_SELECT_FIRST) => {
             // can have select nested in parens, i.e., ((select 1));
-            opt_paren_select(p, None, r.semi_allowed)
+            opt_paren_select(
+                p,
+                None,
+                &ParenSelectRestrictions {
+                    semi_allowed: r.semi_allowed,
+                },
+            )
         }
         (LISTEN_KW, _) => Some(listen(p)),
         (LOAD_KW, _) => Some(load(p)),
@@ -16198,7 +16210,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
     if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default(), false).is_none())
-        && opt_paren_select(p, None, false).is_none()
+        && opt_paren_select(p, None, &ParenSelectRestrictions::default()).is_none()
     {
         p.error("expected select stmt")
     }
@@ -16403,7 +16415,7 @@ fn set_expr_list_or_paren_select(p: &mut Parser<'_>) {
     p.eat(ROW_KW);
     if p.at(L_PAREN) {
         if p.nth_at(1, SELECT_KW) {
-            if opt_paren_select(p, Some(m), false).is_none() {
+            if opt_paren_select(p, Some(m), &ParenSelectRestrictions::default()).is_none() {
                 p.error("expected sub-SELECT");
             }
         } else {
@@ -16560,7 +16572,7 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Option<Com
         MERGE_KW => Some(merge(p, Some(m), semi_allowed)),
         L_PAREN if p.nth_at_ts(1, PAREN_SELECT_FIRST) => {
             // can have select nested in parens, i.e., ((select 1));
-            opt_paren_select(p, Some(m), semi_allowed)
+            opt_paren_select(p, Some(m), &ParenSelectRestrictions { semi_allowed })
         }
         _ => {
             m.abandon(p);
