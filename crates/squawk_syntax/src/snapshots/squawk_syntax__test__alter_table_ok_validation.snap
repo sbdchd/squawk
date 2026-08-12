@@ -23,7 +23,7 @@ SOURCE_FILE@0..470
     ADD_CONSTRAINT@95..243
       ADD_KW@95..98 "add"
       WHITESPACE@98..99 " "
-      CHECK_CONSTRAINT@99..233
+      CHECK_CONSTRAINT@99..243
         CONSTRAINT_NAME_CLAUSE@99..136
           CONSTRAINT_KW@99..109 "constraint"
           WHITESPACE@109..110 " "
@@ -66,11 +66,11 @@ SOURCE_FILE@0..470
             R_PAREN@228..229 ")"
         WHITESPACE@229..232 "\n  "
         R_PAREN@232..233 ")"
-      WHITESPACE@233..234 " "
-      NOT_VALID@234..243
-        NOT_KW@234..237 "not"
-        WHITESPACE@237..238 " "
-        VALID_KW@238..243 "valid"
+        WHITESPACE@233..234 " "
+        NOT_VALID@234..243
+          NOT_KW@234..237 "not"
+          WHITESPACE@237..238 " "
+          VALID_KW@238..243 "valid"
     SEMICOLON@243..244 ";"
   WHITESPACE@244..246 "\n\n"
   ALTER_TABLE@246..469
@@ -91,7 +91,7 @@ SOURCE_FILE@0..470
     ADD_CONSTRAINT@283..469
       ADD_KW@283..286 "add"
       WHITESPACE@286..287 " "
-      CHECK_CONSTRAINT@287..459
+      CHECK_CONSTRAINT@287..469
         CONSTRAINT_NAME_CLAUSE@287..343
           CONSTRAINT_KW@287..297 "constraint"
           WHITESPACE@297..298 " "
@@ -134,9 +134,9 @@ SOURCE_FILE@0..470
             R_PAREN@454..455 ")"
         WHITESPACE@455..458 "\n  "
         R_PAREN@458..459 ")"
-      WHITESPACE@459..460 " "
-      NOT_VALID@460..469
-        NOT_KW@460..463 "not"
-        WHITESPACE@463..464 " "
-        VALID_KW@464..469 "valid"
+        WHITESPACE@459..460 " "
+        NOT_VALID@460..469
+          NOT_KW@460..463 "not"
+          WHITESPACE@463..464 " "
+          VALID_KW@464..469 "valid"
   WHITESPACE@469..470 "\n"

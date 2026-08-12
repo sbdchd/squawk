@@ -4777,7 +4777,9 @@ fn find_json_path_name(
     target: &Name,
 ) -> Option<ast::JsonPathName> {
     for column in column_list.json_table_columns() {
-        if let Some(name) = column.json_path_name()
+        if let Some(name) = column
+            .json_path_name_clause()
+            .and_then(|clause| clause.json_path_name())
             && Name::from_node(&name) == *target
         {
             return Some(name);
@@ -4797,7 +4799,8 @@ fn find_json_path_name_in_table(
     target: &Name,
 ) -> Option<ast::JsonPathName> {
     json_table
-        .json_path_name()
+        .json_path_name_clause()
+        .and_then(|clause| clause.json_path_name())
         .filter(|name| Name::from_node(name) == *target)
         .or_else(|| find_json_path_name(&json_table.json_table_column_list()?, target))
 }

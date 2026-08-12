@@ -39,9 +39,43 @@ SOURCE_FILE
       NO_INHERIT
         NO_KW "no"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- constraint options after a missing constraint body"
+  WHITESPACE "\n"
+  ALTER_DOMAIN
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "d"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      CONSTRAINT_NAME_CLAUSE
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        CONSTRAINT_NAME
+          IDENT "c"
+      WHITESPACE " "
+      DEFERRABLE_CONSTRAINT_OPTION
+        DEFERRABLE_KW "deferrable"
+      WHITESPACE " "
+      INITIALLY_DEFERRED_CONSTRAINT_OPTION
+        INITIALLY_KW "initially"
+        WHITESPACE " "
+        DEFERRED_KW "deferred"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected INHERIT_KW
   ╭▸ 
 2 │ create domain d as int check (v > 0) no;
   ╰╴                                       ━
+error[syntax-error]: expected NOT NULL or CHECK constraint
+  ╭▸ 
+5 │ alter domain d add constraint c deferrable initially deferred;
+  ╰╴                               ━

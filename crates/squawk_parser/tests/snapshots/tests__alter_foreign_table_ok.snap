@@ -1082,11 +1082,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-      WHITESPACE " "
-      NOT_VALID
-        NOT_KW "not"
         WHITESPACE " "
-        VALID_KW "valid"
+        NOT_VALID
+          NOT_KW "not"
+          WHITESPACE " "
+          VALID_KW "valid"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -1255,7 +1255,8 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -1276,7 +1277,8 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      USER_KW "user"
+      USER
+        USER_KW "user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_enable_replica_trigger"

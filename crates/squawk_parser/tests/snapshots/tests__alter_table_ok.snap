@@ -1489,7 +1489,8 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1508,7 +1509,8 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      USER_KW "user"
+      USER
+        USER_KW "user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable_trigger"
@@ -1549,7 +1551,8 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1568,7 +1571,8 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      USER_KW "user"
+      USER
+        USER_KW "user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -1633,7 +1637,8 @@ SOURCE_FILE
       WHITESPACE " "
       IDENTITY_KW "identity"
       WHITESPACE " "
-      DEFAULT_KW "default"
+      REPLICA_IDENTITY_DEFAULT
+        DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1679,7 +1684,8 @@ SOURCE_FILE
       WHITESPACE " "
       IDENTITY_KW "identity"
       WHITESPACE " "
-      FULL_KW "full"
+      REPLICA_IDENTITY_FULL
+        FULL_KW "full"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1698,7 +1704,8 @@ SOURCE_FILE
       WHITESPACE " "
       IDENTITY_KW "identity"
       WHITESPACE " "
-      NOTHING_KW "nothing"
+      REPLICA_IDENTITY_NOTHING
+        NOTHING_KW "nothing"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rule_enable_disable"
@@ -3381,11 +3388,11 @@ SOURCE_FILE
           LITERAL
             NULL_KW "null"
         R_PAREN ")"
-      WHITESPACE " "
-      NOT_VALID
-        NOT_KW "not"
         WHITESPACE " "
-        VALID_KW "valid"
+        NOT_VALID
+          NOT_KW "not"
+          WHITESPACE " "
+          VALID_KW "valid"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- rename column"
@@ -3929,7 +3936,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "f"
       WHITESPACE " "
-      CONCURRENTLY_KW "concurrently"
+      DETACH_CONCURRENTLY
+        CONCURRENTLY_KW "concurrently"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- finalize"
@@ -3955,7 +3963,8 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "f"
       WHITESPACE " "
-      FINALIZE_KW "finalize"
+      DETACH_FINALIZE
+        FINALIZE_KW "finalize"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- references on update on delete"

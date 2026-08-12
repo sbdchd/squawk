@@ -25,7 +25,10 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                     for action in alter_table.actions() {
                         match action {
                             ast::AlterTableAction::AddConstraint(add_constraint) => {
-                                if add_constraint.not_valid().is_some()
+                                let Some(constraint) = add_constraint.constraint() else {
+                                    continue;
+                                };
+                                if constraint.is_not_valid()
                                     || tables_created.contains(&table_name.text())
                                 {
                                     // Adding foreign key is okay when:
@@ -33,21 +36,19 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                     // - The table is created in the same transaction
                                     continue;
                                 }
-                                if let Some(constraint) = add_constraint.constraint() {
-                                    if matches!(
-                                        constraint,
-                                        ast::Constraint::ForeignKeyConstraint(_)
-                                            | ast::Constraint::ReferencesConstraint(_)
-                                    ) {
-                                        ctx.report(
-                                            Violation::for_node(
-                                                Rule::AddingForeignKeyConstraint,
-                                                message.into(),
-                                                constraint.syntax(),
-                                            )
-                                            .help(help),
+                                if matches!(
+                                    constraint,
+                                    ast::Constraint::ForeignKeyConstraint(_)
+                                        | ast::Constraint::ReferencesConstraint(_)
+                                ) {
+                                    ctx.report(
+                                        Violation::for_node(
+                                            Rule::AddingForeignKeyConstraint,
+                                            message.into(),
+                                            constraint.syntax(),
                                         )
-                                    }
+                                        .help(help),
+                                    )
                                 }
                             }
                             ast::AlterTableAction::AddColumn(add_column) => {

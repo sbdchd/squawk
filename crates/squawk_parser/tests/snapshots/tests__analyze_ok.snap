@@ -74,21 +74,26 @@ SOURCE_FILE
     OPTION_ITEM_LIST
       L_PAREN "("
       OPTION_ITEM
-        VERBOSE_KW "verbose"
+        OPTION_ITEM_KEY
+          VERBOSE_KW "verbose"
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        OPTION_ITEM_VALUE
+          LITERAL
+            FALSE_KW "false"
       COMMA ","
       WHITESPACE " "
       OPTION_ITEM
-        IDENT "skip_locked"
+        OPTION_ITEM_KEY
+          IDENT "skip_locked"
       COMMA ","
       WHITESPACE " "
       OPTION_ITEM
-        IDENT "buffer_usage_limit"
+        OPTION_ITEM_KEY
+          IDENT "buffer_usage_limit"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "10"
+        OPTION_ITEM_VALUE
+          LITERAL
+            INT_NUMBER "10"
       R_PAREN ")"
     WHITESPACE " "
     TABLE_AND_COLUMNS_LIST
@@ -123,16 +128,21 @@ SOURCE_FILE
     OPTION_ITEM_LIST
       L_PAREN "("
       OPTION_ITEM
-        VERBOSE_KW "verbose"
+        OPTION_ITEM_KEY
+          VERBOSE_KW "verbose"
         WHITESPACE " "
-        NO_KW "no"
+        OPTION_ITEM_VALUE
+          OPTION_ITEM_VALUE_NAME
+            NO_KW "no"
       COMMA ","
       WHITESPACE " "
       OPTION_ITEM
-        IDENT "skip_locked"
+        OPTION_ITEM_KEY
+          IDENT "skip_locked"
         WHITESPACE " "
-        LITERAL
-          STRING "'on'"
+        OPTION_ITEM_VALUE
+          LITERAL
+            STRING "'on'"
       R_PAREN ")"
     WHITESPACE " "
     TABLE_AND_COLUMNS_LIST

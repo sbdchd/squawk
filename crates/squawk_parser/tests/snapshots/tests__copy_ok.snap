@@ -70,18 +70,21 @@ SOURCE_FILE
     COPY_OPTION_LIST
       L_PAREN "("
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           FORMAT_KW "FORMAT"
         WHITESPACE " "
-        CSV_KW "csv"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            CSV_KW "csv"
       COMMA ","
       WHITESPACE " "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           HEADER_KW "HEADER"
         WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
+        COPY_OPTION_VALUE
+          LITERAL
+            TRUE_KW "true"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -105,11 +108,12 @@ SOURCE_FILE
     COPY_OPTION_LIST
       L_PAREN "("
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           DELIMITER_KW "DELIMITER"
         WHITESPACE " "
-        LITERAL
-          STRING "'|'"
+        COPY_OPTION_VALUE
+          LITERAL
+            STRING "'|'"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -230,17 +234,21 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE " "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "on_error"
         WHITESPACE " "
-        IGNORE_KW "ignore"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            IGNORE_KW "ignore"
       COMMA ","
       WHITESPACE " "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "log_verbosity"
         WHITESPACE " "
-        VERBOSE_KW "verbose"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            VERBOSE_KW "verbose"
       WHITESPACE " "
       R_PAREN ")"
     SEMICOLON ";"
@@ -267,10 +275,12 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE " "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "on_error"
         WHITESPACE " "
-        IGNORE_KW "ignore"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            IGNORE_KW "ignore"
       WHITESPACE " "
       R_PAREN ")"
     SEMICOLON ";"
@@ -297,205 +307,231 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           FORMAT_KW "format"
         WHITESPACE " "
-        CSV_KW "csv"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            CSV_KW "csv"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           FREEZE_KW "freeze"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
-          FREEZE_KW "freeze"
-        WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
-      COMMA ","
-      WHITESPACE "\n  "
-      COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           FREEZE_KW "freeze"
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        COPY_OPTION_VALUE
+          LITERAL
+            TRUE_KW "true"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
+          FREEZE_KW "freeze"
+        WHITESPACE " "
+        COPY_OPTION_VALUE
+          LITERAL
+            FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        COPY_OPTION_KEY
           DELIMITER_KW "delimiter"
         WHITESPACE " "
-        LITERAL
-          STRING "','"
+        COPY_OPTION_VALUE
+          LITERAL
+            STRING "','"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           NULL_KW "null"
         WHITESPACE " "
-        LITERAL
-          STRING "'\\n'"
+        COPY_OPTION_VALUE
+          LITERAL
+            STRING "'\\n'"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           DEFAULT_KW "default"
         WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
+        COPY_OPTION_VALUE
+          LITERAL
+            STRING "'foo'"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           HEADER_KW "header"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
-          HEADER_KW "header"
-        WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
-      COMMA ","
-      WHITESPACE "\n  "
-      COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           HEADER_KW "header"
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        COPY_OPTION_VALUE
+          LITERAL
+            TRUE_KW "true"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           HEADER_KW "header"
         WHITESPACE " "
-        MATCH_KW "match"
+        COPY_OPTION_VALUE
+          LITERAL
+            FALSE_KW "false"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
+          HEADER_KW "header"
+        WHITESPACE " "
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            MATCH_KW "match"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        COPY_OPTION_KEY
           QUOTE_KW "quote"
         WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
+        COPY_OPTION_VALUE
+          LITERAL
+            STRING "'foo'"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           ESCAPE_KW "escape"
         WHITESPACE " "
-        LITERAL
-          STRING "'bar'"
+        COPY_OPTION_VALUE
+          LITERAL
+            STRING "'bar'"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "force_quote"
         WHITESPACE " "
-        STAR "*"
+        COPY_OPTION_VALUE
+          STAR "*"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "force_quote"
         WHITESPACE " "
-        COPY_OPTION_LIST
-          L_PAREN "("
-          COPY_OPTION
-            COPY_OPTION_NAME
-              IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COPY_OPTION
-            COPY_OPTION_NAME
-              IDENT "b"
-          COMMA ","
-          WHITESPACE " "
-          COPY_OPTION
-            COPY_OPTION_NAME
-              IDENT "c"
-          COMMA ","
-          WHITESPACE " "
-          COPY_OPTION
-            COPY_OPTION_NAME
-              IDENT "d"
-          R_PAREN ")"
+        COPY_OPTION_VALUE
+          COPY_OPTION_LIST
+            L_PAREN "("
+            COPY_OPTION
+              COPY_OPTION_KEY
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION
+              COPY_OPTION_KEY
+                IDENT "b"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION
+              COPY_OPTION_KEY
+                IDENT "c"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION
+              COPY_OPTION_KEY
+                IDENT "d"
+            R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "force_not_null"
         WHITESPACE " "
-        STAR "*"
+        COPY_OPTION_VALUE
+          STAR "*"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "force_not_null"
         WHITESPACE " "
-        COPY_OPTION_LIST
-          L_PAREN "("
-          COPY_OPTION
-            COPY_OPTION_NAME
-              IDENT "a"
-          R_PAREN ")"
+        COPY_OPTION_VALUE
+          COPY_OPTION_LIST
+            L_PAREN "("
+            COPY_OPTION
+              COPY_OPTION_KEY
+                IDENT "a"
+            R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "force_null"
         WHITESPACE " "
-        STAR "*"
+        COPY_OPTION_VALUE
+          STAR "*"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "force_null"
         WHITESPACE " "
-        COPY_OPTION_LIST
-          L_PAREN "("
-          COPY_OPTION
-            COPY_OPTION_NAME
-              IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COPY_OPTION
-            COPY_OPTION_NAME
-              IDENT "b"
-          R_PAREN ")"
+        COPY_OPTION_VALUE
+          COPY_OPTION_LIST
+            L_PAREN "("
+            COPY_OPTION
+              COPY_OPTION_KEY
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION
+              COPY_OPTION_KEY
+                IDENT "b"
+            R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "on_error"
         WHITESPACE " "
-        IDENT "stop"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            IDENT "stop"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "on_error"
         WHITESPACE " "
-        IGNORE_KW "ignore"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            IGNORE_KW "ignore"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           ENCODING_KW "encoding"
         WHITESPACE " "
-        LITERAL
-          STRING "'utf8'"
+        COPY_OPTION_VALUE
+          LITERAL
+            STRING "'utf8'"
       COMMA ","
       WHITESPACE "\n  "
       COPY_OPTION
-        COPY_OPTION_NAME
+        COPY_OPTION_KEY
           IDENT "log_verbosity"
         WHITESPACE " "
-        VERBOSE_KW "verbose"
+        COPY_OPTION_VALUE
+          COPY_OPTION_VALUE_NAME
+            VERBOSE_KW "verbose"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"

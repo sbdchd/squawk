@@ -17,10 +17,12 @@ SOURCE_FILE
     OPTION_ITEM_LIST
       L_PAREN "("
       OPTION_ITEM
-        VERBOSE_KW "verbose"
+        OPTION_ITEM_KEY
+          VERBOSE_KW "verbose"
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        OPTION_ITEM_VALUE
+          LITERAL
+            FALSE_KW "false"
       R_PAREN ")"
     WHITESPACE " "
     TABLE_NAME_REF
@@ -49,10 +51,12 @@ SOURCE_FILE
     OPTION_ITEM_LIST
       L_PAREN "("
       OPTION_ITEM
-        VERBOSE_KW "verbose"
+        OPTION_ITEM_KEY
+          VERBOSE_KW "verbose"
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        OPTION_ITEM_VALUE
+          LITERAL
+            FALSE_KW "false"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

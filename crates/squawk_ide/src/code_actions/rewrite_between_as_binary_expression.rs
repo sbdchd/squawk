@@ -22,7 +22,10 @@ pub(super) fn rewrite_between_as_binary_expression(
     let end = between_expr.end()?;
 
     let is_not = between_expr.not_token().is_some();
-    let is_symmetric = between_expr.symmetric_token().is_some();
+    let is_symmetric = matches!(
+        between_expr.between_symmetry(),
+        Some(ast::BetweenSymmetry::Symmetric(_))
+    );
 
     let target_text = target.syntax().text();
     let start_text = start.syntax().text();

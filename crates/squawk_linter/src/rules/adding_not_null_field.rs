@@ -65,11 +65,17 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
             for action in alter_table.actions() {
                 match action {
                     // Step 1: Add constraint
-                    ast::AlterTableAction::AddConstraint(add_constraint)
-                        if is_pg12_plus && add_constraint.not_valid().is_some() =>
-                    {
-                        if let Some(ast::Constraint::CheckConstraint(check)) =
-                            add_constraint.constraint()
+                    ast::AlterTableAction::AddConstraint(add_constraint) => {
+                        if !is_pg12_plus {
+                            continue;
+                        }
+                        let Some(constraint) = add_constraint.constraint() else {
+                            continue;
+                        };
+                        if !constraint.is_not_valid() {
+                            continue;
+                        }
+                        if let ast::Constraint::CheckConstraint(check) = constraint
                             && let Some(constraint_name) = check
                                 .constraint_name_clause()
                                 .and_then(|clause| clause.constraint_name())

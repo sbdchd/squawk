@@ -119,5 +119,33 @@ select
 with t as (select 1)
 select * from t;
 
+-- semicolon not allowed
+(select 1;);
+
+-- compound select requires a select on the left
+select (1 union select 2);
+select ((1) union select 2);
+select (((((1)))) union select 1);
+
+-- compound w/ empty parens
+select 1 union ();
+
+-- compound missing select
+select * from (foo union select 1);
+
+-- compound operators must precede trailing clauses
+select 1 limit 1 union select 2;
+select 1 order by 1 intersect select 2;
+select 1 offset 1 except select 2;
+select 1 fetch first 1 row only union select 2;
+select 1 for update union select 2;
+
+-- WITH is only allowed at the start of a compound select
+select 1 union with x as (select 2) select * from x;
+
+-- ALL and DISTINCT are only allowed before the first function argument
+select f(1, all 2);
+select f(1, distinct 2);
+
 -- trailing comma at EOF
 select 1,

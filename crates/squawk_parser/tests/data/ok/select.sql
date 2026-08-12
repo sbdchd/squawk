@@ -345,6 +345,7 @@ select * from t where x not in (1, 2, 3);
 
 -- composite_types
 select row('fuzzy dice', 42, 1.99);
+select row(1);
 select ('fuzzy dice', 42, 1.99);
 
 -- join
@@ -524,3 +525,7 @@ explain (costs off)
 select string_agg(distinct f1, ',') filter (where length(f1) > 1)
 from varchar_tbl;
 
+-- make sure we're detecting select correctly
+select (select ((((1)))) union select 1);
+select ((((select (1)))) union select 1);
+select (select (select 1) union select 1);

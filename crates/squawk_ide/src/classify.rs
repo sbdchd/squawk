@@ -324,22 +324,14 @@ fn classify_call_expr_name_ref(
                 .call_expr()
                 .is_some_and(|execute_call| execute_call.syntax() == call_expr.syntax())
         {
-            return Some(if create_trigger.procedure_token().is_some() {
-                NameRefClass::Procedure
-            } else {
-                NameRefClass::Function
-            });
+            return Some(NameRefClass::Function);
         }
         if let Some(create_event_trigger) = ast::CreateEventTrigger::cast(ancestor.clone())
             && create_event_trigger
                 .call_expr()
                 .is_some_and(|execute_call| execute_call.syntax() == call_expr.syntax())
         {
-            return Some(if create_event_trigger.procedure_token().is_some() {
-                NameRefClass::Procedure
-            } else {
-                NameRefClass::Function
-            });
+            return Some(NameRefClass::Function);
         }
         if ast::Select::can_cast(ancestor.kind())
             || ast::SelectInto::can_cast(ancestor.kind())

@@ -61,7 +61,10 @@ fn can_transform_select_to_table(select: &ast::Select) -> bool {
         return false;
     };
 
-    if select_clause.distinct_clause().is_some() {
+    if matches!(
+        select_clause.select_quantifier(),
+        Some(ast::SelectQuantifier::DistinctClause(_))
+    ) {
         return false;
     }
 
