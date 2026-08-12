@@ -97,10 +97,12 @@ function convertSymbolKind(kind: string): monaco.languages.SymbolKind {
   }
 }
 
-export async function provideCodeActions(
+// The related lint fixes come from the markers, which live in App.tsx, so the
+// caller is responsible for merging these in with those.
+export function ideCodeActions(
   model: monaco.editor.ITextModel,
-  position: monaco.Position,
-): Promise<monaco.languages.CodeAction[]> {
+  range: monaco.IRange,
+): monaco.languages.CodeAction[] {
   const content = model.getValue()
   const version = model.getVersionId()
   if (!content) return []
@@ -109,8 +111,8 @@ export async function provideCodeActions(
     const actions = code_actions(
       content,
       version,
-      position.lineNumber - 1,
-      position.column - 1,
+      range.startLineNumber - 1,
+      range.startColumn - 1,
     )
 
     if (!actions) return []
@@ -135,7 +137,7 @@ export async function provideCodeActions(
       },
     }))
   } catch (e) {
-    console.error("Error in provideCodeActions:", e)
+    console.error("Error in ideCodeActions:", e)
     return []
   }
 }

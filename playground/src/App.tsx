@@ -14,6 +14,7 @@ import {
   decompressFromEncodedURIComponent,
 } from "lz-string"
 import {
+  ideCodeActions,
   provideInlayHints,
   provideHover,
   provideDefinition,
@@ -400,8 +401,11 @@ function registerMonacoProvidersOnce() {
   const codeActionProvider = monaco.languages.registerCodeActionProvider(
     "pgsql",
     {
-      provideCodeActions: (model, _range, context) => {
-        const actions: monaco.languages.CodeAction[] = []
+      provideCodeActions: (model, range, context) => {
+        const actions: monaco.languages.CodeAction[] = ideCodeActions(
+          model,
+          range,
+        )
         for (const marker of context.markers) {
           if (marker.source === "squawk") {
             const key = createMarkerKey(marker)
