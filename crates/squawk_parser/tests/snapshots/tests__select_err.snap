@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
-assertion_line: 58
 input_file: crates/squawk_parser/tests/data/err/select.sql
 ---
 SOURCE_FILE
@@ -1322,15 +1321,211 @@ SOURCE_FILE
       PAREN_FROM_ITEM
         PAREN_EXPR
           L_PAREN "("
-          RELATION_FROM_ITEM
-            RELATION_NAME_REF
-              PATH_REF
-                PATH_SEGMENT_REF
-                  IDENT "foo"
+          COMPOUND_SELECT
+            RELATION_FROM_ITEM
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "foo"
+            WHITESPACE " "
+            UNION
+              UNION_KW "union"
+            WHITESPACE " "
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "select"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    LITERAL
+                      INT_NUMBER "1"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- compound operators must precede trailing clauses"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+      WHITESPACE " "
+      LIMIT_CLAUSE
+        LIMIT_KW "limit"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    WHITESPACE " "
+    UNION
+      UNION_KW "union"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        SORT_BY_LIST
+          SORT_BY
+            LITERAL
+              INT_NUMBER "1"
+    WHITESPACE " "
+    INTERSECT
+      INTERSECT_KW "intersect"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+      WHITESPACE " "
+      OFFSET_CLAUSE
+        OFFSET_KW "offset"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    WHITESPACE " "
+    EXCEPT
+      EXCEPT_KW "except"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+      WHITESPACE " "
+      FETCH_CLAUSE
+        FETCH_KW "fetch"
+        WHITESPACE " "
+        FIRST_KW "first"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        ROW_KW "row"
+        WHITESPACE " "
+        FETCH_ONLY
+          ONLY_KW "only"
+    WHITESPACE " "
+    UNION
+      UNION_KW "union"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "for"
+        WHITESPACE " "
+        FOR_UPDATE
+          UPDATE_KW "update"
+    WHITESPACE " "
+    UNION
+      UNION_KW "union"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- WITH is only allowed at the start of a compound select"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    WHITESPACE " "
+    UNION
+      UNION_KW "union"
+    WHITESPACE " "
+    SELECT
+      WITH_CLAUSE
+        WITH_KW "with"
+        WHITESPACE " "
+        WITH_TABLE
+          CTE_NAME
+            IDENT "x"
           WHITESPACE " "
-          UNION
-            UNION_KW "union"
+          AS_KW "as"
           WHITESPACE " "
+          L_PAREN "("
           SELECT
             SELECT_CLAUSE
               SELECT_KW "select"
@@ -1338,8 +1533,76 @@ SOURCE_FILE
               TARGET_LIST
                 TARGET
                   LITERAL
-                    INT_NUMBER "1"
+                    INT_NUMBER "2"
           R_PAREN ")"
+      WHITESPACE " "
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        RELATION_FROM_ITEM
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ALL and DISTINCT are only allowed before the first function argument"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              ERROR
+                ALL_KW "all"
+              WHITESPACE " "
+              ARG
+                LITERAL
+                  INT_NUMBER "2"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              ERROR
+                DISTINCT_KW "distinct"
+              WHITESPACE " "
+              ARG
+                LITERAL
+                  INT_NUMBER "2"
+              R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
@@ -1528,7 +1791,39 @@ error[syntax-error]: expected select before compound select operator
     ╭▸ 
 134 │ select * from (foo union select 1);
     ╰╴                  ━
+error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+    ╭▸ 
+137 │ select 1 limit 1 union select 2;
+    ╰╴                ━
+error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+    ╭▸ 
+138 │ select 1 order by 1 intersect select 2;
+    ╰╴                   ━
+error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+    ╭▸ 
+139 │ select 1 offset 1 except select 2;
+    ╰╴                 ━
+error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+    ╭▸ 
+140 │ select 1 fetch first 1 row only union select 2;
+    ╰╴                               ━
+error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+    ╭▸ 
+141 │ select 1 for update union select 2;
+    ╰╴                   ━
+error[syntax-error]: a WITH clause is only allowed at the start of a select statement
+    ╭▸ 
+144 │ select 1 union with x as (select 2) select * from x;
+    ╰╴              ━
+error[syntax-error]: ALL or DISTINCT is only allowed before the first argument
+    ╭▸ 
+147 │ select f(1, all 2);
+    ╰╴            ━
+error[syntax-error]: ALL or DISTINCT is only allowed before the first argument
+    ╭▸ 
+148 │ select f(1, distinct 2);
+    ╰╴            ━
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-137 │ select 1,
+151 │ select 1,
     ╰╴        ━

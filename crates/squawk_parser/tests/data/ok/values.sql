@@ -30,6 +30,11 @@ WHERE employees.depno = v.depno AND employees.sales >= v.target;
 SELECT * FROM machines
 WHERE ip_address IN (VALUES('192.168.0.1'::inet), ('192.168.0.10'), ('192.168.1.43'));
 
+-- trailing_clauses
+values (2), (1) order by 1 limit 1 offset 1;
+values (1) fetch first 1 row only;
+values (1) for update;
+
 -- union
 values (1, 2) union values (3, 4);
 

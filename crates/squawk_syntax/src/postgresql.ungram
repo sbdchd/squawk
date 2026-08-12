@@ -2102,9 +2102,10 @@ Values =
   WithClause?
   'values' RowList
   OrderByClause?
+  LockingClause*
   LimitClause?
-  OffsetClause?
-  FetchClause? ';'?
+  FetchClause?
+  OffsetClause? ';'?
 
 Table =
   WithClause?

@@ -63,7 +63,7 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
         p.expect(L_PAREN);
-        select(p, None, &SelectRestrictions::default(), false);
+        select(p, None, &SelectRestrictions::default());
         p.expect(R_PAREN);
     } else {
         // `[` or `(`
@@ -83,26 +83,35 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
 }
 
 struct SelectRestrictions {
+    semi_allowed: bool,
     trailing_clauses: bool,
+    compound_allowed: bool,
+}
+
+impl SelectRestrictions {
+    const fn none() -> Self {
+        Self {
+            semi_allowed: false,
+            trailing_clauses: false,
+            compound_allowed: false,
+        }
+    }
 }
 
 impl Default for SelectRestrictions {
     fn default() -> Self {
         Self {
+            semi_allowed: false,
             trailing_clauses: true,
+            compound_allowed: true,
         }
     }
-}
-
-#[derive(Default)]
-struct ParenSelectRestrictions {
-    semi_allowed: bool,
 }
 
 fn opt_paren_select(
     p: &mut Parser<'_>,
     m: Option<Marker>,
-    r: &ParenSelectRestrictions,
+    r: &SelectRestrictions,
 ) -> Option<CompletedMarker> {
     let m = m.unwrap_or_else(|| p.start());
     if !p.eat(L_PAREN) {
@@ -117,13 +126,13 @@ fn opt_paren_select(
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
         if p.at_ts(SELECT_FIRST)
-            && (select(p, None, &SelectRestrictions::default(), false).is_none()
+            && (select(p, None, &SelectRestrictions::default()).is_none()
                 || p.at(EOF)
                 || p.at(R_PAREN))
         {
             break;
         }
-        if opt_paren_select(p, None, &ParenSelectRestrictions::default()).is_none() {
+        if opt_paren_select(p, None, &SelectRestrictions::default()).is_none() {
             break;
         }
         if !p.at(R_PAREN) {
@@ -131,11 +140,13 @@ fn opt_paren_select(
         }
     }
     p.expect(R_PAREN);
-    if p.at_ts(COMPOUND_SELECT_FIRST) {
+    if p.at_ts(COMPOUND_SELECT_FIRST) && r.compound_allowed {
         let cm = m.complete(p, PAREN_SELECT);
-        Some(compound_select(p, cm, r.semi_allowed))
+        Some(compound_select(p, cm, r))
     } else {
-        opt_select_trailing_clauses(p);
+        if r.trailing_clauses {
+            opt_select_trailing_clauses(p);
+        }
         if r.semi_allowed {
             p.eat(SEMICOLON);
         }
@@ -176,7 +187,7 @@ fn tuple_expr(p: &mut Parser<'_>) -> (CompletedMarker, ExprKind) {
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
         if p.at_ts(SELECT_FIRST) {
-            let select = select(p, None, &SelectRestrictions::default(), false);
+            let select = select(p, None, &SelectRestrictions::default());
             saw_select |= select.as_ref().is_some_and(is_select_marker);
             if select.is_none() || p.at(EOF) || p.at(R_PAREN) {
                 break;
@@ -189,7 +200,7 @@ fn tuple_expr(p: &mut Parser<'_>) -> (CompletedMarker, ExprKind) {
             if expr_kind != ExprKind::Select {
                 p.error("expected select before compound select operator");
             }
-            compound_select(p, expr, false);
+            compound_select(p, expr, &SelectRestrictions::default());
         }
         saw_select |= expr_kind == ExprKind::Select;
         if !p.at(R_PAREN) {
@@ -871,7 +882,7 @@ fn opt_json_array_fn_arg_list(p: &mut Parser<'_>) {
     while !p.at(EOF) && !p.at(R_PAREN) && !p.at(RETURNING_KW) {
         let m = p.start();
         if p.at_ts(SELECT_FIRST) {
-            if select(p, None, &SelectRestrictions::default(), false).is_none() {
+            if select(p, None, &SelectRestrictions::default()).is_none() {
                 m.abandon(p);
                 break;
             }
@@ -921,7 +932,7 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     // args
     p.expect(L_PAREN);
     if p.at_ts(SELECT_FIRST) {
-        select(p, None, &SelectRestrictions::default(), false);
+        select(p, None, &SelectRestrictions::default());
     } else {
         if expr(p).is_none() {
             p.error("expected expression or select");
@@ -2308,6 +2319,7 @@ fn arg_list(p: &mut Parser<'_>) {
         m.complete(p, ARG_LIST);
         return;
     }
+    let mut first_arg = true;
     delimited(
         p,
         L_PAREN,
@@ -2316,7 +2328,11 @@ fn arg_list(p: &mut Parser<'_>) {
         || "expected expression".into(),
         EXPR_FIRST,
         |p| {
-            opt_all_or_distinct(p);
+            if std::mem::take(&mut first_arg) {
+                opt_all_or_distinct(p);
+            } else if p.at(ALL_KW) || p.at(DISTINCT_KW) {
+                p.err_and_bump("ALL or DISTINCT is only allowed before the first argument");
+            }
             arg_expr(p).is_some()
         },
     );
@@ -3126,34 +3142,63 @@ fn compound_op(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
-fn compound_select_rhs(p: &mut Parser<'_>) {
-    assert!(p.at_ts(COMPOUND_SELECT_FIRST));
-    compound_op(p);
-    if p.at(L_PAREN) {
-        opt_paren_select(p, None, &ParenSelectRestrictions::default());
-    } else if p.at_ts(SELECT_FIRST) {
-        select(
-            p,
-            None,
-            &SelectRestrictions {
-                trailing_clauses: false,
-            },
-            false,
-        );
-    } else {
-        p.error("expected start of a select statement");
+fn compound_op_bp(p: &Parser<'_>) -> Option<u8> {
+    match p.current() {
+        UNION_KW | EXCEPT_KW => Some(1),
+        INTERSECT_KW => Some(2),
+        _ => None,
     }
 }
 
-fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker, semi_allowed: bool) -> CompletedMarker {
-    assert!(p.at_ts(COMPOUND_SELECT_FIRST));
-    let m = cm.precede(p);
-    compound_select_rhs(p);
-    opt_select_trailing_clauses(p);
-    if semi_allowed {
-        p.eat(SEMICOLON);
+fn compound_select_operand(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if p.at(L_PAREN) {
+        opt_paren_select(p, None, &SelectRestrictions::none())
+    } else if p.at_ts(SELECT_FIRST) {
+        if p.at(WITH_KW) {
+            p.error("a WITH clause is only allowed at the start of a select statement");
+        }
+        select(p, None, &SelectRestrictions::none())
+    } else {
+        p.error("expected start of a select statement");
+        None
     }
-    m.complete(p, COMPOUND_SELECT)
+}
+
+fn compound_select_bp(
+    p: &mut Parser<'_>,
+    lhs: CompletedMarker,
+    min_bp: u8,
+    r: &SelectRestrictions,
+) -> CompletedMarker {
+    let mut lhs = lhs;
+    while let Some(bp) = compound_op_bp(p) {
+        if bp < min_bp {
+            break;
+        }
+        let m = lhs.precede(p);
+        compound_op(p);
+        if let Some(rhs) = compound_select_operand(p) {
+            compound_select_bp(p, rhs, bp + 1, &SelectRestrictions::none());
+        }
+        if r.trailing_clauses {
+            opt_select_trailing_clauses(p);
+        }
+        let terminated = r.semi_allowed && p.eat(SEMICOLON);
+        lhs = m.complete(p, COMPOUND_SELECT);
+        if terminated {
+            break;
+        }
+    }
+    lhs
+}
+
+fn compound_select(
+    p: &mut Parser<'_>,
+    cm: CompletedMarker,
+    r: &SelectRestrictions,
+) -> CompletedMarker {
+    assert!(p.at_ts(COMPOUND_SELECT_FIRST));
+    compound_select_bp(p, cm, 0, r)
 }
 
 fn opt_select_clause(p: &mut Parser<'_>) {
@@ -3165,12 +3210,7 @@ fn opt_select_clause(p: &mut Parser<'_>) {
 // error recovery:
 // - <https://youtu.be/0HlrqwLjCxA?feature=shared&t=2172>
 /// <https://www.postgresql.org/docs/17/sql-select.html>
-fn select(
-    p: &mut Parser,
-    m: Option<Marker>,
-    r: &SelectRestrictions,
-    semi_allowed: bool,
-) -> Option<CompletedMarker> {
+fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<CompletedMarker> {
     assert!(p.at_ts(SELECT_FIRST));
     let m = m.unwrap_or_else(|| p.start());
 
@@ -3179,15 +3219,10 @@ fn select(
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
     if p.at(WITH_KW) {
-        return with(p, Some(m), semi_allowed);
+        return with(p, Some(m), r);
     }
     if p.at(VALUES_KW) {
-        let cm = values(p, Some(m), semi_allowed);
-        if p.at_ts(COMPOUND_SELECT_FIRST) {
-            return Some(compound_select(p, cm, semi_allowed));
-        } else {
-            return Some(cm);
-        }
+        return Some(values(p, Some(m), r));
     }
     // table [only] name [*]
     if p.eat(TABLE_KW) {
@@ -3209,14 +3244,19 @@ fn select(
     opt_group_by_clause(p);
     opt_having_clause(p);
     opt_window_clause(p);
-    if p.at_ts(COMPOUND_SELECT_FIRST) {
+    if p.at_ts(COMPOUND_SELECT_FIRST) && r.compound_allowed {
         let cm = m.complete(p, out_kind);
-        return Some(compound_select(p, cm, semi_allowed));
+        return Some(compound_select(p, cm, r));
     }
     if r.trailing_clauses {
         opt_select_trailing_clauses(p);
+        // error recovery
+        if p.at_ts(COMPOUND_SELECT_FIRST) && r.compound_allowed {
+            let cm = m.complete(p, out_kind);
+            return Some(compound_select(p, cm, r));
+        }
     }
-    if semi_allowed {
+    if r.semi_allowed {
         p.eat(SEMICOLON);
     }
     Some(m.complete(p, out_kind))
@@ -3247,6 +3287,11 @@ fn opt_select_trailing_clauses(p: &mut Parser<'_>) -> bool {
         while p.at(FOR_KW) {
             opt_locking_clause(p);
         }
+    }
+    if p.at_ts(COMPOUND_SELECT_FIRST) {
+        p.error(
+            "UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses",
+        );
     }
     true
 }
@@ -3622,16 +3667,25 @@ fn from_item_name(p: &mut Parser<'_>) -> SyntaxKind {
     }
 }
 
-fn data_source(p: &mut Parser<'_>) -> (SyntaxKind, ExprKind) {
-    p.eat(ONLY_KW);
-    p.eat(LATERAL_KW);
+struct DataSource {
+    kind: SyntaxKind,
+    expr_kind: ExprKind,
+    paren_select: Option<CompletedMarker>,
+}
+
+fn data_source(p: &mut Parser<'_>) -> DataSource {
+    let only = p.eat(ONLY_KW);
+    let lateral = p.eat(LATERAL_KW);
     let mut expr_kind = ExprKind::Other;
+    let mut paren_select = None;
     let kind = match p.current() {
         L_PAREN => {
-            expr_kind = paren_data_source(p)
-                .map(|(_, expr_kind)| expr_kind)
-                .unwrap_or(ExprKind::Other);
-            opt_from_alias(p);
+            let cm = paren_data_source(p);
+            expr_kind = cm.as_ref().map_or(ExprKind::Other, |(_, kind)| *kind);
+            let alias = opt_from_alias(p);
+            if !only && !lateral && alias.is_none() {
+                paren_select = cm.map(|(cm, _)| cm).filter(is_select_marker);
+            }
             PAREN_FROM_ITEM
         }
         JSON_TABLE_KW => {
@@ -3684,7 +3738,11 @@ fn data_source(p: &mut Parser<'_>) -> (SyntaxKind, ExprKind) {
             RELATION_FROM_ITEM
         }
     };
-    (kind, expr_kind)
+    DataSource {
+        kind,
+        expr_kind,
+        paren_select,
+    }
 }
 
 fn xml_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
@@ -3846,32 +3904,27 @@ fn xml_namespace_prefix(p: &mut Parser<'_>) {
 fn paren_data_source(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     assert!(p.at(L_PAREN));
     if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
-        return opt_paren_select(p, None, &ParenSelectRestrictions::default())
+        return opt_paren_select(p, None, &SelectRestrictions::default())
             .map(|cm| (cm, ExprKind::Select));
     }
     let m = p.start();
     p.bump(L_PAREN);
     // Then try to parse as a FROM_ITEM (which includes table references and joins)
-    if let Some(lhs_kind) = opt_from_item(p) {
-        if p.at_ts(COMPOUND_SELECT_FIRST) && lhs_kind == ExprKind::Select {
-            let cm = m.complete(p, PAREN_SELECT);
-            let cm = compound_select(p, cm, false);
-            p.expect(R_PAREN);
-            return Some((cm.precede(p).complete(p, PAREN_SELECT), ExprKind::Select));
-        }
+    if let Some((lhs, lhs_kind)) = opt_paren_from_item(p) {
         if p.at_ts(COMPOUND_SELECT_FIRST) {
-            p.error("expected select before compound select operator");
-            compound_select_rhs(p);
+            if lhs_kind != ExprKind::Select {
+                p.error("expected select before compound select operator");
+            }
+            compound_select(p, lhs, &SelectRestrictions::default());
+        } else if lhs_kind == ExprKind::Select {
             opt_select_trailing_clauses(p);
-            p.expect(R_PAREN);
-            return Some((m.complete(p, PAREN_EXPR), ExprKind::Other));
-        }
-        if lhs_kind == ExprKind::Select && opt_select_trailing_clauses(p) {
-            p.expect(R_PAREN);
-            return Some((m.complete(p, PAREN_SELECT), ExprKind::Select));
         }
         p.expect(R_PAREN);
-        return Some((m.complete(p, PAREN_EXPR), lhs_kind));
+        let kind = match lhs_kind {
+            ExprKind::Select => PAREN_SELECT,
+            ExprKind::Other => PAREN_EXPR,
+        };
+        return Some((m.complete(p, kind), lhs_kind));
     } else {
         p.error("expected table name or SELECT");
     }
@@ -3927,12 +3980,31 @@ fn merge_using_clause(p: &mut Parser<'_>) {
 //    RIGHT [ OUTER ] JOIN
 //    FULL [ OUTER ] JOIN
 //
-fn opt_from_item(p: &mut Parser<'_>) -> Option<ExprKind> {
+fn opt_from_item(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
+    from_item(p, false)
+}
+
+fn opt_paren_from_item(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
+    from_item(p, true)
+}
+
+fn from_item(p: &mut Parser<'_>, in_parens: bool) -> Option<(CompletedMarker, ExprKind)> {
     if !p.at_ts(FROM_ITEM_FIRST) {
         return None;
     }
     let m = p.start();
-    let (kind, mut expr_kind) = data_source(p);
+    let DataSource {
+        kind,
+        mut expr_kind,
+        paren_select,
+    } = data_source(p);
+    if in_parens
+        && let Some(select) = paren_select
+        && !p.at_ts(JOIN_FIRST)
+    {
+        m.abandon(p);
+        return Some((select, expr_kind));
+    }
     let mut cm = m.complete(p, kind);
     while p.at_ts(JOIN_FIRST) {
         let m = cm.precede(p);
@@ -3940,7 +4012,7 @@ fn opt_from_item(p: &mut Parser<'_>) -> Option<ExprKind> {
         cm = m.complete(p, JOIN_EXPR);
         expr_kind = ExprKind::Other;
     }
-    Some(expr_kind)
+    Some((cm, expr_kind))
 }
 
 // we have a from_item
@@ -7556,8 +7628,9 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             opt_paren_select(
                 p,
                 None,
-                &ParenSelectRestrictions {
+                &SelectRestrictions {
                     semi_allowed: r.semi_allowed,
+                    ..SelectRestrictions::default()
                 },
             )
         }
@@ -7581,9 +7654,14 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (ROLLBACK_KW, _) => Some(rollback(p)),
         (SAVEPOINT_KW, _) => Some(savepoint_create(p)),
         (SECURITY_KW, LABEL_KW) => Some(security_label(p)),
-        (SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW, _) => {
-            select(p, None, &SelectRestrictions::default(), r.semi_allowed)
-        }
+        (SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW, _) => select(
+            p,
+            None,
+            &SelectRestrictions {
+                semi_allowed: r.semi_allowed,
+                ..SelectRestrictions::default()
+            },
+        ),
         (SET_KW, CONSTRAINTS_KW) => Some(set_constraints(p)),
         (SET_KW, LOCAL_KW) => match p.nth(2) {
             ROLE_KW => Some(set_role(p)),
@@ -7605,7 +7683,14 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (UNLISTEN_KW, _) => Some(unlisten(p)),
         (UPDATE_KW, _) => Some(update(p, None, r.semi_allowed)),
         (VACUUM_KW, _) => Some(vacuum(p)),
-        (WITH_KW, _) => with(p, None, r.semi_allowed),
+        (WITH_KW, _) => with(
+            p,
+            None,
+            &SelectRestrictions {
+                semi_allowed: r.semi_allowed,
+                ..SelectRestrictions::default()
+            },
+        ),
         (command, _) => {
             // commands are outlined in:
             // https://www.postgresql.org/docs/17/sql-commands.html
@@ -9107,6 +9192,7 @@ fn domain_constraint(p: &mut Parser<'_>) {
     } else {
         p.error("expected NOT NULL or CHECK constraint");
         m.abandon(p);
+        opt_constraint_option_list(p);
         return;
     };
     opt_constraint_option_list(p);
@@ -13908,7 +13994,7 @@ fn merge_action(p: &mut Parser<'_>) {
             opt_overriding_clause(p);
             // { VALUES ( { expression | DEFAULT } [, ...] ) | DEFAULT VALUES }
             if p.at(VALUES_KW) {
-                values(p, None, false);
+                values(p, None, &SelectRestrictions::none());
             } else if p.at(DEFAULT_KW) {
                 default_values(p);
             } else {
@@ -14759,15 +14845,18 @@ fn set_transaction(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ LIMIT { count | ALL } ]
 //     [ OFFSET start [ ROW | ROWS ] ]
 //     [ FETCH { FIRST | NEXT } [ count ] { ROW | ROWS } ONLY ]
-fn values(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> CompletedMarker {
+fn values(p: &mut Parser<'_>, m: Option<Marker>, r: &SelectRestrictions) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(VALUES_KW);
     row_list(p);
-    opt_order_by_clause(p);
-    opt_limit_clause(p);
-    opt_offset_clause(p);
-    opt_fetch_clause(p);
-    if semi_allowed {
+    if p.at_ts(COMPOUND_SELECT_FIRST) && r.compound_allowed {
+        let cm = m.complete(p, VALUES);
+        return compound_select(p, cm, r);
+    }
+    if r.trailing_clauses {
+        opt_select_trailing_clauses(p);
+    }
+    if r.semi_allowed {
         p.eat(SEMICOLON);
     }
     m.complete(p, VALUES)
@@ -16209,8 +16298,8 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
-    if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default(), false).is_none())
-        && opt_paren_select(p, None, &ParenSelectRestrictions::default()).is_none()
+    if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default()).is_none())
+        && opt_paren_select(p, None, &SelectRestrictions::default()).is_none()
     {
         p.error("expected select stmt")
     }
@@ -16415,7 +16504,7 @@ fn set_expr_list_or_paren_select(p: &mut Parser<'_>) {
     p.eat(ROW_KW);
     if p.at(L_PAREN) {
         if p.nth_at(1, SELECT_KW) {
-            if opt_paren_select(p, Some(m), &ParenSelectRestrictions::default()).is_none() {
+            if opt_paren_select(p, Some(m), &SelectRestrictions::default()).is_none() {
                 p.error("expected sub-SELECT");
             }
         } else {
@@ -16557,22 +16646,20 @@ fn opt_where_or_current_of(p: &mut Parser<'_>) {
     }
 }
 
-fn with(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Option<CompletedMarker> {
+fn with(p: &mut Parser<'_>, m: Option<Marker>, r: &SelectRestrictions) -> Option<CompletedMarker> {
     let m = m.unwrap_or_else(|| p.start());
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
     with_query_clause(p);
     match p.current() {
-        DELETE_KW => Some(delete(p, Some(m), semi_allowed)),
-        SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW => {
-            select(p, Some(m), &SelectRestrictions::default(), semi_allowed)
-        }
-        INSERT_KW => Some(insert(p, Some(m), semi_allowed)),
-        UPDATE_KW => Some(update(p, Some(m), semi_allowed)),
-        MERGE_KW => Some(merge(p, Some(m), semi_allowed)),
+        DELETE_KW => Some(delete(p, Some(m), r.semi_allowed)),
+        SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW => select(p, Some(m), r),
+        INSERT_KW => Some(insert(p, Some(m), r.semi_allowed)),
+        UPDATE_KW => Some(update(p, Some(m), r.semi_allowed)),
+        MERGE_KW => Some(merge(p, Some(m), r.semi_allowed)),
         L_PAREN if p.nth_at_ts(1, PAREN_SELECT_FIRST) => {
             // can have select nested in parens, i.e., ((select 1));
-            opt_paren_select(p, Some(m), &ParenSelectRestrictions { semi_allowed })
+            opt_paren_select(p, Some(m), r)
         }
         _ => {
             m.abandon(p);

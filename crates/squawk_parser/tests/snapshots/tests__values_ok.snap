@@ -500,6 +500,89 @@ SOURCE_FILE
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- trailing_clauses"
+  WHITESPACE "\n"
+  VALUES
+    VALUES_KW "values"
+    WHITESPACE " "
+    ROW_LIST
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "2"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    WHITESPACE " "
+    OFFSET_CLAUSE
+      OFFSET_KW "offset"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  VALUES
+    VALUES_KW "values"
+    WHITESPACE " "
+    ROW_LIST
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
+    WHITESPACE " "
+    FETCH_CLAUSE
+      FETCH_KW "fetch"
+      WHITESPACE " "
+      FIRST_KW "first"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      ROW_KW "row"
+      WHITESPACE " "
+      FETCH_ONLY
+        ONLY_KW "only"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  VALUES
+    VALUES_KW "values"
+    WHITESPACE " "
+    ROW_LIST
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
+    WHITESPACE " "
+    LOCKING_CLAUSE
+      FOR_KW "for"
+      WHITESPACE " "
+      FOR_UPDATE
+        UPDATE_KW "update"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- union"
   WHITESPACE "\n"
   COMPOUND_SELECT

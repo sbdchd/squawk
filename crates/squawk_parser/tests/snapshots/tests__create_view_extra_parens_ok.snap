@@ -32,31 +32,30 @@ SOURCE_FILE
         FROM_KW "from"
         WHITESPACE " "
         PAREN_FROM_ITEM
-          PAREN_EXPR
+          PAREN_SELECT
             L_PAREN "("
-            PAREN_FROM_ITEM
-              PAREN_SELECT
-                L_PAREN "("
-                WHITESPACE " "
-                SELECT
-                  SELECT_CLAUSE
-                    SELECT_KW "select"
-                    WHITESPACE " "
-                    TARGET_LIST
-                      TARGET
-                        NAME_REF
-                          IDENT "y"
+            PAREN_SELECT
+              L_PAREN "("
+              WHITESPACE " "
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
                   WHITESPACE " "
-                  FROM_CLAUSE
-                    FROM_KW "from"
-                    WHITESPACE " "
-                    RELATION_FROM_ITEM
-                      RELATION_NAME_REF
-                        PATH_REF
-                          PATH_SEGMENT_REF
-                            IDENT "bar"
+                  TARGET_LIST
+                    TARGET
+                      NAME_REF
+                        IDENT "y"
                 WHITESPACE " "
-                R_PAREN ")"
+                FROM_CLAUSE
+                  FROM_KW "from"
+                  WHITESPACE " "
+                  RELATION_FROM_ITEM
+                    RELATION_NAME_REF
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          IDENT "bar"
+              WHITESPACE " "
+              R_PAREN ")"
             R_PAREN ")"
           WHITESPACE " "
           FROM_ALIAS

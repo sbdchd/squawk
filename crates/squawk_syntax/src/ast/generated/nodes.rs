@@ -25915,6 +25915,10 @@ impl Values {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn locking_clauses(&self) -> AstChildren<LockingClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn offset_clause(&self) -> Option<OffsetClause> {
         support::child(&self.syntax)
     }
