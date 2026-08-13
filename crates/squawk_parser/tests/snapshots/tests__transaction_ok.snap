@@ -26,19 +26,21 @@ SOURCE_FILE
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_NO_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      NO_KW "no"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
@@ -383,19 +385,21 @@ SOURCE_FILE
   COMMIT
     END_KW "end"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_NO_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      NO_KW "no"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
@@ -417,19 +421,21 @@ SOURCE_FILE
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_NO_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      NO_KW "no"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
@@ -451,19 +457,21 @@ SOURCE_FILE
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
-    AND_KW "and"
-    WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    CHAIN_KW "chain"
+    AND_NO_CHAIN
+      AND_KW "and"
+      WHITESPACE " "
+      NO_KW "no"
+      WHITESPACE " "
+      CHAIN_KW "chain"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK

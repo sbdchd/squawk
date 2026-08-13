@@ -148,7 +148,10 @@ fn inlay_hint_insert(
                 .collect()
         };
 
-    inlay_hint_insert_select(hints, columns, insert.select_variant()?)
+    let ast::InsertSource::SelectVariant(select) = insert.insert_source()? else {
+        return None;
+    };
+    inlay_hint_insert_select(hints, columns, select)
 }
 
 fn inlay_hint_insert_select(

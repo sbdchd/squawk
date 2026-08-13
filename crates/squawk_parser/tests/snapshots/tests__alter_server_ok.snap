@@ -40,7 +40,7 @@ SOURCE_FILE
       OPTIONS_KW "options"
       WHITESPACE " "
       L_PAREN "("
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         ADD_KW "add"
         WHITESPACE " "
         FOREIGN_OPTION_NAME
@@ -50,7 +50,7 @@ SOURCE_FILE
           STRING "'val'"
       COMMA ","
       WHITESPACE " "
-      ALTER_OPTION
+      DROP_FOREIGN_OPTION
         DROP_KW "drop"
         WHITESPACE " "
         FOREIGN_OPTION_NAME

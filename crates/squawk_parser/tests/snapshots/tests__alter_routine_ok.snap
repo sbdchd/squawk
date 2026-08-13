@@ -17,7 +17,7 @@ SOURCE_FILE
             IDENT "r"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
-      VOLATILITY_FUNC_OPTION
+      STABLE
         STABLE_KW "stable"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -224,13 +224,13 @@ SOURCE_FILE
             IDENT "r"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
-      VOLATILITY_FUNC_OPTION
+      IMMUTABLE
         IMMUTABLE_KW "immutable"
       WHITESPACE "\n  "
-      VOLATILITY_FUNC_OPTION
+      STABLE
         STABLE_KW "stable"
       WHITESPACE "\n  "
-      VOLATILITY_FUNC_OPTION
+      VOLATILE
         VOLATILE_KW "volatile"
       WHITESPACE "\n  "
       NOT_LEAKPROOF_FUNC_OPTION

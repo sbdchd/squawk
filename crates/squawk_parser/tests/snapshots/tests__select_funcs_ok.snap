@@ -4117,16 +4117,17 @@ SOURCE_FILE
             OVER_CLAUSE
               OVER_KW "over"
               WHITESPACE " "
-              L_PAREN "("
-              WINDOW_SPEC
-                PARTITION_BY_CLAUSE
-                  PARTITION_KW "partition"
-                  WHITESPACE " "
-                  BY_KW "by"
-                  WHITESPACE " "
-                  NAME_REF
-                    IDENT "b"
-              R_PAREN ")"
+              OVER_WINDOW_SPEC
+                L_PAREN "("
+                WINDOW_SPEC
+                  PARTITION_BY_CLAUSE
+                    PARTITION_KW "partition"
+                    WHITESPACE " "
+                    BY_KW "by"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "b"
+                R_PAREN ")"
           WHITESPACE " "
           AS_NAME
             AS_KW "as"
@@ -4283,7 +4284,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_ORDINALITY_COLUMN
               COLUMN_NAME
                 IDENT "id"
               WHITESPACE " "
@@ -4292,7 +4293,7 @@ SOURCE_FILE
               ORDINALITY_KW "ORDINALITY"
             COMMA ","
             WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_VALUE_COLUMN
               COLUMN_NAME
                 IDENT "kind"
               WHITESPACE " "
@@ -4308,7 +4309,7 @@ SOURCE_FILE
                   STRING "'$.kind'"
             COMMA ","
             WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_VALUE_COLUMN
               COLUMN_NAME
                 IDENT "title"
               WHITESPACE " "
@@ -4329,7 +4330,7 @@ SOURCE_FILE
                 WRAPPER_KW "WRAPPER"
             COMMA ","
             WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_VALUE_COLUMN
               COLUMN_NAME
                 IDENT "director"
               WHITESPACE " "
@@ -4412,7 +4413,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_ORDINALITY_COLUMN
               COLUMN_NAME
                 IDENT "id"
               WHITESPACE " "
@@ -4421,7 +4422,7 @@ SOURCE_FILE
               ORDINALITY_KW "ORDINALITY"
             COMMA ","
             WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_VALUE_COLUMN
               COLUMN_NAME
                 IDENT "kind"
               WHITESPACE " "
@@ -4437,7 +4438,7 @@ SOURCE_FILE
                   STRING "'$.kind'"
             COMMA ","
             WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "NESTED"
               WHITESPACE " "
               PATH_KW "PATH"
@@ -4450,7 +4451,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n      "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "title"
                   WHITESPACE " "
@@ -4477,7 +4478,7 @@ SOURCE_FILE
                       QUOTES_KW "QUOTES"
                 COMMA ","
                 WHITESPACE "\n      "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "director"
                   WHITESPACE " "
@@ -4550,7 +4551,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_ORDINALITY_COLUMN
               COLUMN_NAME
                 IDENT "id"
               WHITESPACE " "
@@ -4559,7 +4560,7 @@ SOURCE_FILE
               ORDINALITY_KW "ORDINALITY"
             COMMA ","
             WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_VALUE_COLUMN
               COLUMN_NAME
                 IDENT "kind"
               WHITESPACE " "
@@ -4575,7 +4576,7 @@ SOURCE_FILE
                   STRING "'$.kind'"
             COMMA ","
             WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "NESTED"
               WHITESPACE " "
               PATH_KW "PATH"
@@ -4588,7 +4589,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n      "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "title"
                   WHITESPACE " "
@@ -4615,7 +4616,7 @@ SOURCE_FILE
                       QUOTES_KW "QUOTES"
                 COMMA ","
                 WHITESPACE "\n      "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "director"
                   WHITESPACE " "
@@ -4685,7 +4686,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_ORDINALITY_COLUMN
               COLUMN_NAME
                 IDENT "user_id"
               WHITESPACE " "
@@ -4694,7 +4695,7 @@ SOURCE_FILE
               ORDINALITY_KW "ORDINALITY"
             COMMA ","
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "NESTED"
               WHITESPACE " "
               LITERAL
@@ -4705,7 +4706,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n    "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_ORDINALITY_COLUMN
                   COLUMN_NAME
                     IDENT "movie_id"
                   WHITESPACE " "
@@ -4714,7 +4715,7 @@ SOURCE_FILE
                   ORDINALITY_KW "ORDINALITY"
                 COMMA ","
                 WHITESPACE "\n    "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -4730,7 +4731,7 @@ SOURCE_FILE
                       STRING "'$.name'"
                 COMMA ","
                 WHITESPACE "\n    "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "director"
                   WHITESPACE " "
@@ -4741,7 +4742,7 @@ SOURCE_FILE
                 R_PAREN ")"
             COMMA ","
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "NESTED"
               WHITESPACE " "
               LITERAL
@@ -4752,7 +4753,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n      "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_ORDINALITY_COLUMN
                   COLUMN_NAME
                     IDENT "book_id"
                   WHITESPACE " "
@@ -4761,7 +4762,7 @@ SOURCE_FILE
                   ORDINALITY_KW "ORDINALITY"
                 COMMA ","
                 WHITESPACE "\n      "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "bname"
                   WHITESPACE " "
@@ -4777,7 +4778,7 @@ SOURCE_FILE
                       STRING "'$.name'"
                 COMMA ","
                 WHITESPACE "\n      "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_NESTED_COLUMN
                   NESTED_KW "NESTED"
                   WHITESPACE " "
                   LITERAL
@@ -4788,7 +4789,7 @@ SOURCE_FILE
                     WHITESPACE " "
                     L_PAREN "("
                     WHITESPACE "\n          "
-                    JSON_TABLE_COLUMN
+                    JSON_TABLE_ORDINALITY_COLUMN
                       COLUMN_NAME
                         IDENT "author_id"
                       WHITESPACE " "
@@ -4797,7 +4798,7 @@ SOURCE_FILE
                       ORDINALITY_KW "ORDINALITY"
                     COMMA ","
                     WHITESPACE "\n          "
-                    JSON_TABLE_COLUMN
+                    JSON_TABLE_VALUE_COLUMN
                       COLUMN_NAME
                         IDENT "author_name"
                       WHITESPACE " "
@@ -4853,7 +4854,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_ORDINALITY_COLUMN
               COLUMN_NAME
                 IDENT "id"
               WHITESPACE " "
@@ -4862,7 +4863,7 @@ SOURCE_FILE
               ORDINALITY_KW "ordinality"
             COMMA ","
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -4881,7 +4882,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -4898,7 +4899,7 @@ SOURCE_FILE
                 R_PAREN ")"
             COMMA ","
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -4917,7 +4918,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "bname"
                   WHITESPACE " "
@@ -4984,7 +4985,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5003,7 +5004,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -5028,7 +5029,8 @@ SOURCE_FILE
               JSON_PATH_NAME_REF
                 IDENT "p0"
               WHITESPACE " "
-              OUTER_KW "outer"
+              JSON_TABLE_PLAN_OUTER
+                OUTER_KW "outer"
               WHITESPACE " "
               JSON_PATH_NAME_REF
                 IDENT "p1"
@@ -5076,7 +5078,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5095,7 +5097,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -5112,7 +5114,7 @@ SOURCE_FILE
                 R_PAREN ")"
             COMMA ","
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5131,7 +5133,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "bname"
                   WHITESPACE " "
@@ -5156,7 +5158,8 @@ SOURCE_FILE
               JSON_PATH_NAME_REF
                 IDENT "p0"
               WHITESPACE " "
-              INNER_KW "inner"
+              JSON_TABLE_PLAN_INNER
+                INNER_KW "inner"
               WHITESPACE " "
               PAREN_JSON_TABLE_PLAN
                 L_PAREN "("
@@ -5164,7 +5167,8 @@ SOURCE_FILE
                   JSON_PATH_NAME_REF
                     IDENT "p1"
                   WHITESPACE " "
-                  UNION_KW "union"
+                  JSON_TABLE_PLAN_UNION
+                    UNION_KW "union"
                   WHITESPACE " "
                   JSON_PATH_NAME_REF
                     IDENT "\"p2 x\""
@@ -5213,7 +5217,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5232,7 +5236,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_NESTED_COLUMN
                   NESTED_KW "nested"
                   WHITESPACE " "
                   PATH_KW "path"
@@ -5251,7 +5255,7 @@ SOURCE_FILE
                     WHITESPACE " "
                     L_PAREN "("
                     WHITESPACE "\n    "
-                    JSON_TABLE_COLUMN
+                    JSON_TABLE_VALUE_COLUMN
                       COLUMN_NAME
                         IDENT "aname"
                       WHITESPACE " "
@@ -5268,7 +5272,7 @@ SOURCE_FILE
                     R_PAREN ")"
                 COMMA ","
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_NESTED_COLUMN
                   NESTED_KW "nested"
                   WHITESPACE " "
                   PATH_KW "path"
@@ -5287,7 +5291,7 @@ SOURCE_FILE
                     WHITESPACE " "
                     L_PAREN "("
                     WHITESPACE "\n    "
-                    JSON_TABLE_COLUMN
+                    JSON_TABLE_VALUE_COLUMN
                       COLUMN_NAME
                         IDENT "dname"
                       WHITESPACE " "
@@ -5305,7 +5309,7 @@ SOURCE_FILE
                 R_PAREN ")"
             COMMA ","
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5324,7 +5328,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "bname"
                   WHITESPACE " "
@@ -5349,7 +5353,8 @@ SOURCE_FILE
               JSON_PATH_NAME_REF
                 IDENT "p0"
               WHITESPACE " "
-              OUTER_KW "outer"
+              JSON_TABLE_PLAN_OUTER
+                OUTER_KW "outer"
               WHITESPACE " "
               PAREN_JSON_TABLE_PLAN
                 L_PAREN "("
@@ -5360,7 +5365,8 @@ SOURCE_FILE
                       JSON_PATH_NAME_REF
                         IDENT "p1"
                       WHITESPACE " "
-                      INNER_KW "inner"
+                      JSON_TABLE_PLAN_INNER
+                        INNER_KW "inner"
                       WHITESPACE " "
                       PAREN_JSON_TABLE_PLAN
                         L_PAREN "("
@@ -5368,14 +5374,16 @@ SOURCE_FILE
                           JSON_PATH_NAME_REF
                             IDENT "p11"
                           WHITESPACE " "
-                          CROSS_KW "cross"
+                          JSON_TABLE_PLAN_CROSS
+                            CROSS_KW "cross"
                           WHITESPACE " "
                           JSON_PATH_NAME_REF
                             IDENT "p12"
                         R_PAREN ")"
                     R_PAREN ")"
                   WHITESPACE " "
-                  UNION_KW "union"
+                  JSON_TABLE_PLAN_UNION
+                    UNION_KW "union"
                   WHITESPACE " "
                   JSON_PATH_NAME_REF
                     IDENT "p2"
@@ -5420,7 +5428,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5433,7 +5441,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -5457,7 +5465,8 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             JSON_TABLE_PLAN_CHOICE
-              UNION_KW "union"
+              JSON_TABLE_PLAN_UNION
+                UNION_KW "union"
             R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
@@ -5496,7 +5505,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5509,7 +5518,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -5533,7 +5542,8 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             JSON_TABLE_PLAN_CHOICE
-              INNER_KW "inner"
+              JSON_TABLE_PLAN_INNER
+                INNER_KW "inner"
             R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
@@ -5572,7 +5582,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5585,7 +5595,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -5609,11 +5619,13 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             JSON_TABLE_PLAN_CHOICE
-              OUTER_KW "outer"
+              JSON_TABLE_PLAN_OUTER
+                OUTER_KW "outer"
             COMMA ","
             WHITESPACE " "
             JSON_TABLE_PLAN_CHOICE
-              CROSS_KW "cross"
+              JSON_TABLE_PLAN_CROSS
+                CROSS_KW "cross"
             R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
@@ -5652,7 +5664,7 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
+            JSON_TABLE_NESTED_COLUMN
               NESTED_KW "nested"
               WHITESPACE " "
               PATH_KW "path"
@@ -5665,7 +5677,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 L_PAREN "("
                 WHITESPACE "\n   "
-                JSON_TABLE_COLUMN
+                JSON_TABLE_VALUE_COLUMN
                   COLUMN_NAME
                     IDENT "mname"
                   WHITESPACE " "
@@ -5689,11 +5701,13 @@ SOURCE_FILE
             WHITESPACE " "
             L_PAREN "("
             JSON_TABLE_PLAN_CHOICE
-              UNION_KW "union"
+              JSON_TABLE_PLAN_UNION
+                UNION_KW "union"
             COMMA ","
             WHITESPACE " "
             JSON_TABLE_PLAN_CHOICE
-              INNER_KW "inner"
+              JSON_TABLE_PLAN_INNER
+                INNER_KW "inner"
             R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "

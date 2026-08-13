@@ -65,7 +65,7 @@ SOURCE_FILE
       OPTIONS_KW "options"
       WHITESPACE " "
       L_PAREN "("
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "a"
         WHITESPACE " "
@@ -73,7 +73,7 @@ SOURCE_FILE
           STRING "'foo'"
       COMMA ","
       WHITESPACE " "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "bar"
         WHITESPACE " "
@@ -105,7 +105,7 @@ SOURCE_FILE
       OPTIONS_KW "OPTIONS"
       WHITESPACE " "
       L_PAREN "("
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "host"
         WHITESPACE " "
@@ -113,7 +113,7 @@ SOURCE_FILE
           STRING "'foo'"
       COMMA ","
       WHITESPACE " "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "dbname"
         WHITESPACE " "
@@ -121,7 +121,7 @@ SOURCE_FILE
           STRING "'foodb'"
       COMMA ","
       WHITESPACE " "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "port"
         WHITESPACE " "

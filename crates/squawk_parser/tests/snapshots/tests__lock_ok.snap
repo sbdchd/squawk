@@ -61,14 +61,15 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    ACCESS_SHARE
-      ACCESS_KW "access"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
       WHITESPACE " "
-      SHARE_KW "share"
-    WHITESPACE " "
-    MODE_KW "mode"
+      ACCESS_SHARE
+        ACCESS_KW "access"
+        WHITESPACE " "
+        SHARE_KW "share"
+      WHITESPACE " "
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
@@ -81,14 +82,15 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    ROW_SHARE
-      ROW_KW "row"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
       WHITESPACE " "
-      SHARE_KW "share"
-    WHITESPACE " "
-    MODE_KW "mode"
+      ROW_SHARE
+        ROW_KW "row"
+        WHITESPACE " "
+        SHARE_KW "share"
+      WHITESPACE " "
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
@@ -101,14 +103,15 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    ROW_EXCLUSIVE
-      ROW_KW "row"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
       WHITESPACE " "
-      EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
+      ROW_EXCLUSIVE
+        ROW_KW "row"
+        WHITESPACE " "
+        EXCLUSIVE_KW "exclusive"
+      WHITESPACE " "
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
@@ -121,16 +124,17 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    SHARE_UPDATE_EXCLUSIVE
-      SHARE_KW "share"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
       WHITESPACE " "
-      UPDATE_KW "update"
+      SHARE_UPDATE_EXCLUSIVE
+        SHARE_KW "share"
+        WHITESPACE " "
+        UPDATE_KW "update"
+        WHITESPACE " "
+        EXCLUSIVE_KW "exclusive"
       WHITESPACE " "
-      EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
@@ -143,12 +147,13 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    SHARE
-      SHARE_KW "share"
-    WHITESPACE " "
-    MODE_KW "mode"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
+      WHITESPACE " "
+      SHARE
+        SHARE_KW "share"
+      WHITESPACE " "
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
@@ -161,16 +166,17 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    SHARE_ROW_EXCLUSIVE
-      SHARE_KW "share"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
       WHITESPACE " "
-      ROW_KW "row"
+      SHARE_ROW_EXCLUSIVE
+        SHARE_KW "share"
+        WHITESPACE " "
+        ROW_KW "row"
+        WHITESPACE " "
+        EXCLUSIVE_KW "exclusive"
       WHITESPACE " "
-      EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
@@ -183,12 +189,13 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    EXCLUSIVE
-      EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
+      WHITESPACE " "
+      EXCLUSIVE
+        EXCLUSIVE_KW "exclusive"
+      WHITESPACE " "
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
@@ -201,14 +208,15 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    ACCESS_EXCLUSIVE
-      ACCESS_KW "access"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
       WHITESPACE " "
-      EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
+      ACCESS_EXCLUSIVE
+        ACCESS_KW "access"
+        WHITESPACE " "
+        EXCLUSIVE_KW "exclusive"
+      WHITESPACE " "
+      MODE_KW "mode"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
@@ -243,14 +251,15 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "c"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    ROW_EXCLUSIVE
-      ROW_KW "row"
+    LOCK_MODE_CLAUSE
+      IN_KW "in"
       WHITESPACE " "
-      EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
+      ROW_EXCLUSIVE
+        ROW_KW "row"
+        WHITESPACE " "
+        EXCLUSIVE_KW "exclusive"
+      WHITESPACE " "
+      MODE_KW "mode"
     WHITESPACE " "
     NOWAIT
       NOWAIT_KW "nowait"

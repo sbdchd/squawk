@@ -88,7 +88,7 @@ SOURCE_FILE
         OPTIONS_KW "options"
         WHITESPACE " "
         L_PAREN "("
-        ALTER_OPTION
+        ADD_FOREIGN_OPTION
           FOREIGN_OPTION_NAME
             IDENT "a"
           WHITESPACE " "
@@ -96,7 +96,7 @@ SOURCE_FILE
             STRING "'foo'"
         COMMA ","
         WHITESPACE " "
-        ALTER_OPTION
+        ADD_FOREIGN_OPTION
           FOREIGN_OPTION_NAME
             IDENT "b"
           WHITESPACE " "

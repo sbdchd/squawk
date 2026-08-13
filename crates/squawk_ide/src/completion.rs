@@ -608,7 +608,7 @@ fn delete_clauses_completions(
         });
     }
 
-    if delete.where_clause().is_none() {
+    if delete.where_clause_or_current_of().is_none() {
         completions.push(CompletionItem {
             label: "where".to_owned(),
             kind: CompletionItemKind::Snippet,

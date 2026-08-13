@@ -10,13 +10,14 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PAREN_EXPR
-      L_PAREN "("
-      NAME_REF
-        IDENT "a"
-      R_PAREN ")"
+    STATISTICS_ON_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        NAME_REF
+          IDENT "a"
+        R_PAREN ")"
     WHITESPACE " "
     FROM_TABLE
       FROM_KW "from"
@@ -63,34 +64,35 @@ SOURCE_FILE
         IDENT "dependencies"
       R_PAREN ")"
     WHITESPACE "\n"
-    ON_KW "on"
-    WHITESPACE " "
-    PAREN_EXPR
-      L_PAREN "("
+    STATISTICS_ON_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        NAME_REF
+          IDENT "foo"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
       NAME_REF
-        IDENT "foo"
-      R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "bar"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "buzz"
-    COMMA ","
-    WHITESPACE " "
-    PAREN_EXPR
-      L_PAREN "("
-      BIN_EXPR
-        NAME_REF
-          IDENT "a"
-        WHITESPACE " "
-        PLUS "+"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "b"
-      R_PAREN ")"
+        IDENT "bar"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "buzz"
+      COMMA ","
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          PLUS "+"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+        R_PAREN ")"
     WHITESPACE "\n"
     FROM_TABLE
       FROM_KW "from"
@@ -123,14 +125,15 @@ SOURCE_FILE
         IDENT "dependencies"
       R_PAREN ")"
     WHITESPACE " "
-    ON_KW "ON"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    STATISTICS_ON_CLAUSE
+      ON_KW "ON"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
     WHITESPACE " "
     FROM_TABLE
       FROM_KW "FROM"
@@ -159,14 +162,15 @@ SOURCE_FILE
         IDENT "mcv"
       R_PAREN ")"
     WHITESPACE " "
-    ON_KW "ON"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    STATISTICS_ON_CLAUSE
+      ON_KW "ON"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
     WHITESPACE " "
     FROM_TABLE
       FROM_KW "FROM"
@@ -195,38 +199,39 @@ SOURCE_FILE
         IDENT "ndistinct"
       R_PAREN ")"
     WHITESPACE " "
-    ON_KW "ON"
-    WHITESPACE " "
-    CALL_EXPR
-      NAME_REF
-        IDENT "date_trunc"
-      ARG_LIST
-        L_PAREN "("
-        ARG
-          LITERAL
-            STRING "'month'"
-        COMMA ","
-        WHITESPACE " "
-        ARG
-          NAME_REF
-            IDENT "a"
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    CALL_EXPR
-      NAME_REF
-        IDENT "date_trunc"
-      ARG_LIST
-        L_PAREN "("
-        ARG
-          LITERAL
-            STRING "'day'"
-        COMMA ","
-        WHITESPACE " "
-        ARG
-          NAME_REF
-            IDENT "a"
-        R_PAREN ")"
+    STATISTICS_ON_CLAUSE
+      ON_KW "ON"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "date_trunc"
+        ARG_LIST
+          L_PAREN "("
+          ARG
+            LITERAL
+              STRING "'month'"
+          COMMA ","
+          WHITESPACE " "
+          ARG
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "date_trunc"
+        ARG_LIST
+          L_PAREN "("
+          ARG
+            LITERAL
+              STRING "'day'"
+          COMMA ","
+          WHITESPACE " "
+          ARG
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
     WHITESPACE " "
     FROM_TABLE
       FROM_KW "FROM"

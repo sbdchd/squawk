@@ -24,12 +24,13 @@ SOURCE_FILE
     PUBLICATION
       IDENT "p"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
     FOR_ALL_PUBLICATION_OBJECTS
-      ALL_KW "all"
+      FOR_KW "for"
       WHITESPACE " "
-      TABLES_KW "tables"
+      ALL_PUBLICATION_TABLES
+        ALL_KW "all"
+        WHITESPACE " "
+        TABLES_KW "tables"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -65,28 +66,15 @@ SOURCE_FILE
     PUBLICATION
       IDENT "p"
     WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " \n  "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_KW "table"
-      WHITESPACE " "
-      ONLY_KW "only"
-      WHITESPACE " "
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_REF
-            PATH_SEGMENT_REF
-              IDENT "foo"
-          DOT "."
-          PATH_SEGMENT_REF
-            IDENT "bar"
-    COMMA ","
-    WHITESPACE " \n  "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_KW "table"
-      WHITESPACE " "
-      TABLE_NAME_REF
-        PATH_REF
+    FOR_PUBLICATION_OBJECTS
+      FOR_KW "for"
+      WHITESPACE " \n  "
+      PUBLICATION_OBJECT_TABLE
+        TABLE_KW "table"
+        WHITESPACE " "
+        ONLY_KW "only"
+        WHITESPACE " "
+        TABLE_NAME_REF
           PATH_REF
             PATH_REF
               PATH_SEGMENT_REF
@@ -94,81 +82,95 @@ SOURCE_FILE
             DOT "."
             PATH_SEGMENT_REF
               IDENT "bar"
-          DOT "."
-          PATH_SEGMENT_REF
-            IDENT "buzz"
-      WHITESPACE " "
-      STAR "*"
-    COMMA ","
-    WHITESPACE " \n  "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_KW "table"
-      WHITESPACE " "
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "foo"
-    COMMA ","
-    WHITESPACE " \n  "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_KW "table"
-      WHITESPACE " "
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "foo"
-      COLUMN_REF_LIST
-        L_PAREN "("
-        COLUMN_NAME_REF
-          IDENT "a"
-        COMMA ","
+      COMMA ","
+      WHITESPACE " \n  "
+      PUBLICATION_OBJECT_TABLE
+        TABLE_KW "table"
         WHITESPACE " "
-        COLUMN_NAME_REF
-          IDENT "b"
-        COMMA ","
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "foo"
+              DOT "."
+              PATH_SEGMENT_REF
+                IDENT "bar"
+            DOT "."
+            PATH_SEGMENT_REF
+              IDENT "buzz"
         WHITESPACE " "
-        COLUMN_NAME_REF
-          IDENT "c"
-        R_PAREN ")"
-      WHITESPACE " "
-      WHERE_CONDITION_CLAUSE
-        WHERE_KW "where"
+        STAR "*"
+      COMMA ","
+      WHITESPACE " \n  "
+      PUBLICATION_OBJECT_TABLE
+        TABLE_KW "table"
         WHITESPACE " "
-        L_PAREN "("
-        BIN_EXPR
-          BIN_EXPR
-            NAME_REF
-              IDENT "x"
-            WHITESPACE " "
-            R_ANGLE ">"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "10"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "foo"
+      COMMA ","
+      WHITESPACE " \n  "
+      PUBLICATION_OBJECT_TABLE
+        TABLE_KW "table"
+        WHITESPACE " "
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "foo"
+        COLUMN_REF_LIST
+          L_PAREN "("
+          COLUMN_NAME_REF
+            IDENT "a"
+          COMMA ","
           WHITESPACE " "
-          OR_KW "or"
+          COLUMN_NAME_REF
+            IDENT "b"
+          COMMA ","
           WHITESPACE " "
+          COLUMN_NAME_REF
+            IDENT "c"
+          R_PAREN ")"
+        WHITESPACE " "
+        WHERE_CONDITION_CLAUSE
+          WHERE_KW "where"
+          WHITESPACE " "
+          L_PAREN "("
           BIN_EXPR
-            NAME_REF
-              IDENT "a"
+            BIN_EXPR
+              NAME_REF
+                IDENT "x"
+              WHITESPACE " "
+              R_ANGLE ">"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
             WHITESPACE " "
-            NEQ "!="
+            OR_KW "or"
             WHITESPACE " "
-            NAME_REF
-              IDENT "b"
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              NEQ "!="
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      PUBLICATION_OBJECT_TABLE
+        TABLE_KW "table"
+        WHITESPACE " "
+        ONLY_KW "only"
+        WHITESPACE " "
+        L_PAREN "("
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "foo"
         R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_KW "table"
-      WHITESPACE " "
-      ONLY_KW "only"
-      WHITESPACE " "
-      L_PAREN "("
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "foo"
-      R_PAREN ")"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -204,35 +206,36 @@ SOURCE_FILE
     PUBLICATION
       IDENT "p"
     WHITESPACE "\n  "
-    FOR_KW "for"
-    WHITESPACE " "
-    PUBLICATION_OBJECT_TABLES_IN_SCHEMA
-      TABLES_KW "tables"
+    FOR_PUBLICATION_OBJECTS
+      FOR_KW "for"
       WHITESPACE " "
-      IN_KW "in"
+      PUBLICATION_OBJECT_TABLES_IN_SCHEMA
+        TABLES_KW "tables"
+        WHITESPACE " "
+        IN_KW "in"
+        WHITESPACE " "
+        SCHEMA_KW "schema"
+        WHITESPACE " "
+        SCHEMA_REF
+          IDENT "a"
+      COMMA ","
       WHITESPACE " "
-      SCHEMA_KW "schema"
+      PUBLICATION_OBJECT_TABLE
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "b"
+      COMMA ","
       WHITESPACE " "
-      SCHEMA_REF
-        IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "c"
-    COMMA ","
-    WHITESPACE " "
-    PUBLICATION_OBJECT_CURRENT_SCHEMA
-      CURRENT_SCHEMA_KW "current_schema"
+      PUBLICATION_OBJECT_TABLE
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      PUBLICATION_OBJECT_CURRENT_SCHEMA
+        CURRENT_SCHEMA_KW "current_schema"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple tables"
@@ -245,22 +248,23 @@ SOURCE_FILE
     PUBLICATION
       IDENT "pub"
     WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_KW "table"
+    FOR_PUBLICATION_OBJECTS
+      FOR_KW "for"
       WHITESPACE " "
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "chats"
-    COMMA ","
-    WHITESPACE " "
-    PUBLICATION_OBJECT_TABLE
-      TABLE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "users"
+      PUBLICATION_OBJECT_TABLE
+        TABLE_KW "table"
+        WHITESPACE " "
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "chats"
+      COMMA ","
+      WHITESPACE " "
+      PUBLICATION_OBJECT_TABLE
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "users"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PUBLICATION
@@ -271,12 +275,13 @@ SOURCE_FILE
     PUBLICATION
       IDENT "p"
     WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
     FOR_ALL_PUBLICATION_OBJECTS
-      ALL_KW "all"
+      FOR_KW "for"
       WHITESPACE " "
-      TABLES_KW "tables"
+      ALL_PUBLICATION_TABLES
+        ALL_KW "all"
+        WHITESPACE " "
+        TABLES_KW "tables"
       WHITESPACE " "
       EXCEPT_TABLE_CLAUSE
         EXCEPT_KW "except"
@@ -303,12 +308,13 @@ SOURCE_FILE
     PUBLICATION
       IDENT "p"
     WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
     FOR_ALL_PUBLICATION_OBJECTS
-      ALL_KW "all"
+      FOR_KW "for"
       WHITESPACE " "
-      TABLES_KW "tables"
+      ALL_PUBLICATION_TABLES
+        ALL_KW "all"
+        WHITESPACE " "
+        TABLES_KW "tables"
       WHITESPACE " "
       EXCEPT_TABLE_CLAUSE
         EXCEPT_KW "except"

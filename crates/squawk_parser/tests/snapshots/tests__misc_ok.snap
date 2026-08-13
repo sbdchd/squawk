@@ -3306,7 +3306,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "fdw_package_url"
         WHITESPACE " "
@@ -3314,7 +3314,7 @@ SOURCE_FILE
           STRING "'https://github.com/supabase/wrappers/releases/download/wasm_cal_fdw_v0.1.0/cal_fdw.wasm'"
       COMMA ","
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "fdw_package_name"
         WHITESPACE " "
@@ -3322,7 +3322,7 @@ SOURCE_FILE
           STRING "'supabase:cal-fdw'"
       COMMA ","
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "fdw_package_version"
         WHITESPACE " "
@@ -3330,7 +3330,7 @@ SOURCE_FILE
           STRING "'0.1.0'"
       COMMA ","
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "fdw_package_checksum"
         WHITESPACE " "
@@ -3338,7 +3338,7 @@ SOURCE_FILE
           STRING "'4afe4fac8c51f2caa1de8483b3817d2cec3a14cd8a65a3942c8b4ff6c430f08a'"
       COMMA ","
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "api_key"
         WHITESPACE " "
@@ -3406,7 +3406,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           OBJECT_KW "object"
         WHITESPACE " "
@@ -3457,7 +3457,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           OBJECT_KW "object"
         WHITESPACE " "
@@ -3465,7 +3465,7 @@ SOURCE_FILE
           STRING "'bookings'"
       COMMA ","
       WHITESPACE "\n    "
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "rowid_column"
         WHITESPACE " "
@@ -4509,7 +4509,7 @@ SOURCE_FILE
     ALTER_OPTION_LIST
       OPTIONS_KW "OPTIONS"
       L_PAREN "("
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           COMPRESSION_KW "compression"
         WHITESPACE " "
@@ -4583,7 +4583,7 @@ SOURCE_FILE
       OPTIONS_KW "OPTIONS"
       WHITESPACE " "
       L_PAREN "("
-      ALTER_OPTION
+      ADD_FOREIGN_OPTION
         FOREIGN_OPTION_NAME
           IDENT "files"
         WHITESPACE " "
@@ -4865,40 +4865,41 @@ SOURCE_FILE
             OVER_CLAUSE
               OVER_KW "OVER"
               WHITESPACE " "
-              L_PAREN "("
-              WHITESPACE "\n    "
-              WINDOW_SPEC
-                ORDER_BY_CLAUSE
-                  ORDER_KW "ORDER"
-                  WHITESPACE " "
-                  BY_KW "BY"
-                  WHITESPACE " "
-                  SORT_BY_LIST
-                    SORT_BY
-                      NAME_REF
-                        MONTH_KW "month"
-                WHITESPACE " \n    "
-                FRAME_CLAUSE
-                  FRAME_ROWS
-                    ROWS_KW "ROWS"
-                  WHITESPACE " "
-                  FRAME_BETWEEN
-                    BETWEEN_KW "BETWEEN"
+              OVER_WINDOW_SPEC
+                L_PAREN "("
+                WHITESPACE "\n    "
+                WINDOW_SPEC
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
                     WHITESPACE " "
-                    EXPR_PRECEDING
-                      LITERAL
-                        INT_NUMBER "2"
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    SORT_BY_LIST
+                      SORT_BY
+                        NAME_REF
+                          MONTH_KW "month"
+                  WHITESPACE " \n    "
+                  FRAME_CLAUSE
+                    FRAME_ROWS
+                      ROWS_KW "ROWS"
+                    WHITESPACE " "
+                    FRAME_BETWEEN
+                      BETWEEN_KW "BETWEEN"
                       WHITESPACE " "
-                      PRECEDING_KW "PRECEDING"
-                    WHITESPACE " "
-                    AND_KW "AND"
-                    WHITESPACE " "
-                    CURRENT_ROW
-                      CURRENT_KW "CURRENT"
+                      EXPR_PRECEDING
+                        LITERAL
+                          INT_NUMBER "2"
+                        WHITESPACE " "
+                        PRECEDING_KW "PRECEDING"
                       WHITESPACE " "
-                      ROW_KW "ROW"
-              WHITESPACE "\n  "
-              R_PAREN ")"
+                      AND_KW "AND"
+                      WHITESPACE " "
+                      CURRENT_ROW
+                        CURRENT_KW "CURRENT"
+                        WHITESPACE " "
+                        ROW_KW "ROW"
+                WHITESPACE "\n  "
+                R_PAREN ")"
           WHITESPACE " "
           AS_NAME
             AS_KW "as"
@@ -4988,40 +4989,41 @@ SOURCE_FILE
             OVER_CLAUSE
               OVER_KW "OVER"
               WHITESPACE " "
-              L_PAREN "("
-              WHITESPACE "\n    "
-              WINDOW_SPEC
-                PARTITION_BY_CLAUSE
-                  PARTITION_KW "PARTITION"
-                  WHITESPACE " "
-                  BY_KW "BY"
-                  WHITESPACE " "
-                  NAME_REF
-                    IDENT "customer_segment"
+              OVER_WINDOW_SPEC
+                L_PAREN "("
                 WHITESPACE "\n    "
-                ORDER_BY_CLAUSE
-                  ORDER_KW "ORDER"
-                  WHITESPACE " "
-                  BY_KW "BY"
-                  WHITESPACE " "
-                  SORT_BY_LIST
-                    SORT_BY
-                      CALL_EXPR
-                        NAME_REF
-                          IDENT "date_trunc"
-                        ARG_LIST
-                          L_PAREN "("
-                          ARG
-                            LITERAL
-                              STRING "'month'"
-                          COMMA ","
-                          WHITESPACE " "
-                          ARG
-                            NAME_REF
-                              TIMESTAMP_KW "timestamp"
-                          R_PAREN ")"
-              WHITESPACE "\n  "
-              R_PAREN ")"
+                WINDOW_SPEC
+                  PARTITION_BY_CLAUSE
+                    PARTITION_KW "PARTITION"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "customer_segment"
+                  WHITESPACE "\n    "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    SORT_BY_LIST
+                      SORT_BY
+                        CALL_EXPR
+                          NAME_REF
+                            IDENT "date_trunc"
+                          ARG_LIST
+                            L_PAREN "("
+                            ARG
+                              LITERAL
+                                STRING "'month'"
+                            COMMA ","
+                            WHITESPACE " "
+                            ARG
+                              NAME_REF
+                                TIMESTAMP_KW "timestamp"
+                            R_PAREN ")"
+                WHITESPACE "\n  "
+                R_PAREN ")"
           WHITESPACE " "
           AS_NAME
             AS_KW "as"

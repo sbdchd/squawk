@@ -643,13 +643,14 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "products"
         WHITESPACE " "
-        KEY_KW "KEY"
-        WHITESPACE " "
-        COLUMN_REF_LIST
-          L_PAREN "("
-          COLUMN_NAME_REF
-            IDENT "product_no"
-          R_PAREN ")"
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "product_no"
+            R_PAREN ")"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
@@ -658,13 +659,14 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "customers"
         WHITESPACE " "
-        KEY_KW "KEY"
-        WHITESPACE " "
-        COLUMN_REF_LIST
-          L_PAREN "("
-          COLUMN_NAME_REF
-            IDENT "customer_id"
-          R_PAREN ")"
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "customer_id"
+            R_PAREN ")"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
@@ -673,13 +675,14 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "orders"
         WHITESPACE " "
-        KEY_KW "KEY"
-        WHITESPACE " "
-        COLUMN_REF_LIST
-          L_PAREN "("
-          COLUMN_NAME_REF
-            IDENT "order_id"
-          R_PAREN ")"
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "order_id"
+            R_PAREN ")"
       WHITESPACE "\n    "
       R_PAREN ")"
     WHITESPACE "\n    "
@@ -696,13 +699,14 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "order_items"
         WHITESPACE " "
-        KEY_KW "KEY"
-        WHITESPACE " "
-        COLUMN_REF_LIST
-          L_PAREN "("
-          COLUMN_NAME_REF
-            IDENT "order_items_id"
-          R_PAREN ")"
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "order_items_id"
+            R_PAREN ")"
         WHITESPACE "\n            "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
@@ -757,13 +761,14 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "customer_orders"
         WHITESPACE " "
-        KEY_KW "KEY"
-        WHITESPACE " "
-        COLUMN_REF_LIST
-          L_PAREN "("
-          COLUMN_NAME_REF
-            IDENT "customer_orders_id"
-          R_PAREN ")"
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "customer_orders_id"
+            R_PAREN ")"
         WHITESPACE "\n            "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
@@ -1617,10 +1622,11 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "Accounts"
         WHITESPACE " "
-        AS_KW "AS"
-        WHITESPACE " "
-        ELEMENT_TABLE_ALIAS
-          IDENT "PersonOwner"
+        ELEMENT_TABLE_ALIAS_CLAUSE
+          AS_KW "AS"
+          WHITESPACE " "
+          ELEMENT_TABLE_ALIAS
+            IDENT "PersonOwner"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
@@ -1675,10 +1681,11 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "Accounts"
         WHITESPACE " "
-        AS_KW "AS"
-        WHITESPACE " "
-        ELEMENT_TABLE_ALIAS
-          IDENT "CompanyOwner"
+        ELEMENT_TABLE_ALIAS_CLAUSE
+          AS_KW "AS"
+          WHITESPACE " "
+          ELEMENT_TABLE_ALIAS
+            IDENT "CompanyOwner"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
@@ -1733,10 +1740,11 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "Persons"
         WHITESPACE " "
-        AS_KW "AS"
-        WHITESPACE " "
-        ELEMENT_TABLE_ALIAS
-          IDENT "worksFor"
+        ELEMENT_TABLE_ALIAS_CLAUSE
+          AS_KW "AS"
+          WHITESPACE " "
+          ELEMENT_TABLE_ALIAS
+            IDENT "worksFor"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
