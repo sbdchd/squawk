@@ -709,7 +709,7 @@ SOURCE_FILE
             IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      VOLATILITY_FUNC_OPTION
+      IMMUTABLE
         IMMUTABLE_KW "immutable"
       WHITESPACE "\n"
       AS_FUNC_OPTION
@@ -748,7 +748,7 @@ SOURCE_FILE
             IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      VOLATILITY_FUNC_OPTION
+      STABLE
         STABLE_KW "stable"
       WHITESPACE "\n"
       AS_FUNC_OPTION
@@ -787,7 +787,7 @@ SOURCE_FILE
             IDENT "void"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
-      VOLATILITY_FUNC_OPTION
+      VOLATILE
         VOLATILE_KW "volatile"
       WHITESPACE "\n"
       AS_FUNC_OPTION
@@ -2048,7 +2048,7 @@ SOURCE_FILE
       WINDOW_FUNC_OPTION
         WINDOW_KW "window"
       WHITESPACE "\n  "
-      VOLATILITY_FUNC_OPTION
+      IMMUTABLE
         IMMUTABLE_KW "immutable"
       WHITESPACE "\n  "
       NOT_LEAKPROOF_FUNC_OPTION

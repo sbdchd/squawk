@@ -140,17 +140,18 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "a"
           WHITESPACE " "
-          KEY_KW "key"
-          WHITESPACE " "
-          COLUMN_REF_LIST
-            L_PAREN "("
-            COLUMN_NAME_REF
-              IDENT "c"
-            COMMA ","
+          ELEMENT_TABLE_KEY_CLAUSE
+            KEY_KW "key"
             WHITESPACE " "
-            COLUMN_NAME_REF
-              IDENT "k"
-            R_PAREN ")"
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "c"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN_NAME_REF
+                IDENT "k"
+              R_PAREN ")"
         COMMA ","
         WHITESPACE "\n    "
         VERTEX_TABLE_DEF
@@ -159,17 +160,18 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "d"
           WHITESPACE " "
-          KEY_KW "key"
-          WHITESPACE " "
-          COLUMN_REF_LIST
-            L_PAREN "("
-            COLUMN_NAME_REF
-              IDENT "l"
-            COMMA ","
+          ELEMENT_TABLE_KEY_CLAUSE
+            KEY_KW "key"
             WHITESPACE " "
-            COLUMN_NAME_REF
-              IDENT "u"
-            R_PAREN ")"
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "l"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN_NAME_REF
+                IDENT "u"
+              R_PAREN ")"
           WHITESPACE " \n      "
           NO_PROPERTIES
             NO_KW "no"
@@ -193,17 +195,18 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "a"
           WHITESPACE " "
-          KEY_KW "key"
-          WHITESPACE " "
-          COLUMN_REF_LIST
-            L_PAREN "("
-            COLUMN_NAME_REF
-              IDENT "x"
-            COMMA ","
+          ELEMENT_TABLE_KEY_CLAUSE
+            KEY_KW "key"
             WHITESPACE " "
-            COLUMN_NAME_REF
-              IDENT "y"
-            R_PAREN ")"
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "x"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN_NAME_REF
+                IDENT "y"
+              R_PAREN ")"
           WHITESPACE "\n      "
           SOURCE_VERTEX_TABLE
             SOURCE_KW "source"
@@ -345,13 +348,14 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "d"
           WHITESPACE " "
-          KEY_KW "key"
-          WHITESPACE " "
-          COLUMN_REF_LIST
-            L_PAREN "("
-            COLUMN_NAME_REF
-              IDENT "l"
-            R_PAREN ")"
+          ELEMENT_TABLE_KEY_CLAUSE
+            KEY_KW "key"
+            WHITESPACE " "
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "l"
+              R_PAREN ")"
           WHITESPACE " \n      "
           ALL_PROPERTIES
             PROPERTIES_KW "properties"
@@ -377,17 +381,18 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "a"
           WHITESPACE " "
-          KEY_KW "key"
-          WHITESPACE " "
-          COLUMN_REF_LIST
-            L_PAREN "("
-            COLUMN_NAME_REF
-              IDENT "x"
-            COMMA ","
+          ELEMENT_TABLE_KEY_CLAUSE
+            KEY_KW "key"
             WHITESPACE " "
-            COLUMN_NAME_REF
-              IDENT "y"
-            R_PAREN ")"
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "x"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN_NAME_REF
+                IDENT "y"
+              R_PAREN ")"
           WHITESPACE "\n      "
           SOURCE_VERTEX_TABLE
             SOURCE_KW "source"

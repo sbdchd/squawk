@@ -1494,35 +1494,36 @@ SOURCE_FILE
                   OVER_CLAUSE
                     OVER_KW "OVER"
                     WHITESPACE " "
-                    L_PAREN "("
-                    WHITESPACE "\n      "
-                    WINDOW_SPEC
-                      PARTITION_BY_CLAUSE
-                        PARTITION_KW "PARTITION"
+                    OVER_WINDOW_SPEC
+                      L_PAREN "("
+                      WHITESPACE "\n      "
+                      WINDOW_SPEC
+                        PARTITION_BY_CLAUSE
+                          PARTITION_KW "PARTITION"
+                          WHITESPACE " "
+                          BY_KW "BY"
+                          WHITESPACE " "
+                          NAME_REF
+                            IDENT "user_id"
+                          COMMA ","
+                          WHITESPACE " "
+                          NAME_REF
+                            IDENT "board_id"
                         WHITESPACE " "
-                        BY_KW "BY"
-                        WHITESPACE " "
-                        NAME_REF
-                          IDENT "user_id"
-                        COMMA ","
-                        WHITESPACE " "
-                        NAME_REF
-                          IDENT "board_id"
-                      WHITESPACE " "
-                      ORDER_BY_CLAUSE
-                        ORDER_KW "ORDER"
-                        WHITESPACE " "
-                        BY_KW "BY"
-                        WHITESPACE " "
-                        SORT_BY_LIST
-                          SORT_BY
-                            NAME_REF
-                              IDENT "created_at"
-                            WHITESPACE " "
-                            SORT_DESC
-                              DESC_KW "DESC"
-                    WHITESPACE "\n    "
-                    R_PAREN ")"
+                        ORDER_BY_CLAUSE
+                          ORDER_KW "ORDER"
+                          WHITESPACE " "
+                          BY_KW "BY"
+                          WHITESPACE " "
+                          SORT_BY_LIST
+                            SORT_BY
+                              NAME_REF
+                                IDENT "created_at"
+                              WHITESPACE " "
+                              SORT_DESC
+                                DESC_KW "DESC"
+                      WHITESPACE "\n    "
+                      R_PAREN ")"
           WHITESPACE "\n  "
           FROM_CLAUSE
             FROM_KW "FROM"

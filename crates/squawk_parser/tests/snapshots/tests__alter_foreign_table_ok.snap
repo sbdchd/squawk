@@ -975,7 +975,7 @@ SOURCE_FILE
         ALTER_OPTION_LIST
           OPTIONS_KW "options"
           L_PAREN "("
-          ALTER_OPTION
+          ADD_FOREIGN_OPTION
             FOREIGN_OPTION_NAME
               IDENT "b"
             WHITESPACE " "
@@ -983,7 +983,7 @@ SOURCE_FILE
               STRING "''"
           COMMA ","
           WHITESPACE " "
-          ALTER_OPTION
+          ADD_FOREIGN_OPTION
             ADD_KW "add"
             WHITESPACE " "
             FOREIGN_OPTION_NAME
@@ -993,7 +993,7 @@ SOURCE_FILE
               STRING "'c'"
           COMMA ","
           WHITESPACE " "
-          ALTER_OPTION
+          SET_FOREIGN_OPTION
             SET_KW "set"
             WHITESPACE " "
             FOREIGN_OPTION_NAME
@@ -1003,7 +1003,7 @@ SOURCE_FILE
               STRING "''"
           COMMA ","
           WHITESPACE " "
-          ALTER_OPTION
+          DROP_FOREIGN_OPTION
             DROP_KW "drop"
             WHITESPACE " "
             FOREIGN_OPTION_NAME
@@ -1034,7 +1034,7 @@ SOURCE_FILE
         ALTER_OPTION_LIST
           OPTIONS_KW "options"
           L_PAREN "("
-          ALTER_OPTION
+          SET_FOREIGN_OPTION
             SET_KW "set"
             WHITESPACE " "
             FOREIGN_OPTION_NAME

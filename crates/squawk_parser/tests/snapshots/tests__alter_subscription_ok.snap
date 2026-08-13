@@ -63,25 +63,26 @@ SOURCE_FILE
       PUBLICATION_REF
         IDENT "r"
       WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      ATTRIBUTE_LIST
-        L_PAREN "("
-        ATTRIBUTE_OPTION
-          ATTRIBUTE_NAME
-            IDENT "a"
-        COMMA ","
+      WITH_PARAMS
+        WITH_KW "with"
         WHITESPACE " "
-        ATTRIBUTE_OPTION
-          ATTRIBUTE_NAME
-            IDENT "b"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            ATTRIBUTE_NAME
+              IDENT "a"
+          COMMA ","
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          ATTRIBUTE_VALUE
-            LITERAL
-              TRUE_KW "true"
-        R_PAREN ")"
+          ATTRIBUTE_OPTION
+            ATTRIBUTE_NAME
+              IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            ATTRIBUTE_VALUE
+              LITERAL
+                TRUE_KW "true"
+          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_publication"
@@ -127,25 +128,26 @@ SOURCE_FILE
       PUBLICATION_REF
         IDENT "c"
       WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      ATTRIBUTE_LIST
-        L_PAREN "("
-        ATTRIBUTE_OPTION
-          ATTRIBUTE_NAME
-            IDENT "a"
-        COMMA ","
+      WITH_PARAMS
+        WITH_KW "with"
         WHITESPACE " "
-        ATTRIBUTE_OPTION
-          ATTRIBUTE_NAME
-            IDENT "b"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            ATTRIBUTE_NAME
+              IDENT "a"
+          COMMA ","
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          ATTRIBUTE_VALUE
-            LITERAL
-              INT_NUMBER "1"
-        R_PAREN ")"
+          ATTRIBUTE_OPTION
+            ATTRIBUTE_NAME
+              IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "1"
+          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_publication"
@@ -191,25 +193,26 @@ SOURCE_FILE
       PUBLICATION_REF
         IDENT "c"
       WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      ATTRIBUTE_LIST
-        L_PAREN "("
-        ATTRIBUTE_OPTION
-          ATTRIBUTE_NAME
-            IDENT "a"
-        COMMA ","
+      WITH_PARAMS
+        WITH_KW "with"
         WHITESPACE " "
-        ATTRIBUTE_OPTION
-          ATTRIBUTE_NAME
-            IDENT "b"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            ATTRIBUTE_NAME
+              IDENT "a"
+          COMMA ","
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          ATTRIBUTE_VALUE
-            LITERAL
-              INT_NUMBER "1"
-        R_PAREN ")"
+          ATTRIBUTE_OPTION
+            ATTRIBUTE_NAME
+              IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "1"
+          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
@@ -227,20 +230,21 @@ SOURCE_FILE
       WHITESPACE " "
       PUBLICATION_KW "publication"
       WHITESPACE " "
-      WITH_KW "with"
-      WHITESPACE " "
-      ATTRIBUTE_LIST
-        L_PAREN "("
-        ATTRIBUTE_OPTION
-          ATTRIBUTE_NAME
-            IDENT "copy_data"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          ATTRIBUTE_VALUE
-            LITERAL
-              FALSE_KW "false"
-        R_PAREN ")"
+      WITH_PARAMS
+        WITH_KW "with"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            ATTRIBUTE_NAME
+              IDENT "copy_data"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            ATTRIBUTE_VALUE
+              LITERAL
+                FALSE_KW "false"
+          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable"

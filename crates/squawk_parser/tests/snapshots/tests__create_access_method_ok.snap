@@ -17,7 +17,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     TYPE_KW "type"
     WHITESPACE " "
-    TABLE_KW "table"
+    ACCESS_METHOD_TYPE_TABLE
+      TABLE_KW "table"
     WHITESPACE "\n  "
     HANDLER_CLAUSE
       HANDLER_KW "handler"
@@ -42,7 +43,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     TYPE_KW "type"
     WHITESPACE " "
-    INDEX_KW "index"
+    ACCESS_METHOD_TYPE_INDEX
+      INDEX_KW "index"
     WHITESPACE "\n  "
     HANDLER_CLAUSE
       HANDLER_KW "handler"

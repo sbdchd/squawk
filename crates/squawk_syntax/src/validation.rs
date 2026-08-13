@@ -630,7 +630,7 @@ fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
 
     match join_clause {
         Required => {
-            if join.on_clause().is_none() && join.using_clause().is_none() {
+            if join.join_condition().is_none() {
                 let end = join_expr.syntax().text_range().end();
                 acc.push(SyntaxError::new(
                     "Join missing condition.",
@@ -639,7 +639,7 @@ fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
             }
         }
         NotAllowed => {
-            if let Some(using_clause) = join.using_clause() {
+            if let Some(ast::JoinCondition::JoinUsingClause(using_clause)) = join.join_condition() {
                 acc.push(SyntaxError::new(
                     format!("Join `using` clause is not allowed for {join_name} joins."),
                     using_clause.syntax().text_range(),

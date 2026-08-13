@@ -269,10 +269,28 @@ JsonTablePlan =
 | ParenJsonTablePlan
 
 JsonTablePlanChoice =
-  'cross' | 'inner' | 'outer' | 'union'
+  JsonTablePlanOperator
 
 JsonTablePlanJoin =
-  lhs:JsonTablePlan ('cross' | 'inner' | 'outer' | 'union') rhs:JsonTablePlan
+  lhs:JsonTablePlan JsonTablePlanOperator rhs:JsonTablePlan
+
+JsonTablePlanOperator =
+  JsonTablePlanCross
+| JsonTablePlanInner
+| JsonTablePlanOuter
+| JsonTablePlanUnion
+
+JsonTablePlanCross =
+  'cross'
+
+JsonTablePlanInner =
+  'inner'
+
+JsonTablePlanOuter =
+  'outer'
+
+JsonTablePlanUnion =
+  'union'
 
 ParenJsonTablePlan =
   '(' JsonTablePlan ')'
@@ -1397,7 +1415,11 @@ WindowClause =
   'window' (WindowDef (',' WindowDef)*)
 
 LimitClause =
-  'limit' ('all' | Expr)
+  'limit' LimitValue
+
+LimitValue =
+  All
+| Expr
 
 FetchClause =
   'fetch'
@@ -1523,7 +1545,14 @@ OptionStart =
   'start' 'with'? Literal
 
 OptionOwnedBy =
-  'owned' 'by' ('none' | name:QualifiedColumnNameRef)
+  'owned' 'by' OwnedByTarget
+
+OwnedByTarget =
+  OwnedByNone
+| QualifiedColumnNameRef
+
+OwnedByNone =
+  'none'
 
 OptionMaxValue =
   'maxvalue' Literal
@@ -1608,7 +1637,11 @@ JoinUsingClause =
   'using' ColumnRefList alias:RequiredAsAlias?
 
 Join =
-  'natural'? JoinType FromItem (using_clause:JoinUsingClause | OnClause)?
+  'natural'? JoinType FromItem JoinCondition?
+
+JoinCondition =
+  JoinUsingClause
+| OnClause
 
 JoinExpr =
   (FromItem | JoinExpr) Join
@@ -1684,15 +1717,25 @@ Begin =
 
 Commit =
   (
-    'commit' ('prepared' Literal | ('work' | 'transaction')? ('and' 'no'? 'chain')?)
-  | 'end' ('work' | 'transaction')? ('and' 'no'? 'chain')?
+    'commit' ('prepared' Literal | ('work' | 'transaction')? ChainClause?)
+  | 'end' ('work' | 'transaction')? ChainClause?
   ) ';'?
 
 Rollback =
-  'rollback' ('work' | 'transaction')? ('and' 'no'? 'chain')? ';'?
-| 'abort' ('work' | 'transaction')? ('and' 'no'? 'chain')? ';'?
+  'rollback' ('work' | 'transaction')? ChainClause? ';'?
+| 'abort' ('work' | 'transaction')? ChainClause? ';'?
 | 'rollback' ('work' | 'transaction')? 'to' 'savepoint'? SavepointRef ';'?
 | 'rollback' 'prepared' Literal ';'?
+
+ChainClause =
+  AndChain
+| AndNoChain
+
+AndChain =
+  'and' 'chain'
+
+AndNoChain =
+  'and' 'no' 'chain'
 
 CreateAggregate =
   'create' OrReplace? 'aggregate' AggregateName ParamList? AttributeList ';'?
@@ -2087,9 +2130,9 @@ AllInTablespace =
 Revoke =
   'revoke' RevokeOptionFor?
   Privileges
-  ('on' PrivilegeObjects)?
+  OnPrivilegeObjectsClause?
   'from' RoleRefList
-  ('granted' 'by' RoleRef)?
+  GrantedByClause?
   DropBehavior? ';'?
 
 Row =
@@ -2120,7 +2163,7 @@ Insert =
   WithClause?
   'insert' 'into' RelationNameRef alias:RequiredAsAlias? ColumnTargetList?
   OverridingClause?
-  (DefaultValues | SelectVariant)
+  InsertSource
   OnConflictClause?
   ReturningClause? ';'?
 
@@ -2133,6 +2176,10 @@ OverridingSystemValue =
 
 OverridingUserValue =
   'overriding' 'user' 'value'
+
+InsertSource =
+  DefaultValues
+| SelectVariant
 
 DefaultValues =
   'default' 'values'
@@ -2205,7 +2252,7 @@ Update =
   alias:OptionalAsAlias?
   SetClause
   FromClause?
-  (WhereClause | WhereCurrentOf)?
+  WhereClauseOrCurrentOf?
   ReturningClause? ';'?
 
 ForPortionOf =
@@ -2245,8 +2292,12 @@ Delete =
   ForPortionOf?
   alias:OptionalAsAlias?
   UsingClause?
-  (WhereClause | WhereCurrentOf)?
+  WhereClauseOrCurrentOf?
   ReturningClause? ';'?
+
+WhereClauseOrCurrentOf =
+  WhereClause
+| WhereCurrentOf
 
 WhereCurrentOf =
   'where' 'current' 'of' CursorRef
@@ -2434,18 +2485,34 @@ Asymmetric =
   'asymmetric'
 
 JsonTableColumn =
+  JsonTableOrdinalityColumn
+| JsonTableValueColumn
+| JsonTableExistsColumn
+| JsonTableNestedColumn
+
+JsonTableOrdinalityColumn =
   ColumnName 'for' 'ordinality'
-| ColumnName Type
-    JsonFormatClause?
-    JsonPathClause?
-    JsonWrapperBehaviorClause?
-    JsonQuotesClause?
-    (JsonOnErrorClause | JsonOnEmptyClause)?
-| ColumnName Type
-    'exists'
-    JsonPathClause?
-    JsonOnErrorClause?
-| 'nested' 'path'? Expr JsonPathNameClause? JsonTableColumnList
+
+JsonTableValueColumn =
+  ColumnName Type
+  JsonFormatClause?
+  JsonPathClause?
+  JsonWrapperBehaviorClause?
+  JsonQuotesClause?
+  JsonTableValueBehavior?
+
+JsonTableValueBehavior =
+  JsonOnErrorClause
+| JsonOnEmptyClause
+
+JsonTableExistsColumn =
+  ColumnName Type
+  'exists'
+  JsonPathClause?
+  JsonOnErrorClause?
+
+JsonTableNestedColumn =
+  'nested' 'path'? Expr JsonPathNameClause? JsonTableColumnList
 
 JsonPathClause =
   'path' Expr
@@ -2588,7 +2655,14 @@ FilterClause =
   'filter' '(' 'where' Expr ')'
 
 OverClause =
-  'over' (WindowRef | '(' WindowSpec? ')')
+  'over' OverTarget
+
+OverTarget =
+  WindowRef
+| OverWindowSpec
+
+OverWindowSpec =
+  '(' WindowSpec? ')'
 
 NullTreatment =
   IgnoreNulls
@@ -2985,8 +3059,18 @@ AlterOptionList =
   'options' '(' (AlterOption (',' AlterOption)*)? ')'
 
 AlterOption =
-  ('add' | 'set')? ForeignOptionName Literal
-| 'drop' ForeignOptionName
+  AddForeignOption
+| SetForeignOption
+| DropForeignOption
+
+AddForeignOption =
+  'add'? ForeignOptionName Literal
+
+SetForeignOption =
+  'set' ForeignOptionName Literal
+
+DropForeignOption =
+  'drop' ForeignOptionName
 
 ForeignOptionName =
   '#name'?
@@ -3044,7 +3128,7 @@ AlterPublicationAction =
 | DropPublicationObjects
 | OwnerTo
 | PublicationRenameTo
-| SetAllPublicationObjects
+| SetAllPublicationObjectList
 | SetOptions
 | SetPublicationObjects
 
@@ -3054,8 +3138,8 @@ AddPublicationObjects =
 DropPublicationObjects =
   'drop' (PublicationObject (',' PublicationObject)*)
 
-SetAllPublicationObjects =
-  'set' 'all' ('tables' | 'sequences') ExceptTableClause?
+SetAllPublicationObjectList =
+  'set' (AllPublicationObject (',' AllPublicationObject)*) ExceptTableClause?
 
 SetPublicationObjects =
   'set' (PublicationObject (',' PublicationObject)*)
@@ -3639,16 +3723,16 @@ ConnectionClause =
   'connection' Literal
 
 AddPublication =
-  'add' 'publication' (PublicationRef (',' PublicationRef)*) ('with' AttributeList)?
+  'add' 'publication' (PublicationRef (',' PublicationRef)*) WithParams?
 
 SetPublication =
-  'set' 'publication' (PublicationRef (',' PublicationRef)*) ('with' AttributeList)?
+  'set' 'publication' (PublicationRef (',' PublicationRef)*) WithParams?
 
 DropSubscriptionPublication =
-  'drop' 'publication' (PublicationRef (',' PublicationRef)*) ('with' AttributeList)?
+  'drop' 'publication' (PublicationRef (',' PublicationRef)*) WithParams?
 
 RefreshPublication =
-  'refresh' 'publication' ('with' AttributeList)?
+  'refresh' 'publication' WithParams?
 
 EnableSubscription =
   'enable'
@@ -3940,8 +4024,8 @@ VertexTables =
 
 VertexTableDef =
   TableNameRef
-  ('as' alias:ElementTableAlias)?
-  ('key' ColumnRefList)?
+  ElementTableAliasClause?
+  ElementTableKeyClause?
   ElementTableLabelAndProperties?
 
 ElementTableLabelAndProperties =
@@ -3990,8 +4074,8 @@ EdgeTables =
 
 EdgeTableDef =
   TableNameRef
-  ('as' alias:ElementTableAlias)?
-  ('key' ColumnRefList)?
+  ElementTableAliasClause?
+  ElementTableKeyClause?
   SourceVertexTable
   DestVertexTable
   ElementTableLabelAndProperties?
@@ -4013,6 +4097,12 @@ VertexTableRef =
 
 ElementTableRef =
   '#name'?
+
+ElementTableAliasClause =
+  'as' alias:ElementTableAlias
+
+ElementTableKeyClause =
+  'key' ColumnRefList
 
 ElementTableAlias =
   '#name'?
@@ -4134,8 +4224,18 @@ QualifierMax =
 
 CreateAccessMethod =
   'create' 'access' 'method' AccessMethod
-  'type' ('table' | 'index')
+  'type' AccessMethodType
   HandlerClause ';'?
+
+AccessMethodType =
+  AccessMethodTypeTable
+| AccessMethodTypeIndex
+
+AccessMethodTypeTable =
+  'table'
+
+AccessMethodTypeIndex =
+  'index'
 
 HandlerClause =
   'handler' FunctionNameRef
@@ -4166,8 +4266,12 @@ WithoutFunction =
 
 CreateCollation =
   'create' 'collation' IfNotExists? Collation
-  (CollationFrom | AttributeList)
+  definition:CreateCollationDefinition
   ';'?
+
+CreateCollationDefinition =
+  CollationFrom
+| AttributeList
 
 CollationFrom =
   'from' CollationRef
@@ -4331,7 +4435,29 @@ CreatePolicy =
   WithCheckExprClause? ';'?
 
 PolicyCommand =
-  'for' ('all' | 'select' | 'insert' | 'update' | 'delete')
+  'for' command:PolicyCommandKind
+
+PolicyCommandKind =
+  PolicyCommandAll
+| PolicyCommandSelect
+| PolicyCommandInsert
+| PolicyCommandUpdate
+| PolicyCommandDelete
+
+PolicyCommandAll =
+  'all'
+
+PolicyCommandSelect =
+  'select'
+
+PolicyCommandInsert =
+  'insert'
+
+PolicyCommandUpdate =
+  'update'
+
+PolicyCommandDelete =
+  'delete'
 
 PolicyRoles =
   'to' RoleRefList
@@ -4350,17 +4476,28 @@ CreateProcedure =
 
 CreatePublication =
   'create' 'publication' Publication
-  (
-    'for'
-    (
-      ForAllPublicationObjects
-    | (PublicationObject (',' PublicationObject)*)
-    )
-  )?
+  PublicationForClause?
   WithParams? ';'?
 
+PublicationForClause =
+  ForAllPublicationObjects
+| ForPublicationObjects
+
 ForAllPublicationObjects =
-  'all' ('tables' | 'sequences') ExceptTableClause?
+  'for' (AllPublicationObject (',' AllPublicationObject)*) ExceptTableClause?
+
+AllPublicationObject =
+  AllPublicationTables
+| AllPublicationSequences
+
+AllPublicationTables =
+  'all' 'tables'
+
+AllPublicationSequences =
+  'all' 'sequences'
+
+ForPublicationObjects =
+  'for' (PublicationObject (',' PublicationObject)*)
 
 ExceptTableClause =
   'except' '(' 'table' ( ExceptTableName (',' ExceptTableName)*) ')'
@@ -4443,17 +4580,24 @@ ServerType =
 CreateStatistics =
   'create' 'statistics' IfNotExists? Statistics?
   StatTypes?
-  ('on' (Expr (',' Expr)*))?
+  StatisticsOnClause?
   FromTable ';'?
+
+StatisticsOnClause =
+  'on' (Expr (',' Expr)*)
 
 StatTypes =
   '(' (StatisticsKind (',' StatisticsKind)*) ')'
 
 CreateSubscription =
   'create' 'subscription' Subscription
-  (ConnectionClause | ServerClause)
+  source:SubscriptionSource
   'publication' (PublicationRef (',' PublicationRef)*)
   WithParams? ';'?
+
+SubscriptionSource =
+  ConnectionClause
+| ServerClause
 
 CreateTablespace =
   'create' 'tablespace' Tablespace
@@ -4478,8 +4622,11 @@ CreateTextSearchTemplate =
 
 CreateTransform =
   'create' OrReplace? 'transform' 'for' Type 'language' LanguageRef
-  '(' (from_func:TransformFromFunc | to_func:TransformToFunc)
-      (',' (from_func:TransformFromFunc | to_func:TransformToFunc))? ')' ';'?
+  '(' (TransformFunc (',' TransformFunc)*) ')' ';'?
+
+TransformFunc =
+  TransformFromFunc
+| TransformToFunc
 
 TransformFromFunc =
    'from' 'sql' 'with' 'function' FunctionSig
@@ -4751,8 +4898,11 @@ IntoSchema =
 
 Lock =
   'lock' 'table'? RelationList
-  ('in' LockMode 'mode')?
+  LockModeClause?
   Nowait? ';'?
+
+LockModeClause =
+  'in' LockMode 'mode'
 
 LockMode =
   AccessShare
@@ -4798,10 +4948,16 @@ Refresh =
 Grant =
   'grant'
   Privileges?
-  ('on' PrivilegeObjects)?
+  OnPrivilegeObjectsClause?
   'to' RoleRefList
   GrantWithClause?
-  ('granted' 'by' RoleRef)? ';'?
+  GrantedByClause? ';'?
+
+GrantedByClause =
+  'granted' 'by' RoleRef
+
+OnPrivilegeObjectsClause =
+  'on' PrivilegeObjects
 
 AllPrivileges =
   'all' 'privileges'? ColumnRefList?
@@ -4977,13 +5133,29 @@ Immediate =
   'immediate'
 
 SetRole =
-  'set' SetScope? 'role' (RoleRef | Literal | 'none') ';'?
+  'set' SetScope? 'role' SetRoleTarget ';'?
+
+SetRoleTarget =
+  RoleRef
+| Literal
+| SetRoleNone
+
+SetRoleNone =
+  'none'
 
 ResetRole =
   'reset' 'role' ';'?
 
 SetSessionAuth =
-  'set' SetScope? 'session' 'authorization' (RoleRef | Literal | 'default') ';'?
+  'set' SetScope? 'session' 'authorization' SetSessionAuthTarget ';'?
+
+SetSessionAuthTarget =
+  RoleRef
+| Literal
+| SetSessionAuthDefault
+
+SetSessionAuthDefault =
+  'default'
 
 ResetSessionAuth =
   'reset' 'session' 'authorization' ';'?
@@ -5057,7 +5229,14 @@ WithCheckOption =
   'with' CheckOptionLevel? 'check' 'option'
 
 CheckOptionLevel =
-  'cascaded' | 'local'
+  CascadedCheckOption
+| LocalCheckOption
+
+CascadedCheckOption =
+  'cascaded'
+
+LocalCheckOption =
+  'local'
 
 Prepare =
   'prepare' name:PreparedStatement ParamList? 'as' stmt:PreparableStmt ';'?
@@ -5116,7 +5295,23 @@ Discard =
   'discard' DiscardTarget ';'?
 
 DiscardTarget =
-  'all' | 'temp' | 'temporary' | 'plans' | 'sequences'
+  DiscardAll
+| DiscardPlans
+| DiscardSequences
+| DiscardTemp
+
+DiscardAll =
+  'all'
+
+DiscardPlans =
+  'plans'
+
+DiscardSequences =
+  'sequences'
+
+DiscardTemp =
+  'temp'
+| 'temporary'
 
 Do =
   'do' DoLanguage? body:Literal DoLanguage? ';'?
@@ -5555,7 +5750,18 @@ WindowFuncOption =
   'window'
 
 VolatilityFuncOption =
-  'immutable' | 'stable' | 'volatile'
+  Immutable
+| Stable
+| Volatile
+
+Immutable =
+  'immutable'
+
+Stable =
+  'stable'
+
+Volatile =
+  'volatile'
 
 LeakproofFuncOption =
   'leakproof'

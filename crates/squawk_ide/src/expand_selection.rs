@@ -86,6 +86,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::SET_COLUMN_LIST,
     SyntaxKind::SET_EXPR_LIST,
     SyntaxKind::SET_OPTIONS_LIST,
+    SyntaxKind::SET_ALL_PUBLICATION_OBJECT_LIST,
     SyntaxKind::SORT_BY_LIST,
     SyntaxKind::TABLE_AND_COLUMNS_LIST,
     SyntaxKind::TABLE_ARG_LIST,

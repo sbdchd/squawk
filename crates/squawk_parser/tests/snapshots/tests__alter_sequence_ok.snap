@@ -130,7 +130,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      NONE_KW "none"
+      OWNED_BY_NONE
+        NONE_KW "none"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_logged"

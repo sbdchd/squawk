@@ -242,7 +242,8 @@ impl LockKind {
             }
             ast::Stmt::DropTable(_) | ast::Stmt::DropView(_) => LockKind::AccessExclusive,
             ast::Stmt::Lock(lock) => lock
-                .lock_mode()
+                .lock_mode_clause()
+                .and_then(|clause| clause.lock_mode())
                 .map(Self::from_lock_mode)
                 .unwrap_or(LockKind::AccessExclusive),
             ast::Stmt::Refresh(refresh) => {

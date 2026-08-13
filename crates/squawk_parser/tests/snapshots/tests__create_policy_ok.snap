@@ -98,7 +98,8 @@ SOURCE_FILE
     POLICY_COMMAND
       FOR_KW "for"
       WHITESPACE " "
-      ALL_KW "all"
+      POLICY_COMMAND_ALL
+        ALL_KW "all"
     WHITESPACE "\n  "
     POLICY_ROLES
       TO_KW "to"
@@ -184,7 +185,8 @@ SOURCE_FILE
     POLICY_COMMAND
       FOR_KW "for"
       WHITESPACE " "
-      ALL_KW "all"
+      POLICY_COMMAND_ALL
+        ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -206,7 +208,8 @@ SOURCE_FILE
     POLICY_COMMAND
       FOR_KW "for"
       WHITESPACE " "
-      SELECT_KW "select"
+      POLICY_COMMAND_SELECT
+        SELECT_KW "select"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -228,7 +231,8 @@ SOURCE_FILE
     POLICY_COMMAND
       FOR_KW "for"
       WHITESPACE " "
-      INSERT_KW "insert"
+      POLICY_COMMAND_INSERT
+        INSERT_KW "insert"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -250,7 +254,8 @@ SOURCE_FILE
     POLICY_COMMAND
       FOR_KW "for"
       WHITESPACE " "
-      UPDATE_KW "update"
+      POLICY_COMMAND_UPDATE
+        UPDATE_KW "update"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -272,6 +277,7 @@ SOURCE_FILE
     POLICY_COMMAND
       FOR_KW "for"
       WHITESPACE " "
-      DELETE_KW "delete"
+      POLICY_COMMAND_DELETE
+        DELETE_KW "delete"
     SEMICOLON ";"
   WHITESPACE "\n\n"

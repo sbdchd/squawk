@@ -786,13 +786,14 @@ SOURCE_FILE
       REVOKE_COMMAND
         SELECT_KW "select"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PRIVILEGE_DEFAULT
-      RELATION_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            IDENT "t"
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "

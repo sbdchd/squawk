@@ -817,10 +817,15 @@ pub(crate) fn resolve_name_ref(
         }
         NameRefClass::PrivilegeColumn => {
             let column_name = Name::from_node(name_ref);
-            let privilege_objects = name_ref.syntax().ancestors().find_map(|a| {
-                ast::Grant::cast(a.clone())
-                    .and_then(|grant| grant.privilege_objects())
-                    .or_else(|| ast::Revoke::cast(a).and_then(|revoke| revoke.privilege_objects()))
+            let privilege_objects = name_ref.syntax().ancestors().find_map(|ancestor| {
+                ast::Grant::cast(ancestor.clone())
+                    .and_then(|grant| grant.on_privilege_objects_clause())
+                    .and_then(|clause| clause.privilege_objects())
+                    .or_else(|| {
+                        ast::Revoke::cast(ancestor)
+                            .and_then(|revoke| revoke.on_privilege_objects_clause())
+                            .and_then(|clause| clause.privilege_objects())
+                    })
             })?;
             let path = privilege_objects
                 .syntax()
@@ -1357,8 +1362,10 @@ fn resolve_property_graph_column_ptr(
                 InFile::new(file, &edge_table_def.table_name_ref()?.path_ref()?),
                 column_name,
             );
-        } else if let Some(vertex_table_def) =
-            ast::VertexTableDef::cast(column_list.syntax().parent()?)
+        } else if let Some(vertex_table_def) = column_list
+            .syntax()
+            .ancestors()
+            .find_map(ast::VertexTableDef::cast)
         {
             return resolve_column_for_path(
                 db,
@@ -1771,7 +1778,10 @@ pub(crate) fn resolve_vertex_table_ref(
     let file = vertex_table_ref.file_id;
     let vertex_table_ref = vertex_table_ref.value;
     let vertex_table = property_graph_vertex_table(vertex_table_ref)?;
-    if let Some(alias) = vertex_table.alias() {
+    if let Some(alias) = vertex_table
+        .element_table_alias_clause()
+        .and_then(|clause| clause.alias())
+    {
         return Some(smallvec![Location::new(
             file,
             alias.syntax().text_range(),
@@ -1829,7 +1839,8 @@ fn property_graph_vertex_table(
         .find_map(|vertex_table| {
             let path = vertex_table.table_name_ref()?.path_ref()?;
             let matches_alias = vertex_table
-                .alias()
+                .element_table_alias_clause()
+                .and_then(|clause| clause.alias())
                 .is_some_and(|alias| Name::from_node(&alias) == vertex_table_name);
             let matches_table = path
                 .segment()
@@ -3076,7 +3087,8 @@ fn find_join_expr_by_using_alias(
     join_expr: &ast::JoinExpr,
     qualifier: &Name,
 ) -> Option<ast::JoinExpr> {
-    if let Some(using_clause) = join_expr.join().and_then(|join| join.using_clause())
+    if let Some(ast::JoinCondition::JoinUsingClause(using_clause)) =
+        join_expr.join().and_then(|join| join.join_condition())
         && let Some(alias_name) = using_clause.alias().and_then(|alias| alias.name())
         && Name::from_node(&alias_name) == *qualifier
     {
@@ -3104,7 +3116,11 @@ fn resolve_join_using_alias_table_ptr(
     qualifier: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
     let join_expr = find_using_alias_join_expr_for_name_ref(name_ref.value, qualifier)?;
-    let alias_name = join_expr.join()?.using_clause()?.alias()?.name()?;
+    let ast::JoinCondition::JoinUsingClause(using_clause) = join_expr.join()?.join_condition()?
+    else {
+        return None;
+    };
+    let alias_name = using_clause.alias()?.name()?;
     Some(smallvec![Location::new(
         name_ref.file_id,
         alias_name.syntax().text_range(),
@@ -4777,6 +4793,9 @@ fn find_json_path_name(
     target: &Name,
 ) -> Option<ast::JsonPathName> {
     for column in column_list.json_table_columns() {
+        let ast::JsonTableColumn::JsonTableNestedColumn(column) = column else {
+            continue;
+        };
         if let Some(name) = column
             .json_path_name_clause()
             .and_then(|clause| clause.json_path_name())
@@ -4845,13 +4864,20 @@ fn resolve_json_table_column(
 ) -> Option<SmallVec<[Location; 1]>> {
     let mut index = 0usize;
     for column in column_list.json_table_columns() {
-        if let Some(nested_list) = column.json_table_column_list() {
-            if let Some(ptr) = resolve_json_table_column(&nested_list, column_name, file, 0) {
-                return Some(ptr);
+        let name = match column {
+            ast::JsonTableColumn::JsonTableNestedColumn(column) => {
+                if let Some(nested_list) = column.json_table_column_list()
+                    && let Some(ptr) = resolve_json_table_column(&nested_list, column_name, file, 0)
+                {
+                    return Some(ptr);
+                }
+                continue;
             }
-            continue;
-        }
-        if let Some(name) = column.column_name()
+            ast::JsonTableColumn::JsonTableExistsColumn(column) => column.column_name(),
+            ast::JsonTableColumn::JsonTableOrdinalityColumn(column) => column.column_name(),
+            ast::JsonTableColumn::JsonTableValueColumn(column) => column.column_name(),
+        };
+        if let Some(name) = name
             && Name::from_node(&name) == *column_name
             && index >= min_index
         {

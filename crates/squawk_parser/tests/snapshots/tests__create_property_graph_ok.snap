@@ -179,22 +179,24 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "boo"
         WHITESPACE " "
-        AS_KW "as"
-        WHITESPACE " "
-        ELEMENT_TABLE_ALIAS
-          IDENT "foo"
-        WHITESPACE " "
-        KEY_KW "key"
-        WHITESPACE " "
-        COLUMN_REF_LIST
-          L_PAREN "("
-          COLUMN_NAME_REF
-            IDENT "a"
-          COMMA ","
+        ELEMENT_TABLE_ALIAS_CLAUSE
+          AS_KW "as"
           WHITESPACE " "
-          COLUMN_NAME_REF
-            IDENT "b"
-          R_PAREN ")"
+          ELEMENT_TABLE_ALIAS
+            IDENT "foo"
+        WHITESPACE " "
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_NAME_REF
+              IDENT "b"
+            R_PAREN ")"
         WHITESPACE " "
         NO_PROPERTIES
           NO_KW "no"
@@ -218,22 +220,24 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "bar"
         WHITESPACE " "
-        AS_KW "as"
-        WHITESPACE " "
-        ELEMENT_TABLE_ALIAS
-          IDENT "z"
-        WHITESPACE " "
-        KEY_KW "key"
-        WHITESPACE " "
-        COLUMN_REF_LIST
-          L_PAREN "("
-          COLUMN_NAME_REF
-            IDENT "x"
-          COMMA ","
+        ELEMENT_TABLE_ALIAS_CLAUSE
+          AS_KW "as"
           WHITESPACE " "
-          COLUMN_NAME_REF
-            IDENT "y"
-          R_PAREN ")"
+          ELEMENT_TABLE_ALIAS
+            IDENT "z"
+        WHITESPACE " "
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "x"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_NAME_REF
+              IDENT "y"
+            R_PAREN ")"
         WHITESPACE "\n    "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"

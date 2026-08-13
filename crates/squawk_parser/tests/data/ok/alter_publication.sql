@@ -25,3 +25,4 @@ alter publication p owner to current_user;
 alter publication p rename to q;
 
 alter publication p set all tables except (table t, u, table k);
+alter publication p set all sequences;
