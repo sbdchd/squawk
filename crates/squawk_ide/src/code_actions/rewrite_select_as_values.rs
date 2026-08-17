@@ -84,7 +84,7 @@ fn is_values_row_column_name(target: &ast::Target, idx: usize) -> bool {
         return false;
     };
     let expected = format!("column{}", idx + 1);
-    if Name::from_node(&column_name) != Name::from_string(expected) {
+    if Name::from_node(&column_name) != expected.as_str() {
         return false;
     }
     true

@@ -6,7 +6,7 @@ use smallvec::SmallVec;
 use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 
 use crate::literals::literal_string_value;
-use crate::name::schema_and_func_name;
+use crate::name::{AsName, schema_and_func_name};
 use crate::scope::Scope;
 use crate::symbols::{Name, Schema, Symbol, SymbolKind};
 
@@ -71,7 +71,11 @@ impl Binder {
         }
     }
 
-    pub(crate) fn lookup(&self, name: &Name, kind: SymbolKind) -> Option<SyntaxNodePtr> {
+    pub(crate) fn lookup<N: AsName + ?Sized>(
+        &self,
+        name: &N,
+        kind: SymbolKind,
+    ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
         let symbol_id = symbols.iter().copied().find(|id| {
             let symbol = &self.symbols[*id];
@@ -112,9 +116,9 @@ impl Binder {
         list
     }
 
-    pub(crate) fn lookup_with(
+    pub(crate) fn lookup_with<N: AsName + ?Sized>(
         &self,
-        name: &Name,
+        name: &N,
         kind: SymbolKind,
         schemas: &ResolvedSchemas,
     ) -> Option<SyntaxNodePtr> {
@@ -130,9 +134,9 @@ impl Binder {
         None
     }
 
-    pub(crate) fn lookup_with_params(
+    pub(crate) fn lookup_with_params<N: AsName + ?Sized>(
         &self,
-        name: &Name,
+        name: &N,
         kind: SymbolKind,
         schemas: &ResolvedSchemas,
         params: Option<&[Name]>,
@@ -155,9 +159,9 @@ impl Binder {
         None
     }
 
-    pub(crate) fn lookup_with_table(
+    pub(crate) fn lookup_with_table<N: AsName + ?Sized>(
         &self,
-        name: &Name,
+        name: &N,
         kind: SymbolKind,
         schemas: &ResolvedSchemas,
         table: &Option<Name>,
@@ -176,9 +180,9 @@ impl Binder {
         None
     }
 
-    pub(crate) fn lookup_info(
+    pub(crate) fn lookup_info<N: AsName + ?Sized>(
         &self,
-        name: &Name,
+        name: &N,
         kind: SymbolKind,
         schemas: &ResolvedSchemas,
     ) -> Option<(Schema, String)> {
@@ -189,7 +193,7 @@ impl Binder {
                 symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
             }) {
                 let symbol = &self.symbols[symbol_id];
-                return Some((symbol.schema.clone()?, name.to_string()));
+                return Some((symbol.schema.clone()?, name.as_name().to_string()));
             }
         }
         None
@@ -844,12 +848,11 @@ fn multirange_type_from_range(
     fallback_ptr: SyntaxNodePtr,
 ) -> Option<(Name, SyntaxNodePtr, Schema)> {
     if let Some(attribute_list) = range_type.attribute_list() {
-        let multirange_key = Name::from_string("multirange_type_name");
         for option in attribute_list.attribute_options() {
             let Some(name) = option.name() else {
                 continue;
             };
-            if Name::from_node(&name) != multirange_key {
+            if Name::from_node(&name) != "multirange_type_name" {
                 continue;
             }
             if let Some(attribute_value) = option.attribute_value() {
@@ -1905,7 +1908,7 @@ fn bind_select_set_config(b: &mut Binder, select: &ast::Select, position: TextSi
     let Some((schema, func_name)) = schema_and_func_name(&call_expr) else {
         return;
     };
-    if func_name != Name::from_string("set_config") {
+    if func_name != "set_config" {
         return;
     }
     if let Some(schema) = &schema

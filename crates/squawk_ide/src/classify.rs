@@ -267,16 +267,14 @@ fn classify_ddl_function_option_value(ty_node: &SyntaxNode) -> Option<NameRefCla
         return Some(NameRefClass::Function);
     }
     if ast::CreateTextSearchConfiguration::can_cast(ddl_node.kind()) {
-        if attr_name.0.as_str() == "parser" {
+        if attr_name == "parser" {
             return Some(NameRefClass::TextSearchParser);
         }
-        if attr_name.0.as_str() == "copy" {
+        if attr_name == "copy" {
             return Some(NameRefClass::TextSearchConfiguration);
         }
     }
-    if ast::CreateTextSearchDictionary::can_cast(ddl_node.kind())
-        && attr_name.0.as_str() == "template"
-    {
+    if ast::CreateTextSearchDictionary::can_cast(ddl_node.kind()) && attr_name == "template" {
         return Some(NameRefClass::TextSearchTemplate);
     }
     None
@@ -291,7 +289,7 @@ fn is_search_path(config_parameter: Option<ast::ConfigParameterRef>) -> bool {
         return false;
     }
     path.segment()
-        .is_some_and(|name_ref| Name::from_node(&name_ref).0.as_str() == "search_path")
+        .is_some_and(|name_ref| Name::from_node(&name_ref) == "search_path")
 }
 
 fn is_rule_old_new_ref(name_ref: &impl ast::NameLike) -> bool {

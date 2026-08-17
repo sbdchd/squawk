@@ -10,7 +10,7 @@ use crate::binder::ResolvedSchemas;
 use crate::db::File;
 use crate::file::InFile;
 use crate::location::{Location, LocationKind};
-use crate::name::{self, Name, Schema};
+use crate::name::{self, AsName, Name, Schema};
 use crate::symbols::SymbolKind;
 use crate::{
     binder::extract_string_literal,
@@ -1091,7 +1091,7 @@ fn fallback_type_alias(type_name: &Name) -> Option<Name> {
 }
 
 fn resolve_float_precision(name_ref: &impl ast::NameLike, type_name: Name) -> Name {
-    if type_name.0.as_str() == "float"
+    if type_name == "float"
         && let Some(ast::Expr::Literal(lit)) = name_ref
             .syntax()
             .ancestors()
@@ -1218,9 +1218,9 @@ fn constraint_owner(name_ref: &impl ast::NameLike) -> Option<(Option<Schema>, Op
     Some((fallback_schema, None))
 }
 
-fn resolve_for_kind_with_params(
+fn resolve_for_kind_with_params<N: AsName + ?Sized>(
     db: &dyn Db,
-    name: &Name,
+    name: &N,
     schemas: &ResolvedSchemas,
     params: Option<&[Name]>,
     file: File,
@@ -1245,15 +1245,14 @@ fn resolve_special_keyword_as_function(
             SyntaxKind::SESSION_USER_KW => Some("session_user"),
             _ => None,
         })?;
-    let function_name = Name::from_string(function_name);
     let position = name_ref.value.syntax().text_range().start();
     let schemas = bind(db, name_ref.file_id).resolved_schemas(position, None);
-    resolve_function(db, &function_name, &schemas, None, name_ref.file_id)
+    resolve_function(db, function_name, &schemas, None, name_ref.file_id)
 }
 
-fn resolve_function(
+fn resolve_function<N: AsName + ?Sized>(
     db: &dyn Db,
-    function_name: &Name,
+    function_name: &N,
     schemas: &ResolvedSchemas,
     params: Option<&[Name]>,
     file: File,
@@ -1982,9 +1981,7 @@ fn match_table_in_returning_clause(
         return Some(ReturningClauseMatch::TableAlias(alias.clone()));
     }
 
-    let old_name = Name::from_string("old");
-    let new_name = Name::from_string("new");
-    if *table_name == old_name || *table_name == new_name {
+    if *table_name == "old" || *table_name == "new" {
         return Some(ReturningClauseMatch::PseudoTable);
     }
 
@@ -2061,7 +2058,7 @@ fn resolve_select_qualified_column_ptr(
                 }
 
                 if from_item.alias().and_then(|a| a.columns()).is_none()
-                    && column_name == Name::from_string("ordinality")
+                    && column_name == "ordinality"
                     && let Some(ordinality_token) = from_item
                         .with_ordinality()
                         .and_then(|it| it.ordinality_token())
@@ -2543,7 +2540,7 @@ fn resolve_from_item_column_by_name_after_index(
 
     if original_skip == 0
         && from_item.alias().and_then(|a| a.columns()).is_none()
-        && *column_name == Name::from_string("ordinality")
+        && *column_name == "ordinality"
         && let Some(ordinality_token) = from_item
             .with_ordinality()
             .and_then(|it| it.ordinality_token())

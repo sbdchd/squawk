@@ -1,5 +1,6 @@
 use smol_str::SmolStr;
 use squawk_syntax::ast::{self, AstNode};
+use std::borrow::Borrow;
 use std::fmt;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -41,6 +42,62 @@ impl Name {
 impl fmt::Display for Name {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+fn debug_assert_normalized(text: &str) {
+    debug_assert!(
+        !text.bytes().any(|b| b.is_ascii_uppercase()),
+        "un-normalized str used as a Name: {text:?}"
+    );
+}
+
+// Allows us to use either Name or &str
+pub(crate) trait AsName {
+    fn as_name(&self) -> &str;
+}
+
+impl AsName for Name {
+    fn as_name(&self) -> &str {
+        &self.0
+    }
+}
+
+impl AsName for str {
+    fn as_name(&self) -> &str {
+        debug_assert_normalized(self);
+        self
+    }
+}
+
+impl Borrow<str> for Name {
+    fn borrow(&self) -> &str {
+        &self.0
+    }
+}
+
+impl PartialEq<str> for Name {
+    fn eq(&self, other: &str) -> bool {
+        debug_assert_normalized(other);
+        self.0 == other
+    }
+}
+
+impl PartialEq<Name> for str {
+    fn eq(&self, other: &Name) -> bool {
+        other == self
+    }
+}
+
+impl PartialEq<&str> for Name {
+    fn eq(&self, other: &&str) -> bool {
+        self == *other
+    }
+}
+
+impl PartialEq<Name> for &str {
+    fn eq(&self, other: &Name) -> bool {
+        other == *self
     }
 }
 
@@ -209,5 +266,12 @@ mod test {
     #[test]
     fn name_quote_comparing() {
         assert_eq!(Name::from_string(r#""foo""#), Name::from_string("foo"));
+    }
+
+    #[test]
+    fn name_str_comparing() {
+        assert_eq!(Name::from_string("FOO"), "foo");
+        assert_eq!("foo", Name::from_string(r#""foo""#));
+        assert_ne!(Name::from_string(r#""FOO""#), "foo");
     }
 }
