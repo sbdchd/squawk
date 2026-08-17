@@ -631,7 +631,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         }
         ast_nav::ParentSouce::Alias(alias) => {
             let alias_name = alias.name()?;
-            alias.column_list()?;
+            alias.columns()?;
             let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
             let table_name = Name::from_node(&alias_name);
             let column_name = Name::from_string(def_node.text().to_string());
@@ -802,7 +802,7 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> 
     let alias_name = alias.name()?;
     let name = Name::from_node(&alias_name);
 
-    let Some(column_list) = alias.column_list() else {
+    let Some(alias_columns) = alias.columns() else {
         let name = Name::from_node(&alias.name()?);
         let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
         let ast::FromItem::ParenFromItem(paren) = from_item else {
@@ -812,7 +812,7 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> 
         return format_subquery_table(name, paren_select);
     };
 
-    let mut columns: Vec<Name> = column_list
+    let mut columns: Vec<Name> = alias_columns
         .column_names()
         .map(|column_name| Name::from_node(&column_name))
         .collect();
@@ -954,7 +954,7 @@ fn hover_qualified_star_columns_from_alias(
     let file = alias.file_id;
     let alias = alias.value;
     let alias_name = Name::from_node(&alias.name()?);
-    alias.column_list()?;
+    alias.columns()?;
     let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let columns = collect::columns_for_star_from_alias(db, file, &from_item, alias);
 
@@ -2034,7 +2034,7 @@ fn qualified_star_from_clause_table_ptr(
     let from_item = resolve::find_from_item_in_from_clause(&from_clause, table_name)?;
 
     if let Some(alias) = from_item.alias()
-        && alias.column_list().is_some()
+        && alias.columns().is_some()
     {
         return Some(SyntaxNodePtr::new(alias.syntax()));
     }

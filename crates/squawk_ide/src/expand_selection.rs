@@ -38,12 +38,12 @@ use crate::tokens::is_string_or_comment;
 
 const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::ALTER_OPTION_LIST,
-    SyntaxKind::ALIAS_COLUMN_LIST,
     SyntaxKind::ALTER_TYPE_ATTRIBUTE_ACTION_LIST,
     SyntaxKind::ARG_LIST,
     SyntaxKind::ATTRIBUTE_LIST,
     SyntaxKind::BEGIN_FUNC_OPTION_LIST,
     SyntaxKind::CHECKPOINT_OPTION_LIST,
+    SyntaxKind::COLUMN_DEF_LIST,
     SyntaxKind::COLUMN_LIST,
     SyntaxKind::COLUMN_REF_LIST,
     SyntaxKind::COLUMN_TARGET_LIST,

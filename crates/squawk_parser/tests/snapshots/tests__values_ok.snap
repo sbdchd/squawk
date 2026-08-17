@@ -245,16 +245,14 @@ SOURCE_FILE
           TABLE_ALIAS
             IDENT "t"
           WHITESPACE " "
-          ALIAS_COLUMN_LIST
+          COLUMN_LIST
             L_PAREN "("
-            ALIAS_COLUMN
-              COLUMN_NAME
-                IDENT "studio"
+            COLUMN_NAME
+              IDENT "studio"
             COMMA ","
             WHITESPACE " "
-            ALIAS_COLUMN
-              COLUMN_NAME
-                IDENT "kind"
+            COLUMN_NAME
+              IDENT "kind"
             R_PAREN ")"
     WHITESPACE "\n  "
     WHERE_CLAUSE
@@ -379,21 +377,18 @@ SOURCE_FILE
           TABLE_ALIAS
             IDENT "v"
           WHITESPACE " "
-          ALIAS_COLUMN_LIST
+          COLUMN_LIST
             L_PAREN "("
-            ALIAS_COLUMN
-              COLUMN_NAME
-                IDENT "depno"
+            COLUMN_NAME
+              IDENT "depno"
             COMMA ","
             WHITESPACE " "
-            ALIAS_COLUMN
-              COLUMN_NAME
-                TARGET_KW "target"
+            COLUMN_NAME
+              TARGET_KW "target"
             COMMA ","
             WHITESPACE " "
-            ALIAS_COLUMN
-              COLUMN_NAME
-                IDENT "increase"
+            COLUMN_NAME
+              IDENT "increase"
             R_PAREN ")"
     WHITESPACE "\n"
     WHERE_CLAUSE

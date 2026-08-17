@@ -26,6 +26,7 @@
 
 use std::borrow::Cow;
 
+use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
 use rowan::{GreenNodeData, GreenTokenData, NodeOrToken};
@@ -151,6 +152,21 @@ impl ast::FromItem {
             ast::FromItem::FunctionFromItem(it) => it.with_ordinality(),
             ast::FromItem::RowsFromItem(it) => it.with_ordinality(),
             _ => None,
+        }
+    }
+}
+
+impl ast::ColumnDefList {
+    pub fn column_names(self) -> impl Iterator<Item = ast::ColumnName> {
+        self.column_defs().filter_map(|column| column.name())
+    }
+}
+
+impl ast::FromAliasColumns {
+    pub fn column_names(self) -> impl Iterator<Item = ast::ColumnName> {
+        match self {
+            ast::FromAliasColumns::ColumnList(it) => Either::Left(it.column_names()),
+            ast::FromAliasColumns::ColumnDefList(it) => Either::Right(it.column_names()),
         }
     }
 }

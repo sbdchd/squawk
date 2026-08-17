@@ -21,7 +21,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::CreateViewLike(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::CustomOp(it) => validate_custom_op_length(it, errors),
-                ast::FromAlias(it) => validate_non_empty_column_list(it.column_list(), errors),
+                ast::FromAlias(it) => validate_non_empty_column_list(it.columns(), errors),
                 ast::WithTable(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),

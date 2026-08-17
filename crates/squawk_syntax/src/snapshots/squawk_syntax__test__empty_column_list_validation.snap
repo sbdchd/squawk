@@ -157,11 +157,10 @@ SOURCE_FILE@0..438
           TABLE_ALIAS@236..237
             IDENT@236..237 "x"
           WHITESPACE@237..238 " "
-          ALIAS_COLUMN_LIST@238..241
+          COLUMN_LIST@238..241
             L_PAREN@238..239 "("
-            ALIAS_COLUMN@239..240
-              COLUMN_NAME@239..240
-                IDENT@239..240 "a"
+            COLUMN_NAME@239..240
+              IDENT@239..240 "a"
             R_PAREN@240..241 ")"
     SEMICOLON@241..242 ";"
   WHITESPACE@242..244 "\n\n"
@@ -284,7 +283,7 @@ SOURCE_FILE@0..438
           TABLE_ALIAS@432..433
             IDENT@432..433 "x"
           WHITESPACE@433..434 " "
-          ALIAS_COLUMN_LIST@434..436
+          COLUMN_LIST@434..436
             L_PAREN@434..435 "("
             R_PAREN@435..436 ")"
     SEMICOLON@436..437 ";"

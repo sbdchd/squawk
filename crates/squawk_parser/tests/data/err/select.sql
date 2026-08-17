@@ -147,5 +147,12 @@ select 1 union with x as (select 2) select * from x;
 select f(1, all 2);
 select f(1, distinct 2);
 
+-- only column def list list allowed, not alias
+select * from rows from (f() t);
+select * from rows from (f() as t(a int));
+
+-- column def columns a type
+select * from rows from (f() as (a));
+
 -- trailing comma at EOF
 select 1,

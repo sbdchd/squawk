@@ -760,9 +760,9 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "x"
-          ALIAS_COLUMN_LIST
+          COLUMN_DEF_LIST
             L_PAREN "("
-            ALIAS_COLUMN
+            COLUMN_DEF
               COLUMN_NAME
                 IDENT "\"index\""
               WHITESPACE " "
@@ -772,7 +772,7 @@ SOURCE_FILE
                     INT_KW "int"
             COMMA ","
             WHITESPACE " "
-            ALIAS_COLUMN
+            COLUMN_DEF
               COLUMN_NAME
                 IDENT "\"document\""
               WHITESPACE " "
@@ -782,7 +782,7 @@ SOURCE_FILE
                     IDENT "jsonb"
             COMMA ","
             WHITESPACE " "
-            ALIAS_COLUMN
+            COLUMN_DEF
               COLUMN_NAME
                 IDENT "relevance_score"
               WHITESPACE " "

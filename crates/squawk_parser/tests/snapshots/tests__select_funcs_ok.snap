@@ -3871,11 +3871,10 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "s"
-          ALIAS_COLUMN_LIST
+          COLUMN_LIST
             L_PAREN "("
-            ALIAS_COLUMN
-              COLUMN_NAME
-                IDENT "i"
+            COLUMN_NAME
+              IDENT "i"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -538,44 +538,6 @@ impl AggregateRenameTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AliasColumn {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AliasColumn {
-    #[inline]
-    pub fn collate(&self) -> Option<Collate> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name(&self) -> Option<ColumnName> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ty(&self) -> Option<Type> {
-        support::child(&self.syntax)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AliasColumnList {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AliasColumnList {
-    #[inline]
-    pub fn alias_columns(&self) -> AstChildren<AliasColumn> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct All {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3832,6 +3794,44 @@ impl Column {
     #[inline]
     pub fn with_options(&self) -> Option<WithOptions> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ColumnDef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ColumnDef {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<ColumnName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ColumnDefList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ColumnDefList {
+    #[inline]
+    pub fn column_defs(&self) -> AstChildren<ColumnDef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -11716,7 +11716,7 @@ pub struct FromAlias {
 }
 impl FromAlias {
     #[inline]
-    pub fn column_list(&self) -> Option<AliasColumnList> {
+    pub fn columns(&self) -> Option<FromAliasColumns> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -22285,8 +22285,12 @@ impl RowsFromArg {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn column_def_list(&self) -> Option<FromAlias> {
+    pub fn column_def_list(&self) -> Option<ColumnDefList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
     }
 }
 
@@ -28537,6 +28541,12 @@ pub enum FrameUnits {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum FromAliasColumns {
+    ColumnDefList(ColumnDefList),
+    ColumnList(ColumnList),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FromItem {
     ExprFromItem(ExprFromItem),
     FunctionFromItem(FunctionFromItem),
@@ -30027,42 +30037,6 @@ impl AstNode for AggregateRenameTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::AGGREGATE_RENAME_TO
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for AliasColumn {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALIAS_COLUMN
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for AliasColumnList {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALIAS_COLUMN_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -32421,6 +32395,42 @@ impl AstNode for Column {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ColumnDef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COLUMN_DEF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ColumnDefList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COLUMN_DEF_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -61755,6 +61765,44 @@ impl From<FrameRows> for FrameUnits {
     #[inline]
     fn from(node: FrameRows) -> FrameUnits {
         FrameUnits::FrameRows(node)
+    }
+}
+impl AstNode for FromAliasColumns {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::COLUMN_DEF_LIST | SyntaxKind::COLUMN_LIST)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::COLUMN_DEF_LIST => {
+                FromAliasColumns::ColumnDefList(ColumnDefList { syntax })
+            }
+            SyntaxKind::COLUMN_LIST => FromAliasColumns::ColumnList(ColumnList { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            FromAliasColumns::ColumnDefList(it) => &it.syntax,
+            FromAliasColumns::ColumnList(it) => &it.syntax,
+        }
+    }
+}
+impl From<ColumnDefList> for FromAliasColumns {
+    #[inline]
+    fn from(node: ColumnDefList) -> FromAliasColumns {
+        FromAliasColumns::ColumnDefList(node)
+    }
+}
+impl From<ColumnList> for FromAliasColumns {
+    #[inline]
+    fn from(node: ColumnList) -> FromAliasColumns {
+        FromAliasColumns::ColumnList(node)
     }
 }
 impl AstNode for FromItem {

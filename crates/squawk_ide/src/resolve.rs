@@ -2060,7 +2060,7 @@ fn resolve_select_qualified_column_ptr(
                     return Some(ptr);
                 }
 
-                if from_item.alias().and_then(|a| a.column_list()).is_none()
+                if from_item.alias().and_then(|a| a.columns()).is_none()
                     && column_name == Name::from_string("ordinality")
                     && let Some(ordinality_token) = from_item
                         .with_ordinality()
@@ -2101,8 +2101,8 @@ fn resolve_select_qualified_column_ptr(
                     }
 
                     // `from t as u(a, b, c)`
-                    if let Some(column_list) = alias.column_list() {
-                        for col_name in column_list.column_names() {
+                    if let Some(columns) = alias.columns() {
+                        for col_name in columns.column_names() {
                             if Name::from_node(&col_name) == column_name {
                                 return Some(smallvec![Location::new(
                                     file,
@@ -2447,13 +2447,10 @@ fn resolve_from_item_column_by_name_after_index(
     if let ast::FromItem::RowsFromItem(rows_from) = from_item {
         let mut remaining_skip = skip_column_count;
         for arg in rows_from.rows_from_args() {
-            if let Some(column_def_list) = arg
-                .column_def_list()
-                .filter(|alias| alias.column_list().is_some())
-            {
+            if let Some(column_def_list) = arg.column_def_list() {
                 let (column_count, column) = resolve_column_list_column(
                     file,
-                    alias_column_names(Some(column_def_list)),
+                    column_def_list.column_names(),
                     column_name,
                     remaining_skip,
                 );
@@ -2545,7 +2542,7 @@ fn resolve_from_item_column_by_name_after_index(
     }
 
     if original_skip == 0
-        && from_item.alias().and_then(|a| a.column_list()).is_none()
+        && from_item.alias().and_then(|a| a.columns()).is_none()
         && *column_name == Name::from_string("ordinality")
         && let Some(ordinality_token) = from_item
             .with_ordinality()
@@ -3371,9 +3368,9 @@ fn column_list_names(
 
 fn alias_column_names(alias: Option<ast::FromAlias>) -> impl Iterator<Item = ast::ColumnName> {
     alias
-        .and_then(|alias| alias.column_list())
+        .and_then(|alias| alias.columns())
         .into_iter()
-        .flat_map(|column_list| column_list.column_names())
+        .flat_map(|columns| columns.column_names())
 }
 
 fn resolve_column_list_column(
@@ -4489,7 +4486,7 @@ pub(crate) fn table_ptrs_from_clause(
 
     for from_item in ast_nav::iter_from_clause(from_clause) {
         if let Some(alias) = from_item.alias()
-            && alias.column_list().is_some()
+            && alias.columns().is_some()
         {
             results.push(SyntaxNodePtr::new(alias.syntax()));
             continue;
