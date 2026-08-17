@@ -233,6 +233,9 @@ select * from rows from(f()) with ordinality;
 select * from rows from(f()) with ordinality as t;
 select * from rows from(f()) as t(a, b, c);
 select * from rows from(f()) t(a, b, c);
+select * from rows from(f() as (x int), g() as (y int));
+select * from rows from(f() as (x int)) as t(a);
+select * from rows from(f() as (x int)) with ordinality as t(a, n);
 
 -- select_with_where_clause
 -- simple

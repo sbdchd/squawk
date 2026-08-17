@@ -3801,8 +3801,10 @@ fn opt_row_from_expr(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(EXPR_FIRST) {
         return false;
     }
+    let m = p.start();
     call_expr(p);
     opt_from_alias(p);
+    m.complete(p, ROWS_FROM_ARG);
     true
 }
 

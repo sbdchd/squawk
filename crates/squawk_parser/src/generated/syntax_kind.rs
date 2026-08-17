@@ -1608,6 +1608,7 @@ pub enum SyntaxKind {
     ROUTINE_SIG,
     ROUTINE_SIG_LIST,
     ROW,
+    ROWS_FROM_ARG,
     ROWS_FROM_ITEM,
     ROWS_FUNC_OPTION,
     ROW_EXCLUSIVE,

@@ -15302,4 +15302,67 @@ select ordinality$0 from rows from (unnest(array[1,2])) with ordinality;
           ╰╴                ─ 1. source                                ────────── 2. destination
         ");
     }
+
+    #[test]
+    fn goto_rows_from_alias_column_with_per_item_column_def_list() {
+        assert_snapshot!(goto("
+select z.q$0 from rows from (unnest(array[1,2]) as (x int)) as z(q);
+"), @"
+          ╭▸ 
+        2 │ select z.q from rows from (unnest(array[1,2]) as (x int)) as z(q);
+          ╰╴         ─ 1. source                                           ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_rows_from_column_def_after_partial_item_alias() {
+        assert_snapshot!(goto("
+create function f_rec() returns record as $$ select 1 $$ language sql;
+select x$0 from rows from (unnest(array[1,2]), f_rec() as (x int)) as z(c1);
+"), @"
+          ╭▸ 
+        3 │ select x from rows from (unnest(array[1,2]), f_rec() as (x int)) as z(c1);
+          ╰╴       ─ 1. source                                       ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_rows_from_applies_outer_alias_skip_across_items() {
+        assert_snapshot!(goto("
+create function f() returns record as $$ select 1 $$ language sql;
+create function g() returns record as $$ select 1 $$ language sql;
+select y$0 from rows from (f() as (x int), g() as (y int)) as z(q);
+"), @"
+          ╭▸ 
+        4 │ select y from rows from (f() as (x int), g() as (y int)) as z(q);
+          ╰╴       ─ 1. source                               ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_rows_from_per_item_column_def_list_column() {
+        assert_snapshot!(goto("
+select x$0 from rows from (unnest(array[1,2]) as (x int));
+"), @"
+          ╭▸ 
+        2 │ select x from rows from (unnest(array[1,2]) as (x int));
+          ╰╴       ─ 1. source                              ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_rows_from_column_after_outer_alias_for_composite_return() {
+        assert_snapshot!(goto("
+create type pair as (a int, b int);
+create function f() returns setof pair as $$ select 1, 2 $$ language sql;
+create function g() returns table(y int) as $$ select 3 $$ language sql;
+select y$0 from rows from (f(), g()) as z(q, r);
+"), @"
+          ╭▸ 
+        4 │ create function g() returns table(y int) as $$ select 3 $$ language sql;
+          │                                   ─ 2. destination
+        5 │ select y from rows from (f(), g()) as z(q, r);
+          ╰╴       ─ 1. source
+        ");
+    }
 }

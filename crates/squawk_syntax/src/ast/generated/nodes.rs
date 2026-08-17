@@ -22276,6 +22276,21 @@ impl RowShare {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RowsFromArg {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RowsFromArg {
+    #[inline]
+    pub fn call_expr(&self) -> Option<CallExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn column_def_list(&self) -> Option<FromAlias> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RowsFromItem {
     pub(crate) syntax: SyntaxNode,
 }
@@ -22285,7 +22300,7 @@ impl RowsFromItem {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn call_exprs(&self) -> AstChildren<CallExpr> {
+    pub fn rows_from_args(&self) -> AstChildren<RowsFromArg> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -48372,6 +48387,24 @@ impl AstNode for RowShare {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ROW_SHARE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RowsFromArg {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROWS_FROM_ARG
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
