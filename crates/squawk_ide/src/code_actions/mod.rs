@@ -20,12 +20,15 @@ mod rewrite_from;
 mod rewrite_integer_radix;
 mod rewrite_leading_from;
 mod rewrite_not_equals_operator;
+mod rewrite_rows_from_as_unnest;
 mod rewrite_select_as_table;
 mod rewrite_select_as_values;
 mod rewrite_select_into_as_create_table_as;
 mod rewrite_table_as_select;
 mod rewrite_timestamp_type;
+mod rewrite_unnest_as_rows_from;
 mod rewrite_values_as_select;
+mod unnest;
 mod unquote_identifier;
 
 #[cfg(test)]
@@ -47,11 +50,13 @@ use rewrite_from::rewrite_from;
 use rewrite_integer_radix::rewrite_integer_radix;
 use rewrite_leading_from::rewrite_leading_from;
 use rewrite_not_equals_operator::rewrite_not_equals_operator;
+use rewrite_rows_from_as_unnest::rewrite_rows_from_as_unnest;
 use rewrite_select_as_table::rewrite_select_as_table;
 use rewrite_select_as_values::rewrite_select_as_values;
 use rewrite_select_into_as_create_table_as::rewrite_select_into_as_create_table_as;
 use rewrite_table_as_select::rewrite_table_as_select;
 use rewrite_timestamp_type::rewrite_timestamp_type;
+use rewrite_unnest_as_rows_from::rewrite_unnest_as_rows_from;
 use rewrite_values_as_select::rewrite_values_as_select;
 use unquote_identifier::unquote_identifier;
 
@@ -93,5 +98,7 @@ pub fn code_actions(db: &dyn Db, position: InFile<TextSize>) -> Option<Vec<CodeA
     rewrite_between_as_binary_expression(db, position, &mut actions);
     rewrite_not_equals_operator(db, position, &mut actions);
     rewrite_timestamp_type(db, position, &mut actions);
+    rewrite_unnest_as_rows_from(db, position, &mut actions);
+    rewrite_rows_from_as_unnest(db, position, &mut actions);
     Some(actions)
 }
