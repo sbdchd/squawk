@@ -1,5 +1,6 @@
 use rustc_hash::FxHashMap;
 
+use crate::name::AsName;
 use crate::symbols::{Name, SymbolId};
 
 #[derive(Default, Debug, Clone, PartialEq)]
@@ -12,7 +13,7 @@ impl Scope {
         self.entries.entry(name).or_default().push(id);
     }
 
-    pub(crate) fn get(&self, name: &Name) -> Option<&[SymbolId]> {
-        self.entries.get(name).map(|ids| ids.as_slice())
+    pub(crate) fn get<N: AsName + ?Sized>(&self, name: &N) -> Option<&[SymbolId]> {
+        self.entries.get(name.as_name()).map(|ids| ids.as_slice())
     }
 }
