@@ -2445,15 +2445,43 @@ fn resolve_from_item_column_by_name_after_index(
     }
 
     if let ast::FromItem::RowsFromItem(rows_from) = from_item {
-        for call_expr in rows_from.call_exprs() {
-            if let Some(ptr) = resolve_column_from_call_expr_return_table(
-                db,
-                InFile::new(file, &call_expr),
-                scope_name_ref,
-                column_name,
-                skip_column_count,
-            ) {
-                return Some(ptr);
+        let mut remaining_skip = skip_column_count;
+        for arg in rows_from.rows_from_args() {
+            if let Some(column_def_list) = arg
+                .column_def_list()
+                .filter(|alias| alias.column_list().is_some())
+            {
+                let (column_count, column) = resolve_column_list_column(
+                    file,
+                    alias_column_names(Some(column_def_list)),
+                    column_name,
+                    remaining_skip,
+                );
+                if let Some(column) = column {
+                    return Some(column);
+                }
+                remaining_skip = remaining_skip.saturating_sub(column_count);
+                continue;
+            }
+            if let Some(call_expr) = arg.call_expr() {
+                if let Some(ptr) = resolve_column_from_call_expr_return_table(
+                    db,
+                    InFile::new(file, &call_expr),
+                    scope_name_ref,
+                    column_name,
+                    remaining_skip,
+                ) {
+                    return Some(ptr);
+                }
+                if remaining_skip > 0 {
+                    let column_count = count_columns_for_call_expr_return_table(
+                        db,
+                        InFile::new(file, &call_expr),
+                        scope_name_ref,
+                    )
+                    .unwrap_or(1);
+                    remaining_skip = remaining_skip.saturating_sub(column_count);
+                }
             }
         }
     }
@@ -4892,6 +4920,60 @@ fn resolve_json_table_column(
     None
 }
 
+fn count_columns_for_call_expr_return_table(
+    db: &dyn Db,
+    call_expr: InFile<&ast::CallExpr>,
+    name_ref: &impl ast::NameLike,
+) -> Option<usize> {
+    let file = call_expr.file_id;
+    let call_expr = call_expr.value;
+    let position = name_ref.syntax().text_range().start();
+    let (schema, function_name) = name::schema_and_func_name(call_expr)?;
+    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+    let function_locs = resolve_function(db, &function_name, &schemas, None, file)?;
+    let function_loc = function_locs.first()?;
+    let function_node = function_loc.to_node(db)?;
+    let create_function = function_node
+        .ancestors()
+        .find_map(ast::CreateFunction::cast)?;
+
+    if let Some(table_arg_list) = create_function.ret_type().and_then(|r| r.table_arg_list()) {
+        return Some(
+            table_arg_list
+                .args()
+                .filter(|arg| matches!(arg, ast::TableArg::Column(_)))
+                .count(),
+        );
+    }
+
+    if let Some(param_list) = create_function.param_list() {
+        let output_count = param_list
+            .params()
+            .filter(|param| {
+                matches!(
+                    param.mode(),
+                    Some(ast::ParamMode::ParamInOut(_) | ast::ParamMode::ParamOut(_))
+                )
+            })
+            .count();
+        if output_count > 0 {
+            return Some(output_count);
+        }
+    }
+
+    if let Some(ast::Type::PathType(path_type)) = create_function.ret_type().and_then(|r| r.ty())
+        && let Some(path) = path_type.path_ref()
+        && let Some(column_count) =
+            count_columns_for_path(db, InFile::new(function_loc.file, &path)).or_else(|| {
+                count_columns_for_composite_type_path(db, InFile::new(function_loc.file, &path))
+            })
+    {
+        return Some(column_count);
+    }
+
+    create_function.ret_type().map(|_| 1)
+}
+
 fn resolve_column_from_call_expr_return_table(
     db: &dyn Db,
     call_expr: InFile<&ast::CallExpr>,
@@ -5140,6 +5222,30 @@ fn resolve_composite_type_field_ptr(
     let type_node = type_name_ptr.to_node(root);
 
     composite_type_field_location(file, &type_node, &field_name)
+}
+
+fn count_columns_for_composite_type_path(
+    db: &dyn Db,
+    path: InFile<&ast::PathRef>,
+) -> Option<usize> {
+    let file = path.file_id;
+    let path = path.value;
+    let (schema, type_name) = name::schema_and_name_path(path)?;
+    let position = path.syntax().text_range().start();
+    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+    let type_name_ptr = resolve_type_name_ptr(db, &type_name, &schemas, file)?;
+    let tree = parse(db, file).tree();
+    let type_node = type_name_ptr.to_node(tree.syntax());
+    let create_type = type_node.ancestors().find_map(ast::CreateType::cast)?;
+    let ast::CreateTypeKind::CompositeType(composite) = create_type.kind()? else {
+        return None;
+    };
+    Some(
+        composite
+            .composite_field_list()?
+            .composite_field_defs()
+            .count(),
+    )
 }
 
 fn resolve_composite_type_field_for_path(

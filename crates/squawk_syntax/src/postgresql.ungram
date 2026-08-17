@@ -2911,7 +2911,10 @@ ExprFromItem =
   'lateral'? (CastExpr | CollationForFn) alias:FromAlias?
 
 RowsFromItem =
-  'lateral'? 'rows' 'from' '(' (CallExpr (',' CallExpr)*) ')' WithOrdinality? alias:FromAlias?
+  'lateral'? 'rows' 'from' '(' (RowsFromArg (',' RowsFromArg)*) ')' WithOrdinality? alias:FromAlias?
+
+RowsFromArg =
+  CallExpr column_def_list:FromAlias?
 
 FromClause =
   'from'
