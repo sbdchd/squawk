@@ -1492,7 +1492,11 @@ TableAlias =
   '#name'?
 
 FromAlias =
-  'as'? name:TableAlias column_list:AliasColumnList?
+  'as'? name:TableAlias? columns:FromAliasColumns?
+
+FromAliasColumns =
+  ColumnList
+| ColumnDefList
 
 OptionalAsAlias =
   'as'? name:TableAlias
@@ -1575,11 +1579,11 @@ OptionCycle =
 ColumnList =
   '(' (ColumnName (',' ColumnName)*) ')'
 
-AliasColumnList =
-  '(' (AliasColumn (',' AliasColumn)*) ')'
+ColumnDefList =
+  '(' (ColumnDef (',' ColumnDef)*) ')'
 
-AliasColumn =
-  name:ColumnName Type? Collate?
+ColumnDef =
+  name:ColumnName Type Collate?
 
 ColumnRefList =
   '(' (ColumnNameRef (',' ColumnNameRef)*) ')'
@@ -2914,7 +2918,7 @@ RowsFromItem =
   'lateral'? 'rows' 'from' '(' (RowsFromArg (',' RowsFromArg)*) ')' WithOrdinality? alias:FromAlias?
 
 RowsFromArg =
-  CallExpr column_def_list:FromAlias?
+  CallExpr ('as' ColumnDefList)?
 
 FromClause =
   'from'

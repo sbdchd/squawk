@@ -84,11 +84,10 @@ SOURCE_FILE
           WHITESPACE " "
           TABLE_ALIAS
             IDENT "u"
-          ALIAS_COLUMN_LIST
+          COLUMN_LIST
             L_PAREN "("
-            ALIAS_COLUMN
-              COLUMN_NAME
-                IDENT "a"
+            COLUMN_NAME
+              IDENT "a"
             ERROR
               COMMA ","
             R_PAREN ")"
@@ -1606,6 +1605,121 @@ SOURCE_FILE
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- only column def list list allowed, not alias"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      ROWS_FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        ROWS_FROM_ARG
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+        WHITESPACE " "
+        ROWS_FROM_ARG
+          NAME_REF
+            IDENT "t"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      ROWS_FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        ROWS_FROM_ARG
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+        WHITESPACE " "
+        ROWS_FROM_ARG
+          CALL_EXPR
+            NAME_REF
+              IDENT "t"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAME_REF
+                  IDENT "a"
+              WHITESPACE " "
+              ARG
+                NAME_REF
+                  INT_KW "int"
+              R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- column def columns a type"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      ROWS_FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        ROWS_FROM_ARG
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          COLUMN_DEF_LIST
+            L_PAREN "("
+            COLUMN_DEF
+              COLUMN_NAME
+                IDENT "a"
+            R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
   SELECT
@@ -1824,7 +1938,31 @@ error[syntax-error]: ALL or DISTINCT is only allowed before the first argument
     ╭▸ 
 148 │ select f(1, distinct 2);
     ╰╴            ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+151 │ select * from rows from (f() t);
+    ╰╴                            ━
+error[syntax-error]: expected call expression
+    ╭▸ 
+151 │ select * from rows from (f() t);
+    ╰╴                              ━
+error[syntax-error]: expected column definition list
+    ╭▸ 
+152 │ select * from rows from (f() as t(a int));
+    ╰╴                               ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+152 │ select * from rows from (f() as t(a int));
+    ╰╴                               ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+152 │ select * from rows from (f() as t(a int));
+    ╰╴                                   ━
+error[syntax-error]: expected a type
+    ╭▸ 
+155 │ select * from rows from (f() as (a));
+    ╰╴                                  ━
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-151 │ select 1,
+158 │ select 1,
     ╰╴        ━

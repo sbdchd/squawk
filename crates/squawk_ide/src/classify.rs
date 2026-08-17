@@ -1106,10 +1106,12 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         if let Some(class) = classify_object_definition(ancestor.kind()) {
             return Some(class);
         }
-        if ast::Column::can_cast(ancestor.kind()) || ast::AliasColumn::can_cast(ancestor.kind()) {
+        if ast::Column::can_cast(ancestor.kind()) || ast::ColumnDef::can_cast(ancestor.kind()) {
             in_column = true;
         }
-        if ast::ColumnList::can_cast(ancestor.kind()) {
+        if ast::ColumnList::can_cast(ancestor.kind())
+            || ast::ColumnDefList::can_cast(ancestor.kind())
+        {
             in_column_list = true;
         }
         if ast::Param::can_cast(ancestor.kind()) {
@@ -1149,7 +1151,7 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
             || ast::OptionalAsAlias::can_cast(ancestor.kind())
             || ast::RequiredAsAlias::can_cast(ancestor.kind())
         {
-            if in_column {
+            if in_column || in_column_list {
                 return Some(LocationKind::Column);
             }
             return Some(LocationKind::Table);

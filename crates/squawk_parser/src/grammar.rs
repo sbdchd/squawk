@@ -3803,7 +3803,9 @@ fn opt_row_from_expr(p: &mut Parser<'_>) -> bool {
     }
     let m = p.start();
     call_expr(p);
-    opt_from_alias(p);
+    if p.eat(AS_KW) && !opt_column_list_with(p, ColumnDefKind::ColumnDef) {
+        p.error("expected column definition list");
+    }
     m.complete(p, ROWS_FROM_ARG);
     true
 }
@@ -4275,11 +4277,12 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 #[derive(Clone, Copy, PartialEq)]
 enum ColumnDefKind {
-    Alias,
+    ColumnDef,
     ColumnTarget,
     CompositeFieldDef,
     ConstraintColumnRef,
     ForeignKeyColumnRef,
+    FromAliasColumn,
     Name,
     NameRef,
 }
@@ -4298,6 +4301,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     }
     let m = p.start();
     p.expect(L_PAREN);
+    let mut kind = kind;
     let mut seen_period = false;
     while !p.at(EOF) && !p.at(R_PAREN) {
         if p.at(COMMA) {
@@ -4311,7 +4315,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
             p.error("PERIOD must be the last column in the list");
         }
         seen_period |= kind == ColumnDefKind::ForeignKeyColumnRef && at_period_column(p);
-        column(p, kind);
+        kind = column(p, kind);
         if p.at(COMMA) && p.nth_at(1, R_PAREN) {
             p.err_and_bump("unexpected trailing comma");
         }
@@ -4326,28 +4330,41 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     opt_without_overlaps(p, kind);
     p.expect(R_PAREN);
     let list_kind = match kind {
-        ColumnDefKind::Alias => ALIAS_COLUMN_LIST,
+        ColumnDefKind::ColumnDef => COLUMN_DEF_LIST,
         ColumnDefKind::ColumnTarget => COLUMN_TARGET_LIST,
         ColumnDefKind::CompositeFieldDef => COMPOSITE_FIELD_LIST,
         ColumnDefKind::ConstraintColumnRef => CONSTRAINT_COLUMN_REF_LIST,
         ColumnDefKind::ForeignKeyColumnRef => FOREIGN_KEY_COLUMN_LIST,
-        ColumnDefKind::Name => COLUMN_LIST,
+        ColumnDefKind::FromAliasColumn | ColumnDefKind::Name => COLUMN_LIST,
         ColumnDefKind::NameRef => COLUMN_REF_LIST,
     };
     m.complete(p, list_kind);
     return true;
 }
 
-fn column(p: &mut Parser<'_>, kind: ColumnDefKind) {
+fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> ColumnDefKind {
     assert!(p.at_ts(COLUMN_FIRST));
     match kind {
-        ColumnDefKind::Alias => {
+        ColumnDefKind::FromAliasColumn => {
             let m = p.start();
             column_name(p);
             if !p.at(COMMA) && !p.at(R_PAREN) && opt_type_name(p) {
                 opt_collate(p);
+                m.complete(p, COLUMN_DEF);
+                return ColumnDefKind::ColumnDef;
             }
-            m.complete(p, ALIAS_COLUMN);
+            m.abandon(p);
+            return ColumnDefKind::Name;
+        }
+        ColumnDefKind::ColumnDef => {
+            let m = p.start();
+            column_name(p);
+            if p.at(COMMA) || p.at(R_PAREN) || !opt_type_name(p) {
+                p.error("expected a type");
+            } else {
+                opt_collate(p);
+            }
+            m.complete(p, COLUMN_DEF);
         }
         ColumnDefKind::CompositeFieldDef => {
             let m = p.start();
@@ -4392,6 +4409,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) {
             }
         }
     }
+    kind
 }
 
 fn at_period_column(p: &Parser<'_>) -> bool {
@@ -5344,7 +5362,6 @@ fn like_clause(p: &mut Parser<'_>) -> CompletedMarker {
 // [ AS ] alias ( column_definition [, ...] )
 // AS ( column_definition [, ...] )
 fn opt_from_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    // TODO: we should split this into opt_col_def and opt_col_alias
     if !(p.at(AS_KW) || p.at_ts(NAME_FIRST) || p.at(L_PAREN)) {
         return None;
     }
@@ -5354,10 +5371,8 @@ fn opt_from_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at_ts(NAME_FIRST) {
         table_alias(p);
     }
-    if p.at(L_PAREN) {
-        if !opt_column_list_with(p, ColumnDefKind::Alias) {
-            p.error("expected column list");
-        }
+    if p.at(L_PAREN) && !opt_column_list_with(p, ColumnDefKind::FromAliasColumn) {
+        p.error("expected column list");
     }
     Some(m.complete(p, FROM_ALIAS))
 }

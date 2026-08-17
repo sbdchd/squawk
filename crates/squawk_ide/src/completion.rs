@@ -400,9 +400,9 @@ fn column_completions_from_clause(
             }
             Some(ast_nav::ParentSouce::Alias(alias)) => {
                 let alias_columns: Vec<Name> = alias
-                    .column_list()
+                    .columns()
                     .into_iter()
-                    .flat_map(|column_list| column_list.column_names())
+                    .flat_map(|columns| columns.column_names())
                     .map(|name| Name::from_node(&name))
                     .collect();
 
