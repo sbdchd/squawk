@@ -17,6 +17,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
             match node {
                 ast::AlterAggregate(it) => validate_aggregate_params(it.aggregate().and_then(|x| x.param_list()), errors),
                 ast::BeginFuncOptionList(it) => validate_begin_func_option_list(it, errors),
+                ast::BinExpr(it) => validate_bin_expr(it, errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::CreateViewLike(it) => validate_non_empty_column_list(it.column_list(), errors),
@@ -587,6 +588,25 @@ fn offset_range(start: TextSize, range: Range<usize>) -> TextRange {
     let begin = start + TextSize::new(range.start as u32);
     let end = start + TextSize::new(range.end as u32);
     TextRange::new(begin, end)
+}
+
+// see: https://christopher.xyz/2020/08/01/any-all-pg.html
+fn validate_bin_expr(bin_expr: ast::BinExpr, acc: &mut Vec<SyntaxError>) {
+    if !matches!(
+        bin_expr.op(),
+        Some(ast::BinOp::In(_) | ast::BinOp::NotIn(_))
+    ) {
+        return;
+    }
+    let rhs = match bin_expr.rhs() {
+        None | Some(ast::Expr::ParenExpr(_)) => return,
+        Some(ast::Expr::TupleExpr(tuple)) if tuple.row_token().is_none() => return,
+        Some(rhs) => rhs,
+    };
+    acc.push(SyntaxError::new(
+        "Expected a parenthesized value list or subquery.",
+        rhs.syntax().text_range(),
+    ));
 }
 
 fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
