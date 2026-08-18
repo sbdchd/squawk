@@ -833,6 +833,12 @@ impl ast::CreateConversion {
     }
 }
 
+impl ast::ExtractFieldName {
+    pub fn text(&self) -> String {
+        normalize_name_node(self.syntax())
+    }
+}
+
 impl ast::PositionFn {
     #[inline]
     pub fn pos(&self) -> Option<ast::Expr> {
@@ -842,6 +848,57 @@ impl ast::PositionFn {
     #[inline]
     pub fn string(&self) -> Option<ast::Expr> {
         support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::SubstringForFrom {
+    #[inline]
+    pub fn string(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn count(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+
+    #[inline]
+    pub fn start(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(2)
+    }
+}
+
+impl ast::SubstringFromFor {
+    #[inline]
+    pub fn string(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn start(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+
+    #[inline]
+    pub fn count(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(2)
+    }
+}
+
+impl ast::SubstringSimilarEscape {
+    #[inline]
+    pub fn string(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn pattern(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+
+    #[inline]
+    pub fn escape(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(2)
     }
 }
 

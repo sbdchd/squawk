@@ -285,16 +285,19 @@ fn when_clause(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, WHEN_CLAUSE)
 }
 
-const EXTRACT_ARG_FIRST_: TokenSet =
-    TokenSet::new(&[YEAR_KW, MONTH_KW, DAY_KW, HOUR_KW, MINUTE_KW, SECOND_KW]).union(STRING_FIRST);
-
-// IDENT | YEAR_P | MONTH_P | DAY_P | HOUR_P | MINUTE_P | SECOND_P | Sconst
-const EXTRACT_ARG_FIRST: TokenSet = IDENTS.union(EXTRACT_ARG_FIRST_);
+const EXTRACT_ARG_FIRST: TokenSet = TokenSet::new(&[
+    IDENT, YEAR_KW, MONTH_KW, DAY_KW, HOUR_KW, MINUTE_KW, SECOND_KW,
+])
+.union(STRING_FIRST);
 fn extract_arg(p: &mut Parser<'_>) {
-    if p.at_ts(EXTRACT_ARG_FIRST) {
+    if p.at_ts(STRING_FIRST) {
         let m = p.start();
-        p.bump_any();
-        m.complete(p, EXTRACT_FIELD);
+        literal(p);
+        m.complete(p, EXTRACT_FIELD_LITERAL);
+    } else if p.at_ts(EXTRACT_ARG_FIRST) {
+        let m = p.start();
+        pg_name(p);
+        m.complete(p, EXTRACT_FIELD_NAME);
     } else {
         p.error(format!(
             "expected ident, year, month, day, hour, minute, second, or string, got {:?}",
@@ -384,31 +387,40 @@ fn opt_trim_side(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
-fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(TRIM_KW));
+fn trim_args(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    p.expect(TRIM_KW);
-    p.expect(L_PAREN);
-    opt_trim_side(p);
     // | FROM expr_list
     // | a_expr FROM expr_list
     // | expr_list
-    if p.eat(FROM_KW) {
+    let kind = if p.eat(FROM_KW) {
         if !opt_expr_list(p) {
             p.error("expected expression")
         }
+        TRIM_FROM
     } else {
         if expr(p).is_none() {
             p.error("expected expression");
         }
         if p.eat(FROM_KW) {
             opt_expr_list(p);
+            TRIM_EXPR_FROM
         } else {
             if p.eat(COMMA) {
                 opt_expr_list(p);
             }
+            TRIM_EXPRS
         }
     };
+    m.complete(p, kind)
+}
+
+fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(TRIM_KW));
+    let m = p.start();
+    p.expect(TRIM_KW);
+    p.expect(L_PAREN);
+    opt_trim_side(p);
+    trim_args(p);
     p.expect(R_PAREN);
     let m = m.complete(p, TRIM_FN).precede(p);
     opt_agg_clauses(p);
@@ -424,13 +436,10 @@ fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
 //     | a_expr SIMILAR a_expr ESCAPE a_expr
 //
 // SUBSTRING '(' func_arg_list_opt ')'
-fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(SUBSTRING_KW));
+fn substring_args(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    p.expect(SUBSTRING_KW);
-    p.expect(L_PAREN);
     expr(p);
-    match p.current() {
+    let kind = match p.current() {
         // FOR a_expr FROM a_expr
         // FOR a_expr
         FOR_KW => {
@@ -440,6 +449,7 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
             if p.eat(FROM_KW) {
                 expr(p);
             }
+            SUBSTRING_FOR_FROM
         }
         // FROM a_expr
         // FROM a_expr FOR a_expr
@@ -450,17 +460,39 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
             if p.eat(FOR_KW) {
                 expr(p);
             }
+            SUBSTRING_FROM_FOR
         }
         // SIMILAR a_expr ESCAPE a_expr
         SIMILAR_KW => {
             p.bump(SIMILAR_KW);
+            expr_bp(
+                p,
+                1,
+                &Restrictions {
+                    escape_disabled: true,
+                    ..Restrictions::default()
+                },
+            );
+            p.expect(ESCAPE_KW);
             expr(p);
+            SUBSTRING_SIMILAR_ESCAPE
         }
-        _ if p.eat(COMMA) => {
-            opt_expr_list(p);
+        _ => {
+            if p.eat(COMMA) {
+                opt_expr_list(p);
+            }
+            SUBSTRING_EXPRS
         }
-        _ => (),
-    }
+    };
+    m.complete(p, kind)
+}
+
+fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(SUBSTRING_KW));
+    let m = p.start();
+    p.expect(SUBSTRING_KW);
+    p.expect(L_PAREN);
+    substring_args(p);
     p.expect(R_PAREN);
     let m = m.complete(p, SUBSTRING_FN).precede(p);
     opt_agg_clauses(p);
@@ -2785,7 +2817,7 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         // overlaps
         OVERLAPS_KW => (7, OVERLAPS_KW, Left),
         // escape
-        ESCAPE_KW => (7, ESCAPE_KW, Left),
+        ESCAPE_KW if !r.escape_disabled => (7, ESCAPE_KW, Left),
         // like
         LIKE_KW => (6, LIKE_KW, Left),
         // ilike
@@ -2868,6 +2900,7 @@ const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLA
 #[derive(Default)]
 struct Restrictions {
     order_by_allowed: bool,
+    escape_disabled: bool,
     in_disabled: bool,
     is_disabled: bool,
     not_disabled: bool,

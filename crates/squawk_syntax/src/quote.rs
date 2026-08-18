@@ -1,6 +1,10 @@
 use crate::SyntaxNode;
 use crate::generated::keywords::RESERVED_KEYWORDS;
 
+pub fn quote_string_literal(text: &str) -> String {
+    format!("'{}'", text.replace('\'', "''"))
+}
+
 pub fn quote_column_alias(text: &str) -> String {
     if needs_quoting(text) {
         format!(r#""{}""#, text.replace('"', r#""""#))
@@ -104,6 +108,11 @@ mod tests {
     use insta::assert_snapshot;
 
     use super::*;
+
+    #[test]
+    fn quote_string_literal_escapes_apostrophes() {
+        assert_snapshot!(quote_string_literal("it's"), @"'it''s'");
+    }
 
     #[test]
     fn quote_column_alias_handles_embedded_quotes() {

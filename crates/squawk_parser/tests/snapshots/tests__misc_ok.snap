@@ -1050,8 +1050,9 @@ SOURCE_FILE
                       EXTRACT_KW "EXTRACT"
                       L_PAREN "("
                       WHITESPACE " "
-                      EXTRACT_FIELD
-                        STRING "'hour'"
+                      EXTRACT_FIELD_LITERAL
+                        LITERAL
+                          STRING "'hour'"
                       WHITESPACE " "
                       FROM_KW "FROM"
                       WHITESPACE " "
@@ -1110,8 +1111,9 @@ SOURCE_FILE
                       EXTRACT_KW "EXTRACT"
                       L_PAREN "("
                       WHITESPACE " "
-                      EXTRACT_FIELD
-                        STRING "'hour'"
+                      EXTRACT_FIELD_LITERAL
+                        LITERAL
+                          STRING "'hour'"
                       WHITESPACE " "
                       FROM_KW "FROM"
                       WHITESPACE " "

@@ -546,13 +546,14 @@ SOURCE_FILE
               TRIM_BOTH
                 BOTH_KW "both"
               WHITESPACE " "
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              FROM_KW "from"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "a"
+              TRIM_EXPR_FROM
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -569,10 +570,11 @@ SOURCE_FILE
               TRIM_BOTH
                 BOTH_KW "both"
               WHITESPACE " "
-              FROM_KW "from"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "a"
+              TRIM_FROM
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -589,8 +591,9 @@ SOURCE_FILE
               TRIM_BOTH
                 BOTH_KW "both"
               WHITESPACE " "
-              NAME_REF
-                IDENT "a"
+              TRIM_EXPRS
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -607,8 +610,9 @@ SOURCE_FILE
               TRIM_LEADING
                 LEADING_KW "leading"
               WHITESPACE " "
-              NAME_REF
-                IDENT "a"
+              TRIM_EXPRS
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -625,8 +629,9 @@ SOURCE_FILE
               TRIM_TRAILING
                 TRAILING_KW "trailing"
               WHITESPACE " "
-              NAME_REF
-                IDENT "a"
+              TRIM_EXPRS
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -640,8 +645,9 @@ SOURCE_FILE
             TRIM_FN
               TRIM_KW "trim"
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              TRIM_EXPRS
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -657,18 +663,19 @@ SOURCE_FILE
             SUBSTRING_FN
               SUBSTRING_KW "substring"
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              FROM_KW "from"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "b"
-              WHITESPACE " "
-              FOR_KW "for"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              SUBSTRING_FROM_FOR
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
+                WHITESPACE " "
+                FOR_KW "for"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -682,18 +689,19 @@ SOURCE_FILE
             SUBSTRING_FN
               SUBSTRING_KW "substring"
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              FOR_KW "for"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "b"
-              WHITESPACE " "
-              FROM_KW "from"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              SUBSTRING_FOR_FROM
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                FOR_KW "for"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
+                WHITESPACE " "
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -707,13 +715,14 @@ SOURCE_FILE
             SUBSTRING_FN
               SUBSTRING_KW "substring"
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              FROM_KW "from"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              SUBSTRING_FROM_FOR
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -727,13 +736,14 @@ SOURCE_FILE
             SUBSTRING_FN
               SUBSTRING_KW "substring"
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              FOR_KW "for"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              SUBSTRING_FOR_FROM
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                FOR_KW "for"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -747,12 +757,12 @@ SOURCE_FILE
             SUBSTRING_FN
               SUBSTRING_KW "substring"
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              SIMILAR_KW "similar"
-              WHITESPACE " "
-              BIN_EXPR
+              SUBSTRING_SIMILAR_ESCAPE
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                SIMILAR_KW "similar"
+                WHITESPACE " "
                 NAME_REF
                   IDENT "b"
                 WHITESPACE " "
@@ -773,36 +783,37 @@ SOURCE_FILE
             SUBSTRING_FN
               SUBSTRING_KW "substring"
               L_PAREN "("
-              BIN_EXPR
-                NAME_REF
-                  IDENT "a"
+              SUBSTRING_EXPRS
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "''"
+                COMMA ","
                 WHITESPACE " "
-                CUSTOM_OP
-                  PIPE "|"
-                  PIPE "|"
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "b"
+                  WHITESPACE " "
+                  STAR "*"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "2"
+                COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  STRING "''"
-              COMMA ","
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "b"
-                WHITESPACE " "
-                STAR "*"
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-              COMMA ","
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "c"
-                WHITESPACE " "
-                MINUS "-"
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "1"
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "c"
+                  WHITESPACE " "
+                  MINUS "-"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -816,16 +827,17 @@ SOURCE_FILE
             SUBSTRING_FN
               SUBSTRING_KW "substring"
               L_PAREN "("
-              LITERAL
-                STRING "'hello world'"
-              COMMA ","
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
-              COMMA ","
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "5"
+              SUBSTRING_EXPRS
+                LITERAL
+                  STRING "'hello world'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "5"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2980,7 +2992,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "foo"
               WHITESPACE " "
               FROM_KW "from"
@@ -3008,7 +3020,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 YEAR_KW "year"
               WHITESPACE " "
               FROM_KW "from"
@@ -3028,7 +3040,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 MONTH_KW "month"
               WHITESPACE " "
               FROM_KW "from"
@@ -3048,7 +3060,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 DAY_KW "day"
               WHITESPACE " "
               FROM_KW "from"
@@ -3068,7 +3080,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 HOUR_KW "hour"
               WHITESPACE " "
               FROM_KW "from"
@@ -3088,7 +3100,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 MINUTE_KW "minute"
               WHITESPACE " "
               FROM_KW "from"
@@ -3108,7 +3120,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 SECOND_KW "second"
               WHITESPACE " "
               FROM_KW "from"
@@ -3128,8 +3140,9 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
-                STRING "'minute'"
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'century'"
               WHITESPACE " "
               FROM_KW "from"
               WHITESPACE " "
@@ -3148,7 +3161,448 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'day'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'decade'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'dow'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'doy'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'epoch'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'hour'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'isodow'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'isoyear'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'julian'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'microseconds'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'millennium'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'milliseconds'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'minute'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'month'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'quarter'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'second'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'timezone'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'timezone_hour'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'timezone_minute'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'week'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_LITERAL
+                LITERAL
+                  STRING "'year'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXTRACT_FN
+              EXTRACT_KW "extract"
+              L_PAREN "("
+              EXTRACT_FIELD_NAME
                 IDENT "epoch"
               WHITESPACE " "
               FROM_KW "from"
@@ -3174,7 +3628,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "century"
               WHITESPACE " "
               FROM_KW "from"
@@ -3198,7 +3652,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "isodow"
               WHITESPACE " "
               FROM_KW "from"
@@ -3222,7 +3676,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "isoyear"
               WHITESPACE " "
               FROM_KW "from"
@@ -3248,7 +3702,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "julian"
               WHITESPACE " "
               FROM_KW "from"
@@ -3274,7 +3728,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "microseconds"
               WHITESPACE " "
               FROM_KW "from"
@@ -3298,7 +3752,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "millennium"
               WHITESPACE " "
               FROM_KW "from"
@@ -3322,7 +3776,7 @@ SOURCE_FILE
             EXTRACT_FN
               EXTRACT_KW "extract"
               L_PAREN "("
-              EXTRACT_FIELD
+              EXTRACT_FIELD_NAME
                 IDENT "quarter"
               WHITESPACE " "
               FROM_KW "from"

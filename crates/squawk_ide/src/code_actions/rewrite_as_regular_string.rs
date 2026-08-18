@@ -1,7 +1,7 @@
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_linter::Edit;
-use squawk_syntax::{SyntaxKind, ast::AstNode};
+use squawk_syntax::{SyntaxKind, ast::AstNode, quote::quote_string_literal};
 
 use crate::db::parse;
 use crate::file::InFile;
@@ -40,9 +40,7 @@ fn dollar_quoted_to_string(text: &str) -> Option<String> {
         return None;
     }
 
-    // quotes are escaped by using two of them in Postgres
-    let escaped = content.replace('\'', "''");
-    Some(format!("'{escaped}'"))
+    Some(quote_string_literal(content))
 }
 
 fn split_dollar_quoted(text: &str) -> Option<(String, &str)> {
