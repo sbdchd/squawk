@@ -1,0 +1,289 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/in_array_expr.sql
+---
+SOURCE_FILE@0..402
+  SELECT@0..75
+    SELECT_CLAUSE@0..8
+      SELECT_KW@0..6 "SELECT"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..8
+        TARGET@7..8
+          STAR@7..8 "*"
+    WHITESPACE@8..9 " "
+    FROM_CLAUSE@9..20
+      FROM_KW@9..13 "FROM"
+      WHITESPACE@13..14 " "
+      RELATION_FROM_ITEM@14..20
+        RELATION_NAME_REF@14..20
+          PATH_REF@14..20
+            PATH_SEGMENT_REF@14..20
+              IDENT@14..20 "recipe"
+    WHITESPACE@20..21 " "
+    WHERE_CLAUSE@21..74
+      WHERE_KW@21..26 "WHERE"
+      WHITESPACE@26..27 " "
+      BIN_EXPR@27..74
+        NAME_REF@27..30
+          IDENT@27..30 "tag"
+        WHITESPACE@30..31 " "
+        IN_KW@31..33 "IN"
+        WHITESPACE@33..34 " "
+        ARRAY_EXPR@34..74
+          ARRAY_KW@34..39 "ARRAY"
+          L_BRACK@39..40 "["
+          LITERAL@40..51
+            STRING@40..51 "'breakfast'"
+          COMMA@51..52 ","
+          WHITESPACE@52..53 " "
+          LITERAL@53..60
+            STRING@53..60 "'snack'"
+          COMMA@60..61 ","
+          WHITESPACE@61..62 " "
+          LITERAL@62..73
+            STRING@62..73 "'appetizer'"
+          R_BRACK@73..74 "]"
+    SEMICOLON@74..75 ";"
+  WHITESPACE@75..76 "\n"
+  SELECT@76..155
+    SELECT_CLAUSE@76..84
+      SELECT_KW@76..82 "SELECT"
+      WHITESPACE@82..83 " "
+      TARGET_LIST@83..84
+        TARGET@83..84
+          STAR@83..84 "*"
+    WHITESPACE@84..85 " "
+    FROM_CLAUSE@85..96
+      FROM_KW@85..89 "FROM"
+      WHITESPACE@89..90 " "
+      RELATION_FROM_ITEM@90..96
+        RELATION_NAME_REF@90..96
+          PATH_REF@90..96
+            PATH_SEGMENT_REF@90..96
+              IDENT@90..96 "recipe"
+    WHITESPACE@96..97 " "
+    WHERE_CLAUSE@97..154
+      WHERE_KW@97..102 "WHERE"
+      WHITESPACE@102..103 " "
+      BIN_EXPR@103..154
+        NAME_REF@103..106
+          IDENT@103..106 "tag"
+        WHITESPACE@106..107 " "
+        NOT_IN@107..113
+          NOT_KW@107..110 "NOT"
+          WHITESPACE@110..111 " "
+          IN_KW@111..113 "IN"
+        WHITESPACE@113..114 " "
+        ARRAY_EXPR@114..154
+          ARRAY_KW@114..119 "ARRAY"
+          L_BRACK@119..120 "["
+          LITERAL@120..131
+            STRING@120..131 "'breakfast'"
+          COMMA@131..132 ","
+          WHITESPACE@132..133 " "
+          LITERAL@133..140
+            STRING@133..140 "'snack'"
+          COMMA@140..141 ","
+          WHITESPACE@141..142 " "
+          LITERAL@142..153
+            STRING@142..153 "'appetizer'"
+          R_BRACK@153..154 "]"
+    SEMICOLON@154..155 ";"
+  WHITESPACE@155..156 "\n"
+  SELECT@156..202
+    SELECT_CLAUSE@156..164
+      SELECT_KW@156..162 "SELECT"
+      WHITESPACE@162..163 " "
+      TARGET_LIST@163..164
+        TARGET@163..164
+          STAR@163..164 "*"
+    WHITESPACE@164..165 " "
+    FROM_CLAUSE@165..176
+      FROM_KW@165..169 "FROM"
+      WHITESPACE@169..170 " "
+      RELATION_FROM_ITEM@170..176
+        RELATION_NAME_REF@170..176
+          PATH_REF@170..176
+            PATH_SEGMENT_REF@170..176
+              IDENT@170..176 "recipe"
+    WHITESPACE@176..177 " "
+    WHERE_CLAUSE@177..201
+      WHERE_KW@177..182 "WHERE"
+      WHITESPACE@182..183 " "
+      BIN_EXPR@183..201
+        NAME_REF@183..186
+          IDENT@183..186 "tag"
+        WHITESPACE@186..187 " "
+        IN_KW@187..189 "IN"
+        WHITESPACE@189..190 " "
+        LITERAL@190..201
+          STRING@190..201 "'breakfast'"
+    SEMICOLON@201..202 ";"
+  WHITESPACE@202..203 "\n"
+  SELECT@203..244
+    SELECT_CLAUSE@203..211
+      SELECT_KW@203..209 "SELECT"
+      WHITESPACE@209..210 " "
+      TARGET_LIST@210..211
+        TARGET@210..211
+          STAR@210..211 "*"
+    WHITESPACE@211..212 " "
+    FROM_CLAUSE@212..223
+      FROM_KW@212..216 "FROM"
+      WHITESPACE@216..217 " "
+      RELATION_FROM_ITEM@217..223
+        RELATION_NAME_REF@217..223
+          PATH_REF@217..223
+            PATH_SEGMENT_REF@217..223
+              IDENT@217..223 "recipe"
+    WHITESPACE@223..224 " "
+    WHERE_CLAUSE@224..243
+      WHERE_KW@224..229 "WHERE"
+      WHITESPACE@229..230 " "
+      BIN_EXPR@230..243
+        NAME_REF@230..233
+          IDENT@230..233 "tag"
+        WHITESPACE@233..234 " "
+        NOT_IN@234..240
+          NOT_KW@234..237 "NOT"
+          WHITESPACE@237..238 " "
+          IN_KW@238..240 "IN"
+        WHITESPACE@240..241 " "
+        LITERAL@241..243
+          POSITIONAL_PARAM@241..243 "$1"
+    SEMICOLON@243..244 ";"
+  WHITESPACE@244..245 "\n"
+  SELECT@245..287
+    SELECT_CLAUSE@245..253
+      SELECT_KW@245..251 "SELECT"
+      WHITESPACE@251..252 " "
+      TARGET_LIST@252..253
+        TARGET@252..253
+          STAR@252..253 "*"
+    WHITESPACE@253..254 " "
+    FROM_CLAUSE@254..265
+      FROM_KW@254..258 "FROM"
+      WHITESPACE@258..259 " "
+      RELATION_FROM_ITEM@259..265
+        RELATION_NAME_REF@259..265
+          PATH_REF@259..265
+            PATH_SEGMENT_REF@259..265
+              IDENT@259..265 "recipe"
+    WHITESPACE@265..266 " "
+    WHERE_CLAUSE@266..286
+      WHERE_KW@266..271 "WHERE"
+      WHITESPACE@271..272 " "
+      BIN_EXPR@272..286
+        NAME_REF@272..275
+          IDENT@272..275 "tag"
+        WHITESPACE@275..276 " "
+        IN_KW@276..278 "IN"
+        WHITESPACE@278..279 " "
+        NAME_REF@279..286
+          IDENT@279..286 "choices"
+    SEMICOLON@286..287 ";"
+  WHITESPACE@287..288 "\n"
+  SELECT@288..340
+    SELECT_CLAUSE@288..296
+      SELECT_KW@288..294 "SELECT"
+      WHITESPACE@294..295 " "
+      TARGET_LIST@295..296
+        TARGET@295..296
+          STAR@295..296 "*"
+    WHITESPACE@296..297 " "
+    FROM_CLAUSE@297..308
+      FROM_KW@297..301 "FROM"
+      WHITESPACE@301..302 " "
+      RELATION_FROM_ITEM@302..308
+        RELATION_NAME_REF@302..308
+          PATH_REF@302..308
+            PATH_SEGMENT_REF@302..308
+              IDENT@302..308 "recipe"
+    WHITESPACE@308..309 " "
+    WHERE_CLAUSE@309..339
+      WHERE_KW@309..314 "WHERE"
+      WHITESPACE@314..315 " "
+      BIN_EXPR@315..339
+        NAME_REF@315..318
+          IDENT@315..318 "tag"
+        WHITESPACE@318..319 " "
+        NOT_IN@319..325
+          NOT_KW@319..322 "NOT"
+          WHITESPACE@322..323 " "
+          IN_KW@323..325 "IN"
+        WHITESPACE@325..326 " "
+        CALL_EXPR@326..339
+          NAME_REF@326..337
+            IDENT@326..337 "get_choices"
+          ARG_LIST@337..339
+            L_PAREN@337..338 "("
+            R_PAREN@338..339 ")"
+    SEMICOLON@339..340 ";"
+  WHITESPACE@340..341 "\n"
+  SELECT@341..401
+    SELECT_CLAUSE@341..349
+      SELECT_KW@341..347 "SELECT"
+      WHITESPACE@347..348 " "
+      TARGET_LIST@348..349
+        TARGET@348..349
+          STAR@348..349 "*"
+    WHITESPACE@349..350 " "
+    FROM_CLAUSE@350..361
+      FROM_KW@350..354 "FROM"
+      WHITESPACE@354..355 " "
+      RELATION_FROM_ITEM@355..361
+        RELATION_NAME_REF@355..361
+          PATH_REF@355..361
+            PATH_SEGMENT_REF@355..361
+              IDENT@355..361 "recipe"
+    WHITESPACE@361..362 " "
+    WHERE_CLAUSE@362..400
+      WHERE_KW@362..367 "WHERE"
+      WHITESPACE@367..368 " "
+      BIN_EXPR@368..400
+        NAME_REF@368..371
+          IDENT@368..371 "tag"
+        WHITESPACE@371..372 " "
+        IN_KW@372..374 "IN"
+        WHITESPACE@374..375 " "
+        TUPLE_EXPR@375..400
+          ROW_KW@375..378 "ROW"
+          L_PAREN@378..379 "("
+          LITERAL@379..390
+            STRING@379..390 "'breakfast'"
+          COMMA@390..391 ","
+          WHITESPACE@391..392 " "
+          LITERAL@392..399
+            STRING@392..399 "'snack'"
+          R_PAREN@399..400 ")"
+    SEMICOLON@400..401 ";"
+  WHITESPACE@401..402 "\n"
+
+error[syntax-error]: Expected a parenthesized value list or subquery.
+  ╭▸ 
+1 │ SELECT * FROM recipe WHERE tag IN ARRAY['breakfast', 'snack', 'appetizer'];
+  ╰╴                                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Expected a parenthesized value list or subquery.
+  ╭▸ 
+2 │ SELECT * FROM recipe WHERE tag NOT IN ARRAY['breakfast', 'snack', 'appetizer'];
+  ╰╴                                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Expected a parenthesized value list or subquery.
+  ╭▸ 
+3 │ SELECT * FROM recipe WHERE tag IN 'breakfast';
+  ╰╴                                  ━━━━━━━━━━━
+error[syntax-error]: Expected a parenthesized value list or subquery.
+  ╭▸ 
+4 │ SELECT * FROM recipe WHERE tag NOT IN $1;
+  ╰╴                                      ━━
+error[syntax-error]: Expected a parenthesized value list or subquery.
+  ╭▸ 
+5 │ SELECT * FROM recipe WHERE tag IN choices;
+  ╰╴                                  ━━━━━━━
+error[syntax-error]: Expected a parenthesized value list or subquery.
+  ╭▸ 
+6 │ SELECT * FROM recipe WHERE tag NOT IN get_choices();
+  ╰╴                                      ━━━━━━━━━━━━━
+error[syntax-error]: Expected a parenthesized value list or subquery.
+  ╭▸ 
+7 │ SELECT * FROM recipe WHERE tag IN ROW('breakfast', 'snack');
+  ╰╴                                  ━━━━━━━━━━━━━━━━━━━━━━━━━
