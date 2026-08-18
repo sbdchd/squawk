@@ -1,0 +1,245 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/in_array_expr_ok.sql
+---
+SOURCE_FILE@0..363
+  SELECT@0..74
+    SELECT_CLAUSE@0..8
+      SELECT_KW@0..6 "SELECT"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..8
+        TARGET@7..8
+          STAR@7..8 "*"
+    WHITESPACE@8..9 " "
+    FROM_CLAUSE@9..20
+      FROM_KW@9..13 "FROM"
+      WHITESPACE@13..14 " "
+      RELATION_FROM_ITEM@14..20
+        RELATION_NAME_REF@14..20
+          PATH_REF@14..20
+            PATH_SEGMENT_REF@14..20
+              IDENT@14..20 "recipe"
+    WHITESPACE@20..21 " "
+    WHERE_CLAUSE@21..73
+      WHERE_KW@21..26 "WHERE"
+      WHITESPACE@26..27 " "
+      BIN_EXPR@27..73
+        NAME_REF@27..30
+          IDENT@27..30 "tag"
+        WHITESPACE@30..31 " "
+        NOT_IN@31..37
+          NOT_KW@31..34 "NOT"
+          WHITESPACE@34..35 " "
+          IN_KW@35..37 "IN"
+        WHITESPACE@37..38 " "
+        TUPLE_EXPR@38..73
+          L_PAREN@38..39 "("
+          LITERAL@39..50
+            STRING@39..50 "'breakfast'"
+          COMMA@50..51 ","
+          WHITESPACE@51..52 " "
+          LITERAL@52..59
+            STRING@52..59 "'snack'"
+          COMMA@59..60 ","
+          WHITESPACE@60..61 " "
+          LITERAL@61..72
+            STRING@61..72 "'appetizer'"
+          R_PAREN@72..73 ")"
+    SEMICOLON@73..74 ";"
+  WHITESPACE@74..75 "\n"
+  SELECT@75..156
+    SELECT_CLAUSE@75..83
+      SELECT_KW@75..81 "SELECT"
+      WHITESPACE@81..82 " "
+      TARGET_LIST@82..83
+        TARGET@82..83
+          STAR@82..83 "*"
+    WHITESPACE@83..84 " "
+    FROM_CLAUSE@84..95
+      FROM_KW@84..88 "FROM"
+      WHITESPACE@88..89 " "
+      RELATION_FROM_ITEM@89..95
+        RELATION_NAME_REF@89..95
+          PATH_REF@89..95
+            PATH_SEGMENT_REF@89..95
+              IDENT@89..95 "recipe"
+    WHITESPACE@95..96 " "
+    WHERE_CLAUSE@96..155
+      WHERE_KW@96..101 "WHERE"
+      WHITESPACE@101..102 " "
+      BIN_EXPR@102..155
+        NAME_REF@102..105
+          IDENT@102..105 "tag"
+        WHITESPACE@105..106 " "
+        NEQB@106..108 "<>"
+        WHITESPACE@108..109 " "
+        CALL_EXPR@109..155
+          ALL_FN@109..155
+            ALL_KW@109..112 "ALL"
+            WHITESPACE@112..113 " "
+            L_PAREN@113..114 "("
+            ARRAY_EXPR@114..154
+              ARRAY_KW@114..119 "ARRAY"
+              L_BRACK@119..120 "["
+              LITERAL@120..131
+                STRING@120..131 "'breakfast'"
+              COMMA@131..132 ","
+              WHITESPACE@132..133 " "
+              LITERAL@133..140
+                STRING@133..140 "'snack'"
+              COMMA@140..141 ","
+              WHITESPACE@141..142 " "
+              LITERAL@142..153
+                STRING@142..153 "'appetizer'"
+              R_BRACK@153..154 "]"
+            R_PAREN@154..155 ")"
+    SEMICOLON@155..156 ";"
+  WHITESPACE@156..157 "\n"
+  SELECT@157..238
+    SELECT_CLAUSE@157..165
+      SELECT_KW@157..163 "SELECT"
+      WHITESPACE@163..164 " "
+      TARGET_LIST@164..165
+        TARGET@164..165
+          STAR@164..165 "*"
+    WHITESPACE@165..166 " "
+    FROM_CLAUSE@166..177
+      FROM_KW@166..170 "FROM"
+      WHITESPACE@170..171 " "
+      RELATION_FROM_ITEM@171..177
+        RELATION_NAME_REF@171..177
+          PATH_REF@171..177
+            PATH_SEGMENT_REF@171..177
+              IDENT@171..177 "recipe"
+    WHITESPACE@177..178 " "
+    WHERE_CLAUSE@178..237
+      WHERE_KW@178..183 "WHERE"
+      WHITESPACE@183..184 " "
+      PREFIX_EXPR@184..237
+        NOT_KW@184..187 "NOT"
+        WHITESPACE@187..188 " "
+        PAREN_EXPR@188..237
+          L_PAREN@188..189 "("
+          BIN_EXPR@189..236
+            NAME_REF@189..192
+              IDENT@189..192 "tag"
+            WHITESPACE@192..193 " "
+            CUSTOM_OP@193..195
+              AMP@193..194 "&"
+              AMP@194..195 "&"
+            WHITESPACE@195..196 " "
+            ARRAY_EXPR@196..236
+              ARRAY_KW@196..201 "ARRAY"
+              L_BRACK@201..202 "["
+              LITERAL@202..213
+                STRING@202..213 "'breakfast'"
+              COMMA@213..214 ","
+              WHITESPACE@214..215 " "
+              LITERAL@215..222
+                STRING@215..222 "'snack'"
+              COMMA@222..223 ","
+              WHITESPACE@223..224 " "
+              LITERAL@224..235
+                STRING@224..235 "'appetizer'"
+              R_BRACK@235..236 "]"
+          R_PAREN@236..237 ")"
+    SEMICOLON@237..238 ";"
+  WHITESPACE@238..239 "\n"
+  SELECT@239..269
+    SELECT_CLAUSE@239..268
+      SELECT_KW@239..245 "SELECT"
+      WHITESPACE@245..246 " "
+      TARGET_LIST@246..268
+        TARGET@246..268
+          BIN_EXPR@246..268
+            ARRAY_EXPR@246..254
+              ARRAY_KW@246..251 "ARRAY"
+              L_BRACK@251..252 "["
+              LITERAL@252..253
+                INT_NUMBER@252..253 "1"
+              R_BRACK@253..254 "]"
+            WHITESPACE@254..255 " "
+            IN_KW@255..257 "IN"
+            WHITESPACE@257..258 " "
+            PAREN_EXPR@258..268
+              L_PAREN@258..259 "("
+              ARRAY_EXPR@259..267
+                ARRAY_KW@259..264 "ARRAY"
+                L_BRACK@264..265 "["
+                LITERAL@265..266
+                  INT_NUMBER@265..266 "1"
+                R_BRACK@266..267 "]"
+              R_PAREN@267..268 ")"
+    SEMICOLON@268..269 ";"
+  WHITESPACE@269..270 "\n"
+  SELECT@270..310
+    SELECT_CLAUSE@270..297
+      SELECT_KW@270..276 "SELECT"
+      WHITESPACE@276..277 " "
+      TARGET_LIST@277..297
+        TARGET@277..297
+          BIN_EXPR@277..297
+            NAME_REF@277..280
+              IDENT@277..280 "tag"
+            WHITESPACE@280..281 " "
+            IN_KW@281..283 "IN"
+            WHITESPACE@283..284 " "
+            PAREN_EXPR@284..297
+              L_PAREN@284..285 "("
+              LITERAL@285..296
+                STRING@285..296 "'breakfast'"
+              R_PAREN@296..297 ")"
+    WHITESPACE@297..298 " "
+    FROM_CLAUSE@298..309
+      FROM_KW@298..302 "FROM"
+      WHITESPACE@302..303 " "
+      RELATION_FROM_ITEM@303..309
+        RELATION_NAME_REF@303..309
+          PATH_REF@303..309
+            PATH_SEGMENT_REF@303..309
+              IDENT@303..309 "recipe"
+    SEMICOLON@309..310 ";"
+  WHITESPACE@310..311 "\n"
+  SELECT@311..362
+    SELECT_CLAUSE@311..349
+      SELECT_KW@311..317 "SELECT"
+      WHITESPACE@317..318 " "
+      TARGET_LIST@318..349
+        TARGET@318..349
+          BIN_EXPR@318..349
+            NAME_REF@318..321
+              IDENT@318..321 "tag"
+            WHITESPACE@321..322 " "
+            IN_KW@322..324 "IN"
+            WHITESPACE@324..325 " "
+            PAREN_EXPR@325..349
+              L_PAREN@325..326 "("
+              SELECT@326..348
+                SELECT_CLAUSE@326..336
+                  SELECT_KW@326..332 "SELECT"
+                  WHITESPACE@332..333 " "
+                  TARGET_LIST@333..336
+                    TARGET@333..336
+                      NAME_REF@333..336
+                        IDENT@333..336 "tag"
+                WHITESPACE@336..337 " "
+                FROM_CLAUSE@337..348
+                  FROM_KW@337..341 "FROM"
+                  WHITESPACE@341..342 " "
+                  RELATION_FROM_ITEM@342..348
+                    RELATION_NAME_REF@342..348
+                      PATH_REF@342..348
+                        PATH_SEGMENT_REF@342..348
+                          IDENT@342..348 "recipe"
+              R_PAREN@348..349 ")"
+    WHITESPACE@349..350 " "
+    FROM_CLAUSE@350..361
+      FROM_KW@350..354 "FROM"
+      WHITESPACE@354..355 " "
+      RELATION_FROM_ITEM@355..361
+        RELATION_NAME_REF@355..361
+          PATH_REF@355..361
+            PATH_SEGMENT_REF@355..361
+              IDENT@355..361 "recipe"
+    SEMICOLON@361..362 ";"
+  WHITESPACE@362..363 "\n"
