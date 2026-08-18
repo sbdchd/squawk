@@ -1239,15 +1239,28 @@ fn resolve_special_keyword_as_function(
         .syntax()
         .first_child_or_token()
         .and_then(|t| match t.kind() {
-            SyntaxKind::CURRENT_SCHEMA_KW => Some("current_schema"),
+            SyntaxKind::CURRENT_CATALOG_KW => Some("current_database"),
             SyntaxKind::CURRENT_TIMESTAMP_KW => Some("now"),
-            SyntaxKind::CURRENT_USER_KW | SyntaxKind::USER_KW => Some("current_user"),
+            SyntaxKind::CURRENT_ROLE_KW | SyntaxKind::CURRENT_USER_KW | SyntaxKind::USER_KW => {
+                Some("current_user")
+            }
+            SyntaxKind::CURRENT_SCHEMA_KW => Some("current_schema"),
             SyntaxKind::SESSION_USER_KW => Some("session_user"),
+            SyntaxKind::SYSTEM_USER_KW => Some("system_user"),
             _ => None,
         })?;
     let position = name_ref.value.syntax().text_range().start();
     let schemas = bind(db, name_ref.file_id).resolved_schemas(position, None);
     resolve_function(db, function_name, &schemas, None, name_ref.file_id)
+}
+
+pub(crate) fn resolve_function_name(
+    db: &dyn Db,
+    position: InFile<TextSize>,
+    function_name: &str,
+) -> Option<SmallVec<[Location; 1]>> {
+    let schemas = bind(db, position.file_id).resolved_schemas(position.value, None);
+    resolve_function(db, function_name, &schemas, None, position.file_id)
 }
 
 fn resolve_function<N: AsName + ?Sized>(

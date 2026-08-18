@@ -7,9 +7,46 @@ use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
-    SyntaxKind,
+    SyntaxKind, SyntaxToken,
     ast::{self, AstNode},
 };
+
+fn special_syntax_function_name(token: &SyntaxToken) -> Option<&'static str> {
+    let parent = token.parent()?;
+    match token.kind() {
+        SyntaxKind::EXTRACT_KW if ast::ExtractFn::can_cast(parent.kind()) => Some("extract"),
+        SyntaxKind::SUBSTRING_KW if ast::SubstringFn::can_cast(parent.kind()) => Some("substring"),
+        SyntaxKind::POSITION_KW if ast::PositionFn::can_cast(parent.kind()) => Some("position"),
+        SyntaxKind::OVERLAY_KW if ast::OverlayFn::can_cast(parent.kind()) => Some("overlay"),
+        SyntaxKind::XMLEXISTS_KW if ast::XmlExistsFn::can_cast(parent.kind()) => Some("xmlexists"),
+        SyntaxKind::TRIM_KW => match ast::TrimFn::cast(parent)?.trim_side() {
+            None | Some(ast::TrimSide::TrimBoth(_)) => Some("btrim"),
+            Some(ast::TrimSide::TrimLeading(_)) => Some("ltrim"),
+            Some(ast::TrimSide::TrimTrailing(_)) => Some("rtrim"),
+        },
+        SyntaxKind::COLLATION_KW | SyntaxKind::FOR_KW
+            if ast::CollationForFn::can_cast(parent.kind()) =>
+        {
+            Some("pg_collation_for")
+        }
+        SyntaxKind::IS_KW | SyntaxKind::NOT_KW | SyntaxKind::NORMALIZED_KW
+            if ast::IsNormalized::can_cast(parent.kind())
+                || ast::IsNotNormalized::can_cast(parent.kind()) =>
+        {
+            Some("is_normalized")
+        }
+        SyntaxKind::OVERLAPS_KW if ast::BinExpr::can_cast(parent.kind()) => Some("overlaps"),
+        SyntaxKind::AT_KW | SyntaxKind::TIME_KW | SyntaxKind::ZONE_KW
+            if ast::AtTimeZone::can_cast(parent.kind()) =>
+        {
+            Some("timezone")
+        }
+        SyntaxKind::AT_KW | SyntaxKind::LOCAL_KW if ast::AtLocal::can_cast(parent.kind()) => {
+            Some("timezone")
+        }
+        _ => None,
+    }
+}
 
 fn resolve_in_files(
     db: &dyn Db,
@@ -49,6 +86,17 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
                 )];
             }
         }
+    }
+
+    if let Some(function_name) = special_syntax_function_name(&token) {
+        return resolve_in_files(db, file, |definition_file| {
+            resolve::resolve_function_name(
+                db,
+                InFile::new(definition_file, token.text_range().start()),
+                function_name,
+            )
+        })
+        .unwrap_or_default();
     }
 
     // goto def on COMMIT -> BEGIN/START TRANSACTION
@@ -1907,6 +1955,310 @@ select now$0();
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_extract() {
+        assert_snapshot!(goto("
+-- include-builtins
+select extract$0(year from now());
+"), @"
+              ╭▸ current.sql:3:14
+              │
+            3 │ select extract(year from now());
+              │              ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:6309:28
+              │
+         6309 │ create function pg_catalog.extract(text, date) returns numeric
+              ╰╴                           ─────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_substring() {
+        assert_snapshot!(goto("
+-- include-builtins
+select substring$0('abc' from 2);
+"), @"
+               ╭▸ current.sql:3:16
+               │
+             3 │ select substring('abc' from 2);
+               │                ─ 1. source
+               ╰╴
+
+               ╭▸ builtins.sql:15183:28
+               │
+         15183 │ create function pg_catalog.substring(bit, integer) returns bit
+               ╰╴                           ───────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_position() {
+        assert_snapshot!(goto("
+-- include-builtins
+select position$0('b' in 'abc');
+"), @"
+               ╭▸ current.sql:3:15
+               │
+             3 │ select position('b' in 'abc');
+               │               ─ 1. source
+               ╰╴
+
+               ╭▸ builtins.sql:13749:28
+               │
+         13749 │ create function pg_catalog.position(bit, bit) returns integer
+               ╰╴                           ──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_overlay() {
+        assert_snapshot!(goto("
+-- include-builtins
+select overlay$0('abc' placing 'x' from 2);
+"), @"
+               ╭▸ current.sql:3:14
+               │
+             3 │ select overlay('abc' placing 'x' from 2);
+               │              ─ 1. source
+               ╰╴
+
+               ╭▸ builtins.sql:11609:28
+               │
+         11609 │ create function pg_catalog.overlay(bit, bit, integer) returns bit
+               ╰╴                           ─────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_xmlexists() {
+        assert_snapshot!(goto("
+-- include-builtins
+select xmlexists$0('//town[text() = ''Toronto'']' passing by value '<town>Toronto</town>'::xml);
+"), @"
+               ╭▸ current.sql:3:16
+               │
+             3 │ select xmlexists('//town[text() = ''Toronto'']' passing by value '<town>Toronto</town>'::xml);
+               │                ─ 1. source
+               ╰╴
+
+               ╭▸ builtins.sql:17434:28
+               │
+         17434 │ create function pg_catalog.xmlexists(text, xml) returns boolean
+               ╰╴                           ───────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_system_user() {
+        assert_snapshot!(goto("
+-- include-builtins
+select system_user$0;
+"), @"
+              ╭▸ current.sql:3:18
+              │
+            3 │ select system_user;
+              │                  ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:15282:28
+              │
+        15282 │ create function pg_catalog.system_user() returns text
+              ╰╴                           ─────────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_trim_both() {
+        assert_snapshot!(goto("
+-- include-builtins
+select trim$0(both 'x' from 'xxhixx');
+"), @"
+             ╭▸ current.sql:3:11
+             │
+           3 │ select trim(both 'x' from 'xxhixx');
+             │           ─ 1. source
+             ╰╴
+
+             ╭▸ builtins.sql:5005:28
+             │
+        5005 │ create function pg_catalog.btrim(bytea, bytea) returns bytea
+             ╰╴                           ───── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_trim_leading() {
+        assert_snapshot!(goto("
+-- include-builtins
+select trim$0(leading 'x' from 'xxhi');
+"), @"
+              ╭▸ current.sql:3:11
+              │
+            3 │ select trim(leading 'x' from 'xxhi');
+              │           ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:10077:28
+              │
+        10077 │ create function pg_catalog.ltrim(bytea, bytea) returns bytea
+              ╰╴                           ───── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_trim_trailing() {
+        assert_snapshot!(goto("
+-- include-builtins
+select trim$0(trailing 'x' from 'hixx');
+"), @"
+              ╭▸ current.sql:3:11
+              │
+            3 │ select trim(trailing 'x' from 'hixx');
+              │           ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:14633:28
+              │
+        14633 │ create function pg_catalog.rtrim(bytea, bytea) returns bytea
+              ╰╴                           ───── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_collation_for() {
+        assert_snapshot!(goto("
+-- include-builtins
+select collation$0 for ('x');
+"), @r#"
+              ╭▸ current.sql:3:16
+              │
+            3 │ select collation for ('x');
+              │                ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:11861:28
+              │
+        11861 │ create function pg_catalog.pg_collation_for("any") returns text
+              ╰╴                           ──────────────── 2. destination
+        "#);
+    }
+
+    #[test]
+    fn goto_builtin_is_normalized() {
+        assert_snapshot!(goto("
+-- include-builtins
+select 'abc' is normalized$0;
+"), @"
+             ╭▸ current.sql:3:26
+             │
+           3 │ select 'abc' is normalized;
+             │                          ─ 1. source
+             ╰╴
+
+             ╭▸ builtins.sql:8965:28
+             │
+        8965 │ create function pg_catalog.is_normalized(text, text DEFAULT 'NFC'::text) returns boolean
+             ╰╴                           ───────────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_overlaps() {
+        assert_snapshot!(goto("
+-- include-builtins
+select (date '2026-01-01', date '2026-01-02') overlaps$0 (date '2026-01-02', date '2026-01-03');
+"), @"
+              ╭▸ current.sql:3:54
+              │
+            3 │ select (date '2026-01-01', date '2026-01-02') overlaps (date '2026-01-02', date '2026-01-03');
+              │                                                      ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:11557:28
+              │
+        11557 │ create function pg_catalog.overlaps(time with time zone, time with time zone, time with time zone, time with time zone) returns boo…
+              ╰╴                           ──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_at_time_zone() {
+        assert_snapshot!(goto("
+-- include-builtins
+select timestamp '2026-01-01' at time zone$0 'UTC';
+"), @"
+              ╭▸ current.sql:3:42
+              │
+            3 │ select timestamp '2026-01-01' at time zone 'UTC';
+              │                                          ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:16074:28
+              │
+        16074 │ create function pg_catalog.timezone(interval, time with time zone) returns time with time zone
+              ╰╴                           ──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_at_local() {
+        assert_snapshot!(goto("
+-- include-builtins
+select timestamptz '2026-01-01 UTC' at local$0;
+"), @"
+              ╭▸ current.sql:3:44
+              │
+            3 │ select timestamptz '2026-01-01 UTC' at local;
+              │                                            ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:16074:28
+              │
+        16074 │ create function pg_catalog.timezone(interval, time with time zone) returns time with time zone
+              ╰╴                           ──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_current_role() {
+        assert_snapshot!(goto("
+-- include-builtins
+select current_role$0;
+"), @"
+             ╭▸ current.sql:3:19
+             │
+           3 │ select current_role;
+             │                   ─ 1. source
+             ╰╴
+
+             ╭▸ builtins.sql:5692:28
+             │
+        5692 │ create function pg_catalog.current_user() returns name
+             ╰╴                           ──────────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_current_catalog() {
+        assert_snapshot!(goto("
+-- include-builtins
+select current_catalog$0;
+"), @"
+             ╭▸ current.sql:3:22
+             │
+           3 │ select current_catalog;
+             │                      ─ 1. source
+             ╰╴
+
+             ╭▸ builtins.sql:5668:28
+             │
+        5668 │ create function pg_catalog.current_database() returns name
+             ╰╴                           ──────────────── 2. destination
         ");
     }
 
