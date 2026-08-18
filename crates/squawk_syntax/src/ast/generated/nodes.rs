@@ -10979,14 +10979,21 @@ impl ExtensionVersionClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ExtractField {
+pub struct ExtractFieldLiteral {
     pub(crate) syntax: SyntaxNode,
 }
-impl ExtractField {
+impl ExtractFieldLiteral {
     #[inline]
-    pub fn string_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::STRING)
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExtractFieldName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExtractFieldName {
     #[inline]
     pub fn day_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DAY_KW)
@@ -24561,17 +24568,24 @@ impl SubscriptionRenameTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SubstringExprs {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SubstringExprs {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SubstringFn {
     pub(crate) syntax: SyntaxNode,
 }
 impl SubstringFn {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn substring_args(&self) -> Option<SubstringArgs> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn exprs(&self) -> AstChildren<Expr> {
-        support::children(&self.syntax)
     }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
@@ -24582,6 +24596,21 @@ impl SubstringFn {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
+    pub fn substring_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SUBSTRING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SubstringForFrom {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SubstringForFrom {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn for_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FOR_KW)
     }
@@ -24589,13 +24618,43 @@ impl SubstringFn {
     pub fn from_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FROM_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SubstringFromFor {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SubstringFromFor {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SubstringSimilarEscape {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SubstringSimilarEscape {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn escape_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ESCAPE_KW)
+    }
     #[inline]
     pub fn similar_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SIMILAR_KW)
-    }
-    #[inline]
-    pub fn substring_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SUBSTRING_KW)
     }
 }
 
@@ -25544,10 +25603,10 @@ impl TrimBoth {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TrimFn {
+pub struct TrimExprFrom {
     pub(crate) syntax: SyntaxNode,
 }
-impl TrimFn {
+impl TrimExprFrom {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -25555,6 +25614,32 @@ impl TrimFn {
     #[inline]
     pub fn exprs(&self) -> AstChildren<Expr> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TrimExprs {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TrimExprs {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TrimFn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TrimFn {
+    #[inline]
+    pub fn trim_args(&self) -> Option<TrimArgs> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn trim_side(&self) -> Option<TrimSide> {
@@ -25569,12 +25654,23 @@ impl TrimFn {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
-    pub fn from_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FROM_KW)
-    }
-    #[inline]
     pub fn trim_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TRIM_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TrimFrom {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TrimFrom {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
     }
 }
 
@@ -28494,6 +28590,12 @@ pub enum ExtensionMemberObject {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExtractField {
+    ExtractFieldLiteral(ExtractFieldLiteral),
+    ExtractFieldName(ExtractFieldName),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FdwOption {
     OptionAlterOptionList(OptionAlterOptionList),
     OptionConnection(OptionConnection),
@@ -29399,6 +29501,14 @@ pub enum SubscriptionSource {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SubstringArgs {
+    SubstringExprs(SubstringExprs),
+    SubstringForFrom(SubstringForFrom),
+    SubstringFromFor(SubstringFromFor),
+    SubstringSimilarEscape(SubstringSimilarEscape),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TableArg {
     Column(Column),
     LikeClause(LikeClause),
@@ -29484,6 +29594,13 @@ pub enum TriggerTarget {
     All(All),
     TriggerRef(TriggerRef),
     User(User),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TrimArgs {
+    TrimExprFrom(TrimExprFrom),
+    TrimExprs(TrimExprs),
+    TrimFrom(TrimFrom),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -37575,10 +37692,28 @@ impl AstNode for ExtensionVersionClause {
         &self.syntax
     }
 }
-impl AstNode for ExtractField {
+impl AstNode for ExtractFieldLiteral {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EXTRACT_FIELD
+        kind == SyntaxKind::EXTRACT_FIELD_LITERAL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExtractFieldName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXTRACT_FIELD_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -50625,10 +50760,82 @@ impl AstNode for SubscriptionRenameTo {
         &self.syntax
     }
 }
+impl AstNode for SubstringExprs {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SUBSTRING_EXPRS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SubstringFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SUBSTRING_FN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SubstringForFrom {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SUBSTRING_FOR_FROM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SubstringFromFor {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SUBSTRING_FROM_FOR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SubstringSimilarEscape {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SUBSTRING_SIMILAR_ESCAPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -51723,10 +51930,64 @@ impl AstNode for TrimBoth {
         &self.syntax
     }
 }
+impl AstNode for TrimExprFrom {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TRIM_EXPR_FROM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for TrimExprs {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TRIM_EXPRS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TrimFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TRIM_FN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for TrimFrom {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TRIM_FROM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -61433,6 +61694,49 @@ impl From<ObjectView> for ExtensionMemberObject {
         ExtensionMemberObject::ObjectView(node)
     }
 }
+impl AstNode for ExtractField {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::EXTRACT_FIELD_LITERAL | SyntaxKind::EXTRACT_FIELD_NAME
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::EXTRACT_FIELD_LITERAL => {
+                ExtractField::ExtractFieldLiteral(ExtractFieldLiteral { syntax })
+            }
+            SyntaxKind::EXTRACT_FIELD_NAME => {
+                ExtractField::ExtractFieldName(ExtractFieldName { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ExtractField::ExtractFieldLiteral(it) => &it.syntax,
+            ExtractField::ExtractFieldName(it) => &it.syntax,
+        }
+    }
+}
+impl From<ExtractFieldLiteral> for ExtractField {
+    #[inline]
+    fn from(node: ExtractFieldLiteral) -> ExtractField {
+        ExtractField::ExtractFieldLiteral(node)
+    }
+}
+impl From<ExtractFieldName> for ExtractField {
+    #[inline]
+    fn from(node: ExtractFieldName) -> ExtractField {
+        ExtractField::ExtractFieldName(node)
+    }
+}
 impl AstNode for FdwOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -68660,6 +68964,70 @@ impl From<ServerClause> for SubscriptionSource {
         SubscriptionSource::ServerClause(node)
     }
 }
+impl AstNode for SubstringArgs {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::SUBSTRING_EXPRS
+                | SyntaxKind::SUBSTRING_FOR_FROM
+                | SyntaxKind::SUBSTRING_FROM_FOR
+                | SyntaxKind::SUBSTRING_SIMILAR_ESCAPE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::SUBSTRING_EXPRS => SubstringArgs::SubstringExprs(SubstringExprs { syntax }),
+            SyntaxKind::SUBSTRING_FOR_FROM => {
+                SubstringArgs::SubstringForFrom(SubstringForFrom { syntax })
+            }
+            SyntaxKind::SUBSTRING_FROM_FOR => {
+                SubstringArgs::SubstringFromFor(SubstringFromFor { syntax })
+            }
+            SyntaxKind::SUBSTRING_SIMILAR_ESCAPE => {
+                SubstringArgs::SubstringSimilarEscape(SubstringSimilarEscape { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            SubstringArgs::SubstringExprs(it) => &it.syntax,
+            SubstringArgs::SubstringForFrom(it) => &it.syntax,
+            SubstringArgs::SubstringFromFor(it) => &it.syntax,
+            SubstringArgs::SubstringSimilarEscape(it) => &it.syntax,
+        }
+    }
+}
+impl From<SubstringExprs> for SubstringArgs {
+    #[inline]
+    fn from(node: SubstringExprs) -> SubstringArgs {
+        SubstringArgs::SubstringExprs(node)
+    }
+}
+impl From<SubstringForFrom> for SubstringArgs {
+    #[inline]
+    fn from(node: SubstringForFrom) -> SubstringArgs {
+        SubstringArgs::SubstringForFrom(node)
+    }
+}
+impl From<SubstringFromFor> for SubstringArgs {
+    #[inline]
+    fn from(node: SubstringFromFor) -> SubstringArgs {
+        SubstringArgs::SubstringFromFor(node)
+    }
+}
+impl From<SubstringSimilarEscape> for SubstringArgs {
+    #[inline]
+    fn from(node: SubstringSimilarEscape) -> SubstringArgs {
+        SubstringArgs::SubstringSimilarEscape(node)
+    }
+}
 impl AstNode for TableArg {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -69323,6 +69691,53 @@ impl From<User> for TriggerTarget {
     #[inline]
     fn from(node: User) -> TriggerTarget {
         TriggerTarget::User(node)
+    }
+}
+impl AstNode for TrimArgs {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::TRIM_EXPR_FROM | SyntaxKind::TRIM_EXPRS | SyntaxKind::TRIM_FROM
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::TRIM_EXPR_FROM => TrimArgs::TrimExprFrom(TrimExprFrom { syntax }),
+            SyntaxKind::TRIM_EXPRS => TrimArgs::TrimExprs(TrimExprs { syntax }),
+            SyntaxKind::TRIM_FROM => TrimArgs::TrimFrom(TrimFrom { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            TrimArgs::TrimExprFrom(it) => &it.syntax,
+            TrimArgs::TrimExprs(it) => &it.syntax,
+            TrimArgs::TrimFrom(it) => &it.syntax,
+        }
+    }
+}
+impl From<TrimExprFrom> for TrimArgs {
+    #[inline]
+    fn from(node: TrimExprFrom) -> TrimArgs {
+        TrimArgs::TrimExprFrom(node)
+    }
+}
+impl From<TrimExprs> for TrimArgs {
+    #[inline]
+    fn from(node: TrimExprs) -> TrimArgs {
+        TrimArgs::TrimExprs(node)
+    }
+}
+impl From<TrimFrom> for TrimArgs {
+    #[inline]
+    fn from(node: TrimFrom) -> TrimArgs {
+        TrimArgs::TrimFrom(node)
     }
 }
 impl AstNode for TrimSide {

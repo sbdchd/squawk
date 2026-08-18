@@ -150,7 +150,14 @@ ExtractFn =
   ')'
 
 ExtractField =
-  '#ident' | 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | '@string'
+  ExtractFieldName
+| ExtractFieldLiteral
+
+ExtractFieldName =
+  '#ident' | 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second'
+
+ExtractFieldLiteral =
+  Literal
 
 JsonExistsFn =
   'json_exists' '('
@@ -315,12 +322,25 @@ JsonValueFn =
   ')'
 
 SubstringFn =
-  'substring' '('
-    Expr 'for' Expr ('from' Expr)?
-  | Expr 'from' Expr ('for' Expr)?
-  | Expr 'similar' Expr
-  | (Expr (',' Expr)*)
-  ')'
+  'substring' '(' SubstringArgs ')'
+
+SubstringArgs =
+  SubstringForFrom
+| SubstringFromFor
+| SubstringSimilarEscape
+| SubstringExprs
+
+SubstringForFrom =
+  Expr 'for' Expr ('from' Expr)?
+
+SubstringFromFor =
+  Expr 'from' Expr ('for' Expr)?
+
+SubstringSimilarEscape =
+  Expr 'similar' Expr 'escape' Expr
+
+SubstringExprs =
+  Expr (',' Expr)*
 
 PositionFn =
   'position' '(' pos:Expr 'in' string:Expr ')'
@@ -343,14 +363,21 @@ OverlayExpr =
 | NamedArg
 
 TrimFn =
-  'trim' '('
-    TrimSide?
-    (
-      'from' (Expr (',' Expr)*)
-    | (Expr 'from' (Expr (',' Expr)*))
-    | (Expr (',' Expr)*)
-    )
-  ')'
+  'trim' '(' TrimSide? TrimArgs ')'
+
+TrimArgs =
+  TrimFrom
+| TrimExprFrom
+| TrimExprs
+
+TrimFrom =
+  'from' (Expr (',' Expr)*)
+
+TrimExprFrom =
+  Expr 'from' (Expr (',' Expr)*)
+
+TrimExprs =
+  Expr (',' Expr)*
 
 TrimSide =
   TrimBoth
