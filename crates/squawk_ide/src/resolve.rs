@@ -1729,7 +1729,7 @@ pub(crate) fn resolve_savepoint_ref(
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = savepoint_ref.file_id;
     let binder = bind(db, file);
-    let ptr = binder.lookup(&Name::from_node(savepoint_ref.value), SymbolKind::Savepoint)?;
+    let ptr = binder.lookup_savepoint(savepoint_ref.value)?;
     Some(smallvec![Location::new(
         file,
         ptr.text_range(),

@@ -755,6 +755,91 @@ rollback to savepoint sp$0;
     }
 
     #[test]
+    fn goto_rollback_to_savepoint_without_savepoint_keyword() {
+        assert_snapshot!(goto("
+begin;
+savepoint sp;
+rollback to sp$0;
+"), @"
+          ╭▸ 
+        3 │ savepoint sp;
+          │           ── 2. destination
+        4 │ rollback to sp;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_rollback_to_most_recent_savepoint_with_same_name() {
+        assert_snapshot!(goto("
+begin;
+savepoint sp;
+savepoint sp;
+rollback to sp$0;
+"), @"
+          ╭▸ 
+        4 │ savepoint sp;
+          │           ── 2. destination
+        5 │ rollback to sp;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_rollback_keeps_target_savepoint() {
+        assert_snapshot!(goto("
+begin;
+savepoint sp;
+rollback to sp;
+rollback to sp$0;
+"), @"
+          ╭▸ 
+        3 │ savepoint sp;
+          │           ── 2. destination
+        4 │ rollback to sp;
+        5 │ rollback to sp;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_rollback_discards_later_savepoints() {
+        goto_not_found(
+            "
+begin;
+savepoint keep;
+savepoint discarded;
+rollback to keep;
+release savepoint discarded$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_commit_discards_savepoints() {
+        goto_not_found(
+            "
+begin;
+savepoint sp;
+commit;
+release savepoint sp$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_bare_rollback_discards_savepoints() {
+        goto_not_found(
+            "
+begin;
+savepoint sp;
+rollback;
+release savepoint sp$0;
+",
+        );
+    }
+
+    #[test]
     fn goto_release_savepoint() {
         assert_snapshot!(goto("
 begin;
