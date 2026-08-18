@@ -2,6 +2,7 @@
 /// see: typescript-go/internal/binder/binder.go
 use la_arena::Arena;
 use rowan::{TextRange, TextSize};
+use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 
@@ -51,6 +52,8 @@ pub(crate) struct Binder {
     // If we have a `create schema foo` command then commands nested inside that
     // get `foo` for their schema.
     schema_regions: Vec<(TextRange, Schema)>,
+    savepoint_stack: Vec<(Name, SyntaxNodePtr)>,
+    savepoint_refs: FxHashMap<SyntaxNodePtr, SyntaxNodePtr>,
 }
 
 impl Binder {
@@ -68,6 +71,8 @@ impl Binder {
             }],
             default_schema_override: None,
             schema_regions: vec![],
+            savepoint_stack: vec![],
+            savepoint_refs: FxHashMap::default(),
         }
     }
 
@@ -82,6 +87,15 @@ impl Binder {
             symbol.kind == kind
         })?;
         Some(self.symbols[symbol_id].ptr)
+    }
+
+    pub(crate) fn lookup_savepoint(
+        &self,
+        savepoint_ref: &ast::SavepointRef,
+    ) -> Option<SyntaxNodePtr> {
+        self.savepoint_refs
+            .get(&SyntaxNodePtr::new(savepoint_ref.syntax()))
+            .copied()
     }
 
     pub(crate) fn resolved_schemas(
@@ -358,6 +372,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::Prepare(prepare) => bind_prepare(b, prepare),
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
         ast::Stmt::SavepointCreate(savepoint) => bind_savepoint(b, savepoint),
+        ast::Stmt::ReleaseSavepoint(release) => bind_release_savepoint(b, release),
+        ast::Stmt::Rollback(rollback) => bind_rollback(b, rollback),
+        ast::Stmt::Begin(_) | ast::Stmt::Commit(_) => b.savepoint_stack.clear(),
         ast::Stmt::Select(select) => bind_select(b, select),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
@@ -1682,7 +1699,40 @@ fn bind_savepoint(b: &mut Binder, savepoint: ast::SavepointCreate) {
         table: None,
     });
 
+    b.savepoint_stack.push((savepoint_name.clone(), name_ptr));
+
     b.scope.insert(savepoint_name, savepoint_id);
+}
+
+fn bind_savepoint_ref(b: &mut Binder, savepoint_ref: &ast::SavepointRef) -> Option<usize> {
+    let name = Name::from_node(savepoint_ref);
+    let idx = b.savepoint_stack.iter().rposition(|(n, _)| *n == name)?;
+    b.savepoint_refs.insert(
+        SyntaxNodePtr::new(savepoint_ref.syntax()),
+        b.savepoint_stack[idx].1,
+    );
+    Some(idx)
+}
+
+fn bind_release_savepoint(b: &mut Binder, release: ast::ReleaseSavepoint) {
+    let Some(savepoint_ref) = release.savepoint_ref() else {
+        return;
+    };
+
+    if let Some(idx) = bind_savepoint_ref(b, &savepoint_ref) {
+        b.savepoint_stack.truncate(idx);
+    }
+}
+
+fn bind_rollback(b: &mut Binder, rollback: ast::Rollback) {
+    let Some(savepoint_ref) = rollback.savepoint_ref() else {
+        b.savepoint_stack.clear();
+        return;
+    };
+
+    if let Some(idx) = bind_savepoint_ref(b, &savepoint_ref) {
+        b.savepoint_stack.truncate(idx + 1);
+    }
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
