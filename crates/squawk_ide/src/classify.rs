@@ -1,7 +1,7 @@
 use crate::{location::LocationKind, name, symbols::Name};
 use squawk_syntax::{
     SyntaxKind, SyntaxNode,
-    ast::{self, AstNode},
+    ast::{self, AstNode, LitKind},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -45,6 +45,7 @@ pub(crate) enum NameRefClass {
     PolicyColumn,
     PolicyQualifiedColumnTable,
     PreparedStatement,
+    PreparedTransaction,
     PrivilegeColumn,
     PrivilegeObjectTable,
     Procedure,
@@ -392,10 +393,44 @@ pub(crate) fn classify_literal(node: &SyntaxNode) -> Option<NameRefClass> {
     if ast::SetSchemaValue::can_cast(parent.kind()) {
         return Some(NameRefClass::Schema);
     }
+    if is_prepared_transaction_id(node) {
+        return Some(NameRefClass::PreparedTransaction);
+    }
     if is_search_path_config_value(node) {
         return Some(NameRefClass::Schema);
     }
     None
+}
+
+// commit prepared 'foo' | rollback prepared 'foo'
+fn is_prepared_transaction_id(node: &SyntaxNode) -> bool {
+    let Some(literal) = ast::Literal::cast(node.clone()) else {
+        return false;
+    };
+    if !matches!(
+        literal.kind(),
+        Some(
+            LitKind::String(_)
+                | LitKind::BitString(_)
+                | LitKind::ByteString(_)
+                | LitKind::EscString(_)
+                | LitKind::NationalString(_)
+                | LitKind::UnicodeEscString(_)
+                | LitKind::DollarQuotedString(_)
+        )
+    ) {
+        return false;
+    }
+    let Some(parent) = node.parent() else {
+        return false;
+    };
+    if let Some(commit) = ast::Commit::cast(parent.clone()) {
+        commit.prepared_token().is_some()
+    } else if let Some(rollback) = ast::Rollback::cast(parent) {
+        rollback.prepared_token().is_some()
+    } else {
+        false
+    }
 }
 
 // set search_path to ...

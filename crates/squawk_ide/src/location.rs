@@ -37,6 +37,7 @@ pub enum LocationKind {
     OperatorFamily,
     Policy,
     PreparedStatement,
+    PreparedTransaction,
     Procedure,
     Property,
     PropertyGraph,

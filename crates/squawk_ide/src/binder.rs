@@ -54,6 +54,8 @@ pub(crate) struct Binder {
     schema_regions: Vec<(TextRange, Schema)>,
     savepoint_stack: Vec<(Name, SyntaxNodePtr)>,
     savepoint_refs: FxHashMap<SyntaxNodePtr, SyntaxNodePtr>,
+    prepared_transactions: FxHashMap<String, SyntaxNodePtr>,
+    prepared_transaction_refs: FxHashMap<SyntaxNodePtr, SyntaxNodePtr>,
 }
 
 impl Binder {
@@ -73,6 +75,8 @@ impl Binder {
             schema_regions: vec![],
             savepoint_stack: vec![],
             savepoint_refs: FxHashMap::default(),
+            prepared_transactions: FxHashMap::default(),
+            prepared_transaction_refs: FxHashMap::default(),
         }
     }
 
@@ -95,6 +99,15 @@ impl Binder {
     ) -> Option<SyntaxNodePtr> {
         self.savepoint_refs
             .get(&SyntaxNodePtr::new(savepoint_ref.syntax()))
+            .copied()
+    }
+
+    pub(crate) fn lookup_prepared_transaction(
+        &self,
+        literal: &ast::Literal,
+    ) -> Option<SyntaxNodePtr> {
+        self.prepared_transaction_refs
+            .get(&SyntaxNodePtr::new(literal.syntax()))
             .copied()
     }
 
@@ -374,7 +387,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::SavepointCreate(savepoint) => bind_savepoint(b, savepoint),
         ast::Stmt::ReleaseSavepoint(release) => bind_release_savepoint(b, release),
         ast::Stmt::Rollback(rollback) => bind_rollback(b, rollback),
-        ast::Stmt::Begin(_) | ast::Stmt::Commit(_) => b.savepoint_stack.clear(),
+        ast::Stmt::PrepareTransaction(prepare) => bind_prepare_transaction(b, prepare),
+        ast::Stmt::Commit(commit) => bind_commit(b, commit),
+        ast::Stmt::Begin(_) => b.savepoint_stack.clear(),
         ast::Stmt::Select(select) => bind_select(b, select),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
@@ -1724,7 +1739,49 @@ fn bind_release_savepoint(b: &mut Binder, release: ast::ReleaseSavepoint) {
     }
 }
 
+fn bind_commit(b: &mut Binder, commit: ast::Commit) {
+    if commit.prepared_token().is_some() {
+        bind_prepared_transaction_ref(b, commit.literal());
+    }
+
+    b.savepoint_stack.clear();
+}
+
+fn bind_prepare_transaction(b: &mut Binder, prepare: ast::PrepareTransaction) {
+    b.savepoint_stack.clear();
+
+    let Some(literal) = prepare.literal() else {
+        return;
+    };
+    let Some(transaction_id) = literal_string_value(&literal) else {
+        return;
+    };
+
+    b.prepared_transactions
+        .insert(transaction_id, SyntaxNodePtr::new(literal.syntax()));
+}
+
+fn bind_prepared_transaction_ref(b: &mut Binder, literal: Option<ast::Literal>) {
+    let Some(literal) = literal else {
+        return;
+    };
+    let Some(transaction_id) = literal_string_value(&literal) else {
+        return;
+    };
+
+    let Some(ptr) = b.prepared_transactions.remove(&transaction_id) else {
+        return;
+    };
+
+    b.prepared_transaction_refs
+        .insert(SyntaxNodePtr::new(literal.syntax()), ptr);
+}
+
 fn bind_rollback(b: &mut Binder, rollback: ast::Rollback) {
+    if rollback.prepared_token().is_some() {
+        bind_prepared_transaction_ref(b, rollback.literal());
+    }
+
     let Some(savepoint_ref) = rollback.savepoint_ref() else {
         b.savepoint_stack.clear();
         return;

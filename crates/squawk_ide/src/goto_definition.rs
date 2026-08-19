@@ -828,6 +828,18 @@ release savepoint sp$0;
     }
 
     #[test]
+    fn goto_prepare_transaction_discards_savepoints() {
+        goto_not_found(
+            "
+begin;
+savepoint sp;
+prepare transaction 'foo';
+release savepoint sp$0;
+",
+        );
+    }
+
+    #[test]
     fn goto_bare_rollback_discards_savepoints() {
         goto_not_found(
             "
@@ -6069,6 +6081,132 @@ commit;
         4 │ commit;
           ╰╴─────── 2. destination
         ");
+    }
+
+    #[test]
+    fn commit_prepared_to_prepare_transaction() {
+        assert_snapshot!(goto(
+            "
+prepare transaction 'foo';
+select 1;
+commit prepared 'foo'$0;
+",
+        ), @"
+          ╭▸ 
+        2 │ prepare transaction 'foo';
+          │                     ───── 2. destination
+        3 │ select 1;
+        4 │ commit prepared 'foo';
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn rollback_prepared_to_prepare_transaction() {
+        assert_snapshot!(goto(
+            "
+prepare transaction 'foo';
+rollback prepared 'foo'$0;
+",
+        ), @"
+          ╭▸ 
+        2 │ prepare transaction 'foo';
+          │                     ───── 2. destination
+        3 │ rollback prepared 'foo';
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn commit_prepared_to_most_recent_prepare_transaction() {
+        assert_snapshot!(goto(
+            "
+prepare transaction 'foo';
+commit prepared 'foo';
+prepare transaction 'foo';
+commit prepared 'foo'$0;
+",
+        ), @"
+          ╭▸ 
+        4 │ prepare transaction 'foo';
+          │                     ───── 2. destination
+        5 │ commit prepared 'foo';
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn commit_prepared_before_prepare_transaction() {
+        goto_not_found(
+            "
+commit prepared 'foo'$0;
+prepare transaction 'foo';
+",
+        );
+    }
+
+    #[test]
+    fn commit_prepared_frees_transaction_id() {
+        goto_not_found(
+            "
+prepare transaction 'foo';
+commit prepared 'foo';
+commit prepared 'foo'$0;
+",
+        );
+    }
+
+    #[test]
+    fn commit_prepared_matches_escaped_transaction_id() {
+        assert_snapshot!(goto(
+            r#"
+prepare transaction e'fo\u006f';
+commit prepared 'foo'$0;
+"#,
+        ), @r"
+          ╭▸ 
+        2 │ prepare transaction e'fo\u006f';
+          │                     ─────────── 2. destination
+        3 │ commit prepared 'foo';
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn commit_prepared_matches_dollar_quoted_transaction_id() {
+        assert_snapshot!(goto(
+            "
+prepare transaction $$foo$$;
+commit prepared 'foo'$0;
+",
+        ), @"
+          ╭▸ 
+        2 │ prepare transaction $$foo$$;
+          │                     ─────── 2. destination
+        3 │ commit prepared 'foo';
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn commit_prepared_with_unknown_transaction_id() {
+        goto_not_found(
+            "
+begin;
+prepare transaction 'foo';
+commit prepared 'bar'$0;
+",
+        );
+    }
+
+    #[test]
+    fn commit_prepared_ignores_enclosing_begin() {
+        goto_not_found(
+            "
+begin;
+commit prepared 'foo'$0;
+",
+        );
     }
 
     #[test]
