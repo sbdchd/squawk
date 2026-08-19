@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.63.0 - 2026-08-19
+
+### Added
+
+- syntax: add validation for empty tuple & overlaps (#1292)
+- syntax: add validation for in/not in (#1287)
+
+- ide: goto def for prepared transactions (#1291)
+- ide: goto def for savepoints (#1290)
+- ide: goto def for builtins like extract/substring/position (#1289)
+
+- ide: code actions for builtins -> pg functions (#1288)
+- ide: code actions unnest <-> rows from (#1284)
+
+- parser: split AliasColumnList into ColumnList & ColumnDefList (#1282)
+- parser: add more enums to ast (#1281, #1280, #1277, #1276)
+
+### Changed
+
+- linter: update ban-duplicate-column-assignment to check more queries (#1274)
+
+### Fixed
+
+- playground: fix code actions (#1286)
+- parser: fix select parsing & add more node detail (#1279)
+
 ## v2.62.0 - 2026-08-06
 
 ### Added
