@@ -1,0 +1,79 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/empty_in_expr.sql
+---
+SOURCE_FILE@0..66
+  SELECT@0..30
+    SELECT_CLAUSE@0..8
+      SELECT_KW@0..6 "SELECT"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..8
+        TARGET@7..8
+          STAR@7..8 "*"
+    WHITESPACE@8..9 " "
+    FROM_CLAUSE@9..15
+      FROM_KW@9..13 "FROM"
+      WHITESPACE@13..14 " "
+      RELATION_FROM_ITEM@14..15
+        RELATION_NAME_REF@14..15
+          PATH_REF@14..15
+            PATH_SEGMENT_REF@14..15
+              IDENT@14..15 "t"
+    WHITESPACE@15..16 " "
+    WHERE_CLAUSE@16..29
+      WHERE_KW@16..21 "WHERE"
+      WHITESPACE@21..22 " "
+      BIN_EXPR@22..29
+        NAME_REF@22..23
+          IDENT@22..23 "a"
+        WHITESPACE@23..24 " "
+        IN_KW@24..26 "IN"
+        WHITESPACE@26..27 " "
+        TUPLE_EXPR@27..29
+          L_PAREN@27..28 "("
+          R_PAREN@28..29 ")"
+    SEMICOLON@29..30 ";"
+  WHITESPACE@30..31 "\n"
+  SELECT@31..65
+    SELECT_CLAUSE@31..39
+      SELECT_KW@31..37 "SELECT"
+      WHITESPACE@37..38 " "
+      TARGET_LIST@38..39
+        TARGET@38..39
+          STAR@38..39 "*"
+    WHITESPACE@39..40 " "
+    FROM_CLAUSE@40..46
+      FROM_KW@40..44 "FROM"
+      WHITESPACE@44..45 " "
+      RELATION_FROM_ITEM@45..46
+        RELATION_NAME_REF@45..46
+          PATH_REF@45..46
+            PATH_SEGMENT_REF@45..46
+              IDENT@45..46 "t"
+    WHITESPACE@46..47 " "
+    WHERE_CLAUSE@47..64
+      WHERE_KW@47..52 "WHERE"
+      WHITESPACE@52..53 " "
+      BIN_EXPR@53..64
+        NAME_REF@53..54
+          IDENT@53..54 "a"
+        WHITESPACE@54..55 " "
+        NOT_IN@55..61
+          NOT_KW@55..58 "NOT"
+          WHITESPACE@58..59 " "
+          IN_KW@59..61 "IN"
+        WHITESPACE@61..62 " "
+        TUPLE_EXPR@62..64
+          L_PAREN@62..63 "("
+          R_PAREN@63..64 ")"
+    SEMICOLON@64..65 ";"
+  WHITESPACE@65..66 "\n"
+
+error[syntax-error]: Expected at least one expression in IN list.
+  ╭▸ 
+1 │ SELECT * FROM t WHERE a IN ();
+  ╰╴                           ━━
+error[syntax-error]: Expected at least one expression in IN list.
+  ╭▸ 
+2 │ SELECT * FROM t WHERE a NOT IN ();
+  ╰╴                               ━━

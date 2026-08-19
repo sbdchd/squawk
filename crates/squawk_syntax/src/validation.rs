@@ -590,23 +590,48 @@ fn offset_range(start: TextSize, range: Range<usize>) -> TextRange {
     TextRange::new(begin, end)
 }
 
-// see: https://christopher.xyz/2020/08/01/any-all-pg.html
 fn validate_bin_expr(bin_expr: ast::BinExpr, acc: &mut Vec<SyntaxError>) {
-    if !matches!(
-        bin_expr.op(),
-        Some(ast::BinOp::In(_) | ast::BinOp::NotIn(_))
-    ) {
-        return;
+    match bin_expr.op() {
+        Some(ast::BinOp::In(_) | ast::BinOp::NotIn(_)) => validate_in_expr(&bin_expr, acc),
+        Some(ast::BinOp::Overlaps(_)) => validate_overlaps_expr(&bin_expr, acc),
+        _ => (),
     }
+}
+
+// see: https://christopher.xyz/2020/08/01/any-all-pg.html
+fn validate_in_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
     let rhs = match bin_expr.rhs() {
         None | Some(ast::Expr::ParenExpr(_)) => return,
-        Some(ast::Expr::TupleExpr(tuple)) if tuple.row_token().is_none() => return,
+        Some(ast::Expr::TupleExpr(tuple)) if tuple.row_token().is_none() => {
+            if tuple.exprs().next().is_none() {
+                acc.push(SyntaxError::new(
+                    "Expected at least one expression in IN list.",
+                    tuple.syntax().text_range(),
+                ));
+            }
+            return;
+        }
         Some(rhs) => rhs,
     };
     acc.push(SyntaxError::new(
         "Expected a parenthesized value list or subquery.",
         rhs.syntax().text_range(),
     ));
+}
+
+fn validate_overlaps_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
+    for operand in [bin_expr.lhs(), bin_expr.rhs()].into_iter().flatten() {
+        match operand {
+            ast::Expr::TupleExpr(tuple) if tuple.exprs().count() != 2 => acc.push(
+                SyntaxError::new("wrong number of parameters", tuple.syntax().text_range()),
+            ),
+            ast::Expr::TupleExpr(_) => (),
+            operand => acc.push(SyntaxError::new(
+                "OVERLAPS operand must be a row expression",
+                operand.syntax().text_range(),
+            )),
+        }
+    }
 }
 
 fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {

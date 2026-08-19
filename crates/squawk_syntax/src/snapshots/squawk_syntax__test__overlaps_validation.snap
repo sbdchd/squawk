@@ -1,0 +1,112 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/overlaps.sql
+---
+SOURCE_FILE@0..286
+  COMMENT@0..61 "-- OVERLAPS is only d ..."
+  WHITESPACE@61..62 "\n"
+  SELECT@62..82
+    SELECT_CLAUSE@62..81
+      SELECT_KW@62..68 "SELECT"
+      WHITESPACE@68..69 " "
+      TARGET_LIST@69..81
+        TARGET@69..81
+          BIN_EXPR@69..81
+            LITERAL@69..70
+              INT_NUMBER@69..70 "1"
+            WHITESPACE@70..71 " "
+            OVERLAPS_KW@71..79 "OVERLAPS"
+            WHITESPACE@79..80 " "
+            LITERAL@80..81
+              INT_NUMBER@80..81 "2"
+    SEMICOLON@81..82 ";"
+  WHITESPACE@82..84 "\n\n"
+  COMMENT@84..149 "-- wrong number of pa ..."
+  WHITESPACE@149..150 "\n"
+  SELECT@150..183
+    SELECT_CLAUSE@150..182
+      SELECT_KW@150..156 "SELECT"
+      WHITESPACE@156..157 " "
+      TARGET_LIST@157..182
+        TARGET@157..182
+          BIN_EXPR@157..182
+            TUPLE_EXPR@157..166
+              L_PAREN@157..158 "("
+              LITERAL@158..159
+                INT_NUMBER@158..159 "1"
+              COMMA@159..160 ","
+              WHITESPACE@160..161 " "
+              LITERAL@161..162
+                INT_NUMBER@161..162 "2"
+              COMMA@162..163 ","
+              WHITESPACE@163..164 " "
+              LITERAL@164..165
+                INT_NUMBER@164..165 "3"
+              R_PAREN@165..166 ")"
+            WHITESPACE@166..167 " "
+            OVERLAPS_KW@167..175 "OVERLAPS"
+            WHITESPACE@175..176 " "
+            TUPLE_EXPR@176..182
+              L_PAREN@176..177 "("
+              LITERAL@177..178
+                INT_NUMBER@177..178 "1"
+              COMMA@178..179 ","
+              WHITESPACE@179..180 " "
+              LITERAL@180..181
+                INT_NUMBER@180..181 "2"
+              R_PAREN@181..182 ")"
+    SEMICOLON@182..183 ";"
+  WHITESPACE@183..185 "\n\n"
+  COMMENT@185..251 "-- wrong number of pa ..."
+  WHITESPACE@251..252 "\n"
+  SELECT@252..285
+    SELECT_CLAUSE@252..284
+      SELECT_KW@252..258 "SELECT"
+      WHITESPACE@258..259 " "
+      TARGET_LIST@259..284
+        TARGET@259..284
+          BIN_EXPR@259..284
+            TUPLE_EXPR@259..265
+              L_PAREN@259..260 "("
+              LITERAL@260..261
+                INT_NUMBER@260..261 "1"
+              COMMA@261..262 ","
+              WHITESPACE@262..263 " "
+              LITERAL@263..264
+                INT_NUMBER@263..264 "2"
+              R_PAREN@264..265 ")"
+            WHITESPACE@265..266 " "
+            OVERLAPS_KW@266..274 "OVERLAPS"
+            WHITESPACE@274..275 " "
+            TUPLE_EXPR@275..284
+              L_PAREN@275..276 "("
+              LITERAL@276..277
+                INT_NUMBER@276..277 "1"
+              COMMA@277..278 ","
+              WHITESPACE@278..279 " "
+              LITERAL@279..280
+                INT_NUMBER@279..280 "2"
+              COMMA@280..281 ","
+              WHITESPACE@281..282 " "
+              LITERAL@282..283
+                INT_NUMBER@282..283 "3"
+              R_PAREN@283..284 ")"
+    SEMICOLON@284..285 ";"
+  WHITESPACE@285..286 "\n"
+
+error[syntax-error]: OVERLAPS operand must be a row expression
+  ╭▸ 
+2 │ SELECT 1 OVERLAPS 2;
+  ╰╴       ━
+error[syntax-error]: OVERLAPS operand must be a row expression
+  ╭▸ 
+2 │ SELECT 1 OVERLAPS 2;
+  ╰╴                  ━
+error[syntax-error]: wrong number of parameters
+  ╭▸ 
+5 │ SELECT (1, 2, 3) OVERLAPS (1, 2);
+  ╰╴       ━━━━━━━━━
+error[syntax-error]: wrong number of parameters
+  ╭▸ 
+8 │ SELECT (1, 2) OVERLAPS (1, 2, 3);
+  ╰╴                       ━━━━━━━━━
