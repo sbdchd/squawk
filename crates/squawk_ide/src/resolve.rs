@@ -922,6 +922,7 @@ pub(crate) fn resolve_name_ref(
             let table_path = resolve_alter_column_relation_path(name_ref.syntax())?;
             resolve_column_for_path(db, InFile::new(file, &table_path), column_name)
         }
+        NameRefClass::PreparedTransaction => None,
     }
     .or_else(|| resolve_special_keyword_as_function(db, InFile::new(file, name_ref)))
 }
@@ -948,7 +949,7 @@ pub(crate) fn resolve_config_value_name(
 }
 
 /// Resolves a string literal to its definition(s), e.g. the schema name in
-/// `set schema 'app'` or `set search_path to 'app'`.
+/// `set schema 'app'` or the transaction id in `commit prepared 'foo'`.
 pub(crate) fn resolve_literal(
     db: &dyn Db,
     literal: InFile<&ast::Literal>,
@@ -975,6 +976,15 @@ pub(crate) fn resolve_literal(
                 file,
                 ptr.text_range(),
                 LocationKind::Schema
+            )])
+        }
+        NameRefClass::PreparedTransaction => {
+            let binder = bind(db, file);
+            let ptr = binder.lookup_prepared_transaction(literal)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::PreparedTransaction
             )])
         }
         _ => None,

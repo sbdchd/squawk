@@ -220,6 +220,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::OperatorFamily
             | LocationKind::Policy
             | LocationKind::PreparedStatement
+            | LocationKind::PreparedTransaction
             | LocationKind::Publication
             | LocationKind::Role
             | LocationKind::Rule

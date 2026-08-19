@@ -357,6 +357,7 @@ fn hover_name(db: &dyn Db, def: Location) -> Option<Hover> {
         | LocationKind::CommitEnd
         | LocationKind::ElementTable
         | LocationKind::Label
+        | LocationKind::PreparedTransaction
         | LocationKind::Property => None,
         LocationKind::Channel => hover_channel(db, def),
         LocationKind::Column => hover_name_column(db, def),
@@ -445,6 +446,7 @@ fn hover_position(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         | LocationKind::CommitEnd
         | LocationKind::ElementTable
         | LocationKind::Label
+        | LocationKind::PreparedTransaction
         | LocationKind::Property => None,
         LocationKind::Channel => hover_channel(db, def),
         LocationKind::Column => {
