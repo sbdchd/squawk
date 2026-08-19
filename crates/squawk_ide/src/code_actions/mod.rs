@@ -27,6 +27,7 @@ mod rewrite_is_normalized_as_function_call;
 mod rewrite_leading_from;
 mod rewrite_normalize_as_function_call;
 mod rewrite_not_equals_operator;
+mod rewrite_null_predicate;
 mod rewrite_overlaps_as_function_call;
 mod rewrite_overlay_as_function_call;
 mod rewrite_pattern_matching_as_operators;
@@ -72,6 +73,7 @@ use rewrite_is_normalized_as_function_call::rewrite_is_normalized_as_function_ca
 use rewrite_leading_from::rewrite_leading_from;
 use rewrite_normalize_as_function_call::rewrite_normalize_as_function_call;
 use rewrite_not_equals_operator::rewrite_not_equals_operator;
+use rewrite_null_predicate::rewrite_null_predicate;
 use rewrite_overlaps_as_function_call::rewrite_overlaps_as_function_call;
 use rewrite_overlay_as_function_call::rewrite_overlay_as_function_call;
 use rewrite_pattern_matching_as_operators::rewrite_pattern_matching_as_operators;
@@ -127,6 +129,7 @@ pub fn code_actions(db: &dyn Db, position: InFile<TextSize>) -> Option<Vec<CodeA
     rewrite_double_colon_to_cast(db, position, &mut actions);
     rewrite_between_as_binary_expression(db, position, &mut actions);
     rewrite_not_equals_operator(db, position, &mut actions);
+    rewrite_null_predicate(db, position, &mut actions);
     rewrite_timestamp_type(db, position, &mut actions);
     rewrite_unnest_as_rows_from(db, position, &mut actions);
     rewrite_rows_from_as_unnest(db, position, &mut actions);
