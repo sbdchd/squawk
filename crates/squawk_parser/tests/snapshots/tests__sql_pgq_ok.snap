@@ -78,7 +78,7 @@ SOURCE_FILE
         COLUMN_NAME
           NAME_KW "name"
         WHITESPACE " "
-        CHAR_TYPE
+        VARCHAR_TYPE
           VARCHAR_KW "varchar"
       COMMA ","
       WHITESPACE "\n    "
@@ -127,7 +127,7 @@ SOURCE_FILE
         COLUMN_NAME
           NAME_KW "name"
         WHITESPACE " "
-        CHAR_TYPE
+        VARCHAR_TYPE
           VARCHAR_KW "varchar"
       COMMA ","
       WHITESPACE "\n    "
@@ -135,7 +135,7 @@ SOURCE_FILE
         COLUMN_NAME
           IDENT "address"
         WHITESPACE " "
-        CHAR_TYPE
+        VARCHAR_TYPE
           VARCHAR_KW "varchar"
       WHITESPACE "\n"
       R_PAREN ")"

@@ -230,15 +230,8 @@ pub(crate) fn schema_and_type_name(ty: &ast::Type) -> Option<(Option<Schema>, Na
                 None
             }
         }
-        ast::Type::CharType(char_type) => {
-            let name = if char_type.varchar_token().is_some() || char_type.varying_token().is_some()
-            {
-                "varchar"
-            } else {
-                "bpchar"
-            };
-            Some((None, Name::from_string(name)))
-        }
+        ast::Type::VarcharType(_) => Some((None, Name::from_string("varchar"))),
+        ast::Type::CharacterType(_) => Some((None, Name::from_string("bpchar"))),
         ast::Type::DoubleType(_) => Some((None, Name::from_string("float8"))),
         ast::Type::TimeType(time_type) => {
             let mut name = if time_type.timestamp_token().is_some() {

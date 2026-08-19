@@ -2208,11 +2208,14 @@ fn type_mods(
 fn char_type(p: &mut Parser<'_>) -> SyntaxKind {
     assert!(p.at(CHARACTER_KW) || p.at(CHAR_KW) || p.at(NCHAR_KW) || p.at(VARCHAR_KW));
     if p.eat(VARCHAR_KW) {
-        return CHAR_TYPE;
+        return VARCHAR_TYPE;
     }
     p.bump_any();
-    p.eat(VARYING_KW);
-    CHAR_TYPE
+    if p.eat(VARYING_KW) {
+        VARCHAR_TYPE
+    } else {
+        CHARACTER_TYPE
+    }
 }
 
 const TYPE_NAME_FIRST: TokenSet = TokenSet::new(&[
@@ -7258,15 +7261,17 @@ fn commit(p: &mut Parser<'_>) -> CompletedMarker {
     let is_commit = p.at(COMMIT_KW);
     p.bump_any();
     // PREPARED transaction_id
-    if is_commit && p.eat(PREPARED_KW) {
+    let kind = if is_commit && p.eat(PREPARED_KW) {
         string_literal(p);
+        COMMIT_PREPARED
     } else {
         // [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]
         let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
         opt_chain_clause(p);
-    }
+        COMMIT_TRANSACTION
+    };
     p.eat(SEMICOLON);
-    m.complete(p, COMMIT)
+    m.complete(p, kind)
 }
 
 fn opt_chain_clause(p: &mut Parser<'_>) {
@@ -7465,20 +7470,22 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     let is_rollback = p.at(ROLLBACK_KW);
     p.bump_any();
-    if p.eat(PREPARED_KW) {
+    if is_rollback && p.eat(PREPARED_KW) {
         string_literal(p);
         p.eat(SEMICOLON);
-        return m.complete(p, ROLLBACK);
+        return m.complete(p, ROLLBACK_PREPARED);
     }
     let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
-    if is_rollback && p.eat(TO_KW) {
+    let kind = if is_rollback && p.eat(TO_KW) {
         p.eat(SAVEPOINT_KW);
         savepoint_ref(p);
+        ROLLBACK_TO_SAVEPOINT
     } else {
         opt_chain_clause(p);
-    }
+        ROLLBACK_TRANSACTION
+    };
     p.eat(SEMICOLON);
-    m.complete(p, ROLLBACK)
+    m.complete(p, kind)
 }
 
 #[derive(Default)]

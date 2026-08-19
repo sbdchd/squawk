@@ -1740,7 +1740,7 @@ fn bind_release_savepoint(b: &mut Binder, release: ast::ReleaseSavepoint) {
 }
 
 fn bind_commit(b: &mut Binder, commit: ast::Commit) {
-    if commit.prepared_token().is_some() {
+    if let ast::Commit::CommitPrepared(commit) = commit {
         bind_prepared_transaction_ref(b, commit.literal());
     }
 
@@ -1778,17 +1778,20 @@ fn bind_prepared_transaction_ref(b: &mut Binder, literal: Option<ast::Literal>) 
 }
 
 fn bind_rollback(b: &mut Binder, rollback: ast::Rollback) {
-    if rollback.prepared_token().is_some() {
-        bind_prepared_transaction_ref(b, rollback.literal());
-    }
-
-    let Some(savepoint_ref) = rollback.savepoint_ref() else {
-        b.savepoint_stack.clear();
-        return;
-    };
-
-    if let Some(idx) = bind_savepoint_ref(b, &savepoint_ref) {
-        b.savepoint_stack.truncate(idx + 1);
+    match rollback {
+        ast::Rollback::RollbackPrepared(rollback) => {
+            bind_prepared_transaction_ref(b, rollback.literal());
+            b.savepoint_stack.clear();
+        }
+        ast::Rollback::RollbackToSavepoint(rollback) => {
+            let Some(savepoint_ref) = rollback.savepoint_ref() else {
+                return;
+            };
+            if let Some(idx) = bind_savepoint_ref(b, &savepoint_ref) {
+                b.savepoint_stack.truncate(idx + 1);
+            }
+        }
+        ast::Rollback::RollbackTransaction(_) => b.savepoint_stack.clear(),
     }
 }
 

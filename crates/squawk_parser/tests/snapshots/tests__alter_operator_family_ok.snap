@@ -164,7 +164,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             PARAM
-              CHAR_TYPE
+              VARCHAR_TYPE
                 VARCHAR_KW "varchar"
                 ARG_LIST
                   L_PAREN "("

@@ -476,7 +476,7 @@ SOURCE_FILE
         COMPOSITE_FIELD
           IDENT "a"
         WHITESPACE " "
-        CHAR_TYPE
+        VARCHAR_TYPE
           VARCHAR_KW "varchar"
           ARG_LIST
             L_PAREN "("
@@ -627,7 +627,7 @@ SOURCE_FILE
         WHITESPACE " "
         TYPE_KW "type"
         WHITESPACE " "
-        CHAR_TYPE
+        VARCHAR_TYPE
           VARCHAR_KW "varchar"
           ARG_LIST
             L_PAREN "("

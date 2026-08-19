@@ -1760,7 +1760,7 @@ SOURCE_FILE
           IDENT "clean_default_temp"
     SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMIT
+  COMMIT_TRANSACTION
     COMMIT_KW "COMMIT"
     SEMICOLON ";"
   WHITESPACE "\n\n"

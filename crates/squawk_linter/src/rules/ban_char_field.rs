@@ -44,22 +44,23 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
     }
 }
 
-fn check_char_type(ctx: &mut Linter, char_type: ast::CharType) {
-    if is_char_type(&char_type.text()) {
-        let fix = create_fix(char_type.syntax().text_range(), char_type.arg_list());
-        ctx.report(Violation::for_node(
-            Rule::BanCharField,
-            "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.".into(),
-            char_type.syntax(),
-        ).fix(fix));
-    }
+fn check_character_type(ctx: &mut Linter, character_type: ast::CharacterType) {
+    let fix = create_fix(
+        character_type.syntax().text_range(),
+        character_type.arg_list(),
+    );
+    ctx.report(Violation::for_node(
+        Rule::BanCharField,
+        "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.".into(),
+        character_type.syntax(),
+    ).fix(fix));
 }
 
 fn check_ty(ctx: &mut Linter, ty: Option<ast::Type>) {
     match ty {
         Some(ast::Type::ArrayType(array_type)) => match array_type.ty() {
-            Some(ast::Type::CharType(char_type)) => {
-                check_char_type(ctx, char_type);
+            Some(ast::Type::CharacterType(character_type)) => {
+                check_character_type(ctx, character_type);
             }
             Some(ast::Type::PathType(path_type)) => {
                 check_path_type(ctx, path_type);
@@ -69,8 +70,8 @@ fn check_ty(ctx: &mut Linter, ty: Option<ast::Type>) {
         Some(ast::Type::PathType(path_type)) => {
             check_path_type(ctx, path_type);
         }
-        Some(ast::Type::CharType(char_type)) => {
-            check_char_type(ctx, char_type);
+        Some(ast::Type::CharacterType(character_type)) => {
+            check_character_type(ctx, character_type);
         }
         _ => (),
     }
@@ -180,7 +181,8 @@ create table t (
     l bit varying,
     m int array[],
     o pg_catalog.char,
-    p char[]
+    p char[],
+    q nchar
 );
         "#;
         assert_snapshot!(lint_errors(sql, Rule::BanCharField));

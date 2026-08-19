@@ -51,7 +51,7 @@ SOURCE_FILE
                           COLON_COLON
                             COLON ":"
                             COLON ":"
-                          CHAR_TYPE
+                          CHARACTER_TYPE
                             CHAR_KW "char"
                             ARG_LIST
                               L_PAREN "("
@@ -194,7 +194,7 @@ SOURCE_FILE
                           COLON_COLON
                             COLON ":"
                             COLON ":"
-                          CHAR_TYPE
+                          CHARACTER_TYPE
                             CHAR_KW "char"
                             ARG_LIST
                               L_PAREN "("

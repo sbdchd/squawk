@@ -1191,7 +1191,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- so now we issue these commands:"
   WHITESPACE "\n"
-  ROLLBACK
+  ROLLBACK_TO_SAVEPOINT
     ROLLBACK_KW "ROLLBACK"
     WHITESPACE " "
     TO_KW "TO"
@@ -1245,7 +1245,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- continue with other operations, and eventually"
   WHITESPACE "\n"
-  COMMIT
+  COMMIT_TRANSACTION
     COMMIT_KW "COMMIT"
     SEMICOLON ";"
   WHITESPACE "\n\n"

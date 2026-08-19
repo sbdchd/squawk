@@ -603,7 +603,7 @@ SOURCE_FILE
     RET_TYPE
       RETURNS_KW "returns"
       WHITESPACE " "
-      CHAR_TYPE
+      VARCHAR_TYPE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("
@@ -621,7 +621,7 @@ SOURCE_FILE
           WHITESPACE " "
           TYPE_KW "type"
           WHITESPACE " "
-          CHAR_TYPE
+          VARCHAR_TYPE
             VARCHAR_KW "varchar"
             ARG_LIST
               L_PAREN "("
@@ -1927,7 +1927,7 @@ SOURCE_FILE
         END_KW "end"
     SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT
+  COMMIT_TRANSACTION
     END_KW "end"
     SEMICOLON ";"
   WHITESPACE "\n\n"

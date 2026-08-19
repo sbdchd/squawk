@@ -66,7 +66,7 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    CHAR_TYPE
+    VARCHAR_TYPE
       VARCHAR_KW "varchar"
       ARG_LIST
         L_PAREN "("
@@ -164,7 +164,7 @@ SOURCE_FILE
             POUND "#"
         WHITESPACE " "
         L_PAREN "("
-        CHAR_TYPE
+        VARCHAR_TYPE
           VARCHAR_KW "varchar"
           ARG_LIST
             L_PAREN "("
@@ -174,7 +174,7 @@ SOURCE_FILE
             R_PAREN ")"
         COMMA ","
         WHITESPACE " "
-        CHAR_TYPE
+        VARCHAR_TYPE
           VARCHAR_KW "varchar"
           ARG_LIST
             L_PAREN "("

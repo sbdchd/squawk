@@ -675,7 +675,14 @@ pub(crate) fn normalize_name_node(node: &SyntaxNode) -> String {
         .unwrap_or_else(|| raw.to_ascii_lowercase())
 }
 
-impl ast::CharType {
+impl ast::VarcharType {
+    #[inline]
+    pub fn text(&self) -> TokenText<'_> {
+        text_of_first_token(self.syntax())
+    }
+}
+
+impl ast::CharacterType {
     #[inline]
     pub fn text(&self) -> TokenText<'_> {
         text_of_first_token(self.syntax())

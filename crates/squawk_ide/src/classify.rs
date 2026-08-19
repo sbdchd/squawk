@@ -425,9 +425,9 @@ fn is_prepared_transaction_id(node: &SyntaxNode) -> bool {
         return false;
     };
     if let Some(commit) = ast::Commit::cast(parent.clone()) {
-        commit.prepared_token().is_some()
+        matches!(commit, ast::Commit::CommitPrepared(_))
     } else if let Some(rollback) = ast::Rollback::cast(parent) {
-        rollback.prepared_token().is_some()
+        matches!(rollback, ast::Rollback::RollbackPrepared(_))
     } else {
         false
     }
