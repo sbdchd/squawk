@@ -60,7 +60,7 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    CHAR_TYPE
+    VARCHAR_TYPE
       VARCHAR_KW "varchar"
       ARG_LIST
         L_PAREN "("

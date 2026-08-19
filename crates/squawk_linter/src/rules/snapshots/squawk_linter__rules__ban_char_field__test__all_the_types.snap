@@ -43,9 +43,17 @@ warning[ban-char-field]: Using `character` is likely a mistake and should almost
    ╰╴
 warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
    ╭▸ 
-16 │     p char[]
+16 │     p char[],
    │       ━━━━
    ╭╴
-16 -     p char[]
-16 +     p text[]
+16 -     p char[],
+16 +     p text[],
+   ╰╴
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+   ╭▸ 
+17 │     q nchar
+   │       ━━━━━
+   ╭╴
+17 -     q nchar
+17 +     q text
    ╰╴

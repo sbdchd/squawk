@@ -59,7 +59,7 @@ pub(crate) fn infer_type_from_expr(expr: &ast::Expr) -> Option<Type> {
 
 pub(crate) fn infer_type_from_ty(ty: &ast::Type) -> Option<Type> {
     match ty {
-        ast::Type::CharType(_) => Some(Type::Text),
+        ast::Type::VarcharType(_) | ast::Type::CharacterType(_) => Some(Type::Text),
         ast::Type::BitType(_) => Some(Type::Bit),
         ast::Type::PathType(path_type) => {
             let name = path_type.path_ref()?.segment()?;

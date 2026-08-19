@@ -448,7 +448,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            CHARACTER_TYPE
               CHARACTER_KW "character"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -464,7 +464,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               CHARACTER_KW "character"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -482,7 +482,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            CHARACTER_TYPE
               CHAR_KW "char"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -498,7 +498,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               CHAR_KW "char"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -516,7 +516,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               VARCHAR_KW "varchar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -532,7 +532,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            CHARACTER_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHARACTER_KW "character"
@@ -550,7 +550,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHARACTER_KW "character"
@@ -570,7 +570,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            CHARACTER_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHAR_KW "char"
@@ -588,7 +588,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHAR_KW "char"
@@ -608,7 +608,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            CHARACTER_TYPE
               NCHAR_KW "nchar"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -624,7 +624,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               NCHAR_KW "nchar"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -643,7 +643,7 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             ARRAY_TYPE
-              CHAR_TYPE
+              VARCHAR_TYPE
                 NCHAR_KW "nchar"
                 WHITESPACE " "
                 VARYING_KW "varying"
@@ -1664,7 +1664,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               VARCHAR_KW "varchar"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1680,7 +1680,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            CHAR_TYPE
+            VARCHAR_TYPE
               VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
@@ -1703,7 +1703,7 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             ARRAY_TYPE
-              CHAR_TYPE
+              VARCHAR_TYPE
                 VARCHAR_KW "varchar"
                 ARG_LIST
                   L_PAREN "("
@@ -1728,7 +1728,7 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             ARRAY_TYPE
-              CHAR_TYPE
+              VARCHAR_TYPE
                 VARCHAR_KW "varchar"
               L_BRACK "["
               LITERAL
@@ -2518,7 +2518,7 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              CHAR_TYPE
+              CHARACTER_TYPE
                 CHAR_KW "char"
                 ARG_LIST
                   L_PAREN "("
@@ -2549,7 +2549,7 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                CHAR_TYPE
+                CHARACTER_TYPE
                   CHAR_KW "CHAR"
                   ARG_LIST
                     L_PAREN "("
@@ -2573,7 +2573,7 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              CHAR_TYPE
+              CHARACTER_TYPE
                 CHAR_KW "CHAR"
                 ARG_LIST
                   L_PAREN "("
@@ -3171,7 +3171,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            VARCHAR_TYPE
               CHARACTER_KW "character"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -3187,7 +3187,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            CHARACTER_TYPE
               CHARACTER_KW "character"
             WHITESPACE " "
             LITERAL
@@ -3201,7 +3201,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            VARCHAR_TYPE
               CHAR_KW "char"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -3217,7 +3217,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            CHARACTER_TYPE
               CHAR_KW "char"
             WHITESPACE " "
             LITERAL
@@ -3231,7 +3231,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            VARCHAR_TYPE
               VARCHAR_KW "varchar"
             WHITESPACE " "
             LITERAL
@@ -3245,7 +3245,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            VARCHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHARACTER_KW "character"
@@ -3263,7 +3263,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            CHARACTER_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHARACTER_KW "character"
@@ -3279,7 +3279,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            VARCHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHAR_KW "char"
@@ -3297,7 +3297,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            CHARACTER_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
               CHAR_KW "char"
@@ -3313,7 +3313,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            VARCHAR_TYPE
               NCHAR_KW "nchar"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -3329,7 +3329,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CHAR_TYPE
+            CHARACTER_TYPE
               NCHAR_KW "nchar"
             WHITESPACE " "
             LITERAL

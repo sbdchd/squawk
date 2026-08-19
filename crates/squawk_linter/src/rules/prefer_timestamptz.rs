@@ -27,7 +27,7 @@ pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
             // if we don't have any args, then it's the same as `text`
             ty_name == "varchar" && path_type.arg_list().is_some()
         }
-        ast::Type::CharType(_) => false,
+        ast::Type::VarcharType(_) | ast::Type::CharacterType(_) => false,
         ast::Type::BitType(_) => false,
         ast::Type::DoubleType(_) => false,
         ast::Type::TimeType(time_type) => {

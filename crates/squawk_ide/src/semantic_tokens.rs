@@ -55,23 +55,37 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
                 out.push_type(token.into());
             }
         }
-        ast::Type::CharType(char_type) => {
-            if let Some(token) = char_type.setof_token() {
+        ast::Type::VarcharType(varchar_type) => {
+            if let Some(token) = varchar_type.setof_token() {
                 out.push_type(token.into());
             }
-            if let Some(token) = char_type.national_token() {
+            if let Some(token) = varchar_type.national_token() {
                 out.push_type(token.into());
             }
-
-            if let Some(token) = char_type
+            if let Some(token) = varchar_type
                 .varchar_token()
-                .or_else(|| char_type.nchar_token())
-                .or_else(|| char_type.character_token())
-                .or_else(|| char_type.char_token())
+                .or_else(|| varchar_type.nchar_token())
+                .or_else(|| varchar_type.character_token())
+                .or_else(|| varchar_type.char_token())
             {
                 out.push_type(token.into());
             }
-            if let Some(token) = char_type.varying_token() {
+            if let Some(token) = varchar_type.varying_token() {
+                out.push_type(token.into());
+            }
+        }
+        ast::Type::CharacterType(character_type) => {
+            if let Some(token) = character_type.setof_token() {
+                out.push_type(token.into());
+            }
+            if let Some(token) = character_type.national_token() {
+                out.push_type(token.into());
+            }
+            if let Some(token) = character_type
+                .nchar_token()
+                .or_else(|| character_type.character_token())
+                .or_else(|| character_type.char_token())
+            {
                 out.push_type(token.into());
             }
         }

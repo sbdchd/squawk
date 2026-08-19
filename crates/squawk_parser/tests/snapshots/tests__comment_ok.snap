@@ -635,7 +635,7 @@ SOURCE_FILE
           AT "@"
           R_ANGLE ">"
       L_PAREN "("
-      CHAR_TYPE
+      VARCHAR_TYPE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("
@@ -645,7 +645,7 @@ SOURCE_FILE
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      CHAR_TYPE
+      VARCHAR_TYPE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("

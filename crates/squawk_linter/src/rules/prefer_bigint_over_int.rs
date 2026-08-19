@@ -30,7 +30,8 @@ fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
         ast::Type::ArrayType(array_type) => return create_bigint_fix(&array_type.ty()?),
         ast::Type::PathType(path_type) => path_type.path_ref()?.segment()?,
         ast::Type::BitType(_)
-        | ast::Type::CharType(_)
+        | ast::Type::VarcharType(_)
+        | ast::Type::CharacterType(_)
         | ast::Type::DoubleType(_)
         | ast::Type::ExprType(_)
         | ast::Type::PercentType(_)

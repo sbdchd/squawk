@@ -28,9 +28,8 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
             // if we don't have any args, then it's the same as `text`
             ty_name == "varchar" && path_type.arg_list().is_some()
         }
-        ast::Type::CharType(char_type) => {
-            char_type.text().eq_ignore_ascii_case("varchar") && char_type.arg_list().is_some()
-        }
+        ast::Type::VarcharType(varchar_type) => varchar_type.arg_list().is_some(),
+        ast::Type::CharacterType(_) => false,
         ast::Type::BitType(_) => false,
         ast::Type::DoubleType(_) => false,
         ast::Type::TimeType(_) => false,
@@ -46,10 +45,10 @@ fn create_varchar_to_text_fix(ty: &ast::Type) -> Option<Fix> {
             // so: `"varchar"(100)` becomes `text`
             path_type.syntax().text_range()
         }
-        ast::Type::CharType(char_type) => {
-            // we'll replace the entire char type, including args
+        ast::Type::VarcharType(varchar_type) => {
+            // we'll replace the entire varchar type, including args
             // so: `varchar(100)` becomes `text`
-            char_type.syntax().text_range()
+            varchar_type.syntax().text_range()
         }
         ast::Type::ArrayType(array_type) => {
             let ty = array_type.ty()?;

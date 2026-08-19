@@ -122,16 +122,16 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 bit_type.syntax().clone(),
             ));
         }
-        ast::Type::CharType(char_type) => {
-            let name = if char_type.varchar_token().is_some() || char_type.varying_token().is_some()
-            {
-                "varchar"
-            } else {
-                "bpchar"
-            };
+        ast::Type::VarcharType(varchar_type) => {
             return Some((
-                ColumnName::new_static(name, unknown_column),
-                char_type.syntax().clone(),
+                ColumnName::new_static("varchar", unknown_column),
+                varchar_type.syntax().clone(),
+            ));
+        }
+        ast::Type::CharacterType(character_type) => {
+            return Some((
+                ColumnName::new_static("bpchar", unknown_column),
+                character_type.syntax().clone(),
             ));
         }
         ast::Type::DoubleType(double_type) => {

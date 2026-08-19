@@ -3856,7 +3856,7 @@ SOURCE_FILE
       COLUMN_NAME
         IDENT "status"
       WHITESPACE " "
-      CHAR_TYPE
+      VARCHAR_TYPE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("

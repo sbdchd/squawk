@@ -115,7 +115,7 @@ SOURCE_FILE
         EQ "="
         WHITESPACE " "
         ATTRIBUTE_VALUE
-          CHAR_TYPE
+          VARCHAR_TYPE
             VARCHAR_KW "varchar"
             ARG_LIST
               L_PAREN "("

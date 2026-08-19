@@ -771,9 +771,18 @@ PercentType =
 PathType =
   'setof'? PathRef ArgList?
 
-CharType =
+VarcharType =
   'setof'?
-  ('varchar' | 'national'? ( 'character' | 'char' | 'nchar' ) 'varying'? )
+  (
+    'varchar'
+  | 'national'? ( 'character' | 'char' ) 'varying'
+  | 'nchar' 'varying'
+  )
+  ArgList?
+
+CharacterType =
+  'setof'?
+  ('national'? ( 'character' | 'char' ) | 'nchar')
   ArgList?
 
 BitType =
@@ -819,7 +828,8 @@ Type =
 | PathType
 // TODO: I think we can probably simplify the AST nodes for Types & Exprs.
 | ExprType
-| CharType
+| VarcharType
+| CharacterType
 | BitType
 | DoubleType
 | TimeType
@@ -1747,16 +1757,28 @@ Begin =
   TransactionModeList? ';'?
 
 Commit =
-  (
-    'commit' ('prepared' Literal | ('work' | 'transaction')? ChainClause?)
-  | 'end' ('work' | 'transaction')? ChainClause?
-  ) ';'?
+  CommitTransaction
+| CommitPrepared
+
+CommitTransaction =
+  ('commit' | 'end') ('work' | 'transaction')? ChainClause? ';'?
+
+CommitPrepared =
+  'commit' 'prepared' Literal ';'?
 
 Rollback =
-  'rollback' ('work' | 'transaction')? ChainClause? ';'?
-| 'abort' ('work' | 'transaction')? ChainClause? ';'?
-| 'rollback' ('work' | 'transaction')? 'to' 'savepoint'? SavepointRef ';'?
-| 'rollback' 'prepared' Literal ';'?
+  RollbackTransaction
+| RollbackToSavepoint
+| RollbackPrepared
+
+RollbackTransaction =
+  ('rollback' | 'abort') ('work' | 'transaction')? ChainClause? ';'?
+
+RollbackToSavepoint =
+  'rollback' ('work' | 'transaction')? 'to' 'savepoint'? SavepointRef ';'?
+
+RollbackPrepared =
+  'rollback' 'prepared' Literal ';'?
 
 ChainClause =
   AndChain
@@ -6124,8 +6146,6 @@ Collate =
   Expr? 'collate' CollationRef
 
 Stmt =
-  // We merge this into Rollback
-  // Abort
   AlterAggregate
 | AlterCollation
 | AlterConversion
@@ -6296,9 +6316,6 @@ Stmt =
 | Reset
 | Revoke
 | Rollback
-// Merged into Rollback
-// | RollbackPrepared
-// | RollbackToSavepoint
 | SavepointCreate
 | SecurityLabel
 | Select

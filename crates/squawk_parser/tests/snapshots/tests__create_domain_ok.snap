@@ -35,7 +35,7 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
-    CHAR_TYPE
+    VARCHAR_TYPE
       VARCHAR_KW "varchar"
       ARG_LIST
         L_PAREN "("

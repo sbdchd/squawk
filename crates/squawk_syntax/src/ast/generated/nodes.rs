@@ -3390,10 +3390,10 @@ impl ChannelRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CharType {
+pub struct CharacterType {
     pub(crate) syntax: SyntaxNode,
 }
-impl CharType {
+impl CharacterType {
     #[inline]
     pub fn arg_list(&self) -> Option<ArgList> {
         support::child(&self.syntax)
@@ -3417,14 +3417,6 @@ impl CharType {
     #[inline]
     pub fn setof_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SETOF_KW)
-    }
-    #[inline]
-    pub fn varchar_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VARCHAR_KW)
-    }
-    #[inline]
-    pub fn varying_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VARYING_KW)
     }
 }
 
@@ -3965,14 +3957,10 @@ impl CommentOn {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Commit {
+pub struct CommitPrepared {
     pub(crate) syntax: SyntaxNode,
 }
-impl Commit {
-    #[inline]
-    pub fn chain_clause(&self) -> Option<ChainClause> {
-        support::child(&self.syntax)
-    }
+impl CommitPrepared {
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
@@ -3986,12 +3974,31 @@ impl Commit {
         support::token(&self.syntax, SyntaxKind::COMMIT_KW)
     }
     #[inline]
-    pub fn end_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::END_KW)
-    }
-    #[inline]
     pub fn prepared_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PREPARED_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommitTransaction {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommitTransaction {
+    #[inline]
+    pub fn chain_clause(&self) -> Option<ChainClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn commit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMIT_KW)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
     }
     #[inline]
     pub fn transaction_token(&self) -> Option<SyntaxToken> {
@@ -22105,20 +22112,12 @@ impl RoleRenameTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Rollback {
+pub struct RollbackPrepared {
     pub(crate) syntax: SyntaxNode,
 }
-impl Rollback {
-    #[inline]
-    pub fn chain_clause(&self) -> Option<ChainClause> {
-        support::child(&self.syntax)
-    }
+impl RollbackPrepared {
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn savepoint_ref(&self) -> Option<SavepointRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -22126,12 +22125,27 @@ impl Rollback {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
-    pub fn abort_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ABORT_KW)
-    }
-    #[inline]
     pub fn prepared_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PREPARED_KW)
+    }
+    #[inline]
+    pub fn rollback_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROLLBACK_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RollbackToSavepoint {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RollbackToSavepoint {
+    #[inline]
+    pub fn savepoint_ref(&self) -> Option<SavepointRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn rollback_token(&self) -> Option<SyntaxToken> {
@@ -22144,6 +22158,37 @@ impl Rollback {
     #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn transaction_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TRANSACTION_KW)
+    }
+    #[inline]
+    pub fn work_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WORK_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RollbackTransaction {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RollbackTransaction {
+    #[inline]
+    pub fn chain_clause(&self) -> Option<ChainClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn abort_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ABORT_KW)
+    }
+    #[inline]
+    pub fn rollback_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROLLBACK_KW)
     }
     #[inline]
     pub fn transaction_token(&self) -> Option<SyntaxToken> {
@@ -26315,6 +26360,45 @@ impl Values {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VarcharType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VarcharType {
+    #[inline]
+    pub fn arg_list(&self) -> Option<ArgList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn char_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CHAR_KW)
+    }
+    #[inline]
+    pub fn character_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CHARACTER_KW)
+    }
+    #[inline]
+    pub fn national_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NATIONAL_KW)
+    }
+    #[inline]
+    pub fn nchar_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NCHAR_KW)
+    }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
+    #[inline]
+    pub fn varchar_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VARCHAR_KW)
+    }
+    #[inline]
+    pub fn varying_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VARYING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Variant {
     pub(crate) syntax: SyntaxNode,
 }
@@ -28301,6 +28385,12 @@ pub enum CommentObject {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Commit {
+    CommitPrepared(CommitPrepared),
+    CommitTransaction(CommitTransaction),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CompoundOp {
     Except(Except),
     Intersect(Intersect),
@@ -29154,6 +29244,13 @@ pub enum RoleOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Rollback {
+    RollbackPrepared(RollbackPrepared),
+    RollbackToSavepoint(RollbackToSavepoint),
+    RollbackTransaction(RollbackTransaction),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RuleAction {
     Nothing(Nothing),
     RuleStmtList(RuleStmtList),
@@ -29355,7 +29452,6 @@ pub enum Stmt {
     Close(Close),
     Cluster(Cluster),
     CommentOn(CommentOn),
-    Commit(Commit),
     CompoundSelect(CompoundSelect),
     Copy(Copy),
     CreateAccessMethod(CreateAccessMethod),
@@ -29475,7 +29571,6 @@ pub enum Stmt {
     ResetRole(ResetRole),
     ResetSessionAuth(ResetSessionAuth),
     Revoke(Revoke),
-    Rollback(Rollback),
     SavepointCreate(SavepointCreate),
     SecurityLabel(SecurityLabel),
     Select(Select),
@@ -29492,6 +29587,8 @@ pub enum Stmt {
     Update(Update),
     Vacuum(Vacuum),
     Values(Values),
+    Commit(Commit),
+    Rollback(Rollback),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -29614,13 +29711,14 @@ pub enum TrimSide {
 pub enum Type {
     ArrayType(ArrayType),
     BitType(BitType),
-    CharType(CharType),
+    CharacterType(CharacterType),
     DoubleType(DoubleType),
     ExprType(ExprType),
     IntervalType(IntervalType),
     PathType(PathType),
     PercentType(PercentType),
     TimeType(TimeType),
+    VarcharType(VarcharType),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -32166,10 +32264,10 @@ impl AstNode for ChannelRef {
         &self.syntax
     }
 }
-impl AstNode for CharType {
+impl AstNode for CharacterType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CHAR_TYPE
+        kind == SyntaxKind::CHARACTER_TYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -32688,10 +32786,28 @@ impl AstNode for CommentOn {
         &self.syntax
     }
 }
-impl AstNode for Commit {
+impl AstNode for CommitPrepared {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::COMMIT
+        kind == SyntaxKind::COMMIT_PREPARED
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CommitTransaction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COMMIT_TRANSACTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -48366,10 +48482,46 @@ impl AstNode for RoleRenameTo {
         &self.syntax
     }
 }
-impl AstNode for Rollback {
+impl AstNode for RollbackPrepared {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ROLLBACK
+        kind == SyntaxKind::ROLLBACK_PREPARED
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RollbackToSavepoint {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLLBACK_TO_SAVEPOINT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RollbackTransaction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLLBACK_TRANSACTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -52578,6 +52730,24 @@ impl AstNode for Values {
         &self.syntax
     }
 }
+impl AstNode for VarcharType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VARCHAR_TYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Variant {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -55134,7 +55304,7 @@ impl AstNode for AlterMaterializedViewAction {
                 AlterMaterializedViewAction::ViewRenameTo(ViewRenameTo { syntax })
             }
             _ => {
-                if let Some(result) = AlterTableAction::cast(syntax) {
+                if let Some(result) = AlterTableAction::cast(syntax.clone()) {
                     return Some(AlterMaterializedViewAction::AlterTableAction(result));
                 }
                 return None;
@@ -55973,7 +56143,7 @@ impl AstNode for AlterSequenceAction {
             SyntaxKind::SET_SCHEMA => AlterSequenceAction::SetSchema(SetSchema { syntax }),
             SyntaxKind::SET_UNLOGGED => AlterSequenceAction::SetUnlogged(SetUnlogged { syntax }),
             _ => {
-                if let Some(result) = SequenceOption::cast(syntax) {
+                if let Some(result) = SequenceOption::cast(syntax.clone()) {
                     return Some(AlterSequenceAction::SequenceOption(result));
                 }
                 return None;
@@ -58668,7 +58838,7 @@ impl AstNode for BeginFuncOption {
                 BeginFuncOption::ReturnFuncOption(ReturnFuncOption { syntax })
             }
             _ => {
-                if let Some(result) = Stmt::cast(syntax) {
+                if let Some(result) = Stmt::cast(syntax.clone()) {
                     return Some(BeginFuncOption::Stmt(result));
                 }
                 return None;
@@ -59466,6 +59636,47 @@ impl From<ObjectView> for CommentObject {
         CommentObject::ObjectView(node)
     }
 }
+impl AstNode for Commit {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::COMMIT_PREPARED | SyntaxKind::COMMIT_TRANSACTION
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::COMMIT_PREPARED => Commit::CommitPrepared(CommitPrepared { syntax }),
+            SyntaxKind::COMMIT_TRANSACTION => {
+                Commit::CommitTransaction(CommitTransaction { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Commit::CommitPrepared(it) => &it.syntax,
+            Commit::CommitTransaction(it) => &it.syntax,
+        }
+    }
+}
+impl From<CommitPrepared> for Commit {
+    #[inline]
+    fn from(node: CommitPrepared) -> Commit {
+        Commit::CommitPrepared(node)
+    }
+}
+impl From<CommitTransaction> for Commit {
+    #[inline]
+    fn from(node: CommitTransaction) -> Commit {
+        Commit::CommitTransaction(node)
+    }
+}
 impl AstNode for CompoundOp {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -60228,7 +60439,7 @@ impl AstNode for CreateTableAsQuery {
         let res = match syntax.kind() {
             SyntaxKind::EXECUTE => CreateTableAsQuery::Execute(Execute { syntax }),
             _ => {
-                if let Some(result) = SelectVariant::cast(syntax) {
+                if let Some(result) = SelectVariant::cast(syntax.clone()) {
                     return Some(CreateTableAsQuery::SelectVariant(result));
                 }
                 return None;
@@ -60337,7 +60548,7 @@ impl AstNode for CursorAction {
             SyntaxKind::PRIOR => CursorAction::Prior(Prior { syntax }),
             SyntaxKind::RELATIVE => CursorAction::Relative(Relative { syntax }),
             _ => {
-                if let Some(result) = Expr::cast(syntax) {
+                if let Some(result) = Expr::cast(syntax.clone()) {
                     return Some(CursorAction::Expr(result));
                 }
                 return None;
@@ -60846,7 +61057,7 @@ impl AstNode for ElementTableLabelAndProperties {
                 })
             }
             _ => {
-                if let Some(result) = ElementTableProperties::cast(syntax) {
+                if let Some(result) = ElementTableProperties::cast(syntax.clone()) {
                     return Some(ElementTableLabelAndProperties::ElementTableProperties(
                         result,
                     ));
@@ -62002,7 +62213,7 @@ impl AstNode for FrameExtent {
         let res = match syntax.kind() {
             SyntaxKind::FRAME_BETWEEN => FrameExtent::FrameBetween(FrameBetween { syntax }),
             _ => {
-                if let Some(result) = FrameBound::cast(syntax) {
+                if let Some(result) = FrameBound::cast(syntax.clone()) {
                     return Some(FrameExtent::FrameBound(result));
                 }
                 return None;
@@ -62294,7 +62505,7 @@ impl AstNode for FuncOption {
                 FuncOption::WindowFuncOption(WindowFuncOption { syntax })
             }
             _ => {
-                if let Some(result) = VolatilityFuncOption::cast(syntax) {
+                if let Some(result) = VolatilityFuncOption::cast(syntax.clone()) {
                     return Some(FuncOption::VolatilityFuncOption(result));
                 }
                 return None;
@@ -62805,7 +63016,7 @@ impl AstNode for InsertSource {
         let res = match syntax.kind() {
             SyntaxKind::DEFAULT_VALUES => InsertSource::DefaultValues(DefaultValues { syntax }),
             _ => {
-                if let Some(result) = SelectVariant::cast(syntax) {
+                if let Some(result) = SelectVariant::cast(syntax.clone()) {
                     return Some(InsertSource::SelectVariant(result));
                 }
                 return None;
@@ -63517,7 +63728,7 @@ impl AstNode for LimitValue {
         let res = match syntax.kind() {
             SyntaxKind::ALL => LimitValue::All(All { syntax }),
             _ => {
-                if let Some(result) = Expr::cast(syntax) {
+                if let Some(result) = Expr::cast(syntax.clone()) {
                     return Some(LimitValue::Expr(result));
                 }
                 return None;
@@ -64279,7 +64490,7 @@ impl AstNode for OverlayExpr {
         let res = match syntax.kind() {
             SyntaxKind::NAMED_ARG => OverlayExpr::NamedArg(NamedArg { syntax }),
             _ => {
-                if let Some(result) = Expr::cast(syntax) {
+                if let Some(result) = Expr::cast(syntax.clone()) {
                     return Some(OverlayExpr::Expr(result));
                 }
                 return None;
@@ -66000,6 +66211,61 @@ impl From<RoleOptionValidUntil> for RoleOption {
         RoleOption::RoleOptionValidUntil(node)
     }
 }
+impl AstNode for Rollback {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::ROLLBACK_PREPARED
+                | SyntaxKind::ROLLBACK_TO_SAVEPOINT
+                | SyntaxKind::ROLLBACK_TRANSACTION
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::ROLLBACK_PREPARED => {
+                Rollback::RollbackPrepared(RollbackPrepared { syntax })
+            }
+            SyntaxKind::ROLLBACK_TO_SAVEPOINT => {
+                Rollback::RollbackToSavepoint(RollbackToSavepoint { syntax })
+            }
+            SyntaxKind::ROLLBACK_TRANSACTION => {
+                Rollback::RollbackTransaction(RollbackTransaction { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Rollback::RollbackPrepared(it) => &it.syntax,
+            Rollback::RollbackToSavepoint(it) => &it.syntax,
+            Rollback::RollbackTransaction(it) => &it.syntax,
+        }
+    }
+}
+impl From<RollbackPrepared> for Rollback {
+    #[inline]
+    fn from(node: RollbackPrepared) -> Rollback {
+        Rollback::RollbackPrepared(node)
+    }
+}
+impl From<RollbackToSavepoint> for Rollback {
+    #[inline]
+    fn from(node: RollbackToSavepoint) -> Rollback {
+        Rollback::RollbackToSavepoint(node)
+    }
+}
+impl From<RollbackTransaction> for Rollback {
+    #[inline]
+    fn from(node: RollbackTransaction) -> Rollback {
+        Rollback::RollbackTransaction(node)
+    }
+}
 impl AstNode for RuleAction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -66011,7 +66277,7 @@ impl AstNode for RuleAction {
             SyntaxKind::NOTHING => RuleAction::Nothing(Nothing { syntax }),
             SyntaxKind::RULE_STMT_LIST => RuleAction::RuleStmtList(RuleStmtList { syntax }),
             _ => {
-                if let Some(result) = RuleStmt::cast(syntax) {
+                if let Some(result) = RuleStmt::cast(syntax.clone()) {
                     return Some(RuleAction::RuleStmt(result));
                 }
                 return None;
@@ -66056,7 +66322,7 @@ impl AstNode for RuleStmt {
             SyntaxKind::NOTIFY => RuleStmt::Notify(Notify { syntax }),
             SyntaxKind::UPDATE => RuleStmt::Update(Update { syntax }),
             _ => {
-                if let Some(result) = SelectVariant::cast(syntax) {
+                if let Some(result) = SelectVariant::cast(syntax.clone()) {
                     return Some(RuleStmt::SelectVariant(result));
                 }
                 return None;
@@ -67199,7 +67465,6 @@ impl AstNode for Stmt {
                 | SyntaxKind::CLOSE
                 | SyntaxKind::CLUSTER
                 | SyntaxKind::COMMENT_ON
-                | SyntaxKind::COMMIT
                 | SyntaxKind::COMPOUND_SELECT
                 | SyntaxKind::COPY
                 | SyntaxKind::CREATE_ACCESS_METHOD
@@ -67319,7 +67584,6 @@ impl AstNode for Stmt {
                 | SyntaxKind::RESET_ROLE
                 | SyntaxKind::RESET_SESSION_AUTH
                 | SyntaxKind::REVOKE
-                | SyntaxKind::ROLLBACK
                 | SyntaxKind::SAVEPOINT_CREATE
                 | SyntaxKind::SECURITY_LABEL
                 | SyntaxKind::SELECT
@@ -67336,7 +67600,8 @@ impl AstNode for Stmt {
                 | SyntaxKind::UPDATE
                 | SyntaxKind::VACUUM
                 | SyntaxKind::VALUES
-        )
+        ) || Commit::can_cast(kind)
+            || Rollback::can_cast(kind)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -67415,7 +67680,6 @@ impl AstNode for Stmt {
             SyntaxKind::CLOSE => Stmt::Close(Close { syntax }),
             SyntaxKind::CLUSTER => Stmt::Cluster(Cluster { syntax }),
             SyntaxKind::COMMENT_ON => Stmt::CommentOn(CommentOn { syntax }),
-            SyntaxKind::COMMIT => Stmt::Commit(Commit { syntax }),
             SyntaxKind::COMPOUND_SELECT => Stmt::CompoundSelect(CompoundSelect { syntax }),
             SyntaxKind::COPY => Stmt::Copy(Copy { syntax }),
             SyntaxKind::CREATE_ACCESS_METHOD => {
@@ -67585,7 +67849,6 @@ impl AstNode for Stmt {
             SyntaxKind::RESET_ROLE => Stmt::ResetRole(ResetRole { syntax }),
             SyntaxKind::RESET_SESSION_AUTH => Stmt::ResetSessionAuth(ResetSessionAuth { syntax }),
             SyntaxKind::REVOKE => Stmt::Revoke(Revoke { syntax }),
-            SyntaxKind::ROLLBACK => Stmt::Rollback(Rollback { syntax }),
             SyntaxKind::SAVEPOINT_CREATE => Stmt::SavepointCreate(SavepointCreate { syntax }),
             SyntaxKind::SECURITY_LABEL => Stmt::SecurityLabel(SecurityLabel { syntax }),
             SyntaxKind::SELECT => Stmt::Select(Select { syntax }),
@@ -67603,6 +67866,12 @@ impl AstNode for Stmt {
             SyntaxKind::VACUUM => Stmt::Vacuum(Vacuum { syntax }),
             SyntaxKind::VALUES => Stmt::Values(Values { syntax }),
             _ => {
+                if let Some(result) = Commit::cast(syntax.clone()) {
+                    return Some(Stmt::Commit(result));
+                }
+                if let Some(result) = Rollback::cast(syntax.clone()) {
+                    return Some(Stmt::Rollback(result));
+                }
                 return None;
             }
         };
@@ -67661,7 +67930,6 @@ impl AstNode for Stmt {
             Stmt::Close(it) => &it.syntax,
             Stmt::Cluster(it) => &it.syntax,
             Stmt::CommentOn(it) => &it.syntax,
-            Stmt::Commit(it) => &it.syntax,
             Stmt::CompoundSelect(it) => &it.syntax,
             Stmt::Copy(it) => &it.syntax,
             Stmt::CreateAccessMethod(it) => &it.syntax,
@@ -67781,7 +68049,6 @@ impl AstNode for Stmt {
             Stmt::ResetRole(it) => &it.syntax,
             Stmt::ResetSessionAuth(it) => &it.syntax,
             Stmt::Revoke(it) => &it.syntax,
-            Stmt::Rollback(it) => &it.syntax,
             Stmt::SavepointCreate(it) => &it.syntax,
             Stmt::SecurityLabel(it) => &it.syntax,
             Stmt::Select(it) => &it.syntax,
@@ -67798,6 +68065,8 @@ impl AstNode for Stmt {
             Stmt::Update(it) => &it.syntax,
             Stmt::Vacuum(it) => &it.syntax,
             Stmt::Values(it) => &it.syntax,
+            Stmt::Commit(it) => it.syntax(),
+            Stmt::Rollback(it) => it.syntax(),
         }
     }
 }
@@ -68099,12 +68368,6 @@ impl From<CommentOn> for Stmt {
     #[inline]
     fn from(node: CommentOn) -> Stmt {
         Stmt::CommentOn(node)
-    }
-}
-impl From<Commit> for Stmt {
-    #[inline]
-    fn from(node: Commit) -> Stmt {
-        Stmt::Commit(node)
     }
 }
 impl From<CompoundSelect> for Stmt {
@@ -68821,12 +69084,6 @@ impl From<Revoke> for Stmt {
         Stmt::Revoke(node)
     }
 }
-impl From<Rollback> for Stmt {
-    #[inline]
-    fn from(node: Rollback) -> Stmt {
-        Stmt::Rollback(node)
-    }
-}
 impl From<SavepointCreate> for Stmt {
     #[inline]
     fn from(node: SavepointCreate) -> Stmt {
@@ -69040,7 +69297,7 @@ impl AstNode for TableArg {
             SyntaxKind::COLUMN => TableArg::Column(Column { syntax }),
             SyntaxKind::LIKE_CLAUSE => TableArg::LikeClause(LikeClause { syntax }),
             _ => {
-                if let Some(result) = TableConstraint::cast(syntax) {
+                if let Some(result) = TableConstraint::cast(syntax.clone()) {
                     return Some(TableArg::TableConstraint(result));
                 }
                 return None;
@@ -69794,13 +70051,14 @@ impl AstNode for Type {
             kind,
             SyntaxKind::ARRAY_TYPE
                 | SyntaxKind::BIT_TYPE
-                | SyntaxKind::CHAR_TYPE
+                | SyntaxKind::CHARACTER_TYPE
                 | SyntaxKind::DOUBLE_TYPE
                 | SyntaxKind::EXPR_TYPE
                 | SyntaxKind::INTERVAL_TYPE
                 | SyntaxKind::PATH_TYPE
                 | SyntaxKind::PERCENT_TYPE
                 | SyntaxKind::TIME_TYPE
+                | SyntaxKind::VARCHAR_TYPE
         )
     }
     #[inline]
@@ -69808,13 +70066,14 @@ impl AstNode for Type {
         let res = match syntax.kind() {
             SyntaxKind::ARRAY_TYPE => Type::ArrayType(ArrayType { syntax }),
             SyntaxKind::BIT_TYPE => Type::BitType(BitType { syntax }),
-            SyntaxKind::CHAR_TYPE => Type::CharType(CharType { syntax }),
+            SyntaxKind::CHARACTER_TYPE => Type::CharacterType(CharacterType { syntax }),
             SyntaxKind::DOUBLE_TYPE => Type::DoubleType(DoubleType { syntax }),
             SyntaxKind::EXPR_TYPE => Type::ExprType(ExprType { syntax }),
             SyntaxKind::INTERVAL_TYPE => Type::IntervalType(IntervalType { syntax }),
             SyntaxKind::PATH_TYPE => Type::PathType(PathType { syntax }),
             SyntaxKind::PERCENT_TYPE => Type::PercentType(PercentType { syntax }),
             SyntaxKind::TIME_TYPE => Type::TimeType(TimeType { syntax }),
+            SyntaxKind::VARCHAR_TYPE => Type::VarcharType(VarcharType { syntax }),
             _ => {
                 return None;
             }
@@ -69826,13 +70085,14 @@ impl AstNode for Type {
         match self {
             Type::ArrayType(it) => &it.syntax,
             Type::BitType(it) => &it.syntax,
-            Type::CharType(it) => &it.syntax,
+            Type::CharacterType(it) => &it.syntax,
             Type::DoubleType(it) => &it.syntax,
             Type::ExprType(it) => &it.syntax,
             Type::IntervalType(it) => &it.syntax,
             Type::PathType(it) => &it.syntax,
             Type::PercentType(it) => &it.syntax,
             Type::TimeType(it) => &it.syntax,
+            Type::VarcharType(it) => &it.syntax,
         }
     }
 }
@@ -69848,10 +70108,10 @@ impl From<BitType> for Type {
         Type::BitType(node)
     }
 }
-impl From<CharType> for Type {
+impl From<CharacterType> for Type {
     #[inline]
-    fn from(node: CharType) -> Type {
-        Type::CharType(node)
+    fn from(node: CharacterType) -> Type {
+        Type::CharacterType(node)
     }
 }
 impl From<DoubleType> for Type {
@@ -69888,6 +70148,12 @@ impl From<TimeType> for Type {
     #[inline]
     fn from(node: TimeType) -> Type {
         Type::TimeType(node)
+    }
+}
+impl From<VarcharType> for Type {
+    #[inline]
+    fn from(node: VarcharType) -> Type {
+        Type::VarcharType(node)
     }
 }
 impl AstNode for ValuePosition {

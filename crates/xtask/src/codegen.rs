@@ -931,7 +931,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
                             )*
                             _ => {
                                 #(
-                                    if let Some(result) = #cast_variants::cast(syntax) {
+                                    if let Some(result) = #cast_variants::cast(syntax.clone()) {
                                         return Some(#name::#cast_variants(result));
                                     }
                                 )*
