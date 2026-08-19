@@ -76,7 +76,9 @@ fn tuple_ranges(tuple: &SyntaxNode) -> Option<TupleRanges> {
 mod test {
     use insta::assert_snapshot;
 
-    use crate::code_actions::test_utils::{apply_code_action, code_action_not_applicable};
+    use crate::code_actions::test_utils::{
+        apply_code_action, code_action_not_applicable, code_action_not_applicable_with_errors,
+    };
 
     use super::rewrite_overlaps_as_function_call;
 
@@ -126,7 +128,7 @@ mod test {
 
     #[test]
     fn not_applicable_to_non_pair_tuples() {
-        assert!(code_action_not_applicable(
+        assert!(code_action_not_applicable_with_errors(
             rewrite_overlaps_as_function_call,
             "select (a, b, c) over$0laps (d, e);"
         ));
