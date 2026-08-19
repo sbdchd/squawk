@@ -1,0 +1,2 @@
+SELECT * FROM t WHERE a IN ();
+SELECT * FROM t WHERE a NOT IN ();
