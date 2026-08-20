@@ -404,7 +404,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            BIT_TYPE
+            BIT_VARYING_TYPE
               BIT_KW "bit"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -422,7 +422,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            BIT_TYPE
+            BIT_VARYING_TYPE
               BIT_KW "bit"
               WHITESPACE " "
               VARYING_KW "varying"
@@ -665,7 +665,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
               L_PAREN "("
               LITERAL
@@ -685,7 +685,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
               L_PAREN "("
               LITERAL
@@ -712,7 +712,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
               L_PAREN "("
               LITERAL
@@ -739,7 +739,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -755,7 +755,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
               WHITESPACE " "
               WITH_TIMEZONE
@@ -778,7 +778,7 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
               WHITESPACE " "
               WITHOUT_TIMEZONE
@@ -934,7 +934,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
               WHITESPACE " "
               WITH_TIMEZONE
@@ -958,7 +958,7 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              TIME_TYPE
+              TIMESTAMP_TYPE
                 TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 WITH_TIMEZONE
@@ -992,7 +992,7 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              TIME_TYPE
+              TIMESTAMP_TYPE
                 TIMESTAMP_KW "timestamp"
               WHITESPACE " "
               LITERAL
@@ -1020,7 +1020,7 @@ SOURCE_FILE
           BIN_EXPR
             BIN_EXPR
               CAST_EXPR
-                TIME_TYPE
+                TIMESTAMP_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -1100,7 +1100,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             CAST_EXPR
-              TIME_TYPE
+              TIMESTAMP_TYPE
                 TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 WITH_TIMEZONE
@@ -3107,7 +3107,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
               L_PAREN "("
               LITERAL
@@ -3125,7 +3125,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
             WHITESPACE " "
             LITERAL
@@ -3636,7 +3636,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            BIT_TYPE
+            BIT_VARYING_TYPE
               BIT_KW "bit"
               WHITESPACE " "
               VARYING_KW "varying"

@@ -786,7 +786,10 @@ CharacterType =
   ArgList?
 
 BitType =
-  'setof'? 'bit' 'varying'?  ArgList?
+  'setof'? 'bit' ArgList?
+
+BitVaryingType =
+  'setof'? 'bit' 'varying' ArgList?
 
 DoubleType =
   'setof'? 'double' 'precision'
@@ -797,7 +800,13 @@ Timezone =
 
 TimeType =
   'setof'?
-  ('time' | 'timestamp')
+  'time'
+  ('(' Literal ')')?
+  Timezone?
+
+TimestampType =
+  'setof'?
+  'timestamp'
   ('(' Literal ')')?
   Timezone?
 
@@ -831,8 +840,10 @@ Type =
 | VarcharType
 | CharacterType
 | BitType
+| BitVaryingType
 | DoubleType
 | TimeType
+| TimestampType
 | IntervalType
 
 TypeName =

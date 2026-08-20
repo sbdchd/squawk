@@ -154,7 +154,7 @@ SOURCE_FILE
           BY_KW "by"
           WHITESPACE " "
           PARAM
-            TIME_TYPE
+            TIMESTAMP_TYPE
               TIMESTAMP_KW "timestamp"
           R_PAREN ")"
     WHITESPACE " "

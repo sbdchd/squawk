@@ -3634,7 +3634,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                TIME_TYPE
+                TIMESTAMP_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -3658,7 +3658,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                TIME_TYPE
+                TIMESTAMP_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -3758,7 +3758,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                TIME_TYPE
+                TIMESTAMP_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -3782,7 +3782,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                TIME_TYPE
+                TIMESTAMP_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL

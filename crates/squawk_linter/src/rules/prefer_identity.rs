@@ -39,12 +39,14 @@ fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
         ast::Type::ArrayType(array_type) => return create_identity_fix(&array_type.ty()?),
         ast::Type::PathType(path_type) => path_type.path_ref()?.segment()?,
         ast::Type::BitType(_)
+        | ast::Type::BitVaryingType(_)
         | ast::Type::VarcharType(_)
         | ast::Type::CharacterType(_)
         | ast::Type::DoubleType(_)
         | ast::Type::ExprType(_)
         | ast::Type::PercentType(_)
         | ast::Type::TimeType(_)
+        | ast::Type::TimestampType(_)
         | ast::Type::IntervalType(_) => return None,
     };
     let text = replace_serial(&name.text());
