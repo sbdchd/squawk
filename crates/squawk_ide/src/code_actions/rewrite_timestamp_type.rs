@@ -15,27 +15,21 @@ pub(super) fn rewrite_timestamp_type(
     let token = token_from_offset(db, position)?;
     let ty = token.parent_ancestors().find_map(ast::Type::cast)?;
 
-    let (replacement, range) = match ty {
-        ast::Type::TimeType(time_type) => {
-            let replacement = match time_type.timezone()? {
-                ast::Timezone::WithoutTimezone(_) => "time",
-                ast::Timezone::WithTimezone(_) => "timetz",
-            };
-            (replacement, time_type.syntax().text_range())
-        }
-        ast::Type::TimestampType(timestamp_type) => {
-            let replacement = match timestamp_type.timezone()? {
-                ast::Timezone::WithoutTimezone(_) => "timestamp",
-                ast::Timezone::WithTimezone(_) => "timestamptz",
-            };
-            (replacement, timestamp_type.syntax().text_range())
-        }
+    let replacement = match &ty {
+        ast::Type::TimeType(time_type) => match time_type.timezone()? {
+            ast::Timezone::WithoutTimezone(_) => "time",
+            ast::Timezone::WithTimezone(_) => "timetz",
+        },
+        ast::Type::TimestampType(timestamp_type) => match timestamp_type.timezone()? {
+            ast::Timezone::WithoutTimezone(_) => "timestamp",
+            ast::Timezone::WithTimezone(_) => "timestamptz",
+        },
         _ => return None,
     };
 
     actions.push(CodeAction {
         title: format!("Rewrite as `{replacement}`"),
-        edits: vec![Edit::replace(range, replacement)],
+        edits: vec![Edit::replace(ty.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 
