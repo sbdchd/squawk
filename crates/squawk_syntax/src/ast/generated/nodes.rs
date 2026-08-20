@@ -3031,6 +3031,25 @@ impl BitType {
     pub fn setof_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BitVaryingType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl BitVaryingType {
+    #[inline]
+    pub fn arg_list(&self) -> Option<ArgList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn bit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BIT_KW)
+    }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
     #[inline]
     pub fn varying_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VARYING_KW)
@@ -25284,10 +25303,6 @@ impl TimeType {
     pub fn time_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TIME_KW)
     }
-    #[inline]
-    pub fn timestamp_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TIMESTAMP_KW)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -25302,6 +25317,37 @@ impl TimeZone {
     #[inline]
     pub fn zone_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ZONE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TimestampType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TimestampType {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn timezone(&self) -> Option<Timezone> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
+    #[inline]
+    pub fn timestamp_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TIMESTAMP_KW)
     }
 }
 
@@ -29711,6 +29757,7 @@ pub enum TrimSide {
 pub enum Type {
     ArrayType(ArrayType),
     BitType(BitType),
+    BitVaryingType(BitVaryingType),
     CharacterType(CharacterType),
     DoubleType(DoubleType),
     ExprType(ExprType),
@@ -29718,6 +29765,7 @@ pub enum Type {
     PathType(PathType),
     PercentType(PercentType),
     TimeType(TimeType),
+    TimestampType(TimestampType),
     VarcharType(VarcharType),
 }
 
@@ -32034,6 +32082,24 @@ impl AstNode for BitType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::BIT_TYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for BitVaryingType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::BIT_VARYING_TYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -51686,6 +51752,24 @@ impl AstNode for TimeZone {
         &self.syntax
     }
 }
+impl AstNode for TimestampType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TIMESTAMP_TYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TimingAfter {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -70051,6 +70135,7 @@ impl AstNode for Type {
             kind,
             SyntaxKind::ARRAY_TYPE
                 | SyntaxKind::BIT_TYPE
+                | SyntaxKind::BIT_VARYING_TYPE
                 | SyntaxKind::CHARACTER_TYPE
                 | SyntaxKind::DOUBLE_TYPE
                 | SyntaxKind::EXPR_TYPE
@@ -70058,6 +70143,7 @@ impl AstNode for Type {
                 | SyntaxKind::PATH_TYPE
                 | SyntaxKind::PERCENT_TYPE
                 | SyntaxKind::TIME_TYPE
+                | SyntaxKind::TIMESTAMP_TYPE
                 | SyntaxKind::VARCHAR_TYPE
         )
     }
@@ -70066,6 +70152,7 @@ impl AstNode for Type {
         let res = match syntax.kind() {
             SyntaxKind::ARRAY_TYPE => Type::ArrayType(ArrayType { syntax }),
             SyntaxKind::BIT_TYPE => Type::BitType(BitType { syntax }),
+            SyntaxKind::BIT_VARYING_TYPE => Type::BitVaryingType(BitVaryingType { syntax }),
             SyntaxKind::CHARACTER_TYPE => Type::CharacterType(CharacterType { syntax }),
             SyntaxKind::DOUBLE_TYPE => Type::DoubleType(DoubleType { syntax }),
             SyntaxKind::EXPR_TYPE => Type::ExprType(ExprType { syntax }),
@@ -70073,6 +70160,7 @@ impl AstNode for Type {
             SyntaxKind::PATH_TYPE => Type::PathType(PathType { syntax }),
             SyntaxKind::PERCENT_TYPE => Type::PercentType(PercentType { syntax }),
             SyntaxKind::TIME_TYPE => Type::TimeType(TimeType { syntax }),
+            SyntaxKind::TIMESTAMP_TYPE => Type::TimestampType(TimestampType { syntax }),
             SyntaxKind::VARCHAR_TYPE => Type::VarcharType(VarcharType { syntax }),
             _ => {
                 return None;
@@ -70085,6 +70173,7 @@ impl AstNode for Type {
         match self {
             Type::ArrayType(it) => &it.syntax,
             Type::BitType(it) => &it.syntax,
+            Type::BitVaryingType(it) => &it.syntax,
             Type::CharacterType(it) => &it.syntax,
             Type::DoubleType(it) => &it.syntax,
             Type::ExprType(it) => &it.syntax,
@@ -70092,6 +70181,7 @@ impl AstNode for Type {
             Type::PathType(it) => &it.syntax,
             Type::PercentType(it) => &it.syntax,
             Type::TimeType(it) => &it.syntax,
+            Type::TimestampType(it) => &it.syntax,
             Type::VarcharType(it) => &it.syntax,
         }
     }
@@ -70106,6 +70196,12 @@ impl From<BitType> for Type {
     #[inline]
     fn from(node: BitType) -> Type {
         Type::BitType(node)
+    }
+}
+impl From<BitVaryingType> for Type {
+    #[inline]
+    fn from(node: BitVaryingType) -> Type {
+        Type::BitVaryingType(node)
     }
 }
 impl From<CharacterType> for Type {
@@ -70148,6 +70244,12 @@ impl From<TimeType> for Type {
     #[inline]
     fn from(node: TimeType) -> Type {
         Type::TimeType(node)
+    }
+}
+impl From<TimestampType> for Type {
+    #[inline]
+    fn from(node: TimestampType) -> Type {
+        Type::TimestampType(node)
     }
 }
 impl From<VarcharType> for Type {

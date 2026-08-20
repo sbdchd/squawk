@@ -4949,7 +4949,7 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              TIME_TYPE
+              TIMESTAMP_TYPE
                 TIMESTAMP_KW "timestamp"
     SEMICOLON ";"
   WHITESPACE "\n\n"

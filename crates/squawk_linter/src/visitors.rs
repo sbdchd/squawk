@@ -28,9 +28,9 @@ pub(crate) fn is_not_valid_int_type(
             invalid_type_names.contains(ty_name.as_str())
         }
         ast::Type::VarcharType(_) | ast::Type::CharacterType(_) => false,
-        ast::Type::BitType(_) => false,
+        ast::Type::BitType(_) | ast::Type::BitVaryingType(_) => false,
         ast::Type::DoubleType(_) => false,
-        ast::Type::TimeType(_) => false,
+        ast::Type::TimeType(_) | ast::Type::TimestampType(_) => false,
         ast::Type::IntervalType(_) => false,
         ast::Type::ExprType(_) => false,
     }

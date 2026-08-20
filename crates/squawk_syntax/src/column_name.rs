@@ -112,14 +112,15 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
             }
         }
         ast::Type::BitType(bit_type) => {
-            let name = if bit_type.varying_token().is_some() {
-                "varbit"
-            } else {
-                "bit"
-            };
             return Some((
-                ColumnName::new_static(name, unknown_column),
+                ColumnName::new_static("bit", unknown_column),
                 bit_type.syntax().clone(),
+            ));
+        }
+        ast::Type::BitVaryingType(bit_varying_type) => {
+            return Some((
+                ColumnName::new_static("varbit", unknown_column),
+                bit_varying_type.syntax().clone(),
             ));
         }
         ast::Type::VarcharType(varchar_type) => {
@@ -147,15 +148,28 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
             ));
         }
         ast::Type::TimeType(time_type) => {
-            let name = match (time_type.timestamp_token().is_some(), time_type.timezone()) {
-                (true, Some(ast::Timezone::WithTimezone(_))) => "timestamptz",
-                (true, _) => "timestamp",
-                (false, Some(ast::Timezone::WithTimezone(_))) => "timetz",
-                (false, _) => "time",
+            let name = if matches!(time_type.timezone(), Some(ast::Timezone::WithTimezone(_))) {
+                "timetz"
+            } else {
+                "time"
             };
             return Some((
                 ColumnName::new_static(name, unknown_column),
                 time_type.syntax().clone(),
+            ));
+        }
+        ast::Type::TimestampType(timestamp_type) => {
+            let name = if matches!(
+                timestamp_type.timezone(),
+                Some(ast::Timezone::WithTimezone(_))
+            ) {
+                "timestamptz"
+            } else {
+                "timestamp"
+            };
+            return Some((
+                ColumnName::new_static(name, unknown_column),
+                timestamp_type.syntax().clone(),
             ));
         }
         ast::Type::ArrayType(array_type) => {

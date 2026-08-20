@@ -144,7 +144,7 @@ SOURCE_FILE@0..389
           PARAM_NAME@248..249
             IDENT@248..249 "a"
           WHITESPACE@249..250 " "
-          TIME_TYPE@250..259
+          TIMESTAMP_TYPE@250..259
             TIMESTAMP_KW@250..259 "timestamp"
         COMMA@259..260 ","
         WHITESPACE@260..265 "\n    "
@@ -200,7 +200,7 @@ SOURCE_FILE@0..389
           PARAM_NAME@344..345
             IDENT@344..345 "a"
           WHITESPACE@345..346 " "
-          TIME_TYPE@346..355
+          TIMESTAMP_TYPE@346..355
             TIMESTAMP_KW@346..355 "timestamp"
         COMMA@355..356 ","
         WHITESPACE@356..361 "\n    "

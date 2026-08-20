@@ -753,7 +753,7 @@ SOURCE_FILE
         PARAM_NAME
           IDENT "value2"
         WHITESPACE " "
-        TIME_TYPE
+        TIMESTAMP_TYPE
           TIMESTAMP_KW "timestamp"
       WHITESPACE " "
       ORDER_KW "ORDER"

@@ -2264,8 +2264,11 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
     let wrapper_type = match p.current() {
         BIT_KW => {
             p.bump(BIT_KW);
-            p.eat(VARYING_KW);
-            BIT_TYPE
+            if p.eat(VARYING_KW) {
+                BIT_VARYING_TYPE
+            } else {
+                BIT_TYPE
+            }
         }
         NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
             p.bump(NATIONAL_KW);
@@ -2273,13 +2276,18 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
         }
         CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => char_type(p),
         TIMESTAMP_KW | TIME_KW => {
-            p.bump_any();
+            let kind = if p.eat(TIMESTAMP_KW) {
+                TIMESTAMP_TYPE
+            } else {
+                p.bump(TIME_KW);
+                TIME_TYPE
+            };
             if p.eat(L_PAREN) {
                 expr(p);
                 p.expect(R_PAREN);
             }
             opt_with_timezone(p);
-            TIME_TYPE
+            kind
         }
         INTERVAL_KW => {
             p.bump(INTERVAL_KW);
@@ -2476,7 +2484,12 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     let kind = match p.current() {
         TIMESTAMP_KW | TIME_KW => {
-            p.bump_any();
+            let kind = if p.eat(TIMESTAMP_KW) {
+                TIMESTAMP_TYPE
+            } else {
+                p.bump(TIME_KW);
+                TIME_TYPE
+            };
             if p.eat(L_PAREN) {
                 if opt_numeric_literal(p).is_none() {
                     p.error("expected numeric literal");
@@ -2484,12 +2497,15 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 p.expect(R_PAREN);
             }
             opt_with_timezone(p);
-            TIME_TYPE
+            kind
         }
         BIT_KW => {
             p.bump(BIT_KW);
-            p.eat(VARYING_KW);
-            BIT_TYPE
+            if p.eat(VARYING_KW) {
+                BIT_VARYING_TYPE
+            } else {
+                BIT_TYPE
+            }
         }
         NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
             p.bump(NATIONAL_KW);
