@@ -2149,16 +2149,25 @@ fn opt_percent_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn opt_array_index(p: &mut Parser<'_>) -> bool {
-    if p.eat(L_BRACK) {
-        if !p.at(R_BRACK) {
-            let _ = expr(p);
-        }
-        p.expect(R_BRACK);
-        true
-    } else {
-        false
+fn opt_array_bound(p: &mut Parser<'_>) -> bool {
+    if !p.at(L_BRACK) {
+        return false;
     }
+    let m = p.start();
+    p.bump(L_BRACK);
+    if !p.at(R_BRACK) {
+        let _ = expr(p);
+    }
+    p.expect(R_BRACK);
+    m.complete(p, ARRAY_BOUND);
+    true
+}
+
+fn allows_type_mods(kind: SyntaxKind) -> bool {
+    matches!(
+        kind,
+        PATH_TYPE | BIT_TYPE | BIT_VARYING_TYPE | CHARACTER_TYPE | VARCHAR_TYPE
+    )
 }
 
 fn type_mods(
@@ -2170,7 +2179,7 @@ fn type_mods(
     if opt_percent_type(p).is_some() {
         return Some(m.complete(p, PERCENT_TYPE));
     }
-    if p.at(L_PAREN) && type_args_enabled {
+    if p.at(L_PAREN) && type_args_enabled && allows_type_mods(kind) {
         let m = p.start();
         delimited(
             p,
@@ -2188,13 +2197,12 @@ fn type_mods(
         return Some(cm);
     }
     let m = cm.precede(p);
-    // TODO: we should probably mimic the INDEX_EXPR but be stricter
     if p.eat(ARRAY_KW) {
-        opt_array_index(p);
+        opt_array_bound(p);
     } else {
         let mut found_one_array_bracks = false;
         while !p.at(EOF) && p.at(L_BRACK) {
-            if opt_array_index(p) {
+            if opt_array_bound(p) {
                 found_one_array_bracks = true;
             }
         }
@@ -2422,49 +2430,75 @@ fn interval_second(p: &mut Parser<'_>) {
 }
 
 fn opt_interval_trailing(p: &mut Parser<'_>) {
-    match (p.current(), p.nth(1)) {
+    let m = p.start();
+    let kind = match (p.current(), p.nth(1)) {
         (DAY_KW, TO_KW) => {
             p.bump(DAY_KW);
             p.bump(TO_KW);
             match p.current() {
                 HOUR_KW => {
                     p.bump(HOUR_KW);
+                    INTERVAL_HOUR
                 }
                 MINUTE_KW => {
                     p.bump(MINUTE_KW);
+                    INTERVAL_MINUTE
                 }
                 SECOND_KW => {
                     interval_second(p);
+                    INTERVAL_SECOND
                 }
-                _ => p.error("expected HOUR, MINUTE, or SECOND"),
+                _ => {
+                    p.error("expected HOUR, MINUTE, or SECOND");
+                    INTERVAL_DAY
+                }
             }
         }
-        (DAY_KW, _) => p.bump(DAY_KW),
+        (DAY_KW, _) => {
+            p.bump(DAY_KW);
+            INTERVAL_DAY
+        }
         (HOUR_KW, TO_KW) => {
             p.bump(HOUR_KW);
             p.bump(TO_KW);
-            if !p.eat(MINUTE_KW) {
+            if p.eat(MINUTE_KW) {
+                INTERVAL_MINUTE
+            } else {
                 interval_second(p);
+                INTERVAL_SECOND
             }
         }
-        (HOUR_KW, _) => p.bump(HOUR_KW),
+        (HOUR_KW, _) => {
+            p.bump(HOUR_KW);
+            INTERVAL_HOUR
+        }
         (MINUTE_KW, TO_KW) => {
             p.bump(MINUTE_KW);
             p.bump(TO_KW);
             interval_second(p);
+            INTERVAL_SECOND
         }
-        (MINUTE_KW, _) => p.bump(MINUTE_KW),
-        (MONTH_KW, _) => p.bump(MONTH_KW),
+        (MINUTE_KW, _) => {
+            p.bump(MINUTE_KW);
+            INTERVAL_MINUTE
+        }
+        (MONTH_KW, _) => {
+            p.bump(MONTH_KW);
+            INTERVAL_MONTH
+        }
         (YEAR_KW, TO_KW) => {
             p.bump(YEAR_KW);
             p.bump(TO_KW);
             p.expect(MONTH_KW);
+            INTERVAL_MONTH
         }
         (YEAR_KW, _) => {
             p.bump(YEAR_KW);
+            INTERVAL_YEAR
         }
         (SECOND_KW, _) => {
             interval_second(p);
+            INTERVAL_SECOND
         }
         (L_PAREN, _) => {
             p.bump(L_PAREN);
@@ -2472,9 +2506,14 @@ fn opt_interval_trailing(p: &mut Parser<'_>) {
                 p.error("expected number")
             }
             p.expect(R_PAREN);
+            INTERVAL_SECOND
         }
-        _ => (),
-    }
+        _ => {
+            m.abandon(p);
+            return;
+        }
+    };
+    m.complete(p, kind);
 }
 
 fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {

@@ -2750,8 +2750,9 @@ SOURCE_FILE
             PATH_REF
               PATH_SEGMENT_REF
                 INTEGER_KW "integer"
-          L_BRACK "["
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -2763,10 +2764,12 @@ SOURCE_FILE
             PATH_REF
               PATH_SEGMENT_REF
                 TEXT_KW "text"
-          L_BRACK "["
-          R_BRACK "]"
-          L_BRACK "["
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -2795,14 +2798,16 @@ SOURCE_FILE
             PATH_REF
               PATH_SEGMENT_REF
                 INTEGER_KW "integer"
-          L_BRACK "["
-          LITERAL
-            INT_NUMBER "3"
-          R_BRACK "]"
-          L_BRACK "["
-          LITERAL
-            INT_NUMBER "3"
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "3"
+            R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "3"
+            R_BRACK "]"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -2833,10 +2838,11 @@ SOURCE_FILE
                 INTEGER_KW "integer"
           WHITESPACE " "
           ARRAY_KW "ARRAY"
-          L_BRACK "["
-          LITERAL
-            INT_NUMBER "4"
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "4"
+            R_BRACK "]"
       COMMA ","
       WHITESPACE "\n    "
       COLUMN

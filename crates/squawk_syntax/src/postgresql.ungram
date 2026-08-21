@@ -536,7 +536,7 @@ ExistsFn =
 CastExpr =
   ('cast' | 'treat') '(' Expr 'as' Type ')'
 | Expr ColonColon Type
-| Type Literal
+| Type Literal IntervalQualifier?
 
 ArrayExpr =
   'array' '[' (Expr (',' Expr)*) ']'
@@ -763,7 +763,10 @@ ArrayType =
   // int array[]
   // text[]
   // t[10][10]
-  Type 'array'? '[' Expr? ']'
+  Type 'array'? ArrayBound ArrayBound*
+
+ArrayBound =
+  '[' Expr? ']'
 
 PercentType =
   'setof'? PathRef PercentTypeClause
@@ -813,23 +816,37 @@ TimestampType =
 IntervalType =
   'setof'?
   'interval'
-  (
-    'year'
-  | 'month'
-  | 'day'
-  | 'hour'
-  | 'minute'
-  | 'second'
-  | 'year' 'to' 'month'
-  | 'day' 'to' 'hour'
-  | 'day' 'to' 'minute'
-  | 'day' 'to' 'second'
-  | 'hour' 'to' 'minute'
-  | 'hour' 'to' 'second'
-  | 'minute' 'to' 'second'
-  )?
-  ('(' Literal ')')?
+  IntervalQualifier?
 
+IntervalQualifier =
+  IntervalYear
+| IntervalMonth
+| IntervalDay
+| IntervalHour
+| IntervalMinute
+| IntervalSecond
+
+IntervalYear =
+  'year'
+
+IntervalMonth =
+  'month'
+| 'year' 'to' 'month'
+
+IntervalDay =
+  'day'
+
+IntervalHour =
+  'hour'
+| 'day' 'to' 'hour'
+
+IntervalMinute =
+  'minute'
+| ('day' | 'hour') 'to' 'minute'
+
+IntervalSecond =
+  '(' Literal ')'
+| (('day' | 'hour' | 'minute') 'to')? 'second' ('(' Literal ')')?
 
 Type =
   ArrayType

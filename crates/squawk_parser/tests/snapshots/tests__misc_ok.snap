@@ -107,8 +107,9 @@ SOURCE_FILE
                       PATH_REF
                         PATH_SEGMENT_REF
                           IDENT "timestamptz"
-                    L_BRACK "["
-                    R_BRACK "]"
+                    ARRAY_BOUND
+                      L_BRACK "["
+                      R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
               ARG
@@ -123,8 +124,9 @@ SOURCE_FILE
                       PATH_REF
                         PATH_SEGMENT_REF
                           TEXT_KW "text"
-                    L_BRACK "["
-                    R_BRACK "]"
+                    ARRAY_BOUND
+                      L_BRACK "["
+                      R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
               ARG
@@ -139,8 +141,9 @@ SOURCE_FILE
                       PATH_REF
                         PATH_SEGMENT_REF
                           IDENT "float8"
-                    L_BRACK "["
-                    R_BRACK "]"
+                    ARRAY_BOUND
+                      L_BRACK "["
+                      R_BRACK "]"
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
@@ -838,8 +841,9 @@ SOURCE_FILE
             PATH_REF
               PATH_SEGMENT_REF
                 IDENT "int8"
-          L_BRACK "["
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -877,8 +881,9 @@ SOURCE_FILE
           PATH_REF
             PATH_SEGMENT_REF
               IDENT "int8"
-        L_BRACK "["
-        R_BRACK "]"
+        ARRAY_BOUND
+          L_BRACK "["
+          R_BRACK "]"
     WHITESPACE " "
     FUNC_OPTION_LIST
       LANGUAGE_FUNC_OPTION
@@ -979,8 +984,9 @@ SOURCE_FILE
               PATH_REF
                 PATH_SEGMENT_REF
                   IDENT "int8"
-            L_BRACK "["
-            R_BRACK "]"
+            ARRAY_BOUND
+              L_BRACK "["
+              R_BRACK "]"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1231,8 +1237,9 @@ SOURCE_FILE
             PATH_REF
               PATH_SEGMENT_REF
                 IDENT "int8"
-          L_BRACK "["
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -1247,8 +1254,9 @@ SOURCE_FILE
             PATH_REF
               PATH_SEGMENT_REF
                 IDENT "int8"
-          L_BRACK "["
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
       WHITESPACE " "
       R_PAREN ")"
     WHITESPACE " "
@@ -1260,8 +1268,9 @@ SOURCE_FILE
           PATH_REF
             PATH_SEGMENT_REF
               IDENT "int8"
-        L_BRACK "["
-        R_BRACK "]"
+        ARRAY_BOUND
+          L_BRACK "["
+          R_BRACK "]"
     WHITESPACE " "
     FUNC_OPTION_LIST
       AS_FUNC_OPTION

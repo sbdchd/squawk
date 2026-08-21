@@ -5829,13 +5829,13 @@ select 1::smallint$0;
     fn goto_cast_double_precision_falls_back_to_float8() {
         assert_snapshot!(goto("
 create type pg_catalog.float8;
-select '1'::double precision[]$0;
+select '1'::double precision[$0];
 "), @r"
           ╭▸ 
         2 │ create type pg_catalog.float8;
           │                        ────── 2. destination
         3 │ select '1'::double precision[];
-          ╰╴                             ─ 1. source
+          ╰╴                            ─ 1. source
         ");
     }
 

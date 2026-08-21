@@ -2501,6 +2501,25 @@ impl ArgList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ArrayBound {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ArrayBound {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2541,20 +2560,16 @@ pub struct ArrayType {
 }
 impl ArrayType {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn array_bound(&self) -> Option<ArrayBound> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_BRACK)
-    }
-    #[inline]
-    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_BRACK)
     }
     #[inline]
     pub fn array_token(&self) -> Option<SyntaxToken> {
@@ -3335,6 +3350,10 @@ impl CastExpr {
     }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn interval_qualifier(&self) -> Option<IntervalQualifier> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12955,10 +12974,82 @@ impl Intersect {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IntervalType {
+pub struct IntervalDay {
     pub(crate) syntax: SyntaxNode,
 }
-impl IntervalType {
+impl IntervalDay {
+    #[inline]
+    pub fn day_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DAY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IntervalHour {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IntervalHour {
+    #[inline]
+    pub fn day_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DAY_KW)
+    }
+    #[inline]
+    pub fn hour_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::HOUR_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IntervalMinute {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IntervalMinute {
+    #[inline]
+    pub fn day_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DAY_KW)
+    }
+    #[inline]
+    pub fn hour_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::HOUR_KW)
+    }
+    #[inline]
+    pub fn minute_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MINUTE_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IntervalMonth {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IntervalMonth {
+    #[inline]
+    pub fn month_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MONTH_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn year_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::YEAR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IntervalSecond {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IntervalSecond {
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
@@ -12980,29 +13071,43 @@ impl IntervalType {
         support::token(&self.syntax, SyntaxKind::HOUR_KW)
     }
     #[inline]
-    pub fn interval_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INTERVAL_KW)
-    }
-    #[inline]
     pub fn minute_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MINUTE_KW)
-    }
-    #[inline]
-    pub fn month_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::MONTH_KW)
     }
     #[inline]
     pub fn second_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SECOND_KW)
     }
     #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
-    }
-    #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IntervalType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IntervalType {
+    #[inline]
+    pub fn interval_qualifier(&self) -> Option<IntervalQualifier> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn interval_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INTERVAL_KW)
+    }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IntervalYear {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IntervalYear {
     #[inline]
     pub fn year_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::YEAR_KW)
@@ -28876,6 +28981,16 @@ pub enum InsertSource {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum IntervalQualifier {
+    IntervalDay(IntervalDay),
+    IntervalHour(IntervalHour),
+    IntervalMinute(IntervalMinute),
+    IntervalMonth(IntervalMonth),
+    IntervalSecond(IntervalSecond),
+    IntervalYear(IntervalYear),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoinCondition {
     JoinUsingClause(JoinUsingClause),
     OnClause(OnClause),
@@ -31542,6 +31657,24 @@ impl AstNode for ArgList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ARG_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ArrayBound {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ARRAY_BOUND
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -39782,10 +39915,118 @@ impl AstNode for Intersect {
         &self.syntax
     }
 }
+impl AstNode for IntervalDay {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INTERVAL_DAY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IntervalHour {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INTERVAL_HOUR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IntervalMinute {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INTERVAL_MINUTE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IntervalMonth {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INTERVAL_MONTH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IntervalSecond {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INTERVAL_SECOND
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for IntervalType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::INTERVAL_TYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IntervalYear {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INTERVAL_YEAR
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -63120,6 +63361,88 @@ impl From<DefaultValues> for InsertSource {
     #[inline]
     fn from(node: DefaultValues) -> InsertSource {
         InsertSource::DefaultValues(node)
+    }
+}
+impl AstNode for IntervalQualifier {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::INTERVAL_DAY
+                | SyntaxKind::INTERVAL_HOUR
+                | SyntaxKind::INTERVAL_MINUTE
+                | SyntaxKind::INTERVAL_MONTH
+                | SyntaxKind::INTERVAL_SECOND
+                | SyntaxKind::INTERVAL_YEAR
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::INTERVAL_DAY => IntervalQualifier::IntervalDay(IntervalDay { syntax }),
+            SyntaxKind::INTERVAL_HOUR => IntervalQualifier::IntervalHour(IntervalHour { syntax }),
+            SyntaxKind::INTERVAL_MINUTE => {
+                IntervalQualifier::IntervalMinute(IntervalMinute { syntax })
+            }
+            SyntaxKind::INTERVAL_MONTH => {
+                IntervalQualifier::IntervalMonth(IntervalMonth { syntax })
+            }
+            SyntaxKind::INTERVAL_SECOND => {
+                IntervalQualifier::IntervalSecond(IntervalSecond { syntax })
+            }
+            SyntaxKind::INTERVAL_YEAR => IntervalQualifier::IntervalYear(IntervalYear { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            IntervalQualifier::IntervalDay(it) => &it.syntax,
+            IntervalQualifier::IntervalHour(it) => &it.syntax,
+            IntervalQualifier::IntervalMinute(it) => &it.syntax,
+            IntervalQualifier::IntervalMonth(it) => &it.syntax,
+            IntervalQualifier::IntervalSecond(it) => &it.syntax,
+            IntervalQualifier::IntervalYear(it) => &it.syntax,
+        }
+    }
+}
+impl From<IntervalDay> for IntervalQualifier {
+    #[inline]
+    fn from(node: IntervalDay) -> IntervalQualifier {
+        IntervalQualifier::IntervalDay(node)
+    }
+}
+impl From<IntervalHour> for IntervalQualifier {
+    #[inline]
+    fn from(node: IntervalHour) -> IntervalQualifier {
+        IntervalQualifier::IntervalHour(node)
+    }
+}
+impl From<IntervalMinute> for IntervalQualifier {
+    #[inline]
+    fn from(node: IntervalMinute) -> IntervalQualifier {
+        IntervalQualifier::IntervalMinute(node)
+    }
+}
+impl From<IntervalMonth> for IntervalQualifier {
+    #[inline]
+    fn from(node: IntervalMonth) -> IntervalQualifier {
+        IntervalQualifier::IntervalMonth(node)
+    }
+}
+impl From<IntervalSecond> for IntervalQualifier {
+    #[inline]
+    fn from(node: IntervalSecond) -> IntervalQualifier {
+        IntervalQualifier::IntervalSecond(node)
+    }
+}
+impl From<IntervalYear> for IntervalQualifier {
+    #[inline]
+    fn from(node: IntervalYear) -> IntervalQualifier {
+        IntervalQualifier::IntervalYear(node)
     }
 }
 impl AstNode for JoinCondition {

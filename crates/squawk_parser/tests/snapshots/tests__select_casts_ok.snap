@@ -183,8 +183,9 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "1"
                   R_PAREN ")"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -204,8 +205,9 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     INT_KW "int"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -243,8 +245,9 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     NUMERIC_KW "numeric"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -268,8 +271,9 @@ SOURCE_FILE
                     PATH_REF
                       PATH_SEGMENT_REF
                         INT_KW "int"
-                  L_BRACK "["
-                  R_BRACK "]"
+                  ARRAY_BOUND
+                    L_BRACK "["
+                    R_BRACK "]"
               WHITESPACE " "
               COLON_COLON
                 COLON ":"
@@ -280,8 +284,9 @@ SOURCE_FILE
                   PATH_REF
                     PATH_SEGMENT_REF
                       IDENT "int8"
-                L_BRACK "["
-                R_BRACK "]"
+                ARRAY_BOUND
+                  L_BRACK "["
+                  R_BRACK "]"
             WHITESPACE " "
             COLON_COLON
               COLON ":"
@@ -292,10 +297,11 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     NUMERIC_KW "numeric"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "1"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "1"
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -317,8 +323,9 @@ SOURCE_FILE
                     PATH_REF
                       PATH_SEGMENT_REF
                         INT_KW "int"
-                  L_BRACK "["
-                  R_BRACK "]"
+                  ARRAY_BOUND
+                    L_BRACK "["
+                    R_BRACK "]"
               COLON_COLON
                 COLON ":"
                 COLON ":"
@@ -327,8 +334,9 @@ SOURCE_FILE
                   PATH_REF
                     PATH_SEGMENT_REF
                       IDENT "int8"
-                L_BRACK "["
-                R_BRACK "]"
+                ARRAY_BOUND
+                  L_BRACK "["
+                  R_BRACK "]"
             COLON_COLON
               COLON ":"
               COLON ":"
@@ -337,10 +345,11 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     NUMERIC_KW "numeric"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "1"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "1"
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- setof"
@@ -647,8 +656,9 @@ SOURCE_FILE
                 NCHAR_KW "nchar"
                 WHITESPACE " "
                 VARYING_KW "varying"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ConstDatetime"
@@ -1152,7 +1162,8 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              YEAR_KW "year"
+              INTERVAL_YEAR
+                YEAR_KW "year"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1170,7 +1181,8 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              MONTH_KW "month"
+              INTERVAL_MONTH
+                MONTH_KW "month"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1187,46 +1199,11 @@ SOURCE_FILE
               COLON ":"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
-              L_PAREN "("
-              LITERAL
-                INT_NUMBER "0"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            LITERAL
-              STRING "'10 days'"
-            COLON_COLON
-              COLON ":"
-              COLON ":"
-            INTERVAL_TYPE
-              INTERVAL_KW "interval"
-              WHITESPACE " "
-              DAY_KW "day"
-    SEMICOLON ";"
-  WHITESPACE "\n\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            LITERAL
-              STRING "'10 days'"
-            COLON_COLON
-              COLON ":"
-              COLON ":"
-            INTERVAL_TYPE
-              INTERVAL_KW "interval"
-              WHITESPACE " "
-              HOUR_KW "hour"
+              INTERVAL_SECOND
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1244,7 +1221,8 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              MINUTE_KW "minute"
+              INTERVAL_DAY
+                DAY_KW "day"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1262,7 +1240,46 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              SECOND_KW "second"
+              INTERVAL_HOUR
+                HOUR_KW "hour"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'10 days'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              INTERVAL_MINUTE
+                MINUTE_KW "minute"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'10 days'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              INTERVAL_SECOND
+                SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1280,11 +1297,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              SECOND_KW "second"
-              L_PAREN "("
-              LITERAL
-                INT_NUMBER "100"
-              R_PAREN ")"
+              INTERVAL_SECOND
+                SECOND_KW "second"
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "100"
+                R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1302,11 +1320,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              YEAR_KW "year"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              MONTH_KW "month"
+              INTERVAL_MONTH
+                YEAR_KW "year"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                MONTH_KW "month"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1324,11 +1343,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              DAY_KW "day"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              HOUR_KW "hour"
+              INTERVAL_HOUR
+                DAY_KW "day"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                HOUR_KW "hour"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1346,11 +1366,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              DAY_KW "day"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              MINUTE_KW "minute"
+              INTERVAL_MINUTE
+                DAY_KW "day"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                MINUTE_KW "minute"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1368,11 +1389,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              DAY_KW "day"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              SECOND_KW "second"
+              INTERVAL_SECOND
+                DAY_KW "day"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1390,15 +1412,16 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              DAY_KW "day"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              SECOND_KW "second"
-              L_PAREN "("
-              LITERAL
-                INT_NUMBER "10"
-              R_PAREN ")"
+              INTERVAL_SECOND
+                DAY_KW "day"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                SECOND_KW "second"
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1416,11 +1439,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              HOUR_KW "hour"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              MINUTE_KW "minute"
+              INTERVAL_MINUTE
+                HOUR_KW "hour"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                MINUTE_KW "minute"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1438,11 +1462,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              HOUR_KW "hour"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              SECOND_KW "second"
+              INTERVAL_SECOND
+                HOUR_KW "hour"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1460,15 +1485,16 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              HOUR_KW "hour"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              SECOND_KW "second"
-              L_PAREN "("
-              LITERAL
-                INT_NUMBER "10"
-              R_PAREN ")"
+              INTERVAL_SECOND
+                HOUR_KW "hour"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                SECOND_KW "second"
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1486,11 +1512,12 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              MINUTE_KW "minute"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              SECOND_KW "second"
+              INTERVAL_SECOND
+                MINUTE_KW "minute"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1508,15 +1535,16 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
-              MINUTE_KW "minute"
-              WHITESPACE " "
-              TO_KW "to"
-              WHITESPACE " "
-              SECOND_KW "second"
-              L_PAREN "("
-              LITERAL
-                INT_NUMBER "10"
-              R_PAREN ")"
+              INTERVAL_SECOND
+                MINUTE_KW "minute"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                SECOND_KW "second"
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1533,10 +1561,11 @@ SOURCE_FILE
               COLON ":"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
-              L_PAREN "("
-              LITERAL
-                INT_NUMBER "10"
-              R_PAREN ")"
+              INTERVAL_SECOND
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- JsonType"
@@ -1711,8 +1740,9 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "255"
                   R_PAREN ")"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1730,10 +1760,11 @@ SOURCE_FILE
             ARRAY_TYPE
               VARCHAR_TYPE
                 VARCHAR_KW "varchar"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "5"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "5"
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1759,8 +1790,9 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "255"
                   R_PAREN ")"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1816,10 +1848,11 @@ SOURCE_FILE
                   DOT "."
                   PATH_SEGMENT_REF
                     IDENT "buzz"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "5"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "5"
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1853,8 +1886,9 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "255"
                   R_PAREN ")"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Numeric"
@@ -2187,10 +2221,11 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "2"
                   R_PAREN ")"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "10"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "10"
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- interval_cast_trailing"
@@ -2208,7 +2243,8 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            YEAR_KW "year"
+            INTERVAL_YEAR
+              YEAR_KW "year"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2224,7 +2260,8 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            MONTH_KW "month"
+            INTERVAL_MONTH
+              MONTH_KW "month"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2240,7 +2277,8 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            DAY_KW "day"
+            INTERVAL_DAY
+              DAY_KW "day"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2256,7 +2294,8 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            HOUR_KW "hour"
+            INTERVAL_HOUR
+              HOUR_KW "hour"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2272,7 +2311,8 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            MINUTE_KW "minute"
+            INTERVAL_MINUTE
+              MINUTE_KW "minute"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2288,7 +2328,8 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            SECOND_KW "second"
+            INTERVAL_SECOND
+              SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2304,11 +2345,12 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            YEAR_KW "year"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            MONTH_KW "month"
+            INTERVAL_MONTH
+              YEAR_KW "year"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              MONTH_KW "month"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2324,11 +2366,12 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            DAY_KW "day"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            HOUR_KW "hour"
+            INTERVAL_HOUR
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              HOUR_KW "hour"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2344,11 +2387,12 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            DAY_KW "day"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            MINUTE_KW "minute"
+            INTERVAL_MINUTE
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              MINUTE_KW "minute"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2364,11 +2408,12 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            DAY_KW "day"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            SECOND_KW "second"
+            INTERVAL_SECOND
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2384,15 +2429,16 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            DAY_KW "day"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            SECOND_KW "second"
-            L_PAREN "("
-            LITERAL
-              INT_NUMBER "10"
-            R_PAREN ")"
+            INTERVAL_SECOND
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2408,11 +2454,12 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            HOUR_KW "hour"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            MINUTE_KW "minute"
+            INTERVAL_MINUTE
+              HOUR_KW "hour"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              MINUTE_KW "minute"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2428,11 +2475,12 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            HOUR_KW "hour"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            SECOND_KW "second"
+            INTERVAL_SECOND
+              HOUR_KW "hour"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2448,15 +2496,16 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            HOUR_KW "hour"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            SECOND_KW "second"
-            L_PAREN "("
-            LITERAL
-              INT_NUMBER "10"
-            R_PAREN ")"
+            INTERVAL_SECOND
+              HOUR_KW "hour"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2472,11 +2521,12 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            MINUTE_KW "minute"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            SECOND_KW "second"
+            INTERVAL_SECOND
+              MINUTE_KW "minute"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2492,15 +2542,16 @@ SOURCE_FILE
             LITERAL
               STRING "'1'"
             WHITESPACE " "
-            MINUTE_KW "minute"
-            WHITESPACE " "
-            TO_KW "to"
-            WHITESPACE " "
-            SECOND_KW "second"
-            L_PAREN "("
-            LITERAL
-              INT_NUMBER "10"
-            R_PAREN ")"
+            INTERVAL_SECOND
+              MINUTE_KW "minute"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pgdoc_char"
@@ -2641,10 +2692,11 @@ SOURCE_FILE
                     INTEGER_KW "integer"
               WHITESPACE " "
               ARRAY_KW "ARRAY"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "4"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "4"
+                R_BRACK "]"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2691,10 +2743,11 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     INT_KW "int"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "4"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "4"
+                R_BRACK "]"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2717,14 +2770,16 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     INTEGER_KW "integer"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "3"
-              R_BRACK "]"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "3"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "3"
+                R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "3"
+                R_BRACK "]"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2745,26 +2800,32 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     INTEGER_KW "integer"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "1"
-              R_BRACK "]"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "2"
-              R_BRACK "]"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "3"
-              R_BRACK "]"
-              L_BRACK "["
-              R_BRACK "]"
-              L_BRACK "["
-              R_BRACK "]"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "1000"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "1"
+                R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "2"
+                R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "3"
+                R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "1000"
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2786,10 +2847,11 @@ SOURCE_FILE
                     INT_KW "int"
               WHITESPACE " "
               ARRAY_KW "array"
-              L_BRACK "["
-              LITERAL
-                INT_NUMBER "10"
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "10"
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2811,8 +2873,9 @@ SOURCE_FILE
                 PATH_REF
                   PATH_SEGMENT_REF
                     INTEGER_KW "integer"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- casts"
@@ -2969,8 +3032,9 @@ SOURCE_FILE
                   DOT "."
                   PATH_SEGMENT_REF
                     IDENT "int8"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- cast"
@@ -3029,8 +3093,9 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "1"
                   R_PAREN ")"
-              L_BRACK "["
-              R_BRACK "]"
+              ARRAY_BOUND
+                L_BRACK "["
+                R_BRACK "]"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
