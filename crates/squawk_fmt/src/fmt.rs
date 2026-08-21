@@ -147,9 +147,52 @@ fn build_table_arg<'a>(create_table: ast::TableArg) -> Doc<'a> {
         ast::TableArg::Column(column) => build_name(column.name().unwrap().syntax())
             .append(Doc::space())
             .append(Doc::text(column.ty().unwrap().syntax().to_string())),
-        ast::TableArg::LikeClause(_like_clause) => todo!(),
+        ast::TableArg::LikeClause(like_clause) => build_like_clause(&like_clause),
         ast::TableArg::TableConstraint(_table_constraint) => todo!(),
     }
+}
+
+fn build_like_clause<'a>(like_clause: &ast::LikeClause) -> Doc<'a> {
+    let mut doc = Doc::text("like");
+
+    if let Some(relation_name) = like_clause.relation_name_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(relation_name.syntax()));
+        if let Some(path) = relation_name.path_ref() {
+            doc = doc.append(build_path_ref(&path));
+        }
+    }
+
+    let options: Vec<Doc<'a>> = like_clause
+        .like_options()
+        .map(|option| {
+            Doc::line_or_space()
+                .append(leading_comments(option.syntax()))
+                .append(build_like_option(&option))
+        })
+        .collect();
+    if !options.is_empty() {
+        doc = doc.append(Doc::list(options).nest(2).group());
+    }
+
+    doc
+}
+
+fn build_like_option<'a>(option: &ast::LikeOption) -> Doc<'a> {
+    let (keyword, property) = match option {
+        ast::LikeOption::ExcludingProperty(n) => ("excluding", n.table_property()),
+        ast::LikeOption::IncludingProperty(n) => ("including", n.table_property()),
+    };
+
+    let mut doc = Doc::text(keyword);
+    if let Some(property) = property {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(property.syntax()))
+            .append(build_keyword_node(property.syntax()));
+    }
+    doc
 }
 
 fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
