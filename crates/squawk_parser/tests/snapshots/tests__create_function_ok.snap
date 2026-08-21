@@ -448,8 +448,9 @@ SOURCE_FILE
           PATH_REF
             PATH_SEGMENT_REF
               NUMERIC_KW "numeric"
-        L_BRACK "["
-        R_BRACK "]"
+        ARRAY_BOUND
+          L_BRACK "["
+          R_BRACK "]"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION
@@ -3176,8 +3177,9 @@ SOURCE_FILE
             PATH_REF
               PATH_SEGMENT_REF
                 TEXT_KW "text"
-          L_BRACK "["
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -3253,8 +3255,9 @@ SOURCE_FILE
               DOT "."
               PATH_SEGMENT_REF
                 IDENT "u"
-          L_BRACK "["
-          R_BRACK "]"
+          ARRAY_BOUND
+            L_BRACK "["
+            R_BRACK "]"
       COMMA ","
       WHITESPACE " "
       PARAM

@@ -4010,8 +4010,9 @@ SOURCE_FILE
                   PATH_REF
                     PATH_SEGMENT_REF
                       TEXT_KW "text"
-                L_BRACK "["
-                R_BRACK "]"
+                ARRAY_BOUND
+                  L_BRACK "["
+                  R_BRACK "]"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT

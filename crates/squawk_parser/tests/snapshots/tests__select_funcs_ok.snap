@@ -4455,8 +4455,9 @@ SOURCE_FILE
                       PATH_REF
                         PATH_SEGMENT_REF
                           NUMERIC_KW "numeric"
-                    L_BRACK "["
-                    R_BRACK "]"
+                    ARRAY_BOUND
+                      L_BRACK "["
+                      R_BRACK "]"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
