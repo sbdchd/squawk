@@ -760,10 +760,11 @@ Expr =
 | PostfixExpr
 
 ArrayType =
+  // int array
   // int array[]
   // text[]
   // t[10][10]
-  Type 'array'? ArrayBound ArrayBound*
+  Type 'array'? ArrayBound*
 
 ArrayBound =
   '[' Expr? ']'
