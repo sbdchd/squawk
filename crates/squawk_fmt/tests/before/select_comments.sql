@@ -10,3 +10,8 @@ select/*a*/*;
 select/*a*/all/*b*/1;
 
 select/*a*/distinct/*b*/1;
+
+select 1 /*a*/ /*b*/ group by 1;
+
+select 1 -- a line comment
+, 2;

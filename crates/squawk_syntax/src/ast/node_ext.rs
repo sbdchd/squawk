@@ -623,7 +623,7 @@ fn is_quoted(node: &SyntaxNode) -> bool {
 }
 
 // TODO: return a NewType wrapper around String?
-pub(crate) fn normalize_name_node(node: &SyntaxNode) -> String {
+pub fn normalize_name_node(node: &SyntaxNode) -> String {
     let mut tokens = node
         .children_with_tokens()
         .filter_map(|el| el.into_token())
@@ -1168,6 +1168,7 @@ fn name() {
     assert_snapshot!(extract_name(r#"select 1 "foo""#), @"foo");
     assert_snapshot!(extract_name(r#"select 1 "Foo""#), @"Foo");
     assert_snapshot!(extract_name(r#"select 1 "FOO""#), @"FOO");
+    assert_snapshot!(extract_name(r#"select 1 "foo""bar""#), @r#"foo"bar"#);
     assert_snapshot!(extract_name(r#"select 1 U&"\0066\006f\006f""#), @"foo");
     assert_snapshot!(extract_name(r#"select 1 U&"@0066@006f@006f" uescape '@'"#), @"foo");
 

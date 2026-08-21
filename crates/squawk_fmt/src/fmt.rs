@@ -2,8 +2,8 @@ use anyhow::{Result, bail};
 use itertools::Itertools;
 use rowan::Direction;
 use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
-use squawk_syntax::ast::{self, AstNode, LitKind};
-use squawk_syntax::quote::quote_column_alias;
+use squawk_syntax::ast::{self, AstNode, LitKind, normalize_name_node};
+use squawk_syntax::quote::{quote_bare_column_alias, quote_column_alias, quote_ident};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 use tiny_pretty::Doc;
 use tiny_pretty::{LineBreak, PrintOptions, print};
@@ -47,13 +47,13 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
 }
 
 fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
+    let table_name = create_table.table_name().unwrap();
     let mut doc = Doc::text("create")
         .append(Doc::space())
         .append(Doc::text("table"))
         .append(Doc::space())
-        .append(Doc::text(
-            create_table.table_name().unwrap().syntax().to_string(),
-        ))
+        .append(leading_comments(table_name.syntax()))
+        .append(build_path(&table_name.path().unwrap()))
         .append(Doc::text("("))
         .append(
             Doc::line_or_nil()
@@ -79,9 +79,72 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
     doc
 }
 
+fn build_path<'a>(path: &ast::Path) -> Doc<'a> {
+    build_path_parts(path.qualifier(), path.dot_token(), path.segment())
+}
+
+fn build_path_ref<'a>(path: &ast::PathRef) -> Doc<'a> {
+    build_path_parts(path.qualifier(), path.dot_token(), path.segment())
+}
+
+fn build_path_parts<'a>(
+    qualifier: Option<ast::PathRef>,
+    dot: Option<SyntaxToken>,
+    segment: Option<impl AstNode>,
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(qualifier) = qualifier {
+        doc = doc
+            .append(build_path_ref(&qualifier))
+            .append(trailing_comments(qualifier.syntax()));
+    }
+    if dot.is_some() {
+        doc = doc.append(Doc::text("."));
+    }
+    if let Some(segment) = segment {
+        doc = doc
+            .append(leading_comments(segment.syntax()))
+            .append(build_name(segment.syntax()));
+    }
+    doc
+}
+
+fn build_name<'a>(node: &SyntaxNode) -> Doc<'a> {
+    let mut tokens = node
+        .children_with_tokens()
+        .filter_map(|el| el.into_token())
+        .filter(|token| token.kind() != SyntaxKind::WHITESPACE);
+
+    let Some(ident) = tokens.next() else {
+        return Doc::nil();
+    };
+
+    if is_unicode_escape(ident.text()) {
+        let mut doc = Doc::text(ident.text().to_string());
+        for token in tokens {
+            let text = match token.kind() {
+                SyntaxKind::STRING | SyntaxKind::COMMENT => token.text().to_string(),
+                _ => token.text().to_ascii_lowercase(),
+            };
+            doc = doc.append(Doc::space()).append(Doc::text(text));
+            if is_line_comment(&token) {
+                doc = doc.append(Doc::hard_line());
+            }
+        }
+        return doc;
+    }
+
+    Doc::text(quote_ident(&normalize_name_node(node)))
+}
+
+fn is_unicode_escape(text: &str) -> bool {
+    text.strip_prefix(['u', 'U'])
+        .is_some_and(|text| text.starts_with("&\""))
+}
+
 fn build_table_arg<'a>(create_table: ast::TableArg) -> Doc<'a> {
     match create_table {
-        ast::TableArg::Column(column) => build_column_name(column.name().unwrap())
+        ast::TableArg::Column(column) => build_name(column.name().unwrap().syntax())
             .append(Doc::space())
             .append(Doc::text(column.ty().unwrap().syntax().to_string())),
         ast::TableArg::LikeClause(_like_clause) => todo!(),
@@ -546,10 +609,6 @@ fn format_string_token(t: &SyntaxToken) -> String {
     }
 }
 
-fn build_column_name<'a>(name: ast::ColumnName) -> Doc<'a> {
-    Doc::text(quote_column_alias(&name.text()))
-}
-
 fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
     Doc::text(ty.syntax().to_string())
 }
@@ -577,8 +636,12 @@ fn leading_comments_token<'a>(node: &SyntaxToken) -> Doc<'a> {
     doc
 }
 
+fn is_line_comment(token: &SyntaxToken) -> bool {
+    token.text().starts_with("--")
+}
+
 fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
-    let mut doc = Doc::nil();
+    let mut docs: Vec<Doc<'a>> = vec![];
     for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
         match next {
             rowan::NodeOrToken::Node(_node) => {
@@ -586,14 +649,13 @@ fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
             }
             rowan::NodeOrToken::Token(token) => {
                 if token.kind() == SyntaxKind::COMMENT {
-                    let is_block = token.text().starts_with("--");
-                    doc = doc
-                        .append(Doc::text(token.text().to_string()))
-                        .append(if is_block {
+                    docs.push(Doc::text(token.text().to_string()).append(
+                        if is_line_comment(&token) {
                             Doc::hard_line()
                         } else {
                             Doc::space()
-                        });
+                        },
+                    ));
                 } else if token.kind() == SyntaxKind::WHITESPACE {
                     continue;
                 } else {
@@ -602,11 +664,13 @@ fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
             }
         }
     }
-    doc
+    docs.reverse();
+    Doc::list(docs)
 }
 
 fn trailing_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut doc = Doc::nil();
+    let mut after_line_comment = false;
     for next in node.siblings_with_tokens(Direction::Next).skip(1) {
         match next {
             rowan::NodeOrToken::Node(_node) => {
@@ -614,9 +678,14 @@ fn trailing_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
             }
             rowan::NodeOrToken::Token(token) => {
                 if token.kind() == SyntaxKind::COMMENT {
-                    doc = doc
-                        .append(Doc::space())
-                        .append(Doc::text(token.text().to_string()));
+                    if !after_line_comment {
+                        doc = doc.append(Doc::space());
+                    }
+                    doc = doc.append(Doc::text(token.text().to_string()));
+                    after_line_comment = is_line_comment(&token);
+                    if after_line_comment {
+                        doc = doc.append(Doc::hard_line());
+                    }
                 } else if token.kind() == SyntaxKind::WHITESPACE {
                     continue;
                 } else {
@@ -643,9 +712,12 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
         }
 
         if let Some(column_name) = as_name.name() {
-            doc = doc
-                .append(Doc::space())
-                .append(build_column_name(column_name));
+            let alias = if as_name.as_token().is_some() {
+                quote_column_alias(&column_name.text())
+            } else {
+                quote_bare_column_alias(&column_name.text())
+            };
+            doc = doc.append(Doc::space()).append(Doc::text(alias));
         }
     }
 
