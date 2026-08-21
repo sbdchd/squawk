@@ -88,18 +88,16 @@ pub(crate) fn codegen() -> Result<()> {
     std::fs::write(playground_keywords_file, playground_keywords)
         .context("problem writing playground keywords")?;
 
+    let syntax_keywords = project_root().join("crates/squawk_syntax/src/generated/keywords.rs");
+    let keyword_arrays = generate_keyword_arrays(&keyword_kinds)?;
+    std::fs::write(syntax_keywords, keyword_arrays).context("problem writing keyword arrays")?;
+
     let kinds = generate_kind_src(&ast_src.nodes, &grammar, keyword_kinds.all_keywords);
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
     let syntax_kinds_file =
         project_root().join("crates/squawk_parser/src/generated/syntax_kind.rs");
     std::fs::write(syntax_kinds_file, syntax_kinds).context("problem writing syntax kinds")?;
-
-    let ide_reserved_keywords =
-        project_root().join("crates/squawk_syntax/src/generated/keywords.rs");
-    let reserved_keywords = generate_reserved_keywords_array(&keyword_kinds.reserved_keywords)?;
-    std::fs::write(ide_reserved_keywords, reserved_keywords)
-        .context("problem writing reserved keywords")?;
 
     Ok(())
 }
@@ -237,23 +235,38 @@ const PRELUDE: &str = "\
 
 ";
 
-fn generate_reserved_keywords_array(reserved_keywords: &[String]) -> Result<String> {
-    let mut reserved_keywords = reserved_keywords
-        .iter()
-        .map(|x| x.to_ascii_lowercase())
-        .collect::<Vec<_>>();
-    reserved_keywords.sort();
+fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
+    let sorted = |keywords: &[String]| {
+        let mut keywords = keywords
+            .iter()
+            .map(|x| x.to_ascii_lowercase())
+            .collect::<Vec<_>>();
+        keywords.sort();
+        keywords
+    };
+    let reserved_keywords = sorted(&keyword_kinds.reserved_keywords);
+    let type_func_name_keywords = sorted(&keyword_kinds.type_func_name_keywords);
+    let as_label_keywords = sorted(&keyword_kinds.as_label_keywords);
 
     let output = reformat(
         quote! {
             pub(crate) const RESERVED_KEYWORDS: &[&str] = &[
                 #(#reserved_keywords),*
             ];
+
+            pub(crate) const TYPE_FUNC_NAME_KEYWORDS: &[&str] = &[
+                #(#type_func_name_keywords),*
+            ];
+
+            pub(crate) const AS_LABEL_KEYWORDS: &[&str] = &[
+                #(#as_label_keywords),*
+            ];
         }
         .to_string(),
-    );
+    )
+    .replace("pub(crate)", "\npub(crate)");
 
-    Ok(format!("{PRELUDE}{output}"))
+    Ok(format!("{PRELUDE}{}", output.trim_start()))
 }
 
 fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {

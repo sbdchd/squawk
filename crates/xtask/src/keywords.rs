@@ -121,6 +121,7 @@ fn parse_header() -> Result<FxHashMap<String, KeywordMeta>> {
 pub(crate) struct KeywordKinds {
     pub(crate) all_keywords: Vec<String>,
     pub(crate) bare_label_keywords: Vec<String>,
+    pub(crate) as_label_keywords: Vec<String>,
     pub(crate) unreserved_keywords: Vec<String>,
     pub(crate) reserved_keywords: Vec<String>,
     pub(crate) col_name_keywords: Vec<String>,
@@ -140,6 +141,16 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
         .map(|(key, _value)| key.to_owned())
         .collect::<Vec<String>>();
     bare_label_keywords.sort();
+
+    let mut as_label_keywords = keywords
+        .iter()
+        .filter(|(_key, value)| match value.label {
+            KeywordLabel::As => true,
+            KeywordLabel::Bare => false,
+        })
+        .map(|(key, _value)| key.to_owned())
+        .collect::<Vec<String>>();
+    as_label_keywords.sort();
 
     let mut unreserved_keywords = keywords
         .iter()
@@ -208,6 +219,7 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
     Ok(KeywordKinds {
         all_keywords,
         bare_label_keywords,
+        as_label_keywords,
         unreserved_keywords,
         reserved_keywords,
         col_name_keywords,

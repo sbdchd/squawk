@@ -1,13 +1,33 @@
 use crate::SyntaxNode;
-use crate::generated::keywords::RESERVED_KEYWORDS;
+use crate::generated::keywords::{AS_LABEL_KEYWORDS, RESERVED_KEYWORDS, TYPE_FUNC_NAME_KEYWORDS};
 
 pub fn quote_string_literal(text: &str) -> String {
     format!("'{}'", text.replace('\'', "''"))
 }
 
+fn quote(text: &str) -> String {
+    format!(r#""{}""#, text.replace('"', r#""""#))
+}
+
 pub fn quote_column_alias(text: &str) -> String {
     if needs_quoting(text) {
-        format!(r#""{}""#, text.replace('"', r#""""#))
+        quote(text)
+    } else {
+        text.to_string()
+    }
+}
+
+pub fn quote_bare_column_alias(text: &str) -> String {
+    if needs_quoting(text) || is_as_label_word(text) {
+        quote(text)
+    } else {
+        text.to_string()
+    }
+}
+
+pub fn quote_ident(text: &str) -> String {
+    if needs_quoting(text) || is_reserved_word(text) || is_type_func_name_word(text) {
+        quote(text)
     } else {
         text.to_string()
     }
@@ -22,7 +42,7 @@ pub fn unquote_ident(node: &SyntaxNode) -> Option<String> {
 
     let text = &text[1..text.len() - 1];
 
-    if is_reserved_word(text) {
+    if is_reserved_word(text) || is_type_func_name_word(text) {
         return None;
     }
 
@@ -76,6 +96,18 @@ pub fn needs_quoting(text: &str) -> bool {
 
 pub fn is_reserved_word(text: &str) -> bool {
     RESERVED_KEYWORDS
+        .binary_search(&text.to_ascii_lowercase().as_str())
+        .is_ok()
+}
+
+fn is_type_func_name_word(text: &str) -> bool {
+    TYPE_FUNC_NAME_KEYWORDS
+        .binary_search(&text.to_ascii_lowercase().as_str())
+        .is_ok()
+}
+
+fn is_as_label_word(text: &str) -> bool {
+    AS_LABEL_KEYWORDS
         .binary_search(&text.to_ascii_lowercase().as_str())
         .is_ok()
 }
@@ -134,5 +166,57 @@ mod tests {
     #[test]
     fn quote_column_alias_handles_special_column_name() {
         assert_snapshot!(quote_column_alias("?column?"), @r#""?column?""#);
+    }
+
+    #[test]
+    fn quote_bare_column_alias_quotes_keywords_that_need_an_as() {
+        assert_snapshot!(quote_bare_column_alias("filter"), @r#""filter""#);
+        assert_snapshot!(quote_bare_column_alias("day"), @r#""day""#);
+        // also reserved
+        assert_snapshot!(quote_bare_column_alias("array"), @r#""array""#);
+    }
+
+    #[test]
+    fn quote_bare_column_alias_doesnt_quote_bare_label_keywords() {
+        assert_snapshot!(quote_bare_column_alias("between"), @"between");
+        assert_snapshot!(quote_bare_column_alias("all"), @"all");
+        assert_snapshot!(quote_bare_column_alias("left"), @"left");
+        assert_snapshot!(quote_bare_column_alias("col_name"), @"col_name");
+    }
+
+    #[test]
+    fn quote_ident_doesnt_quote_simple_identifiers() {
+        assert_snapshot!(quote_ident("col_name"), @"col_name");
+        assert_snapshot!(quote_ident("users"), @"users");
+        assert_snapshot!(quote_ident("t2$"), @"t2$");
+    }
+
+    #[test]
+    fn quote_ident_doesnt_quote_column_or_table_keywords() {
+        // unreserved
+        assert_snapshot!(quote_ident("data"), @"data");
+        assert_snapshot!(quote_ident("value"), @"value");
+        // col name
+        assert_snapshot!(quote_ident("int"), @"int");
+    }
+
+    #[test]
+    fn quote_ident_quotes_reserved_words() {
+        assert_snapshot!(quote_ident("select"), @r#""select""#);
+        assert_snapshot!(quote_ident("array"), @r#""array""#);
+    }
+
+    #[test]
+    fn quote_ident_quotes_type_func_name_words() {
+        assert_snapshot!(quote_ident("left"), @r#""left""#);
+        assert_snapshot!(quote_ident("join"), @r#""join""#);
+    }
+
+    #[test]
+    fn quote_ident_quotes_names_that_dont_fold_to_themselves() {
+        assert_snapshot!(quote_ident("Mixed"), @r#""Mixed""#);
+        assert_snapshot!(quote_ident("has space"), @r#""has space""#);
+        assert_snapshot!(quote_ident(""), @r#""""#);
+        assert_snapshot!(quote_ident(r#"foo"bar"#), @r#""foo""bar""#);
     }
 }

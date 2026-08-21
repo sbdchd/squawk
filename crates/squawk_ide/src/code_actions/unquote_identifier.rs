@@ -144,6 +144,11 @@ mod test {
             unquote_identifier,
             r#"select "select"$0 from t;"#
         ));
+        // type or function name word
+        assert!(code_action_not_applicable(
+            unquote_identifier,
+            r#"create table t ("left"$0 int);"#
+        ));
     }
 
     #[test]
