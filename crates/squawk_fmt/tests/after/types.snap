@@ -1,0 +1,137 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/types.sql
+---
+-- keywords in types are lowercased
+create table t(
+  a int,
+  b numeric(10, 2),
+  c pg_catalog.varchar(10),
+  d "MyType"
+);
+
+-- character types
+create table t(
+  a varchar(10),
+  b character varying,
+  c national char varying(2),
+  d nchar(3),
+  e character(4),
+  f national character
+);
+
+-- bit & double types
+create table t(
+  a bit,
+  b bit(4),
+  c bit varying,
+  d bit varying(3),
+  e double precision
+);
+
+-- date & time types
+create table t(
+  a time,
+  b time(3) with time zone,
+  c timestamp without time zone,
+  d timestamp(6) with time zone
+);
+
+-- interval types
+create table t(
+  a interval,
+  b interval(6),
+  c interval year,
+  d interval year to month,
+  e interval day to hour,
+  f interval hour to minute,
+  g interval second(2),
+  h interval day to second(3)
+);
+
+-- array types
+create table t(
+  a int[],
+  b text array,
+  c text array[4],
+  d int[][3],
+  e int[10][10]
+);
+
+-- types in casts
+select
+  1::int8,
+  cast(1 as int8),
+  treat(2 as bigint),
+  pg_catalog.varchar(10) 'foo';
+select
+  '1'::interval day to second(3),
+  'a'::character varying(2),
+  now()::timestamp(3) with time zone;
+select 1::setof int;
+
+-- comments inside types
+create table t(
+  a national /*a*/ char /*b*/ varying /*c*/(2),
+  b int /*d*/[],
+  c interval /*e*/ day to /*f*/ second /*g*/(3),
+  d numeric /*h*/(/*i*/ 10 /*j*/, /*k*/ 2 /*l*/),
+  e time /*m*/(/*n*/ 3 /*o*/) /*p*/ with /*q*/ time /*r*/ zone,
+  f int[ /*s*/][/*t*/ 3 /*u*/],
+  g timestamp /*v*/ without /*w*/ time /*x*/ zone,
+  h timestamp with /*y*/ time /*z*/ zone,
+  i double /*aa*/ precision,
+  j character /*bb*/ varying,
+  k national /*cc*/ character,
+  l bit /*dd*/ varying /*ee*/(/*ff*/ 3 /*gg*/),
+  m interval year /*hh*/ to /*ii*/ month
+);
+select 1::setof /*a*/ int, 2::pg_catalog /*b*/./*c*/ int4;
+
+-- line comments inside types
+create table t(
+  a int -- one
+  [],
+  b numeric -- two
+  (10),
+  c text -- three
+  array[2],
+  d time -- four
+  (3) with time zone,
+  e interval day to -- five
+  second(3)
+);
+
+-- interval literals keep their qualifier
+select
+  interval '1' day to second(3),
+  interval '2' year to month,
+  interval(4) '3';
+
+-- comments around casts
+select 1 /*a*/::/*b*/ int8;
+select cast /*c*/(/*d*/ 1 /*e*/ as /*f*/ int8 /*g*/);
+select treat /*h*/(2 as /*i*/ bigint);
+select pg_catalog.varchar(10) /*j*/ 'foo';
+select interval '4' /*k*/ year to month;
+
+-- line comments before a type's trailing keywords
+create table t(
+  a double -- one
+  precision,
+  b bit -- two
+  varying(3),
+  c national -- three
+  character varying(2),
+  d varchar -- four
+  (10),
+  e timestamp without -- five
+  time zone,
+  f time(3) with time -- six
+  zone,
+  g interval year -- seven
+  to month
+);
+select
+  1::double -- eight
+  precision;

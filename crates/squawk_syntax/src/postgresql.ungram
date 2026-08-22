@@ -817,7 +817,7 @@ TimestampType =
 IntervalType =
   'setof'?
   'interval'
-  IntervalQualifier?
+  ('(' Literal ')' | IntervalQualifier)?
 
 IntervalQualifier =
   IntervalYear
@@ -846,8 +846,7 @@ IntervalMinute =
 | ('day' | 'hour') 'to' 'minute'
 
 IntervalSecond =
-  '(' Literal ')'
-| (('day' | 'hour' | 'minute') 'to')? 'second' ('(' Literal ')')?
+  (('day' | 'hour' | 'minute') 'to')? 'second' ('(' Literal ')')?
 
 Type =
   ArrayType

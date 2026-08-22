@@ -2299,7 +2299,8 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
         }
         INTERVAL_KW => {
             p.bump(INTERVAL_KW);
-            opt_interval_trailing(p);
+            let has_precision = opt_interval_precision(p);
+            opt_interval_trailing(p, has_precision);
             INTERVAL_TYPE
         }
         DOUBLE_KW if p.nth_at(1, PRECISION_KW) => {
@@ -2419,6 +2420,20 @@ fn opt_all_or_distinct(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
+const INTERVAL_QUALIFIER_FIRST: TokenSet =
+    TokenSet::new(&[DAY_KW, HOUR_KW, MINUTE_KW, MONTH_KW, SECOND_KW, YEAR_KW]);
+
+fn opt_interval_precision(p: &mut Parser<'_>) -> bool {
+    if !p.eat(L_PAREN) {
+        return false;
+    }
+    if opt_numeric_literal(p).is_none() {
+        p.error("expected an integer");
+    }
+    p.expect(R_PAREN);
+    true
+}
+
 fn interval_second(p: &mut Parser<'_>) {
     p.expect(SECOND_KW);
     if p.eat(L_PAREN) {
@@ -2429,7 +2444,10 @@ fn interval_second(p: &mut Parser<'_>) {
     }
 }
 
-fn opt_interval_trailing(p: &mut Parser<'_>) {
+fn opt_interval_trailing(p: &mut Parser<'_>, has_precision: bool) {
+    if has_precision && p.at_ts(INTERVAL_QUALIFIER_FIRST) {
+        p.error("unexpected interval qualifier");
+    }
     let m = p.start();
     let kind = match (p.current(), p.nth(1)) {
         (DAY_KW, TO_KW) => {
@@ -2500,14 +2518,6 @@ fn opt_interval_trailing(p: &mut Parser<'_>) {
             interval_second(p);
             INTERVAL_SECOND
         }
-        (L_PAREN, _) => {
-            p.bump(L_PAREN);
-            if opt_numeric_literal(p).is_none() {
-                p.error("expected number")
-            }
-            p.expect(R_PAREN);
-            INTERVAL_SECOND
-        }
         _ => {
             m.abandon(p);
             return;
@@ -2521,6 +2531,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
+    let mut has_interval_precision = false;
     let kind = match p.current() {
         TIMESTAMP_KW | TIME_KW => {
             let kind = if p.eat(TIMESTAMP_KW) {
@@ -2558,7 +2569,8 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => char_type(p),
         INTERVAL_KW => {
             p.bump(INTERVAL_KW);
-            opt_interval_trailing(p);
+            has_interval_precision = opt_interval_precision(p);
+            opt_interval_trailing(p, has_interval_precision);
             INTERVAL_TYPE
         }
         _ => {
@@ -2593,7 +2605,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
         string_literal(p);
         if kind == INTERVAL_TYPE {
-            opt_interval_trailing(p);
+            opt_interval_trailing(p, has_interval_precision);
         }
         Some(cm.precede(p).complete(p, CAST_EXPR))
     } else {
@@ -12220,7 +12232,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
         OPERATOR_KW => {
             p.bump(OPERATOR_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected number");
+                p.error("expected an integer");
             }
             operator(p);
             if p.eat(L_PAREN) {
@@ -12248,7 +12260,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
         FUNCTION_KW => {
             p.bump(FUNCTION_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected number");
+                p.error("expected an integer");
             }
             opt_param_list(p, ParamKind::TypeOnly);
             function_sig(p);
@@ -12279,7 +12291,7 @@ fn operator_drop_class_option(p: &mut Parser<'_>) {
             let m = p.start();
             p.bump_any();
             if opt_numeric_literal(p).is_none() {
-                p.error("expected number");
+                p.error("expected an integer");
             }
             opt_param_list(p, ParamKind::TypeOnly);
             m.complete(p, kind);
