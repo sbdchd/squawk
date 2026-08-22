@@ -2560,10 +2560,6 @@ pub struct ArrayType {
 }
 impl ArrayType {
     #[inline]
-    pub fn array_bound(&self) -> Option<ArrayBound> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
         support::children(&self.syntax)
     }
@@ -13092,6 +13088,18 @@ impl IntervalType {
     #[inline]
     pub fn interval_qualifier(&self) -> Option<IntervalQualifier> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
     pub fn interval_token(&self) -> Option<SyntaxToken> {

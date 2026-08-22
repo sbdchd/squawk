@@ -4,7 +4,7 @@ use rowan::Direction;
 use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
 use squawk_syntax::ast::{self, AstNode, LitKind, normalize_name_node};
 use squawk_syntax::quote::{quote_bare_column_alias, quote_column_alias, quote_ident};
-use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
+use squawk_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 use tiny_pretty::Doc;
 use tiny_pretty::{LineBreak, PrintOptions, print};
 
@@ -142,14 +142,23 @@ fn is_unicode_escape(text: &str) -> bool {
         .is_some_and(|text| text.starts_with("&\""))
 }
 
-fn build_table_arg<'a>(create_table: ast::TableArg) -> Doc<'a> {
-    match create_table {
-        ast::TableArg::Column(column) => build_name(column.name().unwrap().syntax())
-            .append(Doc::space())
-            .append(Doc::text(column.ty().unwrap().syntax().to_string())),
-        ast::TableArg::LikeClause(like_clause) => build_like_clause(&like_clause),
+fn build_table_arg<'a>(arg: ast::TableArg) -> Doc<'a> {
+    let doc = leading_comments(arg.syntax());
+    let doc = doc.append(match &arg {
+        ast::TableArg::Column(column) => {
+            let mut doc = build_name(column.name().unwrap().syntax());
+            if let Some(ty) = column.ty() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(ty.syntax()))
+                    .append(build_type(ty));
+            }
+            doc
+        }
+        ast::TableArg::LikeClause(like_clause) => build_like_clause(like_clause),
         ast::TableArg::TableConstraint(_table_constraint) => todo!(),
-    }
+    });
+    doc.append(trailing_comments(arg.syntax()))
 }
 
 fn build_like_clause<'a>(like_clause: &ast::LikeClause) -> Doc<'a> {
@@ -262,23 +271,11 @@ fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
         return Doc::nil();
     };
     let mut doc = Doc::nil();
-    let mut comments: Vec<SyntaxToken> = vec![];
-    for next in semi.siblings_with_tokens(Direction::Prev).skip(1) {
-        match next {
-            rowan::NodeOrToken::Node(_) => break,
-            rowan::NodeOrToken::Token(token) => {
-                if token.kind() == SyntaxKind::COMMENT {
-                    comments.push(token);
-                } else if token.kind() == SyntaxKind::WHITESPACE {
-                    continue;
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-    for comment in comments.iter().rev() {
+    for comment in comment_tokens_before(semi) {
         doc = doc.append(Doc::text(comment.text().to_string()));
+        if is_line_comment(&comment) {
+            doc = doc.append(Doc::hard_line());
+        }
     }
     doc.append(Doc::text(";"))
 }
@@ -344,30 +341,52 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
         // ast::Expr::CaseExpr(case_expr) => todo!(),
         ast::Expr::CastExpr(cast_expr) => {
             let mut doc = Doc::nil();
-            if cast_expr.colon_colon().is_some() {
+            if let Some(colon_colon) = cast_expr.colon_colon() {
+                let ty = cast_expr.ty().unwrap();
                 doc = doc
                     .append(build_expr(cast_expr.expr().unwrap()))
+                    .append(comments_before(colon_colon.syntax().clone()))
                     .append(Doc::text("::"))
-                    .append(build_type(cast_expr.ty().unwrap()))
-            } else if cast_expr.as_token().is_some() {
+                    .append(leading_comments(ty.syntax()))
+                    .append(build_type(ty))
+            } else if let Some(as_token) = cast_expr.as_token() {
                 if cast_expr.cast_token().is_some() {
                     doc = doc.append(Doc::text("cast"))
                 } else if cast_expr.treat_token().is_some() {
                     doc = doc.append(Doc::text("treat"))
                 }
+                let expr = cast_expr.expr().unwrap();
+                let ty = cast_expr.ty().unwrap();
+                if let Some(l_paren) = cast_expr.l_paren_token() {
+                    doc = doc.append(comments_before(l_paren));
+                }
                 doc = doc
                     .append(Doc::text("("))
-                    .append(build_expr(cast_expr.expr().unwrap()))
+                    .append(leading_comments(expr.syntax()))
+                    .append(build_expr(expr))
                     .append(Doc::space())
+                    .append(leading_comments_token(&as_token))
                     .append(Doc::text("as"))
                     .append(Doc::space())
-                    .append(build_type(cast_expr.ty().unwrap()))
-                    .append(Doc::text(")"))
+                    .append(leading_comments(ty.syntax()))
+                    .append(build_type(ty));
+                if let Some(r_paren) = cast_expr.r_paren_token() {
+                    doc = doc.append(comments_before(r_paren));
+                }
+                doc = doc.append(Doc::text(")"))
             } else {
+                let literal = cast_expr.literal().unwrap();
                 doc = doc
                     .append(build_type(cast_expr.ty().unwrap()))
                     .append(Doc::space())
-                    .append(build_literal(cast_expr.literal().unwrap()))
+                    .append(leading_comments(literal.syntax()))
+                    .append(build_literal(literal));
+                if let Some(qualifier) = cast_expr.interval_qualifier() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments(qualifier.syntax()))
+                        .append(build_interval_qualifier(&qualifier))
+                }
             }
             doc
         }
@@ -533,24 +552,30 @@ fn build_unicode_normal_form<'a>(form: ast::UnicodeNormalForm) -> Doc<'a> {
 
 fn build_keyword_node<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut docs: Vec<Doc<'a>> = vec![];
+    let mut after_line_comment = false;
     for el in node.children_with_tokens() {
-        match el {
-            rowan::NodeOrToken::Token(token) => match token.kind() {
-                SyntaxKind::WHITESPACE => continue,
-                SyntaxKind::COMMENT => {
-                    if !docs.is_empty() {
-                        docs.push(Doc::space());
-                    }
-                    docs.push(Doc::text(token.text().to_string()));
+        let Some(token) = el.into_token() else {
+            continue;
+        };
+        match token.kind() {
+            SyntaxKind::WHITESPACE => continue,
+            SyntaxKind::COMMENT => {
+                if !docs.is_empty() && !after_line_comment {
+                    docs.push(Doc::space());
                 }
-                _ => {
-                    if !docs.is_empty() {
-                        docs.push(Doc::space());
-                    }
-                    docs.push(Doc::text(token.text().to_ascii_lowercase()));
+                docs.push(Doc::text(token.text().to_string()));
+                after_line_comment = is_line_comment(&token);
+                if after_line_comment {
+                    docs.push(Doc::hard_line());
                 }
-            },
-            rowan::NodeOrToken::Node(_) => (),
+            }
+            _ => {
+                if !docs.is_empty() && !after_line_comment {
+                    docs.push(Doc::space());
+                }
+                after_line_comment = false;
+                docs.push(Doc::text(token.text().to_ascii_lowercase()));
+            }
         }
     }
     Doc::list(docs)
@@ -653,30 +678,275 @@ fn format_string_token(t: &SyntaxToken) -> String {
 }
 
 fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
-    Doc::text(ty.syntax().to_string())
-}
-
-fn leading_comments_token<'a>(node: &SyntaxToken) -> Doc<'a> {
-    let mut doc = Doc::nil();
-    for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
-        match next {
-            rowan::NodeOrToken::Node(_node) => {
-                break;
+    match ty {
+        ast::Type::ArrayType(array_type) => {
+            let mut doc = match array_type.ty() {
+                Some(inner) => build_type(inner),
+                None => Doc::nil(),
+            };
+            if let Some(array_token) = array_type.array_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&array_token))
+                    .append(Doc::text("array"));
             }
-            rowan::NodeOrToken::Token(token) => {
-                if token.kind() == SyntaxKind::COMMENT {
+            for bound in array_type.array_bounds() {
+                doc = doc
+                    .append(comments_before(bound.syntax().clone()))
+                    .append(build_array_bound(&bound));
+            }
+            doc
+        }
+        ast::Type::BitType(bit_type) => {
+            build_keyword_node(bit_type.syntax()).append(build_type_args(bit_type.arg_list()))
+        }
+        ast::Type::BitVaryingType(bit_varying_type) => {
+            build_keyword_node(bit_varying_type.syntax())
+                .append(build_type_args(bit_varying_type.arg_list()))
+        }
+        ast::Type::CharacterType(character_type) => build_keyword_node(character_type.syntax())
+            .append(build_type_args(character_type.arg_list())),
+        ast::Type::VarcharType(varchar_type) => build_keyword_node(varchar_type.syntax())
+            .append(build_type_args(varchar_type.arg_list())),
+        ast::Type::DoubleType(double_type) => build_keyword_node(double_type.syntax()),
+        ast::Type::ExprType(expr_type) => match expr_type.expr() {
+            Some(expr) => build_expr(expr),
+            None => Doc::nil(),
+        },
+        ast::Type::IntervalType(interval_type) => {
+            let mut doc = build_setof(interval_type.setof_token());
+            if let Some(interval_token) = interval_type.interval_token() {
+                doc = doc
+                    .append(leading_comments_token(&interval_token))
+                    .append(Doc::text("interval"));
+            }
+            doc = doc.append(build_type_precision(
+                interval_type.l_paren_token(),
+                interval_type.literal(),
+                interval_type.r_paren_token(),
+            ));
+            if let Some(qualifier) = interval_type.interval_qualifier() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(qualifier.syntax()))
+                    .append(build_interval_qualifier(&qualifier));
+            }
+            doc
+        }
+        ast::Type::PathType(path_type) => {
+            let mut doc = build_setof(path_type.setof_token());
+            if let Some(path) = path_type.path_ref() {
+                doc = doc
+                    .append(leading_comments(path.syntax()))
+                    .append(build_path_ref(&path));
+            }
+            let arg_list = path_type.arg_list();
+            if let Some(arg_list) = &arg_list {
+                doc = doc.append(comments_before(arg_list.syntax().clone()));
+            }
+            doc.append(build_type_args(arg_list))
+        }
+        ast::Type::PercentType(percent_type) => {
+            let mut doc = build_setof(percent_type.setof_token());
+            if let Some(path) = percent_type.path_ref() {
+                doc = doc
+                    .append(leading_comments(path.syntax()))
+                    .append(build_path_ref(&path));
+            }
+            if let Some(clause) = percent_type.percent_type_clause() {
+                doc = doc.append(comments_before(clause.syntax().clone()));
+                if clause.percent_token().is_some() {
+                    doc = doc.append(Doc::text("%"));
+                }
+                if let Some(type_token) = clause.type_token() {
                     doc = doc
-                        .append(Doc::text(token.text().to_string()))
-                        .append(Doc::space());
-                } else if token.kind() == SyntaxKind::WHITESPACE {
-                    continue;
-                } else {
-                    break;
+                        .append(comments_before(type_token))
+                        .append(Doc::text("type"));
                 }
             }
+            doc
+        }
+        ast::Type::TimeType(time_type) => {
+            let mut doc = build_setof(time_type.setof_token());
+            if let Some(time_token) = time_type.time_token() {
+                doc = doc
+                    .append(leading_comments_token(&time_token))
+                    .append(Doc::text("time"));
+            }
+            doc.append(build_type_precision(
+                time_type.l_paren_token(),
+                time_type.literal(),
+                time_type.r_paren_token(),
+            ))
+            .append(build_timezone(time_type.timezone()))
+        }
+        ast::Type::TimestampType(timestamp_type) => {
+            let mut doc = build_setof(timestamp_type.setof_token());
+            if let Some(timestamp_token) = timestamp_type.timestamp_token() {
+                doc = doc
+                    .append(leading_comments_token(&timestamp_token))
+                    .append(Doc::text("timestamp"));
+            }
+            doc.append(build_type_precision(
+                timestamp_type.l_paren_token(),
+                timestamp_type.literal(),
+                timestamp_type.r_paren_token(),
+            ))
+            .append(build_timezone(timestamp_type.timezone()))
+        }
+    }
+}
+
+fn build_setof<'a>(setof: Option<SyntaxToken>) -> Doc<'a> {
+    match setof {
+        Some(_) => Doc::text("setof").append(Doc::space()),
+        None => Doc::nil(),
+    }
+}
+
+fn build_array_bound<'a>(bound: &ast::ArrayBound) -> Doc<'a> {
+    let mut doc = Doc::text("[");
+    if let Some(expr) = bound.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_brack) = bound.r_brack_token() {
+        doc = doc.append(comments_before(r_brack));
+    }
+    doc.append(Doc::text("]"))
+}
+
+fn build_type_args<'a>(arg_list: Option<ast::ArgList>) -> Doc<'a> {
+    let Some(arg_list) = arg_list else {
+        return Doc::nil();
+    };
+    let args: Vec<Doc<'a>> = arg_list
+        .args()
+        .map(|arg| {
+            let mut doc = leading_comments(arg.syntax());
+            if let Some(expr) = arg.expr() {
+                doc = doc.append(build_expr(expr));
+            }
+            doc.append(trailing_comments(arg.syntax()))
+        })
+        .collect();
+    let mut doc = Doc::text("(");
+    if args.is_empty() {
+        if let Some(r_paren) = arg_list.r_paren_token() {
+            doc = doc.append(comments_before(r_paren));
+        }
+    } else {
+        doc = doc.append(Doc::list(
+            Itertools::intersperse(args.into_iter(), Doc::text(",").append(Doc::space())).collect(),
+        ));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_type_precision<'a>(
+    l_paren: Option<SyntaxToken>,
+    literal: Option<ast::Literal>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let Some(l_paren) = l_paren else {
+        return Doc::nil();
+    };
+    let mut doc = comments_before(l_paren).append(Doc::text("("));
+    if let Some(literal) = literal {
+        doc = doc
+            .append(leading_comments(literal.syntax()))
+            .append(build_literal(literal));
+    }
+    if let Some(r_paren) = r_paren {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_timezone<'a>(timezone: Option<ast::Timezone>) -> Doc<'a> {
+    let Some(timezone) = timezone else {
+        return Doc::nil();
+    };
+    let doc = Doc::space().append(leading_comments(timezone.syntax()));
+    match timezone {
+        ast::Timezone::WithTimezone(with_timezone) => {
+            doc.append(build_keyword_node(with_timezone.syntax()))
+        }
+        ast::Timezone::WithoutTimezone(without_timezone) => {
+            doc.append(build_keyword_node(without_timezone.syntax()))
+        }
+    }
+}
+
+fn build_interval_qualifier<'a>(qualifier: &ast::IntervalQualifier) -> Doc<'a> {
+    match qualifier {
+        ast::IntervalQualifier::IntervalSecond(second) => {
+            let mut doc = Doc::nil();
+            if let Some(unit) = second
+                .day_token()
+                .or_else(|| second.hour_token())
+                .or_else(|| second.minute_token())
+            {
+                doc = doc
+                    .append(Doc::text(unit.text().to_ascii_lowercase()))
+                    .append(Doc::space());
+            }
+            if let Some(to_token) = second.to_token() {
+                doc = doc
+                    .append(leading_comments_token(&to_token))
+                    .append(Doc::text("to"))
+                    .append(Doc::space());
+            }
+            if let Some(second_token) = second.second_token() {
+                doc = doc
+                    .append(leading_comments_token(&second_token))
+                    .append(Doc::text("second"));
+            }
+            doc.append(build_type_precision(
+                second.l_paren_token(),
+                second.literal(),
+                second.r_paren_token(),
+            ))
+        }
+        ast::IntervalQualifier::IntervalDay(day) => build_keyword_node(day.syntax()),
+        ast::IntervalQualifier::IntervalHour(hour) => build_keyword_node(hour.syntax()),
+        ast::IntervalQualifier::IntervalMinute(minute) => build_keyword_node(minute.syntax()),
+        ast::IntervalQualifier::IntervalMonth(month) => build_keyword_node(month.syntax()),
+        ast::IntervalQualifier::IntervalYear(year) => build_keyword_node(year.syntax()),
+    }
+}
+
+fn comments_before<'a>(el: impl Into<SyntaxElement>) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    for token in comment_tokens_before(el) {
+        doc = doc
+            .append(Doc::space())
+            .append(Doc::text(token.text().to_string()));
+        if is_line_comment(&token) {
+            doc = doc.append(Doc::hard_line());
         }
     }
     doc
+}
+
+fn comment_tokens_before(el: impl Into<SyntaxElement>) -> Vec<SyntaxToken> {
+    let mut tokens: Vec<SyntaxToken> = vec![];
+    let mut curr = el.into().prev_sibling_or_token();
+    while let Some(rowan::NodeOrToken::Token(token)) = curr {
+        match token.kind() {
+            SyntaxKind::COMMENT => tokens.push(token.clone()),
+            SyntaxKind::WHITESPACE => (),
+            _ => break,
+        }
+        curr = token.prev_sibling_or_token();
+    }
+    tokens.reverse();
+    tokens
+}
+
+fn leading_comments_token<'a>(token: &SyntaxToken) -> Doc<'a> {
+    build_leading_comments(&comment_tokens_before(token.clone()))
 }
 
 fn is_line_comment(token: &SyntaxToken) -> bool {
@@ -684,31 +954,20 @@ fn is_line_comment(token: &SyntaxToken) -> bool {
 }
 
 fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
-    let mut docs: Vec<Doc<'a>> = vec![];
-    for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
-        match next {
-            rowan::NodeOrToken::Node(_node) => {
-                break;
-            }
-            rowan::NodeOrToken::Token(token) => {
-                if token.kind() == SyntaxKind::COMMENT {
-                    docs.push(Doc::text(token.text().to_string()).append(
-                        if is_line_comment(&token) {
-                            Doc::hard_line()
-                        } else {
-                            Doc::space()
-                        },
-                    ));
-                } else if token.kind() == SyntaxKind::WHITESPACE {
-                    continue;
-                } else {
-                    break;
-                }
-            }
-        }
+    build_leading_comments(&comment_tokens_before(node.clone()))
+}
+
+fn build_leading_comments<'a>(tokens: &[SyntaxToken]) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    for token in tokens {
+        doc = doc.append(Doc::text(token.text().to_string()));
+        doc = doc.append(if is_line_comment(token) {
+            Doc::hard_line()
+        } else {
+            Doc::space()
+        });
     }
-    docs.reverse();
-    Doc::list(docs)
+    doc
 }
 
 fn trailing_comments<'a>(node: &SyntaxNode) -> Doc<'a> {

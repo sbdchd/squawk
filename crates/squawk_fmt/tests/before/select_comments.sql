@@ -15,3 +15,14 @@ select 1 /*a*/ /*b*/ group by 1;
 
 select 1 -- a line comment
 , 2;
+
+-- line comments before the semicolon
+select 1 -- a
+;
+select 1 -- b
+-- c
+;
+select 1, 2 -- d
+;
+select 1 /*e*/ -- f
+;

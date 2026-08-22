@@ -1199,11 +1199,10 @@ SOURCE_FILE
               COLON ":"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
-              INTERVAL_SECOND
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "0"
-                R_PAREN ")"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1561,11 +1560,10 @@ SOURCE_FILE
               COLON ":"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
-              INTERVAL_SECOND
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
-                R_PAREN ")"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- JsonType"

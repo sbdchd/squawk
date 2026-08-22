@@ -44,3 +44,27 @@ create table t(U&"c!006fl" uescape /* c */ '!' int);
 create table foo /*a*/ /*b*/.bar(id int);
 create table foo -- a line comment
 .bar(id int);
+
+-- comments between table args
+create table t(
+  a int /*x*/,
+  b int
+);
+create table t(
+  /*a*/ a int,
+  /*b*/ b int /*c*/
+);
+create table t(
+  a int -- one
+  ,
+  b int
+);
+create table t(
+  a int,
+  b int -- two
+  
+);
+
+-- line comment before the semicolon
+create table t(a int)-- one
+;
