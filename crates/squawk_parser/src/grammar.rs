@@ -5052,7 +5052,7 @@ fn opt_operator(p: &mut Parser<'_>) -> bool {
 // >
 // bar.>
 // foo.bar.>
-fn operator(p: &mut Parser<'_>) {
+pub(crate) fn operator(p: &mut Parser<'_>) {
     let m = p.start();
     opt_path_name_ref(p);
     if !opt_operator(p) {

@@ -17708,20 +17708,12 @@ impl OperatorCall {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path_ref(&self) -> Option<PathRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn dot_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOT)
     }
     #[inline]
     pub fn operator_token(&self) -> Option<SyntaxToken> {

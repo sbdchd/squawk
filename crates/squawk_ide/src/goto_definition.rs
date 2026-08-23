@@ -12643,6 +12643,26 @@ create operator class ops for type int using btree family fa$0m as operator 1 <;
     }
 
     #[test]
+    fn goto_operator_call_schema() {
+        assert_snapshot!(goto("
+create schema s;
+create operator s.+ (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4pl
+);
+select 1 operator(s$0.+) 2;
+"), @"
+          ╭▸ 
+        2 │ create schema s;
+          │               ─ 2. destination
+          ‡
+        8 │ select 1 operator(s.+) 2;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_operator_class_for_order_by_family() {
         assert_snapshot!(goto("
 create operator family sort_fam using btree;

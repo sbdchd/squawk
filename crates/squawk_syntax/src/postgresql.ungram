@@ -615,7 +615,7 @@ IsNotNormalized =
   'is' UnicodeNormalForm? 'not' 'normalized'
 
 OperatorCall =
-  'operator' '(' (PathRef '.')? Op ')'
+  'operator' '(' Op ')'
 
 ColonEq =
   ':' '='

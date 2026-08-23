@@ -66,6 +66,9 @@ set foo to default;
 -- binary
 select 3 operator(pg_catalog.+) 4;
 
+-- parses by PG and then reports an error about cross DB refs not allowed
+select 2 operator(database_name.pg_catalog.+) 2;
+
 select 3 operator(+) 4;
 
 select 1 operator(a.&&) 2;
@@ -75,6 +78,10 @@ select operator(pg_catalog.-) 4;
 select operator(-) 4;
 
 select operator(a.b.-) 4;
+
+-- keyword schema names
+select 1 operator(domain.+) 2;
+select 1 operator(u&"schema" uescape '!'.+) 2;
 
 
 set catalog 'foo';
