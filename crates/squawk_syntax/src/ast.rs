@@ -39,7 +39,7 @@ use squawk_parser::SyntaxKind;
 pub use self::node_ext::normalize_name_node;
 pub use self::{
     generated::tokens::*,
-    node_ext::{BinOp, LitKind, PostfixOp},
+    node_ext::{BinOp, LitKind, PostfixOp, PrefixOp},
     nodes::*,
     traits::{HasCreateTable, HasWithClause, NameLike},
 };

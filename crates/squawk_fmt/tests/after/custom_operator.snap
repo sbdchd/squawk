@@ -1,0 +1,6 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/custom_operator.sql
+---
+select 1 /*before*/ <<<< /*after*/ 1;
+select ##### /*after*/ 1;

@@ -10,6 +10,7 @@ select
   2  between  symmetric  1  and  3,
   -- bin expr
   1 + 1,
+  1 /* before op */ + /* after op */ 1,
   2@@@2,
   true  and  false,
   ts  at  time  zone  'UTC',
@@ -34,8 +35,9 @@ select
   1  not  in  (1, 2),
   'foo'  not  like  'f%',
   'foo'  not  similar  to  'f%',
-  1  operator(+)  1,
-  1  operator(public.+)  1,
+  1  OPERATOR ( + )  1,
+  1  OPERATOR ( PUBLIC . + )  1,
+  1  OPERATOR /* before paren */ ( /* before path */ PUBLIC /* before dot */ . /* before op */ + /* after op */ ) /* after paren */ 1,
   true  or  false,
   (1, 2)  overlaps  (3, 4),
   10  %  3,
@@ -84,6 +86,10 @@ select
   x  is  not  nfkd  normalized,
   -- prefix expr
   @-@ 10,
+  OPERATOR ( PUBLIC . + ) /* after op */ 1,
+  + 1,
+  - 1,
+  not true,
   -- slice expr
   c[:2][2:],
   -- tuple expr

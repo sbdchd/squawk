@@ -282,248 +282,217 @@ fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
 
 fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
     match expr {
-        ast::Expr::ArrayExpr(array_expr) => {
-            let mut doc = Doc::nil();
-
-            // nested parts of array expressions don't require the array token
-            if array_expr.array_token().is_some() {
-                doc = doc.append(Doc::text("array"));
-            };
-
-            if let Some(select) = array_expr.select() {
-                doc = doc
-                    .append(Doc::text("("))
-                    .append(build_select_doc(&select))
-                    .append(Doc::text(")"))
-            } else {
-                doc = doc
-                    .append(Doc::text("["))
-                    .append(Doc::list(
-                        Itertools::intersperse(
-                            array_expr.exprs().map(build_expr),
-                            Doc::text(",").append(Doc::space()),
-                        )
-                        .collect(),
-                    ))
-                    .append(Doc::text("]"));
-            }
-
-            doc
-        }
-        ast::Expr::BetweenExpr(between_expr) => {
-            let mut doc = build_expr(between_expr.target().unwrap());
-            if between_expr.not_token().is_some() {
-                doc = doc.append(Doc::space()).append(Doc::text("not"));
-            }
-            doc = doc.append(Doc::space()).append(Doc::text("between"));
-            match between_expr.between_symmetry() {
-                Some(ast::BetweenSymmetry::Asymmetric(_)) => {
-                    doc = doc.append(Doc::space()).append(Doc::text("asymmetric"));
-                }
-                Some(ast::BetweenSymmetry::Symmetric(_)) => {
-                    doc = doc.append(Doc::space()).append(Doc::text("symmetric"));
-                }
-                None => (),
-            }
-            doc.append(Doc::space())
-                .append(build_expr(between_expr.start().unwrap()))
-                .append(Doc::space())
-                .append(Doc::text("and"))
-                .append(Doc::space())
-                .append(build_expr(between_expr.end().unwrap()))
-        }
-        ast::Expr::BinExpr(bin_expr) => build_expr(bin_expr.lhs().unwrap())
-            .append(Doc::space())
-            .append(build_op(bin_expr.op().unwrap()))
-            .append(Doc::space())
-            .append(build_expr(bin_expr.rhs().unwrap())),
+        ast::Expr::ArrayExpr(array_expr) => build_array_expr(array_expr),
+        ast::Expr::BetweenExpr(between_expr) => build_between_expr(between_expr),
+        ast::Expr::BinExpr(bin_expr) => build_bin_expr(bin_expr),
         // ast::Expr::CallExpr(call_expr) => todo!(),
         // ast::Expr::CaseExpr(case_expr) => todo!(),
-        ast::Expr::CastExpr(cast_expr) => {
-            let mut doc = Doc::nil();
-            if let Some(colon_colon) = cast_expr.colon_colon() {
-                let ty = cast_expr.ty().unwrap();
-                doc = doc
-                    .append(build_expr(cast_expr.expr().unwrap()))
-                    .append(comments_before(colon_colon.syntax().clone()))
-                    .append(Doc::text("::"))
-                    .append(leading_comments(ty.syntax()))
-                    .append(build_type(ty))
-            } else if let Some(as_token) = cast_expr.as_token() {
-                if cast_expr.cast_token().is_some() {
-                    doc = doc.append(Doc::text("cast"))
-                } else if cast_expr.treat_token().is_some() {
-                    doc = doc.append(Doc::text("treat"))
-                }
-                let expr = cast_expr.expr().unwrap();
-                let ty = cast_expr.ty().unwrap();
-                if let Some(l_paren) = cast_expr.l_paren_token() {
-                    doc = doc.append(comments_before(l_paren));
-                }
-                doc = doc
-                    .append(Doc::text("("))
-                    .append(leading_comments(expr.syntax()))
-                    .append(build_expr(expr))
-                    .append(Doc::space())
-                    .append(leading_comments_token(&as_token))
-                    .append(Doc::text("as"))
-                    .append(Doc::space())
-                    .append(leading_comments(ty.syntax()))
-                    .append(build_type(ty));
-                if let Some(r_paren) = cast_expr.r_paren_token() {
-                    doc = doc.append(comments_before(r_paren));
-                }
-                doc = doc.append(Doc::text(")"))
-            } else {
-                let literal = cast_expr.literal().unwrap();
-                doc = doc
-                    .append(build_type(cast_expr.ty().unwrap()))
-                    .append(Doc::space())
-                    .append(leading_comments(literal.syntax()))
-                    .append(build_literal(literal));
-                if let Some(qualifier) = cast_expr.interval_qualifier() {
-                    doc = doc
-                        .append(Doc::space())
-                        .append(leading_comments(qualifier.syntax()))
-                        .append(build_interval_qualifier(&qualifier))
-                }
-            }
-            doc
-        }
-        ast::Expr::Collate(collate) => build_expr(collate.expr().unwrap())
-            .append(Doc::space())
-            .append(Doc::text("collate"))
-            .append(Doc::space())
-            .append(Doc::text(
-                collate.collation_ref().unwrap().syntax().to_string(),
-            )),
+        ast::Expr::CastExpr(cast_expr) => build_cast_expr(cast_expr),
+        ast::Expr::Collate(collate) => build_collate_expr(collate),
         // ast::Expr::FieldExpr(field_expr) => todo!(),
         // ast::Expr::IndexExpr(index_expr) => todo!(),
         ast::Expr::Literal(literal) => build_literal(literal),
         // ast::Expr::NameRef(name_ref) => todo!(),
         // ast::Expr::ParenExpr(paren_expr) => todo!(),
-        ast::Expr::PostfixExpr(postfix_expr) => {
-            let expr = build_expr(postfix_expr.expr().unwrap());
-            let op = match postfix_expr.op().unwrap() {
-                ast::PostfixOp::AtLocal(_) => Doc::text("at local"),
-                ast::PostfixOp::IsNull(_) => Doc::text("isnull"),
-                ast::PostfixOp::NotNull(_) => Doc::text("notnull"),
-                ast::PostfixOp::IsJson(n) => {
-                    let mut doc = Doc::text("is json");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsJsonArray(n) => {
-                    let mut doc = Doc::text("is json array");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsJsonObject(n) => {
-                    let mut doc = Doc::text("is json object");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsJsonScalar(n) => {
-                    let mut doc = Doc::text("is json scalar");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsJsonValue(n) => {
-                    let mut doc = Doc::text("is json value");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsNormalized(n) => {
-                    let mut doc = Doc::text("is");
-                    if let Some(form) = n.unicode_normal_form() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_unicode_normal_form(form));
-                    }
-                    doc.append(Doc::space()).append(Doc::text("normalized"))
-                }
-                ast::PostfixOp::IsNotJson(n) => {
-                    let mut doc = Doc::text("is not json");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsNotJsonArray(n) => {
-                    let mut doc = Doc::text("is not json array");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsNotJsonObject(n) => {
-                    let mut doc = Doc::text("is not json object");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsNotJsonScalar(n) => {
-                    let mut doc = Doc::text("is not json scalar");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsNotJsonValue(n) => {
-                    let mut doc = Doc::text("is not json value");
-                    if let Some(clause) = n.json_keys_unique_clause() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_json_keys_unique_clause(clause));
-                    }
-                    doc
-                }
-                ast::PostfixOp::IsNotNormalized(n) => {
-                    let mut doc = Doc::text("is not");
-                    if let Some(form) = n.unicode_normal_form() {
-                        doc = doc
-                            .append(Doc::space())
-                            .append(build_unicode_normal_form(form));
-                    }
-                    doc.append(Doc::space()).append(Doc::text("normalized"))
-                }
-            };
-            expr.append(Doc::space()).append(op)
-        }
-        // ast::Expr::PrefixExpr(prefix_expr) => todo!(),
+        ast::Expr::PostfixExpr(postfix_expr) => build_postfix_expr(postfix_expr),
+        ast::Expr::PrefixExpr(prefix_expr) => build_prefix_expr(prefix_expr),
         // ast::Expr::SliceExpr(slice_expr) => todo!(),
         // ast::Expr::TupleExpr(tuple_expr) => todo!(),
         _ => Doc::text(expr.syntax().to_string()),
     }
+}
+
+fn build_array_expr<'a>(array_expr: ast::ArrayExpr) -> Doc<'a> {
+    let mut doc = Doc::nil();
+
+    // nested parts of array expressions don't require the array token
+    if array_expr.array_token().is_some() {
+        doc = doc.append(Doc::text("array"));
+    };
+
+    if let Some(select) = array_expr.select() {
+        doc.append(Doc::text("("))
+            .append(build_select_doc(&select))
+            .append(Doc::text(")"))
+    } else {
+        doc.append(Doc::text("["))
+            .append(Doc::list(
+                Itertools::intersperse(
+                    array_expr.exprs().map(build_expr),
+                    Doc::text(",").append(Doc::space()),
+                )
+                .collect(),
+            ))
+            .append(Doc::text("]"))
+    }
+}
+
+fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
+    let mut doc = build_expr(between_expr.target().unwrap());
+    if between_expr.not_token().is_some() {
+        doc = doc.append(Doc::space()).append(Doc::text("not"));
+    }
+    doc = doc.append(Doc::space()).append(Doc::text("between"));
+    match between_expr.between_symmetry() {
+        Some(ast::BetweenSymmetry::Asymmetric(_)) => {
+            doc = doc.append(Doc::space()).append(Doc::text("asymmetric"));
+        }
+        Some(ast::BetweenSymmetry::Symmetric(_)) => {
+            doc = doc.append(Doc::space()).append(Doc::text("symmetric"));
+        }
+        None => (),
+    }
+    doc.append(Doc::space())
+        .append(build_expr(between_expr.start().unwrap()))
+        .append(Doc::space())
+        .append(Doc::text("and"))
+        .append(Doc::space())
+        .append(build_expr(between_expr.end().unwrap()))
+}
+
+fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(colon_colon) = cast_expr.colon_colon() {
+        let ty = cast_expr.ty().unwrap();
+        doc = doc
+            .append(build_expr(cast_expr.expr().unwrap()))
+            .append(comments_before(colon_colon.syntax().clone()))
+            .append(Doc::text("::"))
+            .append(leading_comments(ty.syntax()))
+            .append(build_type(ty))
+    } else if let Some(as_token) = cast_expr.as_token() {
+        if cast_expr.cast_token().is_some() {
+            doc = doc.append(Doc::text("cast"))
+        } else if cast_expr.treat_token().is_some() {
+            doc = doc.append(Doc::text("treat"))
+        }
+        let expr = cast_expr.expr().unwrap();
+        let ty = cast_expr.ty().unwrap();
+        if let Some(l_paren) = cast_expr.l_paren_token() {
+            doc = doc.append(comments_before(l_paren));
+        }
+        doc = doc
+            .append(Doc::text("("))
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr))
+            .append(Doc::space())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"))
+            .append(Doc::space())
+            .append(leading_comments(ty.syntax()))
+            .append(build_type(ty));
+        if let Some(r_paren) = cast_expr.r_paren_token() {
+            doc = doc.append(comments_before(r_paren));
+        }
+        doc = doc.append(Doc::text(")"))
+    } else {
+        let literal = cast_expr.literal().unwrap();
+        doc = doc
+            .append(build_type(cast_expr.ty().unwrap()))
+            .append(Doc::space())
+            .append(leading_comments(literal.syntax()))
+            .append(build_literal(literal));
+        if let Some(qualifier) = cast_expr.interval_qualifier() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(qualifier.syntax()))
+                .append(build_interval_qualifier(&qualifier))
+        }
+    }
+    doc
+}
+
+fn build_collate_expr<'a>(collate: ast::Collate) -> Doc<'a> {
+    build_expr(collate.expr().unwrap())
+        .append(Doc::space())
+        .append(Doc::text("collate"))
+        .append(Doc::space())
+        .append(Doc::text(
+            collate.collation_ref().unwrap().syntax().to_string(),
+        ))
+}
+
+fn build_postfix_expr<'a>(postfix_expr: ast::PostfixExpr) -> Doc<'a> {
+    let expr = build_expr(postfix_expr.expr().unwrap());
+    let op = match postfix_expr.op().unwrap() {
+        ast::PostfixOp::AtLocal(_) => Doc::text("at local"),
+        ast::PostfixOp::IsNull(_) => Doc::text("isnull"),
+        ast::PostfixOp::NotNull(_) => Doc::text("notnull"),
+        ast::PostfixOp::IsJson(n) => build_json_postfix("is json", n.json_keys_unique_clause()),
+        ast::PostfixOp::IsJsonArray(n) => {
+            build_json_postfix("is json array", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsJsonObject(n) => {
+            build_json_postfix("is json object", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsJsonScalar(n) => {
+            build_json_postfix("is json scalar", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsJsonValue(n) => {
+            build_json_postfix("is json value", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsNormalized(n) => build_normalized_postfix("is", n.unicode_normal_form()),
+        ast::PostfixOp::IsNotJson(n) => {
+            build_json_postfix("is not json", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsNotJsonArray(n) => {
+            build_json_postfix("is not json array", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsNotJsonObject(n) => {
+            build_json_postfix("is not json object", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsNotJsonScalar(n) => {
+            build_json_postfix("is not json scalar", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsNotJsonValue(n) => {
+            build_json_postfix("is not json value", n.json_keys_unique_clause())
+        }
+        ast::PostfixOp::IsNotNormalized(n) => {
+            build_normalized_postfix("is not", n.unicode_normal_form())
+        }
+    };
+    expr.append(Doc::space()).append(op)
+}
+
+fn build_json_postfix<'a>(
+    prefix: &'static str,
+    clause: Option<ast::JsonKeysUniqueClause>,
+) -> Doc<'a> {
+    let mut doc = Doc::text(prefix);
+    if let Some(clause) = clause {
+        doc = doc
+            .append(Doc::space())
+            .append(build_json_keys_unique_clause(clause));
+    }
+    doc
+}
+
+fn build_normalized_postfix<'a>(
+    prefix: &'static str,
+    form: Option<ast::UnicodeNormalForm>,
+) -> Doc<'a> {
+    let mut doc = Doc::text(prefix);
+    if let Some(form) = form {
+        doc = doc
+            .append(Doc::space())
+            .append(build_unicode_normal_form(form));
+    }
+    doc.append(Doc::space()).append(Doc::text("normalized"))
+}
+
+fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
+    let lhs = bin_expr.lhs().unwrap();
+    let rhs = bin_expr.rhs().unwrap();
+    let before_op = trailing_comments(lhs.syntax());
+    let after_op = leading_comments(rhs.syntax());
+
+    build_expr(lhs)
+        .append(before_op)
+        .append(Doc::space())
+        .append(build_op(bin_expr.op().unwrap()))
+        .append(Doc::space())
+        .append(after_op)
+        .append(build_expr(rhs))
 }
 
 fn build_json_keys_unique_clause<'a>(clause: ast::JsonKeysUniqueClause) -> Doc<'a> {
@@ -588,7 +557,7 @@ fn build_op<'a>(op: ast::BinOp) -> Doc<'a> {
         ast::BinOp::Caret(_) => Doc::text("^"),
         ast::BinOp::ColonColon(_) => Doc::text("::"),
         ast::BinOp::ColonEq(_) => Doc::text(":="),
-        ast::BinOp::CustomOp(custom_op) => Doc::text(custom_op.syntax().to_string()),
+        ast::BinOp::CustomOp(custom_op) => build_operator_part(custom_op.syntax()),
         ast::BinOp::Eq(_) => Doc::text("="),
         ast::BinOp::Escape(_) => Doc::text("escape"),
         ast::BinOp::FatArrow(_) => Doc::text("=>"),
@@ -609,7 +578,7 @@ fn build_op<'a>(op: ast::BinOp) -> Doc<'a> {
         ast::BinOp::NotIn(n) => build_keyword_node(n.syntax()),
         ast::BinOp::NotLike(n) => build_keyword_node(n.syntax()),
         ast::BinOp::NotSimilarTo(n) => build_keyword_node(n.syntax()),
-        ast::BinOp::OperatorCall(op) => Doc::text(op.syntax().to_string()),
+        ast::BinOp::OperatorCall(op) => build_operator_call(&op),
         ast::BinOp::Or(_) => Doc::text("or"),
         ast::BinOp::Overlaps(_) => Doc::text("overlaps"),
         ast::BinOp::Percent(_) => Doc::text("%"),
@@ -618,6 +587,93 @@ fn build_op<'a>(op: ast::BinOp) -> Doc<'a> {
         ast::BinOp::SimilarTo(n) => build_keyword_node(n.syntax()),
         ast::BinOp::Slash(_) => Doc::text("/"),
         ast::BinOp::Star(_) => Doc::text("*"),
+    }
+}
+
+fn build_operator_call<'a>(operator_call: &ast::OperatorCall) -> Doc<'a> {
+    let mut doc = Doc::text("operator");
+
+    if let Some(l_paren) = operator_call.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(op) = operator_call.op() {
+        doc = doc
+            .append(leading_comments(op.syntax()))
+            .append(build_operator(&op));
+    }
+
+    if let Some(r_paren) = operator_call.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_prefix_expr<'a>(prefix_expr: ast::PrefixExpr) -> Doc<'a> {
+    let expr = prefix_expr.expr().unwrap();
+    let comments = comment_tokens_before(expr.syntax().clone());
+    let (op, space_before_expr) = match prefix_expr.op().unwrap() {
+        ast::PrefixOp::CustomOp(custom_op) => (build_operator_part(custom_op.syntax()), true),
+        ast::PrefixOp::Minus(_) => (Doc::text("-"), !comments.is_empty()),
+        ast::PrefixOp::Not(_) => (Doc::text("not"), true),
+        ast::PrefixOp::OperatorCall(operator_call) => (build_operator_call(&operator_call), true),
+        ast::PrefixOp::Plus(_) => (Doc::text("+"), !comments.is_empty()),
+    };
+
+    op.append(if space_before_expr {
+        Doc::space()
+    } else {
+        Doc::nil()
+    })
+    .append(build_leading_comments(&comments))
+    .append(build_expr(expr))
+}
+
+fn build_operator<'a>(op: &ast::Op) -> Doc<'a> {
+    let path_ref = op.path_ref();
+    let mut doc = Doc::nil();
+
+    for element in op.syntax().children_with_tokens() {
+        match element {
+            rowan::NodeOrToken::Node(node) => {
+                doc = doc.append(match path_ref.as_ref() {
+                    Some(path) if path.syntax() == &node => build_path_ref(path),
+                    _ => build_operator_part(&node),
+                });
+            }
+            rowan::NodeOrToken::Token(token) => {
+                doc = doc.append(build_operator_token(&token));
+            }
+        }
+    }
+
+    doc
+}
+
+fn build_operator_part<'a>(node: &SyntaxNode) -> Doc<'a> {
+    Doc::list(
+        node.children_with_tokens()
+            .map(|element| match element {
+                rowan::NodeOrToken::Node(node) => build_operator_part(&node),
+                rowan::NodeOrToken::Token(token) => build_operator_token(&token),
+            })
+            .collect(),
+    )
+}
+
+fn build_operator_token<'a>(token: &SyntaxToken) -> Doc<'a> {
+    match token.kind() {
+        SyntaxKind::WHITESPACE => Doc::nil(),
+        SyntaxKind::COMMENT => {
+            let doc = Doc::text(token.text().to_string());
+            if is_line_comment(token) {
+                doc.append(Doc::hard_line())
+            } else {
+                doc
+            }
+        }
+        _ => Doc::text(token.text().to_ascii_lowercase()),
     }
 }
 

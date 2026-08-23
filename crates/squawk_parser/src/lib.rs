@@ -399,24 +399,8 @@ impl<'t> Parser<'t> {
                 self.bump(SyntaxKind::OPERATOR_KW);
                 self.bump(SyntaxKind::L_PAREN);
 
-                // database.
-                if self.eat(SyntaxKind::IDENT) {
-                    self.expect(SyntaxKind::DOT);
-                }
-                // schema.
-                if self.eat(SyntaxKind::IDENT) {
-                    self.expect(SyntaxKind::DOT);
-                }
-
-                // +, -, etc.
-                match grammar::current_operator(self) {
-                    Some(kind) => {
-                        self.bump(kind);
-                    }
-                    None => {
-                        self.error("expected operator");
-                    }
-                }
+                // e.g. `+`, `pg_catalog.+`, `db.pg_catalog.+`
+                grammar::operator(self);
 
                 self.expect(SyntaxKind::R_PAREN);
                 m.complete(self, SyntaxKind::OPERATOR_CALL);
