@@ -400,7 +400,7 @@ impl<'t> Parser<'t> {
                 self.bump(SyntaxKind::L_PAREN);
 
                 // e.g. `+`, `pg_catalog.+`, `db.pg_catalog.+`
-                grammar::operator(self);
+                grammar::qual_op(self);
 
                 self.expect(SyntaxKind::R_PAREN);
                 m.complete(self, SyntaxKind::OPERATOR_CALL);

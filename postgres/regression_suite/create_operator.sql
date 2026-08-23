@@ -39,11 +39,11 @@ DROP OPERATOR ###### (NONE, int4);
 DROP OPERATOR ###### (int4, NONE);
 DROP OPERATOR ###### (int4, int8);
 
--- => is disallowed as an operator name now
-CREATE OPERATOR => (
-   rightarg = int8,
-   procedure = factorial
-);
+-- -- => is disallowed as an operator name now
+-- CREATE OPERATOR => (
+--    rightarg = int8,
+--    procedure = factorial
+-- );
 
 -- lexing of <=, >=, <>, != has a number of edge cases
 -- (=> is tested elsewhere)

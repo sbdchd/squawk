@@ -503,6 +503,10 @@ select current_schema;
 -- order_by_with_custom_op
 select * from t order by a using >>>;
 
+-- order_by_with_operator_call
+select * from t order by a using operator(<);
+select * from t order by a using operator(pg_catalog.<);
+
 -- order_by_regression
 SELECT sensor_id, DATE_TRUNC('day', ts) AS day, MAX(value) AS max_value, MIN(value) AS min_value
 FROM sensors_uncompressed

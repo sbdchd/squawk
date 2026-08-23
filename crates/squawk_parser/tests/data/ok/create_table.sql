@@ -235,6 +235,10 @@ create table t (
   exclude using btree ( a with f.buzz.> ) where ( a > 10 )
 );
 
+-- exclude constraint with an explicit operator call
+create table t (c int, exclude using gist (c with operator(pg_catalog.=)));
+create table t (c int, exclude using gist (c with operator(=)));
+
 -- exclude constraint multiple exclusions
 create table t (
   a int,

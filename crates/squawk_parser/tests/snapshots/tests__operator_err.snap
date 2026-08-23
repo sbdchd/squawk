@@ -1,0 +1,787 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/operator.sql
+---
+SOURCE_FILE
+  COMMENT "-- all_Op is symbolic only, keyword operators aren't operator names"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                ERROR
+                  AND_KW "and"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                ERROR
+                  OR_KW "or"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                ERROR
+                  IN_KW "in"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      ERROR
+        AND_KW "and"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "leftarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "rightarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          FUNCTION_KW "function"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "int4pl"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR
+    DROP_KW "drop"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP_SIG_LIST
+      OP_SIG
+        OP
+          ERROR
+            AND_KW "and"
+        WHITESPACE " "
+        L_PAREN "("
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+        COMMA ","
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- neither are the tokens Postgres reserves"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                ERROR
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                ERROR
+                  COLON_EQ ":="
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                ERROR
+                  FAT_ARROW "=>"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      ERROR
+        FAT_ARROW "=>"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "rightarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "int8"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          FUNCTION_KW "function"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "factorial"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_CLASS
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    OP_CLASS_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "c"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH_REF
+        PATH_SEGMENT_REF
+          INT_KW "int"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
+        IDENT "btree"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    OPERATOR_CLASS_OPTION_LIST
+      OP_CLASS_OPTION_OPERATOR
+        OPERATOR_KW "operator"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        OP
+          ERROR
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      CUSTOM_OP
+        EQ "="
+        EQ "="
+        EQ "="
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "leftarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "rightarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          ERROR
+            COLON ":"
+            COLON ":"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- qualifiers are ColId, so type function name keywords aren't allowed"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      ERROR
+                        BINARY_KW "binary"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                PLUS "+"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      ERROR
+                        LEFT_KW "left"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                PLUS "+"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      ERROR
+                        COLLATION_KW "collation"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                PLUS "+"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                PATH_REF
+                  PATH_REF
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        IDENT "a"
+                    DOT "."
+                    PATH_SEGMENT_REF
+                      ERROR
+                        BINARY_KW "binary"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                PLUS "+"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ERROR
+              BINARY_KW "binary"
+        DOT "."
+        PATH_SEGMENT_REF
+      PLUS "+"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "leftarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "rightarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          FUNCTION_KW "function"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "int4pl"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- order by using takes qual_all_Op, a qualified operator needs operator(...)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          SORT_USING
+            USING_KW "using"
+            WHITESPACE " "
+            OP
+              ERROR
+                AND_KW "and"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          SORT_USING
+            USING_KW "using"
+            WHITESPACE " "
+            OP
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "pg_catalog"
+                DOT "."
+                PATH_SEGMENT_REF
+              L_ANGLE "<"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- same for the operator of an exclusion constraint"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_INDEX_METHOD
+          USING_KW "using"
+          WHITESPACE " "
+          ACCESS_METHOD_REF
+            IDENT "gist"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "c"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OP
+              ERROR
+                AND_KW "and"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_INDEX_METHOD
+          USING_KW "using"
+          WHITESPACE " "
+          ACCESS_METHOD_REF
+            IDENT "gist"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "c"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OP
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    ERROR
+                      BINARY_KW "binary"
+                DOT "."
+                PATH_SEGMENT_REF
+              EQ "="
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected operator, got AND_KW
+  ╭▸ 
+2 │ select 1 operator(and) 2;
+  ╰╴                  ━
+error[syntax-error]: expected operator, got OR_KW
+  ╭▸ 
+3 │ select 1 operator(or) 2;
+  ╰╴                  ━
+error[syntax-error]: expected operator, got IN_KW
+  ╭▸ 
+4 │ select 1 operator(in) 2;
+  ╰╴                  ━
+error[syntax-error]: expected operator, got AND_KW
+  ╭▸ 
+5 │ create operator and (leftarg = int, rightarg = int, function = int4pl);
+  ╰╴                ━
+error[syntax-error]: expected operator, got AND_KW
+  ╭▸ 
+6 │ drop operator and (int, int);
+  ╰╴              ━
+error[syntax-error]: expected operator, got COLON
+  ╭▸ 
+9 │ select 1 operator(::) 2;
+  ╰╴                  ━
+error[syntax-error]: expected operator, got COLON
+   ╭▸ 
+10 │ select 1 operator(:=) 2;
+   ╰╴                  ━
+error[syntax-error]: expected operator, got EQ
+   ╭▸ 
+11 │ select 1 operator(=>) 2;
+   ╰╴                  ━
+error[syntax-error]: expected operator, got EQ
+   ╭▸ 
+12 │ create operator => (rightarg = int8, function = factorial);
+   ╰╴                ━
+error[syntax-error]: expected operator, got COLON
+   ╭▸ 
+13 │ create operator class c for type int using btree as operator 1 ::;
+   ╰╴                                                               ━
+error[syntax-error]: expected attribute value, got COLON
+   ╭▸ 
+14 │ create operator === (leftarg = int, rightarg = int, commutator = ::);
+   ╰╴                                                                 ━
+error[syntax-error]: expected name
+   ╭▸ 
+17 │ select 1 operator(binary.+) 2;
+   ╰╴                  ━
+error[syntax-error]: expected name
+   ╭▸ 
+18 │ select 1 operator(left.+) 2;
+   ╰╴                  ━
+error[syntax-error]: expected name
+   ╭▸ 
+19 │ select 1 operator(collation.+) 2;
+   ╰╴                  ━
+error[syntax-error]: expected name
+   ╭▸ 
+20 │ select 1 operator(a.binary.+) 2;
+   ╰╴                    ━
+error[syntax-error]: expected name
+   ╭▸ 
+21 │ create operator binary.+ (leftarg = int, rightarg = int, function = int4pl);
+   ╰╴                ━
+error[syntax-error]: expected operator, got AND_KW
+   ╭▸ 
+24 │ select 1 from t order by a using and;
+   ╰╴                                 ━
+error[syntax-error]: qualified operator requires OPERATOR(...)
+   ╭▸ 
+25 │ select 1 from t order by a using pg_catalog.<;
+   ╰╴                                            ━
+error[syntax-error]: expected operator, got AND_KW
+   ╭▸ 
+28 │ create table t (c int, exclude using gist (c with and));
+   ╰╴                                                  ━
+error[syntax-error]: expected name
+   ╭▸ 
+29 │ create table t (c int, exclude using gist (c with binary.=));
+   ╰╴                                                  ━

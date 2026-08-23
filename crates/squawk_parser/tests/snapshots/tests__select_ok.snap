@@ -6478,6 +6478,90 @@ SOURCE_FILE
                 R_ANGLE ">"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- order_by_with_operator_call"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          SORT_USING
+            USING_KW "using"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                L_ANGLE "<"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          SORT_USING
+            USING_KW "using"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "pg_catalog"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                L_ANGLE "<"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- order_by_regression"
   WHITESPACE "\n"
   SELECT
