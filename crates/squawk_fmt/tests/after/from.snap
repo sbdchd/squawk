@@ -1,0 +1,11 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/from.sql
+---
+select * from foo;
+select * from public.foo as f, bar b;
+select * from users tablesample bernoulli(10) repeatable(42);
+select
+  *
+/* before from */ from /* before item */ only /* before relation */ public /* before dot */./* before table */ foo /* before star */ * /* before alias */ as /* before alias name */ f /* before item comma */,
+  /* before second item */ other /* before second alias */ o;

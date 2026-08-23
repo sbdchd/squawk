@@ -20,6 +20,7 @@ select
   ts at time zone 'UTC',
   2 ^ 3,
   name collate "C",
+  name /* before collate */ collate /* before collation */ public /* before dot */./* before name */ "C",
   1 = 1,
   1 >= 1,
   'foo' ilike 'F%',
