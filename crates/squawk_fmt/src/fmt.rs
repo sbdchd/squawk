@@ -233,14 +233,11 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
         }
     }
 
-    if let Some(from) = &select.from_clause() {
+    if let Some(from) = select.from_clause() {
         doc = doc.append(
             Doc::line_or_space()
-                .append(Doc::text("from"))
-                .append(Doc::space())
-                .append(Doc::text(
-                    from.from_items().next().unwrap().syntax().to_string(),
-                )),
+                .append(leading_comments(from.syntax()))
+                .append(build_from_clause(from)),
         );
     }
 
@@ -251,6 +248,15 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
             group_doc = group_doc.append(leading_comments_token(&by_token));
         }
         group_doc = group_doc.append(Doc::text("by")).append(Doc::space());
+        if let Some(quantifier) = group.all_or_distinct() {
+            group_doc = group_doc
+                .append(leading_comments(quantifier.syntax()))
+                .append(match quantifier {
+                    ast::AllOrDistinct::All(_) => Doc::text("all"),
+                    ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
+                })
+                .append(Doc::space());
+        }
         if let Some(list) = group.group_by_list() {
             group_doc = group_doc.append(build_group_by_list(list));
         }
@@ -262,8 +268,240 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
     doc.group()
 }
 
+fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
+    if from.join_exprs().next().is_some() {
+        todo!("joins are not supported yet")
+    }
+
+    let from_items: Vec<_> = from
+        .from_items()
+        .map(|item| {
+            let leading = leading_comments(item.syntax());
+            let trailing = trailing_comments(item.syntax());
+            leading.append(build_from_item(item)).append(trailing)
+        })
+        .collect();
+
+    Doc::text("from").append(Doc::space()).append(
+        Doc::list(
+            Itertools::intersperse(
+                from_items.into_iter(),
+                Doc::text(",").append(Doc::line_or_space()),
+            )
+            .collect(),
+        )
+        .nest(2),
+    )
+}
+
+fn build_from_item<'a>(item: ast::FromItem) -> Doc<'a> {
+    match item {
+        ast::FromItem::RelationFromItem(relation) => build_relation_from_item(relation),
+        ast::FromItem::FunctionFromItem(_) => {
+            todo!("function from items are not supported yet")
+        }
+        ast::FromItem::ExprFromItem(_) => todo!("expression from items are not supported yet"),
+        ast::FromItem::ParenFromItem(_) => {
+            todo!("parenthesized from items are not supported yet")
+        }
+        ast::FromItem::RowsFromItem(_) => todo!("rows from items are not supported yet"),
+        ast::FromItem::GraphTableFromItem(_) => {
+            todo!("graph_table from items are not supported yet")
+        }
+        ast::FromItem::JsonTableFromItem(_) => {
+            todo!("json_table from items are not supported yet")
+        }
+        ast::FromItem::XmlTableFromItem(_) => {
+            todo!("xmltable from items are not supported yet")
+        }
+    }
+}
+
+fn build_relation_from_item<'a>(relation: ast::RelationFromItem) -> Doc<'a> {
+    let mut doc = if relation.only_token().is_some() {
+        Doc::text("only").append(Doc::space())
+    } else {
+        Doc::nil()
+    };
+
+    if let Some(name) = relation.relation_name_ref() {
+        doc = doc.append(leading_comments(name.syntax()));
+        if let Some(path) = name.path_ref() {
+            doc = doc.append(build_path_ref(&path));
+        }
+    }
+    if let Some(star) = relation.star_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&star))
+            .append(Doc::text("*"));
+    }
+    if let Some(tablesample) = relation.tablesample_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(tablesample.syntax()))
+            .append(build_tablesample_clause(tablesample));
+    }
+    doc.append(build_from_alias(relation.alias()))
+}
+
+fn build_tablesample_clause<'a>(tablesample: ast::TablesampleClause) -> Doc<'a> {
+    let mut doc = Doc::text("tablesample").append(Doc::space());
+    if let Some(call) = tablesample.call_expr() {
+        doc = doc
+            .append(leading_comments(call.syntax()))
+            .append(build_call_expr(call));
+    }
+    if let Some(repeatable) = tablesample.repeatable_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(repeatable.syntax()))
+            .append(Doc::text("repeatable"));
+        if let Some(l_paren) = repeatable.l_paren_token() {
+            doc = doc.append(comments_before(l_paren));
+        }
+        doc = doc.append(Doc::text("("));
+        if let Some(expr) = repeatable.expr() {
+            doc = doc
+                .append(leading_comments(expr.syntax()))
+                .append(build_expr(expr));
+        }
+        if let Some(r_paren) = repeatable.r_paren_token() {
+            doc = doc.append(comments_before(r_paren));
+        }
+        doc = doc.append(Doc::text(")"));
+    }
+    doc
+}
+
+fn build_from_alias<'a>(alias: Option<ast::FromAlias>) -> Doc<'a> {
+    let Some(alias) = alias else {
+        return Doc::nil();
+    };
+    let mut doc = Doc::space().append(leading_comments(alias.syntax()));
+    if alias.as_token().is_some() {
+        doc = doc.append(Doc::text("as")).append(Doc::space());
+    }
+    if let Some(name) = alias.name() {
+        doc = doc
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    if alias.columns().is_some() {
+        todo!("columns in from aliases are not supported yet")
+    }
+    doc
+}
+
 fn build_group_by_list<'a>(list: ast::GroupByList) -> Doc<'a> {
-    leading_comments(list.syntax()).append(Doc::text(list.syntax().to_string()))
+    leading_comments(list.syntax()).append(build_group_bys(list.group_bys()))
+}
+
+fn build_group_bys<'a>(group_bys: impl Iterator<Item = ast::GroupBy>) -> Doc<'a> {
+    Doc::list(
+        Itertools::intersperse(
+            group_bys.map(|group_by| {
+                let leading = leading_comments(group_by.syntax());
+                let trailing = trailing_comments(group_by.syntax());
+                leading.append(build_group_by(group_by)).append(trailing)
+            }),
+            Doc::text(",").append(Doc::line_or_space()),
+        )
+        .collect(),
+    )
+    .nest(2)
+}
+
+fn build_group_by<'a>(group_by: ast::GroupBy) -> Doc<'a> {
+    match group_by {
+        ast::GroupBy::GroupingExpr(grouping_expr) => grouping_expr
+            .expr()
+            .map(build_expr)
+            .unwrap_or_else(Doc::nil),
+        ast::GroupBy::GroupingRollup(rollup) => Doc::text("rollup").append(build_grouping_exprs(
+            rollup.l_paren_token(),
+            rollup.exprs(),
+            rollup.r_paren_token(),
+        )),
+        ast::GroupBy::GroupingCube(cube) => Doc::text("cube").append(build_grouping_exprs(
+            cube.l_paren_token(),
+            cube.exprs(),
+            cube.r_paren_token(),
+        )),
+        ast::GroupBy::GroupingSets(sets) => {
+            let mut doc = Doc::text("grouping").append(Doc::space());
+            if let Some(sets_token) = sets.sets_token() {
+                doc = doc.append(leading_comments_token(&sets_token));
+            }
+            doc.append(Doc::text("sets"))
+                .append(build_grouping_group_bys(
+                    sets.l_paren_token(),
+                    sets.group_bys(),
+                    sets.r_paren_token(),
+                ))
+        }
+    }
+}
+
+fn build_grouping_exprs<'a>(
+    l_paren: Option<SyntaxToken>,
+    exprs: impl Iterator<Item = ast::Expr>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let exprs: Vec<_> = exprs
+        .map(|expr| {
+            let leading = leading_comments(expr.syntax());
+            let trailing = trailing_comments(expr.syntax());
+            leading.append(build_expr(expr)).append(trailing)
+        })
+        .collect();
+    build_grouping_list(l_paren, exprs, r_paren)
+}
+
+fn build_grouping_group_bys<'a>(
+    l_paren: Option<SyntaxToken>,
+    group_bys: impl Iterator<Item = ast::GroupBy>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let group_bys = group_bys
+        .map(|group_by| {
+            let leading = leading_comments(group_by.syntax());
+            let trailing = trailing_comments(group_by.syntax());
+            leading.append(build_group_by(group_by)).append(trailing)
+        })
+        .collect();
+    build_grouping_list(l_paren, group_bys, r_paren)
+}
+
+fn build_grouping_list<'a>(
+    l_paren: Option<SyntaxToken>,
+    items: Vec<Doc<'a>>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = l_paren {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if items.is_empty() {
+        if let Some(r_paren) = r_paren {
+            doc = doc.append(comments_before(r_paren));
+        }
+    } else {
+        doc = doc.append(
+            Doc::list(
+                Itertools::intersperse(
+                    items.into_iter(),
+                    Doc::text(",").append(Doc::line_or_space()),
+                )
+                .collect(),
+            )
+            .nest(2),
+        );
+    }
+
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
@@ -743,13 +981,22 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
 }
 
 fn build_collate_expr<'a>(collate: ast::Collate) -> Doc<'a> {
-    build_expr(collate.expr().unwrap())
-        .append(Doc::space())
-        .append(Doc::text("collate"))
-        .append(Doc::space())
-        .append(Doc::text(
-            collate.collation_ref().unwrap().syntax().to_string(),
-        ))
+    let mut doc = collate.expr().map(build_expr).unwrap_or_else(Doc::nil);
+
+    if let Some(collate_token) = collate.collate_token() {
+        doc = doc.append(comments_before(collate_token));
+    }
+    doc = doc.append(Doc::space()).append(Doc::text("collate"));
+
+    if let Some(collation) = collate.collation_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(collation.syntax()));
+        if let Some(path) = collation.path_ref() {
+            doc = doc.append(build_path_ref(&path));
+        }
+    }
+    doc
 }
 
 fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
