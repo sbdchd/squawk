@@ -2940,7 +2940,7 @@ SortDesc =
   'desc'
 
 SortUsing =
-  'using' Op
+  'using' (Op | OperatorCall)
 
 SortBy =
   Expr SortOrder? NullsOrder?
@@ -3041,7 +3041,7 @@ ConstraintExclusionList =
   '(' (ConstraintExclusion (',' ConstraintExclusion)*) ')'
 
 ConstraintExclusion =
- Expr 'with' Op
+ Expr 'with' (Op | OperatorCall)
 
 WhereConditionClause =
   'where' '(' Expr ')'

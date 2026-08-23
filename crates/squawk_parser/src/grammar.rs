@@ -3580,7 +3580,7 @@ fn opt_sort_order(p: &mut Parser<'_>) {
         }
         USING_KW => {
             p.bump(USING_KW);
-            operator(p);
+            op_or_opcall(p);
             SORT_USING
         }
         _ => {
@@ -5048,17 +5048,120 @@ fn opt_operator(p: &mut Parser<'_>) -> bool {
     p.eat(kind)
 }
 
+fn opt_op(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(OPERATOR_FIRST) || p.at(FAT_ARROW) {
+        return false;
+    }
+    let (power, kind, _) = current_op(p, &Restrictions::default());
+    if power == 0 {
+        p.bump_any();
+        return true;
+    }
+    p.eat(kind)
+}
+
+const OP_RECOVERY: TokenSet = TokenSet::new(&[L_PAREN, COMMA]).union(EXPR_RECOVERY_SET);
+
+fn err_recover_run(p: &mut Parser<'_>, message: String, recovery: TokenSet) {
+    if p.at(EOF) || p.at_ts(recovery) {
+        p.error(message);
+        return;
+    }
+    let m = p.start();
+    p.error(message);
+    while !p.at(EOF) && !p.at_ts(recovery) {
+        p.bump_any();
+    }
+    m.complete(p, ERROR);
+}
+
+fn op(p: &mut Parser<'_>) {
+    if opt_op(p) {
+        return;
+    }
+    let message = format!("expected operator, got {:?}", p.current());
+    if p.at(EOF) || p.at_ts(OP_RECOVERY) {
+        p.error(message);
+        return;
+    }
+    let m = p.start();
+    p.error(message);
+    if !p.eat(COLON_COLON) && !p.eat(COLON_EQ) && !p.eat(FAT_ARROW) {
+        p.bump_any();
+    }
+    m.complete(p, ERROR);
+}
+
+fn opt_op_or_opcall(p: &mut Parser<'_>) -> bool {
+    p.eat(OPERATOR_CALL) || opt_op(p)
+}
+
+fn op_or_opcall(p: &mut Parser<'_>) {
+    if p.eat(OPERATOR_CALL) {
+        return;
+    }
+    let m = p.start();
+    if p.nth_at(1, DOT) {
+        opt_op_path(p);
+        p.error("qualified operator requires OPERATOR(...)");
+    }
+    op(p);
+    m.complete(p, OP);
+}
+
+fn at_op_path_segment(p: &Parser<'_>) -> bool {
+    p.at_ts(NAME_FIRST) || (!p.at(DOT) && p.nth_at(1, DOT))
+}
+
+fn opt_op_path(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !at_op_path_segment(p) {
+        return None;
+    }
+    let m = p.start();
+    op_path_segment(p);
+    let mut qual = m.complete(p, PATH_REF);
+    while p.at(DOT) {
+        let path = qual.precede(p);
+        p.bump(DOT);
+        let named = at_op_path_segment(p);
+        op_path_segment(p);
+        qual = path.complete(p, PATH_REF);
+        if !named {
+            break;
+        }
+    }
+    Some(qual)
+}
+
+fn op_path_segment(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.at_ts(NAME_FIRST) {
+        pg_name(p);
+    } else if at_op_path_segment(p) {
+        p.err_and_bump("expected name");
+    }
+    m.complete(p, PATH_SEGMENT_REF);
+}
+
 // optional schema supported
 // >
 // bar.>
 // foo.bar.>
-pub(crate) fn operator(p: &mut Parser<'_>) {
+pub(crate) fn qual_op(p: &mut Parser<'_>) {
     let m = p.start();
-    opt_path_name_ref(p);
-    if !opt_operator(p) {
-        p.error(format!("expected operator, got {:?}", p.current()));
-    }
+    opt_op_path(p);
+    op(p);
     m.complete(p, OP);
+}
+
+// >
+// bar.>
+// foo.bar.>
+// operator(bar.>)
+fn qual_op_or_opcall(p: &mut Parser<'_>) {
+    if !p.eat(OPERATOR_CALL) {
+        qual_op(p);
+    }
 }
 
 pub(crate) fn current_operator(p: &Parser<'_>) -> Option<SyntaxKind> {
@@ -5274,10 +5377,7 @@ fn opt_constraint_exclusion(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     p.expect(WITH_KW);
-    // support:
-    // with >
-    // with foo.bar.buzz.>
-    operator(p);
+    qual_op_or_opcall(p);
     Some(m.complete(p, CONSTRAINT_EXCLUSION))
 }
 
@@ -9152,7 +9252,7 @@ fn extension_member_object(p: &mut Parser<'_>) {
         }
         OPERATOR_KW => {
             p.bump(OPERATOR_KW);
-            operator(p);
+            qual_op(p);
             p.expect(L_PAREN);
             type_name(p);
             p.expect(COMMA);
@@ -10804,7 +10904,7 @@ fn comment_object(p: &mut Parser<'_>) {
         }
         OPERATOR_KW => {
             p.bump(OPERATOR_KW);
-            operator(p);
+            qual_op(p);
             p.eat(L_PAREN);
             type_name(p);
             p.expect(COMMA);
@@ -12182,7 +12282,7 @@ fn create_operator(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(CREATE_KW);
     p.bump(OPERATOR_KW);
-    operator(p);
+    qual_op(p);
     attribute_list(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_OPERATOR)
@@ -12234,7 +12334,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected an integer");
             }
-            operator(p);
+            qual_op(p);
             if p.eat(L_PAREN) {
                 type_name(p);
                 p.expect(COMMA);
@@ -13418,7 +13518,7 @@ fn op_sig_list(p: &mut Parser<'_>) {
 // name ( { left_type | NONE } , right_type )
 fn operator_sig(p: &mut Parser<'_>) {
     let m = p.start();
-    operator(p);
+    qual_op(p);
     p.expect(L_PAREN);
     if !p.eat(NONE_KW) {
         type_name(p);
@@ -18675,22 +18775,25 @@ fn opt_attribute_option(p: &mut Parser<'_>) -> bool {
 // qual_all_Op:
 //   | all_Op
 //   | OPERATOR '(' any_operator ')'
+const ATTRIBUTE_VALUE_RECOVERY: TokenSet = TokenSet::new(&[COMMA]).union(EXPR_RECOVERY_SET);
+
 fn def_arg(p: &mut Parser<'_>) {
     let m = p.start();
     if opt_bool_literal(p)
         || opt_string_literal(p).is_some()
         || opt_numeric_literal(p).is_some()
-        || opt_operator(p)
+        || opt_op_or_opcall(p)
         || p.eat(NONE_KW)
     {
     } else if p.at_ts(RESERVED_KEYWORDS) {
         p.bump_any();
     } else if p.eat(OPERATOR_KW) {
         p.expect(L_PAREN);
-        operator(p);
+        qual_op(p);
         p.expect(R_PAREN);
-    } else {
-        opt_type_name(p);
+    } else if !opt_type_name(p) {
+        let message = format!("expected attribute value, got {:?}", p.current());
+        err_recover_run(p, message, ATTRIBUTE_VALUE_RECOVERY);
     }
     m.complete(p, ATTRIBUTE_VALUE);
 }

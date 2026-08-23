@@ -26,6 +26,7 @@ const START_END_MARKERS: &[(&str, &str)] = &[
         "-- TO is used for the bound but not the INTERVAL:",
         "  WHERE id = '[1,2)';",
     ),
+    ("-- => is disallowed as an operator name now", ");"),
 ];
 
 const IGNORED_LINES: &[&str] = &[

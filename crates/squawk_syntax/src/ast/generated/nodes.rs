@@ -4387,6 +4387,10 @@ impl ConstraintExclusion {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn operator_call(&self) -> Option<OperatorCall> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn with_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WITH_KW)
     }
@@ -24397,6 +24401,10 @@ pub struct SortUsing {
 impl SortUsing {
     #[inline]
     pub fn op(&self) -> Option<Op> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn operator_call(&self) -> Option<OperatorCall> {
         support::child(&self.syntax)
     }
     #[inline]

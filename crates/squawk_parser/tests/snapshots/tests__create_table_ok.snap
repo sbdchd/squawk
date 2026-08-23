@@ -2115,6 +2115,112 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- exclude constraint with an explicit operator call"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_INDEX_METHOD
+          USING_KW "using"
+          WHITESPACE " "
+          ACCESS_METHOD_REF
+            IDENT "gist"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "c"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "pg_catalog"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                EQ "="
+              R_PAREN ")"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_INDEX_METHOD
+          USING_KW "using"
+          WHITESPACE " "
+          ACCESS_METHOD_REF
+            IDENT "gist"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "c"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                EQ "="
+              R_PAREN ")"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- exclude constraint multiple exclusions"
   WHITESPACE "\n"
   CREATE_TABLE
