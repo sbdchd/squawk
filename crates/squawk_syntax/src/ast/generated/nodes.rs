@@ -3770,21 +3770,6 @@ impl ColonColon {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ColonEq {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ColonEq {
-    #[inline]
-    pub fn colon_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COLON)
-    }
-    #[inline]
-    pub fn eq_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EQ)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Column {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11101,21 +11086,6 @@ impl ExtractFn {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct FatArrow {
-    pub(crate) syntax: SyntaxNode,
-}
-impl FatArrow {
-    #[inline]
-    pub fn eq_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EQ)
-    }
-    #[inline]
-    pub fn r_angle_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_ANGLE)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FdwOptionList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -12440,21 +12410,6 @@ impl GroupingSets {
     #[inline]
     pub fn sets_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SETS_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Gteq {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Gteq {
-    #[inline]
-    pub fn eq_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EQ)
-    }
-    #[inline]
-    pub fn r_angle_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_ANGLE)
     }
 }
 
@@ -15216,21 +15171,6 @@ impl LockingOf {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Lteq {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Lteq {
-    #[inline]
-    pub fn l_angle_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_ANGLE)
-    }
-    #[inline]
-    pub fn eq_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EQ)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MatchFull {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15592,20 +15532,20 @@ pub struct NamedArg {
 }
 impl NamedArg {
     #[inline]
-    pub fn colon_eq(&self) -> Option<ColonEq> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn fat_arrow(&self) -> Option<FatArrow> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn name(&self) -> Option<ParamNameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn fat_arrow_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FAT_ARROW)
     }
 }
 
@@ -15640,36 +15580,6 @@ impl NamedSchema {
     #[inline]
     pub fn authorization_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AUTHORIZATION_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Neq {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Neq {
-    #[inline]
-    pub fn bang_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::BANG)
-    }
-    #[inline]
-    pub fn eq_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EQ)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Neqb {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Neqb {
-    #[inline]
-    pub fn l_angle_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_ANGLE)
-    }
-    #[inline]
-    pub fn r_angle_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_ANGLE)
     }
 }
 
@@ -17274,19 +17184,7 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn colon_eq(&self) -> Option<ColonEq> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn custom_op(&self) -> Option<CustomOp> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn fat_arrow(&self) -> Option<FatArrow> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn gteq(&self) -> Option<Gteq> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17350,18 +17248,6 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn lteq(&self) -> Option<Lteq> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn neq(&self) -> Option<Neq> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn neqb(&self) -> Option<Neqb> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn not_ilike(&self) -> Option<NotIlike> {
         support::child(&self.syntax)
     }
@@ -17390,6 +17276,10 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn neq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NEQ)
+    }
+    #[inline]
     pub fn percent_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PERCENT)
     }
@@ -17410,16 +17300,36 @@ impl Op {
         support::token(&self.syntax, SyntaxKind::COLON)
     }
     #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
     pub fn l_angle_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_ANGLE)
+    }
+    #[inline]
+    pub fn lteq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LTEQ)
+    }
+    #[inline]
+    pub fn neqb_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NEQB)
     }
     #[inline]
     pub fn eq_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EQ)
     }
     #[inline]
+    pub fn fat_arrow_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FAT_ARROW)
+    }
+    #[inline]
     pub fn r_angle_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_ANGLE)
+    }
+    #[inline]
+    pub fn gteq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GTEQ)
     }
     #[inline]
     pub fn caret_token(&self) -> Option<SyntaxToken> {
@@ -32795,24 +32705,6 @@ impl AstNode for ColonColon {
         &self.syntax
     }
 }
-impl AstNode for ColonEq {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::COLON_EQ
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for Column {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -38069,24 +37961,6 @@ impl AstNode for ExtractFn {
         &self.syntax
     }
 }
-impl AstNode for FatArrow {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FAT_ARROW
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for FdwOptionList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -39369,24 +39243,6 @@ impl AstNode for GroupingSets {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::GROUPING_SETS
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for Gteq {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::GTEQ
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -41957,24 +41813,6 @@ impl AstNode for LockingOf {
         &self.syntax
     }
 }
-impl AstNode for Lteq {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LTEQ
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for MatchFull {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -42303,42 +42141,6 @@ impl AstNode for NamedSchema {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NAMED_SCHEMA
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for Neq {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::NEQ
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for Neqb {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::NEQB
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

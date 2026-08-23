@@ -3954,6 +3954,41 @@ SOURCE_FILE
               IDENT "vals"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- order by named param"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "foo"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "x"
+                WHITESPACE " "
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        IDENT "y"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- order by param 2"
   WHITESPACE "\n"
   SELECT

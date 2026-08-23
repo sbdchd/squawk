@@ -387,10 +387,88 @@ fn build_from_alias<'a>(alias: Option<ast::FromAlias>) -> Doc<'a> {
             .append(leading_comments(name.syntax()))
             .append(build_name(name.syntax()));
     }
-    if alias.columns().is_some() {
-        todo!("columns in from aliases are not supported yet")
+    if let Some(columns) = alias.columns() {
+        doc = doc.append(build_from_alias_columns(columns));
     }
     doc
+}
+
+fn build_from_alias_columns<'a>(columns: ast::FromAliasColumns) -> Doc<'a> {
+    match columns {
+        ast::FromAliasColumns::ColumnList(list) => {
+            let items = list
+                .column_names()
+                .map(|name| {
+                    leading_comments(name.syntax())
+                        .append(build_name(name.syntax()))
+                        .append(trailing_comments(name.syntax()))
+                })
+                .collect();
+            comments_before(list.syntax().clone()).append(build_from_alias_column_list(
+                list.l_paren_token(),
+                items,
+                list.r_paren_token(),
+            ))
+        }
+        ast::FromAliasColumns::ColumnDefList(list) => {
+            let items = list
+                .column_defs()
+                .map(|column| {
+                    let mut doc = leading_comments(column.syntax());
+                    if let Some(name) = column.name() {
+                        doc = doc.append(build_name(name.syntax()));
+                    }
+                    if let Some(ty) = column.ty() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(ty.syntax()))
+                            .append(build_type(ty));
+                    }
+                    if let Some(collate) = column.collate() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(collate.syntax()))
+                            .append(build_collate_expr(collate));
+                    }
+                    doc.append(trailing_comments(column.syntax()))
+                })
+                .collect();
+            comments_before(list.syntax().clone()).append(build_from_alias_column_list(
+                list.l_paren_token(),
+                items,
+                list.r_paren_token(),
+            ))
+        }
+    }
+}
+
+fn build_from_alias_column_list<'a>(
+    l_paren: Option<SyntaxToken>,
+    items: Vec<Doc<'a>>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = l_paren {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+    if items.is_empty() {
+        if let Some(r_paren) = r_paren {
+            doc = doc.append(comments_before(r_paren));
+        }
+    } else {
+        doc = doc.append(
+            Doc::list(
+                Itertools::intersperse(
+                    items.into_iter(),
+                    Doc::text(",").append(Doc::line_or_space()),
+                )
+                .collect(),
+            )
+            .nest(2),
+        );
+    }
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_group_by_list<'a>(list: ast::GroupByList) -> Doc<'a> {
@@ -827,19 +905,130 @@ fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
 }
 
 fn build_call_arg<'a>(arg: ast::Arg) -> Doc<'a> {
-    if let Some(_named_arg) = arg.named_arg() {
-        todo!("named function arguments are not supported yet")
+    let mut doc = if let Some(named_arg) = arg.named_arg() {
+        build_named_call_arg(named_arg)
+    } else {
+        let mut doc = Doc::nil();
+        if arg.variadic_token().is_some() {
+            doc = doc.append(Doc::text("variadic")).append(Doc::space());
+        }
+        if let Some(expr) = arg.expr() {
+            doc = doc
+                .append(leading_comments(expr.syntax()))
+                .append(build_expr(expr));
+        }
+        doc
+    };
+    if let Some(order_by_clause) = arg.order_by_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(order_by_clause.syntax()))
+            .append(build_order_by_clause(order_by_clause));
     }
-    if let Some(_order_by_clause) = arg.order_by_clause() {
-        todo!("order by clauses in function arguments are not supported yet")
+    doc
+}
+
+fn build_order_by_clause<'a>(clause: ast::OrderByClause) -> Doc<'a> {
+    let mut doc = Doc::text("order").append(Doc::space());
+    if let Some(by_token) = clause.by_token() {
+        doc = doc.append(leading_comments_token(&by_token));
+    }
+    doc = doc.append(Doc::text("by"));
+
+    if let Some(list) = clause.sort_by_list() {
+        let items = list
+            .sort_bys()
+            .map(|sort_by| leading_comments(sort_by.syntax()).append(build_sort_by(sort_by)));
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(list.syntax()))
+            .append(Doc::list(
+                Itertools::intersperse(items, Doc::text(",").append(Doc::space())).collect(),
+            ));
+    }
+    doc
+}
+
+fn build_sort_by<'a>(sort_by: ast::SortBy) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(expr) = sort_by.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
     }
 
-    let mut doc = Doc::nil();
-    if arg.variadic_token().is_some() {
-        doc = doc.append(Doc::text("variadic")).append(Doc::space());
+    if let Some(order) = sort_by.sort_order() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(order.syntax()))
+            .append(match order {
+                ast::SortOrder::SortAsc(_) => Doc::text("asc"),
+                ast::SortOrder::SortDesc(_) => Doc::text("desc"),
+                ast::SortOrder::SortUsing(using) => {
+                    let mut doc = Doc::text("using");
+                    if let Some(operator_call) = using.operator_call() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(operator_call.syntax()))
+                            .append(build_operator_call(&operator_call));
+                    } else if let Some(op) = using.op() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(op.syntax()))
+                            .append(build_operator(&op));
+                    }
+                    doc
+                }
+            });
     }
+
+    if let Some(nulls_order) = sort_by.nulls_order() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(nulls_order.syntax()))
+            .append(Doc::text("nulls"))
+            .append(Doc::space());
+        let suffix = match nulls_order {
+            ast::NullsOrder::NullsFirst(first) => first
+                .first_token()
+                .map(|token| leading_comments_token(&token))
+                .unwrap_or_else(Doc::nil)
+                .append(Doc::text("first")),
+            ast::NullsOrder::NullsLast(last) => last
+                .last_token()
+                .map(|token| leading_comments_token(&token))
+                .unwrap_or_else(Doc::nil)
+                .append(Doc::text("last")),
+        };
+        doc = doc.append(suffix);
+    }
+
+    doc.append(trailing_comments(sort_by.syntax()))
+}
+
+fn build_named_call_arg<'a>(arg: ast::NamedArg) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(name) = arg.name() {
+        doc = doc
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+
+    if let Some(fat_arrow) = arg.fat_arrow_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&fat_arrow))
+            .append(Doc::text("=>"));
+    } else if let Some(colon_eq) = arg.colon_eq_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&colon_eq))
+            .append(Doc::text(":="));
+    }
+
     if let Some(expr) = arg.expr() {
         doc = doc
+            .append(Doc::space())
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     }
@@ -981,12 +1170,17 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
 }
 
 fn build_collate_expr<'a>(collate: ast::Collate) -> Doc<'a> {
-    let mut doc = collate.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    let expr = collate.expr();
+    let has_expr = expr.is_some();
+    let mut doc = expr.map(build_expr).unwrap_or_else(Doc::nil);
 
     if let Some(collate_token) = collate.collate_token() {
         doc = doc.append(comments_before(collate_token));
     }
-    doc = doc.append(Doc::space()).append(Doc::text("collate"));
+    if has_expr {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("collate"));
 
     if let Some(collation) = collate.collation_ref() {
         doc = doc

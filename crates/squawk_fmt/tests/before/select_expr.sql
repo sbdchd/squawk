@@ -56,6 +56,12 @@ select
   foo ( /* before distinct */ DISTINCT /* after distinct */ 1 ),
   foo ( VARIADIC xs ),
   foo ( /* before variadic */ VARIADIC /* after variadic */ xs ),
+  foo(a => 1, b := 2),
+  foo(/* before name */ a /* before arrow */ => /* before value */ 1 /* before comma */, /* before arg */ b /* before assign */ := /* before value 2 */ 2),
+  array_agg(x order by y desc nulls last, z asc),
+  foo(a => x order by y),
+  array_agg(x order by y using > nulls first),
+  array_agg(x /* before order */ order /* before by */ by /* before first */ y /* before desc */ desc /* before nulls */ nulls /* before last */ last /* before comma */, /* before second */ z /* before asc */ asc),
   public.foo(1),
   foo /* before opening paren */ ( /* before first arg */ 1 /* before comma */, /* before second arg */ 2 /* before closing paren */ ),
   -- case expr
