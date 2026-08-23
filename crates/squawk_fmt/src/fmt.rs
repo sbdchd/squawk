@@ -285,20 +285,19 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
         ast::Expr::ArrayExpr(array_expr) => build_array_expr(array_expr),
         ast::Expr::BetweenExpr(between_expr) => build_between_expr(between_expr),
         ast::Expr::BinExpr(bin_expr) => build_bin_expr(bin_expr),
-        // ast::Expr::CallExpr(call_expr) => todo!(),
-        // ast::Expr::CaseExpr(case_expr) => todo!(),
+        ast::Expr::CallExpr(call_expr) => build_call_expr(call_expr),
+        ast::Expr::CaseExpr(case_expr) => build_case_expr(case_expr),
         ast::Expr::CastExpr(cast_expr) => build_cast_expr(cast_expr),
         ast::Expr::Collate(collate) => build_collate_expr(collate),
-        // ast::Expr::FieldExpr(field_expr) => todo!(),
-        // ast::Expr::IndexExpr(index_expr) => todo!(),
+        ast::Expr::FieldExpr(field_expr) => build_field_expr(field_expr),
+        ast::Expr::IndexExpr(index_expr) => build_index_expr(index_expr),
         ast::Expr::Literal(literal) => build_literal(literal),
-        // ast::Expr::NameRef(name_ref) => todo!(),
-        // ast::Expr::ParenExpr(paren_expr) => todo!(),
+        ast::Expr::NameRef(name_ref) => build_name(name_ref.syntax()),
+        ast::Expr::ParenExpr(paren_expr) => build_paren_expr(paren_expr),
         ast::Expr::PostfixExpr(postfix_expr) => build_postfix_expr(postfix_expr),
         ast::Expr::PrefixExpr(prefix_expr) => build_prefix_expr(prefix_expr),
-        // ast::Expr::SliceExpr(slice_expr) => todo!(),
-        // ast::Expr::TupleExpr(tuple_expr) => todo!(),
-        _ => Doc::text(expr.syntax().to_string()),
+        ast::Expr::SliceExpr(slice_expr) => build_slice_expr(slice_expr),
+        ast::Expr::TupleExpr(tuple_expr) => build_tuple_expr(tuple_expr),
     }
 }
 
@@ -327,6 +326,118 @@ fn build_array_expr<'a>(array_expr: ast::ArrayExpr) -> Doc<'a> {
     }
 }
 
+fn build_field_expr<'a>(field_expr: ast::FieldExpr) -> Doc<'a> {
+    let mut doc = match field_expr.base() {
+        Some(base) => build_expr(base),
+        None => Doc::nil(),
+    };
+
+    if let Some(dot) = field_expr.dot_token() {
+        doc = doc.append(comments_before(dot));
+    }
+    doc = doc.append(Doc::text("."));
+
+    if let Some(star) = field_expr.star_token() {
+        doc = doc
+            .append(leading_comments_token(&star))
+            .append(Doc::text("*"));
+    } else if let Some(field) = field_expr.field() {
+        doc = doc
+            .append(leading_comments(field.syntax()))
+            .append(build_name(field.syntax()));
+    }
+
+    doc
+}
+
+fn build_index_expr<'a>(index_expr: ast::IndexExpr) -> Doc<'a> {
+    let mut doc = match index_expr.base() {
+        Some(base) => build_expr(base),
+        None => Doc::nil(),
+    };
+
+    if let Some(l_brack) = index_expr.l_brack_token() {
+        doc = doc.append(comments_before(l_brack));
+    }
+    doc = doc.append(Doc::text("["));
+
+    if let Some(index) = index_expr.index() {
+        doc = doc
+            .append(leading_comments(index.syntax()))
+            .append(build_expr(index));
+    }
+    if let Some(r_brack) = index_expr.r_brack_token() {
+        doc = doc.append(comments_before(r_brack));
+    }
+    doc.append(Doc::text("]"))
+}
+
+fn build_slice_expr<'a>(slice_expr: ast::SliceExpr) -> Doc<'a> {
+    let mut doc = match slice_expr.base() {
+        Some(base) => build_expr(base),
+        None => Doc::nil(),
+    };
+
+    if let Some(l_brack) = slice_expr.l_brack_token() {
+        doc = doc.append(comments_before(l_brack));
+    }
+    doc = doc.append(Doc::text("["));
+
+    if let Some(start) = slice_expr.start() {
+        doc = doc
+            .append(leading_comments(start.syntax()))
+            .append(build_expr(start));
+    }
+    if let Some(colon) = slice_expr.colon_token() {
+        doc = doc.append(comments_before(colon));
+    }
+    doc = doc.append(Doc::text(":"));
+
+    if let Some(end) = slice_expr.end() {
+        doc = doc
+            .append(leading_comments(end.syntax()))
+            .append(build_expr(end));
+    }
+    if let Some(r_brack) = slice_expr.r_brack_token() {
+        doc = doc.append(comments_before(r_brack));
+    }
+    doc.append(Doc::text("]"))
+}
+
+fn build_tuple_expr<'a>(tuple_expr: ast::TupleExpr) -> Doc<'a> {
+    let mut doc = if tuple_expr.row_token().is_some() {
+        Doc::text("row")
+    } else {
+        Doc::nil()
+    };
+
+    if let Some(l_paren) = tuple_expr.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let exprs: Vec<Doc<'a>> = tuple_expr
+        .exprs()
+        .map(|expr| {
+            let leading = leading_comments(expr.syntax());
+            let trailing = trailing_comments(expr.syntax());
+            leading.append(build_expr(expr)).append(trailing)
+        })
+        .collect();
+    if exprs.is_empty() {
+        if let Some(r_paren) = tuple_expr.r_paren_token() {
+            doc = doc.append(comments_before(r_paren));
+        }
+    } else {
+        doc = doc.append(Doc::list(
+            Itertools::intersperse(exprs.into_iter(), Doc::text(",").append(Doc::space()))
+                .collect(),
+        ));
+    }
+
+    doc.append(Doc::text(")"))
+}
+
 fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
     let mut doc = build_expr(between_expr.target().unwrap());
     if between_expr.not_token().is_some() {
@@ -348,6 +459,235 @@ fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
         .append(Doc::text("and"))
         .append(Doc::space())
         .append(build_expr(between_expr.end().unwrap()))
+}
+
+fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
+    if let (Some(expr), Some(arg_list)) = (call_expr.expr(), call_expr.arg_list()) {
+        if call_expr.within_clause().is_some() {
+            todo!("within clauses on call expressions are not supported yet")
+        } else if call_expr.filter_clause().is_some() {
+            todo!("filter clauses on call expressions are not supported yet")
+        } else if call_expr.null_treatment().is_some() {
+            todo!("null treatment on call expressions is not supported yet")
+        } else if call_expr.over_clause().is_some() {
+            todo!("over clauses on call expressions are not supported yet")
+        }
+        build_expr(expr)
+            .append(comments_before(arg_list.syntax().clone()))
+            .append(build_call_arg_list(arg_list))
+    } else if let Some(_all_fn) = call_expr.all_fn() {
+        todo!("all function expressions are not supported yet")
+    } else if let Some(_any_fn) = call_expr.any_fn() {
+        todo!("any function expressions are not supported yet")
+    } else if let Some(_collation_for_fn) = call_expr.collation_for_fn() {
+        todo!("collation_for function expressions are not supported yet")
+    } else if let Some(_exists_fn) = call_expr.exists_fn() {
+        todo!("exists function expressions are not supported yet")
+    } else if let Some(_extract_fn) = call_expr.extract_fn() {
+        todo!("extract function expressions are not supported yet")
+    } else if let Some(_graph_table_fn) = call_expr.graph_table_fn() {
+        todo!("graph_table function expressions are not supported yet")
+    } else if let Some(_json_array_agg_fn) = call_expr.json_array_agg_fn() {
+        todo!("json_arrayagg function expressions are not supported yet")
+    } else if let Some(_json_array_fn) = call_expr.json_array_fn() {
+        todo!("json_array function expressions are not supported yet")
+    } else if let Some(_json_exists_fn) = call_expr.json_exists_fn() {
+        todo!("json_exists function expressions are not supported yet")
+    } else if let Some(_json_fn) = call_expr.json_fn() {
+        todo!("json function expressions are not supported yet")
+    } else if let Some(_json_object_agg_fn) = call_expr.json_object_agg_fn() {
+        todo!("json_objectagg function expressions are not supported yet")
+    } else if let Some(_json_object_fn) = call_expr.json_object_fn() {
+        todo!("json_object function expressions are not supported yet")
+    } else if let Some(_json_query_fn) = call_expr.json_query_fn() {
+        todo!("json_query function expressions are not supported yet")
+    } else if let Some(_json_scalar_fn) = call_expr.json_scalar_fn() {
+        todo!("json_scalar function expressions are not supported yet")
+    } else if let Some(_json_serialize_fn) = call_expr.json_serialize_fn() {
+        todo!("json_serialize function expressions are not supported yet")
+    } else if let Some(_json_value_fn) = call_expr.json_value_fn() {
+        todo!("json_value function expressions are not supported yet")
+    } else if let Some(_overlay_fn) = call_expr.overlay_fn() {
+        todo!("overlay function expressions are not supported yet")
+    } else if let Some(_position_fn) = call_expr.position_fn() {
+        todo!("position function expressions are not supported yet")
+    } else if let Some(_some_fn) = call_expr.some_fn() {
+        todo!("some function expressions are not supported yet")
+    } else if let Some(_substring_fn) = call_expr.substring_fn() {
+        todo!("substring function expressions are not supported yet")
+    } else if let Some(_trim_fn) = call_expr.trim_fn() {
+        todo!("trim function expressions are not supported yet")
+    } else if let Some(_xml_element_fn) = call_expr.xml_element_fn() {
+        todo!("xmlelement function expressions are not supported yet")
+    } else if let Some(_xml_exists_fn) = call_expr.xml_exists_fn() {
+        todo!("xmlexists function expressions are not supported yet")
+    } else if let Some(_xml_forest_fn) = call_expr.xml_forest_fn() {
+        todo!("xmlforest function expressions are not supported yet")
+    } else if let Some(_xml_parse_fn) = call_expr.xml_parse_fn() {
+        todo!("xmlparse function expressions are not supported yet")
+    } else if let Some(_xml_pi_fn) = call_expr.xml_pi_fn() {
+        todo!("xmlpi function expressions are not supported yet")
+    } else if let Some(_xml_root_fn) = call_expr.xml_root_fn() {
+        todo!("xmlroot function expressions are not supported yet")
+    } else if let Some(_xml_serialize_fn) = call_expr.xml_serialize_fn() {
+        todo!("xmlserialize function expressions are not supported yet")
+    } else {
+        unreachable!("a call expression should contain a supported function node")
+    }
+}
+
+fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = arg_list.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(star) = arg_list.star_token() {
+        doc = doc
+            .append(leading_comments_token(&star))
+            .append(Doc::text("*"));
+        if let Some(r_paren) = arg_list.r_paren_token() {
+            doc = doc.append(comments_before(r_paren));
+        }
+        return doc.append(Doc::text(")"));
+    }
+
+    let mut has_quantifier = false;
+    if let Some(quantifier) = arg_list.all_or_distinct() {
+        has_quantifier = true;
+        doc = doc
+            .append(leading_comments(quantifier.syntax()))
+            .append(match quantifier {
+                ast::AllOrDistinct::All(_) => Doc::text("all"),
+                ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
+            });
+    }
+
+    let args: Vec<Doc<'a>> = arg_list
+        .args()
+        .map(|arg| {
+            let leading = leading_comments(arg.syntax());
+            let trailing = trailing_comments(arg.syntax());
+            leading.append(build_call_arg(arg)).append(trailing)
+        })
+        .collect();
+    if args.is_empty() {
+        if let Some(r_paren) = arg_list.r_paren_token() {
+            doc = doc.append(comments_before(r_paren));
+        }
+    } else {
+        if has_quantifier {
+            doc = doc.append(Doc::space());
+        }
+        doc = doc.append(Doc::list(
+            Itertools::intersperse(args.into_iter(), Doc::text(",").append(Doc::space())).collect(),
+        ));
+    }
+
+    doc.append(Doc::text(")"))
+}
+
+fn build_call_arg<'a>(arg: ast::Arg) -> Doc<'a> {
+    if let Some(_named_arg) = arg.named_arg() {
+        todo!("named function arguments are not supported yet")
+    }
+    if let Some(_order_by_clause) = arg.order_by_clause() {
+        todo!("order by clauses in function arguments are not supported yet")
+    }
+
+    let mut doc = Doc::nil();
+    if arg.variadic_token().is_some() {
+        doc = doc.append(Doc::text("variadic")).append(Doc::space());
+    }
+    if let Some(expr) = arg.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_case_expr<'a>(case_expr: ast::CaseExpr) -> Doc<'a> {
+    let mut doc = Doc::text("case");
+
+    if let Some(expr) = case_expr.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+
+    if let Some(when_clause_list) = case_expr.when_clause_list() {
+        for (index, when_clause) in when_clause_list.when_clauses().enumerate() {
+            let list_comments = if index == 0 {
+                leading_comments(when_clause_list.syntax())
+            } else {
+                Doc::nil()
+            };
+            doc = doc.append(
+                Doc::line_or_space()
+                    .append(list_comments)
+                    .append(leading_comments(when_clause.syntax()))
+                    .append(build_when_clause(when_clause))
+                    .nest(2),
+            );
+        }
+    }
+
+    if let Some(else_clause) = case_expr.else_clause() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(else_clause.syntax()))
+                .append(build_else_clause(else_clause))
+                .nest(2),
+        );
+    }
+
+    if let Some(end) = case_expr.end_token() {
+        doc = doc
+            .append(comments_before(end))
+            .append(Doc::line_or_space());
+    }
+    doc.append(Doc::text("end")).group()
+}
+
+fn build_when_clause<'a>(when_clause: ast::WhenClause) -> Doc<'a> {
+    let mut doc = Doc::text("when");
+    if let Some(condition) = when_clause.condition() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(condition.syntax()))
+            .append(build_expr(condition));
+    }
+    if let Some(then) = when_clause.then_token() {
+        doc = doc
+            .append(comments_before(then))
+            .append(Doc::space())
+            .append(Doc::text("then"));
+    }
+    if let Some(result) = when_clause.then() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(result.syntax()))
+                .append(build_expr(result))
+                .nest(2),
+        );
+    }
+    doc.group()
+}
+
+fn build_else_clause<'a>(else_clause: ast::ElseClause) -> Doc<'a> {
+    let mut doc = Doc::text("else");
+    if let Some(expr) = else_clause.expr() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(expr.syntax()))
+                .append(build_expr(expr))
+                .nest(2),
+        );
+    }
+    doc
 }
 
 fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
@@ -410,6 +750,39 @@ fn build_collate_expr<'a>(collate: ast::Collate) -> Doc<'a> {
         .append(Doc::text(
             collate.collation_ref().unwrap().syntax().to_string(),
         ))
+}
+
+fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = paren_expr.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(expr) = paren_expr.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    } else if let Some(_compound_select) = paren_expr.compound_select() {
+        todo!("parenthesized compound select nodes are not supported yet")
+    } else if let Some(_from_item) = paren_expr.from_item() {
+        todo!("parenthesized from item nodes are not supported yet")
+    } else if let Some(_join_expr) = paren_expr.join_expr() {
+        todo!("parenthesized join expression nodes are not supported yet")
+    } else if let Some(_select) = paren_expr.select() {
+        todo!("parenthesized select nodes are not supported yet")
+    } else if let Some(_table) = paren_expr.table() {
+        todo!("parenthesized table nodes are not supported yet")
+    } else if let Some(_values) = paren_expr.values() {
+        todo!("parenthesized values nodes are not supported yet")
+    } else {
+        unreachable!("a parenthesized expression should contain a node")
+    }
+
+    if let Some(r_paren) = paren_expr.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
 }
 
 fn build_postfix_expr<'a>(postfix_expr: ast::PostfixExpr) -> Doc<'a> {

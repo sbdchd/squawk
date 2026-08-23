@@ -47,23 +47,51 @@ select
   2  *  3,
   -- call expr
   date_trunc('month', now()),
+  foo ( ),
+  foo ( * ),
+  foo ( ALL 1, 2 ),
+  foo ( /* before all */ ALL /* after all */ 1 ),
+  foo ( DISTINCT 1 ),
+  foo ( /* before distinct */ DISTINCT /* after distinct */ 1 ),
+  foo ( VARIADIC xs ),
+  foo ( /* before variadic */ VARIADIC /* after variadic */ xs ),
+  public.foo(1),
+  foo /* before opening paren */ ( /* before first arg */ 1 /* before comma */, /* before second arg */ 2 /* before closing paren */ ),
   -- case expr
-  case when x > 1 then 1 else 0 end ,
+  case when x > 1 then 1 else 0 end,
+  case x when 1 then 'one' when 2 then 'two' else 'other' end,
+  case a_very_long_input_expression when a_very_long_condition_expression then 'a very long result value for the first condition' when another_very_long_condition_expression then 'another very long result value for the second condition' else 'a very long fallback result value' end,
+  case when true then 1 end,
+  case /* after case */ x /* before when */ when /* after when */ 1 /* before then */ then /* after then */ 2 /* before else */ else /* after else */ 3 /* before end */ end,
   -- cast expr
   cast(1 as int8),
   treat(2 as bigint),
   1::int8,
   int8 '1',
   -- field expr
-  foo.bar,
+  foo . bar,
+  foo.bar.baz,
+  foo . *,
+  (foo) . bar,
+  ( /* after opening paren */ foo /* before closing paren */ ) . bar,
+  foo /* before dot */ . /* before field */ "bar",
   -- index expr
-  a[1],
+  a [ 1 ],
+  a[1][2],
+  a[1 + 2],
+  a /* before bracket */ [ /* before index */ 1 /* before closing bracket */ ],
   -- literal
   42,
   -- name ref
-  foo,
+  FOO,
+  "foo",
+  "Mixed",
+  U&"@0066@006f@006f" UESCAPE '@',
   -- paren expr
-  (1),
+  ( 1 ),
+  ( 1 + 2 ),
+  ( ( 1 ) ),
+  ( /* before expr */ 1 /* before closing paren */ ),
   -- postfix expr
   1  isnull,
   2  notnull,
@@ -92,5 +120,15 @@ select
   not true,
   -- slice expr
   c[:2][2:],
+  c[1:2],
+  c[2:],
+  c[:3],
+  c[:],
+  c /* before bracket */ [ /* before start */ 1 /* before colon */ : /* before end */ 2 /* before closing bracket */ ],
   -- tuple expr
-  (1, 2, 3);
+  ( 1 , 2 , 3 ),
+  row ( ),
+  row ( 1 ),
+  row /* before opening paren */ ( 1 ),
+  row ( 1 , 2 ),
+  ( /* before first */ 1 /* before comma */ , /* before second */ 2 /* before closing paren */ );
