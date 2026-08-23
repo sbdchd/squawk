@@ -824,10 +824,10 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         build_extract_fn(extract_fn)
     } else if let Some(_graph_table_fn) = call_expr.graph_table_fn() {
         todo!("graph_table function expressions are not supported yet")
-    } else if let Some(_json_array_agg_fn) = call_expr.json_array_agg_fn() {
-        todo!("json_arrayagg function expressions are not supported yet")
-    } else if let Some(_json_array_fn) = call_expr.json_array_fn() {
-        todo!("json_array function expressions are not supported yet")
+    } else if let Some(json_array_agg_fn) = call_expr.json_array_agg_fn() {
+        build_json_array_agg_fn(json_array_agg_fn)
+    } else if let Some(json_array_fn) = call_expr.json_array_fn() {
+        build_json_array_fn(json_array_fn)
     } else if let Some(_json_exists_fn) = call_expr.json_exists_fn() {
         todo!("json_exists function expressions are not supported yet")
     } else if let Some(_json_fn) = call_expr.json_fn() {
@@ -877,6 +877,204 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
     } else {
         unreachable!("a call expression should contain a supported function node")
     }
+}
+
+fn build_json_array_fn<'a>(json_array_fn: ast::JsonArrayFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_array");
+    if let Some(l_paren) = json_array_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let exprs = json_array_fn.json_expr_formats().map(|value| {
+        (
+            leading_comments(value.syntax()).append(build_json_expr_format(value.clone())),
+            value.syntax().clone(),
+        )
+    });
+    let selects = json_array_fn.json_select_formats().map(|select| {
+        (
+            leading_comments(select.syntax()).append(build_json_select_format(select.clone())),
+            select.syntax().clone(),
+        )
+    });
+    let mut items = exprs.chain(selects);
+    if let Some((first, mut previous_syntax)) = items.next() {
+        let mut item_docs = vec![first];
+        for (item, syntax) in items {
+            item_docs.push(
+                trailing_comments(&previous_syntax)
+                    .append(Doc::text(","))
+                    .append(Doc::space())
+                    .append(item),
+            );
+            previous_syntax = syntax;
+        }
+        doc = doc.append(Doc::list(item_docs));
+    }
+
+    if let Some(null_clause) = json_array_fn.json_null_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+    }
+    if let Some(returning) = json_array_fn.json_returning_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_array_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_json_expr_format<'a>(value: ast::JsonExprFormat) -> Doc<'a> {
+    let mut doc = value.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(format) = value.json_format_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc
+}
+
+fn build_json_select_format<'a>(select: ast::JsonSelectFormat) -> Doc<'a> {
+    let mut doc = select
+        .select_variant()
+        .map(|select| match select {
+            ast::SelectVariant::Select(select) => build_select_doc(&select),
+            _ => todo!("this select variant is not supported yet"),
+        })
+        .unwrap_or_else(Doc::nil);
+    if let Some(format) = select.json_format_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc
+}
+
+fn build_json_array_agg_fn<'a>(json_array_agg_fn: ast::JsonArrayAggFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_arrayagg");
+    if let Some(l_paren) = json_array_agg_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(value) = json_array_agg_fn.json_value_expr() {
+        doc = doc
+            .append(leading_comments(value.syntax()))
+            .append(build_json_value_expr(value));
+    }
+    if let Some(order_by) = json_array_agg_fn.order_by_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(order_by.syntax()))
+            .append(build_order_by_clause(order_by));
+    }
+    if let Some(null_clause) = json_array_agg_fn.json_null_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+    }
+    if let Some(returning) = json_array_agg_fn.json_returning_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_array_agg_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_json_value_expr<'a>(value: ast::JsonValueExpr) -> Doc<'a> {
+    let mut doc = value.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(format) = value.json_format_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc
+}
+
+fn build_json_format_clause<'a>(format: ast::JsonFormatClause) -> Doc<'a> {
+    let mut doc = Doc::text("format");
+    if let Some(json_token) = format.json_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&json_token))
+            .append(Doc::text("json"));
+    }
+    if let Some(encoding) = format.json_encoding_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(encoding.syntax()))
+            .append(build_json_encoding_clause(encoding));
+    }
+    doc
+}
+
+fn build_json_encoding_clause<'a>(clause: ast::JsonEncodingClause) -> Doc<'a> {
+    let mut doc = Doc::text("encoding");
+    if let Some(encoding) = clause.json_encoding() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(encoding.syntax()))
+            .append(build_name(encoding.syntax()));
+    }
+    doc
+}
+
+fn build_json_null_clause<'a>(clause: ast::JsonNullClause) -> Doc<'a> {
+    let (prefix, on_token, null_token) = match clause {
+        ast::JsonNullClause::JsonAbsentOnNull(clause) => {
+            ("absent", clause.on_token(), clause.null_token())
+        }
+        ast::JsonNullClause::JsonNullOnNull(clause) => {
+            ("null", clause.on_token(), clause.null_token())
+        }
+    };
+
+    let mut doc = Doc::text(prefix);
+    if let Some(on_token) = on_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&on_token))
+            .append(Doc::text("on"));
+    }
+    if let Some(null_token) = null_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&null_token))
+            .append(Doc::text("null"));
+    }
+    doc
+}
+
+fn build_json_returning_clause<'a>(returning: ast::JsonReturningClause) -> Doc<'a> {
+    let mut doc = Doc::text("returning");
+    if let Some(ty) = returning.ty() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(ty.syntax()))
+            .append(build_type(ty));
+    }
+    if let Some(format) = returning.json_format_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc
 }
 
 fn build_substring_fn<'a>(substring_fn: ast::SubstringFn) -> Doc<'a> {
