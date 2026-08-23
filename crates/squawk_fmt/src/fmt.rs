@@ -766,18 +766,34 @@ fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
 
 fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
     if let (Some(expr), Some(arg_list)) = (call_expr.expr(), call_expr.arg_list()) {
-        if call_expr.within_clause().is_some() {
-            todo!("within clauses on call expressions are not supported yet")
-        } else if call_expr.filter_clause().is_some() {
-            todo!("filter clauses on call expressions are not supported yet")
-        } else if call_expr.null_treatment().is_some() {
-            todo!("null treatment on call expressions is not supported yet")
-        } else if call_expr.over_clause().is_some() {
-            todo!("over clauses on call expressions are not supported yet")
-        }
-        build_expr(expr)
+        let mut doc = build_expr(expr)
             .append(comments_before(arg_list.syntax().clone()))
-            .append(build_call_arg_list(arg_list))
+            .append(build_call_arg_list(arg_list));
+        if let Some(within_clause) = call_expr.within_clause() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(within_clause.syntax()))
+                .append(build_within_clause(within_clause));
+        }
+        if let Some(filter_clause) = call_expr.filter_clause() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(filter_clause.syntax()))
+                .append(build_filter_clause(filter_clause));
+        }
+        if let Some(null_treatment) = call_expr.null_treatment() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(null_treatment.syntax()))
+                .append(build_null_treatment(null_treatment));
+        }
+        if let Some(over_clause) = call_expr.over_clause() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(over_clause.syntax()))
+                .append(build_over_clause(over_clause));
+        }
+        doc
     } else if let Some(all_fn) = call_expr.all_fn() {
         build_parenthesized_expr_or_select_fn(
             "all",
@@ -1559,6 +1575,264 @@ fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
         .append(Doc::space())
         .append(after_op)
         .append(build_expr(rhs))
+}
+
+fn build_within_clause<'a>(within_clause: ast::WithinClause) -> Doc<'a> {
+    let mut doc = Doc::text("within").append(Doc::space());
+    if let Some(group_token) = within_clause.group_token() {
+        doc = doc.append(leading_comments_token(&group_token));
+    }
+    doc = doc.append(Doc::text("group"));
+    if let Some(l_paren) = within_clause.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren))
+            .append(Doc::text("("));
+    }
+    if let Some(order_by) = within_clause.order_by_clause() {
+        doc = doc
+            .append(leading_comments(order_by.syntax()))
+            .append(build_order_by_clause(order_by));
+    }
+    if let Some(r_paren) = within_clause.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_over_clause<'a>(over_clause: ast::OverClause) -> Doc<'a> {
+    let mut doc = Doc::text("over");
+    if let Some(target) = over_clause.over_target() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(target.syntax()))
+            .append(match target {
+                ast::OverTarget::WindowRef(window_ref) => build_name(window_ref.syntax()),
+                ast::OverTarget::OverWindowSpec(window_spec) => build_over_window_spec(window_spec),
+            });
+    }
+    doc
+}
+
+fn build_over_window_spec<'a>(over_window_spec: ast::OverWindowSpec) -> Doc<'a> {
+    let mut doc = Doc::text("(");
+    if let Some(window_spec) = over_window_spec.window_spec() {
+        doc = doc
+            .append(leading_comments(window_spec.syntax()))
+            .append(build_window_spec(window_spec));
+    }
+    if let Some(r_paren) = over_window_spec.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_window_spec<'a>(window_spec: ast::WindowSpec) -> Doc<'a> {
+    let mut parts = Vec::new();
+    if let Some(window_ref) = window_spec.window_ref() {
+        parts.push(leading_comments(window_ref.syntax()).append(build_name(window_ref.syntax())));
+    }
+    if let Some(partition_by) = window_spec.partition_by_clause() {
+        parts.push(
+            leading_comments(partition_by.syntax()).append(build_partition_by_clause(partition_by)),
+        );
+    }
+    if let Some(order_by) = window_spec.order_by_clause() {
+        parts.push(leading_comments(order_by.syntax()).append(build_order_by_clause(order_by)));
+    }
+    if let Some(frame) = window_spec.frame_clause() {
+        parts.push(leading_comments(frame.syntax()).append(build_frame_clause(frame)));
+    }
+
+    Doc::list(Itertools::intersperse(parts.into_iter(), Doc::space()).collect())
+}
+
+fn build_partition_by_clause<'a>(partition_by: ast::PartitionByClause) -> Doc<'a> {
+    let mut doc = Doc::text("partition").append(Doc::space());
+    if let Some(by_token) = partition_by.by_token() {
+        doc = doc.append(leading_comments_token(&by_token));
+    }
+    doc = doc.append(Doc::text("by"));
+    if let Some(exprs) = build_comma_separated_exprs(partition_by.exprs()) {
+        doc = doc.append(Doc::space()).append(exprs);
+    }
+    doc
+}
+
+fn build_frame_clause<'a>(frame: ast::FrameClause) -> Doc<'a> {
+    let mut doc = match frame.frame_units() {
+        Some(ast::FrameUnits::FrameGroups(_)) => Doc::text("groups"),
+        Some(ast::FrameUnits::FrameRange(_)) => Doc::text("range"),
+        Some(ast::FrameUnits::FrameRows(_)) => Doc::text("rows"),
+        None => Doc::nil(),
+    };
+    if let Some(extent) = frame.frame_extent() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(extent.syntax()))
+            .append(build_frame_extent(extent));
+    }
+    if let Some(exclude) = frame.frame_exclude() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(exclude.syntax()))
+            .append(build_frame_exclude(exclude));
+    }
+    doc
+}
+
+fn build_frame_extent<'a>(extent: ast::FrameExtent) -> Doc<'a> {
+    match extent {
+        ast::FrameExtent::FrameBetween(between) => {
+            let mut doc = Doc::text("between");
+            if let Some(start) = between.start() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(start.syntax()))
+                    .append(build_frame_bound(start));
+            }
+            if let Some(and_token) = between.and_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&and_token))
+                    .append(Doc::text("and"));
+            }
+            if let Some(end) = between.end() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(end.syntax()))
+                    .append(build_frame_bound(end));
+            }
+            doc
+        }
+        ast::FrameExtent::FrameBound(bound) => build_frame_bound(bound),
+    }
+}
+
+fn build_frame_bound<'a>(bound: ast::FrameBound) -> Doc<'a> {
+    match bound {
+        ast::FrameBound::CurrentRow(current_row) => Doc::text("current")
+            .append(Doc::space())
+            .append(
+                current_row
+                    .row_token()
+                    .map(|token| leading_comments_token(&token))
+                    .unwrap_or_else(Doc::nil),
+            )
+            .append(Doc::text("row")),
+        ast::FrameBound::ExprFollowing(following) => {
+            build_expr_frame_bound(following.expr(), following.following_token(), "following")
+        }
+        ast::FrameBound::ExprPreceding(preceding) => {
+            build_expr_frame_bound(preceding.expr(), preceding.preceding_token(), "preceding")
+        }
+        ast::FrameBound::UnboundedFollowing(following) => Doc::text("unbounded")
+            .append(Doc::space())
+            .append(
+                following
+                    .following_token()
+                    .map(|token| leading_comments_token(&token))
+                    .unwrap_or_else(Doc::nil),
+            )
+            .append(Doc::text("following")),
+        ast::FrameBound::UnboundedPreceding(preceding) => Doc::text("unbounded")
+            .append(Doc::space())
+            .append(
+                preceding
+                    .preceding_token()
+                    .map(|token| leading_comments_token(&token))
+                    .unwrap_or_else(Doc::nil),
+            )
+            .append(Doc::text("preceding")),
+    }
+}
+
+fn build_expr_frame_bound<'a>(
+    expr: Option<ast::Expr>,
+    suffix_token: Option<SyntaxToken>,
+    suffix: &'static str,
+) -> Doc<'a> {
+    let mut doc = expr.map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(suffix_token) = suffix_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&suffix_token))
+            .append(Doc::text(suffix));
+    }
+    doc
+}
+
+fn build_frame_exclude<'a>(exclude: ast::FrameExclude) -> Doc<'a> {
+    let mut doc = Doc::text("exclude");
+    if let Some(target) = exclude.frame_exclude_target() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(target.syntax()))
+            .append(match target {
+                ast::FrameExcludeTarget::CurrentRow(current_row) => Doc::text("current")
+                    .append(Doc::space())
+                    .append(
+                        current_row
+                            .row_token()
+                            .map(|token| leading_comments_token(&token))
+                            .unwrap_or_else(Doc::nil),
+                    )
+                    .append(Doc::text("row")),
+                ast::FrameExcludeTarget::Group(_) => Doc::text("group"),
+                ast::FrameExcludeTarget::NoOthers(no_others) => Doc::text("no")
+                    .append(Doc::space())
+                    .append(
+                        no_others
+                            .others_token()
+                            .map(|token| leading_comments_token(&token))
+                            .unwrap_or_else(Doc::nil),
+                    )
+                    .append(Doc::text("others")),
+                ast::FrameExcludeTarget::Ties(_) => Doc::text("ties"),
+            });
+    }
+    doc
+}
+
+fn build_filter_clause<'a>(filter_clause: ast::FilterClause) -> Doc<'a> {
+    let mut doc = Doc::text("filter");
+    if let Some(l_paren) = filter_clause.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren))
+            .append(Doc::text("("));
+    }
+    if let Some(where_token) = filter_clause.where_token() {
+        doc = doc
+            .append(leading_comments_token(&where_token))
+            .append(Doc::text("where"));
+    }
+    if let Some(expr) = filter_clause.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = filter_clause.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_null_treatment<'a>(null_treatment: ast::NullTreatment) -> Doc<'a> {
+    let (keyword, nulls_token) = match null_treatment {
+        ast::NullTreatment::IgnoreNulls(ignore_nulls) => ("ignore", ignore_nulls.nulls_token()),
+        ast::NullTreatment::RespectNulls(respect_nulls) => ("respect", respect_nulls.nulls_token()),
+    };
+
+    let mut doc = Doc::text(keyword);
+    if let Some(nulls_token) = nulls_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&nulls_token))
+            .append(Doc::text("nulls"));
+    }
+    doc
 }
 
 fn build_json_keys_unique_clause<'a>(clause: ast::JsonKeysUniqueClause) -> Doc<'a> {
