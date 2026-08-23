@@ -83,7 +83,7 @@ fn fmt_crlf_line_endings() {
 
 #[test]
 fn fmt_cr_line_endings() {
-    assert_snapshot!(fmt_with_line_ending("\r"), @"error: CR line endings aren't supported");
+    assert_snapshot!(fmt_with_line_ending("\r"), @"-- a comment<CR>select 1;<CR><CR>/* a comment<CR> * spanning lines<CR> */<CR>select<CR>  'a',<CR>  'really long string                                                    ';<CR>");
 }
 
 fn meaningful_tokens(text: &str) -> Vec<(TokenKind, &str)> {

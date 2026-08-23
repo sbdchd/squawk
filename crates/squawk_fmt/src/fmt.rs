@@ -1,4 +1,4 @@
-use anyhow::{Result, bail};
+use anyhow::Result;
 use itertools::Itertools;
 use rowan::Direction;
 use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
@@ -1463,8 +1463,7 @@ pub fn fmt(text: &str) -> Result<String> {
         .unwrap_or_default();
 
     let line_break = match line_ending {
-        // see: https://github.com/g-plane/tiny_pretty/issues/3
-        LineEnding::Cr => bail!("CR line endings aren't supported"),
+        LineEnding::Cr => LineBreak::Cr,
         LineEnding::CrLf => LineBreak::Crlf,
         LineEnding::Lf => LineBreak::Lf,
     };
