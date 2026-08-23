@@ -732,23 +732,10 @@ fn build_tuple_expr<'a>(tuple_expr: ast::TupleExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
-    let exprs: Vec<Doc<'a>> = tuple_expr
-        .exprs()
-        .map(|expr| {
-            let leading = leading_comments(expr.syntax());
-            let trailing = trailing_comments(expr.syntax());
-            leading.append(build_expr(expr)).append(trailing)
-        })
-        .collect();
-    if exprs.is_empty() {
-        if let Some(r_paren) = tuple_expr.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
-        }
-    } else {
-        doc = doc.append(Doc::list(
-            Itertools::intersperse(exprs.into_iter(), Doc::text(",").append(Doc::space()))
-                .collect(),
-        ));
+    if let Some(exprs) = build_comma_separated_exprs(tuple_expr.exprs()) {
+        doc = doc.append(exprs);
+    } else if let Some(r_paren) = tuple_expr.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
     }
 
     doc.append(Doc::text(")"))
@@ -792,7 +779,7 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
             .append(comments_before(arg_list.syntax().clone()))
             .append(build_call_arg_list(arg_list))
     } else if let Some(all_fn) = call_expr.all_fn() {
-        build_quantified_fn(
+        build_parenthesized_expr_or_select_fn(
             "all",
             all_fn.l_paren_token(),
             all_fn.expr(),
@@ -800,7 +787,7 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
             all_fn.r_paren_token(),
         )
     } else if let Some(any_fn) = call_expr.any_fn() {
-        build_quantified_fn(
+        build_parenthesized_expr_or_select_fn(
             "any",
             any_fn.l_paren_token(),
             any_fn.expr(),
@@ -809,10 +796,16 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         )
     } else if let Some(_collation_for_fn) = call_expr.collation_for_fn() {
         todo!("collation_for function expressions are not supported yet")
-    } else if let Some(_exists_fn) = call_expr.exists_fn() {
-        todo!("exists function expressions are not supported yet")
-    } else if let Some(_extract_fn) = call_expr.extract_fn() {
-        todo!("extract function expressions are not supported yet")
+    } else if let Some(exists_fn) = call_expr.exists_fn() {
+        build_parenthesized_expr_or_select_fn(
+            "exists",
+            exists_fn.l_paren_token(),
+            None,
+            exists_fn.select_variant(),
+            exists_fn.r_paren_token(),
+        )
+    } else if let Some(extract_fn) = call_expr.extract_fn() {
+        build_extract_fn(extract_fn)
     } else if let Some(_graph_table_fn) = call_expr.graph_table_fn() {
         todo!("graph_table function expressions are not supported yet")
     } else if let Some(_json_array_agg_fn) = call_expr.json_array_agg_fn() {
@@ -837,20 +830,20 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         todo!("json_value function expressions are not supported yet")
     } else if let Some(_overlay_fn) = call_expr.overlay_fn() {
         todo!("overlay function expressions are not supported yet")
-    } else if let Some(_position_fn) = call_expr.position_fn() {
-        todo!("position function expressions are not supported yet")
+    } else if let Some(position_fn) = call_expr.position_fn() {
+        build_position_fn(position_fn)
     } else if let Some(some_fn) = call_expr.some_fn() {
-        build_quantified_fn(
+        build_parenthesized_expr_or_select_fn(
             "some",
             some_fn.l_paren_token(),
             some_fn.expr(),
             some_fn.select_variant(),
             some_fn.r_paren_token(),
         )
-    } else if let Some(_substring_fn) = call_expr.substring_fn() {
-        todo!("substring function expressions are not supported yet")
-    } else if let Some(_trim_fn) = call_expr.trim_fn() {
-        todo!("trim function expressions are not supported yet")
+    } else if let Some(substring_fn) = call_expr.substring_fn() {
+        build_substring_fn(substring_fn)
+    } else if let Some(trim_fn) = call_expr.trim_fn() {
+        build_trim_fn(trim_fn)
     } else if let Some(_xml_element_fn) = call_expr.xml_element_fn() {
         todo!("xmlelement function expressions are not supported yet")
     } else if let Some(_xml_exists_fn) = call_expr.xml_exists_fn() {
@@ -870,7 +863,216 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
     }
 }
 
-fn build_quantified_fn<'a>(
+fn build_substring_fn<'a>(substring_fn: ast::SubstringFn) -> Doc<'a> {
+    let mut doc = Doc::text("substring");
+    if let Some(l_paren) = substring_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(args) = substring_fn.substring_args() {
+        doc = doc
+            .append(leading_comments(args.syntax()))
+            .append(match args {
+                ast::SubstringArgs::SubstringForFrom(args) => {
+                    let mut doc = args.string().map(build_expr).unwrap_or_else(Doc::nil);
+                    doc = append_keyword_expr(doc, args.for_token(), "for", args.count());
+                    append_keyword_expr(doc, args.from_token(), "from", args.start())
+                }
+                ast::SubstringArgs::SubstringFromFor(args) => {
+                    let mut doc = args.string().map(build_expr).unwrap_or_else(Doc::nil);
+                    doc = append_keyword_expr(doc, args.from_token(), "from", args.start());
+                    append_keyword_expr(doc, args.for_token(), "for", args.count())
+                }
+                ast::SubstringArgs::SubstringSimilarEscape(args) => {
+                    let mut doc = args.string().map(build_expr).unwrap_or_else(Doc::nil);
+                    doc = append_keyword_expr(doc, args.similar_token(), "similar", args.pattern());
+                    append_keyword_expr(doc, args.escape_token(), "escape", args.escape())
+                }
+                ast::SubstringArgs::SubstringExprs(args) => {
+                    build_comma_separated_exprs(args.exprs()).unwrap_or_else(Doc::nil)
+                }
+            });
+    }
+
+    if let Some(r_paren) = substring_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn append_keyword_expr<'a>(
+    mut doc: Doc<'a>,
+    token: Option<SyntaxToken>,
+    keyword: &'static str,
+    expr: Option<ast::Expr>,
+) -> Doc<'a> {
+    if let Some(token) = token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(keyword));
+    }
+    if let Some(expr) = expr {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_trim_fn<'a>(trim_fn: ast::TrimFn) -> Doc<'a> {
+    let mut doc = Doc::text("trim");
+    if let Some(l_paren) = trim_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let has_side = if let Some(side) = trim_fn.trim_side() {
+        doc = doc
+            .append(leading_comments(side.syntax()))
+            .append(match side {
+                ast::TrimSide::TrimBoth(_) => Doc::text("both"),
+                ast::TrimSide::TrimLeading(_) => Doc::text("leading"),
+                ast::TrimSide::TrimTrailing(_) => Doc::text("trailing"),
+            });
+        true
+    } else {
+        false
+    };
+
+    if let Some(args) = trim_fn.trim_args() {
+        if has_side {
+            doc = doc.append(Doc::space());
+        }
+        doc = doc
+            .append(leading_comments(args.syntax()))
+            .append(match args {
+                ast::TrimArgs::TrimFrom(args) => {
+                    let mut doc = Doc::text("from");
+                    if let Some(exprs) = build_comma_separated_exprs(args.exprs()) {
+                        doc = doc.append(Doc::space()).append(exprs);
+                    }
+                    doc
+                }
+                ast::TrimArgs::TrimExprFrom(args) => {
+                    let mut exprs = args.exprs();
+                    let mut doc = exprs.next().map(build_expr).unwrap_or_else(Doc::nil);
+                    if let Some(from) = args.from_token() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments_token(&from))
+                            .append(Doc::text("from"));
+                    }
+                    if let Some(exprs) = build_comma_separated_exprs(exprs) {
+                        doc = doc.append(Doc::space()).append(exprs);
+                    }
+                    doc
+                }
+                ast::TrimArgs::TrimExprs(args) => {
+                    build_comma_separated_exprs(args.exprs()).unwrap_or_else(Doc::nil)
+                }
+            });
+    }
+
+    if let Some(r_paren) = trim_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_comma_separated_exprs<'a>(exprs: impl Iterator<Item = ast::Expr>) -> Option<Doc<'a>> {
+    let exprs: Vec<Doc<'a>> = exprs
+        .map(|expr| {
+            let leading = leading_comments(expr.syntax());
+            let trailing = trailing_comments(expr.syntax());
+            leading.append(build_expr(expr)).append(trailing)
+        })
+        .collect();
+    if exprs.is_empty() {
+        None
+    } else {
+        Some(Doc::list(
+            Itertools::intersperse(exprs.into_iter(), Doc::text(",").append(Doc::space()))
+                .collect(),
+        ))
+    }
+}
+
+fn build_position_fn<'a>(position_fn: ast::PositionFn) -> Doc<'a> {
+    let mut doc = Doc::text("position");
+    if let Some(l_paren) = position_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(pos) = position_fn.pos() {
+        doc = doc
+            .append(leading_comments(pos.syntax()))
+            .append(build_expr(pos));
+    }
+    if let Some(in_token) = position_fn.in_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&in_token))
+            .append(Doc::text("in"));
+    }
+    if let Some(string) = position_fn.string() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(string.syntax()))
+            .append(build_expr(string));
+    }
+    if let Some(r_paren) = position_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_extract_fn<'a>(extract_fn: ast::ExtractFn) -> Doc<'a> {
+    let mut doc = Doc::text("extract");
+    if let Some(l_paren) = extract_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(field) = extract_fn.extract_field() {
+        doc = doc
+            .append(leading_comments(field.syntax()))
+            .append(match field {
+                ast::ExtractField::ExtractFieldLiteral(field) => {
+                    field.literal().map(build_literal).unwrap_or_else(Doc::nil)
+                }
+                ast::ExtractField::ExtractFieldName(field) => {
+                    if field.ident_token().is_some() {
+                        build_name(field.syntax())
+                    } else {
+                        build_keyword_node(field.syntax())
+                    }
+                }
+            });
+    }
+
+    if let Some(from) = extract_fn.from_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&from))
+            .append(Doc::text("from"));
+    }
+    if let Some(expr) = extract_fn.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = extract_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_parenthesized_expr_or_select_fn<'a>(
     keyword: &'static str,
     l_paren: Option<SyntaxToken>,
     expr: Option<ast::Expr>,
