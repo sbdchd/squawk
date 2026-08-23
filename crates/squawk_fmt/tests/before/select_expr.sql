@@ -47,6 +47,10 @@ select
   6  /  2,
   2  *  3,
   -- call expr
+  1 = ANY ( ARRAY [ 1 , 2 ] ),
+  2 = ALL ( SELECT x FROM things ),
+  3 = SOME ( ARRAY [ 3 ] ),
+  4 /* before op */ = /* before any */ ANY /* before opening paren */ ( /* before expr */ ARRAY [ 4 ] /* before closing paren */ ) /* after any */,
   date_trunc('month', now()),
   foo ( ),
   foo ( * ),

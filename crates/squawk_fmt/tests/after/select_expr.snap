@@ -51,6 +51,10 @@ select
   6 / 2,
   2 * 3,
   -- call expr
+  1 = any(array[1, 2]),
+  2 = all(select x from things),
+  3 = some(array[3]),
+  4 /* before op */ = /* before any */ any /* before opening paren */(/* before expr */ array[4] /* before closing paren */) /* after any */,
   date_trunc('month', now()),
   foo(),
   foo(*),

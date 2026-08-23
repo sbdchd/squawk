@@ -14519,8 +14519,8 @@ pub struct JsonTablePlanClause {
 }
 impl JsonTablePlanClause {
     #[inline]
-    pub fn json_table_plan(&self) -> Option<JsonTablePlan> {
-        support::child(&self.syntax)
+    pub fn json_table_plans(&self) -> AstChildren<JsonTablePlan> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
@@ -14529,10 +14529,6 @@ impl JsonTablePlanClause {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn comma_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COMMA)
     }
     #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> {
@@ -14613,15 +14609,19 @@ impl JsonTableValueColumn {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn json_on_empty_clause(&self) -> Option<JsonOnEmptyClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn json_on_error_clause(&self) -> Option<JsonOnErrorClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn json_path_clause(&self) -> Option<JsonPathClause> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn json_quotes_clause(&self) -> Option<JsonQuotesClause> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn json_table_value_behavior(&self) -> Option<JsonTableValueBehavior> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -28969,12 +28969,6 @@ pub enum JsonTablePlanOperator {
     JsonTablePlanInner(JsonTablePlanInner),
     JsonTablePlanOuter(JsonTablePlanOuter),
     JsonTablePlanUnion(JsonTablePlanUnion),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum JsonTableValueBehavior {
-    JsonOnEmptyClause(JsonOnEmptyClause),
-    JsonOnErrorClause(JsonOnErrorClause),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -63752,49 +63746,6 @@ impl From<JsonTablePlanUnion> for JsonTablePlanOperator {
     #[inline]
     fn from(node: JsonTablePlanUnion) -> JsonTablePlanOperator {
         JsonTablePlanOperator::JsonTablePlanUnion(node)
-    }
-}
-impl AstNode for JsonTableValueBehavior {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(
-            kind,
-            SyntaxKind::JSON_ON_EMPTY_CLAUSE | SyntaxKind::JSON_ON_ERROR_CLAUSE
-        )
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        let res = match syntax.kind() {
-            SyntaxKind::JSON_ON_EMPTY_CLAUSE => {
-                JsonTableValueBehavior::JsonOnEmptyClause(JsonOnEmptyClause { syntax })
-            }
-            SyntaxKind::JSON_ON_ERROR_CLAUSE => {
-                JsonTableValueBehavior::JsonOnErrorClause(JsonOnErrorClause { syntax })
-            }
-            _ => {
-                return None;
-            }
-        };
-        Some(res)
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            JsonTableValueBehavior::JsonOnEmptyClause(it) => &it.syntax,
-            JsonTableValueBehavior::JsonOnErrorClause(it) => &it.syntax,
-        }
-    }
-}
-impl From<JsonOnEmptyClause> for JsonTableValueBehavior {
-    #[inline]
-    fn from(node: JsonOnEmptyClause) -> JsonTableValueBehavior {
-        JsonTableValueBehavior::JsonOnEmptyClause(node)
-    }
-}
-impl From<JsonOnErrorClause> for JsonTableValueBehavior {
-    #[inline]
-    fn from(node: JsonOnErrorClause) -> JsonTableValueBehavior {
-        JsonTableValueBehavior::JsonOnErrorClause(node)
     }
 }
 impl AstNode for JsonWrapperBehaviorClause {

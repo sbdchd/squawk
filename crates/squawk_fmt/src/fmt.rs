@@ -791,10 +791,22 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         build_expr(expr)
             .append(comments_before(arg_list.syntax().clone()))
             .append(build_call_arg_list(arg_list))
-    } else if let Some(_all_fn) = call_expr.all_fn() {
-        todo!("all function expressions are not supported yet")
-    } else if let Some(_any_fn) = call_expr.any_fn() {
-        todo!("any function expressions are not supported yet")
+    } else if let Some(all_fn) = call_expr.all_fn() {
+        build_quantified_fn(
+            "all",
+            all_fn.l_paren_token(),
+            all_fn.expr(),
+            all_fn.select_variant(),
+            all_fn.r_paren_token(),
+        )
+    } else if let Some(any_fn) = call_expr.any_fn() {
+        build_quantified_fn(
+            "any",
+            any_fn.l_paren_token(),
+            any_fn.expr(),
+            any_fn.select_variant(),
+            any_fn.r_paren_token(),
+        )
     } else if let Some(_collation_for_fn) = call_expr.collation_for_fn() {
         todo!("collation_for function expressions are not supported yet")
     } else if let Some(_exists_fn) = call_expr.exists_fn() {
@@ -827,8 +839,14 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         todo!("overlay function expressions are not supported yet")
     } else if let Some(_position_fn) = call_expr.position_fn() {
         todo!("position function expressions are not supported yet")
-    } else if let Some(_some_fn) = call_expr.some_fn() {
-        todo!("some function expressions are not supported yet")
+    } else if let Some(some_fn) = call_expr.some_fn() {
+        build_quantified_fn(
+            "some",
+            some_fn.l_paren_token(),
+            some_fn.expr(),
+            some_fn.select_variant(),
+            some_fn.r_paren_token(),
+        )
     } else if let Some(_substring_fn) = call_expr.substring_fn() {
         todo!("substring function expressions are not supported yet")
     } else if let Some(_trim_fn) = call_expr.trim_fn() {
@@ -850,6 +868,38 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
     } else {
         unreachable!("a call expression should contain a supported function node")
     }
+}
+
+fn build_quantified_fn<'a>(
+    keyword: &'static str,
+    l_paren: Option<SyntaxToken>,
+    expr: Option<ast::Expr>,
+    select: Option<ast::SelectVariant>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let mut doc = Doc::text(keyword);
+    if let Some(l_paren) = l_paren {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(expr) = expr {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    } else if let Some(select) = select {
+        doc = doc
+            .append(leading_comments(select.syntax()))
+            .append(match select {
+                ast::SelectVariant::Select(select) => build_select_doc(&select),
+                _ => todo!("this select variant is not supported yet"),
+            });
+    }
+
+    if let Some(r_paren) = r_paren {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
 }
 
 fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {

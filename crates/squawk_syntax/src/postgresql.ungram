@@ -267,7 +267,7 @@ JsonTable =
   ')'
 
 JsonTablePlanClause =
-  'plan' 'default'? '(' JsonTablePlan (',' JsonTablePlan)? ')'
+  'plan' 'default'? '(' (JsonTablePlan (',' JsonTablePlan)*) ')'
 
 JsonTablePlan =
   JsonPathNameRef
@@ -2562,11 +2562,8 @@ JsonTableValueColumn =
   JsonPathClause?
   JsonWrapperBehaviorClause?
   JsonQuotesClause?
-  JsonTableValueBehavior?
-
-JsonTableValueBehavior =
-  JsonOnErrorClause
-| JsonOnEmptyClause
+  JsonOnEmptyClause?
+  JsonOnErrorClause?
 
 JsonTableExistsColumn =
   ColumnName Type
