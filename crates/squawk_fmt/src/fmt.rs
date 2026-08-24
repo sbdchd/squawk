@@ -305,9 +305,7 @@ fn build_from_item<'a>(item: ast::FromItem) -> Doc<'a> {
             todo!("parenthesized from items are not supported yet")
         }
         ast::FromItem::RowsFromItem(_) => todo!("rows from items are not supported yet"),
-        ast::FromItem::GraphTableFromItem(_) => {
-            todo!("graph_table from items are not supported yet")
-        }
+        ast::FromItem::GraphTableFromItem(graph_table) => build_graph_table_from_item(graph_table),
         ast::FromItem::JsonTableFromItem(_) => {
             todo!("json_table from items are not supported yet")
         }
@@ -315,6 +313,22 @@ fn build_from_item<'a>(item: ast::FromItem) -> Doc<'a> {
             todo!("xmltable from items are not supported yet")
         }
     }
+}
+
+fn build_graph_table_from_item<'a>(item: ast::GraphTableFromItem) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(lateral) = item.lateral_token() {
+        doc = doc
+            .append(leading_comments_token(&lateral))
+            .append(Doc::text("lateral"))
+            .append(Doc::space());
+    }
+    if let Some(graph_table) = item.graph_table_fn() {
+        doc = doc
+            .append(leading_comments(graph_table.syntax()))
+            .append(build_graph_table_fn(graph_table));
+    }
+    doc.append(build_from_alias(item.alias()))
 }
 
 fn build_relation_from_item<'a>(relation: ast::RelationFromItem) -> Doc<'a> {
@@ -822,8 +836,8 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         )
     } else if let Some(extract_fn) = call_expr.extract_fn() {
         build_extract_fn(extract_fn)
-    } else if let Some(_graph_table_fn) = call_expr.graph_table_fn() {
-        todo!("graph_table function expressions are not supported yet")
+    } else if let Some(graph_table_fn) = call_expr.graph_table_fn() {
+        build_graph_table_fn(graph_table_fn)
     } else if let Some(json_array_agg_fn) = call_expr.json_array_agg_fn() {
         build_json_array_agg_fn(json_array_agg_fn)
     } else if let Some(json_array_fn) = call_expr.json_array_fn() {
@@ -877,6 +891,337 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
     } else {
         unreachable!("a call expression should contain a supported function node")
     }
+}
+
+fn build_graph_table_fn<'a>(graph_table_fn: ast::GraphTableFn) -> Doc<'a> {
+    let mut doc = Doc::text("graph_table");
+    if let Some(l_paren) = graph_table_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(graph) = graph_table_fn.property_graph_ref() {
+        if let Some(path) = graph.path_ref() {
+            doc = doc
+                .append(leading_comments(graph.syntax()))
+                .append(build_path_ref(&path));
+        }
+    }
+    if let Some(match_token) = graph_table_fn.match_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&match_token))
+            .append(Doc::text("match"));
+    }
+    if let Some(patterns) = graph_table_fn.path_pattern_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(patterns.syntax()))
+            .append(build_path_pattern_list(patterns));
+    }
+    if let Some(where_clause) = graph_table_fn.where_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_clause(where_clause));
+    }
+    if let Some(columns) = graph_table_fn.columns_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&columns))
+            .append(Doc::text("columns"));
+    }
+    if let Some(columns) = graph_table_fn.expr_as_column_name_list() {
+        if comment_tokens_before(columns.syntax().clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(columns.syntax().clone()));
+        }
+        doc = doc.append(build_expr_as_column_name_list(columns));
+    }
+
+    if let Some(r_paren) = graph_table_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_path_pattern_list<'a>(patterns: ast::PathPatternList) -> Doc<'a> {
+    let items = patterns.path_patterns().map(|pattern| {
+        (
+            leading_comments(pattern.syntax()).append(build_path_pattern(pattern.clone())),
+            pattern.syntax().clone(),
+        )
+    });
+    build_comma_separated_docs(items).unwrap_or_else(Doc::nil)
+}
+
+fn build_path_pattern<'a>(pattern: ast::PathPattern) -> Doc<'a> {
+    Doc::list(
+        pattern
+            .path_factors()
+            .map(|factor| leading_comments(factor.syntax()).append(build_path_factor(factor)))
+            .collect(),
+    )
+}
+
+fn build_path_factor<'a>(factor: ast::PathFactor) -> Doc<'a> {
+    let mut doc = factor
+        .path_primary()
+        .map(build_path_primary)
+        .unwrap_or_else(Doc::nil);
+    if let Some(qualifier) = factor.graph_pattern_qualifier() {
+        doc = doc
+            .append(leading_comments(qualifier.syntax()))
+            .append(build_graph_pattern_qualifier(qualifier));
+    }
+    doc
+}
+
+fn build_path_primary<'a>(primary: ast::PathPrimary) -> Doc<'a> {
+    match primary {
+        ast::PathPrimary::VertexPattern(pattern) => build_vertex_pattern(pattern),
+        ast::PathPrimary::EdgeLeft(edge) => build_edge_left(edge),
+        ast::PathPrimary::EdgeRight(edge) => build_edge_right(edge),
+        ast::PathPrimary::EdgeAny(edge) => build_edge_any(edge),
+        ast::PathPrimary::ParenGraphPattern(pattern) => build_paren_graph_pattern(pattern),
+    }
+}
+
+fn build_vertex_pattern<'a>(pattern: ast::VertexPattern) -> Doc<'a> {
+    let mut doc = pattern
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("))
+        .append(build_graph_pattern_inner(
+            pattern.element_variable(),
+            pattern.is_label(),
+            pattern.where_clause(),
+        ));
+    if let Some(r_paren) = pattern.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_edge_left<'a>(edge: ast::EdgeLeft) -> Doc<'a> {
+    let mut doc = Doc::text("<");
+    if let Some(minus) = edge.minus_token() {
+        doc = doc.append(comments_before(minus));
+    }
+    doc = doc.append(Doc::text("-"));
+    if let Some(l_brack) = edge.l_brack_token() {
+        doc = doc
+            .append(comments_before(l_brack))
+            .append(Doc::text("["))
+            .append(build_graph_pattern_inner(
+                edge.element_variable(),
+                edge.is_label(),
+                edge.where_clause(),
+            ));
+        if let Some(r_brack) = edge.r_brack_token() {
+            doc = doc.append(comments_before(r_brack));
+        }
+        doc = doc.append(Doc::text("]"));
+        if let Some(minus) = edge.end_minus_token() {
+            doc = doc.append(comments_before(minus));
+        }
+        doc = doc.append(Doc::text("-"));
+    }
+    doc
+}
+
+fn build_edge_right<'a>(edge: ast::EdgeRight) -> Doc<'a> {
+    let mut doc = Doc::text("-");
+    if let Some(l_brack) = edge.l_brack_token() {
+        doc = doc
+            .append(comments_before(l_brack))
+            .append(Doc::text("["))
+            .append(build_graph_pattern_inner(
+                edge.element_variable(),
+                edge.is_label(),
+                edge.where_clause(),
+            ));
+        if let Some(r_brack) = edge.r_brack_token() {
+            doc = doc.append(comments_before(r_brack));
+        }
+        doc = doc.append(Doc::text("]"));
+        if let Some(minus) = edge.end_minus_token() {
+            doc = doc.append(comments_before(minus));
+        }
+        doc = doc.append(Doc::text("-"));
+    }
+    if let Some(r_angle) = edge.r_angle_token() {
+        doc = doc.append(comments_before(r_angle));
+    }
+    doc.append(Doc::text(">"))
+}
+
+fn build_edge_any<'a>(edge: ast::EdgeAny) -> Doc<'a> {
+    let mut doc = Doc::text("-");
+    if let Some(l_brack) = edge.l_brack_token() {
+        doc = doc
+            .append(comments_before(l_brack))
+            .append(Doc::text("["))
+            .append(build_graph_pattern_inner(
+                edge.element_variable(),
+                edge.is_label(),
+                edge.where_clause(),
+            ));
+        if let Some(r_brack) = edge.r_brack_token() {
+            doc = doc.append(comments_before(r_brack));
+        }
+        doc = doc.append(Doc::text("]"));
+        if let Some(minus) = edge.end_minus_token() {
+            doc = doc.append(comments_before(minus));
+        }
+        doc = doc.append(Doc::text("-"));
+    }
+    doc
+}
+
+fn build_graph_pattern_inner<'a>(
+    variable: Option<ast::ElementVariable>,
+    label: Option<ast::IsLabel>,
+    where_clause: Option<ast::WhereClause>,
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(variable) = variable {
+        doc = doc
+            .append(leading_comments(variable.syntax()))
+            .append(build_name(variable.syntax()));
+    }
+    if let Some(label) = label {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(label.syntax()))
+            .append(build_is_label(label));
+    }
+    if let Some(where_clause) = where_clause {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_clause(where_clause));
+    }
+    doc
+}
+
+fn build_is_label<'a>(label: ast::IsLabel) -> Doc<'a> {
+    let mut doc = label
+        .is_token()
+        .map(|token| leading_comments_token(&token).append(Doc::text("is")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(expr) = label.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_where_clause<'a>(where_clause: ast::WhereClause) -> Doc<'a> {
+    let mut doc = where_clause
+        .where_token()
+        .map(|token| leading_comments_token(&token).append(Doc::text("where")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(expr) = where_clause.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_paren_graph_pattern<'a>(pattern: ast::ParenGraphPattern) -> Doc<'a> {
+    let mut doc = pattern
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    if let Some(inner) = pattern.path_pattern() {
+        doc = doc
+            .append(leading_comments(inner.syntax()))
+            .append(build_path_pattern(inner));
+    }
+    if let Some(where_clause) = pattern.where_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_clause(where_clause));
+    }
+    if let Some(r_paren) = pattern.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_graph_pattern_qualifier<'a>(qualifier: ast::GraphPatternQualifier) -> Doc<'a> {
+    let mut doc = qualifier
+        .l_curly_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("{"));
+    if let Some(min) = qualifier.min() {
+        if let Some(literal) = min.literal() {
+            doc = doc
+                .append(leading_comments(min.syntax()))
+                .append(build_literal(literal));
+        }
+    }
+    if let Some(comma) = qualifier.comma_token() {
+        doc = doc.append(comments_before(comma)).append(Doc::text(","));
+    }
+    if let Some(max) = qualifier.max() {
+        if qualifier.comma_token().is_some() {
+            doc = doc.append(Doc::space());
+        }
+        if let Some(literal) = max.literal() {
+            doc = doc
+                .append(leading_comments(max.syntax()))
+                .append(build_literal(literal));
+        }
+    }
+    if let Some(r_curly) = qualifier.r_curly_token() {
+        doc = doc.append(comments_before(r_curly));
+    }
+    doc.append(Doc::text("}"))
+}
+
+fn build_expr_as_column_name_list<'a>(list: ast::ExprAsColumnNameList) -> Doc<'a> {
+    let mut doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = list.expr_as_column_names().map(|item| {
+        let mut item_doc = item.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(as_token) = item.as_token() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments_token(&as_token))
+                .append(Doc::text("as"));
+        }
+        if let Some(name) = item.column_name() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        (
+            leading_comments(item.syntax()).append(item_doc),
+            item.syntax().clone(),
+        )
+    });
+    if let Some(items) = build_comma_separated_docs(items) {
+        doc = doc.append(items);
+    }
+    if let Some(r_paren) = list.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
 }
 
 fn build_xml_element_fn<'a>(xml_element_fn: ast::XmlElementFn) -> Doc<'a> {

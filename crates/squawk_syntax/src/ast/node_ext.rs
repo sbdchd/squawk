@@ -495,6 +495,31 @@ impl ast::ForeignKeyConstraint {
     }
 }
 
+fn second_minus_token(node: &SyntaxNode) -> Option<SyntaxToken> {
+    node.children_with_tokens()
+        .filter_map(|element| element.into_token())
+        .filter(|token| token.kind() == SyntaxKind::MINUS)
+        .nth(1)
+}
+
+impl ast::EdgeAny {
+    pub fn end_minus_token(&self) -> Option<SyntaxToken> {
+        second_minus_token(self.syntax())
+    }
+}
+
+impl ast::EdgeLeft {
+    pub fn end_minus_token(&self) -> Option<SyntaxToken> {
+        second_minus_token(self.syntax())
+    }
+}
+
+impl ast::EdgeRight {
+    pub fn end_minus_token(&self) -> Option<SyntaxToken> {
+        second_minus_token(self.syntax())
+    }
+}
+
 impl ast::XmlPiFn {
     #[inline]
     pub fn target(&self) -> Option<ast::XmlPiTarget> {
