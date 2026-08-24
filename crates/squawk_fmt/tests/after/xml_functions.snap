@@ -1,0 +1,31 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/xml_functions.sql
+---
+select
+  xmlelement(name foo),
+  xmlelement(name foo, 1, 2),
+  xmlelement(name foo, xmlattributes(a, b as c)),
+  xmlelement(name foo, xmlattributes(a as attr), x, y),
+  /* before element */ xmlelement /* before outer opening paren */(/* before name */ name /* before tag */ tag /* before attributes comma */, /* before xmlattributes */ xmlattributes /* before attributes opening paren */(/* before first attribute */ a /* before as */ as /* before attribute name */ attr /* before attribute comma */, /* before second attribute */ b /* before attributes closing paren */) /* before content comma */, /* before content */ x /* before outer closing paren */) /* after element */,
+  xmlexists('/foo' passing doc),
+  xmlexists('/foo' passing by ref doc),
+  xmlexists('/foo' passing doc by value),
+  /* before exists */ xmlexists /* before opening paren */(/* before row */ '/foo' /* before passing */ passing /* before first by */ by /* before ref */ ref /* before document */ doc /* before second by */ by /* before value */ value /* before closing paren */) /* after exists */,
+  xmlforest(a, b as foo),
+  /* before forest */ xmlforest /* before opening paren */(/* before first expression */ a /* before as */ as /* before tag */ first /* before comma */, /* before second expression */ b /* before closing paren */) /* after forest */,
+  xmlparse(document '<foo/>' preserve whitespace),
+  xmlparse(content value strip whitespace),
+  /* before parse */ xmlparse /* before opening paren */(/* before kind */ document /* before expression */ value /* before preserve */ preserve /* before whitespace */ whitespace /* before closing paren */) /* after parse */,
+  xmlpi(name php),
+  xmlpi(name php, 'echo'),
+  /* before pi */ xmlpi /* before opening paren */(/* before name */ name /* before target */ php /* before comma */, /* before expression */ 'echo' /* before closing paren */) /* after pi */,
+  xmlroot(doc, version '1.0'),
+  xmlroot(doc, version no value, standalone yes),
+  xmlroot(doc, version '1.0', standalone no),
+  xmlroot(doc, version '1.0', standalone no value),
+  /* before root */ xmlroot /* before opening paren */(/* before expression */ doc /* before version comma */, /* before version */ version /* before no */ no /* before version value */ value/* before standalone comma */ , /* before standalone */ standalone /* before standalone no */ no /* before standalone value */ value /* before closing paren */) /* after root */,
+  xmlserialize(document doc as text),
+  xmlserialize(content doc as varchar(20) indent),
+  xmlserialize(content doc as text no indent),
+  /* before serialize */ xmlserialize /* before opening paren */(/* before kind */ content /* before expression */ doc /* before as */ as /* before type */ text /* before no */ no /* before indent */ indent /* before closing paren */)/* after serialize */;

@@ -860,23 +860,503 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         build_substring_fn(substring_fn)
     } else if let Some(trim_fn) = call_expr.trim_fn() {
         build_trim_fn(trim_fn)
-    } else if let Some(_xml_element_fn) = call_expr.xml_element_fn() {
-        todo!("xmlelement function expressions are not supported yet")
-    } else if let Some(_xml_exists_fn) = call_expr.xml_exists_fn() {
-        todo!("xmlexists function expressions are not supported yet")
-    } else if let Some(_xml_forest_fn) = call_expr.xml_forest_fn() {
-        todo!("xmlforest function expressions are not supported yet")
-    } else if let Some(_xml_parse_fn) = call_expr.xml_parse_fn() {
-        todo!("xmlparse function expressions are not supported yet")
-    } else if let Some(_xml_pi_fn) = call_expr.xml_pi_fn() {
-        todo!("xmlpi function expressions are not supported yet")
-    } else if let Some(_xml_root_fn) = call_expr.xml_root_fn() {
-        todo!("xmlroot function expressions are not supported yet")
-    } else if let Some(_xml_serialize_fn) = call_expr.xml_serialize_fn() {
-        todo!("xmlserialize function expressions are not supported yet")
+    } else if let Some(xml_element_fn) = call_expr.xml_element_fn() {
+        build_xml_element_fn(xml_element_fn)
+    } else if let Some(xml_exists_fn) = call_expr.xml_exists_fn() {
+        build_xml_exists_fn(xml_exists_fn)
+    } else if let Some(xml_forest_fn) = call_expr.xml_forest_fn() {
+        build_xml_forest_fn(xml_forest_fn)
+    } else if let Some(xml_parse_fn) = call_expr.xml_parse_fn() {
+        build_xml_parse_fn(xml_parse_fn)
+    } else if let Some(xml_pi_fn) = call_expr.xml_pi_fn() {
+        build_xml_pi_fn(xml_pi_fn)
+    } else if let Some(xml_root_fn) = call_expr.xml_root_fn() {
+        build_xml_root_fn(xml_root_fn)
+    } else if let Some(xml_serialize_fn) = call_expr.xml_serialize_fn() {
+        build_xml_serialize_fn(xml_serialize_fn)
     } else {
         unreachable!("a call expression should contain a supported function node")
     }
+}
+
+fn build_xml_element_fn<'a>(xml_element_fn: ast::XmlElementFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlelement");
+    if let Some(l_paren) = xml_element_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(name) = xml_element_fn.name_token() {
+        doc = doc
+            .append(leading_comments_token(&name))
+            .append(Doc::text("name"));
+    }
+
+    let Some(tag) = xml_element_fn.tag() else {
+        return doc.append(Doc::text(")"));
+    };
+    doc = doc
+        .append(Doc::space())
+        .append(leading_comments(tag.syntax()))
+        .append(build_name(tag.syntax()));
+
+    let mut items = Vec::new();
+    if let Some(attrs) = xml_element_fn.expr_as_xml_attr_list() {
+        let attrs_doc = xml_element_fn
+            .xmlattributes_token()
+            .map(|token| {
+                leading_comments_token(&token)
+                    .append(Doc::text("xmlattributes"))
+                    .append(comments_before(attrs.syntax().clone()))
+            })
+            .unwrap_or_else(Doc::nil)
+            .append(build_expr_as_xml_attr_list(attrs.clone()));
+        items.push((attrs_doc, attrs.syntax().clone()));
+    }
+    items.extend(xml_element_fn.exprs().map(|expr| {
+        (
+            leading_comments(expr.syntax()).append(build_expr(expr.clone())),
+            expr.syntax().clone(),
+        )
+    }));
+
+    let mut previous = tag.syntax().clone();
+    for (item, syntax) in items {
+        doc = doc
+            .append(trailing_comments(&previous))
+            .append(Doc::text(","))
+            .append(Doc::space())
+            .append(item);
+        previous = syntax;
+    }
+
+    if let Some(r_paren) = xml_element_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_expr_as_xml_attr_list<'a>(attrs: ast::ExprAsXmlAttrList) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = attrs.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let items = attrs.expr_as_xml_attrs().map(|attr| {
+        let mut item = attr.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(as_token) = attr.as_token() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments_token(&as_token))
+                .append(Doc::text("as"));
+        }
+        if let Some(name) = attr.attr() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        (
+            leading_comments(attr.syntax()).append(item),
+            attr.syntax().clone(),
+        )
+    });
+    if let Some(items) = build_comma_separated_docs(items) {
+        doc = doc.append(items);
+    }
+
+    if let Some(r_paren) = attrs.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_xml_exists_fn<'a>(xml_exists_fn: ast::XmlExistsFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlexists");
+    if let Some(l_paren) = xml_exists_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(passing) = xml_exists_fn.xml_row_passing_clause() {
+        if let Some(row) = passing.row() {
+            doc = doc
+                .append(leading_comments(passing.syntax()))
+                .append(build_expr(row));
+        }
+        if let Some(passing_token) = passing.passing_token() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments_token(&passing_token))
+                .append(Doc::text("passing"));
+        }
+        if let Some(mech) = passing.xml_passing_mech() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(mech.syntax()))
+                .append(build_xml_passing_mech(mech));
+        }
+        if let Some(passing_doc) = passing.xml_passing_doc() {
+            if let Some(expr) = passing_doc.expr() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(passing_doc.syntax()))
+                    .append(build_expr(expr));
+            }
+            if let Some(mech) = passing_doc.xml_passing_mech() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(mech.syntax()))
+                    .append(build_xml_passing_mech(mech));
+            }
+        }
+    }
+
+    if let Some(r_paren) = xml_exists_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_xml_forest_fn<'a>(xml_forest_fn: ast::XmlForestFn) -> Doc<'a> {
+    Doc::text("xmlforest").append(
+        xml_forest_fn
+            .expr_as_element_tag_list()
+            .map(|list| {
+                comments_before(list.syntax().clone()).append(build_expr_as_element_tag_list(list))
+            })
+            .unwrap_or_else(Doc::nil),
+    )
+}
+
+fn build_expr_as_element_tag_list<'a>(list: ast::ExprAsElementTagList) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = list.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let items = list.expr_as_element_tags().map(|item| {
+        let mut item_doc = item.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(as_token) = item.as_token() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments_token(&as_token))
+                .append(Doc::text("as"));
+        }
+        if let Some(tag) = item.tag() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(tag.syntax()))
+                .append(build_name(tag.syntax()));
+        }
+        (
+            leading_comments(item.syntax()).append(item_doc),
+            item.syntax().clone(),
+        )
+    });
+    if let Some(items) = build_comma_separated_docs(items) {
+        doc = doc.append(items);
+    }
+
+    if let Some(r_paren) = list.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_xml_parse_fn<'a>(xml_parse_fn: ast::XmlParseFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlparse");
+    if let Some(l_paren) = xml_parse_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(kind) = xml_parse_fn.xml_document_or_content() {
+        doc = doc
+            .append(leading_comments(kind.syntax()))
+            .append(build_xml_document_or_content(kind));
+    }
+    if let Some(expr) = xml_parse_fn.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(whitespace) = xml_parse_fn.xml_whitespace() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(whitespace.syntax()))
+            .append(build_xml_whitespace(whitespace));
+    }
+
+    if let Some(r_paren) = xml_parse_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_xml_pi_fn<'a>(xml_pi_fn: ast::XmlPiFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlpi");
+    if let Some(l_paren) = xml_pi_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(name) = xml_pi_fn.name_token() {
+        doc = doc
+            .append(leading_comments_token(&name))
+            .append(Doc::text("name"));
+    }
+    if let Some(target) = xml_pi_fn.target() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(target.syntax()))
+            .append(build_name(target.syntax()));
+    }
+    if let Some(expr) = xml_pi_fn.expr() {
+        if let Some(comma) = xml_pi_fn.comma_token() {
+            doc = doc.append(comments_before(comma));
+        }
+        doc = doc
+            .append(Doc::text(","))
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+
+    if let Some(r_paren) = xml_pi_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_xml_root_fn<'a>(xml_root_fn: ast::XmlRootFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlroot");
+    if let Some(l_paren) = xml_root_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(expr) = xml_root_fn.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(comma) = xml_root_fn.comma_token() {
+        doc = doc.append(comments_before(comma));
+    }
+    doc = doc.append(Doc::text(",")).append(Doc::space());
+    if let Some(version) = xml_root_fn.xml_root_version() {
+        doc = doc
+            .append(leading_comments(version.syntax()))
+            .append(build_xml_root_version(version));
+    }
+    if let Some(standalone) = xml_root_fn.xml_standalone() {
+        doc = doc
+            .append(leading_comments(standalone.syntax()))
+            .append(build_xml_standalone(standalone));
+    }
+
+    if let Some(r_paren) = xml_root_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_xml_root_version<'a>(version: ast::XmlRootVersion) -> Doc<'a> {
+    match version {
+        ast::XmlRootVersion::XmlVersionExpr(version) => {
+            let mut doc = version
+                .version_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("version")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(expr) = version.expr() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(expr.syntax()))
+                    .append(build_expr(expr));
+            }
+            doc
+        }
+        ast::XmlRootVersion::XmlVersionNoValue(version) => {
+            let mut doc = version
+                .version_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("version")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(no) = version.no_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&no))
+                    .append(Doc::text("no"));
+            }
+            if let Some(value) = version.value_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&value))
+                    .append(Doc::text("value"));
+            }
+            doc
+        }
+    }
+}
+
+fn build_xml_standalone<'a>(standalone: ast::XmlStandalone) -> Doc<'a> {
+    let (comma, standalone_token, no_or_yes, value, text) = match standalone {
+        ast::XmlStandalone::StandaloneYes(node) => (
+            node.comma_token(),
+            node.standalone_token(),
+            node.yes_token(),
+            None,
+            "yes",
+        ),
+        ast::XmlStandalone::StandaloneNo(node) => (
+            node.comma_token(),
+            node.standalone_token(),
+            node.no_token(),
+            None,
+            "no",
+        ),
+        ast::XmlStandalone::StandaloneNoValue(node) => (
+            node.comma_token(),
+            node.standalone_token(),
+            node.no_token(),
+            node.value_token(),
+            "no",
+        ),
+    };
+
+    let mut doc = comma.map(comments_before).unwrap_or_else(Doc::nil);
+    doc = doc.append(Doc::text(",")).append(Doc::space());
+    if let Some(token) = standalone_token {
+        doc = doc
+            .append(leading_comments_token(&token))
+            .append(Doc::text("standalone"));
+    }
+    if let Some(token) = no_or_yes {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(text));
+    }
+    if let Some(token) = value {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("value"));
+    }
+    doc
+}
+
+fn build_xml_serialize_fn<'a>(xml_serialize_fn: ast::XmlSerializeFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlserialize");
+    if let Some(l_paren) = xml_serialize_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(kind) = xml_serialize_fn.xml_document_or_content() {
+        doc = doc
+            .append(leading_comments(kind.syntax()))
+            .append(build_xml_document_or_content(kind));
+    }
+    if let Some(expr) = xml_serialize_fn.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(as_token) = xml_serialize_fn.as_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"));
+    }
+    if let Some(ty) = xml_serialize_fn.ty() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(ty.syntax()))
+            .append(build_type(ty));
+    }
+    if let Some(indent) = xml_serialize_fn.xml_indent() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(indent.syntax()))
+            .append(build_xml_indent(indent));
+    }
+
+    if let Some(r_paren) = xml_serialize_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_xml_document_or_content<'a>(kind: ast::XmlDocumentOrContent) -> Doc<'a> {
+    match kind {
+        ast::XmlDocumentOrContent::XmlDocument(_) => Doc::text("document"),
+        ast::XmlDocumentOrContent::XmlContent(_) => Doc::text("content"),
+    }
+}
+
+fn build_xml_whitespace<'a>(whitespace: ast::XmlWhitespace) -> Doc<'a> {
+    let (first, second, text) = match whitespace {
+        ast::XmlWhitespace::PreserveWhitespace(node) => {
+            (node.preserve_token(), node.whitespace_token(), "preserve")
+        }
+        ast::XmlWhitespace::StripWhitespace(node) => {
+            (node.strip_token(), node.whitespace_token(), "strip")
+        }
+    };
+    build_two_keywords(first, text, second, "whitespace")
+}
+
+fn build_xml_indent<'a>(indent: ast::XmlIndent) -> Doc<'a> {
+    match indent {
+        ast::XmlIndent::Indent(_) => Doc::text("indent"),
+        ast::XmlIndent::NoIndent(node) => {
+            build_two_keywords(node.no_token(), "no", node.indent_token(), "indent")
+        }
+    }
+}
+
+fn build_two_keywords<'a>(
+    first: Option<SyntaxToken>,
+    first_text: &'static str,
+    second: Option<SyntaxToken>,
+    second_text: &'static str,
+) -> Doc<'a> {
+    let mut doc = first
+        .map(|token| leading_comments_token(&token).append(Doc::text(first_text)))
+        .unwrap_or_else(Doc::nil);
+    if let Some(token) = second {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(second_text));
+    }
+    doc
+}
+
+fn build_xml_passing_mech<'a>(mech: ast::XmlPassingMech) -> Doc<'a> {
+    let (by, end, text) = match mech {
+        ast::XmlPassingMech::XmlPassingMechByRef(mech) => {
+            (mech.by_token(), mech.ref_token(), "ref")
+        }
+        ast::XmlPassingMech::XmlPassingMechByValue(mech) => {
+            (mech.by_token(), mech.value_token(), "value")
+        }
+    };
+    let mut doc = by
+        .map(|token| leading_comments_token(&token).append(Doc::text("by")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(end) = end {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&end))
+            .append(Doc::text(text));
+    }
+    doc
 }
 
 fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
