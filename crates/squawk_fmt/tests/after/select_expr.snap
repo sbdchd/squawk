@@ -7,10 +7,33 @@ select
   array[1, 2],
   array(select 1),
   array[[1, 2], [3, 4]],
-  array[a_very_long_first_array_expression, a_very_long_second_array_expression, a_very_long_third_array_expression],
-  array(select a_very_long_array_select_expression
-  from a_very_long_array_select_relation_name),
-  array[[a_very_long_first_nested_array_expression, a_very_long_second_nested_array_expression], [a_very_long_third_nested_array_expression, a_very_long_fourth_nested_array_expression]],
+  /* before array */ array /* before opening bracket */[
+    /* before first */ 1 /* before comma */,
+    /* before second */ 2 /* before closing bracket */
+  ] /* after array */,
+  array[
+    a_very_long_first_array_expression,
+    a_very_long_second_array_expression,
+    a_very_long_third_array_expression
+  ],
+  array(
+    select a_very_long_array_select_expression
+    from a_very_long_array_select_relation_name
+  ),
+  array[
+    [
+      a_very_long_first_nested_array_expression,
+      a_very_long_second_nested_array_expression
+    ],
+    [
+      a_very_long_third_nested_array_expression,
+      a_very_long_fourth_nested_array_expression
+    ]
+  ],
+  array[
+    [a_very_long_first, a_very_long_second],
+    [a_very_long_third, a_very_long_fourth]
+  ],
   -- between expr
   2 between 1 and 3,
   2 not between 1 and 3,
@@ -60,20 +83,33 @@ select
   1 = any(array[1, 2]),
   2 = all(select x from things),
   3 = some(array[3]),
-  4 /* before op */ = /* before any */ any /* before opening paren */(/* before expr */ array[4] /* before closing paren */) /* after any */,
+  4 /* before op */ = /* before any */ any /* before opening paren */(
+    /* before expr */ array[4] /* before closing paren */
+  ) /* after any */,
   exists(select 1 from things),
-  a_very_long_any_comparison_expression = any(a_very_long_any_input_expression_that_forces_wrapping),
-  a_very_long_all_comparison_expression = all(select
-    a_very_long_all_select_expression
-  from a_very_long_all_relation_name),
-  a_very_long_some_comparison_expression = some(a_very_long_some_input_expression),
-  exists(select a_very_long_exists_select_expression
-  from a_very_long_exists_relation_name),
-  /* before exists */ exists /* before opening paren */(/* before select */ select
-    1 /* before closing paren */) /* after exists */,
+  a_very_long_any_comparison_expression = any(
+    a_very_long_any_input_expression_that_forces_wrapping
+  ),
+  a_very_long_all_comparison_expression = all(
+    select a_very_long_all_select_expression from a_very_long_all_relation_name
+  ),
+  a_very_long_some_comparison_expression = some(
+    a_very_long_some_input_expression
+  ),
+  exists(
+    select a_very_long_exists_select_expression
+    from a_very_long_exists_relation_name
+  ),
+  /* before exists */ exists /* before opening paren */(
+    /* before select */ select 1 /* before closing paren */
+  ) /* after exists */,
   collation for (b + c),
-  collation for (a_very_long_collation_input_expression_that_forces_the_builtin_to_wrap),
-  /* before collation */ collation /* before for */ for /* before opening paren */(/* before expr */ foo /* before closing paren */) /* after collation */,
+  collation for (
+    a_very_long_collation_input_expression_that_forces_the_builtin_to_wrap
+  ),
+  /* before collation */ collation /* before for */ for /* before opening paren */(
+    /* before expr */ foo /* before closing paren */
+  ) /* after collation */,
   extract(year from timestamp '2001-02-16 20:38:40'),
   extract('month' from ts),
   extract("Field" from ts),
@@ -86,16 +122,30 @@ select
   overlay('Txxxxas' placing 'hom' from 2),
   overlay(),
   overlay('Txxxxas', 'hom', 2, count => 4),
-  overlay(a_very_long_string_expression placing a_very_long_replacement_expression from a_very_long_start_expression for a_very_long_count_expression),
-  overlay(a_very_long_string_expression,
-  a_very_long_replacement_expression,
-  a_very_long_start_expression,
-  a_very_long_count_name => a_very_long_count_expression),
-  /* before overlay */ overlay /* before opening paren */(/* before string */ 'Txxxxas' /* before placing */ placing /* before replacement */ 'hom' /* before from */ from /* before start */ 2 /* before for */ for /* before count */ 4 /* before closing paren */) /* after overlay */,
-  overlay /* before opening paren */(/* before string */ 'Txxxxas' /* before comma */,
-  /* before replacement */ 'hom' /* before comma */,
-  /* before start */ 2 /* before comma */,
-  /* before name */ count /* before arrow */ => /* before count */ 4 /* before closing paren */),
+  overlay(
+    a_very_long_string_expression
+    placing a_very_long_replacement_expression
+    from a_very_long_start_expression
+    for a_very_long_count_expression
+  ),
+  overlay(
+    a_very_long_string_expression,
+    a_very_long_replacement_expression,
+    a_very_long_start_expression,
+    a_very_long_count_name => a_very_long_count_expression
+  ),
+  /* before overlay */ overlay /* before opening paren */(
+    /* before string */ 'Txxxxas'
+    /* before placing */ placing /* before replacement */ 'hom'
+    /* before from */ from /* before start */ 2
+    /* before for */ for /* before count */ 4 /* before closing paren */
+  ) /* after overlay */,
+  overlay /* before opening paren */(
+    /* before string */ 'Txxxxas' /* before comma */,
+    /* before replacement */ 'hom' /* before comma */,
+    /* before start */ 2 /* before comma */,
+    /* before name */ count /* before arrow */ => /* before count */ 4 /* before closing paren */
+  ),
   substring('Thomas' from 2 for 3),
   substring('Thomas' for 3 from 2),
   substring('Thomas' from 2),
@@ -228,9 +278,13 @@ select
   json_exists(doc, '$' empty array on error),
   json_exists(doc, '$' empty object on error),
   json_scalar(1),
-  json_scalar(a_very_long_json_scalar_input_expression_that_forces_the_builtin_to_wrap),
+  json_scalar(
+    a_very_long_json_scalar_input_expression_that_forces_the_builtin_to_wrap
+  ),
   json_scalar(),
-  json_scalar /* before opening paren */(/* before expression */ 1 /* before closing paren */),
+  json_scalar /* before opening paren */(
+    /* before expression */ 1 /* before closing paren */
+  ),
   json_serialize(doc),
   json_serialize(doc format json returning text format json),
   json_serialize(a_very_long_json_serialize_document

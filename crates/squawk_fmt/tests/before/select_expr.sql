@@ -3,9 +3,11 @@ select
   array[1,2],
   array(select 1),
   array[[1,2],[3,4]],
+  /* before array */ ARRAY /* before opening bracket */ [ /* before first */ 1 /* before comma */, /* before second */ 2 /* before closing bracket */ ] /* after array */,
   array[a_very_long_first_array_expression, a_very_long_second_array_expression, a_very_long_third_array_expression],
   array(select a_very_long_array_select_expression from a_very_long_array_select_relation_name),
   array[[a_very_long_first_nested_array_expression, a_very_long_second_nested_array_expression], [a_very_long_third_nested_array_expression, a_very_long_fourth_nested_array_expression]],
+  array[[a_very_long_first, a_very_long_second], [a_very_long_third, a_very_long_fourth]],
   -- between expr
   2  between  1  and  3,
   2  not  between  1  and  3,

@@ -56,21 +56,18 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
         .append(build_path(&table_name.path().unwrap()))
         .append(Doc::text("("))
         .append(
-            Doc::line_or_nil()
-                .append(Doc::list(
-                    Itertools::intersperse(
-                        create_table
-                            .table_arg_list()
-                            .unwrap()
-                            .args()
-                            .map(build_table_arg),
-                        Doc::text(",").append(Doc::hard_line()),
-                    )
-                    .collect(),
-                ))
-                .nest(2)
-                .append(Doc::line_or_nil())
-                .group(),
+            wrap_body(Doc::list(
+                Itertools::intersperse(
+                    create_table
+                        .table_arg_list()
+                        .unwrap()
+                        .args()
+                        .map(build_table_arg),
+                    Doc::text(",").append(Doc::hard_line()),
+                )
+                .collect(),
+            ))
+            .group(),
         )
         .append(Doc::text(")"));
 
@@ -1193,21 +1190,23 @@ fn build_grouping_list<'a>(
             doc = doc.append(comments_before(r_paren));
         }
     } else {
-        doc = doc.append(
-            Doc::line_or_nil()
-                .append(Doc::list(
-                    Itertools::intersperse(
-                        items.into_iter(),
-                        Doc::text(",").append(Doc::line_or_space()),
-                    )
-                    .collect(),
-                ))
-                .nest(2)
-                .append(Doc::line_or_nil()),
-        );
+        doc = doc.append(wrap_body(Doc::list(
+            Itertools::intersperse(
+                items.into_iter(),
+                Doc::text(",").append(Doc::line_or_space()),
+            )
+            .collect(),
+        )));
     }
 
     doc.append(Doc::text(")")).group()
+}
+
+fn wrap_body<'a>(body: Doc<'a>) -> Doc<'a> {
+    Doc::line_or_nil()
+        .append(body)
+        .nest(2)
+        .append(Doc::line_or_nil())
 }
 
 fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
@@ -1254,19 +1253,33 @@ fn build_array_expr<'a>(array_expr: ast::ArrayExpr) -> Doc<'a> {
     };
 
     if let Some(select) = array_expr.select() {
+        if let Some(l_paren) = array_expr.l_paren_token() {
+            doc = doc.append(comments_before(l_paren));
+        }
+        let mut body = leading_comments(select.syntax()).append(build_select_doc(&select));
+        if let Some(r_paren) = array_expr.r_paren_token() {
+            body = body.append(comments_before(r_paren));
+        }
         doc.append(Doc::text("("))
-            .append(build_select_doc(&select))
+            .append(wrap_body(body))
             .append(Doc::text(")"))
+            .group()
     } else {
-        doc.append(Doc::text("["))
-            .append(Doc::list(
-                Itertools::intersperse(
-                    array_expr.exprs().map(build_expr),
-                    Doc::text(",").append(Doc::space()),
-                )
-                .collect(),
-            ))
-            .append(Doc::text("]"))
+        if let Some(l_brack) = array_expr.l_brack_token() {
+            doc = doc.append(comments_before(l_brack));
+        }
+        doc = doc.append(Doc::text("["));
+
+        let exprs = array_expr.exprs().map(|expr| {
+            let syntax = expr.syntax().clone();
+            let doc = leading_comments(expr.syntax()).append(build_expr(expr));
+            (doc, syntax)
+        });
+        let mut body = build_comma_separated_docs(exprs).unwrap_or_else(Doc::nil);
+        if let Some(r_brack) = array_expr.r_brack_token() {
+            body = body.append(comments_before(r_brack));
+        }
+        doc.append(wrap_body(body)).append(Doc::text("]")).group()
     }
 }
 
@@ -1560,14 +1573,7 @@ fn build_graph_table_fn<'a>(graph_table_fn: ast::GraphTableFn) -> Doc<'a> {
     if let Some(r_paren) = graph_table_fn.r_paren_token() {
         body = body.append(comments_before(r_paren));
     }
-    doc.append(
-        Doc::line_or_nil()
-            .append(body)
-            .nest(2)
-            .append(Doc::line_or_nil())
-            .group(),
-    )
-    .append(Doc::text(")"))
+    doc.append(wrap_body(body).group()).append(Doc::text(")"))
 }
 
 fn build_path_pattern_list<'a>(patterns: ast::PathPatternList) -> Doc<'a> {
@@ -3058,8 +3064,9 @@ fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
     if let Some(args) = overlay_fn.overlay_args() {
-        doc = doc
+        body = body
             .append(leading_comments(args.syntax()))
             .append(match args {
                 ast::OverlayArgs::OverlayPlacing(args) => {
@@ -3067,9 +3074,14 @@ fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
                         .string()
                         .map(|expr| leading_comments(expr.syntax()).append(build_expr(expr)))
                         .unwrap_or_else(Doc::nil);
-                    doc = append_keyword_expr(doc, args.placing_token(), "placing", args.placing());
-                    doc = append_keyword_expr(doc, args.from_token(), "from", args.from());
-                    append_keyword_expr(doc, args.for_token(), "for", args.for_())
+                    doc = append_line_keyword_expr(
+                        doc,
+                        args.placing_token(),
+                        "placing",
+                        args.placing(),
+                    );
+                    doc = append_line_keyword_expr(doc, args.from_token(), "from", args.from());
+                    append_line_keyword_expr(doc, args.for_token(), "for", args.for_()).group()
                 }
                 ast::OverlayArgs::OverlayExprs(args) => {
                     let items = args.overlay_exprs().map(|arg| {
@@ -3086,9 +3098,10 @@ fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
     }
 
     if let Some(r_paren) = overlay_fn.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc = doc.append(wrap_body(body));
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_substring_fn<'a>(substring_fn: ast::SubstringFn) -> Doc<'a> {
@@ -3152,6 +3165,27 @@ fn append_keyword_expr<'a>(
     if let Some(token) = token {
         doc = doc
             .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(keyword));
+    }
+    if let Some(expr) = expr {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn append_line_keyword_expr<'a>(
+    mut doc: Doc<'a>,
+    token: Option<SyntaxToken>,
+    keyword: &'static str,
+    expr: Option<ast::Expr>,
+) -> Doc<'a> {
+    if let Some(token) = token {
+        doc = doc
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&token))
             .append(Doc::text(keyword));
     }
@@ -3298,15 +3332,17 @@ fn build_collation_for_fn<'a>(collation_for_fn: ast::CollationForFn) -> Doc<'a> 
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
     if let Some(expr) = collation_for_fn.expr() {
-        doc = doc
+        body = body
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     }
     if let Some(r_paren) = collation_for_fn.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc = doc.append(wrap_body(body));
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_extract_fn<'a>(extract_fn: ast::ExtractFn) -> Doc<'a> {
@@ -3364,12 +3400,13 @@ fn build_parenthesized_expr_or_select_fn<'a>(
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
     if let Some(expr) = expr {
-        doc = doc
+        body = body
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     } else if let Some(select) = select {
-        doc = doc
+        body = body
             .append(leading_comments(select.syntax()))
             .append(match select {
                 ast::SelectVariant::Select(select) => build_select_doc(&select),
@@ -3378,9 +3415,10 @@ fn build_parenthesized_expr_or_select_fn<'a>(
     }
 
     if let Some(r_paren) = r_paren {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc = doc.append(wrap_body(body));
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
@@ -3391,17 +3429,13 @@ fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
     doc = doc.append(Doc::text("("));
 
     let mut body = Doc::nil();
-    let mut has_body = false;
-    let mut has_args = false;
     if let Some(star) = arg_list.star_token() {
-        has_body = true;
         body = body
             .append(leading_comments_token(&star))
             .append(Doc::text("*"));
     } else {
         let mut has_quantifier = false;
         if let Some(quantifier) = arg_list.all_or_distinct() {
-            has_body = true;
             has_quantifier = true;
             body = body
                 .append(leading_comments(quantifier.syntax()))
@@ -3411,48 +3445,23 @@ fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
                 });
         }
 
-        let args: Vec<Doc<'a>> = arg_list
-            .args()
-            .map(|arg| {
-                let leading = leading_comments(arg.syntax());
-                let trailing = trailing_comments(arg.syntax());
-                leading.append(build_call_arg(arg)).append(trailing)
-            })
-            .collect();
-        if !args.is_empty() {
-            has_body = true;
-            has_args = true;
+        let args = arg_list.args().map(|arg| {
+            let syntax = arg.syntax().clone();
+            let doc = leading_comments(arg.syntax()).append(build_call_arg(arg));
+            (doc, syntax)
+        });
+        if let Some(args) = build_comma_separated_docs(args) {
             if has_quantifier {
                 body = body.append(Doc::space());
             }
-            body = body.append(
-                Doc::list(
-                    Itertools::intersperse(
-                        args.into_iter(),
-                        Doc::text(",").append(Doc::line_or_space()),
-                    )
-                    .collect(),
-                )
-                .group(),
-            );
+            body = body.append(args);
         }
     }
 
-    if !has_args {
-        if let Some(r_paren) = arg_list.r_paren_token() {
-            body = body.append(comments_before(r_paren));
-        }
+    if let Some(r_paren) = arg_list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
     }
-    if has_body {
-        doc = doc.append(
-            Doc::line_or_nil()
-                .append(body)
-                .nest(2)
-                .append(Doc::line_or_nil()),
-        );
-    } else {
-        doc = doc.append(body);
-    }
+    doc = doc.append(wrap_body(body));
 
     doc.append(Doc::text(")")).group()
 }
@@ -3705,12 +3714,7 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
         }
         doc = doc
             .append(Doc::text("("))
-            .append(
-                Doc::line_or_nil()
-                    .append(body)
-                    .nest(2)
-                    .append(Doc::line_or_nil()),
-            )
+            .append(wrap_body(body))
             .append(Doc::text(")"))
     } else {
         let literal = cast_expr.literal().unwrap();
