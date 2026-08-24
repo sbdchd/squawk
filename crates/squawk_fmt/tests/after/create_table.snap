@@ -68,3 +68,10 @@ create table t(
 -- line comment before the semicolon
 create table t(a int)-- one
 ;
+
+create table a_very_long_schema_name.a_very_long_table_name(
+  a_very_long_integer_column_name int,
+  a_very_long_text_column_name text,
+  a_very_long_qualified_type_column_name a_very_long_type_schema_name.a_very_long_type_name,
+  U&"c!006fl" uescape '!' a_very_long_type_schema_name.a_very_long_type_name
+);

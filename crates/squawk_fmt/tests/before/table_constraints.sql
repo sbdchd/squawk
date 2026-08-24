@@ -24,6 +24,8 @@ create table using_indexes (
   PRIMARY KEY USING INDEX existing_primary
 );
 
+create table a_very_long_table_name_using_existing_indexes (a_very_long_first_identifier_column_name bigint, a_very_long_second_identifier_column_name bigint, unique using index a_very_long_existing_unique_index_name, primary key using index a_very_long_existing_primary_index_name);
+
 create table commented_constraints (
   id bigint,
   parent_id bigint,

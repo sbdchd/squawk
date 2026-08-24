@@ -42,3 +42,16 @@ create table t(
     -- a line comment
     including all
 );
+
+create table a_very_long_destination_table_name(
+  like a_very_long_source_schema_name.a_very_long_source_table_name
+    including comments
+    including compression
+    including constraints
+    including defaults
+    including generated
+    including identity
+    including indexes
+    including statistics
+    including storage
+);
