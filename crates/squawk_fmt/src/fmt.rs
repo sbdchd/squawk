@@ -3390,53 +3390,68 @@ fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
+    let mut has_body = false;
+    let mut has_args = false;
     if let Some(star) = arg_list.star_token() {
-        doc = doc
+        has_body = true;
+        body = body
             .append(leading_comments_token(&star))
             .append(Doc::text("*"));
-        if let Some(r_paren) = arg_list.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
-        }
-        return doc.append(Doc::text(")"));
-    }
-
-    let mut has_quantifier = false;
-    if let Some(quantifier) = arg_list.all_or_distinct() {
-        has_quantifier = true;
-        doc = doc
-            .append(leading_comments(quantifier.syntax()))
-            .append(match quantifier {
-                ast::AllOrDistinct::All(_) => Doc::text("all"),
-                ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
-            });
-    }
-
-    let args: Vec<Doc<'a>> = arg_list
-        .args()
-        .map(|arg| {
-            let leading = leading_comments(arg.syntax());
-            let trailing = trailing_comments(arg.syntax());
-            leading.append(build_call_arg(arg)).append(trailing)
-        })
-        .collect();
-    if args.is_empty() {
-        if let Some(r_paren) = arg_list.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
-        }
     } else {
-        if has_quantifier {
-            doc = doc.append(Doc::space());
+        let mut has_quantifier = false;
+        if let Some(quantifier) = arg_list.all_or_distinct() {
+            has_body = true;
+            has_quantifier = true;
+            body = body
+                .append(leading_comments(quantifier.syntax()))
+                .append(match quantifier {
+                    ast::AllOrDistinct::All(_) => Doc::text("all"),
+                    ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
+                });
         }
-        doc = doc.append(
-            Doc::list(
-                Itertools::intersperse(
-                    args.into_iter(),
-                    Doc::text(",").append(Doc::line_or_space()),
+
+        let args: Vec<Doc<'a>> = arg_list
+            .args()
+            .map(|arg| {
+                let leading = leading_comments(arg.syntax());
+                let trailing = trailing_comments(arg.syntax());
+                leading.append(build_call_arg(arg)).append(trailing)
+            })
+            .collect();
+        if !args.is_empty() {
+            has_body = true;
+            has_args = true;
+            if has_quantifier {
+                body = body.append(Doc::space());
+            }
+            body = body.append(
+                Doc::list(
+                    Itertools::intersperse(
+                        args.into_iter(),
+                        Doc::text(",").append(Doc::line_or_space()),
+                    )
+                    .collect(),
                 )
-                .collect(),
-            )
-            .nest(2),
+                .group(),
+            );
+        }
+    }
+
+    if !has_args {
+        if let Some(r_paren) = arg_list.r_paren_token() {
+            body = body.append(comments_before(r_paren));
+        }
+    }
+    if has_body {
+        doc = doc.append(
+            Doc::line_or_nil()
+                .append(body)
+                .nest(2)
+                .append(Doc::line_or_nil()),
         );
+    } else {
+        doc = doc.append(body);
     }
 
     doc.append(Doc::text(")")).group()
@@ -3676,20 +3691,27 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
         if let Some(l_paren) = cast_expr.l_paren_token() {
             doc = doc.append(comments_before(l_paren));
         }
-        doc = doc
-            .append(Doc::text("("))
-            .append(leading_comments(expr.syntax()))
+        let mut body = leading_comments(expr.syntax())
             .append(build_expr(expr))
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&as_token))
             .append(Doc::text("as"))
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(ty.syntax()))
-            .append(build_type(ty));
+            .append(build_type(ty))
+            .group();
         if let Some(r_paren) = cast_expr.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
+            body = body.append(comments_before(r_paren));
         }
-        doc = doc.append(Doc::text(")"))
+        doc = doc
+            .append(Doc::text("("))
+            .append(
+                Doc::line_or_nil()
+                    .append(body)
+                    .nest(2)
+                    .append(Doc::line_or_nil()),
+            )
+            .append(Doc::text(")"))
     } else {
         let literal = cast_expr.literal().unwrap();
         doc = doc

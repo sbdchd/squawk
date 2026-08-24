@@ -61,8 +61,12 @@ create table t(
 -- types in casts
 select
   1::int8,
-  cast(1 as int8),
-  treat(2 as bigint),
+  cast(
+    1 as int8
+  ),
+  treat(
+    2 as bigint
+  ),
   pg_catalog.varchar(10) 'foo';
 select
   '1'::interval day to second(3),
@@ -111,6 +115,11 @@ select
 -- comments around casts
 select 1 /*a*/::/*b*/ int8;
 select cast /*c*/(/*d*/ 1 /*e*/ as /*f*/ int8 /*g*/);
+select
+  a_very_long_expression_name_that_forces_the_select_to_wrap,
+  cast /*c*/(
+    /*d*/ 1 /*e*/ as /*f*/ int8 /*g*/
+  );
 select treat /*h*/(2 as /*i*/ bigint);
 select pg_catalog.varchar(10) /*j*/ 'foo';
 select interval '4' /*k*/ year to month;
@@ -151,7 +160,20 @@ create table a_very_long_table_name_for_type_wrapping(
 );
 select
   a_very_long_expression_name::a_very_long_type_schema_name.a_very_long_type_name,
-  cast(a_very_long_expression_name as character varying(12345)),
-  treat(a_very_long_expression_name as a_very_long_type_schema_name.a_very_long_type_name),
-  a_very_long_type_schema_name.a_very_long_type_name(12345) 'a very long typed string literal value',
+  cast(
+    a_very_long_expression_name as character varying(12345)
+  ),
+  cast(
+    a_very_long_expression_name_long_long_long_long_long_long
+    as
+    character varying(12345)
+  ),
+  treat(
+    a_very_long_expression_name
+    as
+    a_very_long_type_schema_name.a_very_long_type_name
+  ),
+  a_very_long_type_schema_name.a_very_long_type_name(
+    12345
+  ) 'a very long typed string literal value',
   interval 'a very long interval literal value' day to second(12345);

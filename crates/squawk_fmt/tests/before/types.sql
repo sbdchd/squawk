@@ -74,6 +74,7 @@ select interval '1' day to second(3), interval '2' year to month, interval(4) '3
 -- comments around casts
 select 1 /*a*/ :: /*b*/ INT8;
 select cast /*c*/ ( /*d*/ 1 /*e*/ as /*f*/ INT8 /*g*/ );
+select a_very_long_expression_name_that_forces_the_select_to_wrap, cast /*c*/ ( /*d*/ 1 /*e*/ as /*f*/ INT8 /*g*/ );
 select treat /*h*/ ( 2 as /*i*/ BIGINT );
 select pg_catalog.varchar(10) /*j*/ 'foo';
 select interval '4' /*k*/ year to month;
@@ -99,4 +100,4 @@ select 1::DOUBLE -- eight
 PRECISION;
 
 create table a_very_long_table_name_for_type_wrapping (a_very_long_numeric_column_name numeric(12345, 12345), a_very_long_varchar_column_name varchar(12345), a_very_long_character_varying_column_name character varying(12345), a_very_long_national_character_varying_column_name national character varying(12345), a_very_long_nchar_column_name nchar(12345), a_very_long_bit_varying_column_name bit varying(12345), a_very_long_double_precision_column_name double precision, a_very_long_timestamp_column_name timestamp(12345) without time zone, a_very_long_time_column_name time(12345) with time zone, a_very_long_interval_column_name interval day to second(12345), a_very_long_array_column_name text[12345][12345]);
-select a_very_long_expression_name::a_very_long_type_schema_name.a_very_long_type_name, cast(a_very_long_expression_name as character varying(12345)), treat(a_very_long_expression_name as a_very_long_type_schema_name.a_very_long_type_name), a_very_long_type_schema_name.a_very_long_type_name(12345) 'a very long typed string literal value', interval 'a very long interval literal value' day to second(12345);
+select a_very_long_expression_name::a_very_long_type_schema_name.a_very_long_type_name, cast(a_very_long_expression_name as character varying(12345)), cast(a_very_long_expression_name_long_long_long_long_long_long as character varying(12345)), treat(a_very_long_expression_name as a_very_long_type_schema_name.a_very_long_type_name), a_very_long_type_schema_name.a_very_long_type_name(12345) 'a very long typed string literal value', interval 'a very long interval literal value' day to second(12345);

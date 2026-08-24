@@ -128,9 +128,11 @@ select
     a_third_very_long_trim_expression),
   /* before trim */ trim /* before opening paren */(/* before side */ both /* before trim char */ 'x' /* before from */ from /* before string */ 'xfoox' /* before closing paren */) /* after trim */,
   date_trunc('month', now()),
-  a_very_long_function_name(first_very_long_argument_name,
+  a_very_long_function_name(
+    first_very_long_argument_name,
     second_very_long_argument_name,
-    third_very_long_argument_name),
+    third_very_long_argument_name
+  ),
   foo(),
   foo(*),
   foo(all 1, 2),
@@ -140,20 +142,34 @@ select
   foo(variadic xs),
   foo(/* before variadic */ variadic /* after variadic */ xs),
   foo(a => 1, b := 2),
-  foo(/* before name */ a /* before arrow */ => /* before value */ 1 /* before comma */,
-    /* before arg */ b /* before assign */ := /* before value 2 */ 2),
+  foo(
+    /* before name */ a /* before arrow */ => /* before value */ 1 /* before comma */,
+    /* before arg */ b /* before assign */ := /* before value 2 */ 2
+  ),
   array_agg(x order by y desc nulls last, z asc),
   foo(a => x order by y),
   array_agg(x order by y using > nulls first),
-  a_very_long_function_name(all a_very_long_first_quantified_argument_name,
-    a_very_long_second_quantified_argument_name),
-  a_very_long_function_name(distinct a_very_long_first_distinct_argument_name,
-    a_very_long_second_distinct_argument_name),
-  a_very_long_function_name(variadic a_very_long_variadic_argument_expression_that_forces_wrapping),
-  a_very_long_function_name(a_very_long_first_argument_name => a_very_long_first_argument_expression,
-    a_very_long_second_argument_name := a_very_long_second_argument_expression),
-  a_very_long_aggregate_name(a_very_long_aggregate_argument_expression order by a_very_long_first_order_expression desc nulls last, a_very_long_second_order_expression using > nulls first),
-  array_agg(x /* before order */ order /* before by */ by /* before first */ y /* before desc */ desc /* before nulls */ nulls /* before last */ last /* before comma */, /* before second */ z /* before asc */ asc),
+  a_very_long_function_name(
+    all a_very_long_first_quantified_argument_name,
+    a_very_long_second_quantified_argument_name
+  ),
+  a_very_long_function_name(
+    distinct a_very_long_first_distinct_argument_name,
+    a_very_long_second_distinct_argument_name
+  ),
+  a_very_long_function_name(
+    variadic a_very_long_variadic_argument_expression_that_forces_wrapping
+  ),
+  a_very_long_function_name(
+    a_very_long_first_argument_name => a_very_long_first_argument_expression,
+    a_very_long_second_argument_name := a_very_long_second_argument_expression
+  ),
+  a_very_long_aggregate_name(
+    a_very_long_aggregate_argument_expression order by a_very_long_first_order_expression desc nulls last, a_very_long_second_order_expression using > nulls first
+  ),
+  array_agg(
+    x /* before order */ order /* before by */ by /* before first */ y /* before desc */ desc /* before nulls */ nulls /* before last */ last /* before comma */, /* before second */ z /* before asc */ asc
+  ),
   json_arrayagg(v),
   json_arrayagg(v format json
     order by sort_col desc
@@ -313,19 +329,33 @@ select
     /* before returning */ returning /* before type */ jsonb
       /* before returning format */ format /* before returning json */ json /* before closing paren */),
   public.foo(1),
-  foo /* before opening paren */(/* before first arg */ 1 /* before comma */,
-    /* before second arg */ 2 /* before closing paren */),
+  foo /* before opening paren */(
+    /* before first arg */ 1 /* before comma */,
+    /* before second arg */ 2 /* before closing paren */
+  ),
   percentile_cont(0.5) within group (order by x),
   mode() within group (order by y desc),
-  percentile_disc(0.5) /* before within */ within /* before group */ group /* before opening paren */ (/* before order */ order /* before by */ by /* before sort */ x /* before closing paren */) /* after within */,
+  percentile_disc(
+    0.5
+  ) /* before within */ within /* before group */ group /* before opening paren */ (/* before order */ order /* before by */ by /* before sort */ x /* before closing paren */) /* after within */,
   count(*) filter (where x > 1),
-  sum(x) /* before filter */ filter /* before opening paren */ (/* before where */ where /* before expr */ x > 0 /* before closing paren */) /* after filter */,
+  sum(
+    x
+  ) /* before filter */ filter /* before opening paren */ (/* before where */ where /* before expr */ x > 0 /* before closing paren */) /* after filter */,
   first_value(x) ignore nulls,
   last_value(y) respect nulls,
-  first_value(x) /* before treatment */ ignore /* before nulls */ nulls /* after nulls */,
-  a_very_long_ordered_set_aggregate_name(a_very_long_direct_argument_expression) within group (order by a_very_long_ordered_set_expression desc nulls last),
-  a_very_long_filtered_aggregate_name(a_very_long_filter_argument_expression) filter (where a_very_long_filter_condition_expression > a_very_long_filter_threshold_expression),
-  a_very_long_window_function_name(a_very_long_null_treatment_argument_expression) ignore nulls,
+  first_value(
+    x
+  ) /* before treatment */ ignore /* before nulls */ nulls /* after nulls */,
+  a_very_long_ordered_set_aggregate_name(
+    a_very_long_direct_argument_expression
+  ) within group (order by a_very_long_ordered_set_expression desc nulls last),
+  a_very_long_filtered_aggregate_name(
+    a_very_long_filter_argument_expression
+  ) filter (where a_very_long_filter_condition_expression > a_very_long_filter_threshold_expression),
+  a_very_long_window_function_name(
+    a_very_long_null_treatment_argument_expression
+  ) ignore nulls,
   sum(x) over window_name,
   count(*) over (),
   avg(x) over (w
@@ -343,7 +373,9 @@ select
     rows between a_very_long_frame_start_expression preceding
         and a_very_long_frame_end_expression following
       exclude ties),
-  sum(x) /* before over */ over /* before target */ (/* before partition */ partition /* before by */ by /* before expr */ a /* before comma */,
+  sum(
+    x
+  ) /* before over */ over /* before target */ (/* before partition */ partition /* before by */ by /* before expr */ a /* before comma */,
       /* before second */ b
     /* before order */ order /* before order by */ by /* before sort */ c
     /* before rows */ rows /* before between */ between /* before start */ 1 /* before preceding */ preceding
@@ -368,12 +400,24 @@ select
       /* after else */ 3 /* before end */
   end,
   -- cast expr
-  cast(1 as int8),
-  treat(2 as bigint),
+  cast(
+    1 as int8
+  ),
+  treat(
+    2 as bigint
+  ),
   1::int8,
   int8 '1',
-  cast(a_very_long_cast_input_expression as a_very_long_type_schema_name.a_very_long_cast_type_name),
-  treat(a_very_long_treat_input_expression as a_very_long_type_schema_name.a_very_long_treat_type_name),
+  cast(
+    a_very_long_cast_input_expression
+    as
+    a_very_long_type_schema_name.a_very_long_cast_type_name
+  ),
+  treat(
+    a_very_long_treat_input_expression
+    as
+    a_very_long_type_schema_name.a_very_long_treat_type_name
+  ),
   a_very_long_postgres_cast_input_expression::a_very_long_type_schema_name.a_very_long_postgres_cast_type_name,
   a_very_long_type_schema_name.a_very_long_typed_literal_type_name 'a very long typed literal input value',
   -- field expr
@@ -461,6 +505,8 @@ select
     /* before second */ 2 /* before closing paren */);
 
 select
-  a_very_long_function_name(first_very_long_argument_name,
+  a_very_long_function_name(
+    first_very_long_argument_name,
     second_very_long_argument_name,
-    third_very_long_argument_name);
+    third_very_long_argument_name
+  );
