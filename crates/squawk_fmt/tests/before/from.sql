@@ -1,5 +1,12 @@
 select * from foo;
 select * from public.foo as f, bar b;
+select * from foo as f (id, display_name);
+select * from foo f (id int, display_name text collate "C");
+select * from foo
+  /* before alias */ as /* before alias name */ f /* before open paren */ (
+    /* after open paren */ id /* before comma */,
+    /* after comma */ display_name /* before close paren */
+  );
 select * from users tablesample bernoulli(10) repeatable (42);
 select *
 /* before from */ from
@@ -7,3 +14,8 @@ select *
   /* before star */ *
   /* before alias */ as /* before alias name */ f /* before item comma */,
   /* before second item */ other /* before second alias */ o;
+
+select * from a_very_long_schema_name.a_very_long_relation_name as a_very_long_relation_alias (a_very_long_first_column_alias, a_very_long_second_column_alias, a_very_long_third_column_alias);
+select * from a_very_long_relation_name a_very_long_relation_alias (a_very_long_first_column_name a_very_long_type_schema.a_very_long_first_type_name, a_very_long_second_column_name a_very_long_type_schema.a_very_long_second_type_name collate a_very_long_collation_name);
+select * from a_very_long_relation_name tablesample bernoulli(a_very_long_sampling_percentage_expression) repeatable (a_very_long_repeatable_seed_expression);
+select * from only a_very_long_schema_name.a_very_long_first_relation_name * as a_very_long_first_alias, a_very_long_schema_name.a_very_long_second_relation_name as a_very_long_second_alias;

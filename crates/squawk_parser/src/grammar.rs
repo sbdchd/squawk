@@ -2364,12 +2364,13 @@ fn arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // https://www.postgresql.org/docs/17/typeconv-func.html
     let m = p.start();
     p.eat(VARIADIC_KW);
-    let r = Restrictions {
-        order_by_allowed: true,
-        ..Restrictions::default()
-    };
-    match expr_bp(p, 1, &r) {
-        Some(_) => Some(m.complete(p, ARG)),
+    match expr_bp(p, 1, &Restrictions::default()) {
+        Some(_) => {
+            if p.at(ORDER_KW) {
+                opt_order_by_clause(p);
+            }
+            Some(m.complete(p, ARG))
+        }
         None => {
             m.abandon(p);
             None
@@ -2969,7 +2970,6 @@ const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLA
 
 #[derive(Default)]
 struct Restrictions {
-    order_by_allowed: bool,
     escape_disabled: bool,
     in_disabled: bool,
     is_disabled: bool,
@@ -3012,9 +3012,6 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
         m.complete(p, AS_NAME);
         return Some((lhs, expr_kind));
     }
-    if r.order_by_allowed && p.at(ORDER_KW) {
-        opt_order_by_clause(p);
-    }
     loop {
         let (op_bp, op, associativity) = current_op(p, r);
         if op_bp < bp {
@@ -3047,9 +3044,6 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
             m.complete(p, BIN_EXPR)
         };
         expr_kind = ExprKind::Other;
-    }
-    if r.order_by_allowed && p.at(ORDER_KW) {
-        opt_order_by_clause(p);
     }
     Some((lhs, expr_kind))
 }

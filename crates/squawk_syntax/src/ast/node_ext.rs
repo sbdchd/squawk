@@ -495,6 +495,31 @@ impl ast::ForeignKeyConstraint {
     }
 }
 
+fn second_minus_token(node: &SyntaxNode) -> Option<SyntaxToken> {
+    node.children_with_tokens()
+        .filter_map(|element| element.into_token())
+        .filter(|token| token.kind() == SyntaxKind::MINUS)
+        .nth(1)
+}
+
+impl ast::EdgeAny {
+    pub fn end_minus_token(&self) -> Option<SyntaxToken> {
+        second_minus_token(self.syntax())
+    }
+}
+
+impl ast::EdgeLeft {
+    pub fn end_minus_token(&self) -> Option<SyntaxToken> {
+        second_minus_token(self.syntax())
+    }
+}
+
+impl ast::EdgeRight {
+    pub fn end_minus_token(&self) -> Option<SyntaxToken> {
+        second_minus_token(self.syntax())
+    }
+}
+
 impl ast::XmlPiFn {
     #[inline]
     pub fn target(&self) -> Option<ast::XmlPiTarget> {
@@ -843,6 +868,53 @@ impl ast::CreateConversion {
 impl ast::ExtractFieldName {
     pub fn text(&self) -> String {
         normalize_name_node(self.syntax())
+    }
+}
+
+impl ast::JsonNullOnNull {
+    #[inline]
+    pub fn on_null_token(&self) -> Option<SyntaxToken> {
+        self.syntax()
+            .children_with_tokens()
+            .filter_map(|element| element.into_token())
+            .filter(|token| token.kind() == SyntaxKind::NULL_KW)
+            .nth(1)
+    }
+}
+
+impl ast::JsonExistsFn {
+    #[inline]
+    pub fn document(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn path(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::JsonQueryFn {
+    #[inline]
+    pub fn document(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn path(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::JsonValueFn {
+    #[inline]
+    pub fn document(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn path(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
     }
 }
 

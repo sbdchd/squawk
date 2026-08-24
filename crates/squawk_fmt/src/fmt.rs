@@ -48,29 +48,31 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
 
 fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
     let table_name = create_table.table_name().unwrap();
+    let arg_list = create_table.table_arg_list().unwrap();
     let mut doc = Doc::text("create")
         .append(Doc::space())
         .append(Doc::text("table"))
         .append(Doc::space())
         .append(leading_comments(table_name.syntax()))
-        .append(build_path(&table_name.path().unwrap()))
+        .append(build_path(&table_name.path().unwrap()));
+    if let Some(l_paren) = arg_list.l_paren_token() {
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
+    }
+    doc = doc
         .append(Doc::text("("))
         .append(
-            Doc::line_or_nil()
-                .append(Doc::list(
-                    Itertools::intersperse(
-                        create_table
-                            .table_arg_list()
-                            .unwrap()
-                            .args()
-                            .map(build_table_arg),
-                        Doc::text(",").append(Doc::hard_line()),
-                    )
-                    .collect(),
-                ))
-                .nest(2)
-                .append(Doc::line_or_nil())
-                .group(),
+            wrap_body(Doc::list(
+                Itertools::intersperse(
+                    arg_list.args().map(build_table_arg),
+                    Doc::text(",").append(Doc::hard_line()),
+                )
+                .collect(),
+            ))
+            .group(),
         )
         .append(Doc::text(")"));
 
@@ -156,9 +158,627 @@ fn build_table_arg<'a>(arg: ast::TableArg) -> Doc<'a> {
             doc
         }
         ast::TableArg::LikeClause(like_clause) => build_like_clause(like_clause),
-        ast::TableArg::TableConstraint(_table_constraint) => todo!(),
+        ast::TableArg::TableConstraint(table_constraint) => {
+            build_table_constraint(table_constraint.clone())
+        }
     });
     doc.append(trailing_comments(arg.syntax()))
+}
+
+fn build_table_constraint<'a>(constraint: ast::TableConstraint) -> Doc<'a> {
+    match constraint {
+        ast::TableConstraint::CheckConstraint(constraint) => build_check_constraint(constraint),
+        ast::TableConstraint::ExcludeConstraint(constraint) => build_exclude_constraint(constraint),
+        ast::TableConstraint::ForeignKeyConstraint(constraint) => {
+            build_foreign_key_constraint(constraint)
+        }
+        ast::TableConstraint::PrimaryKeyConstraint(constraint) => {
+            build_primary_key_constraint(constraint)
+        }
+        ast::TableConstraint::UniqueConstraint(constraint) => build_unique_constraint(constraint),
+    }
+}
+
+fn build_constraint_name_clause<'a>(clause: Option<ast::ConstraintNameClause>) -> Doc<'a> {
+    let Some(clause) = clause else {
+        return Doc::nil();
+    };
+    let mut doc = Doc::text("constraint");
+    if let Some(name) = clause.constraint_name() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    doc.append(Doc::space())
+}
+
+fn build_check_constraint<'a>(constraint: ast::CheckConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(check) = constraint.check_token() {
+        doc = doc
+            .append(leading_comments_token(&check))
+            .append(Doc::text("check"));
+    }
+    if let Some(l_paren) = constraint.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(expr) = constraint.expr() {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = constraint.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc = doc.append(wrap_body(body)).append(Doc::text(")")).group();
+
+    let mut options = Doc::nil();
+    for option in constraint.constraint_options() {
+        options = options
+            .append(Doc::line_or_space())
+            .append(leading_comments(option.syntax()))
+            .append(build_keyword_node(option.syntax()));
+    }
+    doc.append(options.nest(2)).group()
+}
+
+fn build_primary_key_constraint<'a>(constraint: ast::PrimaryKeyConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(primary) = constraint.primary_token() {
+        doc = doc
+            .append(leading_comments_token(&primary))
+            .append(Doc::text("primary"));
+    }
+    if let Some(key) = constraint.key_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&key))
+            .append(Doc::text("key"));
+    }
+    if let Some(using_index) = constraint.using_index() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(using_index.syntax()))
+            .append(build_using_index_name(using_index));
+    } else if let Some(parameters) = constraint.index_parameters() {
+        doc = doc
+            .append(leading_comments(parameters.syntax()))
+            .append(build_index_parameters(parameters));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_unique_constraint<'a>(constraint: ast::UniqueConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(unique) = constraint.unique_token() {
+        doc = doc
+            .append(leading_comments_token(&unique))
+            .append(Doc::text("unique"));
+    }
+    if let Some(using_index) = constraint.using_index() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(using_index.syntax()))
+            .append(build_using_index_name(using_index));
+    } else if let Some(parameters) = constraint.index_parameters() {
+        doc = doc
+            .append(leading_comments(parameters.syntax()))
+            .append(build_index_parameters(parameters));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_using_index_name<'a>(using_index: ast::UsingIndexName) -> Doc<'a> {
+    let mut doc = Doc::text("using");
+    if let Some(index) = using_index.index_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&index))
+            .append(Doc::text("index"));
+    }
+    if let Some(index) = using_index.index_ref() {
+        if let Some(path) = index.path_ref() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(index.syntax()))
+                .append(build_path_ref(&path));
+        }
+    }
+    doc
+}
+
+fn build_index_parameters<'a>(parameters: ast::IndexParameters) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(nulls) = parameters.nulls_distinct_option() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(nulls.syntax()))
+            .append(build_keyword_node(nulls.syntax()));
+    }
+    if let Some(columns) = parameters.column_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_constraint_column_ref_list(columns));
+    }
+    if let Some(include) = parameters.constraint_include_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(include.syntax()))
+            .append(build_constraint_include_clause(include));
+    }
+    if let Some(with_params) = parameters.with_params() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(with_params.syntax()))
+            .append(build_with_params(with_params));
+    }
+    if let Some(tablespace) = parameters.constraint_index_tablespace() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(tablespace.syntax()))
+            .append(build_constraint_index_tablespace(tablespace));
+    }
+    doc
+}
+
+fn build_constraint_column_ref_list<'a>(list: ast::ConstraintColumnRefList) -> Doc<'a> {
+    let suffix = list.without_overlaps().map(|overlaps| {
+        Doc::space()
+            .append(leading_comments(overlaps.syntax()))
+            .append(build_keyword_node(overlaps.syntax()))
+    });
+    build_column_names(
+        list.l_paren_token(),
+        list.column_name_refs(),
+        suffix,
+        list.r_paren_token(),
+    )
+}
+
+fn build_column_ref_list<'a>(list: ast::ColumnRefList) -> Doc<'a> {
+    build_column_names(
+        list.l_paren_token(),
+        list.column_name_refs(),
+        None,
+        list.r_paren_token(),
+    )
+}
+
+fn build_column_names<'a>(
+    l_paren: Option<SyntaxToken>,
+    names: impl Iterator<Item = ast::ColumnNameRef>,
+    suffix: Option<Doc<'a>>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let doc = l_paren
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = names.map(|name| {
+        (
+            leading_comments(name.syntax()).append(build_name(name.syntax())),
+            name.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+    if let Some(suffix) = suffix {
+        body = body.append(suffix);
+    }
+    if let Some(r_paren) = r_paren {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_constraint_include_clause<'a>(include: ast::ConstraintIncludeClause) -> Doc<'a> {
+    let mut doc = Doc::text("include");
+    if let Some(columns) = include.column_ref_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_column_ref_list(columns));
+    }
+    doc
+}
+
+fn build_with_params<'a>(with_params: ast::WithParams) -> Doc<'a> {
+    let mut doc = Doc::text("with");
+    if let Some(attributes) = with_params.attribute_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(attributes.syntax()))
+            .append(build_attribute_list(attributes));
+    }
+    doc
+}
+
+fn build_attribute_list<'a>(list: ast::AttributeList) -> Doc<'a> {
+    let doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = list.attribute_options().map(|option| {
+        let mut item = option
+            .namespace()
+            .map(|namespace| build_name(namespace.syntax()))
+            .unwrap_or_else(Doc::nil);
+        if let Some(dot) = option.dot_token() {
+            item = item.append(comments_before(dot)).append(Doc::text("."));
+        }
+        if let Some(name) = option.name() {
+            item = item
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        if let Some(eq) = option.eq_token() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments_token(&eq))
+                .append(Doc::text("="));
+        }
+        if let Some(value) = option.attribute_value() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(value.syntax()))
+                .append(build_attribute_value(value));
+        }
+        (
+            leading_comments(option.syntax()).append(item),
+            option.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_attribute_value<'a>(value: ast::AttributeValue) -> Doc<'a> {
+    if let Some(literal) = value.literal() {
+        build_literal(literal)
+    } else if let Some(ty) = value.ty() {
+        build_type(ty)
+    } else if value.none_token().is_some() {
+        Doc::text("none")
+    } else if let Some(op) = value.op() {
+        if value.operator_token().is_some() {
+            let mut doc = Doc::text("operator");
+            if let Some(l_paren) = value.l_paren_token() {
+                doc = doc.append(comments_before(l_paren));
+            }
+            doc = doc.append(Doc::text("(")).append(build_operator(&op));
+            if let Some(r_paren) = value.r_paren_token() {
+                doc = doc.append(comments_before(r_paren));
+            }
+            doc.append(Doc::text(")"))
+        } else {
+            build_operator(&op)
+        }
+    } else {
+        Doc::nil()
+    }
+}
+
+fn build_constraint_index_tablespace<'a>(tablespace: ast::ConstraintIndexTablespace) -> Doc<'a> {
+    let mut doc = Doc::text("using");
+    if let Some(index) = tablespace.index_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&index))
+            .append(Doc::text("index"));
+    }
+    if let Some(token) = tablespace.tablespace_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("tablespace"));
+    }
+    if let Some(name) = tablespace.tablespace_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    doc
+}
+
+fn append_constraint_options<'a>(
+    mut doc: Doc<'a>,
+    options: impl Iterator<Item = ast::ConstraintOption>,
+) -> Doc<'a> {
+    for option in options {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(option.syntax()))
+            .append(build_keyword_node(option.syntax()));
+    }
+    doc
+}
+
+fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(foreign) = constraint.foreign_token() {
+        doc = doc
+            .append(leading_comments_token(&foreign))
+            .append(Doc::text("foreign"));
+    }
+    if let Some(key) = constraint.key_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&key))
+            .append(Doc::text("key"));
+    }
+    if let Some(columns) = constraint.from_columns() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_foreign_key_column_list(columns));
+    }
+    if let Some(references) = constraint.references_token() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&references))
+            .append(Doc::text("references"));
+    }
+    if let Some(table) = constraint.table_name_ref() {
+        if let Some(path) = table.path_ref() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(table.syntax()))
+                .append(build_path_ref(&path));
+        }
+    }
+    if let Some(columns) = constraint.to_columns() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_foreign_key_column_list(columns));
+    }
+    if let Some(match_type) = constraint.match_type() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(match_type.syntax()))
+            .append(build_keyword_node(match_type.syntax()));
+    }
+    if let Some(action) = constraint.on_delete_action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_reference_action(
+                action.on_token(),
+                action.delete_token(),
+                "delete",
+                action.ref_action(),
+            ));
+    }
+    if let Some(action) = constraint.on_update_action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_reference_action(
+                action.on_token(),
+                action.update_token(),
+                "update",
+                action.ref_action(),
+            ));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_foreign_key_column_list<'a>(list: ast::ForeignKeyColumnList) -> Doc<'a> {
+    let suffix = list.period_column().map(|period| {
+        let mut doc = Doc::space()
+            .append(leading_comments(period.syntax()))
+            .append(Doc::text("period"));
+        if let Some(name) = period.name() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        doc
+    });
+    build_column_names(
+        list.l_paren_token(),
+        list.column_name_refs(),
+        suffix,
+        list.r_paren_token(),
+    )
+}
+
+fn build_reference_action<'a>(
+    on: Option<SyntaxToken>,
+    kind_token: Option<SyntaxToken>,
+    kind: &'static str,
+    action: Option<ast::RefAction>,
+) -> Doc<'a> {
+    let mut doc = on
+        .map(|token| leading_comments_token(&token).append(Doc::text("on")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(token) = kind_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(kind));
+    }
+    let Some(action) = action else {
+        return doc;
+    };
+    doc = doc
+        .append(Doc::space())
+        .append(leading_comments(action.syntax()));
+    match action {
+        ast::RefAction::SetNullColumns(action) => {
+            if let Some(set) = action.set_token() {
+                doc = doc
+                    .append(leading_comments_token(&set))
+                    .append(Doc::text("set"));
+            }
+            if let Some(null) = action.null_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&null))
+                    .append(Doc::text("null"));
+            }
+            if let Some(columns) = action.column_ref_list() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(columns.syntax()))
+                    .append(build_column_ref_list(columns));
+            }
+            doc
+        }
+        ast::RefAction::SetDefaultColumns(action) => {
+            if let Some(set) = action.set_token() {
+                doc = doc
+                    .append(leading_comments_token(&set))
+                    .append(Doc::text("set"));
+            }
+            if let Some(default) = action.default_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&default))
+                    .append(Doc::text("default"));
+            }
+            if let Some(columns) = action.column_ref_list() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(columns.syntax()))
+                    .append(build_column_ref_list(columns));
+            }
+            doc
+        }
+        action => doc.append(build_keyword_node(action.syntax())),
+    }
+}
+
+fn build_exclude_constraint<'a>(constraint: ast::ExcludeConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(exclude) = constraint.exclude_token() {
+        doc = doc
+            .append(leading_comments_token(&exclude))
+            .append(Doc::text("exclude"));
+    }
+    if let Some(method) = constraint.constraint_index_method() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(method.syntax()))
+            .append(Doc::text("using"));
+        if let Some(name) = method.access_method_ref() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+    }
+    if let Some(list) = constraint.constraint_exclusion_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(list.syntax()))
+            .append(build_constraint_exclusion_list(list));
+    }
+    if let Some(include) = constraint.constraint_include_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(include.syntax()))
+            .append(build_constraint_include_clause(include));
+    }
+    if let Some(with_params) = constraint.with_params() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(with_params.syntax()))
+            .append(build_with_params(with_params));
+    }
+    if let Some(tablespace) = constraint.constraint_index_tablespace() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(tablespace.syntax()))
+            .append(build_constraint_index_tablespace(tablespace));
+    }
+    if let Some(where_clause) = constraint.where_condition_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_condition_clause(where_clause));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_constraint_exclusion_list<'a>(list: ast::ConstraintExclusionList) -> Doc<'a> {
+    let doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = list.constraint_exclusions().map(|exclusion| {
+        let mut item = exclusion.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(with) = exclusion.with_token() {
+            item = item
+                .append(Doc::line_or_space())
+                .append(leading_comments_token(&with))
+                .append(Doc::text("with"));
+        }
+        if let Some(op) = exclusion.op() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(op.syntax()))
+                .append(build_operator(&op));
+        } else if let Some(op) = exclusion.operator_call() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(op.syntax()))
+                .append(build_operator_call(&op));
+        }
+        (
+            leading_comments(exclusion.syntax()).append(item.nest(2).group()),
+            exclusion.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_where_condition_clause<'a>(where_clause: ast::WhereConditionClause) -> Doc<'a> {
+    let mut doc = Doc::text("where");
+    if let Some(l_paren) = where_clause.l_paren_token() {
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(expr) = where_clause.expr() {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = where_clause.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_like_clause<'a>(like_clause: &ast::LikeClause) -> Doc<'a> {
@@ -205,6 +825,10 @@ fn build_like_option<'a>(option: &ast::LikeOption) -> Doc<'a> {
 }
 
 fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
+    build_select_doc_ungrouped(select).group()
+}
+
+fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
     let mut doc = Doc::text("select").append(Doc::line_or_space());
 
     if let Some(select_clause) = select.select_clause() {
@@ -231,6 +855,9 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
                 ))
                 .nest(2);
         }
+    }
+    if select.from_clause().is_some() {
+        doc = doc.group();
     }
 
     if let Some(from) = select.from_clause() {
@@ -265,7 +892,7 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
 
     doc = doc.append(build_semicolon(select.semicolon_token()));
 
-    doc.group()
+    doc
 }
 
 fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
@@ -305,9 +932,7 @@ fn build_from_item<'a>(item: ast::FromItem) -> Doc<'a> {
             todo!("parenthesized from items are not supported yet")
         }
         ast::FromItem::RowsFromItem(_) => todo!("rows from items are not supported yet"),
-        ast::FromItem::GraphTableFromItem(_) => {
-            todo!("graph_table from items are not supported yet")
-        }
+        ast::FromItem::GraphTableFromItem(graph_table) => build_graph_table_from_item(graph_table),
         ast::FromItem::JsonTableFromItem(_) => {
             todo!("json_table from items are not supported yet")
         }
@@ -315,6 +940,22 @@ fn build_from_item<'a>(item: ast::FromItem) -> Doc<'a> {
             todo!("xmltable from items are not supported yet")
         }
     }
+}
+
+fn build_graph_table_from_item<'a>(item: ast::GraphTableFromItem) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(lateral) = item.lateral_token() {
+        doc = doc
+            .append(leading_comments_token(&lateral))
+            .append(Doc::text("lateral"))
+            .append(Doc::space());
+    }
+    if let Some(graph_table) = item.graph_table_fn() {
+        doc = doc
+            .append(leading_comments(graph_table.syntax()))
+            .append(build_graph_table_fn(graph_table));
+    }
+    doc.append(build_from_alias(item.alias()))
 }
 
 fn build_relation_from_item<'a>(relation: ast::RelationFromItem) -> Doc<'a> {
@@ -350,7 +991,7 @@ fn build_tablesample_clause<'a>(tablesample: ast::TablesampleClause) -> Doc<'a> 
     if let Some(call) = tablesample.call_expr() {
         doc = doc
             .append(leading_comments(call.syntax()))
-            .append(build_call_expr(call));
+            .append(build_call_expr_with_spacing(call, true));
     }
     if let Some(repeatable) = tablesample.repeatable_clause() {
         doc = doc
@@ -358,7 +999,11 @@ fn build_tablesample_clause<'a>(tablesample: ast::TablesampleClause) -> Doc<'a> 
             .append(leading_comments(repeatable.syntax()))
             .append(Doc::text("repeatable"));
         if let Some(l_paren) = repeatable.l_paren_token() {
-            doc = doc.append(comments_before(l_paren));
+            if comment_tokens_before(l_paren.clone()).is_empty() {
+                doc = doc.append(Doc::space());
+            } else {
+                doc = doc.append(comments_before(l_paren));
+            }
         }
         doc = doc.append(Doc::text("("));
         if let Some(expr) = repeatable.expr() {
@@ -387,10 +1032,94 @@ fn build_from_alias<'a>(alias: Option<ast::FromAlias>) -> Doc<'a> {
             .append(leading_comments(name.syntax()))
             .append(build_name(name.syntax()));
     }
-    if alias.columns().is_some() {
-        todo!("columns in from aliases are not supported yet")
+    if let Some(columns) = alias.columns() {
+        doc = doc.append(build_from_alias_columns(columns));
     }
     doc
+}
+
+fn build_from_alias_columns<'a>(columns: ast::FromAliasColumns) -> Doc<'a> {
+    match columns {
+        ast::FromAliasColumns::ColumnList(list) => {
+            let items = list
+                .column_names()
+                .map(|name| {
+                    leading_comments(name.syntax())
+                        .append(build_name(name.syntax()))
+                        .append(trailing_comments(name.syntax()))
+                })
+                .collect();
+            comments_before(list.syntax().clone()).append(build_from_alias_column_list(
+                list.l_paren_token(),
+                items,
+                list.r_paren_token(),
+            ))
+        }
+        ast::FromAliasColumns::ColumnDefList(list) => {
+            let items = list
+                .column_defs()
+                .map(|column| {
+                    let mut doc = leading_comments(column.syntax());
+                    if let Some(name) = column.name() {
+                        doc = doc.append(build_name(name.syntax()));
+                    }
+                    if let Some(ty) = column.ty() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(ty.syntax()))
+                            .append(build_type(ty));
+                    }
+                    if let Some(collate) = column.collate() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(collate.syntax()))
+                            .append(build_collate_expr(collate));
+                    }
+                    doc.append(trailing_comments(column.syntax()))
+                })
+                .collect();
+            comments_before(list.syntax().clone()).append(build_from_alias_column_list(
+                list.l_paren_token(),
+                items,
+                list.r_paren_token(),
+            ))
+        }
+    }
+}
+
+fn build_from_alias_column_list<'a>(
+    l_paren: Option<SyntaxToken>,
+    items: Vec<Doc<'a>>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = l_paren {
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
+    }
+    doc = doc.append(Doc::text("("));
+
+    let has_items = !items.is_empty();
+    let mut body = if has_items {
+        Doc::list(
+            Itertools::intersperse(
+                items.into_iter(),
+                Doc::text(",").append(Doc::line_or_space()),
+            )
+            .collect(),
+        )
+    } else {
+        Doc::nil()
+    };
+    if !has_items {
+        if let Some(r_paren) = r_paren {
+            body = body.append(comments_before(r_paren));
+        }
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_group_by_list<'a>(list: ast::GroupByList) -> Doc<'a> {
@@ -480,7 +1209,11 @@ fn build_grouping_list<'a>(
 ) -> Doc<'a> {
     let mut doc = Doc::nil();
     if let Some(l_paren) = l_paren {
-        doc = doc.append(comments_before(l_paren));
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
     }
     doc = doc.append(Doc::text("("));
 
@@ -489,19 +1222,23 @@ fn build_grouping_list<'a>(
             doc = doc.append(comments_before(r_paren));
         }
     } else {
-        doc = doc.append(
-            Doc::list(
-                Itertools::intersperse(
-                    items.into_iter(),
-                    Doc::text(",").append(Doc::line_or_space()),
-                )
-                .collect(),
+        doc = doc.append(wrap_body(Doc::list(
+            Itertools::intersperse(
+                items.into_iter(),
+                Doc::text(",").append(Doc::line_or_space()),
             )
-            .nest(2),
-        );
+            .collect(),
+        )));
     }
 
     doc.append(Doc::text(")")).group()
+}
+
+fn wrap_body<'a>(body: Doc<'a>) -> Doc<'a> {
+    Doc::line_or_nil()
+        .append(body)
+        .nest(2)
+        .append(Doc::line_or_nil())
 }
 
 fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
@@ -548,19 +1285,33 @@ fn build_array_expr<'a>(array_expr: ast::ArrayExpr) -> Doc<'a> {
     };
 
     if let Some(select) = array_expr.select() {
+        if let Some(l_paren) = array_expr.l_paren_token() {
+            doc = doc.append(comments_before(l_paren));
+        }
+        let mut body = leading_comments(select.syntax()).append(build_select_doc(&select));
+        if let Some(r_paren) = array_expr.r_paren_token() {
+            body = body.append(comments_before(r_paren));
+        }
         doc.append(Doc::text("("))
-            .append(build_select_doc(&select))
+            .append(wrap_body(body))
             .append(Doc::text(")"))
+            .group()
     } else {
-        doc.append(Doc::text("["))
-            .append(Doc::list(
-                Itertools::intersperse(
-                    array_expr.exprs().map(build_expr),
-                    Doc::text(",").append(Doc::space()),
-                )
-                .collect(),
-            ))
-            .append(Doc::text("]"))
+        if let Some(l_brack) = array_expr.l_brack_token() {
+            doc = doc.append(comments_before(l_brack));
+        }
+        doc = doc.append(Doc::text("["));
+
+        let exprs = array_expr.exprs().map(|expr| {
+            let syntax = expr.syntax().clone();
+            let doc = leading_comments(expr.syntax()).append(build_expr(expr));
+            (doc, syntax)
+        });
+        let mut body = build_comma_separated_docs(exprs).unwrap_or_else(Doc::nil);
+        if let Some(r_brack) = array_expr.r_brack_token() {
+            body = body.append(comments_before(r_brack));
+        }
+        doc.append(wrap_body(body)).append(Doc::text("]")).group()
     }
 }
 
@@ -599,15 +1350,19 @@ fn build_index_expr<'a>(index_expr: ast::IndexExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("["));
 
+    let mut body = Doc::nil();
     if let Some(index) = index_expr.index() {
-        doc = doc
+        body = body
             .append(leading_comments(index.syntax()))
-            .append(build_expr(index));
+            .append(match index {
+                ast::Expr::BinExpr(binary) => build_bin_expr_doc(binary, false),
+                expression => build_expr(expression),
+            });
     }
     if let Some(r_brack) = index_expr.r_brack_token() {
-        doc = doc.append(comments_before(r_brack));
+        body = body.append(comments_before(r_brack));
     }
-    doc.append(Doc::text("]"))
+    doc.append(wrap_body(body)).append(Doc::text("]")).group()
 }
 
 fn build_slice_expr<'a>(slice_expr: ast::SliceExpr) -> Doc<'a> {
@@ -654,34 +1409,24 @@ fn build_tuple_expr<'a>(tuple_expr: ast::TupleExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
-    let exprs: Vec<Doc<'a>> = tuple_expr
-        .exprs()
-        .map(|expr| {
-            let leading = leading_comments(expr.syntax());
-            let trailing = trailing_comments(expr.syntax());
-            leading.append(build_expr(expr)).append(trailing)
-        })
-        .collect();
-    if exprs.is_empty() {
+    let exprs = build_comma_separated_exprs(tuple_expr.exprs());
+    let has_exprs = exprs.is_some();
+    let mut body = exprs.unwrap_or_else(Doc::nil);
+    if !has_exprs {
         if let Some(r_paren) = tuple_expr.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
+            body = body.append(comments_before(r_paren));
         }
-    } else {
-        doc = doc.append(Doc::list(
-            Itertools::intersperse(exprs.into_iter(), Doc::text(",").append(Doc::space()))
-                .collect(),
-        ));
     }
 
-    doc.append(Doc::text(")"))
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
-    let mut doc = build_expr(between_expr.target().unwrap());
+    let mut doc = build_expr(between_expr.target().unwrap()).append(Doc::line_or_space());
     if between_expr.not_token().is_some() {
-        doc = doc.append(Doc::space()).append(Doc::text("not"));
+        doc = doc.append(Doc::text("not")).append(Doc::space());
     }
-    doc = doc.append(Doc::space()).append(Doc::text("between"));
+    doc = doc.append(Doc::text("between"));
     match between_expr.between_symmetry() {
         Some(ast::BetweenSymmetry::Asymmetric(_)) => {
             doc = doc.append(Doc::space()).append(Doc::text("asymmetric"));
@@ -693,85 +1438,2047 @@ fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
     }
     doc.append(Doc::space())
         .append(build_expr(between_expr.start().unwrap()))
-        .append(Doc::space())
+        .append(Doc::line_or_space())
         .append(Doc::text("and"))
         .append(Doc::space())
         .append(build_expr(between_expr.end().unwrap()))
+        .nest(2)
+        .group()
 }
 
 fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
+    build_call_expr_with_spacing(call_expr, false)
+}
+
+fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren: bool) -> Doc<'a> {
     if let (Some(expr), Some(arg_list)) = (call_expr.expr(), call_expr.arg_list()) {
-        if call_expr.within_clause().is_some() {
-            todo!("within clauses on call expressions are not supported yet")
-        } else if call_expr.filter_clause().is_some() {
-            todo!("filter clauses on call expressions are not supported yet")
-        } else if call_expr.null_treatment().is_some() {
-            todo!("null treatment on call expressions is not supported yet")
-        } else if call_expr.over_clause().is_some() {
-            todo!("over clauses on call expressions are not supported yet")
+        let mut doc = build_expr(expr);
+        if space_before_paren && comment_tokens_before(arg_list.syntax().clone()).is_empty() {
+            doc = doc.append(Doc::space());
         }
-        build_expr(expr)
+        doc = doc
             .append(comments_before(arg_list.syntax().clone()))
-            .append(build_call_arg_list(arg_list))
-    } else if let Some(_all_fn) = call_expr.all_fn() {
-        todo!("all function expressions are not supported yet")
-    } else if let Some(_any_fn) = call_expr.any_fn() {
-        todo!("any function expressions are not supported yet")
-    } else if let Some(_collation_for_fn) = call_expr.collation_for_fn() {
-        todo!("collation_for function expressions are not supported yet")
-    } else if let Some(_exists_fn) = call_expr.exists_fn() {
-        todo!("exists function expressions are not supported yet")
-    } else if let Some(_extract_fn) = call_expr.extract_fn() {
-        todo!("extract function expressions are not supported yet")
-    } else if let Some(_graph_table_fn) = call_expr.graph_table_fn() {
-        todo!("graph_table function expressions are not supported yet")
-    } else if let Some(_json_array_agg_fn) = call_expr.json_array_agg_fn() {
-        todo!("json_arrayagg function expressions are not supported yet")
-    } else if let Some(_json_array_fn) = call_expr.json_array_fn() {
-        todo!("json_array function expressions are not supported yet")
-    } else if let Some(_json_exists_fn) = call_expr.json_exists_fn() {
-        todo!("json_exists function expressions are not supported yet")
-    } else if let Some(_json_fn) = call_expr.json_fn() {
-        todo!("json function expressions are not supported yet")
-    } else if let Some(_json_object_agg_fn) = call_expr.json_object_agg_fn() {
-        todo!("json_objectagg function expressions are not supported yet")
-    } else if let Some(_json_object_fn) = call_expr.json_object_fn() {
-        todo!("json_object function expressions are not supported yet")
-    } else if let Some(_json_query_fn) = call_expr.json_query_fn() {
-        todo!("json_query function expressions are not supported yet")
-    } else if let Some(_json_scalar_fn) = call_expr.json_scalar_fn() {
-        todo!("json_scalar function expressions are not supported yet")
-    } else if let Some(_json_serialize_fn) = call_expr.json_serialize_fn() {
-        todo!("json_serialize function expressions are not supported yet")
-    } else if let Some(_json_value_fn) = call_expr.json_value_fn() {
-        todo!("json_value function expressions are not supported yet")
-    } else if let Some(_overlay_fn) = call_expr.overlay_fn() {
-        todo!("overlay function expressions are not supported yet")
-    } else if let Some(_position_fn) = call_expr.position_fn() {
-        todo!("position function expressions are not supported yet")
-    } else if let Some(_some_fn) = call_expr.some_fn() {
-        todo!("some function expressions are not supported yet")
-    } else if let Some(_substring_fn) = call_expr.substring_fn() {
-        todo!("substring function expressions are not supported yet")
-    } else if let Some(_trim_fn) = call_expr.trim_fn() {
-        todo!("trim function expressions are not supported yet")
-    } else if let Some(_xml_element_fn) = call_expr.xml_element_fn() {
-        todo!("xmlelement function expressions are not supported yet")
-    } else if let Some(_xml_exists_fn) = call_expr.xml_exists_fn() {
-        todo!("xmlexists function expressions are not supported yet")
-    } else if let Some(_xml_forest_fn) = call_expr.xml_forest_fn() {
-        todo!("xmlforest function expressions are not supported yet")
-    } else if let Some(_xml_parse_fn) = call_expr.xml_parse_fn() {
-        todo!("xmlparse function expressions are not supported yet")
-    } else if let Some(_xml_pi_fn) = call_expr.xml_pi_fn() {
-        todo!("xmlpi function expressions are not supported yet")
-    } else if let Some(_xml_root_fn) = call_expr.xml_root_fn() {
-        todo!("xmlroot function expressions are not supported yet")
-    } else if let Some(_xml_serialize_fn) = call_expr.xml_serialize_fn() {
-        todo!("xmlserialize function expressions are not supported yet")
+            .append(build_call_arg_list(arg_list));
+        if let Some(within_clause) = call_expr.within_clause() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(within_clause.syntax()))
+                .append(build_within_clause(within_clause));
+        }
+        if let Some(filter_clause) = call_expr.filter_clause() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(filter_clause.syntax()))
+                .append(build_filter_clause(filter_clause));
+        }
+        if let Some(null_treatment) = call_expr.null_treatment() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(null_treatment.syntax()))
+                .append(build_null_treatment(null_treatment));
+        }
+        if let Some(over_clause) = call_expr.over_clause() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(over_clause.syntax()))
+                .append(build_over_clause(over_clause));
+        }
+        doc
+    } else if let Some(all_fn) = call_expr.all_fn() {
+        build_parenthesized_expr_or_select_fn(
+            "all",
+            all_fn.l_paren_token(),
+            all_fn.expr(),
+            all_fn.select_variant(),
+            all_fn.r_paren_token(),
+        )
+    } else if let Some(any_fn) = call_expr.any_fn() {
+        build_parenthesized_expr_or_select_fn(
+            "any",
+            any_fn.l_paren_token(),
+            any_fn.expr(),
+            any_fn.select_variant(),
+            any_fn.r_paren_token(),
+        )
+    } else if let Some(collation_for_fn) = call_expr.collation_for_fn() {
+        build_collation_for_fn(collation_for_fn)
+    } else if let Some(exists_fn) = call_expr.exists_fn() {
+        build_parenthesized_expr_or_select_fn(
+            "exists",
+            exists_fn.l_paren_token(),
+            None,
+            exists_fn.select_variant(),
+            exists_fn.r_paren_token(),
+        )
+    } else if let Some(extract_fn) = call_expr.extract_fn() {
+        build_extract_fn(extract_fn)
+    } else if let Some(graph_table_fn) = call_expr.graph_table_fn() {
+        build_graph_table_fn(graph_table_fn)
+    } else if let Some(json_array_agg_fn) = call_expr.json_array_agg_fn() {
+        build_json_array_agg_fn(json_array_agg_fn)
+    } else if let Some(json_array_fn) = call_expr.json_array_fn() {
+        build_json_array_fn(json_array_fn)
+    } else if let Some(json_exists_fn) = call_expr.json_exists_fn() {
+        build_json_exists_fn(json_exists_fn)
+    } else if let Some(json_fn) = call_expr.json_fn() {
+        build_json_fn(json_fn)
+    } else if let Some(json_object_agg_fn) = call_expr.json_object_agg_fn() {
+        build_json_object_agg_fn(json_object_agg_fn)
+    } else if let Some(json_object_fn) = call_expr.json_object_fn() {
+        build_json_object_fn(json_object_fn)
+    } else if let Some(json_query_fn) = call_expr.json_query_fn() {
+        build_json_query_fn(json_query_fn)
+    } else if let Some(json_scalar_fn) = call_expr.json_scalar_fn() {
+        build_json_scalar_fn(json_scalar_fn)
+    } else if let Some(json_serialize_fn) = call_expr.json_serialize_fn() {
+        build_json_serialize_fn(json_serialize_fn)
+    } else if let Some(json_value_fn) = call_expr.json_value_fn() {
+        build_json_value_fn(json_value_fn)
+    } else if let Some(overlay_fn) = call_expr.overlay_fn() {
+        build_overlay_fn(overlay_fn)
+    } else if let Some(position_fn) = call_expr.position_fn() {
+        build_position_fn(position_fn)
+    } else if let Some(some_fn) = call_expr.some_fn() {
+        build_parenthesized_expr_or_select_fn(
+            "some",
+            some_fn.l_paren_token(),
+            some_fn.expr(),
+            some_fn.select_variant(),
+            some_fn.r_paren_token(),
+        )
+    } else if let Some(substring_fn) = call_expr.substring_fn() {
+        build_substring_fn(substring_fn)
+    } else if let Some(trim_fn) = call_expr.trim_fn() {
+        build_trim_fn(trim_fn)
+    } else if let Some(xml_element_fn) = call_expr.xml_element_fn() {
+        build_xml_element_fn(xml_element_fn)
+    } else if let Some(xml_exists_fn) = call_expr.xml_exists_fn() {
+        build_xml_exists_fn(xml_exists_fn)
+    } else if let Some(xml_forest_fn) = call_expr.xml_forest_fn() {
+        build_xml_forest_fn(xml_forest_fn)
+    } else if let Some(xml_parse_fn) = call_expr.xml_parse_fn() {
+        build_xml_parse_fn(xml_parse_fn)
+    } else if let Some(xml_pi_fn) = call_expr.xml_pi_fn() {
+        build_xml_pi_fn(xml_pi_fn)
+    } else if let Some(xml_root_fn) = call_expr.xml_root_fn() {
+        build_xml_root_fn(xml_root_fn)
+    } else if let Some(xml_serialize_fn) = call_expr.xml_serialize_fn() {
+        build_xml_serialize_fn(xml_serialize_fn)
     } else {
         unreachable!("a call expression should contain a supported function node")
     }
+}
+
+fn build_graph_table_fn<'a>(graph_table_fn: ast::GraphTableFn) -> Doc<'a> {
+    let mut doc = Doc::text("graph_table");
+    if let Some(l_paren) = graph_table_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(graph) = graph_table_fn.property_graph_ref() {
+        if let Some(path) = graph.path_ref() {
+            body = body
+                .append(leading_comments(graph.syntax()))
+                .append(build_path_ref(&path));
+        }
+    }
+    if let Some(match_token) = graph_table_fn.match_token() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&match_token))
+            .append(Doc::text("match"));
+    }
+    if let Some(patterns) = graph_table_fn.path_pattern_list() {
+        body = body.append(
+            Doc::line_or_space()
+                .append(leading_comments(patterns.syntax()))
+                .append(build_path_pattern_list(patterns))
+                .nest(2),
+        );
+    }
+    if let Some(where_clause) = graph_table_fn.where_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_clause(where_clause));
+    }
+    if let Some(columns) = graph_table_fn.columns_token() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&columns))
+            .append(Doc::text("columns"));
+    }
+    if let Some(columns) = graph_table_fn.expr_as_column_name_list() {
+        if comment_tokens_before(columns.syntax().clone()).is_empty() {
+            body = body.append(Doc::space());
+        } else {
+            body = body.append(comments_before(columns.syntax().clone()));
+        }
+        body = body.append(build_expr_as_column_name_list(columns));
+    }
+
+    if let Some(r_paren) = graph_table_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body).group()).append(Doc::text(")"))
+}
+
+fn build_path_pattern_list<'a>(patterns: ast::PathPatternList) -> Doc<'a> {
+    let items = patterns.path_patterns().map(|pattern| {
+        (
+            leading_comments(pattern.syntax()).append(build_path_pattern(pattern.clone())),
+            pattern.syntax().clone(),
+        )
+    });
+    build_comma_separated_docs(items).unwrap_or_else(Doc::nil)
+}
+
+fn build_path_pattern<'a>(pattern: ast::PathPattern) -> Doc<'a> {
+    Doc::list(
+        Itertools::intersperse(
+            pattern
+                .path_factors()
+                .map(|factor| leading_comments(factor.syntax()).append(build_path_factor(factor))),
+            Doc::line_or_nil(),
+        )
+        .collect(),
+    )
+    .nest(2)
+    .group()
+}
+
+fn build_path_factor<'a>(factor: ast::PathFactor) -> Doc<'a> {
+    let mut doc = factor
+        .path_primary()
+        .map(build_path_primary)
+        .unwrap_or_else(Doc::nil);
+    if let Some(qualifier) = factor.graph_pattern_qualifier() {
+        doc = doc
+            .append(leading_comments(qualifier.syntax()))
+            .append(build_graph_pattern_qualifier(qualifier));
+    }
+    doc
+}
+
+fn build_path_primary<'a>(primary: ast::PathPrimary) -> Doc<'a> {
+    match primary {
+        ast::PathPrimary::VertexPattern(pattern) => build_vertex_pattern(pattern),
+        ast::PathPrimary::EdgeLeft(edge) => build_edge_left(edge),
+        ast::PathPrimary::EdgeRight(edge) => build_edge_right(edge),
+        ast::PathPrimary::EdgeAny(edge) => build_edge_any(edge),
+        ast::PathPrimary::ParenGraphPattern(pattern) => build_paren_graph_pattern(pattern),
+    }
+}
+
+fn build_vertex_pattern<'a>(pattern: ast::VertexPattern) -> Doc<'a> {
+    let mut doc = pattern
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("))
+        .append(build_graph_pattern_inner(
+            pattern.element_variable(),
+            pattern.is_label(),
+            pattern.where_clause(),
+        ));
+    if let Some(r_paren) = pattern.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_edge_left<'a>(edge: ast::EdgeLeft) -> Doc<'a> {
+    let mut doc = Doc::text("<");
+    if let Some(minus) = edge.minus_token() {
+        doc = doc.append(comments_before(minus));
+    }
+    doc = doc.append(Doc::text("-"));
+    if let Some(l_brack) = edge.l_brack_token() {
+        doc = doc
+            .append(comments_before(l_brack))
+            .append(Doc::text("["))
+            .append(build_graph_pattern_inner(
+                edge.element_variable(),
+                edge.is_label(),
+                edge.where_clause(),
+            ));
+        if let Some(r_brack) = edge.r_brack_token() {
+            doc = doc.append(comments_before(r_brack));
+        }
+        doc = doc.append(Doc::text("]"));
+        if let Some(minus) = edge.end_minus_token() {
+            doc = doc.append(comments_before(minus));
+        }
+        doc = doc.append(Doc::text("-"));
+    }
+    doc
+}
+
+fn build_edge_right<'a>(edge: ast::EdgeRight) -> Doc<'a> {
+    let mut doc = Doc::text("-");
+    if let Some(l_brack) = edge.l_brack_token() {
+        doc = doc
+            .append(comments_before(l_brack))
+            .append(Doc::text("["))
+            .append(build_graph_pattern_inner(
+                edge.element_variable(),
+                edge.is_label(),
+                edge.where_clause(),
+            ));
+        if let Some(r_brack) = edge.r_brack_token() {
+            doc = doc.append(comments_before(r_brack));
+        }
+        doc = doc.append(Doc::text("]"));
+        if let Some(minus) = edge.end_minus_token() {
+            doc = doc.append(comments_before(minus));
+        }
+        doc = doc.append(Doc::text("-"));
+    }
+    if let Some(r_angle) = edge.r_angle_token() {
+        doc = doc.append(comments_before(r_angle));
+    }
+    doc.append(Doc::text(">"))
+}
+
+fn build_edge_any<'a>(edge: ast::EdgeAny) -> Doc<'a> {
+    let mut doc = Doc::text("-");
+    if let Some(l_brack) = edge.l_brack_token() {
+        doc = doc
+            .append(comments_before(l_brack))
+            .append(Doc::text("["))
+            .append(build_graph_pattern_inner(
+                edge.element_variable(),
+                edge.is_label(),
+                edge.where_clause(),
+            ));
+        if let Some(r_brack) = edge.r_brack_token() {
+            doc = doc.append(comments_before(r_brack));
+        }
+        doc = doc.append(Doc::text("]"));
+        if let Some(minus) = edge.end_minus_token() {
+            doc = doc.append(comments_before(minus));
+        }
+        doc = doc.append(Doc::text("-"));
+    }
+    doc
+}
+
+fn build_graph_pattern_inner<'a>(
+    variable: Option<ast::ElementVariable>,
+    label: Option<ast::IsLabel>,
+    where_clause: Option<ast::WhereClause>,
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(variable) = variable {
+        doc = doc
+            .append(leading_comments(variable.syntax()))
+            .append(build_name(variable.syntax()));
+    }
+    if let Some(label) = label {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(label.syntax()))
+            .append(build_is_label(label));
+    }
+    if let Some(where_clause) = where_clause {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_clause(where_clause));
+    }
+    doc.nest(2).group()
+}
+
+fn build_is_label<'a>(label: ast::IsLabel) -> Doc<'a> {
+    let mut doc = label
+        .is_token()
+        .map(|token| leading_comments_token(&token).append(Doc::text("is")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(expr) = label.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_where_clause<'a>(where_clause: ast::WhereClause) -> Doc<'a> {
+    let mut doc = where_clause
+        .where_token()
+        .map(|token| leading_comments_token(&token).append(Doc::text("where")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(expr) = where_clause.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_paren_graph_pattern<'a>(pattern: ast::ParenGraphPattern) -> Doc<'a> {
+    let mut doc = pattern
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    if let Some(inner) = pattern.path_pattern() {
+        doc = doc
+            .append(leading_comments(inner.syntax()))
+            .append(build_path_pattern(inner));
+    }
+    if let Some(where_clause) = pattern.where_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_clause(where_clause));
+    }
+    if let Some(r_paren) = pattern.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_graph_pattern_qualifier<'a>(qualifier: ast::GraphPatternQualifier) -> Doc<'a> {
+    let mut doc = qualifier
+        .l_curly_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("{"));
+    if let Some(min) = qualifier.min() {
+        if let Some(literal) = min.literal() {
+            doc = doc
+                .append(leading_comments(min.syntax()))
+                .append(build_literal(literal));
+        }
+    }
+    if let Some(comma) = qualifier.comma_token() {
+        doc = doc.append(comments_before(comma)).append(Doc::text(","));
+    }
+    if let Some(max) = qualifier.max() {
+        if qualifier.comma_token().is_some() {
+            doc = doc.append(Doc::space());
+        }
+        if let Some(literal) = max.literal() {
+            doc = doc
+                .append(leading_comments(max.syntax()))
+                .append(build_literal(literal));
+        }
+    }
+    if let Some(r_curly) = qualifier.r_curly_token() {
+        doc = doc.append(comments_before(r_curly));
+    }
+    doc.append(Doc::text("}"))
+}
+
+fn build_expr_as_column_name_list<'a>(list: ast::ExprAsColumnNameList) -> Doc<'a> {
+    let doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = list.expr_as_column_names().map(|item| {
+        let mut item_doc = item.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(as_token) = item.as_token() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments_token(&as_token))
+                .append(Doc::text("as"));
+        }
+        if let Some(name) = item.column_name() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        (
+            leading_comments(item.syntax()).append(item_doc),
+            item.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_element_fn<'a>(xml_element_fn: ast::XmlElementFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlelement");
+    if let Some(l_paren) = xml_element_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(name) = xml_element_fn.name_token() {
+        body = body
+            .append(leading_comments_token(&name))
+            .append(Doc::text("name"));
+    }
+
+    let Some(tag) = xml_element_fn.tag() else {
+        return doc.append(Doc::text(")"));
+    };
+    body = body
+        .append(Doc::space())
+        .append(leading_comments(tag.syntax()))
+        .append(build_name(tag.syntax()));
+
+    let mut items = Vec::new();
+    if let Some(attrs) = xml_element_fn.expr_as_xml_attr_list() {
+        let attrs_doc = xml_element_fn
+            .xmlattributes_token()
+            .map(|token| {
+                leading_comments_token(&token)
+                    .append(Doc::text("xmlattributes"))
+                    .append(comments_before(attrs.syntax().clone()))
+            })
+            .unwrap_or_else(Doc::nil)
+            .append(build_expr_as_xml_attr_list(attrs.clone()));
+        items.push((attrs_doc, attrs.syntax().clone()));
+    }
+    items.extend(xml_element_fn.exprs().map(|expr| {
+        (
+            leading_comments(expr.syntax()).append(build_expr(expr.clone())),
+            expr.syntax().clone(),
+        )
+    }));
+
+    let mut previous = tag.syntax().clone();
+    for (item, syntax) in items {
+        body = body
+            .append(trailing_comments(&previous))
+            .append(Doc::text(","))
+            .append(Doc::line_or_space())
+            .append(item);
+        previous = syntax;
+    }
+
+    if let Some(r_paren) = xml_element_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_expr_as_xml_attr_list<'a>(attrs: ast::ExprAsXmlAttrList) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = attrs.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let items = attrs.expr_as_xml_attrs().map(|attr| {
+        let mut item = attr.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(as_token) = attr.as_token() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments_token(&as_token))
+                .append(Doc::text("as"));
+        }
+        if let Some(name) = attr.attr() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        (
+            leading_comments(attr.syntax()).append(item),
+            attr.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+
+    if let Some(r_paren) = attrs.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_exists_fn<'a>(xml_exists_fn: ast::XmlExistsFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlexists");
+    if let Some(l_paren) = xml_exists_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(passing) = xml_exists_fn.xml_row_passing_clause() {
+        if let Some(row) = passing.row() {
+            body = body
+                .append(leading_comments(passing.syntax()))
+                .append(build_expr(row));
+        }
+        if let Some(passing_token) = passing.passing_token() {
+            body = body
+                .append(Doc::line_or_space())
+                .append(leading_comments_token(&passing_token))
+                .append(Doc::text("passing"));
+        }
+        if let Some(mech) = passing.xml_passing_mech() {
+            body = body
+                .append(Doc::line_or_space())
+                .append(leading_comments(mech.syntax()))
+                .append(build_xml_passing_mech(mech));
+        }
+        if let Some(passing_doc) = passing.xml_passing_doc() {
+            if let Some(expr) = passing_doc.expr() {
+                body = body
+                    .append(Doc::line_or_space())
+                    .append(leading_comments(passing_doc.syntax()))
+                    .append(build_expr(expr));
+            }
+            if let Some(mech) = passing_doc.xml_passing_mech() {
+                body = body
+                    .append(Doc::line_or_space())
+                    .append(leading_comments(mech.syntax()))
+                    .append(build_xml_passing_mech(mech));
+            }
+        }
+    }
+
+    if let Some(r_paren) = xml_exists_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_forest_fn<'a>(xml_forest_fn: ast::XmlForestFn) -> Doc<'a> {
+    Doc::text("xmlforest")
+        .append(
+            xml_forest_fn
+                .expr_as_element_tag_list()
+                .map(|list| {
+                    comments_before(list.syntax().clone())
+                        .append(build_expr_as_element_tag_list(list))
+                })
+                .unwrap_or_else(Doc::nil),
+        )
+        .group()
+}
+
+fn build_expr_as_element_tag_list<'a>(list: ast::ExprAsElementTagList) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(l_paren) = list.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let items = list.expr_as_element_tags().map(|item| {
+        let mut item_doc = item.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(as_token) = item.as_token() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments_token(&as_token))
+                .append(Doc::text("as"));
+        }
+        if let Some(tag) = item.tag() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(tag.syntax()))
+                .append(build_name(tag.syntax()));
+        }
+        (
+            leading_comments(item.syntax()).append(item_doc),
+            item.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_parse_fn<'a>(xml_parse_fn: ast::XmlParseFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlparse");
+    if let Some(l_paren) = xml_parse_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(kind) = xml_parse_fn.xml_document_or_content() {
+        body = body
+            .append(leading_comments(kind.syntax()))
+            .append(build_xml_document_or_content(kind));
+    }
+    if let Some(expr) = xml_parse_fn.expr() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(whitespace) = xml_parse_fn.xml_whitespace() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(whitespace.syntax()))
+            .append(build_xml_whitespace(whitespace));
+    }
+
+    if let Some(r_paren) = xml_parse_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_pi_fn<'a>(xml_pi_fn: ast::XmlPiFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlpi");
+    if let Some(l_paren) = xml_pi_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(name) = xml_pi_fn.name_token() {
+        body = body
+            .append(leading_comments_token(&name))
+            .append(Doc::text("name"));
+    }
+    if let Some(target) = xml_pi_fn.target() {
+        body = body
+            .append(Doc::space())
+            .append(leading_comments(target.syntax()))
+            .append(build_name(target.syntax()));
+    }
+    if let Some(expr) = xml_pi_fn.expr() {
+        if let Some(comma) = xml_pi_fn.comma_token() {
+            body = body.append(comments_before(comma));
+        }
+        body = body
+            .append(Doc::text(","))
+            .append(Doc::line_or_space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+
+    if let Some(r_paren) = xml_pi_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_root_fn<'a>(xml_root_fn: ast::XmlRootFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlroot");
+    if let Some(l_paren) = xml_root_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(expr) = xml_root_fn.expr() {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(comma) = xml_root_fn.comma_token() {
+        body = body.append(comments_before(comma));
+    }
+    body = body.append(Doc::text(",")).append(Doc::line_or_space());
+    if let Some(version) = xml_root_fn.xml_root_version() {
+        body = body
+            .append(leading_comments(version.syntax()))
+            .append(build_xml_root_version(version));
+    }
+    if let Some(standalone) = xml_root_fn.xml_standalone() {
+        body = body
+            .append(leading_comments(standalone.syntax()))
+            .append(build_xml_standalone(standalone));
+    }
+
+    if let Some(r_paren) = xml_root_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_root_version<'a>(version: ast::XmlRootVersion) -> Doc<'a> {
+    match version {
+        ast::XmlRootVersion::XmlVersionExpr(version) => {
+            let mut doc = version
+                .version_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("version")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(expr) = version.expr() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(expr.syntax()))
+                    .append(build_expr(expr));
+            }
+            doc
+        }
+        ast::XmlRootVersion::XmlVersionNoValue(version) => {
+            let mut doc = version
+                .version_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("version")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(no) = version.no_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&no))
+                    .append(Doc::text("no"));
+            }
+            if let Some(value) = version.value_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&value))
+                    .append(Doc::text("value"));
+            }
+            doc
+        }
+    }
+}
+
+fn build_xml_standalone<'a>(standalone: ast::XmlStandalone) -> Doc<'a> {
+    let (comma, standalone_token, no_or_yes, value, text) = match standalone {
+        ast::XmlStandalone::StandaloneYes(node) => (
+            node.comma_token(),
+            node.standalone_token(),
+            node.yes_token(),
+            None,
+            "yes",
+        ),
+        ast::XmlStandalone::StandaloneNo(node) => (
+            node.comma_token(),
+            node.standalone_token(),
+            node.no_token(),
+            None,
+            "no",
+        ),
+        ast::XmlStandalone::StandaloneNoValue(node) => (
+            node.comma_token(),
+            node.standalone_token(),
+            node.no_token(),
+            node.value_token(),
+            "no",
+        ),
+    };
+
+    let mut doc = comma.map(comments_before).unwrap_or_else(Doc::nil);
+    doc = doc.append(Doc::text(",")).append(Doc::line_or_space());
+    if let Some(token) = standalone_token {
+        doc = doc
+            .append(leading_comments_token(&token))
+            .append(Doc::text("standalone"));
+    }
+    if let Some(token) = no_or_yes {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(text));
+    }
+    if let Some(token) = value {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("value"));
+    }
+    doc
+}
+
+fn build_xml_serialize_fn<'a>(xml_serialize_fn: ast::XmlSerializeFn) -> Doc<'a> {
+    let mut doc = Doc::text("xmlserialize");
+    if let Some(l_paren) = xml_serialize_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(kind) = xml_serialize_fn.xml_document_or_content() {
+        body = body
+            .append(leading_comments(kind.syntax()))
+            .append(build_xml_document_or_content(kind));
+    }
+    if let Some(expr) = xml_serialize_fn.expr() {
+        body = body
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(as_token) = xml_serialize_fn.as_token() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"));
+    }
+    if let Some(ty) = xml_serialize_fn.ty() {
+        body = body
+            .append(Doc::space())
+            .append(leading_comments(ty.syntax()))
+            .append(build_type(ty));
+    }
+    if let Some(indent) = xml_serialize_fn.xml_indent() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(indent.syntax()))
+            .append(build_xml_indent(indent));
+    }
+
+    if let Some(r_paren) = xml_serialize_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_xml_document_or_content<'a>(kind: ast::XmlDocumentOrContent) -> Doc<'a> {
+    match kind {
+        ast::XmlDocumentOrContent::XmlDocument(_) => Doc::text("document"),
+        ast::XmlDocumentOrContent::XmlContent(_) => Doc::text("content"),
+    }
+}
+
+fn build_xml_whitespace<'a>(whitespace: ast::XmlWhitespace) -> Doc<'a> {
+    let (first, second, text) = match whitespace {
+        ast::XmlWhitespace::PreserveWhitespace(node) => {
+            (node.preserve_token(), node.whitespace_token(), "preserve")
+        }
+        ast::XmlWhitespace::StripWhitespace(node) => {
+            (node.strip_token(), node.whitespace_token(), "strip")
+        }
+    };
+    build_two_keywords(first, text, second, "whitespace")
+}
+
+fn build_xml_indent<'a>(indent: ast::XmlIndent) -> Doc<'a> {
+    match indent {
+        ast::XmlIndent::Indent(_) => Doc::text("indent"),
+        ast::XmlIndent::NoIndent(node) => {
+            build_two_keywords(node.no_token(), "no", node.indent_token(), "indent")
+        }
+    }
+}
+
+fn build_two_keywords<'a>(
+    first: Option<SyntaxToken>,
+    first_text: &'static str,
+    second: Option<SyntaxToken>,
+    second_text: &'static str,
+) -> Doc<'a> {
+    let mut doc = first
+        .map(|token| leading_comments_token(&token).append(Doc::text(first_text)))
+        .unwrap_or_else(Doc::nil);
+    if let Some(token) = second {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(second_text));
+    }
+    doc
+}
+
+fn build_xml_passing_mech<'a>(mech: ast::XmlPassingMech) -> Doc<'a> {
+    let (by, end, text) = match mech {
+        ast::XmlPassingMech::XmlPassingMechByRef(mech) => {
+            (mech.by_token(), mech.ref_token(), "ref")
+        }
+        ast::XmlPassingMech::XmlPassingMechByValue(mech) => {
+            (mech.by_token(), mech.value_token(), "value")
+        }
+    };
+    let mut doc = by
+        .map(|token| leading_comments_token(&token).append(Doc::text("by")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(end) = end {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&end))
+            .append(Doc::text(text));
+    }
+    doc
+}
+
+fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_object");
+    if let Some(l_paren) = json_object_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    let exprs = json_object_fn.exprs().map(|expr| {
+        (
+            leading_comments(expr.syntax()).append(build_expr(expr.clone())),
+            expr.syntax().clone(),
+        )
+    });
+    let key_values = json_object_fn.json_key_values().map(|key_value| {
+        (
+            leading_comments(key_value.syntax()).append(build_json_key_value(key_value.clone())),
+            key_value.syntax().clone(),
+        )
+    });
+    let items = build_comma_separated_docs(exprs.chain(key_values));
+    let mut has_content = items.is_some();
+    if let Some(items) = items {
+        body = body.append(items);
+    }
+
+    if let Some(null_clause) = json_object_fn.json_null_clause() {
+        if has_content {
+            body = body.append(Doc::line_or_space());
+        }
+        body = body
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+        has_content = true;
+    }
+    if let Some(unique) = json_object_fn.json_keys_unique_clause() {
+        if has_content {
+            body = body.append(Doc::line_or_space());
+        }
+        body = body
+            .append(leading_comments(unique.syntax()))
+            .append(build_json_keys_unique_clause(unique));
+        has_content = true;
+    }
+    if let Some(returning) = json_object_fn.json_returning_clause() {
+        if has_content {
+            body = body.append(Doc::line_or_space());
+        }
+        body = body
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_object_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_object_agg_fn<'a>(json_object_agg_fn: ast::JsonObjectAggFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_objectagg");
+    if let Some(l_paren) = json_object_agg_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(key_value) = json_object_agg_fn.json_key_value() {
+        body = body
+            .append(leading_comments(key_value.syntax()))
+            .append(build_json_key_value(key_value));
+    }
+    if let Some(null_clause) = json_object_agg_fn.json_null_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+    }
+    if let Some(unique) = json_object_agg_fn.json_keys_unique_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(unique.syntax()))
+            .append(build_json_keys_unique_clause(unique));
+    }
+    if let Some(returning) = json_object_agg_fn.json_returning_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_object_agg_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_key_value<'a>(key_value: ast::JsonKeyValue) -> Doc<'a> {
+    let mut doc = key_value.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(colon) = key_value.colon_token() {
+        doc = doc.append(comments_before(colon)).append(Doc::text(":"));
+    } else if let Some(value_token) = key_value.value_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&value_token))
+            .append(Doc::text("value"));
+    }
+    if let Some(value) = key_value.json_value_expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(value.syntax()))
+            .append(build_json_value_expr(value));
+    }
+    doc
+}
+
+fn build_json_fn<'a>(json_fn: ast::JsonFn) -> Doc<'a> {
+    let mut doc = Doc::text("json");
+    if let Some(l_paren) = json_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(expr) = json_fn.expr() {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(format) = json_fn.json_format_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    if let Some(unique) = json_fn.json_keys_unique_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(unique.syntax()))
+            .append(build_json_keys_unique_clause(unique));
+    }
+    if let Some(r_paren) = json_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_scalar_fn<'a>(json_scalar_fn: ast::JsonScalarFn) -> Doc<'a> {
+    build_parenthesized_expr_or_select_fn(
+        "json_scalar",
+        json_scalar_fn.l_paren_token(),
+        json_scalar_fn.expr(),
+        None,
+        json_scalar_fn.r_paren_token(),
+    )
+}
+
+fn build_json_serialize_fn<'a>(json_serialize_fn: ast::JsonSerializeFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_serialize");
+    if let Some(l_paren) = json_serialize_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(expr) = json_serialize_fn.expr() {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(format) = json_serialize_fn.json_format_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    if let Some(returning) = json_serialize_fn.json_returning_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_serialize_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_query_fn<'a>(json_query_fn: ast::JsonQueryFn) -> Doc<'a> {
+    let (doc, mut body) = build_json_document_path_fn(
+        "json_query",
+        json_query_fn.l_paren_token(),
+        json_query_fn.document(),
+        json_query_fn.json_format_clause(),
+        json_query_fn.comma_token(),
+        json_query_fn.path(),
+    );
+    if let Some(passing) = json_query_fn.json_passing_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(passing.syntax()))
+            .append(build_json_passing_clause(passing));
+    }
+    if let Some(returning) = json_query_fn.json_returning_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(wrapper) = json_query_fn.json_wrapper_behavior_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(wrapper.syntax()))
+            .append(build_json_wrapper_behavior_clause(wrapper));
+    }
+    if let Some(quotes) = json_query_fn.json_quotes_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(quotes.syntax()))
+            .append(build_json_quotes_clause(quotes));
+    }
+    if let Some(on_empty) = json_query_fn.json_on_empty_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(on_empty.syntax()))
+            .append(build_json_on_empty_clause(on_empty));
+    }
+    if let Some(on_error) = json_query_fn.json_on_error_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(on_error.syntax()))
+            .append(build_json_on_error_clause(on_error));
+    }
+    if let Some(r_paren) = json_query_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_value_fn<'a>(json_value_fn: ast::JsonValueFn) -> Doc<'a> {
+    let (doc, mut body) = build_json_document_path_fn(
+        "json_value",
+        json_value_fn.l_paren_token(),
+        json_value_fn.document(),
+        json_value_fn.json_format_clause(),
+        json_value_fn.comma_token(),
+        json_value_fn.path(),
+    );
+    if let Some(passing) = json_value_fn.json_passing_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(passing.syntax()))
+            .append(build_json_passing_clause(passing));
+    }
+    if let Some(returning) = json_value_fn.json_returning_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(on_empty) = json_value_fn.json_on_empty_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(on_empty.syntax()))
+            .append(build_json_on_empty_clause(on_empty));
+    }
+    if let Some(on_error) = json_value_fn.json_on_error_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(on_error.syntax()))
+            .append(build_json_on_error_clause(on_error));
+    }
+    if let Some(r_paren) = json_value_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_document_path_fn<'a>(
+    keyword: &'static str,
+    l_paren: Option<SyntaxToken>,
+    document: Option<ast::Expr>,
+    format: Option<ast::JsonFormatClause>,
+    comma: Option<SyntaxToken>,
+    path: Option<ast::Expr>,
+) -> (Doc<'a>, Doc<'a>) {
+    let mut doc = Doc::text(keyword);
+    if let Some(l_paren) = l_paren {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(document) = document {
+        body = body
+            .append(leading_comments(document.syntax()))
+            .append(build_expr(document));
+    }
+    if let Some(format) = format {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    if let Some(comma) = comma {
+        body = body
+            .append(comments_before(comma))
+            .append(Doc::text(","))
+            .append(Doc::line_or_space());
+    }
+    if let Some(path) = path {
+        body = body
+            .append(leading_comments(path.syntax()))
+            .append(build_expr(path));
+    }
+    (doc, body)
+}
+
+fn build_json_exists_fn<'a>(json_exists_fn: ast::JsonExistsFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_exists");
+    if let Some(l_paren) = json_exists_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(document) = json_exists_fn.document() {
+        body = body
+            .append(leading_comments(document.syntax()))
+            .append(build_expr(document));
+    }
+    if let Some(format) = json_exists_fn.json_format_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    if let Some(comma) = json_exists_fn.comma_token() {
+        body = body
+            .append(comments_before(comma))
+            .append(Doc::text(","))
+            .append(Doc::line_or_space());
+    }
+    if let Some(path) = json_exists_fn.path() {
+        body = body
+            .append(leading_comments(path.syntax()))
+            .append(build_expr(path));
+    }
+    if let Some(passing) = json_exists_fn.json_passing_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(passing.syntax()))
+            .append(build_json_passing_clause(passing));
+    }
+    if let Some(on_error) = json_exists_fn.json_on_error_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(on_error.syntax()))
+            .append(build_json_on_error_clause(on_error));
+    }
+    if let Some(r_paren) = json_exists_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_passing_clause<'a>(passing: ast::JsonPassingClause) -> Doc<'a> {
+    let mut doc = Doc::text("passing");
+    let mut args = passing.json_passing_args();
+    if let Some(first) = args.next() {
+        let mut previous_syntax = first.syntax().clone();
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(first.syntax()))
+            .append(build_json_passing_arg(first));
+        for arg in args {
+            doc = doc
+                .append(trailing_comments(&previous_syntax))
+                .append(Doc::text(","))
+                .append(Doc::line_or_space())
+                .append(leading_comments(arg.syntax()))
+                .append(build_json_passing_arg(arg.clone()));
+            previous_syntax = arg.syntax().clone();
+        }
+    }
+    doc.nest(2).group()
+}
+
+fn build_json_passing_arg<'a>(arg: ast::JsonPassingArg) -> Doc<'a> {
+    let mut doc = arg.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(as_token) = arg.as_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"));
+    }
+    if let Some(name) = arg.name() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    doc
+}
+
+fn build_json_wrapper_behavior_clause<'a>(clause: ast::JsonWrapperBehaviorClause) -> Doc<'a> {
+    match clause {
+        ast::JsonWrapperBehaviorClause::JsonWithConditionalWrapper(clause) => {
+            let mut doc = Doc::text("with");
+            doc = append_keyword_token(doc, clause.conditional_token(), "conditional");
+            doc = append_keyword_token(doc, clause.array_token(), "array");
+            append_keyword_token(doc, clause.wrapper_token(), "wrapper")
+        }
+        ast::JsonWrapperBehaviorClause::JsonWithUnconditionalWrapper(clause) => {
+            let mut doc = Doc::text("with");
+            doc = append_keyword_token(doc, clause.unconditional_token(), "unconditional");
+            doc = append_keyword_token(doc, clause.array_token(), "array");
+            append_keyword_token(doc, clause.wrapper_token(), "wrapper")
+        }
+        ast::JsonWrapperBehaviorClause::JsonWithoutWrapper(clause) => {
+            let mut doc = Doc::text("without");
+            doc = append_keyword_token(doc, clause.array_token(), "array");
+            append_keyword_token(doc, clause.wrapper_token(), "wrapper")
+        }
+    }
+}
+
+fn build_json_quotes_clause<'a>(clause: ast::JsonQuotesClause) -> Doc<'a> {
+    let mut doc = clause
+        .quotes_behavior()
+        .map(|behavior| match behavior {
+            ast::QuotesBehavior::KeepQuotes(behavior) => {
+                append_keyword_token(Doc::text("keep"), behavior.quotes_token(), "quotes")
+            }
+            ast::QuotesBehavior::OmitQuotes(behavior) => {
+                append_keyword_token(Doc::text("omit"), behavior.quotes_token(), "quotes")
+            }
+        })
+        .unwrap_or_else(Doc::nil);
+    if let Some(on_scalar) = clause.on_scalar_string() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(on_scalar.syntax()))
+            .append(Doc::text("on"));
+        doc = append_keyword_token(doc, on_scalar.scalar_token(), "scalar");
+        doc = append_keyword_token(doc, on_scalar.string_token(), "string");
+    }
+    doc
+}
+
+fn build_json_on_empty_clause<'a>(clause: ast::JsonOnEmptyClause) -> Doc<'a> {
+    let mut doc = clause
+        .json_behavior()
+        .map(build_json_behavior)
+        .unwrap_or_else(Doc::nil);
+    doc = append_keyword_token(doc, clause.on_token(), "on");
+    append_keyword_token(doc, clause.empty_token(), "empty")
+}
+
+fn build_json_on_error_clause<'a>(clause: ast::JsonOnErrorClause) -> Doc<'a> {
+    let mut doc = clause
+        .json_behavior()
+        .map(build_json_behavior)
+        .unwrap_or_else(Doc::nil);
+    if let Some(on_token) = clause.on_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&on_token))
+            .append(Doc::text("on"));
+    }
+    if let Some(error_token) = clause.error_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&error_token))
+            .append(Doc::text("error"));
+    }
+    doc
+}
+
+fn build_json_behavior<'a>(behavior: ast::JsonBehavior) -> Doc<'a> {
+    match behavior {
+        ast::JsonBehavior::JsonBehaviorDefault(behavior) => {
+            let mut doc = Doc::text("default");
+            if let Some(expr) = behavior.expr() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(expr.syntax()))
+                    .append(build_expr(expr));
+            }
+            doc
+        }
+        ast::JsonBehavior::JsonBehaviorEmptyArray(behavior) => {
+            let mut doc = Doc::text("empty");
+            if let Some(array_token) = behavior.array_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&array_token))
+                    .append(Doc::text("array"));
+            }
+            doc
+        }
+        ast::JsonBehavior::JsonBehaviorEmptyObject(behavior) => {
+            let mut doc = Doc::text("empty");
+            if let Some(object_token) = behavior.object_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&object_token))
+                    .append(Doc::text("object"));
+            }
+            doc
+        }
+        ast::JsonBehavior::JsonBehaviorError(_) => Doc::text("error"),
+        ast::JsonBehavior::JsonBehaviorFalse(_) => Doc::text("false"),
+        ast::JsonBehavior::JsonBehaviorNull(_) => Doc::text("null"),
+        ast::JsonBehavior::JsonBehaviorTrue(_) => Doc::text("true"),
+        ast::JsonBehavior::JsonBehaviorUnknown(_) => Doc::text("unknown"),
+    }
+}
+
+fn build_json_array_fn<'a>(json_array_fn: ast::JsonArrayFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_array");
+    if let Some(l_paren) = json_array_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    let exprs = json_array_fn.json_expr_formats().map(|value| {
+        (
+            leading_comments(value.syntax()).append(build_json_expr_format(value.clone())),
+            value.syntax().clone(),
+        )
+    });
+    let selects = json_array_fn.json_select_formats().map(|select| {
+        (
+            leading_comments(select.syntax()).append(build_json_select_format(select.clone())),
+            select.syntax().clone(),
+        )
+    });
+    if let Some(items) = build_comma_separated_docs(exprs.chain(selects)) {
+        body = body.append(items);
+    }
+
+    if let Some(null_clause) = json_array_fn.json_null_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+    }
+    if let Some(returning) = json_array_fn.json_returning_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_array_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_comma_separated_docs<'a>(
+    mut items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
+) -> Option<Doc<'a>> {
+    let (first, mut previous_syntax) = items.next()?;
+    let mut docs = vec![first];
+    for (item, syntax) in items {
+        docs.push(
+            trailing_comments(&previous_syntax)
+                .append(Doc::text(","))
+                .append(Doc::line_or_space())
+                .append(item),
+        );
+        previous_syntax = syntax;
+    }
+    Some(Doc::list(docs))
+}
+
+fn build_json_expr_format<'a>(value: ast::JsonExprFormat) -> Doc<'a> {
+    let mut doc = value.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(format) = value.json_format_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc.group()
+}
+
+fn build_json_select_format<'a>(select: ast::JsonSelectFormat) -> Doc<'a> {
+    let mut doc = select
+        .select_variant()
+        .map(|select| match select {
+            ast::SelectVariant::Select(select) => build_select_doc(&select),
+            _ => todo!("this select variant is not supported yet"),
+        })
+        .unwrap_or_else(Doc::nil);
+    if let Some(format) = select.json_format_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc.group()
+}
+
+fn build_json_array_agg_fn<'a>(json_array_agg_fn: ast::JsonArrayAggFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_arrayagg");
+    if let Some(l_paren) = json_array_agg_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(value) = json_array_agg_fn.json_value_expr() {
+        body = body
+            .append(leading_comments(value.syntax()))
+            .append(build_json_value_expr(value));
+    }
+    if let Some(order_by) = json_array_agg_fn.order_by_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(order_by.syntax()))
+            .append(build_order_by_clause(order_by));
+    }
+    if let Some(null_clause) = json_array_agg_fn.json_null_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+    }
+    if let Some(returning) = json_array_agg_fn.json_returning_clause() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_array_agg_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_json_value_expr<'a>(value: ast::JsonValueExpr) -> Doc<'a> {
+    let mut doc = value.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(format) = value.json_format_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc.group()
+}
+
+fn build_json_format_clause<'a>(format: ast::JsonFormatClause) -> Doc<'a> {
+    let mut doc = Doc::text("format");
+    if let Some(json_token) = format.json_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&json_token))
+            .append(Doc::text("json"));
+    }
+    if let Some(encoding) = format.json_encoding_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(encoding.syntax()))
+            .append(build_json_encoding_clause(encoding));
+    }
+    doc.group()
+}
+
+fn build_json_encoding_clause<'a>(clause: ast::JsonEncodingClause) -> Doc<'a> {
+    let mut doc = Doc::text("encoding");
+    if let Some(encoding) = clause.json_encoding() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(encoding.syntax()))
+            .append(build_name(encoding.syntax()));
+    }
+    doc
+}
+
+fn build_json_null_clause<'a>(clause: ast::JsonNullClause) -> Doc<'a> {
+    let (prefix, on_token, null_token) = match clause {
+        ast::JsonNullClause::JsonAbsentOnNull(clause) => {
+            ("absent", clause.on_token(), clause.null_token())
+        }
+        ast::JsonNullClause::JsonNullOnNull(clause) => {
+            ("null", clause.on_token(), clause.on_null_token())
+        }
+    };
+
+    let mut doc = Doc::text(prefix);
+    if let Some(on_token) = on_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&on_token))
+            .append(Doc::text("on"));
+    }
+    if let Some(null_token) = null_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&null_token))
+            .append(Doc::text("null"));
+    }
+    doc
+}
+
+fn build_json_returning_clause<'a>(returning: ast::JsonReturningClause) -> Doc<'a> {
+    let mut doc = Doc::text("returning");
+    if let Some(ty) = returning.ty() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(ty.syntax()))
+            .append(build_type(ty));
+    }
+    if let Some(format) = returning.json_format_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    doc.nest(2).group()
+}
+
+fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
+    let mut doc = Doc::text("overlay");
+    if let Some(l_paren) = overlay_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(args) = overlay_fn.overlay_args() {
+        body = body
+            .append(leading_comments(args.syntax()))
+            .append(match args {
+                ast::OverlayArgs::OverlayPlacing(args) => {
+                    let mut doc = args
+                        .string()
+                        .map(|expr| leading_comments(expr.syntax()).append(build_expr(expr)))
+                        .unwrap_or_else(Doc::nil);
+                    doc = append_line_keyword_expr(
+                        doc,
+                        args.placing_token(),
+                        "placing",
+                        args.placing(),
+                    );
+                    doc = append_line_keyword_expr(doc, args.from_token(), "from", args.from());
+                    append_line_keyword_expr(doc, args.for_token(), "for", args.for_()).group()
+                }
+                ast::OverlayArgs::OverlayExprs(args) => {
+                    let items = args.overlay_exprs().map(|arg| {
+                        let syntax = arg.syntax().clone();
+                        let doc = leading_comments(arg.syntax()).append(match arg {
+                            ast::OverlayExpr::Expr(expr) => build_expr(expr),
+                            ast::OverlayExpr::NamedArg(arg) => build_named_call_arg(arg),
+                        });
+                        (doc, syntax)
+                    });
+                    build_comma_separated_docs(items).unwrap_or_else(Doc::nil)
+                }
+            });
+    }
+
+    if let Some(r_paren) = overlay_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc = doc.append(wrap_body(body));
+    doc.append(Doc::text(")")).group()
+}
+
+fn build_substring_fn<'a>(substring_fn: ast::SubstringFn) -> Doc<'a> {
+    let mut doc = Doc::text("substring");
+    if let Some(l_paren) = substring_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(args) = substring_fn.substring_args() {
+        body = body
+            .append(leading_comments(args.syntax()))
+            .append(match args {
+                ast::SubstringArgs::SubstringForFrom(args) => {
+                    let mut body = args.string().map(build_expr).unwrap_or_else(Doc::nil);
+                    body = append_line_keyword_expr(body, args.for_token(), "for", args.count());
+                    append_line_keyword_expr(body, args.from_token(), "from", args.start())
+                }
+                ast::SubstringArgs::SubstringFromFor(args) => {
+                    let mut body = args.string().map(build_expr).unwrap_or_else(Doc::nil);
+                    body = append_line_keyword_expr(body, args.from_token(), "from", args.start());
+                    append_line_keyword_expr(body, args.for_token(), "for", args.count())
+                }
+                ast::SubstringArgs::SubstringSimilarEscape(args) => {
+                    let mut body = args.string().map(build_expr).unwrap_or_else(Doc::nil);
+                    body = append_line_keyword_expr(
+                        body,
+                        args.similar_token(),
+                        "similar",
+                        args.pattern(),
+                    );
+                    append_line_keyword_expr(body, args.escape_token(), "escape", args.escape())
+                }
+                ast::SubstringArgs::SubstringExprs(args) => {
+                    build_comma_separated_exprs(args.exprs()).unwrap_or_else(Doc::nil)
+                }
+            });
+    }
+
+    if let Some(r_paren) = substring_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn append_keyword_token<'a>(
+    mut doc: Doc<'a>,
+    token: Option<SyntaxToken>,
+    keyword: &'static str,
+) -> Doc<'a> {
+    if let Some(token) = token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(keyword));
+    }
+    doc
+}
+
+fn append_line_keyword_expr<'a>(
+    mut doc: Doc<'a>,
+    token: Option<SyntaxToken>,
+    keyword: &'static str,
+    expr: Option<ast::Expr>,
+) -> Doc<'a> {
+    if let Some(token) = token {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(keyword));
+    }
+    if let Some(expr) = expr {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_trim_fn<'a>(trim_fn: ast::TrimFn) -> Doc<'a> {
+    let mut doc = Doc::text("trim");
+    if let Some(l_paren) = trim_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    let has_side = if let Some(side) = trim_fn.trim_side() {
+        body = body
+            .append(leading_comments(side.syntax()))
+            .append(match side {
+                ast::TrimSide::TrimBoth(_) => Doc::text("both"),
+                ast::TrimSide::TrimLeading(_) => Doc::text("leading"),
+                ast::TrimSide::TrimTrailing(_) => Doc::text("trailing"),
+            });
+        true
+    } else {
+        false
+    };
+
+    if let Some(args) = trim_fn.trim_args() {
+        if has_side {
+            body = body.append(Doc::space());
+        }
+        body = body
+            .append(leading_comments(args.syntax()))
+            .append(match args {
+                ast::TrimArgs::TrimFrom(args) => {
+                    let mut body = Doc::text("from");
+                    if let Some(exprs) = build_comma_separated_exprs(args.exprs()) {
+                        body = body.append(Doc::space()).append(exprs);
+                    }
+                    body
+                }
+                ast::TrimArgs::TrimExprFrom(args) => {
+                    let mut exprs = args.exprs();
+                    let mut body = exprs.next().map(build_expr).unwrap_or_else(Doc::nil);
+                    if let Some(from) = args.from_token() {
+                        body = body
+                            .append(Doc::line_or_space())
+                            .append(leading_comments_token(&from))
+                            .append(Doc::text("from"));
+                    }
+                    if let Some(exprs) = build_comma_separated_exprs(exprs) {
+                        body = body.append(Doc::space()).append(exprs);
+                    }
+                    body
+                }
+                ast::TrimArgs::TrimExprs(args) => {
+                    build_comma_separated_exprs(args.exprs()).unwrap_or_else(Doc::nil)
+                }
+            });
+    }
+
+    if let Some(r_paren) = trim_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_comma_separated_exprs<'a>(exprs: impl Iterator<Item = ast::Expr>) -> Option<Doc<'a>> {
+    let exprs: Vec<Doc<'a>> = exprs
+        .map(|expr| {
+            let leading = leading_comments(expr.syntax());
+            let trailing = trailing_comments(expr.syntax());
+            leading.append(build_expr(expr)).append(trailing)
+        })
+        .collect();
+    if exprs.is_empty() {
+        None
+    } else {
+        Some(
+            Doc::list(
+                Itertools::intersperse(
+                    exprs.into_iter(),
+                    Doc::text(",").append(Doc::line_or_space()),
+                )
+                .collect(),
+            )
+            .group(),
+        )
+    }
+}
+
+fn build_position_fn<'a>(position_fn: ast::PositionFn) -> Doc<'a> {
+    let mut doc = Doc::text("position");
+    if let Some(l_paren) = position_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(pos) = position_fn.pos() {
+        body = body
+            .append(leading_comments(pos.syntax()))
+            .append(build_expr(pos));
+    }
+    if let Some(in_token) = position_fn.in_token() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&in_token))
+            .append(Doc::text("in"));
+    }
+    if let Some(string) = position_fn.string() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments(string.syntax()))
+            .append(build_expr(string));
+    }
+    if let Some(r_paren) = position_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_collation_for_fn<'a>(collation_for_fn: ast::CollationForFn) -> Doc<'a> {
+    let mut doc = Doc::text("collation");
+    if let Some(for_token) = collation_for_fn.for_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&for_token))
+            .append(Doc::text("for"));
+    }
+    if let Some(l_paren) = collation_for_fn.l_paren_token() {
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(expr) = collation_for_fn.expr() {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = collation_for_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc = doc.append(wrap_body(body));
+    doc.append(Doc::text(")")).group()
+}
+
+fn build_extract_fn<'a>(extract_fn: ast::ExtractFn) -> Doc<'a> {
+    let mut doc = Doc::text("extract");
+    if let Some(l_paren) = extract_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+
+    if let Some(field) = extract_fn.extract_field() {
+        body = body
+            .append(leading_comments(field.syntax()))
+            .append(match field {
+                ast::ExtractField::ExtractFieldLiteral(field) => {
+                    field.literal().map(build_literal).unwrap_or_else(Doc::nil)
+                }
+                ast::ExtractField::ExtractFieldName(field) => {
+                    if field.ident_token().is_some() {
+                        build_name(field.syntax())
+                    } else {
+                        build_keyword_node(field.syntax())
+                    }
+                }
+            });
+    }
+
+    if let Some(from) = extract_fn.from_token() {
+        body = body
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&from))
+            .append(Doc::text("from"));
+    }
+    if let Some(expr) = extract_fn.expr() {
+        body = body
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = extract_fn.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_parenthesized_expr_or_select_fn<'a>(
+    keyword: &'static str,
+    l_paren: Option<SyntaxToken>,
+    expr: Option<ast::Expr>,
+    select: Option<ast::SelectVariant>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let mut doc = Doc::text(keyword);
+    if let Some(l_paren) = l_paren {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(expr) = expr {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    } else if let Some(select) = select {
+        body = body
+            .append(leading_comments(select.syntax()))
+            .append(match select {
+                ast::SelectVariant::Select(select) => build_select_doc_ungrouped(&select),
+                _ => todo!("this select variant is not supported yet"),
+            });
+    }
+
+    if let Some(r_paren) = r_paren {
+        body = body.append(comments_before(r_paren));
+    }
+    doc = doc.append(wrap_body(body));
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
@@ -781,65 +3488,169 @@ fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
     if let Some(star) = arg_list.star_token() {
-        doc = doc
+        body = body
             .append(leading_comments_token(&star))
             .append(Doc::text("*"));
-        if let Some(r_paren) = arg_list.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
-        }
-        return doc.append(Doc::text(")"));
-    }
-
-    let mut has_quantifier = false;
-    if let Some(quantifier) = arg_list.all_or_distinct() {
-        has_quantifier = true;
-        doc = doc
-            .append(leading_comments(quantifier.syntax()))
-            .append(match quantifier {
-                ast::AllOrDistinct::All(_) => Doc::text("all"),
-                ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
-            });
-    }
-
-    let args: Vec<Doc<'a>> = arg_list
-        .args()
-        .map(|arg| {
-            let leading = leading_comments(arg.syntax());
-            let trailing = trailing_comments(arg.syntax());
-            leading.append(build_call_arg(arg)).append(trailing)
-        })
-        .collect();
-    if args.is_empty() {
-        if let Some(r_paren) = arg_list.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
-        }
     } else {
-        if has_quantifier {
-            doc = doc.append(Doc::space());
+        let mut has_quantifier = false;
+        if let Some(quantifier) = arg_list.all_or_distinct() {
+            has_quantifier = true;
+            body = body
+                .append(leading_comments(quantifier.syntax()))
+                .append(match quantifier {
+                    ast::AllOrDistinct::All(_) => Doc::text("all"),
+                    ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
+                });
         }
-        doc = doc.append(Doc::list(
-            Itertools::intersperse(args.into_iter(), Doc::text(",").append(Doc::space())).collect(),
-        ));
+
+        let args = arg_list.args().map(|arg| {
+            let syntax = arg.syntax().clone();
+            let doc = leading_comments(arg.syntax()).append(build_call_arg(arg));
+            (doc, syntax)
+        });
+        if let Some(args) = build_comma_separated_docs(args) {
+            if has_quantifier {
+                body = body.append(Doc::space());
+            }
+            body = body.append(args);
+        }
     }
 
-    doc.append(Doc::text(")"))
+    if let Some(r_paren) = arg_list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc = doc.append(wrap_body(body));
+
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_call_arg<'a>(arg: ast::Arg) -> Doc<'a> {
-    if let Some(_named_arg) = arg.named_arg() {
-        todo!("named function arguments are not supported yet")
+    let mut doc = if let Some(named_arg) = arg.named_arg() {
+        build_named_call_arg(named_arg)
+    } else {
+        let mut doc = Doc::nil();
+        if arg.variadic_token().is_some() {
+            doc = doc.append(Doc::text("variadic")).append(Doc::space());
+        }
+        if let Some(expr) = arg.expr() {
+            doc = doc
+                .append(leading_comments(expr.syntax()))
+                .append(build_expr(expr));
+        }
+        doc
+    };
+    if let Some(order_by_clause) = arg.order_by_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(order_by_clause.syntax()))
+            .append(build_order_by_clause(order_by_clause));
     }
-    if let Some(_order_by_clause) = arg.order_by_clause() {
-        todo!("order by clauses in function arguments are not supported yet")
+    doc
+}
+
+fn build_order_by_clause<'a>(clause: ast::OrderByClause) -> Doc<'a> {
+    let mut doc = Doc::text("order").append(Doc::space());
+    if let Some(by_token) = clause.by_token() {
+        doc = doc.append(leading_comments_token(&by_token));
+    }
+    doc = doc.append(Doc::text("by"));
+
+    if let Some(list) = clause.sort_by_list() {
+        let items = list
+            .sort_bys()
+            .map(|sort_by| leading_comments(sort_by.syntax()).append(build_sort_by(sort_by)));
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(list.syntax()))
+            .append(Doc::list(
+                Itertools::intersperse(items, Doc::text(",").append(Doc::space())).collect(),
+            ));
+    }
+    doc
+}
+
+fn build_sort_by<'a>(sort_by: ast::SortBy) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(expr) = sort_by.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
     }
 
-    let mut doc = Doc::nil();
-    if arg.variadic_token().is_some() {
-        doc = doc.append(Doc::text("variadic")).append(Doc::space());
+    if let Some(order) = sort_by.sort_order() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(order.syntax()))
+            .append(match order {
+                ast::SortOrder::SortAsc(_) => Doc::text("asc"),
+                ast::SortOrder::SortDesc(_) => Doc::text("desc"),
+                ast::SortOrder::SortUsing(using) => {
+                    let mut doc = Doc::text("using");
+                    if let Some(operator_call) = using.operator_call() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(operator_call.syntax()))
+                            .append(build_operator_call(&operator_call));
+                    } else if let Some(op) = using.op() {
+                        doc = doc
+                            .append(Doc::space())
+                            .append(leading_comments(op.syntax()))
+                            .append(build_operator(&op));
+                    }
+                    doc
+                }
+            });
     }
+
+    if let Some(nulls_order) = sort_by.nulls_order() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(nulls_order.syntax()))
+            .append(Doc::text("nulls"))
+            .append(Doc::space());
+        let suffix = match nulls_order {
+            ast::NullsOrder::NullsFirst(first) => first
+                .first_token()
+                .map(|token| leading_comments_token(&token))
+                .unwrap_or_else(Doc::nil)
+                .append(Doc::text("first")),
+            ast::NullsOrder::NullsLast(last) => last
+                .last_token()
+                .map(|token| leading_comments_token(&token))
+                .unwrap_or_else(Doc::nil)
+                .append(Doc::text("last")),
+        };
+        doc = doc.append(suffix);
+    }
+
+    doc.append(trailing_comments(sort_by.syntax()))
+}
+
+fn build_named_call_arg<'a>(arg: ast::NamedArg) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(name) = arg.name() {
+        doc = doc
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+
+    if let Some(fat_arrow) = arg.fat_arrow_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&fat_arrow))
+            .append(Doc::text("=>"));
+    } else if let Some(colon_eq) = arg.colon_eq_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&colon_eq))
+            .append(Doc::text(":="));
+    }
+
     if let Some(expr) = arg.expr() {
         doc = doc
+            .append(Doc::space())
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     }
@@ -949,20 +3760,22 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
         if let Some(l_paren) = cast_expr.l_paren_token() {
             doc = doc.append(comments_before(l_paren));
         }
-        doc = doc
-            .append(Doc::text("("))
-            .append(leading_comments(expr.syntax()))
+        let mut body = leading_comments(expr.syntax())
             .append(build_expr(expr))
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&as_token))
             .append(Doc::text("as"))
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(ty.syntax()))
-            .append(build_type(ty));
+            .append(build_type(ty))
+            .group();
         if let Some(r_paren) = cast_expr.r_paren_token() {
-            doc = doc.append(comments_before(r_paren));
+            body = body.append(comments_before(r_paren));
         }
-        doc = doc.append(Doc::text(")"))
+        doc = doc
+            .append(Doc::text("("))
+            .append(wrap_body(body))
+            .append(Doc::text(")"))
     } else {
         let literal = cast_expr.literal().unwrap();
         doc = doc
@@ -981,12 +3794,17 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
 }
 
 fn build_collate_expr<'a>(collate: ast::Collate) -> Doc<'a> {
-    let mut doc = collate.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    let expr = collate.expr();
+    let has_expr = expr.is_some();
+    let mut doc = expr.map(build_expr).unwrap_or_else(Doc::nil);
 
     if let Some(collate_token) = collate.collate_token() {
         doc = doc.append(comments_before(collate_token));
     }
-    doc = doc.append(Doc::space()).append(Doc::text("collate"));
+    if has_expr {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("collate"));
 
     if let Some(collation) = collate.collation_ref() {
         doc = doc
@@ -1006,10 +3824,14 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
     if let Some(expr) = paren_expr.expr() {
-        doc = doc
+        body = body
             .append(leading_comments(expr.syntax()))
-            .append(build_expr(expr));
+            .append(match expr {
+                ast::Expr::BinExpr(binary) => build_bin_expr_doc(binary, false),
+                expression => build_expr(expression),
+            });
     } else if let Some(_compound_select) = paren_expr.compound_select() {
         todo!("parenthesized compound select nodes are not supported yet")
     } else if let Some(_from_item) = paren_expr.from_item() {
@@ -1027,9 +3849,9 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
     }
 
     if let Some(r_paren) = paren_expr.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_postfix_expr<'a>(postfix_expr: ast::PostfixExpr) -> Doc<'a> {
@@ -1101,30 +3923,327 @@ fn build_normalized_postfix<'a>(
 }
 
 fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
+    build_bin_expr_doc(bin_expr, true)
+}
+
+fn build_bin_expr_doc<'a>(bin_expr: ast::BinExpr, wrap: bool) -> Doc<'a> {
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
     let before_op = trailing_comments(lhs.syntax());
     let after_op = leading_comments(rhs.syntax());
+    let rhs_is_uncommented_quantifier = comment_tokens_before(rhs.syntax().clone()).is_empty()
+        && match &rhs {
+            ast::Expr::CallExpr(call) => {
+                call.all_fn().is_some() || call.any_fn().is_some() || call.some_fn().is_some()
+            }
+            _ => false,
+        };
 
-    build_expr(lhs)
+    let doc = build_expr(lhs)
         .append(before_op)
-        .append(Doc::space())
+        .append(if rhs_is_uncommented_quantifier {
+            Doc::space()
+        } else {
+            Doc::line_or_space()
+        })
         .append(build_op(bin_expr.op().unwrap()))
         .append(Doc::space())
         .append(after_op)
-        .append(build_expr(rhs))
+        .append(build_expr(rhs));
+    if rhs_is_uncommented_quantifier || !wrap {
+        doc
+    } else {
+        doc.nest(2).group()
+    }
+}
+
+fn build_within_clause<'a>(within_clause: ast::WithinClause) -> Doc<'a> {
+    let mut doc = Doc::text("within").append(Doc::space());
+    if let Some(group_token) = within_clause.group_token() {
+        doc = doc.append(leading_comments_token(&group_token));
+    }
+    doc = doc.append(Doc::text("group"));
+    if let Some(l_paren) = within_clause.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren))
+            .append(Doc::text("("));
+    }
+
+    let mut body = Doc::nil();
+    if let Some(order_by) = within_clause.order_by_clause() {
+        body = body
+            .append(leading_comments(order_by.syntax()))
+            .append(build_order_by_clause(order_by));
+    }
+    if let Some(r_paren) = within_clause.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_over_clause<'a>(over_clause: ast::OverClause) -> Doc<'a> {
+    let mut doc = Doc::text("over");
+    if let Some(target) = over_clause.over_target() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(target.syntax()))
+            .append(match target {
+                ast::OverTarget::WindowRef(window_ref) => build_name(window_ref.syntax()),
+                ast::OverTarget::OverWindowSpec(window_spec) => build_over_window_spec(window_spec),
+            });
+    }
+    doc
+}
+
+fn build_over_window_spec<'a>(over_window_spec: ast::OverWindowSpec) -> Doc<'a> {
+    let doc = Doc::text("(");
+    let mut body = Doc::nil();
+    if let Some(window_spec) = over_window_spec.window_spec() {
+        body = body
+            .append(leading_comments(window_spec.syntax()))
+            .append(build_window_spec(window_spec));
+    }
+    if let Some(r_paren) = over_window_spec.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_window_spec<'a>(window_spec: ast::WindowSpec) -> Doc<'a> {
+    let mut parts = Vec::new();
+    if let Some(window_ref) = window_spec.window_ref() {
+        parts.push(leading_comments(window_ref.syntax()).append(build_name(window_ref.syntax())));
+    }
+    if let Some(partition_by) = window_spec.partition_by_clause() {
+        parts.push(
+            leading_comments(partition_by.syntax()).append(build_partition_by_clause(partition_by)),
+        );
+    }
+    if let Some(order_by) = window_spec.order_by_clause() {
+        parts.push(leading_comments(order_by.syntax()).append(build_order_by_clause(order_by)));
+    }
+    if let Some(frame) = window_spec.frame_clause() {
+        parts.push(leading_comments(frame.syntax()).append(build_frame_clause(frame)));
+    }
+
+    Doc::list(Itertools::intersperse(parts.into_iter(), Doc::line_or_space()).collect()).group()
+}
+
+fn build_partition_by_clause<'a>(partition_by: ast::PartitionByClause) -> Doc<'a> {
+    let mut doc = Doc::text("partition").append(Doc::space());
+    if let Some(by_token) = partition_by.by_token() {
+        doc = doc.append(leading_comments_token(&by_token));
+    }
+    doc = doc.append(Doc::text("by"));
+    if let Some(exprs) = build_comma_separated_exprs(partition_by.exprs()) {
+        doc = doc.append(Doc::space()).append(exprs);
+    }
+    doc
+}
+
+fn build_frame_clause<'a>(frame: ast::FrameClause) -> Doc<'a> {
+    let mut doc = match frame.frame_units() {
+        Some(ast::FrameUnits::FrameGroups(_)) => Doc::text("groups"),
+        Some(ast::FrameUnits::FrameRange(_)) => Doc::text("range"),
+        Some(ast::FrameUnits::FrameRows(_)) => Doc::text("rows"),
+        None => Doc::nil(),
+    };
+    if let Some(extent) = frame.frame_extent() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(extent.syntax()))
+            .append(build_frame_extent(extent));
+    }
+    if let Some(exclude) = frame.frame_exclude() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(exclude.syntax()))
+            .append(build_frame_exclude(exclude));
+    }
+    doc.nest(2).group()
+}
+
+fn build_frame_extent<'a>(extent: ast::FrameExtent) -> Doc<'a> {
+    match extent {
+        ast::FrameExtent::FrameBetween(between) => {
+            let mut doc = Doc::text("between");
+            if let Some(start) = between.start() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(start.syntax()))
+                    .append(build_frame_bound(start));
+            }
+            if let Some(and_token) = between.and_token() {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(leading_comments_token(&and_token))
+                    .append(Doc::text("and"));
+            }
+            if let Some(end) = between.end() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(end.syntax()))
+                    .append(build_frame_bound(end));
+            }
+            doc.nest(2).group()
+        }
+        ast::FrameExtent::FrameBound(bound) => build_frame_bound(bound),
+    }
+}
+
+fn build_frame_bound<'a>(bound: ast::FrameBound) -> Doc<'a> {
+    match bound {
+        ast::FrameBound::CurrentRow(current_row) => Doc::text("current")
+            .append(Doc::space())
+            .append(
+                current_row
+                    .row_token()
+                    .map(|token| leading_comments_token(&token))
+                    .unwrap_or_else(Doc::nil),
+            )
+            .append(Doc::text("row")),
+        ast::FrameBound::ExprFollowing(following) => {
+            build_expr_frame_bound(following.expr(), following.following_token(), "following")
+        }
+        ast::FrameBound::ExprPreceding(preceding) => {
+            build_expr_frame_bound(preceding.expr(), preceding.preceding_token(), "preceding")
+        }
+        ast::FrameBound::UnboundedFollowing(following) => Doc::text("unbounded")
+            .append(Doc::space())
+            .append(
+                following
+                    .following_token()
+                    .map(|token| leading_comments_token(&token))
+                    .unwrap_or_else(Doc::nil),
+            )
+            .append(Doc::text("following")),
+        ast::FrameBound::UnboundedPreceding(preceding) => Doc::text("unbounded")
+            .append(Doc::space())
+            .append(
+                preceding
+                    .preceding_token()
+                    .map(|token| leading_comments_token(&token))
+                    .unwrap_or_else(Doc::nil),
+            )
+            .append(Doc::text("preceding")),
+    }
+}
+
+fn build_expr_frame_bound<'a>(
+    expr: Option<ast::Expr>,
+    suffix_token: Option<SyntaxToken>,
+    suffix: &'static str,
+) -> Doc<'a> {
+    let mut doc = expr.map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(suffix_token) = suffix_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&suffix_token))
+            .append(Doc::text(suffix));
+    }
+    doc
+}
+
+fn build_frame_exclude<'a>(exclude: ast::FrameExclude) -> Doc<'a> {
+    let mut doc = Doc::text("exclude");
+    if let Some(target) = exclude.frame_exclude_target() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(target.syntax()))
+            .append(match target {
+                ast::FrameExcludeTarget::CurrentRow(current_row) => Doc::text("current")
+                    .append(Doc::space())
+                    .append(
+                        current_row
+                            .row_token()
+                            .map(|token| leading_comments_token(&token))
+                            .unwrap_or_else(Doc::nil),
+                    )
+                    .append(Doc::text("row")),
+                ast::FrameExcludeTarget::Group(_) => Doc::text("group"),
+                ast::FrameExcludeTarget::NoOthers(no_others) => Doc::text("no")
+                    .append(Doc::space())
+                    .append(
+                        no_others
+                            .others_token()
+                            .map(|token| leading_comments_token(&token))
+                            .unwrap_or_else(Doc::nil),
+                    )
+                    .append(Doc::text("others")),
+                ast::FrameExcludeTarget::Ties(_) => Doc::text("ties"),
+            });
+    }
+    doc
+}
+
+fn build_filter_clause<'a>(filter_clause: ast::FilterClause) -> Doc<'a> {
+    let mut doc = Doc::text("filter");
+    if let Some(l_paren) = filter_clause.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren))
+            .append(Doc::text("("));
+    }
+
+    let mut body = Doc::nil();
+    if let Some(where_token) = filter_clause.where_token() {
+        body = body
+            .append(leading_comments_token(&where_token))
+            .append(Doc::text("where"));
+    }
+    if let Some(expr) = filter_clause.expr() {
+        body = body
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = filter_clause.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_null_treatment<'a>(null_treatment: ast::NullTreatment) -> Doc<'a> {
+    let (keyword, nulls_token) = match null_treatment {
+        ast::NullTreatment::IgnoreNulls(ignore_nulls) => ("ignore", ignore_nulls.nulls_token()),
+        ast::NullTreatment::RespectNulls(respect_nulls) => ("respect", respect_nulls.nulls_token()),
+    };
+
+    let mut doc = Doc::text(keyword);
+    if let Some(nulls_token) = nulls_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&nulls_token))
+            .append(Doc::text("nulls"));
+    }
+    doc
 }
 
 fn build_json_keys_unique_clause<'a>(clause: ast::JsonKeysUniqueClause) -> Doc<'a> {
-    let prefix = match clause {
-        ast::JsonKeysUniqueClause::JsonWithoutUniqueKeys(_) => "without",
-        ast::JsonKeysUniqueClause::JsonWithUniqueKeys(_) => "with",
+    let (prefix, unique_token, keys_token) = match clause {
+        ast::JsonKeysUniqueClause::JsonWithoutUniqueKeys(clause) => {
+            ("without", clause.unique_token(), clause.keys_token())
+        }
+        ast::JsonKeysUniqueClause::JsonWithUniqueKeys(clause) => {
+            ("with", clause.unique_token(), clause.keys_token())
+        }
     };
-    Doc::text(prefix)
-        .append(Doc::space())
-        .append(Doc::text("unique"))
-        .append(Doc::space())
-        .append(Doc::text("keys"))
+
+    let mut doc = Doc::text(prefix);
+    if let Some(unique_token) = unique_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&unique_token))
+            .append(Doc::text("unique"));
+    }
+    if let Some(keys_token) = keys_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&keys_token))
+            .append(Doc::text("keys"));
+    }
+    doc
 }
 
 fn build_unicode_normal_form<'a>(form: ast::UnicodeNormalForm) -> Doc<'a> {

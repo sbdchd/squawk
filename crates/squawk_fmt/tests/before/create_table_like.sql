@@ -19,3 +19,5 @@ create table t (like U&"d!0061tum" uescape '!' including all);
 create table t (like /* a */ foo /* b */ including /* c */ all);
 create table t (like foo -- a line comment
 including all);
+
+create table a_very_long_destination_table_name (like a_very_long_source_schema_name.a_very_long_source_table_name including comments including compression including constraints including defaults including generated including identity including indexes including statistics including storage);

@@ -230,6 +230,9 @@ select pg_sleep_until('tomorrow 03:00');
 -- order by one param
 select array_agg(v order by v desc) from vals;
 
+-- order by named param
+select foo(a => x order by y);
+
 -- order by param 2
 select jsonb_object_agg(k, v order by v) from vals;
 

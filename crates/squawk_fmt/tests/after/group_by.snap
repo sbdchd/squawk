@@ -3,13 +3,37 @@ source: crates/squawk_fmt/tests/tests.rs
 input_file: crates/squawk_fmt/tests/before/group_by.sql
 ---
 select 1 group by 1, foo + 2;
-select 1 group by all rollup(1, 2), cube(3, 4);
-select 1 group by distinct grouping sets((), (1, 2), rollup(3), cube(4));
+select 1 group by all rollup (1, 2), cube (3, 4);
+select 1 group by distinct grouping sets ((), (1, 2), rollup (3), cube (4));
+select
+  1
+group by grouping sets (
+    (first_very_long_grouping_expression, second_very_long_grouping_expression),
+    rollup (
+      third_very_long_grouping_expression,
+      fourth_very_long_grouping_expression
+    ),
+    cube (
+      fifth_very_long_grouping_expression,
+      sixth_very_long_grouping_expression
+    )
+  );
 
 select
   1
-group /* before by */ by /* before distinct */ distinct /* before grouping */ grouping /* before sets */ sets /* before outer paren */(/* before rollup */ rollup /* before rollup paren */(/* before first expression */ 1 /* before expression comma */,
-      /* before second expression */ 2 /* before rollup close */) /* before group-by comma */,
-    /* before cube */ cube /* before cube paren */(/* before cube expression */ 3 /* before cube close */) /* before second group-by comma */,
-    /* before nested grouping */ grouping /* before nested sets */ sets /* before nested paren */(/* before empty tuple */ () /* before nested comma */,
-      /* before grouping expression */ (4 /* before tuple comma */, /* before tuple expression */ 5 /* before tuple close */) /* before nested close */) /* before outer close */)/* before semicolon */;
+group /* before by */ by /* before distinct */ distinct /* before grouping */ grouping /* before sets */ sets /* before outer paren */(
+    /* before rollup */ rollup /* before rollup paren */(
+      /* before first expression */ 1 /* before expression comma */,
+      /* before second expression */ 2 /* before rollup close */
+    ) /* before group-by comma */,
+    /* before cube */ cube /* before cube paren */(
+      /* before cube expression */ 3 /* before cube close */
+    ) /* before second group-by comma */,
+    /* before nested grouping */ grouping /* before nested sets */ sets /* before nested paren */(
+      /* before empty tuple */ () /* before nested comma */,
+      /* before grouping expression */ (
+        4 /* before tuple comma */,
+        /* before tuple expression */ 5 /* before tuple close */
+      ) /* before nested close */
+    ) /* before outer close */
+  )/* before semicolon */;

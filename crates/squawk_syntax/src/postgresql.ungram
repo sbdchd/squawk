@@ -267,7 +267,7 @@ JsonTable =
   ')'
 
 JsonTablePlanClause =
-  'plan' 'default'? '(' JsonTablePlan (',' JsonTablePlan)? ')'
+  'plan' 'default'? '(' (JsonTablePlan (',' JsonTablePlan)*) ')'
 
 JsonTablePlan =
   JsonPathNameRef
@@ -561,7 +561,7 @@ Literal =
   )
 
 NamedArg =
-  name:ParamNameRef (FatArrow | ColonEq) Expr
+  name:ParamNameRef ('=>' | ':=') Expr
 
 JsonFormatClause =
   'format' 'json' JsonEncodingClause?
@@ -571,18 +571,6 @@ JsonValueExpr =
 
 JsonKeyValue =
   Expr (':' | 'value') JsonValueExpr
-
-Gteq =
- '>' '='
-
-FatArrow =
-  '=' '>'
-
-Neqb =
-  '<' '>'
-
-Lteq =
-  '<' '='
 
 NotLike =
   'not' 'like'
@@ -617,14 +605,8 @@ IsNotNormalized =
 OperatorCall =
   'operator' '(' Op ')'
 
-ColonEq =
-  ':' '='
-
 ColonColon =
   ':' ':'
-
-Neq =
- '!' '='
 
 SimilarTo =
   'similar' 'to'
@@ -667,10 +649,10 @@ Op =
   | AtLocal
   | AtTimeZone
   | ColonColon
-  | ColonEq
+  | ':='
   | CustomOp
-  | FatArrow
-  | Gteq
+  | '=>'
+  | '>='
   | IsDistinctFrom
   | IsJson
   | IsJsonArray
@@ -686,9 +668,9 @@ Op =
   | IsNotJsonScalar
   | IsNotJsonValue
   | IsNotNormalized
-  | Lteq
-  | Neq
-  | Neqb
+  | '<='
+  | '!='
+  | '<>'
   | NotIlike
   | NotIn
   | NotLike
@@ -2580,11 +2562,8 @@ JsonTableValueColumn =
   JsonPathClause?
   JsonWrapperBehaviorClause?
   JsonQuotesClause?
-  JsonTableValueBehavior?
-
-JsonTableValueBehavior =
-  JsonOnErrorClause
-| JsonOnEmptyClause
+  JsonOnEmptyClause?
+  JsonOnErrorClause?
 
 JsonTableExistsColumn =
   ColumnName Type
