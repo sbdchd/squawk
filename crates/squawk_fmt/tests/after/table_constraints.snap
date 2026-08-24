@@ -1,0 +1,62 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/table_constraints.sql
+---
+create table simple_constraints(
+  id bigint,
+  parent_id bigint,
+  name text,
+  primary key (id),
+  unique nulls not distinct (name),
+  check (id > 0),
+  foreign key (parent_id) references parents (id)
+);
+
+create table named_constraints(
+  id bigint,
+  valid_at tstzrange,
+  constraint pk primary key (id) deferrable initially deferred,
+  constraint name_unique unique (id)
+    include (valid_at)
+    with (fillfactor = 70)
+    using index tablespace fast,
+  constraint id_check check (id > 0) not valid no inherit,
+  constraint parent_fk foreign key (id) references public.parents (id)
+    match full
+    on delete set null (id)
+    on update no action
+    not deferrable,
+  constraint no_overlap exclude using gist (id with =, valid_at with &&)
+    include (id)
+    with (fillfactor = 80)
+    using index tablespace fast
+    where (id > 0)
+    deferrable
+);
+
+create table using_indexes(
+  id bigint,
+  unique using index existing_unique,
+  primary key using index existing_primary
+);
+
+create table commented_constraints(
+  id bigint,
+  parent_id bigint,
+  valid_at tstzrange,
+  /* before constraint */ constraint /* before constraint name */ named_pk /* before primary */ primary /* before key */ key/* before column opening paren */  (/* before column */ id /* before column closing paren */)
+    /* before deferrable */ deferrable,
+  constraint named_check /* before check */ check /* before check opening paren */ (/* before check expression */ id > 0 /* before check closing paren */)
+    /* before not */ not /* before valid */ valid,
+  constraint named_fk /* before foreign */ foreign /* before key */ key /* before from opening paren */ (/* before from column */ parent_id /* before from closing paren */) /* before references */ references /* before table */ public /* before dot */./* before table name */ parents /* before to opening paren */ (/* before to column */ id /* before to closing paren */)
+    /* before match */ match /* before simple */ simple
+    /* before on delete */ on /* before delete */ delete /* before set */ set /* before null */ null /* before set columns */ (parent_id)
+    /* before on update */ on /* before update */ update /* before cascade */ cascade
+    /* before enforced */ enforced,
+  constraint named_exclude /* before exclude */ exclude /* before using */ using /* before method */ gist /* before exclusion opening paren */ (/* before exclusion expression */ id /* before exclusion with */ with /* before exclusion op */ = /* before exclusion comma */, /* before second exclusion */ valid_at with /* before operator */ operator /* before operator opening paren */(/* before operator name */ public /* before operator dot */./* before operator op */ && /* before operator closing paren */) /* before exclusion closing paren */)
+    /* before include */ include /* before include opening paren */ (id /* before include closing paren */)
+    /* before with params */ with /* before params opening paren */ (/* before param */ fillfactor /* before equals */ = /* before value */ 80 /* before params closing paren */)
+    /* before tablespace using */ using /* before index */ index /* before tablespace */ tablespace /* before tablespace name */ fast
+    /* before where */ where  /* before where opening paren */(/* before where expression */ id > 0 /* before where closing paren */)
+    /* before initially */ initially /* before immediate */ immediate
+);

@@ -156,9 +156,618 @@ fn build_table_arg<'a>(arg: ast::TableArg) -> Doc<'a> {
             doc
         }
         ast::TableArg::LikeClause(like_clause) => build_like_clause(like_clause),
-        ast::TableArg::TableConstraint(_table_constraint) => todo!(),
+        ast::TableArg::TableConstraint(table_constraint) => {
+            build_table_constraint(table_constraint.clone())
+        }
     });
     doc.append(trailing_comments(arg.syntax()))
+}
+
+fn build_table_constraint<'a>(constraint: ast::TableConstraint) -> Doc<'a> {
+    match constraint {
+        ast::TableConstraint::CheckConstraint(constraint) => build_check_constraint(constraint),
+        ast::TableConstraint::ExcludeConstraint(constraint) => build_exclude_constraint(constraint),
+        ast::TableConstraint::ForeignKeyConstraint(constraint) => {
+            build_foreign_key_constraint(constraint)
+        }
+        ast::TableConstraint::PrimaryKeyConstraint(constraint) => {
+            build_primary_key_constraint(constraint)
+        }
+        ast::TableConstraint::UniqueConstraint(constraint) => build_unique_constraint(constraint),
+    }
+}
+
+fn build_constraint_name_clause<'a>(clause: Option<ast::ConstraintNameClause>) -> Doc<'a> {
+    let Some(clause) = clause else {
+        return Doc::nil();
+    };
+    let mut doc = Doc::text("constraint");
+    if let Some(name) = clause.constraint_name() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    doc.append(Doc::space())
+}
+
+fn build_check_constraint<'a>(constraint: ast::CheckConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(check) = constraint.check_token() {
+        doc = doc
+            .append(leading_comments_token(&check))
+            .append(Doc::text("check"));
+    }
+    if let Some(l_paren) = constraint.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+    if let Some(expr) = constraint.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = constraint.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    append_constraint_options(doc.append(Doc::text(")")), constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_primary_key_constraint<'a>(constraint: ast::PrimaryKeyConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(primary) = constraint.primary_token() {
+        doc = doc
+            .append(leading_comments_token(&primary))
+            .append(Doc::text("primary"));
+    }
+    if let Some(key) = constraint.key_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&key))
+            .append(Doc::text("key"));
+    }
+    if let Some(using_index) = constraint.using_index() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(using_index.syntax()))
+            .append(build_using_index_name(using_index));
+    } else if let Some(parameters) = constraint.index_parameters() {
+        doc = doc
+            .append(leading_comments(parameters.syntax()))
+            .append(build_index_parameters(parameters));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_unique_constraint<'a>(constraint: ast::UniqueConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(unique) = constraint.unique_token() {
+        doc = doc
+            .append(leading_comments_token(&unique))
+            .append(Doc::text("unique"));
+    }
+    if let Some(using_index) = constraint.using_index() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(using_index.syntax()))
+            .append(build_using_index_name(using_index));
+    } else if let Some(parameters) = constraint.index_parameters() {
+        doc = doc
+            .append(leading_comments(parameters.syntax()))
+            .append(build_index_parameters(parameters));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_using_index_name<'a>(using_index: ast::UsingIndexName) -> Doc<'a> {
+    let mut doc = Doc::text("using");
+    if let Some(index) = using_index.index_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&index))
+            .append(Doc::text("index"));
+    }
+    if let Some(index) = using_index.index_ref() {
+        if let Some(path) = index.path_ref() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(index.syntax()))
+                .append(build_path_ref(&path));
+        }
+    }
+    doc
+}
+
+fn build_index_parameters<'a>(parameters: ast::IndexParameters) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(nulls) = parameters.nulls_distinct_option() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(nulls.syntax()))
+            .append(build_keyword_node(nulls.syntax()));
+    }
+    if let Some(columns) = parameters.column_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_constraint_column_ref_list(columns));
+    }
+    if let Some(include) = parameters.constraint_include_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(include.syntax()))
+            .append(build_constraint_include_clause(include));
+    }
+    if let Some(with_params) = parameters.with_params() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(with_params.syntax()))
+            .append(build_with_params(with_params));
+    }
+    if let Some(tablespace) = parameters.constraint_index_tablespace() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(tablespace.syntax()))
+            .append(build_constraint_index_tablespace(tablespace));
+    }
+    doc
+}
+
+fn build_constraint_column_ref_list<'a>(list: ast::ConstraintColumnRefList) -> Doc<'a> {
+    let suffix = list.without_overlaps().map(|overlaps| {
+        Doc::space()
+            .append(leading_comments(overlaps.syntax()))
+            .append(build_keyword_node(overlaps.syntax()))
+    });
+    build_column_names(
+        list.l_paren_token(),
+        list.column_name_refs(),
+        suffix,
+        list.r_paren_token(),
+    )
+}
+
+fn build_column_ref_list<'a>(list: ast::ColumnRefList) -> Doc<'a> {
+    build_column_names(
+        list.l_paren_token(),
+        list.column_name_refs(),
+        None,
+        list.r_paren_token(),
+    )
+}
+
+fn build_column_names<'a>(
+    l_paren: Option<SyntaxToken>,
+    names: impl Iterator<Item = ast::ColumnNameRef>,
+    suffix: Option<Doc<'a>>,
+    r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let mut doc = l_paren
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = names.map(|name| {
+        (
+            leading_comments(name.syntax()).append(build_name(name.syntax())),
+            name.syntax().clone(),
+        )
+    });
+    if let Some(items) = build_comma_separated_docs(items) {
+        doc = doc.append(items);
+    }
+    if let Some(suffix) = suffix {
+        doc = doc.append(suffix);
+    }
+    if let Some(r_paren) = r_paren {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_constraint_include_clause<'a>(include: ast::ConstraintIncludeClause) -> Doc<'a> {
+    let mut doc = Doc::text("include");
+    if let Some(columns) = include.column_ref_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_column_ref_list(columns));
+    }
+    doc
+}
+
+fn build_with_params<'a>(with_params: ast::WithParams) -> Doc<'a> {
+    let mut doc = Doc::text("with");
+    if let Some(attributes) = with_params.attribute_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(attributes.syntax()))
+            .append(build_attribute_list(attributes));
+    }
+    doc
+}
+
+fn build_attribute_list<'a>(list: ast::AttributeList) -> Doc<'a> {
+    let mut doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = list.attribute_options().map(|option| {
+        let mut item = option
+            .namespace()
+            .map(|namespace| build_name(namespace.syntax()))
+            .unwrap_or_else(Doc::nil);
+        if let Some(dot) = option.dot_token() {
+            item = item.append(comments_before(dot)).append(Doc::text("."));
+        }
+        if let Some(name) = option.name() {
+            item = item
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        if let Some(eq) = option.eq_token() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments_token(&eq))
+                .append(Doc::text("="));
+        }
+        if let Some(value) = option.attribute_value() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(value.syntax()))
+                .append(build_attribute_value(value));
+        }
+        (
+            leading_comments(option.syntax()).append(item),
+            option.syntax().clone(),
+        )
+    });
+    if let Some(items) = build_comma_separated_docs(items) {
+        doc = doc.append(items);
+    }
+    if let Some(r_paren) = list.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_attribute_value<'a>(value: ast::AttributeValue) -> Doc<'a> {
+    if let Some(literal) = value.literal() {
+        build_literal(literal)
+    } else if let Some(ty) = value.ty() {
+        build_type(ty)
+    } else if value.none_token().is_some() {
+        Doc::text("none")
+    } else if let Some(op) = value.op() {
+        if value.operator_token().is_some() {
+            let mut doc = Doc::text("operator");
+            if let Some(l_paren) = value.l_paren_token() {
+                doc = doc.append(comments_before(l_paren));
+            }
+            doc = doc.append(Doc::text("(")).append(build_operator(&op));
+            if let Some(r_paren) = value.r_paren_token() {
+                doc = doc.append(comments_before(r_paren));
+            }
+            doc.append(Doc::text(")"))
+        } else {
+            build_operator(&op)
+        }
+    } else {
+        Doc::nil()
+    }
+}
+
+fn build_constraint_index_tablespace<'a>(tablespace: ast::ConstraintIndexTablespace) -> Doc<'a> {
+    let mut doc = Doc::text("using");
+    if let Some(index) = tablespace.index_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&index))
+            .append(Doc::text("index"));
+    }
+    if let Some(token) = tablespace.tablespace_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("tablespace"));
+    }
+    if let Some(name) = tablespace.tablespace_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    doc
+}
+
+fn append_constraint_options<'a>(
+    mut doc: Doc<'a>,
+    options: impl Iterator<Item = ast::ConstraintOption>,
+) -> Doc<'a> {
+    for option in options {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(option.syntax()))
+            .append(build_keyword_node(option.syntax()));
+    }
+    doc
+}
+
+fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(foreign) = constraint.foreign_token() {
+        doc = doc
+            .append(leading_comments_token(&foreign))
+            .append(Doc::text("foreign"));
+    }
+    if let Some(key) = constraint.key_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&key))
+            .append(Doc::text("key"));
+    }
+    if let Some(columns) = constraint.from_columns() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_foreign_key_column_list(columns));
+    }
+    if let Some(references) = constraint.references_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&references))
+            .append(Doc::text("references"));
+    }
+    if let Some(table) = constraint.table_name_ref() {
+        if let Some(path) = table.path_ref() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(table.syntax()))
+                .append(build_path_ref(&path));
+        }
+    }
+    if let Some(columns) = constraint.to_columns() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_foreign_key_column_list(columns));
+    }
+    if let Some(match_type) = constraint.match_type() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(match_type.syntax()))
+            .append(build_keyword_node(match_type.syntax()));
+    }
+    if let Some(action) = constraint.on_delete_action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_reference_action(
+                action.on_token(),
+                action.delete_token(),
+                "delete",
+                action.ref_action(),
+            ));
+    }
+    if let Some(action) = constraint.on_update_action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_reference_action(
+                action.on_token(),
+                action.update_token(),
+                "update",
+                action.ref_action(),
+            ));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_foreign_key_column_list<'a>(list: ast::ForeignKeyColumnList) -> Doc<'a> {
+    let suffix = list.period_column().map(|period| {
+        let mut doc = Doc::space()
+            .append(leading_comments(period.syntax()))
+            .append(Doc::text("period"));
+        if let Some(name) = period.name() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        doc
+    });
+    build_column_names(
+        list.l_paren_token(),
+        list.column_name_refs(),
+        suffix,
+        list.r_paren_token(),
+    )
+}
+
+fn build_reference_action<'a>(
+    on: Option<SyntaxToken>,
+    kind_token: Option<SyntaxToken>,
+    kind: &'static str,
+    action: Option<ast::RefAction>,
+) -> Doc<'a> {
+    let mut doc = on
+        .map(|token| leading_comments_token(&token).append(Doc::text("on")))
+        .unwrap_or_else(Doc::nil);
+    if let Some(token) = kind_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text(kind));
+    }
+    let Some(action) = action else {
+        return doc;
+    };
+    doc = doc
+        .append(Doc::space())
+        .append(leading_comments(action.syntax()));
+    match action {
+        ast::RefAction::SetNullColumns(action) => {
+            if let Some(set) = action.set_token() {
+                doc = doc
+                    .append(leading_comments_token(&set))
+                    .append(Doc::text("set"));
+            }
+            if let Some(null) = action.null_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&null))
+                    .append(Doc::text("null"));
+            }
+            if let Some(columns) = action.column_ref_list() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(columns.syntax()))
+                    .append(build_column_ref_list(columns));
+            }
+            doc
+        }
+        ast::RefAction::SetDefaultColumns(action) => {
+            if let Some(set) = action.set_token() {
+                doc = doc
+                    .append(leading_comments_token(&set))
+                    .append(Doc::text("set"));
+            }
+            if let Some(default) = action.default_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&default))
+                    .append(Doc::text("default"));
+            }
+            if let Some(columns) = action.column_ref_list() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(columns.syntax()))
+                    .append(build_column_ref_list(columns));
+            }
+            doc
+        }
+        action => doc.append(build_keyword_node(action.syntax())),
+    }
+}
+
+fn build_exclude_constraint<'a>(constraint: ast::ExcludeConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(exclude) = constraint.exclude_token() {
+        doc = doc
+            .append(leading_comments_token(&exclude))
+            .append(Doc::text("exclude"));
+    }
+    if let Some(method) = constraint.constraint_index_method() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(method.syntax()))
+            .append(Doc::text("using"));
+        if let Some(name) = method.access_method_ref() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+    }
+    if let Some(list) = constraint.constraint_exclusion_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(list.syntax()))
+            .append(build_constraint_exclusion_list(list));
+    }
+    if let Some(include) = constraint.constraint_include_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(include.syntax()))
+            .append(build_constraint_include_clause(include));
+    }
+    if let Some(with_params) = constraint.with_params() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(with_params.syntax()))
+            .append(build_with_params(with_params));
+    }
+    if let Some(tablespace) = constraint.constraint_index_tablespace() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(tablespace.syntax()))
+            .append(build_constraint_index_tablespace(tablespace));
+    }
+    if let Some(where_clause) = constraint.where_condition_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_condition_clause(where_clause));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_constraint_exclusion_list<'a>(list: ast::ConstraintExclusionList) -> Doc<'a> {
+    let mut doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let items = list.constraint_exclusions().map(|exclusion| {
+        let mut item = exclusion.expr().map(build_expr).unwrap_or_else(Doc::nil);
+        if let Some(with) = exclusion.with_token() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments_token(&with))
+                .append(Doc::text("with"));
+        }
+        if let Some(op) = exclusion.op() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(op.syntax()))
+                .append(build_operator(&op));
+        } else if let Some(op) = exclusion.operator_call() {
+            item = item
+                .append(Doc::space())
+                .append(leading_comments(op.syntax()))
+                .append(build_operator_call(&op));
+        }
+        (
+            leading_comments(exclusion.syntax()).append(item),
+            exclusion.syntax().clone(),
+        )
+    });
+    if let Some(items) = build_comma_separated_docs(items) {
+        doc = doc.append(items);
+    }
+    if let Some(r_paren) = list.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_where_condition_clause<'a>(where_clause: ast::WhereConditionClause) -> Doc<'a> {
+    let mut doc = Doc::text("where");
+    if let Some(l_paren) = where_clause.l_paren_token() {
+        doc = doc.append(Doc::space()).append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+    if let Some(expr) = where_clause.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = where_clause.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
 }
 
 fn build_like_clause<'a>(like_clause: &ast::LikeClause) -> Doc<'a> {
