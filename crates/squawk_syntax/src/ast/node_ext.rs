@@ -869,6 +869,30 @@ impl ast::JsonExistsFn {
     }
 }
 
+impl ast::JsonQueryFn {
+    #[inline]
+    pub fn document(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn path(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::JsonValueFn {
+    #[inline]
+    pub fn document(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn path(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
 impl ast::PositionFn {
     #[inline]
     pub fn pos(&self) -> Option<ast::Expr> {
