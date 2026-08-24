@@ -39,10 +39,15 @@ select
   2 not between 1 and 3,
   2 between asymmetric 1 and 3,
   2 between symmetric 1 and 3,
-  a_very_long_between_target_expression between symmetric a_very_long_between_start_expression and a_very_long_between_end_expression,
+  a_very_long_between_target_expression
+    between symmetric a_very_long_between_start_expression
+    and a_very_long_between_end_expression,
   -- bin expr
   1 + 1,
   1 /* before op */ + /* after op */ 1,
+  a_very_long_binary_left_expression
+    + a_very_long_binary_middle_expression
+      * a_very_long_binary_right_expression,
   2 @@@ 2,
   true and false,
   ts at time zone 'UTC',
@@ -70,7 +75,8 @@ select
   'foo' not similar to 'f%',
   1 operator(+) 1,
   1 operator(public.+) 1,
-  1 operator /* before paren */(/* before path */ public /* before dot */./* before op */ + /* after op */) /* after paren */ 1,
+  1
+    operator /* before paren */(/* before path */ public /* before dot */./* before op */ + /* after op */) /* after paren */ 1,
   true or false,
   (1, 2) overlaps (3, 4),
   10 % 3,
@@ -78,20 +84,24 @@ select
   'foo' similar to 'f%',
   6 / 2,
   2 * 3,
-  a_very_long_binary_left_expression + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
+  a_very_long_binary_left_expression
+    + a_very_long_binary_middle_expression
+      * a_very_long_binary_right_expression,
   -- call expr
   1 = any(array[1, 2]),
   2 = all(select x from things),
   3 = some(array[3]),
-  4 /* before op */ = /* before any */ any /* before opening paren */(
-    /* before expr */ array[4] /* before closing paren */
-  ) /* after any */,
+  4 /* before op */
+    = /* before any */ any /* before opening paren */(
+      /* before expr */ array[4] /* before closing paren */
+    ) /* after any */,
   exists(select 1 from things),
   a_very_long_any_comparison_expression = any(
     a_very_long_any_input_expression_that_forces_wrapping
   ),
   a_very_long_all_comparison_expression = all(
-    select a_very_long_all_select_expression from a_very_long_all_relation_name
+    select a_very_long_all_select_expression
+    from a_very_long_all_relation_name
   ),
   a_very_long_some_comparison_expression = some(
     a_very_long_some_input_expression
@@ -101,7 +111,8 @@ select
     from a_very_long_exists_relation_name
   ),
   /* before exists */ exists /* before opening paren */(
-    /* before select */ select 1 /* before closing paren */
+    /* before select */ select
+      1 /* before closing paren */
   ) /* after exists */,
   collation for (b + c),
   collation for (
@@ -123,10 +134,14 @@ select
   ) /* after extract */,
   position('om' in 'Thomas'),
   position(
-    a_very_long_substring_expression_that_forces_wrapping in a_very_long_string_expression_that_forces_wrapping
+    a_very_long_substring_expression_that_forces_wrapping
+    in
+    a_very_long_string_expression_that_forces_wrapping
   ),
   /* before position */ position /* before opening paren */(
-    /* before substring */ 'om' /* before in */ in /* before string */ 'Thomas' /* before closing paren */
+    /* before substring */ 'om'
+    /* before in */ in
+    /* before string */ 'Thomas' /* before closing paren */
   ) /* after position */,
   overlay('Txxxxas' placing 'hom' from 2 for 4),
   overlay('Txxxxas' placing 'hom' from 2),
@@ -496,7 +511,8 @@ select
   a_very_long_filtered_aggregate_name(
     a_very_long_filter_argument_expression
   ) filter (
-    where a_very_long_filter_condition_expression > a_very_long_filter_threshold_expression
+    where a_very_long_filter_condition_expression
+      > a_very_long_filter_threshold_expression
   ),
   a_very_long_window_function_name(
     a_very_long_null_treatment_argument_expression
@@ -578,13 +594,18 @@ select
   (/* after opening paren */ foo /* before closing paren */).bar,
   foo /* before dot */./* before field */ bar,
   a_very_long_field_base_expression.a_very_long_first_field_name.a_very_long_second_field_name,
-  (a_very_long_parenthesized_field_base_expression_that_forces_wrapping).a_very_long_field_name_that_forces_wrapping,
+  (
+    a_very_long_parenthesized_field_base_expression_that_forces_wrapping
+  ).a_very_long_field_name_that_forces_wrapping,
   -- index expr
   a[1],
   a[1][2],
   a[1 + 2],
   a /* before bracket */[/* before index */ 1 /* before closing bracket */],
-  a_very_long_indexed_expression[a_very_long_first_index_expression][a_very_long_second_index_expression + a_very_long_index_offset_expression],
+  a_very_long_indexed_expression[a_very_long_first_index_expression][
+    a_very_long_second_index_expression
+    + a_very_long_index_offset_expression
+  ],
   -- literal
   42,
   'a very long literal expression value that forces the literal expression target to wrap across the configured line width',
@@ -600,7 +621,10 @@ select
   (1 + 2),
   ((1)),
   (/* before expr */ 1 /* before closing paren */),
-  (a_very_long_parenthesized_expression + a_second_very_long_parenthesized_expression),
+  (
+    a_very_long_parenthesized_expression
+    + a_second_very_long_parenthesized_expression
+  ),
   -- postfix expr
   1 isnull,
   2 notnull,

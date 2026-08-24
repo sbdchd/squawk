@@ -206,17 +206,26 @@ fn build_check_constraint<'a>(constraint: ast::CheckConstraint) -> Doc<'a> {
             .append(leading_comments_token(&l_paren));
     }
     doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
     if let Some(expr) = constraint.expr() {
-        doc = doc
+        body = body
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     }
     if let Some(r_paren) = constraint.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    append_constraint_options(doc.append(Doc::text(")")), constraint.constraint_options())
-        .nest(2)
-        .group()
+    doc = doc.append(wrap_body(body)).append(Doc::text(")")).group();
+
+    let mut options = Doc::nil();
+    for option in constraint.constraint_options() {
+        options = options
+            .append(Doc::line_or_space())
+            .append(leading_comments(option.syntax()))
+            .append(build_keyword_node(option.syntax()));
+    }
+    doc.append(options.nest(2)).group()
 }
 
 fn build_primary_key_constraint<'a>(constraint: ast::PrimaryKeyConstraint) -> Doc<'a> {
@@ -713,7 +722,7 @@ fn build_exclude_constraint<'a>(constraint: ast::ExcludeConstraint) -> Doc<'a> {
 }
 
 fn build_constraint_exclusion_list<'a>(list: ast::ConstraintExclusionList) -> Doc<'a> {
-    let mut doc = list
+    let doc = list
         .l_paren_token()
         .map(comments_before)
         .unwrap_or_else(Doc::nil)
@@ -742,30 +751,34 @@ fn build_constraint_exclusion_list<'a>(list: ast::ConstraintExclusionList) -> Do
             exclusion.syntax().clone(),
         )
     });
-    if let Some(items) = build_comma_separated_docs(items) {
-        doc = doc.append(items);
-    }
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
     if let Some(r_paren) = list.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_where_condition_clause<'a>(where_clause: ast::WhereConditionClause) -> Doc<'a> {
     let mut doc = Doc::text("where");
     if let Some(l_paren) = where_clause.l_paren_token() {
-        doc = doc.append(Doc::space()).append(comments_before(l_paren));
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
     }
     doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
     if let Some(expr) = where_clause.expr() {
-        doc = doc
+        body = body
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     }
     if let Some(r_paren) = where_clause.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_like_clause<'a>(like_clause: &ast::LikeClause) -> Doc<'a> {
@@ -812,6 +825,10 @@ fn build_like_option<'a>(option: &ast::LikeOption) -> Doc<'a> {
 }
 
 fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
+    build_select_doc_ungrouped(select).group()
+}
+
+fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
     let mut doc = Doc::text("select").append(Doc::line_or_space());
 
     if let Some(select_clause) = select.select_clause() {
@@ -875,7 +892,7 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
 
     doc = doc.append(build_semicolon(select.semicolon_token()));
 
-    doc.group()
+    doc
 }
 
 fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
@@ -1333,15 +1350,19 @@ fn build_index_expr<'a>(index_expr: ast::IndexExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("["));
 
+    let mut body = Doc::nil();
     if let Some(index) = index_expr.index() {
-        doc = doc
+        body = body
             .append(leading_comments(index.syntax()))
-            .append(build_expr(index));
+            .append(match index {
+                ast::Expr::BinExpr(binary) => build_bin_expr_doc(binary, false),
+                expression => build_expr(expression),
+            });
     }
     if let Some(r_brack) = index_expr.r_brack_token() {
-        doc = doc.append(comments_before(r_brack));
+        body = body.append(comments_before(r_brack));
     }
-    doc.append(Doc::text("]"))
+    doc.append(wrap_body(body)).append(Doc::text("]")).group()
 }
 
 fn build_slice_expr<'a>(slice_expr: ast::SliceExpr) -> Doc<'a> {
@@ -1401,11 +1422,11 @@ fn build_tuple_expr<'a>(tuple_expr: ast::TupleExpr) -> Doc<'a> {
 }
 
 fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
-    let mut doc = build_expr(between_expr.target().unwrap());
+    let mut doc = build_expr(between_expr.target().unwrap()).append(Doc::line_or_space());
     if between_expr.not_token().is_some() {
-        doc = doc.append(Doc::space()).append(Doc::text("not"));
+        doc = doc.append(Doc::text("not")).append(Doc::space());
     }
-    doc = doc.append(Doc::space()).append(Doc::text("between"));
+    doc = doc.append(Doc::text("between"));
     match between_expr.between_symmetry() {
         Some(ast::BetweenSymmetry::Asymmetric(_)) => {
             doc = doc.append(Doc::space()).append(Doc::text("asymmetric"));
@@ -1417,10 +1438,12 @@ fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
     }
     doc.append(Doc::space())
         .append(build_expr(between_expr.start().unwrap()))
-        .append(Doc::space())
+        .append(Doc::line_or_space())
         .append(Doc::text("and"))
         .append(Doc::space())
         .append(build_expr(between_expr.end().unwrap()))
+        .nest(2)
+        .group()
 }
 
 fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
@@ -3332,13 +3355,13 @@ fn build_position_fn<'a>(position_fn: ast::PositionFn) -> Doc<'a> {
     }
     if let Some(in_token) = position_fn.in_token() {
         body = body
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&in_token))
             .append(Doc::text("in"));
     }
     if let Some(string) = position_fn.string() {
         body = body
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(string.syntax()))
             .append(build_expr(string));
     }
@@ -3446,7 +3469,7 @@ fn build_parenthesized_expr_or_select_fn<'a>(
         body = body
             .append(leading_comments(select.syntax()))
             .append(match select {
-                ast::SelectVariant::Select(select) => build_select_doc(&select),
+                ast::SelectVariant::Select(select) => build_select_doc_ungrouped(&select),
                 _ => todo!("this select variant is not supported yet"),
             });
     }
@@ -3801,10 +3824,14 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
     if let Some(expr) = paren_expr.expr() {
-        doc = doc
+        body = body
             .append(leading_comments(expr.syntax()))
-            .append(build_expr(expr));
+            .append(match expr {
+                ast::Expr::BinExpr(binary) => build_bin_expr_doc(binary, false),
+                expression => build_expr(expression),
+            });
     } else if let Some(_compound_select) = paren_expr.compound_select() {
         todo!("parenthesized compound select nodes are not supported yet")
     } else if let Some(_from_item) = paren_expr.from_item() {
@@ -3822,9 +3849,9 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
     }
 
     if let Some(r_paren) = paren_expr.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_postfix_expr<'a>(postfix_expr: ast::PostfixExpr) -> Doc<'a> {
@@ -3896,18 +3923,38 @@ fn build_normalized_postfix<'a>(
 }
 
 fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
+    build_bin_expr_doc(bin_expr, true)
+}
+
+fn build_bin_expr_doc<'a>(bin_expr: ast::BinExpr, wrap: bool) -> Doc<'a> {
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
     let before_op = trailing_comments(lhs.syntax());
     let after_op = leading_comments(rhs.syntax());
+    let rhs_is_uncommented_quantifier = comment_tokens_before(rhs.syntax().clone()).is_empty()
+        && match &rhs {
+            ast::Expr::CallExpr(call) => {
+                call.all_fn().is_some() || call.any_fn().is_some() || call.some_fn().is_some()
+            }
+            _ => false,
+        };
 
-    build_expr(lhs)
+    let doc = build_expr(lhs)
         .append(before_op)
-        .append(Doc::space())
+        .append(if rhs_is_uncommented_quantifier {
+            Doc::space()
+        } else {
+            Doc::line_or_space()
+        })
         .append(build_op(bin_expr.op().unwrap()))
         .append(Doc::space())
         .append(after_op)
-        .append(build_expr(rhs))
+        .append(build_expr(rhs));
+    if rhs_is_uncommented_quantifier || !wrap {
+        doc
+    } else {
+        doc.nest(2).group()
+    }
 }
 
 fn build_within_clause<'a>(within_clause: ast::WithinClause) -> Doc<'a> {

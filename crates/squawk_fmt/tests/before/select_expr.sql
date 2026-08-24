@@ -17,6 +17,7 @@ select
   -- bin expr
   1 + 1,
   1 /* before op */ + /* after op */ 1,
+  a_very_long_binary_left_expression + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
   2@@@2,
   true  and  false,
   ts  at  time  zone  'UTC',
