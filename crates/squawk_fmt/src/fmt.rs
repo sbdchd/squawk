@@ -828,14 +828,14 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         build_json_array_agg_fn(json_array_agg_fn)
     } else if let Some(json_array_fn) = call_expr.json_array_fn() {
         build_json_array_fn(json_array_fn)
-    } else if let Some(_json_exists_fn) = call_expr.json_exists_fn() {
-        todo!("json_exists function expressions are not supported yet")
-    } else if let Some(_json_fn) = call_expr.json_fn() {
-        todo!("json function expressions are not supported yet")
-    } else if let Some(_json_object_agg_fn) = call_expr.json_object_agg_fn() {
-        todo!("json_objectagg function expressions are not supported yet")
-    } else if let Some(_json_object_fn) = call_expr.json_object_fn() {
-        todo!("json_object function expressions are not supported yet")
+    } else if let Some(json_exists_fn) = call_expr.json_exists_fn() {
+        build_json_exists_fn(json_exists_fn)
+    } else if let Some(json_fn) = call_expr.json_fn() {
+        build_json_fn(json_fn)
+    } else if let Some(json_object_agg_fn) = call_expr.json_object_agg_fn() {
+        build_json_object_agg_fn(json_object_agg_fn)
+    } else if let Some(json_object_fn) = call_expr.json_object_fn() {
+        build_json_object_fn(json_object_fn)
     } else if let Some(_json_query_fn) = call_expr.json_query_fn() {
         todo!("json_query function expressions are not supported yet")
     } else if let Some(_json_scalar_fn) = call_expr.json_scalar_fn() {
@@ -879,6 +879,294 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
     }
 }
 
+fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_object");
+    if let Some(l_paren) = json_object_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let exprs = json_object_fn.exprs().map(|expr| {
+        (
+            leading_comments(expr.syntax()).append(build_expr(expr.clone())),
+            expr.syntax().clone(),
+        )
+    });
+    let key_values = json_object_fn.json_key_values().map(|key_value| {
+        (
+            leading_comments(key_value.syntax()).append(build_json_key_value(key_value.clone())),
+            key_value.syntax().clone(),
+        )
+    });
+    let items = build_comma_separated_docs(exprs.chain(key_values));
+    let mut has_content = items.is_some();
+    if let Some(items) = items {
+        doc = doc.append(items);
+    }
+
+    if let Some(null_clause) = json_object_fn.json_null_clause() {
+        if has_content {
+            doc = doc.append(Doc::space());
+        }
+        doc = doc
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+        has_content = true;
+    }
+    if let Some(unique) = json_object_fn.json_keys_unique_clause() {
+        if has_content {
+            doc = doc.append(Doc::space());
+        }
+        doc = doc
+            .append(leading_comments(unique.syntax()))
+            .append(build_json_keys_unique_clause(unique));
+        has_content = true;
+    }
+    if let Some(returning) = json_object_fn.json_returning_clause() {
+        if has_content {
+            doc = doc.append(Doc::space());
+        }
+        doc = doc
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_object_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_json_object_agg_fn<'a>(json_object_agg_fn: ast::JsonObjectAggFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_objectagg");
+    if let Some(l_paren) = json_object_agg_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(key_value) = json_object_agg_fn.json_key_value() {
+        doc = doc
+            .append(leading_comments(key_value.syntax()))
+            .append(build_json_key_value(key_value));
+    }
+    if let Some(null_clause) = json_object_agg_fn.json_null_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(null_clause.syntax()))
+            .append(build_json_null_clause(null_clause));
+    }
+    if let Some(unique) = json_object_agg_fn.json_keys_unique_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(unique.syntax()))
+            .append(build_json_keys_unique_clause(unique));
+    }
+    if let Some(returning) = json_object_agg_fn.json_returning_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(returning.syntax()))
+            .append(build_json_returning_clause(returning));
+    }
+    if let Some(r_paren) = json_object_agg_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_json_key_value<'a>(key_value: ast::JsonKeyValue) -> Doc<'a> {
+    let mut doc = key_value.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(colon) = key_value.colon_token() {
+        doc = doc.append(comments_before(colon)).append(Doc::text(":"));
+    } else if let Some(value_token) = key_value.value_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&value_token))
+            .append(Doc::text("value"));
+    }
+    if let Some(value) = key_value.json_value_expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(value.syntax()))
+            .append(build_json_value_expr(value));
+    }
+    doc
+}
+
+fn build_json_fn<'a>(json_fn: ast::JsonFn) -> Doc<'a> {
+    let mut doc = Doc::text("json");
+    if let Some(l_paren) = json_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(expr) = json_fn.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(format) = json_fn.json_format_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    if let Some(unique) = json_fn.json_keys_unique_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(unique.syntax()))
+            .append(build_json_keys_unique_clause(unique));
+    }
+    if let Some(r_paren) = json_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_json_exists_fn<'a>(json_exists_fn: ast::JsonExistsFn) -> Doc<'a> {
+    let mut doc = Doc::text("json_exists");
+    if let Some(l_paren) = json_exists_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(document) = json_exists_fn.document() {
+        doc = doc
+            .append(leading_comments(document.syntax()))
+            .append(build_expr(document));
+    }
+    if let Some(format) = json_exists_fn.json_format_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(format.syntax()))
+            .append(build_json_format_clause(format));
+    }
+    if let Some(comma) = json_exists_fn.comma_token() {
+        doc = doc
+            .append(comments_before(comma))
+            .append(Doc::text(","))
+            .append(Doc::space());
+    }
+    if let Some(path) = json_exists_fn.path() {
+        doc = doc
+            .append(leading_comments(path.syntax()))
+            .append(build_expr(path));
+    }
+    if let Some(passing) = json_exists_fn.json_passing_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(passing.syntax()))
+            .append(build_json_passing_clause(passing));
+    }
+    if let Some(on_error) = json_exists_fn.json_on_error_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(on_error.syntax()))
+            .append(build_json_on_error_clause(on_error));
+    }
+    if let Some(r_paren) = json_exists_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_json_passing_clause<'a>(passing: ast::JsonPassingClause) -> Doc<'a> {
+    let mut doc = Doc::text("passing");
+    let mut args = passing.json_passing_args();
+    if let Some(first) = args.next() {
+        let mut previous_syntax = first.syntax().clone();
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(first.syntax()))
+            .append(build_json_passing_arg(first));
+        for arg in args {
+            doc = doc
+                .append(trailing_comments(&previous_syntax))
+                .append(Doc::text(","))
+                .append(Doc::space())
+                .append(leading_comments(arg.syntax()))
+                .append(build_json_passing_arg(arg.clone()));
+            previous_syntax = arg.syntax().clone();
+        }
+    }
+    doc
+}
+
+fn build_json_passing_arg<'a>(arg: ast::JsonPassingArg) -> Doc<'a> {
+    let mut doc = arg.expr().map(build_expr).unwrap_or_else(Doc::nil);
+    if let Some(as_token) = arg.as_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"));
+    }
+    if let Some(name) = arg.name() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    doc
+}
+
+fn build_json_on_error_clause<'a>(clause: ast::JsonOnErrorClause) -> Doc<'a> {
+    let mut doc = clause
+        .json_behavior()
+        .map(build_json_behavior)
+        .unwrap_or_else(Doc::nil);
+    if let Some(on_token) = clause.on_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&on_token))
+            .append(Doc::text("on"));
+    }
+    if let Some(error_token) = clause.error_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&error_token))
+            .append(Doc::text("error"));
+    }
+    doc
+}
+
+fn build_json_behavior<'a>(behavior: ast::JsonBehavior) -> Doc<'a> {
+    match behavior {
+        ast::JsonBehavior::JsonBehaviorDefault(behavior) => {
+            let mut doc = Doc::text("default");
+            if let Some(expr) = behavior.expr() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(expr.syntax()))
+                    .append(build_expr(expr));
+            }
+            doc
+        }
+        ast::JsonBehavior::JsonBehaviorEmptyArray(behavior) => {
+            let mut doc = Doc::text("empty");
+            if let Some(array_token) = behavior.array_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&array_token))
+                    .append(Doc::text("array"));
+            }
+            doc
+        }
+        ast::JsonBehavior::JsonBehaviorEmptyObject(behavior) => {
+            let mut doc = Doc::text("empty");
+            if let Some(object_token) = behavior.object_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&object_token))
+                    .append(Doc::text("object"));
+            }
+            doc
+        }
+        ast::JsonBehavior::JsonBehaviorError(_) => Doc::text("error"),
+        ast::JsonBehavior::JsonBehaviorFalse(_) => Doc::text("false"),
+        ast::JsonBehavior::JsonBehaviorNull(_) => Doc::text("null"),
+        ast::JsonBehavior::JsonBehaviorTrue(_) => Doc::text("true"),
+        ast::JsonBehavior::JsonBehaviorUnknown(_) => Doc::text("unknown"),
+    }
+}
+
 fn build_json_array_fn<'a>(json_array_fn: ast::JsonArrayFn) -> Doc<'a> {
     let mut doc = Doc::text("json_array");
     if let Some(l_paren) = json_array_fn.l_paren_token() {
@@ -898,19 +1186,8 @@ fn build_json_array_fn<'a>(json_array_fn: ast::JsonArrayFn) -> Doc<'a> {
             select.syntax().clone(),
         )
     });
-    let mut items = exprs.chain(selects);
-    if let Some((first, mut previous_syntax)) = items.next() {
-        let mut item_docs = vec![first];
-        for (item, syntax) in items {
-            item_docs.push(
-                trailing_comments(&previous_syntax)
-                    .append(Doc::text(","))
-                    .append(Doc::space())
-                    .append(item),
-            );
-            previous_syntax = syntax;
-        }
-        doc = doc.append(Doc::list(item_docs));
+    if let Some(items) = build_comma_separated_docs(exprs.chain(selects)) {
+        doc = doc.append(items);
     }
 
     if let Some(null_clause) = json_array_fn.json_null_clause() {
@@ -929,6 +1206,23 @@ fn build_json_array_fn<'a>(json_array_fn: ast::JsonArrayFn) -> Doc<'a> {
         doc = doc.append(comments_before(r_paren));
     }
     doc.append(Doc::text(")"))
+}
+
+fn build_comma_separated_docs<'a>(
+    mut items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
+) -> Option<Doc<'a>> {
+    let (first, mut previous_syntax) = items.next()?;
+    let mut docs = vec![first];
+    for (item, syntax) in items {
+        docs.push(
+            trailing_comments(&previous_syntax)
+                .append(Doc::text(","))
+                .append(Doc::space())
+                .append(item),
+        );
+        previous_syntax = syntax;
+    }
+    Some(Doc::list(docs))
 }
 
 fn build_json_expr_format<'a>(value: ast::JsonExprFormat) -> Doc<'a> {
@@ -1040,7 +1334,7 @@ fn build_json_null_clause<'a>(clause: ast::JsonNullClause) -> Doc<'a> {
             ("absent", clause.on_token(), clause.null_token())
         }
         ast::JsonNullClause::JsonNullOnNull(clause) => {
-            ("null", clause.on_token(), clause.null_token())
+            ("null", clause.on_token(), clause.on_null_token())
         }
     };
 
@@ -2034,15 +2328,29 @@ fn build_null_treatment<'a>(null_treatment: ast::NullTreatment) -> Doc<'a> {
 }
 
 fn build_json_keys_unique_clause<'a>(clause: ast::JsonKeysUniqueClause) -> Doc<'a> {
-    let prefix = match clause {
-        ast::JsonKeysUniqueClause::JsonWithoutUniqueKeys(_) => "without",
-        ast::JsonKeysUniqueClause::JsonWithUniqueKeys(_) => "with",
+    let (prefix, unique_token, keys_token) = match clause {
+        ast::JsonKeysUniqueClause::JsonWithoutUniqueKeys(clause) => {
+            ("without", clause.unique_token(), clause.keys_token())
+        }
+        ast::JsonKeysUniqueClause::JsonWithUniqueKeys(clause) => {
+            ("with", clause.unique_token(), clause.keys_token())
+        }
     };
-    Doc::text(prefix)
-        .append(Doc::space())
-        .append(Doc::text("unique"))
-        .append(Doc::space())
-        .append(Doc::text("keys"))
+
+    let mut doc = Doc::text(prefix);
+    if let Some(unique_token) = unique_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&unique_token))
+            .append(Doc::text("unique"));
+    }
+    if let Some(keys_token) = keys_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&keys_token))
+            .append(Doc::text("keys"));
+    }
+    doc
 }
 
 fn build_unicode_normal_form<'a>(form: ast::UnicodeNormalForm) -> Doc<'a> {

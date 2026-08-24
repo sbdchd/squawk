@@ -846,6 +846,29 @@ impl ast::ExtractFieldName {
     }
 }
 
+impl ast::JsonNullOnNull {
+    #[inline]
+    pub fn on_null_token(&self) -> Option<SyntaxToken> {
+        self.syntax()
+            .children_with_tokens()
+            .filter_map(|element| element.into_token())
+            .filter(|token| token.kind() == SyntaxKind::NULL_KW)
+            .nth(1)
+    }
+}
+
+impl ast::JsonExistsFn {
+    #[inline]
+    pub fn document(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    #[inline]
+    pub fn path(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
 impl ast::PositionFn {
     #[inline]
     pub fn pos(&self) -> Option<ast::Expr> {
