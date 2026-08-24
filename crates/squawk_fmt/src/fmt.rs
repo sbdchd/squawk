@@ -810,8 +810,8 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
             any_fn.select_variant(),
             any_fn.r_paren_token(),
         )
-    } else if let Some(_collation_for_fn) = call_expr.collation_for_fn() {
-        todo!("collation_for function expressions are not supported yet")
+    } else if let Some(collation_for_fn) = call_expr.collation_for_fn() {
+        build_collation_for_fn(collation_for_fn)
     } else if let Some(exists_fn) = call_expr.exists_fn() {
         build_parenthesized_expr_or_select_fn(
             "exists",
@@ -844,8 +844,8 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
         todo!("json_serialize function expressions are not supported yet")
     } else if let Some(_json_value_fn) = call_expr.json_value_fn() {
         todo!("json_value function expressions are not supported yet")
-    } else if let Some(_overlay_fn) = call_expr.overlay_fn() {
-        todo!("overlay function expressions are not supported yet")
+    } else if let Some(overlay_fn) = call_expr.overlay_fn() {
+        build_overlay_fn(overlay_fn)
     } else if let Some(position_fn) = call_expr.position_fn() {
         build_position_fn(position_fn)
     } else if let Some(some_fn) = call_expr.some_fn() {
@@ -1371,6 +1371,46 @@ fn build_json_returning_clause<'a>(returning: ast::JsonReturningClause) -> Doc<'
     doc
 }
 
+fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
+    let mut doc = Doc::text("overlay");
+    if let Some(l_paren) = overlay_fn.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(args) = overlay_fn.overlay_args() {
+        doc = doc
+            .append(leading_comments(args.syntax()))
+            .append(match args {
+                ast::OverlayArgs::OverlayPlacing(args) => {
+                    let mut doc = args
+                        .string()
+                        .map(|expr| leading_comments(expr.syntax()).append(build_expr(expr)))
+                        .unwrap_or_else(Doc::nil);
+                    doc = append_keyword_expr(doc, args.placing_token(), "placing", args.placing());
+                    doc = append_keyword_expr(doc, args.from_token(), "from", args.from());
+                    append_keyword_expr(doc, args.for_token(), "for", args.for_())
+                }
+                ast::OverlayArgs::OverlayExprs(args) => {
+                    let items = args.overlay_exprs().map(|arg| {
+                        let syntax = arg.syntax().clone();
+                        let doc = leading_comments(arg.syntax()).append(match arg {
+                            ast::OverlayExpr::Expr(expr) => build_expr(expr),
+                            ast::OverlayExpr::NamedArg(arg) => build_named_call_arg(arg),
+                        });
+                        (doc, syntax)
+                    });
+                    build_comma_separated_docs(items).unwrap_or_else(Doc::nil)
+                }
+            });
+    }
+
+    if let Some(r_paren) = overlay_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
 fn build_substring_fn<'a>(substring_fn: ast::SubstringFn) -> Doc<'a> {
     let mut doc = Doc::text("substring");
     if let Some(l_paren) = substring_fn.l_paren_token() {
@@ -1533,6 +1573,36 @@ fn build_position_fn<'a>(position_fn: ast::PositionFn) -> Doc<'a> {
             .append(build_expr(string));
     }
     if let Some(r_paren) = position_fn.r_paren_token() {
+        doc = doc.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text(")"))
+}
+
+fn build_collation_for_fn<'a>(collation_for_fn: ast::CollationForFn) -> Doc<'a> {
+    let mut doc = Doc::text("collation");
+    if let Some(for_token) = collation_for_fn.for_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&for_token))
+            .append(Doc::text("for"));
+    }
+    if let Some(l_paren) = collation_for_fn.l_paren_token() {
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("("));
+
+    if let Some(expr) = collation_for_fn.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(r_paren) = collation_for_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
     doc.append(Doc::text(")"))
