@@ -7,25 +7,64 @@ select
   xmlelement(name foo, 1, 2),
   xmlelement(name foo, xmlattributes(a, b as c)),
   xmlelement(name foo, xmlattributes(a as attr), x, y),
-  /* before element */ xmlelement /* before outer opening paren */(/* before name */ name /* before tag */ tag /* before attributes comma */, /* before xmlattributes */ xmlattributes /* before attributes opening paren */(/* before first attribute */ a /* before as */ as /* before attribute name */ attr /* before attribute comma */, /* before second attribute */ b /* before attributes closing paren */) /* before content comma */, /* before content */ x /* before outer closing paren */) /* after element */,
+  xmlelement(name a_very_long_element_name,
+    xmlattributes(a_very_long_xml_attribute_expression as a_very_long_xml_attribute_name,
+      a_second_very_long_xml_attribute_expression as a_second_very_long_xml_attribute_name),
+    first_very_long_content_expression,
+    second_very_long_content_expression,
+    third_very_long_content_expression),
+  /* before element */ xmlelement /* before outer opening paren */(/* before name */ name /* before tag */ tag /* before attributes comma */,
+    /* before xmlattributes */ xmlattributes /* before attributes opening paren */(/* before first attribute */ a /* before as */ as /* before attribute name */ attr /* before attribute comma */,
+      /* before second attribute */ b /* before attributes closing paren */) /* before content comma */,
+    /* before content */ x /* before outer closing paren */) /* after element */,
   xmlexists('/foo' passing doc),
   xmlexists('/foo' passing by ref doc),
   xmlexists('/foo' passing doc by value),
-  /* before exists */ xmlexists /* before opening paren */(/* before row */ '/foo' /* before passing */ passing /* before first by */ by /* before ref */ ref /* before document */ doc /* before second by */ by /* before value */ value /* before closing paren */) /* after exists */,
+  xmlexists(a_very_long_xml_exists_path_expression
+    passing
+    by ref
+    a_very_long_xml_exists_document_expression
+    by value),
+  /* before exists */ xmlexists /* before opening paren */(/* before row */ '/foo'
+    /* before passing */ passing
+    /* before first by */ by /* before ref */ ref
+    /* before document */ doc
+    /* before second by */ by /* before value */ value /* before closing paren */) /* after exists */,
   xmlforest(a, b as foo),
-  /* before forest */ xmlforest /* before opening paren */(/* before first expression */ a /* before as */ as /* before tag */ first /* before comma */, /* before second expression */ b /* before closing paren */) /* after forest */,
+  xmlforest(first_very_long_expression as first_very_long_element_name,
+    second_very_long_expression as second_very_long_element_name),
+  /* before forest */ xmlforest /* before opening paren */(/* before first expression */ a /* before as */ as /* before tag */ first /* before comma */,
+    /* before second expression */ b /* before closing paren */) /* after forest */,
   xmlparse(document '<foo/>' preserve whitespace),
   xmlparse(content value strip whitespace),
-  /* before parse */ xmlparse /* before opening paren */(/* before kind */ document /* before expression */ value /* before preserve */ preserve /* before whitespace */ whitespace /* before closing paren */) /* after parse */,
+  xmlparse(document
+    a_very_long_xml_parse_document_expression_that_forces_the_xml_parse_node_to_wrap
+    preserve whitespace),
+  /* before parse */ xmlparse /* before opening paren */(/* before kind */ document
+    /* before expression */ value
+    /* before preserve */ preserve /* before whitespace */ whitespace /* before closing paren */) /* after parse */,
   xmlpi(name php),
   xmlpi(name php, 'echo'),
-  /* before pi */ xmlpi /* before opening paren */(/* before name */ name /* before target */ php /* before comma */, /* before expression */ 'echo' /* before closing paren */) /* after pi */,
+  xmlpi(name a_very_long_xml_processing_instruction_target,
+    a_very_long_xml_processing_instruction_expression_that_forces_the_xml_pi_node_to_wrap),
+  /* before pi */ xmlpi /* before opening paren */(/* before name */ name /* before target */ php /* before comma */,
+    /* before expression */ 'echo' /* before closing paren */) /* after pi */,
   xmlroot(doc, version '1.0'),
   xmlroot(doc, version no value, standalone yes),
   xmlroot(doc, version '1.0', standalone no),
   xmlroot(doc, version '1.0', standalone no value),
-  /* before root */ xmlroot /* before opening paren */(/* before expression */ doc /* before version comma */, /* before version */ version /* before no */ no /* before version value */ value/* before standalone comma */ , /* before standalone */ standalone /* before standalone no */ no /* before standalone value */ value /* before closing paren */) /* after root */,
+  xmlroot(a_very_long_xml_root_document_expression_that_forces_the_xml_root_node_to_wrap,
+    version a_very_long_xml_root_version_expression,
+    standalone no value),
+  /* before root */ xmlroot /* before opening paren */(/* before expression */ doc /* before version comma */,
+    /* before version */ version /* before no */ no /* before version value */ value/* before standalone comma */ ,
+    /* before standalone */ standalone /* before standalone no */ no /* before standalone value */ value /* before closing paren */) /* after root */,
   xmlserialize(document doc as text),
   xmlserialize(content doc as varchar(20) indent),
   xmlserialize(content doc as text no indent),
-  /* before serialize */ xmlserialize /* before opening paren */(/* before kind */ content /* before expression */ doc /* before as */ as /* before type */ text /* before no */ no /* before indent */ indent /* before closing paren */)/* after serialize */;
+  xmlserialize(content a_long_xml_serialize_content_expression_that_forces_wrapping
+    as a_very_long_xml_serialize_return_type
+    no indent),
+  /* before serialize */ xmlserialize /* before opening paren */(/* before kind */ content /* before expression */ doc
+    /* before as */ as /* before type */ text
+    /* before no */ no /* before indent */ indent /* before closing paren */)/* after serialize */;

@@ -12,10 +12,10 @@ create table named_constraints (
   id bigint,
   valid_at tstzrange,
   CONSTRAINT pk PRIMARY KEY (id) DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT name_unique UNIQUE (id) INCLUDE (valid_at) WITH (fillfactor = 70) USING INDEX TABLESPACE fast,
-  CONSTRAINT id_check CHECK (id > 0) NOT VALID NO INHERIT,
-  CONSTRAINT parent_fk FOREIGN KEY (id) REFERENCES public.parents(id) MATCH FULL ON DELETE SET NULL (id) ON UPDATE NO ACTION NOT DEFERRABLE,
-  CONSTRAINT no_overlap EXCLUDE USING gist (id WITH =, valid_at WITH &&) INCLUDE (id) WITH (fillfactor = 80) USING INDEX TABLESPACE fast WHERE (id > 0) DEFERRABLE
+  CONSTRAINT name_unique UNIQUE (first_very_long_unique_column_name, second_very_long_unique_column_name) INCLUDE (first_very_long_included_column_name, second_very_long_included_column_name) WITH (fillfactor = 70, a_very_long_storage_parameter_name = false) USING INDEX TABLESPACE fast,
+  CONSTRAINT id_check CHECK (a_long_check_expression_name > another_long_check_expression_name) NOT VALID NO INHERIT,
+  CONSTRAINT parent_fk FOREIGN KEY (first_very_long_foreign_key_column_name, second_very_long_foreign_key_column_name) REFERENCES public.parents (first_very_long_referenced_column_name, second_very_long_referenced_column_name) MATCH FULL ON DELETE SET NULL (first_very_long_foreign_key_column_name, second_very_long_foreign_key_column_name) ON UPDATE NO ACTION NOT DEFERRABLE,
+  CONSTRAINT no_overlap EXCLUDE USING gist (first_very_long_exclusion_expression WITH =, second_very_long_exclusion_expression WITH &&) INCLUDE (first_very_long_excluded_column_name, second_very_long_excluded_column_name) WITH (fillfactor = 80, a_very_long_exclusion_storage_parameter = false) USING INDEX TABLESPACE fast WHERE (a_very_long_exclusion_predicate_expression > 0) DEFERRABLE
 );
 
 create table using_indexes (

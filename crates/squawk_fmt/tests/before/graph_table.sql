@@ -6,6 +6,8 @@ select * from GRAPH_TABLE(g MATCH (a)<-[left_edge]-(b), (c)-[any_edge]-(d), (e)<
 
 select * from GRAPH_TABLE(g MATCH (a)->{1}(b), (c)-{,3}(d), (e)-{2,4}(f) COLUMNS(a));
 
+select * from GRAPH_TABLE(a_very_long_property_graph_name MATCH (a_very_long_vertex_variable IS a_very_long_vertex_label WHERE a_very_long_vertex_filter_expression)-[a_very_long_edge_variable IS a_very_long_edge_label WHERE a_very_long_edge_filter_expression]->(a_second_very_long_vertex_variable IS a_second_very_long_vertex_label), (a_third_very_long_vertex_variable)-[a_second_very_long_edge_variable]-(a_fourth_very_long_vertex_variable) WHERE a_very_long_graph_filter_expression COLUMNS (a_very_long_vertex_variable.long_property_name AS first_long_output_column_name, a_second_very_long_vertex_variable.other_long_property_name AS second_output_column_name));
+
 select * from
   /* before graph table */ GRAPH_TABLE /* before outer opening paren */ (
     /* before graph */ public /* before graph dot */ . /* before graph name */ g

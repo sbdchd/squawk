@@ -71,14 +71,19 @@ select
   overlay(),
   overlay('Txxxxas', 'hom', 2, count => 4),
   /* before overlay */ overlay /* before opening paren */(/* before string */ 'Txxxxas' /* before placing */ placing /* before replacement */ 'hom' /* before from */ from /* before start */ 2 /* before for */ for /* before count */ 4 /* before closing paren */) /* after overlay */,
-  overlay /* before opening paren */(/* before string */ 'Txxxxas' /* before comma */, /* before replacement */ 'hom' /* before comma */, /* before start */ 2 /* before comma */, /* before name */ count /* before arrow */ => /* before count */ 4 /* before closing paren */),
+  overlay /* before opening paren */(/* before string */ 'Txxxxas' /* before comma */,
+  /* before replacement */ 'hom' /* before comma */,
+  /* before start */ 2 /* before comma */,
+  /* before name */ count /* before arrow */ => /* before count */ 4 /* before closing paren */),
   substring('Thomas' from 2 for 3),
   substring('Thomas' for 3 from 2),
   substring('Thomas' from 2),
   substring('Thomas' for 3),
   substring('Thomas' similar '%#"o_a#"_' escape '#'),
   substring('Thomas', 2, 3),
-  substring('Thomas' /* before comma */, /* before start */ 2, /* before count */ 3),
+  substring('Thomas' /* before comma */,
+    /* before start */ 2,
+    /* before count */ 3),
   /* before substring */ substring /* before opening paren */(/* before string */ 'Thomas' /* before from */ from /* before start */ 2 /* before for */ for /* before count */ 3 /* before closing paren */) /* after substring */,
   trim('  foo  '),
   trim(both 'x' from 'xfoox'),
@@ -88,6 +93,9 @@ select
   trim(foo, bar),
   /* before trim */ trim /* before opening paren */(/* before side */ both /* before trim char */ 'x' /* before from */ from /* before string */ 'xfoox' /* before closing paren */) /* after trim */,
   date_trunc('month', now()),
+  a_very_long_function_name(first_very_long_argument_name,
+    second_very_long_argument_name,
+    third_very_long_argument_name),
   foo(),
   foo(*),
   foo(all 1, 2),
@@ -97,22 +105,63 @@ select
   foo(variadic xs),
   foo(/* before variadic */ variadic /* after variadic */ xs),
   foo(a => 1, b := 2),
-  foo(/* before name */ a /* before arrow */ => /* before value */ 1 /* before comma */, /* before arg */ b /* before assign */ := /* before value 2 */ 2),
+  foo(/* before name */ a /* before arrow */ => /* before value */ 1 /* before comma */,
+    /* before arg */ b /* before assign */ := /* before value 2 */ 2),
   array_agg(x order by y desc nulls last, z asc),
   foo(a => x order by y),
   array_agg(x order by y using > nulls first),
   array_agg(x /* before order */ order /* before by */ by /* before first */ y /* before desc */ desc /* before nulls */ nulls /* before last */ last /* before comma */, /* before second */ z /* before asc */ asc),
   json_arrayagg(v),
-  json_arrayagg(v format json order by sort_col desc null on null returning jsonb format json),
-  json_arrayagg /* before opening paren */(/* before value */ v /* before value format */ format /* before value json */ json /* before encoding */ encoding /* before encoding name */ utf8 /* before order */ order /* before by */ by /* before sort */ x /* before absent */ absent /* before on */ on /* before null */ null /* before returning */ returning /* before type */ jsonb /* before returning format */ format /* before returning json */ json /* before closing paren */),
+  json_arrayagg(v format json
+    order by sort_col desc
+    null on null
+    returning jsonb format json),
+  json_arrayagg(a_very_long_json_arrayagg_value format json encoding utf8
+    order by a_very_long_json_arrayagg_sort_expression desc
+    absent on null
+    returning a_very_long_json_arrayagg_return_type format json),
+  json_arrayagg /* before opening paren */(/* before value */ v
+    /* before value format */ format /* before value json */ json
+    /* before encoding */ encoding /* before encoding name */ utf8
+    /* before order */ order /* before by */ by /* before sort */ x
+    /* before absent */ absent /* before on */ on /* before null */ null
+    /* before returning */ returning /* before type */ jsonb
+      /* before returning format */ format /* before returning json */ json /* before closing paren */),
   json_array(),
   json_array(1, 2 format json returning jsonb),
-  json_array /* before opening paren */(/* before first */ 1 /* before comma */, /* before second */ 2 /* before format */ format /* before json */ json /* before encoding */ encoding /* before encoding name */ utf8 /* before returning */ returning /* before type */ jsonb /* before returning format */ format /* before returning json */ json /* before closing paren */),
-  json_array(/* before select */ select
-    /* before target */ x /* before format */ format /* before json */ json /* before absent */ absent /* before on */ on /* before null */ null /* before returning */ returning /* before type */ jsonb /* before closing paren */),
+  json_array(first_very_long_json_array_expression,
+    second_very_long_json_array_expression,
+    third_very_long_json_array_expression
+    returning a_very_long_json_array_return_type),
+  json_array(select
+      a_very_long_json_select_expression_that_forces_the_json_select_format_node_to_wrap
+    format json
+    absent on null
+    returning a_very_long_json_select_return_type),
+  json_array /* before opening paren */(/* before first */ 1 /* before comma */,
+    /* before second */ 2
+    /* before format */ format /* before json */ json
+    /* before encoding */ encoding /* before encoding name */ utf8
+    /* before returning */ returning /* before type */ jsonb
+      /* before returning format */ format /* before returning json */ json /* before closing paren */),
+  json_array(/* before select */ select /* before target */ x
+    /* before format */ format /* before json */ json
+    /* before absent */ absent /* before on */ on /* before null */ null
+    /* before returning */ returning /* before type */ jsonb /* before closing paren */),
   json_exists(doc, '$.a'),
   json_exists(doc, '$.a' passing x as foo, y as bar true on error),
-  json_exists /* before opening paren */(/* before document */ doc /* before format */ format /* before json */ json /* before encoding */ encoding /* before encoding name */ utf8 /* before comma */, /* before path */ '$.a' /* before passing */ passing /* before arg */ x /* before as */ as /* before name */ foo /* before arg comma */, /* before second arg */ y /* before second as */ as /* before second name */ bar /* before behavior */ default /* before default */ false /* before on */ on /* before error */ error /* before closing paren */),
+  json_exists(a_very_long_json_exists_document
+    format json encoding utf8,
+    a_very_long_json_exists_path
+    passing a_very_long_json_exists_argument as a_very_long_json_exists_name
+    false on error),
+  json_exists /* before opening paren */(/* before document */ doc
+    /* before format */ format /* before json */ json
+    /* before encoding */ encoding /* before encoding name */ utf8 /* before comma */,
+    /* before path */ '$.a'
+    /* before passing */ passing /* before arg */ x /* before as */ as /* before name */ foo /* before arg comma */,
+      /* before second arg */ y /* before second as */ as /* before second name */ bar
+    /* before behavior */ default /* before default */ false /* before on */ on /* before error */ error /* before closing paren */),
   json_exists(doc, '$' error on error),
   json_exists(doc, '$' null on error),
   json_exists(doc, '$' false on error),
@@ -124,28 +173,104 @@ select
   json_scalar /* before opening paren */(/* before expression */ 1 /* before closing paren */),
   json_serialize(doc),
   json_serialize(doc format json returning text format json),
-  json_serialize /* before opening paren */(/* before document */ doc /* before format */ format /* before json */ json /* before returning */ returning /* before type */ text /* before returning format */ format /* before returning json */ json /* before closing paren */),
+  json_serialize(a_very_long_json_serialize_document
+    format json
+    encoding a_very_long_json_encoding_name_that_forces_the_json_format_clause_to_wrap
+    returning a_very_long_json_serialize_return_type_name_that_forces_returning_to_wrap
+      format json),
+  json_serialize /* before opening paren */(/* before document */ doc
+    /* before format */ format /* before json */ json
+    /* before returning */ returning /* before type */ text
+      /* before returning format */ format /* before returning json */ json /* before closing paren */),
   json_query(doc, '$.a'),
   json_query(doc, '$.a' with wrapper),
   json_query(doc, '$.a' with unconditional array wrapper omit quotes),
   json_query(doc, '$.a' without array wrapper),
-  json_query /* before opening paren */(/* before document */ doc /* before format */ format /* before json */ json /* before encoding */ encoding /* before encoding name */ utf8 /* before comma */, /* before path */ '$.a' /* before passing */ passing /* before arg */ x /* before as */ as /* before name */ foo /* before returning */ returning /* before type */ text /* before returning format */ format /* before returning json */ json /* before wrapper */ with /* before conditional */ conditional /* before array */ array /* before wrapper keyword */ wrapper /* before keep */ keep /* before quotes */ quotes /* before on scalar */ on /* before scalar */ scalar /* before string */ string /* before empty behavior */ default /* before default */ 'empty' /* before empty on */ on /* before empty */ empty /* before error behavior */ empty /* before object */ object /* before error on */ on /* before error */ error /* before closing paren */),
+  json_query(a_very_long_json_query_document
+    format json encoding utf8,
+    a_very_long_json_query_path
+    passing a_very_long_json_query_argument as a_very_long_json_query_name
+    returning a_very_long_json_query_return_type format json
+    with unconditional array wrapper
+    keep quotes on scalar string
+    default a_very_long_json_query_empty_value on empty
+    error on error),
+  json_query /* before opening paren */(/* before document */ doc
+    /* before format */ format /* before json */ json
+    /* before encoding */ encoding /* before encoding name */ utf8 /* before comma */,
+    /* before path */ '$.a'
+    /* before passing */ passing /* before arg */ x /* before as */ as /* before name */ foo
+    /* before returning */ returning /* before type */ text
+      /* before returning format */ format /* before returning json */ json
+    /* before wrapper */ with /* before conditional */ conditional /* before array */ array /* before wrapper keyword */ wrapper
+    /* before keep */ keep /* before quotes */ quotes /* before on scalar */ on /* before scalar */ scalar /* before string */ string
+    /* before empty behavior */ default /* before default */ 'empty' /* before empty on */ on /* before empty */ empty
+    /* before error behavior */ empty /* before object */ object /* before error on */ on /* before error */ error /* before closing paren */),
   json_value(doc, '$.a'),
-  json_value /* before opening paren */(/* before document */ doc /* before format */ format /* before json */ json /* before comma */, /* before path */ '$.a' /* before passing */ passing /* before arg */ x /* before as */ as /* before name */ foo /* before returning */ returning /* before type */ text /* before empty behavior */ null /* before empty on */ on /* before empty */ empty /* before error behavior */ error /* before error on */ on /* before error */ error /* before closing paren */),
+  json_value(a_very_long_json_value_document
+    format json encoding utf8,
+    a_very_long_json_value_path
+    passing a_very_long_json_value_argument as a_very_long_json_value_name
+    returning a_very_long_json_value_return_type
+    default a_very_long_json_value_empty_value on empty
+    error on error),
+  json_value /* before opening paren */(/* before document */ doc
+    /* before format */ format /* before json */ json /* before comma */,
+    /* before path */ '$.a'
+    /* before passing */ passing /* before arg */ x /* before as */ as /* before name */ foo
+    /* before returning */ returning /* before type */ text
+    /* before empty behavior */ null /* before empty on */ on /* before empty */ empty
+    /* before error behavior */ error /* before error on */ on /* before error */ error /* before closing paren */),
   json(doc),
   json(doc format json encoding utf8 with unique keys),
   json(doc without unique keys),
-  json /* before opening paren */(/* before expression */ doc /* before format */ format /* before json */ json /* before encoding */ encoding /* before encoding name */ utf8 /* before without */ without /* before unique */ unique /* before keys */ keys /* before closing paren */),
+  json(a_very_long_json_document_expression
+    format json encoding utf8
+    with unique keys),
+  json /* before opening paren */(/* before expression */ doc
+    /* before format */ format /* before json */ json
+    /* before encoding */ encoding /* before encoding name */ utf8
+    /* before without */ without /* before unique */ unique /* before keys */ keys /* before closing paren */),
   json_objectagg(k: v),
-  json_objectagg(k value v format json absent on null with unique keys returning jsonb format json),
-  json_objectagg /* before opening paren */(/* before key */ k /* before value keyword */ value /* before value */ v /* before value format */ format /* before value json */ json /* before null */ null /* before on */ on /* before second null */ null /* before without */ without /* before unique */ unique /* before keys */ keys /* before returning */ returning /* before type */ jsonb /* before returning format */ format /* before returning json */ json /* before closing paren */),
+  json_objectagg(k value v format json
+    absent on null
+    with unique keys
+    returning jsonb format json),
+  json_objectagg(a_very_long_json_objectagg_key value a_very_long_json_objectagg_value
+    format json
+    absent on null
+    with unique keys
+    returning a_very_long_json_objectagg_return_type format json),
+  json_objectagg /* before opening paren */(/* before key */ k /* before value keyword */ value /* before value */ v
+    /* before value format */ format /* before value json */ json
+    /* before null */ null /* before on */ on /* before second null */ null
+    /* before without */ without /* before unique */ unique /* before keys */ keys
+    /* before returning */ returning /* before type */ jsonb
+      /* before returning format */ format /* before returning json */ json /* before closing paren */),
   json_object(),
   json_object('a', 1, 'b', 2),
-  json_object('a': 1, 'b' value 2 format json null on null with unique keys returning jsonb format json),
+  json_object('a': 1, 'b' value 2 format json
+    null on null
+    with unique keys
+    returning jsonb format json),
+  json_object(a_very_long_json_object_key value a_very_long_json_object_value
+    format json,
+    a_second_very_long_json_object_key value a_second_very_long_json_object_value
+    format json
+    absent on null
+    with unique keys
+    returning a_very_long_json_object_return_type format json),
   json_object(returning jsonb),
-  json_object /* before opening paren */(/* before key */ 'a' /* before colon */: /* before value */ 1 /* before comma */, /* before second key */ 'b' /* before value keyword */ value /* before second value */ 2 /* before format */ format /* before json */ json /* before absent */ absent /* before on */ on /* before null */ null /* before with */ with /* before unique */ unique /* before keys */ keys /* before returning */ returning /* before type */ jsonb /* before returning format */ format /* before returning json */ json /* before closing paren */),
+  json_object /* before opening paren */(/* before key */ 'a' /* before colon */: /* before value */ 1 /* before comma */,
+    /* before second key */ 'b' /* before value keyword */ value /* before second value */ 2
+    /* before format */ format /* before json */ json
+    /* before absent */ absent /* before on */ on /* before null */ null
+    /* before with */ with /* before unique */ unique /* before keys */ keys
+    /* before returning */ returning /* before type */ jsonb
+      /* before returning format */ format /* before returning json */ json /* before closing paren */),
   public.foo(1),
-  foo /* before opening paren */(/* before first arg */ 1 /* before comma */, /* before second arg */ 2 /* before closing paren */),
+  foo /* before opening paren */(/* before first arg */ 1 /* before comma */,
+    /* before second arg */ 2 /* before closing paren */),
   percentile_cont(0.5) within group (order by x),
   mode() within group (order by y desc),
   percentile_disc(0.5) /* before within */ within /* before group */ group /* before opening paren */ (/* before order */ order /* before by */ by /* before sort */ x /* before closing paren */) /* after within */,
@@ -156,11 +281,27 @@ select
   first_value(x) /* before treatment */ ignore /* before nulls */ nulls /* after nulls */,
   sum(x) over window_name,
   count(*) over (),
-  avg(x) over (w partition by a, b order by c desc rows between unbounded preceding and current row exclude ties),
+  avg(x) over (w
+    partition by a, b
+    order by c desc
+    rows between unbounded preceding and current row exclude ties),
   sum(x) over (range 1 preceding),
-  sum(x) over (groups between current row and unbounded following exclude group),
+  sum(x) over (groups between current row and unbounded following
+      exclude group),
   sum(x) over (rows between 1 preceding and 2 following exclude no others),
-  sum(x) /* before over */ over /* before target */ (/* before partition */ partition /* before by */ by /* before expr */ a /* before comma */, /* before second */ b /* before order */ order /* before order by */ by /* before sort */ c /* before rows */ rows /* before between */ between /* before start */ 1 /* before preceding */ preceding /* before and */ and /* before end */ current /* before row */ row /* before exclude */ exclude /* before ties */ ties /* before close */) /* after over */,
+  sum(a_very_long_window_value_expression) over (a_very_long_window_reference
+    partition by a_very_long_partition_expression,
+      a_second_very_long_partition_expression
+    order by a_very_long_order_expression desc
+    rows between a_very_long_frame_start_expression preceding
+        and a_very_long_frame_end_expression following
+      exclude ties),
+  sum(x) /* before over */ over /* before target */ (/* before partition */ partition /* before by */ by /* before expr */ a /* before comma */,
+      /* before second */ b
+    /* before order */ order /* before order by */ by /* before sort */ c
+    /* before rows */ rows /* before between */ between /* before start */ 1 /* before preceding */ preceding
+        /* before and */ and /* before end */ current /* before row */ row
+      /* before exclude */ exclude /* before ties */ ties /* before close */) /* after over */,
   -- case expr
   case when x > 1 then 1 else 0 end,
   case x when 1 then 'one' when 2 then 'two' else 'other' end,
@@ -243,8 +384,12 @@ select
   c /* before bracket */[/* before start */ 1 /* before colon */:/* before end */ 2 /* before closing bracket */],
   -- tuple expr
   (1, 2, 3),
+  (first_very_long_tuple_expression,
+    second_very_long_tuple_expression,
+    third_very_long_tuple_expression),
   row(),
   row(1),
   row /* before opening paren */(1),
   row(1, 2),
-  (/* before first */ 1 /* before comma */, /* before second */ 2 /* before closing paren */);
+  (/* before first */ 1 /* before comma */,
+    /* before second */ 2 /* before closing paren */);

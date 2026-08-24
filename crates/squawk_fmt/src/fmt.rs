@@ -522,7 +522,7 @@ fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Do
     }
     if let Some(references) = constraint.references_token() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&references))
             .append(Doc::text("references"));
     }
@@ -724,7 +724,7 @@ fn build_constraint_exclusion_list<'a>(list: ast::ConstraintExclusionList) -> Do
         let mut item = exclusion.expr().map(build_expr).unwrap_or_else(Doc::nil);
         if let Some(with) = exclusion.with_token() {
             item = item
-                .append(Doc::space())
+                .append(Doc::line_or_space())
                 .append(leading_comments_token(&with))
                 .append(Doc::text("with"));
         }
@@ -740,7 +740,7 @@ fn build_constraint_exclusion_list<'a>(list: ast::ConstraintExclusionList) -> Do
                 .append(build_operator_call(&op));
         }
         (
-            leading_comments(exclusion.syntax()).append(item),
+            leading_comments(exclusion.syntax()).append(item.nest(2).group()),
             exclusion.syntax().clone(),
         )
     });
@@ -840,6 +840,9 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
                 ))
                 .nest(2);
         }
+    }
+    if select.from_clause().is_some() {
+        doc = doc.group();
     }
 
     if let Some(from) = select.from_clause() {
@@ -1191,14 +1194,16 @@ fn build_grouping_list<'a>(
         }
     } else {
         doc = doc.append(
-            Doc::list(
-                Itertools::intersperse(
-                    items.into_iter(),
-                    Doc::text(",").append(Doc::line_or_space()),
-                )
-                .collect(),
-            )
-            .nest(2),
+            Doc::line_or_nil()
+                .append(Doc::list(
+                    Itertools::intersperse(
+                        items.into_iter(),
+                        Doc::text(",").append(Doc::line_or_space()),
+                    )
+                    .collect(),
+                ))
+                .nest(2)
+                .append(Doc::line_or_nil()),
         );
     }
 
@@ -1509,50 +1514,60 @@ fn build_graph_table_fn<'a>(graph_table_fn: ast::GraphTableFn) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("("));
 
+    let mut body = Doc::nil();
     if let Some(graph) = graph_table_fn.property_graph_ref() {
         if let Some(path) = graph.path_ref() {
-            doc = doc
+            body = body
                 .append(leading_comments(graph.syntax()))
                 .append(build_path_ref(&path));
         }
     }
     if let Some(match_token) = graph_table_fn.match_token() {
-        doc = doc
-            .append(Doc::space())
+        body = body
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&match_token))
             .append(Doc::text("match"));
     }
     if let Some(patterns) = graph_table_fn.path_pattern_list() {
-        doc = doc
-            .append(Doc::space())
-            .append(leading_comments(patterns.syntax()))
-            .append(build_path_pattern_list(patterns));
+        body = body.append(
+            Doc::line_or_space()
+                .append(leading_comments(patterns.syntax()))
+                .append(build_path_pattern_list(patterns))
+                .nest(2),
+        );
     }
     if let Some(where_clause) = graph_table_fn.where_clause() {
-        doc = doc
-            .append(Doc::space())
+        body = body
+            .append(Doc::line_or_space())
             .append(leading_comments(where_clause.syntax()))
             .append(build_where_clause(where_clause));
     }
     if let Some(columns) = graph_table_fn.columns_token() {
-        doc = doc
-            .append(Doc::space())
+        body = body
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&columns))
             .append(Doc::text("columns"));
     }
     if let Some(columns) = graph_table_fn.expr_as_column_name_list() {
         if comment_tokens_before(columns.syntax().clone()).is_empty() {
-            doc = doc.append(Doc::space());
+            body = body.append(Doc::space());
         } else {
-            doc = doc.append(comments_before(columns.syntax().clone()));
+            body = body.append(comments_before(columns.syntax().clone()));
         }
-        doc = doc.append(build_expr_as_column_name_list(columns));
+        body = body.append(build_expr_as_column_name_list(columns));
     }
 
     if let Some(r_paren) = graph_table_fn.r_paren_token() {
-        doc = doc.append(comments_before(r_paren));
+        body = body.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(
+        Doc::line_or_nil()
+            .append(body)
+            .nest(2)
+            .append(Doc::line_or_nil())
+            .group(),
+    )
+    .append(Doc::text(")"))
 }
 
 fn build_path_pattern_list<'a>(patterns: ast::PathPatternList) -> Doc<'a> {
@@ -1567,11 +1582,16 @@ fn build_path_pattern_list<'a>(patterns: ast::PathPatternList) -> Doc<'a> {
 
 fn build_path_pattern<'a>(pattern: ast::PathPattern) -> Doc<'a> {
     Doc::list(
-        pattern
-            .path_factors()
-            .map(|factor| leading_comments(factor.syntax()).append(build_path_factor(factor)))
-            .collect(),
+        Itertools::intersperse(
+            pattern
+                .path_factors()
+                .map(|factor| leading_comments(factor.syntax()).append(build_path_factor(factor))),
+            Doc::line_or_nil(),
+        )
+        .collect(),
     )
+    .nest(2)
+    .group()
 }
 
 fn build_path_factor<'a>(factor: ast::PathFactor) -> Doc<'a> {
@@ -1703,17 +1723,17 @@ fn build_graph_pattern_inner<'a>(
     }
     if let Some(label) = label {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(label.syntax()))
             .append(build_is_label(label));
     }
     if let Some(where_clause) = where_clause {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(where_clause.syntax()))
             .append(build_where_clause(where_clause));
     }
-    doc
+    doc.nest(2).group()
 }
 
 fn build_is_label<'a>(label: ast::IsLabel) -> Doc<'a> {
@@ -1830,7 +1850,7 @@ fn build_expr_as_column_name_list<'a>(list: ast::ExprAsColumnNameList) -> Doc<'a
     if let Some(r_paren) = list.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_xml_element_fn<'a>(xml_element_fn: ast::XmlElementFn) -> Doc<'a> {
@@ -1879,7 +1899,7 @@ fn build_xml_element_fn<'a>(xml_element_fn: ast::XmlElementFn) -> Doc<'a> {
         doc = doc
             .append(trailing_comments(&previous))
             .append(Doc::text(","))
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(item);
         previous = syntax;
     }
@@ -1887,7 +1907,7 @@ fn build_xml_element_fn<'a>(xml_element_fn: ast::XmlElementFn) -> Doc<'a> {
     if let Some(r_paren) = xml_element_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_expr_as_xml_attr_list<'a>(attrs: ast::ExprAsXmlAttrList) -> Doc<'a> {
@@ -1923,7 +1943,7 @@ fn build_expr_as_xml_attr_list<'a>(attrs: ast::ExprAsXmlAttrList) -> Doc<'a> {
     if let Some(r_paren) = attrs.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_xml_exists_fn<'a>(xml_exists_fn: ast::XmlExistsFn) -> Doc<'a> {
@@ -1941,26 +1961,26 @@ fn build_xml_exists_fn<'a>(xml_exists_fn: ast::XmlExistsFn) -> Doc<'a> {
         }
         if let Some(passing_token) = passing.passing_token() {
             doc = doc
-                .append(Doc::space())
+                .append(Doc::line_or_space())
                 .append(leading_comments_token(&passing_token))
                 .append(Doc::text("passing"));
         }
         if let Some(mech) = passing.xml_passing_mech() {
             doc = doc
-                .append(Doc::space())
+                .append(Doc::line_or_space())
                 .append(leading_comments(mech.syntax()))
                 .append(build_xml_passing_mech(mech));
         }
         if let Some(passing_doc) = passing.xml_passing_doc() {
             if let Some(expr) = passing_doc.expr() {
                 doc = doc
-                    .append(Doc::space())
+                    .append(Doc::line_or_space())
                     .append(leading_comments(passing_doc.syntax()))
                     .append(build_expr(expr));
             }
             if let Some(mech) = passing_doc.xml_passing_mech() {
                 doc = doc
-                    .append(Doc::space())
+                    .append(Doc::line_or_space())
                     .append(leading_comments(mech.syntax()))
                     .append(build_xml_passing_mech(mech));
             }
@@ -1970,18 +1990,22 @@ fn build_xml_exists_fn<'a>(xml_exists_fn: ast::XmlExistsFn) -> Doc<'a> {
     if let Some(r_paren) = xml_exists_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_xml_forest_fn<'a>(xml_forest_fn: ast::XmlForestFn) -> Doc<'a> {
-    Doc::text("xmlforest").append(
-        xml_forest_fn
-            .expr_as_element_tag_list()
-            .map(|list| {
-                comments_before(list.syntax().clone()).append(build_expr_as_element_tag_list(list))
-            })
-            .unwrap_or_else(Doc::nil),
-    )
+    Doc::text("xmlforest")
+        .append(
+            xml_forest_fn
+                .expr_as_element_tag_list()
+                .map(|list| {
+                    comments_before(list.syntax().clone())
+                        .append(build_expr_as_element_tag_list(list))
+                })
+                .unwrap_or_else(Doc::nil),
+        )
+        .nest(2)
+        .group()
 }
 
 fn build_expr_as_element_tag_list<'a>(list: ast::ExprAsElementTagList) -> Doc<'a> {
@@ -2017,7 +2041,7 @@ fn build_expr_as_element_tag_list<'a>(list: ast::ExprAsElementTagList) -> Doc<'a
     if let Some(r_paren) = list.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_xml_parse_fn<'a>(xml_parse_fn: ast::XmlParseFn) -> Doc<'a> {
@@ -2034,13 +2058,13 @@ fn build_xml_parse_fn<'a>(xml_parse_fn: ast::XmlParseFn) -> Doc<'a> {
     }
     if let Some(expr) = xml_parse_fn.expr() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     }
     if let Some(whitespace) = xml_parse_fn.xml_whitespace() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(whitespace.syntax()))
             .append(build_xml_whitespace(whitespace));
     }
@@ -2048,7 +2072,7 @@ fn build_xml_parse_fn<'a>(xml_parse_fn: ast::XmlParseFn) -> Doc<'a> {
     if let Some(r_paren) = xml_parse_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_xml_pi_fn<'a>(xml_pi_fn: ast::XmlPiFn) -> Doc<'a> {
@@ -2075,7 +2099,7 @@ fn build_xml_pi_fn<'a>(xml_pi_fn: ast::XmlPiFn) -> Doc<'a> {
         }
         doc = doc
             .append(Doc::text(","))
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(expr.syntax()))
             .append(build_expr(expr));
     }
@@ -2083,7 +2107,7 @@ fn build_xml_pi_fn<'a>(xml_pi_fn: ast::XmlPiFn) -> Doc<'a> {
     if let Some(r_paren) = xml_pi_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_xml_root_fn<'a>(xml_root_fn: ast::XmlRootFn) -> Doc<'a> {
@@ -2101,7 +2125,7 @@ fn build_xml_root_fn<'a>(xml_root_fn: ast::XmlRootFn) -> Doc<'a> {
     if let Some(comma) = xml_root_fn.comma_token() {
         doc = doc.append(comments_before(comma));
     }
-    doc = doc.append(Doc::text(",")).append(Doc::space());
+    doc = doc.append(Doc::text(",")).append(Doc::line_or_space());
     if let Some(version) = xml_root_fn.xml_root_version() {
         doc = doc
             .append(leading_comments(version.syntax()))
@@ -2116,7 +2140,7 @@ fn build_xml_root_fn<'a>(xml_root_fn: ast::XmlRootFn) -> Doc<'a> {
     if let Some(r_paren) = xml_root_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_xml_root_version<'a>(version: ast::XmlRootVersion) -> Doc<'a> {
@@ -2182,7 +2206,7 @@ fn build_xml_standalone<'a>(standalone: ast::XmlStandalone) -> Doc<'a> {
     };
 
     let mut doc = comma.map(comments_before).unwrap_or_else(Doc::nil);
-    doc = doc.append(Doc::text(",")).append(Doc::space());
+    doc = doc.append(Doc::text(",")).append(Doc::line_or_space());
     if let Some(token) = standalone_token {
         doc = doc
             .append(leading_comments_token(&token))
@@ -2223,7 +2247,7 @@ fn build_xml_serialize_fn<'a>(xml_serialize_fn: ast::XmlSerializeFn) -> Doc<'a> 
     }
     if let Some(as_token) = xml_serialize_fn.as_token() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments_token(&as_token))
             .append(Doc::text("as"));
     }
@@ -2235,7 +2259,7 @@ fn build_xml_serialize_fn<'a>(xml_serialize_fn: ast::XmlSerializeFn) -> Doc<'a> 
     }
     if let Some(indent) = xml_serialize_fn.xml_indent() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(indent.syntax()))
             .append(build_xml_indent(indent));
     }
@@ -2243,7 +2267,7 @@ fn build_xml_serialize_fn<'a>(xml_serialize_fn: ast::XmlSerializeFn) -> Doc<'a> 
     if let Some(r_paren) = xml_serialize_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_xml_document_or_content<'a>(kind: ast::XmlDocumentOrContent) -> Doc<'a> {
@@ -2340,7 +2364,7 @@ fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
 
     if let Some(null_clause) = json_object_fn.json_null_clause() {
         if has_content {
-            doc = doc.append(Doc::space());
+            doc = doc.append(Doc::line_or_space());
         }
         doc = doc
             .append(leading_comments(null_clause.syntax()))
@@ -2349,7 +2373,7 @@ fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
     }
     if let Some(unique) = json_object_fn.json_keys_unique_clause() {
         if has_content {
-            doc = doc.append(Doc::space());
+            doc = doc.append(Doc::line_or_space());
         }
         doc = doc
             .append(leading_comments(unique.syntax()))
@@ -2358,7 +2382,7 @@ fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
     }
     if let Some(returning) = json_object_fn.json_returning_clause() {
         if has_content {
-            doc = doc.append(Doc::space());
+            doc = doc.append(Doc::line_or_space());
         }
         doc = doc
             .append(leading_comments(returning.syntax()))
@@ -2367,7 +2391,7 @@ fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
     if let Some(r_paren) = json_object_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_object_agg_fn<'a>(json_object_agg_fn: ast::JsonObjectAggFn) -> Doc<'a> {
@@ -2384,26 +2408,26 @@ fn build_json_object_agg_fn<'a>(json_object_agg_fn: ast::JsonObjectAggFn) -> Doc
     }
     if let Some(null_clause) = json_object_agg_fn.json_null_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(null_clause.syntax()))
             .append(build_json_null_clause(null_clause));
     }
     if let Some(unique) = json_object_agg_fn.json_keys_unique_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(unique.syntax()))
             .append(build_json_keys_unique_clause(unique));
     }
     if let Some(returning) = json_object_agg_fn.json_returning_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(returning.syntax()))
             .append(build_json_returning_clause(returning));
     }
     if let Some(r_paren) = json_object_agg_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_key_value<'a>(key_value: ast::JsonKeyValue) -> Doc<'a> {
@@ -2439,20 +2463,20 @@ fn build_json_fn<'a>(json_fn: ast::JsonFn) -> Doc<'a> {
     }
     if let Some(format) = json_fn.json_format_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
     if let Some(unique) = json_fn.json_keys_unique_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(unique.syntax()))
             .append(build_json_keys_unique_clause(unique));
     }
     if let Some(r_paren) = json_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_scalar_fn<'a>(json_scalar_fn: ast::JsonScalarFn) -> Doc<'a> {
@@ -2479,20 +2503,20 @@ fn build_json_serialize_fn<'a>(json_serialize_fn: ast::JsonSerializeFn) -> Doc<'
     }
     if let Some(format) = json_serialize_fn.json_format_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
     if let Some(returning) = json_serialize_fn.json_returning_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(returning.syntax()))
             .append(build_json_returning_clause(returning));
     }
     if let Some(r_paren) = json_serialize_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_query_fn<'a>(json_query_fn: ast::JsonQueryFn) -> Doc<'a> {
@@ -2506,44 +2530,44 @@ fn build_json_query_fn<'a>(json_query_fn: ast::JsonQueryFn) -> Doc<'a> {
     );
     if let Some(passing) = json_query_fn.json_passing_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(passing.syntax()))
             .append(build_json_passing_clause(passing));
     }
     if let Some(returning) = json_query_fn.json_returning_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(returning.syntax()))
             .append(build_json_returning_clause(returning));
     }
     if let Some(wrapper) = json_query_fn.json_wrapper_behavior_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(wrapper.syntax()))
             .append(build_json_wrapper_behavior_clause(wrapper));
     }
     if let Some(quotes) = json_query_fn.json_quotes_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(quotes.syntax()))
             .append(build_json_quotes_clause(quotes));
     }
     if let Some(on_empty) = json_query_fn.json_on_empty_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(on_empty.syntax()))
             .append(build_json_on_empty_clause(on_empty));
     }
     if let Some(on_error) = json_query_fn.json_on_error_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(on_error.syntax()))
             .append(build_json_on_error_clause(on_error));
     }
     if let Some(r_paren) = json_query_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_value_fn<'a>(json_value_fn: ast::JsonValueFn) -> Doc<'a> {
@@ -2557,32 +2581,32 @@ fn build_json_value_fn<'a>(json_value_fn: ast::JsonValueFn) -> Doc<'a> {
     );
     if let Some(passing) = json_value_fn.json_passing_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(passing.syntax()))
             .append(build_json_passing_clause(passing));
     }
     if let Some(returning) = json_value_fn.json_returning_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(returning.syntax()))
             .append(build_json_returning_clause(returning));
     }
     if let Some(on_empty) = json_value_fn.json_on_empty_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(on_empty.syntax()))
             .append(build_json_on_empty_clause(on_empty));
     }
     if let Some(on_error) = json_value_fn.json_on_error_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(on_error.syntax()))
             .append(build_json_on_error_clause(on_error));
     }
     if let Some(r_paren) = json_value_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_document_path_fn<'a>(
@@ -2605,7 +2629,7 @@ fn build_json_document_path_fn<'a>(
     }
     if let Some(format) = format {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
@@ -2613,7 +2637,7 @@ fn build_json_document_path_fn<'a>(
         doc = doc
             .append(comments_before(comma))
             .append(Doc::text(","))
-            .append(Doc::space());
+            .append(Doc::line_or_space());
     }
     if let Some(path) = path {
         doc = doc
@@ -2637,7 +2661,7 @@ fn build_json_exists_fn<'a>(json_exists_fn: ast::JsonExistsFn) -> Doc<'a> {
     }
     if let Some(format) = json_exists_fn.json_format_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
@@ -2645,7 +2669,7 @@ fn build_json_exists_fn<'a>(json_exists_fn: ast::JsonExistsFn) -> Doc<'a> {
         doc = doc
             .append(comments_before(comma))
             .append(Doc::text(","))
-            .append(Doc::space());
+            .append(Doc::line_or_space());
     }
     if let Some(path) = json_exists_fn.path() {
         doc = doc
@@ -2654,20 +2678,20 @@ fn build_json_exists_fn<'a>(json_exists_fn: ast::JsonExistsFn) -> Doc<'a> {
     }
     if let Some(passing) = json_exists_fn.json_passing_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(passing.syntax()))
             .append(build_json_passing_clause(passing));
     }
     if let Some(on_error) = json_exists_fn.json_on_error_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(on_error.syntax()))
             .append(build_json_on_error_clause(on_error));
     }
     if let Some(r_paren) = json_exists_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_passing_clause<'a>(passing: ast::JsonPassingClause) -> Doc<'a> {
@@ -2683,13 +2707,13 @@ fn build_json_passing_clause<'a>(passing: ast::JsonPassingClause) -> Doc<'a> {
             doc = doc
                 .append(trailing_comments(&previous_syntax))
                 .append(Doc::text(","))
-                .append(Doc::space())
+                .append(Doc::line_or_space())
                 .append(leading_comments(arg.syntax()))
                 .append(build_json_passing_arg(arg.clone()));
             previous_syntax = arg.syntax().clone();
         }
     }
-    doc
+    doc.nest(2).group()
 }
 
 fn build_json_passing_arg<'a>(arg: ast::JsonPassingArg) -> Doc<'a> {
@@ -2848,20 +2872,20 @@ fn build_json_array_fn<'a>(json_array_fn: ast::JsonArrayFn) -> Doc<'a> {
 
     if let Some(null_clause) = json_array_fn.json_null_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(null_clause.syntax()))
             .append(build_json_null_clause(null_clause));
     }
     if let Some(returning) = json_array_fn.json_returning_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(returning.syntax()))
             .append(build_json_returning_clause(returning));
     }
     if let Some(r_paren) = json_array_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_comma_separated_docs<'a>(
@@ -2873,23 +2897,23 @@ fn build_comma_separated_docs<'a>(
         docs.push(
             trailing_comments(&previous_syntax)
                 .append(Doc::text(","))
-                .append(Doc::space())
+                .append(Doc::line_or_space())
                 .append(item),
         );
         previous_syntax = syntax;
     }
-    Some(Doc::list(docs))
+    Some(Doc::list(docs).group())
 }
 
 fn build_json_expr_format<'a>(value: ast::JsonExprFormat) -> Doc<'a> {
     let mut doc = value.expr().map(build_expr).unwrap_or_else(Doc::nil);
     if let Some(format) = value.json_format_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
-    doc
+    doc.group()
 }
 
 fn build_json_select_format<'a>(select: ast::JsonSelectFormat) -> Doc<'a> {
@@ -2902,11 +2926,11 @@ fn build_json_select_format<'a>(select: ast::JsonSelectFormat) -> Doc<'a> {
         .unwrap_or_else(Doc::nil);
     if let Some(format) = select.json_format_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
-    doc
+    doc.group()
 }
 
 fn build_json_array_agg_fn<'a>(json_array_agg_fn: ast::JsonArrayAggFn) -> Doc<'a> {
@@ -2923,37 +2947,37 @@ fn build_json_array_agg_fn<'a>(json_array_agg_fn: ast::JsonArrayAggFn) -> Doc<'a
     }
     if let Some(order_by) = json_array_agg_fn.order_by_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(order_by.syntax()))
             .append(build_order_by_clause(order_by));
     }
     if let Some(null_clause) = json_array_agg_fn.json_null_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(null_clause.syntax()))
             .append(build_json_null_clause(null_clause));
     }
     if let Some(returning) = json_array_agg_fn.json_returning_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(returning.syntax()))
             .append(build_json_returning_clause(returning));
     }
     if let Some(r_paren) = json_array_agg_fn.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).nest(2).group()
 }
 
 fn build_json_value_expr<'a>(value: ast::JsonValueExpr) -> Doc<'a> {
     let mut doc = value.expr().map(build_expr).unwrap_or_else(Doc::nil);
     if let Some(format) = value.json_format_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
-    doc
+    doc.group()
 }
 
 fn build_json_format_clause<'a>(format: ast::JsonFormatClause) -> Doc<'a> {
@@ -2966,11 +2990,11 @@ fn build_json_format_clause<'a>(format: ast::JsonFormatClause) -> Doc<'a> {
     }
     if let Some(encoding) = format.json_encoding_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(encoding.syntax()))
             .append(build_json_encoding_clause(encoding));
     }
-    doc
+    doc.group()
 }
 
 fn build_json_encoding_clause<'a>(clause: ast::JsonEncodingClause) -> Doc<'a> {
@@ -3020,11 +3044,11 @@ fn build_json_returning_clause<'a>(returning: ast::JsonReturningClause) -> Doc<'
     }
     if let Some(format) = returning.json_format_clause() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(format.syntax()))
             .append(build_json_format_clause(format));
     }
-    doc
+    doc.nest(2).group()
 }
 
 fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
@@ -3211,10 +3235,17 @@ fn build_comma_separated_exprs<'a>(exprs: impl Iterator<Item = ast::Expr>) -> Op
     if exprs.is_empty() {
         None
     } else {
-        Some(Doc::list(
-            Itertools::intersperse(exprs.into_iter(), Doc::text(",").append(Doc::space()))
+        Some(
+            Doc::list(
+                Itertools::intersperse(
+                    exprs.into_iter(),
+                    Doc::text(",").append(Doc::line_or_space()),
+                )
                 .collect(),
-        ))
+            )
+            .nest(2)
+            .group(),
+        )
     }
 }
 
@@ -3396,12 +3427,19 @@ fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
         if has_quantifier {
             doc = doc.append(Doc::space());
         }
-        doc = doc.append(Doc::list(
-            Itertools::intersperse(args.into_iter(), Doc::text(",").append(Doc::space())).collect(),
-        ));
+        doc = doc.append(
+            Doc::list(
+                Itertools::intersperse(
+                    args.into_iter(),
+                    Doc::text(",").append(Doc::line_or_space()),
+                )
+                .collect(),
+            )
+            .nest(2),
+        );
     }
 
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_call_arg<'a>(arg: ast::Arg) -> Doc<'a> {
@@ -3856,7 +3894,7 @@ fn build_over_window_spec<'a>(over_window_spec: ast::OverWindowSpec) -> Doc<'a> 
     if let Some(r_paren) = over_window_spec.r_paren_token() {
         doc = doc.append(comments_before(r_paren));
     }
-    doc.append(Doc::text(")"))
+    doc.append(Doc::text(")")).group()
 }
 
 fn build_window_spec<'a>(window_spec: ast::WindowSpec) -> Doc<'a> {
@@ -3876,7 +3914,9 @@ fn build_window_spec<'a>(window_spec: ast::WindowSpec) -> Doc<'a> {
         parts.push(leading_comments(frame.syntax()).append(build_frame_clause(frame)));
     }
 
-    Doc::list(Itertools::intersperse(parts.into_iter(), Doc::space()).collect())
+    Doc::list(Itertools::intersperse(parts.into_iter(), Doc::line_or_space()).collect())
+        .nest(2)
+        .group()
 }
 
 fn build_partition_by_clause<'a>(partition_by: ast::PartitionByClause) -> Doc<'a> {
@@ -3906,11 +3946,11 @@ fn build_frame_clause<'a>(frame: ast::FrameClause) -> Doc<'a> {
     }
     if let Some(exclude) = frame.frame_exclude() {
         doc = doc
-            .append(Doc::space())
+            .append(Doc::line_or_space())
             .append(leading_comments(exclude.syntax()))
             .append(build_frame_exclude(exclude));
     }
-    doc
+    doc.nest(2).group()
 }
 
 fn build_frame_extent<'a>(extent: ast::FrameExtent) -> Doc<'a> {
@@ -3925,7 +3965,7 @@ fn build_frame_extent<'a>(extent: ast::FrameExtent) -> Doc<'a> {
             }
             if let Some(and_token) = between.and_token() {
                 doc = doc
-                    .append(Doc::space())
+                    .append(Doc::line_or_space())
                     .append(leading_comments_token(&and_token))
                     .append(Doc::text("and"));
             }
@@ -3935,7 +3975,7 @@ fn build_frame_extent<'a>(extent: ast::FrameExtent) -> Doc<'a> {
                     .append(leading_comments(end.syntax()))
                     .append(build_frame_bound(end));
             }
-            doc
+            doc.nest(2).group()
         }
         ast::FrameExtent::FrameBound(bound) => build_frame_bound(bound),
     }
