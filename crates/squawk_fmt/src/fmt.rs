@@ -247,72 +247,430 @@ fn build_empty_stmt<'a>(empty_stmt: &ast::EmptyStmt) -> Doc<'a> {
 }
 
 fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
-    if create_table.if_not_exists().is_some() {
-        todo!("create table if not exists clauses are not supported yet")
-    }
-    if create_table.inherits().is_some() {
-        todo!("create table inherits clauses are not supported yet")
-    }
-    if create_table.of_type().is_some() {
-        todo!("create table of type clauses are not supported yet")
-    }
-    if create_table.on_commit().is_some() {
-        todo!("create table on commit clauses are not supported yet")
-    }
-    if create_table.partition_by().is_some() {
-        todo!("create table partition by clauses are not supported yet")
-    }
-    if create_table.partition_of().is_some() {
-        todo!("create table partition of clauses are not supported yet")
-    }
-    if create_table.partition_type().is_some() {
-        todo!("create table partition types are not supported yet")
-    }
-    if create_table.persistence().is_some() {
-        todo!("create table persistence options are not supported yet")
-    }
-    if create_table.table_params().is_some() {
-        todo!("create table parameters are not supported yet")
-    }
-    if create_table.tablespace_clause().is_some() {
-        todo!("create table tablespace clauses are not supported yet")
-    }
-    if create_table.using_method().is_some() {
-        todo!("create table access methods are not supported yet")
+    let mut doc = Doc::text("create");
+
+    if let Some(persistence) = create_table.persistence() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(persistence.syntax()))
+            .append(build_keyword_node(persistence.syntax()));
     }
 
-    let table_name = create_table.table_name().unwrap();
-    let arg_list = create_table.table_arg_list().unwrap();
-    let mut doc = Doc::text("create")
-        .append(Doc::space())
-        .append(Doc::text("table"))
-        .append(Doc::space())
-        .append(leading_comments(table_name.syntax()))
-        .append(build_path(&table_name.path().unwrap()));
-    if let Some(l_paren) = arg_list.l_paren_token() {
+    if let Some(table_token) = create_table.table_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&table_token));
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("table"));
+
+    if let Some(if_not_exists) = create_table.if_not_exists() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(if_not_exists.syntax()))
+            .append(build_keyword_node(if_not_exists.syntax()));
+    }
+
+    if let Some(table_name) = create_table.table_name() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(table_name.syntax()));
+        if let Some(path) = table_name.path() {
+            doc = doc.append(build_path(&path));
+        }
+    }
+
+    if let Some(partition_of) = create_table.partition_of() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(partition_of.syntax()))
+                .append(build_create_table_partition_of(partition_of))
+                .nest(2),
+        );
+    }
+
+    if let Some(of_type) = create_table.of_type() {
+        let mut of_type_doc = leading_comments(of_type.syntax()).append(Doc::text("of"));
+        if let Some(ty) = of_type.ty() {
+            of_type_doc = of_type_doc
+                .append(Doc::space())
+                .append(leading_comments(ty.syntax()))
+                .append(build_type(ty));
+        }
+        doc = doc.append(Doc::hard_line().append(of_type_doc).nest(2));
+    }
+
+    if let Some(arg_list) = create_table.table_arg_list() {
+        if let Some(l_paren) = arg_list.l_paren_token() {
+            if comment_tokens_before(l_paren.clone()).is_empty() {
+                doc = doc.append(Doc::space());
+            } else {
+                doc = doc.append(comments_before(l_paren));
+            }
+        }
+        let body = Doc::list(
+            Itertools::intersperse(
+                arg_list.args().map(build_table_arg),
+                Doc::text(",").append(Doc::hard_line()),
+            )
+            .collect(),
+        );
+        doc = doc
+            .append(Doc::text("("))
+            .append(wrap_body(body).group())
+            .append(Doc::text(")"));
+    }
+
+    if let Some(partition_type) = create_table.partition_type() {
+        let separator = if matches!(&partition_type, ast::PartitionType::PartitionDefault(_)) {
+            Doc::space()
+        } else {
+            Doc::line_or_space()
+        };
+        doc = doc.append(
+            separator
+                .append(leading_comments(partition_type.syntax()))
+                .append(build_create_table_partition_type(partition_type))
+                .nest(2),
+        );
+    }
+
+    if let Some(inherits) = create_table.inherits() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(inherits.syntax()))
+                .append(build_create_table_inherits(inherits))
+                .nest(2),
+        );
+    }
+
+    if let Some(partition_by) = create_table.partition_by() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(partition_by.syntax()))
+                .append(build_create_table_partition_by(partition_by))
+                .nest(2),
+        );
+    }
+
+    if let Some(using_method) = create_table.using_method() {
+        let mut using_doc = leading_comments(using_method.syntax()).append(Doc::text("using"));
+        if let Some(method) = using_method.access_method_ref() {
+            using_doc = using_doc
+                .append(Doc::space())
+                .append(leading_comments(method.syntax()))
+                .append(build_name(method.syntax()));
+        }
+        doc = doc.append(Doc::line_or_space().append(using_doc).nest(2));
+    }
+
+    if let Some(params) = create_table.table_params() {
+        let (separator, params_doc) = match params {
+            ast::TableParams::WithParams(params) => (
+                Doc::line_or_space(),
+                leading_comments(params.syntax()).append(build_with_params(params)),
+            ),
+            ast::TableParams::WithoutOids(without_oids) => (
+                Doc::hard_line(),
+                leading_comments(without_oids.syntax())
+                    .append(build_keyword_node(without_oids.syntax())),
+            ),
+        };
+        doc = doc.append(separator.append(params_doc).nest(2));
+    }
+
+    if let Some(on_commit) = create_table.on_commit() {
+        let mut on_commit_doc = leading_comments(on_commit.syntax()).append(Doc::text("on"));
+        if let Some(commit_token) = on_commit.commit_token() {
+            on_commit_doc = on_commit_doc
+                .append(Doc::space())
+                .append(leading_comments_token(&commit_token));
+        } else {
+            on_commit_doc = on_commit_doc.append(Doc::space());
+        }
+        on_commit_doc = on_commit_doc.append(Doc::text("commit"));
+        if let Some(action) = on_commit.on_commit_action() {
+            on_commit_doc = on_commit_doc
+                .append(Doc::space())
+                .append(leading_comments(action.syntax()))
+                .append(build_keyword_node(action.syntax()));
+        }
+        doc = doc.append(Doc::hard_line().append(on_commit_doc).nest(2));
+    }
+
+    if let Some(tablespace) = create_table.tablespace_clause() {
+        let mut tablespace_doc =
+            leading_comments(tablespace.syntax()).append(Doc::text("tablespace"));
+        if let Some(tablespace_ref) = tablespace.tablespace_ref() {
+            tablespace_doc = tablespace_doc
+                .append(Doc::space())
+                .append(leading_comments(tablespace_ref.syntax()))
+                .append(build_name(tablespace_ref.syntax()));
+        }
+        doc = doc.append(Doc::line_or_space().append(tablespace_doc).nest(2));
+    }
+
+    doc.group()
+        .append(build_semicolon(create_table.semicolon_token()))
+}
+
+fn build_create_table_partition_of<'a>(partition_of: ast::PartitionOf) -> Doc<'a> {
+    let mut doc = Doc::text("partition");
+    if let Some(of_token) = partition_of.of_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&of_token));
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("of"));
+    if let Some(table) = partition_of.table_name_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(table.syntax()));
+        if let Some(path) = table.path_ref() {
+            doc = doc.append(build_path_ref(&path));
+        }
+    }
+    doc
+}
+
+fn build_create_table_inherits<'a>(inherits: ast::Inherits) -> Doc<'a> {
+    let mut doc = Doc::text("inherits");
+    if let Some(l_paren) = inherits.l_paren_token() {
         if comment_tokens_before(l_paren.clone()).is_empty() {
             doc = doc.append(Doc::space());
         } else {
             doc = doc.append(comments_before(l_paren));
         }
     }
-    doc = doc
-        .append(Doc::text("("))
-        .append(
-            wrap_body(Doc::list(
+    let tables = inherits.table_name_refs().map(|table| {
+        let mut item = leading_comments(table.syntax());
+        if let Some(path) = table.path_ref() {
+            item = item.append(build_path_ref(&path));
+        }
+        (item, table.syntax().clone())
+    });
+    let mut body = build_comma_separated_docs(tables).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = inherits.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text("("))
+        .append(wrap_body(body))
+        .append(Doc::text(")"))
+        .group()
+}
+
+fn build_create_table_partition_by<'a>(partition_by: ast::PartitionBy) -> Doc<'a> {
+    let mut doc = Doc::text("partition");
+    if let Some(by_token) = partition_by.by_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&by_token));
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("by"));
+    if let Some(strategy) = partition_by.partition_strategy() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(strategy.syntax()))
+            .append(build_keyword_node(strategy.syntax()));
+    }
+    if let Some(items) = partition_by.partition_item_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(items.syntax()))
+            .append(build_create_table_partition_items(items));
+    }
+    doc
+}
+
+fn build_create_table_partition_items<'a>(items: ast::PartitionItemList) -> Doc<'a> {
+    let doc = items
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let item_docs = items.partition_items().map(|item| {
+        let mut item_doc = leading_comments(item.syntax());
+        if let Some(expr) = item.expr() {
+            item_doc = item_doc.append(build_expr(expr));
+        }
+        if item.expr().is_none() {
+            if let Some(collate) = item.collate() {
+                item_doc = item_doc.append(build_collate_expr(collate));
+            }
+        }
+        if let Some(op_class) = item.op_class_ref() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(op_class.syntax()));
+            if let Some(path) = op_class.path_ref() {
+                item_doc = item_doc.append(build_path_ref(&path));
+            }
+        }
+        if let Some(attributes) = item.attribute_list() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(attributes.syntax()))
+                .append(build_attribute_list(attributes));
+        }
+        if let Some(order) = item.sort_order() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(order.syntax()))
+                .append(build_keyword_node(order.syntax()));
+        }
+        if let Some(nulls) = item.nulls_order() {
+            item_doc = item_doc
+                .append(Doc::space())
+                .append(leading_comments(nulls.syntax()))
+                .append(build_keyword_node(nulls.syntax()));
+        }
+        (item_doc, item.syntax().clone())
+    });
+    let mut body = build_comma_separated_docs(item_docs).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = items.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_create_table_partition_type<'a>(partition_type: ast::PartitionType) -> Doc<'a> {
+    match partition_type {
+        ast::PartitionType::PartitionDefault(_) => Doc::text("default"),
+        ast::PartitionType::PartitionForValuesIn(values) => {
+            let mut doc = build_partition_for_values_prefix(values.values_token());
+            if let Some(in_token) = values.in_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&in_token));
+            } else {
+                doc = doc.append(Doc::space());
+            }
+            doc = doc.append(Doc::text("in"));
+            if let Some(l_paren) = values.l_paren_token() {
+                if comment_tokens_before(l_paren.clone()).is_empty() {
+                    doc = doc.append(Doc::space());
+                } else {
+                    doc = doc.append(comments_before(l_paren));
+                }
+            }
+            let body = build_comma_separated_exprs(values.exprs()).unwrap_or_else(Doc::nil);
+            doc.append(Doc::text("("))
+                .append(wrap_body(body))
+                .append(Doc::text(")"))
+                .group()
+        }
+        ast::PartitionType::PartitionForValuesFrom(values) => {
+            let mut doc = build_partition_for_values_prefix(values.values_token());
+            if let Some(from_token) = values.from_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&from_token));
+            } else {
+                doc = doc.append(Doc::space());
+            }
+            doc = doc.append(Doc::text("from"));
+            if let Some(from) = values.from() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(from.syntax()))
+                    .append(build_create_table_partition_values(
+                        from.l_paren_token(),
+                        from.exprs(),
+                        from.r_paren_token(),
+                    ));
+            }
+            doc = doc.append(Doc::line_or_space());
+            if let Some(to_token) = values.to_token() {
+                doc = doc.append(leading_comments_token(&to_token));
+            }
+            doc = doc.append(Doc::text("to"));
+            if let Some(to) = values.to() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(to.syntax()))
+                    .append(build_create_table_partition_values(
+                        to.l_paren_token(),
+                        to.exprs(),
+                        to.r_paren_token(),
+                    ));
+            }
+            doc.group()
+        }
+        ast::PartitionType::PartitionForValuesWith(values) => {
+            let mut doc = build_partition_for_values_prefix(values.values_token());
+            if let Some(with_token) = values.with_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&with_token));
+            } else {
+                doc = doc.append(Doc::space());
+            }
+            doc = doc.append(Doc::text("with"));
+            if let Some(l_paren) = values.l_paren_token() {
+                if comment_tokens_before(l_paren.clone()).is_empty() {
+                    doc = doc.append(Doc::space());
+                } else {
+                    doc = doc.append(comments_before(l_paren));
+                }
+            }
+            let mut parts = Vec::new();
+            if let Some(modulus) = values.modulus() {
+                parts.push(
+                    leading_comments(modulus.syntax())
+                        .append(build_keyword_node(modulus.syntax()))
+                        .append(trailing_comments(modulus.syntax())),
+                );
+            }
+            if let Some(remainder) = values.remainder() {
+                parts.push(
+                    leading_comments(remainder.syntax())
+                        .append(build_keyword_node(remainder.syntax()))
+                        .append(trailing_comments(remainder.syntax())),
+                );
+            }
+            let body = Doc::list(
                 Itertools::intersperse(
-                    arg_list.args().map(build_table_arg),
-                    Doc::text(",").append(Doc::hard_line()),
+                    parts.into_iter(),
+                    Doc::text(",").append(Doc::line_or_space()),
                 )
                 .collect(),
-            ))
-            .group(),
-        )
-        .append(Doc::text(")"));
+            );
+            doc.append(Doc::text("("))
+                .append(wrap_body(body))
+                .append(Doc::text(")"))
+                .group()
+        }
+    }
+}
 
-    doc = doc.append(build_semicolon(create_table.semicolon_token()));
+fn build_partition_for_values_prefix<'a>(values_token: Option<SyntaxToken>) -> Doc<'a> {
+    let mut doc = Doc::text("for");
+    if let Some(values_token) = values_token {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&values_token));
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    doc.append(Doc::text("values"))
+}
 
-    doc
+fn build_create_table_partition_values<'a>(
+    l_paren: Option<SyntaxToken>,
+    exprs: impl Iterator<Item = ast::Expr>,
+    _r_paren: Option<SyntaxToken>,
+) -> Doc<'a> {
+    let doc = l_paren
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let body = build_comma_separated_exprs(exprs).unwrap_or_else(Doc::nil);
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_path<'a>(path: &ast::Path) -> Doc<'a> {
@@ -381,28 +739,401 @@ fn is_unicode_escape(text: &str) -> bool {
 fn build_table_arg<'a>(arg: ast::TableArg) -> Doc<'a> {
     let doc = leading_comments(arg.syntax());
     let doc = doc.append(match &arg {
-        ast::TableArg::Column(column) => {
-            if column.alter_option_list().is_some() {
-                todo!("column alter options are not supported yet")
-            }
-            if column.collate().is_some() {
-                todo!("column collations are not supported yet")
-            }
-            if column.compression_method().is_some() {
-                todo!("column compression methods are not supported yet")
-            }
-            if column.constraints().next().is_some() {
-                todo!("column constraints are not supported yet")
-            }
-            if column.storage().is_some() {
-                todo!("column storage options are not supported yet")
-            }
-            if column.with_options().is_some() {
-                todo!("column with options are not supported yet")
-            }
+        ast::TableArg::Column(column) => build_column(column),
+        ast::TableArg::LikeClause(like_clause) => build_like_clause(like_clause),
+        ast::TableArg::TableConstraint(table_constraint) => {
+            build_table_constraint(table_constraint.clone())
+        }
+    });
+    doc.append(trailing_comments(arg.syntax()))
+}
 
-            let mut doc = build_name(column.name().unwrap().syntax());
-            if let Some(ty) = column.ty() {
+fn build_column<'a>(column: &ast::Column) -> Doc<'a> {
+    let mut doc = column
+        .name()
+        .map(|name| build_name(name.syntax()))
+        .unwrap_or_else(Doc::nil);
+    if let Some(ty) = column.ty() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(ty.syntax()))
+            .append(build_type(ty));
+    }
+    if let Some(storage) = column.storage() {
+        let mut clause = Doc::text("storage");
+        if let Some(mode) = storage.storage_mode() {
+            clause = clause
+                .append(Doc::space())
+                .append(leading_comments(mode.syntax()))
+                .append(build_keyword_node(mode.syntax()));
+        }
+        doc = append_column_clause(doc, storage.syntax(), clause);
+    }
+    if let Some(compression) = column.compression_method() {
+        let mut clause = Doc::text("compression");
+        if let Some(method) = compression.compression_method_name() {
+            clause = clause
+                .append(Doc::space())
+                .append(leading_comments(method.syntax()))
+                .append(build_keyword_node(method.syntax()));
+        }
+        doc = append_column_clause(doc, compression.syntax(), clause);
+    }
+    if let Some(options) = column.with_options() {
+        doc = append_column_clause(doc, options.syntax(), build_keyword_node(options.syntax()));
+    }
+    if let Some(options) = column.alter_option_list() {
+        let syntax = options.syntax().clone();
+        doc = append_column_clause(doc, &syntax, build_alter_option_list(options));
+    }
+    if let Some(collate) = column.collate() {
+        let syntax = collate.syntax().clone();
+        doc = append_column_clause(doc, &syntax, build_collate_expr(collate));
+    }
+    for constraint in column.constraints() {
+        let syntax = constraint.syntax().clone();
+        doc = append_column_clause(doc, &syntax, build_column_constraint(constraint));
+    }
+    doc.group()
+}
+
+fn append_column_clause<'a>(doc: Doc<'a>, syntax: &SyntaxNode, clause: Doc<'a>) -> Doc<'a> {
+    doc.append(
+        Doc::line_or_space()
+            .append(leading_comments(syntax))
+            .append(clause)
+            .nest(2),
+    )
+}
+
+fn build_alter_option_list<'a>(list: ast::AlterOptionList) -> Doc<'a> {
+    let mut doc = Doc::text("options");
+    if let Some(l_paren) = list.l_paren_token() {
+        if comment_tokens_before(l_paren.clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments_before(l_paren));
+        }
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    let items = list.alter_options().map(|option| {
+        let item = leading_comments(option.syntax()).append(build_alter_option(&option));
+        (item, option.syntax().clone())
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(Doc::text("("))
+        .append(Doc::hard_line().append(body).nest(2))
+        .append(Doc::hard_line())
+        .append(Doc::text(")"))
+}
+
+fn build_alter_option<'a>(option: &ast::AlterOption) -> Doc<'a> {
+    match option {
+        ast::AlterOption::AddForeignOption(option) => {
+            let mut doc = option
+                .add_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("add")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(name) = option.foreign_option_name() {
+                if option.add_token().is_some() {
+                    doc = doc.append(Doc::space());
+                }
+                doc = doc
+                    .append(leading_comments(name.syntax()))
+                    .append(build_name(name.syntax()));
+            }
+            if let Some(value) = option.literal() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(value.syntax()))
+                    .append(build_literal(value));
+            }
+            doc
+        }
+        ast::AlterOption::SetForeignOption(option) => {
+            let mut doc = Doc::text("set");
+            if let Some(name) = option.foreign_option_name() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(name.syntax()))
+                    .append(build_name(name.syntax()));
+            }
+            if let Some(value) = option.literal() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(value.syntax()))
+                    .append(build_literal(value));
+            }
+            doc
+        }
+        ast::AlterOption::DropForeignOption(option) => {
+            let mut doc = Doc::text("drop");
+            if let Some(name) = option.foreign_option_name() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(name.syntax()))
+                    .append(build_name(name.syntax()));
+            }
+            doc
+        }
+    }
+}
+
+fn build_column_constraint<'a>(constraint: ast::ColumnConstraint) -> Doc<'a> {
+    match constraint {
+        ast::ColumnConstraint::CheckConstraint(constraint) => build_check_constraint(constraint),
+        ast::ColumnConstraint::DefaultConstraint(constraint) => {
+            let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+            if let Some(default) = constraint.default_token() {
+                doc = doc
+                    .append(leading_comments_token(&default))
+                    .append(Doc::text("default"));
+            }
+            if let Some(expr) = constraint.expr() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(expr.syntax()))
+                    .append(build_expr(expr));
+            }
+            append_constraint_options(doc, constraint.constraint_options())
+                .nest(2)
+                .group()
+        }
+        ast::ColumnConstraint::ExcludeConstraint(constraint) => {
+            build_exclude_constraint(constraint)
+        }
+        ast::ColumnConstraint::GeneratedConstraint(constraint) => {
+            build_generated_constraint(constraint)
+        }
+        ast::ColumnConstraint::NotNullConstraint(constraint) => {
+            let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+            if let Some(not) = constraint.not_token() {
+                doc = doc
+                    .append(leading_comments_token(&not))
+                    .append(Doc::text("not"));
+            }
+            if let Some(null) = constraint.null_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&null))
+                    .append(Doc::text("null"));
+            }
+            if let Some(column) = constraint.column_name_ref() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(column.syntax()))
+                    .append(build_name(column.syntax()));
+            }
+            append_constraint_options(doc, constraint.constraint_options())
+                .nest(2)
+                .group()
+        }
+        ast::ColumnConstraint::NullConstraint(constraint) => {
+            let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+            if let Some(null) = constraint.null_token() {
+                doc = doc
+                    .append(leading_comments_token(&null))
+                    .append(Doc::text("null"));
+            }
+            append_constraint_options(doc, constraint.constraint_options())
+                .nest(2)
+                .group()
+        }
+        ast::ColumnConstraint::PrimaryKeyConstraint(constraint) => {
+            build_primary_key_constraint(constraint)
+        }
+        ast::ColumnConstraint::ReferencesConstraint(constraint) => {
+            build_references_constraint(constraint)
+        }
+        ast::ColumnConstraint::UniqueConstraint(constraint) => build_unique_constraint(constraint),
+    }
+}
+
+fn build_references_constraint<'a>(constraint: ast::ReferencesConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(references) = constraint.references_token() {
+        doc = doc
+            .append(leading_comments_token(&references))
+            .append(Doc::text("references"));
+    }
+    if let Some(table) = constraint.table() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(table.syntax()));
+        if let Some(path) = table.path_ref() {
+            doc = doc.append(build_path_ref(&path));
+        }
+    }
+    if let Some(column) = constraint.column() {
+        if let Some(l_paren) = constraint.l_paren_token() {
+            doc = doc.append(comments_before(l_paren));
+        }
+        doc = doc
+            .append(Doc::text("("))
+            .append(leading_comments(column.syntax()))
+            .append(build_name(column.syntax()));
+        if let Some(r_paren) = constraint.r_paren_token() {
+            doc = doc.append(comments_before(r_paren));
+        }
+        doc = doc.append(Doc::text(")"));
+    }
+    if let Some(match_type) = constraint.match_type() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(match_type.syntax()))
+            .append(build_keyword_node(match_type.syntax()));
+    }
+    if let Some(action) = constraint.on_delete_action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_reference_action(
+                action.on_token(),
+                action.delete_token(),
+                "delete",
+                action.ref_action(),
+            ));
+    }
+    if let Some(action) = constraint.on_update_action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_reference_action(
+                action.on_token(),
+                action.update_token(),
+                "update",
+                action.ref_action(),
+            ));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_generated_constraint<'a>(constraint: ast::GeneratedConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(generated) = constraint.generated_token() {
+        doc = doc
+            .append(leading_comments_token(&generated))
+            .append(Doc::text("generated"));
+    }
+    if let Some(generated_as) = constraint.generated_as() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(generated_as.syntax()))
+            .append(match generated_as {
+                ast::GeneratedAs::GeneratedIdentity(identity) => {
+                    let mut body = identity
+                        .generated_when()
+                        .map(build_generated_when)
+                        .unwrap_or_else(Doc::nil);
+                    if let Some(as_token) = identity.as_token() {
+                        body = body
+                            .append(Doc::space())
+                            .append(leading_comments_token(&as_token))
+                            .append(Doc::text("as"));
+                    }
+                    if let Some(identity_token) = identity.identity_token() {
+                        body = body
+                            .append(Doc::space())
+                            .append(leading_comments_token(&identity_token))
+                            .append(Doc::text("identity"));
+                    }
+                    if let Some(options) = identity.sequence_option_list() {
+                        body = body
+                            .append(Doc::space())
+                            .append(leading_comments(options.syntax()))
+                            .append(build_sequence_option_list(options));
+                    }
+                    body
+                }
+                ast::GeneratedAs::GeneratedStored(stored) => {
+                    let mut body = stored
+                        .generated_when()
+                        .map(build_generated_when)
+                        .unwrap_or_else(Doc::nil);
+                    if let Some(as_token) = stored.as_token() {
+                        body = body
+                            .append(Doc::space())
+                            .append(leading_comments_token(&as_token))
+                            .append(Doc::text("as"));
+                    }
+                    if let Some(l_paren) = stored.l_paren_token() {
+                        if comment_tokens_before(l_paren.clone()).is_empty() {
+                            body = body.append(Doc::space());
+                        } else {
+                            body = body.append(comments_before(l_paren));
+                        }
+                    }
+                    let mut expr = stored
+                        .expr()
+                        .map(|expr| leading_comments(expr.syntax()).append(build_expr(expr)))
+                        .unwrap_or_else(Doc::nil);
+                    if let Some(r_paren) = stored.r_paren_token() {
+                        expr = expr.append(comments_before(r_paren));
+                    }
+                    body = body
+                        .append(Doc::text("("))
+                        .append(wrap_body(expr))
+                        .append(Doc::text(")"));
+                    if let Some(kind) = stored.generated_kind() {
+                        body = body
+                            .append(Doc::space())
+                            .append(leading_comments(kind.syntax()))
+                            .append(build_keyword_node(kind.syntax()));
+                    }
+                    body.group()
+                }
+            });
+    }
+    doc = doc.group();
+    for option in constraint.constraint_options() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(option.syntax()))
+                .append(build_keyword_node(option.syntax()))
+                .nest(2),
+        );
+    }
+    doc.group()
+}
+
+fn build_generated_when<'a>(when: ast::GeneratedWhen) -> Doc<'a> {
+    match when {
+        ast::GeneratedWhen::GeneratedAlways(always) => build_keyword_node(always.syntax()),
+        ast::GeneratedWhen::GeneratedByDefault(by_default) => {
+            build_keyword_node(by_default.syntax())
+        }
+    }
+}
+
+fn build_sequence_option_list<'a>(list: ast::SequenceOptionList) -> Doc<'a> {
+    let doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let options = list
+        .sequence_options()
+        .map(|option| leading_comments(option.syntax()).append(build_sequence_option(option)));
+    let mut body = Doc::list(Itertools::intersperse(options, Doc::line_or_space()).collect());
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(Doc::hard_line().append(body).nest(2))
+        .append(Doc::hard_line())
+        .append(Doc::text(")"))
+}
+
+fn build_sequence_option<'a>(option: ast::SequenceOption) -> Doc<'a> {
+    match option {
+        ast::SequenceOption::OptionAsType(option) => {
+            let mut doc = Doc::text("as");
+            if let Some(ty) = option.ty() {
                 doc = doc
                     .append(Doc::space())
                     .append(leading_comments(ty.syntax()))
@@ -410,12 +1141,115 @@ fn build_table_arg<'a>(arg: ast::TableArg) -> Doc<'a> {
             }
             doc
         }
-        ast::TableArg::LikeClause(like_clause) => build_like_clause(like_clause),
-        ast::TableArg::TableConstraint(table_constraint) => {
-            build_table_constraint(table_constraint.clone())
+        ast::SequenceOption::OptionCache(option) => {
+            append_optional_literal(Doc::text("cache"), option.literal())
         }
-    });
-    doc.append(trailing_comments(arg.syntax()))
+        ast::SequenceOption::OptionIncrement(option) => {
+            let mut doc = option
+                .increment_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("increment")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(by) = option.by_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&by))
+                    .append(Doc::text("by"));
+            }
+            append_optional_literal(doc, option.literal())
+        }
+        ast::SequenceOption::OptionMaxValue(option) => {
+            append_optional_literal(Doc::text("maxvalue"), option.literal())
+        }
+        ast::SequenceOption::OptionMinValue(option) => {
+            append_optional_literal(Doc::text("minvalue"), option.literal())
+        }
+        ast::SequenceOption::OptionRestart(option) => {
+            let mut doc = option
+                .restart_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("restart")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(with) = option.with_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&with))
+                    .append(Doc::text("with"));
+            }
+            append_optional_literal(doc, option.literal())
+        }
+        ast::SequenceOption::OptionStart(option) => {
+            let mut doc = option
+                .start_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("start")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(with) = option.with_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&with))
+                    .append(Doc::text("with"));
+            }
+            append_optional_literal(doc, option.literal())
+        }
+        ast::SequenceOption::OptionOwnedBy(option) => {
+            let mut doc = option
+                .owned_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("owned")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(by) = option.by_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&by))
+                    .append(Doc::text("by"));
+            }
+            if let Some(target) = option.owned_by_target() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(target.syntax()))
+                    .append(match target {
+                        ast::OwnedByTarget::OwnedByNone(_) => Doc::text("none"),
+                        ast::OwnedByTarget::QualifiedColumnNameRef(name) => name
+                            .path_ref()
+                            .map(|path| build_path_ref(&path))
+                            .unwrap_or_else(Doc::nil),
+                    });
+            }
+            doc
+        }
+        ast::SequenceOption::OptionSequenceName(option) => {
+            let mut doc = option
+                .sequence_token()
+                .map(|token| leading_comments_token(&token).append(Doc::text("sequence")))
+                .unwrap_or_else(Doc::nil);
+            if let Some(name) = option.name_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&name))
+                    .append(Doc::text("name"));
+            }
+            if let Some(sequence) = option.sequence() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(sequence.syntax()));
+                if let Some(path) = sequence.path() {
+                    doc = doc.append(build_path(&path));
+                }
+            }
+            doc
+        }
+        ast::SequenceOption::OptionCycle(option) => build_keyword_node(option.syntax()),
+        ast::SequenceOption::OptionLogged(option) => build_keyword_node(option.syntax()),
+        ast::SequenceOption::OptionNoCycle(option) => build_keyword_node(option.syntax()),
+        ast::SequenceOption::OptionNoMaxValue(option) => build_keyword_node(option.syntax()),
+        ast::SequenceOption::OptionNoMinValue(option) => build_keyword_node(option.syntax()),
+        ast::SequenceOption::OptionUnlogged(option) => build_keyword_node(option.syntax()),
+    }
+}
+
+fn append_optional_literal<'a>(doc: Doc<'a>, literal: Option<ast::Literal>) -> Doc<'a> {
+    literal.map_or(doc.clone(), |literal| {
+        doc.append(Doc::space())
+            .append(leading_comments(literal.syntax()))
+            .append(build_literal(literal))
+    })
 }
 
 fn build_table_constraint<'a>(constraint: ast::TableConstraint) -> Doc<'a> {
@@ -5317,69 +6151,152 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
 fn build_postfix_expr<'a>(postfix_expr: ast::PostfixExpr) -> Doc<'a> {
     let expr = build_expr(postfix_expr.expr().unwrap());
     let op = match postfix_expr.op().unwrap() {
-        ast::PostfixOp::AtLocal(_) => Doc::text("at local"),
+        ast::PostfixOp::AtLocal(n) => {
+            build_two_keywords(n.at_token(), "at", n.local_token(), "local")
+        }
         ast::PostfixOp::IsNull(_) => Doc::text("isnull"),
         ast::PostfixOp::NotNull(_) => Doc::text("notnull"),
-        ast::PostfixOp::IsJson(n) => build_json_postfix("is json", n.json_keys_unique_clause()),
-        ast::PostfixOp::IsJsonArray(n) => {
-            build_json_postfix("is json array", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsJsonObject(n) => {
-            build_json_postfix("is json object", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsJsonScalar(n) => {
-            build_json_postfix("is json scalar", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsJsonValue(n) => {
-            build_json_postfix("is json value", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsNormalized(n) => build_normalized_postfix("is", n.unicode_normal_form()),
-        ast::PostfixOp::IsNotJson(n) => {
-            build_json_postfix("is not json", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsNotJsonArray(n) => {
-            build_json_postfix("is not json array", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsNotJsonObject(n) => {
-            build_json_postfix("is not json object", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsNotJsonScalar(n) => {
-            build_json_postfix("is not json scalar", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsNotJsonValue(n) => {
-            build_json_postfix("is not json value", n.json_keys_unique_clause())
-        }
-        ast::PostfixOp::IsNotNormalized(n) => {
-            build_normalized_postfix("is not", n.unicode_normal_form())
-        }
+        ast::PostfixOp::IsJson(n) => build_json_postfix(
+            [(n.is_token(), "is"), (n.json_token(), "json")],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsJsonArray(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.json_token(), "json"),
+                (n.array_token(), "array"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsJsonObject(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.json_token(), "json"),
+                (n.object_token(), "object"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsJsonScalar(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.json_token(), "json"),
+                (n.scalar_token(), "scalar"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsJsonValue(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.json_token(), "json"),
+                (n.value_token(), "value"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsNormalized(n) => build_normalized_postfix(
+            [(n.is_token(), "is")],
+            n.unicode_normal_form(),
+            n.normalized_token(),
+        ),
+        ast::PostfixOp::IsNotJson(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.not_token(), "not"),
+                (n.json_token(), "json"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsNotJsonArray(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.not_token(), "not"),
+                (n.json_token(), "json"),
+                (n.array_token(), "array"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsNotJsonObject(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.not_token(), "not"),
+                (n.json_token(), "json"),
+                (n.object_token(), "object"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsNotJsonScalar(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.not_token(), "not"),
+                (n.json_token(), "json"),
+                (n.scalar_token(), "scalar"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsNotJsonValue(n) => build_json_postfix(
+            [
+                (n.is_token(), "is"),
+                (n.not_token(), "not"),
+                (n.json_token(), "json"),
+                (n.value_token(), "value"),
+            ],
+            n.json_keys_unique_clause(),
+        ),
+        ast::PostfixOp::IsNotNormalized(n) => build_normalized_postfix(
+            [(n.is_token(), "is"), (n.not_token(), "not")],
+            n.unicode_normal_form(),
+            n.normalized_token(),
+        ),
     };
     expr.append(Doc::space()).append(op)
 }
 
+fn build_postfix_keywords<'a>(
+    keywords: impl IntoIterator<Item = (Option<SyntaxToken>, &'static str)>,
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    let mut has_keyword = false;
+    for (token, text) in keywords {
+        let Some(token) = token else {
+            continue;
+        };
+        if has_keyword {
+            doc = doc.append(Doc::space());
+        }
+        doc = doc
+            .append(leading_comments_token(&token))
+            .append(Doc::text(text));
+        has_keyword = true;
+    }
+    doc
+}
+
 fn build_json_postfix<'a>(
-    prefix: &'static str,
+    keywords: impl IntoIterator<Item = (Option<SyntaxToken>, &'static str)>,
     clause: Option<ast::JsonKeysUniqueClause>,
 ) -> Doc<'a> {
-    let mut doc = Doc::text(prefix);
+    let mut doc = build_postfix_keywords(keywords);
     if let Some(clause) = clause {
         doc = doc
             .append(Doc::space())
+            .append(leading_comments(clause.syntax()))
             .append(build_json_keys_unique_clause(clause));
     }
     doc
 }
 
 fn build_normalized_postfix<'a>(
-    prefix: &'static str,
+    keywords: impl IntoIterator<Item = (Option<SyntaxToken>, &'static str)>,
     form: Option<ast::UnicodeNormalForm>,
+    normalized_token: Option<SyntaxToken>,
 ) -> Doc<'a> {
-    let mut doc = Doc::text(prefix);
+    let mut doc = build_postfix_keywords(keywords);
     if let Some(form) = form {
         doc = doc
             .append(Doc::space())
+            .append(leading_comments(form.syntax()))
             .append(build_unicode_normal_form(form));
     }
-    doc.append(Doc::space()).append(Doc::text("normalized"))
+    append_keyword_token(doc, normalized_token, "normalized")
 }
 
 fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {

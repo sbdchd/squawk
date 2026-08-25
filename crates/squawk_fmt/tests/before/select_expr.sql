@@ -263,6 +263,7 @@ select
   (values (a_very_long_first_parenthesized_value_expression, a_very_long_second_parenthesized_value_expression), (a_very_long_third_parenthesized_value_expression, a_very_long_fourth_parenthesized_value_expression)),
   (a_very_long_parenthesized_expression + a_second_very_long_parenthesized_expression),
   -- postfix expr
+  'x' at /* between at and local */ local,
   1  isnull,
   2  notnull,
   x  is  json,
@@ -282,6 +283,8 @@ select
   x  is  not  json  value,
   x  is  not  normalized,
   x  is  not  nfkd  normalized,
+  x is /* before not */ not /* before json */ json /* before array */ array /* before with */ with /* before unique */ unique /* before keys */ keys,
+  x is /* before normalized not */ not /* before form */ nfkd /* before normalized */ normalized,
   a_very_long_json_postfix_input_expression_that_forces_wrapping is json array with unique keys,
   a_very_long_normalized_postfix_input_expression_that_forces_wrapping is not nfkd normalized,
   -- prefix expr
