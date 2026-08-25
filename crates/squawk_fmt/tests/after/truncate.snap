@@ -1,0 +1,21 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 28
+input_file: crates/squawk_fmt/tests/before/truncate.sql
+---
+truncate foo;
+truncate table only foo continue identity restrict;
+truncate foo *, bar restart identity cascade;
+
+/*before*/
+truncate /*a*/ table
+  /*b*/ public /*c*/./*d*/ foo /*e*/ * /*f*/,
+  /*g*/ bar
+/*h*/ continue /*i*/ identity
+/*j*/ restrict/*k*/;
+
+truncate table
+  a_very_long_schema_name.a_very_long_table_name,
+  another_very_long_schema_name.another_very_long_table_name
+restart identity
+cascade;

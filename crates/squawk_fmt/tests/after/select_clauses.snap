@@ -1,0 +1,59 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/select_clauses.sql
+---
+with cte as (
+  select 1
+)
+select x
+from cte
+where x > 0
+group by x
+having count(*) > 0
+window win as (partition by x)
+order by x
+for update
+limit 10
+offset 2 rows;
+
+select x from foo fetch first 5 rows with ties;
+
+with a_very_long_common_table_expression_name as (
+  select a_very_long_source_column_name from a_very_long_source_relation_name
+)
+select a_very_long_result_column_name
+from a_very_long_common_table_expression_name
+where a_very_long_filter_column_name > a_very_long_filter_threshold_value
+group by a_very_long_result_column_name
+having count(*) > a_very_long_having_threshold_value
+window a_very_long_window_name as (
+    partition by a_very_long_partition_column_name
+    order by a_very_long_order_column_name
+  )
+order by a_very_long_result_column_name desc
+for no key update of a_very_long_common_table_expression_name skip locked
+limit a_very_long_limit_expression
+offset a_very_long_offset_expression rows;
+
+with /* before recursive */ recursive /* before cte */ cte/* before columns */ (
+  /* before column */ x /* before columns close */
+) /* before as */ as /* before materialized */ materialized /* before query open */ (
+  /* before query */ select 1 /* before query close */
+)
+/* before outer select */ select /* before target */ x
+/* before from */ from /* before relation */ cte
+/* before where */ where /* before where expression */ x > 0
+/* before group */ group /* before by */ by /* before group expression */ x
+/* before having */ having /* before having expression */ count(*) > 0
+/* before window */ window /* before window name */ win /* before window as */ as /* before window open */ (
+    /* before partition */ partition /* before partition by */ by /* before partition expression */ x /* before window close */
+  )
+/* before order */ order /* before order by */ by
+  /* before order expression */ x /* before desc */ desc
+/* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait
+/* before limit */ limit /* before limit value */ 10
+/* before offset */ offset /* before offset value */ 2 /* before rows */ rows/* before semicolon */;
+
+select
+  x
+/* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties;

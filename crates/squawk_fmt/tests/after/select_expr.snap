@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_fmt/tests/before/select_expr.sql
 ---
 select
@@ -615,8 +614,7 @@ select
   a[1 + 2],
   a /* before bracket */[/* before index */ 1 /* before closing bracket */],
   a_very_long_indexed_expression[a_very_long_first_index_expression][
-    a_very_long_second_index_expression
-    + a_very_long_index_offset_expression
+    a_very_long_second_index_expression + a_very_long_index_offset_expression
   ],
   -- literal
   42,
@@ -654,19 +652,18 @@ select
   ),
   (values (1, 2), (3, 4)),
   (
-    values
-      (
-        a_very_long_first_parenthesized_value_expression,
-        a_very_long_second_parenthesized_value_expression
-      ),
-      (
-        a_very_long_third_parenthesized_value_expression,
-        a_very_long_fourth_parenthesized_value_expression
-      )
+    values (
+      a_very_long_first_parenthesized_value_expression,
+      a_very_long_second_parenthesized_value_expression
+    ),
+    (
+      a_very_long_third_parenthesized_value_expression,
+      a_very_long_fourth_parenthesized_value_expression
+    )
   ),
   (
     a_very_long_parenthesized_expression
-    + a_second_very_long_parenthesized_expression
+      + a_second_very_long_parenthesized_expression
   ),
   -- postfix expr
   'x' at /* between at and local */ local,
@@ -730,9 +727,16 @@ select
     /* before second */ 2 /* before closing paren */
   );
 
-select
-  a_very_long_function_name(
-    first_very_long_argument_name,
-    second_very_long_argument_name,
-    third_very_long_argument_name
-  );
+select a_very_long_function_name(
+  first_very_long_argument_name,
+  second_very_long_argument_name,
+  third_very_long_argument_name
+);
+
+select json_object(
+  'a': 1,
+  'b' value 2 format json
+  null on null
+  with unique keys
+  returning jsonb format json
+);

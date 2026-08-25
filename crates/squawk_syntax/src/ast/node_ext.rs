@@ -434,6 +434,29 @@ impl ast::FieldExpr {
     }
 }
 
+impl ast::IndexAccessor {
+    #[inline]
+    pub fn index(&self) -> Option<ast::Expr> {
+        support::child(self.syntax())
+    }
+}
+
+impl ast::SliceAccessor {
+    #[inline]
+    pub fn start(&self) -> Option<ast::Expr> {
+        let colon = self.colon_token()?;
+        support::children(self.syntax())
+            .find(|expr: &ast::Expr| expr.syntax().text_range().end() <= colon.text_range().start())
+    }
+
+    #[inline]
+    pub fn end(&self) -> Option<ast::Expr> {
+        let colon = self.colon_token()?;
+        support::children(self.syntax())
+            .find(|expr: &ast::Expr| expr.syntax().text_range().start() >= colon.text_range().end())
+    }
+}
+
 impl ast::IndexExpr {
     #[inline]
     pub fn base(&self) -> Option<ast::Expr> {

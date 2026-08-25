@@ -56,10 +56,12 @@ from /* before graph table */ graph_table /* before outer opening paren */(
     /* before match */ match
       /* before first vertex opening paren */ (/* before first variable */ a
           /* before is */ is /* before first label */ person
-          /* before vertex where */ where /* before vertex expression */ a.active /* before first vertex closing paren */)
+          /* before vertex where */ where
+            /* before vertex expression */ a.active /* before first vertex closing paren */)
         /* before first edge minus */ - /* before edge opening bracket */[/* before edge variable */ e
           /* before edge is */ is /* before edge label */ knows
-          /* before edge where */ where /* before edge expression */ e.active /* before edge closing bracket */] /* before edge ending minus */- /* before right angle */>
+          /* before edge where */ where
+            /* before edge expression */ e.active /* before edge closing bracket */] /* before edge ending minus */- /* before right angle */>
         /* before second vertex */ (b)/* before qualifier opening curly */ {/* before qualifier min */ 1 /* before qualifier comma */, /* before qualifier max */ 3 /* before qualifier closing curly */} /* before pattern comma */,
       /* before second pattern */ /* before left angle */ < /* before left minus */- /* before left opening bracket */[left_edge /* before left closing bracket */] /* before left ending minus */-
         (c),
@@ -68,7 +70,8 @@ from /* before graph table */ graph_table /* before outer opening paren */(
         (e),
       /* before nested opening paren */ (/* before nested pattern */ (x)
           /* before simple edge */ - /* before simple right angle */>
-          (y) /* before nested where */ where /* before nested expression */ x.active /* before nested closing paren */)
+          (y) /* before nested where */ where
+          /* before nested expression */ x.active /* before nested closing paren */)
     /* before graph where */ where /* before graph expression */ b.active
     /* before columns */ columns /* before columns opening paren */(
       /* before first column */ a.name /* before column as */ as /* before column name */ source /* before column comma */,

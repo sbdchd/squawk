@@ -1,0 +1,68 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/insert.sql
+---
+insert into foo (id, name) values (1, 'one') returning id;
+
+with inserted as (
+  insert into foo default values returning id
+)
+select *
+from inserted;
+
+with inserted as (
+  insert into foo as f (id, name)
+  overriding system value
+  select id, name from incoming
+  on conflict on constraint foo_pkey do nothing
+  returning id
+)
+select *
+from inserted;
+
+with inserted as (
+  insert into a_very_long_schema_name.a_very_long_table_name (
+    organization_identifier,
+    extremely_long_descriptive_column_name
+  )
+  values (
+    123456789,
+    'an extremely long value that forces the insert statement to wrap across lines'
+  )
+  on conflict (organization_identifier)
+    do update
+    set
+      extremely_long_descriptive_column_name
+        = excluded.extremely_long_descriptive_column_name
+    where
+      a_very_long_table_name.organization_identifier
+        = excluded.organization_identifier
+  returning organization_identifier, extremely_long_descriptive_column_name
+)
+select organization_identifier, extremely_long_descriptive_column_name
+from inserted;
+
+/*before*/
+with /*a*/ inserted/*b*/ (
+  /*c*/ result_id /*d*/
+) /*e*/ as /*f*/ not /*g*/ materialized /*h*/ (
+  /*i*/ insert /*j*/ into /*k*/ public /*l*/./*m*/ foo /*n*/ as /*o*/ f /*p*/ (
+    /*q*/ id /*r*/,
+    /*s*/ payload /*t*/
+  )
+  /*u*/ overriding /*v*/ user /*w*/ value
+  /*x*/ values /*y*/ (/*z*/ 1 /*aa*/, /*ab*/ 'new' /*ac*/)
+  /*ad*/ on /*ae*/ conflict /*af*/ (
+    /*ag*/ id /*ah*/ collate /*ai*/ "C" /*aj*/ text_ops /*ak*/
+  )
+  /*al*/ where /*am*/ id > 0
+    /*an*/ do /*ao*/ update
+    /*ap*/ set /*aq*/ payload /*ar*/ = /*as*/ excluded.payload
+    /*at*/ where /*au*/ foo.id = excluded.id
+  /*av*/ returning /*aw*/ with /*ax*/ (
+    /*ay*/ old /*az*/ as /*ba*/ old_row /*bb*/,
+    /*bc*/ new /*bd*/ as /*be*/ new_row /*bf*/
+  ) /*bg*/ new_row.id /*bh*/
+)
+/*bi*/ select /*bj*/ result_id
+/*bk*/ from /*bl*/ inserted/*bm*/;
