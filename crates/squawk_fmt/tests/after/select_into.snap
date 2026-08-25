@@ -1,0 +1,25 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/select_into.sql
+---
+select 1 into foo;
+select a, b into temporary table public.foo from bar;
+select 1 into unlogged foo;
+/* before select */
+select
+  /* before distinct */ distinct /* before first target */ a /* before target comma */,
+  /* before second target */ b
+/* before into */ into /* before local */ local /* before temporary */ temporary /* before table */ table /* before schema */ public /* before dot */./* before table name */ foo
+/* before from */ from /* before relation */ bar
+/* before group */ group /* before by */ by /* before group expression */ a
+/* before order */ order /* before order by */ by
+  /* before order expression */ b /* before desc */ desc/* before semicolon */;
+select
+  a_very_long_first_select_into_expression,
+  a_very_long_second_select_into_expression,
+  a_very_long_third_select_into_expression
+into unlogged a_very_long_schema_name.a_very_long_select_into_table_name
+from a_very_long_select_into_source_relation
+order by
+  a_very_long_first_order_expression desc,
+  a_very_long_second_order_expression asc;

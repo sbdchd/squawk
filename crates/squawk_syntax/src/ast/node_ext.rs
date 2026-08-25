@@ -882,6 +882,26 @@ impl ast::JsonNullOnNull {
     }
 }
 
+impl ast::JsonTable {
+    pub fn document_expr(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    pub fn path_expr(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::JsonTablePlanJoin {
+    pub fn lhs(&self) -> Option<ast::JsonTablePlan> {
+        support::children(self.syntax()).next()
+    }
+
+    pub fn rhs(&self) -> Option<ast::JsonTablePlan> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
 impl ast::JsonExistsFn {
     #[inline]
     pub fn document(&self) -> Option<ast::Expr> {

@@ -96,6 +96,9 @@ select
       /* before expr */ array[4] /* before closing paren */
     ) /* after any */,
   exists(select 1 from things),
+  exists((select 1)),
+  exists(table things),
+  5 = any(values (1), (5)),
   a_very_long_any_comparison_expression = any(
     a_very_long_any_input_expression_that_forces_wrapping
   ),
@@ -271,10 +274,14 @@ select
     a_very_long_second_argument_name := a_very_long_second_argument_expression
   ),
   a_very_long_aggregate_name(
-    a_very_long_aggregate_argument_expression order by a_very_long_first_order_expression desc nulls last, a_very_long_second_order_expression using > nulls first
+    a_very_long_aggregate_argument_expression order by
+      a_very_long_first_order_expression desc nulls last,
+      a_very_long_second_order_expression using > nulls first
   ),
   array_agg(
-    x /* before order */ order /* before by */ by /* before first */ y /* before desc */ desc /* before nulls */ nulls /* before last */ last /* before comma */, /* before second */ z /* before asc */ asc
+    x /* before order */ order /* before by */ by
+      /* before first */ y /* before desc */ desc /* before nulls */ nulls /* before last */ last /* before comma */,
+      /* before second */ z /* before asc */ asc
   ),
   json_arrayagg(v),
   json_arrayagg(
@@ -313,6 +320,9 @@ select
     absent on null
     returning a_very_long_json_select_return_type
   ),
+  json_array((select 1)),
+  json_array(table things),
+  json_array(values (1), (2)),
   json_array /* before opening paren */(
     /* before first */ 1 /* before comma */,
     /* before second */ 2
@@ -494,7 +504,8 @@ select
   percentile_disc(
     0.5
   ) /* before within */ within /* before group */ group /* before opening paren */ (
-    /* before order */ order /* before by */ by /* before sort */ x /* before closing paren */
+    /* before order */ order /* before by */ by
+      /* before sort */ x /* before closing paren */
   ) /* after within */,
   count(*) filter (where x > 1),
   sum(x) /* before filter */ filter /* before opening paren */ (
@@ -621,6 +632,37 @@ select
   (1 + 2),
   ((1)),
   (/* before expr */ 1 /* before closing paren */),
+  (select 1),
+  /* before opening paren */ (
+    /* before select */ select /* before target */ x
+    /* before from */ from /* before relation */ things /* before closing paren */
+  ) /* after paren */,
+  (
+    select a_very_long_parenthesized_select_expression
+    from a_very_long_parenthesized_select_relation_name
+  ),
+  (table foo),
+  (table foo order by a desc, b asc),
+  (
+    /* before table */ table
+      /* before only */ only /* before relation opening paren */(/* before relation */ public /* before dot */./* before name */ foo /* before relation closing paren */) /* before outer closing paren */
+  ),
+  (
+    table
+      a_very_long_schema_name.a_very_long_relation_name_that_forces_parenthesized_table_wrapping
+  ),
+  (values (1, 2), (3, 4)),
+  (
+    values
+      (
+        a_very_long_first_parenthesized_value_expression,
+        a_very_long_second_parenthesized_value_expression
+      ),
+      (
+        a_very_long_third_parenthesized_value_expression,
+        a_very_long_fourth_parenthesized_value_expression
+      )
+  ),
   (
     a_very_long_parenthesized_expression
     + a_second_very_long_parenthesized_expression

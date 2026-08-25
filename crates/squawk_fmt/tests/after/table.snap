@@ -1,0 +1,19 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/table.sql
+---
+table foo;
+table public.foo *;
+table only (public.foo);
+table foo order by a desc, b asc;
+/* before table */
+table
+  /* before only */ only /* before relation opening paren */(/* before relation */ public /* before dot */./* before name */ foo /* before relation closing paren */)
+/* before order */ order /* before by */ by
+  /* before first expression */ a /* before desc */ desc /* before comma */,
+  /* before second expression */ b /* before asc */ asc/* before semicolon */;
+table
+  a_very_long_schema_name.a_very_long_relation_name_that_forces_the_table_statement_to_wrap
+order by
+  a_very_long_first_order_expression desc,
+  a_very_long_second_order_expression asc;

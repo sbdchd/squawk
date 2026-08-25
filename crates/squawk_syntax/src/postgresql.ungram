@@ -2968,7 +2968,7 @@ XmlTableFromItem =
   'lateral'? XmlTable alias:FromAlias?
 
 ExprFromItem =
-  'lateral'? (CastExpr | CollationForFn) alias:FromAlias?
+  'lateral'? (CastExpr | CallExpr) alias:FromAlias?
 
 RowsFromItem =
   'lateral'? 'rows' 'from' '(' (RowsFromArg (',' RowsFromArg)*) ')' WithOrdinality? alias:FromAlias?
