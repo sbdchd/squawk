@@ -25,7 +25,9 @@ order by
   a_very_long_second_order_expression asc;
 
 with recursive
-  first_cte(a, b) as not materialized (select 1, 2),
+  first_cte(a, b) as not materialized (select 1, 2)
+  search depth first by a, b set traversal_order
+  cycle a, b set is_cycle to true default false using traversal_path,
   second_cte as (values (3, 4))
 select distinct on (a, b) a, count(*)
 into result
@@ -46,6 +48,10 @@ with /* before recursive */ recursive
   ) /* before as */ as /* before not */ not /* before materialized */ materialized /* before query open */ (
     /* before query */ select 1 /* before query close */
   )
+  /* before search */ search /* before depth */ depth /* before first */ first /* before search by */ by /* before search column */ a /* before search comma */,
+  /* before second search column */ b /* before search set */ set /* before search set column */ traversal_order
+  /* before cycle */ cycle /* before cycle column */ a /* before cycle comma */,
+  /* before second cycle column */ b /* before cycle set */ set /* before cycle set column */ is_cycle /* before to */ to /* before cycle value */ true /* before default */ default /* before default value */ false /* before using */ using /* before path column */ traversal_path
 /* before outer select */ select
   /* before distinct */ distinct /* before on */ on /* before distinct open */ (
     /* before distinct expression */ a /* before distinct comma */,

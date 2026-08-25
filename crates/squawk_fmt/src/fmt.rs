@@ -2195,13 +2195,6 @@ fn build_with_clause<'a>(with_clause: ast::WithClause) -> Doc<'a> {
 }
 
 fn build_with_table<'a>(table: ast::WithTable) -> Doc<'a> {
-    if table.search_clause().is_some() {
-        todo!("CTE search clauses are not supported yet")
-    }
-    if table.cycle_clause().is_some() {
-        todo!("CTE cycle clauses are not supported yet")
-    }
-
     let mut doc = table
         .name()
         .map(|name| build_name(name.syntax()))
@@ -2247,7 +2240,163 @@ fn build_with_table<'a>(table: ast::WithTable) -> Doc<'a> {
     if let Some(r_paren) = table.r_paren_token() {
         body = body.append(comments_before(r_paren));
     }
-    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+    doc = doc.append(wrap_body(body)).append(Doc::text(")")).group();
+    if let Some(search) = table.search_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(search.syntax()))
+            .append(build_search_clause(search));
+    }
+    if let Some(cycle) = table.cycle_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(cycle.syntax()))
+            .append(build_cycle_clause(cycle));
+    }
+    doc.group()
+}
+
+fn build_search_clause<'a>(search: ast::SearchClause) -> Doc<'a> {
+    let mut doc = Doc::text("search");
+    if let Some(order) = search.search_order() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(order.syntax()))
+            .append(match order {
+                ast::SearchOrder::BreadthFirst(first) => Doc::text("breadth")
+                    .append(Doc::space())
+                    .append(
+                        first
+                            .first_token()
+                            .map(|token| leading_comments_token(&token))
+                            .unwrap_or_else(Doc::nil),
+                    )
+                    .append(Doc::text("first")),
+                ast::SearchOrder::DepthFirst(first) => Doc::text("depth")
+                    .append(Doc::space())
+                    .append(
+                        first
+                            .first_token()
+                            .map(|token| leading_comments_token(&token))
+                            .unwrap_or_else(Doc::nil),
+                    )
+                    .append(Doc::text("first")),
+            });
+    }
+    if let Some(by_token) = search.by_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&by_token))
+            .append(Doc::text("by"));
+    }
+    if let Some(columns) = search.columns() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_column_name_refs(columns.column_name_refs()));
+    }
+    if let Some(set_column) = search.set_column() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(set_column.syntax()))
+            .append(build_search_set_column(set_column));
+    }
+    doc.group()
+}
+
+fn build_search_set_column<'a>(set_column: ast::SearchSetColumn) -> Doc<'a> {
+    let mut doc = Doc::text("set");
+    if let Some(column) = set_column.column_name_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(column.syntax()))
+            .append(build_name(column.syntax()));
+    }
+    doc
+}
+
+fn build_cycle_clause<'a>(cycle: ast::CycleClause) -> Doc<'a> {
+    let mut doc = Doc::text("cycle");
+    if let Some(columns) = cycle.columns() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_column_name_refs(columns.column_name_refs()));
+    }
+    if let Some(set_column) = cycle.set_column() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(set_column.syntax()))
+            .append(build_cycle_set_column(set_column));
+    }
+    if let Some(path) = cycle.path() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(path.syntax()))
+            .append(build_cycle_path(path));
+    }
+    doc.group()
+}
+
+fn build_cycle_set_column<'a>(set_column: ast::CycleSetColumn) -> Doc<'a> {
+    let mut doc = Doc::text("set");
+    if let Some(column) = set_column.column_name_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(column.syntax()))
+            .append(build_name(column.syntax()));
+    }
+    if let Some(column_to) = set_column.column_to() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(column_to.syntax()))
+            .append(build_cycle_column_to(column_to));
+    }
+    doc
+}
+
+fn build_cycle_column_to<'a>(column_to: ast::CycleColumnTo) -> Doc<'a> {
+    let mut doc = Doc::text("to");
+    if let Some(expr) = column_to.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    if let Some(default) = column_to.default() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(default.syntax()))
+            .append(Doc::text("default"));
+        if let Some(expr) = default.expr() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(expr.syntax()))
+                .append(build_expr(expr));
+        }
+    }
+    doc
+}
+
+fn build_cycle_path<'a>(path: ast::CyclePath) -> Doc<'a> {
+    let mut doc = Doc::text("using");
+    if let Some(column) = path.column_name_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(column.syntax()))
+            .append(build_name(column.syntax()));
+    }
+    doc
+}
+
+fn build_column_name_refs<'a>(columns: impl Iterator<Item = ast::ColumnNameRef>) -> Doc<'a> {
+    let columns = columns.map(|column| {
+        (
+            leading_comments(column.syntax()).append(build_name(column.syntax())),
+            column.syntax().clone(),
+        )
+    });
+    build_comma_separated_docs(columns).unwrap_or_else(Doc::nil)
 }
 
 fn build_cte_column_list<'a>(columns: ast::ColumnList) -> Doc<'a> {
