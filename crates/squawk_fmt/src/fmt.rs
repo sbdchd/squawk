@@ -2048,42 +2048,20 @@ fn build_relation_name<'a>(relation: ast::RelationName) -> Doc<'a> {
 }
 
 fn build_select_into<'a>(select_into: &ast::SelectInto) -> Doc<'a> {
-    if select_into.with_clause().is_some() {
-        todo!("select into with clauses are not supported yet")
-    }
-    if select_into.where_clause().is_some() {
-        todo!("select into where clauses are not supported yet")
-    }
-    if select_into.having_clause().is_some() {
-        todo!("select into having clauses are not supported yet")
-    }
-    if select_into.window_clause().is_some() {
-        todo!("select into window clauses are not supported yet")
-    }
-    if select_into.locking_clauses().next().is_some() {
-        todo!("select into locking clauses are not supported yet")
-    }
-    if select_into.limit_clause().is_some() {
-        todo!("select into limit clauses are not supported yet")
-    }
-    if select_into.offset_clause().is_some() {
-        todo!("select into offset clauses are not supported yet")
-    }
-    if select_into.filter_clause().is_some() {
-        todo!("select into filter clauses are not supported yet")
-    }
-
     let mut select_body = Doc::nil();
     if let Some(select_clause) = select_into.select_clause() {
         match select_clause.select_quantifier() {
             Some(ast::SelectQuantifier::DistinctClause(distinct_clause)) => {
-                if distinct_clause.distinct_on().is_some() {
-                    todo!("select into distinct on clauses are not supported yet")
-                }
                 select_body = select_body
                     .append(leading_comments(distinct_clause.syntax()))
-                    .append(Doc::text("distinct"))
-                    .append(Doc::space());
+                    .append(Doc::text("distinct"));
+                if let Some(distinct_on) = distinct_clause.distinct_on() {
+                    select_body = select_body
+                        .append(Doc::space())
+                        .append(leading_comments(distinct_on.syntax()))
+                        .append(build_distinct_on(distinct_on));
+                }
+                select_body = select_body.append(Doc::space());
             }
             Some(ast::SelectQuantifier::All(all)) => {
                 select_body = select_body
@@ -2105,9 +2083,23 @@ fn build_select_into<'a>(select_into: &ast::SelectInto) -> Doc<'a> {
                 ));
         }
     }
-    let mut doc = Doc::text("select")
-        .append(Doc::line_or_space().append(select_body).nest(2))
-        .group();
+    let mut doc = Doc::nil();
+    if let Some(with_clause) = select_into.with_clause() {
+        doc = doc
+            .append(leading_comments(with_clause.syntax()))
+            .append(build_with_clause(with_clause))
+            .append(Doc::hard_line());
+    }
+    if select_into.with_clause().is_some() {
+        if let Some(select_clause) = select_into.select_clause() {
+            doc = doc.append(leading_comments(select_clause.syntax()));
+        }
+    }
+    doc = doc.append(
+        Doc::text("select")
+            .append(Doc::line_or_space().append(select_body).nest(2))
+            .group(),
+    );
 
     if let Some(into) = select_into.into_clause() {
         doc = doc
@@ -2122,11 +2114,29 @@ fn build_select_into<'a>(select_into: &ast::SelectInto) -> Doc<'a> {
             .append(leading_comments(from.syntax()))
             .append(build_from_clause(from));
     }
+    if let Some(where_clause) = select_into.where_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(where_clause.syntax()))
+            .append(build_where_clause(where_clause));
+    }
     if let Some(group) = select_into.group_by_clause() {
         doc = doc
             .append(Doc::line_or_space())
             .append(leading_comments(group.syntax()))
             .append(build_select_group_by_clause(group));
+    }
+    if let Some(having) = select_into.having_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(having.syntax()))
+            .append(build_having_clause(having));
+    }
+    if let Some(window) = select_into.window_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(window.syntax()))
+            .append(build_window_clause(window));
     }
     if let Some(order_by) = select_into.order_by_clause() {
         doc = doc
@@ -2134,8 +2144,215 @@ fn build_select_into<'a>(select_into: &ast::SelectInto) -> Doc<'a> {
             .append(leading_comments(order_by.syntax()))
             .append(build_order_by_clause(order_by));
     }
+    for locking in select_into.locking_clauses() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(locking.syntax()))
+            .append(build_locking_clause(locking));
+    }
+    if let Some(limit) = select_into.limit_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(limit.syntax()))
+            .append(build_limit_clause(limit));
+    }
+    if let Some(offset) = select_into.offset_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(offset.syntax()))
+            .append(build_offset_clause(offset));
+    }
+    if let Some(filter) = select_into.filter_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(filter.syntax()))
+            .append(build_filter_clause(filter));
+    }
     doc.append(build_semicolon(select_into.semicolon_token()))
         .group()
+}
+
+fn build_with_clause<'a>(with_clause: ast::WithClause) -> Doc<'a> {
+    let mut doc = Doc::text("with");
+    if let Some(recursive) = with_clause.recursive_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&recursive))
+            .append(Doc::text("recursive"));
+    }
+    let tables = with_clause.with_tables().map(|table| {
+        (
+            leading_comments(table.syntax()).append(build_with_table(table.clone())),
+            table.syntax().clone(),
+        )
+    });
+    if let Some(tables) = build_comma_separated_docs(tables) {
+        doc = doc
+            .append(Doc::line_or_space().append(tables).nest(2))
+            .group();
+    }
+    doc
+}
+
+fn build_with_table<'a>(table: ast::WithTable) -> Doc<'a> {
+    if table.search_clause().is_some() {
+        todo!("CTE search clauses are not supported yet")
+    }
+    if table.cycle_clause().is_some() {
+        todo!("CTE cycle clauses are not supported yet")
+    }
+
+    let mut doc = table
+        .name()
+        .map(|name| build_name(name.syntax()))
+        .unwrap_or_else(Doc::nil);
+    if let Some(columns) = table.column_list() {
+        doc = doc
+            .append(leading_comments(columns.syntax()))
+            .append(build_cte_column_list(columns));
+    }
+    if let Some(as_token) = table.as_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"));
+    }
+    if let Some(materialized) = table.materialized_option() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(materialized.syntax()))
+            .append(match materialized {
+                ast::MaterializedOption::Materialized(_) => Doc::text("materialized"),
+                ast::MaterializedOption::NotMaterialized(not_materialized) => Doc::text("not")
+                    .append(Doc::space())
+                    .append(
+                        not_materialized
+                            .materialized_token()
+                            .map(|token| leading_comments_token(&token))
+                            .unwrap_or_else(Doc::nil),
+                    )
+                    .append(Doc::text("materialized")),
+            });
+    }
+    if let Some(l_paren) = table.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren))
+            .append(Doc::text("("));
+    }
+    let mut body = table
+        .query()
+        .map(|query| leading_comments(query.syntax()).append(build_with_query(query)))
+        .unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = table.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_cte_column_list<'a>(columns: ast::ColumnList) -> Doc<'a> {
+    let mut doc = columns
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let names = columns.column_names().map(|name| {
+        (
+            leading_comments(name.syntax()).append(build_name(name.syntax())),
+            name.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(names).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = columns.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc = doc.append(wrap_body(body)).append(Doc::text(")")).group();
+    doc
+}
+
+fn build_with_query<'a>(query: ast::WithQuery) -> Doc<'a> {
+    match query {
+        ast::WithQuery::CompoundSelect(select) => build_compound_select(&select),
+        ast::WithQuery::ParenSelect(select) => build_paren_select(select),
+        ast::WithQuery::Select(select) => build_select_doc(&select),
+        ast::WithQuery::Table(table) => build_table(&table),
+        ast::WithQuery::Values(values) => build_values(&values),
+        ast::WithQuery::Delete(_) => todo!("DELETE CTEs are not supported yet"),
+        ast::WithQuery::Insert(_) => todo!("INSERT CTEs are not supported yet"),
+        ast::WithQuery::Merge(_) => todo!("MERGE CTEs are not supported yet"),
+        ast::WithQuery::Update(_) => todo!("UPDATE CTEs are not supported yet"),
+    }
+}
+
+fn build_distinct_on<'a>(distinct_on: ast::DistinctOn) -> Doc<'a> {
+    let mut doc = Doc::text("on");
+    if let Some(l_paren) = distinct_on.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren))
+            .append(Doc::text("("));
+    }
+    let exprs: Vec<_> = distinct_on.exprs().collect();
+    let has_exprs = !exprs.is_empty();
+    let mut body = build_comma_separated_exprs(exprs.into_iter()).unwrap_or_else(Doc::nil);
+    if !has_exprs {
+        if let Some(r_paren) = distinct_on.r_paren_token() {
+            body = body.append(comments_before(r_paren));
+        }
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_having_clause<'a>(having: ast::HavingClause) -> Doc<'a> {
+    let mut doc = Doc::text("having");
+    if let Some(expr) = having.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc
+}
+
+fn build_window_clause<'a>(window: ast::WindowClause) -> Doc<'a> {
+    let defs = window.window_defs().map(|def| {
+        (
+            leading_comments(def.syntax()).append(build_window_def(def.clone())),
+            def.syntax().clone(),
+        )
+    });
+    let mut doc = Doc::text("window");
+    if let Some(defs) = build_comma_separated_docs(defs) {
+        doc = doc.append(Doc::space()).append(defs.nest(2));
+    }
+    doc.group()
+}
+
+fn build_window_def<'a>(def: ast::WindowDef) -> Doc<'a> {
+    let mut doc = def
+        .window()
+        .map(|window| build_name(window.syntax()))
+        .unwrap_or_else(Doc::nil);
+    if let Some(as_token) = def.as_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"));
+    }
+    if let Some(l_paren) = def.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&l_paren))
+            .append(Doc::text("("));
+    }
+    let mut body = def
+        .window_spec()
+        .map(|spec| leading_comments(spec.syntax()).append(build_window_spec(spec)))
+        .unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = def.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
 fn build_into_clause<'a>(into: ast::IntoClause) -> Doc<'a> {
