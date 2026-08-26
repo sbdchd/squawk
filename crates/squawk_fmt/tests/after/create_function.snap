@@ -103,3 +103,16 @@ create function commented_body(value integer) returns integer
     /*bg*/ values /*bh*/ (value)/*bi*/;
     /*bj*/ return /*bk*/ value + 1/*bl*/;
   /*bm*/ end/*bn*/;
+
+create function external_add(integer, integer) returns integer
+  as '$libdir/example', 'external_add'
+  language c;
+
+create function commented_external() returns integer
+  as /*bo*/ '$libdir/example' /*bp*/, /*bq*/ 'commented_external'
+  /*br*/ language c;
+
+create function function_with_a_very_long_external_definition() returns integer
+  as '$libdir/a_very_long_object_file_name_that_does_not_fit_on_the_same_line',
+  'a_very_long_link_symbol_name_that_does_not_fit_on_the_same_line'
+  language c;

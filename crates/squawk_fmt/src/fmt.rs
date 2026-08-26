@@ -1969,8 +1969,25 @@ fn build_as_function_option<'a>(option: ast::AsFuncOption) -> Doc<'a> {
                         .append(build_literal(literal));
                 }
             }
-            ast::AsFuncTarget::AsObjFile(_) => {
-                todo!("object-file function definitions are not supported yet")
+            ast::AsFuncTarget::AsObjFile(obj_file) => {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(obj_file.syntax()));
+                if let Some(literal) = obj_file.obj_file() {
+                    doc = doc
+                        .append(leading_comments(literal.syntax()))
+                        .append(build_literal(literal));
+                }
+                if let Some(comma) = obj_file.comma_token() {
+                    doc = doc.append(comments_before(comma)).append(Doc::text(","));
+                }
+                if let Some(literal) = obj_file.link_symbol() {
+                    doc = doc
+                        .append(Doc::line_or_space())
+                        .append(leading_comments(literal.syntax()))
+                        .append(build_literal(literal));
+                }
+                doc = doc.group();
             }
         }
     }
@@ -5537,29 +5554,104 @@ fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
 }
 
 fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
-    if from.join_exprs().next().is_some() {
-        todo!("joins are not supported yet")
-    }
-
-    let from_items: Vec<_> = from
-        .from_items()
-        .map(|item| {
-            let leading = leading_comments(item.syntax());
-            let trailing = trailing_comments(item.syntax());
-            leading.append(build_from_item(item)).append(trailing)
-        })
-        .collect();
-
-    Doc::text("from").append(Doc::space()).append(
-        Doc::list(
-            Itertools::intersperse(
-                from_items.into_iter(),
-                Doc::text(",").append(Doc::line_or_space()),
-            )
-            .collect(),
+    let from_items = from.from_items().map(|item| {
+        let syntax = item.syntax().clone();
+        (
+            leading_comments(item.syntax()).append(build_from_item(item)),
+            syntax,
         )
-        .nest(2),
-    )
+    });
+    let join_exprs = from.join_exprs().map(|join_expr| {
+        let syntax = join_expr.syntax().clone();
+        (
+            leading_comments(join_expr.syntax()).append(build_join_expr(join_expr)),
+            syntax,
+        )
+    });
+    let body = build_comma_separated_docs(from_items.chain(join_exprs)).unwrap_or_else(Doc::nil);
+
+    Doc::text("from").append(Doc::space()).append(body.nest(2))
+}
+
+fn build_join_expr<'a>(join_expr: ast::JoinExpr) -> Doc<'a> {
+    let mut doc = if let Some(left) = join_expr.join_expr() {
+        leading_comments(left.syntax()).append(build_join_expr(left))
+    } else if let Some(left) = join_expr.from_item() {
+        leading_comments(left.syntax()).append(build_from_item(left))
+    } else {
+        Doc::nil()
+    };
+
+    if let Some(join) = join_expr.join() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(join.syntax()))
+            .append(build_join(join));
+    }
+    doc.group()
+}
+
+fn build_join<'a>(join: ast::Join) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(natural) = join.natural_token() {
+        doc = doc
+            .append(leading_comments_token(&natural))
+            .append(Doc::text("natural"))
+            .append(Doc::space());
+    }
+    if let Some(join_type) = join.join_type() {
+        doc = doc
+            .append(leading_comments(join_type.syntax()))
+            .append(build_keyword_node(join_type.syntax()));
+    }
+    if let Some(item) = join.from_item() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(item.syntax()))
+            .append(build_from_item(item));
+    }
+    if let Some(condition) = join.join_condition() {
+        match condition {
+            ast::JoinCondition::OnClause(on_clause) => {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(on_clause.syntax()))
+                    .append(build_join_on_clause(on_clause));
+            }
+            ast::JoinCondition::JoinUsingClause(using) => {
+                let condition_doc =
+                    leading_comments(using.syntax()).append(build_join_using_clause(using));
+                doc = doc.append(Doc::line_or_space().append(condition_doc).nest(2));
+            }
+        }
+    }
+    doc.group()
+}
+
+fn build_join_on_clause<'a>(on_clause: ast::OnClause) -> Doc<'a> {
+    let mut doc = Doc::text("on");
+    if let Some(expr) = on_clause.expr() {
+        let expr_doc = leading_comments(expr.syntax()).append(build_expr(expr));
+        doc = doc.append(Doc::line_or_space().append(expr_doc).nest(2));
+    }
+    doc
+}
+
+fn build_join_using_clause<'a>(using: ast::JoinUsingClause) -> Doc<'a> {
+    let mut doc = Doc::text("using");
+    if let Some(columns) = using.column_ref_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_column_ref_list(columns));
+    }
+    if let Some(alias) = using.alias() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(alias.syntax()))
+            .append(build_required_as_alias(alias));
+    }
+    doc
 }
 
 fn build_from_item<'a>(item: ast::FromItem) -> Doc<'a> {
@@ -9416,8 +9508,10 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
         body = body
             .append(leading_comments(from_item.syntax()))
             .append(build_from_item(from_item));
-    } else if let Some(_join_expr) = paren_expr.join_expr() {
-        todo!("parenthesized join expression nodes are not supported yet")
+    } else if let Some(join_expr) = paren_expr.join_expr() {
+        body = body
+            .append(leading_comments(join_expr.syntax()))
+            .append(build_join_expr(join_expr));
     } else if let Some(select) = paren_expr.select() {
         body = body
             .append(leading_comments(select.syntax()))

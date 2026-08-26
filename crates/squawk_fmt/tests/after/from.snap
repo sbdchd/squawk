@@ -207,3 +207,39 @@ from a_very_long_relation_name tablesample bernoulli (
 select *
 from only a_very_long_schema_name.a_very_long_first_relation_name * as a_very_long_first_alias,
   a_very_long_schema_name.a_very_long_second_relation_name as a_very_long_second_alias;
+
+select * from users join profiles on users.id = profiles.user_id;
+
+select * from users left outer join profiles using (user_id) as matched_users;
+
+select *
+from a right join b on true,
+  c full outer join d on true,
+  e natural inner join f,
+  g cross join h;
+
+select *
+from first_really_long_table_name
+  join second_really_long_table_name on
+    first_really_long_table_name.id = second_really_long_table_name.first_id
+  join third_really_long_table_name on
+    second_really_long_table_name.id = third_really_long_table_name.second_id;
+
+select * from (a join b on a.id = b.id) as joined_tables;
+
+select *
+from a
+  /*ja*/ left /*jb*/ outer /*jc*/ join /*jd*/ b /*je*/ on
+    /*jf*/ a /*jg*/./*jh*/ id /*ji*/ = /*jj*/ b /*jk*/./*jl*/ id,
+  /*jm*/ c
+  /*jn*/ join /*jo*/ d
+    /*jp*/ using /*jq*/ (
+      /*jr*/ first_id /*js*/,
+      /*jt*/ second_id /*ju*/
+    ) /*jv*/ as /*jw*/ ids/*jx*/;
+
+select a_very_long_column_name
+from a_very_long_schema_name.a_very_long_table_name
+  left outer join another_very_long_schema_name.another_very_long_table_name on
+    a_very_long_schema_name.a_very_long_table_name.a_very_long_column_name
+      = another_very_long_schema_name.another_very_long_table_name.another_very_long_column_name;

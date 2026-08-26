@@ -29,3 +29,9 @@ create function increment(value integer) returns integer language sql begin atom
 create function record_and_calculate(a_very_long_input_parameter_name integer, another_very_long_input_parameter_name integer) returns integer language sql begin atomic insert into function_audit_log (first_recorded_value, second_recorded_value) values (a_very_long_input_parameter_name, another_very_long_input_parameter_name); return a_very_long_input_parameter_name + another_very_long_input_parameter_name; end;
 
 create function commented_body(value integer) returns integer language sql /*bb*/ begin /*bc*/ atomic /*bd*/ insert /*be*/ into function_log /*bf*/ (value) /*bg*/ values /*bh*/ (value) /*bi*/; /*bj*/ return /*bk*/ value + 1 /*bl*/; /*bm*/ end /*bn*/;
+
+create function external_add(integer, integer) returns integer as '$libdir/example', 'external_add' language c;
+
+create function commented_external() returns integer as /*bo*/ '$libdir/example' /*bp*/, /*bq*/ 'commented_external' /*br*/ language c;
+
+create function function_with_a_very_long_external_definition() returns integer as '$libdir/a_very_long_object_file_name_that_does_not_fit_on_the_same_line', 'a_very_long_link_symbol_name_that_does_not_fit_on_the_same_line' language c;
