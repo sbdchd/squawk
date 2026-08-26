@@ -1,0 +1,10 @@
+create view active_users as select id, name from users where active = true;
+
+create or replace temporary recursive view public.user_summary (user_id, display_name) with (security_barrier = true, check_option = local) as select id, name from public.users with local check option;
+
+create view a_very_long_schema_name.a_very_long_view_name (a_very_long_identifier_column, another_very_long_identifier_column, a_third_very_long_identifier_column) as select a_very_long_identifier_column, another_very_long_identifier_column, a_third_very_long_identifier_column from a_very_long_schema_name.a_very_long_table_name with cascaded check option;
+
+-- comments in every position
+create /*a*/ or /*b*/ replace /*c*/ temp /*d*/ recursive /*e*/ view /*f*/ app /*g*/ . /*h*/ dashboard /*i*/ (/*j*/ account_id /*k*/, /*l*/ total /*m*/) /*n*/ with /*o*/ (/*p*/ security_barrier /*q*/ = /*r*/ true /*s*/, /*t*/ check_option /*u*/ = /*v*/ local /*w*/) /*x*/ as /*y*/ select /*z*/ account_id, total from summaries /*aa*/ with /*ab*/ cascaded /*ac*/ check /*ad*/ option /*ae*/;
+
+create view plain_check as select 1 with check option;
