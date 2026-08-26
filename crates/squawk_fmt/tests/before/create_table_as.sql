@@ -1,0 +1,10 @@
+create table active_users as select id, name from users where active = true;
+
+create temporary table if not exists reporting.a_very_long_destination_table_name (a_very_long_identifier_column, another_very_long_identifier_column) using heap with (fillfactor = 70, autovacuum_enabled = true) on commit preserve rows tablespace fast as select a_very_long_identifier_column, another_very_long_identifier_column from a_very_long_source_schema_name.a_very_long_source_table_name with no data;
+
+create table cached_result as execute refresh_cached_result(1, 'full') with data;
+
+-- comments in every position
+create /*a*/ temp /*b*/ table /*c*/ if /*d*/ not /*e*/ exists /*f*/ app /*g*/ . /*h*/ report /*i*/ (/*j*/ id /*k*/, /*l*/ total /*m*/) /*n*/ using /*o*/ heap /*p*/ with /*q*/ (/*r*/ fillfactor /*s*/ = /*t*/ 70 /*u*/) /*v*/ on /*w*/ commit /*x*/ preserve /*y*/ rows /*z*/ tablespace /*aa*/ fast /*ab*/ as /*ac*/ select id, total from summaries /*ad*/ with /*ae*/ no /*af*/ data /*ag*/;
+
+create table executed /*a*/ as /*b*/ execute /*c*/ refresh_report /*d*/ (/*e*/ 1 /*f*/, /*g*/ 'full' /*h*/) /*i*/ with /*j*/ data /*k*/;

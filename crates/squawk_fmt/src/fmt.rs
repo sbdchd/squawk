@@ -17,251 +17,7 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
         match el {
             rowan::NodeOrToken::Node(node) => {
                 if let Some(stmt) = ast::Stmt::cast(node) {
-                    match stmt {
-                        ast::Stmt::Select(select) => {
-                            doc = doc.append(build_select_doc(&select));
-                        }
-                        ast::Stmt::CreateTable(create_table) => {
-                            doc = doc.append(build_create_table(&create_table));
-                        }
-                        ast::Stmt::AlterAggregate(_) => todo!(),
-                        ast::Stmt::AlterCollation(_) => todo!(),
-                        ast::Stmt::AlterConversion(_) => todo!(),
-                        ast::Stmt::AlterDatabase(_) => todo!(),
-                        ast::Stmt::AlterDefaultPrivileges(_) => todo!(),
-                        ast::Stmt::AlterDomain(_) => todo!(),
-                        ast::Stmt::AlterEventTrigger(_) => todo!(),
-                        ast::Stmt::AlterExtension(_) => todo!(),
-                        ast::Stmt::AlterForeignDataWrapper(_) => todo!(),
-                        ast::Stmt::AlterForeignTable(_) => todo!(),
-                        ast::Stmt::AlterFunction(_) => todo!(),
-                        ast::Stmt::AlterGroup(_) => todo!(),
-                        ast::Stmt::AlterIndex(_) => todo!(),
-                        ast::Stmt::AlterLanguage(_) => todo!(),
-                        ast::Stmt::AlterLargeObject(_) => todo!(),
-                        ast::Stmt::AlterMaterializedView(_) => todo!(),
-                        ast::Stmt::AlterOperator(_) => todo!(),
-                        ast::Stmt::AlterOperatorClass(_) => todo!(),
-                        ast::Stmt::AlterOperatorFamily(_) => todo!(),
-                        ast::Stmt::AlterPolicy(_) => todo!(),
-                        ast::Stmt::AlterProcedure(_) => todo!(),
-                        ast::Stmt::AlterPropertyGraph(_) => todo!(),
-                        ast::Stmt::AlterPublication(alter_publication) => {
-                            doc = doc.append(build_alter_publication(&alter_publication));
-                        }
-                        ast::Stmt::AlterRole(_) => todo!(),
-                        ast::Stmt::AlterRoutine(_) => todo!(),
-                        ast::Stmt::AlterRule(_) => todo!(),
-                        ast::Stmt::AlterSchema(_) => todo!(),
-                        ast::Stmt::AlterSequence(_) => todo!(),
-                        ast::Stmt::AlterServer(_) => todo!(),
-                        ast::Stmt::AlterStatistics(_) => todo!(),
-                        ast::Stmt::AlterSubscription(alter_subscription) => {
-                            doc = doc.append(build_alter_subscription(&alter_subscription));
-                        }
-                        ast::Stmt::AlterSystem(_) => todo!(),
-                        ast::Stmt::AlterTable(_) => todo!(),
-                        ast::Stmt::AlterTablespace(_) => todo!(),
-                        ast::Stmt::AlterTextSearchConfiguration(_) => todo!(),
-                        ast::Stmt::AlterTextSearchDictionary(_) => todo!(),
-                        ast::Stmt::AlterTextSearchParser(_) => todo!(),
-                        ast::Stmt::AlterTextSearchTemplate(_) => todo!(),
-                        ast::Stmt::AlterTrigger(_) => todo!(),
-                        ast::Stmt::AlterType(_) => todo!(),
-                        ast::Stmt::AlterUser(_) => todo!(),
-                        ast::Stmt::AlterUserMapping(_) => todo!(),
-                        ast::Stmt::AlterView(_) => todo!(),
-                        ast::Stmt::Analyze(_) => todo!(),
-                        ast::Stmt::Begin(begin) => {
-                            doc = doc.append(build_begin(&begin));
-                        }
-                        ast::Stmt::Call(_) => todo!(),
-                        ast::Stmt::Checkpoint(_) => todo!(),
-                        ast::Stmt::Close(_) => todo!(),
-                        ast::Stmt::Cluster(_) => todo!(),
-                        ast::Stmt::CommentOn(_) => todo!(),
-                        ast::Stmt::CompoundSelect(compound_select) => {
-                            doc = doc.append(build_compound_select(&compound_select));
-                        }
-                        ast::Stmt::Copy(_) => todo!(),
-                        ast::Stmt::CreateAccessMethod(_) => todo!(),
-                        ast::Stmt::CreateAggregate(_) => todo!(),
-                        ast::Stmt::CreateCast(_) => todo!(),
-                        ast::Stmt::CreateCollation(_) => todo!(),
-                        ast::Stmt::CreateConversion(_) => todo!(),
-                        ast::Stmt::CreateDatabase(_) => todo!(),
-                        ast::Stmt::CreateDomain(_) => todo!(),
-                        ast::Stmt::CreateEventTrigger(_) => todo!(),
-                        ast::Stmt::CreateExtension(_) => todo!(),
-                        ast::Stmt::CreateForeignDataWrapper(_) => todo!(),
-                        ast::Stmt::CreateForeignTable(_) => todo!(),
-                        ast::Stmt::CreateFunction(create_function) => {
-                            doc = doc.append(build_create_function(&create_function));
-                        }
-                        ast::Stmt::CreateGroup(_) => todo!(),
-                        ast::Stmt::CreateIndex(create_index) => {
-                            doc = doc.append(build_create_index(&create_index));
-                        }
-                        ast::Stmt::CreateLanguage(_) => todo!(),
-                        ast::Stmt::CreateMaterializedView(_) => todo!(),
-                        ast::Stmt::CreateOperator(_) => todo!(),
-                        ast::Stmt::CreateOperatorClass(_) => todo!(),
-                        ast::Stmt::CreateOperatorFamily(_) => todo!(),
-                        ast::Stmt::CreatePolicy(_) => todo!(),
-                        ast::Stmt::CreateProcedure(_) => todo!(),
-                        ast::Stmt::CreatePropertyGraph(_) => todo!(),
-                        ast::Stmt::CreatePublication(create_publication) => {
-                            doc = doc.append(build_create_publication(&create_publication));
-                        }
-                        ast::Stmt::CreateRole(_) => todo!(),
-                        ast::Stmt::CreateRule(_) => todo!(),
-                        ast::Stmt::CreateSchema(_) => todo!(),
-                        ast::Stmt::CreateSequence(_) => todo!(),
-                        ast::Stmt::CreateServer(_) => todo!(),
-                        ast::Stmt::CreateStatistics(_) => todo!(),
-                        ast::Stmt::CreateSubscription(create_subscription) => {
-                            doc = doc.append(build_create_subscription(&create_subscription));
-                        }
-                        ast::Stmt::CreateTableAs(_) => todo!(),
-                        ast::Stmt::CreateTablespace(_) => todo!(),
-                        ast::Stmt::CreateTextSearchConfiguration(_) => todo!(),
-                        ast::Stmt::CreateTextSearchDictionary(_) => todo!(),
-                        ast::Stmt::CreateTextSearchParser(_) => todo!(),
-                        ast::Stmt::CreateTextSearchTemplate(_) => todo!(),
-                        ast::Stmt::CreateTransform(_) => todo!(),
-                        ast::Stmt::CreateTrigger(_) => todo!(),
-                        ast::Stmt::CreateType(_) => todo!(),
-                        ast::Stmt::CreateUser(_) => todo!(),
-                        ast::Stmt::CreateUserMapping(_) => todo!(),
-                        ast::Stmt::CreateView(create_view) => {
-                            doc = doc.append(build_create_view(&create_view));
-                        }
-                        ast::Stmt::Deallocate(_) => todo!(),
-                        ast::Stmt::Declare(_) => todo!(),
-                        ast::Stmt::Delete(delete) => {
-                            doc = doc.append(build_delete(&delete));
-                        }
-                        ast::Stmt::Discard(_) => todo!(),
-                        ast::Stmt::Do(_) => todo!(),
-                        ast::Stmt::DropAccessMethod(_) => todo!(),
-                        ast::Stmt::DropAggregate(_) => todo!(),
-                        ast::Stmt::DropCast(_) => todo!(),
-                        ast::Stmt::DropCollation(_) => todo!(),
-                        ast::Stmt::DropConversion(_) => todo!(),
-                        ast::Stmt::DropDatabase(_) => todo!(),
-                        ast::Stmt::DropDomain(_) => todo!(),
-                        ast::Stmt::DropEventTrigger(_) => todo!(),
-                        ast::Stmt::DropExtension(_) => todo!(),
-                        ast::Stmt::DropForeignDataWrapper(_) => todo!(),
-                        ast::Stmt::DropForeignTable(_) => todo!(),
-                        ast::Stmt::DropFunction(_) => todo!(),
-                        ast::Stmt::DropGroup(_) => todo!(),
-                        ast::Stmt::DropIndex(_) => todo!(),
-                        ast::Stmt::DropLanguage(_) => todo!(),
-                        ast::Stmt::DropMaterializedView(_) => todo!(),
-                        ast::Stmt::DropOperator(_) => todo!(),
-                        ast::Stmt::DropOperatorClass(_) => todo!(),
-                        ast::Stmt::DropOperatorFamily(_) => todo!(),
-                        ast::Stmt::DropOwned(_) => todo!(),
-                        ast::Stmt::DropPolicy(_) => todo!(),
-                        ast::Stmt::DropProcedure(_) => todo!(),
-                        ast::Stmt::DropPropertyGraph(_) => todo!(),
-                        ast::Stmt::DropPublication(drop_publication) => {
-                            doc = doc.append(build_drop_publication(&drop_publication));
-                        }
-                        ast::Stmt::DropRole(_) => todo!(),
-                        ast::Stmt::DropRoutine(_) => todo!(),
-                        ast::Stmt::DropRule(_) => todo!(),
-                        ast::Stmt::DropSchema(_) => todo!(),
-                        ast::Stmt::DropSequence(_) => todo!(),
-                        ast::Stmt::DropServer(_) => todo!(),
-                        ast::Stmt::DropStatistics(_) => todo!(),
-                        ast::Stmt::DropSubscription(drop_subscription) => {
-                            doc = doc.append(build_drop_subscription(&drop_subscription));
-                        }
-                        ast::Stmt::DropTable(_) => todo!(),
-                        ast::Stmt::DropTablespace(_) => todo!(),
-                        ast::Stmt::DropTextSearchConfig(_) => todo!(),
-                        ast::Stmt::DropTextSearchDict(_) => todo!(),
-                        ast::Stmt::DropTextSearchParser(_) => todo!(),
-                        ast::Stmt::DropTextSearchTemplate(_) => todo!(),
-                        ast::Stmt::DropTransform(_) => todo!(),
-                        ast::Stmt::DropTrigger(_) => todo!(),
-                        ast::Stmt::DropType(_) => todo!(),
-                        ast::Stmt::DropUser(_) => todo!(),
-                        ast::Stmt::DropUserMapping(_) => todo!(),
-                        ast::Stmt::DropView(_) => todo!(),
-                        ast::Stmt::EmptyStmt(empty_stmt) => {
-                            doc = doc.append(build_empty_stmt(&empty_stmt));
-                        }
-                        ast::Stmt::Execute(_) => todo!(),
-                        ast::Stmt::Explain(_) => todo!(),
-                        ast::Stmt::Fetch(_) => todo!(),
-                        ast::Stmt::Grant(_) => todo!(),
-                        ast::Stmt::ImportForeignSchema(_) => todo!(),
-                        ast::Stmt::Insert(insert) => {
-                            doc = doc.append(build_insert(&insert));
-                        }
-                        ast::Stmt::Listen(_) => todo!(),
-                        ast::Stmt::Load(_) => todo!(),
-                        ast::Stmt::Lock(_) => todo!(),
-                        ast::Stmt::Merge(merge) => {
-                            doc = doc.append(build_merge(&merge));
-                        }
-                        ast::Stmt::Move(_) => todo!(),
-                        ast::Stmt::Notify(_) => todo!(),
-                        ast::Stmt::ParenSelect(paren_select) => {
-                            doc = doc.append(build_paren_select(paren_select));
-                        }
-                        ast::Stmt::Prepare(_) => todo!(),
-                        ast::Stmt::PrepareTransaction(prepare) => {
-                            doc = doc.append(build_prepare_transaction(&prepare));
-                        }
-                        ast::Stmt::Reassign(_) => todo!(),
-                        ast::Stmt::Refresh(_) => todo!(),
-                        ast::Stmt::Reindex(_) => todo!(),
-                        ast::Stmt::ReleaseSavepoint(release) => {
-                            doc = doc.append(build_release_savepoint(&release));
-                        }
-                        ast::Stmt::Repack(_) => todo!(),
-                        ast::Stmt::Reset(_) => todo!(),
-                        ast::Stmt::ResetRole(_) => todo!(),
-                        ast::Stmt::ResetSessionAuth(_) => todo!(),
-                        ast::Stmt::Revoke(_) => todo!(),
-                        ast::Stmt::SavepointCreate(savepoint) => {
-                            doc = doc.append(build_savepoint_create(&savepoint));
-                        }
-                        ast::Stmt::SecurityLabel(_) => todo!(),
-                        ast::Stmt::SelectInto(select_into) => {
-                            doc = doc.append(build_select_into(&select_into));
-                        }
-                        ast::Stmt::Set(_) => todo!(),
-                        ast::Stmt::SetConstraints(_) => todo!(),
-                        ast::Stmt::SetRole(_) => todo!(),
-                        ast::Stmt::SetSessionAuth(_) => todo!(),
-                        ast::Stmt::SetTransaction(_) => todo!(),
-                        ast::Stmt::Show(_) => todo!(),
-                        ast::Stmt::Table(table) => {
-                            doc = doc.append(build_table(&table));
-                        }
-                        ast::Stmt::Truncate(truncate) => {
-                            doc = doc.append(build_truncate(&truncate));
-                        }
-                        ast::Stmt::Unlisten(_) => todo!(),
-                        ast::Stmt::Update(update) => {
-                            doc = doc.append(build_update(&update));
-                        }
-                        ast::Stmt::Vacuum(_) => todo!(),
-                        ast::Stmt::Values(values) => {
-                            doc = doc.append(build_values(&values));
-                        }
-                        ast::Stmt::Commit(commit) => {
-                            doc = doc.append(build_commit(commit));
-                        }
-                        ast::Stmt::Rollback(rollback) => {
-                            doc = doc.append(build_rollback(rollback));
-                        }
-                    }
+                    doc = doc.append(build_stmt(stmt));
                 }
             }
             rowan::NodeOrToken::Token(token) => {
@@ -1858,9 +1614,7 @@ fn build_function_ret_type<'a>(ret_type: ast::RetType) -> Doc<'a> {
 fn build_function_option<'a>(option: ast::FuncOption) -> Doc<'a> {
     match option {
         ast::FuncOption::AsFuncOption(option) => build_as_function_option(option),
-        ast::FuncOption::BeginFuncOptionList(_) => {
-            todo!("SQL-standard function bodies are not supported yet")
-        }
+        ast::FuncOption::BeginFuncOptionList(options) => build_begin_function_option_list(options),
         ast::FuncOption::CostFuncOption(option) => {
             build_literal_function_option("cost", option.literal())
         }
@@ -1896,16 +1650,7 @@ fn build_function_option<'a>(option: ast::FuncOption) -> Doc<'a> {
             }
             doc
         }
-        ast::FuncOption::ReturnFuncOption(option) => {
-            let mut doc = Doc::text("return");
-            if let Some(expr) = option.expr() {
-                doc = doc
-                    .append(Doc::space())
-                    .append(leading_comments(expr.syntax()))
-                    .append(build_expr(expr));
-            }
-            doc.append(build_semicolon(option.semicolon_token()))
-        }
+        ast::FuncOption::ReturnFuncOption(option) => build_return_function_option(option),
         ast::FuncOption::RowsFuncOption(option) => {
             build_literal_function_option("rows", option.literal())
         }
@@ -1961,6 +1706,240 @@ fn build_function_option<'a>(option: ast::FuncOption) -> Doc<'a> {
         ast::FuncOption::VolatilityFuncOption(option) => build_keyword_node(option.syntax()),
         ast::FuncOption::WindowFuncOption(option) => build_keyword_node(option.syntax()),
     }
+}
+
+fn build_begin_function_option_list<'a>(options: ast::BeginFuncOptionList) -> Doc<'a> {
+    let mut doc = Doc::text("begin");
+    if let Some(atomic) = options.atomic_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&atomic))
+            .append(Doc::text("atomic"));
+    }
+
+    for option in options.begin_func_options() {
+        let option_comments = leading_comments(option.syntax());
+        let option_doc = match option {
+            ast::BeginFuncOption::ReturnFuncOption(option) => build_return_function_option(option),
+            ast::BeginFuncOption::Stmt(stmt) => build_stmt(stmt),
+        };
+        doc = doc.append(
+            Doc::hard_line()
+                .append(option_comments)
+                .append(option_doc)
+                .nest(2),
+        );
+    }
+
+    let end_doc = options
+        .end_token()
+        .map(|end| leading_comments_token(&end))
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("end"));
+    doc.append(Doc::hard_line()).append(end_doc)
+}
+
+fn build_stmt<'a>(stmt: ast::Stmt) -> Doc<'a> {
+    match stmt {
+        ast::Stmt::AlterPublication(stmt) => build_alter_publication(&stmt),
+        ast::Stmt::AlterSubscription(stmt) => build_alter_subscription(&stmt),
+        ast::Stmt::Begin(stmt) => build_begin(&stmt),
+        ast::Stmt::Commit(stmt) => build_commit(stmt),
+        ast::Stmt::CompoundSelect(stmt) => build_compound_select(&stmt),
+        ast::Stmt::CreateFunction(stmt) => build_create_function(&stmt),
+        ast::Stmt::CreateIndex(stmt) => build_create_index(&stmt),
+        ast::Stmt::CreatePublication(stmt) => build_create_publication(&stmt),
+        ast::Stmt::CreateSubscription(stmt) => build_create_subscription(&stmt),
+        ast::Stmt::CreateTable(stmt) => build_create_table(&stmt),
+        ast::Stmt::CreateTableAs(stmt) => build_create_table_as(&stmt),
+        ast::Stmt::CreateView(stmt) => build_create_view(&stmt),
+        ast::Stmt::Delete(stmt) => build_delete(&stmt),
+        ast::Stmt::DropPublication(stmt) => build_drop_publication(&stmt),
+        ast::Stmt::DropSubscription(stmt) => build_drop_subscription(&stmt),
+        ast::Stmt::EmptyStmt(stmt) => build_empty_stmt(&stmt),
+        ast::Stmt::Insert(stmt) => build_insert(&stmt),
+        ast::Stmt::Merge(stmt) => build_merge(&stmt),
+        ast::Stmt::ParenSelect(stmt) => build_paren_select(stmt),
+        ast::Stmt::PrepareTransaction(stmt) => build_prepare_transaction(&stmt),
+        ast::Stmt::ReleaseSavepoint(stmt) => build_release_savepoint(&stmt),
+        ast::Stmt::Rollback(stmt) => build_rollback(stmt),
+        ast::Stmt::SavepointCreate(stmt) => build_savepoint_create(&stmt),
+        ast::Stmt::Select(stmt) => build_select_doc(&stmt),
+        ast::Stmt::SelectInto(stmt) => build_select_into(&stmt),
+        ast::Stmt::Table(stmt) => build_table(&stmt),
+        ast::Stmt::Truncate(stmt) => build_truncate(&stmt),
+        ast::Stmt::Update(stmt) => build_update(&stmt),
+        ast::Stmt::Values(stmt) => build_values(&stmt),
+        ast::Stmt::AlterAggregate(_) => todo!(),
+        ast::Stmt::AlterCollation(_) => todo!(),
+        ast::Stmt::AlterConversion(_) => todo!(),
+        ast::Stmt::AlterDatabase(_) => todo!(),
+        ast::Stmt::AlterDefaultPrivileges(_) => todo!(),
+        ast::Stmt::AlterDomain(_) => todo!(),
+        ast::Stmt::AlterEventTrigger(_) => todo!(),
+        ast::Stmt::AlterExtension(_) => todo!(),
+        ast::Stmt::AlterForeignDataWrapper(_) => todo!(),
+        ast::Stmt::AlterForeignTable(_) => todo!(),
+        ast::Stmt::AlterFunction(_) => todo!(),
+        ast::Stmt::AlterGroup(_) => todo!(),
+        ast::Stmt::AlterIndex(_) => todo!(),
+        ast::Stmt::AlterLanguage(_) => todo!(),
+        ast::Stmt::AlterLargeObject(_) => todo!(),
+        ast::Stmt::AlterMaterializedView(_) => todo!(),
+        ast::Stmt::AlterOperator(_) => todo!(),
+        ast::Stmt::AlterOperatorClass(_) => todo!(),
+        ast::Stmt::AlterOperatorFamily(_) => todo!(),
+        ast::Stmt::AlterPolicy(_) => todo!(),
+        ast::Stmt::AlterProcedure(_) => todo!(),
+        ast::Stmt::AlterPropertyGraph(_) => todo!(),
+        ast::Stmt::AlterRole(_) => todo!(),
+        ast::Stmt::AlterRoutine(_) => todo!(),
+        ast::Stmt::AlterRule(_) => todo!(),
+        ast::Stmt::AlterSchema(_) => todo!(),
+        ast::Stmt::AlterSequence(_) => todo!(),
+        ast::Stmt::AlterServer(_) => todo!(),
+        ast::Stmt::AlterStatistics(_) => todo!(),
+        ast::Stmt::AlterSystem(_) => todo!(),
+        ast::Stmt::AlterTable(_) => todo!(),
+        ast::Stmt::AlterTablespace(_) => todo!(),
+        ast::Stmt::AlterTextSearchConfiguration(_) => todo!(),
+        ast::Stmt::AlterTextSearchDictionary(_) => todo!(),
+        ast::Stmt::AlterTextSearchParser(_) => todo!(),
+        ast::Stmt::AlterTextSearchTemplate(_) => todo!(),
+        ast::Stmt::AlterTrigger(_) => todo!(),
+        ast::Stmt::AlterType(_) => todo!(),
+        ast::Stmt::AlterUser(_) => todo!(),
+        ast::Stmt::AlterUserMapping(_) => todo!(),
+        ast::Stmt::AlterView(_) => todo!(),
+        ast::Stmt::Analyze(_) => todo!(),
+        ast::Stmt::Call(_) => todo!(),
+        ast::Stmt::Checkpoint(_) => todo!(),
+        ast::Stmt::Close(_) => todo!(),
+        ast::Stmt::Cluster(_) => todo!(),
+        ast::Stmt::CommentOn(_) => todo!(),
+        ast::Stmt::Copy(_) => todo!(),
+        ast::Stmt::CreateAccessMethod(_) => todo!(),
+        ast::Stmt::CreateAggregate(_) => todo!(),
+        ast::Stmt::CreateCast(_) => todo!(),
+        ast::Stmt::CreateCollation(_) => todo!(),
+        ast::Stmt::CreateConversion(_) => todo!(),
+        ast::Stmt::CreateDatabase(_) => todo!(),
+        ast::Stmt::CreateDomain(_) => todo!(),
+        ast::Stmt::CreateEventTrigger(_) => todo!(),
+        ast::Stmt::CreateExtension(_) => todo!(),
+        ast::Stmt::CreateForeignDataWrapper(_) => todo!(),
+        ast::Stmt::CreateForeignTable(_) => todo!(),
+        ast::Stmt::CreateGroup(_) => todo!(),
+        ast::Stmt::CreateLanguage(_) => todo!(),
+        ast::Stmt::CreateMaterializedView(_) => todo!(),
+        ast::Stmt::CreateOperator(_) => todo!(),
+        ast::Stmt::CreateOperatorClass(_) => todo!(),
+        ast::Stmt::CreateOperatorFamily(_) => todo!(),
+        ast::Stmt::CreatePolicy(_) => todo!(),
+        ast::Stmt::CreateProcedure(_) => todo!(),
+        ast::Stmt::CreatePropertyGraph(_) => todo!(),
+        ast::Stmt::CreateRole(_) => todo!(),
+        ast::Stmt::CreateRule(_) => todo!(),
+        ast::Stmt::CreateSchema(_) => todo!(),
+        ast::Stmt::CreateSequence(_) => todo!(),
+        ast::Stmt::CreateServer(_) => todo!(),
+        ast::Stmt::CreateStatistics(_) => todo!(),
+        ast::Stmt::CreateTablespace(_) => todo!(),
+        ast::Stmt::CreateTextSearchConfiguration(_) => todo!(),
+        ast::Stmt::CreateTextSearchDictionary(_) => todo!(),
+        ast::Stmt::CreateTextSearchParser(_) => todo!(),
+        ast::Stmt::CreateTextSearchTemplate(_) => todo!(),
+        ast::Stmt::CreateTransform(_) => todo!(),
+        ast::Stmt::CreateTrigger(_) => todo!(),
+        ast::Stmt::CreateType(_) => todo!(),
+        ast::Stmt::CreateUser(_) => todo!(),
+        ast::Stmt::CreateUserMapping(_) => todo!(),
+        ast::Stmt::Deallocate(_) => todo!(),
+        ast::Stmt::Declare(_) => todo!(),
+        ast::Stmt::Discard(_) => todo!(),
+        ast::Stmt::Do(_) => todo!(),
+        ast::Stmt::DropAccessMethod(_) => todo!(),
+        ast::Stmt::DropAggregate(_) => todo!(),
+        ast::Stmt::DropCast(_) => todo!(),
+        ast::Stmt::DropCollation(_) => todo!(),
+        ast::Stmt::DropConversion(_) => todo!(),
+        ast::Stmt::DropDatabase(_) => todo!(),
+        ast::Stmt::DropDomain(_) => todo!(),
+        ast::Stmt::DropEventTrigger(_) => todo!(),
+        ast::Stmt::DropExtension(_) => todo!(),
+        ast::Stmt::DropForeignDataWrapper(_) => todo!(),
+        ast::Stmt::DropForeignTable(_) => todo!(),
+        ast::Stmt::DropFunction(_) => todo!(),
+        ast::Stmt::DropGroup(_) => todo!(),
+        ast::Stmt::DropIndex(_) => todo!(),
+        ast::Stmt::DropLanguage(_) => todo!(),
+        ast::Stmt::DropMaterializedView(_) => todo!(),
+        ast::Stmt::DropOperator(_) => todo!(),
+        ast::Stmt::DropOperatorClass(_) => todo!(),
+        ast::Stmt::DropOperatorFamily(_) => todo!(),
+        ast::Stmt::DropOwned(_) => todo!(),
+        ast::Stmt::DropPolicy(_) => todo!(),
+        ast::Stmt::DropProcedure(_) => todo!(),
+        ast::Stmt::DropPropertyGraph(_) => todo!(),
+        ast::Stmt::DropRole(_) => todo!(),
+        ast::Stmt::DropRoutine(_) => todo!(),
+        ast::Stmt::DropRule(_) => todo!(),
+        ast::Stmt::DropSchema(_) => todo!(),
+        ast::Stmt::DropSequence(_) => todo!(),
+        ast::Stmt::DropServer(_) => todo!(),
+        ast::Stmt::DropStatistics(_) => todo!(),
+        ast::Stmt::DropTable(_) => todo!(),
+        ast::Stmt::DropTablespace(_) => todo!(),
+        ast::Stmt::DropTextSearchConfig(_) => todo!(),
+        ast::Stmt::DropTextSearchDict(_) => todo!(),
+        ast::Stmt::DropTextSearchParser(_) => todo!(),
+        ast::Stmt::DropTextSearchTemplate(_) => todo!(),
+        ast::Stmt::DropTransform(_) => todo!(),
+        ast::Stmt::DropTrigger(_) => todo!(),
+        ast::Stmt::DropType(_) => todo!(),
+        ast::Stmt::DropUser(_) => todo!(),
+        ast::Stmt::DropUserMapping(_) => todo!(),
+        ast::Stmt::DropView(_) => todo!(),
+        ast::Stmt::Execute(_) => todo!(),
+        ast::Stmt::Explain(_) => todo!(),
+        ast::Stmt::Fetch(_) => todo!(),
+        ast::Stmt::Grant(_) => todo!(),
+        ast::Stmt::ImportForeignSchema(_) => todo!(),
+        ast::Stmt::Listen(_) => todo!(),
+        ast::Stmt::Load(_) => todo!(),
+        ast::Stmt::Lock(_) => todo!(),
+        ast::Stmt::Move(_) => todo!(),
+        ast::Stmt::Notify(_) => todo!(),
+        ast::Stmt::Prepare(_) => todo!(),
+        ast::Stmt::Reassign(_) => todo!(),
+        ast::Stmt::Refresh(_) => todo!(),
+        ast::Stmt::Reindex(_) => todo!(),
+        ast::Stmt::Repack(_) => todo!(),
+        ast::Stmt::Reset(_) => todo!(),
+        ast::Stmt::ResetRole(_) => todo!(),
+        ast::Stmt::ResetSessionAuth(_) => todo!(),
+        ast::Stmt::Revoke(_) => todo!(),
+        ast::Stmt::SecurityLabel(_) => todo!(),
+        ast::Stmt::Set(_) => todo!(),
+        ast::Stmt::SetConstraints(_) => todo!(),
+        ast::Stmt::SetRole(_) => todo!(),
+        ast::Stmt::SetSessionAuth(_) => todo!(),
+        ast::Stmt::SetTransaction(_) => todo!(),
+        ast::Stmt::Show(_) => todo!(),
+        ast::Stmt::Unlisten(_) => todo!(),
+        ast::Stmt::Vacuum(_) => todo!(),
+    }
+}
+
+fn build_return_function_option<'a>(option: ast::ReturnFuncOption) -> Doc<'a> {
+    let mut doc = Doc::text("return");
+    if let Some(expr) = option.expr() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    doc.append(build_semicolon(option.semicolon_token()))
 }
 
 fn build_literal_function_option<'a>(
@@ -2260,6 +2239,162 @@ fn build_create_view<'a>(create_view: &ast::CreateView) -> Doc<'a> {
 
     doc.append(build_semicolon(create_view.semicolon_token()))
         .group()
+}
+
+fn build_create_table_as<'a>(create_table_as: &ast::CreateTableAs) -> Doc<'a> {
+    let mut doc = Doc::text("create");
+
+    if let Some(persistence) = create_table_as.persistence() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(persistence.syntax()))
+            .append(build_keyword_node(persistence.syntax()));
+    }
+    if let Some(table_token) = create_table_as.table_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&table_token));
+    } else {
+        doc = doc.append(Doc::space());
+    }
+    doc = doc.append(Doc::text("table"));
+
+    if let Some(if_not_exists) = create_table_as.if_not_exists() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(if_not_exists.syntax()))
+            .append(build_keyword_node(if_not_exists.syntax()));
+    }
+    if let Some(table_name) = create_table_as.table_name() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(table_name.syntax()));
+        if let Some(path) = table_name.path() {
+            doc = doc.append(build_path(&path));
+        }
+    }
+    if let Some(arg_list) = create_table_as.table_arg_list() {
+        let comments = comments_before(arg_list.syntax().clone());
+        if comment_tokens_before(arg_list.syntax().clone()).is_empty() {
+            doc = doc.append(Doc::space());
+        } else {
+            doc = doc.append(comments).append(Doc::space());
+        }
+        let body = Doc::list(
+            Itertools::intersperse(
+                arg_list.args().map(build_table_arg),
+                Doc::text(",").append(Doc::hard_line()),
+            )
+            .collect(),
+        );
+        doc = doc
+            .append(Doc::text("("))
+            .append(wrap_body(body).group())
+            .append(Doc::text(")"));
+    }
+
+    let mut has_table_option = false;
+    if let Some(using_method) = create_table_as.using_method() {
+        has_table_option = true;
+        let mut option = leading_comments(using_method.syntax()).append(Doc::text("using"));
+        if let Some(method) = using_method.access_method_ref() {
+            option = option
+                .append(Doc::space())
+                .append(leading_comments(method.syntax()))
+                .append(build_name(method.syntax()));
+        }
+        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+    }
+    if let Some(params) = create_table_as.table_params() {
+        has_table_option = true;
+        let option = match params {
+            ast::TableParams::WithParams(params) => {
+                leading_comments(params.syntax()).append(build_with_params(params))
+            }
+            ast::TableParams::WithoutOids(without_oids) => leading_comments(without_oids.syntax())
+                .append(build_keyword_node(without_oids.syntax())),
+        };
+        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+    }
+    if let Some(on_commit) = create_table_as.on_commit() {
+        has_table_option = true;
+        let mut option = leading_comments(on_commit.syntax()).append(Doc::text("on"));
+        if let Some(commit_token) = on_commit.commit_token() {
+            option = option
+                .append(Doc::space())
+                .append(leading_comments_token(&commit_token));
+        } else {
+            option = option.append(Doc::space());
+        }
+        option = option.append(Doc::text("commit"));
+        if let Some(action) = on_commit.on_commit_action() {
+            option = option
+                .append(Doc::space())
+                .append(leading_comments(action.syntax()))
+                .append(build_keyword_node(action.syntax()));
+        }
+        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+    }
+    if let Some(tablespace) = create_table_as.tablespace_clause() {
+        has_table_option = true;
+        let mut option = leading_comments(tablespace.syntax()).append(Doc::text("tablespace"));
+        if let Some(name) = tablespace.tablespace_ref() {
+            option = option
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+    }
+
+    if let Some(as_token) = create_table_as.as_token() {
+        let as_doc = leading_comments_token(&as_token).append(Doc::text("as"));
+        doc = if has_table_option {
+            doc.append(Doc::hard_line().append(as_doc).nest(2))
+        } else {
+            doc.append(Doc::space()).append(as_doc)
+        };
+    }
+    if let Some(query) = create_table_as.query() {
+        let query_comments = leading_comments(query.syntax());
+        let query_doc = match query {
+            ast::CreateTableAsQuery::SelectVariant(select) => build_select_variant(select),
+            ast::CreateTableAsQuery::Execute(execute) => build_execute(execute),
+        };
+        doc = doc.append(
+            Doc::hard_line()
+                .append(query_comments)
+                .append(query_doc)
+                .nest(2),
+        );
+    }
+    if let Some(data_option) = create_table_as.data_option() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(data_option.syntax()))
+                .append(build_keyword_node(data_option.syntax()))
+                .nest(2),
+        );
+    }
+
+    doc.append(build_semicolon(create_table_as.semicolon_token()))
+        .group()
+}
+
+fn build_execute<'a>(execute: ast::Execute) -> Doc<'a> {
+    let mut doc = Doc::text("execute");
+    if let Some(statement) = execute.prepared_statement_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(statement.syntax()))
+            .append(build_name(statement.syntax()));
+    }
+    if let Some(args) = execute.arg_list() {
+        doc = doc
+            .append(comments_before(args.syntax().clone()))
+            .append(build_call_arg_list(args));
+    }
+    doc
 }
 
 fn build_with_check_option<'a>(check_option: ast::WithCheckOption) -> Doc<'a> {

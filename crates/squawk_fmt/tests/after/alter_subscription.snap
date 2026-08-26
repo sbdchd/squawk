@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_fmt/tests/before/alter_subscription.sql
 ---
 alter subscription local_sub connection 'host=otherhost dbname=publisher';
