@@ -1,0 +1,10 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 28
+input_file: crates/squawk_fmt/tests/before/drop_subscription.sql
+---
+drop subscription if exists renamed_sub restrict;
+
+drop /* after drop */ subscription /* before if */ if /* before exists */ exists
+/* before name */ commented_sub
+/* before behavior */ cascade/* before semicolon */;

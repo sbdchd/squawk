@@ -1,0 +1,26 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 28
+input_file: crates/squawk_fmt/tests/before/alter_publication.sql
+---
+alter publication selected_tables
+add table public.new_accounts, tables in schema archive;
+
+alter publication selected_tables drop table public.old_accounts;
+
+alter publication selected_tables
+set table public.accounts (id) where (id > 200);
+
+alter publication everything
+set all tables, all sequences except (table private.tokens, audit.logs);
+
+alter publication everything set (publish = 'insert, update');
+
+alter publication everything owner to replication_admin;
+
+alter publication everything rename to all_changes;
+
+alter /* after alter */ publication /* before name */ commented_pub
+set
+  /* before object */ table /* before table name */ public.commented,
+  /* after comma */ current_schema/* before semicolon */;

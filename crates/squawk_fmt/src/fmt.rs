@@ -46,7 +46,9 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                         ast::Stmt::AlterPolicy(_) => todo!(),
                         ast::Stmt::AlterProcedure(_) => todo!(),
                         ast::Stmt::AlterPropertyGraph(_) => todo!(),
-                        ast::Stmt::AlterPublication(_) => todo!(),
+                        ast::Stmt::AlterPublication(alter_publication) => {
+                            doc = doc.append(build_alter_publication(&alter_publication));
+                        }
                         ast::Stmt::AlterRole(_) => todo!(),
                         ast::Stmt::AlterRoutine(_) => todo!(),
                         ast::Stmt::AlterRule(_) => todo!(),
@@ -54,7 +56,9 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                         ast::Stmt::AlterSequence(_) => todo!(),
                         ast::Stmt::AlterServer(_) => todo!(),
                         ast::Stmt::AlterStatistics(_) => todo!(),
-                        ast::Stmt::AlterSubscription(_) => todo!(),
+                        ast::Stmt::AlterSubscription(alter_subscription) => {
+                            doc = doc.append(build_alter_subscription(&alter_subscription));
+                        }
                         ast::Stmt::AlterSystem(_) => todo!(),
                         ast::Stmt::AlterTable(_) => todo!(),
                         ast::Stmt::AlterTablespace(_) => todo!(),
@@ -106,14 +110,18 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                         ast::Stmt::CreatePolicy(_) => todo!(),
                         ast::Stmt::CreateProcedure(_) => todo!(),
                         ast::Stmt::CreatePropertyGraph(_) => todo!(),
-                        ast::Stmt::CreatePublication(_) => todo!(),
+                        ast::Stmt::CreatePublication(create_publication) => {
+                            doc = doc.append(build_create_publication(&create_publication));
+                        }
                         ast::Stmt::CreateRole(_) => todo!(),
                         ast::Stmt::CreateRule(_) => todo!(),
                         ast::Stmt::CreateSchema(_) => todo!(),
                         ast::Stmt::CreateSequence(_) => todo!(),
                         ast::Stmt::CreateServer(_) => todo!(),
                         ast::Stmt::CreateStatistics(_) => todo!(),
-                        ast::Stmt::CreateSubscription(_) => todo!(),
+                        ast::Stmt::CreateSubscription(create_subscription) => {
+                            doc = doc.append(build_create_subscription(&create_subscription));
+                        }
                         ast::Stmt::CreateTableAs(_) => todo!(),
                         ast::Stmt::CreateTablespace(_) => todo!(),
                         ast::Stmt::CreateTextSearchConfiguration(_) => todo!(),
@@ -158,7 +166,9 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                         ast::Stmt::DropPolicy(_) => todo!(),
                         ast::Stmt::DropProcedure(_) => todo!(),
                         ast::Stmt::DropPropertyGraph(_) => todo!(),
-                        ast::Stmt::DropPublication(_) => todo!(),
+                        ast::Stmt::DropPublication(drop_publication) => {
+                            doc = doc.append(build_drop_publication(&drop_publication));
+                        }
                         ast::Stmt::DropRole(_) => todo!(),
                         ast::Stmt::DropRoutine(_) => todo!(),
                         ast::Stmt::DropRule(_) => todo!(),
@@ -166,7 +176,9 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                         ast::Stmt::DropSequence(_) => todo!(),
                         ast::Stmt::DropServer(_) => todo!(),
                         ast::Stmt::DropStatistics(_) => todo!(),
-                        ast::Stmt::DropSubscription(_) => todo!(),
+                        ast::Stmt::DropSubscription(drop_subscription) => {
+                            doc = doc.append(build_drop_subscription(&drop_subscription));
+                        }
                         ast::Stmt::DropTable(_) => todo!(),
                         ast::Stmt::DropTablespace(_) => todo!(),
                         ast::Stmt::DropTextSearchConfig(_) => todo!(),
@@ -4621,6 +4633,604 @@ fn build_select_group_by_clause<'a>(group: ast::GroupByClause) -> Doc<'a> {
         doc = doc.append(build_group_by_list(list));
     }
     doc
+}
+
+fn build_create_publication<'a>(stmt: &ast::CreatePublication) -> Doc<'a> {
+    let mut doc = Doc::text("create");
+    if let Some(token) = stmt.publication_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("publication"));
+    }
+    if let Some(publication) = stmt.publication() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(publication.syntax()))
+            .append(build_name(publication.syntax()));
+    }
+    if let Some(clause) = stmt.publication_for_clause() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(clause.syntax()))
+            .append(build_publication_for_clause(clause));
+    }
+    if let Some(params) = stmt.with_params() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(params.syntax()))
+            .append(build_with_params(params));
+    }
+    doc.append(build_semicolon(stmt.semicolon_token())).group()
+}
+
+fn build_publication_for_clause<'a>(clause: ast::PublicationForClause) -> Doc<'a> {
+    match clause {
+        ast::PublicationForClause::ForAllPublicationObjects(clause) => {
+            let mut doc = Doc::text("for");
+            if let Some(objects) = build_all_publication_objects(clause.all_publication_objects()) {
+                doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+            }
+            if let Some(except) = clause.except_table_clause() {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(leading_comments(except.syntax()))
+                    .append(build_except_table_clause(except));
+            }
+            doc.group()
+        }
+        ast::PublicationForClause::ForPublicationObjects(clause) => {
+            let mut doc = Doc::text("for");
+            if let Some(objects) = build_publication_objects(clause.publication_objects()) {
+                doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+            }
+            doc.group()
+        }
+    }
+}
+
+fn build_all_publication_objects<'a>(
+    objects: impl Iterator<Item = ast::AllPublicationObject>,
+) -> Option<Doc<'a>> {
+    build_comma_separated_docs(objects.map(|object| {
+        let syntax = object.syntax().clone();
+        let doc = leading_comments(object.syntax()).append(match object {
+            ast::AllPublicationObject::AllPublicationTables(object) => {
+                let mut doc = Doc::text("all");
+                if let Some(token) = object.tables_token() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments_token(&token))
+                        .append(Doc::text("tables"));
+                }
+                doc
+            }
+            ast::AllPublicationObject::AllPublicationSequences(object) => {
+                let mut doc = Doc::text("all");
+                if let Some(token) = object.sequences_token() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments_token(&token))
+                        .append(Doc::text("sequences"));
+                }
+                doc
+            }
+        });
+        (doc, syntax)
+    }))
+}
+
+fn build_publication_objects<'a>(
+    objects: impl Iterator<Item = ast::PublicationObject>,
+) -> Option<Doc<'a>> {
+    build_comma_separated_docs(objects.map(|object| {
+        let syntax = object.syntax().clone();
+        (
+            leading_comments(object.syntax()).append(build_publication_object(object)),
+            syntax,
+        )
+    }))
+}
+
+fn build_publication_object<'a>(object: ast::PublicationObject) -> Doc<'a> {
+    match object {
+        ast::PublicationObject::PublicationObjectCurrentSchema(_) => Doc::text("current_schema"),
+        ast::PublicationObject::PublicationObjectTable(object) => {
+            let mut doc = Doc::text("table");
+            if let Some(token) = object.only_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("only"));
+            }
+            let parenthesized = object.l_paren_token().is_some();
+            if let Some(l_paren) = object.l_paren_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(comments_before(l_paren))
+                    .append(Doc::text("("));
+            }
+            if let Some(table) = object.table_name_ref() {
+                if !parenthesized {
+                    doc = doc.append(Doc::space());
+                }
+                doc = doc.append(leading_comments(table.syntax()));
+                if let Some(path) = table.path_ref() {
+                    doc = doc.append(build_path_ref(&path));
+                }
+            }
+            if let Some(r_paren) = object.r_paren_token() {
+                doc = doc.append(comments_before(r_paren)).append(Doc::text(")"));
+            }
+            if let Some(star) = object.star_token() {
+                doc = doc
+                    .append(leading_comments_token(&star))
+                    .append(Doc::text("*"));
+            }
+            if let Some(columns) = object.column_ref_list() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(columns.syntax()))
+                    .append(build_column_ref_list(columns));
+            }
+            if let Some(where_clause) = object.where_condition_clause() {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(leading_comments(where_clause.syntax()))
+                    .append(build_where_condition_clause(where_clause));
+            }
+            doc.group()
+        }
+        ast::PublicationObject::PublicationObjectTablesInSchema(object) => {
+            let mut doc = Doc::text("tables");
+            if let Some(token) = object.in_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("in"));
+            }
+            if let Some(token) = object.schema_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("schema"));
+            }
+            if let Some(token) = object.current_schema_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("current_schema"));
+            } else if let Some(schema) = object.schema_ref() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(schema.syntax()))
+                    .append(build_name(schema.syntax()));
+            }
+            if let Some(where_clause) = object.where_condition_clause() {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(leading_comments(where_clause.syntax()))
+                    .append(build_where_condition_clause(where_clause));
+            }
+            doc.group()
+        }
+    }
+}
+
+fn build_except_table_clause<'a>(clause: ast::ExceptTableClause) -> Doc<'a> {
+    let mut doc = Doc::text("except");
+    if let Some(l_paren) = clause.l_paren_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(comments_before(l_paren))
+            .append(Doc::text("("));
+    }
+    let items = clause.except_table_names().map(|name| {
+        let mut item = Doc::nil();
+        if let Some(table_token) = name.table_token() {
+            item = item
+                .append(leading_comments_token(&table_token))
+                .append(Doc::text("table"))
+                .append(Doc::space());
+        }
+        if let Some(table) = name.table_relation_name() {
+            item = item
+                .append(leading_comments(table.syntax()))
+                .append(build_table_relation_name(table));
+        }
+        (
+            leading_comments(name.syntax()).append(item),
+            name.syntax().clone(),
+        )
+    });
+    let mut body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = clause.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_alter_publication<'a>(stmt: &ast::AlterPublication) -> Doc<'a> {
+    let mut doc = Doc::text("alter");
+    if let Some(token) = stmt.publication_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("publication"));
+    }
+    if let Some(publication) = stmt.publication_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(publication.syntax()))
+            .append(build_name(publication.syntax()));
+    }
+    if let Some(action) = stmt.action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_alter_publication_action(action));
+    }
+    doc.append(build_semicolon(stmt.semicolon_token())).group()
+}
+
+fn build_alter_publication_action<'a>(action: ast::AlterPublicationAction) -> Doc<'a> {
+    match action {
+        ast::AlterPublicationAction::AddPublicationObjects(action) => {
+            build_publication_object_action("add", action.publication_objects())
+        }
+        ast::AlterPublicationAction::DropPublicationObjects(action) => {
+            build_publication_object_action("drop", action.publication_objects())
+        }
+        ast::AlterPublicationAction::SetPublicationObjects(action) => {
+            build_publication_object_action("set", action.publication_objects())
+        }
+        ast::AlterPublicationAction::SetAllPublicationObjectList(action) => {
+            let mut doc = Doc::text("set");
+            if let Some(objects) = build_all_publication_objects(action.all_publication_objects()) {
+                doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+            }
+            if let Some(except) = action.except_table_clause() {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(leading_comments(except.syntax()))
+                    .append(build_except_table_clause(except));
+            }
+            doc.group()
+        }
+        ast::AlterPublicationAction::SetOptions(action) => build_set_options(action),
+        ast::AlterPublicationAction::OwnerTo(action) => build_owner_to(action),
+        ast::AlterPublicationAction::PublicationRenameTo(action) => {
+            let mut doc = Doc::text("rename");
+            if let Some(token) = action.to_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("to"));
+            }
+            if let Some(publication) = action.publication() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(publication.syntax()))
+                    .append(build_name(publication.syntax()));
+            }
+            doc
+        }
+    }
+}
+
+fn build_publication_object_action<'a>(
+    keyword: &'static str,
+    objects: impl Iterator<Item = ast::PublicationObject>,
+) -> Doc<'a> {
+    let mut doc = Doc::text(keyword);
+    if let Some(objects) = build_publication_objects(objects) {
+        doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+    }
+    doc.group()
+}
+
+fn build_set_options<'a>(options: ast::SetOptions) -> Doc<'a> {
+    let mut doc = Doc::text("set");
+    if let Some(attributes) = options.attribute_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(attributes.syntax()))
+            .append(build_attribute_list(attributes));
+    }
+    doc
+}
+
+fn build_owner_to<'a>(owner: ast::OwnerTo) -> Doc<'a> {
+    let mut doc = Doc::text("owner");
+    if let Some(token) = owner.to_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("to"));
+    }
+    if let Some(role) = owner.role_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(role.syntax()))
+            .append(build_name(role.syntax()));
+    }
+    doc
+}
+
+fn build_create_subscription<'a>(stmt: &ast::CreateSubscription) -> Doc<'a> {
+    let mut doc = Doc::text("create");
+    if let Some(token) = stmt.subscription_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("subscription"));
+    }
+    if let Some(subscription) = stmt.subscription() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(subscription.syntax()))
+            .append(build_name(subscription.syntax()));
+    }
+    if let Some(source) = stmt.source() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(source.syntax()))
+            .append(build_subscription_source(source));
+    }
+    if let Some(token) = stmt.publication_token() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("publication"));
+    }
+    if let Some(publications) = build_publication_refs(stmt.publication_refs()) {
+        doc = doc.append(Doc::space()).append(publications.nest(2));
+    }
+    if let Some(params) = stmt.with_params() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(params.syntax()))
+            .append(build_with_params(params));
+    }
+    doc.append(build_semicolon(stmt.semicolon_token())).group()
+}
+
+fn build_subscription_source<'a>(source: ast::SubscriptionSource) -> Doc<'a> {
+    match source {
+        ast::SubscriptionSource::ConnectionClause(source) => {
+            let mut doc = Doc::text("connection");
+            if let Some(literal) = source.literal() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(literal.syntax()))
+                    .append(build_literal(literal));
+            }
+            doc
+        }
+        ast::SubscriptionSource::ServerClause(source) => {
+            let mut doc = Doc::text("server");
+            if let Some(server) = source.server_ref() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(server.syntax()))
+                    .append(build_name(server.syntax()));
+            }
+            doc
+        }
+    }
+}
+
+fn build_publication_refs<'a>(
+    publications: impl Iterator<Item = ast::PublicationRef>,
+) -> Option<Doc<'a>> {
+    build_comma_separated_docs(publications.map(|publication| {
+        (
+            leading_comments(publication.syntax()).append(build_name(publication.syntax())),
+            publication.syntax().clone(),
+        )
+    }))
+}
+
+fn build_alter_subscription<'a>(stmt: &ast::AlterSubscription) -> Doc<'a> {
+    let mut doc = Doc::text("alter");
+    if let Some(token) = stmt.subscription_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("subscription"));
+    }
+    if let Some(subscription) = stmt.subscription_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(subscription.syntax()))
+            .append(build_name(subscription.syntax()));
+    }
+    if let Some(action) = stmt.action() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(action.syntax()))
+            .append(build_alter_subscription_action(action));
+    }
+    doc.append(build_semicolon(stmt.semicolon_token())).group()
+}
+
+fn build_alter_subscription_action<'a>(action: ast::AlterSubscriptionAction) -> Doc<'a> {
+    match action {
+        ast::AlterSubscriptionAction::ConnectionClause(action) => {
+            build_subscription_source(ast::SubscriptionSource::ConnectionClause(action))
+        }
+        ast::AlterSubscriptionAction::ServerClause(action) => {
+            build_subscription_source(ast::SubscriptionSource::ServerClause(action))
+        }
+        ast::AlterSubscriptionAction::SetOptions(action) => build_set_options(action),
+        ast::AlterSubscriptionAction::AddPublication(action) => {
+            build_subscription_publication_action(
+                "add",
+                action.publication_token(),
+                action.publication_refs(),
+                action.with_params(),
+            )
+        }
+        ast::AlterSubscriptionAction::SetPublication(action) => {
+            build_subscription_publication_action(
+                "set",
+                action.publication_token(),
+                action.publication_refs(),
+                action.with_params(),
+            )
+        }
+        ast::AlterSubscriptionAction::DropSubscriptionPublication(action) => {
+            build_subscription_publication_action(
+                "drop",
+                action.publication_token(),
+                action.publication_refs(),
+                action.with_params(),
+            )
+        }
+        ast::AlterSubscriptionAction::RefreshPublication(action) => {
+            let mut doc = Doc::text("refresh").append(Doc::space());
+            if let Some(token) = action.publication_token() {
+                doc = doc
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("publication"));
+            }
+            if let Some(params) = action.with_params() {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(leading_comments(params.syntax()))
+                    .append(build_with_params(params));
+            }
+            doc.group()
+        }
+        ast::AlterSubscriptionAction::EnableSubscription(_) => Doc::text("enable"),
+        ast::AlterSubscriptionAction::DisableSubscription(_) => Doc::text("disable"),
+        ast::AlterSubscriptionAction::SkipSubscription(action) => {
+            let mut doc = Doc::text("skip");
+            if let Some(attributes) = action.attribute_list() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(attributes.syntax()))
+                    .append(build_attribute_list(attributes));
+            }
+            doc
+        }
+        ast::AlterSubscriptionAction::OwnerTo(action) => build_owner_to(action),
+        ast::AlterSubscriptionAction::SubscriptionRenameTo(action) => {
+            let mut doc = Doc::text("rename");
+            if let Some(token) = action.to_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("to"));
+            }
+            if let Some(subscription) = action.subscription() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(subscription.syntax()))
+                    .append(build_name(subscription.syntax()));
+            }
+            doc
+        }
+    }
+}
+
+fn build_subscription_publication_action<'a>(
+    keyword: &'static str,
+    publication_token: Option<SyntaxToken>,
+    publications: impl Iterator<Item = ast::PublicationRef>,
+    params: Option<ast::WithParams>,
+) -> Doc<'a> {
+    let mut doc = Doc::text(keyword).append(Doc::space());
+    if let Some(token) = publication_token {
+        doc = doc
+            .append(leading_comments_token(&token))
+            .append(Doc::text("publication"));
+    }
+    if let Some(publications) = build_publication_refs(publications) {
+        doc = doc.append(Doc::space()).append(publications.nest(2));
+    }
+    if let Some(params) = params {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(params.syntax()))
+            .append(build_with_params(params));
+    }
+    doc.group()
+}
+
+fn build_drop_publication<'a>(stmt: &ast::DropPublication) -> Doc<'a> {
+    let mut doc = Doc::text("drop");
+    if let Some(token) = stmt.publication_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("publication"));
+    }
+    if let Some(if_exists) = stmt.if_exists() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(if_exists.syntax()))
+            .append(build_if_exists(if_exists));
+    }
+    if let Some(publications) = build_publication_refs(stmt.publication_refs()) {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(publications.nest(2));
+    }
+    if let Some(behavior) = stmt.drop_behavior() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(behavior.syntax()))
+            .append(build_drop_behavior(behavior));
+    }
+    doc.append(build_semicolon(stmt.semicolon_token())).group()
+}
+
+fn build_drop_subscription<'a>(stmt: &ast::DropSubscription) -> Doc<'a> {
+    let mut doc = Doc::text("drop");
+    if let Some(token) = stmt.subscription_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("subscription"));
+    }
+    if let Some(if_exists) = stmt.if_exists() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(if_exists.syntax()))
+            .append(build_if_exists(if_exists));
+    }
+    if let Some(subscription) = stmt.subscription_ref() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(subscription.syntax()))
+            .append(build_name(subscription.syntax()));
+    }
+    if let Some(behavior) = stmt.drop_behavior() {
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(behavior.syntax()))
+            .append(build_drop_behavior(behavior));
+    }
+    doc.append(build_semicolon(stmt.semicolon_token())).group()
+}
+
+fn build_if_exists<'a>(if_exists: ast::IfExists) -> Doc<'a> {
+    let mut doc = Doc::text("if");
+    if let Some(token) = if_exists.exists_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("exists"));
+    }
+    doc
+}
+
+fn build_drop_behavior<'a>(behavior: ast::DropBehavior) -> Doc<'a> {
+    match behavior {
+        ast::DropBehavior::Cascade(_) => Doc::text("cascade"),
+        ast::DropBehavior::Restrict(_) => Doc::text("restrict"),
+    }
 }
 
 fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
