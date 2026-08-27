@@ -1489,6 +1489,359 @@ fn build_table_relation_name<'a>(relation: ast::TableRelationName) -> Doc<'a> {
     doc
 }
 
+fn build_create_trigger<'a>(stmt: &ast::CreateTrigger) -> Doc<'a> {
+    let mut doc = Doc::text("create");
+    if let Some(or_replace) = stmt.or_replace() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(or_replace.syntax()))
+            .append(build_keyword_node(or_replace.syntax()));
+    }
+    if let Some(constraint) = stmt.constraint_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&constraint))
+            .append(Doc::text("constraint"));
+    }
+    if let Some(trigger) = stmt.trigger_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&trigger))
+            .append(Doc::text("trigger"));
+    }
+    if let Some(trigger) = stmt.trigger() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(trigger.syntax()))
+            .append(build_name(trigger.syntax()));
+    }
+    doc = doc.group();
+
+    if let Some(timing) = stmt.timing() {
+        let mut clause =
+            leading_comments(timing.syntax()).append(build_keyword_node(timing.syntax()));
+        if let Some(events) = stmt.trigger_event_list() {
+            clause = clause
+                .append(Doc::line_or_space())
+                .append(leading_comments(events.syntax()))
+                .append(build_trigger_event_list(events));
+        }
+        doc = doc.append(Doc::hard_line().append(clause.group()).nest(2));
+    }
+    if let Some(on_relation) = stmt.on_relation() {
+        let mut clause = Doc::text("on");
+        if let Some(relation) = on_relation.relation_name_ref() {
+            clause = clause
+                .append(Doc::line_or_space())
+                .append(leading_comments(relation.syntax()));
+            if let Some(path) = relation.path_ref() {
+                clause = clause.append(build_path_ref(&path));
+            }
+        }
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(on_relation.syntax()))
+                .append(clause.group())
+                .nest(2),
+        );
+    }
+    if let Some(from_table) = stmt.from_table() {
+        let mut clause = Doc::text("from");
+        if let Some(table) = from_table.table_name_ref() {
+            clause = clause
+                .append(Doc::line_or_space())
+                .append(leading_comments(table.syntax()));
+            if let Some(path) = table.path_ref() {
+                clause = clause.append(build_path_ref(&path));
+            }
+        }
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(from_table.syntax()))
+                .append(clause.group())
+                .nest(2),
+        );
+    }
+    for option in [
+        stmt.deferrable_constraint_option()
+            .map(|node| node.syntax().clone()),
+        stmt.not_deferrable_constraint_option()
+            .map(|node| node.syntax().clone()),
+        stmt.initially_deferred_constraint_option()
+            .map(|node| node.syntax().clone()),
+        stmt.initially_immediate_constraint_option()
+            .map(|node| node.syntax().clone()),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(&option))
+                .append(build_keyword_node(&option))
+                .nest(2),
+        );
+    }
+    if let Some(referencing) = stmt.referencing() {
+        let mut clause = Doc::text("referencing");
+        for table in referencing.referencing_tables() {
+            clause = clause.append(
+                Doc::line_or_space()
+                    .append(leading_comments(table.syntax()))
+                    .append(build_referencing_table(table))
+                    .nest(2),
+            );
+        }
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(referencing.syntax()))
+                .append(clause.group())
+                .nest(2),
+        );
+    }
+    if let Some(level) = stmt.trigger_level() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(level.syntax()))
+                .append(build_keyword_node(level.syntax()))
+                .nest(2),
+        );
+    }
+    if let Some(condition) = stmt.when_condition() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(condition.syntax()))
+                .append(build_trigger_when_condition(condition))
+                .nest(2),
+        );
+    }
+    if let Some(call) = stmt.call_expr() {
+        let mut clause = stmt
+            .execute_token()
+            .map(|execute| leading_comments_token(&execute).append(Doc::text("execute")))
+            .unwrap_or_else(|| Doc::text("execute"));
+        if let Some(function) = stmt.function_token() {
+            clause = clause
+                .append(Doc::space())
+                .append(leading_comments_token(&function))
+                .append(Doc::text("function"));
+        } else if let Some(procedure) = stmt.procedure_token() {
+            clause = clause
+                .append(Doc::space())
+                .append(leading_comments_token(&procedure))
+                .append(Doc::text("procedure"));
+        }
+        clause = clause
+            .append(Doc::line_or_space())
+            .append(leading_comments(call.syntax()))
+            .append(build_call_expr(call))
+            .nest(2)
+            .group();
+        doc = doc.append(Doc::hard_line().append(clause).nest(2));
+    }
+
+    doc.append(build_semicolon(stmt.semicolon_token()))
+}
+
+fn build_trigger_event_list<'a>(events: ast::TriggerEventList) -> Doc<'a> {
+    let mut events = events.trigger_events();
+    let Some(first) = events.next() else {
+        return Doc::nil();
+    };
+    let mut previous_syntax = first.syntax().clone();
+    let mut doc = build_trigger_event(first);
+    for event in events {
+        doc = doc
+            .append(trailing_comments(&previous_syntax))
+            .append(Doc::line_or_space())
+            .append(Doc::text("or"))
+            .append(Doc::line_or_space())
+            .append(leading_comments(event.syntax()))
+            .append(build_trigger_event(event.clone()));
+        previous_syntax = event.syntax().clone();
+    }
+    doc.group()
+}
+
+fn build_trigger_event<'a>(event: ast::TriggerEvent) -> Doc<'a> {
+    match event {
+        ast::TriggerEvent::TriggerEventDelete(event) => build_keyword_node(event.syntax()),
+        ast::TriggerEvent::TriggerEventInsert(event) => build_keyword_node(event.syntax()),
+        ast::TriggerEvent::TriggerEventTruncate(event) => build_keyword_node(event.syntax()),
+        ast::TriggerEvent::TriggerEventUpdate(event) => {
+            let mut doc = Doc::text("update");
+            if let Some(of) = event.of_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&of))
+                    .append(Doc::text("of"));
+            }
+            let columns = event.column_name_refs().map(|column| {
+                let syntax = column.syntax().clone();
+                (
+                    leading_comments(&syntax).append(build_name(&syntax)),
+                    syntax,
+                )
+            });
+            if let Some(columns) = build_comma_separated_docs(columns) {
+                doc = doc.append(Doc::line_or_space().append(columns).nest(2));
+            }
+            doc.group()
+        }
+    }
+}
+
+fn build_referencing_table<'a>(table: ast::ReferencingTable) -> Doc<'a> {
+    match table {
+        ast::ReferencingTable::OldTable(table) => {
+            let mut doc = build_keyword_tokens([
+                (table.old_token(), "old"),
+                (table.table_token(), "table"),
+                (table.as_token(), "as"),
+            ]);
+            if let Some(name) = table.transition_relation_name() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(name.syntax()))
+                    .append(build_name(name.syntax()));
+            }
+            doc
+        }
+        ast::ReferencingTable::NewTable(table) => {
+            let mut doc = build_keyword_tokens([
+                (table.new_token(), "new"),
+                (table.table_token(), "table"),
+                (table.as_token(), "as"),
+            ]);
+            if let Some(name) = table.transition_relation_name() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(name.syntax()))
+                    .append(build_name(name.syntax()));
+            }
+            doc
+        }
+    }
+}
+
+fn build_trigger_when_condition<'a>(condition: ast::WhenCondition) -> Doc<'a> {
+    let mut doc = Doc::text("when");
+    if let Some(l_paren) = condition.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    let mut body = condition
+        .expr()
+        .map(|expr| leading_comments(expr.syntax()).append(build_expr(expr)))
+        .unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = condition.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(Doc::space())
+        .append(Doc::text("("))
+        .append(wrap_body(body))
+        .append(Doc::text(")"))
+        .group()
+}
+
+fn build_create_transform<'a>(stmt: &ast::CreateTransform) -> Doc<'a> {
+    let mut doc = Doc::text("create");
+    if let Some(or_replace) = stmt.or_replace() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(or_replace.syntax()))
+            .append(build_keyword_node(or_replace.syntax()));
+    }
+    if let Some(transform) = stmt.transform_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&transform))
+            .append(Doc::text("transform"));
+    }
+    if let Some(for_token) = stmt.for_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&for_token))
+            .append(Doc::text("for"));
+    }
+    if let Some(ty) = stmt.ty() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(ty.syntax()))
+                .append(build_type(ty))
+                .nest(2),
+        );
+    }
+    if let Some(language) = stmt.language_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&language))
+                .append(Doc::text("language"))
+                .nest(2),
+        );
+    }
+    if let Some(language) = stmt.language_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(language.syntax()))
+            .append(build_name(language.syntax()));
+    }
+    doc = doc.group();
+
+    if let Some(l_paren) = stmt.l_paren_token() {
+        doc = doc.append(comments_before(l_paren));
+    }
+    let funcs = stmt.transform_funcs().map(|func| {
+        let syntax = func.syntax().clone();
+        (
+            leading_comments(&syntax).append(build_transform_func(func)),
+            syntax,
+        )
+    });
+    let mut body = build_comma_separated_docs(funcs).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = stmt.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(Doc::space())
+        .append(Doc::text("("))
+        .append(wrap_body(body))
+        .append(Doc::text(")"))
+        .group()
+        .append(build_semicolon(stmt.semicolon_token()))
+}
+
+fn build_transform_func<'a>(func: ast::TransformFunc) -> Doc<'a> {
+    let (prefix, sig) = match func {
+        ast::TransformFunc::TransformFromFunc(func) => (
+            build_keyword_tokens([
+                (func.from_token(), "from"),
+                (func.sql_token(), "sql"),
+                (func.with_token(), "with"),
+                (func.function_token(), "function"),
+            ]),
+            func.function_sig(),
+        ),
+        ast::TransformFunc::TransformToFunc(func) => (
+            build_keyword_tokens([
+                (func.to_token(), "to"),
+                (func.sql_token(), "sql"),
+                (func.with_token(), "with"),
+                (func.function_token(), "function"),
+            ]),
+            func.function_sig(),
+        ),
+    };
+    if let Some(sig) = sig {
+        prefix
+            .append(Doc::line_or_space())
+            .append(leading_comments(sig.syntax()))
+            .append(build_function_sig(sig))
+            .nest(2)
+            .group()
+    } else {
+        prefix
+    }
+}
+
 fn build_create_function<'a>(create_function: &ast::CreateFunction) -> Doc<'a> {
     let mut doc = Doc::text("create");
     if let Some(or_replace) = create_function.or_replace() {
@@ -3073,8 +3426,8 @@ fn build_stmt<'a>(stmt: ast::Stmt) -> Doc<'a> {
         ast::Stmt::CreateTextSearchDictionary(_) => todo!(),
         ast::Stmt::CreateTextSearchParser(_) => todo!(),
         ast::Stmt::CreateTextSearchTemplate(_) => todo!(),
-        ast::Stmt::CreateTransform(_) => todo!(),
-        ast::Stmt::CreateTrigger(_) => todo!(),
+        ast::Stmt::CreateTransform(stmt) => build_create_transform(&stmt),
+        ast::Stmt::CreateTrigger(stmt) => build_create_trigger(&stmt),
         ast::Stmt::CreateType(_) => todo!(),
         ast::Stmt::CreateUser(_) => todo!(),
         ast::Stmt::CreateUserMapping(_) => todo!(),
