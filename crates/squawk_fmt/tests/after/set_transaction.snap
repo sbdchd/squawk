@@ -1,0 +1,46 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/set_transaction.sql
+---
+set transaction isolation level serializable;
+
+set transaction isolation level repeatable read, read write, not deferrable;
+
+set
+  session
+  characteristics
+  as
+  transaction
+    isolation level read committed,
+    read only,
+    deferrable;
+
+set transaction snapshot '00000003-0000001B-1';
+
+set
+  session
+  characteristics
+  as
+  transaction
+    isolation level serializable,
+    read write,
+    not deferrable;
+
+/* before set */
+set
+  /* before transaction */ transaction
+    /* before first mode */ isolation /* before level */ level /* before serializable */ serializable /* before comma */,
+    /* before read */ read /* before only */ only /* before second comma */,
+    /* before not */ not /* before deferrable */ deferrable/* before semicolon */;
+
+set
+  /* before session */ session
+  /* before characteristics */ characteristics
+  /* before as */ as
+  /* before transaction */ transaction
+    /* before mode */ read /* before write */ write/* before semicolon */;
+
+set
+  /* before transaction */ transaction
+  /* before snapshot */ snapshot
+    /* before literal */ '00000003-0000001B-1'/* before semicolon */;

@@ -1,0 +1,18 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/move.sql
+---
+move next from cursor_name;
+
+move forward 10 in cursor_name;
+
+move
+  absolute 100000000000000000000000000000000000000000000000000000000000000
+  from
+  an_intentionally_long_cursor_name;
+
+/* before move */
+move
+  /* before backward */ backward /* before all */ all
+  /* before from */ from
+  /* before cursor */ cursor_name/* before semicolon */;

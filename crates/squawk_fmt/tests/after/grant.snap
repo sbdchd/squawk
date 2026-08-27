@@ -1,0 +1,51 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/grant.sql
+---
+grant
+  select,
+  update (payload)
+  on
+    table public.records, archived_records
+  to
+  app_user;
+
+grant select on public.records to app_user;
+
+grant
+  all privileges
+  on
+    all tables in schema public, audit
+  to
+  app_user
+  with grant option
+  granted by current_user;
+
+grant
+  app_reader,
+  app_writer
+  to
+  app_user
+  with admin option, inherit true
+  granted by current_user;
+
+grant
+  usage
+  on
+    sequence
+      public.an_intentionally_long_sequence_name_that_makes_this_statement_exceed_eighty_characters
+  to
+  an_intentionally_long_role_name;
+
+/* before grant */
+grant
+  /* before select */ select /* before columns */ (
+    /* before column */ payload /* before close */
+  )
+  /* before on */ on
+    /* before table */ table
+      /* before object */ public /* before dot */./* after dot */ records
+  /* before to */ to
+  /* before role */ app_user
+  /* before with */ with /* before grant option */ grant /* before option */ option
+  /* before granted */ granted /* before by */ by /* before grantor */ current_user/* before semicolon */;

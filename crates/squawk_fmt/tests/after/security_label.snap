@@ -1,0 +1,22 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/security_label.sql
+---
+security label
+  on table public.records
+  is 'system_u:object_r:postgresql_db_t:s0';
+
+security label
+  for selinux
+  on materialized view
+    public.an_intentionally_long_materialized_view_name_that_makes_this_statement_exceed_eighty_characters
+  is null;
+
+security label on function public.process_record(bigint, text) is 'trusted';
+
+/* before security */
+security /* before label */ label
+  /* before for */ for /* before provider */ selinux
+  /* before on */ on /* before foreign */ foreign /* before table */ table
+    /* before name */ public /* before dot */./* after dot */ records
+  /* before is */ is /* before value */ 'trusted'/* before semicolon */;

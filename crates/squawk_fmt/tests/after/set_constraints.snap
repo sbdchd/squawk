@@ -1,0 +1,25 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/set_constraints.sql
+---
+set constraints all deferred;
+
+set constraints first_constraint, public.second_constraint immediate;
+
+set
+  constraints
+  an_intentionally_long_schema_name.an_intentionally_long_constraint_name,
+  another_intentionally_long_constraint_name
+  deferred;
+
+/* before set */
+set
+  /* before constraints */ constraints
+  /* before first name */ first_constraint /* before comma */,
+  /* before second name */ public /* before dot */./* after dot */ second_constraint
+  /* before timing */ immediate/* before semicolon */;
+
+set
+  /* before constraints */ constraints
+  /* before all */ all
+  /* before deferred */ deferred/* before semicolon */;

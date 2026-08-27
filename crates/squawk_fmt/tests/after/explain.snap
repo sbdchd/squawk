@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/explain.sql
+---
+explain
+  select * from records;
+
+explain
+  analyze verbose
+  update records set value = 1;
+
+explain (
+  analyze true, verbose, costs false, format json
+)
+  select an_intentionally_long_column_name
+  from an_intentionally_long_table_name
+  where an_intentionally_long_column_name > 0;
+
+/* before explain */
+explain /* before options */ (
+  /* before analyze */ analyze /* before value */ true /* before comma */,
+  /* before format */ format /* before json */ json /* before close */
+)
+  /* before select */ select /* before target */ 1/* before semicolon */;

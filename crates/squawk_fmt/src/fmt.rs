@@ -2104,7 +2104,9 @@ fn build_reindex_boolean_option_value<'a>(
         Some(leading_comments_token(&ident).append(Doc::text(text)))
     } else if let Some(no) = no {
         Some(leading_comments_token(&no).append(Doc::text("no")))
-    } else { yes.map(|yes| leading_comments_token(&yes).append(Doc::text("yes"))) };
+    } else {
+        yes.map(|yes| leading_comments_token(&yes).append(Doc::text("yes")))
+    };
     if let Some(value) = value {
         doc = doc.append(Doc::space()).append(value);
     }
@@ -2444,6 +2446,60 @@ fn build_option_item_value<'a>(value: ast::OptionItemValue) -> Doc<'a> {
     } else {
         Doc::text("default")
     }
+}
+
+fn build_analyze_option_list<'a>(list: ast::OptionItemList) -> Doc<'a> {
+    let mut body = build_comma_separated_docs(list.option_items().map(|option| {
+        let syntax = option.syntax().clone();
+        (
+            leading_comments(&syntax).append(build_option_item(option)),
+            syntax,
+        )
+    }))
+    .unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+
+    list.l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("))
+        .append(Doc::hard_line().append(body.group()).nest(2))
+        .append(Doc::hard_line())
+        .append(Doc::text(")"))
+}
+
+fn build_analyze<'a>(analyze: &ast::Analyze) -> Doc<'a> {
+    let mut doc = if analyze.analyse_token().is_some() {
+        Doc::text("analyse")
+    } else {
+        Doc::text("analyze")
+    };
+
+    if let Some(verbose) = analyze.verbose_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&verbose))
+            .append(Doc::text("verbose"));
+    }
+    if let Some(options) = analyze.option_item_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(options.syntax()))
+            .append(build_analyze_option_list(options));
+    }
+    if let Some(tables) = analyze.table_and_columns_list() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(tables.syntax()))
+                .append(build_table_and_columns_list(tables))
+                .nest(2),
+        );
+    }
+
+    doc.group()
+        .append(build_semicolon(analyze.semicolon_token()))
 }
 
 fn build_vacuum<'a>(vacuum: &ast::Vacuum) -> Doc<'a> {
@@ -2979,7 +3035,7 @@ fn build_stmt<'a>(stmt: ast::Stmt) -> Doc<'a> {
         ast::Stmt::AlterUser(_) => todo!(),
         ast::Stmt::AlterUserMapping(_) => todo!(),
         ast::Stmt::AlterView(_) => todo!(),
-        ast::Stmt::Analyze(_) => todo!(),
+        ast::Stmt::Analyze(stmt) => build_analyze(&stmt),
         ast::Stmt::Call(stmt) => build_call(&stmt),
         ast::Stmt::Checkpoint(stmt) => build_checkpoint(&stmt),
         ast::Stmt::Close(stmt) => build_close(&stmt),
@@ -3069,32 +3125,32 @@ fn build_stmt<'a>(stmt: ast::Stmt) -> Doc<'a> {
         ast::Stmt::DropUserMapping(_) => todo!(),
         ast::Stmt::DropView(_) => todo!(),
         ast::Stmt::Execute(stmt) => build_execute(stmt),
-        ast::Stmt::Explain(_) => todo!(),
+        ast::Stmt::Explain(stmt) => build_explain(&stmt),
         ast::Stmt::Fetch(stmt) => build_fetch(&stmt),
-        ast::Stmt::Grant(_) => todo!(),
-        ast::Stmt::ImportForeignSchema(_) => todo!(),
-        ast::Stmt::Listen(_) => todo!(),
+        ast::Stmt::Grant(stmt) => build_grant(&stmt),
+        ast::Stmt::ImportForeignSchema(stmt) => build_import_foreign_schema(&stmt),
+        ast::Stmt::Listen(stmt) => build_listen(&stmt),
         ast::Stmt::Load(stmt) => build_load(&stmt),
         ast::Stmt::Lock(stmt) => build_lock(&stmt),
-        ast::Stmt::Move(_) => todo!(),
-        ast::Stmt::Notify(_) => todo!(),
+        ast::Stmt::Move(stmt) => build_move(&stmt),
+        ast::Stmt::Notify(stmt) => build_notify(&stmt),
         ast::Stmt::Prepare(stmt) => build_prepare(&stmt),
-        ast::Stmt::Reassign(_) => todo!(),
-        ast::Stmt::Refresh(_) => todo!(),
+        ast::Stmt::Reassign(stmt) => build_reassign(&stmt),
+        ast::Stmt::Refresh(stmt) => build_refresh(&stmt),
         ast::Stmt::Reindex(stmt) => build_reindex(&stmt),
-        ast::Stmt::Repack(_) => todo!(),
+        ast::Stmt::Repack(stmt) => build_repack(&stmt),
         ast::Stmt::Reset(stmt) => build_reset(&stmt),
-        ast::Stmt::ResetRole(_) => todo!(),
-        ast::Stmt::ResetSessionAuth(_) => todo!(),
-        ast::Stmt::Revoke(_) => todo!(),
-        ast::Stmt::SecurityLabel(_) => todo!(),
+        ast::Stmt::ResetRole(stmt) => build_reset_role(&stmt),
+        ast::Stmt::ResetSessionAuth(stmt) => build_reset_session_auth(&stmt),
+        ast::Stmt::Revoke(stmt) => build_revoke(&stmt),
+        ast::Stmt::SecurityLabel(stmt) => build_security_label(&stmt),
         ast::Stmt::Set(stmt) => build_set(&stmt),
-        ast::Stmt::SetConstraints(_) => todo!(),
-        ast::Stmt::SetRole(_) => todo!(),
-        ast::Stmt::SetSessionAuth(_) => todo!(),
-        ast::Stmt::SetTransaction(_) => todo!(),
-        ast::Stmt::Show(_) => todo!(),
-        ast::Stmt::Unlisten(_) => todo!(),
+        ast::Stmt::SetConstraints(stmt) => build_set_constraints(&stmt),
+        ast::Stmt::SetRole(stmt) => build_set_role(&stmt),
+        ast::Stmt::SetSessionAuth(stmt) => build_set_session_auth(&stmt),
+        ast::Stmt::SetTransaction(stmt) => build_set_transaction(&stmt),
+        ast::Stmt::Show(stmt) => build_show(&stmt),
+        ast::Stmt::Unlisten(stmt) => build_unlisten(&stmt),
         ast::Stmt::Vacuum(stmt) => build_vacuum(&stmt),
     }
 }
@@ -3160,6 +3216,1719 @@ fn build_as_function_option<'a>(option: ast::AsFuncOption) -> Doc<'a> {
         }
     }
     doc
+}
+
+fn build_explain<'a>(explain: &ast::Explain) -> Doc<'a> {
+    let mut doc = Doc::text("explain");
+    if let Some(mode) = explain.explain_mode() {
+        let mode_syntax = mode.syntax().clone();
+        let parenthesized = matches!(&mode, ast::ExplainMode::ExplainOptionList(_));
+        let mode_doc = match mode {
+            ast::ExplainMode::ExplainAnalyze(analyze) => {
+                let mut doc = if analyze.analyse_token().is_some() {
+                    Doc::text("analyse")
+                } else {
+                    Doc::text("analyze")
+                };
+                if let Some(verbose) = analyze.explain_verbose() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments(verbose.syntax()))
+                        .append(build_keyword_node(verbose.syntax()));
+                }
+                doc
+            }
+            ast::ExplainMode::ExplainVerbose(verbose) => build_keyword_node(verbose.syntax()),
+            ast::ExplainMode::ExplainOptionList(options) => build_explain_option_list(options),
+        };
+        let mode_doc = leading_comments(&mode_syntax).append(mode_doc);
+        doc = if parenthesized {
+            doc.append(Doc::space()).append(mode_doc)
+        } else {
+            doc.append(Doc::line_or_space().append(mode_doc).nest(2))
+        };
+    }
+    if let Some(stmt) = explain.explain_stmt() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(stmt.syntax()))
+                .append(build_explain_stmt(stmt))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(explain.semicolon_token()))
+}
+
+fn build_explain_option_list<'a>(list: ast::ExplainOptionList) -> Doc<'a> {
+    let mut body = build_comma_separated_docs(list.explain_options().map(|option| {
+        let syntax = option.syntax().clone();
+        let mut doc = option
+            .explain_option_name()
+            .map(|name| build_keyword_node(name.syntax()))
+            .unwrap_or_else(Doc::nil);
+        if let Some(value) = option.explain_option_value() {
+            let value_doc = value
+                .expr()
+                .map(build_expr)
+                .unwrap_or_else(|| build_keyword_node(value.syntax()));
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(value.syntax()))
+                .append(value_doc);
+        }
+        (leading_comments(&syntax).append(doc), syntax)
+    }))
+    .unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    list.l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("))
+        .append(Doc::hard_line().append(body.group()).nest(2))
+        .append(Doc::hard_line())
+        .append(Doc::text(")"))
+}
+
+fn build_create_materialized_view<'a>(view: &ast::CreateMaterializedView) -> Doc<'a> {
+    let mut doc = Doc::text("create");
+    for (token, keyword) in [
+        (view.materialized_token(), "materialized"),
+        (view.view_token(), "view"),
+    ] {
+        if let Some(token) = token {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments_token(&token))
+                .append(Doc::text(keyword));
+        }
+    }
+    if let Some(if_not_exists) = view.if_not_exists() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(if_not_exists.syntax()))
+            .append(build_keyword_node(if_not_exists.syntax()));
+    }
+    if let Some(name) = view.view() {
+        if let Some(path) = name.path() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_path(&path));
+        }
+    }
+    if let Some(columns) = view.column_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_cte_column_list(columns));
+    }
+    if let Some(using) = view.using_method() {
+        let mut option = Doc::text("using");
+        if let Some(method) = using.access_method_ref() {
+            option = option
+                .append(Doc::space())
+                .append(leading_comments(method.syntax()))
+                .append(build_name(method.syntax()));
+        }
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(using.syntax()))
+                .append(option)
+                .nest(2),
+        );
+    }
+    if let Some(params) = view.with_params() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(params.syntax()))
+                .append(build_with_params(params))
+                .nest(2),
+        );
+    }
+    if let Some(tablespace) = view.tablespace_clause() {
+        let mut option = Doc::text("tablespace");
+        if let Some(name) = tablespace.tablespace_ref() {
+            option = option
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        }
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(tablespace.syntax()))
+                .append(option)
+                .nest(2),
+        );
+    }
+    if let Some(as_token) = view.as_token() {
+        doc = doc
+            .append(Doc::hard_line())
+            .append(leading_comments_token(&as_token))
+            .append(Doc::text("as"));
+    }
+    if let Some(query) = view.query() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(query.syntax()))
+                .append(build_select_variant(query))
+                .nest(2),
+        );
+    }
+    if let Some(data) = view.data_option() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(data.syntax()))
+                .append(build_keyword_node(data.syntax()))
+                .nest(2),
+        );
+    }
+    doc.group().append(build_semicolon(view.semicolon_token()))
+}
+
+fn build_explain_stmt<'a>(stmt: ast::ExplainStmt) -> Doc<'a> {
+    match stmt {
+        ast::ExplainStmt::CompoundSelect(stmt) => build_compound_select(&stmt),
+        ast::ExplainStmt::CreateTableAs(stmt) => build_create_table_as(&stmt),
+        ast::ExplainStmt::Declare(stmt) => build_declare(&stmt),
+        ast::ExplainStmt::Delete(stmt) => build_delete(&stmt),
+        ast::ExplainStmt::Execute(stmt) => build_execute(stmt),
+        ast::ExplainStmt::Insert(stmt) => build_insert(&stmt),
+        ast::ExplainStmt::Merge(stmt) => build_merge(&stmt),
+        ast::ExplainStmt::ParenSelect(stmt) => build_paren_select(stmt),
+        ast::ExplainStmt::Select(stmt) => build_select_doc(&stmt),
+        ast::ExplainStmt::SelectInto(stmt) => build_select_into(&stmt),
+        ast::ExplainStmt::Table(stmt) => build_table(&stmt),
+        ast::ExplainStmt::Update(stmt) => build_update(&stmt),
+        ast::ExplainStmt::Values(stmt) => build_values(&stmt),
+        ast::ExplainStmt::CreateMaterializedView(stmt) => build_create_materialized_view(&stmt),
+    }
+}
+
+fn build_role_ref_list<'a>(list: ast::RoleRefList) -> Doc<'a> {
+    build_comma_separated_docs(list.role_refs().map(|role| {
+        let syntax = role.syntax().clone();
+        (
+            leading_comments(&syntax).append(build_role_ref(&role)),
+            syntax,
+        )
+    }))
+    .unwrap_or_else(Doc::nil)
+}
+
+fn build_keyword_tokens<'a, const N: usize>(
+    tokens: [(Option<SyntaxToken>, &'static str); N],
+) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    let mut has_keyword = false;
+    for (token, keyword) in tokens {
+        if let Some(token) = token {
+            if has_keyword {
+                doc = doc.append(Doc::space());
+            }
+            has_keyword = true;
+            doc = doc
+                .append(leading_comments_token(&token))
+                .append(Doc::text(keyword));
+        }
+    }
+    doc
+}
+
+fn build_revoke_command<'a>(command: ast::RevokeCommand) -> Doc<'a> {
+    let mut doc = if let Some(role) = command.role_ref() {
+        build_role_ref(&role)
+    } else if command.ident_token().is_some() {
+        build_name(command.syntax())
+    } else {
+        let tokens = [
+            (command.all_token(), "all"),
+            (command.alter_token(), "alter"),
+            (command.create_token(), "create"),
+            (command.delete_token(), "delete"),
+            (command.execute_token(), "execute"),
+            (command.insert_token(), "insert"),
+            (command.references_token(), "references"),
+            (command.select_token(), "select"),
+            (command.system_token(), "system"),
+            (command.temp_token(), "temp"),
+            (command.temporary_token(), "temporary"),
+            (command.trigger_token(), "trigger"),
+            (command.truncate_token(), "truncate"),
+            (command.update_token(), "update"),
+        ];
+        build_keyword_tokens(tokens)
+    };
+    if let Some(columns) = command.column_ref_list() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(columns.syntax()))
+            .append(build_column_ref_list(columns));
+    }
+    doc.group()
+}
+
+fn build_privileges<'a>(privileges: ast::Privileges) -> Doc<'a> {
+    match privileges {
+        ast::Privileges::AllPrivileges(all) => {
+            let mut doc = build_keyword_tokens([
+                (all.all_token(), "all"),
+                (all.privileges_token(), "privileges"),
+            ]);
+            if let Some(columns) = all.column_ref_list() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(columns.syntax()))
+                    .append(build_column_ref_list(columns));
+            }
+            doc
+        }
+        ast::Privileges::RevokeCommandList(commands) => {
+            build_comma_separated_docs(commands.revoke_commands().map(|command| {
+                let syntax = command.syntax().clone();
+                (
+                    leading_comments(&syntax).append(build_revoke_command(command)),
+                    syntax,
+                )
+            }))
+            .unwrap_or_else(Doc::nil)
+        }
+    }
+}
+
+fn build_path_items<'a>(items: Vec<(SyntaxNode, ast::PathRef)>) -> Doc<'a> {
+    build_comma_separated_docs(items.into_iter().map(|(syntax, path)| {
+        (
+            leading_comments(&syntax).append(build_path_ref(&path)),
+            syntax,
+        )
+    }))
+    .unwrap_or_else(Doc::nil)
+}
+
+fn build_name_items<'a>(items: Vec<SyntaxNode>) -> Doc<'a> {
+    build_comma_separated_docs(items.into_iter().map(|syntax| {
+        let doc = leading_comments(&syntax).append(build_name(&syntax));
+        (doc, syntax)
+    }))
+    .unwrap_or_else(Doc::nil)
+}
+
+fn append_privilege_items<'a>(prefix: Doc<'a>, items: Doc<'a>) -> Doc<'a> {
+    prefix
+        .append(Doc::line_or_space().append(items).nest(2))
+        .group()
+}
+
+fn build_function_sig<'a>(sig: ast::FunctionSig) -> Doc<'a> {
+    let mut doc = sig
+        .function_name_ref()
+        .and_then(|name| name.path_ref())
+        .map(|path| build_path_ref(&path))
+        .unwrap_or_else(Doc::nil);
+    if let Some(params) = sig.param_list() {
+        doc = doc
+            .append(leading_comments(params.syntax()))
+            .append(build_function_param_list(params));
+    }
+    doc
+}
+
+fn build_procedure_sig<'a>(sig: ast::ProcedureSig) -> Doc<'a> {
+    let mut doc = sig
+        .procedure_name_ref()
+        .and_then(|name| name.path_ref())
+        .map(|path| build_path_ref(&path))
+        .unwrap_or_else(Doc::nil);
+    if let Some(params) = sig.param_list() {
+        doc = doc
+            .append(leading_comments(params.syntax()))
+            .append(build_function_param_list(params));
+    }
+    doc
+}
+
+fn build_routine_sig<'a>(sig: ast::RoutineSig) -> Doc<'a> {
+    let mut doc = sig
+        .routine_name_ref()
+        .and_then(|name| name.path_ref())
+        .map(|path| build_path_ref(&path))
+        .unwrap_or_else(Doc::nil);
+    if let Some(params) = sig.param_list() {
+        doc = doc
+            .append(leading_comments(params.syntax()))
+            .append(build_function_param_list(params));
+    }
+    doc
+}
+
+fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
+    macro_rules! direct_items {
+        ($node:ident, $method:ident, $tokens:expr) => {{
+            let items =
+                build_name_items($node.$method().map(|item| item.syntax().clone()).collect());
+            append_privilege_items(build_keyword_tokens($tokens), items)
+        }};
+    }
+    match objects {
+        ast::PrivilegeObjects::PrivilegeAllFunctionsInSchema(node) => direct_items!(
+            node,
+            schema_refs,
+            [
+                (node.all_token(), "all"),
+                (node.functions_token(), "functions"),
+                (node.in_token(), "in"),
+                (node.schema_token(), "schema")
+            ]
+        ),
+        ast::PrivilegeObjects::PrivilegeAllProceduresInSchema(node) => direct_items!(
+            node,
+            schema_refs,
+            [
+                (node.all_token(), "all"),
+                (node.procedures_token(), "procedures"),
+                (node.in_token(), "in"),
+                (node.schema_token(), "schema")
+            ]
+        ),
+        ast::PrivilegeObjects::PrivilegeAllRoutinesInSchema(node) => direct_items!(
+            node,
+            schema_refs,
+            [
+                (node.all_token(), "all"),
+                (node.routines_token(), "routines"),
+                (node.in_token(), "in"),
+                (node.schema_token(), "schema")
+            ]
+        ),
+        ast::PrivilegeObjects::PrivilegeAllSequencesInSchema(node) => direct_items!(
+            node,
+            schema_refs,
+            [
+                (node.all_token(), "all"),
+                (node.sequences_token(), "sequences"),
+                (node.in_token(), "in"),
+                (node.schema_token(), "schema")
+            ]
+        ),
+        ast::PrivilegeObjects::PrivilegeAllTablesInSchema(node) => direct_items!(
+            node,
+            schema_refs,
+            [
+                (node.all_token(), "all"),
+                (node.tables_token(), "tables"),
+                (node.in_token(), "in"),
+                (node.schema_token(), "schema")
+            ]
+        ),
+        ast::PrivilegeObjects::PrivilegeDatabase(node) => {
+            direct_items!(node, database_refs, [(node.database_token(), "database")])
+        }
+        ast::PrivilegeObjects::PrivilegeDefault(node) => build_path_items(
+            node.relation_name_refs()
+                .filter_map(|item| {
+                    let syntax = item.syntax().clone();
+                    item.path_ref().map(|path| (syntax, path))
+                })
+                .collect(),
+        ),
+        ast::PrivilegeObjects::PrivilegeDomain(node) => {
+            let items = build_path_items(
+                node.domain_refs()
+                    .filter_map(|item| {
+                        let syntax = item.syntax().clone();
+                        item.path_ref().map(|path| (syntax, path))
+                    })
+                    .collect(),
+            );
+            append_privilege_items(
+                build_keyword_tokens([(node.domain_token(), "domain")]),
+                items,
+            )
+        }
+        ast::PrivilegeObjects::PrivilegeForeignDataWrapper(node) => direct_items!(
+            node,
+            foreign_data_wrapper_refs,
+            [
+                (node.foreign_token(), "foreign"),
+                (node.data_token(), "data"),
+                (node.wrapper_token(), "wrapper")
+            ]
+        ),
+        ast::PrivilegeObjects::PrivilegeForeignServer(node) => direct_items!(
+            node,
+            server_refs,
+            [
+                (node.foreign_token(), "foreign"),
+                (node.server_token(), "server")
+            ]
+        ),
+        ast::PrivilegeObjects::PrivilegeLanguage(node) => {
+            direct_items!(node, language_refs, [(node.language_token(), "language")])
+        }
+        ast::PrivilegeObjects::PrivilegeParameter(node) => {
+            let items =
+                build_comma_separated_docs(node.config_parameter_refs().filter_map(|item| {
+                    let syntax = item.syntax().clone();
+                    item.path_ref().map(|path| {
+                        (
+                            leading_comments(&syntax).append(build_path_ref(&path)),
+                            syntax,
+                        )
+                    })
+                }))
+                .unwrap_or_else(Doc::nil);
+            append_privilege_items(
+                build_keyword_tokens([(node.parameter_token(), "parameter")]),
+                items,
+            )
+        }
+        ast::PrivilegeObjects::PrivilegePropertyGraph(node) => {
+            let items = build_path_items(
+                node.property_graph_refs()
+                    .filter_map(|item| {
+                        let syntax = item.syntax().clone();
+                        item.path_ref().map(|path| (syntax, path))
+                    })
+                    .collect(),
+            );
+            append_privilege_items(
+                build_keyword_tokens([
+                    (node.property_token(), "property"),
+                    (node.graph_token(), "graph"),
+                ]),
+                items,
+            )
+        }
+        ast::PrivilegeObjects::PrivilegeSchema(node) => {
+            direct_items!(node, schema_refs, [(node.schema_token(), "schema")])
+        }
+        ast::PrivilegeObjects::PrivilegeSequence(node) => {
+            let items = build_path_items(
+                node.sequence_refs()
+                    .filter_map(|item| {
+                        let syntax = item.syntax().clone();
+                        item.path_ref().map(|path| (syntax, path))
+                    })
+                    .collect(),
+            );
+            append_privilege_items(
+                build_keyword_tokens([(node.sequence_token(), "sequence")]),
+                items,
+            )
+        }
+        ast::PrivilegeObjects::PrivilegeTable(node) => {
+            let items = build_path_items(
+                node.relation_name_refs()
+                    .filter_map(|item| {
+                        let syntax = item.syntax().clone();
+                        item.path_ref().map(|path| (syntax, path))
+                    })
+                    .collect(),
+            );
+            append_privilege_items(build_keyword_tokens([(node.table_token(), "table")]), items)
+        }
+        ast::PrivilegeObjects::PrivilegeTablespace(node) => direct_items!(
+            node,
+            tablespace_refs,
+            [(node.tablespace_token(), "tablespace")]
+        ),
+        ast::PrivilegeObjects::PrivilegeType(node) => {
+            let items = build_path_items(
+                node.type_name_refs()
+                    .filter_map(|item| {
+                        let syntax = item.syntax().clone();
+                        item.path_ref().map(|path| (syntax, path))
+                    })
+                    .collect(),
+            );
+            append_privilege_items(build_keyword_tokens([(node.type_token(), "type")]), items)
+        }
+        ast::PrivilegeObjects::PrivilegeLargeObject(node) => {
+            let items = build_comma_separated_docs(node.literals().map(|item| {
+                let syntax = item.syntax().clone();
+                (
+                    leading_comments(&syntax).append(build_literal(item)),
+                    syntax,
+                )
+            }))
+            .unwrap_or_else(Doc::nil);
+            append_privilege_items(
+                build_keyword_tokens([
+                    (node.large_token(), "large"),
+                    (node.object_token(), "object"),
+                ]),
+                items,
+            )
+        }
+        ast::PrivilegeObjects::PrivilegeFunction(node) => {
+            let items = node
+                .function_sig_list()
+                .and_then(|list| {
+                    build_comma_separated_docs(list.function_sigs().map(|sig| {
+                        let syntax = sig.syntax().clone();
+                        (
+                            leading_comments(&syntax).append(build_function_sig(sig)),
+                            syntax,
+                        )
+                    }))
+                })
+                .unwrap_or_else(Doc::nil);
+            append_privilege_items(
+                build_keyword_tokens([(node.function_token(), "function")]),
+                items,
+            )
+        }
+        ast::PrivilegeObjects::PrivilegeProcedure(node) => {
+            let items = node
+                .procedure_sig_list()
+                .and_then(|list| {
+                    build_comma_separated_docs(list.procedure_sigs().map(|sig| {
+                        let syntax = sig.syntax().clone();
+                        (
+                            leading_comments(&syntax).append(build_procedure_sig(sig)),
+                            syntax,
+                        )
+                    }))
+                })
+                .unwrap_or_else(Doc::nil);
+            append_privilege_items(
+                build_keyword_tokens([(node.procedure_token(), "procedure")]),
+                items,
+            )
+        }
+        ast::PrivilegeObjects::PrivilegeRoutine(node) => {
+            let items = node
+                .routine_sig_list()
+                .and_then(|list| {
+                    build_comma_separated_docs(list.routine_sigs().map(|sig| {
+                        let syntax = sig.syntax().clone();
+                        (
+                            leading_comments(&syntax).append(build_routine_sig(sig)),
+                            syntax,
+                        )
+                    }))
+                })
+                .unwrap_or_else(Doc::nil);
+            append_privilege_items(
+                build_keyword_tokens([(node.routine_token(), "routine")]),
+                items,
+            )
+        }
+    }
+}
+
+fn build_grant_with_clause<'a>(with: ast::GrantWithClause) -> Doc<'a> {
+    let mut doc = Doc::text("with");
+    if let Some(option) = with.grant_option() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(option.syntax()))
+            .append(build_keyword_node(option.syntax()));
+    } else if let Some(options) = with.grant_role_option_list() {
+        let options_doc = build_comma_separated_docs(options.grant_role_options().map(|option| {
+            let syntax = option.syntax().clone();
+            let mut option_doc = option
+                .grant_role_option_name()
+                .map(|name| build_keyword_node(name.syntax()))
+                .unwrap_or_else(Doc::nil);
+            let value = option
+                .option_token()
+                .map(|token| (token, "option"))
+                .or_else(|| option.true_token().map(|token| (token, "true")))
+                .or_else(|| option.false_token().map(|token| (token, "false")));
+            if let Some((token, keyword)) = value {
+                option_doc = option_doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text(keyword));
+            }
+            (leading_comments(&syntax).append(option_doc), syntax)
+        }))
+        .unwrap_or_else(Doc::nil);
+        doc = doc.append(Doc::line_or_space().append(options_doc).nest(2));
+    }
+    doc.group()
+}
+
+fn build_granted_by_clause<'a>(granted: ast::GrantedByClause) -> Doc<'a> {
+    let mut doc = Doc::text("granted");
+    if let Some(by) = granted.by_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&by))
+            .append(Doc::text("by"));
+    }
+    if let Some(role) = granted.role_ref() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(role.syntax()))
+            .append(build_role_ref(&role));
+    }
+    doc.group()
+}
+
+fn build_grant<'a>(grant: &ast::Grant) -> Doc<'a> {
+    let mut doc = Doc::text("grant");
+    if let Some(privileges) = grant.privileges() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(privileges.syntax()))
+                .append(build_privileges(privileges))
+                .nest(2),
+        );
+    }
+    if let Some(on) = grant.on_privilege_objects_clause() {
+        let mut on_doc = Doc::text("on");
+        if let Some(objects) = on.privilege_objects() {
+            on_doc = on_doc.append(
+                Doc::line_or_space()
+                    .append(leading_comments(objects.syntax()))
+                    .append(build_privilege_objects(objects))
+                    .nest(2),
+            );
+        }
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(on.syntax()))
+                .append(on_doc)
+                .nest(2),
+        );
+    }
+    if let Some(to) = grant.to_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&to))
+                .append(Doc::text("to"))
+                .nest(2),
+        );
+    }
+    if let Some(roles) = grant.role_ref_list() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(roles.syntax()))
+                .append(build_role_ref_list(roles))
+                .nest(2),
+        );
+    }
+    if let Some(with) = grant.grant_with_clause() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(with.syntax()))
+                .append(build_grant_with_clause(with))
+                .nest(2),
+        );
+    }
+    if let Some(granted) = grant.granted_by_clause() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(granted.syntax()))
+                .append(build_granted_by_clause(granted))
+                .nest(2),
+        );
+    }
+    doc.group().append(build_semicolon(grant.semicolon_token()))
+}
+
+fn build_revoke_option_for<'a>(option: ast::RevokeOptionFor) -> Doc<'a> {
+    match option {
+        ast::RevokeOptionFor::AdminOptionFor(option) => build_keyword_node(option.syntax()),
+        ast::RevokeOptionFor::GrantOptionFor(option) => build_keyword_node(option.syntax()),
+        ast::RevokeOptionFor::InheritOptionFor(option) => build_keyword_node(option.syntax()),
+        ast::RevokeOptionFor::SetOptionFor(option) => build_keyword_node(option.syntax()),
+    }
+}
+
+fn build_revoke<'a>(revoke: &ast::Revoke) -> Doc<'a> {
+    let mut doc = Doc::text("revoke");
+    if let Some(option) = revoke.revoke_option_for() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(option.syntax()))
+                .append(build_revoke_option_for(option))
+                .nest(2),
+        );
+    }
+    if let Some(privileges) = revoke.privileges() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(privileges.syntax()))
+                .append(build_privileges(privileges))
+                .nest(2),
+        );
+    }
+    if let Some(on) = revoke.on_privilege_objects_clause() {
+        let mut on_doc = Doc::text("on");
+        if let Some(objects) = on.privilege_objects() {
+            on_doc = on_doc.append(
+                Doc::line_or_space()
+                    .append(leading_comments(objects.syntax()))
+                    .append(build_privilege_objects(objects))
+                    .nest(2),
+            );
+        }
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(on.syntax()))
+                .append(on_doc)
+                .nest(2),
+        );
+    }
+    if let Some(from) = revoke.from_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&from))
+                .append(Doc::text("from"))
+                .nest(2),
+        );
+    }
+    if let Some(roles) = revoke.role_ref_list() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(roles.syntax()))
+                .append(build_role_ref_list(roles))
+                .nest(2),
+        );
+    }
+    if let Some(granted) = revoke.granted_by_clause() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(granted.syntax()))
+                .append(build_granted_by_clause(granted))
+                .nest(2),
+        );
+    }
+    if let Some(behavior) = revoke.drop_behavior() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(behavior.syntax()))
+                .append(build_drop_behavior(behavior))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(revoke.semicolon_token()))
+}
+
+fn build_import_table_filter<'a>(filter: ast::ImportTableFilter) -> Doc<'a> {
+    let (mut doc, names, l_paren, r_paren) = match filter {
+        ast::ImportTableFilter::ExceptTables(filter) => (
+            Doc::text("except"),
+            filter
+                .remote_table_name_refs()
+                .map(|name| (name.syntax().clone(), build_name(name.syntax())))
+                .collect::<Vec<_>>(),
+            filter.l_paren_token(),
+            filter.r_paren_token(),
+        ),
+        ast::ImportTableFilter::LimitToTables(filter) => {
+            let mut doc = Doc::text("limit");
+            if let Some(to) = filter.to_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&to))
+                    .append(Doc::text("to"));
+            }
+            (
+                doc,
+                filter
+                    .remote_table_name_refs()
+                    .map(|name| (name.syntax().clone(), build_name(name.syntax())))
+                    .collect::<Vec<_>>(),
+                filter.l_paren_token(),
+                filter.r_paren_token(),
+            )
+        }
+    };
+    let mut body = build_comma_separated_docs(
+        names
+            .into_iter()
+            .map(|(syntax, name)| (leading_comments(&syntax).append(name), syntax)),
+    )
+    .unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = r_paren {
+        body = body.append(comments_before(r_paren));
+    }
+    doc = doc
+        .append(Doc::space())
+        .append(l_paren.map(comments_before).unwrap_or_else(Doc::nil))
+        .append(Doc::text("("))
+        .append(wrap_body(body))
+        .append(Doc::text(")"));
+    doc.group()
+}
+
+fn build_import_foreign_schema<'a>(import: &ast::ImportForeignSchema) -> Doc<'a> {
+    let mut doc = Doc::text("import");
+    for (token, keyword) in [
+        (import.foreign_token(), "foreign"),
+        (import.schema_token(), "schema"),
+    ] {
+        if let Some(token) = token {
+            doc = doc.append(
+                Doc::line_or_space()
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text(keyword))
+                    .nest(2),
+            );
+        }
+    }
+    if let Some(schema) = import.schema_ref() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(schema.syntax()))
+                .append(build_name(schema.syntax()))
+                .nest(2),
+        );
+    }
+    if let Some(filter) = import.import_table_filter() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(filter.syntax()))
+                .append(build_import_table_filter(filter))
+                .nest(2),
+        );
+    }
+    if let Some(from) = import.from_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&from))
+                .append(Doc::text("from"))
+                .nest(2),
+        );
+    }
+    if let Some(server) = import.server_clause() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(server.syntax()))
+                .append(build_server_clause(server))
+                .nest(2),
+        );
+    }
+    if let Some(into) = import.into_schema() {
+        let mut into_doc = Doc::text("into");
+        if let Some(schema) = into.schema_ref() {
+            into_doc = into_doc
+                .append(Doc::space())
+                .append(leading_comments(schema.syntax()))
+                .append(build_name(schema.syntax()));
+        }
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(into.syntax()))
+                .append(into_doc)
+                .nest(2),
+        );
+    }
+    if let Some(options) = import.alter_option_list() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(options.syntax()))
+                .append(build_alter_option_list(options))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(import.semicolon_token()))
+}
+
+fn build_listen<'a>(listen: &ast::Listen) -> Doc<'a> {
+    let mut doc = Doc::text("listen");
+    if let Some(channel) = listen.channel() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(channel.syntax()))
+                .append(build_name(channel.syntax()))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(listen.semicolon_token()))
+}
+
+fn build_move<'a>(move_stmt: &ast::Move) -> Doc<'a> {
+    let mut doc = Doc::text("move");
+    if let Some(action) = move_stmt.cursor_action() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(action.syntax()))
+                .append(build_cursor_action(action))
+                .nest(2),
+        );
+    }
+    if let Some(token) = move_stmt.from_token().or_else(|| move_stmt.in_token()) {
+        let keyword = if token.kind() == SyntaxKind::FROM_KW {
+            "from"
+        } else {
+            "in"
+        };
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&token))
+                .append(Doc::text(keyword))
+                .nest(2),
+        );
+    }
+    if let Some(cursor) = move_stmt.cursor_ref() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(cursor.syntax()))
+                .append(build_name(cursor.syntax()))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(move_stmt.semicolon_token()))
+}
+
+fn build_notify<'a>(notify: &ast::Notify) -> Doc<'a> {
+    let mut doc = Doc::text("notify");
+    if let Some(channel) = notify.channel_ref() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(channel.syntax()))
+                .append(build_name(channel.syntax()))
+                .nest(2),
+        );
+    }
+    if let Some(comma) = notify.comma_token() {
+        doc = doc.append(comments_before(comma)).append(Doc::text(","));
+    }
+    if let Some(payload) = notify.literal() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(payload.syntax()))
+                .append(build_literal(payload))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(notify.semicolon_token()))
+}
+
+fn build_reassign<'a>(reassign: &ast::Reassign) -> Doc<'a> {
+    let mut doc = Doc::text("reassign");
+    for (token, keyword) in [
+        (reassign.owned_token(), "owned"),
+        (reassign.by_token(), "by"),
+    ] {
+        if let Some(token) = token {
+            doc = doc.append(
+                Doc::line_or_space()
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text(keyword))
+                    .nest(2),
+            );
+        }
+    }
+    if let Some(roles) = reassign.before() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(roles.syntax()))
+                .append(build_role_ref_list(roles))
+                .nest(2),
+        );
+    }
+    if let Some(to) = reassign.to_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&to))
+                .append(Doc::text("to"))
+                .nest(2),
+        );
+    }
+    if let Some(roles) = reassign.after() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(roles.syntax()))
+                .append(build_role_ref_list(roles))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(reassign.semicolon_token()))
+}
+
+fn build_refresh<'a>(refresh: &ast::Refresh) -> Doc<'a> {
+    let mut doc = Doc::text("refresh");
+    for (token, keyword) in [
+        (refresh.materialized_token(), "materialized"),
+        (refresh.view_token(), "view"),
+        (refresh.concurrently_token(), "concurrently"),
+    ] {
+        if let Some(token) = token {
+            doc = doc.append(
+                Doc::line_or_space()
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text(keyword))
+                    .nest(2),
+            );
+        }
+    }
+    if let Some(view) = refresh.view_ref() {
+        let view_doc = view
+            .path_ref()
+            .map(|path| build_path_ref(&path))
+            .unwrap_or_else(Doc::nil);
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(view.syntax()))
+                .append(view_doc)
+                .nest(2),
+        );
+    }
+    if let Some(data) = refresh.data_option() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(data.syntax()))
+                .append(build_keyword_node(data.syntax()))
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(refresh.semicolon_token()))
+}
+
+fn build_repack<'a>(repack: &ast::Repack) -> Doc<'a> {
+    let mut doc = Doc::text("repack");
+    if let Some(options) = repack.option_item_list() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(options.syntax()))
+                .append(build_option_item_list(options))
+                .nest(2),
+        );
+    }
+    if let Some(tables) = repack.table_and_columns_list() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(tables.syntax()))
+                .append(build_table_and_columns_list(tables))
+                .nest(2),
+        );
+    }
+    if let Some(using_index) = repack.using_index() {
+        let mut using_doc = Doc::text("using");
+        if let Some(index) = using_index.index_token() {
+            using_doc = using_doc
+                .append(Doc::space())
+                .append(leading_comments_token(&index))
+                .append(Doc::text("index"));
+        }
+        if let Some(index) = using_index.index_ref() {
+            let name = index
+                .path_ref()
+                .map(|path| build_path_ref(&path))
+                .unwrap_or_else(Doc::nil);
+            using_doc = using_doc
+                .append(Doc::space())
+                .append(leading_comments(index.syntax()))
+                .append(name);
+        }
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(using_index.syntax()))
+                .append(using_doc)
+                .nest(2),
+        );
+    }
+    doc.group()
+        .append(build_semicolon(repack.semicolon_token()))
+}
+
+fn build_reset_role<'a>(reset: &ast::ResetRole) -> Doc<'a> {
+    let mut doc = Doc::text("reset");
+    if let Some(role) = reset.role_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&role))
+            .append(Doc::text("role"));
+    }
+    doc.append(build_semicolon(reset.semicolon_token()))
+}
+
+fn build_reset_session_auth<'a>(reset: &ast::ResetSessionAuth) -> Doc<'a> {
+    let mut doc = Doc::text("reset");
+    for (token, keyword) in [
+        (reset.session_token(), "session"),
+        (reset.authorization_token(), "authorization"),
+    ] {
+        if let Some(token) = token {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments_token(&token))
+                .append(Doc::text(keyword));
+        }
+    }
+    doc.append(build_semicolon(reset.semicolon_token()))
+}
+
+fn append_security_object_value<'a>(prefix: Doc<'a>, value: Doc<'a>) -> Doc<'a> {
+    prefix
+        .append(Doc::line_or_space().append(value).nest(2))
+        .group()
+}
+
+fn build_security_object_value<'a>(node: &impl AstNode, value: Doc<'a>) -> Doc<'a> {
+    leading_comments(node.syntax()).append(value)
+}
+
+fn build_aggregate_sig<'a>(aggregate: ast::Aggregate) -> Doc<'a> {
+    let mut doc = aggregate
+        .path_ref()
+        .map(|path| build_path_ref(&path))
+        .unwrap_or_else(Doc::nil);
+    if let Some(params) = aggregate.param_list() {
+        doc = doc
+            .append(leading_comments(params.syntax()))
+            .append(build_function_param_list(params));
+    }
+    doc
+}
+
+fn build_security_label_object<'a>(object: ast::SecurityLabelObject) -> Doc<'a> {
+    match object {
+        ast::SecurityLabelObject::ObjectAggregate(node) => {
+            let value = node
+                .aggregate()
+                .map(|value| {
+                    let doc = build_aggregate_sig(value.clone());
+                    build_security_object_value(&value, doc)
+                })
+                .unwrap_or_else(Doc::nil);
+            append_security_object_value(
+                build_keyword_tokens([(node.aggregate_token(), "aggregate")]),
+                value,
+            )
+        }
+        ast::SecurityLabelObject::ObjectColumn(node) => {
+            let value = node
+                .name()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil);
+            append_security_object_value(
+                build_keyword_tokens([(node.column_token(), "column")]),
+                value,
+            )
+        }
+        ast::SecurityLabelObject::ObjectDatabase(node) => append_security_object_value(
+            build_keyword_tokens([(node.database_token(), "database")]),
+            node.database_ref()
+                .map(|name| build_security_object_value(&name, build_name(name.syntax())))
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectDomain(node) => append_security_object_value(
+            build_keyword_tokens([(node.domain_token(), "domain")]),
+            node.domain_ref()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectEventTrigger(node) => append_security_object_value(
+            build_keyword_tokens([
+                (node.event_token(), "event"),
+                (node.trigger_token(), "trigger"),
+            ]),
+            node.event_trigger_ref()
+                .map(|name| build_security_object_value(&name, build_name(name.syntax())))
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectForeignTable(node) => append_security_object_value(
+            build_keyword_tokens([
+                (node.foreign_token(), "foreign"),
+                (node.table_token(), "table"),
+            ]),
+            node.table_name_ref()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectFunction(node) => append_security_object_value(
+            build_keyword_tokens([(node.function_token(), "function")]),
+            node.function_sig()
+                .map(|value| {
+                    let doc = build_function_sig(value.clone());
+                    build_security_object_value(&value, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectLanguage(node) => append_security_object_value(
+            build_keyword_tokens([
+                (node.procedural_token(), "procedural"),
+                (node.language_token(), "language"),
+            ]),
+            node.language_ref()
+                .map(|name| build_security_object_value(&name, build_name(name.syntax())))
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectLargeObject(node) => append_security_object_value(
+            build_keyword_tokens([
+                (node.large_token(), "large"),
+                (node.object_token(), "object"),
+            ]),
+            node.literal()
+                .map(|value| {
+                    let doc = build_literal(value.clone());
+                    build_security_object_value(&value, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectMaterializedView(node) => append_security_object_value(
+            build_keyword_tokens([
+                (node.materialized_token(), "materialized"),
+                (node.view_token(), "view"),
+            ]),
+            node.view_ref()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectProcedure(node) => append_security_object_value(
+            build_keyword_tokens([(node.procedure_token(), "procedure")]),
+            node.procedure_sig()
+                .map(|value| {
+                    let doc = build_procedure_sig(value.clone());
+                    build_security_object_value(&value, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectPublication(node) => append_security_object_value(
+            build_keyword_tokens([(node.publication_token(), "publication")]),
+            node.publication_ref()
+                .map(|name| build_security_object_value(&name, build_name(name.syntax())))
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectRole(node) => append_security_object_value(
+            build_keyword_tokens([(node.role_token(), "role")]),
+            node.role_ref()
+                .map(|role| {
+                    let doc = build_role_ref(&role);
+                    build_security_object_value(&role, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectRoutine(node) => append_security_object_value(
+            build_keyword_tokens([(node.routine_token(), "routine")]),
+            node.routine_sig()
+                .map(|value| {
+                    let doc = build_routine_sig(value.clone());
+                    build_security_object_value(&value, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectSchema(node) => append_security_object_value(
+            build_keyword_tokens([(node.schema_token(), "schema")]),
+            node.schema_ref()
+                .map(|name| build_security_object_value(&name, build_name(name.syntax())))
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectSequence(node) => append_security_object_value(
+            build_keyword_tokens([(node.sequence_token(), "sequence")]),
+            node.sequence_ref()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectSubscription(node) => append_security_object_value(
+            build_keyword_tokens([(node.subscription_token(), "subscription")]),
+            node.subscription_ref()
+                .map(|name| build_security_object_value(&name, build_name(name.syntax())))
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectTable(node) => append_security_object_value(
+            build_keyword_tokens([(node.table_token(), "table")]),
+            node.table_name_ref()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectTablespace(node) => append_security_object_value(
+            build_keyword_tokens([(node.tablespace_token(), "tablespace")]),
+            node.tablespace_ref()
+                .map(|name| build_security_object_value(&name, build_name(name.syntax())))
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectType(node) => append_security_object_value(
+            build_keyword_tokens([(node.type_token(), "type")]),
+            node.type_name_ref()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+        ast::SecurityLabelObject::ObjectView(node) => append_security_object_value(
+            build_keyword_tokens([(node.view_token(), "view")]),
+            node.view_ref()
+                .map(|name| {
+                    let doc = name
+                        .path_ref()
+                        .map(|path| build_path_ref(&path))
+                        .unwrap_or_else(Doc::nil);
+                    build_security_object_value(&name, doc)
+                })
+                .unwrap_or_else(Doc::nil),
+        ),
+    }
+}
+
+fn build_security_label<'a>(label: &ast::SecurityLabel) -> Doc<'a> {
+    let mut doc = Doc::text("security");
+    if let Some(token) = label.label_token() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments_token(&token))
+            .append(Doc::text("label"));
+    }
+    if let Some(provider) = label.for_provider() {
+        let mut provider_doc = Doc::text("for");
+        if let Some(name) = provider.security_label_provider() {
+            provider_doc = provider_doc
+                .append(Doc::space())
+                .append(leading_comments(name.syntax()))
+                .append(build_name(name.syntax()));
+        } else if let Some(literal) = provider.literal() {
+            provider_doc = provider_doc
+                .append(Doc::space())
+                .append(leading_comments(literal.syntax()))
+                .append(build_literal(literal));
+        }
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(provider.syntax()))
+                .append(provider_doc)
+                .nest(2),
+        );
+    }
+    let object = label.security_label_object();
+    if let Some(on) = label.on_token() {
+        let mut on_doc = leading_comments_token(&on).append(Doc::text("on"));
+        if let Some(object) = object {
+            on_doc = on_doc
+                .append(Doc::space())
+                .append(leading_comments(object.syntax()))
+                .append(build_security_label_object(object));
+        }
+        doc = doc.append(Doc::line_or_space().append(on_doc).nest(2));
+    } else if let Some(object) = object {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(object.syntax()))
+                .append(build_security_label_object(object))
+                .nest(2),
+        );
+    }
+
+    let value = if let Some(literal) = label.literal() {
+        Some(leading_comments(literal.syntax()).append(build_literal(literal)))
+    } else {
+        label
+            .null_token()
+            .map(|null| leading_comments_token(&null).append(Doc::text("null")))
+    };
+    if let Some(is) = label.is_token() {
+        let mut is_doc = leading_comments_token(&is).append(Doc::text("is"));
+        if let Some(value) = value {
+            is_doc = is_doc.append(Doc::space()).append(value);
+        }
+        doc = doc.append(Doc::line_or_space().append(is_doc).nest(2));
+    } else if let Some(value) = value {
+        doc = doc.append(Doc::line_or_space().append(value).nest(2));
+    }
+    doc.group().append(build_semicolon(label.semicolon_token()))
+}
+
+fn build_set_constraints<'a>(set: &ast::SetConstraints) -> Doc<'a> {
+    let mut doc = Doc::text("set");
+    if let Some(constraints) = set.constraints_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&constraints))
+                .append(Doc::text("constraints"))
+                .nest(2),
+        );
+    }
+
+    let names = set.constraint_name_refs().map(|name| {
+        let syntax = name.syntax().clone();
+        let name_doc = name
+            .path_ref()
+            .map(|path| build_path_ref(&path))
+            .unwrap_or_else(Doc::nil);
+        (leading_comments(&syntax).append(name_doc), syntax)
+    });
+    let target = if let Some(names) = build_comma_separated_docs(names) {
+        Some(names)
+    } else {
+        set.all_token()
+            .map(|all| leading_comments_token(&all).append(Doc::text("all")))
+    };
+    if let Some(target) = target {
+        doc = doc.append(Doc::line_or_space().append(target).nest(2));
+    }
+    if let Some(timing) = set.constraint_timing() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(timing.syntax()))
+                .append(build_keyword_node(timing.syntax()))
+                .nest(2),
+        );
+    }
+    doc.group().append(build_semicolon(set.semicolon_token()))
+}
+
+fn build_role_ref<'a>(role: &ast::RoleRef) -> Doc<'a> {
+    if let Some(group) = role.group_token() {
+        let mut doc = leading_comments_token(&group).append(Doc::text("group"));
+        if let Some(ident) = role.ident_token() {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments_token(&ident))
+                .append(build_name(role.syntax()));
+        }
+        doc
+    } else if role.ident_token().is_some() {
+        build_name(role.syntax())
+    } else {
+        build_keyword_node(role.syntax())
+    }
+}
+
+fn build_set_role_target<'a>(target: ast::SetRoleTarget) -> Doc<'a> {
+    match target {
+        ast::SetRoleTarget::Literal(literal) => build_literal(literal),
+        ast::SetRoleTarget::RoleRef(role) => build_role_ref(&role),
+        ast::SetRoleTarget::SetRoleNone(none) => build_keyword_node(none.syntax()),
+    }
+}
+
+fn build_set_role<'a>(set: &ast::SetRole) -> Doc<'a> {
+    let mut doc = Doc::text("set");
+    if let Some(scope) = set.set_scope() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(scope.syntax()))
+                .append(build_keyword_node(scope.syntax()))
+                .nest(2),
+        );
+    }
+    if let Some(role) = set.role_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&role))
+                .append(Doc::text("role"))
+                .nest(2),
+        );
+    }
+    if let Some(target) = set.set_role_target() {
+        let comments = leading_comments(target.syntax());
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(comments)
+                .append(build_set_role_target(target))
+                .nest(2),
+        );
+    }
+    doc.group().append(build_semicolon(set.semicolon_token()))
+}
+
+fn build_set_session_auth_target<'a>(target: ast::SetSessionAuthTarget) -> Doc<'a> {
+    match target {
+        ast::SetSessionAuthTarget::Literal(literal) => build_literal(literal),
+        ast::SetSessionAuthTarget::RoleRef(role) => build_role_ref(&role),
+        ast::SetSessionAuthTarget::SetSessionAuthDefault(default) => {
+            build_keyword_node(default.syntax())
+        }
+    }
+}
+
+fn build_set_session_auth<'a>(set: &ast::SetSessionAuth) -> Doc<'a> {
+    let mut doc = Doc::text("set");
+    if let Some(scope) = set.set_scope() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments(scope.syntax()))
+                .append(build_keyword_node(scope.syntax()))
+                .nest(2),
+        );
+    }
+    if let Some(session) = set.session_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&session))
+                .append(Doc::text("session"))
+                .nest(2),
+        );
+    }
+    if let Some(authorization) = set.authorization_token() {
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(leading_comments_token(&authorization))
+                .append(Doc::text("authorization"))
+                .nest(2),
+        );
+    }
+    if let Some(target) = set.set_session_auth_target() {
+        let comments = leading_comments(target.syntax());
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(comments)
+                .append(build_set_session_auth_target(target))
+                .nest(2),
+        );
+    }
+    doc.group().append(build_semicolon(set.semicolon_token()))
+}
+
+fn build_transaction_mode_list<'a>(list: ast::TransactionModeList) -> Doc<'a> {
+    let modes = list.transaction_modes().map(|mode| {
+        let syntax = mode.syntax().clone();
+        (
+            leading_comments(&syntax).append(build_keyword_node(&syntax)),
+            syntax,
+        )
+    });
+    build_comma_separated_docs(modes).unwrap_or_else(Doc::nil)
+}
+
+fn build_set_transaction<'a>(set: &ast::SetTransaction) -> Doc<'a> {
+    let mut doc = Doc::text("set");
+    let body = if let Some(characteristics) = set.session_characteristics() {
+        let mut body = Doc::text("session");
+        for (token, keyword) in [
+            (characteristics.characteristics_token(), "characteristics"),
+            (characteristics.as_token(), "as"),
+            (characteristics.transaction_token(), "transaction"),
+        ] {
+            if let Some(token) = token {
+                body = body
+                    .append(Doc::line_or_space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text(keyword));
+            }
+        }
+        if let Some(modes) = characteristics.transaction_mode_list() {
+            body = body.append(
+                Doc::line_or_space()
+                    .append(leading_comments(modes.syntax()))
+                    .append(build_transaction_mode_list(modes))
+                    .nest(2),
+            );
+        }
+        Some((leading_comments(characteristics.syntax()), body))
+    } else if let Some(modes) = set.transaction_modes() {
+        let mut body = Doc::text("transaction");
+        if let Some(list) = modes.transaction_mode_list() {
+            body = body.append(
+                Doc::line_or_space()
+                    .append(leading_comments(list.syntax()))
+                    .append(build_transaction_mode_list(list))
+                    .nest(2),
+            );
+        }
+        Some((leading_comments(modes.syntax()), body))
+    } else {
+        set.transaction_snapshot().map(|snapshot| {
+            let mut body = Doc::text("transaction");
+            if let Some(token) = snapshot.snapshot_token() {
+                body = body
+                    .append(Doc::line_or_space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("snapshot"));
+            }
+            if let Some(literal) = snapshot.literal() {
+                body = body.append(
+                    Doc::line_or_space()
+                        .append(leading_comments(literal.syntax()))
+                        .append(build_literal(literal))
+                        .nest(2),
+                );
+            }
+            (leading_comments(snapshot.syntax()), body)
+        })
+    };
+    if let Some((comments, body)) = body {
+        doc = doc.append(Doc::line_or_space().append(comments).append(body).nest(2));
+    }
+    doc.group().append(build_semicolon(set.semicolon_token()))
+}
+
+fn build_show<'a>(show: &ast::Show) -> Doc<'a> {
+    let mut doc = Doc::text("show");
+    if let Some(action) = show.show_action() {
+        let comments = leading_comments(action.syntax());
+        let action_doc = match action {
+            ast::ShowAction::ConfigParameterRef(parameter) => parameter
+                .path_ref()
+                .map(|path| build_path_ref(&path))
+                .unwrap_or_else(Doc::nil),
+            ast::ShowAction::All(action) => build_keyword_node(action.syntax()),
+            ast::ShowAction::SessionAuthorization(action) => build_keyword_node(action.syntax()),
+            ast::ShowAction::TimeZone(action) => build_keyword_node(action.syntax()),
+            ast::ShowAction::TransactionIsolationLevel(action) => {
+                build_keyword_node(action.syntax())
+            }
+        };
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(comments)
+                .append(action_doc)
+                .nest(2),
+        );
+    }
+    doc.group().append(build_semicolon(show.semicolon_token()))
+}
+
+fn build_unlisten<'a>(unlisten: &ast::Unlisten) -> Doc<'a> {
+    let mut doc = Doc::text("unlisten");
+    let target = if let Some(channel) = unlisten.channel_ref() {
+        Some(leading_comments(channel.syntax()).append(build_name(channel.syntax())))
+    } else {
+        unlisten
+            .star_token()
+            .map(|star| leading_comments_token(&star).append(Doc::text("*")))
+    };
+    if let Some(target) = target {
+        doc = doc.append(Doc::line_or_space().append(target).nest(2));
+    }
+    doc.group()
+        .append(build_semicolon(unlisten.semicolon_token()))
 }
 
 fn build_set<'a>(set: &ast::Set) -> Doc<'a> {
