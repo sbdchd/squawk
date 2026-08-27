@@ -55,6 +55,8 @@ pub enum LitKind {
     NationalString(SyntaxToken),
     Null(SyntaxToken),
     NumericNumber(SyntaxToken),
+    Off(SyntaxToken),
+    On(SyntaxToken),
     PositionalParam(SyntaxToken),
     String(SyntaxToken),
     True(SyntaxToken),
@@ -83,6 +85,8 @@ impl ast::Literal {
             SyntaxKind::NATIONAL_STRING => LitKind::NationalString(token),
             SyntaxKind::NULL_KW => LitKind::Null(token),
             SyntaxKind::NUMERIC_NUMBER => LitKind::NumericNumber(token),
+            SyntaxKind::OFF_KW => LitKind::Off(token),
+            SyntaxKind::ON_KW => LitKind::On(token),
             SyntaxKind::POSITIONAL_PARAM => LitKind::PositionalParam(token),
             SyntaxKind::STRING => LitKind::String(token),
             SyntaxKind::TRUE_KW => LitKind::True(token),
@@ -431,6 +435,29 @@ impl ast::FieldExpr {
     #[inline]
     pub fn field(&self) -> Option<ast::NameRef> {
         support::children(self.syntax()).last()
+    }
+}
+
+impl ast::IndexAccessor {
+    #[inline]
+    pub fn index(&self) -> Option<ast::Expr> {
+        support::child(self.syntax())
+    }
+}
+
+impl ast::SliceAccessor {
+    #[inline]
+    pub fn start(&self) -> Option<ast::Expr> {
+        let colon = self.colon_token()?;
+        support::children(self.syntax())
+            .find(|expr: &ast::Expr| expr.syntax().text_range().end() <= colon.text_range().start())
+    }
+
+    #[inline]
+    pub fn end(&self) -> Option<ast::Expr> {
+        let colon = self.colon_token()?;
+        support::children(self.syntax())
+            .find(|expr: &ast::Expr| expr.syntax().text_range().start() >= colon.text_range().end())
     }
 }
 
@@ -879,6 +906,26 @@ impl ast::JsonNullOnNull {
             .filter_map(|element| element.into_token())
             .filter(|token| token.kind() == SyntaxKind::NULL_KW)
             .nth(1)
+    }
+}
+
+impl ast::JsonTable {
+    pub fn document_expr(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    pub fn path_expr(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::JsonTablePlanJoin {
+    pub fn lhs(&self) -> Option<ast::JsonTablePlan> {
+        support::children(self.syntax()).next()
+    }
+
+    pub fn rhs(&self) -> Option<ast::JsonTablePlan> {
+        support::children(self.syntax()).nth(1)
     }
 }
 

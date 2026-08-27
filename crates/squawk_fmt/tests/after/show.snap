@@ -1,0 +1,23 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/show.sql
+---
+show all;
+
+show work_mem;
+
+show
+  custom.an_intentionally_long_config_group.an_intentionally_long_parameter_name_that_exceeds_eighty_characters;
+
+show time zone;
+
+show transaction isolation level;
+
+show session authorization;
+
+/* before show */
+show
+  /* before parameter */ custom /* before dot */./* after dot */ parameter/* before semicolon */;
+
+show
+  /* before transaction */ transaction /* before isolation */ isolation /* before level */ level/* before semicolon */;

@@ -1,0 +1,41 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/reindex.sql
+---
+reindex index my_index;
+
+reindex table my_table;
+
+reindex table concurrently my_broken_table;
+
+reindex database my_database;
+
+reindex system my_database;
+
+reindex schema my_schema;
+
+reindex (concurrently true, tablespace new_tablespace, verbose false)
+  database concurrently my_database;
+
+reindex (concurrently 'off', verbose yes) table public.my_table;
+
+reindex (concurrently no, verbose auto) index public.my_index;
+
+reindex (concurrently, verbose) table public.my_table;
+
+reindex () table my_table;
+
+reindex (
+  concurrently true,
+  tablespace an_intentionally_long_tablespace_name,
+  verbose false
+)
+  table concurrently an_intentionally_long_schema_name.an_intentionally_long_table_name;
+
+/* before reindex */
+reindex /* before left paren */ (
+  /* after left paren */ concurrently /* before option value */ true /* before comma */,
+  /* after comma */ tablespace /* before tablespace */ new_tablespace /* before second comma */,
+  /* after second comma */ verbose /* before verbose value */ no /* before right paren */
+)
+  /* before target */ table /* before concurrently */ concurrently /* before table name */ public /* before dot */./* after dot */ records/* before semicolon */;

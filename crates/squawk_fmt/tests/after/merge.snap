@@ -1,0 +1,72 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/merge.sql
+---
+merge into target as t
+using source as s on t.id = s.id
+when matched then
+  update set value = s.value
+when not matched then
+  insert (id, value) values (s.id, s.value)
+returning t.id;
+
+with merged as (
+  merge into target
+  using source on target.id = source.id
+  when matched and source.deleted then
+    delete
+  when not matched by source then
+    do nothing
+  when not matched by target then
+    insert default values
+  returning target.id
+)
+select *
+from merged;
+
+merge into a_very_long_schema_name.a_very_long_target_table_name as an_extremely_long_target_alias
+using a_very_long_schema_name.a_very_long_source_table_name as an_extremely_long_source_alias
+on an_extremely_long_target_alias.organization_identifier
+  = an_extremely_long_source_alias.organization_identifier
+when matched and
+  an_extremely_long_source_alias.should_update_the_existing_record then
+  update
+  set
+    extremely_long_descriptive_column_name
+      = an_extremely_long_source_alias.extremely_long_descriptive_column_name
+when not matched by target then
+  insert (organization_identifier, extremely_long_descriptive_column_name)
+  overriding system value
+  values (
+    an_extremely_long_source_alias.organization_identifier,
+    an_extremely_long_source_alias.extremely_long_descriptive_column_name
+  )
+returning an_extremely_long_target_alias.organization_identifier;
+
+/* before merge */
+merge /* before into */ into /* before target */ only /* before target open */(/* before schema */ public /* before dot */./* before table */ target /* before target close */) /* before as */ as /* before target alias */ t
+/* before using */ using /* before source */ source /* before source as */ as /* before source alias */ s
+/* before on */ on /* before condition */ t.id = s.id
+/* before first when */ when /* before matched */ matched /* before and */ and
+  /* before predicate */ s.deleted /* before then */ then
+  /* before delete */ delete
+/* before second when */ when /* before second matched */ matched /* before second then */ then
+  /* before update */ update
+  /* before set */ set
+    /* before column */ value /* before equals */ = /* before value */ s.value
+/* before third when */ when /* before not */ not /* before third matched */ matched /* before by */ by /* before source keyword */ source /* before source and */ and
+  /* before source predicate */ t.active /* before source then */ then
+  /* before do */ do /* before nothing */ nothing
+/* before fourth when */ when /* before fourth not */ not /* before fourth matched */ matched /* before target by */ by /* before target keyword */ target /* before target then */ then
+  /* before insert */ insert /* before columns */ (
+    /* before id */ id /* before comma */,
+    /* before value column */ value /* before columns close */
+  )
+  /* before overriding */ overriding /* before user */ user /* before overriding value */ value
+  /* before values */ values /* before row */ (
+    /* before source id */ s.id /* before values comma */,
+    /* before source value */ s.value /* before row close */
+  )
+/* before fifth when */ when not matched then
+  insert /* before default */ default /* before default values */ values
+/* before returning */ returning /* before return target */ t.id/* before semicolon */;

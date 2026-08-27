@@ -1,0 +1,17 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/discard.sql
+---
+discard all;
+
+discard plans;
+
+discard sequences;
+
+discard temporary;
+
+discard temp;
+
+/* before discard */
+discard
+  /* first comment before target */ /* second comment before target */ /* third comment before target */ all/* before semicolon */;

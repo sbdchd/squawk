@@ -12,10 +12,183 @@ from foo /* before alias */ as /* before alias name */ f /* before open paren */
     /* after comma */ display_name /* before close paren */
   );
 select * from users tablesample bernoulli (10) repeatable (42);
+select * from generate_series(1, 3);
+select * from lateral generate_series(1, 3) with ordinality as g (n, ord);
+select *
+from /* before lateral */ lateral /* before call */ generate_series /* before opening paren */(
+    /* before first argument */ 1 /* before comma */,
+    /* before second argument */ 3 /* before closing paren */
+  ) /* before with */ with /* before ordinality */ ordinality /* before alias */ as /* before alias name */ g /* before alias opening paren */ (
+    /* before first column */ n /* before column comma */,
+    /* before second column */ ord /* before alias closing paren */
+  ) /* after function item */,
+  other;
+select *
+from lateral cast(
+    a_very_long_expression_name as a_very_long_schema_name.a_very_long_type_name
+  ) as converted;
+select * from collation for (foo) as collation_name;
+select *
+from /* before lateral */ lateral /* before cast */ cast /* before opening paren */(
+    /* before expression */ value
+    /* before as */ as
+    /* before type */ int8 /* before closing paren */
+  ) /* before alias */ as /* before alias name */ converted;
+select * from (select 1) as selected;
+select *
+from only lateral (
+    select a_very_long_parenthesized_select_expression
+    from a_very_long_parenthesized_select_relation_name
+  ) as a_very_long_parenthesized_select_alias;
+select *
+from /* before only */ only /* before lateral */ lateral /* before opening paren */ (
+    /* before select */ select
+      /* before target */ value /* before closing paren */
+  ) /* before alias */ as /* before alias name */ selected;
+select *
+from (
+    /* before relation */ foo /* before closing paren */
+  ) as parenthesized_relation;
+select *
+from rows from (
+    generate_series(1, 3),
+    unnest(array[1, 2]) as (value int8)
+  ) with ordinality as generated (first_value, second_value, ordinality);
+select *
+from /* before lateral */ lateral /* before rows */ rows /* before from */ from /* before opening paren */(
+    /* before first argument */ generate_series(
+      1,
+      3
+    ) /* before argument comma */,
+    /* before second argument */ unnest(
+      array[1, 2]
+    ) /* before as */ as /* before column list */ (
+      /* before column */ value /* before type */ int8 /* before column list close */
+    ) /* before rows close */
+  ) /* before with */ with /* before ordinality */ ordinality /* before alias */ as /* before alias name */ generated (
+    value,
+    ordinality
+  );
+select *
+from xmltable(
+    '/rows/row' passing doc
+    columns
+      id int8 path '@id' not null,
+      ord for ordinality,
+      value text default 'unknown' null
+  ) as parsed;
+select *
+from lateral xmltable(
+    xmlnamespaces('urn:a' as a, default 'urn:default'),
+    a_very_long_xml_row_expression passing by ref
+      a_very_long_xml_document_expression by value
+    columns
+      a_very_long_first_xml_column_name a_very_long_xml_column_type
+      path a_very_long_xml_path_expression,
+      a_very_long_ordinality_column_name for ordinality
+  ) as a_very_long_xml_table_alias;
+select *
+from /* before lateral */ lateral /* before xmltable */ xmltable /* before opening paren */(
+    /* before namespaces */ xmlnamespaces /* before namespace opening paren */(
+      /* before namespace expression */ 'urn:a' /* before as */ as /* before prefix */ a /* before namespace comma */,
+      /* before default */ default /* before default expression */ 'urn:default' /* before namespace closing paren */
+    ) /* before outer comma */,
+    /* before row */ '/rows/row'
+    /* before passing */ passing /* before first by */ by /* before ref */ ref
+      /* before document */ doc /* before second by */ by /* before value */ value
+    /* before columns */ columns
+      /* before first column */ id /* before type */ int8
+      /* before path */ path /* before path expression */ '@id'
+      /* before not */ not /* before null */ null /* before column comma */,
+      /* before ordinality column */ ord /* before for */ for /* before ordinality */ ordinality /* before closing paren */
+  ) /* before alias */ as /* before alias name */ parsed;
+select *
+from json_table(
+    doc,
+    '$[*]'
+    columns (
+      ord for ordinality,
+      value text path '$.value',
+      has_value bool exists path '$.value',
+      nested path '$.items[*]' columns (item text path '$')
+    )
+    plan (items)
+  ) as jt;
+select *
+from json_table(
+    doc,
+    '$'
+    columns (
+      nested '$.a' as a columns (x int),
+      nested '$.b' as b columns (y int)
+    )
+    plan (a cross b)
+  ) jt;
+select *
+from json_table(doc, '$' columns (x int) plan default (inner, union)) jt;
+select *
+from lateral json_table(
+    a_very_long_json_document_expression
+    format json,
+    a_very_long_json_path_expression as a_very_long_json_path_name
+    passing a_very_long_json_passing_expression as a_very_long_json_variable_name
+    columns (
+      a_very_long_ordinality_column_name for ordinality,
+      a_very_long_value_column_name a_very_long_json_value_type
+      format json
+      path '$.a_very_long_value_path_expression_that_forces_wrapping'
+      with unconditional array wrapper
+      keep quotes on scalar string
+      default a_very_long_default_expression on empty
+      error on error,
+      a_very_long_exists_column_name boolean
+      exists
+      path '$.a_very_long_exists_path_expression_that_forces_wrapping'
+      false on error,
+      nested path a_very_long_nested_path_expression as a_very_long_nested_path_name
+      columns (
+        a_very_long_nested_column_name a_very_long_nested_column_type
+        path '$.a_very_long_nested_column_path_expression_that_forces_wrapping'
+      )
+    )
+    error on error
+  ) as a_very_long_json_table_alias;
+select *
+from /* before lateral */ lateral /* before json table */ json_table /* before opening paren */(
+    /* before document */ doc
+    /* before format */ format /* before json */ json /* before comma */,
+    /* before path */ '$[*]' /* before path as */ as /* before path name */ root
+    /* before passing */ passing /* before argument */ x /* before argument as */ as /* before variable */ foo
+    /* before columns */ columns /* before columns opening paren */(
+      /* before ordinality column */ ord /* before for */ for /* before ordinality */ ordinality /* before column comma */,
+      /* before value column */ value /* before type */ text
+      /* before path keyword */ path /* before column path */ '$.value' /* before second column comma */,
+      /* before exists column */ has_value /* before exists type */ bool
+      /* before exists */ exists
+      /* before exists path */ path /* before exists path expression */ '$.value' /* before nested comma */,
+      /* before nested */ nested /* before nested path */ path /* before nested expression */ '$.items[*]' /* before nested as */ as /* before nested name */ items
+      /* before nested columns */ columns /* before nested opening paren */(
+        /* before nested column */ item /* before nested type */ text /* before nested closing paren */
+      ) /* before columns closing paren */
+    )
+    /* before plan */ plan /* before plan opening paren */(
+      /* before plan name */ items /* before plan closing paren */
+    )
+    /* before on error */ error /* before on */ on /* before error */ error /* before closing paren */
+  ) /* before alias */ as /* before alias name */ jt;
 select *
 /* before from */ from /* before item */ only /* before relation */ public /* before dot */./* before table */ foo /* before star */ * /* before alias */ as /* before alias name */ f /* before item comma */,
   /* before second item */ other /* before second alias */ o;
 
+select *
+from lateral a_very_long_function_name(
+    a_very_long_first_argument_name,
+    a_very_long_second_argument_name,
+    a_very_long_third_argument_name
+  ) with ordinality as a_very_long_function_alias (
+    a_very_long_value_column_alias,
+    a_very_long_ordinality_column_alias
+  );
 select *
 from a_very_long_schema_name.a_very_long_relation_name as a_very_long_relation_alias (
     a_very_long_first_column_alias,
@@ -34,3 +207,39 @@ from a_very_long_relation_name tablesample bernoulli (
 select *
 from only a_very_long_schema_name.a_very_long_first_relation_name * as a_very_long_first_alias,
   a_very_long_schema_name.a_very_long_second_relation_name as a_very_long_second_alias;
+
+select * from users join profiles on users.id = profiles.user_id;
+
+select * from users left outer join profiles using (user_id) as matched_users;
+
+select *
+from a right join b on true,
+  c full outer join d on true,
+  e natural inner join f,
+  g cross join h;
+
+select *
+from first_really_long_table_name
+  join second_really_long_table_name on
+    first_really_long_table_name.id = second_really_long_table_name.first_id
+  join third_really_long_table_name on
+    second_really_long_table_name.id = third_really_long_table_name.second_id;
+
+select * from (a join b on a.id = b.id) as joined_tables;
+
+select *
+from a
+  /*ja*/ left /*jb*/ outer /*jc*/ join /*jd*/ b /*je*/ on
+    /*jf*/ a /*jg*/./*jh*/ id /*ji*/ = /*jj*/ b /*jk*/./*jl*/ id,
+  /*jm*/ c
+  /*jn*/ join /*jo*/ d
+    /*jp*/ using /*jq*/ (
+      /*jr*/ first_id /*js*/,
+      /*jt*/ second_id /*ju*/
+    ) /*jv*/ as /*jw*/ ids/*jx*/;
+
+select a_very_long_column_name
+from a_very_long_schema_name.a_very_long_table_name
+  left outer join another_very_long_schema_name.another_very_long_table_name on
+    a_very_long_schema_name.a_very_long_table_name.a_very_long_column_name
+      = another_very_long_schema_name.another_very_long_table_name.another_very_long_column_name;

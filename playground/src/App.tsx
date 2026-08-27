@@ -51,6 +51,8 @@ const SETTINGS = {
   value: DEFAULT_CONTENT,
   language: "pgsql",
   tabSize: 2,
+  insertSpaces: true,
+  detectIndentation: false,
   theme: "squawk-dark",
   minimap: { enabled: false },
   automaticLayout: true,

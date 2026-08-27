@@ -1,0 +1,38 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/prepare.sql
+---
+prepare statement_name as
+  select 1;
+
+prepare statement_name(int, text) as
+  insert into t values ($1, $2);
+
+prepare statement_name as
+  update t set value = 1 where id = $1;
+
+prepare statement_name as
+  delete from t where id = $1;
+
+prepare statement_name as
+  values (1, 'one'), (2, 'two');
+
+prepare
+  prepared_statement_with_an_intentionally_long_name(
+    integer,
+    character varying,
+    timestamp with time zone,
+    double precision
+  )
+  as
+  select an_intentionally_long_column_name
+  from an_intentionally_long_table_name;
+
+/* before prepare */
+prepare
+  /* before name */ statement_name/* before left paren */ (
+    /* after left paren */ int /* before comma */,
+    /* after comma */ text /* before right paren */
+  )
+  /* before as */ as
+  /* before statement */ select /* before value */ $1/* before semicolon */;

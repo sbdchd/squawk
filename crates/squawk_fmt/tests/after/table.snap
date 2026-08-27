@@ -1,0 +1,51 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/table.sql
+---
+table foo;
+table public.foo *;
+table only (public.foo);
+table foo order by a desc, b asc;
+/* before table */
+table
+  /* before only */ only /* before relation opening paren */(/* before relation */ public /* before dot */./* before name */ foo /* before relation closing paren */)
+/* before order */ order /* before by */ by
+  /* before first expression */ a /* before desc */ desc /* before comma */,
+  /* before second expression */ b /* before asc */ asc/* before semicolon */;
+table
+  a_very_long_schema_name.a_very_long_relation_name_that_forces_the_table_statement_to_wrap
+order by
+  a_very_long_first_order_expression desc,
+  a_very_long_second_order_expression asc;
+
+with cte as (
+  select 1
+)
+table cte
+order by a
+for update
+limit 10
+offset 2 rows;
+table foo fetch first 5 rows with ties;
+
+table
+  a_very_long_schema_name.a_very_long_relation_name_that_forces_the_table_statement_to_wrap
+order by
+  a_very_long_first_order_expression desc,
+  a_very_long_second_order_expression asc
+for no key update of a_very_long_schema_name.a_very_long_relation_name_that_forces_the_locking_clause_to_wrap skip locked
+limit a_very_long_limit_expression
+offset a_very_long_offset_expression rows;
+
+with /* before recursive */ recursive /* before cte */ cte /* before as */ as /* before query open */ (
+  /* before query */ select 1 /* before query close */
+)
+/* before table */ table /* before relation */ cte
+/* before order */ order /* before by */ by
+  /* before order expression */ a /* before desc */ desc
+/* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait
+/* before limit */ limit /* before limit value */ 10
+/* before offset */ offset /* before offset value */ 2 /* before rows */ rows/* before semicolon */;
+
+table /* before relation */ foo
+/* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties/* before semicolon */;

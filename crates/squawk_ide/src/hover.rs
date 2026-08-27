@@ -300,6 +300,8 @@ fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
         LitKind::IntNumber(_) => return None,
         LitKind::Null(_) => return None,
         LitKind::NumericNumber(_) => return None,
+        LitKind::Off(_) => return None,
+        LitKind::On(_) => return None,
         LitKind::PositionalParam(_) => return None,
         LitKind::True(_) => return None,
     };

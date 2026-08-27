@@ -1,0 +1,28 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/do.sql
+---
+do 'BEGIN NULL; END';
+
+do $$BEGIN RAISE NOTICE 'hello'; END$$;
+
+do
+  language plpgsql
+  $$begin perform refresh_materialized_view_with_an_intentionally_long_name(); end$$;
+
+do $$begin null; end$$ language 'plpgsql';
+
+do $body$
+begin
+  raise notice 'hello';
+end
+$body$;
+
+/* before */
+do
+  /* after do */ language /* after language */ plpgsql
+  /* before body */ $body$BEGIN NULL; END$body$/* before semicolon */;
+
+do
+  /* before trailing body */ $body$BEGIN NULL; END$body$
+  /* before trailing language */ language /* before language literal */ 'plpgsql'/* before trailing semicolon */;

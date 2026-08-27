@@ -1,0 +1,77 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 28
+input_file: crates/squawk_fmt/tests/before/create_table_options.sql
+---
+create temporary table if not exists t (id int)
+  inherits (parent, archive.parent)
+  partition by hash (id)
+  using heap
+  with (fillfactor = 70)
+  on commit delete rows
+  tablespace fast;
+
+create global temporary table global_temp (id int)
+  on commit preserve rows;
+
+create local temp table local_temp (id int)
+  on commit drop;
+
+create unlogged table events (id int)
+  without oids;
+
+create table typed_table
+  of public.record_type;
+
+create table measurements
+  partition of events
+  for values from (minvalue, 1) to (maxvalue, 100);
+
+create table statuses
+  partition of events
+  for values in (
+    'new',
+    'ready',
+    'a status value which makes this create table statement longer than eighty characters'
+  );
+
+create table hash_part
+  partition of events
+  for values with (modulus 4, remainder 0);
+
+create table default_part
+  partition of events default;
+
+create table partitioned (
+  a_very_long_region_column_name text,
+  a_very_long_created_at_column_name timestamptz
+)
+  partition by range (
+    a_very_long_region_column_name collate "C",
+    a_very_long_created_at_column_name
+  );
+
+-- comments in every clause position
+create /*a*/ local /*b*/ temporary /*c*/ table /*d*/ if /*e*/ not /*f*/ exists /*g*/ commented (
+  /*h*/ id int /*i*/
+)
+  /*j*/ inherits /*k*/(/*l*/ parent /*m*/, /*n*/ archive.parent /*o*/)
+  /*p*/ partition /*q*/ by /*r*/ hash /*s*/ (/*t*/ id /*u*/)
+  /*v*/ using /*w*/ heap
+  /*x*/ with /*y*/ (fillfactor /*z*/ = /*aa*/ 70 /*ab*/)
+  /*ac*/ on /*ad*/ commit /*ae*/ preserve /*af*/ rows
+  /*ag*/ tablespace /*ah*/ fast;
+
+create table child
+  /*a*/ partition /*b*/ of /*c*/ parent
+  /*d*/ for /*e*/ values /*f*/ from /*g*/ (/*h*/ minvalue /*i*/, /*j*/ 1 /*k*/)
+  /*l*/ to /*m*/ (/*n*/ maxvalue /*o*/, /*p*/ 100 /*q*/);
+create table child_in
+  partition of parent
+  for /*a*/ values /*b*/ in /*c*/(/*d*/ 1 /*e*/, /*f*/ 2 /*g*/);
+create table child_hash
+  partition of parent
+  for /*a*/ values /*b*/ with /*c*/(
+    /*d*/ modulus /*e*/ 4 /*f*/,
+    /*g*/ remainder /*h*/ 0 /*i*/
+  );

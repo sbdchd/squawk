@@ -1,0 +1,11 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/listen.sql
+---
+listen events;
+
+listen
+  an_intentionally_long_channel_name_that_makes_this_statement_longer_than_eighty_characters;
+
+/* before listen */
+listen /* before channel */ event_channel/* before semicolon */;

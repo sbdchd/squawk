@@ -1,0 +1,49 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/fetch.sql
+---
+fetch next from cursor_name;
+
+fetch prior in cursor_name;
+
+fetch first from cursor_name;
+
+fetch last from cursor_name;
+
+fetch absolute 10 from cursor_name;
+
+fetch relative -3 from cursor_name;
+
+fetch 10 from cursor_name;
+
+fetch all from cursor_name;
+
+fetch forward from cursor_name;
+
+fetch forward 10 in cursor_name;
+
+fetch forward all from cursor_name;
+
+fetch backward from cursor_name;
+
+fetch backward 10 from cursor_name;
+
+fetch backward all from cursor_name;
+
+fetch prior cursor_name;
+
+fetch
+  next
+  from
+  cursor_with_an_intentionally_long_name_that_makes_this_fetch_statement_longer_than_eighty_characters;
+
+/* before fetch */
+fetch
+  /* before action */ forward /* before all */ all
+  /* before from */ from
+  /* before cursor */ cursor_name/* before semicolon */;
+
+fetch
+  /* before absolute */ absolute /* before count */ 10
+  /* before in */ in
+  /* before second cursor */ cursor_name/* before second semicolon */;

@@ -10902,11 +10902,11 @@ impl ExprFromItem {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn cast_expr(&self) -> Option<CastExpr> {
+    pub fn call_expr(&self) -> Option<CallExpr> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn collation_for_fn(&self) -> Option<CollationForFn> {
+    pub fn cast_expr(&self) -> Option<CastExpr> {
         support::child(&self.syntax)
     }
     #[inline]

@@ -1,0 +1,53 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/update.sql
+---
+update foo set a = 1;
+
+update only (foo) as f
+set a = 1, b = default
+from bar
+where f.id = bar.id
+returning f.*;
+
+update foo
+set
+  (a, b) = row(1, default),
+  (c, d) = (select x, y from bar),
+  payload.field[1][2:3] = 4;
+
+update a_very_long_schema_name.a_very_long_table_name
+set
+  a_very_long_first_column_name = 'a very long replacement value',
+  a_very_long_second_column_name = 'another very long replacement value'
+where organization_id = 12345 and status = 'active'
+returning id, a_very_long_first_column_name;
+
+with changed as (
+  update foo set a = 1 where id = 2 returning id
+)
+select *
+from changed;
+
+with source as (
+  select id, value from incoming
+)
+update foo
+set value = source.value
+from source
+where foo.id = source.id
+returning foo.id;
+
+/*before*/
+update /*a*/ only /*b*/(/*c*/ public /*d*/./*e*/ foo /*f*/)
+/*g*/ for /*h*/ portion /*i*/ of /*j*/ valid_at /*k*/ from /*l*/ 1 /*m*/ to /*n*/ 2 /*o*/ as /*p*/ f
+/*q*/ set
+  /*r*/ payload/*s*/ ./*t*/ field/*u*/ [/*v*/ 1 /*w*/:/*x*/ 2 /*y*/]
+    /*z*/ = /*aa*/ 'new' /*ab*/,
+  /*ac*/ (/*ad*/ a /*ae*/, /*af*/ b /*ag*/) /*ah*/ = /*ai*/ row /*aj*/(
+    /*ak*/ 1 /*al*/,
+    /*am*/ default /*an*/
+  )
+/*ao*/ from /*ap*/ bar
+/*aq*/ where /*ar*/ f.id = bar.id
+/*as*/ returning /*at*/ f.id /*au*/, /*av*/ f.payload/*aw*/;

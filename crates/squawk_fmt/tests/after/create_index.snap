@@ -1,0 +1,50 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_index.sql
+---
+create index users_email_idx on users (email);
+
+create unique index concurrently if not exists idx_users_email
+  on only public.users
+  using btree (
+    email collate public."C" text_pattern_ops desc nulls last,
+    (lower(display_name)) asc
+  )
+  include (id, created_at)
+  nulls not distinct
+  with (fillfactor = 70, deduplicate_items = off)
+  tablespace fastspace
+  where active and email is not null;
+
+create index reservations_during_idx
+  on reservations using gist (during);
+
+create index documents_search_idx
+  on documents using gin (search_vector);
+
+create index long_index_name_for_testing_line_wrapping
+  on long_schema_name.a_very_long_table_name
+  using btree (
+    a_very_long_column_name,
+    another_very_long_column_name,
+    a_third_very_long_column_name
+  )
+  include (a_very_long_included_column_name)
+  nulls distinct
+  where a_very_long_column_name is not null;
+
+-- comments in every position
+create /*a*/ unique /*b*/ index /*c*/ concurrently /*d*/ if /*e*/ not /*f*/ exists /*g*/ idx
+  /*h*/ on /*i*/ only /*j*/ app /*k*/./*l*/ users
+  /*m*/ using /*n*/ btree /*o*/ (
+    /*p*/ email /*q*/ collate /*r*/ "C" /*s*/ text_pattern_ops /*t*/ desc /*u*/ nulls /*v*/ last /*w*/,
+    /*x*/ (lower(name)) /*y*/ asc /*z*/
+  )
+  /*aa*/ include /*ab*/ (/*ac*/ id /*ad*/, /*ae*/ created_at /*af*/)
+  /*ag*/ nulls /*ah*/ not /*ai*/ distinct
+  /*aj*/ with /*ak*/ (
+    /*al*/ fillfactor /*am*/ = /*an*/ 70 /*ao*/,
+    /*ap*/ deduplicate_items /*aq*/ = /*ar*/ on /*as*/
+  )
+  /*at*/ tablespace /*au*/ fastspace
+  /*av*/ where /*aw*/ active /*ax*/ and email is not null/*ay*/;

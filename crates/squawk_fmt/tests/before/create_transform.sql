@@ -1,0 +1,8 @@
+create transform for t language l (from sql with function t, to sql with function g);
+
+create or replace transform for foo.t(10231) language l (from sql with function bar.foo.f(a text), to sql with function g);
+
+create transform for a_transform_type_with_a_very_long_name language a_language_with_a_very_long_name (from sql with function a_schema_with_a_long_name.a_function_with_a_very_long_name(a_parameter_with_a_long_name text), to sql with function another_function_with_a_very_long_name);
+
+-- comments in every position
+create /*a*/ or /*b*/ replace /*c*/ transform /*d*/ for /*e*/ app /*f*/. /*g*/ custom_type /*h*/ language /*i*/ plpgsql /*j*/ (/*k*/ from /*l*/ sql /*m*/ with /*n*/ function /*o*/ app /*p*/. /*q*/ from_sql(/*r*/ integer /*s*/) /*t*/, /*u*/ to /*v*/ sql /*w*/ with /*x*/ function /*y*/ app /*z*/. /*aa*/ to_sql(/*ab*/ integer /*ac*/) /*ad*/) /*ae*/;

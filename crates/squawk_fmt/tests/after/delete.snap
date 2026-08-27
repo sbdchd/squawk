@@ -1,0 +1,56 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/delete.sql
+---
+delete from foo;
+
+delete from foo as f
+using bar b,
+  another_extremely_long_table_name_with_many_characters baz
+where f.id = b.id
+returning f.id, f.name, f.created_at;
+
+delete from foo * f
+where current of delete_cursor
+returning with (
+  old as the_extremely_long_previous_row_value,
+  new as the_extremely_long_updated_row_value
+) the_extremely_long_previous_row_value.*;
+
+delete from only (foo) f;
+
+delete from foo for portion of valid_at from 1 to 2;
+
+delete from foo
+for portion of valid_at from 1 to 2
+where
+  organization_id = 12345
+  and status = 'inactive'
+  and archived_at is not null
+returning id, valid_at;
+
+delete from foo for portion of valid_at (1 + 2);
+
+with doomed as (
+  select id from foo
+)
+delete from foo
+using doomed
+where foo.id = doomed.id;
+
+with deleted as (
+  delete from foo where id = 1 returning id
+)
+select *
+from deleted;
+
+/*before*/
+delete /*a*/ from /*b*/ foo
+/*c*/ for /*d*/ portion /*e*/ of /*f*/ valid_at /*g*/ from /*h*/ 1 /*i*/ to /*j*/ 2 /*k*/ as /*l*/ f
+/*m*/ using /*n*/ bar /*o*/ b /*p*/,
+  /*q*/ baz
+/*r*/ where /*s*/ f.id = b.id
+/*t*/ returning /*u*/ with /*v*/ (
+  /*w*/ old /*x*/ as /*y*/ o /*z*/,
+  /*aa*/ new /*ab*/ as /*ac*/ n /*ad*/
+) /*ae*/ o.id /*af*/, /*ag*/ n.id/*ah*/;

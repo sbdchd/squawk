@@ -1,0 +1,5 @@
+reassign owned by alice to bob;
+
+reassign owned by alice, group legacy_owner, current_user to an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters;
+
+/* before reassign */ REASSIGN /* before owned */ OWNED /* before by */ BY /* before first */ alice /* before comma */, /* before second */ bob /* before to */ TO /* before new owner */ carol /* before semicolon */;

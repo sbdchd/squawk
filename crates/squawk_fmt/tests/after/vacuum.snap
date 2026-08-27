@@ -1,0 +1,48 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/vacuum.sql
+---
+vacuum;
+
+vacuum records;
+
+vacuum full freeze verbose analyze public.records;
+
+vacuum full freeze verbose analyse records;
+
+vacuum (
+  full,
+  freeze,
+  verbose,
+  analyze,
+  disable_page_skipping true,
+  skip_locked on,
+  index_cleanup auto,
+  truncate no,
+  process_main yes,
+  parallel 2
+)
+  public.records (id, name),
+  public.archived_records;
+
+vacuum (analyze, verbose, index_cleanup auto, parallel 4)
+  a_very_long_schema_name.an_intentionally_long_table_name (
+    an_intentionally_long_column_name,
+    another_intentionally_long_column_name
+  ),
+  another_very_long_schema_name.another_intentionally_long_table_name;
+
+/* before */
+vacuum /* after vacuum */ (
+  /* after left paren */ full /* before comma */,
+  /* after comma */ analyze /* before value */ true /* before second comma */,
+  /* after second comma */ index_cleanup /* before name value */ auto /* before right paren */
+)
+  /* before tables */ public /* before table dot */./* after table dot */ records /* before columns */ (
+    /* after columns left paren */ id /* before column comma */,
+    /* after column comma */ name /* before columns right paren */
+  ) /* before table comma */,
+  /* after table comma */ archived_records/* before semicolon */;
+
+vacuum /* before full */ full /* before freeze */ freeze /* before verbose */ verbose /* before analyse */ analyse
+  /* before legacy table */ records/* before legacy semicolon */;
