@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/checkpoint.sql
+---
+checkpoint;
+
+checkpoint (mode fast);
+
+checkpoint (mode spread, flush_unlogged true);
+
+checkpoint (flush_unlogged false);
+
+checkpoint (flush_unlogged);
+
+checkpoint (
+  an_intentionally_long_checkpoint_option_name an_intentionally_long_value_name,
+  another_intentionally_long_checkpoint_option_name another_intentionally_long_value_name
+);
+
+/* before checkpoint */
+checkpoint /* before left paren */ (
+  /* after left paren */ mode /* before value */ fast /* before comma */,
+  /* after comma */ flush_unlogged /* before second value */ false /* before right paren */
+)/* before semicolon */;

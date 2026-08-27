@@ -1,0 +1,38 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/lock.sql
+---
+lock t;
+
+lock table t, only b, c *;
+
+lock t in access share mode;
+
+lock t in row share mode;
+
+lock t in row exclusive mode;
+
+lock t in share update exclusive mode;
+
+lock t in share mode;
+
+lock t in share row exclusive mode;
+
+lock t in exclusive mode;
+
+lock t in access exclusive mode;
+
+lock table t, a *, only c in row exclusive mode nowait;
+
+lock table
+  an_intentionally_long_schema_name.an_intentionally_long_table_name,
+  another_intentionally_long_schema_name.another_intentionally_long_table_name
+  in access exclusive mode
+  nowait;
+
+/* before lock */
+lock /* before table */ table
+  /* before first relation */ only /* before first name */ public /* before dot */./* after dot */ records /* before comma */,
+  /* after comma */ archived_records
+  /* before in */ in /* before access */ access /* before exclusive */ exclusive /* before mode */ mode
+  /* before nowait */ nowait/* before semicolon */;

@@ -1,0 +1,38 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/declare.sql
+---
+declare cursor_name cursor
+for select * from t;
+
+declare c binary insensitive no scroll cursor without hold
+for select 1;
+
+declare c binary asensitive scroll cursor with hold
+for select 2;
+
+declare c cursor
+for (values (1) union values (2));
+
+declare
+  cursor_with_an_intentionally_long_name
+  binary
+  insensitive
+  no scroll
+  cursor
+  without hold
+for select
+  an_intentionally_long_column_name,
+  another_intentionally_long_column_name
+from an_intentionally_long_table_name;
+
+/* before declare */
+declare
+  /* before cursor name */ c
+  /* before binary */ binary
+  /* before sensitivity */ insensitive
+  /* before no */ no /* before scroll */ scroll
+  /* before cursor keyword */ cursor
+  /* before without */ without /* before hold */ hold
+/* before for */ for /* before query */ select
+  /* before value */ 1/* before semicolon */;

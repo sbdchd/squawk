@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/deallocate.sql
+---
+deallocate all;
+
+deallocate prepare all;
+
+deallocate statement_name;
+
+deallocate prepare statement_name;
+
+deallocate "Case-Sensitive Statement";
+
+deallocate
+  prepare
+  prepared_statement_with_an_intentionally_long_name_that_makes_the_statement_longer_than_eighty_characters;
+
+/* before deallocate */
+deallocate
+  /* before prepare */ prepare
+  /* before target */ statement_name/* before semicolon */;
+
+deallocate /* before all */ all/* before all semicolon */;

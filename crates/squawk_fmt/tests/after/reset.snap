@@ -1,0 +1,25 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/reset.sql
+---
+reset all;
+
+reset some_config_param;
+
+reset foo.bar.buzz;
+
+reset time zone;
+
+reset transaction isolation level;
+
+reset
+  an_intentionally_long_config_namespace.an_intentionally_long_config_group.an_intentionally_long_config_parameter_name;
+
+/* before reset */
+reset
+  /* before parameter */ custom /* before first dot */./* after first dot */ group_name /* before second dot */./* after second dot */ parameter_name/* before semicolon */;
+
+reset
+  /* before transaction */ transaction /* before isolation */ isolation /* before level */ level/* before transaction semicolon */;
+
+reset /* before time */ time /* before zone */ zone/* before time semicolon */;
