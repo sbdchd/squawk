@@ -1,0 +1,26 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/drop_routine.sql
+---
+drop routine public.calculate_total(integer, numeric);
+
+drop routine if exists
+  extraordinarily_long_schema_name.extraordinarily_long_calculation_routine(
+    extraordinarily_long_schema_name.extraordinarily_long_argument_type_name,
+    double precision
+  ),
+  public.another_extraordinarily_long_routine_name(
+    integer
+  )
+  cascade;
+
+-- comments in every position
+drop /* routine */ routine /* if */ if /* exists */ exists
+  /* first routine */ public /* dot */.calculate_total /* open */(
+    /* first argument */ integer /* argument comma */,
+    /* second argument */ numeric /* close */
+  ) /* routine comma */,
+  /* second routine */ reporting.refresh_cache(
+    /* argument */ text
+  )
+  /* behavior */ restrict/* end */;

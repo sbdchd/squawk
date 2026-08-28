@@ -43,6 +43,14 @@ use crate::{SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
 
 use super::support;
 
+impl ast::CustomOp {
+    pub fn tokens(&self) -> impl Iterator<Item = SyntaxToken> + '_ {
+        self.syntax()
+            .children_with_tokens()
+            .filter_map(|element| element.into_token())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LitKind {
     BitString(SyntaxToken),
@@ -1228,6 +1236,16 @@ impl ast::SelectVariant {
     }
 }
 
+impl ast::ParamList {
+    pub fn all_params(&self) -> impl Iterator<Item = ast::Param> {
+        self.params().chain(
+            self.aggregate_order_by()
+                .into_iter()
+                .flat_map(|order_by| order_by.params()),
+        )
+    }
+}
+
 impl ast::HasParamList {
     #[inline]
     pub fn param_list(&self) -> Option<ast::ParamList> {
@@ -1269,6 +1287,34 @@ where
         is_quoted(self.syntax())
     }
 }
+
+impl ast::HasPathRef for ast::Aggregate {}
+impl ast::HasPathRef for ast::CollationRef {}
+impl ast::HasPathRef for ast::ConfigParameterRef {}
+impl ast::HasPathRef for ast::ConstraintNameRef {}
+impl ast::HasPathRef for ast::ConversionRef {}
+impl ast::HasPathRef for ast::DomainRef {}
+impl ast::HasPathRef for ast::FunctionNameRef {}
+impl ast::HasPathRef for ast::IndexRef {}
+impl ast::HasPathRef for ast::Op {}
+impl ast::HasPathRef for ast::OpClassRef {}
+impl ast::HasPathRef for ast::OpFamilyRef {}
+impl ast::HasPathRef for ast::PathType {}
+impl ast::HasPathRef for ast::PercentType {}
+impl ast::HasPathRef for ast::ProcedureNameRef {}
+impl ast::HasPathRef for ast::PropertyGraphRef {}
+impl ast::HasPathRef for ast::QualifiedColumnNameRef {}
+impl ast::HasPathRef for ast::RelationNameRef {}
+impl ast::HasPathRef for ast::RoutineNameRef {}
+impl ast::HasPathRef for ast::SequenceRef {}
+impl ast::HasPathRef for ast::StatisticsRef {}
+impl ast::HasPathRef for ast::TableNameRef {}
+impl ast::HasPathRef for ast::TextSearchConfigurationRef {}
+impl ast::HasPathRef for ast::TextSearchDictionaryRef {}
+impl ast::HasPathRef for ast::TextSearchParserRef {}
+impl ast::HasPathRef for ast::TextSearchTemplateRef {}
+impl ast::HasPathRef for ast::TypeNameRef {}
+impl ast::HasPathRef for ast::ViewRef {}
 
 impl ast::HasWithClause for ast::Select {}
 impl ast::HasWithClause for ast::SelectInto {}

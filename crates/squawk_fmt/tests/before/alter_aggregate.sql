@@ -1,0 +1,9 @@
+alter aggregate public.total_sales(numeric) rename to total_revenue;
+
+alter aggregate public.total_sales(numeric) owner to reporting_role;
+
+alter aggregate public.total_sales(numeric) set schema reporting;
+
+alter aggregate extraordinarily_long_schema_name.extraordinarily_long_aggregate_name(double precision, numeric, bigint) rename to another_extraordinarily_long_aggregate_name;
+
+alter /* aggregate keyword */ aggregate /* aggregate signature */ public.commented_total(/* first parameter */ numeric, /* second parameter */ bigint) /* action */ rename /* to keyword */ to /* new name */ commented_revenue /* semicolon */;

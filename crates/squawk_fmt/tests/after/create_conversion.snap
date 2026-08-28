@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_conversion.sql
+---
+create conversion public.latin_to_utf8
+  for 'LATIN1'
+  to 'UTF8'
+  from public.latin1_to_utf8;
+
+create default conversion public.default_latin_to_utf8
+  for 'LATIN1'
+  to 'UTF8'
+  from public.latin1_to_utf8;
+
+create conversion extraordinarily_long_schema_name.extraordinarily_long_conversion_name
+  for 'EXTRAORDINARILY_LONG_SOURCE_ENCODING'
+  to 'EXTRAORDINARILY_LONG_DESTINATION_ENCODING'
+  from
+    extraordinarily_long_schema_name.extraordinarily_long_conversion_function_name;
+
+create /* default keyword */ default /* conversion keyword */ conversion /* name */ public.commented_conversion
+  /* for keyword */ for /* source encoding */ 'LATIN1'
+  /* to keyword */ to /* destination encoding */ 'UTF8'
+  /* from keyword */ from /* function */ public.convert_encoding/* semicolon */;

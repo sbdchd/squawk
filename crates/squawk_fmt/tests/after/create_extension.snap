@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_extension.sql
+---
+create extension postgis;
+
+create extension if not exists postgis
+  with
+  schema extensions
+  version '3.4.2'
+  cascade;
+
+create extension if not exists extraordinarily_long_extension_name
+  with
+  schema extraordinarily_long_schema_name
+  version 'extraordinarily-long-extension-version-number'
+  cascade;
+
+/* before create */
+create /* before extension */ extension /* before if */ if /* before not */ not /* before exists */ exists /* before name */ commented_extension
+  /* before with */ with
+  /* before schema */ schema /* before schema name */ extensions
+  /* before version */ version /* before version value */ '1.2.3'
+  /* before cascade */ cascade/* before semicolon */;

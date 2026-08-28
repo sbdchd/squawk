@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 28
+input_file: crates/squawk_fmt/tests/before/alter_text_search_dictionary.sql
+---
+alter /* text */ text /* search */ search /* dictionary */ dictionary /* name */ public.english /* left paren */ (
+  /* first option */ stopwords /* equals */ = /* first value */ english /* comma */,
+  /* second option */ language /* second equals */ = /* second value */ 'english' /* right paren */
+)/* end */;
+
+alter text search dictionary public.english (
+  stopwords = english,
+  accept = false,
+  long_dictionary_configuration_option_name = 'a very long dictionary configuration value for wrapping'
+);
+
+alter text search dictionary public.english
+  owner /* to */ to /* owner */ application_owner;
+
+alter text search dictionary public.english
+  set /* schema */ schema /* schema */ archive;
+
+alter text search dictionary public.english
+  rename /* to */ to /* name */ english_dictionary_for_archived_documents_and_historical_search_results;

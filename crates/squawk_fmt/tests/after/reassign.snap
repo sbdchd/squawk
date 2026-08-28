@@ -4,20 +4,14 @@ input_file: crates/squawk_fmt/tests/before/reassign.sql
 ---
 reassign owned by alice to bob;
 
-reassign
-  owned
-  by
+reassign owned by
   alice,
   group legacy_owner,
   current_user
-  to
-  an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters;
+  to an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters;
 
 /* before reassign */
-reassign
-  /* before owned */ owned
-  /* before by */ by
+reassign /* before owned */ owned /* before by */ by
   /* before first */ alice /* before comma */,
   /* before second */ bob
-  /* before to */ to
-  /* before new owner */ carol/* before semicolon */;
+  /* before to */ to /* before new owner */ carol/* before semicolon */;

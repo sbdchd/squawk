@@ -1,0 +1,5 @@
+create text search template public.simple_template (lexize = public.simple_lexize);
+
+create text search template extraordinarily_long_schema_name.extraordinarily_long_template_name (init = public.extraordinarily_long_template_initialization_function_name, lexize = public.extraordinarily_long_template_lexize_function_name);
+
+create /* text keyword */ text /* search keyword */ search /* template keyword */ template /* name */ public /* dot */ . /* name segment */ commented_template /* left parenthesis */ (/* first option */ init /* equals */ = /* value */ public.simple_init /* comma */, /* second option */ lexize = /* second value */ public.simple_lexize /* right parenthesis */) /* semicolon */;

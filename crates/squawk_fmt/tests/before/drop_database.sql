@@ -1,0 +1,8 @@
+drop database application;
+
+drop database reporting (force);
+
+drop database if exists extraordinarily_long_database_name_used_to_verify_statement_line_wrapping with (force);
+
+-- comments in every position
+drop /* database */ database /* if */ if /* exists */ exists /* name */ application /* with */ with /* left paren */ ( /* force */ force /* right paren */ ) /* end */;

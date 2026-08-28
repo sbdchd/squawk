@@ -1,0 +1,6 @@
+drop operator family public.integer_ops using btree;
+
+drop operator family if exists extraordinarily_long_schema_name.extraordinarily_long_operator_family_name using extraordinarily_long_access_method_name restrict;
+
+-- comments in every position
+drop /* operator */ operator /* family */ family /* if */ if /* exists */ exists /* family name */ public /* dot */ . integer_ops /* using */ using /* method */ hash /* behavior */ cascade /* end */;

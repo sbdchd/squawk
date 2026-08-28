@@ -519,6 +519,25 @@ impl AggregateName {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AggregateOrderBy {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AggregateOrderBy {
+    #[inline]
+    pub fn params(&self) -> AstChildren<Param> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn by_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BY_KW)
+    }
+    #[inline]
+    pub fn order_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ORDER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AggregateRenameTo {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2841,6 +2860,10 @@ pub struct AttributeValue {
     pub(crate) syntax: SyntaxNode,
 }
 impl AttributeValue {
+    #[inline]
+    pub fn custom_op(&self) -> Option<CustomOp> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
@@ -10375,12 +10398,31 @@ impl EventTriggerWhen {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EventTriggerWhenAnd {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EventTriggerWhenAnd {
+    #[inline]
+    pub fn event_trigger_when(&self) -> Option<EventTriggerWhen> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn and_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AND_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EventTriggerWhenClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl EventTriggerWhenClause {
     #[inline]
-    pub fn event_trigger_whens(&self) -> AstChildren<EventTriggerWhen> {
+    pub fn event_trigger_when(&self) -> Option<EventTriggerWhen> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn event_trigger_when_ands(&self) -> AstChildren<EventTriggerWhenAnd> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -18469,6 +18511,10 @@ pub struct ParamList {
 }
 impl ParamList {
     #[inline]
+    pub fn aggregate_order_by(&self) -> Option<AggregateOrderBy> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn params(&self) -> AstChildren<Param> {
         support::children(&self.syntax)
     }
@@ -18483,14 +18529,6 @@ impl ParamList {
     #[inline]
     pub fn star_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STAR)
-    }
-    #[inline]
-    pub fn by_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::BY_KW)
-    }
-    #[inline]
-    pub fn order_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ORDER_KW)
     }
 }
 
@@ -30323,6 +30361,24 @@ impl AstNode for AggregateName {
         &self.syntax
     }
 }
+impl AstNode for AggregateOrderBy {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::AGGREGATE_ORDER_BY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for AggregateRenameTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -37275,6 +37331,24 @@ impl AstNode for EventTriggerWhen {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::EVENT_TRIGGER_WHEN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EventTriggerWhenAnd {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EVENT_TRIGGER_WHEN_AND
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

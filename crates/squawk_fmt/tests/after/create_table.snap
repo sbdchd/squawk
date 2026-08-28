@@ -118,7 +118,7 @@ create table column_option_comments (
     /*c*/ storage /*d*/ external
     /*e*/ compression /*f*/ lz4
     /*g*/ with /*h*/ options
-    /*i*/ options /*j*/(
+    /*i*/ options /*j*/ (
       /*k*/ add /*l*/ formatter /*m*/ 'x' /*n*/,
       /*o*/ set /*p*/ formatter /*q*/ 'y' /*r*/,
       /*s*/ drop /*t*/ formatter /*u*/

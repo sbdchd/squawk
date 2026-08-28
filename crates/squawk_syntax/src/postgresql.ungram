@@ -69,7 +69,10 @@ ParamNameRef =
 
 ParamList =
   '(' '*' ')'
-| '(' (Param (',' Param)*)? ('order' 'by' (Param (',' Param)*))? ')'
+| '(' (Param (',' Param)*)? AggregateOrderBy? ')'
+
+AggregateOrderBy =
+  'order' 'by' (Param (',' Param)*)
 
 ArgList =
  '(' '*' ')'
@@ -2706,6 +2709,7 @@ AttributeValue =
 | 'none'
 | 'operator' '(' Op ')'
 | Op
+| CustomOp
 | Type
 
 AttributeList =
@@ -4371,7 +4375,10 @@ CreateEventTrigger =
   CallExpr ';'?
 
 EventTriggerWhenClause =
-  'when' (EventTriggerWhen ('and' EventTriggerWhen)*)
+  'when' EventTriggerWhen EventTriggerWhenAnd*
+
+EventTriggerWhenAnd =
+  'and' EventTriggerWhen
 
 EventTriggerWhen =
   var:EventTriggerFilterVariable 'in' '(' (Literal (',' Literal)*) ')'

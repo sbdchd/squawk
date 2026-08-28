@@ -1,0 +1,6 @@
+drop materialized view public.monthly_sales;
+
+drop materialized view if exists extraordinarily_long_schema_name.extraordinarily_long_materialized_view_name, another_extraordinarily_long_schema_name.another_extraordinarily_long_materialized_view_name cascade;
+
+-- comments in every position
+drop /* materialized */ materialized /* view */ view /* if */ if /* exists */ exists /* first view */ public /* dot */ . monthly_sales /* before comma */, /* second view */ reporting.archived_sales /* behavior */ restrict /* end */;

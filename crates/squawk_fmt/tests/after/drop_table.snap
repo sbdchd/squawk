@@ -1,0 +1,16 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/drop_table.sql
+---
+drop table public.accounts;
+
+drop table if exists
+  extraordinarily_long_schema_name.extraordinarily_long_table_name_for_customer_accounts,
+  another_extraordinarily_long_schema_name.another_extraordinarily_long_table_name
+  cascade;
+
+-- comments in every position
+drop /* table */ table /* if */ if /* exists */ exists
+  /* first table */ public /* dot */.accounts /* before comma */,
+  /* second table */ archive.old_accounts
+  /* behavior */ restrict/* end */;

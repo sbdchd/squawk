@@ -1,0 +1,36 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_tablespace.sql
+---
+alter tablespace application_data owner to storage_administrator;
+
+alter tablespace application_data
+  rename to application_data_for_archived_customer_records;
+
+alter tablespace application_data
+  set (
+    seq_page_cost = 1.0,
+    random_page_cost = 1.1,
+    effective_io_concurrency = 200
+  );
+
+alter tablespace application_data
+  reset (seq_page_cost, random_page_cost, effective_io_concurrency);
+
+alter /* tablespace */ tablespace /* name */ commented_application_data
+  /* action */ owner /* to */ to /* owner */ storage_administrator_with_a_very_long_name/* semicolon */;
+
+alter /* tablespace */ tablespace /* name */ commented_options
+  /* action */ set /* left paren */ (
+    /* option */ seq_page_cost /* equals */ = /* value */ 1.0,
+    /* second option */ random_page_cost /* second equals */ = /* second value */ 1.1 /* right paren */
+  )/* semicolon */;
+
+alter /* tablespace */ tablespace /* name */ commented_reset
+  /* action */ reset /* left paren */ (
+    /* option */ seq_page_cost,
+    /* second option */ random_page_cost /* right paren */
+  )/* semicolon */;
+
+alter /* tablespace */ tablespace /* old name */ commented_old_name
+  /* rename */ rename /* to */ to /* new name */ commented_new_name/* semicolon */;

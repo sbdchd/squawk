@@ -1,0 +1,23 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_operator.sql
+---
+create operator > (
+  function = greater_than
+);
+
+create operator extraordinarily_long_schema_name.## (
+  function = extraordinarily_long_schema_name.extraordinarily_long_operator_function_name,
+  leftarg = extraordinarily_long_schema_name.extraordinarily_long_left_argument_type,
+  rightarg = extraordinarily_long_schema_name.extraordinarily_long_right_argument_type,
+  commutator = &&&&,
+  hashes,
+  merges
+);
+
+-- comments in every position
+create /* operator */ operator /* schema */ app /* dot */./* symbol */ # /* attributes */ (
+  /* function name */ function /* equals */ = /* function value */ app.compare_values /* comma */,
+  /* left argument */ leftarg /* second equals */ = /* type */ integer /* comma */,
+  /* marker */ hashes /* closing parenthesis */
+)/* semicolon */;

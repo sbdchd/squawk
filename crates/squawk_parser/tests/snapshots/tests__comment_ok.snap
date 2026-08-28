@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
+assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/comment.sql
 ---
 SOURCE_FILE
@@ -149,13 +150,14 @@ SOURCE_FILE
                 PATH_SEGMENT_REF
                   TEXT_KW "text"
           WHITESPACE " "
-          ORDER_KW "order"
-          WHITESPACE " "
-          BY_KW "by"
-          WHITESPACE " "
-          PARAM
-            TIMESTAMP_TYPE
-              TIMESTAMP_KW "timestamp"
+          AGGREGATE_ORDER_BY
+            ORDER_KW "order"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            PARAM
+              TIMESTAMP_TYPE
+                TIMESTAMP_KW "timestamp"
           R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"

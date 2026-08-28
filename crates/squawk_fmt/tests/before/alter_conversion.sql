@@ -1,0 +1,11 @@
+alter conversion public.latin1_to_utf8 rename to latin_to_utf8;
+
+alter conversion public.latin1_to_utf8 owner to encoding_admin;
+
+alter conversion public.latin1_to_utf8 set schema encodings;
+
+alter conversion extraordinarily_long_schema_name.extraordinarily_long_conversion_name rename to another_extraordinarily_long_conversion_name;
+
+alter /* conversion keyword */ conversion /* conversion name */ public.commented_conversion /* action */ rename /* to keyword */ to /* new name */ renamed_conversion /* semicolon */;
+
+alter conversion /* conversion name */ public.schema_comments /* action */ set /* schema keyword */ schema /* schema name */ archived_encodings;

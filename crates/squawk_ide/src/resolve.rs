@@ -1032,7 +1032,7 @@ fn resolve_positional_param(
         let Some(param_list) = has_param_list.param_list() else {
             continue;
         };
-        if let Some(param) = param_list.params().nth(index) {
+        if let Some(param) = param_list.all_params().nth(index) {
             let range = param
                 .name()
                 .map(|name| name.syntax().text_range())
@@ -2864,7 +2864,7 @@ fn resolve_enclosing_function_param(
         let Some(param_list) = has_param_list.param_list() else {
             continue;
         };
-        for param in param_list.params() {
+        for param in param_list.all_params() {
             if let Some(name) = param.name()
                 && Name::from_node(&name) == param_name
             {
@@ -5181,7 +5181,7 @@ fn resolve_symbol_info_from_parts(
 
 fn param_signature(node: &ast::HasParamList) -> Option<Vec<Name>> {
     let mut params = vec![];
-    for param in node.param_list()?.params() {
+    for param in node.param_list()?.all_params() {
         if let Some(ast::Type::PathType(path_type)) = param.ty()
             && let Some(name_ref) = path_type.path_ref().and_then(|x| x.segment())
         {
@@ -5740,7 +5740,7 @@ fn find_param_in_func_def(
         }
     })?;
 
-    for param in param_list.params() {
+    for param in param_list.all_params() {
         if let Some(name) = param.name()
             && Name::from_node(&name) == *param_name
         {

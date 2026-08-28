@@ -1,0 +1,26 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/drop_aggregate.sql
+---
+drop aggregate public.sum(integer);
+
+drop aggregate if exists
+  extraordinarily_long_schema_name.extraordinarily_long_aggregate_name(
+    extraordinarily_long_schema_name.extraordinarily_long_argument_type_name
+  ),
+  public.another_extraordinarily_long_aggregate_name(double precision, numeric)
+  cascade;
+
+drop aggregate
+  public.ordered_set_aggregate(double precision order by anyelement, text);
+
+-- comments in every position
+drop /* aggregate */ aggregate /* if */ if /* exists */ exists
+  /* first aggregate */ public.first_aggregate(
+    /* first argument */ integer /* first close */
+  ) /* before comma */,
+  /* second aggregate */ public.second_aggregate(
+    /* second argument */ text,
+    /* third argument */ numeric /* second close */
+  )
+  /* behavior */ restrict/* end */;

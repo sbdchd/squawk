@@ -1,0 +1,22 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_statistics.sql
+---
+alter statistics reporting.user_activity_statistics
+  owner to analytics_administrator;
+
+alter statistics reporting.user_activity_statistics
+  rename to user_activity_statistics_for_archived_reporting;
+
+alter statistics reporting.user_activity_statistics
+  set schema reporting_archive;
+
+alter statistics reporting.user_activity_statistics set statistics 1000;
+
+alter statistics reporting.user_activity_statistics set statistics default;
+
+alter /* statistics */ statistics /* name */ reporting.commented_statistics
+  /* action */ rename /* to */ to /* new name */ reporting.renamed_commented_statistics/* semicolon */;
+
+alter statistics reporting.statistics_with_a_very_long_and_descriptive_name
+  set statistics /* expression */ 10000;

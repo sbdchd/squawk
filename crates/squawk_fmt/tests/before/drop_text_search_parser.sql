@@ -1,0 +1,6 @@
+drop text search parser public.default_parser;
+
+drop text search parser if exists extraordinarily_long_schema_name.extraordinarily_long_text_search_parser_for_customer_documents cascade;
+
+-- comments in every position
+drop /* text */ text /* search */ search /* parser */ parser /* if */ if /* exists */ exists /* parser name */ public /* dot */ . default_parser /* behavior */ restrict /* end */;

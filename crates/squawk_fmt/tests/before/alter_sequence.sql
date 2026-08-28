@@ -1,0 +1,19 @@
+alter sequence public.invoice_number increment by 10 minvalue 1 maxvalue 999999999 start with 100 cache 50 cycle owned by public.invoices.invoice_number;
+
+alter sequence if exists public.invoice_number as bigint no minvalue no maxvalue restart with 500 no cycle owned by none;
+
+alter sequence public.invoice_number set logged;
+
+alter sequence public.invoice_number set unlogged;
+
+alter sequence public.invoice_number owner to sequence_admin;
+
+alter sequence public.invoice_number rename to archived_invoice_number;
+
+alter sequence public.invoice_number set schema archive;
+
+alter /* before sequence */ sequence /* before if */ if /* before exists */ exists /* before name */ public.commented_sequence /* before increment */ increment /* before by */ by /* before value */ 100 /* before minvalue */ minvalue /* before minimum */ 1 /* before maxvalue */ maxvalue /* before maximum */ 999999 /* before start */ start /* before with */ with /* before start value */ 10 /* before cache */ cache /* before cache value */ 20 /* before cycle */ no /* before cycle keyword */ cycle /* before owned */ owned /* before owned by */ by /* before owner target */ public.orders.sequence_id /* before semicolon */;
+
+alter sequence public.other_sequence /* before set */ set /* before logged */ logged;
+
+alter sequence public.third_sequence /* before owner */ owner /* before to */ to /* before role */ current_role;

@@ -1,0 +1,38 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_type.sql
+---
+alter /* type */ type /* name */ public.delivery_status
+  /* action */ add /* value */ value /* if */ if /* not */ not /* exists */ exists /* new value */ 'an exceptionally long delivery status awaiting additional customer confirmation'
+    /* before */ before /* existing value */ 'delivered'/* end */;
+
+alter type public.delivery_status add value 'returned' after 'delivered';
+
+alter type public.delivery_status
+  rename /* value */ value /* old */ 'awaiting' /* to */ to /* new */ 'pending';
+
+alter type public.customer_address
+  add /* attribute */ attribute /* name */ street_name /* type */ character varying(255)
+    /* collate */ collate /* collation */ "C" /* behavior */ cascade,
+  /* next */ alter /* attribute */ attribute /* field */ postal_code /* set */ set /* data */ data /* type */ type /* new type */ character varying(32) /* behavior */ restrict,
+  /* next */ drop /* attribute */ attribute /* if */ if /* exists */ exists /* field */ obsolete_field /* behavior */ cascade;
+
+alter type public.customer_address
+  alter attribute country_code type text collate "C";
+
+alter type public.customer_address
+  rename /* attribute */ attribute /* old */ street_name /* to */ to /* new */ address_line /* behavior */ cascade;
+
+alter type public.customer_address owner /* to */ to /* owner */ current_user;
+
+alter type public.customer_address
+  set /* options */ (
+    /* receive */ receive = /* function */ public.receive_customer_address,
+    /* send */ send = public.send_customer_address
+  );
+
+alter type public.customer_address
+  set /* schema */ schema /* target */ archived_customer_data;
+
+alter type public.customer_address
+  rename /* to */ to /* target */ archived_customer_address;

@@ -1,0 +1,18 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_routine.sql
+---
+alter /* routine */ routine /* signature */ public.calculate_customer_balance(
+  /* arg */ integer
+)
+  /* action */ owner /* to */ to /* owner */ current_user/* end */;
+
+alter routine calculate_customer_balance_for_all_historical_transactions(
+  integer,
+  text
+)
+  immutable parallel safe cost 1000 rows 10000
+  restrict;
+
+alter routine r
+  /* no */ no depends /* on */ on extension /* name */ helper_extension;

@@ -1,0 +1,6 @@
+drop text search configuration public.english;
+
+drop text search configuration if exists extraordinarily_long_schema_name.extraordinarily_long_text_search_configuration_for_customer_documents cascade;
+
+-- comments in every position
+drop /* text */ text /* search */ search /* configuration */ configuration /* if */ if /* exists */ exists /* configuration */ public /* dot */ . english /* behavior */ restrict /* end */;

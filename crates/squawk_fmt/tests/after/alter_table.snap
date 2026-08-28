@@ -1,0 +1,52 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 28
+input_file: crates/squawk_fmt/tests/before/alter_table.sql
+---
+alter table customers
+  add column email_address varchar(320),
+  alter column customer_description
+    set default 'No description has been provided for this customer',
+  drop column if exists obsolete_customer_code cascade;
+
+alter table if exists only (reporting.customer_activity)
+  rename column old_activity_description to new_activity_description;
+
+alter table reporting.customer_activity
+  add constraint positive_activity_count check (activity_count > 0),
+  alter constraint positive_activity_count deferrable initially deferred;
+
+alter table reporting.customer_activity
+  attach partition reporting.customer_activity_2025
+    for values from ('2025-01-01') to ('2026-01-01');
+
+alter table reporting.customer_activity
+  detach partition reporting.customer_activity_2024 concurrently;
+
+alter table reporting.customer_activity
+  enable row level security,
+  force row level security,
+  disable trigger all;
+
+alter table reporting.customer_activity
+  set (fillfactor = 80),
+  reset (fillfactor),
+  set tablespace archive_tablespace;
+
+alter table all in tablespace old_reporting_tablespace
+  owned by analytics_owner,
+  reporting_owner
+  set tablespace new_reporting_tablespace
+  nowait;
+
+alter /* table */ table /* if */ if /* exists */ exists /* only */ only /* left paren */(/* relation */ reporting.commented_customer_activity /* right paren */)
+  /* action */ alter /* column */ column /* column name */ activity_description
+    /* set */ set /* default */ default
+      /* expression */ 'A very long default activity description used to verify formatter wrapping behavior',
+  /* comma */ rename /* column */ column /* old name */ old_activity_code /* to */ to /* new name */ current_activity_code/* semicolon */;
+
+alter /* table */ table /* all */ all /* in */ in /* tablespace keyword */ tablespace /* old tablespace */ old_tablespace
+  /* owned */ owned /* by */ by /* first role */ role_one,
+  /* second role */ role_two
+  /* set */ set /* tablespace */ tablespace /* new tablespace */ new_tablespace
+  /* nowait */ nowait/* semicolon */;
