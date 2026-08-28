@@ -29,6 +29,42 @@ fn fmt(fixture: Fixture<&str>) {
     });
 }
 
+#[test]
+fn fmt_ir() {
+    let ir = squawk_fmt::fmt_ir("select a from t where x = 1;").unwrap();
+    assert_snapshot!(ir, @r#"
+    list [
+      group [
+        group [
+          text "select"
+          nest 2 [ line_or_space list [ text "a" ] ]
+        ]
+        line_or_space
+        text "from"
+        space
+        nest 2 [ list [ text "t" ] ]
+        line_or_space
+        group [
+          text "where"
+          nest 2 [
+            line_or_space
+            group [
+              nest 2 [
+                text "x"
+                line_or_space
+                text "="
+                space
+                text "1"
+              ]
+            ]
+          ]
+        ]
+        text ";"
+      ]
+    ]
+    "#);
+}
+
 fn fmt_with_line_ending(line_ending: &str) -> String {
     let sql = [
         "-- a comment",

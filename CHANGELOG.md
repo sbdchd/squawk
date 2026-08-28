@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- fmt: `squawk-fmt --ir` to print the pretty printing IR instead of the formatted SQL
+
 ## v2.63.0 - 2026-08-19
 
 ### Added

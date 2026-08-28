@@ -9,6 +9,10 @@ use clap::Parser;
 struct Cli {
     /// File to format; reads from stdin if omitted
     file: Option<PathBuf>,
+
+    /// Print the pretty printing IR instead of the formatted SQL
+    #[arg(long)]
+    ir: bool,
 }
 
 fn main() -> Result<()> {
@@ -23,6 +27,10 @@ fn main() -> Result<()> {
         }
     };
 
-    print!("{}", squawk_fmt::fmt(&input)?);
+    if cli.ir {
+        print!("{}", squawk_fmt::fmt_ir(&input)?);
+    } else {
+        print!("{}", squawk_fmt::fmt(&input)?);
+    }
     Ok(())
 }

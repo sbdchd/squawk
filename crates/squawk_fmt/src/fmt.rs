@@ -22979,3 +22979,18 @@ pub fn fmt(text: &str) -> Result<String> {
         },
     ))
 }
+
+/// The pretty printing IR that [`fmt`] prints to text, rather than the text
+/// itself. Handy when a statement formats in a surprising way.
+pub fn fmt_ir(text: &str) -> Result<String> {
+    let parse = ast::SourceFile::parse(text);
+    let file = parse.tree();
+    debug_assert_eq!(
+        parse.errors(),
+        vec![],
+        "should bail out when there's parse errors"
+    );
+    let doc = build_source_file(&file);
+
+    Ok(crate::ir::render(&doc))
+}
