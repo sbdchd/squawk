@@ -1,0 +1,6 @@
+create server analytics foreign data wrapper postgres_fdw;
+
+create server if not exists extraordinarily_long_analytics_foreign_server type 'extraordinarily long server type description' version 'PostgreSQL version 17.2 with additional compatibility information' foreign data wrapper extraordinarily_long_foreign_data_wrapper_name options (host 'analytics.example.internal', dbname 'extraordinarily_long_analytics_database_name', port '5432');
+
+-- comments in every position
+create /* server */ server /* if */ if /* not */ not /* exists */ exists /* name */ reporting /* type */ type /* type value */ 'postgresql' /* version */ version /* version value */ '17' /* foreign */ foreign /* data */ data /* wrapper */ wrapper /* fdw */ postgres_fdw /* options */ options /* open */ (/* option name */ host /* option value */ 'localhost' /* comma */, /* second name */ port /* second value */ '5432' /* close */) /* end */;

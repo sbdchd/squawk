@@ -1,0 +1,6 @@
+create materialized view active_accounts as select account_id, account_name from accounts where active = true;
+
+create materialized view if not exists extraordinarily_long_schema_name.extraordinarily_long_materialized_view_name (extraordinarily_long_account_identifier, extraordinarily_long_account_display_name) using extraordinarily_long_access_method_name with (fillfactor = 80, autovacuum_enabled = true) tablespace extraordinarily_long_tablespace_name as select extraordinarily_long_account_identifier, extraordinarily_long_account_display_name from extraordinarily_long_schema_name.extraordinarily_long_accounts_table with no data;
+
+-- comments in every position
+create /* materialized */ materialized /* view */ view /* if */ if /* not */ not /* exists */ exists /* schema */ app /* dot */ . /* name */ account_rollup /* columns */ (/* first column */ account_id /* comma */, /* second column */ total /* close columns */) /* using */ using /* method */ heap /* with */ with /* attributes */ (/* attribute */ fillfactor /* equals */ = /* value */ 90 /* close attributes */) /* tablespace */ tablespace /* tablespace name */ fastspace /* as */ as /* query */ select /* expression */ account_id, sum(amount) from payments group by account_id /* with */ with /* no */ no /* data */ data /* semicolon */;

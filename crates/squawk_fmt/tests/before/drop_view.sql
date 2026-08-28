@@ -1,0 +1,6 @@
+drop view public.active_accounts;
+
+drop view if exists extraordinarily_long_schema_name.extraordinarily_long_view_name_for_customer_accounts, another_extraordinarily_long_schema_name.another_extraordinarily_long_archived_accounts_view cascade;
+
+-- comments in every position
+drop /* view */ view /* if */ if /* exists */ exists /* first view */ public /* dot */ . active_accounts /* before comma */, /* second view */ reporting.archived_accounts /* behavior */ restrict /* end */;

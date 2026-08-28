@@ -1,0 +1,13 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_language.sql
+---
+alter /* procedural */ procedural /* language */ language /* name */ plpgsql
+  /* rename */ rename /* to */ to /* new name */ plpgsql_new_name_with_a_very_long_descriptive_suffix/* end */;
+
+alter /* language */ language /* name */ plpgsql
+  /* owner */ owner /* to */ to /* role */ language_owner_with_a_very_long_descriptive_name;
+
+alter language old_language rename to new_language;
+
+alter language plpgsql owner to current_user;

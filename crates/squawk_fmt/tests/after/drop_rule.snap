@@ -1,0 +1,16 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/drop_rule.sql
+---
+drop rule archive_order on public.orders;
+
+drop rule if exists
+  extraordinarily_long_rule_name_for_archiving_completed_customer_orders
+  on extraordinarily_long_schema_name.extraordinarily_long_customer_orders_relation
+  cascade;
+
+-- comments in every position
+drop /* rule */ rule /* if */ if /* exists */ exists
+  /* rule name */ archive_order
+  /* on */ on /* relation schema */ public /* dot */.orders
+  /* behavior */ restrict/* end */;

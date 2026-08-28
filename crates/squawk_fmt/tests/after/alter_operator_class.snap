@@ -1,0 +1,15 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_operator_class.sql
+---
+alter /* operator */ operator /* class */ class /* name */ public.integer_operations
+  /* using */ using /* method */ btree
+  /* rename */ rename /* to */ to /* new name */ integer_operations_for_archived_measurements/* end */;
+
+alter operator class public.integer_operations
+  using btree
+  owner to application_owner_with_a_very_long_descriptive_name;
+
+alter operator class public.integer_operations
+  using btree
+  /* set */ set /* schema */ schema /* schema name */ archive;

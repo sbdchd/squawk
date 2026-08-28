@@ -1,0 +1,19 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_foreign_data_wrapper.sql
+---
+alter /* foreign */ foreign /* data */ data /* wrapper */ wrapper /* name */ fdw
+  /* options */ options /* left */ (
+    /* add */ add /* key */ host /* value */ 'localhost',
+    /* set */ set /* key */ port /* value */ '5432',
+    /* drop */ drop /* key */ obsolete /* right */
+  );
+
+alter foreign data wrapper very_long_foreign_data_wrapper_name
+  handler public.very_long_handler_function_name;
+
+alter foreign data wrapper fdw no validator;
+
+alter foreign data wrapper fdw rename /* to */ to /* name */ renamed_fdw;
+
+alter foreign data wrapper fdw owner /* to */ to /* role */ current_user;

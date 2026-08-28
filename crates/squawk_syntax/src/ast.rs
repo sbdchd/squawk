@@ -41,7 +41,7 @@ pub use self::{
     generated::tokens::*,
     node_ext::{BinOp, LitKind, PostfixOp, PrefixOp},
     nodes::*,
-    traits::{HasCreateTable, HasWithClause, NameLike},
+    traits::{HasCreateTable, HasPathRef, HasWithClause, NameLike},
 };
 
 /// The main trait to go from untyped `SyntaxNode`  to a typed ast. The

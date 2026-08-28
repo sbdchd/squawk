@@ -1,0 +1,13 @@
+alter collation public.en_us rename to en_us_utf8;
+
+alter collation public.en_us owner to localization_admin;
+
+alter collation public.en_us refresh version;
+
+alter collation public.en_us set schema localization;
+
+alter collation extraordinarily_long_schema_name.extraordinarily_long_collation_name rename to another_extraordinarily_long_collation_name;
+
+alter /* collation keyword */ collation /* collation name */ public.commented_en_us /* action */ refresh /* version keyword */ version /* semicolon */;
+
+alter collation /* name */ public.comment_positions /* action */ set /* schema keyword */ schema /* schema name */ commented_localization;

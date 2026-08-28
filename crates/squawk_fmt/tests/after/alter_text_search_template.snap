@@ -1,0 +1,9 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_text_search_template.sql
+---
+alter /* text */ text /* search */ search /* template */ template /* name */ public.default_template
+  /* rename */ rename /* to */ to /* new name */ template_for_archived_documents_and_historical_search_results/* end */;
+
+alter text search template public.default_template
+  set /* schema */ schema /* schema name */ archive;

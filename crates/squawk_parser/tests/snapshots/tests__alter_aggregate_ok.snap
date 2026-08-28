@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
+assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/alter_aggregate.sql
 ---
 SOURCE_FILE
@@ -127,15 +128,16 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "x"
         WHITESPACE " "
-        ORDER_KW "order"
-        WHITESPACE " "
-        BY_KW "by"
-        WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH_REF
-              PATH_SEGMENT_REF
-                IDENT "y"
+        AGGREGATE_ORDER_BY
+          ORDER_KW "order"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          PARAM
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "y"
         R_PAREN ")"
     WHITESPACE " \n    "
     AGGREGATE_RENAME_TO

@@ -1,0 +1,31 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_function.sql
+---
+alter /* function */ function /* signature */ public.calculate_a_very_long_and_descriptive_result(
+  /* type */ integer,
+  /* type */ text
+)
+  /* action */ security /* definer */ definer
+  /* restrict */ restrict;
+
+alter function public.f(
+  integer
+)
+  /* action */ set /* parameter */ work_mem /* to */ to /* value */ '64MB';
+
+alter function public.f(
+  integer
+)
+  depends /* on */ on /* extension */ extension /* name */ extension_name;
+
+alter function public.f(
+  integer
+)
+  no /* depends */ depends /* on */ on /* extension */ extension /* name */ extension_name;
+
+alter function public.f(integer) rename /* to */ to /* name */ renamed_function;
+
+alter function public.f(integer) owner /* to */ to /* role */ current_role;
+
+alter function public.f(integer) set /* schema */ schema /* name */ archive;

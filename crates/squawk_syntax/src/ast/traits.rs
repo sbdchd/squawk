@@ -8,6 +8,13 @@ pub trait NameLike: AstNode {
     fn is_quoted(&self) -> bool;
 }
 
+pub trait HasPathRef: AstNode {
+    #[inline]
+    fn path_ref(&self) -> Option<ast::PathRef> {
+        support::child(self.syntax())
+    }
+}
+
 pub trait HasCreateTable: AstNode {
     #[inline]
     fn table_name(&self) -> Option<ast::TableName> {

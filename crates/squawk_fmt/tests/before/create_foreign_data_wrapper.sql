@@ -1,0 +1,7 @@
+create foreign data wrapper local_fdw no handler no validator;
+
+create foreign data wrapper postgres_fdw handler public.postgres_fdw_handler validator public.postgres_fdw_validator options (host 'localhost', port '5432');
+
+create foreign data wrapper extraordinarily_long_foreign_data_wrapper_name handler extraordinarily_long_schema_name.extraordinarily_long_handler_function validator extraordinarily_long_schema_name.extraordinarily_long_validator_function options (extraordinarily_long_option_name 'extraordinarily long foreign data wrapper option value');
+
+/* before create */ create /* before foreign */ foreign /* before data */ data /* before wrapper */ wrapper /* before name */ commented_fdw /* before handler */ handler /* before handler name */ public.handler_fn /* before validator */ validator /* before validator name */ public.validator_fn /* before options */ options /* before left paren */ (/* before option name */ host /* before option value */ 'localhost' /* before comma */, /* after comma */ port /* before second value */ '5432' /* before right paren */) /* before semicolon */;

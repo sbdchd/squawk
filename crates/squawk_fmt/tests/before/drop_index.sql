@@ -1,0 +1,6 @@
+drop index public.events_created_at_idx;
+
+drop index concurrently if exists extraordinarily_long_schema_name.extraordinarily_long_index_name, another_extraordinarily_long_schema_name.another_extraordinarily_long_index_name cascade;
+
+-- comments in every position
+drop /* index */ index /* concurrently */ concurrently /* if */ if /* exists */ exists /* first index */ public /* dot */ . events_idx /* before comma */, /* second index */ reporting.archive_idx /* behavior */ restrict /* end */;

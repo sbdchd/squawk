@@ -1,0 +1,49 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_text_search_configuration.sql
+---
+alter /* text */ text /* search */ search /* configuration */ configuration /* name */ public.english
+  /* add */ add /* mapping */ mapping /* for */ for
+    /* kind one */ asciiword /* kind comma */,
+    /* kind two */ asciihword
+  /* with */ with
+    /* dictionary one */ public.simple /* dictionary comma */,
+    /* dictionary two */ public.english_stem/* end */;
+
+alter text search configuration public.english
+  alter /* mapping */ mapping
+  /* for */ for
+    /* kind */ word
+  /* with */ with
+    /* dictionary */ public.simple;
+
+alter text search configuration public.english
+  alter mapping
+  for
+    asciiword,
+    word
+  replace /* old dictionary */ public.old_dictionary
+  /* with */ with
+  /* new dictionary */ archive.new_dictionary;
+
+alter text search configuration public.english
+  alter mapping
+  /* replace */ replace /* old */ public.old_dictionary
+  /* with */ with
+  /* new */ public.new_dictionary;
+
+alter text search configuration public.english
+  drop /* mapping */ mapping
+  /* if */ if /* exists */ exists
+  /* for */ for
+    /* kind */ url /* comma */,
+    /* second kind */ host;
+
+alter text search configuration public.english
+  owner /* to */ to /* role */ application_owner;
+
+alter text search configuration public.english
+  set /* schema */ schema /* schema name */ archive;
+
+alter text search configuration public.english
+  rename /* to */ to /* new name */ english_configuration_for_archived_documents_and_historical_search_results;

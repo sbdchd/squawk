@@ -1,0 +1,6 @@
+create operator family integer_ops using btree;
+
+create operator family extraordinarily_long_schema_name.extraordinarily_long_operator_family_name using extraordinarily_long_custom_index_access_method;
+
+-- comments in every position
+create /* operator */ operator /* family */ family /* schema */ app /* dot */ . /* name */ integer_family /* using */ using /* method */ btree /* end */;

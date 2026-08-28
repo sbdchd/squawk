@@ -12005,8 +12005,11 @@ fn opt_event_trigger_when_clause(p: &mut Parser<'_>) {
         let m = p.start();
         p.bump(WHEN_KW);
         event_trigger_when(p);
-        while !p.at(EOF) && p.eat(AND_KW) {
+        while !p.at(EOF) && p.at(AND_KW) {
+            let m = p.start();
+            p.bump(AND_KW);
             event_trigger_when(p);
+            m.complete(p, EVENT_TRIGGER_WHEN_AND);
         }
         m.complete(p, EVENT_TRIGGER_WHEN_CLAUSE);
     }
@@ -14962,47 +14965,30 @@ fn security_label_provider(p: &mut Parser<'_>) {
 
 fn agg_args(p: &mut Parser<'_>) {
     match p.current() {
-        STAR => {
-            p.bump(STAR);
-        }
-        // ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
-        ORDER_KW => {
-            p.bump(ORDER_KW);
-            p.expect(BY_KW);
-            // TODO: generalize
-            param(p, ParamKind::All);
-            while !p.at(EOF) {
-                if p.eat(COMMA) {
-                    param(p, ParamKind::All);
-                } else {
-                    break;
-                }
-            }
-        }
+        STAR => p.bump(STAR),
+        ORDER_KW => aggregate_order_by(p),
         _ => {
             param(p, ParamKind::All);
-            while !p.at(EOF) {
-                if p.eat(COMMA) {
-                    param(p, ParamKind::All);
-                } else {
-                    break;
-                }
-            }
-            // ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
-            if p.eat(ORDER_KW) {
-                p.expect(BY_KW);
-                // TODO: generalize
+            while p.eat(COMMA) {
                 param(p, ParamKind::All);
-                while !p.at(EOF) {
-                    if p.eat(COMMA) {
-                        param(p, ParamKind::All);
-                    } else {
-                        break;
-                    }
-                }
+            }
+            if p.at(ORDER_KW) {
+                aggregate_order_by(p);
             }
         }
     }
+}
+
+// ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
+fn aggregate_order_by(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.bump(ORDER_KW);
+    p.expect(BY_KW);
+    param(p, ParamKind::All);
+    while p.eat(COMMA) {
+        param(p, ParamKind::All);
+    }
+    m.complete(p, AGGREGATE_ORDER_BY);
 }
 
 fn aggregate_arg_list(p: &mut Parser<'_>) {

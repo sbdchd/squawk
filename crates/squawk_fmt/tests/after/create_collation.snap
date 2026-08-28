@@ -1,0 +1,26 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_collation.sql
+---
+create collation public.english (
+  locale = 'en_US.UTF-8',
+  provider = icu,
+  deterministic = false
+);
+
+create collation if not exists public.english_copy from public.english;
+
+create collation extraordinarily_long_schema_name.extraordinarily_long_collation_name (
+  locale = 'en-US-u-va-posix',
+  provider = icu,
+  rules = '&V << w <<< W',
+  version = '153.120'
+);
+
+create /* collation keyword */ collation /* if keyword */ if /* not keyword */ not /* exists keyword */ exists /* name */ public.commented /* left parenthesis */ (
+  /* first option */ locale /* equals */ = /* value */ 'en_US.UTF-8' /* comma */,
+  /* second option */ provider = /* provider value */ icu /* closing parenthesis */
+)/* semicolon */;
+
+create collation /* name */ public.commented_copy
+  /* from clause */ from /* source collation */ public.original/* semicolon */;

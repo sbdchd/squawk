@@ -1,0 +1,35 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_domain.sql
+---
+alter domain public.email_address set default 'unknown@example.com';
+
+alter domain public.email_address drop default;
+
+alter domain public.email_address set not null;
+
+alter domain public.email_address drop not null;
+
+alter domain public.email_address
+  add constraint email_format check (value ~ '@');
+
+alter domain public.email_address
+  drop constraint if exists old_email_format cascade;
+
+alter domain public.email_address
+  rename constraint email_format to valid_email_format;
+
+alter domain public.email_address validate constraint valid_email_format;
+
+alter domain public.email_address owner to app_owner;
+
+alter domain public.email_address rename to contact_email_address;
+
+alter domain public.email_address set schema application_types;
+
+alter /* domain */ domain /* name */ exceedingly_long_schema_name.exceedingly_long_domain_name
+  /* action */ add
+    /* constraint keyword */ constraint /* constraint name */ exceedingly_long_constraint_name /* check */ check /* expression */ (
+      value is not null and length(value) > 10
+    )
+      /* not valid */ not /* valid */ valid/* semicolon */;

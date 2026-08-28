@@ -1,0 +1,39 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_rule.sql
+---
+create rule ignore_delete as on delete
+  to public.accounts
+  do instead nothing;
+
+create or replace rule extraordinarily_long_rule_name_for_recording_all_account_changes
+  as on update
+  to extraordinarily_long_schema_name.extraordinarily_long_accounts_table_name
+    where (
+      old.account_owner_identifier is distinct from new.account_owner_identifier
+        and new.account_is_active
+    )
+  do also (
+    notify extraordinarily_long_account_changes_channel,
+      'account owner changed';
+    update extraordinarily_long_audit_table_name
+    set account_was_changed = true
+    where account_identifier = new.account_identifier;
+  );
+
+-- comments in every position
+create /* or */ or /* replace */ replace /* rule */ rule /* name */ audit_change
+  /* as */ as /* on */ on /* event */ update
+  /* to */ to /* schema */ public /* dot */./* relation */ accounts
+    /* where */ where /* left paren */ (
+      /* condition */ old.owner_id
+        is distinct from new.owner_id /* right paren */
+    )
+  /* do */ do /* instead */ instead /* action left */ (
+    /* notify */ notify /* channel */ account_changes /* comma */,
+      /* payload */ 'changed'/* first semicolon */;
+    /* update */ update /* table */ audit_log
+    /* set */ set
+      /* column */ changed
+        /* equals */ = /* value */ true/* second semicolon */; /* action right */
+  )/* end */;

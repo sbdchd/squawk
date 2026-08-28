@@ -1,0 +1,6 @@
+drop text search template public.simple_template;
+
+drop text search template if exists extraordinarily_long_schema_name.extraordinarily_long_text_search_template_for_customer_documents cascade;
+
+-- comments in every position
+drop /* text */ text /* search */ search /* template */ template /* if */ if /* exists */ exists /* template name */ public /* dot */ . simple_template /* behavior */ restrict /* end */;

@@ -1,0 +1,23 @@
+comment on table public.orders is 'customer orders';
+
+comment on column public.orders.customer_identifier is 'external customer identifier';
+
+comment on constraint positive_amount on domain public.positive_money is 'amount must be positive';
+
+comment on policy tenant_isolation on extraordinarily_long_schema_name.extraordinarily_long_table_name is 'restrict rows to the current tenant';
+
+comment on rule refresh_summary on public.orders is null;
+
+comment on trigger update_timestamp on public.orders is 'maintains updated_at';
+
+comment on large object 123456789 is 'archived document';
+
+comment on operator public.+(integer, integer) is 'integer addition';
+
+comment on operator class public.text_ops using btree is 'text operator class';
+
+comment on transform for jsonb language plpgsql is 'json transform';
+
+comment on property graph public.sales_graph is 'sales relationships';
+
+comment /* on keyword */ on /* object kind */ materialized /* view keyword */ view /* object name */ extraordinarily_long_schema_name.extraordinarily_long_materialized_view_name /* is keyword */ is /* comment value */ 'A deliberately long description of the materialized view used to verify wrapping behavior.' /* semicolon */;

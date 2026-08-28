@@ -42,12 +42,12 @@ create foreign table an_intentionally_long_schema_name.an_intentionally_long_for
   );
 
 /* before create */
-create /* before foreign */ foreign /* before table */ table /* before if */ if /* before not */ not /* before exists */ exists /* before table name */ public /* before dot */./* after dot */ remote_records/* before left paren */  (
+create /* before foreign */ foreign /* before table */ table /* before if */ if /* before not */ not /* before exists */ exists /* before table name */ public /* before dot */./* after dot */ remote_records /* before left paren */ (
   /* after left paren */ id /* before type */ bigint /* before comma */,
   /* after comma */ name /* before second type */ text /* before right paren */
 )
   /* before server */ server /* before server name */ foreign_server
-  /* before options */ options /* before options left paren */(
+  /* before options */ options /* before options left paren */ (
     /* after options left paren */ schema_name /* before option value */ 'public' /* before option comma */,
     /* after option comma */ table_name /* before second option value */ 'records' /* before options right paren */
   )/* before semicolon */;

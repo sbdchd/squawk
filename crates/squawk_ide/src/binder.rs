@@ -2079,7 +2079,7 @@ pub(crate) fn extract_string_literal(literal: &ast::Literal) -> Option<String> {
 fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Name>> {
     let param_list = param_list?;
     let mut params = vec![];
-    for param in param_list.params() {
+    for param in param_list.all_params() {
         if let Some(ty) = param.ty()
             && let ast::Type::PathType(path_type) = ty
             && let Some(path) = path_type.path_ref()

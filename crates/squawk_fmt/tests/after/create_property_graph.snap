@@ -1,0 +1,64 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_property_graph.sql
+---
+create property graph social
+  vertex tables (people key (id))
+  edge tables (
+    follows
+      source key (follower_id) references people (id)
+      destination key (followed_id) references people (id)
+  );
+
+create unlogged property graph extraordinarily_long_social_relationship_property_graph
+  vertex tables (
+    extraordinarily_long_people_table key (
+      extraordinarily_long_person_identifier
+    )
+      label person properties (display_name as public_name, date_of_birth),
+    extraordinarily_long_organizations_table key (
+      extraordinarily_long_organization_identifier
+    )
+      no properties
+  )
+  edge tables (
+    extraordinarily_long_employment_relationship_table
+      source key (
+        employee_identifier
+      ) references extraordinarily_long_people_table (
+        extraordinarily_long_person_identifier
+      )
+      destination key (
+        employer_identifier
+      ) references extraordinarily_long_organizations_table (
+        extraordinarily_long_organization_identifier
+      )
+      properties all columns
+  );
+
+-- comments in every position
+create /* persistence */ local /* temporary */ temporary /* property */ property /* graph */ graph /* graph name */ public /* dot */./* name */ social
+  /* vertex */ vertex /* tables */ tables  /* left paren */(
+    /* table */ people /* key */ key /* key left */ (
+      /* key column */ id /* key right */
+    )
+      /* label */ label /* label name */ person /* properties */ properties /* properties left */ (
+        /* expression */ full_name /* as */ as /* property name */ name /* properties right */
+      ) /* comma */,
+    /* second table */ organizations
+      /* no */ no /* properties */ properties /* vertex right */
+  )
+  /* edge */ edge /* edge tables */ tables  /* edge left */(
+    /* edge table */ follows
+      /* source */ source /* source key */ key /* source left */ (
+        /* source column */ follower_id /* source right */
+      ) /* references */ references /* source table */ people /* source reference left */ (
+        /* source reference column */ id /* source reference right */
+      )
+      /* destination */ destination /* destination key */ key /* destination left */ (
+        /* destination column */ followed_id /* destination right */
+      ) /* destination references */ references /* destination table */ people /* destination reference left */ (
+        /* destination reference column */ id /* destination reference right */
+      )
+      /* all properties */ properties /* all */ all /* columns */ columns /* edge right */
+  )/* end */;

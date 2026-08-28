@@ -1,0 +1,6 @@
+drop cast (integer as bigint);
+
+drop cast if exists (extraordinarily_long_schema_name.extraordinarily_long_source_type_name as extraordinarily_long_schema_name.extraordinarily_long_target_type_name) cascade;
+
+-- comments in every position
+drop /* cast */ cast /* if */ if /* exists */ exists /* signature */ (/* source type */ text /* as */ as /* target type */ varchar /* closing parenthesis */) /* behavior */ restrict /* end */;

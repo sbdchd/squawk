@@ -1,0 +1,6 @@
+drop role analysts;
+
+drop role if exists extraordinarily_long_role_name_for_application_analytics_and_business_intelligence, another_extraordinarily_long_role_name_for_application_reporting;
+
+-- comments in every position
+drop /* role */ role /* if */ if /* exists */ exists /* first role */ analysts /* comma */, /* second role */ current_user /* comma */, /* group */ group /* group name */ reporting_users /* end */;

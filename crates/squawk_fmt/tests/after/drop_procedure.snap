@@ -1,0 +1,26 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/drop_procedure.sql
+---
+drop procedure public.refresh_accounts(integer, text);
+
+drop procedure if exists
+  extraordinarily_long_schema_name.extraordinarily_long_account_refresh_procedure(
+    extraordinarily_long_schema_name.extraordinarily_long_account_identifier_type,
+    double precision
+  ),
+  public.another_extraordinarily_long_procedure_name(
+    integer
+  )
+  cascade;
+
+-- comments in every position
+drop /* procedure */ procedure /* if */ if /* exists */ exists
+  /* first procedure */ public /* dot */.refresh_accounts /* open */(
+    /* first argument */ integer /* argument comma */,
+    /* second argument */ text /* close */
+  ) /* procedure comma */,
+  /* second procedure */ reporting.rebuild_cache(
+    /* argument */ bigint
+  )
+  /* behavior */ restrict/* end */;

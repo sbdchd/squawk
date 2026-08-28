@@ -1,0 +1,5 @@
+alter /* trigger */ trigger /* name */ audit_trigger /* on */ on /* relation */ public.accounts /* action */ no /* depends */ depends /* on extension */ on /* extension */ extension /* extension name */ audit_support /* end */;
+
+alter trigger audit_trigger on public.accounts depends on extension exceptionally_long_auditing_extension_name_for_regulated_customer_accounts;
+
+alter trigger audit_trigger on public.accounts rename /* to */ to /* target */ renamed_audit_trigger;

@@ -761,7 +761,7 @@ fn validate_custom_op(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
 
 fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut Vec<SyntaxError>) {
     if let Some(params) = aggregate_params {
-        for p in params.params() {
+        for p in params.all_params() {
             if let Some(mode) = p.mode() {
                 match mode {
                     ast::ParamMode::ParamOut(param_out) => acc.push(SyntaxError::new(

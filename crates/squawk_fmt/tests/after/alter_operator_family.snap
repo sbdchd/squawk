@@ -1,0 +1,43 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_operator_family.sql
+---
+alter /* operator */ operator /* family */ family /* name */ public.integer_family
+  /* using */ using /* method */ btree
+  /* add */ add
+    /* operator option */ operator /* strategy */ 1 /* op */ < /* left paren */(
+      /* lhs */ integer /* comma */,
+      /* rhs */ integer /* right paren */
+    )
+    /* for */ for /* order */ order /* by */ by /* family */ public.sort_family /* option comma */,
+    /* function option */ function /* support */ 1 /* argument types */ (
+      integer,
+      integer
+    )
+    /* function */ public.compare_integer_values(
+      integer,
+      integer
+    ) /* option comma */,
+    /* storage */ storage /* type */ bigint/* end */;
+
+alter operator family public.integer_family
+  using btree
+  /* drop */ drop
+    /* operator */ operator /* strategy */ 1 /* params */ (
+      integer,
+      integer
+    ) /* comma */,
+    /* function */ function /* support */ 1 /* params */ (
+      integer,
+      integer
+    );
+
+alter operator family public.integer_family
+  using btree
+  rename to integer_family_for_archived_measurements;
+
+alter operator family public.integer_family
+  using btree
+  owner to application_owner;
+
+alter operator family public.integer_family using btree set schema archive;
