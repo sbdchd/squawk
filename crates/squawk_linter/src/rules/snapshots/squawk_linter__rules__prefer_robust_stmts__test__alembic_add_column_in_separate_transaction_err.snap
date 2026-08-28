@@ -1,0 +1,11 @@
+---
+source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
+expression: lint_errors(sql)
+---
+warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ 
+3 │ ALTER TABLE t ADD COLUMN test_column TEXT;
+  │               ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+3 │ ALTER TABLE t ADD COLUMN if not exists test_column TEXT;
+  ╰╴                         +++++++++++++
