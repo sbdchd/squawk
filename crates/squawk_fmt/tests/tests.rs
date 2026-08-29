@@ -1,6 +1,3 @@
-use std::io::Write;
-use std::process::{Command, Stdio};
-
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
