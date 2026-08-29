@@ -23,10 +23,6 @@ fn is_alembic_version_update(stmt: &ast::Stmt) -> bool {
 }
 
 fn alembic_version_commit_tx_indices(stmts: &[ast::Stmt]) -> Option<FxHashSet<usize>> {
-    if !stmts.iter().any(is_alembic_version_update) {
-        return None;
-    }
-
     let mut indices = FxHashSet::default();
     let mut tx_start = None;
     for (i, stmt) in stmts.iter().enumerate() {
@@ -42,7 +38,7 @@ fn alembic_version_commit_tx_indices(stmts: &[ast::Stmt]) -> Option<FxHashSet<us
             _ => {}
         }
     }
-    Some(indices)
+    (!indices.is_empty()).then_some(indices)
 }
 
 pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
