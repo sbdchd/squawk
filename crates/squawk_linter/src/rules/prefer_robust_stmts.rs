@@ -552,6 +552,7 @@ CREATE TABLE IF NOT EXISTS "core_bar" (
 
     #[test]
     fn prefer_robust_stmt_part_6_ok() {
+        // If done in a transaction, most forms of drop are fine
         let sql = r#"
 BEGIN;
 DROP INDEX "core_bar_foo_id_idx";
@@ -564,6 +565,7 @@ COMMIT;
 
     #[test]
     fn select_ok() {
+        // select is fine, we're only interested in modifications to the tables
         let sql = r#"
 select 1; -- so we don't skip checking
 SELECT 1;
@@ -573,6 +575,7 @@ SELECT 1;
 
     #[test]
     fn insert_ok() {
+        // select is fine, we're only interested in modifications to the tables
         let sql = r#"
 select 1; -- so we don't skip checking
 INSERT INTO tbl VALUES (a);
@@ -582,6 +585,7 @@ INSERT INTO tbl VALUES (a);
 
     #[test]
     fn alter_table_ok() {
+        // select is fine, we're only interested in modifications to the tables
         let sql = r#"
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
