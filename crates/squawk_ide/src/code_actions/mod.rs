@@ -22,6 +22,7 @@ mod rewrite_create_table_as_as_select_into;
 mod rewrite_double_colon_to_cast;
 mod rewrite_extract_as_function_call;
 mod rewrite_from;
+mod rewrite_function_param_default_as_equals;
 mod rewrite_in_as_expression;
 mod rewrite_integer_radix;
 mod rewrite_is_normalized_as_function_call;
@@ -70,6 +71,7 @@ use rewrite_create_table_as_as_select_into::rewrite_create_table_as_as_select_in
 use rewrite_double_colon_to_cast::rewrite_double_colon_to_cast;
 use rewrite_extract_as_function_call::rewrite_extract_as_function_call;
 use rewrite_from::rewrite_from;
+use rewrite_function_param_default_as_equals::rewrite_function_param_default_as_equals;
 use rewrite_in_as_expression::rewrite_in_as_expression;
 use rewrite_integer_radix::rewrite_integer_radix;
 use rewrite_is_normalized_as_function_call::rewrite_is_normalized_as_function_call;
@@ -118,6 +120,7 @@ pub fn code_actions(db: &dyn Db, position: InFile<TextSize>) -> Option<Vec<CodeA
     rewrite_table_as_select(db, position, &mut actions);
     rewrite_select_as_table(db, position, &mut actions);
     rewrite_from(db, position, &mut actions);
+    rewrite_function_param_default_as_equals(db, position, &mut actions);
     rewrite_integer_radix(db, position, &mut actions);
     rewrite_leading_from(db, position, &mut actions);
     rewrite_values_as_select(db, position, &mut actions);
