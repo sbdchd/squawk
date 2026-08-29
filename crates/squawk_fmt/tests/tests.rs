@@ -15,7 +15,7 @@ fn fmt(fixture: Fixture<&str>) {
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let formatted = squawk_fmt::fmt(content).unwrap();
+    let formatted = squawk_fmt::fmt_str(content).unwrap();
 
     assert_no_dropped_tokens(content, &formatted);
 
@@ -42,7 +42,7 @@ fn fmt_with_line_ending(line_ending: &str) -> String {
     ]
     .join(line_ending);
 
-    match squawk_fmt::fmt(&sql) {
+    match squawk_fmt::fmt_str(&sql) {
         Ok(formatted) => {
             assert_no_dropped_tokens(&sql, &formatted);
             formatted.replace('\r', "<CR>")

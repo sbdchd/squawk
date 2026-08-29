@@ -17,17 +17,19 @@ use url::Url;
 
 use gen_lsp_types::{
     CodeActionRequest, CompletionRequest, DefinitionRequest, DocumentDiagnosticRequest,
-    DocumentSymbolRequest, FoldingRangeRequest, HoverRequest, InlayHintRequest, ReferencesRequest,
-    SelectionRangeRequest, SemanticTokensRangeRequest, SemanticTokensRequest, ShutdownRequest,
+    DocumentFormattingRequest, DocumentSymbolRequest, FoldingRangeRequest, HoverRequest,
+    InlayHintRequest, ReferencesRequest, SelectionRangeRequest, SemanticTokensRangeRequest,
+    SemanticTokensRequest, ShutdownRequest,
 };
 
 use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
 use crate::handlers::{
     SyntaxTreeRequest, TokensRequest, handle_cancel, handle_code_action, handle_completion,
     handle_did_change, handle_did_close, handle_did_open, handle_document_diagnostic,
-    handle_document_symbol, handle_folding_range, handle_goto_definition, handle_hover,
-    handle_inlay_hints, handle_references, handle_selection_range, handle_semantic_tokens_full,
-    handle_semantic_tokens_range, handle_shutdown, handle_syntax_tree, handle_tokens,
+    handle_document_symbol, handle_folding_range, handle_formatting, handle_goto_definition,
+    handle_hover, handle_inlay_hints, handle_references, handle_selection_range,
+    handle_semantic_tokens_full, handle_semantic_tokens_range, handle_shutdown, handle_syntax_tree,
+    handle_tokens,
 };
 
 type ReqQueue = lsp_server::ReqQueue<(String, Instant), ()>;
@@ -242,6 +244,7 @@ impl GlobalState {
             .on::<NO_RETRY, CodeActionRequest>(handle_code_action)
             .on::<NO_RETRY, InlayHintRequest>(handle_inlay_hints)
             .on::<RETRY, DocumentSymbolRequest>(handle_document_symbol)
+            .on::<NO_RETRY, DocumentFormattingRequest>(handle_formatting)
             .on::<RETRY, FoldingRangeRequest>(handle_folding_range)
             .on::<NO_RETRY, DocumentDiagnosticRequest>(handle_document_diagnostic)
             .on::<NO_RETRY, SyntaxTreeRequest>(handle_syntax_tree)

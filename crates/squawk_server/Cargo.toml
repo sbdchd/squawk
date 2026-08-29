@@ -24,6 +24,7 @@ rowan.workspace = true
 salsa.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+squawk-fmt.workspace = true
 squawk-ide.workspace = true
 squawk-lexer.workspace = true
 squawk-linter.workspace = true

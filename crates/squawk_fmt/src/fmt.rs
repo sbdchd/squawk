@@ -22951,25 +22951,13 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
     Some(doc)
 }
 
-pub fn fmt(text: &str) -> Result<String> {
-    let line_ending = find_newline(text)
-        .map(|(_, ending)| ending)
-        .unwrap_or_default();
-
+pub fn fmt(source_file: &ast::SourceFile, line_ending: LineEnding) -> Result<String> {
     let line_break = match line_ending {
         LineEnding::Cr => LineBreak::Cr,
         LineEnding::CrLf => LineBreak::Crlf,
         LineEnding::Lf => LineBreak::Lf,
     };
-
-    let parse = ast::SourceFile::parse(text);
-    let file = parse.tree();
-    debug_assert_eq!(
-        parse.errors(),
-        vec![],
-        "should bail out when there's parse errors"
-    );
-    let doc = build_source_file(&file);
+    let doc = build_source_file(source_file);
 
     Ok(print(
         &doc,
@@ -22978,4 +22966,18 @@ pub fn fmt(text: &str) -> Result<String> {
             ..Default::default()
         },
     ))
+}
+
+pub fn fmt_str(text: &str) -> Result<String> {
+    let line_ending = find_newline(text)
+        .map(|(_, ending)| ending)
+        .unwrap_or_default();
+    let parse = ast::SourceFile::parse(text);
+    let errors = parse.errors();
+    if !errors.is_empty() {
+        let messages = errors.iter().map(ToString::to_string).join("\n");
+        anyhow::bail!(messages);
+    }
+
+    fmt(&parse.tree(), line_ending)
 }

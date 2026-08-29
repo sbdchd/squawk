@@ -2445,6 +2445,7 @@ dependencies = [
 name = "squawk-fmt"
 version = "2.63.0"
 dependencies = [
+ "annotate-snippets",
  "anyhow",
  "camino",
  "clap",
@@ -2556,6 +2557,7 @@ dependencies = [
  "serde",
  "serde_json",
  "simplelog",
+ "squawk-fmt",
  "squawk-ide",
  "squawk-lexer",
  "squawk-line-index",
