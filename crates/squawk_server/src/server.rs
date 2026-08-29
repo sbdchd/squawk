@@ -1,11 +1,11 @@
 use anyhow::Result;
 use gen_lsp_types::{
     CodeActionKind, CodeActionOptions, CodeActionProvider, CompletionOptions, DefinitionProvider,
-    DiagnosticOptions, DiagnosticProvider, DocumentSymbolProvider, FoldingRangeProvider, Full,
-    HoverProvider, InitializeParams, InlayHintProvider, ReferencesProvider, SelectionRangeProvider,
-    SemanticTokensLegend, SemanticTokensOptions, SemanticTokensOptionsRange,
-    SemanticTokensProvider, ServerCapabilities, TextDocumentSync, TextDocumentSyncKind,
-    WorkDoneProgressOptions,
+    DiagnosticOptions, DiagnosticProvider, DocumentFormattingProvider, DocumentSymbolProvider,
+    FoldingRangeProvider, Full, HoverProvider, InitializeParams, InlayHintProvider,
+    ReferencesProvider, SelectionRangeProvider, SemanticTokensLegend, SemanticTokensOptions,
+    SemanticTokensOptionsRange, SemanticTokensProvider, ServerCapabilities, TextDocumentSync,
+    TextDocumentSyncKind, WorkDoneProgressOptions,
 };
 use log::info;
 use lsp_server::Connection;
@@ -47,6 +47,7 @@ pub fn run() -> Result<()> {
             },
         })),
         document_symbol_provider: Some(DocumentSymbolProvider::Bool(true)),
+        document_formatting_provider: Some(DocumentFormattingProvider::Bool(true)),
         folding_range_provider: Some(FoldingRangeProvider::Bool(true)),
         completion_provider: Some(CompletionOptions {
             resolve_provider: Some(false),
