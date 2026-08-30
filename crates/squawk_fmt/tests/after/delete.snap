@@ -44,6 +44,18 @@ with deleted as (
 select *
 from deleted;
 
+delete from t3
+  using t1 join t2 using (a)
+  where t3.x > t1.a;
+
+delete from t3
+  /*before using*/ using /*before t1*/ t1
+    /*before join*/ join /*before t2*/ t2
+      /*before join using*/ using /*before columns*/ (
+        /*before a*/ a /*after a*/
+      )
+  /*before where*/ where t3.x > t1.a;
+
 /*before*/
 delete /*a*/ from /*b*/ foo
 /*c*/ for /*d*/ portion /*e*/ of /*f*/ valid_at /*g*/ from /*h*/ 1 /*i*/ to /*j*/ 2 /*k*/ as /*l*/ f

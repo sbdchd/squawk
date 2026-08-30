@@ -191,7 +191,7 @@ CREATE FUNCTION functest_S_16(a int, b int) RETURNS void
 -- error: duplicate function body
 CREATE FUNCTION functest_S_xxx(x int) RETURNS int
     LANGUAGE SQL
-    AS $$ SELECT x * 2 $$
+--     AS $$ SELECT x * 2 $$
     RETURN x * 3;
 
 -- polymorphic arguments not allowed in this form

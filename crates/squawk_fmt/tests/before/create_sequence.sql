@@ -1,5 +1,9 @@
 create sequence invoice_number_seq;
 
+create sequence descending_seq increment by -1 minvalue -100000 maxvalue +20 start with -10 cache +5;
+
+create sequence commented_descending_seq increment by /* before sign */ - /* before value */ 1 minvalue /* before minimum sign */ - /* before minimum */ 100000 maxvalue /* before maximum sign */ + /* before maximum */ 20 start with /* before start sign */ - /* before start */ 10 cache /* before cache sign */ + /* before cache */ 5;
+
 create temporary sequence if not exists extraordinarily_long_schema_name.extraordinarily_long_invoice_number_sequence as bigint increment by 5 minvalue 100 maxvalue 999999999 start with 100 cache 50 cycle owned by extraordinarily_long_schema_name.extraordinarily_long_table_name.extraordinarily_long_column_name;
 
 -- comments in every position

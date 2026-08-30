@@ -69,3 +69,6 @@ from source
 /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ source /* before lock wait */ nowait
 /* before limit */ limit /* before limit value */ 10
 /* before offset */ offset /* before offset value */ 2 /* before rows */ rows;
+
+select 1 into foo offset 1 limit 2;
+select 1 into foo limit 2 for update;

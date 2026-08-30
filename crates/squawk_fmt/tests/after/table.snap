@@ -49,3 +49,6 @@ with /* before recursive */ recursive /* before cte */ cte /* before as */ as /*
 
 table /* before relation */ foo
 /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties/* before semicolon */;
+
+table foo offset 1 limit 2;
+table foo limit 2 for update;

@@ -26,6 +26,14 @@ create type complex_base (
   internallength = 16
 );
 
+create type null_default_base (
+  default = null
+);
+
+create type commented_null_default_base (
+  default /* equals */ = /* null value */ null /* close */
+);
+
 -- comments in every composite type position
 create /* type */ type /* name */ commented_composite /* as */ as /* open */ (
   /* field */ first_field /* type */ text

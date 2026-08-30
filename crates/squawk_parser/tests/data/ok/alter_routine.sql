@@ -32,17 +32,9 @@ alter routine f(in a text, out b int)
 -- all_actions
 alter routine r
   immutable
-  stable
-  volatile
   not leakproof
-  leakproof
   external security invoker
-  security invoker
-  security definer
-  external security definer
   parallel unsafe
-  parallel restricted
-  parallel safe
   cost 10
   rows 10
   set c = 1
@@ -51,4 +43,20 @@ alter routine r
   reset c
   reset all
   restrict;
+
+-- volatility_variants
+alter routine r stable;
+alter routine r volatile;
+
+-- leakproof_variants
+alter routine r leakproof;
+
+-- security_variants
+alter routine r security invoker;
+alter routine r security definer;
+alter routine r external security definer;
+
+-- parallel_variants
+alter routine r parallel restricted;
+alter routine r parallel safe;
 

@@ -16,4 +16,8 @@ WITH doomed AS (SELECT id FROM foo) DELETE FROM foo USING doomed WHERE foo.id = 
 
 WITH deleted AS (DELETE FROM foo WHERE id = 1 RETURNING id) SELECT * FROM deleted;
 
+DELETE FROM t3 USING t1 JOIN t2 USING (a) WHERE t3.x > t1.a;
+
+DELETE FROM t3 /*before using*/ USING /*before t1*/ t1 /*before join*/ JOIN /*before t2*/ t2 /*before join using*/ USING /*before columns*/ (/*before a*/ a /*after a*/) /*before where*/ WHERE t3.x > t1.a;
+
 /*before*/ DELETE /*a*/ FROM /*b*/ foo /*c*/ FOR /*d*/ PORTION /*e*/ OF /*f*/ valid_at /*g*/ FROM /*h*/ 1 /*i*/ TO /*j*/ 2 /*k*/ AS /*l*/ f /*m*/ USING /*n*/ bar /*o*/ b /*p*/, /*q*/ baz /*r*/ WHERE /*s*/ f.id = b.id /*t*/ RETURNING /*u*/ WITH /*v*/ (/*w*/ OLD /*x*/ AS /*y*/ o /*z*/, /*aa*/ NEW /*ab*/ AS /*ac*/ n /*ad*/) /*ae*/ o.id /*af*/, /*ag*/ n.id /*ah*/;

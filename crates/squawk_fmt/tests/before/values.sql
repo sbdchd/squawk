@@ -11,3 +11,6 @@ values (a_very_long_first_expression, a_very_long_second_expression, a_very_long
 with /* before recursive */ recursive /* before cte */ cte /* before as */ as /* before query open */ (/* before query */ select 1 /* before query close */) /* before values */ values /* before row */ (/* before expression */ 1 /* before row close */) /* before order */ order /* before by */ by /* before order expression */ 1 /* before desc */ desc /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait /* before limit */ limit /* before limit value */ 10 /* before offset */ offset /* before offset value */ 2 /* before rows */ rows /* before semicolon */;
 
 values /* before row */ (/* before expression */ 1 /* before row close */) /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties /* before semicolon */;
+
+values (1) offset 1 limit 2;
+values (1) limit 2 for update;

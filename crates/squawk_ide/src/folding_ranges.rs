@@ -138,7 +138,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::ALTER_OPTION_LIST
         | SyntaxKind::ALTER_TYPE_ATTRIBUTE_ACTION_LIST
         | SyntaxKind::ATTRIBUTE_LIST
-        | SyntaxKind::BEGIN_FUNC_OPTION_LIST
+        | SyntaxKind::ATOMIC_BODY
         | SyntaxKind::CHECKPOINT_OPTION_LIST
         | SyntaxKind::COLUMN_DEF_LIST
         | SyntaxKind::COLUMN_LIST

@@ -13,3 +13,6 @@ table a_very_long_schema_name.a_very_long_relation_name_that_forces_the_table_st
 with /* before recursive */ recursive /* before cte */ cte /* before as */ as /* before query open */ (/* before query */ select 1 /* before query close */) /* before table */ table /* before relation */ cte /* before order */ order /* before by */ by /* before order expression */ a /* before desc */ desc /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait /* before limit */ limit /* before limit value */ 10 /* before offset */ offset /* before offset value */ 2 /* before rows */ rows /* before semicolon */;
 
 table /* before relation */ foo /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties /* before semicolon */;
+
+table foo offset 1 limit 2;
+table foo limit 2 for update;

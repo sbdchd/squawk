@@ -1,4 +1,5 @@
 use anyhow::Result;
+use either::Either;
 use itertools::Itertools;
 use rowan::Direction;
 use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
@@ -70,20 +71,13 @@ fn build_begin<'a>(begin: &ast::Begin) -> Doc<'a> {
             .append(Doc::text(keyword));
     }
     if let Some(modes) = begin.transaction_mode_list() {
-        let mode_docs = modes.transaction_modes().map(|mode| {
-            (
-                leading_comments(mode.syntax()).append(build_keyword_node(mode.syntax())),
-                mode.syntax().clone(),
-            )
-        });
-        if let Some(modes_doc) = build_comma_separated_docs(mode_docs) {
-            doc = doc.append(
-                Doc::line_or_space()
-                    .append(leading_comments(modes.syntax()))
-                    .append(modes_doc)
-                    .nest(2),
-            );
-        }
+        let comments = leading_comments(modes.syntax());
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(comments)
+                .append(build_transaction_mode_list(modes))
+                .nest(2),
+        );
     }
 
     doc.group().append(build_semicolon(begin.semicolon_token()))
@@ -627,17 +621,29 @@ fn build_delete<'a>(delete: &ast::Delete) -> Doc<'a> {
             .append(leading_comments(alias.syntax()))
             .append(build_optional_as_alias(alias));
     }
-    if let Some(using_clause) = delete.using_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(using_clause.syntax()))
-            .append(build_using_clause(using_clause));
+    let using_clause = delete.using_clause();
+    let using_has_join = using_clause.as_ref().is_some_and(|using| {
+        using
+            .items()
+            .any(|item| matches!(item, ast::FromListItem::JoinExpr(_)))
+    });
+    if let Some(using_clause) = using_clause {
+        let clause =
+            leading_comments(using_clause.syntax()).append(build_using_clause(using_clause));
+        doc = if using_has_join {
+            doc.append(Doc::hard_line().append(clause).nest(2))
+        } else {
+            doc.append(Doc::line_or_space()).append(clause)
+        };
     }
     if let Some(where_clause) = delete.where_clause_or_current_of() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(where_clause.syntax()))
+        let clause = leading_comments(where_clause.syntax())
             .append(build_where_clause_or_current_of(where_clause));
+        doc = if using_has_join {
+            doc.append(Doc::hard_line().append(clause).nest(2))
+        } else {
+            doc.append(Doc::line_or_space()).append(clause)
+        };
     }
     if let Some(returning_clause) = delete.returning_clause() {
         doc = doc
@@ -671,10 +677,11 @@ fn build_using_clause<'a>(using_clause: ast::UsingClause) -> Doc<'a> {
         .using_token()
         .map(|token| leading_comments_token(&token).append(Doc::text("using")))
         .unwrap_or_else(Doc::nil);
-    let items = using_clause.from_items().map(|item| {
+    let items = using_clause.items().map(|item| {
+        let syntax = item.syntax().clone();
         (
-            leading_comments(item.syntax()).append(build_from_item(item.clone())),
-            item.syntax().clone(),
+            leading_comments(item.syntax()).append(build_from_list_item(item)),
+            syntax,
         )
     });
     if let Some(items) = build_comma_separated_docs(items) {
@@ -925,11 +932,11 @@ fn build_merge<'a>(merge: &ast::Merge) -> Doc<'a> {
 
 fn build_using_on_clause<'a>(using: ast::UsingOnClause) -> Doc<'a> {
     let mut doc = Doc::text("using");
-    if let Some(item) = using.from_item() {
+    if let Some(item) = using.from_list_item() {
         doc = doc
             .append(Doc::space())
             .append(leading_comments(item.syntax()))
-            .append(build_from_item(item));
+            .append(build_from_list_item(item));
     }
     if let Some(on_clause) = using.on_clause() {
         doc = doc
@@ -1565,23 +1572,11 @@ fn build_create_trigger<'a>(stmt: &ast::CreateTrigger) -> Doc<'a> {
                 .nest(2),
         );
     }
-    for option in [
-        stmt.deferrable_constraint_option()
-            .map(|node| node.syntax().clone()),
-        stmt.not_deferrable_constraint_option()
-            .map(|node| node.syntax().clone()),
-        stmt.initially_deferred_constraint_option()
-            .map(|node| node.syntax().clone()),
-        stmt.initially_immediate_constraint_option()
-            .map(|node| node.syntax().clone()),
-    ]
-    .into_iter()
-    .flatten()
-    {
+    for option in stmt.constraint_options() {
         doc = doc.append(
             Doc::hard_line()
-                .append(leading_comments(&option))
-                .append(build_keyword_node(&option))
+                .append(leading_comments(option.syntax()))
+                .append(build_constraint_option(option))
                 .nest(2),
         );
     }
@@ -1893,6 +1888,14 @@ fn build_create_function<'a>(create_function: &ast::CreateFunction) -> Doc<'a> {
             );
         }
     }
+    if let Some(body) = create_function.body() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(body.syntax()))
+                .append(build_routine_body(body))
+                .nest(2),
+        );
+    }
     doc.append(build_semicolon(create_function.semicolon_token()))
 }
 
@@ -1925,21 +1928,23 @@ fn build_function_params<'a>(params: impl Iterator<Item = ast::Param>) -> Option
 
 fn build_function_param<'a>(param: ast::Param) -> Doc<'a> {
     let mut doc = Doc::nil();
-    if let Some(mode) = param.mode() {
-        doc = doc
-            .append(leading_comments(mode.syntax()))
-            .append(build_keyword_node(mode.syntax()));
-    }
-    if let Some(name) = param.name() {
-        if param.mode().is_some() {
+    let mut has_prefix = false;
+    for part in param.mode_and_name() {
+        if has_prefix {
             doc = doc.append(Doc::space());
         }
-        doc = doc
-            .append(leading_comments(name.syntax()))
-            .append(build_name(name.syntax()));
+        has_prefix = true;
+        doc = doc.append(match part {
+            Either::Left(mode) => {
+                leading_comments(mode.syntax()).append(build_keyword_node(mode.syntax()))
+            }
+            Either::Right(name) => {
+                leading_comments(name.syntax()).append(build_name(name.syntax()))
+            }
+        });
     }
     if let Some(ty) = param.ty() {
-        if param.mode().is_some() || param.name().is_some() {
+        if has_prefix {
             doc = doc.append(Doc::space());
         }
         doc = doc
@@ -2014,7 +2019,6 @@ fn build_function_ret_type<'a>(ret_type: ast::RetType) -> Doc<'a> {
 fn build_function_option<'a>(option: ast::FuncOption) -> Doc<'a> {
     match option {
         ast::FuncOption::AsFuncOption(option) => build_as_function_option(option),
-        ast::FuncOption::BeginFuncOptionList(options) => build_begin_function_option_list(options),
         ast::FuncOption::CostFuncOption(option) => {
             build_literal_function_option("cost", option.literal())
         }
@@ -2050,7 +2054,6 @@ fn build_function_option<'a>(option: ast::FuncOption) -> Doc<'a> {
             }
             doc
         }
-        ast::FuncOption::ReturnFuncOption(option) => build_return_function_option(option),
         ast::FuncOption::RowsFuncOption(option) => {
             build_literal_function_option("rows", option.literal())
         }
@@ -2108,7 +2111,14 @@ fn build_function_option<'a>(option: ast::FuncOption) -> Doc<'a> {
     }
 }
 
-fn build_begin_function_option_list<'a>(options: ast::BeginFuncOptionList) -> Doc<'a> {
+fn build_routine_body<'a>(body: ast::RoutineBody) -> Doc<'a> {
+    match body {
+        ast::RoutineBody::AtomicBody(atomic_body) => build_atomic_body(atomic_body),
+        ast::RoutineBody::ReturnStmt(return_stmt) => build_return_stmt(return_stmt),
+    }
+}
+
+fn build_atomic_body<'a>(options: ast::AtomicBody) -> Doc<'a> {
     let mut doc = Doc::text("begin");
     if let Some(atomic) = options.atomic_token() {
         doc = doc
@@ -2117,11 +2127,11 @@ fn build_begin_function_option_list<'a>(options: ast::BeginFuncOptionList) -> Do
             .append(Doc::text("atomic"));
     }
 
-    for option in options.begin_func_options() {
+    for option in options.routine_body_stmts() {
         let option_comments = leading_comments(option.syntax());
         let option_doc = match option {
-            ast::BeginFuncOption::ReturnFuncOption(option) => build_return_function_option(option),
-            ast::BeginFuncOption::Stmt(stmt) => build_stmt(stmt),
+            ast::RoutineBodyStmt::ReturnStmt(option) => build_return_stmt(option),
+            ast::RoutineBodyStmt::Stmt(stmt) => build_stmt(stmt),
         };
         doc = doc.append(
             Doc::hard_line()
@@ -2973,43 +2983,15 @@ fn build_table_and_columns<'a>(table: ast::TableAndColumns) -> Doc<'a> {
 }
 
 fn build_do<'a>(do_stmt: &ast::Do) -> Doc<'a> {
-    let language = do_stmt.do_language();
-    let body = do_stmt.body();
-    let language_before_body = match (&language, &body) {
-        (Some(language), Some(body)) => {
-            language.syntax().text_range().start() < body.syntax().text_range().start()
-        }
-        _ => false,
-    };
-
     let mut doc = Doc::text("do");
-    if language_before_body {
-        if let Some(language) = language.as_ref() {
-            doc = doc.append(
-                Doc::line_or_space()
-                    .append(leading_comments(language.syntax()))
-                    .append(build_do_language(language.clone()))
-                    .nest(2),
-            );
-        }
-    }
-    if let Some(body) = body {
-        doc = doc.append(
-            Doc::line_or_space()
-                .append(leading_comments(body.syntax()))
-                .append(build_literal(body))
-                .nest(2),
-        );
-    }
-    if !language_before_body {
-        if let Some(language) = language {
-            doc = doc.append(
-                Doc::line_or_space()
-                    .append(leading_comments(language.syntax()))
-                    .append(build_do_language(language))
-                    .nest(2),
-            );
-        }
+    for part in do_stmt.language_and_body() {
+        let part_doc = match part {
+            Either::Left(language) => {
+                leading_comments(language.syntax()).append(build_do_language(language))
+            }
+            Either::Right(body) => leading_comments(body.syntax()).append(build_literal(body)),
+        };
+        doc = doc.append(Doc::line_or_space().append(part_doc).nest(2));
     }
 
     doc.group()
@@ -4470,7 +4452,7 @@ fn build_comment_object_on<'a>(
     doc.group()
 }
 
-fn build_return_function_option<'a>(option: ast::ReturnFuncOption) -> Doc<'a> {
+fn build_return_stmt<'a>(option: ast::ReturnStmt) -> Doc<'a> {
     let mut doc = Doc::text("return");
     if let Some(expr) = option.expr() {
         doc = doc
@@ -4747,11 +4729,11 @@ fn build_create_user_mapping<'a>(stmt: &ast::CreateUserMapping) -> Doc<'a> {
             .append(leading_comments_token(&token))
             .append(Doc::text("for"));
     }
-    if let Some(role) = stmt.role_ref() {
+    if let Some(role) = stmt.user_mapping_role() {
         doc = doc
             .append(Doc::space())
             .append(leading_comments(role.syntax()))
-            .append(build_role_ref(&role));
+            .append(build_user_mapping_role(&role));
     }
     if let Some(server) = stmt.server_clause() {
         doc = doc.append(
@@ -5154,10 +5136,27 @@ fn build_create_schema_target<'a>(target: ast::CreateSchemaTarget) -> Doc<'a> {
 
 fn build_schema_element<'a>(element: ast::SchemaElement) -> Doc<'a> {
     match element {
+        ast::SchemaElement::CreateAggregate(stmt) => build_create_aggregate(&stmt),
+        ast::SchemaElement::CreateCollation(stmt) => build_create_collation(&stmt),
+        ast::SchemaElement::CreateDomain(stmt) => build_create_domain(&stmt),
+        ast::SchemaElement::CreateFunction(stmt) => build_create_function(&stmt),
         ast::SchemaElement::CreateIndex(stmt) => build_create_index(&stmt),
+        ast::SchemaElement::CreateOperator(stmt) => build_create_operator(&stmt),
+        ast::SchemaElement::CreateProcedure(stmt) => build_create_procedure(&stmt),
         ast::SchemaElement::CreateSequence(stmt) => build_create_sequence(&stmt),
         ast::SchemaElement::CreateTable(stmt) => build_create_table(&stmt),
+        ast::SchemaElement::CreateTextSearchConfiguration(stmt) => {
+            build_create_text_search_configuration(&stmt)
+        }
+        ast::SchemaElement::CreateTextSearchDictionary(stmt) => {
+            build_create_text_search_dictionary(&stmt)
+        }
+        ast::SchemaElement::CreateTextSearchParser(stmt) => build_create_text_search_parser(&stmt),
+        ast::SchemaElement::CreateTextSearchTemplate(stmt) => {
+            build_create_text_search_template(&stmt)
+        }
         ast::SchemaElement::CreateTrigger(stmt) => build_create_trigger(&stmt),
+        ast::SchemaElement::CreateType(stmt) => build_create_type(&stmt),
         ast::SchemaElement::CreateView(stmt) => build_create_view(&stmt),
         ast::SchemaElement::Grant(stmt) => build_grant(&stmt),
     }
@@ -5937,6 +5936,14 @@ fn build_create_procedure<'a>(stmt: &ast::CreateProcedure) -> Doc<'a> {
             );
             option_leading = Doc::nil();
         }
+    }
+    if let Some(body) = stmt.body() {
+        doc = doc.append(
+            Doc::hard_line()
+                .append(leading_comments(body.syntax()))
+                .append(build_routine_body(body))
+                .nest(2),
+        );
     }
     doc.append(build_semicolon(stmt.semicolon_token()))
 }
@@ -7344,12 +7351,38 @@ fn build_role_ref<'a>(role: &ast::RoleRef) -> Doc<'a> {
                 .append(Doc::space())
                 .append(leading_comments_token(&ident))
                 .append(build_name(role.syntax()));
+        } else if let Some((token, keyword)) = role
+            .current_role_token()
+            .map(|token| (token, "current_role"))
+            .or_else(|| {
+                role.current_user_token()
+                    .map(|token| (token, "current_user"))
+            })
+            .or_else(|| {
+                role.session_user_token()
+                    .map(|token| (token, "session_user"))
+            })
+        {
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments_token(&token))
+                .append(Doc::text(keyword));
         }
         doc
     } else if role.ident_token().is_some() {
         build_name(role.syntax())
     } else {
         build_keyword_node(role.syntax())
+    }
+}
+
+fn build_user_mapping_role<'a>(role: &ast::UserMappingRole) -> Doc<'a> {
+    if role.user_token().is_some() {
+        Doc::text("user")
+    } else {
+        role.role_ref()
+            .map(|role| build_role_ref(&role))
+            .unwrap_or_else(Doc::nil)
     }
 }
 
@@ -7440,14 +7473,25 @@ fn build_set_session_auth<'a>(set: &ast::SetSessionAuth) -> Doc<'a> {
 }
 
 fn build_transaction_mode_list<'a>(list: ast::TransactionModeList) -> Doc<'a> {
-    let modes = list.transaction_modes().map(|mode| {
-        let syntax = mode.syntax().clone();
-        (
-            leading_comments(&syntax).append(build_keyword_node(&syntax)),
-            syntax,
-        )
-    });
-    build_comma_separated_docs(modes).unwrap_or_else(Doc::nil)
+    let mut modes = list.transaction_modes();
+    let Some(first) = modes.next() else {
+        return Doc::nil();
+    };
+    let mut previous = first;
+    let mut doc = build_keyword_node(previous.syntax());
+    for mode in modes {
+        if previous.comma_after().is_some() {
+            doc = doc
+                .append(trailing_comments(previous.syntax()))
+                .append(Doc::text(","));
+        }
+        doc = doc
+            .append(Doc::line_or_space())
+            .append(leading_comments(mode.syntax()))
+            .append(build_keyword_node(mode.syntax()));
+        previous = mode;
+    }
+    doc
 }
 
 fn build_set_transaction<'a>(set: &ast::SetTransaction) -> Doc<'a> {
@@ -7627,8 +7671,11 @@ fn build_set_time_zone<'a>(target: ast::SetTimeZone) -> Doc<'a> {
         let value_doc = match value.clone() {
             ast::ConfigValue::ConfigValueName(name) => build_name(name.syntax()),
             ast::ConfigValue::Literal(literal) => build_literal(literal),
+            ast::ConfigValue::PrefixExpr(expr) => build_prefix_expr(expr),
         };
         Some(leading_comments(value.syntax()).append(value_doc))
+    } else if let Some(interval) = target.cast_expr() {
+        Some(leading_comments(interval.syntax()).append(build_cast_expr(interval)))
     } else if let Some(default) = target.default_token() {
         Some(leading_comments_token(&default).append(Doc::text("default")))
     } else {
@@ -7696,6 +7743,7 @@ fn build_config_assignment<'a>(assignment: ast::ConfigAssignment) -> Doc<'a> {
                 let value_doc = match value {
                     ast::ConfigValue::ConfigValueName(name) => build_name(name.syntax()),
                     ast::ConfigValue::Literal(literal) => build_literal(literal),
+                    ast::ConfigValue::PrefixExpr(expr) => build_prefix_expr(expr),
                 };
                 (leading_comments(&syntax).append(value_doc), syntax)
             });
@@ -7706,11 +7754,6 @@ fn build_config_assignment<'a>(assignment: ast::ConfigAssignment) -> Doc<'a> {
                     .append(Doc::space())
                     .append(leading_comments_token(&default))
                     .append(Doc::text("default"));
-            } else if let Some(null) = values.null_token() {
-                doc = doc
-                    .append(Doc::space())
-                    .append(leading_comments_token(&null))
-                    .append(Doc::text("null"));
             }
             doc.group()
         }
@@ -7777,13 +7820,15 @@ fn build_create_index<'a>(create_index: &ast::CreateIndex) -> Doc<'a> {
         on_doc = on_doc.append(Doc::line_or_space()).append(using_doc);
         doc = doc.append(Doc::hard_line().append(on_doc.group()).nest(2));
     } else {
+        doc = doc
+            .append(Doc::line_or_space().append(on_doc).nest(2))
+            .group();
         if let Some(items) = create_index.partition_item_list() {
-            on_doc = on_doc
+            doc = doc
                 .append(Doc::space())
                 .append(leading_comments(items.syntax()))
                 .append(build_create_table_partition_items(items));
         }
-        doc = doc.append(Doc::line_or_space().append(on_doc).nest(2));
     }
     if let Some(include) = create_index.index_include_clause() {
         let mut include_doc = leading_comments(include.syntax()).append(Doc::text("include"));
@@ -8732,40 +8777,35 @@ fn build_column<'a>(column: &ast::Column) -> Doc<'a> {
             .append(leading_comments(ty.syntax()))
             .append(build_type(ty));
     }
-    if let Some(storage) = column.storage() {
-        let mut clause = Doc::text("storage");
-        if let Some(mode) = storage.storage_mode() {
-            clause = clause
-                .append(Doc::space())
-                .append(leading_comments(mode.syntax()))
-                .append(build_keyword_node(mode.syntax()));
-        }
-        doc = append_column_clause(doc, storage.syntax(), clause);
-    }
-    if let Some(compression) = column.compression_method() {
-        let mut clause = Doc::text("compression");
-        if let Some(method) = compression.compression_method_name() {
-            clause = clause
-                .append(Doc::space())
-                .append(leading_comments(method.syntax()))
-                .append(build_keyword_node(method.syntax()));
-        }
-        doc = append_column_clause(doc, compression.syntax(), clause);
-    }
-    if let Some(options) = column.with_options() {
-        doc = append_column_clause(doc, options.syntax(), build_keyword_node(options.syntax()));
-    }
-    if let Some(options) = column.alter_option_list() {
-        let syntax = options.syntax().clone();
-        doc = append_column_clause(doc, &syntax, build_alter_option_list(&options));
-    }
-    if let Some(collate) = column.collate() {
-        let syntax = collate.syntax().clone();
-        doc = append_column_clause(doc, &syntax, build_collate_expr(collate));
-    }
-    for constraint in column.constraints() {
-        let syntax = constraint.syntax().clone();
-        doc = append_column_clause(doc, &syntax, build_column_constraint(constraint));
+    for clause in column.clauses() {
+        let syntax = clause.syntax().clone();
+        let clause = match clause {
+            ast::ColumnClause::Storage(storage) => {
+                let mut doc = Doc::text("storage");
+                if let Some(mode) = storage.storage_mode() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments(mode.syntax()))
+                        .append(build_keyword_node(mode.syntax()));
+                }
+                doc
+            }
+            ast::ColumnClause::CompressionMethod(compression) => {
+                let mut doc = Doc::text("compression");
+                if let Some(method) = compression.compression_method_name() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments(method.syntax()))
+                        .append(build_keyword_node(method.syntax()));
+                }
+                doc
+            }
+            ast::ColumnClause::WithOptions(options) => build_keyword_node(options.syntax()),
+            ast::ColumnClause::AlterOptionList(options) => build_alter_option_list(&options),
+            ast::ColumnClause::Collate(collate) => build_collate_expr(collate),
+            ast::ColumnClause::ColumnConstraint(constraint) => build_column_constraint(constraint),
+        };
+        doc = append_column_clause(doc, &syntax, clause);
     }
     doc.group()
 }
@@ -8956,27 +8996,11 @@ fn build_references_constraint<'a>(constraint: ast::ReferencesConstraint) -> Doc
             .append(leading_comments(match_type.syntax()))
             .append(build_keyword_node(match_type.syntax()));
     }
-    if let Some(action) = constraint.on_delete_action() {
+    for action in constraint.referential_actions() {
         doc = doc
             .append(Doc::line_or_space())
             .append(leading_comments(action.syntax()))
-            .append(build_reference_action(
-                action.on_token(),
-                action.delete_token(),
-                "delete",
-                action.ref_action(),
-            ));
-    }
-    if let Some(action) = constraint.on_update_action() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(action.syntax()))
-            .append(build_reference_action(
-                action.on_token(),
-                action.update_token(),
-                "update",
-                action.ref_action(),
-            ));
+            .append(build_referential_action(action));
     }
     append_constraint_options(doc, constraint.constraint_options())
         .nest(2)
@@ -9111,7 +9135,7 @@ fn build_sequence_option<'a>(option: ast::SequenceOption) -> Doc<'a> {
             doc
         }
         ast::SequenceOption::OptionCache(option) => {
-            append_optional_literal(Doc::text("cache"), option.literal())
+            append_optional_expr(Doc::text("cache"), option.expr())
         }
         ast::SequenceOption::OptionIncrement(option) => {
             let mut doc = option
@@ -9124,13 +9148,13 @@ fn build_sequence_option<'a>(option: ast::SequenceOption) -> Doc<'a> {
                     .append(leading_comments_token(&by))
                     .append(Doc::text("by"));
             }
-            append_optional_literal(doc, option.literal())
+            append_optional_expr(doc, option.expr())
         }
         ast::SequenceOption::OptionMaxValue(option) => {
-            append_optional_literal(Doc::text("maxvalue"), option.literal())
+            append_optional_expr(Doc::text("maxvalue"), option.expr())
         }
         ast::SequenceOption::OptionMinValue(option) => {
-            append_optional_literal(Doc::text("minvalue"), option.literal())
+            append_optional_expr(Doc::text("minvalue"), option.expr())
         }
         ast::SequenceOption::OptionRestart(option) => {
             let mut doc = option
@@ -9143,7 +9167,7 @@ fn build_sequence_option<'a>(option: ast::SequenceOption) -> Doc<'a> {
                     .append(leading_comments_token(&with))
                     .append(Doc::text("with"));
             }
-            append_optional_literal(doc, option.literal())
+            append_optional_expr(doc, option.expr())
         }
         ast::SequenceOption::OptionStart(option) => {
             let mut doc = option
@@ -9156,7 +9180,7 @@ fn build_sequence_option<'a>(option: ast::SequenceOption) -> Doc<'a> {
                     .append(leading_comments_token(&with))
                     .append(Doc::text("with"));
             }
-            append_optional_literal(doc, option.literal())
+            append_optional_expr(doc, option.expr())
         }
         ast::SequenceOption::OptionOwnedBy(option) => {
             let mut doc = option
@@ -9213,6 +9237,14 @@ fn build_sequence_option<'a>(option: ast::SequenceOption) -> Doc<'a> {
     }
 }
 
+fn append_optional_expr<'a>(doc: Doc<'a>, expr: Option<ast::Expr>) -> Doc<'a> {
+    expr.map_or(doc.clone(), |expr| {
+        doc.append(Doc::space())
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr))
+    })
+}
+
 fn append_optional_literal<'a>(doc: Doc<'a>, literal: Option<ast::Literal>) -> Doc<'a> {
     literal.map_or(doc.clone(), |literal| {
         doc.append(Doc::space())
@@ -9228,6 +9260,9 @@ fn build_table_constraint<'a>(constraint: ast::TableConstraint) -> Doc<'a> {
         ast::TableConstraint::ForeignKeyConstraint(constraint) => {
             build_foreign_key_constraint(constraint)
         }
+        ast::TableConstraint::NotNullConstraint(constraint) => {
+            build_domain_constraint(constraint.into())
+        }
         ast::TableConstraint::PrimaryKeyConstraint(constraint) => {
             build_primary_key_constraint(constraint)
         }
@@ -9239,6 +9274,10 @@ fn build_constraint_name_clause<'a>(clause: Option<ast::ConstraintNameClause>) -
     let Some(clause) = clause else {
         return Doc::nil();
     };
+    build_constraint_name(&clause).append(Doc::space())
+}
+
+fn build_constraint_name<'a>(clause: &ast::ConstraintNameClause) -> Doc<'a> {
     let mut doc = Doc::text("constraint");
     if let Some(name) = clause.constraint_name() {
         doc = doc
@@ -9246,7 +9285,7 @@ fn build_constraint_name_clause<'a>(clause: Option<ast::ConstraintNameClause>) -
             .append(leading_comments(name.syntax()))
             .append(build_name(name.syntax()));
     }
-    doc.append(Doc::space())
+    doc
 }
 
 fn build_check_constraint<'a>(constraint: ast::CheckConstraint) -> Doc<'a> {
@@ -9308,6 +9347,8 @@ fn build_primary_key_constraint<'a>(constraint: ast::PrimaryKeyConstraint) -> Do
                 .append(Doc::space())
                 .append(leading_comments(parameters.syntax()))
                 .append(build_index_parameters(parameters));
+        } else {
+            doc = doc.append(comments_before(parameters.syntax().clone()));
         }
     }
     let options = append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(2);
@@ -9332,6 +9373,8 @@ fn build_unique_constraint<'a>(constraint: ast::UniqueConstraint) -> Doc<'a> {
                 .append(Doc::space())
                 .append(leading_comments(parameters.syntax()))
                 .append(build_index_parameters(parameters));
+        } else {
+            doc = doc.append(comments_before(parameters.syntax().clone()));
         }
     }
     let options = append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(2);
@@ -9499,9 +9542,16 @@ fn build_attribute_list_with_layout<'a>(list: &ast::AttributeList, multiline: bo
             item = item.append(comments_before(dot)).append(Doc::text("."));
         }
         if let Some(name) = option.name() {
+            let name_doc = if name.default_token().is_some() {
+                Doc::text("default")
+            } else if name.join_token().is_some() {
+                Doc::text("join")
+            } else {
+                build_name(name.syntax())
+            };
             item = item
                 .append(leading_comments(name.syntax()))
-                .append(build_name(name.syntax()));
+                .append(name_doc);
         }
         if let Some(eq) = option.eq_token() {
             item = item
@@ -9538,26 +9588,52 @@ fn build_attribute_list_with_layout<'a>(list: &ast::AttributeList, multiline: bo
 fn build_attribute_value<'a>(value: ast::AttributeValue) -> Doc<'a> {
     if let Some(literal) = value.literal() {
         build_literal(literal)
+    } else if let Some(prefix_expr) = value.prefix_expr() {
+        build_prefix_expr(prefix_expr)
     } else if let Some(ty) = value.ty() {
         build_type(ty)
     } else if let Some(custom_op) = value.custom_op() {
         build_custom_operator(custom_op)
+    } else if value.eq_token().is_some() {
+        Doc::text("=")
+    } else if value.l_angle_token().is_some() {
+        Doc::text("<")
+    } else if value.r_angle_token().is_some() {
+        Doc::text(">")
+    } else if value.lteq_token().is_some() {
+        Doc::text("<=")
+    } else if value.gteq_token().is_some() {
+        Doc::text(">=")
+    } else if value.neqb_token().is_some() {
+        Doc::text("<>")
+    } else if value.neq_token().is_some() {
+        Doc::text("!=")
+    } else if value.plus_token().is_some() {
+        Doc::text("+")
+    } else if value.minus_token().is_some() {
+        Doc::text("-")
+    } else if value.star_token().is_some() {
+        Doc::text("*")
+    } else if value.slash_token().is_some() {
+        Doc::text("/")
+    } else if value.percent_token().is_some() {
+        Doc::text("%")
+    } else if value.caret_token().is_some() {
+        Doc::text("^")
+    } else if value.any_token().is_some() {
+        Doc::text("any")
     } else if value.none_token().is_some() {
         Doc::text("none")
-    } else if let Some(op) = value.op() {
-        if value.operator_token().is_some() {
-            let mut doc = Doc::text("operator");
-            if let Some(l_paren) = value.l_paren_token() {
-                doc = doc.append(comments_before(l_paren));
-            }
-            doc = doc.append(Doc::text("(")).append(build_operator(&op));
-            if let Some(r_paren) = value.r_paren_token() {
-                doc = doc.append(comments_before(r_paren));
-            }
-            doc.append(Doc::text(")"))
-        } else {
-            build_operator(&op)
-        }
+    } else if value.primary_token().is_some() {
+        Doc::text("primary")
+    } else if value.default_token().is_some() {
+        Doc::text("default")
+    } else if value.null_token().is_some() {
+        Doc::text("null")
+    } else if value.constraint_token().is_some() {
+        Doc::text("constraint")
+    } else if let Some(operator_call) = value.operator_call() {
+        build_operator_call(&operator_call)
     } else {
         Doc::nil()
     }
@@ -9594,26 +9670,67 @@ fn append_constraint_options<'a>(
         doc = doc
             .append(Doc::line_or_space())
             .append(leading_comments(option.syntax()))
-            .append(build_keyword_node(option.syntax()));
+            .append(build_constraint_option(option));
     }
     doc
 }
 
+fn build_constraint_option<'a>(option: ast::ConstraintOption) -> Doc<'a> {
+    match option {
+        ast::ConstraintOption::DeferrableConstraintOption(option) => {
+            build_keyword_tokens([(option.deferrable_token(), "deferrable")])
+        }
+        ast::ConstraintOption::Enforced(option) => {
+            build_keyword_tokens([(option.enforced_token(), "enforced")])
+        }
+        ast::ConstraintOption::Inherit(option) => {
+            build_keyword_tokens([(option.inherit_token(), "inherit")])
+        }
+        ast::ConstraintOption::InitiallyDeferredConstraintOption(option) => build_keyword_tokens([
+            (option.initially_token(), "initially"),
+            (option.deferred_token(), "deferred"),
+        ]),
+        ast::ConstraintOption::InitiallyImmediateConstraintOption(option) => {
+            build_keyword_tokens([
+                (option.initially_token(), "initially"),
+                (option.immediate_token(), "immediate"),
+            ])
+        }
+        ast::ConstraintOption::NoInherit(option) => build_keyword_tokens([
+            (option.no_token(), "no"),
+            (option.inherit_token(), "inherit"),
+        ]),
+        ast::ConstraintOption::NotDeferrableConstraintOption(option) => build_keyword_tokens([
+            (option.not_token(), "not"),
+            (option.deferrable_token(), "deferrable"),
+        ]),
+        ast::ConstraintOption::NotEnforced(option) => build_keyword_tokens([
+            (option.not_token(), "not"),
+            (option.enforced_token(), "enforced"),
+        ]),
+        ast::ConstraintOption::NotValid(option) => {
+            build_keyword_tokens([(option.not_token(), "not"), (option.valid_token(), "valid")])
+        }
+    }
+}
+
 fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Doc<'a> {
-    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    let constraint_name = constraint.constraint_name_clause();
+    let has_constraint_name = constraint_name.is_some();
+    let mut body = Doc::nil();
     if let Some(foreign) = constraint.foreign_token() {
-        doc = doc
+        body = body
             .append(leading_comments_token(&foreign))
             .append(Doc::text("foreign"));
     }
     if let Some(key) = constraint.key_token() {
-        doc = doc
+        body = body
             .append(Doc::space())
             .append(leading_comments_token(&key))
             .append(Doc::text("key"));
     }
     if let Some(columns) = constraint.from_columns() {
-        doc = doc
+        body = body
             .append(Doc::space())
             .append(leading_comments(columns.syntax()))
             .append(build_foreign_key_column_list(columns));
@@ -9643,65 +9760,99 @@ fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Do
         );
     }
     if let Some(references_clause) = references_clause {
-        doc = doc.append(Doc::line_or_space().append(references_clause).nest(2));
+        let clause = Doc::line_or_space().append(references_clause);
+        body = body.append(if has_constraint_name {
+            clause
+        } else {
+            clause.nest(2)
+        });
     }
     if let Some(match_type) = constraint.match_type() {
-        doc = doc.append(
-            Doc::line_or_space()
-                .append(leading_comments(match_type.syntax()))
-                .append(build_keyword_node(match_type.syntax()))
-                .nest(2),
-        );
+        let clause = Doc::line_or_space()
+            .append(leading_comments(match_type.syntax()))
+            .append(build_keyword_node(match_type.syntax()));
+        body = body.append(if has_constraint_name {
+            clause
+        } else {
+            clause.nest(2)
+        });
     }
-    if let Some(action) = constraint.on_delete_action() {
-        doc = doc.append(
-            Doc::line_or_space()
-                .append(leading_comments(action.syntax()))
-                .append(build_reference_action(
-                    action.on_token(),
-                    action.delete_token(),
-                    "delete",
-                    action.ref_action(),
-                ))
-                .nest(2),
-        );
+    for action in constraint.referential_actions() {
+        let clause = Doc::line_or_space()
+            .append(leading_comments(action.syntax()))
+            .append(build_referential_action(action));
+        body = body.append(if has_constraint_name {
+            clause
+        } else {
+            clause.nest(2)
+        });
     }
-    if let Some(action) = constraint.on_update_action() {
-        doc = doc.append(
-            Doc::line_or_space()
-                .append(leading_comments(action.syntax()))
-                .append(build_reference_action(
-                    action.on_token(),
-                    action.update_token(),
-                    "update",
-                    action.ref_action(),
-                ))
-                .nest(2),
-        );
+    let options = append_constraint_options(Doc::nil(), constraint.constraint_options());
+    body = body.append(if has_constraint_name {
+        options
+    } else {
+        options.nest(2)
+    });
+
+    if let Some(constraint_name) = constraint_name {
+        build_constraint_name(&constraint_name)
+            .append(Doc::line_or_space().append(body.group()).nest(2))
+            .group()
+    } else {
+        body.group()
     }
-    let options = append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(2);
-    doc.append(options).group()
 }
 
 fn build_foreign_key_column_list<'a>(list: ast::ForeignKeyColumnList) -> Doc<'a> {
-    let suffix = list.period_column().map(|period| {
-        let mut doc = Doc::space()
-            .append(leading_comments(period.syntax()))
-            .append(Doc::text("period"));
+    let doc = list
+        .l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("));
+    let mut items = list
+        .column_name_refs()
+        .map(|name| {
+            (
+                leading_comments(name.syntax()).append(build_name(name.syntax())),
+                name.syntax().clone(),
+            )
+        })
+        .collect::<Vec<_>>();
+    if let Some(period) = list.period_column() {
+        let mut period_doc = period
+            .period_token()
+            .map(|_| leading_comments(period.syntax()).append(Doc::text("period")))
+            .unwrap_or_else(Doc::nil);
         if let Some(name) = period.name() {
-            doc = doc
+            period_doc = period_doc
                 .append(Doc::space())
                 .append(leading_comments(name.syntax()))
                 .append(build_name(name.syntax()));
         }
-        doc
-    });
-    build_column_names(
-        list.l_paren_token(),
-        list.column_name_refs(),
-        suffix,
-        list.r_paren_token(),
-    )
+        items.push((period_doc, period.syntax().clone()));
+    }
+    let mut body = build_comma_separated_docs(items.into_iter()).unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+    doc.append(wrap_body(body)).append(Doc::text(")")).group()
+}
+
+fn build_referential_action<'a>(action: ast::ReferentialAction) -> Doc<'a> {
+    match action {
+        ast::ReferentialAction::OnDeleteAction(action) => build_reference_action(
+            action.on_token(),
+            action.delete_token(),
+            "delete",
+            action.ref_action(),
+        ),
+        ast::ReferentialAction::OnUpdateAction(action) => build_reference_action(
+            action.on_token(),
+            action.update_token(),
+            "update",
+            action.ref_action(),
+        ),
+    }
 }
 
 fn build_reference_action<'a>(
@@ -9960,35 +10111,10 @@ fn build_values<'a>(values: &ast::Values) -> Doc<'a> {
     }
     doc = doc.append(values_doc.group());
 
-    if let Some(order_by) = values.order_by_clause() {
+    for clause in values.tail_clauses() {
         doc = doc
             .append(Doc::line_or_space())
-            .append(leading_comments(order_by.syntax()))
-            .append(build_order_by_clause(order_by));
-    }
-    for locking in values.locking_clauses() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(locking.syntax()))
-            .append(build_locking_clause(locking));
-    }
-    if let Some(limit) = values.limit_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(limit.syntax()))
-            .append(build_limit_clause(limit));
-    }
-    if let Some(fetch) = values.fetch_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(fetch.syntax()))
-            .append(build_fetch_clause(fetch));
-    }
-    if let Some(offset) = values.offset_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(offset.syntax()))
-            .append(build_offset_clause(offset));
+            .append(build_select_tail_clause(clause));
     }
 
     doc.append(build_semicolon(values.semicolon_token()))
@@ -10036,35 +10162,10 @@ fn build_table<'a>(table: &ast::Table) -> Doc<'a> {
     }
     doc = doc.append(table_doc.group());
 
-    if let Some(order_by) = table.order_by_clause() {
+    for clause in table.tail_clauses() {
         doc = doc
             .append(Doc::line_or_space())
-            .append(leading_comments(order_by.syntax()))
-            .append(build_order_by_clause(order_by));
-    }
-    for locking in table.locking_clauses() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(locking.syntax()))
-            .append(build_locking_clause(locking));
-    }
-    if let Some(limit) = table.limit_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(limit.syntax()))
-            .append(build_limit_clause(limit));
-    }
-    if let Some(fetch) = table.fetch_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(fetch.syntax()))
-            .append(build_fetch_clause(fetch));
-    }
-    if let Some(offset) = table.offset_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(offset.syntax()))
-            .append(build_offset_clause(offset));
+            .append(build_select_tail_clause(clause));
     }
 
     doc.append(build_semicolon(table.semicolon_token())).group()
@@ -10198,29 +10299,10 @@ fn build_select_into<'a>(select_into: &ast::SelectInto) -> Doc<'a> {
             .append(leading_comments(window.syntax()))
             .append(build_window_clause(window));
     }
-    if let Some(order_by) = select_into.order_by_clause() {
+    for clause in select_into.tail_clauses() {
         doc = doc
             .append(Doc::line_or_space())
-            .append(leading_comments(order_by.syntax()))
-            .append(build_order_by_clause(order_by));
-    }
-    for locking in select_into.locking_clauses() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(locking.syntax()))
-            .append(build_locking_clause(locking));
-    }
-    if let Some(limit) = select_into.limit_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(limit.syntax()))
-            .append(build_limit_clause(limit));
-    }
-    if let Some(offset) = select_into.offset_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(offset.syntax()))
-            .append(build_offset_clause(offset));
+            .append(build_select_tail_clause(clause));
     }
     if let Some(filter) = select_into.filter_clause() {
         doc = doc
@@ -10716,22 +10798,32 @@ fn build_publication_object<'a>(object: ast::PublicationObject) -> Doc<'a> {
     match object {
         ast::PublicationObject::PublicationObjectCurrentSchema(_) => Doc::text("current_schema"),
         ast::PublicationObject::PublicationObjectTable(object) => {
-            let mut doc = Doc::text("table");
-            if let Some(token) = object.only_token() {
+            let mut doc = Doc::nil();
+            let mut has_prefix = false;
+            if let Some(token) = object.table_token() {
                 doc = doc
-                    .append(Doc::space())
+                    .append(leading_comments_token(&token))
+                    .append(Doc::text("table"));
+                has_prefix = true;
+            }
+            if let Some(token) = object.only_token() {
+                if has_prefix {
+                    doc = doc.append(Doc::space());
+                }
+                doc = doc
                     .append(leading_comments_token(&token))
                     .append(Doc::text("only"));
+                has_prefix = true;
             }
             let parenthesized = object.l_paren_token().is_some();
             if let Some(l_paren) = object.l_paren_token() {
-                doc = doc
-                    .append(Doc::space())
-                    .append(comments_before(l_paren))
-                    .append(Doc::text("("));
+                if has_prefix {
+                    doc = doc.append(Doc::space());
+                }
+                doc = doc.append(comments_before(l_paren)).append(Doc::text("("));
             }
             if let Some(table) = object.table_name_ref() {
-                if !parenthesized {
+                if !parenthesized && has_prefix {
                     doc = doc.append(Doc::space());
                 }
                 doc = doc.append(leading_comments(table.syntax()));
@@ -10906,6 +10998,7 @@ fn append_commented_table_ref<'a>(mut doc: Doc<'a>, table: Option<ast::TableName
 
 fn build_alter_foreign_table_action<'a>(action: ast::AlterTableAction) -> Doc<'a> {
     match action {
+        ast::AlterTableAction::AlterOptionList(node) => build_alter_option_list(&node),
         ast::AlterTableAction::AddColumn(node) => {
             let mut doc =
                 build_keyword_tokens([(node.add_token(), "add"), (node.column_token(), "column")]);
@@ -10943,12 +11036,15 @@ fn build_alter_foreign_table_action<'a>(action: ast::AlterTableAction) -> Doc<'a
         ast::AlterTableAction::AddConstraint(node) => {
             let mut doc = Doc::text("add");
             if let Some(constraint) = node.constraint() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments(constraint.syntax()))
-                        .append(build_domain_constraint(constraint))
-                        .nest(2),
-                );
+                let is_foreign_key =
+                    matches!(&constraint, ast::Constraint::ForeignKeyConstraint(_));
+                let constraint_doc = leading_comments(constraint.syntax())
+                    .append(build_domain_constraint(constraint));
+                doc = if is_foreign_key {
+                    doc.append(Doc::space()).append(constraint_doc)
+                } else {
+                    doc.append(Doc::line_or_space().append(constraint_doc).nest(2))
+                };
             }
             doc.group()
         }
@@ -10974,38 +11070,11 @@ fn build_alter_foreign_table_action<'a>(action: ast::AlterTableAction) -> Doc<'a
                 (node.constraint_token(), "constraint"),
             ]);
             doc = append_commented_constraint_ref(doc, node.constraint_name_ref());
-            if let Some(option) = node.deferrable_constraint_option() {
+            for option in node.constraint_options() {
                 doc = doc
                     .append(Doc::space())
                     .append(leading_comments(option.syntax()))
-                    .append(Doc::text("deferrable"));
-            }
-            if let Some(option) = node.not_deferrable_constraint_option() {
-                doc = doc
-                    .append(Doc::space())
-                    .append(leading_comments(option.syntax()))
-                    .append(build_keyword_tokens([
-                        (option.not_token(), "not"),
-                        (option.deferrable_token(), "deferrable"),
-                    ]));
-            }
-            if let Some(option) = node.initially_deferred_constraint_option() {
-                doc = doc
-                    .append(Doc::space())
-                    .append(leading_comments(option.syntax()))
-                    .append(build_keyword_tokens([
-                        (option.initially_token(), "initially"),
-                        (option.deferred_token(), "deferred"),
-                    ]));
-            }
-            if let Some(option) = node.initially_immediate_constraint_option() {
-                doc = doc
-                    .append(Doc::space())
-                    .append(leading_comments(option.syntax()))
-                    .append(build_keyword_tokens([
-                        (option.initially_token(), "initially"),
-                        (option.immediate_token(), "immediate"),
-                    ]));
+                    .append(build_constraint_option(option));
             }
             doc
         }
@@ -11279,9 +11348,10 @@ fn build_alter_foreign_table_action<'a>(action: ast::AlterTableAction) -> Doc<'a
             (node.oids_token(), "oids"),
         ]),
         ast::AlterTableAction::TableRenameTo(node) => {
-            let target = node
-                .table_name()
-                .map(|name| leading_comments(name.syntax()).append(build_name(name.syntax())));
+            let target = node.table_name().and_then(|name| {
+                name.path()
+                    .map(|path| leading_comments(name.syntax()).append(build_path(&path)))
+            });
             build_rename_to(node.to_token(), target)
         }
         ast::AlterTableAction::ValidateConstraint(node) => append_commented_constraint_ref(
@@ -11297,37 +11367,44 @@ fn build_alter_foreign_table_action<'a>(action: ast::AlterTableAction) -> Doc<'a
                 (node.partitions_token(), "partitions"),
             ]);
             if let Some(list) = node.table_name_ref_list() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments(list.syntax()))
-                        .append(build_table_name_ref_list(list))
-                        .nest(2),
-                );
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(list.syntax()))
+                    .append(build_table_name_ref_list(list));
             }
             if let Some(into) = node.into_token() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments_token(&into))
-                        .append(Doc::text("into"))
-                        .nest(2),
-                );
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(leading_comments_token(&into))
+                    .append(Doc::text("into"));
             }
-            doc = append_commented_name(doc, node.table_name());
+            if let Some(table_name) = node.table_name() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(table_name.syntax()));
+                if let Some(path) = table_name.path() {
+                    doc = doc.append(build_path(&path));
+                }
+            }
             doc.group()
         }
         ast::AlterTableAction::SplitPartition(node) => {
             let mut doc = build_keyword_tokens([
                 (node.split_token(), "split"),
                 (node.partition_token(), "partition"),
-                (node.into_token(), "into"),
             ]);
+            doc = append_commented_table_ref(doc, node.table_name_ref());
+            if let Some(into) = node.into_token() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments_token(&into))
+                    .append(Doc::text("into"));
+            }
             if let Some(list) = node.partition_list() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments(list.syntax()))
-                        .append(build_partition_list(list))
-                        .nest(2),
-                );
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(list.syntax()))
+                    .append(build_partition_list(list));
             }
             doc.group()
         }
@@ -11550,21 +11627,21 @@ fn build_alter_column_option<'a>(option: ast::AlterColumnOption) -> Doc<'a> {
                         .nest(2),
                 );
             }
-            if let Some(using) = n.using_token() {
+            if let Some(using) = n.using_expr() {
                 doc = doc.append(
                     Doc::line_or_space()
-                        .append(leading_comments_token(&using))
-                        .append(Doc::text("using"))
+                        .append(leading_comments(using.syntax()))
+                        .append(build_keyword_tokens([(using.using_token(), "using")]))
                         .nest(2),
                 );
-            }
-            if let Some(expr) = n.expr() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments(expr.syntax()))
-                        .append(build_expr(expr))
-                        .nest(2),
-                );
+                if let Some(expr) = using.expr() {
+                    doc = doc.append(
+                        Doc::line_or_space()
+                            .append(leading_comments(expr.syntax()))
+                            .append(build_expr(expr))
+                            .nest(2),
+                    );
+                }
             }
             doc.group()
         }
@@ -13287,18 +13364,31 @@ fn build_alter_property_graph_action<'a>(action: ast::AlterPropertyGraphAction) 
             build_rename_to(n.to_token(), target)
         }
         ast::AlterPropertyGraphAction::AddVertexEdgeTables(n) => {
-            let mut doc = Doc::text("add");
-            if let Some(x) = n.vertex_tables() {
-                doc = doc
-                    .append(Doc::space())
-                    .append(leading_comments(x.syntax()))
-                    .append(build_vertex_tables(x));
+            let mut doc = Doc::nil();
+            let mut has_vertex_tables = false;
+            if let Some(add) = n.add_vertex_tables() {
+                doc = doc.append(build_keyword_tokens([(add.add_token(), "add")]));
+                if let Some(tables) = add.vertex_tables() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments(tables.syntax()))
+                        .append(build_vertex_tables(tables));
+                }
+                has_vertex_tables = true;
             }
-            if let Some(x) = n.edge_tables() {
+            if let Some(add) = n.add_edge_tables() {
+                if has_vertex_tables {
+                    doc = doc.append(Doc::line_or_space());
+                }
                 doc = doc
-                    .append(Doc::space())
-                    .append(leading_comments(x.syntax()))
-                    .append(build_edge_tables(x));
+                    .append(leading_comments(add.syntax()))
+                    .append(build_keyword_tokens([(add.add_token(), "add")]));
+                if let Some(tables) = add.edge_tables() {
+                    doc = doc
+                        .append(Doc::space())
+                        .append(leading_comments(tables.syntax()))
+                        .append(build_edge_tables(tables));
+                }
             }
             doc
         }
@@ -13695,6 +13785,7 @@ fn build_edge_table_def<'a>(n: ast::EdgeTableDef) -> Doc<'a> {
                     x.key_token(),
                     x.column_ref_list(),
                     x.references_table(),
+                    x.vertex_table_ref(),
                 ))
                 .nest(2),
         );
@@ -13709,6 +13800,7 @@ fn build_edge_table_def<'a>(n: ast::EdgeTableDef) -> Doc<'a> {
                     x.key_token(),
                     x.column_ref_list(),
                     x.references_table(),
+                    x.vertex_table_ref(),
                 ))
                 .nest(2),
         );
@@ -13757,10 +13849,17 @@ fn build_vertex_reference<'a>(
     key_token: Option<SyntaxToken>,
     cols: Option<ast::ColumnRefList>,
     refs: Option<ast::ReferencesTable>,
+    vertex: Option<ast::VertexTableRef>,
 ) -> Doc<'a> {
     let mut d = kind_token
         .map(|token| leading_comments_token(&token).append(Doc::text(keyword)))
         .unwrap_or_else(Doc::nil);
+    if let Some(vertex) = vertex {
+        d = d
+            .append(Doc::space())
+            .append(leading_comments(vertex.syntax()))
+            .append(build_name(vertex.syntax()));
+    }
     if let Some(token) = key_token {
         d = d
             .append(Doc::space())
@@ -15394,26 +15493,25 @@ fn build_alter_default_privileges_action<'a>(action: ast::AlterDefaultPrivileges
         ast::AlterDefaultPrivilegesAction::GrantDefaultPrivileges(grant) => {
             let mut doc = Doc::text("grant");
             if let Some(privileges) = grant.privileges() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments(privileges.syntax()))
-                        .append(build_privileges(privileges))
-                        .nest(2),
-                );
-            }
-            if let Some(on) = grant.on_token() {
                 doc = doc
-                    .append(Doc::line_or_space())
-                    .append(leading_comments_token(&on))
-                    .append(Doc::text("on"));
+                    .append(Doc::space())
+                    .append(leading_comments(privileges.syntax()))
+                    .append(build_privileges(privileges).nest(2));
             }
+            let mut on_clause = grant
+                .on_token()
+                .map(|on| leading_comments_token(&on).append(Doc::text("on")));
             if let Some(target) = grant.privilege_target() {
-                doc = doc.append(
-                    Doc::line_or_space()
+                on_clause = Some(
+                    on_clause
+                        .unwrap_or_else(Doc::nil)
+                        .append(Doc::space())
                         .append(leading_comments(target.syntax()))
-                        .append(build_privilege_target(target))
-                        .nest(2),
+                        .append(build_privilege_target(target)),
                 );
+            }
+            if let Some(on_clause) = on_clause {
+                doc = doc.append(Doc::line_or_space()).append(on_clause);
             }
             if let Some(to) = grant.to_token() {
                 doc = doc
@@ -15441,39 +15539,41 @@ fn build_alter_default_privileges_action<'a>(action: ast::AlterDefaultPrivileges
         }
         ast::AlterDefaultPrivilegesAction::RevokeDefaultPrivileges(revoke) => {
             let mut doc = Doc::text("revoke");
-            if let Some(option) = revoke.grant_option_for() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments(option.syntax()))
-                        .append(build_keyword_tokens([
-                            (option.grant_token(), "grant"),
-                            (option.option_token(), "option"),
-                            (option.for_token(), "for"),
-                        ]))
-                        .nest(2),
-                );
+            let grant_option = revoke.grant_option_for();
+            let has_grant_option = grant_option.is_some();
+            if let Some(option) = grant_option {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(option.syntax()))
+                    .append(build_keyword_tokens([
+                        (option.grant_token(), "grant"),
+                        (option.option_token(), "option"),
+                        (option.for_token(), "for"),
+                    ]));
             }
             if let Some(privileges) = revoke.privileges() {
-                doc = doc.append(
-                    Doc::line_or_space()
-                        .append(leading_comments(privileges.syntax()))
-                        .append(build_privileges(privileges))
-                        .nest(2),
-                );
+                let privileges_doc =
+                    leading_comments(privileges.syntax()).append(build_privileges(privileges));
+                doc = if has_grant_option {
+                    doc.append(Doc::line_or_space().append(privileges_doc).nest(2))
+                } else {
+                    doc.append(Doc::space()).append(privileges_doc.nest(2))
+                };
             }
-            if let Some(on) = revoke.on_token() {
-                doc = doc
-                    .append(Doc::line_or_space())
-                    .append(leading_comments_token(&on))
-                    .append(Doc::text("on"));
-            }
+            let mut on_clause = revoke
+                .on_token()
+                .map(|on| leading_comments_token(&on).append(Doc::text("on")));
             if let Some(target) = revoke.privilege_target() {
-                doc = doc.append(
-                    Doc::line_or_space()
+                on_clause = Some(
+                    on_clause
+                        .unwrap_or_else(Doc::nil)
+                        .append(Doc::space())
                         .append(leading_comments(target.syntax()))
-                        .append(build_privilege_target(target))
-                        .nest(2),
+                        .append(build_privilege_target(target)),
                 );
+            }
+            if let Some(on_clause) = on_clause {
+                doc = doc.append(Doc::line_or_space()).append(on_clause);
             }
             if let Some(from) = revoke.from_token() {
                 doc = doc
@@ -15558,6 +15658,12 @@ fn build_domain_constraint<'a>(constraint: ast::Constraint) -> Doc<'a> {
                 (node.not_token(), "not"),
                 (node.null_token(), "null"),
             ]));
+            if let Some(column) = node.column_name_ref() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(column.syntax()))
+                    .append(build_name(column.syntax()));
+            }
             append_constraint_options(doc, node.constraint_options())
                 .nest(2)
                 .group()
@@ -17598,11 +17704,11 @@ fn build_drop_user_mapping<'a>(stmt: &ast::DropUserMapping) -> Doc<'a> {
             .append(leading_comments_token(&for_token))
             .append(Doc::text("for"));
     }
-    if let Some(role) = stmt.role_ref() {
+    if let Some(role) = stmt.user_mapping_role() {
         doc = doc.append(
             Doc::line_or_space()
                 .append(leading_comments(role.syntax()))
-                .append(build_role_ref(&role))
+                .append(build_user_mapping_role(&role))
                 .nest(2),
         );
     }
@@ -17821,35 +17927,10 @@ fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
             .append(leading_comments(window.syntax()))
             .append(build_window_clause(window));
     }
-    if let Some(order_by) = select.order_by_clause() {
+    for clause in select.tail_clauses() {
         doc = doc
             .append(Doc::line_or_space())
-            .append(leading_comments(order_by.syntax()))
-            .append(build_order_by_clause(order_by));
-    }
-    for locking in select.locking_clauses() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(locking.syntax()))
-            .append(build_locking_clause(locking));
-    }
-    if let Some(limit) = select.limit_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(limit.syntax()))
-            .append(build_limit_clause(limit));
-    }
-    if let Some(fetch) = select.fetch_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(fetch.syntax()))
-            .append(build_fetch_clause(fetch));
-    }
-    if let Some(offset) = select.offset_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(offset.syntax()))
-            .append(build_offset_clause(offset));
+            .append(build_select_tail_clause(clause));
     }
     if let Some(filter) = select.filter_clause() {
         doc = doc
@@ -17864,30 +17945,41 @@ fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
 }
 
 fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
-    let from_items = from.from_items().map(|item| {
+    let mut single_item = from.items();
+    let single_json_table = matches!(
+        single_item.next(),
+        Some(ast::FromListItem::FromItem(
+            ast::FromItem::JsonTableFromItem(_)
+        ))
+    ) && single_item.next().is_none();
+
+    let items = from.items().map(|item| {
         let syntax = item.syntax().clone();
         (
-            leading_comments(item.syntax()).append(build_from_item(item)),
+            leading_comments(item.syntax()).append(build_from_list_item(item)),
             syntax,
         )
     });
-    let join_exprs = from.join_exprs().map(|join_expr| {
-        let syntax = join_expr.syntax().clone();
-        (
-            leading_comments(join_expr.syntax()).append(build_join_expr(join_expr)),
-            syntax,
-        )
-    });
-    let body = build_comma_separated_docs(from_items.chain(join_exprs)).unwrap_or_else(Doc::nil);
+    let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
+    let body = if single_json_table {
+        body
+    } else {
+        body.nest(2)
+    };
 
-    Doc::text("from").append(Doc::space()).append(body.nest(2))
+    Doc::text("from").append(Doc::space()).append(body)
+}
+
+fn build_from_list_item<'a>(item: ast::FromListItem) -> Doc<'a> {
+    match item {
+        ast::FromListItem::FromItem(item) => build_from_item(item),
+        ast::FromListItem::JoinExpr(join_expr) => build_join_expr(join_expr),
+    }
 }
 
 fn build_join_expr<'a>(join_expr: ast::JoinExpr) -> Doc<'a> {
-    let mut doc = if let Some(left) = join_expr.join_expr() {
-        leading_comments(left.syntax()).append(build_join_expr(left))
-    } else if let Some(left) = join_expr.from_item() {
-        leading_comments(left.syntax()).append(build_from_item(left))
+    let mut doc = if let Some(left) = join_expr.from_list_item() {
+        leading_comments(left.syntax()).append(build_from_list_item(left))
     } else {
         Doc::nil()
     };
@@ -17914,11 +18006,11 @@ fn build_join<'a>(join: ast::Join) -> Doc<'a> {
             .append(leading_comments(join_type.syntax()))
             .append(build_keyword_node(join_type.syntax()));
     }
-    if let Some(item) = join.from_item() {
+    if let Some(item) = join.from_list_item() {
         doc = doc
             .append(Doc::space())
             .append(leading_comments(item.syntax()))
-            .append(build_from_item(item));
+            .append(build_from_list_item(item));
     }
     if let Some(condition) = join.join_condition() {
         match condition {
@@ -18069,10 +18161,17 @@ fn build_select_variant<'a>(select: ast::SelectVariant) -> Doc<'a> {
     }
 }
 
+fn build_compound_select_operand<'a>(operand: ast::CompoundSelectOperand) -> Doc<'a> {
+    match operand {
+        ast::CompoundSelectOperand::SelectVariant(select) => build_select_variant(select),
+        ast::CompoundSelectOperand::ParenExpr(expr) => build_paren_expr(expr),
+    }
+}
+
 fn build_compound_select<'a>(select: &ast::CompoundSelect) -> Doc<'a> {
     let mut doc = select
-        .lhs()
-        .map(build_select_variant)
+        .lhs_operand()
+        .map(build_compound_select_operand)
         .unwrap_or_else(Doc::nil);
 
     if let Some(op) = select.op() {
@@ -18096,41 +18195,16 @@ fn build_compound_select<'a>(select: &ast::CompoundSelect) -> Doc<'a> {
         doc = doc.append(Doc::line_or_space()).append(op_doc);
     }
 
-    if let Some(rhs) = select.rhs() {
+    if let Some(rhs) = select.rhs_operand() {
         doc = doc
             .append(Doc::line_or_space())
             .append(leading_comments(rhs.syntax()))
-            .append(build_select_variant(rhs));
+            .append(build_compound_select_operand(rhs));
     }
-    if let Some(order_by) = select.order_by_clause() {
+    for clause in select.tail_clauses() {
         doc = doc
             .append(Doc::hard_line())
-            .append(leading_comments(order_by.syntax()))
-            .append(build_order_by_clause(order_by));
-    }
-    for locking in select.locking_clauses() {
-        doc = doc
-            .append(Doc::hard_line())
-            .append(leading_comments(locking.syntax()))
-            .append(build_locking_clause(locking));
-    }
-    if let Some(limit) = select.limit_clause() {
-        doc = doc
-            .append(Doc::hard_line())
-            .append(leading_comments(limit.syntax()))
-            .append(build_limit_clause(limit));
-    }
-    if let Some(fetch) = select.fetch_clause() {
-        doc = doc
-            .append(Doc::hard_line())
-            .append(leading_comments(fetch.syntax()))
-            .append(build_fetch_clause(fetch));
-    }
-    if let Some(offset) = select.offset_clause() {
-        doc = doc
-            .append(Doc::hard_line())
-            .append(leading_comments(offset.syntax()))
-            .append(build_offset_clause(offset));
+            .append(build_select_tail_clause(clause));
     }
 
     doc.append(build_semicolon(select.semicolon_token()))
@@ -18248,6 +18322,7 @@ fn build_paren_select<'a>(select: ast::ParenSelect) -> Doc<'a> {
         .select()
         .map(|select| leading_comments(select.syntax()).append(build_select_variant(select)))
         .unwrap_or_else(Doc::nil);
+
     if let Some(r_paren) = select.r_paren_token() {
         body = body.append(comments_before(r_paren));
     }
@@ -18257,35 +18332,10 @@ fn build_paren_select<'a>(select: ast::ParenSelect) -> Doc<'a> {
         .group();
     doc = doc.append(paren_doc);
 
-    if let Some(order_by) = select.order_by_clause() {
+    for clause in select.tail_clauses() {
         doc = doc
             .append(Doc::line_or_space())
-            .append(leading_comments(order_by.syntax()))
-            .append(build_order_by_clause(order_by));
-    }
-    for locking in select.locking_clauses() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(locking.syntax()))
-            .append(build_locking_clause(locking));
-    }
-    if let Some(limit) = select.limit_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(limit.syntax()))
-            .append(build_limit_clause(limit));
-    }
-    if let Some(offset) = select.offset_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(offset.syntax()))
-            .append(build_offset_clause(offset));
-    }
-    if let Some(fetch) = select.fetch_clause() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(fetch.syntax()))
-            .append(build_fetch_clause(fetch));
+            .append(build_select_tail_clause(clause));
     }
 
     doc.append(build_semicolon(select.semicolon_token()))
@@ -18948,13 +18998,14 @@ fn build_relation_from_item<'a>(relation: ast::RelationFromItem) -> Doc<'a> {
             .append(leading_comments_token(&star))
             .append(Doc::text("*"));
     }
+    doc = doc.append(build_from_alias(relation.alias()));
     if let Some(tablesample) = relation.tablesample_clause() {
         doc = doc
             .append(Doc::space())
             .append(leading_comments(tablesample.syntax()))
             .append(build_tablesample_clause(tablesample));
     }
-    doc.append(build_from_alias(relation.alias()))
+    doc
 }
 
 fn build_tablesample_clause<'a>(tablesample: ast::TablesampleClause) -> Doc<'a> {
@@ -19255,11 +19306,11 @@ fn build_array_expr<'a>(array_expr: ast::ArrayExpr) -> Doc<'a> {
         doc = doc.append(Doc::text("array"));
     };
 
-    if let Some(select) = array_expr.select() {
+    if let Some(select) = array_expr.select_variant() {
         if let Some(l_paren) = array_expr.l_paren_token() {
             doc = doc.append(comments_before(l_paren));
         }
-        let mut body = leading_comments(select.syntax()).append(build_select_doc(&select));
+        let mut body = leading_comments(select.syntax()).append(build_select_variant(select));
         if let Some(r_paren) = array_expr.r_paren_token() {
             body = body.append(comments_before(r_paren));
         }
@@ -19268,10 +19319,21 @@ fn build_array_expr<'a>(array_expr: ast::ArrayExpr) -> Doc<'a> {
             .append(Doc::text(")"))
             .group()
     } else {
-        if let Some(l_brack) = array_expr.l_brack_token() {
-            doc = doc.append(comments_before(l_brack));
+        let (l_delimiter, r_delimiter, opening, closing) =
+            if let Some(l_paren) = array_expr.l_paren_token() {
+                (Some(l_paren), array_expr.r_paren_token(), "(", ")")
+            } else {
+                (
+                    array_expr.l_brack_token(),
+                    array_expr.r_brack_token(),
+                    "[",
+                    "]",
+                )
+            };
+        if let Some(l_delimiter) = l_delimiter {
+            doc = doc.append(comments_before(l_delimiter));
         }
-        doc = doc.append(Doc::text("["));
+        doc = doc.append(Doc::text(opening));
 
         let exprs = array_expr.exprs().map(|expr| {
             let syntax = expr.syntax().clone();
@@ -19279,10 +19341,12 @@ fn build_array_expr<'a>(array_expr: ast::ArrayExpr) -> Doc<'a> {
             (doc, syntax)
         });
         let mut body = build_comma_separated_docs(exprs).unwrap_or_else(Doc::nil);
-        if let Some(r_brack) = array_expr.r_brack_token() {
-            body = body.append(comments_before(r_brack));
+        if let Some(r_delimiter) = r_delimiter {
+            body = body.append(comments_before(r_delimiter));
         }
-        doc.append(wrap_body(body)).append(Doc::text("]")).group()
+        doc.append(wrap_body(body))
+            .append(Doc::text(closing))
+            .group()
     }
 }
 
@@ -19383,10 +19447,8 @@ fn build_tuple_expr<'a>(tuple_expr: ast::TupleExpr) -> Doc<'a> {
     let exprs = build_comma_separated_exprs(tuple_expr.exprs());
     let has_exprs = exprs.is_some();
     let mut body = exprs.unwrap_or_else(Doc::nil);
-    if !has_exprs {
-        if let Some(r_paren) = tuple_expr.r_paren_token() {
-            body = body.append(comments_before(r_paren));
-        }
+    if !has_exprs && let Some(r_paren) = tuple_expr.r_paren_token() {
+        body = body.append(comments_before(r_paren));
     }
 
     doc.append(wrap_body(body)).append(Doc::text(")")).group()
@@ -19430,31 +19492,7 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
         doc = doc
             .append(comments_before(arg_list.syntax().clone()))
             .append(build_call_arg_list(arg_list));
-        if let Some(within_clause) = call_expr.within_clause() {
-            doc = doc
-                .append(Doc::space())
-                .append(leading_comments(within_clause.syntax()))
-                .append(build_within_clause(within_clause));
-        }
-        if let Some(filter_clause) = call_expr.filter_clause() {
-            doc = doc
-                .append(Doc::space())
-                .append(leading_comments(filter_clause.syntax()))
-                .append(build_filter_clause(filter_clause));
-        }
-        if let Some(null_treatment) = call_expr.null_treatment() {
-            doc = doc
-                .append(Doc::space())
-                .append(leading_comments(null_treatment.syntax()))
-                .append(build_null_treatment(null_treatment));
-        }
-        if let Some(over_clause) = call_expr.over_clause() {
-            doc = doc
-                .append(Doc::space())
-                .append(leading_comments(over_clause.syntax()))
-                .append(build_over_clause(over_clause));
-        }
-        doc
+        build_call_expr_postfix_clauses(doc, &call_expr)
     } else if let Some(all_fn) = call_expr.all_fn() {
         build_parenthesized_expr_or_select_fn(
             "all",
@@ -19486,7 +19524,7 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
     } else if let Some(graph_table_fn) = call_expr.graph_table_fn() {
         build_graph_table_fn(graph_table_fn)
     } else if let Some(json_array_agg_fn) = call_expr.json_array_agg_fn() {
-        build_json_array_agg_fn(json_array_agg_fn)
+        build_call_expr_postfix_clauses(build_json_array_agg_fn(json_array_agg_fn), &call_expr)
     } else if let Some(json_array_fn) = call_expr.json_array_fn() {
         build_json_array_fn(json_array_fn)
     } else if let Some(json_exists_fn) = call_expr.json_exists_fn() {
@@ -19494,7 +19532,7 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
     } else if let Some(json_fn) = call_expr.json_fn() {
         build_json_fn(json_fn)
     } else if let Some(json_object_agg_fn) = call_expr.json_object_agg_fn() {
-        build_json_object_agg_fn(json_object_agg_fn)
+        build_call_expr_postfix_clauses(build_json_object_agg_fn(json_object_agg_fn), &call_expr)
     } else if let Some(json_object_fn) = call_expr.json_object_fn() {
         build_json_object_fn(json_object_fn)
     } else if let Some(json_query_fn) = call_expr.json_query_fn() {
@@ -19538,6 +19576,34 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
     } else {
         unreachable!("a call expression should contain a supported function node")
     }
+}
+
+fn build_call_expr_postfix_clauses<'a>(mut doc: Doc<'a>, call_expr: &ast::CallExpr) -> Doc<'a> {
+    if let Some(within_clause) = call_expr.within_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(within_clause.syntax()))
+            .append(build_within_clause(within_clause));
+    }
+    if let Some(filter_clause) = call_expr.filter_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(filter_clause.syntax()))
+            .append(build_filter_clause(filter_clause));
+    }
+    if let Some(null_treatment) = call_expr.null_treatment() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(null_treatment.syntax()))
+            .append(build_null_treatment(null_treatment));
+    }
+    if let Some(over_clause) = call_expr.over_clause() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(over_clause.syntax()))
+            .append(build_over_clause(over_clause));
+    }
+    doc
 }
 
 fn build_graph_table_fn<'a>(graph_table_fn: ast::GraphTableFn) -> Doc<'a> {
@@ -21507,20 +21573,20 @@ fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
 }
 
 fn build_call_arg<'a>(arg: ast::Arg) -> Doc<'a> {
-    let mut doc = if let Some(named_arg) = arg.named_arg() {
-        build_named_call_arg(named_arg)
-    } else {
-        let mut doc = Doc::nil();
-        if arg.variadic_token().is_some() {
-            doc = doc.append(Doc::text("variadic")).append(Doc::space());
-        }
-        if let Some(expr) = arg.expr() {
-            doc = doc
-                .append(leading_comments(expr.syntax()))
-                .append(build_expr(expr));
-        }
-        doc
-    };
+    let mut doc = Doc::nil();
+    if arg.variadic_token().is_some() {
+        doc = doc.append(Doc::text("variadic")).append(Doc::space());
+    }
+    if let Some(named_arg) = arg.named_arg() {
+        doc = doc
+            .append(leading_comments(named_arg.syntax()))
+            .append(build_named_call_arg(named_arg));
+    } else if let Some(expr) = arg.expr() {
+        doc = doc
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
+    }
+
     if let Some(order_by_clause) = arg.order_by_clause() {
         doc = doc
             .append(Doc::space())
@@ -21528,6 +21594,17 @@ fn build_call_arg<'a>(arg: ast::Arg) -> Doc<'a> {
             .append(build_order_by_clause(order_by_clause));
     }
     doc
+}
+
+fn build_select_tail_clause<'a>(clause: ast::SelectTailClause) -> Doc<'a> {
+    let doc = leading_comments(clause.syntax());
+    match clause {
+        ast::SelectTailClause::OrderByClause(clause) => doc.append(build_order_by_clause(clause)),
+        ast::SelectTailClause::LockingClause(clause) => doc.append(build_locking_clause(clause)),
+        ast::SelectTailClause::LimitClause(clause) => doc.append(build_limit_clause(clause)),
+        ast::SelectTailClause::OffsetClause(clause) => doc.append(build_offset_clause(clause)),
+        ast::SelectTailClause::FetchClause(clause) => doc.append(build_fetch_clause(clause)),
+    }
 }
 
 fn build_order_by_clause<'a>(clause: ast::OrderByClause) -> Doc<'a> {
@@ -21738,15 +21815,15 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
         if let Some(l_paren) = cast_expr.l_paren_token() {
             doc = doc.append(comments_before(l_paren));
         }
-        let mut body = leading_comments(expr.syntax())
+        let body = leading_comments(expr.syntax())
             .append(build_expr(expr))
             .append(Doc::line_or_space())
             .append(leading_comments_token(&as_token))
             .append(Doc::text("as"))
             .append(Doc::line_or_space())
             .append(leading_comments(ty.syntax()))
-            .append(build_type(ty))
-            .group();
+            .append(build_type(ty));
+        let mut body = body.group();
         if let Some(r_paren) = cast_expr.r_paren_token() {
             body = body.append(comments_before(r_paren));
         }
@@ -21814,14 +21891,10 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
         body = body
             .append(leading_comments(compound_select.syntax()))
             .append(build_compound_select(&compound_select));
-    } else if let Some(from_item) = paren_expr.from_item() {
+    } else if let Some(item) = paren_expr.from_list_item() {
         body = body
-            .append(leading_comments(from_item.syntax()))
-            .append(build_from_item(from_item));
-    } else if let Some(join_expr) = paren_expr.join_expr() {
-        body = body
-            .append(leading_comments(join_expr.syntax()))
-            .append(build_join_expr(join_expr));
+            .append(leading_comments(item.syntax()))
+            .append(build_from_list_item(item));
     } else if let Some(select) = paren_expr.select() {
         body = body
             .append(leading_comments(select.syntax()))
@@ -21846,7 +21919,34 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
 
 fn build_postfix_expr<'a>(postfix_expr: ast::PostfixExpr) -> Doc<'a> {
     let expr = build_expr(postfix_expr.expr().unwrap());
-    let op = match postfix_expr.op().unwrap() {
+    let op = postfix_expr.op().unwrap();
+    expr.append(Doc::space())
+        .append(leading_comments_postfix_op(&op))
+        .append(build_postfix_op(op))
+}
+
+fn leading_comments_postfix_op<'a>(op: &ast::PostfixOp) -> Doc<'a> {
+    match op {
+        ast::PostfixOp::AtLocal(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsJson(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsJsonArray(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsJsonObject(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsJsonScalar(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsJsonValue(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNormalized(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNotJson(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNotJsonArray(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNotJsonObject(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNotJsonScalar(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNotJsonValue(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNotNormalized(node) => leading_comments(node.syntax()),
+        ast::PostfixOp::IsNull(token) => leading_comments_token(token),
+        ast::PostfixOp::NotNull(token) => leading_comments_token(token),
+    }
+}
+
+fn build_postfix_op<'a>(op: ast::PostfixOp) -> Doc<'a> {
+    match op {
         ast::PostfixOp::AtLocal(n) => {
             build_two_keywords(n.at_token(), "at", n.local_token(), "local")
         }
@@ -21942,8 +22042,7 @@ fn build_postfix_expr<'a>(postfix_expr: ast::PostfixExpr) -> Doc<'a> {
             n.unicode_normal_form(),
             n.normalized_token(),
         ),
-    };
-    expr.append(Doc::space()).append(op)
+    }
 }
 
 fn build_postfix_keywords<'a>(

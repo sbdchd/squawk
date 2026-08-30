@@ -881,7 +881,7 @@ fn target_has_schema_qualified_from_item(target: &ast::Target) -> bool {
         return false;
     };
 
-    for from_item in from_clause.from_items() {
+    for from_item in ast_nav::iter_from_clause(&from_clause) {
         if let ast::FromItem::RelationFromItem(relation) = from_item
             && relation
                 .path_ref()

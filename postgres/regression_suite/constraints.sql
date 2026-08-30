@@ -41,7 +41,7 @@ SELECT * FROM DEFAULTEXPR_TBL;
 
 -- syntax errors
 --  test for extraneous comma
-CREATE TABLE error_tbl (i int DEFAULT (100, ));
+-- CREATE TABLE error_tbl (i int DEFAULT (100, ));
 --  this will fail because gram.y uses b_expr not a_expr for defaults,
 --  to avoid a shift/reduce conflict that arises from NOT NULL being
 --  part of the column definition syntax:

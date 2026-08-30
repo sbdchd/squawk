@@ -1,5 +1,9 @@
 alter sequence public.invoice_number increment by 10 minvalue 1 maxvalue 999999999 start with 100 cache 50 cycle owned by public.invoices.invoice_number;
 
+alter sequence public.descending_sequence restart with -24 start with -24 increment by -4 minvalue -36 maxvalue -5 cycle;
+
+alter sequence public.commented_descending_sequence restart with /* before restart sign */ - /* before restart value */ 24 start with /* before start sign */ - /* before start value */ 24 increment by /* before increment sign */ - /* before increment value */ 4 minvalue /* before minimum sign */ - /* before minimum value */ 36 maxvalue /* before maximum sign */ - /* before maximum value */ 5;
+
 alter sequence if exists public.invoice_number as bigint no minvalue no maxvalue restart with 500 no cycle owned by none;
 
 alter sequence public.invoice_number set logged;

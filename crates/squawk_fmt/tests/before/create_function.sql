@@ -6,7 +6,9 @@ create function get_users(p_active boolean) returns table (id bigint, name text)
 
 create function a_function_with_a_very_long_name(a_parameter_with_a_very_long_name numeric, another_parameter_with_a_very_long_name text default 'a long default value') returns table (a_column_with_a_very_long_name numeric, another_column_with_a_very_long_name text) language sql as $$ select $1, $2 $$;
 
-create function option_examples(in first integer, out second text, inout third bigint, variadic rest text[]) returns text external security invoker called on null input returns null on null input not leakproof stable window support public.support_fn transform for type integer, for type text set work_mem from current reset all language 'sql' as $$ select null::text $$;
+create function option_examples(in first integer, out second text, inout third bigint, variadic rest text[]) returns text external security invoker called on null input not leakproof stable window support public.support_fn transform for type integer, for type text set work_mem from current reset all language 'sql' as $$ select null::text $$;
+
+create function returns_null_on_null_input_example() returns text returns null on null input language sql as $$ select null::text $$;
 
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/. /*f*/ commented
@@ -31,6 +33,10 @@ create function record_and_calculate(a_very_long_input_parameter_name integer, a
 create function commented_body(value integer) returns integer language sql /*bb*/ begin /*bc*/ atomic /*bd*/ insert /*be*/ into function_log /*bf*/ (value) /*bg*/ values /*bh*/ (value) /*bi*/; /*bj*/ return /*bk*/ value + 1 /*bl*/; /*bm*/ end /*bn*/;
 
 create function external_add(integer, integer) returns integer as '$libdir/example', 'external_add' language c;
+
+create function test_enc_conversion(bytea, name, name, bool, validlen OUT int, result OUT bytea) as 'regresslib', 'test_enc_conversion' language C strict;
+
+create function mode_after_name(input /*bp1*/ in /*bp2*/ bytea, result /*bp3*/ out /*bp4*/ bytea, error /*bp5*/ out /*bp6*/ text) returns record language sql as $$ select null $$;
 
 create function commented_external() returns integer as /*bo*/ '$libdir/example' /*bp*/, /*bq*/ 'commented_external' /*br*/ language c;
 

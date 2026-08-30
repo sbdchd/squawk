@@ -287,6 +287,9 @@ select 1 isnull;
 -- notnull (non-standard syntax)
 select 'foo' notnull;
 
+-- postfix expression wrapping another expression
+select null::json is json;
+
 -- is true
 select true is true;
 

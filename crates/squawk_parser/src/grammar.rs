@@ -206,6 +206,9 @@ fn tuple_expr(p: &mut Parser<'_>) -> (CompletedMarker, ExprKind) {
         if !p.at(R_PAREN) {
             saw_comma = true;
             p.expect(COMMA);
+            if p.at(R_PAREN) {
+                p.error("expected expression after comma");
+            }
         }
     }
     p.expect(R_PAREN);
@@ -888,7 +891,7 @@ fn opt_json_table_column(p: &mut Parser<'_>) -> bool {
             // name type EXISTS [ PATH path_expression ]
             if p.eat(EXISTS_KW) {
                 opt_json_path_clause(p);
-                opt_json_behavior_clause(p);
+                opt_json_on_error_clause(p);
                 JSON_TABLE_EXISTS_COLUMN
             } else {
                 // [ FORMAT JSON [ENCODING UTF8]]
@@ -1011,7 +1014,6 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
             expr(p);
             p.expect(AS_KW);
             type_name(p);
-            opt_collate(p);
             p.expect(R_PAREN);
             m.complete(p, CAST_EXPR)
         }
@@ -1859,91 +1861,91 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
             L_BRACK => index_expr(p, lhs),
             DOT => postfix_dot_expr(p, lhs),
             AT_KW if p.at(AT_LOCAL) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(AT_LOCAL);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             ISNULL_KW => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(ISNULL_KW);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_NORMALIZED) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_NOT_NORMALIZED);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NORMALIZED) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_NORMALIZED);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_OBJECT) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_NOT_JSON_OBJECT);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_ARRAY) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_NOT_JSON_ARRAY);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_VALUE) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_NOT_JSON_VALUE);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_SCALAR) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_NOT_JSON_SCALAR);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_NOT_JSON);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_OBJECT) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_JSON_OBJECT);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_ARRAY) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_JSON_ARRAY);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_VALUE) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_JSON_VALUE);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_SCALAR) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_JSON_SCALAR);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON) => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(IS_JSON);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             NOTNULL_KW => {
-                let m = p.start();
+                let m = lhs.precede(p);
                 p.bump(NOTNULL_KW);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
@@ -3790,14 +3792,14 @@ struct DataSource {
     paren_select: Option<CompletedMarker>,
 }
 
-fn data_source(p: &mut Parser<'_>) -> DataSource {
+fn data_source(p: &mut Parser<'_>, in_parens: bool) -> DataSource {
     let only = p.eat(ONLY_KW);
     let lateral = p.eat(LATERAL_KW);
     let mut expr_kind = ExprKind::Other;
     let mut paren_select = None;
     let kind = match p.current() {
         L_PAREN => {
-            let cm = paren_data_source(p);
+            let cm = paren_data_source(p, in_parens);
             expr_kind = cm.as_ref().map_or(ExprKind::Other, |(_, kind)| *kind);
             let alias = opt_from_alias(p);
             if !only && !lateral && alias.is_none() {
@@ -4022,11 +4024,14 @@ fn xml_namespace_prefix(p: &mut Parser<'_>) {
     m.complete(p, XML_NAMESPACE_PREFIX);
 }
 
-fn paren_data_source(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
+fn paren_data_source(p: &mut Parser<'_>, in_parens: bool) -> Option<(CompletedMarker, ExprKind)> {
     assert!(p.at(L_PAREN));
     if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
-        return opt_paren_select(p, None, &SelectRestrictions::default())
-            .map(|cm| (cm, ExprKind::Select));
+        let r = SelectRestrictions {
+            trailing_clauses: in_parens,
+            ..SelectRestrictions::default()
+        };
+        return opt_paren_select(p, None, &r).map(|cm| (cm, ExprKind::Select));
     }
     let m = p.start();
     p.bump(L_PAREN);
@@ -4037,14 +4042,15 @@ fn paren_data_source(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> 
                 p.error("expected select before compound select operator");
             }
             compound_select(p, lhs, &SelectRestrictions::default());
-        } else if lhs_kind == ExprKind::Select {
-            opt_select_trailing_clauses(p);
         }
         p.expect(R_PAREN);
         let kind = match lhs_kind {
             ExprKind::Select => PAREN_SELECT,
             ExprKind::Other => PAREN_EXPR,
         };
+        if in_parens && lhs_kind == ExprKind::Select {
+            opt_select_trailing_clauses(p);
+        }
         return Some((m.complete(p, kind), lhs_kind));
     } else {
         p.error("expected table name or SELECT");
@@ -4118,7 +4124,7 @@ fn from_item(p: &mut Parser<'_>, in_parens: bool) -> Option<(CompletedMarker, Ex
         kind,
         mut expr_kind,
         paren_select,
-    } = data_source(p);
+    } = data_source(p, in_parens);
     if in_parens
         && let Some(select) = paren_select
         && !p.at_ts(JOIN_FIRST)
@@ -7565,6 +7571,16 @@ fn opt_utility_option_arg(p: &mut Parser<'_>) -> bool {
     false
 }
 
+fn opt_null_literal(p: &mut Parser<'_>) -> bool {
+    if !p.at(NULL_KW) {
+        return false;
+    }
+    let m = p.start();
+    p.bump(NULL_KW);
+    m.complete(p, LITERAL);
+    true
+}
+
 fn opt_bool_literal(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     // TOOD: add validation to check for `1` or `0` inside the INT_NUMBER
@@ -8183,7 +8199,7 @@ fn alter_routine(p: &mut Parser<'_>) -> CompletedMarker {
             depends_on_extension(p);
         }
         _ => {
-            func_option_list(p);
+            func_option_list(p, false);
         }
     }
     p.eat(RESTRICT_KW);
@@ -8361,7 +8377,7 @@ fn alter_procedure(p: &mut Parser<'_>) -> CompletedMarker {
             depends_on_extension(p);
         }
         _ => {
-            func_option_list(p);
+            func_option_list(p, false);
             p.eat(RESTRICT_KW);
         }
     }
@@ -8859,7 +8875,7 @@ fn alter_function(p: &mut Parser<'_>) -> CompletedMarker {
             depends_on_extension(p);
         }
         _ => {
-            func_option_list(p);
+            func_option_list(p, false);
         }
     }
     p.eat(RESTRICT_KW);
@@ -11340,10 +11356,17 @@ fn drop_vertex_tables(p: &mut Parser<'_>) {
 fn add_vertex_edge_tables(p: &mut Parser<'_>) {
     assert!(p.at(ADD_KW));
     let m = p.start();
-    p.bump(ADD_KW);
-    let is_vertex = opt_vertex_tables(p);
-    if p.eat(ADD_KW) || !is_vertex {
+    if p.nth_at_ts(1, VERTEX) {
+        let m = p.start();
+        p.bump(ADD_KW);
+        opt_vertex_tables(p);
+        m.complete(p, ADD_VERTEX_TABLES);
+    }
+    if p.at(ADD_KW) {
+        let m = p.start();
+        p.bump(ADD_KW);
         opt_edge_tables(p);
+        m.complete(p, ADD_EDGE_TABLES);
     }
     m.complete(p, ADD_VERTEX_EDGE_TABLES);
 }
@@ -12511,7 +12534,8 @@ fn create_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(PROCEDURE_KW);
     procedure_name(p);
     param_list(p, ParamKind::All);
-    func_option_list(p);
+    func_option_list(p, true);
+    opt_routine_body(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_PROCEDURE)
 }
@@ -13029,10 +13053,7 @@ fn create_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(MAPPING_KW);
     opt_if_not_exists(p);
     p.expect(FOR_KW);
-    // role | USER
-    if !p.eat(USER_KW) {
-        role_ref(p);
-    }
+    user_mapping_role(p);
     server_clause(p);
     opt_alter_option_list(p);
     p.eat(SEMICOLON);
@@ -13823,10 +13844,7 @@ fn drop_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(MAPPING_KW);
     opt_if_exists(p);
     p.expect(FOR_KW);
-    // role | USER
-    if !p.eat(USER_KW) {
-        role_ref(p);
-    }
+    user_mapping_role(p);
     server_clause(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_USER_MAPPING)
@@ -14740,6 +14758,16 @@ fn role_ref(p: &mut Parser<'_>) {
     if !opt_role_ref(p) {
         p.error(format!("expected role, got {:?}", p.current()))
     }
+}
+
+fn user_mapping_role(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.at(USER_KW) {
+        p.bump(USER_KW);
+    } else {
+        role_ref(p);
+    }
+    m.complete(p, USER_MAPPING_ROLE);
 }
 
 fn opt_role_ref(p: &mut Parser<'_>) -> bool {
@@ -17605,29 +17633,6 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
             m.complete(p, kind);
             AS_FUNC_OPTION
         }
-        // RETURN expression
-        RETURN_KW => {
-            p.bump(RETURN_KW);
-            if expr(p).is_none() {
-                p.error("expected expression for return");
-            }
-            RETURN_FUNC_OPTION
-        }
-        // BEGIN ATOMIC
-        //   statement;
-        //   statement;
-        //   ...
-        //   statement;
-        // END
-        BEGIN_KW => {
-            p.bump(BEGIN_KW);
-            p.expect(ATOMIC_KW);
-            while !p.at(EOF) && !p.at(END_KW) {
-                begin_func_option(p);
-            }
-            p.expect(END_KW);
-            BEGIN_FUNC_OPTION_LIST
-        }
         _ => {
             m.abandon(p);
             return false;
@@ -17643,7 +17648,7 @@ fn config_parameter_ref(p: &mut Parser<'_>) {
     m.complete(p, CONFIG_PARAMETER_REF);
 }
 
-fn begin_func_option(p: &mut Parser<'_>) {
+fn routine_body_stmt(p: &mut Parser<'_>) {
     if p.at(RETURN_KW) {
         let m = p.start();
         p.bump(RETURN_KW);
@@ -17651,7 +17656,7 @@ fn begin_func_option(p: &mut Parser<'_>) {
             p.error("expected expr")
         }
         p.expect(SEMICOLON);
-        m.complete(p, RETURN_FUNC_OPTION);
+        m.complete(p, RETURN_STMT);
     } else {
         stmt(
             p,
@@ -17708,12 +17713,39 @@ fn opt_ret_type(p: &mut Parser<'_>) {
     }
 }
 
-fn func_option_list(p: &mut Parser<'_>) {
+fn opt_routine_body(p: &mut Parser<'_>) {
+    match p.current() {
+        RETURN_KW => {
+            let m = p.start();
+            p.bump(RETURN_KW);
+            if expr(p).is_none() {
+                p.error("expected expression for return");
+            }
+            m.complete(p, RETURN_STMT);
+        }
+        BEGIN_KW => {
+            let m = p.start();
+            p.bump(BEGIN_KW);
+            p.expect(ATOMIC_KW);
+            while !p.at(EOF) && !p.at(END_KW) {
+                routine_body_stmt(p);
+            }
+            p.expect(END_KW);
+            m.complete(p, ATOMIC_BODY);
+        }
+        _ => (),
+    }
+}
+
+const ROUTINE_BODY_FIRST: TokenSet = TokenSet::new(&[RETURN_KW, BEGIN_KW]);
+
+fn func_option_list(p: &mut Parser<'_>, allow_routine_body: bool) {
     let m = p.start();
     let mut seen_func_option = false;
     while !p.at(EOF) {
         if !opt_function_option(p) {
-            if !seen_func_option {
+            let at_routine_body = allow_routine_body && p.at_ts(ROUTINE_BODY_FIRST);
+            if !seen_func_option && !at_routine_body {
                 p.error("expected function option");
             }
             break;
@@ -17794,7 +17826,8 @@ fn create_function(p: &mut Parser<'_>) -> CompletedMarker {
     function_name(p);
     param_list(p, ParamKind::All);
     opt_ret_type(p);
-    func_option_list(p);
+    func_option_list(p, true);
+    opt_routine_body(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_FUNCTION)
 }
@@ -18011,7 +18044,7 @@ fn config_value(p: &mut Parser<'_>) -> bool {
             && opt_numeric_literal(p).is_none()
             && !opt_config_value_name(p)
             && !opt_bool_literal(p)
-            && !p.eat(NULL_KW)
+            && !opt_null_literal(p)
         {
             break;
         }
@@ -18021,6 +18054,39 @@ fn config_value(p: &mut Parser<'_>) -> bool {
         }
     }
     found_value
+}
+
+fn zone_value(p: &mut Parser<'_>) -> bool {
+    match p.current() {
+        DEFAULT_KW | LOCAL_KW => {
+            p.bump_any();
+            true
+        }
+        INTERVAL_KW => {
+            interval_value(p);
+            true
+        }
+        _ => {
+            opt_string_literal(p).is_some()
+                || opt_numeric_literal(p).is_some()
+                || opt_config_value_name(p)
+        }
+    }
+}
+
+fn interval_value(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(INTERVAL_KW));
+    let m = p.start();
+    let has_precision = {
+        let m = p.start();
+        p.bump(INTERVAL_KW);
+        let has_precision = opt_interval_precision(p);
+        m.complete(p, INTERVAL_TYPE);
+        has_precision
+    };
+    string_literal(p);
+    opt_interval_trailing(p, has_precision);
+    m.complete(p, CAST_EXPR)
 }
 
 // SET [ SESSION | LOCAL ] configuration_parameter { TO | = } { value | 'value' | DEFAULT }
@@ -18046,8 +18112,8 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
         let m = p.start();
         p.bump(TIME_KW);
         p.expect(ZONE_KW);
-        if !p.eat(LOCAL_KW) && !config_value(p) {
-            p.error(format!("expected config value, got {:?}", p.current()));
+        if !zone_value(p) {
+            p.error(format!("expected time zone value, got {:?}", p.current()));
         }
         m.complete(p, SET_TIME_ZONE);
     } else if p.at(CATALOG_KW) || p.at(SCHEMA_KW) {
@@ -18759,9 +18825,11 @@ const ATTRIBUTE_VALUE_RECOVERY: TokenSet = TokenSet::new(&[COMMA]).union(EXPR_RE
 
 fn def_arg(p: &mut Parser<'_>) {
     let m = p.start();
+    let at_numeric =
+        p.at_ts(NUMERIC_FIRST) || ((p.at(MINUS) || p.at(PLUS)) && p.nth_at_ts(1, NUMERIC_FIRST));
     if opt_bool_literal(p)
         || opt_string_literal(p).is_some()
-        || opt_numeric_literal(p).is_some()
+        || (at_numeric && opt_numeric_literal(p).is_some())
         || opt_op_or_opcall(p)
         || p.eat(NONE_KW)
     {
@@ -19004,8 +19072,13 @@ fn set_data_type(p: &mut Parser<'_>) {
     p.expect(TYPE_KW);
     type_name(p);
     opt_collate(p);
-    if p.eat(USING_KW) && expr(p).is_none() {
-        p.error("expected expression");
+    if p.at(USING_KW) {
+        let m = p.start();
+        p.bump(USING_KW);
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+        m.complete(p, USING_EXPR);
     }
 }
 

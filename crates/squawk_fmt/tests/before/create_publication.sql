@@ -4,6 +4,10 @@ create publication selected_tables for table only public.accounts (id, email) wh
 
 create publication no_tables with (publish = 'insert');
 
+create publication omitted_table_keywords for table first_table, /* before omitted table */ public.second_table where (id > 100), /* before omitted only */ only third_table;
+
+create publication omitted_schema_keywords for tables in schema first_schema, /* before omitted schema */ second_schema;
+
 create /* after create */ publication /* after publication */ commented_pub
 for /* after for */ table /* after table */ only /* after only */ (/* before table name */ public.commented /* before close */) /* before star */ * /* before columns */ (/* before column */ id /* before comma */, /* after comma */ payload /* before columns close */) /* before where */ where /* before where open */ (/* before expression */ id > 0 /* before where close */), /* after object comma */ tables /* after tables */ in /* after in */ schema /* after schema */ current_schema
 with /* after with */ (/* before option */ publish /* before equals */ = /* before value */ 'insert' /* before options close */) /* before semicolon */;

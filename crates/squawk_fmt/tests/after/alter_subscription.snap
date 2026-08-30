@@ -9,6 +9,15 @@ alter subscription local_sub server publisher_server;
 alter subscription local_sub
   set (slot_name = new_slot, synchronous_commit = local);
 
+alter subscription regress_testsub4
+  set (origin = any, max_retention_duration = -1);
+
+alter subscription regress_testsub4
+  set (
+    /* before origin */ origin /* before equals */ = /* before any */ any /* after any */,
+    /* before retention */ max_retention_duration = /* before minus */ - /* before one */ 1 /* after one */
+  );
+
 alter subscription local_sub
   add publication another_publication,
     third_publication

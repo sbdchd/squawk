@@ -139,23 +139,6 @@ SOURCE_FILE
         WHITESPACE " "
         INVOKER_KW "invoker"
       WHITESPACE "\n"
-      SECURITY_INVOKER_FUNC_OPTION
-        SECURITY_KW "security"
-        WHITESPACE " "
-        INVOKER_KW "invoker"
-      WHITESPACE "\n"
-      SECURITY_DEFINER_FUNC_OPTION
-        EXTERNAL_KW "external"
-        WHITESPACE " "
-        SECURITY_KW "security"
-        WHITESPACE " "
-        DEFINER_KW "definer"
-      WHITESPACE "\n"
-      SECURITY_DEFINER_FUNC_OPTION
-        SECURITY_KW "security"
-        WHITESPACE " "
-        DEFINER_KW "definer"
-      WHITESPACE "\n"
       SET_FUNC_OPTION
         SET_CONFIG_PARAM
           SET_KW "set"
@@ -199,14 +182,145 @@ SOURCE_FILE
             FROM_KW "from"
             WHITESPACE " "
             CURRENT_KW "current"
-      WHITESPACE "\n"
+    WHITESPACE "\n"
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "10"
+        WHITESPACE " "
+        PLUS "+"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- security_variants"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+      WHITESPACE " "
+      SECURITY_INVOKER_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
         AS_DEFINITION
           LITERAL
             STRING "'foo'"
-      WHITESPACE "\n"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+      WHITESPACE " "
+      SECURITY_DEFINER_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "'foo'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+      WHITESPACE " "
+      SECURITY_DEFINER_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "'foo'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- as_with_two_strings"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          IDENT "c"
+      WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"
         WHITESPACE " "
@@ -217,18 +331,6 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'bar'"
-      WHITESPACE "\n"
-      RETURN_FUNC_OPTION
-        RETURN_KW "return"
-        WHITESPACE " "
-        BIN_EXPR
-          LITERAL
-            INT_NUMBER "10"
-          WHITESPACE " "
-          PLUS "+"
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_select_body"
@@ -257,32 +359,32 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_REF
           SQL_KW "sql"
+    WHITESPACE "\n"
+    ATOMIC_BODY
+      BEGIN_KW "begin"
+      WHITESPACE " "
+      ATOMIC_KW "atomic"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+        SEMICOLON ";"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "2"
+        SEMICOLON ";"
       WHITESPACE "\n"
-      BEGIN_FUNC_OPTION_LIST
-        BEGIN_KW "begin"
-        WHITESPACE " "
-        ATOMIC_KW "atomic"
-        WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "1"
-          SEMICOLON ";"
-        WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "2"
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        END_KW "end"
+      END_KW "end"
     SEMICOLON ";"
   WHITESPACE "\n\n"

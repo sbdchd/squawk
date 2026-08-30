@@ -10,6 +10,14 @@ create property graph social
       destination key (followed_id) references people (id)
   );
 
+create property graph social
+  vertex tables (people, organizations)
+  edge tables (
+    employment
+      /* source */ source /* source table */ people
+      /* destination */ destination /* destination table */ organizations
+  );
+
 create unlogged property graph extraordinarily_long_social_relationship_property_graph
   vertex tables (
     extraordinarily_long_people_table key (

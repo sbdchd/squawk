@@ -54,6 +54,10 @@ set role foo;
 set time zone 'America/Los_Angeles';
 set time zone default;
 set time zone local;
+set time zone utc;
+set time zone -8;
+set time zone interval '-08:00' hour to minute;
+set time zone interval(2) '-08:00';
 
 set foo from current;
 set foo.bar from current;

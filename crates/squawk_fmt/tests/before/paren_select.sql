@@ -7,3 +7,10 @@ with cte as (select 1) (select x from cte);
 with /* before recursive */ recursive /* before cte */ cte /* before as */ as /* before query open */ (/* before query */ select 1 /* before query close */) /* before outer open */ (/* before select */ select /* before target */ x /* before from */ from /* before relation */ cte /* before outer close */) /* before order */ order /* before order by */ by /* before order expression */ x /* before desc */ desc /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait /* before limit */ limit /* before limit value */ 10 /* before offset */ offset /* before offset value */ 2 /* before rows */ rows /* before semicolon */;
 
 (/* before select */ select 1 /* before close */) /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties;
+
+select * from (((select 1) union select 2) limit 1) as t;
+
+select * from (/* after outer open */ ((/* before left select */ select 1 /* before left close */) /* before union */ union /* before right select */ select 2 /* before compound close */) /* before inner limit */ limit /* before limit value */ 1 /* before outer close */) /* before alias */ as t;
+
+((select 1) limit 2) order by 3;
+(select 1) offset 1 limit 2;

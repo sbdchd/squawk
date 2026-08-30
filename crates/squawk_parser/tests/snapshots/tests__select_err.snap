@@ -1732,6 +1732,39 @@ SOURCE_FILE
             INT_NUMBER "1"
         ERROR
           COMMA ","
+  WHITESPACE "\n\n"
+  COMMENT "-- collate must follow cast"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          COLLATE
+            CAST_EXPR
+              CAST_KW "cast"
+              L_PAREN "("
+              LITERAL
+                STRING "'42'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    TEXT_KW "text"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "\"C\""
+  ERROR
+    R_PAREN ")"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected trailing comma
@@ -1966,3 +1999,11 @@ error[syntax-error]: unexpected trailing comma
     ╭▸ 
 158 │ select 1,
     ╰╴        ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+161 │ select cast('42' as text collate "C");
+    ╰╴                        ━
+error[syntax-error]: expected command, found R_PAREN
+    ╭▸ 
+161 │ select cast('42' as text collate "C");
+    ╰╴                                    ━

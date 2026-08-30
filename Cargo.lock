@@ -2450,6 +2450,7 @@ dependencies = [
  "camino",
  "clap",
  "dir-test",
+ "either",
  "insta",
  "itertools",
  "rowan",

@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_fmt/tests/before/alter_operator.sql
 ---
 alter /* operator */ operator /* signature */ public.+ /* left paren */(
@@ -11,7 +10,7 @@ alter /* operator */ operator /* signature */ public.+ /* left paren */(
 
 alter operator public.##(none, integer) set (
   restrict = schema_a.restrict_function_with_a_very_long_name,
-  "join" = schema_a.join_function_with_a_very_long_name,
+  join = schema_a.join_function_with_a_very_long_name,
   hashes,
   merges
 );

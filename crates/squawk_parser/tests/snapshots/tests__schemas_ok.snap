@@ -522,6 +522,75 @@ SOURCE_FILE
       WHITESPACE " "
       LOCAL_KW "local"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      CONFIG_VALUE_NAME
+        IDENT "utc"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        LITERAL
+          INT_NUMBER "8"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      CAST_EXPR
+        INTERVAL_TYPE
+          INTERVAL_KW "interval"
+        WHITESPACE " "
+        LITERAL
+          STRING "'-08:00'"
+        WHITESPACE " "
+        INTERVAL_MINUTE
+          HOUR_KW "hour"
+          WHITESPACE " "
+          TO_KW "to"
+          WHITESPACE " "
+          MINUTE_KW "minute"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      CAST_EXPR
+        INTERVAL_TYPE
+          INTERVAL_KW "interval"
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
+        WHITESPACE " "
+        LITERAL
+          STRING "'-08:00'"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"

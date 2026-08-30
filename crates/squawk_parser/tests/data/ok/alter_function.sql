@@ -17,20 +17,10 @@ alter function f set schema s;
 -- multiple_actions
 alter function f 
   called on null input
-  returns null on null input
-  strict
   immutable
-  stable
-  volatile
   not leakproof
-  leakproof
   external security invoker
-  security invoker
-  external security definer
-  security definer
   parallel unsafe
-  parallel restricted
-  parallel safe
   cost 100
   rows 10
   support f
@@ -41,6 +31,26 @@ alter function f
   reset c
   reset all
   restrict;
+
+-- strict_variants
+alter function f returns null on null input;
+alter function f strict;
+
+-- volatility_variants
+alter function f stable;
+alter function f volatile;
+
+-- leakproof_variants
+alter function f leakproof;
+
+-- security_variants
+alter function f security invoker;
+alter function f external security definer;
+alter function f security definer;
+
+-- parallel_variants
+alter function f parallel restricted;
+alter function f parallel safe;
 
 -- depends
 alter function f depends on extension e;

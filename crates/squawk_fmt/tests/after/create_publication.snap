@@ -21,6 +21,15 @@ create publication selected_tables
 
 create publication no_tables with (publish = 'insert');
 
+create publication omitted_table_keywords
+  for
+    table first_table,
+    /* before omitted table */ public.second_table where (id > 100),
+    /* before omitted only */ only third_table;
+
+create publication omitted_schema_keywords
+  for tables in schema first_schema, /* before omitted schema */ second_schema;
+
 create /* after create */ publication /* after publication */ commented_pub
   for
     /* after for */ table /* after table */ only  /* after only */(/* before table name */ public.commented /* before close */)/* before star */ * /* before columns */ (
