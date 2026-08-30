@@ -1,0 +1,11 @@
+---
+source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
+expression: lint_errors(sql)
+---
+warning[prefer-robust-stmts]: Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ 
+3 │ DROP TABLE old_table;
+  │ ━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+3 │ DROP TABLE if exists old_table;
+  ╰╴           +++++++++

@@ -1,4 +1,4 @@
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 use squawk_syntax::{
     Parse, SourceFile,
@@ -13,10 +13,41 @@ enum Constraint {
     Added,
 }
 
+fn is_alembic_version_update(stmt: &ast::Stmt) -> bool {
+    matches!(stmt, ast::Stmt::Update(u) if u
+        .relation_name()
+        .and_then(|rn| rn.relation_name_ref())
+        .and_then(|rnr| rnr.path_ref())
+        .and_then(|path| path.segment())
+        .is_some_and(|name| name.text().eq_ignore_ascii_case("alembic_version")))
+}
+
+fn alembic_version_commit_tx_indices(stmts: &[ast::Stmt]) -> Option<FxHashSet<usize>> {
+    let mut indices = FxHashSet::default();
+    let mut tx_start = None;
+    for (i, stmt) in stmts.iter().enumerate() {
+        match stmt {
+            ast::Stmt::Begin(_) => tx_start = Some(i),
+            ast::Stmt::Commit(_) | ast::Stmt::Rollback(_) => {
+                if let Some(start) = tx_start.take()
+                    && stmts[start..=i].iter().any(is_alembic_version_update)
+                {
+                    indices.extend(start..=i);
+                }
+            }
+            _ => {}
+        }
+    }
+    (!indices.is_empty()).then_some(indices)
+}
+
 pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
+    let stmts: Vec<ast::Stmt> = file.stmts().collect();
     let mut inside_transaction = ctx.settings.assume_in_transaction;
     let mut constraint_names: FxHashMap<String, Constraint> = FxHashMap::default();
+
+    let version_tx_indices = alembic_version_commit_tx_indices(&stmts);
 
     enum ActionErrorMessage {
         IfExists,
@@ -24,7 +55,12 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         None,
     }
 
-    for stmt in file.stmts() {
+    for (i, stmt) in stmts.iter().enumerate() {
+        let in_robust_tx = match &version_tx_indices {
+            Some(set) => ctx.settings.assume_in_transaction || set.contains(&i),
+            None => inside_transaction,
+        };
+
         match stmt {
             ast::Stmt::Begin(_) => {
                 inside_transaction = true;
@@ -107,7 +143,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         _ => (ActionErrorMessage::None, None),
                     };
 
-                    if inside_transaction {
+                    if in_robust_tx {
                         continue;
                     }
 
@@ -132,7 +168,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::CreateIndex(create_index)
                 if create_index.if_not_exists().is_none()
                     && create_index.index().is_some()
-                    && (create_index.concurrently_token().is_some() || !inside_transaction) =>
+                    && (create_index.concurrently_token().is_some() || !in_robust_tx) =>
             {
                 let fix = create_index.index().map(|index| {
                     let at = index.syntax().text_range().start();
@@ -146,7 +182,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 ).help("Use an explicit name for a concurrently created index").fix(fix));
             }
             ast::Stmt::CreateTable(create_table)
-                if create_table.if_not_exists().is_none() && !inside_transaction =>
+                if create_table.if_not_exists().is_none() && !in_robust_tx =>
             {
                 let is_temp = create_table
                     .persistence()
@@ -173,7 +209,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 ).fix(fix));
             }
             ast::Stmt::DropIndex(drop_index)
-                if drop_index.if_exists().is_none() && !inside_transaction =>
+                if drop_index.if_exists().is_none() && !in_robust_tx =>
             {
                 let fix = drop_index.index_refs().next().map(|first_index| {
                     let at = first_index.syntax().text_range().start();
@@ -188,7 +224,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 ).fix(fix));
             }
             ast::Stmt::DropTable(drop_table)
-                if drop_table.if_exists().is_none() && !inside_transaction =>
+                if drop_table.if_exists().is_none() && !in_robust_tx =>
             {
                 let fix = drop_table.table_token().map(|table_token| {
                     let at = table_token.text_range().end();
@@ -201,9 +237,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     drop_table.syntax(),
                 ).fix(fix));
             }
-            ast::Stmt::DropType(drop_type)
-                if drop_type.if_exists().is_none() && !inside_transaction =>
-            {
+            ast::Stmt::DropType(drop_type) if drop_type.if_exists().is_none() && !in_robust_tx => {
                 let fix = drop_type.type_token().map(|type_token| {
                     let at = type_token.text_range().end();
                     let edit = Edit::insert(" if exists", at);
@@ -243,6 +277,105 @@ mod test {
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {
         crate::test_utils::lint_ok_with(sql, settings, Rule::PreferRobustStmts);
+    }
+
+    #[test]
+    fn alembic_add_column_in_separate_transaction_err() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE t ADD COLUMN test_column TEXT;
+COMMIT;
+
+SELECT 1;
+
+BEGIN;
+UPDATE alembic_version SET version_num='bbc810e82b46' WHERE alembic_version.version_num = 'b4d17e0c93aa';
+COMMIT;
+        "#;
+        assert_snapshot!(lint_errors(sql));
+    }
+
+    #[test]
+    fn alembic_add_column_with_if_not_exists_in_separate_transaction_ok() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE t ADD COLUMN IF NOT EXISTS test_column TEXT;
+COMMIT;
+
+BEGIN;
+UPDATE alembic_version SET version_num='bbc810e82b46' WHERE alembic_version.version_num = 'b4d17e0c93aa';
+COMMIT;
+        "#;
+        lint_ok(sql);
+    }
+
+    #[test]
+    fn alembic_add_column_in_version_transaction_ok() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE t ADD COLUMN test_column TEXT;
+UPDATE alembic_version SET version_num='bbc810e82b46' WHERE alembic_version.version_num = 'b4d17e0c93aa';
+COMMIT;
+        "#;
+        lint_ok(sql);
+    }
+
+    #[test]
+    fn alembic_multiple_migrations_in_own_transactions_ok() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE t ADD COLUMN a TEXT;
+UPDATE alembic_version SET version_num='v2' WHERE version_num='v1';
+COMMIT;
+
+BEGIN;
+ALTER TABLE t ADD COLUMN b TEXT;
+UPDATE alembic_version SET version_num='v3' WHERE version_num='v2';
+COMMIT;
+        "#;
+        lint_ok(sql);
+    }
+
+    #[test]
+    fn alembic_drop_table_in_separate_transaction_err() {
+        let sql = r#"
+BEGIN;
+DROP TABLE old_table;
+COMMIT;
+
+BEGIN;
+UPDATE alembic_version SET version_num='abc';
+COMMIT;
+        "#;
+        assert_snapshot!(lint_errors(sql));
+    }
+
+    #[test]
+    fn alembic_drop_table_with_if_exists_in_separate_transaction_ok() {
+        let sql = r#"
+BEGIN;
+DROP TABLE IF EXISTS old_table;
+COMMIT;
+
+BEGIN;
+UPDATE alembic_version SET version_num='abc';
+COMMIT;
+        "#;
+        lint_ok(sql);
+    }
+
+    #[test]
+    fn alembic_create_index_in_separate_transaction_err() {
+        let sql = r#"
+BEGIN;
+CREATE INDEX foo_idx ON bar (baz);
+COMMIT;
+
+BEGIN;
+UPDATE alembic_version SET version_num='abc';
+COMMIT;
+        "#;
+        assert_snapshot!(lint_errors(sql));
     }
 
     #[test]

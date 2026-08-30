@@ -1,0 +1,13 @@
+---
+source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
+expression: lint_errors(sql)
+---
+warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ 
+3 │ CREATE INDEX foo_idx ON bar (baz);
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Use an explicit name for a concurrently created index
+  ╭╴
+3 │ CREATE INDEX if not exists foo_idx ON bar (baz);
+  ╰╴             +++++++++++++
