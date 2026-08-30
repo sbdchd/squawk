@@ -246,7 +246,6 @@ pub(crate) fn schema_and_type_name(ty: &ast::Type) -> Option<(Option<Schema>, Na
             };
             Some((None, Name::from_string(name)))
         }
-        ast::Type::PercentType(_) => None,
     }
 }
 

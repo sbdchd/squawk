@@ -54,7 +54,7 @@ as '' language 'sql';
 
 -- returns table
 create function f()
-returns table (a text, b int)
+returns table (a text, b int, c t.c%type)
 as '' language sql;
 
 -- transform

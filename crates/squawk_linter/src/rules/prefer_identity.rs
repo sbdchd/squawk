@@ -44,7 +44,6 @@ fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
         | ast::Type::CharacterType(_)
         | ast::Type::DoubleType(_)
         | ast::Type::ExprType(_)
-        | ast::Type::PercentType(_)
         | ast::Type::TimeType(_)
         | ast::Type::TimestampType(_)
         | ast::Type::IntervalType(_) => return None,

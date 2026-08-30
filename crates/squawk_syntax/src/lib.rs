@@ -231,9 +231,9 @@ fn api_walkthrough() {
 
     // return
     let ret_type: Option<ast::RetType> = func.ret_type();
-    let r_ty = &ret_type.unwrap().ty().unwrap();
-    let type_: &ast::PathType = match &r_ty {
-        ast::Type::PathType(r) => r,
+    let r_ty = ret_type.unwrap().func_type().unwrap();
+    let type_: ast::PathType = match r_ty {
+        ast::FuncType::Type(ast::Type::PathType(r)) => r,
         _ => unreachable!(),
     };
     let type_path: ast::PathRef = type_.path_ref().unwrap();
@@ -246,7 +246,7 @@ fn api_walkthrough() {
     let param_name: ast::ParamName = param.name().unwrap();
     assert_eq!(param_name.syntax().to_string(), "p");
 
-    let param_ty: ast::Type = param.ty().unwrap();
+    let param_ty: ast::FuncType = param.func_type().unwrap();
     assert_eq!(param_ty.syntax().to_string(), "int8");
 
     let func_option_list: ast::FuncOptionList = func.option_list().unwrap();

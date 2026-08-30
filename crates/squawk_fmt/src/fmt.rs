@@ -1943,13 +1943,13 @@ fn build_function_param<'a>(param: ast::Param) -> Doc<'a> {
             }
         });
     }
-    if let Some(ty) = param.ty() {
+    if let Some(func_type) = param.func_type() {
         if has_prefix {
             doc = doc.append(Doc::space());
         }
         doc = doc
-            .append(leading_comments(ty.syntax()))
-            .append(build_type(ty));
+            .append(leading_comments(func_type.syntax()))
+            .append(build_func_type(func_type));
     }
     if let Some(default) = param.param_default() {
         doc = doc
@@ -1982,10 +1982,10 @@ fn build_function_ret_type<'a>(ret_type: ast::RetType) -> Doc<'a> {
             .append(leading_comments_token(&table_token))
             .append(Doc::text("table"));
     }
-    if let Some(args) = ret_type.table_arg_list() {
+    if let Some(args) = ret_type.return_table_arg_list() {
         let mut body = Doc::list(
             Itertools::intersperse(
-                args.args().map(build_table_arg),
+                args.args().map(build_return_table_column),
                 Doc::text(",").append(Doc::line_or_space()),
             )
             .collect(),
@@ -2007,13 +2007,30 @@ fn build_function_ret_type<'a>(ret_type: ast::RetType) -> Doc<'a> {
             .append(Doc::space())
             .append(leading_comments(args.syntax()))
             .append(args_doc);
-    } else if let Some(ty) = ret_type.ty() {
+    } else if let Some(func_type) = ret_type.func_type() {
         doc = doc
             .append(Doc::space())
-            .append(leading_comments(ty.syntax()))
-            .append(build_type(ty));
+            .append(leading_comments(func_type.syntax()))
+            .append(build_func_type(func_type));
     }
     doc
+}
+
+fn build_return_table_column<'a>(column: ast::ReturnTableColumn) -> Doc<'a> {
+    let syntax = column.syntax().clone();
+    let mut doc = column
+        .name()
+        .map(|name| build_name(name.syntax()))
+        .unwrap_or_else(Doc::nil);
+    if let Some(func_type) = column.func_type() {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(func_type.syntax()))
+            .append(build_func_type(func_type));
+    }
+    leading_comments(&syntax)
+        .append(doc)
+        .append(trailing_comments(&syntax))
 }
 
 fn build_function_option<'a>(option: ast::FuncOption) -> Doc<'a> {
@@ -22685,6 +22702,34 @@ fn format_string_token(t: &SyntaxToken) -> String {
     }
 }
 
+fn build_func_type<'a>(func_type: ast::FuncType) -> Doc<'a> {
+    match func_type {
+        ast::FuncType::PercentType(percent_type) => build_percent_type(percent_type),
+        ast::FuncType::Type(ty) => build_type(ty),
+    }
+}
+
+fn build_percent_type<'a>(percent_type: ast::PercentType) -> Doc<'a> {
+    let mut doc = build_setof(percent_type.setof_token());
+    if let Some(path) = percent_type.path_ref() {
+        doc = doc
+            .append(leading_comments(path.syntax()))
+            .append(build_path_ref(&path));
+    }
+    if let Some(clause) = percent_type.percent_type_clause() {
+        doc = doc.append(comments_before(clause.syntax().clone()));
+        if clause.percent_token().is_some() {
+            doc = doc.append(Doc::text("%"));
+        }
+        if let Some(type_token) = clause.type_token() {
+            doc = doc
+                .append(comments_before(type_token))
+                .append(Doc::text("type"));
+        }
+    }
+    doc
+}
+
 fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
     match ty {
         ast::Type::ArrayType(array_type) => {
@@ -22753,26 +22798,6 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
                 doc = doc.append(comments_before(arg_list.syntax().clone()));
             }
             doc.append(build_type_args(arg_list))
-        }
-        ast::Type::PercentType(percent_type) => {
-            let mut doc = build_setof(percent_type.setof_token());
-            if let Some(path) = percent_type.path_ref() {
-                doc = doc
-                    .append(leading_comments(path.syntax()))
-                    .append(build_path_ref(&path));
-            }
-            if let Some(clause) = percent_type.percent_type_clause() {
-                doc = doc.append(comments_before(clause.syntax().clone()));
-                if clause.percent_token().is_some() {
-                    doc = doc.append(Doc::text("%"));
-                }
-                if let Some(type_token) = clause.type_token() {
-                    doc = doc
-                        .append(comments_before(type_token))
-                        .append(Doc::text("type"));
-                }
-            }
-            doc
         }
         ast::Type::TimeType(time_type) => {
             let mut doc = build_setof(time_type.setof_token());

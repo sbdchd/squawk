@@ -10,6 +10,10 @@ create function option_examples(in first integer, out second text, inout third b
 
 create function returns_null_on_null_input_example() returns text returns null on null input language sql as $$ select null::text $$;
 
+create function percent_type_param(value accounts.id%type) returns accounts.id%type language sql as $$ select value $$;
+
+create function percent_type_table(unused integer) returns table (value accounts /*pct1*/. id /*pct2*/% /*pct3*/type) language sql as $$ select 1 $$;
+
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/. /*f*/ commented
 (/*g*/ in /*h*/ value /*i*/ integer /*j*/ default /*k*/ 1 /*l*/, /*m*/ out /*n*/ result /*o*/ text /*p*/)

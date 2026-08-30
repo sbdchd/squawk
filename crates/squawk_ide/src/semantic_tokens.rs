@@ -149,7 +149,6 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
                 out.push_type(token.into());
             }
         }
-        ast::Type::PercentType(_) => (),
         ast::Type::TimeType(time_type) => {
             if let Some(token) = time_type.setof_token() {
                 out.push_type(token.into());

@@ -74,6 +74,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::REINDEX_OPTION_LIST,
     SyntaxKind::RELATION_LIST,
     SyntaxKind::RETURNING_OPTION_LIST,
+    SyntaxKind::RETURN_TABLE_ARG_LIST,
     SyntaxKind::REVOKE_COMMAND_LIST,
     SyntaxKind::ROLE_REF_LIST,
     SyntaxKind::ROW_LIST,
