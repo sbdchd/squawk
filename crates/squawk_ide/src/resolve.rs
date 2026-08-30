@@ -4963,13 +4963,11 @@ fn count_columns_for_call_expr_return_table(
         .ancestors()
         .find_map(ast::CreateFunction::cast)?;
 
-    if let Some(table_arg_list) = create_function.ret_type().and_then(|r| r.table_arg_list()) {
-        return Some(
-            table_arg_list
-                .args()
-                .filter(|arg| matches!(arg, ast::TableArg::Column(_)))
-                .count(),
-        );
+    if let Some(return_table_arg_list) = create_function
+        .ret_type()
+        .and_then(|ret_type| ret_type.return_table_arg_list())
+    {
+        return Some(return_table_arg_list.args().count());
     }
 
     if let Some(param_list) = create_function.param_list() {
@@ -4987,7 +4985,9 @@ fn count_columns_for_call_expr_return_table(
         }
     }
 
-    if let Some(ast::Type::PathType(path_type)) = create_function.ret_type().and_then(|r| r.ty())
+    if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = create_function
+        .ret_type()
+        .and_then(|ret_type| ret_type.func_type())
         && let Some(path) = path_type.path_ref()
         && let Some(column_count) =
             count_columns_for_path(db, InFile::new(function_loc.file, &path)).or_else(|| {
@@ -5019,21 +5019,20 @@ fn resolve_column_from_call_expr_return_table(
         .find_map(ast::CreateFunction::cast)?;
 
     // `returns table(col ...)`
-    if let Some(table_arg_list) = create_function.ret_type().and_then(|r| r.table_arg_list()) {
-        let mut index = 0usize;
-        for arg in table_arg_list.args() {
-            if let ast::TableArg::Column(column) = arg {
-                if let Some(name) = column.name()
-                    && Name::from_node(&name) == *column_name
-                    && index >= min_index
-                {
-                    return Some(smallvec![Location::new(
-                        file,
-                        name.syntax().text_range(),
-                        LocationKind::Column
-                    )]);
-                }
-                index += 1;
+    if let Some(return_table_arg_list) = create_function
+        .ret_type()
+        .and_then(|ret_type| ret_type.return_table_arg_list())
+    {
+        for (index, column) in return_table_arg_list.args().enumerate() {
+            if let Some(name) = column.name()
+                && Name::from_node(&name) == *column_name
+                && index >= min_index
+            {
+                return Some(smallvec![Location::new(
+                    file,
+                    name.syntax().text_range(),
+                    LocationKind::Column
+                )]);
             }
         }
     }
@@ -5063,7 +5062,9 @@ fn resolve_column_from_call_expr_return_table(
     }
 
     // `returns setof <table>` or `returns setof <composite type>`
-    if let Some(ast::Type::PathType(path_type)) = create_function.ret_type().and_then(|r| r.ty())
+    if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = create_function
+        .ret_type()
+        .and_then(|ret_type| ret_type.func_type())
         && let Some(path) = path_type.path_ref()
     {
         if let Some(ptr) =
@@ -5191,7 +5192,7 @@ fn resolve_symbol_info_from_parts(
 fn param_signature(node: &ast::HasParamList) -> Option<Vec<Name>> {
     let mut params = vec![];
     for param in node.param_list()?.all_params() {
-        if let Some(ast::Type::PathType(path_type)) = param.ty()
+        if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = param.func_type()
             && let Some(name_ref) = path_type.path_ref().and_then(|x| x.segment())
         {
             params.push(Name::from_node(&name_ref));

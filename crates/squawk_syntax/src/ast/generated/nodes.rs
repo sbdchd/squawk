@@ -18549,6 +18549,10 @@ pub struct Param {
 }
 impl Param {
     #[inline]
+    pub fn func_type(&self) -> Option<FuncType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn mode(&self) -> Option<ParamMode> {
         support::child(&self.syntax)
     }
@@ -18558,10 +18562,6 @@ impl Param {
     }
     #[inline]
     pub fn param_default(&self) -> Option<ParamDefault> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
     }
 }
@@ -21671,11 +21671,11 @@ pub struct RetType {
 }
 impl RetType {
     #[inline]
-    pub fn table_arg_list(&self) -> Option<TableArgList> {
+    pub fn func_type(&self) -> Option<FuncType> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn ty(&self) -> Option<Type> {
+    pub fn return_table_arg_list(&self) -> Option<ReturnTableArgList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21704,6 +21704,40 @@ impl ReturnStmt {
     #[inline]
     pub fn return_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RETURN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReturnTableArgList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ReturnTableArgList {
+    #[inline]
+    pub fn args(&self) -> AstChildren<ReturnTableColumn> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReturnTableColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ReturnTableColumn {
+    #[inline]
+    pub fn func_type(&self) -> Option<FuncType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<ColumnName> {
+        support::child(&self.syntax)
     }
 }
 
@@ -28954,6 +28988,12 @@ pub enum FuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum FuncType {
+    PercentType(PercentType),
+    Type(Type),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GeneratedAs {
     GeneratedIdentity(GeneratedIdentity),
     GeneratedStored(GeneratedStored),
@@ -29939,7 +29979,6 @@ pub enum Type {
     ExprType(ExprType),
     IntervalType(IntervalType),
     PathType(PathType),
-    PercentType(PercentType),
     TimeType(TimeType),
     TimestampType(TimestampType),
     VarcharType(VarcharType),
@@ -48346,6 +48385,42 @@ impl AstNode for ReturnStmt {
         &self.syntax
     }
 }
+impl AstNode for ReturnTableArgList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RETURN_TABLE_ARG_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ReturnTableColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RETURN_TABLE_COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ReturningClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -63144,6 +63219,38 @@ impl From<WindowFuncOption> for FuncOption {
         FuncOption::WindowFuncOption(node)
     }
 }
+impl AstNode for FuncType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::PERCENT_TYPE) || Type::can_cast(kind)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PERCENT_TYPE => FuncType::PercentType(PercentType { syntax }),
+            _ => {
+                if let Some(result) = Type::cast(syntax.clone()) {
+                    return Some(FuncType::Type(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            FuncType::PercentType(it) => &it.syntax,
+            FuncType::Type(it) => it.syntax(),
+        }
+    }
+}
+impl From<PercentType> for FuncType {
+    #[inline]
+    fn from(node: PercentType) -> FuncType {
+        FuncType::PercentType(node)
+    }
+}
 impl AstNode for GeneratedAs {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -70893,7 +71000,6 @@ impl AstNode for Type {
                 | SyntaxKind::EXPR_TYPE
                 | SyntaxKind::INTERVAL_TYPE
                 | SyntaxKind::PATH_TYPE
-                | SyntaxKind::PERCENT_TYPE
                 | SyntaxKind::TIME_TYPE
                 | SyntaxKind::TIMESTAMP_TYPE
                 | SyntaxKind::VARCHAR_TYPE
@@ -70910,7 +71016,6 @@ impl AstNode for Type {
             SyntaxKind::EXPR_TYPE => Type::ExprType(ExprType { syntax }),
             SyntaxKind::INTERVAL_TYPE => Type::IntervalType(IntervalType { syntax }),
             SyntaxKind::PATH_TYPE => Type::PathType(PathType { syntax }),
-            SyntaxKind::PERCENT_TYPE => Type::PercentType(PercentType { syntax }),
             SyntaxKind::TIME_TYPE => Type::TimeType(TimeType { syntax }),
             SyntaxKind::TIMESTAMP_TYPE => Type::TimestampType(TimestampType { syntax }),
             SyntaxKind::VARCHAR_TYPE => Type::VarcharType(VarcharType { syntax }),
@@ -70931,7 +71036,6 @@ impl AstNode for Type {
             Type::ExprType(it) => &it.syntax,
             Type::IntervalType(it) => &it.syntax,
             Type::PathType(it) => &it.syntax,
-            Type::PercentType(it) => &it.syntax,
             Type::TimeType(it) => &it.syntax,
             Type::TimestampType(it) => &it.syntax,
             Type::VarcharType(it) => &it.syntax,
@@ -70984,12 +71088,6 @@ impl From<PathType> for Type {
     #[inline]
     fn from(node: PathType) -> Type {
         Type::PathType(node)
-    }
-}
-impl From<PercentType> for Type {
-    #[inline]
-    fn from(node: PercentType) -> Type {
-        Type::PercentType(node)
     }
 }
 impl From<TimeType> for Type {

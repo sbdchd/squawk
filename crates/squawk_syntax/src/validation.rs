@@ -29,7 +29,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::Do(it) => validate_do(it, errors),
                 ast::FuncOptionList(it) => validate_func_option_list(it, errors),
                 ast::FromAlias(it) => validate_non_empty_column_list(it.columns(), errors),
-                ast::RetType(it) => validate_non_empty_column_list(it.table_arg_list(), errors),
+                ast::RetType(it) => validate_non_empty_column_list(it.return_table_arg_list(), errors),
                 ast::WithTable(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),

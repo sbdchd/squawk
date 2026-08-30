@@ -177,9 +177,6 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 return name_from_type(inner_ty, unknown_column);
             }
         }
-        // we shouldn't ever hit this since the following isn't valid syntax:
-        // select cast('foo' as t.a%TYPE);
-        ast::Type::PercentType(_) => return None,
         ast::Type::ExprType(expr_type) => {
             if let Some(expr) = expr_type.expr() {
                 return name_from_expr(expr, true).map(|(column, node)| {
@@ -680,9 +677,6 @@ fn examples() {
 
     // interval types
     assert_snapshot!(name("cast('1 hour' as interval hour to minute)"), @"interval");
-
-    // percent types
-    assert_snapshot!(name("cast(foo as schema.%TYPE)"), @"foo");
 
     // time types
     assert_snapshot!(name("cast('12:00:00' as time(6) without time zone)"), @"time");

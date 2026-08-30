@@ -2176,9 +2176,10 @@ fn type_mods(
     p: &mut Parser<'_>,
     m: Marker,
     type_args_enabled: bool,
+    percent_type_enabled: bool,
     kind: SyntaxKind,
 ) -> Option<CompletedMarker> {
-    if opt_percent_type(p).is_some() {
+    if percent_type_enabled && opt_percent_type(p).is_some() {
         return Some(m.complete(p, PERCENT_TYPE));
     }
     if p.at(L_PAREN) && type_args_enabled && allows_type_mods(kind) {
@@ -2265,7 +2266,11 @@ SimpleTypename is:
 
 */
 #[must_use]
-fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<CompletedMarker> {
+fn opt_type_name_with(
+    p: &mut Parser<'_>,
+    type_args_enabled: bool,
+    percent_type_enabled: bool,
+) -> Option<CompletedMarker> {
     if !p.at_ts(TYPE_NAME_FIRST) {
         return None;
     }
@@ -2326,7 +2331,7 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
             return None;
         }
     };
-    type_mods(p, m, type_args_enabled, wrapper_type)
+    type_mods(p, m, type_args_enabled, percent_type_enabled, wrapper_type)
 }
 
 fn opt_with_timezone(p: &mut Parser<'_>) {
@@ -2347,7 +2352,7 @@ fn opt_with_timezone(p: &mut Parser<'_>) {
 }
 
 fn opt_type_name(p: &mut Parser<'_>) -> bool {
-    opt_type_name_with(p, true).is_some()
+    opt_type_name_with(p, true, false).is_some()
 }
 
 fn type_name(p: &mut Parser<'_>) {
@@ -2356,8 +2361,14 @@ fn type_name(p: &mut Parser<'_>) {
     }
 }
 
+fn func_type(p: &mut Parser<'_>) {
+    if opt_type_name_with(p, true, true).is_none() {
+        p.error("expected type name");
+    }
+}
+
 fn simple_type_name(p: &mut Parser<'_>) {
-    if opt_type_name_with(p, false).is_none() {
+    if opt_type_name_with(p, false, false).is_none() {
         p.error("expected simple type name");
     }
 }
@@ -17435,18 +17446,18 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
                     _ => false,
                 };
                 if at_type {
-                    type_name(p);
+                    func_type(p);
                 } else {
                     param_name(p);
                     if !param_mode_seen {
                         opt_param_mode(p);
                     }
                     // argtype
-                    type_name(p);
+                    func_type(p);
                 }
             } else {
                 // argtype
-                type_name(p);
+                func_type(p);
             }
             opt_param_default(p);
         }
@@ -17693,6 +17704,31 @@ fn reset_config_param(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, RESET_CONFIG_PARAM)
 }
 
+fn return_table_column(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(NAME_FIRST) {
+        return false;
+    }
+    let m = p.start();
+    column_name(p);
+    func_type(p);
+    m.complete(p, RETURN_TABLE_COLUMN);
+    true
+}
+
+fn return_table_arg_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        NAME_FIRST,
+        return_table_column,
+    );
+    m.complete(p, RETURN_TABLE_ARG_LIST);
+}
+
 fn opt_ret_type(p: &mut Parser<'_>) {
     // [ RETURNS rettype
     //       | RETURNS TABLE ( column_name column_type [, ...] ) ]
@@ -17700,12 +17736,12 @@ fn opt_ret_type(p: &mut Parser<'_>) {
     if p.eat(RETURNS_KW) {
         if p.eat(TABLE_KW) {
             if p.at(L_PAREN) {
-                table_arg_list(p);
+                return_table_arg_list(p);
             } else {
-                p.error("expected table arg list");
+                p.error("expected return table arg list");
             }
         } else {
-            type_name(p);
+            func_type(p);
         }
         m.complete(p, RET_TYPE);
     } else {

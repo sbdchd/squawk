@@ -1887,7 +1887,9 @@ fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
     let def_node = def.to_node(db)?;
     let param = def_node.ancestors().find_map(ast::Param::cast)?;
     let param_name = param.name().map(|name| Name::from_node(&name))?;
-    let param_type = param.ty().map(|ty| ty.syntax().text().to_string());
+    let param_type = param
+        .func_type()
+        .map(|func_type| func_type.syntax().text().to_string());
 
     for ancestor in def_node.ancestors() {
         if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {

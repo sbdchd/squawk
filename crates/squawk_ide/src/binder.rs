@@ -2099,8 +2099,7 @@ fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Nam
     let param_list = param_list?;
     let mut params = vec![];
     for param in param_list.all_params() {
-        if let Some(ty) = param.ty()
-            && let ast::Type::PathType(path_type) = ty
+        if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = param.func_type()
             && let Some(path) = path_type.path_ref()
             && let Some(segment) = path.segment()
         {

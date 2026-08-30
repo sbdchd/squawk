@@ -59,7 +59,7 @@ ParamDefault =
  ('default' | '=') Expr
 
 Param =
-  mode:ParamMode? name:ParamName? Type ParamDefault?
+  mode:ParamMode? name:ParamName? FuncType ParamDefault?
 
 ParamName =
   '#name'?
@@ -835,7 +835,6 @@ IntervalSecond =
 
 Type =
   ArrayType
-| PercentType
 | PathType
 // TODO: I think we can probably simplify the AST nodes for Types & Exprs.
 | ExprType
@@ -847,6 +846,10 @@ Type =
 | TimeType
 | TimestampType
 | IntervalType
+
+FuncType =
+  Type
+| PercentType
 
 TypeName =
   Path
@@ -1990,7 +1993,13 @@ OrReplace =
   'or' 'replace'
 
 RetType =
-  'returns' ('table' TableArgList | Type)
+  'returns' ('table' ReturnTableArgList | FuncType)
+
+ReturnTableArgList =
+  '(' args:(ReturnTableColumn (',' ReturnTableColumn)*)? ')'
+
+ReturnTableColumn =
+  name:ColumnName FuncType
 
 AtomicBody =
   'begin' 'atomic'

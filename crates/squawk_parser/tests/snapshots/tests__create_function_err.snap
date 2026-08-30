@@ -23,9 +23,9 @@ SOURCE_FILE
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "
-      TABLE_ARG_LIST
+      RETURN_TABLE_ARG_LIST
         L_PAREN "("
-        COLUMN
+        RETURN_TABLE_COLUMN
           COLUMN_NAME
             IDENT "a"
           WHITESPACE " "
@@ -34,7 +34,7 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 TEXT_KW "text"
         WHITESPACE "  "
-        COLUMN
+        RETURN_TABLE_COLUMN
           COLUMN_NAME
             IDENT "b"
           WHITESPACE " "
