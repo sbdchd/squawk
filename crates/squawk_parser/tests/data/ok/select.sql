@@ -536,3 +536,10 @@ from varchar_tbl;
 select (select ((((1)))) union select 1);
 select ((((select (1)))) union select 1);
 select (select (select 1) union select 1);
+
+-- trailing clauses after a from-item subquery belong to the outer select
+select * from (select 1) limit 5;
+select * from (select 1) t limit 5;
+
+-- but inside the parens they belong to the subquery
+select * from ((select 1) limit 1) t;

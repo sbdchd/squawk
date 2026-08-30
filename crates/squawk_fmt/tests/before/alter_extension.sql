@@ -1,0 +1,79 @@
+alter extension hstore update;
+
+alter extension hstore update to '1.8';
+
+alter extension hstore set schema extensions;
+
+alter extension hstore add access method custom_heap;
+
+alter extension hstore add aggregate public.total(integer);
+
+alter extension hstore add cast (integer as text);
+
+alter extension hstore add collation public.english;
+
+alter extension hstore add conversion public.latin_conversion;
+
+alter extension hstore add database app_db;
+
+alter extension hstore add domain public.email_address;
+
+alter extension hstore add event trigger ddl_audit;
+
+alter extension hstore add extension dependent_extension;
+
+alter extension hstore add foreign data wrapper app_fdw;
+
+alter extension hstore add foreign table public.remote_accounts;
+
+alter extension hstore add function public.calculate(integer, text);
+
+alter extension hstore add index public.accounts_email_idx;
+
+alter extension hstore add procedural language plpgsql;
+
+alter extension hstore add materialized view public.account_totals;
+
+alter extension hstore add operator public.=== (integer, integer);
+
+alter extension hstore add operator class public.custom_ops using btree;
+
+alter extension hstore add operator family public.custom_family using btree;
+
+alter extension hstore add procedure public.refresh_accounts(integer);
+
+alter extension hstore add publication account_changes;
+
+alter extension hstore add role app_owner;
+
+alter extension hstore add routine public.normalize(text);
+
+alter extension hstore add schema application;
+
+alter extension hstore add sequence public.account_ids;
+
+alter extension hstore add server remote_server;
+
+alter extension hstore add statistics public.account_stats;
+
+alter extension hstore add subscription account_subscription;
+
+alter extension hstore drop table public.old_accounts;
+
+alter extension hstore add tablespace fast_storage;
+
+alter extension hstore add text search configuration public.english_config;
+
+alter extension hstore add text search dictionary public.english_dict;
+
+alter extension hstore add text search parser public.english_parser;
+
+alter extension hstore add text search template public.english_template;
+
+alter extension hstore add transform for jsonb language plpgsql;
+
+alter extension hstore add type public.account_state;
+
+alter extension hstore add view public.active_accounts;
+
+alter /* extension */ extension /* name */ an_exceedingly_long_extension_name_for_application_features /* action */ add /* object kind */ operator /* operator name */ application_schema.=== /* open paren */ (/* left type */ application_schema.exceedingly_long_left_operand_type, /* right type */ application_schema.exceedingly_long_right_operand_type /* close paren */) /* semicolon */;

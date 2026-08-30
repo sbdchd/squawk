@@ -1,0 +1,31 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_materialized_view.sql
+---
+alter /* materialized */ materialized /* view */ view
+  /* all */ all /* in */ in /* tablespace */ tablespace /* old */ old_materialized_view_tablespace
+    /* owned */ owned /* by */ by /* role */ analytics_owner_with_a_very_long_name
+    /* set */ set /* tablespace */ tablespace /* new */ new_materialized_view_tablespace
+    /* nowait */ nowait/* end */;
+
+alter materialized view /* if */ if /* exists */ exists /* view */ reporting.materialized_view_with_a_very_long_descriptive_name
+  /* alter */ alter /* column */ column /* name */ measured_value
+    /* set */ set /* statistics */ statistics /* value */ 1000,
+  /* owner */ owner /* to */ to /* role */ analytics_owner_with_a_very_long_name;
+
+alter materialized view reporting.summary
+  /* rename */ rename /* column */ column /* old */ old_column /* to */ to /* new */ new_column;
+
+alter materialized view reporting.summary
+  /* rename */ rename /* to */ to /* view */ renamed_summary;
+
+alter materialized view reporting.summary
+  /* set */ set /* schema */ schema /* name */ archive;
+
+alter materialized view reporting.summary
+  /* depends */ depends /* on */ on /* extension */ extension /* name */ tablefunc;
+
+alter materialized view reporting.summary
+  /* no */ no /* depends */ depends /* on */ on /* extension */ extension /* name */ tablefunc;
+
+alter materialized view reporting.summary set (fillfactor = 80);

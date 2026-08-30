@@ -1,0 +1,6 @@
+drop policy account_policy on public.accounts;
+
+drop policy if exists extraordinarily_long_policy_name_for_customer_account_management on extraordinarily_long_schema_name.extraordinarily_long_customer_accounts_table cascade;
+
+-- comments in every position
+drop /* policy */ policy /* if */ if /* exists */ exists /* policy name */ account_policy /* on */ on /* table schema */ public /* dot */ . accounts /* behavior */ restrict /* end */;

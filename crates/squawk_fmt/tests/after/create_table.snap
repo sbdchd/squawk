@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_fmt/tests/before/create_table.sql
 ---
 create table u ();
@@ -118,7 +117,7 @@ create table column_option_comments (
     /*c*/ storage /*d*/ external
     /*e*/ compression /*f*/ lz4
     /*g*/ with /*h*/ options
-    /*i*/ options /*j*/(
+    /*i*/ options /*j*/ (
       /*k*/ add /*l*/ formatter /*m*/ 'x' /*n*/,
       /*o*/ set /*p*/ formatter /*q*/ 'y' /*r*/,
       /*s*/ drop /*t*/ formatter /*u*/
@@ -134,4 +133,22 @@ create table column_option_comments (
       /*av*/ owned /*aw*/ by /*ax*/ none
       /*ay*/ sequence /*az*/ name /*ba*/ public.seq /*bb*/
     )
+);
+
+-- preserve column clause source order when collate follows constraints
+create table collate_after_primary_key (id varchar primary key collate "C");
+
+create table collate_between_constraints (
+  id varchar not null collate "C" unique
+);
+
+-- preserve comments when collate follows or occurs between constraints
+create table extraordinarily_long_collated_column_clause_order (
+  first_identifier /* before type */ varchar
+    /* before primary */ primary /* before key */ key /* before collate */
+    collate /* before collation */ "C",
+  second_identifier varchar
+    /* before not */ not /* before null */ null
+    /* before second collate */ collate /* before second collation */ "POSIX"
+    /* before unique */ unique
 );

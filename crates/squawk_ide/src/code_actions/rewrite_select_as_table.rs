@@ -20,9 +20,9 @@ pub(super) fn rewrite_select_as_table(
     }
 
     let from_clause = select.from_clause()?;
-    let from_item = from_clause.from_items().next()?;
-
-    let ast::FromItem::RelationFromItem(relation) = from_item else {
+    let ast::FromListItem::FromItem(ast::FromItem::RelationFromItem(relation)) =
+        from_clause.items().next()?
+    else {
         return None;
     };
     let table_name = relation.relation_name_ref()?.syntax().text().to_string();
@@ -47,12 +47,8 @@ fn can_transform_select_to_table(select: &ast::Select) -> bool {
         || select.group_by_clause().is_some()
         || select.having_clause().is_some()
         || select.window_clause().is_some()
-        || select.order_by_clause().is_some()
-        || select.limit_clause().is_some()
-        || select.fetch_clause().is_some()
-        || select.offset_clause().is_some()
         || select.filter_clause().is_some()
-        || select.locking_clauses().next().is_some()
+        || select.tail_clauses().next().is_some()
     {
         return false;
     }
@@ -90,17 +86,17 @@ fn can_transform_select_to_table(select: &ast::Select) -> bool {
         return false;
     };
 
-    let mut from_items = from_clause.from_items();
-    let Some(from_item) = from_items.next() else {
+    let mut items = from_clause.items();
+    let Some(item) = items.next() else {
         return false;
     };
 
     // only can have one from item & no join exprs
-    if from_items.next().is_some() || from_clause.join_exprs().next().is_some() {
+    if items.next().is_some() {
         return false;
     }
 
-    let ast::FromItem::RelationFromItem(relation) = from_item else {
+    let ast::FromListItem::FromItem(ast::FromItem::RelationFromItem(relation)) = item else {
         return false;
     };
     if relation.alias().is_some()

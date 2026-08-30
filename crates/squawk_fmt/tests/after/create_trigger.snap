@@ -41,6 +41,26 @@ create trigger a_trigger_with_a_very_long_name
       'a long argument value'
     );
 
+create constraint trigger constraint_options
+  after insert
+  on foo
+  not valid
+  no inherit
+  not enforced
+  enforced
+  for each row
+  execute function foo();
+
+create constraint trigger commented_constraint_options
+  after insert
+  on foo
+  /*a*/ not /*b*/ valid
+  /*c*/ no /*d*/ inherit
+  /*e*/ not /*f*/ enforced
+  /*g*/ enforced
+  /*h*/ for each row
+  execute function foo();
+
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ constraint /*d*/ trigger /*e*/ commented_trigger
   /*f*/ instead /*g*/ of

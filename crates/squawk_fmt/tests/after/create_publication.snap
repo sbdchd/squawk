@@ -3,31 +3,43 @@ source: crates/squawk_fmt/tests/tests.rs
 input_file: crates/squawk_fmt/tests/before/create_publication.sql
 ---
 create publication everything
-for all tables, all sequences except (table audit.secret_events, internal_jobs)
-with (
-  publish = 'insert, update, delete, truncate',
-  publish_via_partition_root = true
-);
+  for
+    all tables,
+    all sequences
+  except (table audit.secret_events, internal_jobs)
+  with (
+    publish = 'insert, update, delete, truncate',
+    publish_via_partition_root = true
+  );
 
 create publication selected_tables
-for
-  table only public.accounts (id, email) where (id > 100),
-  table (public.orders)*,
-  tables in schema reporting where (tenant_id = 42),
-  current_schema;
+  for
+    table only public.accounts (id, email) where (id > 100),
+    table (public.orders)*,
+    tables in schema reporting where (tenant_id = 42),
+    current_schema;
 
 create publication no_tables with (publish = 'insert');
 
+create publication omitted_table_keywords
+  for
+    table first_table,
+    /* before omitted table */ public.second_table where (id > 100),
+    /* before omitted only */ only third_table;
+
+create publication omitted_schema_keywords
+  for tables in schema first_schema, /* before omitted schema */ second_schema;
+
 create /* after create */ publication /* after publication */ commented_pub
-for
-  /* after for */ table /* after table */ only  /* after only */(/* before table name */ public.commented /* before close */)/* before star */ * /* before columns */ (
-    /* before column */ id /* before comma */,
-    /* after comma */ payload /* before columns close */
-  )
-  /* before where */ where /* before where open */(
-    /* before expression */ id > 0 /* before where close */
-  ),
-  /* after object comma */ tables /* after tables */ in /* after in */ schema /* after schema */ current_schema
-with /* after with */ (
-  /* before option */ publish /* before equals */ = /* before value */ 'insert' /* before options close */
-)/* before semicolon */;
+  for
+    /* after for */ table /* after table */ only  /* after only */(/* before table name */ public.commented /* before close */)/* before star */ * /* before columns */ (
+      /* before column */ id /* before comma */,
+      /* after comma */ payload /* before columns close */
+    )
+    /* before where */ where /* before where open */ (
+      /* before expression */ id > 0 /* before where close */
+    ),
+    /* after object comma */ tables /* after tables */ in /* after in */ schema /* after schema */ current_schema
+  with /* after with */ (
+    /* before option */ publish /* before equals */ = /* before value */ 'insert' /* before options close */
+  )/* before semicolon */;

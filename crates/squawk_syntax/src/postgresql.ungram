@@ -69,7 +69,10 @@ ParamNameRef =
 
 ParamList =
   '(' '*' ')'
-| '(' (Param (',' Param)*)? ('order' 'by' (Param (',' Param)*))? ')'
+| '(' (Param (',' Param)*)? AggregateOrderBy? ')'
+
+AggregateOrderBy =
+  'order' 'by' (Param (',' Param)*)
 
 ArgList =
  '(' '*' ')'
@@ -540,7 +543,7 @@ CastExpr =
 
 ArrayExpr =
   'array' '[' (Expr (',' Expr)*) ']'
-| 'array' '(' Select ')'
+| 'array' '(' SelectVariant ')'
 
 Literal =
   value:(
@@ -921,6 +924,10 @@ RoleRef =
 | 'current_user'
 | 'session_user'
 
+UserMappingRole =
+  RoleRef
+| 'user'
+
 Role =
   'group'? '#name'?
 | 'current_role'
@@ -1064,12 +1071,15 @@ QualifiedColumnNameRef =
 Column =
   name:ColumnName
   Type?
-  Storage?
-  CompressionMethod?
-  WithOptions?
-  AlterOptionList?
-  Collate?
-  constraints:ColumnConstraint*
+  clauses:ColumnClause*
+
+ColumnClause =
+  Storage
+| CompressionMethod
+| WithOptions
+| AlterOptionList
+| Collate
+| ColumnConstraint
 
 // Used by Insert / Update
 ColumnTarget =
@@ -1166,6 +1176,10 @@ OnDeleteAction =
 OnUpdateAction =
   'on' 'update' RefAction
 
+ReferentialAction =
+  OnDeleteAction
+| OnUpdateAction
+
 MatchFull =
   'match' 'full'
 
@@ -1186,8 +1200,7 @@ ForeignKeyConstraint =
   ConstraintNameClause?
   'foreign' 'key' from_columns:ForeignKeyColumnList 'references' TableNameRef to_columns:ForeignKeyColumnList?
   MatchType?
-  OnDeleteAction?
-  OnUpdateAction?
+  ReferentialAction*
   ConstraintOption*
 
 ConstraintOption =
@@ -1272,8 +1285,7 @@ ReferencesConstraint =
   ConstraintNameClause?
   'references' table:TableNameRef ('(' column:ColumnNameRef ')')?
   MatchType?
-  OnDeleteAction?
-  OnUpdateAction?
+  ReferentialAction*
   ConstraintOption*
 
 AlterTableAction =
@@ -1319,6 +1331,7 @@ AlterTableAction =
 | RenameColumn
 | AlterConstraint
 | AlterColumn
+| AlterOptionList
 | OptionItemList
 
 OptionItemList =
@@ -1490,6 +1503,13 @@ OffsetClause =
   Expr
   ('row' | 'rows')?
 
+SelectTailClause =
+  OrderByClause
+| LockingClause
+| LimitClause
+| OffsetClause
+| FetchClause
+
 DistinctClause =
   'distinct' DistinctOn?
 
@@ -1513,6 +1533,7 @@ TableConstraint =
 | CheckConstraint
 | ExcludeConstraint
 | ForeignKeyConstraint
+| NotNullConstraint
 
 TableArg =
   Column
@@ -1529,10 +1550,11 @@ ElseClause =
   'else' Expr
 
 UsingClause =
-  'using' (FromItem (',' FromItem)*)
+  'using'
+  items:((FromListItem (',' FromListItem)*)?)
 
 UsingOnClause =
-  'using' FromItem
+  'using' FromListItem
   OnClause
 
 TableAlias =
@@ -1575,16 +1597,16 @@ OptionAsType =
   'as' Type
 
 OptionCache =
-  'cache' Literal
+  'cache' Expr
 
 OptionIncrement =
-  'increment' 'by'? Literal
+  'increment' 'by'? Expr
 
 OptionSequenceName =
   'sequence' 'name' Sequence
 
 OptionRestart =
-  'restart' ('with'? Literal)?
+  'restart' ('with'? Expr)?
 
 OptionLogged =
   'logged'
@@ -1593,7 +1615,7 @@ OptionUnlogged =
   'unlogged'
 
 OptionStart =
-  'start' 'with'? Literal
+  'start' 'with'? Expr
 
 OptionOwnedBy =
   'owned' 'by' OwnedByTarget
@@ -1606,10 +1628,10 @@ OwnedByNone =
   'none'
 
 OptionMaxValue =
-  'maxvalue' Literal
+  'maxvalue' Expr
 
 OptionMinValue =
-  'minvalue' Literal
+  'minvalue' Expr
 
 OptionNoMaxValue =
   'no' 'maxvalue'
@@ -1688,25 +1710,21 @@ JoinUsingClause =
   'using' ColumnRefList alias:RequiredAsAlias?
 
 Join =
-  'natural'? JoinType FromItem JoinCondition?
+  'natural'? JoinType FromListItem JoinCondition?
 
 JoinCondition =
   JoinUsingClause
 | OnClause
 
 JoinExpr =
-  (FromItem | JoinExpr) Join
+  FromListItem Join
 
 ParenSelect =
   WithClause?
   '('
   select:SelectVariant
   ')'
-  OrderByClause?
-  LockingClause*
-  LimitClause?
-  OffsetClause?
-  FetchClause?
+  tail_clauses:SelectTailClause*
   ';'?
 
 Select =
@@ -1717,11 +1735,7 @@ Select =
  GroupByClause?
  HavingClause?
  WindowClause?
- OrderByClause?
- LockingClause*
- LimitClause?
- FetchClause?
- OffsetClause?
+ tail_clauses:SelectTailClause*
  FilterClause? ';'?
 
 Serializable =
@@ -1978,25 +1992,27 @@ OrReplace =
 RetType =
   'returns' ('table' TableArgList | Type)
 
-BeginFuncOptionList =
+AtomicBody =
   'begin' 'atomic'
-  BeginFuncOption*
+  RoutineBodyStmt*
   'end'
 
-BeginFuncOption =
+RoutineBodyStmt =
   Stmt
-| ReturnFuncOption
+| ReturnStmt
 
-ReturnFuncOption =
+ReturnStmt =
   'return' Expr ';'
+
+RoutineBody =
+  ReturnStmt
+| AtomicBody
 
 FuncOptionList =
   options:(FuncOption*)
 
 FuncOption =
-  BeginFuncOptionList
-| ReturnFuncOption
-| AsFuncOption
+  AsFuncOption
 | SetFuncOption
 | SupportFuncOption
 | RowsFuncOption
@@ -2018,7 +2034,7 @@ FuncOption =
 
 
 CreateFunction =
-  'create' OrReplace? 'function' name:FunctionName ParamList RetType? option_list:FuncOptionList ';'?
+  'create' OrReplace? 'function' name:FunctionName ParamList RetType? option_list:FuncOptionList body:RoutineBody? ';'?
 
 SetDefault =
   'set' 'default' Expr
@@ -2207,20 +2223,12 @@ RowList =
 Values =
   WithClause?
   'values' RowList
-  OrderByClause?
-  LockingClause*
-  LimitClause?
-  FetchClause?
-  OffsetClause? ';'?
+  tail_clauses:SelectTailClause* ';'?
 
 Table =
   WithClause?
   'table' RelationName
-  OrderByClause?
-  LockingClause*
-  LimitClause?
-  FetchClause?
-  OffsetClause? ';'?
+  tail_clauses:SelectTailClause* ';'?
 
 Insert =
   WithClause?
@@ -2510,7 +2518,7 @@ ReleaseSavepoint =
   'release' 'savepoint' SavepointRef ';'?
 
 ParenExpr =
-  '(' (Expr | Select | CompoundSelect | Table | Values | FromItem | JoinExpr) ')'
+  '(' (Expr | Select | CompoundSelect | Table | Values | FromListItem) ')'
 
 TupleExpr =
   'row' '(' (Expr (',' Expr)*)? ')'
@@ -2696,17 +2704,39 @@ AttributeOption =
   ('=' AttributeValue)?
 
 AttributeName =
-  '#name'?
+  ('#name' | 'analyse' | 'analyze' | 'binary' | 'collation' | 'copy' | 'default'
+  | 'delimiter' | 'end' | 'from' | 'function' | 'input' | 'join' | 'like' | 'lsn'
+  | 'parallel' | 'parser' | 'procedure' | 'refresh' | 'restrict' | 'start'
+  | 'storage' | 'template' | 'version')?
 
 AttributeNamespace =
   '#name'?
 
 AttributeValue =
   Literal
+| PrefixExpr
+| 'any'
 | 'none'
-| 'operator' '(' Op ')'
-| Op
+| 'primary'
+| 'default'
+| 'null'
+| 'constraint'
+| OperatorCall
+| CustomOp
 | Type
+| '+'
+| '-'
+| '*'
+| '/'
+| '%'
+| '^'
+| '='
+| '<'
+| '>'
+| '<='
+| '>='
+| '<>'
+| '!='
 
 AttributeList =
   '(' (AttributeOption (',' AttributeOption)*)? ')'
@@ -2833,15 +2863,15 @@ SelectVariant =
 | CompoundSelect
 
 CompoundSelect =
-  lhs:SelectVariant
+  lhs:CompoundSelectOperand
   op:CompoundOp
-  rhs:SelectVariant
-  OrderByClause?
-  LockingClause*
-  LimitClause?
-  FetchClause?
-  OffsetClause?
+  rhs:CompoundSelectOperand
+  tail_clauses:SelectTailClause*
   ';'?
+
+CompoundSelectOperand =
+  SelectVariant
+| ParenExpr
 
 CompoundOp =
   Union
@@ -2866,10 +2896,7 @@ SelectInto =
   GroupByClause?
   HavingClause?
   WindowClause?
-  OrderByClause?
-  LockingClause*
-  LimitClause?
-  OffsetClause?
+  tail_clauses:SelectTailClause*
   FilterClause? ';'?
 
 IntoClause =
@@ -2946,6 +2973,10 @@ FromItem =
 | RowsFromItem
 | XmlTableFromItem
 
+FromListItem =
+  FromItem
+| JoinExpr
+
 RelationFromItem =
   'only'? RelationNameRef '*'? alias:FromAlias? TablesampleClause?
 
@@ -2978,8 +3009,7 @@ RowsFromArg =
 
 FromClause =
   'from'
-  (FromItem (',' FromItem)*)?
-  (JoinExpr (',' JoinExpr)*)?
+  items:((FromListItem (',' FromListItem)*)?)
 
 XmlTableColumnList =
   'columns' (XmlTableColumn (',' XmlTableColumn)*)
@@ -4196,7 +4226,13 @@ AlterPropertyGraphAction =
 | DropVertexEdgeLabelProperties
 
 AddVertexEdgeTables =
-  ('add' VertexTables)? ('add' EdgeTables)?
+  AddVertexTables? AddEdgeTables?
+
+AddVertexTables =
+  'add' VertexTables
+
+AddEdgeTables =
+  'add' EdgeTables
 
 DropVertexTables =
   'drop' ('vertex' | 'node')
@@ -4371,7 +4407,10 @@ CreateEventTrigger =
   CallExpr ';'?
 
 EventTriggerWhenClause =
-  'when' (EventTriggerWhen ('and' EventTriggerWhen)*)
+  'when' EventTriggerWhen EventTriggerWhenAnd*
+
+EventTriggerWhenAnd =
+  'and' EventTriggerWhen
 
 EventTriggerWhen =
   var:EventTriggerFilterVariable 'in' '(' (Literal (',' Literal)*) ')'
@@ -4535,7 +4574,7 @@ UsingExprClause =
   'using' '(' Expr ')'
 
 CreateProcedure =
-  'create' OrReplace? 'procedure' name:ProcedureName ParamList option_list:FuncOptionList ';'?
+  'create' OrReplace? 'procedure' name:ProcedureName ParamList option_list:FuncOptionList body:RoutineBody? ';'?
 
 CreatePublication =
   'create' 'publication' Publication
@@ -4698,7 +4737,7 @@ TransformToFunc =
   'to' 'sql' 'with' 'function' FunctionSig
 
 CreateUserMapping =
-  'create' 'user' 'mapping' IfNotExists? 'for' RoleRef
+  'create' 'user' 'mapping' IfNotExists? 'for' UserMappingRole
   ServerClause
   AlterOptionList? ';'?
 
@@ -4885,7 +4924,7 @@ DropUser =
   'drop' 'user' IfExists? (RoleRef (',' RoleRef)*) ';'?
 
 DropUserMapping =
-  'drop' 'user' 'mapping' IfExists? 'for' RoleRef ServerClause ';'?
+  'drop' 'user' 'mapping' IfExists? 'for' UserMappingRole ServerClause ';'?
 
 DropView =
   'drop' 'view' IfExists? (ViewRef (',' ViewRef)*)
@@ -5592,10 +5631,7 @@ CreateTrigger =
   TriggerEventList
   OnRelation
   FromTable?
-  DeferrableConstraintOption?
-  NotDeferrableConstraintOption?
-  InitiallyDeferredConstraintOption?
-  InitiallyImmediateConstraintOption?
+  ConstraintOption*
   Referencing?
   TriggerLevel?
   WhenCondition?
@@ -5638,11 +5674,22 @@ AuthorizationSchema =
   'authorization' Role
 
 SchemaElement =
-  CreateTable
-| CreateView
+  CreateAggregate
+| CreateCollation
+| CreateDomain
+| CreateFunction
 | CreateIndex
+| CreateOperator
+| CreateProcedure
 | CreateSequence
+| CreateTable
+| CreateTextSearchConfiguration
+| CreateTextSearchDictionary
+| CreateTextSearchParser
+| CreateTextSearchTemplate
 | CreateTrigger
+| CreateType
+| CreateView
 | Grant
 
 DropTrigger =
@@ -5743,7 +5790,7 @@ SetXmlOption =
   'xml' 'option' XmlDocumentOrContent
 
 SetTimeZone =
-  'time' 'zone' (ConfigValue | 'default' | 'local')?
+  'time' 'zone' (ConfigValue | CastExpr | 'default' | 'local')?
 
 SetCatalog =
   'catalog' Literal
@@ -5762,11 +5809,12 @@ FromCurrent =
   'from' 'current'
 
 ToConfigValue =
-  ('to' | '=') ('default' | 'null' | (ConfigValue (',' ConfigValue)*))
+  ('to' | '=') ('default' | (ConfigValue (',' ConfigValue)*))
 
 ConfigValue =
   Literal
 | ConfigValueName
+| PrefixExpr
 
 ConfigValueName =
   '#name'?
@@ -5987,7 +6035,7 @@ MergePartitions =
   TableName
 
 SplitPartition =
-  'split' 'partition' 'into'
+  'split' 'partition' TableNameRef 'into'
   PartitionList
 
 PartitionList =
@@ -6087,10 +6135,7 @@ AlterColumnOption =
 
 AlterConstraint =
   'alter' 'constraint' ConstraintNameRef
-  DeferrableConstraintOption?
-  NotDeferrableConstraintOption?
-  InitiallyDeferredConstraintOption?
-  InitiallyImmediateConstraintOption?
+  ConstraintOption*
 
 AlterColumn =
   'alter' 'column'? ColumnNameRef option:AlterColumnOption
@@ -6117,7 +6162,10 @@ ResetOptions =
   'reset' AttributeList
 
 SetType =
-  ('set' 'data')? 'type' Type Collate? ('using' Expr)?
+  ('set' 'data')? 'type' Type Collate? UsingExpr?
+
+UsingExpr =
+  'using' Expr
 
 SetGeneratedOptions =
   SetGeneratedOption*

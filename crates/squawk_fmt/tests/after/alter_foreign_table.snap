@@ -1,0 +1,28 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_foreign_table.sql
+---
+alter /* foreign */ foreign /* table */ table /* if */ if /* not */ exists /* table name */ public.very_long_foreign_table_name
+  add /* column */ column /* if */ if /* not */ not /* exists */ exists /* column name */ column_with_a_very_long_descriptive_name /* type */ varchar(255)
+    /* options */ options (
+      /* key */ remote_name /* value */ 'remote_column'
+    ),
+  /* drop */ drop /* column */ column /* if */ if /* exists */ exists /* name */ obsolete_column /* behavior */ cascade;
+
+alter foreign table public.items
+  alter column quantity set default 100,
+  alter column description type text using description::text;
+
+alter foreign table public.items
+  add constraint positive_quantity check (quantity > 0),
+  rename column old_name to new_name;
+
+alter foreign table if exists public.items
+  owner to role_with_a_very_long_descriptive_name;
+
+alter foreign table ft1
+  /* options */ options /* open */ (
+    /* drop */ drop /* name */ delimiter /* comma */,
+    /* set */ set /* name */ quote /* value */ '~' /* comma */,
+    /* add */ add /* name */ escape /* value */ '@' /* close */
+  );

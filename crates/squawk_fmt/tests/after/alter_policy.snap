@@ -1,0 +1,29 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_policy.sql
+---
+alter /* policy */ policy /* name */ account_access_policy
+  /* on */ on /* table */ public.accounts
+  /* to */ to /* first role */ account_administrator,
+  /* second role */ account_auditor
+  /* using */ using /* left paren */ (
+    /* expression */ owner_identifier = "current_user" /* right paren */
+  )
+  /* with */ with /* check */ check /* left paren */ (
+    /* expression */ account_is_active
+      and account_identifier > 1000000 /* right paren */
+  )/* end */;
+
+alter policy account_access_policy
+  on public.accounts
+  using (
+    account_identifier
+      = a_very_long_session_account_identifier_function(
+        "current_user",
+        "current_role"
+      )
+  );
+
+alter policy account_access_policy
+  on public.accounts
+  /* rename */ rename /* to */ to /* new name */ archived_account_access_policy;

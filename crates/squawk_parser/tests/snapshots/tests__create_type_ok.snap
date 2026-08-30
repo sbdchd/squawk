@@ -227,6 +227,104 @@ SOURCE_FILE
         WHITESPACE "\n"
         R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TYPE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TYPE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    RANGE_TYPE
+      AS_KW "as"
+      WHITESPACE " "
+      RANGE_KW "range"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            IDENT "subtype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  BIGINT_KW "bigint"
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            IDENT "subtype_opclass"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "o"
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            COLLATION_KW "collation"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "\"C\""
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            IDENT "canonical"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "c"
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            IDENT "subtype_diff"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "d"
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            IDENT "multirange_type_name"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "m"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -434,6 +532,19 @@ SOURCE_FILE
         ATTRIBUTE_OPTION
           ATTRIBUTE_NAME
             ANALYZE_KW "analyze"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "analyze_function"
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            ANALYSE_KW "analyse"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "

@@ -1,0 +1,42 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_index.sql
+---
+alter /* index */ index
+  /* all */ all /* in */ in /* tablespace */ tablespace /* old */ old_tablespace_with_a_very_long_descriptive_name
+    /* owned */ owned /* by */ by /* role one */ first_role_with_a_long_name,
+    /* role two */ second_role_with_a_long_name
+    /* set */ set /* tablespace */ tablespace /* new */ new_tablespace_with_a_very_long_descriptive_name
+    /* nowait */ nowait/* end */;
+
+alter index /* if */ if /* exists */ exists /* name */ public.index_with_a_very_long_descriptive_name
+  /* alter */ alter /* column */ column /* number */ 3
+    /* set */ set /* statistics */ statistics /* value */ 1000;
+
+alter index idx attach /* partition */ partition /* child */ public.child_idx;
+
+alter index idx
+  /* depends */ depends /* on */ on /* extension */ extension /* name */ bloom;
+
+alter index idx
+  /* no */ no /* depends */ depends /* on */ on /* extension */ extension /* name */ bloom;
+
+alter index idx /* rename */ rename /* to */ to /* name */ renamed_idx;
+
+alter index idx
+  /* reset */ reset /* list */ (
+    /* first */ fillfactor,
+    /* second */ deduplicate_items
+  );
+
+alter index idx
+  /* set */ set /* list */ (
+    /* key */ fillfactor /* equals */ = /* value */ 70,
+    deduplicate_items = off
+  );
+
+alter index idx
+  alter column indexed_expression set (/* key */ n_distinct = /* value */ 100);
+
+alter index idx
+  /* set */ set /* tablespace */ tablespace /* name */ fast_storage;

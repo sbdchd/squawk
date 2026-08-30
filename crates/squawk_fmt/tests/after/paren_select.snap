@@ -32,3 +32,18 @@ with /* before recursive */ recursive /* before cte */ cte /* before as */ as /*
 
 (/* before select */ select 1 /* before close */)
 /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties;
+
+select * from (((select 1) union select 2) limit 1) as t;
+
+select *
+from (
+    /* after outer open */ (
+      (/* before left select */ select 1 /* before left close */)
+      /* before union */ union
+      /* before right select */ select 2 /* before compound close */
+    )
+    /* before inner limit */ limit /* before limit value */ 1 /* before outer close */
+  ) /* before alias */ as t;
+
+((select 1) limit 2) order by 3;
+(select 1) offset 1 limit 2;

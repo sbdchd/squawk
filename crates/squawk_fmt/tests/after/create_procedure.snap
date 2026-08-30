@@ -1,0 +1,27 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_procedure.sql
+---
+create procedure refresh_accounts()
+  language sql
+  as $$ select 1 $$;
+
+create or replace procedure extraordinarily_long_schema_name.extraordinarily_long_account_recalculation_procedure(
+  in extraordinarily_long_account_identifier integer,
+  in extraordinarily_long_effective_timestamp timestamp with time zone,
+  out extraordinarily_long_recalculated_total numeric
+)
+  language plpgsql
+  security definer
+  set work_mem = '256MB'
+  as $$ begin null; end $$;
+
+-- comments in every position
+create /* or */ or /* replace */ replace /* procedure */ procedure /* schema */ app /* dot */./* name */ recalculate/* params */ (
+  /* mode */ in /* parameter */ account_id /* type */ integer /* comma */,
+  /* out mode */ out /* output */ result /* output type */ text /* close */
+)
+  /* language */ language /* language name */ plpgsql
+  /* security */ security /* definer */ definer
+  /* set */ set /* parameter name */ work_mem /* equals */ = /* setting */ '64MB'
+  /* as */ as /* body */ $$ begin null; end $$/* end */;

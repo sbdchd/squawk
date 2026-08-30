@@ -8,6 +8,8 @@ select * from foo
     /* after comma */ display_name /* before close paren */
   );
 select * from users tablesample bernoulli(10) repeatable (42);
+select t.id from test_tablesample as t tablesample system (50) repeatable (0);
+select * from users /* before alias */ as /* before alias name */ u /* before tablesample */ tablesample /* before method */ bernoulli /* before sample opening paren */ ( /* before percentage */ 10 /* before sample closing paren */ ) /* before repeatable */ repeatable /* before seed opening paren */ ( /* before seed */ 42 /* before seed closing paren */ );
 select * from generate_series(1, 3);
 select * from lateral generate_series(1, 3) with ordinality as g(n, ord);
 select * from /* before lateral */ lateral /* before call */ generate_series /* before opening paren */ ( /* before first argument */ 1 /* before comma */, /* before second argument */ 3 /* before closing paren */ ) /* before with */ with /* before ordinality */ ordinality /* before alias */ as /* before alias name */ g /* before alias opening paren */ ( /* before first column */ n /* before column comma */, /* before second column */ ord /* before alias closing paren */ ) /* after function item */, other;
@@ -45,6 +47,10 @@ select * from users join profiles on users.id = profiles.user_id;
 
 select * from users left outer join profiles using (user_id) as matched_users;
 
+select relname, pg_get_indexdef from pg_class left join pg_inherits on inhrelid = oid, lateral pg_get_indexdef(pg_class.oid);
+
+select * from /* before joined relation */ pg_class /* before join */ left /* before outer */ outer /* before join keyword */ join /* before joined table */ pg_inherits /* before on */ on /* before left operand */ inhrelid /* before equals */ = /* before right operand */ oid /* before comma */, /* before lateral item */ lateral /* before function */ pg_get_indexdef /* before opening paren */ ( /* before argument */ pg_class.oid /* before closing paren */ );
+
 select * from a right join b on true, c full outer join d on true, e natural inner join f, g cross join h;
 
 select * from first_really_long_table_name join second_really_long_table_name on first_really_long_table_name.id = second_really_long_table_name.first_id join third_really_long_table_name on second_really_long_table_name.id = third_really_long_table_name.second_id;
@@ -54,3 +60,7 @@ select * from (a join b on a.id = b.id) as joined_tables;
 select * from a /*ja*/ left /*jb*/ outer /*jc*/ join /*jd*/ b /*je*/ on /*jf*/ a /*jg*/. /*jh*/ id /*ji*/ = /*jj*/ b /*jk*/. /*jl*/ id, /*jm*/ c /*jn*/ join /*jo*/ d /*jp*/ using /*jq*/ (/*jr*/ first_id /*js*/, /*jt*/ second_id /*ju*/) /*jv*/ as /*jw*/ ids /*jx*/;
 
 select a_very_long_column_name from a_very_long_schema_name.a_very_long_table_name left outer join another_very_long_schema_name.another_very_long_table_name on a_very_long_schema_name.a_very_long_table_name.a_very_long_column_name = another_very_long_schema_name.another_very_long_table_name.another_very_long_column_name;
+
+select s.stxrelid::regclass as relation, array_agg(a.attname order by u.ord) as stats_columns from pg_statistic_ext s cross join lateral unnest(s.stxkeys::int2[]) with ordinality as u(attnum, ord) join pg_attribute a on a.attrelid = s.stxrelid and a.attnum = u.attnum;
+
+select * from statistics /* before base alias */ s /* before cross */ cross /* before cross join */ join /* before lateral */ lateral /* before function */ unnest /* before function opening paren */ ( /* before argument */ s.keys /* before cast */ ::int2[] /* before function closing paren */ ) /* before with */ with /* before ordinality */ ordinality /* before function alias */ as /* before function alias name */ u /* before alias opening paren */ ( /* before first alias column */ attnum /* before alias comma */, /* before second alias column */ ord /* before alias closing paren */ ) /* before nested join */ join /* before nested relation */ attributes /* before nested alias */ a /* before on */ on /* before left operand */ a.attnum /* before equals */ = /* before right operand */ u.attnum;

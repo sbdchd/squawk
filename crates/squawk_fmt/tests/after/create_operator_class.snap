@@ -1,0 +1,49 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_operator_class.sql
+---
+create operator class integer_minmax_ops
+  default for type integer
+  using btree as
+  operator 1 < for search,
+  function 1 (integer, integer) int4cmp(integer, integer),
+  storage integer;
+
+create operator class extraordinarily_long_schema_name.extraordinarily_long_integer_operator_class
+  default for type extraordinarily_long_schema_name.extraordinarily_long_integer_type
+  using extraordinarily_long_access_method
+  family extraordinarily_long_schema_name.extraordinarily_long_operator_family as
+  operator 1 < (
+    extraordinarily_long_schema_name.extraordinarily_long_integer_type,
+    extraordinarily_long_schema_name.extraordinarily_long_integer_type
+  )
+  for order by extraordinarily_long_schema_name.extraordinarily_long_sort_family,
+  function 1 (
+    extraordinarily_long_schema_name.extraordinarily_long_integer_type,
+    extraordinarily_long_schema_name.extraordinarily_long_integer_type
+  )
+  extraordinarily_long_schema_name.extraordinarily_long_comparison_function(
+    extraordinarily_long_schema_name.extraordinarily_long_integer_type,
+    extraordinarily_long_schema_name.extraordinarily_long_integer_type
+  ),
+  storage extraordinarily_long_schema_name.extraordinarily_long_storage_type;
+
+-- comments in every position
+create /* operator */ operator /* class */ class /* schema */ app /* dot */./* name */ integer_ops
+  /* default */ default /* for */ for /* type keyword */ type /* data type */ integer
+  /* using */ using /* method */ btree
+  /* family */ family /* family schema */ app /* family dot */./* family name */ integer_family /* as */ as
+  /* option */ operator /* number */ 1 /* operator name */ < /* left paren */(
+    /* left type */ integer /* type comma */,
+    /* right type */ integer /* right paren */
+  )
+  /* purpose for */ for /* purpose search */ search /* option comma */,
+  /* function */ function /* function number */ 1 /* params */ (
+    /* first param */ integer /* param comma */,
+    /* second param */ integer /* params close */
+  )
+  /* function signature */ app.compare_integers(
+    /* signature arg */ integer,
+    integer
+  ) /* second comma */,
+  /* storage */ storage /* storage type */ integer/* end */;

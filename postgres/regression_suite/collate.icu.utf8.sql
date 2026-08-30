@@ -261,7 +261,7 @@ SELECT * FROM foo;
 
 -- casting
 
-SELECT CAST('42' AS text COLLATE "C");
+-- SELECT CAST('42' AS text COLLATE "C");
 
 SELECT a, CAST(b AS varchar) FROM collate_test1 ORDER BY 2;
 SELECT a, CAST(b AS varchar) FROM collate_test2 ORDER BY 2;

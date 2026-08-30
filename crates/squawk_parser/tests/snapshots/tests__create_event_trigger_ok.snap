@@ -71,18 +71,19 @@ SOURCE_FILE
           STRING "'buzz'"
         R_PAREN ")"
       WHITESPACE "\n    "
-      AND_KW "and"
-      WHITESPACE " "
-      EVENT_TRIGGER_WHEN
-        EVENT_TRIGGER_FILTER_VARIABLE
-          REAL_KW "real"
+      EVENT_TRIGGER_WHEN_AND
+        AND_KW "and"
         WHITESPACE " "
-        IN_KW "in"
-        WHITESPACE " "
-        L_PAREN "("
-        LITERAL
-          STRING "'a'"
-        R_PAREN ")"
+        EVENT_TRIGGER_WHEN
+          EVENT_TRIGGER_FILTER_VARIABLE
+            REAL_KW "real"
+          WHITESPACE " "
+          IN_KW "in"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'a'"
+          R_PAREN ")"
     WHITESPACE "\n  "
     EXECUTE_KW "execute"
     WHITESPACE " "

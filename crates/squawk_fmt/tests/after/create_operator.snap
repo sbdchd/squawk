@@ -1,0 +1,72 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_operator.sql
+---
+create operator > (
+  function = greater_than
+);
+
+create operator === (
+  leftarg = integer,
+  rightarg = integer,
+  procedure = int4eq,
+  commutator = =
+);
+
+create operator === (
+  leftarg = integer,
+  rightarg = integer,
+  procedure = int4eq,
+  negator = <>
+);
+
+create operator = (
+  commutator /* assignment */ = /* equal operator */ = /* comma */,
+  negator = /* not equal operator */ <> /* closing parenthesis */
+);
+
+create operator = (
+  join = eqjoinsel
+);
+
+create operator <> (
+  /* join option */ join /* equals */ = /* selectivity function */ eqjoinsel /* closing parenthesis */
+);
+
+create operator extraordinarily_long_schema_name.## (
+  function = extraordinarily_long_schema_name.extraordinarily_long_operator_function_name,
+  leftarg = extraordinarily_long_schema_name.extraordinarily_long_left_argument_type,
+  rightarg = extraordinarily_long_schema_name.extraordinarily_long_right_argument_type,
+  commutator = &&&&,
+  hashes,
+  merges
+);
+
+-- comments in every position
+create /* operator */ operator /* schema */ app /* dot */./* symbol */ # /* attributes */ (
+  /* function name */ function /* equals */ = /* function value */ app.compare_values /* comma */,
+  /* left argument */ leftarg /* second equals */ = /* type */ integer /* comma */,
+  /* marker */ hashes /* closing parenthesis */
+)/* semicolon */;
+
+create operator + (
+  commutator = +,
+  negator = -,
+  restrict = *,
+  join = %
+);
+
+create operator + (
+  commutator = >,
+  negator = >=,
+  restrict = <=,
+  join = !=
+);
+
+create operator + (
+  commutator = operator(pg_catalog.+)
+);
+
+create operator + (
+  commutator /* before qualified operator */ = /* before operator keyword */ operator /* before open paren */(/* before operator */ pg_catalog.+ /* before close paren */) /* before semicolon */
+);

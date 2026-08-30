@@ -1,0 +1,11 @@
+alter server analytics version 'postgresql-17' options (add host 'analytics.internal.example', set port '5432', drop obsolete_setting);
+
+alter server analytics owner to foreign_data_admin;
+
+alter server analytics rename to analytics_primary;
+
+alter server foreign_server_with_a_very_long_descriptive_name version 'postgresql-17-with-a-very-long-version-description' options (add host 'database-with-a-long-name.internal.example', set application_name 'squawk formatter integration test', drop obsolete_connection_setting);
+
+alter /* before server */ server /* before name */ commented_server /* before version */ version /* before version value */ '17.0' /* before options */ options /* before left paren */ (/* before add */ add /* before option name */ host /* before option value */ 'db.internal', /* after comma */ set /* before set name */ port /* before set value */ '5432', /* second comma */ drop /* before drop name */ old_port /* before right paren */) /* before semicolon */;
+
+alter server another_commented_server /* before owner */ owner /* before to */ to /* before role */ session_user;

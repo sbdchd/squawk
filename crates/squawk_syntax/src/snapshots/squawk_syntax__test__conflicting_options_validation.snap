@@ -1,0 +1,512 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/conflicting_options.sql
+---
+SOURCE_FILE@0..1001
+  COMMENT@0..42 "-- do only takes one  ..."
+  WHITESPACE@42..43 "\n"
+  DO@43..84
+    DO_KW@43..45 "do"
+    WHITESPACE@45..46 " "
+    DO_LANGUAGE@46..62
+      LANGUAGE_KW@46..54 "language"
+      WHITESPACE@54..55 " "
+      LANGUAGE_REF@55..62
+        IDENT@55..62 "plpgsql"
+    WHITESPACE@62..63 " "
+    LITERAL@63..70
+      DOLLAR_QUOTED_STRING@63..70 "$$ x $$"
+    WHITESPACE@70..71 " "
+    DO_LANGUAGE@71..83
+      LANGUAGE_KW@71..79 "language"
+      WHITESPACE@79..80 " "
+      LANGUAGE_REF@80..83
+        SQL_KW@80..83 "sql"
+    SEMICOLON@83..84 ";"
+  WHITESPACE@84..86 "\n\n"
+  COMMENT@86..114 "-- repeated function  ..."
+  WHITESPACE@114..115 "\n"
+  CREATE_FUNCTION@115..193
+    CREATE_KW@115..121 "create"
+    WHITESPACE@121..122 " "
+    FUNCTION_KW@122..130 "function"
+    WHITESPACE@130..131 " "
+    FUNCTION_NAME@131..132
+      PATH@131..132
+        PATH_SEGMENT@131..132
+          IDENT@131..132 "f"
+    PARAM_LIST@132..134
+      L_PAREN@132..133 "("
+      R_PAREN@133..134 ")"
+    WHITESPACE@134..135 " "
+    RET_TYPE@135..146
+      RETURNS_KW@135..142 "returns"
+      WHITESPACE@142..143 " "
+      PATH_TYPE@143..146
+        PATH_REF@143..146
+          PATH_SEGMENT_REF@143..146
+            INT_KW@143..146 "int"
+    WHITESPACE@146..149 "\n  "
+    FUNC_OPTION_LIST@149..192
+      LANGUAGE_FUNC_OPTION@149..161
+        LANGUAGE_KW@149..157 "language"
+        WHITESPACE@157..158 " "
+        LANGUAGE_REF@158..161
+          SQL_KW@158..161 "sql"
+      WHITESPACE@161..164 "\n  "
+      LANGUAGE_FUNC_OPTION@164..176
+        LANGUAGE_KW@164..172 "language"
+        WHITESPACE@172..173 " "
+        LANGUAGE_REF@173..176
+          SQL_KW@173..176 "sql"
+      WHITESPACE@176..179 "\n  "
+      AS_FUNC_OPTION@179..192
+        AS_KW@179..181 "as"
+        WHITESPACE@181..182 " "
+        AS_DEFINITION@182..192
+          LITERAL@182..192
+            STRING@182..192 "'select 1'"
+    SEMICOLON@192..193 ";"
+  WHITESPACE@193..195 "\n\n"
+  CREATE_FUNCTION@195..264
+    CREATE_KW@195..201 "create"
+    WHITESPACE@201..202 " "
+    FUNCTION_KW@202..210 "function"
+    WHITESPACE@210..211 " "
+    FUNCTION_NAME@211..212
+      PATH@211..212
+        PATH_SEGMENT@211..212
+          IDENT@211..212 "f"
+    PARAM_LIST@212..214
+      L_PAREN@212..213 "("
+      R_PAREN@213..214 ")"
+    WHITESPACE@214..215 " "
+    RET_TYPE@215..226
+      RETURNS_KW@215..222 "returns"
+      WHITESPACE@222..223 " "
+      PATH_TYPE@223..226
+        PATH_REF@223..226
+          PATH_SEGMENT_REF@223..226
+            INT_KW@223..226 "int"
+    WHITESPACE@226..229 "\n  "
+    FUNC_OPTION_LIST@229..263
+      IMMUTABLE@229..238
+        IMMUTABLE_KW@229..238 "immutable"
+      WHITESPACE@238..241 "\n  "
+      STABLE@241..247
+        STABLE_KW@241..247 "stable"
+      WHITESPACE@247..250 "\n  "
+      AS_FUNC_OPTION@250..263
+        AS_KW@250..252 "as"
+        WHITESPACE@252..253 " "
+        AS_DEFINITION@253..263
+          LITERAL@253..263
+            STRING@253..263 "'select 1'"
+    SEMICOLON@263..264 ";"
+  WHITESPACE@264..266 "\n\n"
+  CREATE_FUNCTION@266..346
+    CREATE_KW@266..272 "create"
+    WHITESPACE@272..273 " "
+    FUNCTION_KW@273..281 "function"
+    WHITESPACE@281..282 " "
+    FUNCTION_NAME@282..283
+      PATH@282..283
+        PATH_SEGMENT@282..283
+          IDENT@282..283 "f"
+    PARAM_LIST@283..285
+      L_PAREN@283..284 "("
+      R_PAREN@284..285 ")"
+    WHITESPACE@285..286 " "
+    RET_TYPE@286..297
+      RETURNS_KW@286..293 "returns"
+      WHITESPACE@293..294 " "
+      PATH_TYPE@294..297
+        PATH_REF@294..297
+          PATH_SEGMENT_REF@294..297
+            INT_KW@294..297 "int"
+    WHITESPACE@297..300 "\n  "
+    FUNC_OPTION_LIST@300..345
+      STRICT_FUNC_OPTION@300..306
+        STRICT_KW@300..306 "strict"
+      WHITESPACE@306..309 "\n  "
+      CALLED_ON_NULL_INPUT_FUNC_OPTION@309..329
+        CALLED_KW@309..315 "called"
+        WHITESPACE@315..316 " "
+        ON_KW@316..318 "on"
+        WHITESPACE@318..319 " "
+        NULL_KW@319..323 "null"
+        WHITESPACE@323..324 " "
+        INPUT_KW@324..329 "input"
+      WHITESPACE@329..332 "\n  "
+      AS_FUNC_OPTION@332..345
+        AS_KW@332..334 "as"
+        WHITESPACE@334..335 " "
+        AS_DEFINITION@335..345
+          LITERAL@335..345
+            STRING@335..345 "'select 1'"
+    SEMICOLON@345..346 ";"
+  WHITESPACE@346..348 "\n\n"
+  CREATE_FUNCTION@348..443
+    CREATE_KW@348..354 "create"
+    WHITESPACE@354..355 " "
+    FUNCTION_KW@355..363 "function"
+    WHITESPACE@363..364 " "
+    FUNCTION_NAME@364..365
+      PATH@364..365
+        PATH_SEGMENT@364..365
+          IDENT@364..365 "f"
+    PARAM_LIST@365..367
+      L_PAREN@365..366 "("
+      R_PAREN@366..367 ")"
+    WHITESPACE@367..368 " "
+    RET_TYPE@368..379
+      RETURNS_KW@368..375 "returns"
+      WHITESPACE@375..376 " "
+      PATH_TYPE@376..379
+        PATH_REF@376..379
+          PATH_SEGMENT_REF@376..379
+            INT_KW@376..379 "int"
+    WHITESPACE@379..382 "\n  "
+    FUNC_OPTION_LIST@382..442
+      SECURITY_INVOKER_FUNC_OPTION@382..398
+        SECURITY_KW@382..390 "security"
+        WHITESPACE@390..391 " "
+        INVOKER_KW@391..398 "invoker"
+      WHITESPACE@398..401 "\n  "
+      SECURITY_DEFINER_FUNC_OPTION@401..426
+        EXTERNAL_KW@401..409 "external"
+        WHITESPACE@409..410 " "
+        SECURITY_KW@410..418 "security"
+        WHITESPACE@418..419 " "
+        DEFINER_KW@419..426 "definer"
+      WHITESPACE@426..429 "\n  "
+      AS_FUNC_OPTION@429..442
+        AS_KW@429..431 "as"
+        WHITESPACE@431..432 " "
+        AS_DEFINITION@432..442
+          LITERAL@432..442
+            STRING@432..442 "'select 1'"
+    SEMICOLON@442..443 ";"
+  WHITESPACE@443..445 "\n\n"
+  CREATE_FUNCTION@445..503
+    CREATE_KW@445..451 "create"
+    WHITESPACE@451..452 " "
+    FUNCTION_KW@452..460 "function"
+    WHITESPACE@460..461 " "
+    FUNCTION_NAME@461..462
+      PATH@461..462
+        PATH_SEGMENT@461..462
+          IDENT@461..462 "f"
+    PARAM_LIST@462..464
+      L_PAREN@462..463 "("
+      R_PAREN@463..464 ")"
+    WHITESPACE@464..465 " "
+    RET_TYPE@465..476
+      RETURNS_KW@465..472 "returns"
+      WHITESPACE@472..473 " "
+      PATH_TYPE@473..476
+        PATH_REF@473..476
+          PATH_SEGMENT_REF@473..476
+            INT_KW@473..476 "int"
+    WHITESPACE@476..479 "\n  "
+    FUNC_OPTION_LIST@479..502
+      AS_FUNC_OPTION@479..484
+        AS_KW@479..481 "as"
+        WHITESPACE@481..482 " "
+        AS_DEFINITION@482..484
+          LITERAL@482..484
+            STRING@482..484 "''"
+      WHITESPACE@484..487 "\n  "
+      AS_FUNC_OPTION@487..502
+        AS_KW@487..489 "as"
+        WHITESPACE@489..490 " "
+        AS_OBJ_FILE@490..502
+          LITERAL@490..495
+            STRING@490..495 "'foo'"
+          COMMA@495..496 ","
+          WHITESPACE@496..497 " "
+          LITERAL@497..502
+            STRING@497..502 "'bar'"
+    SEMICOLON@502..503 ";"
+  WHITESPACE@503..505 "\n\n"
+  ALTER_FUNCTION@505..538
+    ALTER_KW@505..510 "alter"
+    WHITESPACE@510..511 " "
+    FUNCTION_KW@511..519 "function"
+    WHITESPACE@519..520 " "
+    FUNCTION_SIG@520..523
+      FUNCTION_NAME_REF@520..521
+        PATH_REF@520..521
+          PATH_SEGMENT_REF@520..521
+            IDENT@520..521 "f"
+      PARAM_LIST@521..523
+        L_PAREN@521..522 "("
+        R_PAREN@522..523 ")"
+    WHITESPACE@523..524 " "
+    FUNC_OPTION_LIST@524..537
+      COST_FUNC_OPTION@524..530
+        COST_KW@524..528 "cost"
+        WHITESPACE@528..529 " "
+        LITERAL@529..530
+          INT_NUMBER@529..530 "1"
+      WHITESPACE@530..531 " "
+      COST_FUNC_OPTION@531..537
+        COST_KW@531..535 "cost"
+        WHITESPACE@535..536 " "
+        LITERAL@536..537
+          INT_NUMBER@536..537 "2"
+    SEMICOLON@537..538 ";"
+  WHITESPACE@538..540 "\n\n"
+  ALTER_FUNCTION@540..583
+    ALTER_KW@540..545 "alter"
+    WHITESPACE@545..546 " "
+    FUNCTION_KW@546..554 "function"
+    WHITESPACE@554..555 " "
+    FUNCTION_SIG@555..558
+      FUNCTION_NAME_REF@555..556
+        PATH_REF@555..556
+          PATH_SEGMENT_REF@555..556
+            IDENT@555..556 "f"
+      PARAM_LIST@556..558
+        L_PAREN@556..557 "("
+        R_PAREN@557..558 ")"
+    WHITESPACE@558..559 " "
+    FUNC_OPTION_LIST@559..582
+      LEAKPROOF_FUNC_OPTION@559..568
+        LEAKPROOF_KW@559..568 "leakproof"
+      WHITESPACE@568..569 " "
+      NOT_LEAKPROOF_FUNC_OPTION@569..582
+        NOT_KW@569..572 "not"
+        WHITESPACE@572..573 " "
+        LEAKPROOF_KW@573..582 "leakproof"
+    SEMICOLON@582..583 ";"
+  WHITESPACE@583..585 "\n\n"
+  COMMENT@585..621 "-- as and inline SQL  ..."
+  WHITESPACE@621..622 "\n"
+  CREATE_FUNCTION@622..690
+    CREATE_KW@622..628 "create"
+    WHITESPACE@628..629 " "
+    FUNCTION_KW@629..637 "function"
+    WHITESPACE@637..638 " "
+    FUNCTION_NAME@638..639
+      PATH@638..639
+        PATH_SEGMENT@638..639
+          IDENT@638..639 "f"
+    PARAM_LIST@639..641
+      L_PAREN@639..640 "("
+      R_PAREN@640..641 ")"
+    WHITESPACE@641..642 " "
+    RET_TYPE@642..653
+      RETURNS_KW@642..649 "returns"
+      WHITESPACE@649..650 " "
+      PATH_TYPE@650..653
+        PATH_REF@650..653
+          PATH_SEGMENT_REF@650..653
+            INT_KW@650..653 "int"
+    WHITESPACE@653..654 " "
+    FUNC_OPTION_LIST@654..680
+      LANGUAGE_FUNC_OPTION@654..666
+        LANGUAGE_KW@654..662 "language"
+        WHITESPACE@662..663 " "
+        LANGUAGE_REF@663..666
+          SQL_KW@663..666 "sql"
+      WHITESPACE@666..667 " "
+      AS_FUNC_OPTION@667..680
+        AS_KW@667..669 "as"
+        WHITESPACE@669..670 " "
+        AS_DEFINITION@670..680
+          LITERAL@670..680
+            STRING@670..680 "'select 1'"
+    WHITESPACE@680..681 " "
+    RETURN_STMT@681..689
+      RETURN_KW@681..687 "return"
+      WHITESPACE@687..688 " "
+      LITERAL@688..689
+        INT_NUMBER@688..689 "2"
+    SEMICOLON@689..690 ";"
+  WHITESPACE@690..691 "\n"
+  CREATE_PROCEDURE@691..756
+    CREATE_KW@691..697 "create"
+    WHITESPACE@697..698 " "
+    PROCEDURE_KW@698..707 "procedure"
+    WHITESPACE@707..708 " "
+    PROCEDURE_NAME@708..709
+      PATH@708..709
+        PATH_SEGMENT@708..709
+          IDENT@708..709 "p"
+    PARAM_LIST@709..711
+      L_PAREN@709..710 "("
+      R_PAREN@710..711 ")"
+    WHITESPACE@711..712 " "
+    FUNC_OPTION_LIST@712..738
+      LANGUAGE_FUNC_OPTION@712..724
+        LANGUAGE_KW@712..720 "language"
+        WHITESPACE@720..721 " "
+        LANGUAGE_REF@721..724
+          SQL_KW@721..724 "sql"
+      WHITESPACE@724..725 " "
+      AS_FUNC_OPTION@725..738
+        AS_KW@725..727 "as"
+        WHITESPACE@727..728 " "
+        AS_DEFINITION@728..738
+          LITERAL@728..738
+            STRING@728..738 "'select 1'"
+    WHITESPACE@738..739 " "
+    ATOMIC_BODY@739..755
+      BEGIN_KW@739..744 "begin"
+      WHITESPACE@744..745 " "
+      ATOMIC_KW@745..751 "atomic"
+      WHITESPACE@751..752 " "
+      END_KW@752..755 "end"
+    SEMICOLON@755..756 ";"
+  WHITESPACE@756..758 "\n\n"
+  COMMENT@758..814 "-- repeated set and r ..."
+  WHITESPACE@814..815 "\n"
+  ALTER_FUNCTION@815..880
+    ALTER_KW@815..820 "alter"
+    WHITESPACE@820..821 " "
+    FUNCTION_KW@821..829 "function"
+    WHITESPACE@829..830 " "
+    FUNCTION_SIG@830..833
+      FUNCTION_NAME_REF@830..831
+        PATH_REF@830..831
+          PATH_SEGMENT_REF@830..831
+            IDENT@830..831 "f"
+      PARAM_LIST@831..833
+        L_PAREN@831..832 "("
+        R_PAREN@832..833 ")"
+    WHITESPACE@833..836 "\n  "
+    FUNC_OPTION_LIST@836..879
+      SET_FUNC_OPTION@836..845
+        SET_CONFIG_PARAM@836..845
+          SET_KW@836..839 "set"
+          WHITESPACE@839..840 " "
+          CONFIG_PARAMETER_REF@840..841
+            PATH_REF@840..841
+              PATH_SEGMENT_REF@840..841
+                IDENT@840..841 "a"
+          WHITESPACE@841..842 " "
+          TO_CONFIG_VALUE@842..845
+            EQ@842..843 "="
+            WHITESPACE@843..844 " "
+            LITERAL@844..845
+              INT_NUMBER@844..845 "1"
+      WHITESPACE@845..848 "\n  "
+      SET_FUNC_OPTION@848..857
+        SET_CONFIG_PARAM@848..857
+          SET_KW@848..851 "set"
+          WHITESPACE@851..852 " "
+          CONFIG_PARAMETER_REF@852..853
+            PATH_REF@852..853
+              PATH_SEGMENT_REF@852..853
+                IDENT@852..853 "a"
+          WHITESPACE@853..854 " "
+          TO_CONFIG_VALUE@854..857
+            EQ@854..855 "="
+            WHITESPACE@855..856 " "
+            LITERAL@856..857
+              INT_NUMBER@856..857 "2"
+      WHITESPACE@857..860 "\n  "
+      RESET_FUNC_OPTION@860..867
+        RESET_KW@860..865 "reset"
+        WHITESPACE@865..866 " "
+        CONFIG_PARAMETER_REF@866..867
+          PATH_REF@866..867
+            PATH_SEGMENT_REF@866..867
+              IDENT@866..867 "a"
+      WHITESPACE@867..870 "\n  "
+      RESET_FUNC_OPTION@870..879
+        RESET_KW@870..875 "reset"
+        WHITESPACE@875..876 " "
+        ALL_KW@876..879 "all"
+    SEMICOLON@879..880 ";"
+  WHITESPACE@880..882 "\n\n"
+  COMMENT@882..917 "-- the routine body i ..."
+  WHITESPACE@917..918 "\n"
+  CREATE_FUNCTION@918..1000
+    CREATE_KW@918..924 "create"
+    WHITESPACE@924..925 " "
+    FUNCTION_KW@925..933 "function"
+    WHITESPACE@933..934 " "
+    FUNCTION_NAME@934..935
+      PATH@934..935
+        PATH_SEGMENT@934..935
+          IDENT@934..935 "f"
+    PARAM_LIST@935..937
+      L_PAREN@935..936 "("
+      R_PAREN@936..937 ")"
+    WHITESPACE@937..938 " "
+    RET_TYPE@938..949
+      RETURNS_KW@938..945 "returns"
+      WHITESPACE@945..946 " "
+      PATH_TYPE@946..949
+        PATH_REF@946..949
+          PATH_SEGMENT_REF@946..949
+            INT_KW@946..949 "int"
+    WHITESPACE@949..952 "\n  "
+    FUNC_OPTION_LIST@952..964
+      LANGUAGE_FUNC_OPTION@952..964
+        LANGUAGE_KW@952..960 "language"
+        WHITESPACE@960..961 " "
+        LANGUAGE_REF@961..964
+          SQL_KW@961..964 "sql"
+    WHITESPACE@964..967 "\n  "
+    ATOMIC_BODY@967..999
+      BEGIN_KW@967..972 "begin"
+      WHITESPACE@972..973 " "
+      ATOMIC_KW@973..979 "atomic"
+      WHITESPACE@979..984 "\n    "
+      SELECT@984..993
+        SELECT_CLAUSE@984..992
+          SELECT_KW@984..990 "select"
+          WHITESPACE@990..991 " "
+          TARGET_LIST@991..992
+            TARGET@991..992
+              LITERAL@991..992
+                INT_NUMBER@991..992 "1"
+        SEMICOLON@992..993 ";"
+      WHITESPACE@993..996 "\n  "
+      END_KW@996..999 "end"
+    SEMICOLON@999..1000 ";"
+  WHITESPACE@1000..1001 "\n"
+
+error[syntax-error]: Conflicting or redundant options.
+  ╭▸ 
+2 │ do language plpgsql $$ x $$ language sql;
+  ╰╴                            ━━━━━━━━━━━━
+error[syntax-error]: Conflicting or redundant options.
+  ╭▸ 
+7 │   language sql
+  ╰╴  ━━━━━━━━━━━━
+error[syntax-error]: Conflicting or redundant options.
+   ╭▸ 
+12 │   stable
+   ╰╴  ━━━━━━
+error[syntax-error]: Conflicting or redundant options.
+   ╭▸ 
+17 │   called on null input
+   ╰╴  ━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Conflicting or redundant options.
+   ╭▸ 
+22 │   external security definer
+   ╰╴  ━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Conflicting or redundant options.
+   ╭▸ 
+27 │   as 'foo', 'bar';
+   ╰╴  ━━━━━━━━━━━━━━━
+error[syntax-error]: Conflicting or redundant options.
+   ╭▸ 
+29 │ alter function f() cost 1 cost 2;
+   ╰╴                          ━━━━━━
+error[syntax-error]: Conflicting or redundant options.
+   ╭▸ 
+31 │ alter function f() leakproof not leakproof;
+   ╰╴                             ━━━━━━━━━━━━━
+error[syntax-error]: Duplicate function body.
+   ╭▸ 
+34 │ create function f() returns int language sql as 'select 1' return 2;
+   ╰╴                                                           ━━━━━━━━
+error[syntax-error]: Duplicate function body.
+   ╭▸ 
+35 │ create procedure p() language sql as 'select 1' begin atomic end;
+   ╰╴                                                ━━━━━━━━━━━━━━━━

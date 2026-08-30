@@ -60,6 +60,36 @@ SOURCE_FILE
             IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- from_option"
+  WHITESPACE "\n"
+  CREATE_COLLATION
+    CREATE_KW "create"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    COLLATION
+      PATH
+        PATH_SEGMENT
+          IDENT "c"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          FROM_KW "from"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "\"C\""
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- with_options"
   WHITESPACE "\n"
   CREATE_COLLATION

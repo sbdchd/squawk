@@ -1,0 +1,13 @@
+create cast (integer as bigint) with function public.integer_to_bigint(integer) as assignment;
+
+create cast (text as varchar) without function as implicit;
+
+create cast (json as jsonb) with inout;
+
+create cast (extraordinarily_long_schema_name.extraordinarily_long_source_type_name as extraordinarily_long_schema_name.extraordinarily_long_target_type_name) with function extraordinarily_long_schema_name.extraordinarily_long_conversion_function_name(extraordinarily_long_schema_name.extraordinarily_long_source_type_name) as implicit;
+
+create /* cast keyword */ cast /* left parenthesis */ (/* source type */ text /* as keyword */ as /* target type */ varchar /* right parenthesis */) /* method */ with /* function keyword */ function /* function name */ public.convert_text(/* argument type */ text /* argument closing parenthesis */) /* context */ as /* assignment keyword */ assignment /* semicolon */;
+
+create cast (integer as text) /* method */ without /* function keyword */ function /* context */ as /* implicit keyword */ implicit;
+
+create cast (xml as text) /* method */ with /* inout keyword */ inout;

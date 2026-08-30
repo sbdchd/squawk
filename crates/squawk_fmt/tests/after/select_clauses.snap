@@ -57,3 +57,26 @@ with /* before recursive */ recursive /* before cte */ cte/* before columns */ (
 select
   x
 /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties;
+
+select ''::text as five, unique1, unique2, stringu1
+from onek
+order by unique1
+/* before offset */ offset 990
+/* before limit */ limit 5;
+
+select thousand
+from onek
+where thousand < 5
+order by thousand
+/* before fetch */ fetch first 1 row with ties
+/* before locking */ for update skip locked;
+
+select thousand
+from onek
+where thousand < 995
+order by thousand
+/* before offset */ offset 10
+/* before fetch */ fetch first 5 rows only;
+
+select x from foo offset 1 limit 2;
+select x from foo limit 2 for update;

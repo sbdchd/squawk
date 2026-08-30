@@ -1,0 +1,6 @@
+drop sequence public.order_number_seq;
+
+drop sequence if exists extraordinarily_long_schema_name.extraordinarily_long_sequence_name_for_customer_order_numbers, another_extraordinarily_long_schema_name.another_extraordinarily_long_sequence_name cascade;
+
+-- comments in every position
+drop /* sequence */ sequence /* if */ if /* exists */ exists /* first schema */ public /* first dot */ . order_number_seq /* comma */, /* second schema */ accounting /* second dot */ . invoice_number_seq /* behavior */ restrict /* end */;

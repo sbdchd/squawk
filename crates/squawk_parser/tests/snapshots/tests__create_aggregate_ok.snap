@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
+assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/create_aggregate.sql
 ---
 SOURCE_FILE
@@ -756,25 +757,26 @@ SOURCE_FILE
         TIMESTAMP_TYPE
           TIMESTAMP_KW "timestamp"
       WHITESPACE " "
-      ORDER_KW "ORDER"
-      WHITESPACE " "
-      BY_KW "BY"
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          PATH_REF
-            PATH_SEGMENT_REF
-              IDENT "a"
-      COMMA ","
-      WHITESPACE "\n  "
-      PARAM
-        PARAM_NAME
-          IDENT "result"
+      AGGREGATE_ORDER_BY
+        ORDER_KW "ORDER"
         WHITESPACE " "
-        PATH_TYPE
-          PATH_REF
-            PATH_SEGMENT_REF
-              NUMERIC_KW "numeric"
+        BY_KW "BY"
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "a"
+        COMMA ","
+        WHITESPACE "\n  "
+        PARAM
+          PARAM_NAME
+            IDENT "result"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                NUMERIC_KW "numeric"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
@@ -1033,15 +1035,16 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "float8"
       WHITESPACE " "
-      ORDER_KW "ORDER"
-      WHITESPACE " "
-      BY_KW "BY"
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          PATH_REF
-            PATH_SEGMENT_REF
-              IDENT "anyelement"
+      AGGREGATE_ORDER_BY
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "anyelement"
       R_PAREN ")"
     WHITESPACE "\n"
     ATTRIBUTE_LIST

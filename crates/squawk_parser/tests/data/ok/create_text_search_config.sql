@@ -8,3 +8,8 @@ create text search configuration foo.name (
   config = source_config
 );
 
+-- copy
+create text search configuration foo.name (
+  copy = other_config
+);
+

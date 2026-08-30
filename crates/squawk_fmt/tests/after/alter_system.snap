@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_system.sql
+---
+alter system set work_mem = '64MB';
+
+alter system
+  set archive_command to 'cp %p /very/long/archive/destination/with/a/descriptive/directory/%f';
+
+alter system
+  set shared_preload_libraries = 'pg_stat_statements',
+  /* second value */ 'auto_explain';
+
+alter system set effective_cache_size from current;
+
+alter system reset work_mem;
+
+alter system reset all;
+
+alter /* system */ system
+  /* action */ set /* parameter */ autovacuum_vacuum_cost_limit /* equals */ = /* value */ 4000/* semicolon */;
+
+alter /* system */ system
+  /* reset */ reset /* parameter */ autovacuum_analyze_scale_factor/* semicolon */;

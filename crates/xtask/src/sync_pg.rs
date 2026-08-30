@@ -93,6 +93,10 @@ const IGNORED_LINES: &[&str] = &[
     "CREATE STATISTICS tst ON a FROM ext_stats_test s TABLESAMPLE system (x);",
     "CREATE STATISTICS tst ON a FROM XMLTABLE('foo' PASSING 'bar' COLUMNS a text);",
     "CREATE STATISTICS tst ON a FROM JSON_TABLE(jsonb '123', '$' COLUMNS (item int));",
+    "SELECT CAST('42' AS text COLLATE \"C\");",
+    "SELECT * FROM JSON_TABLE(jsonb '1', '$' COLUMNS (a int exists empty object on empty));",
+    "CREATE TABLE error_tbl (i int DEFAULT (100, ));",
+    "    AS $$ SELECT x * 2 $$",
     "CREATE STATISTICS alt_stat2 ON a FROM tftest(1);",
     "ALTER STATISTICS IF EXISTS ab1_a_b_stats SET STATISTICS 0;",
     "CHECKPOINT (WRONG);",
@@ -541,6 +545,19 @@ mod tests {
                 "SELECT JSON_OBJECT('foo': NULL::int FORMAT JSON);",
                 "SELECT JSON_OBJECT('foo': NULL::int FORMAT JSON);",
             ),
+            (
+                "SELECT CAST('42' AS text COLLATE \"C\");",
+                "-- SELECT CAST('42' AS text COLLATE \"C\");",
+            ),
+            (
+                "SELECT * FROM JSON_TABLE(jsonb '1', '$' COLUMNS (a int exists empty object on empty));",
+                "-- SELECT * FROM JSON_TABLE(jsonb '1', '$' COLUMNS (a int exists empty object on empty));",
+            ),
+            (
+                "CREATE TABLE error_tbl (i int DEFAULT (100, ));",
+                "-- CREATE TABLE error_tbl (i int DEFAULT (100, ));",
+            ),
+            ("    AS $$ SELECT x * 2 $$", "--     AS $$ SELECT x * 2 $$"),
             (
                 r#"ALTER DATABASE :"datname" REFRESH COLLATION VERSION;"#,
                 r#"ALTER DATABASE "datname" REFRESH COLLATION VERSION;"#,

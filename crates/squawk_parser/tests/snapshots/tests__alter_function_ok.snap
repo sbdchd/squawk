@@ -171,75 +171,25 @@ SOURCE_FILE
         WHITESPACE " "
         INPUT_KW "input"
       WHITESPACE "\n  "
-      RETURNS_NULL_ON_NULL_INPUT_FUNC_OPTION
-        RETURNS_KW "returns"
-        WHITESPACE " "
-        NULL_KW "null"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        NULL_KW "null"
-        WHITESPACE " "
-        INPUT_KW "input"
-      WHITESPACE "\n  "
-      STRICT_FUNC_OPTION
-        STRICT_KW "strict"
-      WHITESPACE "\n  "
       IMMUTABLE
         IMMUTABLE_KW "immutable"
-      WHITESPACE "\n  "
-      STABLE
-        STABLE_KW "stable"
-      WHITESPACE "\n  "
-      VOLATILE
-        VOLATILE_KW "volatile"
       WHITESPACE "\n  "
       NOT_LEAKPROOF_FUNC_OPTION
         NOT_KW "not"
         WHITESPACE " "
         LEAKPROOF_KW "leakproof"
       WHITESPACE "\n  "
-      LEAKPROOF_FUNC_OPTION
-        LEAKPROOF_KW "leakproof"
-      WHITESPACE "\n  "
       SECURITY_INVOKER_FUNC_OPTION
         EXTERNAL_KW "external"
         WHITESPACE " "
         SECURITY_KW "security"
         WHITESPACE " "
         INVOKER_KW "invoker"
-      WHITESPACE "\n  "
-      SECURITY_INVOKER_FUNC_OPTION
-        SECURITY_KW "security"
-        WHITESPACE " "
-        INVOKER_KW "invoker"
-      WHITESPACE "\n  "
-      SECURITY_DEFINER_FUNC_OPTION
-        EXTERNAL_KW "external"
-        WHITESPACE " "
-        SECURITY_KW "security"
-        WHITESPACE " "
-        DEFINER_KW "definer"
-      WHITESPACE "\n  "
-      SECURITY_DEFINER_FUNC_OPTION
-        SECURITY_KW "security"
-        WHITESPACE " "
-        DEFINER_KW "definer"
       WHITESPACE "\n  "
       PARALLEL_FUNC_OPTION
         PARALLEL_KW "parallel"
         WHITESPACE " "
         IDENT "unsafe"
-      WHITESPACE "\n  "
-      PARALLEL_FUNC_OPTION
-        PARALLEL_KW "parallel"
-        WHITESPACE " "
-        IDENT "restricted"
-      WHITESPACE "\n  "
-      PARALLEL_FUNC_OPTION
-        PARALLEL_KW "parallel"
-        WHITESPACE " "
-        IDENT "safe"
       WHITESPACE "\n  "
       COST_FUNC_OPTION
         COST_KW "cost"
@@ -333,6 +283,196 @@ SOURCE_FILE
         ALL_KW "all"
     WHITESPACE "\n  "
     RESTRICT_KW "restrict"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- strict_variants"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      RETURNS_NULL_ON_NULL_INPUT_FUNC_OPTION
+        RETURNS_KW "returns"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        INPUT_KW "input"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- volatility_variants"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      STABLE
+        STABLE_KW "stable"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      VOLATILE
+        VOLATILE_KW "volatile"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- leakproof_variants"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LEAKPROOF_FUNC_OPTION
+        LEAKPROOF_KW "leakproof"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- security_variants"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      SECURITY_INVOKER_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      SECURITY_DEFINER_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      SECURITY_DEFINER_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- parallel_variants"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "restricted"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"

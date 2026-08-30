@@ -4,36 +4,24 @@ input_file: crates/squawk_fmt/tests/before/import_foreign_schema.sql
 ---
 import foreign schema remote from server foreign_server into local;
 
-import
-  foreign
-  schema
-  remote
+import foreign schema remote
   limit to (records, users)
-  from
-  server foreign_server
+  from server foreign_server
   into local
   options (
     schema_name 'public'
   );
 
-import
-  foreign
-  schema
-  remote
+import foreign schema remote
   except (ignored_records)
-  from
-  server foreign_server
+  from server foreign_server
   into an_intentionally_long_local_schema_name_that_makes_the_statement_exceed_eighty_characters;
 
 /* before import */
-import
-  /* before foreign */ foreign
-  /* before schema */ schema
-  /* before remote */ remote
+import /* before foreign */ foreign /* before schema */ schema /* before remote */ remote
   /* before limit */ limit /* before to */ to  /* before open */(
     /* before table */ records /* before comma */,
     /* before second */ users /* before close */
   )
-  /* before from */ from
-  /* before server */ server /* before server name */ foreign_server
+  /* before from */ from /* before server */ server /* before server name */ foreign_server
   /* before into */ into /* before local */ local/* before semicolon */;

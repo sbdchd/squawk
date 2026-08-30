@@ -1,0 +1,5 @@
+create text search dictionary public.english_stem (template = snowball, language = english);
+
+create text search dictionary extraordinarily_long_schema_name.extraordinarily_long_dictionary_name (template = public.extraordinarily_long_dictionary_template_name, stopwords = 'extraordinarily_long_stopword_dictionary_name');
+
+create /* text keyword */ text /* search keyword */ search /* dictionary keyword */ dictionary /* name */ public /* dot */ . /* name segment */ commented_dictionary /* left parenthesis */ (/* first option */ template /* equals */ = /* value */ public.snowball /* comma */, /* second option */ language = /* second value */ english /* right parenthesis */) /* semicolon */;

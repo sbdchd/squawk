@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
+assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/alter_extension.sql
 ---
 SOURCE_FILE
@@ -150,22 +151,23 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     TEXT_KW "text"
             WHITESPACE " "
-            ORDER_KW "order"
-            WHITESPACE " "
-            BY_KW "by"
-            WHITESPACE " "
-            PARAM
-              PATH_TYPE
-                PATH_REF
-                  PATH_SEGMENT_REF
-                    IDENT "b"
-            COMMA ","
-            WHITESPACE " "
-            PARAM
-              PATH_TYPE
-                PATH_REF
-                  PATH_SEGMENT_REF
-                    IDENT "c"
+            AGGREGATE_ORDER_BY
+              ORDER_KW "order"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              PARAM
+                PATH_TYPE
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              PARAM
+                PATH_TYPE
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "c"
             WHITESPACE " "
             R_PAREN ")"
     SEMICOLON ";"

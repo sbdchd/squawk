@@ -8,10 +8,14 @@ fn has_foreign_key_constraint(create_table: &ast::CreateTable) -> bool {
                     return true;
                 }
                 ast::TableArg::Column(column) => {
-                    if column
-                        .constraints()
-                        .any(|c| matches!(c, ast::ColumnConstraint::ReferencesConstraint(_)))
-                    {
+                    if column.clauses().any(|c| {
+                        matches!(
+                            c,
+                            ast::ColumnClause::ColumnConstraint(
+                                ast::ColumnConstraint::ReferencesConstraint(_)
+                            )
+                        )
+                    }) {
                         return true;
                     }
                 }

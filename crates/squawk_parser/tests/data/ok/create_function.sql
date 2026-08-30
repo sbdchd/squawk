@@ -291,9 +291,13 @@ create function f()
   rows 1000
   support foo.bar
   set a.b = 10
-  as ''
-  as 'foo', 'bar'
   return (select 1);
+
+-- as_with_two_strings
+create function f()
+  returns void
+  language c
+  as 'foo', 'bar';
 
 -- regression
 create function foo(int8)

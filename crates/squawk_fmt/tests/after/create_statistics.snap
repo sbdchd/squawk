@@ -1,0 +1,31 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_statistics.sql
+---
+create statistics user_activity_stats
+  on user_id, created_at
+  from app.user_activity;
+
+create statistics if not exists
+  extraordinarily_long_schema_name.extraordinarily_long_statistics_name (
+    ndistinct,
+    dependencies,
+    mcv
+  )
+  on
+    extraordinarily_long_first_column_name,
+    (lower(extraordinarily_long_second_column_name)),
+    extraordinarily_long_third_column_name
+      + extraordinarily_long_fourth_column_name
+  from extraordinarily_long_schema_name.extraordinarily_long_table_name;
+
+-- comments in every position
+create /* statistics */ statistics /* if */ if /* not */ not /* exists */ exists
+  /* name */ app.orders_stats /* open kinds */ (
+    /* first kind */ ndistinct /* kind comma */,
+    /* second kind */ dependencies /* close kinds */
+  )
+  /* on */ on
+    /* first expression */ customer_id /* expression comma */,
+    /* second expression */ (lower(email))
+  /* from */ from /* table */ app.orders/* end */;

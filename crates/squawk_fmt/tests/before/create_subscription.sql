@@ -2,4 +2,8 @@ create subscription local_sub connection 'host=localhost port=5432 dbname=publis
 
 create subscription server_sub server publisher_server publication all_changes;
 
+create subscription regress_testsub connection 'dbname=regress_doesnotexist' publication testpub with (connect = false, max_retention_duration = -1);
+
+create subscription regress_testsub connection 'dbname=regress_doesnotexist' publication testpub with (connect = false, max_retention_duration /* before equals */ = /* before minus */ - /* before one */ 1 /* after one */);
+
 create /* after create */ subscription /* before name */ commented_sub connection /* before connection */ 'host=localhost' publication /* before publication */ all_changes, /* after comma */ selected_tables with /* before params */ (enabled = true) /* before semicolon */;

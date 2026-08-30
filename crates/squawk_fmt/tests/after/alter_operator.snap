@@ -1,0 +1,19 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/alter_operator.sql
+---
+alter /* operator */ operator /* signature */ public.+ /* left paren */(
+  /* left type */ integer /* comma */,
+  /* right type */ integer /* right paren */
+)
+  /* owner */ owner /* to */ to /* role */ application_owner/* end */;
+
+alter operator public.##(none, integer) set (
+  restrict = schema_a.restrict_function_with_a_very_long_name,
+  join = schema_a.join_function_with_a_very_long_name,
+  hashes,
+  merges
+);
+
+alter operator public.+(integer, integer)
+  /* set */ set /* schema */ schema /* name */ archive;

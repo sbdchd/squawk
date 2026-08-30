@@ -206,4 +206,241 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- operator names as values"
+  WHITESPACE "\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      PLUS "+"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PLUS "+"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "negator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          MINUS "-"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          RESTRICT_KW "restrict"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          STAR "*"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      PLUS "+"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          R_ANGLE ">"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "negator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          L_ANGLE "<"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          RESTRICT_KW "restrict"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          GTEQ ">="
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          JOIN_KW "join"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          LTEQ "<="
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      PLUS "+"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          NEQB "<>"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "negator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          NEQ "!="
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          RESTRICT_KW "restrict"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          SLASH "/"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          JOIN_KW "join"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PERCENT "%"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      PLUS "+"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          CARET "^"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "negator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          CUSTOM_OP
+            MINUS "-"
+            R_ANGLE ">"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- qualified operator names"
+  WHITESPACE "\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      PLUS "+"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          OPERATOR_CALL
+            OPERATOR_KW "operator"
+            L_PAREN "("
+            OP
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "pg_catalog"
+                DOT "."
+                PATH_SEGMENT_REF
+              PLUS "+"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "negator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          OPERATOR_CALL
+            OPERATOR_KW "operator"
+            L_PAREN "("
+            OP
+              MINUS "-"
+            R_PAREN ")"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

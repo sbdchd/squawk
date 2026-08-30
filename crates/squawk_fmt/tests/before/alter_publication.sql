@@ -2,6 +2,10 @@ alter publication selected_tables add table public.new_accounts, tables in schem
 
 alter publication selected_tables drop table public.old_accounts;
 
+alter publication selected_tables add table public.first_table, /* before omitted table */ public.second_table;
+
+alter publication selected_tables set tables in schema first_schema, /* before omitted schema */ second_schema;
+
 alter publication selected_tables set table public.accounts (id) where (id > 200);
 
 alter publication everything set all tables, all sequences except (table private.tokens, audit.logs);

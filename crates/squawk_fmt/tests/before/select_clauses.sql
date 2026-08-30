@@ -7,3 +7,12 @@ with a_very_long_common_table_expression_name as (select a_very_long_source_colu
 with /* before recursive */ recursive /* before cte */ cte /* before columns */ (/* before column */ x /* before columns close */) /* before as */ as /* before materialized */ materialized /* before query open */ (/* before query */ select 1 /* before query close */) /* before outer select */ select /* before target */ x /* before from */ from /* before relation */ cte /* before where */ where /* before where expression */ x > 0 /* before group */ group /* before by */ by /* before group expression */ x /* before having */ having /* before having expression */ count(*) > 0 /* before window */ window /* before window name */ win /* before window as */ as /* before window open */ (/* before partition */ partition /* before partition by */ by /* before partition expression */ x /* before window close */) /* before order */ order /* before order by */ by /* before order expression */ x /* before desc */ desc /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait /* before limit */ limit /* before limit value */ 10 /* before offset */ offset /* before offset value */ 2 /* before rows */ rows /* before semicolon */;
 
 select x /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties;
+
+select ''::text as five, unique1, unique2, stringu1 from onek order by unique1 /* before offset */ offset 990 /* before limit */ limit 5;
+
+select thousand from onek where thousand < 5 order by thousand /* before fetch */ fetch first 1 row with ties /* before locking */ for update skip locked;
+
+select thousand from onek where thousand < 995 order by thousand /* before offset */ offset 10 /* before fetch */ fetch first 5 rows only;
+
+select x from foo offset 1 limit 2;
+select x from foo limit 2 for update;

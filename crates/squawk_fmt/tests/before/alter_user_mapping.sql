@@ -1,0 +1,3 @@
+alter /* user */ user /* mapping */ mapping /* for */ for /* role */ current_user /* server */ server /* server name */ exceptionally_long_foreign_data_server_for_customer_analytics /* options */ options /* left */ (/* add */ add /* option */ authentication_token /* value */ 'an-exceptionally-long-authentication-token-value', /* set */ set /* option */ endpoint /* value */ 'https://analytics.example.test/foreign-data', /* drop */ drop /* option */ obsolete_setting /* right */) /* end */;
+
+alter user mapping for public server short_server options (set user_name 'reporter');

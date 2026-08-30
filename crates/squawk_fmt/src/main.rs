@@ -1,8 +1,11 @@
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use std::path::PathBuf;
+use std::process::ExitCode;
 
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
 use clap::Parser;
+use squawk_syntax::SourceFile;
 
 #[derive(Parser)]
 #[command(name = "squawk-fmt")]
@@ -11,18 +14,43 @@ struct Cli {
     file: Option<PathBuf>,
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<ExitCode> {
     let cli = Cli::parse();
 
-    let input = match cli.file {
-        Some(path) => std::fs::read_to_string(&path)?,
+    let (input, path) = match cli.file {
+        Some(path) => {
+            let input = std::fs::read_to_string(&path)?;
+            (input, path.display().to_string())
+        }
         None => {
             let mut buf = String::new();
             io::stdin().read_to_string(&mut buf)?;
-            buf
+            (buf, "stdin".to_string())
         }
     };
 
-    print!("{}", squawk_fmt::fmt(&input)?);
-    Ok(())
+    let parse = SourceFile::parse(&input);
+    let errors = parse.errors();
+    if !errors.is_empty() {
+        let renderer = Renderer::styled().decor_style(DecorStyle::Unicode);
+        let stderr = io::stderr();
+        let mut stderr = stderr.lock();
+
+        for error in errors {
+            let snippet = Snippet::source(&input)
+                .path(&path)
+                .fold(true)
+                .annotation(AnnotationKind::Primary.span(error.range().into()));
+            let group = Level::ERROR
+                .primary_title(error.message())
+                .id("syntax-error")
+                .element(snippet);
+            writeln!(stderr, "{}", renderer.render(&[group]))?;
+        }
+
+        return Ok(ExitCode::FAILURE);
+    }
+
+    write!(io::stdout().lock(), "{}", squawk_fmt::fmt_str(&input)?)?;
+    Ok(ExitCode::SUCCESS)
 }

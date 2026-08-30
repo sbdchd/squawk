@@ -1807,21 +1807,21 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_REF
           SQL_KW "sql"
-      WHITESPACE "\n"
-      RETURN_FUNC_OPTION
-        RETURN_KW "return"
-        WHITESPACE " "
-        PAREN_EXPR
-          L_PAREN "("
-          SELECT
-            SELECT_CLAUSE
-              SELECT_KW "select"
-              WHITESPACE " "
-              TARGET_LIST
-                TARGET
-                  LITERAL
-                    INT_NUMBER "1"
-          R_PAREN ")"
+    WHITESPACE "\n"
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- begin atomic"
@@ -1853,33 +1853,33 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_REF
           SQL_KW "sql"
+    WHITESPACE "\n"
+    ATOMIC_BODY
+      BEGIN_KW "begin"
+      WHITESPACE " "
+      ATOMIC_KW "atomic"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+        SEMICOLON ";"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "2"
+        SEMICOLON ";"
       WHITESPACE "\n"
-      BEGIN_FUNC_OPTION_LIST
-        BEGIN_KW "begin"
-        WHITESPACE " "
-        ATOMIC_KW "atomic"
-        WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "1"
-          SEMICOLON ";"
-        WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "2"
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        END_KW "end"
+      END_KW "end"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1909,23 +1909,23 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_REF
           SQL_KW "sql"
-      WHITESPACE "\n"
-      BEGIN_FUNC_OPTION_LIST
-        BEGIN_KW "begin"
-        WHITESPACE " "
-        ATOMIC_KW "atomic"
-        WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "1"
-          SEMICOLON ";"
-        WHITESPACE "\n  "
-        END_KW "end"
+    WHITESPACE "\n"
+    ATOMIC_BODY
+      BEGIN_KW "begin"
+      WHITESPACE " "
+      ATOMIC_KW "atomic"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+        SEMICOLON ";"
+      WHITESPACE "\n  "
+      END_KW "end"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT_TRANSACTION
@@ -1961,46 +1961,46 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_REF
           SQL_KW "sql"
+    WHITESPACE "\n"
+    ATOMIC_BODY
+      BEGIN_KW "begin"
+      WHITESPACE " "
+      ATOMIC_KW "atomic"
       WHITESPACE "\n"
-      BEGIN_FUNC_OPTION_LIST
-        BEGIN_KW "begin"
-        WHITESPACE " "
-        ATOMIC_KW "atomic"
-        WHITESPACE "\n"
-        EMPTY_STMT
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        EMPTY_STMT
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        EMPTY_STMT
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        EMPTY_STMT
-          SEMICOLON ";"
-        WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "1"
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        EMPTY_STMT
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        EMPTY_STMT
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        EMPTY_STMT
-          SEMICOLON ";"
-        EMPTY_STMT
-          SEMICOLON ";"
-        WHITESPACE "\n"
-        END_KW "end"
+      EMPTY_STMT
+        SEMICOLON ";"
+      WHITESPACE "\n"
+      EMPTY_STMT
+        SEMICOLON ";"
+      WHITESPACE "\n"
+      EMPTY_STMT
+        SEMICOLON ";"
+      WHITESPACE "\n"
+      EMPTY_STMT
+        SEMICOLON ";"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+        SEMICOLON ";"
+      WHITESPACE "\n"
+      EMPTY_STMT
+        SEMICOLON ";"
+      WHITESPACE "\n"
+      EMPTY_STMT
+        SEMICOLON ";"
+      WHITESPACE "\n"
+      EMPTY_STMT
+        SEMICOLON ";"
+      EMPTY_STMT
+        SEMICOLON ";"
+      WHITESPACE "\n"
+      END_KW "end"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all options"
@@ -2114,13 +2114,52 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "10"
-      WHITESPACE "\n  "
-      AS_FUNC_OPTION
-        AS_KW "as"
+    WHITESPACE "\n  "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- as_with_two_strings"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "void"
+    WHITESPACE "\n  "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
         WHITESPACE " "
-        AS_DEFINITION
-          LITERAL
-            STRING "''"
+        LANGUAGE_REF
+          IDENT "c"
       WHITESPACE "\n  "
       AS_FUNC_OPTION
         AS_KW "as"
@@ -2132,21 +2171,6 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'bar'"
-      WHITESPACE "\n  "
-      RETURN_FUNC_OPTION
-        RETURN_KW "return"
-        WHITESPACE " "
-        PAREN_EXPR
-          L_PAREN "("
-          SELECT
-            SELECT_CLAUSE
-              SELECT_KW "select"
-              WHITESPACE " "
-              TARGET_LIST
-                TARGET
-                  LITERAL
-                    INT_NUMBER "1"
-          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression"

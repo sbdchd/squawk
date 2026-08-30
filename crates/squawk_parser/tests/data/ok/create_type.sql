@@ -21,6 +21,15 @@ create type t as range (
   subtype = bigint
 );
 
+create type t as range (
+  subtype = bigint,
+  subtype_opclass = o,
+  collation = "C",
+  canonical = c,
+  subtype_diff = d,
+  multirange_type_name = m
+);
+
 
 
 -- schema
@@ -43,6 +52,7 @@ create type t (
   typmod_in = type_modifier_input_function,
   typmod_out = type_modifier_output_function,
   analyze = analyze_function,
+  analyse = analyze_function,
   subscript = subscript_function,
   internallength = variable,
   passedbyvalue,

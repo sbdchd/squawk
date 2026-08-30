@@ -17,8 +17,14 @@ alter procedure p
 -- security
 alter procedure p
   security invoker
+  restrict;
+alter procedure p
   external security invoker
+  restrict;
+alter procedure p
   security definer
+  restrict;
+alter procedure p
   external security definer 
   restrict;
 

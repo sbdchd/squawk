@@ -1,0 +1,29 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_event_trigger.sql
+---
+create event trigger ddl_watch
+  on ddl_command_start
+  execute function audit.log_ddl();
+
+create event trigger extraordinarily_long_event_trigger_name
+  on ddl_command_end
+  when tag in ('CREATE TABLE', 'ALTER TABLE', 'CREATE MATERIALIZED VIEW')
+  and extension in ('extraordinarily_long_extension_name')
+  execute procedure
+    extraordinarily_long_schema_name.extraordinarily_long_event_trigger_procedure();
+
+/* before create */
+create /* before event */ event /* before trigger */ trigger /* before name */ commented_trigger
+  /* before on */ on /* before event name */ ddl_command_end
+  /* before when */ when /* before variable */ tag /* before in */ in /* before left paren */ (
+    /* before first literal */ 'CREATE TABLE' /* before comma */,
+    /* after comma */ 'ALTER TABLE' /* before right paren */
+  )
+  /* before and */ and /* before second variable */ extension /* before second in */ in /* before second left paren */ (
+    /* before second literal */ 'postgis' /* before second right paren */
+  )
+  /* before execute */ execute /* before function */ function
+    /* before call */ audit.log_ddl /* before call left paren */(
+       /* before call right paren */
+    )/* before semicolon */;

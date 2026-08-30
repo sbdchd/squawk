@@ -308,76 +308,50 @@ pub(crate) fn unwrap_paren_expr(expr: ast::Expr) -> impl Iterator<Item = ast::Ex
     }
 }
 
-pub(crate) fn iter_from_clause(
-    from_clause: &ast::FromClause,
-) -> impl Iterator<Item = ast::FromItem> {
-    from_clause.from_items().chain(
-        from_clause
-            .join_exprs()
-            .flat_map(|join_expr| JoinExprIter::new(&join_expr)),
-    )
-}
-
-pub(crate) fn iter_join_expr(join_expr: &ast::JoinExpr) -> impl Iterator<Item = ast::FromItem> {
-    JoinExprIter::new(join_expr)
-}
-
-struct JoinExprIter {
-    stack: Vec<JoinExprIterFrame>,
-}
-
-impl JoinExprIter {
-    fn new(join_expr: &ast::JoinExpr) -> Self {
-        Self {
-            stack: vec![JoinExprIterFrame {
-                join_expr: join_expr.clone(),
-                state: JoinExprIterState::JoinExpr,
-            }],
-        }
+pub(crate) fn merge_using_from_item(merge: &ast::Merge) -> Option<ast::FromItem> {
+    match merge.using_on_clause()?.from_list_item()? {
+        ast::FromListItem::FromItem(from_item) => Some(from_item),
+        ast::FromListItem::JoinExpr(_) => None,
     }
 }
 
-struct JoinExprIterFrame {
-    join_expr: ast::JoinExpr,
-    state: JoinExprIterState,
+pub(crate) fn iter_from_clause(
+    from_clause: &ast::FromClause,
+) -> impl Iterator<Item = ast::FromItem> {
+    iter_from_items(from_clause.items())
 }
 
-#[derive(Clone, Copy)]
-enum JoinExprIterState {
-    FromItem,
-    Join,
-    JoinExpr,
+pub(crate) fn iter_join_expr(join_expr: &ast::JoinExpr) -> impl Iterator<Item = ast::FromItem> {
+    iter_from_items(std::iter::once(ast::FromListItem::JoinExpr(
+        join_expr.clone(),
+    )))
 }
 
-impl Iterator for JoinExprIter {
+pub(crate) fn iter_from_items(
+    items: impl Iterator<Item = ast::FromListItem>,
+) -> impl Iterator<Item = ast::FromItem> {
+    let mut stack = items.collect::<Vec<_>>();
+    stack.reverse();
+    FromItemIter { stack }
+}
+
+struct FromItemIter {
+    stack: Vec<ast::FromListItem>,
+}
+
+impl Iterator for FromItemIter {
     type Item = ast::FromItem;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(frame) = self.stack.last_mut() {
-            match frame.state {
-                JoinExprIterState::JoinExpr => {
-                    frame.state = JoinExprIterState::FromItem;
-
-                    if let Some(nested_join) = frame.join_expr.join_expr() {
-                        self.stack.push(JoinExprIterFrame {
-                            join_expr: nested_join,
-                            state: JoinExprIterState::JoinExpr,
-                        });
+        while let Some(item) = self.stack.pop() {
+            match item {
+                ast::FromListItem::FromItem(from_item) => return Some(from_item),
+                ast::FromListItem::JoinExpr(join_expr) => {
+                    if let Some(rhs) = join_expr.join().and_then(|join| join.from_list_item()) {
+                        self.stack.push(rhs);
                     }
-                }
-                JoinExprIterState::FromItem => {
-                    frame.state = JoinExprIterState::Join;
-
-                    if let Some(from_item) = frame.join_expr.from_item() {
-                        return Some(from_item);
-                    }
-                }
-                JoinExprIterState::Join => {
-                    let from_item = frame.join_expr.join().and_then(|join| join.from_item());
-                    self.stack.pop();
-
-                    if from_item.is_some() {
-                        return from_item;
+                    if let Some(lhs) = join_expr.from_list_item() {
+                        self.stack.push(lhs);
                     }
                 }
             }

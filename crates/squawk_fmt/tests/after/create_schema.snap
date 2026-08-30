@@ -1,0 +1,43 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_schema.sql
+---
+create schema app;
+
+create schema if not exists
+  extraordinarily_long_application_reporting_and_data_warehouse_schema
+  authorization extraordinarily_long_application_reporting_and_data_warehouse_owner_role;
+
+create schema authorization "current_user";
+
+-- comments in every position
+create /* schema */ schema /* if */ if /* not */ not /* exists */ exists
+  /* schema name */ reporting
+  /* authorization */ authorization /* role */ reporting_owner/* end */;
+
+create /* schema */ schema
+  /* authorization */ authorization /* role */ schema_owner/* end */;
+
+create schema
+  authorization regress_create_schema_role
+  create function schema_not_existing.func(int) returns int
+    as 'SELECT $1'
+    language sql;
+
+create schema
+  extraordinarily_long_application_reporting_and_data_warehouse_schema
+  authorization extraordinarily_long_application_reporting_and_data_warehouse_owner_role
+  create function extraordinarily_long_application_reporting_and_data_warehouse_schema.calculate_an_extraordinarily_long_result(
+    an_extraordinarily_long_input_parameter integer
+  ) returns an_extraordinarily_long_result_type
+    language sql
+    immutable
+    as 'SELECT $1';
+
+create /* schema keyword */ schema
+  /* authorization keyword */ authorization /* role */ schema_owner
+  /* schema element */ create /* function keyword */ function /* function name */ app /* separator */./* local name */ calculate(
+    /* parameter */ value integer
+  ) /* return type */ returns integer /* language option */
+    language /* language */ sql
+    /* as option */ as /* body */ 'SELECT $1'/* end */;

@@ -43,6 +43,36 @@ use crate::{SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
 
 use super::support;
 
+fn children_either<L: AstNode, R: AstNode>(
+    parent: &SyntaxNode,
+) -> impl Iterator<Item = Either<L, R>> {
+    parent.children().filter_map(|child| {
+        L::cast(child.clone())
+            .map(Either::Left)
+            .or_else(|| R::cast(child).map(Either::Right))
+    })
+}
+
+impl ast::Param {
+    pub fn mode_and_name(&self) -> impl Iterator<Item = Either<ast::ParamMode, ast::ParamName>> {
+        children_either(self.syntax())
+    }
+}
+
+impl ast::Do {
+    pub fn language_and_body(&self) -> impl Iterator<Item = Either<ast::DoLanguage, ast::Literal>> {
+        children_either(self.syntax())
+    }
+}
+
+impl ast::CustomOp {
+    pub fn tokens(&self) -> impl Iterator<Item = SyntaxToken> + '_ {
+        self.syntax()
+            .children_with_tokens()
+            .filter_map(|element| element.into_token())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LitKind {
     BitString(SyntaxToken),
@@ -68,6 +98,22 @@ impl ast::SourceFile {
         find_newline(&self.syntax().text().to_string())
             .map(|(_, line_ending)| line_ending)
             .unwrap_or_default()
+    }
+}
+
+impl ast::TransactionMode {
+    pub fn comma_after(&self) -> Option<SyntaxToken> {
+        for element in self.syntax().siblings_with_tokens(Direction::Next).skip(1) {
+            match element {
+                NodeOrToken::Token(token)
+                    if matches!(token.kind(), SyntaxKind::COMMENT | SyntaxKind::WHITESPACE) => {}
+                NodeOrToken::Token(token) if token.kind() == SyntaxKind::COMMA => {
+                    return Some(token);
+                }
+                _ => return None,
+            }
+        }
+        None
     }
 }
 
@@ -363,10 +409,7 @@ impl ast::PrefixExpr {
 
 impl ast::PostfixExpr {
     pub fn op(&self) -> Option<PostfixOp> {
-        let lhs = self.expr()?;
-
-        let siblings = lhs.syntax().siblings_with_tokens(Direction::Next).skip(1);
-        for child in siblings {
+        for child in self.syntax().children_with_tokens() {
             match child {
                 NodeOrToken::Token(token) => {
                     let op = match token.kind() {
@@ -603,16 +646,49 @@ impl ast::ReturningOption {
 
 impl ast::CompoundSelect {
     #[inline]
-    pub fn lhs(&self) -> Option<ast::SelectVariant> {
+    pub fn lhs_operand(&self) -> Option<ast::CompoundSelectOperand> {
         support::children(&self.syntax).next()
+    }
+
+    #[inline]
+    pub fn rhs_operand(&self) -> Option<ast::CompoundSelectOperand> {
+        support::children(&self.syntax).nth(1)
+    }
+
+    #[inline]
+    pub fn lhs(&self) -> Option<ast::SelectVariant> {
+        self.lhs_operand()?.select_variant()
     }
     #[inline]
     pub fn rhs(&self) -> Option<ast::SelectVariant> {
-        support::children(&self.syntax).nth(1)
+        self.rhs_operand()?.select_variant()
     }
     #[inline]
     pub fn op(&self) -> Option<ast::CompoundOp> {
         support::child(&self.syntax)
+    }
+}
+
+impl ast::CompoundSelectOperand {
+    /// The select this operand ultimately wraps, looking through any
+    /// parenthesized expressions the parser tagged as `ParenExpr`.
+    pub fn select_variant(&self) -> Option<ast::SelectVariant> {
+        match self {
+            ast::CompoundSelectOperand::SelectVariant(select) => Some(select.clone()),
+            ast::CompoundSelectOperand::ParenExpr(paren) => {
+                let mut node = paren.syntax().clone();
+                loop {
+                    let child = node.children().find(|child| {
+                        ast::SelectVariant::can_cast(child.kind())
+                            || ast::ParenExpr::can_cast(child.kind())
+                    })?;
+                    if let Some(select) = ast::SelectVariant::cast(child.clone()) {
+                        return Some(select);
+                    }
+                    node = child;
+                }
+            }
+        }
     }
 }
 
@@ -1166,6 +1242,9 @@ impl ast::TableConstraint {
                     .constraint_name_clause()
                     .and_then(|clause| clause.constraint_name())
             }
+            ast::TableConstraint::NotNullConstraint(not_null_constraint) => not_null_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
             ast::TableConstraint::PrimaryKeyConstraint(primary_key_constraint) => {
                 primary_key_constraint
                     .constraint_name_clause()
@@ -1228,6 +1307,16 @@ impl ast::SelectVariant {
     }
 }
 
+impl ast::ParamList {
+    pub fn all_params(&self) -> impl Iterator<Item = ast::Param> {
+        self.params().chain(
+            self.aggregate_order_by()
+                .into_iter()
+                .flat_map(|order_by| order_by.params()),
+        )
+    }
+}
+
 impl ast::HasParamList {
     #[inline]
     pub fn param_list(&self) -> Option<ast::ParamList> {
@@ -1269,6 +1358,41 @@ where
         is_quoted(self.syntax())
     }
 }
+
+impl ast::HasPathRef for ast::Aggregate {}
+impl ast::HasPathRef for ast::CollationRef {}
+impl ast::HasPathRef for ast::ConfigParameterRef {}
+impl ast::HasPathRef for ast::ConstraintNameRef {}
+impl ast::HasPathRef for ast::ConversionRef {}
+impl ast::HasPathRef for ast::DomainRef {}
+impl ast::HasPathRef for ast::FunctionNameRef {}
+impl ast::HasPathRef for ast::IndexRef {}
+impl ast::HasPathRef for ast::Op {}
+impl ast::HasPathRef for ast::OpClassRef {}
+impl ast::HasPathRef for ast::OpFamilyRef {}
+impl ast::HasPathRef for ast::PathType {}
+impl ast::HasPathRef for ast::PercentType {}
+impl ast::HasPathRef for ast::ProcedureNameRef {}
+impl ast::HasPathRef for ast::PropertyGraphRef {}
+impl ast::HasPathRef for ast::QualifiedColumnNameRef {}
+impl ast::HasPathRef for ast::RelationNameRef {}
+impl ast::HasPathRef for ast::RoutineNameRef {}
+impl ast::HasPathRef for ast::SequenceRef {}
+impl ast::HasPathRef for ast::StatisticsRef {}
+impl ast::HasPathRef for ast::TableNameRef {}
+impl ast::HasPathRef for ast::TextSearchConfigurationRef {}
+impl ast::HasPathRef for ast::TextSearchDictionaryRef {}
+impl ast::HasPathRef for ast::TextSearchParserRef {}
+impl ast::HasPathRef for ast::TextSearchTemplateRef {}
+impl ast::HasPathRef for ast::TypeNameRef {}
+impl ast::HasPathRef for ast::ViewRef {}
+
+impl ast::HasSelectTail for ast::Select {}
+impl ast::HasSelectTail for ast::SelectInto {}
+impl ast::HasSelectTail for ast::ParenSelect {}
+impl ast::HasSelectTail for ast::CompoundSelect {}
+impl ast::HasSelectTail for ast::Values {}
+impl ast::HasSelectTail for ast::Table {}
 
 impl ast::HasWithClause for ast::Select {}
 impl ast::HasWithClause for ast::SelectInto {}

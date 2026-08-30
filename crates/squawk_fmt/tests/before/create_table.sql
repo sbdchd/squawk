@@ -56,3 +56,15 @@ create table column_option_comments (
 /*z*/ constraint /*aa*/ payload_required /*ab*/ not /*ac*/ null /*ad*/ deferrable,
 /*ae*/ id /*af*/ bigint /*ag*/ generated /*ah*/ by /*ai*/ default /*aj*/ as /*ak*/ identity /*al*/ (/*am*/ increment /*an*/ by /*ao*/ 2 /*ap*/ start /*aq*/ with /*ar*/ 3 /*as*/ restart /*at*/ with /*au*/ 4 /*av*/ owned /*aw*/ by /*ax*/ none /*ay*/ sequence /*az*/ name /*ba*/ public.seq /*bb*/)
 );
+
+-- preserve column clause source order when collate follows constraints
+create table collate_after_primary_key (id VARCHAR PRIMARY KEY COLLATE "C");
+
+create table collate_between_constraints (id varchar NOT NULL COLLATE "C" UNIQUE);
+
+-- preserve comments when collate follows or occurs between constraints
+create table extraordinarily_long_collated_column_clause_order (
+  first_identifier /* before type */ varchar /* before primary */ primary /* before key */ key /* before collate */ collate /* before collation */ "C",
+  second_identifier varchar /* before not */ not /* before null */ null /* before second collate */ collate /* before second collation */ "POSIX" /* before unique */ unique
+);
+

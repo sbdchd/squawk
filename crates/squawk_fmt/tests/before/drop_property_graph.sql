@@ -1,0 +1,6 @@
+drop property graph social_graph;
+
+drop property graph if exists extraordinarily_long_schema_name.extraordinarily_long_social_relationship_property_graph cascade;
+
+-- comments in every position
+drop /* property */ property /* graph */ graph /* if */ if /* exists */ exists /* schema */ public /* dot */ . /* graph name */ social_graph /* behavior */ restrict /* end */;

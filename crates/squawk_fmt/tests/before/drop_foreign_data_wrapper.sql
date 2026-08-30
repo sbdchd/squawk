@@ -1,0 +1,6 @@
+drop foreign data wrapper analytics_fdw;
+
+drop foreign data wrapper if exists extraordinarily_long_foreign_data_wrapper_name_for_analytics, another_extraordinarily_long_foreign_data_wrapper_name cascade;
+
+-- comments in every position
+drop /* foreign */ foreign /* data */ data /* wrapper */ wrapper /* if */ if /* exists */ exists /* first wrapper */ analytics_fdw /* before comma */, /* second wrapper */ reporting_fdw /* behavior */ restrict /* end */;

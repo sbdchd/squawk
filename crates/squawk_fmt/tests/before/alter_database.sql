@@ -1,0 +1,23 @@
+alter database app rename to application;
+
+alter database app owner to app_admin;
+
+alter database app refresh collation version;
+
+alter database app reset all;
+
+alter database app reset statement_timeout;
+
+alter database app set statement_timeout to '10s';
+
+alter database app set tablespace fast_storage;
+
+alter database app with connection limit = 100 encoding = 'UTF8' lc_collate = default owner = app_admin tablespace = fast_storage template = template0;
+
+alter database extraordinarily_long_database_name with connection limit = 1000 encoding = 'UTF8' owner = extraordinarily_long_database_owner tablespace = extraordinarily_long_tablespace_name;
+
+alter /* database keyword */ database /* database name */ commented_app /* action */ with /* option */ connection /* limit keyword */ limit /* equals */ = /* value */ 25 /* next option */ encoding /* equals */ = /* value */ 'UTF8' /* owner option */ owner /* equals */ = /* owner value */ app_admin /* tablespace option */ tablespace /* equals */ = /* tablespace value */ fast_storage /* template option */ template /* equals */ = /* template value */ template0 /* semicolon */;
+
+alter database /* name */ commented_config /* action */ set /* parameter */ statement_timeout /* assignment */ to /* value */ '30s';
+
+alter database /* name */ commented_refresh /* action */ refresh /* collation keyword */ collation /* version keyword */ version /* semicolon */;

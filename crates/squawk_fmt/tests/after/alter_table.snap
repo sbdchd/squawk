@@ -1,0 +1,165 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 28
+input_file: crates/squawk_fmt/tests/before/alter_table.sql
+---
+alter table customers
+  add column email_address varchar(320),
+  alter column customer_description
+    set default 'No description has been provided for this customer',
+  drop column if exists obsolete_customer_code cascade;
+
+alter table if exists only (reporting.customer_activity)
+  rename column old_activity_description to new_activity_description;
+
+alter table reporting.customer_activity
+  add constraint positive_activity_count check (activity_count > 0),
+  alter constraint positive_activity_count deferrable initially deferred;
+
+alter table tx1 rename to a1;
+
+alter table temp_view_test.tt1 rename to tmp1;
+
+alter /* table */ table /* old table */ temp_view_test.tt1
+  /* rename */ rename /* to */ to /* new table */ tmp1/* semicolon */;
+
+alter table temporal_children
+  add constraint temporal_children_parent_fk
+    foreign key (parent_id, period valid_at)
+    references temporal_parents (id, period valid_at);
+
+alter table reporting.customer_activity
+  attach partition reporting.customer_activity_2025
+    for values from ('2025-01-01') to ('2026-01-01');
+
+alter table reporting.customer_activity
+  detach partition reporting.customer_activity_2024 concurrently;
+
+alter table reporting.customer_activity
+  enable row level security,
+  force row level security,
+  disable trigger all;
+
+alter table reporting.customer_activity
+  set (fillfactor = 80),
+  reset (fillfactor),
+  set tablespace archive_tablespace;
+
+alter table all in tablespace old_reporting_tablespace
+  owned by analytics_owner,
+  reporting_owner
+  set tablespace new_reporting_tablespace
+  nowait;
+
+alter /* table */ table /* if */ if /* exists */ exists /* only */ only /* left paren */(/* relation */ reporting.commented_customer_activity /* right paren */)
+  /* action */ alter /* column */ column /* column name */ activity_description
+    /* set */ set /* default */ default
+      /* expression */ 'A very long default activity description used to verify formatter wrapping behavior',
+  /* comma */ rename /* column */ column /* old name */ old_activity_code /* to */ to /* new name */ current_activity_code/* semicolon */;
+
+alter /* table */ table /* all */ all /* in */ in /* tablespace keyword */ tablespace /* old tablespace */ old_tablespace
+  /* owned */ owned /* by */ by /* first role */ role_one,
+  /* second role */ role_two
+  /* set */ set /* tablespace */ tablespace /* new tablespace */ new_tablespace
+  /* nowait */ nowait/* semicolon */;
+
+alter table only parent_table
+  alter constraint inherited_check_constraint enforced;
+
+alter table parent_table
+  alter constraint inherited_check_constraint not enforced;
+
+alter table parent_table alter constraint inherited_not_null_constraint inherit;
+
+alter table parent_table
+  alter constraint inherited_not_null_constraint no inherit;
+
+alter /* table */ table /* relation */ parent_table
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_check_constraint /* enforced */ enforced/* semicolon */;
+
+alter /* table */ table /* relation */ parent_table
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_check_constraint /* not */ not /* enforced */ enforced/* semicolon */;
+
+alter /* table */ table /* relation */ parent_table
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_not_null_constraint /* inherit */ inherit/* semicolon */;
+
+alter /* table */ table /* relation */ parent_table
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_not_null_constraint /* no */ no /* inherit */ inherit/* semicolon */;
+
+alter table child_table
+  add not null a_very_long_inherited_column_name no inherit;
+
+alter /* table */ table /* relation */ child_table
+  /* add */ add
+    /* not */ not /* null */ null /* column */ inherited_column
+      /* no */ no /* inherit */ inherit/* semicolon */;
+
+alter table parent_table
+  alter constraint source_ordered_constraint /* enforced */ enforced /* not */ not /* deferrable */ deferrable;
+
+alter table parent_table
+  alter constraint invalid_constraint /* not */ not /* valid */ valid;
+
+alter table comment_test alter column id set data type int collate "C";
+
+alter table extraordinarily_long_partition_name
+  alter extraordinarily_long_column_name type char(2) collate "POSIX";
+
+alter /* table */ table /* relation */ comment_test
+  /* alter */ alter /* column */ column /* column name */ description
+    /* set */ set /* data */ data /* type keyword */ type /* type */ character varying(100)
+      /* collate */ collate /* collation */ "POSIX"
+      /* using */ using
+      /* expression */ description::character varying/* semicolon */;
+
+alter table sales_range
+  merge partitions (sales_jan2022, sales_feb2022) into sales_jan_feb2022;
+
+alter table partitions_merge_schema.extraordinarily_long_sales_range
+  merge partitions (
+    partitions_merge_schema.extraordinarily_long_sales_january_2022,
+    partitions_merge_schema.extraordinarily_long_sales_february_2022
+  )
+  into partitions_merge_schema.extraordinarily_long_sales_january_february_2022;
+
+alter /* table */ table /* relation */ partitions_merge_schema.sales_range
+  /* merge */ merge /* partitions */ partitions /* left paren */ (
+    /* first partition */ partitions_merge_schema.sales_jan2022 /* first comma */,
+    /* second partition */ sales_feb2022,
+    /* third partition */ sales_mar2022 /* right paren */
+  )
+  /* into */ into /* target partition */ partitions_merge_schema./* target name */ sales_jan_feb_mar2022/* semicolon */;
+
+alter table sales_range
+  split partition sales_feb_mar_apr2022 into (
+    partition sales_feb2022 for values from ('2022-02-01') to ('2022-03-01'),
+    partition sales_mar2022 for values in ('2022-03-01', '2022-04-01'),
+    partition sales_hash for values with (modulus 4, remainder 1),
+    partition sales_others default
+  );
+
+alter /* table */ table /* relation */ sales_range
+  /* split */ split /* partition */ partition /* source */ partition_split_schema./* source name */ sales_all /* into */ into /* list left */ (
+    /* first partition */ partition /* first name */ partition_split_schema./* name */ sales_first
+      /* for */ for /* values */ values /* from */ from /* lower left */ (
+        /* lower */ '2022-01-01' /* lower right */
+      )
+      /* to */ to /* upper left */ (
+        /* upper */ '2022-02-01' /* upper right */
+      ) /* comma */,
+    /* second partition */ partition /* second name */ sales_second
+      /* for */ for /* values */ values /* in */ in /* in left */(
+        /* first value */ 'one' /* value comma */,
+        /* second value */ 'two' /* in right */
+      ),
+    /* default partition */ partition /* default name */ sales_other
+      /* default */ default /* list right */
+  )/* semicolon */;
+
+alter table options_test alter column metadata set (json = constraint);
+
+alter /* table */ table /* relation */ options_test
+  /* alter */ alter /* column */ column /* name */ metadata
+    /* set */ set /* left paren */ (
+      /* option */ json /* equals */ = /* value */ constraint /* right paren */
+    )/* semicolon */;

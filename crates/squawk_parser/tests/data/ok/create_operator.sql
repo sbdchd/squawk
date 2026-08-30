@@ -21,3 +21,35 @@ create operator foo.bar.>>-# (
   merges
 );
 
+
+-- operator names as values
+create operator + (
+  commutator = +,
+  negator = -,
+  restrict = *
+);
+
+create operator + (
+  commutator = >,
+  negator = <,
+  restrict = >=,
+  join = <=
+);
+
+create operator + (
+  commutator = <>,
+  negator = !=,
+  restrict = /,
+  join = %
+);
+
+create operator + (
+  commutator = ^,
+  negator = ->
+);
+
+-- qualified operator names
+create operator + (
+  commutator = operator(pg_catalog.+),
+  negator = operator(-)
+);

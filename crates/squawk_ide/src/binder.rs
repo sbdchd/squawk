@@ -450,8 +450,10 @@ fn bind_create_table_constraints(
     for arg in table_arg_list.args() {
         match arg {
             ast::TableArg::Column(column) => {
-                for constraint in column.constraints() {
-                    if let Some(constraint_name) = constraint.constraint_name() {
+                for clause in column.clauses() {
+                    if let ast::ColumnClause::ColumnConstraint(constraint) = clause
+                        && let Some(constraint_name) = constraint.constraint_name()
+                    {
                         bind_constraint_name_node(b, constraint_name, schema, table_name);
                     }
                 }
@@ -599,7 +601,7 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
 
     b.scope.insert(function_name, function_id);
 
-    bind_routine_body_search_path(b, create_function.option_list());
+    bind_routine_body_search_path(b, create_function.option_list(), create_function.body());
 }
 
 fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate) {
@@ -660,7 +662,7 @@ fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure)
 
     b.scope.insert(procedure_name, procedure_id);
 
-    bind_routine_body_search_path(b, create_procedure.option_list());
+    bind_routine_body_search_path(b, create_procedure.option_list(), create_procedure.body());
 }
 
 fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
@@ -694,13 +696,28 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
 
 fn bind_schema_element(b: &mut Binder, element: ast::SchemaElement) {
     match element {
-        ast::SchemaElement::CreateIndex(create_index) => bind_create_index(b, create_index),
-        ast::SchemaElement::CreateSequence(create_sequence) => {
-            bind_create_sequence(b, create_sequence)
+        ast::SchemaElement::CreateAggregate(stmt) => bind_create_aggregate(b, stmt),
+        ast::SchemaElement::CreateCollation(stmt) => bind_create_collation(b, stmt),
+        ast::SchemaElement::CreateDomain(stmt) => bind_create_domain(b, stmt),
+        ast::SchemaElement::CreateFunction(stmt) => bind_create_function(b, stmt),
+        ast::SchemaElement::CreateIndex(stmt) => bind_create_index(b, stmt),
+        ast::SchemaElement::CreateOperator(stmt) => bind_create_operator(b, stmt),
+        ast::SchemaElement::CreateProcedure(stmt) => bind_create_procedure(b, stmt),
+        ast::SchemaElement::CreateSequence(stmt) => bind_create_sequence(b, stmt),
+        ast::SchemaElement::CreateTable(stmt) => bind_create_table(b, stmt),
+        ast::SchemaElement::CreateTextSearchConfiguration(stmt) => {
+            bind_create_text_search_configuration(b, stmt)
         }
-        ast::SchemaElement::CreateTable(create_table) => bind_create_table(b, create_table),
-        ast::SchemaElement::CreateTrigger(create_trigger) => bind_create_trigger(b, create_trigger),
-        ast::SchemaElement::CreateView(create_view) => bind_create_view(b, create_view),
+        ast::SchemaElement::CreateTextSearchDictionary(stmt) => {
+            bind_create_text_search_dictionary(b, stmt)
+        }
+        ast::SchemaElement::CreateTextSearchParser(stmt) => bind_create_text_search_parser(b, stmt),
+        ast::SchemaElement::CreateTextSearchTemplate(stmt) => {
+            bind_create_text_search_template(b, stmt)
+        }
+        ast::SchemaElement::CreateTrigger(stmt) => bind_create_trigger(b, stmt),
+        ast::SchemaElement::CreateType(stmt) => bind_create_type(b, stmt),
+        ast::SchemaElement::CreateView(stmt) => bind_create_view(b, stmt),
         ast::SchemaElement::Grant(_) => (),
     }
 }
@@ -1834,28 +1851,29 @@ fn schema_name_from_qualifier(
     b.default_schema()
 }
 
-fn bind_routine_body_search_path(b: &mut Binder, option_list: Option<ast::FuncOptionList>) {
+fn bind_routine_body_search_path(
+    b: &mut Binder,
+    option_list: Option<ast::FuncOptionList>,
+    body: Option<ast::RoutineBody>,
+) {
     let Some(option_list) = option_list else {
+        return;
+    };
+    let Some(ast::RoutineBody::AtomicBody(atomic_body)) = body else {
         return;
     };
 
     let mut search_path = None;
-    let mut body_range = None;
     for option in option_list.options() {
-        match option {
-            ast::FuncOption::SetFuncOption(set_func_option) => {
-                if let Some(set_config_param) = set_func_option.set_config_param() {
-                    search_path = search_path_from_set_config_param(&set_config_param);
-                }
+        if let ast::FuncOption::SetFuncOption(set_func_option) = option {
+            if let Some(set_config_param) = set_func_option.set_config_param() {
+                search_path = search_path_from_set_config_param(&set_config_param);
             }
-            ast::FuncOption::BeginFuncOptionList(begin_func_option_list) => {
-                body_range = Some(begin_func_option_list.syntax().text_range());
-            }
-            _ => (),
         }
     }
 
-    let (Some(search_path), Some(body_range)) = (search_path, body_range) else {
+    let body_range = atomic_body.syntax().text_range();
+    let Some(search_path) = search_path else {
         return;
     };
 
@@ -1925,6 +1943,7 @@ fn search_path_from_config_value(to_config_value: &ast::ToConfigValue) -> Vec<Sc
             ast::ConfigValue::ConfigValueName(config_value_name) => {
                 search_path.push(Schema::new(config_value_name.syntax().text().to_string()));
             }
+            ast::ConfigValue::PrefixExpr(_) => {}
         }
     }
     search_path
@@ -2079,7 +2098,7 @@ pub(crate) fn extract_string_literal(literal: &ast::Literal) -> Option<String> {
 fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Name>> {
     let param_list = param_list?;
     let mut params = vec![];
-    for param in param_list.params() {
+    for param in param_list.all_params() {
         if let Some(ty) = param.ty()
             && let ast::Type::PathType(path_type) = ty
             && let Some(path) = path_type.path_ref()
