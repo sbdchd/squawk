@@ -7035,4 +7035,112 @@ SOURCE_FILE
                         INT_NUMBER "1"
             R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing clauses after a from-item subquery belong to the outer select"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      PAREN_FROM_ITEM
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      PAREN_FROM_ITEM
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "t"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- but inside the parens they belong to the subquery"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      PAREN_FROM_ITEM
+        PAREN_SELECT
+          L_PAREN "("
+          PAREN_SELECT
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "select"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    LITERAL
+                      INT_NUMBER "1"
+            R_PAREN ")"
+            WHITESPACE " "
+            LIMIT_CLAUSE
+              LIMIT_KW "limit"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+          R_PAREN ")"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "t"
+    SEMICOLON ";"
   WHITESPACE "\n"

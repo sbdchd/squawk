@@ -2739,6 +2739,32 @@ SOURCE_FILE
             NOTNULL_KW "notnull"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- postfix expression wrapping another expression"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          POSTFIX_EXPR
+            CAST_EXPR
+              LITERAL
+                NULL_KW "null"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    JSON_KW "json"
+            WHITESPACE " "
+            IS_JSON
+              IS_KW "is"
+              WHITESPACE " "
+              JSON_KW "json"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- is true"
   WHITESPACE "\n"
   SELECT

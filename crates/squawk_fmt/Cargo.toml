@@ -25,6 +25,7 @@ squawk-line-index.workspace = true
 rowan.workspace = true
 clap.workspace = true
 anyhow.workspace = true
+either.workspace = true
 annotate-snippets.workspace = true
 
 [dev-dependencies]

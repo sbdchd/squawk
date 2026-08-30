@@ -12,6 +12,11 @@ from foo /* before alias */ as /* before alias name */ f /* before open paren */
     /* after comma */ display_name /* before close paren */
   );
 select * from users tablesample bernoulli (10) repeatable (42);
+select t.id from test_tablesample as t tablesample system (50) repeatable (0);
+select *
+from users /* before alias */ as /* before alias name */ u /* before tablesample */ tablesample /* before method */ bernoulli /* before sample opening paren */(
+    /* before percentage */ 10 /* before sample closing paren */
+  ) /* before repeatable */ repeatable /* before seed opening paren */(/* before seed */ 42 /* before seed closing paren */);
 select * from generate_series(1, 3);
 select * from lateral generate_series(1, 3) with ordinality as g (n, ord);
 select *
@@ -104,78 +109,75 @@ from /* before lateral */ lateral /* before xmltable */ xmltable /* before openi
   ) /* before alias */ as /* before alias name */ parsed;
 select *
 from json_table(
-    doc,
-    '$[*]'
-    columns (
-      ord for ordinality,
-      value text path '$.value',
-      has_value bool exists path '$.value',
-      nested path '$.items[*]' columns (item text path '$')
-    )
-    plan (items)
-  ) as jt;
+  doc,
+  '$[*]'
+  columns (
+    ord for ordinality,
+    value text path '$.value',
+    has_value bool exists path '$.value',
+    nested path '$.items[*]' columns (item text path '$')
+  )
+  plan (items)
+) as jt;
 select *
 from json_table(
-    doc,
-    '$'
-    columns (
-      nested '$.a' as a columns (x int),
-      nested '$.b' as b columns (y int)
-    )
-    plan (a cross b)
-  ) jt;
+  doc,
+  '$'
+  columns (nested '$.a' as a columns (x int), nested '$.b' as b columns (y int))
+  plan (a cross b)
+) jt;
 select *
 from json_table(doc, '$' columns (x int) plan default (inner, union)) jt;
 select *
 from lateral json_table(
-    a_very_long_json_document_expression
-    format json,
-    a_very_long_json_path_expression as a_very_long_json_path_name
-    passing a_very_long_json_passing_expression as a_very_long_json_variable_name
+  a_very_long_json_document_expression
+  format json,
+  a_very_long_json_path_expression as a_very_long_json_path_name
+  passing a_very_long_json_passing_expression as a_very_long_json_variable_name
+  columns (
+    a_very_long_ordinality_column_name for ordinality,
+    a_very_long_value_column_name a_very_long_json_value_type
+    format json
+    path '$.a_very_long_value_path_expression_that_forces_wrapping'
+    with unconditional array wrapper
+    keep quotes on scalar string
+    default a_very_long_default_expression on empty
+    error on error,
+    a_very_long_exists_column_name boolean
+    exists
+    path '$.a_very_long_exists_path_expression_that_forces_wrapping'
+    false on error,
+    nested path a_very_long_nested_path_expression as a_very_long_nested_path_name
     columns (
-      a_very_long_ordinality_column_name for ordinality,
-      a_very_long_value_column_name a_very_long_json_value_type
-      format json
-      path '$.a_very_long_value_path_expression_that_forces_wrapping'
-      with unconditional array wrapper
-      keep quotes on scalar string
-      default a_very_long_default_expression on empty
-      error on error,
-      a_very_long_exists_column_name boolean
-      exists
-      path '$.a_very_long_exists_path_expression_that_forces_wrapping'
-      false on error,
-      nested path a_very_long_nested_path_expression as a_very_long_nested_path_name
-      columns (
-        a_very_long_nested_column_name a_very_long_nested_column_type
-        path '$.a_very_long_nested_column_path_expression_that_forces_wrapping'
-      )
+      a_very_long_nested_column_name a_very_long_nested_column_type
+      path '$.a_very_long_nested_column_path_expression_that_forces_wrapping'
     )
-    error on error
-  ) as a_very_long_json_table_alias;
+  )
+  error on error
+) as a_very_long_json_table_alias;
 select *
 from /* before lateral */ lateral /* before json table */ json_table /* before opening paren */(
-    /* before document */ doc
-    /* before format */ format /* before json */ json /* before comma */,
-    /* before path */ '$[*]' /* before path as */ as /* before path name */ root
-    /* before passing */ passing /* before argument */ x /* before argument as */ as /* before variable */ foo
-    /* before columns */ columns /* before columns opening paren */(
-      /* before ordinality column */ ord /* before for */ for /* before ordinality */ ordinality /* before column comma */,
-      /* before value column */ value /* before type */ text
-      /* before path keyword */ path /* before column path */ '$.value' /* before second column comma */,
-      /* before exists column */ has_value /* before exists type */ bool
-      /* before exists */ exists
-      /* before exists path */ path /* before exists path expression */ '$.value' /* before nested comma */,
-      /* before nested */ nested /* before nested path */ path /* before nested expression */ '$.items[*]' /* before nested as */ as /* before nested name */ items
-      /* before nested columns */ columns /* before nested opening paren */(
-        /* before nested column */ item /* before nested type */ text /* before nested closing paren */
-      ) /* before columns closing paren */
-    )
-    /* before plan */ plan /* before plan opening paren */(
-      /* before plan name */ items /* before plan closing paren */
-    )
-    /* before on error */ error /* before on */ on /* before error */ error /* before closing paren */
-  ) /* before alias */ as /* before alias name */ jt;
+  /* before document */ doc
+  /* before format */ format /* before json */ json /* before comma */,
+  /* before path */ '$[*]' /* before path as */ as /* before path name */ root
+  /* before passing */ passing /* before argument */ x /* before argument as */ as /* before variable */ foo
+  /* before columns */ columns /* before columns opening paren */(
+    /* before ordinality column */ ord /* before for */ for /* before ordinality */ ordinality /* before column comma */,
+    /* before value column */ value /* before type */ text
+    /* before path keyword */ path /* before column path */ '$.value' /* before second column comma */,
+    /* before exists column */ has_value /* before exists type */ bool
+    /* before exists */ exists
+    /* before exists path */ path /* before exists path expression */ '$.value' /* before nested comma */,
+    /* before nested */ nested /* before nested path */ path /* before nested expression */ '$.items[*]' /* before nested as */ as /* before nested name */ items
+    /* before nested columns */ columns /* before nested opening paren */(
+      /* before nested column */ item /* before nested type */ text /* before nested closing paren */
+    ) /* before columns closing paren */
+  )
+  /* before plan */ plan /* before plan opening paren */(
+    /* before plan name */ items /* before plan closing paren */
+  )
+  /* before on error */ error /* before on */ on /* before error */ error /* before closing paren */
+) /* before alias */ as /* before alias name */ jt;
 select *
 /* before from */ from /* before item */ only /* before relation */ public /* before dot */./* before table */ foo /* before star */ * /* before alias */ as /* before alias name */ f /* before item comma */,
   /* before second item */ other /* before second alias */ o;
@@ -212,6 +214,19 @@ select * from users join profiles on users.id = profiles.user_id;
 
 select * from users left outer join profiles using (user_id) as matched_users;
 
+select relname, pg_get_indexdef
+from pg_class left join pg_inherits on inhrelid = oid,
+  lateral pg_get_indexdef(pg_class.oid);
+
+select *
+from /* before joined relation */ pg_class
+  /* before join */ left /* before outer */ outer /* before join keyword */ join /* before joined table */ pg_inherits /* before on */ on
+    /* before left operand */ inhrelid /* before equals */
+      = /* before right operand */ oid /* before comma */,
+  /* before lateral item */ lateral /* before function */ pg_get_indexdef /* before opening paren */(
+    /* before argument */ pg_class.oid /* before closing paren */
+  );
+
 select *
 from a right join b on true,
   c full outer join d on true,
@@ -243,3 +258,25 @@ from a_very_long_schema_name.a_very_long_table_name
   left outer join another_very_long_schema_name.another_very_long_table_name on
     a_very_long_schema_name.a_very_long_table_name.a_very_long_column_name
       = another_very_long_schema_name.another_very_long_table_name.another_very_long_column_name;
+
+select
+  s.stxrelid::regclass as relation,
+  array_agg(a.attname order by u.ord) as stats_columns
+from pg_statistic_ext s
+  cross join lateral unnest(s.stxkeys::int2[]) with ordinality as u (
+    attnum,
+    ord
+  )
+  join pg_attribute a on a.attrelid = s.stxrelid and a.attnum = u.attnum;
+
+select *
+from statistics /* before base alias */ s
+  /* before cross */ cross /* before cross join */ join /* before lateral */ lateral /* before function */ unnest /* before function opening paren */(
+    /* before argument */ s.keys /* before cast */::int2[] /* before function closing paren */
+  ) /* before with */ with /* before ordinality */ ordinality /* before function alias */ as /* before function alias name */ u /* before alias opening paren */ (
+    /* before first alias column */ attnum /* before alias comma */,
+    /* before second alias column */ ord /* before alias closing paren */
+  )
+  /* before nested join */ join /* before nested relation */ attributes /* before nested alias */ a /* before on */ on
+    /* before left operand */ a.attnum /* before equals */
+      = /* before right operand */ u.attnum;

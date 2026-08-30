@@ -2,6 +2,8 @@ alter /* property */ property /* graph */ graph /* if */ if /* exists */ exists 
 
 alter property graph graph_with_an_exceptionally_long_descriptive_name add vertex tables (customer_accounts key (customer_identifier) no properties, merchant_accounts key (merchant_identifier) properties all columns);
 
+alter property graph social_graph /* first add */ add /* vertex tables */ vertex tables (people key (id)) /* second add */ add /* edge tables */ edge tables (follows /* source */ source /* source key */ key (follower_id) references people (id) /* destination */ destination /* destination key */ key (followed_id) references people (id));
+
 alter property graph social_graph alter /* kind */ vertex /* table */ table /* element */ people alter /* label */ label /* name */ person add /* properties */ properties (full_name, birth_date as date_of_birth);
 
 alter property graph social_graph alter relationship table follows alter label connection drop properties (created_at, source_system);

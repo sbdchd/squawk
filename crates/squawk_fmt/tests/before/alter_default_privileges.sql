@@ -1,5 +1,9 @@
 alter default privileges grant select on tables to reporting;
 
+alter default privileges grant update on tables to public, current_user, group /* session role */ session_user, group /* current role */ current_role with grant option;
+
+alter default privileges revoke grant option for select on tables from reporting, group /* current user */ current_user cascade;
+
 alter default privileges for role app_owner, migrations in schema public, audit grant all privileges on sequences to app_user, reporting with grant option;
 
 alter default privileges for user app_owner revoke grant option for insert, update on tables from app_user cascade;

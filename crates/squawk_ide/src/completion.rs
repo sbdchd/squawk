@@ -1,6 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::ast::{self, AstNode, HasSelectTail};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 
 use crate::ast_nav;
@@ -297,7 +297,7 @@ fn select_expr_completions(
     completions.extend(function_completions(db, file, schema.as_ref(), position));
 
     if let Some(from_clause) = select.from_clause() {
-        for from_item in from_clause.from_items() {
+        for from_item in ast_nav::iter_from_clause(&from_clause) {
             if let Some(table_name) = table_name_from_from_item(&from_item) {
                 completions.push(CompletionItem {
                     label: table_name.to_string(),
@@ -1226,6 +1226,22 @@ select $0 from child;
          pg_temp            | Schema   |         
          pg_toast           | Schema   |         
          information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_in_where_clause_with_join() {
+        assert_snapshot!(completions("
+create table t (a int);
+create table u (b int);
+select * from t join u on t.a = u.b where $0;
+"), @"
+         label | kind   | detail 
+        -------+--------+--------
+         a     | Column | int    
+         b     | Column | int    
+         t     | Table  |        
+         u     | Table  |
         ");
     }
 

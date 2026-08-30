@@ -44,7 +44,6 @@ create function option_examples(
 ) returns text
   external security invoker
   called on null input
-  returns null on null input
   not leakproof
   stable
   window
@@ -54,6 +53,11 @@ create function option_examples(
   set work_mem from current
   reset all
   language 'sql'
+  as $$ select null::text $$;
+
+create function returns_null_on_null_input_example() returns text
+  returns null on null input
+  language sql
   as $$ select null::text $$;
 
 -- comments in every position
@@ -107,6 +111,26 @@ create function commented_body(value integer) returns integer
 create function external_add(integer, integer) returns integer
   as '$libdir/example', 'external_add'
   language c;
+
+create function test_enc_conversion(
+  bytea,
+  name,
+  name,
+  bool,
+  validlen out int,
+  result out bytea
+)
+  as 'regresslib', 'test_enc_conversion'
+  language c
+  strict;
+
+create function mode_after_name(
+  input /*bp1*/ in /*bp2*/ bytea,
+  result /*bp3*/ out /*bp4*/ bytea,
+  error /*bp5*/ out /*bp6*/ text
+) returns record
+  language sql
+  as $$ select null $$;
 
 create function commented_external() returns integer
   as /*bo*/ '$libdir/example' /*bp*/, /*bq*/ 'commented_external'

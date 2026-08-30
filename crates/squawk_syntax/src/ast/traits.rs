@@ -43,3 +43,30 @@ pub trait HasWithClause: AstNode {
         support::child(self.syntax())
     }
 }
+
+pub trait HasSelectTail: AstNode {
+    #[inline]
+    fn order_by_clause(&self) -> Option<ast::OrderByClause> {
+        support::child(self.syntax())
+    }
+
+    #[inline]
+    fn limit_clause(&self) -> Option<ast::LimitClause> {
+        support::child(self.syntax())
+    }
+
+    #[inline]
+    fn offset_clause(&self) -> Option<ast::OffsetClause> {
+        support::child(self.syntax())
+    }
+
+    #[inline]
+    fn fetch_clause(&self) -> Option<ast::FetchClause> {
+        support::child(self.syntax())
+    }
+
+    #[inline]
+    fn locking_clauses(&self) -> ast::AstChildren<ast::LockingClause> {
+        support::children(self.syntax())
+    }
+}

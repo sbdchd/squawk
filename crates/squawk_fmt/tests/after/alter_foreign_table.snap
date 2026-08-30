@@ -19,3 +19,10 @@ alter foreign table public.items
 
 alter foreign table if exists public.items
   owner to role_with_a_very_long_descriptive_name;
+
+alter foreign table ft1
+  /* options */ options /* open */ (
+    /* drop */ drop /* name */ delimiter /* comma */,
+    /* set */ set /* name */ quote /* value */ '~' /* comma */,
+    /* add */ add /* name */ escape /* value */ '@' /* close */
+  );

@@ -17,3 +17,11 @@ create /*a*/ unique /*b*/ index /*c*/ concurrently /*d*/ if /*e*/ not /*f*/ exis
 /*aj*/ with /*ak*/ (/*al*/ fillfactor /*am*/ = /*an*/ 70 /*ao*/, /*ap*/ deduplicate_items /*aq*/ = /*ar*/ on /*as*/)
 /*at*/ tablespace /*au*/ fastspace
 /*av*/ where /*aw*/ active /*ax*/ and email is not null /*ay*/;
+
+create index on t (a text_pattern_ops (strength = primary, variant = default), b text_pattern_ops (strength = primary));
+
+-- operator class parameters with comments
+create index on t (
+  a /*ba*/ text_pattern_ops /*bb*/ (/*bc*/ strength /*bd*/ = /*be*/ primary /*bf*/, /*bg*/ variant /*bh*/ = /*bi*/ default /*bj*/),
+  /*bk*/ b /*bl*/ text_pattern_ops /*bm*/ (/*bn*/ strength /*bo*/ = /*bp*/ primary /*bq*/)
+);

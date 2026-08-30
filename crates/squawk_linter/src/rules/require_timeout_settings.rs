@@ -185,6 +185,7 @@ impl LockKind {
             },
             ast::AlterTableAction::AddColumn(_)
             | ast::AlterTableAction::AlterConstraint(_)
+            | ast::AlterTableAction::AlterOptionList(_)
             | ast::AlterTableAction::AttachPartition(_)
             | ast::AlterTableAction::DisableRls(_)
             | ast::AlterTableAction::DisableRule(_)

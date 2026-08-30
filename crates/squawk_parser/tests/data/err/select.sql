@@ -156,3 +156,6 @@ select * from rows from (f() as (a));
 
 -- trailing comma at EOF
 select 1,
+
+-- collate must follow cast
+select cast('42' as text collate "C");

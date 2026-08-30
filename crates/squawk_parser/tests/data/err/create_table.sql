@@ -79,3 +79,6 @@ create table t (a int, foreign key (a without overlaps) references u (c));
 
 -- PERIOD must be the last column in a FOREIGN KEY column list
 create table t (a int, b daterange, foreign key (period b, a) references u (c, period d));
+
+-- trailing comma in a parenthesized default expression
+create table error_tbl (i int default (100, ));

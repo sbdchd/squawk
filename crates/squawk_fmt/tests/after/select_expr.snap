@@ -6,6 +6,20 @@ select
   -- array expr
   array[1, 2],
   array(select 1),
+  array(select '1 4'::int2vector union all select '1 2'::int2vector),
+  /* before array query */ array /* before opening paren */(
+    /* before left select */ select /* before left target */ 1
+    /* before union */ union /* before all */ all
+    /* before right select */ select
+      /* before right target */ 2 /* before closing paren */
+  ) /* after array query */,
+  array(
+    select a_very_long_first_array_select_expression
+    from a_very_long_first_array_select_relation
+    union all
+    select a_very_long_second_array_select_expression
+    from a_very_long_second_array_select_relation
+  ),
   array[[1, 2], [3, 4]],
   /* before array */ array /* before opening bracket */[
     /* before first */ 1 /* before comma */,
@@ -34,6 +48,23 @@ select
     [a_very_long_first, a_very_long_second],
     [a_very_long_third, a_very_long_fourth]
   ],
+  array(((select 1))),
+  array(
+    (
+      (
+        select a_very_long_array_select_expression
+        from a_very_long_array_select_relation_name
+      )
+    )
+  ),
+  /* before nested array */ array /* before outer opening paren */(
+    /* after outer opening paren */ (
+      /* after middle opening paren */ (
+        /* before select */ select
+          /* before target */ 1 /* before inner closing paren */
+      ) /* before middle closing paren */
+    ) /* before outer closing paren */
+  ),
   -- between expr
   2 between 1 and 3,
   2 not between 1 and 3,
@@ -250,6 +281,16 @@ select
   foo(/* before distinct */ distinct /* after distinct */ 1),
   foo(variadic xs),
   foo(/* before variadic */ variadic /* after variadic */ xs),
+  foo(variadic arr => array[2, 3]),
+  foo(
+    /* before variadic */ variadic /* before name */ arr /* before arrow */ => /* before value */ array[
+      2,
+      3
+    ]
+  ),
+  a_very_long_function_name(
+    variadic a_very_long_named_argument => a_very_long_variadic_argument_expression_that_forces_wrapping
+  ),
   foo(a => 1, b := 2),
   foo(
     /* before name */ a /* before arrow */ => /* before value */ 1 /* before comma */,
@@ -304,6 +345,18 @@ select
     /* before absent */ absent /* before on */ on /* before null */ null
     /* before returning */ returning /* before type */ jsonb
       /* before returning format */ format /* before returning json */ json /* before closing paren */
+  ),
+  json_arrayagg(v) filter (where v > 0),
+  json_objectagg(k: v) filter (where v is not null) over (
+    partition by category order by k
+  ),
+  json_arrayagg(v) /* before filter */ filter /* before filter opening */ (
+    /* before where */ where /* before condition */ v
+      > 0 /* before filter closing */
+  ) /* before over */ over /* before over opening */ (
+    /* before partition */ partition /* before by */ by /* before partition expr */ category
+    /* before order */ order /* before order by */ by
+      /* before sort */ v /* before over closing */
   ),
   json_array(),
   json_array(1, 2 format json returning jsonb),
@@ -632,6 +685,17 @@ select
   ((1)),
   (/* before expr */ 1 /* before closing paren */),
   (select 1),
+  ((select 2) union select 2),
+  (((select 2)) union select 2),
+  /* before compound opening paren */ (
+    /* after compound opening paren */ (
+      /* before inner select */ select
+        /* before inner target */ 2 /* before inner closing paren */
+    )
+    /* before union */ union
+    /* before right select */ select
+      /* before right target */ 2 /* before compound closing paren */
+  ),
   /* before opening paren */ (
     /* before select */ select /* before target */ x
     /* before from */ from /* before relation */ things /* before closing paren */
@@ -687,6 +751,8 @@ select
   x is not normalized,
   x is not nfkd normalized,
   x is /* before not */ not /* before json */ json /* before array */ array /* before with */ with /* before unique */ unique /* before keys */ keys,
+  null::json is json,
+  null::json /* before is */ is /* before json */ json /* before with */ with /* before unique */ unique /* before keys */ keys,
   x is /* before normalized not */ not /* before form */ nfkd /* before normalized */ normalized,
   a_very_long_json_postfix_input_expression_that_forces_wrapping is json array with unique keys,
   a_very_long_normalized_postfix_input_expression_that_forces_wrapping is not nfkd normalized,

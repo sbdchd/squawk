@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/empty_column_list.sql
 ---
-SOURCE_FILE@0..438
+SOURCE_FILE@0..573
   COMMENT@0..42 "-- ok, a composite ty ..."
   WHITESPACE@42..43 "\n"
   CREATE_TYPE@43..64
@@ -163,145 +163,231 @@ SOURCE_FILE@0..438
               IDENT@239..240 "a"
             R_PAREN@240..241 ")"
     SEMICOLON@241..242 ";"
-  WHITESPACE@242..244 "\n\n"
-  COMMENT@244..300 "-- error, an empty co ..."
-  WHITESPACE@300..301 "\n"
-  CREATE_VIEW@301..330
-    CREATE_KW@301..307 "create"
-    WHITESPACE@307..308 " "
-    VIEW_KW@308..312 "view"
-    WHITESPACE@312..313 " "
-    VIEW@313..314
-      PATH@313..314
-        PATH_SEGMENT@313..314
-          IDENT@313..314 "v"
-    WHITESPACE@314..315 " "
-    COLUMN_LIST@315..317
-      L_PAREN@315..316 "("
-      R_PAREN@316..317 ")"
-    WHITESPACE@317..318 " "
-    AS_KW@318..320 "as"
-    WHITESPACE@320..321 " "
-    SELECT@321..329
-      SELECT_CLAUSE@321..329
-        SELECT_KW@321..327 "select"
-        WHITESPACE@327..328 " "
-        TARGET_LIST@328..329
-          TARGET@328..329
-            LITERAL@328..329
-              INT_NUMBER@328..329 "1"
-    SEMICOLON@329..330 ";"
-  WHITESPACE@330..331 "\n"
-  CREATE_MATERIALIZED_VIEW@331..374
-    CREATE_KW@331..337 "create"
-    WHITESPACE@337..338 " "
-    MATERIALIZED_KW@338..350 "materialized"
-    WHITESPACE@350..351 " "
-    VIEW_KW@351..355 "view"
-    WHITESPACE@355..356 " "
-    VIEW@356..358
-      PATH@356..358
-        PATH_SEGMENT@356..358
-          IDENT@356..358 "mv"
-    WHITESPACE@358..359 " "
-    COLUMN_LIST@359..361
-      L_PAREN@359..360 "("
-      R_PAREN@360..361 ")"
-    WHITESPACE@361..362 " "
-    AS_KW@362..364 "as"
-    WHITESPACE@364..365 " "
-    SELECT@365..373
-      SELECT_CLAUSE@365..373
-        SELECT_KW@365..371 "select"
-        WHITESPACE@371..372 " "
-        TARGET_LIST@372..373
-          TARGET@372..373
-            LITERAL@372..373
-              INT_NUMBER@372..373 "1"
-    SEMICOLON@373..374 ";"
-  WHITESPACE@374..375 "\n"
-  SELECT@375..415
-    WITH_CLAUSE@375..398
-      WITH_KW@375..379 "with"
-      WHITESPACE@379..380 " "
-      WITH_TABLE@380..398
-        CTE_NAME@380..381
-          IDENT@380..381 "t"
-        WHITESPACE@381..382 " "
-        COLUMN_LIST@382..384
-          L_PAREN@382..383 "("
-          R_PAREN@383..384 ")"
-        WHITESPACE@384..385 " "
-        AS_KW@385..387 "as"
-        WHITESPACE@387..388 " "
-        L_PAREN@388..389 "("
-        SELECT@389..397
-          SELECT_CLAUSE@389..397
-            SELECT_KW@389..395 "select"
-            WHITESPACE@395..396 " "
-            TARGET_LIST@396..397
-              TARGET@396..397
-                LITERAL@396..397
-                  INT_NUMBER@396..397 "1"
-        R_PAREN@397..398 ")"
-    WHITESPACE@398..399 " "
-    SELECT_CLAUSE@399..407
-      SELECT_KW@399..405 "select"
-      WHITESPACE@405..406 " "
-      TARGET_LIST@406..407
-        TARGET@406..407
-          STAR@406..407 "*"
+  WHITESPACE@242..243 "\n"
+  CREATE_FUNCTION@243..312
+    CREATE_KW@243..249 "create"
+    WHITESPACE@249..250 " "
+    FUNCTION_KW@250..258 "function"
+    WHITESPACE@258..259 " "
+    FUNCTION_NAME@259..260
+      PATH@259..260
+        PATH_SEGMENT@259..260
+          IDENT@259..260 "f"
+    PARAM_LIST@260..262
+      L_PAREN@260..261 "("
+      R_PAREN@261..262 ")"
+    WHITESPACE@262..263 " "
+    RET_TYPE@263..284
+      RETURNS_KW@263..270 "returns"
+      WHITESPACE@270..271 " "
+      TABLE_KW@271..276 "table"
+      WHITESPACE@276..277 " "
+      TABLE_ARG_LIST@277..284
+        L_PAREN@277..278 "("
+        COLUMN@278..283
+          COLUMN_NAME@278..279
+            IDENT@278..279 "a"
+          WHITESPACE@279..280 " "
+          PATH_TYPE@280..283
+            PATH_REF@280..283
+              PATH_SEGMENT_REF@280..283
+                INT_KW@280..283 "int"
+        R_PAREN@283..284 ")"
+    WHITESPACE@284..285 " "
+    FUNC_OPTION_LIST@285..311
+      LANGUAGE_FUNC_OPTION@285..297
+        LANGUAGE_KW@285..293 "language"
+        WHITESPACE@293..294 " "
+        LANGUAGE_REF@294..297
+          SQL_KW@294..297 "sql"
+      WHITESPACE@297..298 " "
+      AS_FUNC_OPTION@298..311
+        AS_KW@298..300 "as"
+        WHITESPACE@300..301 " "
+        AS_DEFINITION@301..311
+          LITERAL@301..311
+            STRING@301..311 "'select 1'"
+    SEMICOLON@311..312 ";"
+  WHITESPACE@312..314 "\n\n"
+  COMMENT@314..370 "-- error, an empty co ..."
+  WHITESPACE@370..371 "\n"
+  CREATE_VIEW@371..400
+    CREATE_KW@371..377 "create"
+    WHITESPACE@377..378 " "
+    VIEW_KW@378..382 "view"
+    WHITESPACE@382..383 " "
+    VIEW@383..384
+      PATH@383..384
+        PATH_SEGMENT@383..384
+          IDENT@383..384 "v"
+    WHITESPACE@384..385 " "
+    COLUMN_LIST@385..387
+      L_PAREN@385..386 "("
+      R_PAREN@386..387 ")"
+    WHITESPACE@387..388 " "
+    AS_KW@388..390 "as"
+    WHITESPACE@390..391 " "
+    SELECT@391..399
+      SELECT_CLAUSE@391..399
+        SELECT_KW@391..397 "select"
+        WHITESPACE@397..398 " "
+        TARGET_LIST@398..399
+          TARGET@398..399
+            LITERAL@398..399
+              INT_NUMBER@398..399 "1"
+    SEMICOLON@399..400 ";"
+  WHITESPACE@400..401 "\n"
+  CREATE_MATERIALIZED_VIEW@401..444
+    CREATE_KW@401..407 "create"
     WHITESPACE@407..408 " "
-    FROM_CLAUSE@408..414
-      FROM_KW@408..412 "from"
-      WHITESPACE@412..413 " "
-      RELATION_FROM_ITEM@413..414
-        RELATION_NAME_REF@413..414
-          PATH_REF@413..414
-            PATH_SEGMENT_REF@413..414
-              IDENT@413..414 "t"
-    SEMICOLON@414..415 ";"
-  WHITESPACE@415..416 "\n"
-  SELECT@416..437
-    SELECT_CLAUSE@416..424
-      SELECT_KW@416..422 "select"
-      WHITESPACE@422..423 " "
-      TARGET_LIST@423..424
-        TARGET@423..424
-          STAR@423..424 "*"
-    WHITESPACE@424..425 " "
-    FROM_CLAUSE@425..436
-      FROM_KW@425..429 "from"
-      WHITESPACE@429..430 " "
-      RELATION_FROM_ITEM@430..436
-        RELATION_NAME_REF@430..431
-          PATH_REF@430..431
-            PATH_SEGMENT_REF@430..431
-              IDENT@430..431 "t"
-        WHITESPACE@431..432 " "
-        FROM_ALIAS@432..436
-          TABLE_ALIAS@432..433
-            IDENT@432..433 "x"
-          WHITESPACE@433..434 " "
-          COLUMN_LIST@434..436
-            L_PAREN@434..435 "("
-            R_PAREN@435..436 ")"
-    SEMICOLON@436..437 ";"
-  WHITESPACE@437..438 "\n"
+    MATERIALIZED_KW@408..420 "materialized"
+    WHITESPACE@420..421 " "
+    VIEW_KW@421..425 "view"
+    WHITESPACE@425..426 " "
+    VIEW@426..428
+      PATH@426..428
+        PATH_SEGMENT@426..428
+          IDENT@426..428 "mv"
+    WHITESPACE@428..429 " "
+    COLUMN_LIST@429..431
+      L_PAREN@429..430 "("
+      R_PAREN@430..431 ")"
+    WHITESPACE@431..432 " "
+    AS_KW@432..434 "as"
+    WHITESPACE@434..435 " "
+    SELECT@435..443
+      SELECT_CLAUSE@435..443
+        SELECT_KW@435..441 "select"
+        WHITESPACE@441..442 " "
+        TARGET_LIST@442..443
+          TARGET@442..443
+            LITERAL@442..443
+              INT_NUMBER@442..443 "1"
+    SEMICOLON@443..444 ";"
+  WHITESPACE@444..445 "\n"
+  SELECT@445..485
+    WITH_CLAUSE@445..468
+      WITH_KW@445..449 "with"
+      WHITESPACE@449..450 " "
+      WITH_TABLE@450..468
+        CTE_NAME@450..451
+          IDENT@450..451 "t"
+        WHITESPACE@451..452 " "
+        COLUMN_LIST@452..454
+          L_PAREN@452..453 "("
+          R_PAREN@453..454 ")"
+        WHITESPACE@454..455 " "
+        AS_KW@455..457 "as"
+        WHITESPACE@457..458 " "
+        L_PAREN@458..459 "("
+        SELECT@459..467
+          SELECT_CLAUSE@459..467
+            SELECT_KW@459..465 "select"
+            WHITESPACE@465..466 " "
+            TARGET_LIST@466..467
+              TARGET@466..467
+                LITERAL@466..467
+                  INT_NUMBER@466..467 "1"
+        R_PAREN@467..468 ")"
+    WHITESPACE@468..469 " "
+    SELECT_CLAUSE@469..477
+      SELECT_KW@469..475 "select"
+      WHITESPACE@475..476 " "
+      TARGET_LIST@476..477
+        TARGET@476..477
+          STAR@476..477 "*"
+    WHITESPACE@477..478 " "
+    FROM_CLAUSE@478..484
+      FROM_KW@478..482 "from"
+      WHITESPACE@482..483 " "
+      RELATION_FROM_ITEM@483..484
+        RELATION_NAME_REF@483..484
+          PATH_REF@483..484
+            PATH_SEGMENT_REF@483..484
+              IDENT@483..484 "t"
+    SEMICOLON@484..485 ";"
+  WHITESPACE@485..486 "\n"
+  SELECT@486..507
+    SELECT_CLAUSE@486..494
+      SELECT_KW@486..492 "select"
+      WHITESPACE@492..493 " "
+      TARGET_LIST@493..494
+        TARGET@493..494
+          STAR@493..494 "*"
+    WHITESPACE@494..495 " "
+    FROM_CLAUSE@495..506
+      FROM_KW@495..499 "from"
+      WHITESPACE@499..500 " "
+      RELATION_FROM_ITEM@500..506
+        RELATION_NAME_REF@500..501
+          PATH_REF@500..501
+            PATH_SEGMENT_REF@500..501
+              IDENT@500..501 "t"
+        WHITESPACE@501..502 " "
+        FROM_ALIAS@502..506
+          TABLE_ALIAS@502..503
+            IDENT@502..503 "x"
+          WHITESPACE@503..504 " "
+          COLUMN_LIST@504..506
+            L_PAREN@504..505 "("
+            R_PAREN@505..506 ")"
+    SEMICOLON@506..507 ";"
+  WHITESPACE@507..508 "\n"
+  CREATE_FUNCTION@508..572
+    CREATE_KW@508..514 "create"
+    WHITESPACE@514..515 " "
+    FUNCTION_KW@515..523 "function"
+    WHITESPACE@523..524 " "
+    FUNCTION_NAME@524..525
+      PATH@524..525
+        PATH_SEGMENT@524..525
+          IDENT@524..525 "f"
+    PARAM_LIST@525..527
+      L_PAREN@525..526 "("
+      R_PAREN@526..527 ")"
+    WHITESPACE@527..528 " "
+    RET_TYPE@528..544
+      RETURNS_KW@528..535 "returns"
+      WHITESPACE@535..536 " "
+      TABLE_KW@536..541 "table"
+      WHITESPACE@541..542 " "
+      TABLE_ARG_LIST@542..544
+        L_PAREN@542..543 "("
+        R_PAREN@543..544 ")"
+    WHITESPACE@544..545 " "
+    FUNC_OPTION_LIST@545..571
+      LANGUAGE_FUNC_OPTION@545..557
+        LANGUAGE_KW@545..553 "language"
+        WHITESPACE@553..554 " "
+        LANGUAGE_REF@554..557
+          SQL_KW@554..557 "sql"
+      WHITESPACE@557..558 " "
+      AS_FUNC_OPTION@558..571
+        AS_KW@558..560 "as"
+        WHITESPACE@560..561 " "
+        AS_DEFINITION@561..571
+          LITERAL@561..571
+            STRING@561..571 "'select 1'"
+    SEMICOLON@571..572 ";"
+  WHITESPACE@572..573 "\n"
 
 error[syntax-error]: Expected at least one column
    ╭▸ 
-11 │ create view v () as select 1;
+12 │ create view v () as select 1;
    ╰╴              ━━
 error[syntax-error]: Expected at least one column
    ╭▸ 
-12 │ create materialized view mv () as select 1;
+13 │ create materialized view mv () as select 1;
    ╰╴                            ━━
 error[syntax-error]: Expected at least one column
    ╭▸ 
-13 │ with t () as (select 1) select * from t;
+14 │ with t () as (select 1) select * from t;
    ╰╴       ━━
 error[syntax-error]: Expected at least one column
    ╭▸ 
-14 │ select * from t x ();
+15 │ select * from t x ();
    ╰╴                  ━━
+error[syntax-error]: Expected at least one column
+   ╭▸ 
+16 │ create function f() returns table () language sql as 'select 1';
+   ╰╴                                  ━━

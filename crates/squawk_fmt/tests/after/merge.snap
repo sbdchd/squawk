@@ -43,6 +43,19 @@ when not matched by target then
   )
 returning an_extremely_long_target_alias.organization_identifier;
 
+merge into target t
+using source1 s1 inner join source2 s2 on s1.id = s2.id on t.id = s1.id
+when not matched then
+  insert values (s1.id, s2.value);
+
+merge into target t
+using /* before left source */ source1 /* before left alias */ s1
+/* before inner */ inner /* before join */ join /* before right source */ source2 /* before right alias */ s2 /* before join on */ on
+  /* before join condition */ s1.id = s2.id
+/* before merge on */ on /* before merge condition */ t.id = s1.id
+when matched then
+  delete;
+
 /* before merge */
 merge /* before into */ into /* before target */ only /* before target open */(/* before schema */ public /* before dot */./* before table */ target /* before target close */) /* before as */ as /* before target alias */ t
 /* before using */ using /* before source */ source /* before source as */ as /* before source alias */ s

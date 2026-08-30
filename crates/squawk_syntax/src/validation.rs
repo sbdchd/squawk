@@ -6,6 +6,8 @@
 
 use std::ops::Range;
 
+use either::Either;
+
 use crate::ast::{AstNode, LitKind};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
@@ -16,13 +18,18 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
         match_ast! {
             match node {
                 ast::AlterAggregate(it) => validate_aggregate_params(it.aggregate().and_then(|x| x.param_list()), errors),
-                ast::BeginFuncOptionList(it) => validate_begin_func_option_list(it, errors),
+                ast::AtomicBody(it) => validate_atomic_body(it, errors),
                 ast::BinExpr(it) => validate_bin_expr(it, errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
+                ast::CreateFunction(it) => validate_routine_body(it.option_list(), it.body(), errors),
+                ast::CreateProcedure(it) => validate_routine_body(it.option_list(), it.body(), errors),
                 ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::CreateViewLike(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::CustomOp(it) => validate_custom_op_length(it, errors),
+                ast::Do(it) => validate_do(it, errors),
+                ast::FuncOptionList(it) => validate_func_option_list(it, errors),
                 ast::FromAlias(it) => validate_non_empty_column_list(it.columns(), errors),
+                ast::RetType(it) => validate_non_empty_column_list(it.table_arg_list(), errors),
                 ast::WithTable(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
@@ -64,9 +71,9 @@ fn validate_non_empty_column_list(column_list: Option<impl AstNode>, acc: &mut V
     ));
 }
 
-fn validate_begin_func_option_list(it: ast::BeginFuncOptionList, acc: &mut Vec<SyntaxError>) {
-    for option in it.begin_func_options() {
-        let ast::BeginFuncOption::Stmt(stmt) = option else {
+fn validate_atomic_body(it: ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
+    for option in it.routine_body_stmts() {
+        let ast::RoutineBodyStmt::Stmt(stmt) = option else {
             continue;
         };
         let syntax = stmt.syntax();
@@ -784,4 +791,99 @@ fn validate_non_standard_param(param: ast::NonStandardParam, acc: &mut Vec<Synta
         "Invalid parameter type. Use positional params like $1 instead.",
         param.syntax().text_range(),
     ))
+}
+
+const CONFLICTING_OPTIONS: &str = "Conflicting or redundant options.";
+
+#[derive(Clone, Copy, PartialEq)]
+enum FuncOptionGroup {
+    As,
+    Cost,
+    Language,
+    Leakproof,
+    Parallel,
+    Rows,
+    Security,
+    Strict,
+    Support,
+    Transform,
+    Volatility,
+    Window,
+}
+
+fn func_option_group(option: &ast::FuncOption) -> Option<FuncOptionGroup> {
+    let group = match option {
+        ast::FuncOption::AsFuncOption(_) => FuncOptionGroup::As,
+        ast::FuncOption::CostFuncOption(_) => FuncOptionGroup::Cost,
+        ast::FuncOption::LanguageFuncOption(_) => FuncOptionGroup::Language,
+        ast::FuncOption::LeakproofFuncOption(_) | ast::FuncOption::NotLeakproofFuncOption(_) => {
+            FuncOptionGroup::Leakproof
+        }
+        ast::FuncOption::ParallelFuncOption(_) => FuncOptionGroup::Parallel,
+        ast::FuncOption::RowsFuncOption(_) => FuncOptionGroup::Rows,
+        ast::FuncOption::SecurityDefinerFuncOption(_)
+        | ast::FuncOption::SecurityInvokerFuncOption(_) => FuncOptionGroup::Security,
+        ast::FuncOption::CalledOnNullInputFuncOption(_)
+        | ast::FuncOption::ReturnsNullOnNullInputFuncOption(_)
+        | ast::FuncOption::StrictFuncOption(_) => FuncOptionGroup::Strict,
+        ast::FuncOption::SupportFuncOption(_) => FuncOptionGroup::Support,
+        ast::FuncOption::TransformFuncOption(_) => FuncOptionGroup::Transform,
+        ast::FuncOption::VolatilityFuncOption(_) => FuncOptionGroup::Volatility,
+        ast::FuncOption::WindowFuncOption(_) => FuncOptionGroup::Window,
+        ast::FuncOption::ResetFuncOption(_) | ast::FuncOption::SetFuncOption(_) => return None,
+    };
+    Some(group)
+}
+
+fn validate_func_option_list(option_list: ast::FuncOptionList, acc: &mut Vec<SyntaxError>) {
+    let mut seen: Vec<FuncOptionGroup> = vec![];
+    for option in option_list.options() {
+        let Some(group) = func_option_group(&option) else {
+            continue;
+        };
+        if seen.contains(&group) {
+            acc.push(SyntaxError::new(
+                CONFLICTING_OPTIONS,
+                option.syntax().text_range(),
+            ));
+        } else {
+            seen.push(group);
+        }
+    }
+}
+
+fn validate_routine_body(
+    option_list: Option<ast::FuncOptionList>,
+    body: Option<ast::RoutineBody>,
+    acc: &mut Vec<SyntaxError>,
+) {
+    let Some(body) = body else {
+        return;
+    };
+    let has_as_option = option_list
+        .into_iter()
+        .flat_map(|options| options.options())
+        .any(|option| matches!(option, ast::FuncOption::AsFuncOption(_)));
+    if has_as_option {
+        acc.push(SyntaxError::new(
+            "Duplicate function body.",
+            body.syntax().text_range(),
+        ));
+    }
+}
+
+fn validate_do(do_: ast::Do, acc: &mut Vec<SyntaxError>) {
+    let mut seen_language = false;
+    let mut seen_body = false;
+    for part in do_.language_and_body() {
+        let (seen, range) = match part {
+            Either::Left(language) => (&mut seen_language, language.syntax().text_range()),
+            Either::Right(body) => (&mut seen_body, body.syntax().text_range()),
+        };
+        if *seen {
+            acc.push(SyntaxError::new(CONFLICTING_OPTIONS, range));
+        } else {
+            *seen = true;
+        }
+    }
 }

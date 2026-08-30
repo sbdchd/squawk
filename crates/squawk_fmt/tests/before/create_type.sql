@@ -8,6 +8,10 @@ create type float8_range as range (subtype = float8, subtype_diff = float8mi);
 
 create type complex_base (input = complex_in, output = complex_out, internallength = 16);
 
+create type null_default_base (default = null);
+
+create type commented_null_default_base (default /* equals */ = /* null value */ null /* close */);
+
 -- comments in every composite type position
 create /* type */ type /* name */ commented_composite /* as */ as /* open */ (/* field */ first_field /* type */ text /* collate */ collate /* collation */ "C" /* comma */, /* next field */ second_field /* next type */ integer /* close */) /* end */;
 

@@ -329,16 +329,17 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "\"foo\""
         WHITESPACE " "
-        USING_KW "using"
-        WHITESPACE " "
-        BIN_EXPR
-          NAME_REF
-            IDENT "a"
+        USING_EXPR
+          USING_KW "using"
           WHITESPACE " "
-          R_ANGLE ">"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "b"
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2182,21 +2183,22 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "timestamptz"
         WHITESPACE " "
-        USING_KW "using"
-        WHITESPACE " "
-        BIN_EXPR
-          NAME_REF
-            IDENT "c"
+        USING_EXPR
+          USING_KW "using"
           WHITESPACE " "
-          AT_TIME_ZONE
-            AT_KW "at"
+          BIN_EXPR
+            NAME_REF
+              IDENT "c"
             WHITESPACE " "
-            TIME_KW "time"
+            AT_TIME_ZONE
+              AT_KW "at"
+              WHITESPACE " "
+              TIME_KW "time"
+              WHITESPACE " "
+              ZONE_KW "zone"
             WHITESPACE " "
-            ZONE_KW "zone"
-          WHITESPACE " "
-          LITERAL
-            STRING "'UTC'"
+            LITERAL
+              STRING "'UTC'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove_column"

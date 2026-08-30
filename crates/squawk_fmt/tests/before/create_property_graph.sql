@@ -1,5 +1,7 @@
 create property graph social vertex tables (people key (id)) edge tables (follows source key (follower_id) references people (id) destination key (followed_id) references people (id));
 
+create property graph social vertex tables (people, organizations) edge tables (employment /* source */ source /* source table */ people /* destination */ destination /* destination table */ organizations);
+
 create unlogged property graph extraordinarily_long_social_relationship_property_graph vertex tables (extraordinarily_long_people_table key (extraordinarily_long_person_identifier) label person properties (display_name as public_name, date_of_birth), extraordinarily_long_organizations_table key (extraordinarily_long_organization_identifier) no properties) edge tables (extraordinarily_long_employment_relationship_table source key (employee_identifier) references extraordinarily_long_people_table (extraordinarily_long_person_identifier) destination key (employer_identifier) references extraordinarily_long_organizations_table (extraordinarily_long_organization_identifier) properties all columns);
 
 -- comments in every position

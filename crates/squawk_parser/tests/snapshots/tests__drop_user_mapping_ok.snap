@@ -14,7 +14,8 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    USER_KW "user"
+    USER_MAPPING_ROLE
+      USER_KW "user"
     WHITESPACE " "
     SERVER_CLAUSE
       SERVER_KW "server"
@@ -39,8 +40,9 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    ROLE_REF
-      CURRENT_ROLE_KW "current_role"
+    USER_MAPPING_ROLE
+      ROLE_REF
+        CURRENT_ROLE_KW "current_role"
     WHITESPACE " "
     SERVER_CLAUSE
       SERVER_KW "server"

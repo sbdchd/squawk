@@ -1,0 +1,269 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/routine_body.sql
+---
+SOURCE_FILE
+  COMMENT "-- the routine body must come after the options"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  WHITESPACE " "
+  ERROR
+    LANGUAGE_KW "language"
+  WHITESPACE " "
+  ERROR
+    SQL_KW "sql"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    ATOMIC_BODY
+      BEGIN_KW "begin"
+      WHITESPACE " "
+      ATOMIC_KW "atomic"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+        SEMICOLON ";"
+      WHITESPACE " "
+      END_KW "end"
+  WHITESPACE " "
+  ERROR
+    LANGUAGE_KW "language"
+  WHITESPACE " "
+  ERROR
+    SQL_KW "sql"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- only one routine body"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+    WHITESPACE " "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  WHITESPACE " "
+  ERROR
+    RETURN_KW "return"
+  WHITESPACE " "
+  ERROR
+    INT_NUMBER "2"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alter never takes a routine body"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+      PARAM_LIST
+        L_PAREN "("
+        R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    RETURN_KW "return"
+  WHITESPACE " "
+  ERROR
+    INT_NUMBER "1"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_PROCEDURE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "p"
+      PARAM_LIST
+        L_PAREN "("
+        R_PAREN ")"
+  WHITESPACE " "
+  BEGIN
+    BEGIN_KW "begin"
+  WHITESPACE " "
+  ERROR
+    ATOMIC_KW "atomic"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE " "
+  COMMIT_TRANSACTION
+    END_KW "end"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_ROUTINE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ROUTINE_KW "routine"
+    WHITESPACE " "
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "r"
+      PARAM_LIST
+        L_PAREN "("
+        R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    RETURN_KW "return"
+  WHITESPACE " "
+  ERROR
+    INT_NUMBER "1"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected command, found LANGUAGE_KW
+  ╭▸ 
+2 │ create function f() returns int return 1 language sql;
+  ╰╴                                         ━
+error[syntax-error]: expected command, found SQL_KW
+  ╭▸ 
+2 │ create function f() returns int return 1 language sql;
+  ╰╴                                                  ━
+error[syntax-error]: expected command, found LANGUAGE_KW
+  ╭▸ 
+3 │ create function f() returns int begin atomic select 1; end language sql;
+  ╰╴                                                           ━
+error[syntax-error]: expected command, found SQL_KW
+  ╭▸ 
+3 │ create function f() returns int begin atomic select 1; end language sql;
+  ╰╴                                                                    ━
+error[syntax-error]: expected command, found RETURN_KW
+  ╭▸ 
+6 │ create function f() returns int language sql return 1 return 2;
+  ╰╴                                                      ━
+error[syntax-error]: expected command, found INT_NUMBER
+  ╭▸ 
+6 │ create function f() returns int language sql return 1 return 2;
+  ╰╴                                                             ━
+error[syntax-error]: expected function option
+  ╭▸ 
+9 │ alter function f() return 1;
+  ╰╴                  ━
+error[syntax-error]: expected command, found RETURN_KW
+  ╭▸ 
+9 │ alter function f() return 1;
+  ╰╴                   ━
+error[syntax-error]: expected command, found INT_NUMBER
+  ╭▸ 
+9 │ alter function f() return 1;
+  ╰╴                          ━
+error[syntax-error]: expected function option
+   ╭▸ 
+10 │ alter procedure p() begin atomic select 1; end;
+   ╰╴                   ━
+error[syntax-error]: expected command, found ATOMIC_KW
+   ╭▸ 
+10 │ alter procedure p() begin atomic select 1; end;
+   ╰╴                          ━
+error[syntax-error]: expected function option
+   ╭▸ 
+11 │ alter routine r() return 1;
+   ╰╴                 ━
+error[syntax-error]: expected command, found RETURN_KW
+   ╭▸ 
+11 │ alter routine r() return 1;
+   ╰╴                  ━
+error[syntax-error]: expected command, found INT_NUMBER
+   ╭▸ 
+11 │ alter routine r() return 1;
+   ╰╴                         ━

@@ -4,6 +4,11 @@ create collation c from d;
 -- from_full
 create collation if not exists foo.c from bar.d;
 
+-- from_option
+create collation c (
+  from = "C"
+);
+
 -- with_options
 create collation if not exists foo.c (
   locale = 'foo',

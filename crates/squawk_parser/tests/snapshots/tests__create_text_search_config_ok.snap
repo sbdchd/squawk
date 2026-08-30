@@ -75,3 +75,41 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- copy"
+  WHITESPACE "\n"
+  CREATE_TEXT_SEARCH_CONFIGURATION
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    TEXT_SEARCH_CONFIGURATION
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_KW "name"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          COPY_KW "copy"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "other_config"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"

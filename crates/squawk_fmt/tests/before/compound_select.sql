@@ -22,3 +22,6 @@ select 1 /* before operator */ union /* before quantifier */ distinct /* before 
 select 1 -- before operator
 union all -- before right select
 select 2;
+
+select 1 union select 2 offset 1 limit 2;
+select 1 union select 2 limit 1 for update;

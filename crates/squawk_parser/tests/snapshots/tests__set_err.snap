@@ -1,0 +1,84 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/set.sql
+---
+SOURCE_FILE
+  COMMENT "-- zone_value is a single value, not a list"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      LITERAL
+        STRING "'a'"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    STRING "'b'"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- zone_value doesn't allow arbitrary expressions"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      CONFIG_VALUE_NAME
+        IDENT "now"
+  ERROR
+    L_PAREN "("
+  ERROR
+    R_PAREN ")"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- zone_value doesn't accept NULL"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+  WHITESPACE " "
+  ERROR
+    NULL_KW "null"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected command, found COMMA
+  ╭▸ 
+2 │ set time zone 'a', 'b';
+  ╰╴                 ━
+error[syntax-error]: expected command, found STRING
+  ╭▸ 
+2 │ set time zone 'a', 'b';
+  ╰╴                   ━
+error[syntax-error]: expected command, found L_PAREN
+  ╭▸ 
+5 │ set time zone now();
+  ╰╴                 ━
+error[syntax-error]: expected command, found R_PAREN
+  ╭▸ 
+5 │ set time zone now();
+  ╰╴                  ━
+error[syntax-error]: expected time zone value, got NULL_KW
+  ╭▸ 
+8 │ set time zone null;
+  ╰╴             ━
+error[syntax-error]: expected command, found NULL_KW
+  ╭▸ 
+8 │ set time zone null;
+  ╰╴              ━

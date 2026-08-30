@@ -6,6 +6,22 @@ start transaction isolation level serializable, read write, deferrable;
 
 begin transaction isolation level repeatable read, read only, not deferrable;
 
+begin
+  isolation level read committed
+  read only
+  read write
+  deferrable
+  not deferrable;
+
+start transaction
+  isolation level read committed
+  read only
+  read write
+  deferrable
+  not deferrable;
+
+begin /* before first mode */ isolation /* before level */ level /* before read */ read /* before committed */ committed /* before read only */ read /* before only */ only /* before read write */ read /* before write */ write /* before deferrable */ deferrable /* before not */ not /* before final deferrable */ deferrable /* before semicolon */;
+
 commit;
 
 end work;

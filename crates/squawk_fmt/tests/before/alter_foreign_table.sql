@@ -5,3 +5,5 @@ ALTER FOREIGN TABLE public.items ALTER COLUMN quantity SET DEFAULT 100, ALTER CO
 ALTER FOREIGN TABLE public.items ADD CONSTRAINT positive_quantity CHECK (quantity > 0), RENAME COLUMN old_name TO new_name;
 
 ALTER FOREIGN TABLE IF EXISTS public.items OWNER TO role_with_a_very_long_descriptive_name;
+
+ALTER FOREIGN TABLE ft1 /* options */ OPTIONS /* open */ (/* drop */ DROP /* name */ delimiter /* comma */, /* set */ SET /* name */ quote /* value */ '~' /* comma */, /* add */ ADD /* name */ escape /* value */ '@' /* close */);
