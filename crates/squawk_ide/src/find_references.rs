@@ -30,7 +30,7 @@ fn is_reference_node(node: &SyntaxNode) -> bool {
             | ast::Type::IntervalType(_)
             | ast::Type::TimeType(_)
             | ast::Type::TimestampType(_) => true,
-            ast::Type::ArrayType(_) | ast::Type::ExprType(_) | ast::Type::PathType(_) => false,
+            ast::Type::ArrayType(_) | ast::Type::PathType(_) => false,
         };
     }
 

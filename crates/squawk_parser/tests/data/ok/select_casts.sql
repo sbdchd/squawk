@@ -279,4 +279,43 @@ select foo.bar '100';
 select foo.bar(10, 2) '100';
 select pg_catalog.varchar(100) '{123}';
 
-select foo[10].bar(10, 2) '100';
+-- the type modifier lookahead shouldn't swallow ordinary calls
+select foo.bar(10, 2);
+select foo.bar(10, 2) || '100';
+select foo.bar(nested(1)) '100';
+
+-- unqualified type names with a type modifier
+select foo(1) '100';
+select varchar(10) 'abc';
+select character varying(10) 'abc';
+select national character varying(10) 'abc';
+select char(10) 'abc';
+select nchar(10) 'abc';
+select bit(3) '101';
+select bit varying(3) '101';
+
+-- a reserved keyword is still a valid path segment
+select foo.select 'x';
+
+-- typed literals with non-plain string literals
+select varchar e'a';
+select varchar u&'a';
+select timestamp $$2020-01-01$$;
+select interval u&'1 day';
+select double precision $tag$1.5$tag$;
+
+-- national character types with non-plain string literals
+select national character e'a';
+select national char e'a';
+select national character varying u&'a';
+select national char varying $$a$$;
+select national character(10) e'a';
+select national character varying(10) $tag$a$tag$;
+select nchar e'a';
+select nchar varying u&'a';
+
+-- national string literals
+select n'abc';
+select varchar n'a';
+select nchar n'a';
+select national character n'a';

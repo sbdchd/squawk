@@ -11095,17 +11095,6 @@ impl ExprPreceding {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ExprType {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ExprType {
-    #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Extension {
     pub(crate) syntax: SyntaxNode,
 }
@@ -29976,7 +29965,6 @@ pub enum Type {
     BitVaryingType(BitVaryingType),
     CharacterType(CharacterType),
     DoubleType(DoubleType),
-    ExprType(ExprType),
     IntervalType(IntervalType),
     PathType(PathType),
     TimeType(TimeType),
@@ -38039,24 +38027,6 @@ impl AstNode for ExprPreceding {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::EXPR_PRECEDING
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for ExprType {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EXPR_TYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -70997,7 +70967,6 @@ impl AstNode for Type {
                 | SyntaxKind::BIT_VARYING_TYPE
                 | SyntaxKind::CHARACTER_TYPE
                 | SyntaxKind::DOUBLE_TYPE
-                | SyntaxKind::EXPR_TYPE
                 | SyntaxKind::INTERVAL_TYPE
                 | SyntaxKind::PATH_TYPE
                 | SyntaxKind::TIME_TYPE
@@ -71013,7 +70982,6 @@ impl AstNode for Type {
             SyntaxKind::BIT_VARYING_TYPE => Type::BitVaryingType(BitVaryingType { syntax }),
             SyntaxKind::CHARACTER_TYPE => Type::CharacterType(CharacterType { syntax }),
             SyntaxKind::DOUBLE_TYPE => Type::DoubleType(DoubleType { syntax }),
-            SyntaxKind::EXPR_TYPE => Type::ExprType(ExprType { syntax }),
             SyntaxKind::INTERVAL_TYPE => Type::IntervalType(IntervalType { syntax }),
             SyntaxKind::PATH_TYPE => Type::PathType(PathType { syntax }),
             SyntaxKind::TIME_TYPE => Type::TimeType(TimeType { syntax }),
@@ -71033,7 +71001,6 @@ impl AstNode for Type {
             Type::BitVaryingType(it) => &it.syntax,
             Type::CharacterType(it) => &it.syntax,
             Type::DoubleType(it) => &it.syntax,
-            Type::ExprType(it) => &it.syntax,
             Type::IntervalType(it) => &it.syntax,
             Type::PathType(it) => &it.syntax,
             Type::TimeType(it) => &it.syntax,
@@ -71070,12 +71037,6 @@ impl From<DoubleType> for Type {
     #[inline]
     fn from(node: DoubleType) -> Type {
         Type::DoubleType(node)
-    }
-}
-impl From<ExprType> for Type {
-    #[inline]
-    fn from(node: ExprType) -> Type {
-        Type::ExprType(node)
     }
 }
 impl From<IntervalType> for Type {

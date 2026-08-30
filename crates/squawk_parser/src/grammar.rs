@@ -996,8 +996,96 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, CALL_EXPR)
 }
 
+// To support the following casts, we need to do some lookahead unfortunately.
+//
+//   select type_name 'string';
+//
+fn at_typed_literal(p: &Parser<'_>) -> bool {
+    if !p.at_ts(TYPE_NAME_FIRST) {
+        return false;
+    }
+
+    let mut i =
+        match p.current() {
+            NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
+                if p.nth_at(2, VARYING_KW) { 3 } else { 2 }
+            }
+            CHARACTER_KW | CHAR_KW | NCHAR_KW => {
+                if p.nth_at(1, VARYING_KW) {
+                    2
+                } else {
+                    1
+                }
+            }
+            BIT_KW => {
+                if p.nth_at(1, VARYING_KW) {
+                    2
+                } else {
+                    1
+                }
+            }
+            DOUBLE_KW if p.nth_at(1, PRECISION_KW) => 2,
+            _ => {
+                let mut i = 1;
+                while p.nth_at(i, DOT) && p.nth_at_ts(i + 1, COL_LABEL_FIRST) {
+                    i += 2;
+                }
+                i
+            }
+        };
+
+    if p.nth_at(i, L_PAREN) {
+        let mut depth = 0;
+        loop {
+            match p.nth(i) {
+                L_PAREN => depth += 1,
+                R_PAREN => {
+                    depth -= 1;
+                    if depth == 0 {
+                        i += 1;
+                        break;
+                    }
+                }
+                EOF | SEMICOLON => return false,
+                _ => {}
+            }
+            i += 1;
+        }
+    }
+
+    if matches!(p.current(), TIMESTAMP_KW | TIME_KW)
+        && matches!(p.nth(i), WITH_KW | WITHOUT_KW)
+        && p.nth_at(i + 1, TIME_KW)
+        && p.nth_at(i + 2, ZONE_KW)
+    {
+        i += 3;
+    }
+
+    p.nth_at_ts(i, STRING_FIRST)
+}
+
+fn typed_literal(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    let interval_has_precision = p.at(INTERVAL_KW) && p.nth_at(1, L_PAREN);
+    let ty_kind = match opt_type_name_with(p, true, false) {
+        Some(ty) => Some(ty.kind()),
+        None => {
+            p.error("expected type name");
+            None
+        }
+    };
+    string_literal(p);
+    if ty_kind == Some(INTERVAL_TYPE) {
+        opt_interval_trailing(p, interval_has_precision);
+    }
+    m.complete(p, CAST_EXPR)
+}
+
 // literal, path, tuple, array
 fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
+    if at_typed_literal(p) {
+        return Some((typed_literal(p), ExprKind::Other));
+    }
     if let Some(m) = literal(p) {
         return Some((m, ExprKind::Other));
     }
@@ -1859,7 +1947,7 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
             BETWEEN_KW => between_expr(p),
             L_PAREN => call_expr_args(p, lhs),
             L_BRACK => index_expr(p, lhs),
-            DOT => postfix_dot_expr(p, lhs),
+            DOT => field_expr(p, lhs),
             AT_KW if p.at(AT_LOCAL) => {
                 let m = lhs.precede(p);
                 p.bump(AT_LOCAL);
@@ -2545,15 +2633,11 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    let mut has_interval_precision = false;
-    let kind = match p.current() {
+    match p.current() {
         TIMESTAMP_KW | TIME_KW => {
-            let kind = if p.eat(TIMESTAMP_KW) {
-                TIMESTAMP_TYPE
-            } else {
+            if !p.eat(TIMESTAMP_KW) {
                 p.bump(TIME_KW);
-                TIME_TYPE
-            };
+            }
             if p.eat(L_PAREN) {
                 if opt_numeric_literal(p).is_none() {
                     p.error("expected numeric literal");
@@ -2561,70 +2645,35 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 p.expect(R_PAREN);
             }
             opt_with_timezone(p);
-            kind
         }
         BIT_KW => {
             p.bump(BIT_KW);
-            if p.eat(VARYING_KW) {
-                BIT_VARYING_TYPE
-            } else {
-                BIT_TYPE
-            }
+            p.eat(VARYING_KW);
         }
         NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
             p.bump(NATIONAL_KW);
-            char_type(p)
+            char_type(p);
         }
         DOUBLE_KW if p.nth_at(1, PRECISION_KW) => {
             p.bump(DOUBLE_KW);
             p.bump(PRECISION_KW);
-            DOUBLE_TYPE
         }
-        CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => char_type(p),
+        CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => {
+            char_type(p);
+        }
         INTERVAL_KW => {
             p.bump(INTERVAL_KW);
-            has_interval_precision = opt_interval_precision(p);
+            let has_interval_precision = opt_interval_precision(p);
             opt_interval_trailing(p, has_interval_precision);
-            INTERVAL_TYPE
         }
-        _ => {
-            pg_name(p);
-            NAME_REF
-        }
-    };
-    // A type name followed by a string is a type cast so we insert a CAST_EXPR
-    // preceding it to wrap the previously parsed data.
-    // e.g., `select numeric '12312'`
-    let is_type_cast = kind == NAME_REF && p.at_ts(STRING_FIRST);
+        _ => pg_name(p),
+    }
     let node_kind = if p.at(FAT_ARROW) || p.at(COLON_EQ) {
         PARAM_NAME_REF
-    } else if is_type_cast {
-        PATH_SEGMENT_REF
-    } else if p.at(STRING) {
-        kind
     } else {
         NAME_REF
     };
-    let cm = m.complete(p, node_kind);
-
-    if p.at_ts(STRING_FIRST) {
-        // Wrap expr in type.
-        // TODO: can we unify types & exprs?
-        let cm = if is_type_cast {
-            let path = cm.precede(p).complete(p, PATH_REF);
-            path.precede(p).complete(p, PATH_TYPE)
-        } else {
-            cm
-        };
-
-        string_literal(p);
-        if kind == INTERVAL_TYPE {
-            opt_interval_trailing(p, has_interval_precision);
-        }
-        Some(cm.precede(p).complete(p, CAST_EXPR))
-    } else {
-        Some(cm)
-    }
+    Some(m.complete(p, node_kind))
 }
 
 // [ SYMMETRIC | ASYMMETRIC ]
@@ -2653,22 +2702,10 @@ fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(L_PAREN));
-    let prev_kind = lhs.kind();
     let m = lhs.precede(p);
     arg_list(p);
     opt_agg_clauses(p);
-    let mut cm = m.complete(p, CALL_EXPR);
-    if p.at_ts(STRING_FIRST) {
-        // Wrap expr in type.
-        // TODO: can we unify types & exprs?
-        if prev_kind == FIELD_EXPR {
-            cm = cm.precede(p).complete(p, EXPR_TYPE);
-        }
-        string_literal(p);
-        cm.precede(p).complete(p, CAST_EXPR)
-    } else {
-        cm
-    }
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_agg_clauses(p: &mut Parser<'_>) {
@@ -2803,22 +2840,6 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
         p.error(format!("expected field name, got {:?}", p.current()));
     }
     m.complete(p, FIELD_EXPR)
-}
-
-fn postfix_dot_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
-    assert!(p.at(DOT));
-    let cm = field_expr(p, lhs);
-    if p.at_ts(STRING_FIRST) {
-        // wrap our previous expression in a type
-        // TODO: can we unify types & exprs?
-        let cm = cm.precede(p).complete(p, EXPR_TYPE);
-        string_literal(p);
-        // A field followed by a literal is a type cast so we insert a CAST_EXPR
-        // preceding it to wrap the previously parsed data.
-        cm.precede(p).complete(p, CAST_EXPR)
-    } else {
-        cm
-    }
 }
 
 fn expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
