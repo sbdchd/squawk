@@ -824,7 +824,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         {
             return Some(NameRefClass::PrivilegeColumn);
         }
-        if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
+        if ast::PathType::can_cast(ancestor.kind()) {
             if let Some(class) = classify_ddl_function_option_value(&ancestor) {
                 return Some(class);
             }

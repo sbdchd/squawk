@@ -3406,11 +3406,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                CHARACTER_KW "character"
-                WHITESPACE " "
-                VARYING_KW "varying"
+            VARCHAR_TYPE
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3429,9 +3428,8 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                CHARACTER_KW "character"
+            CHARACTER_TYPE
+              CHARACTER_KW "character"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3450,11 +3448,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                CHAR_KW "char"
-                WHITESPACE " "
-                VARYING_KW "varying"
+            VARCHAR_TYPE
+              CHAR_KW "char"
+              WHITESPACE " "
+              VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3473,9 +3470,8 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                CHAR_KW "char"
+            CHARACTER_TYPE
+              CHAR_KW "char"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3494,9 +3490,8 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                VARCHAR_KW "varchar"
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3515,13 +3510,12 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                NATIONAL_KW "national"
-                WHITESPACE " "
-                CHARACTER_KW "character"
-                WHITESPACE " "
-                VARYING_KW "varying"
+            VARCHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3540,11 +3534,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                NATIONAL_KW "national"
-                WHITESPACE " "
-                CHARACTER_KW "character"
+            CHARACTER_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3563,13 +3556,12 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                NATIONAL_KW "national"
-                WHITESPACE " "
-                CHAR_KW "char"
-                WHITESPACE " "
-                VARYING_KW "varying"
+            VARCHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHAR_KW "char"
+              WHITESPACE " "
+              VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3588,11 +3580,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                NATIONAL_KW "national"
-                WHITESPACE " "
-                CHAR_KW "char"
+            CHARACTER_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHAR_KW "char"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3611,11 +3602,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                NCHAR_KW "nchar"
-                WHITESPACE " "
-                VARYING_KW "varying"
+            VARCHAR_TYPE
+              NCHAR_KW "nchar"
+              WHITESPACE " "
+              VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3634,9 +3624,8 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                NCHAR_KW "nchar"
+            CHARACTER_TYPE
+              NCHAR_KW "nchar"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3655,11 +3644,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                BIT_KW "bit"
-                WHITESPACE " "
-                VARYING_KW "varying"
+            BIT_VARYING_TYPE
+              BIT_KW "bit"
+              WHITESPACE " "
+              VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3678,9 +3666,8 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                BIT_KW "bit"
+            BIT_TYPE
+              BIT_KW "bit"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3825,9 +3812,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                FLOAT_KW "float"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  FLOAT_KW "float"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3862,9 +3850,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                DECIMAL_KW "decimal"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  DECIMAL_KW "decimal"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3904,9 +3893,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                DEC_KW "dec"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  DEC_KW "dec"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -3946,9 +3936,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              NAME_REF
-                NUMERIC_KW "numeric"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NUMERIC_KW "numeric"
               ARG_LIST
                 L_PAREN "("
                 ARG
@@ -4004,12 +3995,13 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            EXPR_TYPE
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "foo"
+            PATH_TYPE
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "foo"
                 DOT "."
-                NAME_REF
+                PATH_SEGMENT_REF
                   IDENT "bar"
             WHITESPACE " "
             LITERAL
@@ -4023,25 +4015,25 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            EXPR_TYPE
-              CALL_EXPR
-                FIELD_EXPR
-                  NAME_REF
+            PATH_TYPE
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     IDENT "foo"
-                  DOT "."
-                  NAME_REF
-                    IDENT "bar"
-                ARG_LIST
-                  L_PAREN "("
-                  ARG
-                    LITERAL
-                      INT_NUMBER "10"
-                  COMMA ","
-                  WHITESPACE " "
-                  ARG
-                    LITERAL
-                      INT_NUMBER "2"
-                  R_PAREN ")"
+                DOT "."
+                PATH_SEGMENT_REF
+                  IDENT "bar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                COMMA ","
+                WHITESPACE " "
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
+                R_PAREN ")"
             WHITESPACE " "
             LITERAL
               STRING "'100'"
@@ -4054,25 +4046,87 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            EXPR_TYPE
-              CALL_EXPR
-                FIELD_EXPR
-                  NAME_REF
+            PATH_TYPE
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     IDENT "pg_catalog"
-                  DOT "."
-                  NAME_REF
-                    VARCHAR_KW "varchar"
-                ARG_LIST
-                  L_PAREN "("
-                  ARG
-                    LITERAL
-                      INT_NUMBER "100"
-                  R_PAREN ")"
+                DOT "."
+                PATH_SEGMENT_REF
+                  VARCHAR_KW "varchar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "100"
+                R_PAREN ")"
             WHITESPACE " "
             LITERAL
               STRING "'{123}'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- the type modifier lookahead shouldn't swallow ordinary calls"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "foo"
+              DOT "."
+              NAME_REF
+                IDENT "bar"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "10"
+              COMMA ","
+              WHITESPACE " "
+              ARG
+                LITERAL
+                  INT_NUMBER "2"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "foo"
+                DOT "."
+                NAME_REF
+                  IDENT "bar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                COMMA ","
+                WHITESPACE " "
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              STRING "'100'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
       SELECT_KW "select"
@@ -4080,32 +4134,499 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            EXPR_TYPE
-              CALL_EXPR
-                FIELD_EXPR
-                  INDEX_EXPR
+            PATH_TYPE
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "foo"
+                DOT "."
+                PATH_SEGMENT_REF
+                  IDENT "bar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  CALL_EXPR
                     NAME_REF
-                      IDENT "foo"
-                    L_BRACK "["
-                    LITERAL
-                      INT_NUMBER "10"
-                    R_BRACK "]"
-                  DOT "."
-                  NAME_REF
-                    IDENT "bar"
-                ARG_LIST
-                  L_PAREN "("
-                  ARG
-                    LITERAL
-                      INT_NUMBER "10"
-                  COMMA ","
-                  WHITESPACE " "
-                  ARG
-                    LITERAL
-                      INT_NUMBER "2"
-                  R_PAREN ")"
+                      NESTED_KW "nested"
+                    ARG_LIST
+                      L_PAREN "("
+                      ARG
+                        LITERAL
+                          INT_NUMBER "1"
+                      R_PAREN ")"
+                R_PAREN ")"
             WHITESPACE " "
             LITERAL
               STRING "'100'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- unqualified type names with a type modifier"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "foo"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'100'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abc'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abc'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abc'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              CHAR_KW "char"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abc'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NCHAR_KW "nchar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abc'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            BIT_TYPE
+              BIT_KW "bit"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'101'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            BIT_VARYING_TYPE
+              BIT_KW "bit"
+              WHITESPACE " "
+              VARYING_KW "varying"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'101'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- a reserved keyword is still a valid path segment"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            PATH_TYPE
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "foo"
+                DOT "."
+                PATH_SEGMENT_REF
+                  SELECT_KW "select"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- typed literals with non-plain string literals"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            WHITESPACE " "
+            LITERAL
+              ESC_STRING "e'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            WHITESPACE " "
+            LITERAL
+              UNICODE_ESC_STRING "u&'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            TIMESTAMP_TYPE
+              TIMESTAMP_KW "timestamp"
+            WHITESPACE " "
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$2020-01-01$$"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+            WHITESPACE " "
+            LITERAL
+              UNICODE_ESC_STRING "u&'1 day'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            DOUBLE_TYPE
+              DOUBLE_KW "double"
+              WHITESPACE " "
+              PRECISION_KW "precision"
+            WHITESPACE " "
+            LITERAL
+              DOLLAR_QUOTED_STRING "$tag$1.5$tag$"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- national character types with non-plain string literals"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+            WHITESPACE " "
+            LITERAL
+              ESC_STRING "e'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHAR_KW "char"
+            WHITESPACE " "
+            LITERAL
+              ESC_STRING "e'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
+            WHITESPACE " "
+            LITERAL
+              UNICODE_ESC_STRING "u&'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHAR_KW "char"
+              WHITESPACE " "
+              VARYING_KW "varying"
+            WHITESPACE " "
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$a$$"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              ESC_STRING "e'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              DOLLAR_QUOTED_STRING "$tag$a$tag$"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NCHAR_KW "nchar"
+            WHITESPACE " "
+            LITERAL
+              ESC_STRING "e'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              NCHAR_KW "nchar"
+              WHITESPACE " "
+              VARYING_KW "varying"
+            WHITESPACE " "
+            LITERAL
+              UNICODE_ESC_STRING "u&'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- national string literals"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            NATIONAL_STRING "n'abc'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            WHITESPACE " "
+            LITERAL
+              NATIONAL_STRING "n'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NCHAR_KW "nchar"
+            WHITESPACE " "
+            LITERAL
+              NATIONAL_STRING "n'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+            WHITESPACE " "
+            LITERAL
+              NATIONAL_STRING "n'a'"
     SEMICOLON ";"
   WHITESPACE "\n"

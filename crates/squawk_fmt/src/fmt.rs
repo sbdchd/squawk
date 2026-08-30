@@ -22762,10 +22762,6 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
         ast::Type::VarcharType(varchar_type) => build_keyword_node(varchar_type.syntax())
             .append(build_type_args(varchar_type.arg_list())),
         ast::Type::DoubleType(double_type) => build_keyword_node(double_type.syntax()),
-        ast::Type::ExprType(expr_type) => match expr_type.expr() {
-            Some(expr) => build_expr(expr),
-            None => Doc::nil(),
-        },
         ast::Type::IntervalType(interval_type) => {
             let mut doc = build_setof(interval_type.setof_token());
             if let Some(interval_token) = interval_type.interval_token() {

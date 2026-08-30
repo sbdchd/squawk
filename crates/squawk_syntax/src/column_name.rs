@@ -177,17 +177,6 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 return name_from_type(inner_ty, unknown_column);
             }
         }
-        ast::Type::ExprType(expr_type) => {
-            if let Some(expr) = expr_type.expr() {
-                return name_from_expr(expr, true).map(|(column, node)| {
-                    let column = match column {
-                        ColumnName::Column(c) => ColumnName::new(c, unknown_column),
-                        _ => column,
-                    };
-                    (column, node)
-                });
-            }
-        }
     }
     None
 }

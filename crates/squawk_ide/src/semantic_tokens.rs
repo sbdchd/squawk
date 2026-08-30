@@ -135,7 +135,6 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
                 out.push_type(token.into());
             }
         }
-        ast::Type::ExprType(_) => (),
         ast::Type::IntervalType(interval_type) => {
             if let Some(token) = interval_type.setof_token() {
                 out.push_type(token.into());

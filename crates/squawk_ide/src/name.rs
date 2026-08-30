@@ -212,18 +212,6 @@ pub(crate) fn schema_and_type_name(ty: &ast::Type) -> Option<(Option<Schema>, Na
             let path = path_type.path_ref()?;
             schema_and_name_path(&path)
         }
-        ast::Type::ExprType(expr_type) => {
-            if let ast::Expr::FieldExpr(field_expr) = expr_type.expr()?
-                && let Some(field) = field_expr.field()
-                && let Some(ast::Expr::NameRef(schema_name_ref)) = field_expr.base()
-            {
-                let type_name = Name::from_node(&field);
-                let schema = Some(Schema(Name::from_node(&schema_name_ref)));
-                Some((schema, type_name))
-            } else {
-                None
-            }
-        }
         ast::Type::VarcharType(_) => Some((None, Name::from_string("varchar"))),
         ast::Type::CharacterType(_) => Some((None, Name::from_string("bpchar"))),
         ast::Type::DoubleType(_) => Some((None, Name::from_string("float8"))),
