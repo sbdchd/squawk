@@ -1,0 +1,656 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/type_modifiers.sql
+---
+SOURCE_FILE@0..655
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..32
+    SELECT_CLAUSE@6..31
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..31
+        TARGET@13..31
+          CAST_EXPR@13..31
+            PATH_TYPE@13..27
+              PATH_REF@13..20
+                PATH_SEGMENT_REF@13..20
+                  NUMERIC_KW@13..20 "numeric"
+              ARG_LIST@20..27
+                L_PAREN@20..21 "("
+                ARG@21..23
+                  LITERAL@21..23
+                    INT_NUMBER@21..23 "10"
+                COMMA@23..24 ","
+                WHITESPACE@24..25 " "
+                ARG@25..26
+                  LITERAL@25..26
+                    INT_NUMBER@25..26 "2"
+                R_PAREN@26..27 ")"
+            WHITESPACE@27..28 " "
+            LITERAL@28..31
+              STRING@28..31 "'1'"
+    SEMICOLON@31..32 ";"
+  WHITESPACE@32..33 "\n"
+  SELECT@33..57
+    SELECT_CLAUSE@33..56
+      SELECT_KW@33..39 "select"
+      WHITESPACE@39..40 " "
+      TARGET_LIST@40..56
+        TARGET@40..56
+          CAST_EXPR@40..56
+            PATH_TYPE@40..52
+              PATH_REF@40..47
+                PATH_SEGMENT_REF@40..47
+                  NUMERIC_KW@40..47 "numeric"
+              ARG_LIST@47..52
+                L_PAREN@47..48 "("
+                ARG@48..51
+                  NAME_REF@48..51
+                    IDENT@48..51 "foo"
+                R_PAREN@51..52 ")"
+            WHITESPACE@52..53 " "
+            LITERAL@53..56
+              STRING@53..56 "'1'"
+    SEMICOLON@56..57 ";"
+  WHITESPACE@57..58 "\n"
+  SELECT@58..81
+    SELECT_CLAUSE@58..80
+      SELECT_KW@58..64 "select"
+      WHITESPACE@64..65 " "
+      TARGET_LIST@65..80
+        TARGET@65..80
+          CAST_EXPR@65..80
+            PATH_TYPE@65..76
+              PATH_REF@65..72
+                PATH_SEGMENT_REF@65..72
+                  NUMERIC_KW@65..72 "numeric"
+              ARG_LIST@72..76
+                L_PAREN@72..73 "("
+                ARG@73..75
+                  PREFIX_EXPR@73..75
+                    MINUS@73..74 "-"
+                    LITERAL@74..75
+                      INT_NUMBER@74..75 "1"
+                R_PAREN@75..76 ")"
+            WHITESPACE@76..77 " "
+            LITERAL@77..80
+              STRING@77..80 "'1'"
+    SEMICOLON@80..81 ";"
+  WHITESPACE@81..82 "\n"
+  SELECT@82..106
+    SELECT_CLAUSE@82..105
+      SELECT_KW@82..88 "select"
+      WHITESPACE@88..89 " "
+      TARGET_LIST@89..105
+        TARGET@89..105
+          CAST_EXPR@89..105
+            PATH_TYPE@89..101
+              PATH_REF@89..96
+                PATH_SEGMENT_REF@89..96
+                  NUMERIC_KW@89..96 "numeric"
+              ARG_LIST@96..101
+                L_PAREN@96..97 "("
+                ARG@97..100
+                  LITERAL@97..100
+                    STRING@97..100 "'1'"
+                R_PAREN@100..101 ")"
+            WHITESPACE@101..102 " "
+            LITERAL@102..105
+              STRING@102..105 "'1'"
+    SEMICOLON@105..106 ";"
+  WHITESPACE@106..107 "\n"
+  SELECT@107..132
+    SELECT_CLAUSE@107..131
+      SELECT_KW@107..113 "select"
+      WHITESPACE@113..114 " "
+      TARGET_LIST@114..131
+        TARGET@114..131
+          CAST_EXPR@114..131
+            PATH_TYPE@114..127
+              PATH_REF@114..121
+                PATH_SEGMENT_REF@114..121
+                  NUMERIC_KW@114..121 "numeric"
+              ARG_LIST@121..127
+                L_PAREN@121..122 "("
+                ARG@122..126
+                  LITERAL@122..126
+                    ESC_STRING@122..126 "e'1'"
+                R_PAREN@126..127 ")"
+            WHITESPACE@127..128 " "
+            LITERAL@128..131
+              STRING@128..131 "'1'"
+    SEMICOLON@131..132 ";"
+  WHITESPACE@132..133 "\n"
+  SELECT@133..159
+    SELECT_CLAUSE@133..158
+      SELECT_KW@133..139 "select"
+      WHITESPACE@139..140 " "
+      TARGET_LIST@140..158
+        TARGET@140..158
+          CAST_EXPR@140..158
+            PATH_TYPE@140..154
+              PATH_REF@140..147
+                PATH_SEGMENT_REF@140..147
+                  NUMERIC_KW@140..147 "numeric"
+              ARG_LIST@147..154
+                L_PAREN@147..148 "("
+                ARG@148..153
+                  LITERAL@148..153
+                    UNICODE_ESC_STRING@148..153 "u&'1'"
+                R_PAREN@153..154 ")"
+            WHITESPACE@154..155 " "
+            LITERAL@155..158
+              STRING@155..158 "'1'"
+    SEMICOLON@158..159 ";"
+  WHITESPACE@159..160 "\n"
+  SELECT@160..186
+    SELECT_CLAUSE@160..185
+      SELECT_KW@160..166 "select"
+      WHITESPACE@166..167 " "
+      TARGET_LIST@167..185
+        TARGET@167..185
+          CAST_EXPR@167..185
+            PATH_TYPE@167..181
+              PATH_REF@167..174
+                PATH_SEGMENT_REF@167..174
+                  NUMERIC_KW@167..174 "numeric"
+              ARG_LIST@174..181
+                L_PAREN@174..175 "("
+                ARG@175..180
+                  LITERAL@175..180
+                    DOLLAR_QUOTED_STRING@175..180 "$$1$$"
+                R_PAREN@180..181 ")"
+            WHITESPACE@181..182 " "
+            LITERAL@182..185
+              STRING@182..185 "'1'"
+    SEMICOLON@185..186 ";"
+  WHITESPACE@186..187 "\n"
+  SELECT@187..214
+    SELECT_CLAUSE@187..213
+      SELECT_KW@187..193 "select"
+      WHITESPACE@193..194 " "
+      TARGET_LIST@194..213
+        TARGET@194..213
+          CAST_EXPR@194..213
+            LITERAL@194..197
+              STRING@194..197 "'1'"
+            COLON_COLON@197..199
+              COLON@197..198 ":"
+              COLON@198..199 ":"
+            PATH_TYPE@199..213
+              PATH_REF@199..206
+                PATH_SEGMENT_REF@199..206
+                  NUMERIC_KW@199..206 "numeric"
+              ARG_LIST@206..213
+                L_PAREN@206..207 "("
+                ARG@207..209
+                  LITERAL@207..209
+                    INT_NUMBER@207..209 "10"
+                COMMA@209..210 ","
+                WHITESPACE@210..211 " "
+                ARG@211..212
+                  LITERAL@211..212
+                    INT_NUMBER@211..212 "2"
+                R_PAREN@212..213 ")"
+    SEMICOLON@213..214 ";"
+  WHITESPACE@214..215 "\n"
+  SELECT@215..250
+    SELECT_CLAUSE@215..249
+      SELECT_KW@215..221 "select"
+      WHITESPACE@221..222 " "
+      TARGET_LIST@222..249
+        TARGET@222..249
+          CAST_EXPR@222..249
+            CAST_KW@222..226 "cast"
+            L_PAREN@226..227 "("
+            LITERAL@227..230
+              STRING@227..230 "'1'"
+            WHITESPACE@230..231 " "
+            AS_KW@231..233 "as"
+            WHITESPACE@233..234 " "
+            PATH_TYPE@234..248
+              PATH_REF@234..241
+                PATH_SEGMENT_REF@234..241
+                  NUMERIC_KW@234..241 "numeric"
+              ARG_LIST@241..248
+                L_PAREN@241..242 "("
+                ARG@242..244
+                  LITERAL@242..244
+                    INT_NUMBER@242..244 "10"
+                COMMA@244..245 ","
+                WHITESPACE@245..246 " "
+                ARG@246..247
+                  LITERAL@246..247
+                    INT_NUMBER@246..247 "2"
+                R_PAREN@247..248 ")"
+            R_PAREN@248..249 ")"
+    SEMICOLON@249..250 ";"
+  WHITESPACE@250..252 "\n\n"
+  COMMENT@252..261 "-- errors"
+  WHITESPACE@261..262 "\n"
+  SELECT@262..285
+    SELECT_CLAUSE@262..284
+      SELECT_KW@262..268 "select"
+      WHITESPACE@268..269 " "
+      TARGET_LIST@269..284
+        TARGET@269..284
+          CAST_EXPR@269..284
+            PATH_TYPE@269..280
+              PATH_REF@269..272
+                PATH_SEGMENT_REF@269..272
+                  IDENT@269..272 "foo"
+              ARG_LIST@272..280
+                L_PAREN@272..273 "("
+                ARG@273..279
+                  NAMED_ARG@273..279
+                    PARAM_NAME_REF@273..274
+                      IDENT@273..274 "a"
+                    WHITESPACE@274..275 " "
+                    FAT_ARROW@275..277 "=>"
+                    WHITESPACE@277..278 " "
+                    LITERAL@278..279
+                      INT_NUMBER@278..279 "1"
+                R_PAREN@279..280 ")"
+            WHITESPACE@280..281 " "
+            LITERAL@281..284
+              STRING@281..284 "'x'"
+    SEMICOLON@284..285 ";"
+  WHITESPACE@285..286 "\n"
+  SELECT@286..315
+    SELECT_CLAUSE@286..314
+      SELECT_KW@286..292 "select"
+      WHITESPACE@292..293 " "
+      TARGET_LIST@293..314
+        TARGET@293..314
+          CAST_EXPR@293..314
+            PATH_TYPE@293..310
+              PATH_REF@293..296
+                PATH_SEGMENT_REF@293..296
+                  IDENT@293..296 "foo"
+              ARG_LIST@296..310
+                L_PAREN@296..297 "("
+                ARG@297..309
+                  LITERAL@297..298
+                    INT_NUMBER@297..298 "1"
+                  WHITESPACE@298..299 " "
+                  ORDER_BY_CLAUSE@299..309
+                    ORDER_KW@299..304 "order"
+                    WHITESPACE@304..305 " "
+                    BY_KW@305..307 "by"
+                    WHITESPACE@307..308 " "
+                    SORT_BY_LIST@308..309
+                      SORT_BY@308..309
+                        LITERAL@308..309
+                          INT_NUMBER@308..309 "2"
+                R_PAREN@309..310 ")"
+            WHITESPACE@310..311 " "
+            LITERAL@311..314
+              STRING@311..314 "'x'"
+    SEMICOLON@314..315 ";"
+  WHITESPACE@315..316 "\n"
+  SELECT@316..342
+    SELECT_CLAUSE@316..341
+      SELECT_KW@316..322 "select"
+      WHITESPACE@322..323 " "
+      TARGET_LIST@323..341
+        TARGET@323..341
+          CAST_EXPR@323..341
+            PATH_TYPE@323..337
+              PATH_REF@323..330
+                PATH_SEGMENT_REF@323..330
+                  NUMERIC_KW@323..330 "numeric"
+              ARG_LIST@330..337
+                L_PAREN@330..331 "("
+                ARG@331..336
+                  BIN_EXPR@331..336
+                    LITERAL@331..332
+                      INT_NUMBER@331..332 "1"
+                    WHITESPACE@332..333 " "
+                    PLUS@333..334 "+"
+                    WHITESPACE@334..335 " "
+                    LITERAL@335..336
+                      INT_NUMBER@335..336 "2"
+                R_PAREN@336..337 ")"
+            WHITESPACE@337..338 " "
+            LITERAL@338..341
+              STRING@338..341 "'1'"
+    SEMICOLON@341..342 ";"
+  WHITESPACE@342..343 "\n"
+  SELECT@343..375
+    SELECT_CLAUSE@343..374
+      SELECT_KW@343..349 "select"
+      WHITESPACE@349..350 " "
+      TARGET_LIST@350..374
+        TARGET@350..374
+          CAST_EXPR@350..374
+            PATH_TYPE@350..368
+              PATH_REF@350..357
+                PATH_REF@350..353
+                  PATH_SEGMENT_REF@350..353
+                    IDENT@350..353 "foo"
+                DOT@353..354 "."
+                PATH_SEGMENT_REF@354..357
+                  IDENT@354..357 "bar"
+              ARG_LIST@357..368
+                L_PAREN@357..358 "("
+                ARG@358..367
+                  CALL_EXPR@358..367
+                    NAME_REF@358..364
+                      NESTED_KW@358..364 "nested"
+                    ARG_LIST@364..367
+                      L_PAREN@364..365 "("
+                      ARG@365..366
+                        LITERAL@365..366
+                          INT_NUMBER@365..366 "1"
+                      R_PAREN@366..367 ")"
+                R_PAREN@367..368 ")"
+            WHITESPACE@368..369 " "
+            LITERAL@369..374
+              STRING@369..374 "'100'"
+    SEMICOLON@374..375 ";"
+  WHITESPACE@375..376 "\n"
+  SELECT@376..403
+    SELECT_CLAUSE@376..402
+      SELECT_KW@376..382 "select"
+      WHITESPACE@382..383 " "
+      TARGET_LIST@383..402
+        TARGET@383..402
+          CAST_EXPR@383..402
+            LITERAL@383..386
+              STRING@383..386 "'1'"
+            COLON_COLON@386..388
+              COLON@386..387 ":"
+              COLON@387..388 ":"
+            PATH_TYPE@388..402
+              PATH_REF@388..395
+                PATH_SEGMENT_REF@388..395
+                  NUMERIC_KW@388..395 "numeric"
+              ARG_LIST@395..402
+                L_PAREN@395..396 "("
+                ARG@396..401
+                  BIN_EXPR@396..401
+                    LITERAL@396..397
+                      INT_NUMBER@396..397 "1"
+                    WHITESPACE@397..398 " "
+                    PLUS@398..399 "+"
+                    WHITESPACE@399..400 " "
+                    LITERAL@400..401
+                      INT_NUMBER@400..401 "2"
+                R_PAREN@401..402 ")"
+    SEMICOLON@402..403 ";"
+  WHITESPACE@403..404 "\n"
+  SELECT@404..439
+    SELECT_CLAUSE@404..438
+      SELECT_KW@404..410 "select"
+      WHITESPACE@410..411 " "
+      TARGET_LIST@411..438
+        TARGET@411..438
+          CAST_EXPR@411..438
+            CAST_KW@411..415 "cast"
+            L_PAREN@415..416 "("
+            LITERAL@416..419
+              STRING@416..419 "'1'"
+            WHITESPACE@419..420 " "
+            AS_KW@420..422 "as"
+            WHITESPACE@422..423 " "
+            PATH_TYPE@423..437
+              PATH_REF@423..430
+                PATH_SEGMENT_REF@423..430
+                  NUMERIC_KW@423..430 "numeric"
+              ARG_LIST@430..437
+                L_PAREN@430..431 "("
+                ARG@431..436
+                  BIN_EXPR@431..436
+                    LITERAL@431..432
+                      INT_NUMBER@431..432 "1"
+                    WHITESPACE@432..433 " "
+                    PLUS@433..434 "+"
+                    WHITESPACE@434..435 " "
+                    LITERAL@435..436
+                      INT_NUMBER@435..436 "2"
+                R_PAREN@436..437 ")"
+            R_PAREN@437..438 ")"
+    SEMICOLON@438..439 ";"
+  WHITESPACE@439..440 "\n"
+  SELECT@440..463
+    SELECT_CLAUSE@440..462
+      SELECT_KW@440..446 "select"
+      WHITESPACE@446..447 " "
+      TARGET_LIST@447..462
+        TARGET@447..462
+          CAST_EXPR@447..462
+            PATH_TYPE@447..458
+              PATH_REF@447..454
+                PATH_SEGMENT_REF@447..454
+                  NUMERIC_KW@447..454 "numeric"
+              ARG_LIST@454..458
+                L_PAREN@454..455 "("
+                ARG@455..457
+                  PREFIX_EXPR@455..457
+                    PLUS@455..456 "+"
+                    LITERAL@456..457
+                      INT_NUMBER@456..457 "1"
+                R_PAREN@457..458 ")"
+            WHITESPACE@458..459 " "
+            LITERAL@459..462
+              STRING@459..462 "'1'"
+    SEMICOLON@462..463 ";"
+  WHITESPACE@463..464 "\n"
+  SELECT@464..492
+    SELECT_CLAUSE@464..491
+      SELECT_KW@464..470 "select"
+      WHITESPACE@470..471 " "
+      TARGET_LIST@471..491
+        TARGET@471..491
+          CAST_EXPR@471..491
+            PATH_TYPE@471..487
+              PATH_REF@471..478
+                PATH_SEGMENT_REF@471..478
+                  NUMERIC_KW@471..478 "numeric"
+              ARG_LIST@478..487
+                L_PAREN@478..479 "("
+                ARG@479..486
+                  FIELD_EXPR@479..486
+                    NAME_REF@479..482
+                      IDENT@479..482 "foo"
+                    DOT@482..483 "."
+                    NAME_REF@483..486
+                      IDENT@483..486 "bar"
+                R_PAREN@486..487 ")"
+            WHITESPACE@487..488 " "
+            LITERAL@488..491
+              STRING@488..491 "'1'"
+    SEMICOLON@491..492 ";"
+  WHITESPACE@492..493 "\n"
+  SELECT@493..518
+    SELECT_CLAUSE@493..517
+      SELECT_KW@493..499 "select"
+      WHITESPACE@499..500 " "
+      TARGET_LIST@500..517
+        TARGET@500..517
+          CAST_EXPR@500..517
+            PATH_TYPE@500..513
+              PATH_REF@500..507
+                PATH_SEGMENT_REF@500..507
+                  NUMERIC_KW@500..507 "numeric"
+              ARG_LIST@507..513
+                L_PAREN@507..508 "("
+                ARG@508..512
+                  LITERAL@508..512
+                    TRUE_KW@508..512 "true"
+                R_PAREN@512..513 ")"
+            WHITESPACE@513..514 " "
+            LITERAL@514..517
+              STRING@514..517 "'1'"
+    SEMICOLON@517..518 ";"
+  WHITESPACE@518..519 "\n"
+  SELECT@519..544
+    SELECT_CLAUSE@519..543
+      SELECT_KW@519..525 "select"
+      WHITESPACE@525..526 " "
+      TARGET_LIST@526..543
+        TARGET@526..543
+          CAST_EXPR@526..543
+            PATH_TYPE@526..539
+              PATH_REF@526..533
+                PATH_SEGMENT_REF@526..533
+                  NUMERIC_KW@526..533 "numeric"
+              ARG_LIST@533..539
+                L_PAREN@533..534 "("
+                ARG@534..538
+                  LITERAL@534..538
+                    NULL_KW@534..538 "null"
+                R_PAREN@538..539 ")"
+            WHITESPACE@539..540 " "
+            LITERAL@540..543
+              STRING@540..543 "'1'"
+    SEMICOLON@543..544 ";"
+  WHITESPACE@544..545 "\n"
+  SELECT@545..570
+    SELECT_CLAUSE@545..569
+      SELECT_KW@545..551 "select"
+      WHITESPACE@551..552 " "
+      TARGET_LIST@552..569
+        TARGET@552..569
+          CAST_EXPR@552..569
+            PATH_TYPE@552..565
+              PATH_REF@552..559
+                PATH_SEGMENT_REF@552..559
+                  NUMERIC_KW@552..559 "numeric"
+              ARG_LIST@559..565
+                L_PAREN@559..560 "("
+                ARG@560..564
+                  LITERAL@560..564
+                    BIT_STRING@560..564 "b'1'"
+                R_PAREN@564..565 ")"
+            WHITESPACE@565..566 " "
+            LITERAL@566..569
+              STRING@566..569 "'1'"
+    SEMICOLON@569..570 ";"
+  WHITESPACE@570..571 "\n"
+  SELECT@571..596
+    SELECT_CLAUSE@571..595
+      SELECT_KW@571..577 "select"
+      WHITESPACE@577..578 " "
+      TARGET_LIST@578..595
+        TARGET@578..595
+          CAST_EXPR@578..595
+            PATH_TYPE@578..591
+              PATH_REF@578..585
+                PATH_SEGMENT_REF@578..585
+                  NUMERIC_KW@578..585 "numeric"
+              ARG_LIST@585..591
+                L_PAREN@585..586 "("
+                ARG@586..590
+                  LITERAL@586..590
+                    BYTE_STRING@586..590 "x'1'"
+                R_PAREN@590..591 ")"
+            WHITESPACE@591..592 " "
+            LITERAL@592..595
+              STRING@592..595 "'1'"
+    SEMICOLON@595..596 ";"
+  WHITESPACE@596..597 "\n"
+  SELECT@597..622
+    SELECT_CLAUSE@597..621
+      SELECT_KW@597..603 "select"
+      WHITESPACE@603..604 " "
+      TARGET_LIST@604..621
+        TARGET@604..621
+          CAST_EXPR@604..621
+            PATH_TYPE@604..617
+              PATH_REF@604..611
+                PATH_SEGMENT_REF@604..611
+                  NUMERIC_KW@604..611 "numeric"
+              ARG_LIST@611..617
+                L_PAREN@611..612 "("
+                ARG@612..616
+                  LITERAL@612..616
+                    NATIONAL_STRING@612..616 "n'1'"
+                R_PAREN@616..617 ")"
+            WHITESPACE@617..618 " "
+            LITERAL@618..621
+              STRING@618..621 "'1'"
+    SEMICOLON@621..622 ";"
+  WHITESPACE@622..623 "\n"
+  SELECT@623..654
+    SELECT_CLAUSE@623..653
+      SELECT_KW@623..629 "select"
+      WHITESPACE@629..630 " "
+      TARGET_LIST@630..653
+        TARGET@630..653
+          CAST_EXPR@630..653
+            PATH_TYPE@630..649
+              PATH_REF@630..637
+                PATH_SEGMENT_REF@630..637
+                  NUMERIC_KW@630..637 "numeric"
+              ARG_LIST@637..649
+                L_PAREN@637..638 "("
+                ARG@638..648
+                  VARIADIC_KW@638..646 "variadic"
+                  WHITESPACE@646..647 " "
+                  LITERAL@647..648
+                    INT_NUMBER@647..648 "1"
+                R_PAREN@648..649 ")"
+            WHITESPACE@649..650 " "
+            LITERAL@650..653
+              STRING@650..653 "'1'"
+    SEMICOLON@653..654 ";"
+  WHITESPACE@654..655 "\n"
+
+error[syntax-error]: Type modifier cannot have parameter name
+   ╭▸ 
+13 │ select foo(a => 1) 'x';
+   ╰╴           ━━━━━━
+error[syntax-error]: Type modifier cannot have ORDER BY
+   ╭▸ 
+14 │ select foo(1 order by 2) 'x';
+   ╰╴             ━━━━━━━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+15 │ select numeric(1 + 2) '1';
+   ╰╴               ━━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+16 │ select foo.bar(nested(1)) '100';
+   ╰╴               ━━━━━━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+17 │ select '1'::numeric(1 + 2);
+   ╰╴                    ━━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+18 │ select cast('1' as numeric(1 + 2));
+   ╰╴                           ━━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+19 │ select numeric(+1) '1';
+   ╰╴               ━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+20 │ select numeric(foo.bar) '1';
+   ╰╴               ━━━━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+21 │ select numeric(true) '1';
+   ╰╴               ━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+22 │ select numeric(null) '1';
+   ╰╴               ━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+23 │ select numeric(b'1') '1';
+   ╰╴               ━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+24 │ select numeric(x'1') '1';
+   ╰╴               ━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+25 │ select numeric(n'1') '1';
+   ╰╴               ━━━━
+error[syntax-error]: Type modifiers must be simple constants or identifiers
+   ╭▸ 
+26 │ select numeric(variadic 1) '1';
+   ╰╴               ━━━━━━━━━━

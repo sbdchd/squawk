@@ -73,6 +73,14 @@ impl ast::CustomOp {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CastKind {
+    Cast,
+    DoubleColon,
+    Treat,
+    TypeLiteral,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LitKind {
     BitString(SyntaxToken),
@@ -114,6 +122,39 @@ impl ast::TransactionMode {
             }
         }
         None
+    }
+}
+
+impl ast::Type {
+    pub fn arg_list(&self) -> Option<ast::ArgList> {
+        match self {
+            ast::Type::BitType(ty) => ty.arg_list(),
+            ast::Type::BitVaryingType(ty) => ty.arg_list(),
+            ast::Type::CharacterType(ty) => ty.arg_list(),
+            ast::Type::PathType(ty) => ty.arg_list(),
+            ast::Type::VarcharType(ty) => ty.arg_list(),
+            ast::Type::ArrayType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::IntervalType(_)
+            | ast::Type::TimeType(_)
+            | ast::Type::TimestampType(_) => None,
+        }
+    }
+}
+
+impl ast::CastExpr {
+    pub fn kind(&self) -> Option<CastKind> {
+        if self.cast_token().is_some() {
+            Some(CastKind::Cast)
+        } else if self.treat_token().is_some() {
+            Some(CastKind::Treat)
+        } else if self.colon_colon().is_some() {
+            Some(CastKind::DoubleColon)
+        } else if self.ty().is_some() && self.literal().is_some() {
+            Some(CastKind::TypeLiteral)
+        } else {
+            None
+        }
     }
 }
 
@@ -1629,6 +1670,7 @@ fn cast_expr() {
     use insta::assert_snapshot;
 
     let cast = extract_expr("select cast('123' as int)");
+    assert_eq!(cast.kind(), Some(CastKind::Cast));
     assert!(cast.expr().is_some());
     assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
     assert!(cast.ty().is_some());
@@ -1640,7 +1682,11 @@ fn cast_expr() {
     assert!(cast.ty().is_some());
     assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.int4");
 
+    let cast = extract_expr("select treat('123' as int)");
+    assert_eq!(cast.kind(), Some(CastKind::Treat));
+
     let cast = extract_expr("select int '123'");
+    assert_eq!(cast.kind(), Some(CastKind::TypeLiteral));
     assert!(cast.expr().is_some());
     assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
     assert!(cast.ty().is_some());
@@ -1653,6 +1699,7 @@ fn cast_expr() {
     assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.int4");
 
     let cast = extract_expr("select '123'::int");
+    assert_eq!(cast.kind(), Some(CastKind::DoubleColon));
     assert!(cast.expr().is_some());
     assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
     assert!(cast.ty().is_some());

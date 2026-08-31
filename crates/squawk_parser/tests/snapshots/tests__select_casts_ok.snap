@@ -4126,39 +4126,6 @@ SOURCE_FILE
             LITERAL
               STRING "'100'"
     SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            PATH_TYPE
-              PATH_REF
-                PATH_REF
-                  PATH_SEGMENT_REF
-                    IDENT "foo"
-                DOT "."
-                PATH_SEGMENT_REF
-                  IDENT "bar"
-              ARG_LIST
-                L_PAREN "("
-                ARG
-                  CALL_EXPR
-                    NAME_REF
-                      NESTED_KW "nested"
-                    ARG_LIST
-                      L_PAREN "("
-                      ARG
-                        LITERAL
-                          INT_NUMBER "1"
-                      R_PAREN ")"
-                R_PAREN ")"
-            WHITESPACE " "
-            LITERAL
-              STRING "'100'"
-    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unqualified type names with a type modifier"
   WHITESPACE "\n"
@@ -4354,7 +4321,7 @@ SOURCE_FILE
               STRING "'x'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMENT "-- typed literals with non-plain string literals"
+  COMMENT "-- type literals with non-plain string literals"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4584,49 +4551,5 @@ SOURCE_FILE
         TARGET
           LITERAL
             NATIONAL_STRING "n'abc'"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            VARCHAR_TYPE
-              VARCHAR_KW "varchar"
-            WHITESPACE " "
-            LITERAL
-              NATIONAL_STRING "n'a'"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            CHARACTER_TYPE
-              NCHAR_KW "nchar"
-            WHITESPACE " "
-            LITERAL
-              NATIONAL_STRING "n'a'"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            CHARACTER_TYPE
-              NATIONAL_KW "national"
-              WHITESPACE " "
-              CHARACTER_KW "character"
-            WHITESPACE " "
-            LITERAL
-              NATIONAL_STRING "n'a'"
     SEMICOLON ";"
   WHITESPACE "\n"
