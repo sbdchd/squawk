@@ -1331,7 +1331,7 @@ fn build_accessor<'a>(accessor: ast::Accessor) -> Doc<'a> {
             } else if let Some(name) = field.composite_field_ref() {
                 doc = doc
                     .append(leading_comments(name.syntax()))
-                    .append(build_name(name.syntax()));
+                    .append(build_column_label(name.syntax()));
             }
             doc
         }
@@ -3225,7 +3225,7 @@ fn build_copy_option_list<'a>(list: ast::CopyOptionList) -> Doc<'a> {
 fn build_copy_option<'a>(option: ast::CopyOption) -> Doc<'a> {
     let mut doc = option
         .copy_option_key()
-        .map(|key| build_keyword_node(key.syntax()))
+        .map(|key| build_column_label(key.syntax()))
         .unwrap_or_else(Doc::nil);
     if let Some(value) = option.copy_option_value() {
         doc = doc
@@ -8727,18 +8727,31 @@ fn build_path_parts<'a>(
             .append(build_path_ref(&qualifier))
             .append(trailing_comments(qualifier.syntax()));
     }
-    if dot.is_some() {
+    let is_qualified = dot.is_some();
+    if is_qualified {
         doc = doc.append(Doc::text("."));
     }
     if let Some(segment) = segment {
         doc = doc
             .append(leading_comments(segment.syntax()))
-            .append(build_name(segment.syntax()));
+            .append(if is_qualified {
+                build_column_label(segment.syntax())
+            } else {
+                build_name(segment.syntax())
+            });
     }
     doc
 }
 
 fn build_name<'a>(node: &SyntaxNode) -> Doc<'a> {
+    build_name_with(node, quote_ident)
+}
+
+fn build_column_label<'a>(node: &SyntaxNode) -> Doc<'a> {
+    build_name_with(node, quote_column_alias)
+}
+
+fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> String) -> Doc<'a> {
     let mut tokens = node
         .children_with_tokens()
         .filter_map(|el| el.into_token())
@@ -8763,7 +8776,7 @@ fn build_name<'a>(node: &SyntaxNode) -> Doc<'a> {
         return doc;
     }
 
-    Doc::text(quote_ident(&normalize_name_node(node)))
+    Doc::text(quote(&normalize_name_node(node)))
 }
 
 fn is_unicode_escape(text: &str) -> bool {
@@ -9553,7 +9566,7 @@ fn build_attribute_list_with_layout<'a>(list: &ast::AttributeList, multiline: bo
     let items = list.attribute_options().map(|option| {
         let mut item = option
             .namespace()
-            .map(|namespace| build_name(namespace.syntax()))
+            .map(|namespace| build_column_label(namespace.syntax()))
             .unwrap_or_else(Doc::nil);
         if let Some(dot) = option.dot_token() {
             item = item.append(comments_before(dot)).append(Doc::text("."));
@@ -9564,7 +9577,7 @@ fn build_attribute_list_with_layout<'a>(list: &ast::AttributeList, multiline: bo
             } else if name.join_token().is_some() {
                 Doc::text("join")
             } else {
-                build_name(name.syntax())
+                build_column_label(name.syntax())
             };
             item = item
                 .append(leading_comments(name.syntax()))
@@ -19385,7 +19398,7 @@ fn build_field_expr<'a>(field_expr: ast::FieldExpr) -> Doc<'a> {
     } else if let Some(field) = field_expr.field() {
         doc = doc
             .append(leading_comments(field.syntax()))
-            .append(build_name(field.syntax()));
+            .append(build_column_label(field.syntax()));
     }
 
     doc
@@ -19992,7 +20005,7 @@ fn build_xml_element_fn<'a>(xml_element_fn: ast::XmlElementFn) -> Doc<'a> {
     body = body
         .append(Doc::space())
         .append(leading_comments(tag.syntax()))
-        .append(build_name(tag.syntax()));
+        .append(build_column_label(tag.syntax()));
 
     let mut items = Vec::new();
     if let Some(attrs) = xml_element_fn.expr_as_xml_attr_list() {
@@ -20049,7 +20062,7 @@ fn build_expr_as_xml_attr_list<'a>(attrs: ast::ExprAsXmlAttrList) -> Doc<'a> {
             item = item
                 .append(Doc::space())
                 .append(leading_comments(name.syntax()))
-                .append(build_name(name.syntax()));
+                .append(build_column_label(name.syntax()));
         }
         (
             leading_comments(attr.syntax()).append(item),
@@ -20146,7 +20159,7 @@ fn build_expr_as_element_tag_list<'a>(list: ast::ExprAsElementTagList) -> Doc<'a
             item_doc = item_doc
                 .append(Doc::space())
                 .append(leading_comments(tag.syntax()))
-                .append(build_name(tag.syntax()));
+                .append(build_column_label(tag.syntax()));
         }
         (
             leading_comments(item.syntax()).append(item_doc),
@@ -20212,7 +20225,7 @@ fn build_xml_pi_fn<'a>(xml_pi_fn: ast::XmlPiFn) -> Doc<'a> {
         body = body
             .append(Doc::space())
             .append(leading_comments(target.syntax()))
-            .append(build_name(target.syntax()));
+            .append(build_column_label(target.syntax()));
     }
     if let Some(expr) = xml_pi_fn.expr() {
         if let Some(comma) = xml_pi_fn.comma_token() {

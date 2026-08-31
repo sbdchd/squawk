@@ -5,14 +5,14 @@ input_file: crates/squawk_fmt/tests/before/create_text_search_parser.sql
 create text search parser public.default_parser (
   start = public.parser_start,
   gettoken = public.parser_gettoken,
-  "end" = public.parser_end,
+  end = public.parser_end,
   lextypes = public.parser_lextypes
 );
 
 create text search parser extraordinarily_long_schema_name.extraordinarily_long_parser_name (
   start = public.extraordinarily_long_parser_start_function_name,
   gettoken = public.extraordinarily_long_parser_gettoken_function_name,
-  "end" = public.extraordinarily_long_parser_end_function_name,
+  end = public.extraordinarily_long_parser_end_function_name,
   lextypes = public.extraordinarily_long_parser_lextypes_function_name,
   headline = public.extraordinarily_long_parser_headline_function_name
 );
@@ -20,6 +20,6 @@ create text search parser extraordinarily_long_schema_name.extraordinarily_long_
 create /* text keyword */ text /* search keyword */ search /* parser keyword */ parser /* name */ public /* dot */./* name segment */ commented_parser /* left parenthesis */ (
   /* first option */ start /* equals */ = /* value */ public.parser_start /* comma */,
   /* second option */ gettoken = /* second value */ public.parser_gettoken /* comma two */,
-  /* third option */ "end" = public.parser_end,
+  /* third option */ end = public.parser_end,
   lextypes = public.parser_lextypes /* right parenthesis */
 )/* semicolon */;

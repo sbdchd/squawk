@@ -22,6 +22,7 @@ tiny_pretty.workspace = true
 itertools.workspace = true
 squawk-syntax.workspace = true
 squawk-line-index.workspace = true
+squawk-lexer.workspace = true
 rowan.workspace = true
 clap.workspace = true
 anyhow.workspace = true
@@ -32,7 +33,6 @@ annotate-snippets.workspace = true
 insta.workspace = true
 dir-test.workspace = true
 camino.workspace = true
-squawk-lexer.workspace = true
 
 [lints]
 workspace = true

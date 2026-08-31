@@ -332,6 +332,8 @@ select
 
 select a_very_long_function_name(first_very_long_argument_name, second_very_long_argument_name, third_very_long_argument_name);
 
+select foo."select", foo."left", foo."array", foo."filter", foo."Mixed", foo."has space";
+
 select
 json_object(
   'a': 1, 'b' value 2 format json

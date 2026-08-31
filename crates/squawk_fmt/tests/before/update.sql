@@ -2,7 +2,7 @@ update foo set a = 1;
 
 UPDATE ONLY (foo) AS f SET a = 1, b = DEFAULT FROM bar WHERE f.id = bar.id RETURNING f.*;
 
-UPDATE foo SET (a, b) = ROW (1, DEFAULT), (c, d) = (SELECT x, y FROM bar), payload.field[1][2:3] = 4;
+UPDATE foo SET (a, b) = ROW (1, DEFAULT), (c, d) = (SELECT x, y FROM bar), payload."select"[1][2:3] = 4;
 
 UPDATE a_very_long_schema_name.a_very_long_table_name SET a_very_long_first_column_name = 'a very long replacement value', a_very_long_second_column_name = 'another very long replacement value' WHERE organization_id = 12345 AND status = 'active' RETURNING id, a_very_long_first_column_name;
 

@@ -1,5 +1,7 @@
 create temporary table if not exists t (id int) inherits (parent, archive.parent) partition by hash (id) using heap with (fillfactor=70) on commit delete rows tablespace fast;
 
+create table label_options (id int) with ("select" = 1, "from"."where" = 2);
+
 create global temporary table global_temp (id int) on commit preserve rows;
 
 create local temp table local_temp (id int) on commit drop;

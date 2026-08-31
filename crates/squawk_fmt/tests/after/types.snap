@@ -186,7 +186,7 @@ select
   numeric(10, 2) '10',
   foo(1) '100',
   foo.bar(10, 2) '100',
-  foo."select" 'x';
+  foo.select 'x';
 
 select
   varchar e'a',
