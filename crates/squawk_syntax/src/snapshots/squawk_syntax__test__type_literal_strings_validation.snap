@@ -1,0 +1,179 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/type_literal_strings.sql
+---
+SOURCE_FILE@0..244
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..18
+    SELECT_CLAUSE@6..17
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..17
+        TARGET@13..17
+          LITERAL@13..17
+            NATIONAL_STRING@13..17 "n'a'"
+    SEMICOLON@17..18 ";"
+  WHITESPACE@18..19 "\n"
+  SELECT@19..40
+    SELECT_CLAUSE@19..39
+      SELECT_KW@19..25 "select"
+      WHITESPACE@25..26 " "
+      TARGET_LIST@26..39
+        TARGET@26..39
+          CAST_EXPR@26..39
+            LITERAL@26..30
+              NATIONAL_STRING@26..30 "n'a'"
+            COLON_COLON@30..32
+              COLON@30..31 ":"
+              COLON@31..32 ":"
+            VARCHAR_TYPE@32..39
+              VARCHAR_KW@32..39 "varchar"
+    SEMICOLON@39..40 ";"
+  WHITESPACE@40..41 "\n"
+  SELECT@41..70
+    SELECT_CLAUSE@41..69
+      SELECT_KW@41..47 "select"
+      WHITESPACE@47..48 " "
+      TARGET_LIST@48..69
+        TARGET@48..69
+          CAST_EXPR@48..69
+            CAST_KW@48..52 "cast"
+            L_PAREN@52..53 "("
+            LITERAL@53..57
+              NATIONAL_STRING@53..57 "n'a'"
+            WHITESPACE@57..58 " "
+            AS_KW@58..60 "as"
+            WHITESPACE@60..61 " "
+            VARCHAR_TYPE@61..68
+              VARCHAR_KW@61..68 "varchar"
+            R_PAREN@68..69 ")"
+    SEMICOLON@69..70 ";"
+  WHITESPACE@70..71 "\n"
+  SELECT@71..93
+    SELECT_CLAUSE@71..92
+      SELECT_KW@71..77 "select"
+      WHITESPACE@77..78 " "
+      TARGET_LIST@78..92
+        TARGET@78..92
+          CAST_EXPR@78..92
+            LITERAL@78..83
+              BIT_STRING@78..83 "b'01'"
+            COLON_COLON@83..85
+              COLON@83..84 ":"
+              COLON@84..85 ":"
+            VARCHAR_TYPE@85..92
+              VARCHAR_KW@85..92 "varchar"
+    SEMICOLON@92..93 ";"
+  WHITESPACE@93..94 "\n"
+  SELECT@94..116
+    SELECT_CLAUSE@94..115
+      SELECT_KW@94..100 "select"
+      WHITESPACE@100..101 " "
+      TARGET_LIST@101..115
+        TARGET@101..115
+          CAST_EXPR@101..115
+            LITERAL@101..106
+              BYTE_STRING@101..106 "x'0a'"
+            COLON_COLON@106..108
+              COLON@106..107 ":"
+              COLON@107..108 ":"
+            VARCHAR_TYPE@108..115
+              VARCHAR_KW@108..115 "varchar"
+    SEMICOLON@115..116 ";"
+  WHITESPACE@116..118 "\n\n"
+  COMMENT@118..127 "-- errors"
+  WHITESPACE@127..128 "\n"
+  SELECT@128..148
+    SELECT_CLAUSE@128..147
+      SELECT_KW@128..134 "select"
+      WHITESPACE@134..135 " "
+      TARGET_LIST@135..147
+        TARGET@135..147
+          CAST_EXPR@135..147
+            VARCHAR_TYPE@135..142
+              VARCHAR_KW@135..142 "varchar"
+            WHITESPACE@142..143 " "
+            LITERAL@143..147
+              NATIONAL_STRING@143..147 "n'a'"
+    SEMICOLON@147..148 ";"
+  WHITESPACE@148..149 "\n"
+  SELECT@149..167
+    SELECT_CLAUSE@149..166
+      SELECT_KW@149..155 "select"
+      WHITESPACE@155..156 " "
+      TARGET_LIST@156..166
+        TARGET@156..166
+          CAST_EXPR@156..166
+            CHARACTER_TYPE@156..161
+              NCHAR_KW@156..161 "nchar"
+            WHITESPACE@161..162 " "
+            LITERAL@162..166
+              NATIONAL_STRING@162..166 "n'a'"
+    SEMICOLON@166..167 ";"
+  WHITESPACE@167..168 "\n"
+  SELECT@168..199
+    SELECT_CLAUSE@168..198
+      SELECT_KW@168..174 "select"
+      WHITESPACE@174..175 " "
+      TARGET_LIST@175..198
+        TARGET@175..198
+          CAST_EXPR@175..198
+            CHARACTER_TYPE@175..193
+              NATIONAL_KW@175..183 "national"
+              WHITESPACE@183..184 " "
+              CHARACTER_KW@184..193 "character"
+            WHITESPACE@193..194 " "
+            LITERAL@194..198
+              NATIONAL_STRING@194..198 "n'a'"
+    SEMICOLON@198..199 ";"
+  WHITESPACE@199..200 "\n"
+  SELECT@200..221
+    SELECT_CLAUSE@200..220
+      SELECT_KW@200..206 "select"
+      WHITESPACE@206..207 " "
+      TARGET_LIST@207..220
+        TARGET@207..220
+          CAST_EXPR@207..220
+            VARCHAR_TYPE@207..214
+              VARCHAR_KW@207..214 "varchar"
+            WHITESPACE@214..215 " "
+            LITERAL@215..220
+              BIT_STRING@215..220 "b'01'"
+    SEMICOLON@220..221 ";"
+  WHITESPACE@221..222 "\n"
+  SELECT@222..243
+    SELECT_CLAUSE@222..242
+      SELECT_KW@222..228 "select"
+      WHITESPACE@228..229 " "
+      TARGET_LIST@229..242
+        TARGET@229..242
+          CAST_EXPR@229..242
+            VARCHAR_TYPE@229..236
+              VARCHAR_KW@229..236 "varchar"
+            WHITESPACE@236..237 " "
+            LITERAL@237..242
+              BYTE_STRING@237..242 "x'0a'"
+    SEMICOLON@242..243 ";"
+  WHITESPACE@243..244 "\n"
+
+error[syntax-error]: National character string literals cannot be used in type literals
+  ╭▸ 
+9 │ select varchar n'a';
+  ╰╴               ━━━━
+error[syntax-error]: National character string literals cannot be used in type literals
+   ╭▸ 
+10 │ select nchar n'a';
+   ╰╴             ━━━━
+error[syntax-error]: National character string literals cannot be used in type literals
+   ╭▸ 
+11 │ select national character n'a';
+   ╰╴                          ━━━━
+error[syntax-error]: Bit string literals cannot be used in type literals
+   ╭▸ 
+12 │ select varchar b'01';
+   ╰╴               ━━━━━
+error[syntax-error]: Hexadecimal string literals cannot be used in type literals
+   ╭▸ 
+13 │ select varchar x'0a';
+   ╰╴               ━━━━━

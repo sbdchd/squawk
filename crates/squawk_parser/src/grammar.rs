@@ -1000,7 +1000,7 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
 //
 //   select type_name 'string';
 //
-fn at_typed_literal(p: &Parser<'_>) -> bool {
+fn at_type_literal(p: &Parser<'_>) -> bool {
     if !p.at_ts(TYPE_NAME_FIRST) {
         return false;
     }
@@ -1064,7 +1064,7 @@ fn at_typed_literal(p: &Parser<'_>) -> bool {
     p.nth_at_ts(i, STRING_FIRST)
 }
 
-fn typed_literal(p: &mut Parser<'_>) -> CompletedMarker {
+fn type_literal(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     let interval_has_precision = p.at(INTERVAL_KW) && p.nth_at(1, L_PAREN);
     let ty_kind = match opt_type_name_with(p, true, false) {
@@ -1083,8 +1083,8 @@ fn typed_literal(p: &mut Parser<'_>) -> CompletedMarker {
 
 // literal, path, tuple, array
 fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
-    if at_typed_literal(p) {
-        return Some((typed_literal(p), ExprKind::Other));
+    if at_type_literal(p) {
+        return Some((type_literal(p), ExprKind::Other));
     }
     if let Some(m) = literal(p) {
         return Some((m, ExprKind::Other));

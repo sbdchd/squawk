@@ -233,7 +233,7 @@ select
   cast(a_very_long_cast_input_expression as a_very_long_type_schema_name.a_very_long_cast_type_name),
   treat(a_very_long_treat_input_expression as a_very_long_type_schema_name.a_very_long_treat_type_name),
   a_very_long_postgres_cast_input_expression::a_very_long_type_schema_name.a_very_long_postgres_cast_type_name,
-  a_very_long_type_schema_name.a_very_long_typed_literal_type_name 'a very long typed literal input value',
+  a_very_long_type_schema_name.a_very_long_type_literal_type_name 'a very long type literal input value',
   -- field expr
   foo . bar,
   foo.bar.baz,

@@ -8,7 +8,7 @@ use std::ops::Range;
 
 use either::Either;
 
-use crate::ast::{AstNode, LitKind};
+use crate::ast::{AstNode, CastKind, LitKind, PrefixOp};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
@@ -20,6 +20,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::AlterAggregate(it) => validate_aggregate_params(it.aggregate().and_then(|x| x.param_list()), errors),
                 ast::AtomicBody(it) => validate_atomic_body(it, errors),
                 ast::BinExpr(it) => validate_bin_expr(it, errors),
+                ast::CastExpr(it) => validate_cast_expr(it, errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::CreateFunction(it) => validate_routine_body(it.option_list(), it.body(), errors),
                 ast::CreateProcedure(it) => validate_routine_body(it.option_list(), it.body(), errors),
@@ -42,6 +43,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::SelectInto(it) => validate_select_into(it, errors),
                 ast::SetSingleColumn(it) => validate_set_single_column(it, errors),
                 ast::SourceFile(it) => validate_source_file(it, errors),
+                ast::Type(it) => validate_type_modifiers(it, errors),
                 _ => (),
             }
         }
@@ -151,6 +153,110 @@ fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
             "Missing select clause",
             TextRange::empty(from_clause.syntax().text_range().start()),
         ));
+    }
+}
+
+fn validate_cast_expr(it: ast::CastExpr, acc: &mut Vec<SyntaxError>) {
+    if it.kind() != Some(CastKind::TypeLiteral) {
+        return;
+    }
+    let Some(literal) = it.literal().and_then(|literal| literal.kind()) else {
+        return;
+    };
+    let (message, token) = match literal {
+        LitKind::BitString(token) => ("Bit string literals cannot be used in type literals", token),
+        LitKind::ByteString(token) => (
+            "Hexadecimal string literals cannot be used in type literals",
+            token,
+        ),
+        LitKind::NationalString(token) => (
+            "National character string literals cannot be used in type literals",
+            token,
+        ),
+        _ => return,
+    };
+    acc.push(SyntaxError::new(message, token.text_range()));
+}
+
+fn validate_type_modifiers(ty: ast::Type, acc: &mut Vec<SyntaxError>) {
+    let Some(arg_list) = ty.arg_list() else {
+        return;
+    };
+
+    for arg in arg_list.args() {
+        if arg.variadic_token().is_some() {
+            acc.push(SyntaxError::new(
+                "Type modifiers must be simple constants or identifiers",
+                arg.syntax().text_range(),
+            ));
+            continue;
+        }
+        if let Some(named_arg) = arg.named_arg() {
+            acc.push(SyntaxError::new(
+                "Type modifier cannot have parameter name",
+                named_arg.syntax().text_range(),
+            ));
+            continue;
+        }
+        if let Some(order_by) = arg.order_by_clause() {
+            acc.push(SyntaxError::new(
+                "Type modifier cannot have ORDER BY",
+                order_by.syntax().text_range(),
+            ));
+            continue;
+        }
+        let Some(expr) = arg.expr() else {
+            continue;
+        };
+        if !is_simple_type_modifier(&expr) {
+            acc.push(SyntaxError::new(
+                "Type modifiers must be simple constants or identifiers",
+                expr.syntax().text_range(),
+            ));
+        }
+    }
+}
+
+fn is_simple_type_modifier(expr: &ast::Expr) -> bool {
+    match expr {
+        ast::Expr::Literal(literal) => matches!(
+            literal.kind(),
+            Some(
+                LitKind::DollarQuotedString(_)
+                    | LitKind::EscString(_)
+                    | LitKind::IntNumber(_)
+                    | LitKind::NumericNumber(_)
+                    | LitKind::String(_)
+                    | LitKind::UnicodeEscString(_)
+            )
+        ),
+        ast::Expr::NameRef(_) => true,
+        ast::Expr::PrefixExpr(prefix) => {
+            matches!(prefix.op(), Some(PrefixOp::Minus(_)))
+                && prefix.expr().is_some_and(|expr| {
+                    matches!(
+                        expr,
+                        ast::Expr::Literal(ref literal)
+                            if matches!(
+                                literal.kind(),
+                                Some(LitKind::IntNumber(_) | LitKind::NumericNumber(_))
+                            )
+                    )
+                })
+        }
+        ast::Expr::ArrayExpr(_)
+        | ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::CallExpr(_)
+        | ast::Expr::CaseExpr(_)
+        | ast::Expr::CastExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::FieldExpr(_)
+        | ast::Expr::IndexExpr(_)
+        | ast::Expr::ParenExpr(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::SliceExpr(_)
+        | ast::Expr::TupleExpr(_) => false,
     }
 }
 
