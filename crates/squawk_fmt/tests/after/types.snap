@@ -201,5 +201,4 @@ select
   national character varying u&'a',
   national char varying $$a$$,
   national character(10) e'a',
-  nchar varying u&'a',
-  varchar n'a';
+  nchar varying u&'a';

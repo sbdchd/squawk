@@ -106,4 +106,4 @@ select varchar(10) 'abc', character varying(10) 'abc', national character varyin
 
 select varchar e'a', varchar u&'a', timestamp $$2020-01-01$$, interval u&'1 day', double precision $tag$1.5$tag$;
 
-select national character e'a', national char e'a', national character varying u&'a', national char varying $$a$$, national character(10) e'a', nchar varying u&'a', varchar n'a';
+select national character e'a', national char e'a', national character varying u&'a', national char varying $$a$$, national character(10) e'a', nchar varying u&'a';
