@@ -2,6 +2,8 @@ COPY foo FROM '/tmp/foo.csv';
 
 copy foo (id, name) to stdout with (format csv, header true, delimiter ',', null '', encoding 'UTF8');
 
+copy foo to stdout ("select" 'x');
+
 copy (select id, a_very_long_column_name, another_very_long_column_name from a_very_long_schema_name.a_very_long_table_name) to program 'gzip > /tmp/a_very_long_output_file_name.csv' with (format csv, header on);
 
 copy binary foo from stdin binary freeze csv header json delimiter as ',' null as '' quote as '"' escape as '\\' encoding 'UTF8' force not null id,name force quote * force null description where id > 0;

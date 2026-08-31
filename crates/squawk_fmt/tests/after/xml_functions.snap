@@ -3,9 +3,9 @@ source: crates/squawk_fmt/tests/tests.rs
 input_file: crates/squawk_fmt/tests/before/xml_functions.sql
 ---
 select
-  xmlelement(name foo),
+  xmlelement(name select),
   xmlelement(name foo, 1, 2),
-  xmlelement(name foo, xmlattributes(a, b as c)),
+  xmlelement(name foo, xmlattributes(a as from, b as c)),
   xmlelement(name foo, xmlattributes(a as attr), x, y),
   xmlelement(
     name a_very_long_element_name,
@@ -42,7 +42,7 @@ select
     /* before document */ doc
     /* before second by */ by /* before value */ value /* before closing paren */
   ) /* after exists */,
-  xmlforest(a, b as foo),
+  xmlforest(a, b as where),
   xmlforest(
     first_very_long_expression as first_very_long_element_name,
     second_very_long_expression as second_very_long_element_name
@@ -63,7 +63,7 @@ select
     /* before expression */ value
     /* before preserve */ preserve /* before whitespace */ whitespace /* before closing paren */
   ) /* after parse */,
-  xmlpi(name php),
+  xmlpi(name select),
   xmlpi(name php, 'echo'),
   xmlpi(
     name a_very_long_xml_processing_instruction_target,

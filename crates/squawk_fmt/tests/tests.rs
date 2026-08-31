@@ -1,7 +1,7 @@
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
-use squawk_lexer::{Token, TokenKind, tokenize};
+use squawk_fmt::token_compare::assert_no_dropped_tokens;
 
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/before",
@@ -18,6 +18,7 @@ fn fmt(fixture: Fixture<&str>) {
     let formatted = squawk_fmt::fmt_str(content).unwrap();
 
     assert_no_dropped_tokens(content, &formatted);
+    assert_parses(&formatted);
 
     with_settings!({
         omit_expression => true,
@@ -45,6 +46,7 @@ fn fmt_with_line_ending(line_ending: &str) -> String {
     match squawk_fmt::fmt_str(&sql) {
         Ok(formatted) => {
             assert_no_dropped_tokens(&sql, &formatted);
+            assert_parses(&formatted);
             formatted.replace('\r', "<CR>")
         }
         Err(err) => format!("error: {err}"),
@@ -86,86 +88,16 @@ fn fmt_cr_line_endings() {
     assert_snapshot!(fmt_with_line_ending("\r"), @"-- a comment<CR>select 1;<CR><CR>/* a comment<CR> * spanning lines<CR> */<CR>select<CR>  'a',<CR>  'really long string                                                    ';<CR>");
 }
 
-fn meaningful_tokens(text: &str) -> Vec<(TokenKind, &str)> {
-    let mut tokens: Vec<(TokenKind, &str)> = vec![];
-    let mut offset = 0;
-    for Token { kind, len } in tokenize(text) {
-        let len = len as usize;
-        if kind != TokenKind::Eof && kind != TokenKind::Whitespace {
-            tokens.push((kind, &text[offset..offset + len]));
-        }
-        offset += len;
-    }
-    tokens
-}
-
-fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> bool {
-    let (bkind, btext) = before;
-    let (akind, atext) = after;
-
-    if bkind == akind {
-        return btext.eq_ignore_ascii_case(atext);
-    }
-
-    // We convert `select 1 "foo"` to `select 1 foo` so we need to do some quote
-    // munging
-    fn unquote<'a>(kind: &TokenKind, text: &'a str) -> Option<&'a str> {
-        match kind {
-            TokenKind::QuotedIdent { .. } => {
-                text.strip_prefix('"').and_then(|t| t.strip_suffix('"'))
-            }
-            TokenKind::Ident => Some(text),
-            _ => None,
-        }
-    }
-
-    match (unquote(&bkind, btext), unquote(&akind, atext)) {
-        (Some(b), Some(a)) => b.eq_ignore_ascii_case(a),
-        _ => false,
-    }
-}
-
-fn assert_no_dropped_tokens(before: &str, after: &str) {
-    let before_tokens = meaningful_tokens(before);
-    let after_tokens = meaningful_tokens(after);
-
-    let before_len = before_tokens.len();
-    let after_len = after_tokens.len();
-
-    for (i, (&(bkind, btext), &(akind, atext))) in
-        before_tokens.iter().zip(after_tokens.iter()).enumerate()
-    {
-        assert!(
-            tokens_equivalent((bkind, btext), (akind, atext)),
-            "token mismatch at position {i}:\n  before: {bkind:?} {btext:?}\n  after:  {akind:?} {atext:?}"
-        );
-    }
-
+fn assert_parses(formatted: &str) {
+    let parse = squawk_syntax::ast::SourceFile::parse(formatted);
     assert!(
-        before_len == after_len,
-        "token count mismatch: before has {before_len} tokens, after has {after_len} tokens\n  {}",
-        if before_len > after_len {
-            let dropped = &before_tokens[after_len..];
-            format!(
-                "dropped {} token(s): {}",
-                dropped.len(),
-                dropped
-                    .iter()
-                    .map(|(k, t)| format!("{k:?} {t:?}"))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            )
-        } else {
-            let extra = &after_tokens[before_len..];
-            format!(
-                "extra {} token(s): {}",
-                extra.len(),
-                extra
-                    .iter()
-                    .map(|(k, t)| format!("{k:?} {t:?}"))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            )
-        }
+        parse.errors().is_empty(),
+        "formatted output has syntax errors:\n{}\n\nformatted output:\n{formatted}",
+        parse
+            .errors()
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join("\n")
     );
 }
