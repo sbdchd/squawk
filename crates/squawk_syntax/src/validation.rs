@@ -17,12 +17,12 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for node in root.descendants() {
         match_ast! {
             match node {
-                ast::AlterAggregate(it) => validate_aggregate_params(it.aggregate().and_then(|x| x.param_list()), errors),
+                ast::Aggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::AtomicBody(it) => validate_atomic_body(it, errors),
                 ast::BinExpr(it) => validate_bin_expr(it, errors),
                 ast::CastExpr(it) => validate_cast_expr(it, errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
-                ast::CreateFunction(it) => validate_routine_body(it.option_list(), it.body(), errors),
+                ast::CreateFunction(it) => validate_create_function(it, errors),
                 ast::CreateProcedure(it) => validate_routine_body(it.option_list(), it.body(), errors),
                 ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::CreateViewLike(it) => validate_non_empty_column_list(it.column_list(), errors),
@@ -34,7 +34,6 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::WithTable(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
-                ast::DropAggregate(it) => validate_drop_aggregate(it, errors),
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
@@ -807,12 +806,6 @@ fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_drop_aggregate(drop_agg: ast::DropAggregate, acc: &mut Vec<SyntaxError>) {
-    for agg in drop_agg.aggregates() {
-        validate_aggregate_params(agg.param_list(), acc);
-    }
-}
-
 fn validate_array_expr(array_expr: ast::ArrayExpr, acc: &mut Vec<SyntaxError>) {
     if array_expr.array_token().is_none() {
         let parent_kind = array_expr.syntax().parent().map(|x| x.kind());
@@ -869,6 +862,36 @@ fn validate_custom_op(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
             "Invalid operator.",
             op.syntax().text_range(),
         ));
+    }
+}
+
+fn validate_create_function(function: ast::CreateFunction, acc: &mut Vec<SyntaxError>) {
+    validate_routine_body(function.option_list(), function.body(), acc);
+
+    let returns_table = function
+        .ret_type()
+        .is_some_and(|ret_type| ret_type.table_token().is_some());
+    if !returns_table {
+        return;
+    }
+
+    let Some(params) = function.param_list() else {
+        return;
+    };
+    for param in params.all_params() {
+        let invalid_mode = match param.mode() {
+            Some(ast::ParamMode::ParamOut(mode)) => Some(mode.syntax().text_range()),
+            Some(ast::ParamMode::ParamInOut(mode)) => Some(mode.syntax().text_range()),
+            Some(ast::ParamMode::ParamIn(_)) | Some(ast::ParamMode::ParamVariadic(_)) | None => {
+                None
+            }
+        };
+        if let Some(range) = invalid_mode {
+            acc.push(SyntaxError::new(
+                "OUT and INOUT arguments aren't allowed in TABLE functions",
+                range,
+            ));
+        }
     }
 }
 

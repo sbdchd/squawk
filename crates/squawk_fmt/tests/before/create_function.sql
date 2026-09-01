@@ -16,7 +16,7 @@ create function percent_type_table(unused integer) returns table (value accounts
 
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/. /*f*/ commented
-(/*g*/ in /*h*/ value /*i*/ integer /*j*/ default /*k*/ 1 /*l*/, /*m*/ out /*n*/ result /*o*/ text /*p*/)
+(/*g*/ in /*h*/ value /*i*/ integer /*j*/ default /*k*/ 1 /*l*/, /*m*/ in /*n*/ result /*o*/ text /*p*/)
 /*q*/ returns /*r*/ table /*s*/ (/*t*/ id /*u*/ bigint /*v*/, /*w*/ label /*x*/ text /*y*/)
 /*z*/ language /*aa*/ sql
 /*ab*/ immutable

@@ -1,0 +1,78 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/aggregate_object_params.sql
+---
+SOURCE_FILE@0..105
+  COMMENT_ON@0..47
+    COMMENT_KW@0..7 "comment"
+    WHITESPACE@7..8 " "
+    ON_KW@8..10 "on"
+    WHITESPACE@10..11 " "
+    OBJECT_AGGREGATE@11..33
+      AGGREGATE_KW@11..20 "aggregate"
+      WHITESPACE@20..21 " "
+      AGGREGATE@21..33
+        PATH_REF@21..22
+          PATH_SEGMENT_REF@21..22
+            IDENT@21..22 "a"
+        PARAM_LIST@22..33
+          L_PAREN@22..23 "("
+          PARAM@23..32
+            PARAM_IN_OUT@23..28
+              INOUT_KW@23..28 "inout"
+            WHITESPACE@28..29 " "
+            PATH_TYPE@29..32
+              PATH_REF@29..32
+                PATH_SEGMENT_REF@29..32
+                  INT_KW@29..32 "int"
+          R_PAREN@32..33 ")"
+    WHITESPACE@33..34 " "
+    IS_KW@34..36 "is"
+    WHITESPACE@36..37 " "
+    LITERAL@37..46
+      STRING@37..46 "'invalid'"
+    SEMICOLON@46..47 ";"
+  WHITESPACE@47..49 "\n\n"
+  SECURITY_LABEL@49..104
+    SECURITY_KW@49..57 "security"
+    WHITESPACE@57..58 " "
+    LABEL_KW@58..63 "label"
+    WHITESPACE@63..64 " "
+    ON_KW@64..66 "on"
+    WHITESPACE@66..67 " "
+    OBJECT_AGGREGATE@67..90
+      AGGREGATE_KW@67..76 "aggregate"
+      WHITESPACE@76..77 " "
+      AGGREGATE@77..90
+        PATH_REF@77..78
+          PATH_SEGMENT_REF@77..78
+            IDENT@77..78 "a"
+        PARAM_LIST@78..90
+          L_PAREN@78..79 "("
+          PARAM@79..89
+            PARAM_IN_OUT@79..85
+              IN_KW@79..81 "in"
+              WHITESPACE@81..82 " "
+              OUT_KW@82..85 "out"
+            WHITESPACE@85..86 " "
+            PATH_TYPE@86..89
+              PATH_REF@86..89
+                PATH_SEGMENT_REF@86..89
+                  INT_KW@86..89 "int"
+          R_PAREN@89..90 ")"
+    WHITESPACE@90..91 " "
+    IS_KW@91..93 "is"
+    WHITESPACE@93..94 " "
+    LITERAL@94..103
+      STRING@94..103 "'invalid'"
+    SEMICOLON@103..104 ";"
+  WHITESPACE@104..105 "\n"
+
+error[syntax-error]: In Out params are not allowed with aggregates.
+  ╭▸ 
+1 │ comment on aggregate a(inout int) is 'invalid';
+  ╰╴                       ━━━━━
+error[syntax-error]: In Out params are not allowed with aggregates.
+  ╭▸ 
+3 │ security label on aggregate a(in out int) is 'invalid';
+  ╰╴                              ━━━━━━

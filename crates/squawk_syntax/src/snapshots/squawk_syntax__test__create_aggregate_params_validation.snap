@@ -2,20 +2,20 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/create_aggregate_params.sql
 ---
-SOURCE_FILE@0..91
+SOURCE_FILE@0..109
   COMMENT@0..38 "-- can't have out par ..."
   WHITESPACE@38..39 "\n"
-  ALTER_AGGREGATE@39..89
+  ALTER_AGGREGATE@39..107
     ALTER_KW@39..44 "alter"
     WHITESPACE@44..45 " "
     AGGREGATE_KW@45..54 "aggregate"
     WHITESPACE@54..55 " "
-    AGGREGATE@55..70
+    AGGREGATE@55..89
       PATH_REF@55..56
         PATH_SEGMENT_REF@55..56
           IDENT@55..56 "a"
       WHITESPACE@56..57 " "
-      PARAM_LIST@57..70
+      PARAM_LIST@57..89
         L_PAREN@57..58 "("
         PARAM@58..62
           PARAM_IN@58..60
@@ -35,19 +35,49 @@ SOURCE_FILE@0..91
             PATH_REF@68..69
               PATH_SEGMENT_REF@68..69
                 IDENT@68..69 "u"
-        R_PAREN@69..70 ")"
-    WHITESPACE@70..76 " \n    "
-    SET_SCHEMA@76..88
-      SET_KW@76..79 "set"
-      WHITESPACE@79..80 " "
-      SCHEMA_KW@80..86 "schema"
-      WHITESPACE@86..87 " "
-      SCHEMA_REF@87..88
-        IDENT@87..88 "s"
-    SEMICOLON@88..89 ";"
-  WHITESPACE@89..91 "\n\n"
+        COMMA@69..70 ","
+        WHITESPACE@70..71 " "
+        PARAM@71..78
+          PARAM_IN_OUT@71..76
+            INOUT_KW@71..76 "inout"
+          WHITESPACE@76..77 " "
+          PATH_TYPE@77..78
+            PATH_REF@77..78
+              PATH_SEGMENT_REF@77..78
+                IDENT@77..78 "v"
+        COMMA@78..79 ","
+        WHITESPACE@79..80 " "
+        PARAM@80..88
+          PARAM_IN_OUT@80..86
+            IN_KW@80..82 "in"
+            WHITESPACE@82..83 " "
+            OUT_KW@83..86 "out"
+          WHITESPACE@86..87 " "
+          PATH_TYPE@87..88
+            PATH_REF@87..88
+              PATH_SEGMENT_REF@87..88
+                IDENT@87..88 "w"
+        R_PAREN@88..89 ")"
+    WHITESPACE@89..94 "\n    "
+    SET_SCHEMA@94..106
+      SET_KW@94..97 "set"
+      WHITESPACE@97..98 " "
+      SCHEMA_KW@98..104 "schema"
+      WHITESPACE@104..105 " "
+      SCHEMA_REF@105..106
+        IDENT@105..106 "s"
+    SEMICOLON@106..107 ";"
+  WHITESPACE@107..109 "\n\n"
 
 error[syntax-error]: Out params are not allowed with aggregates.
   ╭▸ 
-2 │ alter aggregate a (in t, out u) 
+2 │ alter aggregate a (in t, out u, inout v, in out w)
   ╰╴                         ━━━
+error[syntax-error]: In Out params are not allowed with aggregates.
+  ╭▸ 
+2 │ alter aggregate a (in t, out u, inout v, in out w)
+  ╰╴                                ━━━━━
+error[syntax-error]: In Out params are not allowed with aggregates.
+  ╭▸ 
+2 │ alter aggregate a (in t, out u, inout v, in out w)
+  ╰╴                                         ━━━━━━
