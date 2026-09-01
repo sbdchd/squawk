@@ -97,6 +97,8 @@ const IGNORED_LINES: &[&str] = &[
     "SELECT * FROM JSON_TABLE(jsonb '1', '$' COLUMNS (a int exists empty object on empty));",
     "CREATE TABLE error_tbl (i int DEFAULT (100, ));",
     "    AS $$ SELECT x * 2 $$",
+    "CREATE PROCEDURE ptestx(a VARIADIC int[], b OUT int) LANGUAGE SQL",
+    "  AS $$ SELECT a[1] $$;",
     "CREATE STATISTICS alt_stat2 ON a FROM tftest(1);",
     "ALTER STATISTICS IF EXISTS ab1_a_b_stats SET STATISTICS 0;",
     "CHECKPOINT (WRONG);",
@@ -558,6 +560,11 @@ mod tests {
                 "-- CREATE TABLE error_tbl (i int DEFAULT (100, ));",
             ),
             ("    AS $$ SELECT x * 2 $$", "--     AS $$ SELECT x * 2 $$"),
+            (
+                "CREATE PROCEDURE ptestx(a VARIADIC int[], b OUT int) LANGUAGE SQL",
+                "-- CREATE PROCEDURE ptestx(a VARIADIC int[], b OUT int) LANGUAGE SQL",
+            ),
+            ("  AS $$ SELECT a[1] $$;", "--   AS $$ SELECT a[1] $$;"),
             (
                 r#"ALTER DATABASE :"datname" REFRESH COLLATION VERSION;"#,
                 r#"ALTER DATABASE "datname" REFRESH COLLATION VERSION;"#,

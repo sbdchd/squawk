@@ -1,0 +1,123 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/create_procedure_params.sql
+---
+SOURCE_FILE@0..188
+  CREATE_PROCEDURE@0..90
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    PROCEDURE_KW@7..16 "procedure"
+    WHITESPACE@16..17 " "
+    PROCEDURE_NAME@17..33
+      PATH@17..33
+        PATH_SEGMENT@17..33
+          IDENT@17..33 "invalid_variadic"
+    PARAM_LIST@33..70
+      L_PAREN@33..34 "("
+      PARAM@34..54
+        PARAM_VARIADIC@34..42
+          VARIADIC_KW@34..42 "variadic"
+        WHITESPACE@42..43 " "
+        PARAM_NAME@43..48
+          IDENT@43..48 "items"
+        WHITESPACE@48..49 " "
+        ARRAY_TYPE@49..54
+          PATH_TYPE@49..52
+            PATH_REF@49..52
+              PATH_SEGMENT_REF@49..52
+                INT_KW@49..52 "int"
+          ARRAY_BOUND@52..54
+            L_BRACK@52..53 "["
+            R_BRACK@53..54 "]"
+      COMMA@54..55 ","
+      WHITESPACE@55..56 " "
+      PARAM@56..69
+        PARAM_NAME@56..65
+          FOLLOWING_KW@56..65 "following"
+        WHITESPACE@65..66 " "
+        PATH_TYPE@66..69
+          PATH_REF@66..69
+            PATH_SEGMENT_REF@66..69
+              INT_KW@66..69 "int"
+      R_PAREN@69..70 ")"
+    WHITESPACE@70..71 "\n"
+    FUNC_OPTION_LIST@71..89
+      LANGUAGE_FUNC_OPTION@71..83
+        LANGUAGE_KW@71..79 "language"
+        WHITESPACE@79..80 " "
+        LANGUAGE_REF@80..83
+          SQL_KW@80..83 "sql"
+      WHITESPACE@83..84 "\n"
+      AS_FUNC_OPTION@84..89
+        AS_KW@84..86 "as"
+        WHITESPACE@86..87 " "
+        AS_DEFINITION@87..89
+          LITERAL@87..89
+            STRING@87..89 "''"
+    SEMICOLON@89..90 ";"
+  WHITESPACE@90..92 "\n\n"
+  CREATE_PROCEDURE@92..187
+    CREATE_KW@92..98 "create"
+    WHITESPACE@98..99 " "
+    PROCEDURE_KW@99..108 "procedure"
+    WHITESPACE@108..109 " "
+    PROCEDURE_NAME@109..129
+      PATH@109..129
+        PATH_SEGMENT@109..129
+          IDENT@109..129 "invalid_variadic_out"
+    PARAM_LIST@129..167
+      L_PAREN@129..130 "("
+      PARAM@130..150
+        PARAM_VARIADIC@130..138
+          VARIADIC_KW@130..138 "variadic"
+        WHITESPACE@138..139 " "
+        PARAM_NAME@139..144
+          IDENT@139..144 "items"
+        WHITESPACE@144..145 " "
+        ARRAY_TYPE@145..150
+          PATH_TYPE@145..148
+            PATH_REF@145..148
+              PATH_SEGMENT_REF@145..148
+                INT_KW@145..148 "int"
+          ARRAY_BOUND@148..150
+            L_BRACK@148..149 "["
+            R_BRACK@149..150 "]"
+      COMMA@150..151 ","
+      WHITESPACE@151..152 " "
+      PARAM@152..166
+        PARAM_OUT@152..155
+          OUT_KW@152..155 "out"
+        WHITESPACE@155..156 " "
+        PARAM_NAME@156..162
+          IDENT@156..162 "result"
+        WHITESPACE@162..163 " "
+        PATH_TYPE@163..166
+          PATH_REF@163..166
+            PATH_SEGMENT_REF@163..166
+              INT_KW@163..166 "int"
+      R_PAREN@166..167 ")"
+    WHITESPACE@167..168 "\n"
+    FUNC_OPTION_LIST@168..186
+      LANGUAGE_FUNC_OPTION@168..180
+        LANGUAGE_KW@168..176 "language"
+        WHITESPACE@176..177 " "
+        LANGUAGE_REF@177..180
+          SQL_KW@177..180 "sql"
+      WHITESPACE@180..181 "\n"
+      AS_FUNC_OPTION@181..186
+        AS_KW@181..183 "as"
+        WHITESPACE@183..184 " "
+        AS_DEFINITION@184..186
+          LITERAL@184..186
+            STRING@184..186 "''"
+    SEMICOLON@186..187 ";"
+  WHITESPACE@187..188 "\n"
+
+error[syntax-error]: VARIADIC param must be last input param.
+  ╭▸ 
+1 │ create procedure invalid_variadic(variadic items int[], following int)
+  ╰╴                                                        ━━━━━━━━━━━━━
+error[syntax-error]: VARIADIC param must be last.
+  ╭▸ 
+5 │ create procedure invalid_variadic_out(variadic items int[], out result int)
+  ╰╴                                                            ━━━━━━━━━━━━━━

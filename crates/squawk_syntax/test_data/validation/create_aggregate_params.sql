@@ -9,6 +9,11 @@ create aggregate aggregate_with_default(value integer default 1) (
   stype = integer
 );
 
+create aggregate invalid_variadic(variadic items int[], following int) (
+  sfunc = integer_sum,
+  stype = integer
+);
+
 create aggregate ordered_aggregate(
   direct integer order by aggregated integer = 1
 ) (
