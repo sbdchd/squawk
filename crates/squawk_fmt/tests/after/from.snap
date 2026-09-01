@@ -76,37 +76,37 @@ from /* before lateral */ lateral /* before rows */ rows /* before from */ from 
   );
 select *
 from xmltable(
-    '/rows/row' passing doc
-    columns
-      id int8 path '@id' not null,
-      ord for ordinality,
-      value text default 'unknown' null
-  ) as parsed;
+  '/rows/row' passing doc
+  columns
+    id int8 path '@id' not null,
+    ord for ordinality,
+    value text default 'unknown' null
+) as parsed;
 select *
 from lateral xmltable(
-    xmlnamespaces('urn:a' as a, default 'urn:default'),
-    a_very_long_xml_row_expression passing by ref
-      a_very_long_xml_document_expression by value
-    columns
-      a_very_long_first_xml_column_name a_very_long_xml_column_type
-      path a_very_long_xml_path_expression,
-      a_very_long_ordinality_column_name for ordinality
-  ) as a_very_long_xml_table_alias;
+  xmlnamespaces('urn:a' as a, default 'urn:default'),
+  a_very_long_xml_row_expression passing by ref
+    a_very_long_xml_document_expression by value
+  columns
+    a_very_long_first_xml_column_name a_very_long_xml_column_type
+    path a_very_long_xml_path_expression,
+    a_very_long_ordinality_column_name for ordinality
+) as a_very_long_xml_table_alias;
 select *
 from /* before lateral */ lateral /* before xmltable */ xmltable /* before opening paren */(
-    /* before namespaces */ xmlnamespaces /* before namespace opening paren */(
-      /* before namespace expression */ 'urn:a' /* before as */ as /* before prefix */ a /* before namespace comma */,
-      /* before default */ default /* before default expression */ 'urn:default' /* before namespace closing paren */
-    ) /* before outer comma */,
-    /* before row */ '/rows/row'
-    /* before passing */ passing /* before first by */ by /* before ref */ ref
-      /* before document */ doc /* before second by */ by /* before value */ value
-    /* before columns */ columns
-      /* before first column */ id /* before type */ int8
-      /* before path */ path /* before path expression */ '@id'
-      /* before not */ not /* before null */ null /* before column comma */,
-      /* before ordinality column */ ord /* before for */ for /* before ordinality */ ordinality /* before closing paren */
-  ) /* before alias */ as /* before alias name */ parsed;
+  /* before namespaces */ xmlnamespaces /* before namespace opening paren */(
+    /* before namespace expression */ 'urn:a' /* before as */ as /* before prefix */ a /* before namespace comma */,
+    /* before default */ default /* before default expression */ 'urn:default' /* before namespace closing paren */
+  ) /* before outer comma */,
+  /* before row */ '/rows/row'
+  /* before passing */ passing /* before first by */ by /* before ref */ ref
+    /* before document */ doc /* before second by */ by /* before value */ value
+  /* before columns */ columns
+    /* before first column */ id /* before type */ int8
+    /* before path */ path /* before path expression */ '@id'
+    /* before not */ not /* before null */ null /* before column comma */,
+    /* before ordinality column */ ord /* before for */ for /* before ordinality */ ordinality /* before closing paren */
+) /* before alias */ as /* before alias name */ parsed;
 select *
 from json_table(
   doc,
