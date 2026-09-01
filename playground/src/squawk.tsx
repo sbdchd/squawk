@@ -139,9 +139,7 @@ export function semantic_tokens_legend(): SemanticTokensLegend {
   return SquawkDatabase.semantic_tokens_legend()
 }
 
-type FormatResult =
-  | { ok: true; text: string }
-  | { ok: false; error: string }
+type FormatResult = { ok: true; text: string } | { ok: false; error: string }
 
 function format(content: string, version: number): FormatResult {
   try {
@@ -151,11 +149,11 @@ function format(content: string, version: number): FormatResult {
   }
 }
 
-export function dump_cst(content: string, version: number): string {
+function dump_cst(content: string, version: number): string {
   return getDb(content, version).dump_cst()
 }
 
-export function dump_tokens(content: string, version: number): string {
+function dump_tokens(content: string, version: number): string {
   return getDb(content, version).dump_tokens()
 }
 
