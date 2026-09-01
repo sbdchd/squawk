@@ -1,0 +1,40 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/drop_procedure.sql
+---
+SOURCE_FILE@0..43
+  DROP_PROCEDURE@0..42
+    DROP_KW@0..4 "drop"
+    WHITESPACE@4..5 " "
+    PROCEDURE_KW@5..14 "procedure"
+    WHITESPACE@14..15 " "
+    PROCEDURE_SIG_LIST@15..41
+      PROCEDURE_SIG@15..41
+        PROCEDURE_NAME_REF@15..16
+          PATH_REF@15..16
+            PATH_SEGMENT_REF@15..16
+              IDENT@15..16 "p"
+        PARAM_LIST@16..41
+          L_PAREN@16..17 "("
+          PARAM@17..40
+            PARAM_NAME@17..22
+              VALUE_KW@17..22 "value"
+            WHITESPACE@22..23 " "
+            PATH_TYPE@23..30
+              PATH_REF@23..30
+                PATH_SEGMENT_REF@23..30
+                  INTEGER_KW@23..30 "integer"
+            WHITESPACE@30..31 " "
+            PARAM_DEFAULT@31..40
+              DEFAULT_KW@31..38 "default"
+              WHITESPACE@38..39 " "
+              LITERAL@39..40
+                INT_NUMBER@39..40 "1"
+          R_PAREN@40..41 ")"
+    SEMICOLON@41..42 ";"
+  WHITESPACE@42..43 "\n"
+
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+1 │ drop procedure p(value integer default 1);
+  ╰╴                               ━━━━━━━━━

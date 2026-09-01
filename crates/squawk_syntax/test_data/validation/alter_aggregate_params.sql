@@ -1,5 +1,5 @@
 -- can't have out params in aggregates
-create aggregate a(in x, out y, inout z, in out w) (
-  sfunc = f,
-  stype = t
-);
+alter aggregate a (in t, out u, inout v, in out w)
+    set schema s;
+
+alter aggregate a(value integer default 1) rename to a2;

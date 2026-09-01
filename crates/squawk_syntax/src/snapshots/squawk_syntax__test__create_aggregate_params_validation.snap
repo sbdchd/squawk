@@ -2,82 +2,243 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/create_aggregate_params.sql
 ---
-SOURCE_FILE@0..109
+SOURCE_FILE@0..366
   COMMENT@0..38 "-- can't have out par ..."
   WHITESPACE@38..39 "\n"
-  ALTER_AGGREGATE@39..107
-    ALTER_KW@39..44 "alter"
-    WHITESPACE@44..45 " "
-    AGGREGATE_KW@45..54 "aggregate"
-    WHITESPACE@54..55 " "
-    AGGREGATE@55..89
-      PATH_REF@55..56
-        PATH_SEGMENT_REF@55..56
-          IDENT@55..56 "a"
-      WHITESPACE@56..57 " "
-      PARAM_LIST@57..89
-        L_PAREN@57..58 "("
-        PARAM@58..62
-          PARAM_IN@58..60
-            IN_KW@58..60 "in"
-          WHITESPACE@60..61 " "
-          PATH_TYPE@61..62
-            PATH_REF@61..62
-              PATH_SEGMENT_REF@61..62
-                IDENT@61..62 "t"
-        COMMA@62..63 ","
-        WHITESPACE@63..64 " "
-        PARAM@64..69
-          PARAM_OUT@64..67
-            OUT_KW@64..67 "out"
-          WHITESPACE@67..68 " "
-          PATH_TYPE@68..69
-            PATH_REF@68..69
-              PATH_SEGMENT_REF@68..69
-                IDENT@68..69 "u"
-        COMMA@69..70 ","
-        WHITESPACE@70..71 " "
-        PARAM@71..78
-          PARAM_IN_OUT@71..76
-            INOUT_KW@71..76 "inout"
-          WHITESPACE@76..77 " "
-          PATH_TYPE@77..78
-            PATH_REF@77..78
-              PATH_SEGMENT_REF@77..78
-                IDENT@77..78 "v"
-        COMMA@78..79 ","
-        WHITESPACE@79..80 " "
-        PARAM@80..88
-          PARAM_IN_OUT@80..86
-            IN_KW@80..82 "in"
-            WHITESPACE@82..83 " "
-            OUT_KW@83..86 "out"
-          WHITESPACE@86..87 " "
-          PATH_TYPE@87..88
-            PATH_REF@87..88
-              PATH_SEGMENT_REF@87..88
-                IDENT@87..88 "w"
-        R_PAREN@88..89 ")"
-    WHITESPACE@89..94 "\n    "
-    SET_SCHEMA@94..106
-      SET_KW@94..97 "set"
-      WHITESPACE@97..98 " "
-      SCHEMA_KW@98..104 "schema"
-      WHITESPACE@104..105 " "
-      SCHEMA_REF@105..106
-        IDENT@105..106 "s"
-    SEMICOLON@106..107 ";"
-  WHITESPACE@107..109 "\n\n"
+  CREATE_AGGREGATE@39..119
+    CREATE_KW@39..45 "create"
+    WHITESPACE@45..46 " "
+    AGGREGATE_KW@46..55 "aggregate"
+    WHITESPACE@55..56 " "
+    AGGREGATE_NAME@56..57
+      PATH@56..57
+        PATH_SEGMENT@56..57
+          IDENT@56..57 "a"
+    PARAM_LIST@57..89
+      L_PAREN@57..58 "("
+      PARAM@58..62
+        PARAM_IN@58..60
+          IN_KW@58..60 "in"
+        WHITESPACE@60..61 " "
+        PATH_TYPE@61..62
+          PATH_REF@61..62
+            PATH_SEGMENT_REF@61..62
+              IDENT@61..62 "x"
+      COMMA@62..63 ","
+      WHITESPACE@63..64 " "
+      PARAM@64..69
+        PARAM_OUT@64..67
+          OUT_KW@64..67 "out"
+        WHITESPACE@67..68 " "
+        PATH_TYPE@68..69
+          PATH_REF@68..69
+            PATH_SEGMENT_REF@68..69
+              IDENT@68..69 "y"
+      COMMA@69..70 ","
+      WHITESPACE@70..71 " "
+      PARAM@71..78
+        PARAM_IN_OUT@71..76
+          INOUT_KW@71..76 "inout"
+        WHITESPACE@76..77 " "
+        PATH_TYPE@77..78
+          PATH_REF@77..78
+            PATH_SEGMENT_REF@77..78
+              IDENT@77..78 "z"
+      COMMA@78..79 ","
+      WHITESPACE@79..80 " "
+      PARAM@80..88
+        PARAM_IN_OUT@80..86
+          IN_KW@80..82 "in"
+          WHITESPACE@82..83 " "
+          OUT_KW@83..86 "out"
+        WHITESPACE@86..87 " "
+        PATH_TYPE@87..88
+          PATH_REF@87..88
+            PATH_SEGMENT_REF@87..88
+              IDENT@87..88 "w"
+      R_PAREN@88..89 ")"
+    WHITESPACE@89..90 " "
+    ATTRIBUTE_LIST@90..118
+      L_PAREN@90..91 "("
+      WHITESPACE@91..94 "\n  "
+      ATTRIBUTE_OPTION@94..103
+        ATTRIBUTE_NAME@94..99
+          IDENT@94..99 "sfunc"
+        WHITESPACE@99..100 " "
+        EQ@100..101 "="
+        WHITESPACE@101..102 " "
+        ATTRIBUTE_VALUE@102..103
+          PATH_TYPE@102..103
+            PATH_REF@102..103
+              PATH_SEGMENT_REF@102..103
+                IDENT@102..103 "f"
+      COMMA@103..104 ","
+      WHITESPACE@104..107 "\n  "
+      ATTRIBUTE_OPTION@107..116
+        ATTRIBUTE_NAME@107..112
+          IDENT@107..112 "stype"
+        WHITESPACE@112..113 " "
+        EQ@113..114 "="
+        WHITESPACE@114..115 " "
+        ATTRIBUTE_VALUE@115..116
+          PATH_TYPE@115..116
+            PATH_REF@115..116
+              PATH_SEGMENT_REF@115..116
+                IDENT@115..116 "t"
+      WHITESPACE@116..117 "\n"
+      R_PAREN@117..118 ")"
+    SEMICOLON@118..119 ";"
+  WHITESPACE@119..121 "\n\n"
+  CREATE_AGGREGATE@121..231
+    CREATE_KW@121..127 "create"
+    WHITESPACE@127..128 " "
+    AGGREGATE_KW@128..137 "aggregate"
+    WHITESPACE@137..138 " "
+    AGGREGATE_NAME@138..160
+      PATH@138..160
+        PATH_SEGMENT@138..160
+          IDENT@138..160 "aggregate_with_default"
+    PARAM_LIST@160..185
+      L_PAREN@160..161 "("
+      PARAM@161..184
+        PARAM_NAME@161..166
+          VALUE_KW@161..166 "value"
+        WHITESPACE@166..167 " "
+        PATH_TYPE@167..174
+          PATH_REF@167..174
+            PATH_SEGMENT_REF@167..174
+              INTEGER_KW@167..174 "integer"
+        WHITESPACE@174..175 " "
+        PARAM_DEFAULT@175..184
+          DEFAULT_KW@175..182 "default"
+          WHITESPACE@182..183 " "
+          LITERAL@183..184
+            INT_NUMBER@183..184 "1"
+      R_PAREN@184..185 ")"
+    WHITESPACE@185..186 " "
+    ATTRIBUTE_LIST@186..230
+      L_PAREN@186..187 "("
+      WHITESPACE@187..190 "\n  "
+      ATTRIBUTE_OPTION@190..209
+        ATTRIBUTE_NAME@190..195
+          IDENT@190..195 "sfunc"
+        WHITESPACE@195..196 " "
+        EQ@196..197 "="
+        WHITESPACE@197..198 " "
+        ATTRIBUTE_VALUE@198..209
+          PATH_TYPE@198..209
+            PATH_REF@198..209
+              PATH_SEGMENT_REF@198..209
+                IDENT@198..209 "integer_sum"
+      COMMA@209..210 ","
+      WHITESPACE@210..213 "\n  "
+      ATTRIBUTE_OPTION@213..228
+        ATTRIBUTE_NAME@213..218
+          IDENT@213..218 "stype"
+        WHITESPACE@218..219 " "
+        EQ@219..220 "="
+        WHITESPACE@220..221 " "
+        ATTRIBUTE_VALUE@221..228
+          PATH_TYPE@221..228
+            PATH_REF@221..228
+              PATH_SEGMENT_REF@221..228
+                INTEGER_KW@221..228 "integer"
+      WHITESPACE@228..229 "\n"
+      R_PAREN@229..230 ")"
+    SEMICOLON@230..231 ";"
+  WHITESPACE@231..233 "\n\n"
+  CREATE_AGGREGATE@233..365
+    CREATE_KW@233..239 "create"
+    WHITESPACE@239..240 " "
+    AGGREGATE_KW@240..249 "aggregate"
+    WHITESPACE@249..250 " "
+    AGGREGATE_NAME@250..267
+      PATH@250..267
+        PATH_SEGMENT@250..267
+          IDENT@250..267 "ordered_aggregate"
+    PARAM_LIST@267..319
+      L_PAREN@267..268 "("
+      WHITESPACE@268..271 "\n  "
+      PARAM@271..285
+        PARAM_NAME@271..277
+          IDENT@271..277 "direct"
+        WHITESPACE@277..278 " "
+        PATH_TYPE@278..285
+          PATH_REF@278..285
+            PATH_SEGMENT_REF@278..285
+              INTEGER_KW@278..285 "integer"
+      WHITESPACE@285..286 " "
+      AGGREGATE_ORDER_BY@286..317
+        ORDER_KW@286..291 "order"
+        WHITESPACE@291..292 " "
+        BY_KW@292..294 "by"
+        WHITESPACE@294..295 " "
+        PARAM@295..317
+          PARAM_NAME@295..305
+            IDENT@295..305 "aggregated"
+          WHITESPACE@305..306 " "
+          PATH_TYPE@306..313
+            PATH_REF@306..313
+              PATH_SEGMENT_REF@306..313
+                INTEGER_KW@306..313 "integer"
+          WHITESPACE@313..314 " "
+          PARAM_DEFAULT@314..317
+            EQ@314..315 "="
+            WHITESPACE@315..316 " "
+            LITERAL@316..317
+              INT_NUMBER@316..317 "1"
+      WHITESPACE@317..318 "\n"
+      R_PAREN@318..319 ")"
+    WHITESPACE@319..320 " "
+    ATTRIBUTE_LIST@320..364
+      L_PAREN@320..321 "("
+      WHITESPACE@321..324 "\n  "
+      ATTRIBUTE_OPTION@324..343
+        ATTRIBUTE_NAME@324..329
+          IDENT@324..329 "sfunc"
+        WHITESPACE@329..330 " "
+        EQ@330..331 "="
+        WHITESPACE@331..332 " "
+        ATTRIBUTE_VALUE@332..343
+          PATH_TYPE@332..343
+            PATH_REF@332..343
+              PATH_SEGMENT_REF@332..343
+                IDENT@332..343 "integer_sum"
+      COMMA@343..344 ","
+      WHITESPACE@344..347 "\n  "
+      ATTRIBUTE_OPTION@347..362
+        ATTRIBUTE_NAME@347..352
+          IDENT@347..352 "stype"
+        WHITESPACE@352..353 " "
+        EQ@353..354 "="
+        WHITESPACE@354..355 " "
+        ATTRIBUTE_VALUE@355..362
+          PATH_TYPE@355..362
+            PATH_REF@355..362
+              PATH_SEGMENT_REF@355..362
+                INTEGER_KW@355..362 "integer"
+      WHITESPACE@362..363 "\n"
+      R_PAREN@363..364 ")"
+    SEMICOLON@364..365 ";"
+  WHITESPACE@365..366 "\n"
 
 error[syntax-error]: Out params are not allowed with aggregates.
   ╭▸ 
-2 │ alter aggregate a (in t, out u, inout v, in out w)
+2 │ create aggregate a(in x, out y, inout z, in out w) (
   ╰╴                         ━━━
 error[syntax-error]: In Out params are not allowed with aggregates.
   ╭▸ 
-2 │ alter aggregate a (in t, out u, inout v, in out w)
+2 │ create aggregate a(in x, out y, inout z, in out w) (
   ╰╴                                ━━━━━
 error[syntax-error]: In Out params are not allowed with aggregates.
   ╭▸ 
-2 │ alter aggregate a (in t, out u, inout v, in out w)
+2 │ create aggregate a(in x, out y, inout z, in out w) (
   ╰╴                                         ━━━━━━
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+7 │ create aggregate aggregate_with_default(value integer default 1) (
+  ╰╴                                                      ━━━━━━━━━
+error[syntax-error]: Defaults are not allowed.
+   ╭▸ 
+13 │   direct integer order by aggregated integer = 1
+   ╰╴                                             ━━━

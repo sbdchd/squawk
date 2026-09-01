@@ -29,10 +29,13 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::CustomOp(it) => validate_custom_op_length(it, errors),
                 ast::Do(it) => validate_do(it, errors),
                 ast::FuncOptionList(it) => validate_func_option_list(it, errors),
+                ast::FunctionSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::FromAlias(it) => validate_non_empty_column_list(it.columns(), errors),
                 ast::RetType(it) => validate_non_empty_column_list(it.return_table_arg_list(), errors),
                 ast::WithTable(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
+                ast::ProcedureSig(it) => validate_param_defaults(it.param_list(), errors),
+                ast::RoutineSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
@@ -895,7 +898,22 @@ fn validate_create_function(function: ast::CreateFunction, acc: &mut Vec<SyntaxE
     }
 }
 
+fn validate_param_defaults(params: Option<ast::ParamList>, acc: &mut Vec<SyntaxError>) {
+    let Some(params) = params else {
+        return;
+    };
+    for param in params.all_params() {
+        if let Some(default) = param.param_default() {
+            acc.push(SyntaxError::new(
+                "Defaults are not allowed.",
+                default.syntax().text_range(),
+            ));
+        }
+    }
+}
+
 fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut Vec<SyntaxError>) {
+    validate_param_defaults(aggregate_params.clone(), acc);
     if let Some(params) = aggregate_params {
         for p in params.all_params() {
             if let Some(mode) = p.mode() {
