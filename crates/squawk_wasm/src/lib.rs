@@ -172,6 +172,16 @@ impl SquawkDatabase {
         Ok(out)
     }
 
+    pub fn format(&self) -> Result<String, Error> {
+        let file = self.file()?;
+        let content = file.content(&self.db);
+        let line_ending = find_newline(content)
+            .map(|(_, ending)| ending)
+            .unwrap_or_default();
+        let parse = db::parse(&self.db, file);
+        squawk_fmt::fmt(&parse.tree(), line_ending).map_err(into_error)
+    }
+
     pub fn lint(&self) -> Result<JsValue, Error> {
         let file = self.file()?;
         let content = file.content(&self.db);

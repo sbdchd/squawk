@@ -2607,6 +2607,7 @@ dependencies = [
  "salsa",
  "serde",
  "serde-wasm-bindgen",
+ "squawk-fmt",
  "squawk-ide",
  "squawk-lexer",
  "squawk-line-index",

@@ -139,6 +139,18 @@ export function semantic_tokens_legend(): SemanticTokensLegend {
   return SquawkDatabase.semantic_tokens_legend()
 }
 
+type FormatResult =
+  | { ok: true; text: string }
+  | { ok: false; error: string }
+
+function format(content: string, version: number): FormatResult {
+  try {
+    return { ok: true, text: getDb(content, version).format() }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) }
+  }
+}
+
 export function dump_cst(content: string, version: number): string {
   return getDb(content, version).dump_cst()
 }
@@ -160,6 +172,11 @@ export function useDumpCst(text: string, version: number): string {
 export function useDumpTokens(text: string, version: number): string {
   const isReady = useWasmStatus()
   return isReady ? dump_tokens(text, version) : ""
+}
+
+export function useFormat(text: string, version: number): FormatResult {
+  const isReady = useWasmStatus()
+  return isReady ? format(text, version) : { ok: true, text: "" }
 }
 
 let isStartingAlready: { promise: Promise<unknown>; start: number } | null =
