@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.64.0 - 2026-08-31
+
+### Added
+
+- linter: prefer-robust-stmts aware of alembic version update transactions (#1311). Thanks @DylanGriffith!
+
+- fmt: support for all statements (#1321, #1319, #1317, #1312, #1310, #1309, #1307, #1306, #1305, #1303, #1302, #1300, #1299)
+
+- ide: add formatting support (#1315)
+- ide: code action isnull -> is null, notnull -> is not null (#1296)
+- ide: code actions for func params (#1322)
+- ide: code action to convert `default` to `=` in function syntax (#1316)
+- ide: code actions for :=/=> & value/: rewrites (#1313)
+
+- parser: validation for variadic, function defaults, params (#1325, #1324, #1323)
+- parser: validate string literal type cast (#1320)
+
+- playground: add code formatting output (#1326)
+
+### Changed
+
+- parser: split bit & time type ast nodes (#1297)
+- parser: add nodes for interval & array bounds (#1301)
+- parser: improve parsing of operators in using and exclude (#1304)
+- parser: refactor percent type out of ast::Type (#1318)
+- parser: refactor char type into character and varchar nodes (#1295)
+
+### Fixed
+
+- syntax: fix unquoting & add more funcs (#1298)
+
 ## v2.63.0 - 2026-08-19
 
 ### Added
