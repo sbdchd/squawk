@@ -1,0 +1,188 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/function_table_params.sql
+---
+SOURCE_FILE@0..256
+  CREATE_FUNCTION@0..82
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    FUNCTION_KW@7..15 "function"
+    WHITESPACE@15..16 " "
+    FUNCTION_NAME@16..17
+      PATH@16..17
+        PATH_SEGMENT@16..17
+          IDENT@16..17 "f"
+    PARAM_LIST@17..28
+      L_PAREN@17..18 "("
+      PARAM@18..27
+        PARAM_OUT@18..21
+          OUT_KW@18..21 "out"
+        WHITESPACE@21..22 " "
+        PARAM_NAME@22..23
+          IDENT@22..23 "x"
+        WHITESPACE@23..24 " "
+        PATH_TYPE@24..27
+          PATH_REF@24..27
+            PATH_SEGMENT_REF@24..27
+              INT_KW@24..27 "int"
+      R_PAREN@27..28 ")"
+    WHITESPACE@28..29 " "
+    RET_TYPE@29..50
+      RETURNS_KW@29..36 "returns"
+      WHITESPACE@36..37 " "
+      TABLE_KW@37..42 "table"
+      WHITESPACE@42..43 " "
+      RETURN_TABLE_ARG_LIST@43..50
+        L_PAREN@43..44 "("
+        RETURN_TABLE_COLUMN@44..49
+          COLUMN_NAME@44..45
+            IDENT@44..45 "y"
+          WHITESPACE@45..46 " "
+          PATH_TYPE@46..49
+            PATH_REF@46..49
+              PATH_SEGMENT_REF@46..49
+                INT_KW@46..49 "int"
+        R_PAREN@49..50 ")"
+    WHITESPACE@50..51 " "
+    FUNC_OPTION_LIST@51..81
+      LANGUAGE_FUNC_OPTION@51..63
+        LANGUAGE_KW@51..59 "language"
+        WHITESPACE@59..60 " "
+        LANGUAGE_REF@60..63
+          SQL_KW@60..63 "sql"
+      WHITESPACE@63..64 " "
+      AS_FUNC_OPTION@64..81
+        AS_KW@64..66 "as"
+        WHITESPACE@66..67 " "
+        AS_DEFINITION@67..81
+          LITERAL@67..81
+            DOLLAR_QUOTED_STRING@67..81 "$$ select 1 $$"
+    SEMICOLON@81..82 ";"
+  WHITESPACE@82..84 "\n\n"
+  CREATE_FUNCTION@84..168
+    CREATE_KW@84..90 "create"
+    WHITESPACE@90..91 " "
+    FUNCTION_KW@91..99 "function"
+    WHITESPACE@99..100 " "
+    FUNCTION_NAME@100..101
+      PATH@100..101
+        PATH_SEGMENT@100..101
+          IDENT@100..101 "f"
+    PARAM_LIST@101..114
+      L_PAREN@101..102 "("
+      PARAM@102..113
+        PARAM_IN_OUT@102..107
+          INOUT_KW@102..107 "inout"
+        WHITESPACE@107..108 " "
+        PARAM_NAME@108..109
+          IDENT@108..109 "x"
+        WHITESPACE@109..110 " "
+        PATH_TYPE@110..113
+          PATH_REF@110..113
+            PATH_SEGMENT_REF@110..113
+              INT_KW@110..113 "int"
+      R_PAREN@113..114 ")"
+    WHITESPACE@114..115 " "
+    RET_TYPE@115..136
+      RETURNS_KW@115..122 "returns"
+      WHITESPACE@122..123 " "
+      TABLE_KW@123..128 "table"
+      WHITESPACE@128..129 " "
+      RETURN_TABLE_ARG_LIST@129..136
+        L_PAREN@129..130 "("
+        RETURN_TABLE_COLUMN@130..135
+          COLUMN_NAME@130..131
+            IDENT@130..131 "y"
+          WHITESPACE@131..132 " "
+          PATH_TYPE@132..135
+            PATH_REF@132..135
+              PATH_SEGMENT_REF@132..135
+                INT_KW@132..135 "int"
+        R_PAREN@135..136 ")"
+    WHITESPACE@136..137 " "
+    FUNC_OPTION_LIST@137..167
+      LANGUAGE_FUNC_OPTION@137..149
+        LANGUAGE_KW@137..145 "language"
+        WHITESPACE@145..146 " "
+        LANGUAGE_REF@146..149
+          SQL_KW@146..149 "sql"
+      WHITESPACE@149..150 " "
+      AS_FUNC_OPTION@150..167
+        AS_KW@150..152 "as"
+        WHITESPACE@152..153 " "
+        AS_DEFINITION@153..167
+          LITERAL@153..167
+            DOLLAR_QUOTED_STRING@153..167 "$$ select x $$"
+    SEMICOLON@167..168 ";"
+  WHITESPACE@168..170 "\n\n"
+  CREATE_FUNCTION@170..255
+    CREATE_KW@170..176 "create"
+    WHITESPACE@176..177 " "
+    FUNCTION_KW@177..185 "function"
+    WHITESPACE@185..186 " "
+    FUNCTION_NAME@186..187
+      PATH@186..187
+        PATH_SEGMENT@186..187
+          IDENT@186..187 "f"
+    PARAM_LIST@187..201
+      L_PAREN@187..188 "("
+      PARAM@188..200
+        PARAM_IN_OUT@188..194
+          IN_KW@188..190 "in"
+          WHITESPACE@190..191 " "
+          OUT_KW@191..194 "out"
+        WHITESPACE@194..195 " "
+        PARAM_NAME@195..196
+          IDENT@195..196 "x"
+        WHITESPACE@196..197 " "
+        PATH_TYPE@197..200
+          PATH_REF@197..200
+            PATH_SEGMENT_REF@197..200
+              INT_KW@197..200 "int"
+      R_PAREN@200..201 ")"
+    WHITESPACE@201..202 " "
+    RET_TYPE@202..223
+      RETURNS_KW@202..209 "returns"
+      WHITESPACE@209..210 " "
+      TABLE_KW@210..215 "table"
+      WHITESPACE@215..216 " "
+      RETURN_TABLE_ARG_LIST@216..223
+        L_PAREN@216..217 "("
+        RETURN_TABLE_COLUMN@217..222
+          COLUMN_NAME@217..218
+            IDENT@217..218 "y"
+          WHITESPACE@218..219 " "
+          PATH_TYPE@219..222
+            PATH_REF@219..222
+              PATH_SEGMENT_REF@219..222
+                INT_KW@219..222 "int"
+        R_PAREN@222..223 ")"
+    WHITESPACE@223..224 " "
+    FUNC_OPTION_LIST@224..254
+      LANGUAGE_FUNC_OPTION@224..236
+        LANGUAGE_KW@224..232 "language"
+        WHITESPACE@232..233 " "
+        LANGUAGE_REF@233..236
+          SQL_KW@233..236 "sql"
+      WHITESPACE@236..237 " "
+      AS_FUNC_OPTION@237..254
+        AS_KW@237..239 "as"
+        WHITESPACE@239..240 " "
+        AS_DEFINITION@240..254
+          LITERAL@240..254
+            DOLLAR_QUOTED_STRING@240..254 "$$ select x $$"
+    SEMICOLON@254..255 ";"
+  WHITESPACE@255..256 "\n"
+
+error[syntax-error]: OUT and INOUT arguments aren't allowed in TABLE functions
+  ╭▸ 
+1 │ create function f(out x int) returns table (y int) language sql as $$ select 1 $$;
+  ╰╴                  ━━━
+error[syntax-error]: OUT and INOUT arguments aren't allowed in TABLE functions
+  ╭▸ 
+3 │ create function f(inout x int) returns table (y int) language sql as $$ select x $$;
+  ╰╴                  ━━━━━
+error[syntax-error]: OUT and INOUT arguments aren't allowed in TABLE functions
+  ╭▸ 
+5 │ create function f(in out x int) returns table (y int) language sql as $$ select x $$;
+  ╰╴                  ━━━━━━

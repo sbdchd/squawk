@@ -7,6 +7,8 @@ drop aggregate
     foo.bar(
         in foo integer,
         out bar integer,
+        inout baz integer,
+        in out qux integer,
         text
     ), 
     c(*)
