@@ -6,7 +6,14 @@ import {
   useEffectEvent,
 } from "react"
 import * as monaco from "monaco-editor"
-import { LintError, Fix, useDumpCst, useDumpTokens, useErrors } from "./squawk"
+import {
+  LintError,
+  Fix,
+  useDumpCst,
+  useDumpTokens,
+  useErrors,
+  useFormat,
+} from "./squawk"
 import {
   compress,
   compressToEncodedURIComponent,
@@ -28,7 +35,7 @@ import {
 import { language as pgsqlMonarchLanguage } from "./pgsql"
 import BUILTINS_SQL from "./builtins.sql?raw"
 
-const modes = ["Lint", "Syntax Tree", "Tokens"] as const
+const modes = ["Lint", "Format", "Syntax Tree", "Tokens"] as const
 const STORAGE_KEY = "playground-history-v3"
 
 type Mode = (typeof modes)[number]
@@ -210,6 +217,8 @@ export function App() {
             <TokenPanel text={text} version={version} />
           ) : mode === "Lint" ? (
             <ErrorPanel errors={markers} />
+          ) : mode === "Format" ? (
+            <FormatPanel text={text} version={version} />
           ) : mode == null ? null : (
             assertNever(mode)
           )}
@@ -248,6 +257,29 @@ function TokenPanel({ text, version }: { text: string; version: number }) {
         lineNumbers: "off",
       }}
     />
+  )
+}
+
+function FormatPanel({ text, version }: { text: string; version: number }) {
+  const result = useFormat(text, version)
+  const value = result.ok ? result.text : result.error
+  return (
+    <div className="flex flex-col flex-1">
+      {result.ok ? null : (
+        <div className="bg-amber-800 text-slate-100 px-3 py-2 text-sm">
+          can't format this file
+        </div>
+      )}
+      <Editor
+        value={value}
+        settings={{
+          ...SETTINGS,
+          value,
+          language: "pgsql-formatted",
+          readOnly: true,
+        }}
+      />
+    </div>
   )
 }
 
@@ -383,6 +415,12 @@ function registerMonacoProvidersOnce() {
     pgsqlMonarchLanguage,
   )
 
+  monaco.languages.register({ id: "pgsql-formatted" })
+  const pgsqlFormattedTokenProvider = monaco.languages.setMonarchTokensProvider(
+    "pgsql-formatted",
+    pgsqlMonarchLanguage,
+  )
+
   monaco.languages.register({ id: "rast" })
   const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
     tokenizer: {
@@ -510,6 +548,7 @@ function registerMonacoProvidersOnce() {
   return () => {
     languageConfig.dispose()
     pgsqlTokenProvider.dispose()
+    pgsqlFormattedTokenProvider.dispose()
     codeActionProvider.dispose()
     hoverProvider.dispose()
     definitionProvider.dispose()
