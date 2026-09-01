@@ -1,0 +1,137 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/create_function_params.sql
+---
+SOURCE_FILE@0..271
+  CREATE_FUNCTION@0..102
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    FUNCTION_KW@7..15 "function"
+    WHITESPACE@15..16 " "
+    FUNCTION_NAME@16..32
+      PATH@16..32
+        PATH_SEGMENT@16..32
+          IDENT@16..32 "invalid_variadic"
+    PARAM_LIST@32..69
+      L_PAREN@32..33 "("
+      PARAM@33..53
+        PARAM_VARIADIC@33..41
+          VARIADIC_KW@33..41 "variadic"
+        WHITESPACE@41..42 " "
+        PARAM_NAME@42..47
+          IDENT@42..47 "items"
+        WHITESPACE@47..48 " "
+        ARRAY_TYPE@48..53
+          PATH_TYPE@48..51
+            PATH_REF@48..51
+              PATH_SEGMENT_REF@48..51
+                INT_KW@48..51 "int"
+          ARRAY_BOUND@51..53
+            L_BRACK@51..52 "["
+            R_BRACK@52..53 "]"
+      COMMA@53..54 ","
+      WHITESPACE@54..55 " "
+      PARAM@55..68
+        PARAM_NAME@55..64
+          FOLLOWING_KW@55..64 "following"
+        WHITESPACE@64..65 " "
+        PATH_TYPE@65..68
+          PATH_REF@65..68
+            PATH_SEGMENT_REF@65..68
+              INT_KW@65..68 "int"
+      R_PAREN@68..69 ")"
+    WHITESPACE@69..70 "\n"
+    RET_TYPE@70..82
+      RETURNS_KW@70..77 "returns"
+      WHITESPACE@77..78 " "
+      PATH_TYPE@78..82
+        PATH_REF@78..82
+          PATH_SEGMENT_REF@78..82
+            IDENT@78..82 "void"
+    WHITESPACE@82..83 "\n"
+    FUNC_OPTION_LIST@83..101
+      LANGUAGE_FUNC_OPTION@83..95
+        LANGUAGE_KW@83..91 "language"
+        WHITESPACE@91..92 " "
+        LANGUAGE_REF@92..95
+          SQL_KW@92..95 "sql"
+      WHITESPACE@95..96 "\n"
+      AS_FUNC_OPTION@96..101
+        AS_KW@96..98 "as"
+        WHITESPACE@98..99 " "
+        AS_DEFINITION@99..101
+          LITERAL@99..101
+            STRING@99..101 "''"
+    SEMICOLON@101..102 ";"
+  WHITESPACE@102..104 "\n\n"
+  COMMENT@104..168 "-- Functions can have ..."
+  WHITESPACE@168..169 "\n"
+  CREATE_FUNCTION@169..270
+    CREATE_KW@169..175 "create"
+    WHITESPACE@175..176 " "
+    FUNCTION_KW@176..184 "function"
+    WHITESPACE@184..185 " "
+    FUNCTION_NAME@185..199
+      PATH@185..199
+        PATH_SEGMENT@185..199
+          IDENT@185..199 "valid_variadic"
+    PARAM_LIST@199..237
+      L_PAREN@199..200 "("
+      PARAM@200..220
+        PARAM_VARIADIC@200..208
+          VARIADIC_KW@200..208 "variadic"
+        WHITESPACE@208..209 " "
+        PARAM_NAME@209..214
+          IDENT@209..214 "items"
+        WHITESPACE@214..215 " "
+        ARRAY_TYPE@215..220
+          PATH_TYPE@215..218
+            PATH_REF@215..218
+              PATH_SEGMENT_REF@215..218
+                INT_KW@215..218 "int"
+          ARRAY_BOUND@218..220
+            L_BRACK@218..219 "["
+            R_BRACK@219..220 "]"
+      COMMA@220..221 ","
+      WHITESPACE@221..222 " "
+      PARAM@222..236
+        PARAM_OUT@222..225
+          OUT_KW@222..225 "out"
+        WHITESPACE@225..226 " "
+        PARAM_NAME@226..232
+          IDENT@226..232 "result"
+        WHITESPACE@232..233 " "
+        PATH_TYPE@233..236
+          PATH_REF@233..236
+            PATH_SEGMENT_REF@233..236
+              INT_KW@233..236 "int"
+      R_PAREN@236..237 ")"
+    WHITESPACE@237..238 "\n"
+    RET_TYPE@238..250
+      RETURNS_KW@238..245 "returns"
+      WHITESPACE@245..246 " "
+      PATH_TYPE@246..250
+        PATH_REF@246..250
+          PATH_SEGMENT_REF@246..250
+            IDENT@246..250 "void"
+    WHITESPACE@250..251 "\n"
+    FUNC_OPTION_LIST@251..269
+      LANGUAGE_FUNC_OPTION@251..263
+        LANGUAGE_KW@251..259 "language"
+        WHITESPACE@259..260 " "
+        LANGUAGE_REF@260..263
+          SQL_KW@260..263 "sql"
+      WHITESPACE@263..264 "\n"
+      AS_FUNC_OPTION@264..269
+        AS_KW@264..266 "as"
+        WHITESPACE@266..267 " "
+        AS_DEFINITION@267..269
+          LITERAL@267..269
+            STRING@267..269 "''"
+    SEMICOLON@269..270 ";"
+  WHITESPACE@270..271 "\n"
+
+error[syntax-error]: VARIADIC param must be last input param.
+  ╭▸ 
+1 │ create function invalid_variadic(variadic items int[], following int)
+  ╰╴                                                       ━━━━━━━━━━━━━

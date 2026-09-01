@@ -238,8 +238,8 @@ CALL sum(1);  -- error: not a procedure
 
 CREATE PROCEDURE ptestx() LANGUAGE SQL WINDOW AS $$ INSERT INTO cp_test VALUES (1, 'a') $$;
 CREATE PROCEDURE ptestx() LANGUAGE SQL STRICT AS $$ INSERT INTO cp_test VALUES (1, 'a') $$;
-CREATE PROCEDURE ptestx(a VARIADIC int[], b OUT int) LANGUAGE SQL
-  AS $$ SELECT a[1] $$;
+-- CREATE PROCEDURE ptestx(a VARIADIC int[], b OUT int) LANGUAGE SQL
+--   AS $$ SELECT a[1] $$;
 CREATE PROCEDURE ptestx(a int DEFAULT 42, b OUT int) LANGUAGE SQL
   AS $$ SELECT a $$;
 

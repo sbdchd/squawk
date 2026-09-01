@@ -21,9 +21,12 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::AtomicBody(it) => validate_atomic_body(it, errors),
                 ast::BinExpr(it) => validate_bin_expr(it, errors),
                 ast::CastExpr(it) => validate_cast_expr(it, errors),
-                ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
+                ast::CreateAggregate(it) => {
+                    validate_aggregate_params(it.param_list(), errors);
+                    validate_aggregate_variadic_params(it.param_list(), errors);
+                },
                 ast::CreateFunction(it) => validate_create_function(it, errors),
-                ast::CreateProcedure(it) => validate_routine_body(it.option_list(), it.body(), errors),
+                ast::CreateProcedure(it) => validate_create_procedure(it, errors),
                 ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::CreateViewLike(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::CustomOp(it) => validate_custom_op_length(it, errors),
@@ -870,6 +873,7 @@ fn validate_custom_op(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
 
 fn validate_create_function(function: ast::CreateFunction, acc: &mut Vec<SyntaxError>) {
     validate_routine_body(function.option_list(), function.body(), acc);
+    validate_variadic_params(function.param_list(), ParamContext::Func, acc);
 
     let returns_table = function
         .ret_type()
@@ -895,6 +899,67 @@ fn validate_create_function(function: ast::CreateFunction, acc: &mut Vec<SyntaxE
                 range,
             ));
         }
+    }
+}
+
+fn validate_create_procedure(procedure: ast::CreateProcedure, acc: &mut Vec<SyntaxError>) {
+    validate_routine_body(procedure.option_list(), procedure.body(), acc);
+    validate_variadic_params(procedure.param_list(), ParamContext::Procedure, acc);
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ParamContext {
+    Func,
+    Agg,
+    Procedure,
+}
+
+fn validate_variadic_params(
+    params: Option<ast::ParamList>,
+    context: ParamContext,
+    acc: &mut Vec<SyntaxError>,
+) {
+    let Some(params) = params else {
+        return;
+    };
+    validate_variadic_param_iter(params.all_params(), context, acc);
+}
+
+fn validate_aggregate_variadic_params(params: Option<ast::ParamList>, acc: &mut Vec<SyntaxError>) {
+    let Some(params) = params else {
+        return;
+    };
+    validate_variadic_param_iter(params.params(), ParamContext::Agg, acc);
+    if let Some(order_by) = params.aggregate_order_by() {
+        validate_variadic_param_iter(order_by.params(), ParamContext::Agg, acc);
+    }
+}
+
+fn validate_variadic_param_iter(
+    params: impl Iterator<Item = ast::Param>,
+    context: ParamContext,
+    acc: &mut Vec<SyntaxError>,
+) {
+    let mut seen_variadic = false;
+    for param in params {
+        if !seen_variadic {
+            seen_variadic = matches!(param.mode(), Some(ast::ParamMode::ParamVariadic(_)));
+            continue;
+        }
+        if matches!(param.mode(), Some(ast::ParamMode::ParamOut(_))) {
+            if matches!(context, ParamContext::Func | ParamContext::Agg) {
+                continue;
+            }
+            acc.push(SyntaxError::new(
+                "VARIADIC param must be last.",
+                param.syntax().text_range(),
+            ));
+            continue;
+        }
+        acc.push(SyntaxError::new(
+            "VARIADIC param must be last input param.",
+            param.syntax().text_range(),
+        ));
     }
 }
 
