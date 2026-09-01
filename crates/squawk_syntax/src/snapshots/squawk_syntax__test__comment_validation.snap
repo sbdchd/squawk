@@ -1,0 +1,169 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/comment.sql
+---
+SOURCE_FILE@0..250
+  COMMENT_ON@0..61
+    COMMENT_KW@0..7 "comment"
+    WHITESPACE@7..8 " "
+    ON_KW@8..10 "on"
+    WHITESPACE@10..11 " "
+    OBJECT_FUNCTION@11..46
+      FUNCTION_KW@11..19 "function"
+      WHITESPACE@19..20 " "
+      FUNCTION_SIG@20..46
+        FUNCTION_NAME_REF@20..21
+          PATH_REF@20..21
+            PATH_SEGMENT_REF@20..21
+              IDENT@20..21 "f"
+        PARAM_LIST@21..46
+          L_PAREN@21..22 "("
+          PARAM@22..45
+            PARAM_NAME@22..27
+              VALUE_KW@22..27 "value"
+            WHITESPACE@27..28 " "
+            PATH_TYPE@28..35
+              PATH_REF@28..35
+                PATH_SEGMENT_REF@28..35
+                  INTEGER_KW@28..35 "integer"
+            WHITESPACE@35..36 " "
+            PARAM_DEFAULT@36..45
+              DEFAULT_KW@36..43 "default"
+              WHITESPACE@43..44 " "
+              LITERAL@44..45
+                INT_NUMBER@44..45 "1"
+          R_PAREN@45..46 ")"
+    WHITESPACE@46..47 " "
+    IS_KW@47..49 "is"
+    WHITESPACE@49..50 " "
+    LITERAL@50..60
+      STRING@50..60 "'function'"
+    SEMICOLON@60..61 ";"
+  WHITESPACE@61..62 "\n"
+  COMMENT_ON@62..125
+    COMMENT_KW@62..69 "comment"
+    WHITESPACE@69..70 " "
+    ON_KW@70..72 "on"
+    WHITESPACE@72..73 " "
+    OBJECT_PROCEDURE@73..109
+      PROCEDURE_KW@73..82 "procedure"
+      WHITESPACE@82..83 " "
+      PROCEDURE_SIG@83..109
+        PROCEDURE_NAME_REF@83..84
+          PATH_REF@83..84
+            PATH_SEGMENT_REF@83..84
+              IDENT@83..84 "p"
+        PARAM_LIST@84..109
+          L_PAREN@84..85 "("
+          PARAM@85..108
+            PARAM_NAME@85..90
+              VALUE_KW@85..90 "value"
+            WHITESPACE@90..91 " "
+            PATH_TYPE@91..98
+              PATH_REF@91..98
+                PATH_SEGMENT_REF@91..98
+                  INTEGER_KW@91..98 "integer"
+            WHITESPACE@98..99 " "
+            PARAM_DEFAULT@99..108
+              DEFAULT_KW@99..106 "default"
+              WHITESPACE@106..107 " "
+              LITERAL@107..108
+                INT_NUMBER@107..108 "1"
+          R_PAREN@108..109 ")"
+    WHITESPACE@109..110 " "
+    IS_KW@110..112 "is"
+    WHITESPACE@112..113 " "
+    LITERAL@113..124
+      STRING@113..124 "'procedure'"
+    SEMICOLON@124..125 ";"
+  WHITESPACE@125..126 "\n"
+  COMMENT_ON@126..185
+    COMMENT_KW@126..133 "comment"
+    WHITESPACE@133..134 " "
+    ON_KW@134..136 "on"
+    WHITESPACE@136..137 " "
+    OBJECT_ROUTINE@137..171
+      ROUTINE_KW@137..144 "routine"
+      WHITESPACE@144..145 " "
+      ROUTINE_SIG@145..171
+        ROUTINE_NAME_REF@145..146
+          PATH_REF@145..146
+            PATH_SEGMENT_REF@145..146
+              IDENT@145..146 "r"
+        PARAM_LIST@146..171
+          L_PAREN@146..147 "("
+          PARAM@147..170
+            PARAM_NAME@147..152
+              VALUE_KW@147..152 "value"
+            WHITESPACE@152..153 " "
+            PATH_TYPE@153..160
+              PATH_REF@153..160
+                PATH_SEGMENT_REF@153..160
+                  INTEGER_KW@153..160 "integer"
+            WHITESPACE@160..161 " "
+            PARAM_DEFAULT@161..170
+              DEFAULT_KW@161..168 "default"
+              WHITESPACE@168..169 " "
+              LITERAL@169..170
+                INT_NUMBER@169..170 "1"
+          R_PAREN@170..171 ")"
+    WHITESPACE@171..172 " "
+    IS_KW@172..174 "is"
+    WHITESPACE@174..175 " "
+    LITERAL@175..184
+      STRING@175..184 "'routine'"
+    SEMICOLON@184..185 ";"
+  WHITESPACE@185..186 "\n"
+  COMMENT_ON@186..249
+    COMMENT_KW@186..193 "comment"
+    WHITESPACE@193..194 " "
+    ON_KW@194..196 "on"
+    WHITESPACE@196..197 " "
+    OBJECT_AGGREGATE@197..233
+      AGGREGATE_KW@197..206 "aggregate"
+      WHITESPACE@206..207 " "
+      AGGREGATE@207..233
+        PATH_REF@207..208
+          PATH_SEGMENT_REF@207..208
+            IDENT@207..208 "a"
+        PARAM_LIST@208..233
+          L_PAREN@208..209 "("
+          PARAM@209..232
+            PARAM_NAME@209..214
+              VALUE_KW@209..214 "value"
+            WHITESPACE@214..215 " "
+            PATH_TYPE@215..222
+              PATH_REF@215..222
+                PATH_SEGMENT_REF@215..222
+                  INTEGER_KW@215..222 "integer"
+            WHITESPACE@222..223 " "
+            PARAM_DEFAULT@223..232
+              DEFAULT_KW@223..230 "default"
+              WHITESPACE@230..231 " "
+              LITERAL@231..232
+                INT_NUMBER@231..232 "1"
+          R_PAREN@232..233 ")"
+    WHITESPACE@233..234 " "
+    IS_KW@234..236 "is"
+    WHITESPACE@236..237 " "
+    LITERAL@237..248
+      STRING@237..248 "'aggregate'"
+    SEMICOLON@248..249 ";"
+  WHITESPACE@249..250 "\n"
+
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+1 │ comment on function f(value integer default 1) is 'function';
+  ╰╴                                    ━━━━━━━━━
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+2 │ comment on procedure p(value integer default 1) is 'procedure';
+  ╰╴                                     ━━━━━━━━━
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+3 │ comment on routine r(value integer default 1) is 'routine';
+  ╰╴                                   ━━━━━━━━━
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+4 │ comment on aggregate a(value integer default 1) is 'aggregate';
+  ╰╴                                     ━━━━━━━━━

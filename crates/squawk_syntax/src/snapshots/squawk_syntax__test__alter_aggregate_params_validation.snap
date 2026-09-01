@@ -2,103 +2,124 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/alter_aggregate_params.sql
 ---
-SOURCE_FILE@0..120
+SOURCE_FILE@0..166
   COMMENT@0..38 "-- can't have out par ..."
   WHITESPACE@38..39 "\n"
-  CREATE_AGGREGATE@39..119
-    CREATE_KW@39..45 "create"
-    WHITESPACE@45..46 " "
-    AGGREGATE_KW@46..55 "aggregate"
-    WHITESPACE@55..56 " "
-    AGGREGATE_NAME@56..57
-      PATH@56..57
-        PATH_SEGMENT@56..57
-          IDENT@56..57 "a"
-    PARAM_LIST@57..89
-      L_PAREN@57..58 "("
-      PARAM@58..62
-        PARAM_IN@58..60
-          IN_KW@58..60 "in"
-        WHITESPACE@60..61 " "
-        PATH_TYPE@61..62
-          PATH_REF@61..62
-            PATH_SEGMENT_REF@61..62
-              IDENT@61..62 "x"
-      COMMA@62..63 ","
-      WHITESPACE@63..64 " "
-      PARAM@64..69
-        PARAM_OUT@64..67
-          OUT_KW@64..67 "out"
-        WHITESPACE@67..68 " "
-        PATH_TYPE@68..69
-          PATH_REF@68..69
-            PATH_SEGMENT_REF@68..69
-              IDENT@68..69 "y"
-      COMMA@69..70 ","
-      WHITESPACE@70..71 " "
-      PARAM@71..78
-        PARAM_IN_OUT@71..76
-          INOUT_KW@71..76 "inout"
-        WHITESPACE@76..77 " "
-        PATH_TYPE@77..78
-          PATH_REF@77..78
-            PATH_SEGMENT_REF@77..78
-              IDENT@77..78 "z"
-      COMMA@78..79 ","
-      WHITESPACE@79..80 " "
-      PARAM@80..88
-        PARAM_IN_OUT@80..86
-          IN_KW@80..82 "in"
-          WHITESPACE@82..83 " "
-          OUT_KW@83..86 "out"
-        WHITESPACE@86..87 " "
-        PATH_TYPE@87..88
-          PATH_REF@87..88
-            PATH_SEGMENT_REF@87..88
-              IDENT@87..88 "w"
-      R_PAREN@88..89 ")"
-    WHITESPACE@89..90 " "
-    ATTRIBUTE_LIST@90..118
-      L_PAREN@90..91 "("
-      WHITESPACE@91..94 "\n  "
-      ATTRIBUTE_OPTION@94..103
-        ATTRIBUTE_NAME@94..99
-          IDENT@94..99 "sfunc"
-        WHITESPACE@99..100 " "
-        EQ@100..101 "="
-        WHITESPACE@101..102 " "
-        ATTRIBUTE_VALUE@102..103
-          PATH_TYPE@102..103
-            PATH_REF@102..103
-              PATH_SEGMENT_REF@102..103
-                IDENT@102..103 "f"
-      COMMA@103..104 ","
-      WHITESPACE@104..107 "\n  "
-      ATTRIBUTE_OPTION@107..116
-        ATTRIBUTE_NAME@107..112
-          IDENT@107..112 "stype"
-        WHITESPACE@112..113 " "
-        EQ@113..114 "="
-        WHITESPACE@114..115 " "
-        ATTRIBUTE_VALUE@115..116
-          PATH_TYPE@115..116
-            PATH_REF@115..116
-              PATH_SEGMENT_REF@115..116
-                IDENT@115..116 "t"
-      WHITESPACE@116..117 "\n"
-      R_PAREN@117..118 ")"
-    SEMICOLON@118..119 ";"
-  WHITESPACE@119..120 "\n"
+  ALTER_AGGREGATE@39..107
+    ALTER_KW@39..44 "alter"
+    WHITESPACE@44..45 " "
+    AGGREGATE_KW@45..54 "aggregate"
+    WHITESPACE@54..55 " "
+    AGGREGATE@55..89
+      PATH_REF@55..56
+        PATH_SEGMENT_REF@55..56
+          IDENT@55..56 "a"
+      WHITESPACE@56..57 " "
+      PARAM_LIST@57..89
+        L_PAREN@57..58 "("
+        PARAM@58..62
+          PARAM_IN@58..60
+            IN_KW@58..60 "in"
+          WHITESPACE@60..61 " "
+          PATH_TYPE@61..62
+            PATH_REF@61..62
+              PATH_SEGMENT_REF@61..62
+                IDENT@61..62 "t"
+        COMMA@62..63 ","
+        WHITESPACE@63..64 " "
+        PARAM@64..69
+          PARAM_OUT@64..67
+            OUT_KW@64..67 "out"
+          WHITESPACE@67..68 " "
+          PATH_TYPE@68..69
+            PATH_REF@68..69
+              PATH_SEGMENT_REF@68..69
+                IDENT@68..69 "u"
+        COMMA@69..70 ","
+        WHITESPACE@70..71 " "
+        PARAM@71..78
+          PARAM_IN_OUT@71..76
+            INOUT_KW@71..76 "inout"
+          WHITESPACE@76..77 " "
+          PATH_TYPE@77..78
+            PATH_REF@77..78
+              PATH_SEGMENT_REF@77..78
+                IDENT@77..78 "v"
+        COMMA@78..79 ","
+        WHITESPACE@79..80 " "
+        PARAM@80..88
+          PARAM_IN_OUT@80..86
+            IN_KW@80..82 "in"
+            WHITESPACE@82..83 " "
+            OUT_KW@83..86 "out"
+          WHITESPACE@86..87 " "
+          PATH_TYPE@87..88
+            PATH_REF@87..88
+              PATH_SEGMENT_REF@87..88
+                IDENT@87..88 "w"
+        R_PAREN@88..89 ")"
+    WHITESPACE@89..94 "\n    "
+    SET_SCHEMA@94..106
+      SET_KW@94..97 "set"
+      WHITESPACE@97..98 " "
+      SCHEMA_KW@98..104 "schema"
+      WHITESPACE@104..105 " "
+      SCHEMA_REF@105..106
+        IDENT@105..106 "s"
+    SEMICOLON@106..107 ";"
+  WHITESPACE@107..109 "\n\n"
+  ALTER_AGGREGATE@109..165
+    ALTER_KW@109..114 "alter"
+    WHITESPACE@114..115 " "
+    AGGREGATE_KW@115..124 "aggregate"
+    WHITESPACE@124..125 " "
+    AGGREGATE@125..151
+      PATH_REF@125..126
+        PATH_SEGMENT_REF@125..126
+          IDENT@125..126 "a"
+      PARAM_LIST@126..151
+        L_PAREN@126..127 "("
+        PARAM@127..150
+          PARAM_NAME@127..132
+            VALUE_KW@127..132 "value"
+          WHITESPACE@132..133 " "
+          PATH_TYPE@133..140
+            PATH_REF@133..140
+              PATH_SEGMENT_REF@133..140
+                INTEGER_KW@133..140 "integer"
+          WHITESPACE@140..141 " "
+          PARAM_DEFAULT@141..150
+            DEFAULT_KW@141..148 "default"
+            WHITESPACE@148..149 " "
+            LITERAL@149..150
+              INT_NUMBER@149..150 "1"
+        R_PAREN@150..151 ")"
+    WHITESPACE@151..152 " "
+    AGGREGATE_RENAME_TO@152..164
+      RENAME_KW@152..158 "rename"
+      WHITESPACE@158..159 " "
+      TO_KW@159..161 "to"
+      WHITESPACE@161..162 " "
+      AGGREGATE_NAME@162..164
+        PATH@162..164
+          PATH_SEGMENT@162..164
+            IDENT@162..164 "a2"
+    SEMICOLON@164..165 ";"
+  WHITESPACE@165..166 "\n"
 
 error[syntax-error]: Out params are not allowed with aggregates.
   ╭▸ 
-2 │ create aggregate a(in x, out y, inout z, in out w) (
+2 │ alter aggregate a (in t, out u, inout v, in out w)
   ╰╴                         ━━━
 error[syntax-error]: In Out params are not allowed with aggregates.
   ╭▸ 
-2 │ create aggregate a(in x, out y, inout z, in out w) (
+2 │ alter aggregate a (in t, out u, inout v, in out w)
   ╰╴                                ━━━━━
 error[syntax-error]: In Out params are not allowed with aggregates.
   ╭▸ 
-2 │ create aggregate a(in x, out y, inout z, in out w) (
+2 │ alter aggregate a (in t, out u, inout v, in out w)
   ╰╴                                         ━━━━━━
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+5 │ alter aggregate a(value integer default 1) rename to a2;
+  ╰╴                                ━━━━━━━━━

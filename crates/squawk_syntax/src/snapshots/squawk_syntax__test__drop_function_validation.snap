@@ -1,0 +1,40 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/drop_function.sql
+---
+SOURCE_FILE@0..42
+  DROP_FUNCTION@0..41
+    DROP_KW@0..4 "drop"
+    WHITESPACE@4..5 " "
+    FUNCTION_KW@5..13 "function"
+    WHITESPACE@13..14 " "
+    FUNCTION_SIG_LIST@14..40
+      FUNCTION_SIG@14..40
+        FUNCTION_NAME_REF@14..15
+          PATH_REF@14..15
+            PATH_SEGMENT_REF@14..15
+              IDENT@14..15 "f"
+        PARAM_LIST@15..40
+          L_PAREN@15..16 "("
+          PARAM@16..39
+            PARAM_NAME@16..21
+              VALUE_KW@16..21 "value"
+            WHITESPACE@21..22 " "
+            PATH_TYPE@22..29
+              PATH_REF@22..29
+                PATH_SEGMENT_REF@22..29
+                  INTEGER_KW@22..29 "integer"
+            WHITESPACE@29..30 " "
+            PARAM_DEFAULT@30..39
+              DEFAULT_KW@30..37 "default"
+              WHITESPACE@37..38 " "
+              LITERAL@38..39
+                INT_NUMBER@38..39 "1"
+          R_PAREN@39..40 ")"
+    SEMICOLON@40..41 ";"
+  WHITESPACE@41..42 "\n"
+
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+1 │ drop function f(value integer default 1);
+  ╰╴                              ━━━━━━━━━

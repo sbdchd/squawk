@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/drop_aggregate_params.sql
 ---
-SOURCE_FILE@0..444
+SOURCE_FILE@0..488
   WHITESPACE@0..1 "\n"
   COMMENT@1..8 "-- full"
   WHITESPACE@8..9 "\n"
@@ -255,7 +255,35 @@ SOURCE_FILE@0..444
         WHITESPACE@439..440 "\n"
         R_PAREN@440..441 ")"
     SEMICOLON@441..442 ";"
-  WHITESPACE@442..444 "\n\n"
+  WHITESPACE@442..445 "\n\n\n"
+  DROP_AGGREGATE@445..487
+    DROP_KW@445..449 "drop"
+    WHITESPACE@449..450 " "
+    AGGREGATE_KW@450..459 "aggregate"
+    WHITESPACE@459..460 " "
+    AGGREGATE@460..486
+      PATH_REF@460..461
+        PATH_SEGMENT_REF@460..461
+          IDENT@460..461 "a"
+      PARAM_LIST@461..486
+        L_PAREN@461..462 "("
+        PARAM@462..485
+          PARAM_NAME@462..467
+            VALUE_KW@462..467 "value"
+          WHITESPACE@467..468 " "
+          PATH_TYPE@468..475
+            PATH_REF@468..475
+              PATH_SEGMENT_REF@468..475
+                INTEGER_KW@468..475 "integer"
+          WHITESPACE@475..476 " "
+          PARAM_DEFAULT@476..485
+            DEFAULT_KW@476..483 "default"
+            WHITESPACE@483..484 " "
+            LITERAL@484..485
+              INT_NUMBER@484..485 "1"
+        R_PAREN@485..486 ")"
+    SEMICOLON@486..487 ";"
+  WHITESPACE@487..488 "\n"
 
 error[syntax-error]: Out params are not allowed with aggregates.
   ╭▸ 
@@ -277,3 +305,7 @@ error[syntax-error]: Out params are not allowed with aggregates.
    ╭▸ 
 31 │     out b numeric,
    ╰╴    ━━━
+error[syntax-error]: Defaults are not allowed.
+   ╭▸ 
+36 │ drop aggregate a(value integer default 1);
+   ╰╴                               ━━━━━━━━━

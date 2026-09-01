@@ -32,3 +32,5 @@ drop aggregate foo.bar(
     text
 );
 
+
+drop aggregate a(value integer default 1);

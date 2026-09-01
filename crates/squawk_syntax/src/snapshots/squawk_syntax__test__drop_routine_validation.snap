@@ -1,0 +1,40 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/drop_routine.sql
+---
+SOURCE_FILE@0..41
+  DROP_ROUTINE@0..40
+    DROP_KW@0..4 "drop"
+    WHITESPACE@4..5 " "
+    ROUTINE_KW@5..12 "routine"
+    WHITESPACE@12..13 " "
+    ROUTINE_SIG_LIST@13..39
+      ROUTINE_SIG@13..39
+        ROUTINE_NAME_REF@13..14
+          PATH_REF@13..14
+            PATH_SEGMENT_REF@13..14
+              IDENT@13..14 "r"
+        PARAM_LIST@14..39
+          L_PAREN@14..15 "("
+          PARAM@15..38
+            PARAM_NAME@15..20
+              VALUE_KW@15..20 "value"
+            WHITESPACE@20..21 " "
+            PATH_TYPE@21..28
+              PATH_REF@21..28
+                PATH_SEGMENT_REF@21..28
+                  INTEGER_KW@21..28 "integer"
+            WHITESPACE@28..29 " "
+            PARAM_DEFAULT@29..38
+              DEFAULT_KW@29..36 "default"
+              WHITESPACE@36..37 " "
+              LITERAL@37..38
+                INT_NUMBER@37..38 "1"
+          R_PAREN@38..39 ")"
+    SEMICOLON@39..40 ";"
+  WHITESPACE@40..41 "\n"
+
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+1 │ drop routine r(value integer default 1);
+  ╰╴                             ━━━━━━━━━

@@ -1,0 +1,49 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/alter_procedure.sql
+---
+SOURCE_FILE@0..57
+  ALTER_PROCEDURE@0..56
+    ALTER_KW@0..5 "alter"
+    WHITESPACE@5..6 " "
+    PROCEDURE_KW@6..15 "procedure"
+    WHITESPACE@15..16 " "
+    PROCEDURE_SIG@16..42
+      PROCEDURE_NAME_REF@16..17
+        PATH_REF@16..17
+          PATH_SEGMENT_REF@16..17
+            IDENT@16..17 "p"
+      PARAM_LIST@17..42
+        L_PAREN@17..18 "("
+        PARAM@18..41
+          PARAM_NAME@18..23
+            VALUE_KW@18..23 "value"
+          WHITESPACE@23..24 " "
+          PATH_TYPE@24..31
+            PATH_REF@24..31
+              PATH_SEGMENT_REF@24..31
+                INTEGER_KW@24..31 "integer"
+          WHITESPACE@31..32 " "
+          PARAM_DEFAULT@32..41
+            DEFAULT_KW@32..39 "default"
+            WHITESPACE@39..40 " "
+            LITERAL@40..41
+              INT_NUMBER@40..41 "1"
+        R_PAREN@41..42 ")"
+    WHITESPACE@42..43 " "
+    PROCEDURE_RENAME_TO@43..55
+      RENAME_KW@43..49 "rename"
+      WHITESPACE@49..50 " "
+      TO_KW@50..52 "to"
+      WHITESPACE@52..53 " "
+      PROCEDURE_NAME@53..55
+        PATH@53..55
+          PATH_SEGMENT@53..55
+            IDENT@53..55 "p2"
+    SEMICOLON@55..56 ";"
+  WHITESPACE@56..57 "\n"
+
+error[syntax-error]: Defaults are not allowed.
+  ╭▸ 
+1 │ alter procedure p(value integer default 1) rename to p2;
+  ╰╴                                ━━━━━━━━━
