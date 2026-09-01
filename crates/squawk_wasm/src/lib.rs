@@ -179,6 +179,9 @@ impl SquawkDatabase {
             .map(|(_, ending)| ending)
             .unwrap_or_default();
         let parse = db::parse(&self.db, file);
+        if !parse.errors().is_empty() {
+            return Err(Error::new("Cannot format SQL with syntax errors."));
+        }
         squawk_fmt::fmt(&parse.tree(), line_ending).map_err(into_error)
     }
 

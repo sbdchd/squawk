@@ -6,6 +6,7 @@ import {
   useEffectEvent,
 } from "react"
 import * as monaco from "monaco-editor"
+import * as stylex from "@stylexjs/stylex"
 import {
   LintError,
   Fix,
@@ -33,6 +34,7 @@ import {
   semanticTokensProvider,
 } from "./providers"
 import { language as pgsqlMonarchLanguage } from "./pgsql"
+import { breakpoints, colors, transitions } from "./tokens.stylex"
 import BUILTINS_SQL from "./builtins.sql?raw"
 
 const modes = ["Lint", "Format", "Syntax Tree", "Tokens"] as const
@@ -79,19 +81,193 @@ const SETTINGS = {
   "semanticHighlighting.enabled": true,
 } satisfies monaco.editor.IStandaloneEditorConstructionOptions
 
-function clx(...args: (string | undefined | number | false)[]): string {
-  const classes = new Set<string>()
-  for (const arg of args) {
-    if (!arg) {
-      continue
-    } else if (typeof arg === "string" || typeof arg === "number") {
-      classes.add(String(arg))
-    } else {
-      assertNever(arg)
-    }
-  }
-  return [...classes].join(" ")
-}
+const styles = stylex.create({
+  app: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+  },
+  nav: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingInline: "1rem",
+    paddingTop: "0.5rem",
+    paddingBottom: "0.25rem",
+    backgroundColor: colors.background,
+    color: colors.text,
+    borderBottomWidth: "1px",
+    borderBottomColor: colors.border,
+    cursor: "default",
+  },
+  navGroup: {
+    display: "flex",
+    alignItems: "center",
+    gap: "1rem",
+  },
+  navTitle: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  navLinks: {
+    display: "flex",
+    gap: "0.5rem",
+  },
+  heading: {
+    fontSize: "1.125rem",
+    lineHeight: "1.75rem",
+    fontWeight: 600,
+  },
+  navItem: {
+    paddingInline: "0.75rem",
+    paddingBlock: "0.25rem",
+    borderRadius: "0.25rem",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.hover,
+    },
+    transitionProperty: transitions.colors,
+    transitionDuration: transitions.duration,
+    transitionTimingFunction: transitions.easing,
+  },
+  main: {
+    display: "flex",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    marginTop: "0.25rem",
+  },
+  panels: {
+    display: "grid",
+    gridTemplateColumns: "repeat(1, minmax(0, 1fr))",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    overflow: "auto",
+  },
+  panelsSplit: {
+    gridTemplateColumns: {
+      default: "repeat(1, minmax(0, 1fr))",
+      [breakpoints.md]: "repeat(2, minmax(0, 1fr))",
+    },
+  },
+  column: {
+    display: "flex",
+    flexDirection: "column",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+  },
+  panel: {
+    width: "100%",
+    maxHeight: "calc(100vh - 30px)",
+    height: {
+      default: "50vh",
+      [breakpoints.md]: "100%",
+    },
+  },
+  banner: {
+    paddingInline: "0.75rem",
+    paddingBlock: "0.5rem",
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    color: colors.bannerText,
+  },
+  bannerRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  bannerInfo: {
+    backgroundColor: colors.info,
+  },
+  bannerWarning: {
+    backgroundColor: colors.warningBackground,
+  },
+  bannerButton: {
+    paddingInline: "0.5rem",
+    paddingBlock: "0.25rem",
+    borderWidth: "1px",
+    borderColor: colors.bannerBorder,
+    borderRadius: "0.25rem",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.accent,
+    },
+  },
+  controls: {
+    paddingInline: "1rem",
+    paddingBlock: "0.5rem",
+    backgroundColor: colors.background,
+    borderLeftWidth: "1px",
+    borderLeftColor: colors.border,
+  },
+  controlsList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.25rem",
+  },
+  modeButton: {
+    width: "100%",
+    paddingInline: "0.5rem",
+    paddingBlock: "0.25rem",
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    borderRadius: "0.25rem",
+    transitionProperty: transitions.colors,
+    transitionDuration: transitions.duration,
+    transitionTimingFunction: transitions.easing,
+  },
+  modeButtonActive: {
+    backgroundColor: colors.accent,
+    color: colors.text,
+  },
+  modeButtonInactive: {
+    color: colors.subtleText,
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.hover,
+    },
+  },
+  errorPanel: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+    overflow: "auto",
+    padding: "1rem",
+    backgroundColor: colors.background,
+    color: colors.text,
+    fontFamily:
+      'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    userSelect: "auto",
+  },
+  error: {
+    paddingLeft: "0.5rem",
+    borderLeftWidth: "2px",
+    borderLeftColor: "currentColor",
+    lineHeight: "1.25rem",
+  },
+  errorWarning: {
+    borderLeftColor: colors.warning,
+  },
+  errorError: {
+    borderLeftColor: colors.error,
+  },
+  errorCode: {
+    fontWeight: 600,
+  },
+  errorNotes: {
+    paddingLeft: "1rem",
+    paddingTop: "0.25rem",
+  },
+  errorNoteLabel: {
+    color: colors.infoText,
+    fontWeight: 600,
+  },
+})
 
 function initialMode(): Mode | null {
   const mode = localStorage.getItem("play-mode-v1")
@@ -149,39 +325,36 @@ export function App() {
   const markers = useMarkers(text, version)
 
   return (
-    <div className="flex flex-col h-screen">
+    <div {...stylex.props(styles.app)}>
       <Nav>
         <a
           href="https://squawkhq.com"
           target="_blank"
-          className="px-3 py-1 rounded hover:bg-gray-700 transition-colors"
+          {...stylex.props(styles.navItem)}
         >
           Docs
         </a>
         <a
           href="https://squawkhq.com/docs/rules"
           target="_blank"
-          className="px-3 py-1 rounded hover:bg-gray-700 transition-colors"
+          {...stylex.props(styles.navItem)}
         >
           Rules
         </a>
         <a
           href="https://github.com/sbdchd/squawk"
           target="_blank"
-          className="px-3 py-1 rounded hover:bg-gray-700 transition-colors"
+          {...stylex.props(styles.navItem)}
         >
           GitHub
         </a>
         <ShareButton text={text} />
       </Nav>
-      <div className="flex flex-1 mt-1">
+      <div {...stylex.props(styles.main)}>
         <div
-          className={clx(
-            "grid grid-cols-1 flex-1 overflow-auto",
-            mode != null && "md:grid-cols-2",
-          )}
+          {...stylex.props(styles.panels, mode != null && styles.panelsSplit)}
         >
-          <div className="flex flex-col flex-1">
+          <div {...stylex.props(styles.column)}>
             {file == "builtins" ? (
               <BuiltinsBanner
                 onBack={() => {
@@ -231,12 +404,9 @@ export function App() {
 
 function BuiltinsBanner({ onBack }: { onBack: () => void }) {
   return (
-    <div className="bg-blue-800 text-slate-100 px-3 py-2 text-sm flex items-center justify-between">
+    <div {...stylex.props(styles.banner, styles.bannerRow, styles.bannerInfo)}>
       <div>Viewing postgres stubs (read-only)</div>
-      <button
-        className="px-2 py-1 border border-slate-300 rounded hover:bg-blue-600"
-        onClick={onBack}
-      >
+      <button {...stylex.props(styles.bannerButton)} onClick={onBack}>
         Go Back
       </button>
     </div>
@@ -264,21 +434,22 @@ function FormatPanel({ text, version }: { text: string; version: number }) {
   const result = useFormat(text, version)
   const value = result.ok ? result.text : result.error
   return (
-    <div className="flex flex-col flex-1">
-      {result.ok ? null : (
-        <div className="bg-amber-800 text-slate-100 px-3 py-2 text-sm">
-          can't format this file
+    <div {...stylex.props(styles.column)}>
+      {result.ok ? (
+        <Editor
+          value={value}
+          settings={{
+            ...SETTINGS,
+            value,
+            language: "pgsql-formatted",
+            readOnly: true,
+          }}
+        />
+      ) : (
+        <div {...stylex.props(styles.banner, styles.bannerWarning)}>
+          Error formatting this file.
         </div>
       )}
-      <Editor
-        value={value}
-        settings={{
-          ...SETTINGS,
-          value,
-          language: "pgsql-formatted",
-          readOnly: true,
-        }}
-      />
     </div>
   )
 }
@@ -291,19 +462,19 @@ function Controls({
   onModeChange: (mode: Mode | null) => void
 }) {
   return (
-    <div className="bg-[rgb(30,30,30)] border-l border-[#282828] px-4 py-2">
-      <div className="flex flex-col gap-1">
+    <div {...stylex.props(styles.controls)}>
+      <div {...stylex.props(styles.controlsList)}>
         {modes.map((mode) => (
           <button
             key={mode}
             onClick={() => {
               onModeChange(activeMode === mode ? null : mode)
             }}
-            className={clx(
-              "w-full px-2 py-1 text-sm rounded transition-colors",
+            {...stylex.props(
+              styles.modeButton,
               activeMode === mode
-                ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:bg-gray-700",
+                ? styles.modeButtonActive
+                : styles.modeButtonInactive,
             )}
           >
             {mode}
@@ -721,12 +892,7 @@ function Editor({
     }
   }, [value])
 
-  return (
-    <div
-      ref={divRef}
-      className="w-full [max-height:calc(100vh_-_30px)] h-[50vh] md:h-full"
-    />
-  )
+  return <div ref={divRef} {...stylex.props(styles.panel)} />
 }
 
 // I thought if we defined the numeric values for the variants the bindgen would use them, but it doesn't
@@ -824,18 +990,18 @@ function ErrorList({ errors }: { errors: Marker[] }) {
     return <div>no errors!</div>
   }
   return errors.map((x) => {
-    const color =
+    const severity =
       x.severity === monaco.MarkerSeverity.Warning
-        ? "border-l-amber-300"
+        ? styles.errorWarning
         : x.severity === monaco.MarkerSeverity.Error
-          ? "border-l-red-400"
-          : ""
+          ? styles.errorError
+          : null
     const code = typeof x.code === "string" ? x.code : x.code?.value
     return (
-      <div className={`${color} border-l-2 pl-2 leading-5`} key={x.id}>
+      <div {...stylex.props(styles.error, severity)} key={x.id}>
         <div data-range={`${x.range_start}..${x.range_end}`}>
           {code == null ? (
-            <div className="font-semibold">{code}</div>
+            <div {...stylex.props(styles.errorCode)}>{code}</div>
           ) : (
             <a
               href={`https://squawkhq.com/docs/${encodeURIComponent(code)}`}
@@ -847,11 +1013,11 @@ function ErrorList({ errors }: { errors: Marker[] }) {
           :{x.startLineNumber}:{x.startColumn}: {x.message}
         </div>
         {x.messages.length > 0 && (
-          <div className="pl-4 pt-1">
+          <div {...stylex.props(styles.errorNotes)}>
             {x.messages.map((note) => {
               return (
                 <div key={note}>
-                  <span className="text-blue-400 font-semibold">help:</span>{" "}
+                  <span {...stylex.props(styles.errorNoteLabel)}>help:</span>{" "}
                   {note}
                 </div>
               )
@@ -865,7 +1031,7 @@ function ErrorList({ errors }: { errors: Marker[] }) {
 
 function ErrorPanel({ errors }: { errors: Marker[] }) {
   return (
-    <div className="w-full [max-height:calc(100vh_-_30px)] h-[50vh] md:h-full bg-[rgb(30,30,30)] p-4 font-mono flex flex-col gap-4 overflow-auto text-white text-sm select-auto">
+    <div {...stylex.props(styles.panel, styles.errorPanel)}>
       <ErrorList errors={errors} />
     </div>
   )
@@ -873,13 +1039,13 @@ function ErrorPanel({ errors }: { errors: Marker[] }) {
 
 function Nav({ children }: { children: React.ReactNode }) {
   return (
-    <nav className="flex items-center justify-between px-4 py-2 bg-[rgb(30,30,30)] text-white border-b border-[#282828] pb-1 cursor-default">
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
+    <nav {...stylex.props(styles.nav)}>
+      <div {...stylex.props(styles.navGroup)}>
+        <div {...stylex.props(styles.navTitle)}>
           <img src="/owl.png" alt="Squawk Owl Logo" width="24" height="24" />
-          <h1 className="text-lg font-semibold">Squawk Playground</h1>
+          <h1 {...stylex.props(styles.heading)}>Squawk Playground</h1>
         </div>
-        <div className="flex space-x-2">{children}</div>
+        <div {...stylex.props(styles.navLinks)}>{children}</div>
       </div>
     </nav>
   )
@@ -907,7 +1073,7 @@ function handleSave(text: string) {
 function ShareButton({ text }: { text: string }) {
   return (
     <button
-      className="px-3 py-1 rounded hover:bg-gray-700 transition-colors"
+      {...stylex.props(styles.navItem)}
       onClick={() => {
         handleSave(text)
       }}

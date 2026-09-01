@@ -1,7 +1,6 @@
 import { defineConfig } from "vite"
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import react from "@vitejs/plugin-react"
-import tailwindcss from "@tailwindcss/vite"
 
 const ReactCompilerConfig = { panicThreshold: "all_errors" }
 
@@ -10,10 +9,11 @@ export default defineConfig({
   plugins: [
     react({
       babel: {
+        // babel.config.js has the stylex plugin
+        configFile: true,
         plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
       },
     }),
-    tailwindcss(),
     sentryVitePlugin({
       org: "magnus-montis",
       project: "squawk-playground-ui",
