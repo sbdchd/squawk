@@ -15662,8 +15662,56 @@ pub struct NameRef {
 }
 impl NameRef {
     #[inline]
+    pub fn current_catalog_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_CATALOG_KW)
+    }
+    #[inline]
+    pub fn current_date_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_DATE_KW)
+    }
+    #[inline]
+    pub fn current_role_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_ROLE_KW)
+    }
+    #[inline]
+    pub fn current_schema_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_SCHEMA_KW)
+    }
+    #[inline]
+    pub fn current_time_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_TIME_KW)
+    }
+    #[inline]
+    pub fn current_timestamp_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_TIMESTAMP_KW)
+    }
+    #[inline]
+    pub fn current_user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_USER_KW)
+    }
+    #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
+    pub fn localtime_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOCALTIME_KW)
+    }
+    #[inline]
+    pub fn localtimestamp_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOCALTIMESTAMP_KW)
+    }
+    #[inline]
+    pub fn session_user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SESSION_USER_KW)
+    }
+    #[inline]
+    pub fn system_user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SYSTEM_USER_KW)
+    }
+    #[inline]
+    pub fn user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USER_KW)
     }
 }
 

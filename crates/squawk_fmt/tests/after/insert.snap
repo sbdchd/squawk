@@ -20,6 +20,12 @@ with inserted as (
 select *
 from inserted;
 
+insert into products (product_no, name, price) values
+  (1, 'Cheese', 9.99),
+  (2, 'Bread', 1.99),
+  (3, 'Milk', 2.99),
+  (4, 'Eggs', 3.99);
+
 with inserted as (
   insert into a_very_long_schema_name.a_very_long_table_name (
     organization_identifier,

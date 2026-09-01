@@ -338,3 +338,7 @@ select
 json_object(
   'a': 1, 'b' value 2 format json
   null on null with unique keys returning jsonb format json);
+
+select foo = current_date;
+
+select current_catalog, current_role, current_schema, current_time(2), current_timestamp(3), current_user, localtime(4), localtimestamp(5), session_user, system_user, user;

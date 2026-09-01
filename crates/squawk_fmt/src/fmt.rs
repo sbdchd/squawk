@@ -349,10 +349,32 @@ fn build_insert<'a>(insert: &ast::Insert) -> Doc<'a> {
             .append(build_overriding_clause(overriding));
     }
     if let Some(source) = insert.insert_source() {
-        doc = doc
-            .append(Doc::line_or_space())
-            .append(leading_comments(source.syntax()))
-            .append(build_insert_source(source));
+        let source_comments = leading_comments(source.syntax());
+        match source {
+            ast::InsertSource::SelectVariant(ast::SelectVariant::Values(values))
+                if values
+                    .row_list()
+                    .is_some_and(|rows| rows.rows().count() > 1) =>
+            {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(source_comments)
+                    .append(Doc::text("values"))
+                    .group()
+                    .append(build_values_rows(&values, true));
+                for clause in values.tail_clauses() {
+                    doc = doc
+                        .append(Doc::line_or_space())
+                        .append(build_select_tail_clause(clause));
+                }
+            }
+            source => {
+                doc = doc
+                    .append(Doc::line_or_space())
+                    .append(source_comments)
+                    .append(build_insert_source(source));
+            }
+        }
     }
     if let Some(on_conflict) = insert.on_conflict_clause() {
         doc = doc
@@ -10123,23 +10145,11 @@ fn build_values<'a>(values: &ast::Values) -> Doc<'a> {
         }
     }
 
-    let mut values_doc = Doc::text("values");
-    if let Some(row_list) = values.row_list() {
-        let rows = row_list.rows().map(|row| {
-            (
-                leading_comments(row.syntax()).append(build_row(row.clone())),
-                row.syntax().clone(),
-            )
-        });
-        if let Some(rows) = build_comma_separated_docs(rows) {
-            values_doc = values_doc.append(
-                Doc::space()
-                    .append(leading_comments(row_list.syntax()))
-                    .append(rows),
-            );
-        }
-    }
-    doc = doc.append(values_doc.group());
+    doc = doc.append(
+        Doc::text("values")
+            .append(build_values_rows(values, false))
+            .group(),
+    );
 
     for clause in values.tail_clauses() {
         doc = doc
@@ -10149,6 +10159,35 @@ fn build_values<'a>(values: &ast::Values) -> Doc<'a> {
 
     doc.append(build_semicolon(values.semicolon_token()))
         .group()
+}
+
+fn build_values_rows<'a>(values: &ast::Values, nest_rows: bool) -> Doc<'a> {
+    let mut doc = Doc::nil();
+    if let Some(row_list) = values.row_list() {
+        let rows = row_list.rows().map(|row| {
+            (
+                leading_comments(row.syntax()).append(build_row(row.clone())),
+                row.syntax().clone(),
+            )
+        });
+        if let Some(rows) = build_comma_separated_docs(rows) {
+            let multiple_rows = row_list.rows().count() > 1;
+            let separator = if nest_rows && multiple_rows {
+                Doc::line_or_space()
+            } else {
+                Doc::space()
+            };
+            let rows = separator
+                .append(leading_comments(row_list.syntax()))
+                .append(rows);
+            doc = doc.append(if nest_rows && multiple_rows {
+                rows.nest(2).group()
+            } else {
+                rows
+            });
+        }
+    }
+    doc
 }
 
 fn build_row<'a>(row: ast::Row) -> Doc<'a> {
@@ -17976,10 +18015,12 @@ fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
 
 fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
     let mut single_item = from.items();
-    let single_json_table = matches!(
+    let single_nested_table = matches!(
         single_item.next(),
         Some(ast::FromListItem::FromItem(
-            ast::FromItem::JsonTableFromItem(_)
+            ast::FromItem::GraphTableFromItem(_)
+                | ast::FromItem::JsonTableFromItem(_)
+                | ast::FromItem::XmlTableFromItem(_)
         ))
     ) && single_item.next().is_none();
 
@@ -17991,7 +18032,7 @@ fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
         )
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
-    let body = if single_json_table {
+    let body = if single_nested_table {
         body
     } else {
         body.nest(2)
@@ -19319,12 +19360,34 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
         ast::Expr::FieldExpr(field_expr) => build_field_expr(field_expr),
         ast::Expr::IndexExpr(index_expr) => build_index_expr(index_expr),
         ast::Expr::Literal(literal) => build_literal(literal),
-        ast::Expr::NameRef(name_ref) => build_name(name_ref.syntax()),
+        ast::Expr::NameRef(name_ref) => build_expr_name_ref(name_ref),
         ast::Expr::ParenExpr(paren_expr) => build_paren_expr(paren_expr),
         ast::Expr::PostfixExpr(postfix_expr) => build_postfix_expr(postfix_expr),
         ast::Expr::PrefixExpr(prefix_expr) => build_prefix_expr(prefix_expr),
         ast::Expr::SliceExpr(slice_expr) => build_slice_expr(slice_expr),
         ast::Expr::TupleExpr(tuple_expr) => build_tuple_expr(tuple_expr),
+    }
+}
+
+fn build_expr_name_ref<'a>(name_ref: ast::NameRef) -> Doc<'a> {
+    let sql_value_function = name_ref
+        .current_catalog_token()
+        .or_else(|| name_ref.current_date_token())
+        .or_else(|| name_ref.current_role_token())
+        .or_else(|| name_ref.current_schema_token())
+        .or_else(|| name_ref.current_time_token())
+        .or_else(|| name_ref.current_timestamp_token())
+        .or_else(|| name_ref.current_user_token())
+        .or_else(|| name_ref.localtime_token())
+        .or_else(|| name_ref.localtimestamp_token())
+        .or_else(|| name_ref.session_user_token())
+        .or_else(|| name_ref.system_user_token())
+        .or_else(|| name_ref.user_token());
+
+    if let Some(token) = sql_value_function {
+        Doc::text(token.text().to_ascii_lowercase())
+    } else {
+        build_name(name_ref.syntax())
     }
 }
 

@@ -7,7 +7,7 @@ alter /* policy */ policy /* name */ account_access_policy
   /* to */ to /* first role */ account_administrator,
   /* second role */ account_auditor
   /* using */ using /* left paren */ (
-    /* expression */ owner_identifier = "current_user" /* right paren */
+    /* expression */ owner_identifier = current_user /* right paren */
   )
   /* with */ with /* check */ check /* left paren */ (
     /* expression */ account_is_active
@@ -19,8 +19,8 @@ alter policy account_access_policy
   using (
     account_identifier
       = a_very_long_session_account_identifier_function(
-        "current_user",
-        "current_role"
+        current_user,
+        current_role
       )
   );
 
