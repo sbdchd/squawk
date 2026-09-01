@@ -1,1 +1,60 @@
-@import "tailwindcss";
+*,
+::before,
+::after,
+::backdrop {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+
+html {
+  line-height: 1.5;
+  tab-size: 4;
+  font-family:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: rgb(30, 30, 30);
+  user-select: none;
+}
+
+h1 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  vertical-align: middle;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  appearance: button;
+  border-radius: 0;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  opacity: 1;
+}
+
+/* replaced with the generated styles by @stylexjs/postcss-plugin */
+@stylex;
