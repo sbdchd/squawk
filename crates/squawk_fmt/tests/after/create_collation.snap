@@ -20,7 +20,7 @@ create collation extraordinarily_long_schema_name.extraordinarily_long_collation
 create /* collation keyword */ collation /* if keyword */ if /* not keyword */ not /* exists keyword */ exists /* name */ public.commented /* left parenthesis */ (
   /* first option */ locale /* equals */ = /* value */ 'en_US.UTF-8' /* comma */,
   /* second option */ provider = /* provider value */ icu /* closing parenthesis */
-)/* semicolon */;
+) /* semicolon */;
 
 create collation /* name */ public.commented_copy
-  /* from clause */ from /* source collation */ public.original/* semicolon */;
+  /* from clause */ from /* source collation */ public.original /* semicolon */;

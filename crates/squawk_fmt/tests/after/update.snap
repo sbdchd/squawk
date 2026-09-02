@@ -50,4 +50,4 @@ update /*a*/ only /*b*/(/*c*/ public /*d*/./*e*/ foo /*f*/)
   )
 /*ao*/ from /*ap*/ bar
 /*aq*/ where /*ar*/ f.id = bar.id
-/*as*/ returning /*at*/ f.id /*au*/, /*av*/ f.payload/*aw*/;
+/*as*/ returning /*at*/ f.id /*au*/, /*av*/ f.payload /*aw*/;

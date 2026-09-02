@@ -30,4 +30,4 @@ comment on property graph public.sales_graph is 'sales relationships';
 
 comment /* on keyword */ on /* object kind */ materialized /* view keyword */ view
     /* object name */ extraordinarily_long_schema_name.extraordinarily_long_materialized_view_name
-  /* is keyword */ is /* comment value */ 'A deliberately long description of the materialized view used to verify wrapping behavior.'/* semicolon */;
+  /* is keyword */ is /* comment value */ 'A deliberately long description of the materialized view used to verify wrapping behavior.' /* semicolon */;

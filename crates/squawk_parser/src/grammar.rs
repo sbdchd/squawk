@@ -1937,7 +1937,14 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<(CompletedMarker, ExprKin
         }
     };
     // parse the interior of the unary expression
-    expr_bp(p, prefix_bp, &Restrictions::default());
+    expr_bp(
+        p,
+        prefix_bp,
+        &Restrictions {
+            bare_label_disabled: true,
+            ..Default::default()
+        },
+    );
     let cm = m.complete(p, kind);
     Some((cm, ExprKind::Other))
 }
@@ -2123,6 +2130,11 @@ fn separated(
             continue;
         }
         if !parser(p) {
+            break;
+        }
+        if p.at(delim) && (p.nth_at(1, EOF) || p.nth_at(1, SEMICOLON) || p.nth_at_ts(1, follow_set))
+        {
+            p.err_and_bump("unexpected trailing comma");
             break;
         }
         if !p.eat(delim) {
@@ -2397,7 +2409,7 @@ fn opt_type_name_with(
                 expr(p);
                 p.expect(R_PAREN);
             }
-            opt_with_timezone(p);
+            let _ = opt_with_timezone(p);
             kind
         }
         INTERVAL_KW => {
@@ -2430,7 +2442,7 @@ fn opt_type_name_with(
     type_mods(p, m, type_args_enabled, percent_type_enabled, wrapper_type)
 }
 
-fn opt_with_timezone(p: &mut Parser<'_>) {
+fn opt_with_timezone(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     if p.at(WITH_KW) || p.at(WITHOUT_KW) {
         let kind = if p.eat(WITH_KW) {
@@ -2442,8 +2454,10 @@ fn opt_with_timezone(p: &mut Parser<'_>) {
         p.expect(TIME_KW);
         p.expect(ZONE_KW);
         m.complete(p, kind);
+        true
     } else {
         m.abandon(p);
+        false
     }
 }
 
@@ -2685,40 +2699,56 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    match p.current() {
+    let has_type_modifiers = match p.current() {
         TIMESTAMP_KW | TIME_KW => {
             if !p.eat(TIMESTAMP_KW) {
                 p.bump(TIME_KW);
             }
-            if p.eat(L_PAREN) {
+            let has_precision = if p.eat(L_PAREN) {
                 if opt_numeric_literal(p).is_none() {
                     p.error("expected numeric literal");
                 }
                 p.expect(R_PAREN);
-            }
-            opt_with_timezone(p);
+                true
+            } else {
+                false
+            };
+            let has_timezone = opt_with_timezone(p);
+            has_precision || has_timezone
         }
         BIT_KW => {
             p.bump(BIT_KW);
-            p.eat(VARYING_KW);
+            p.eat(VARYING_KW)
         }
         NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
             p.bump(NATIONAL_KW);
             char_type(p);
+            true
         }
         DOUBLE_KW if p.nth_at(1, PRECISION_KW) => {
             p.bump(DOUBLE_KW);
             p.bump(PRECISION_KW);
+            true
         }
         CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => {
+            let has_varying = p.nth_at(1, VARYING_KW);
             char_type(p);
+            has_varying
         }
         INTERVAL_KW => {
             p.bump(INTERVAL_KW);
-            let has_interval_precision = opt_interval_precision(p);
-            opt_interval_trailing(p, has_interval_precision);
+            let has_precision = opt_interval_precision(p);
+            let has_qualifier = p.at_ts(INTERVAL_QUALIFIER_FIRST);
+            opt_interval_trailing(p, has_precision);
+            has_precision || has_qualifier
         }
-        _ => pg_name(p),
+        _ => {
+            pg_name(p);
+            false
+        }
+    };
+    if has_type_modifiers {
+        p.error("type modifiers require a string literal");
     }
     Some(m.complete(p, NAME_REF))
 }
@@ -2881,7 +2911,7 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
         // Unlike Rust, we can't have a number as a field, so we just report an
         // error.
         p.err_and_bump("expected field name");
-    } else if p.eat(STAR) || opt_operator(p) {
+    } else if p.eat(STAR) {
         //
     } else {
         p.error(format!("expected field name, got {:?}", p.current()));
@@ -3045,13 +3075,14 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
 // tokens thare in bin expr and also in bare_labels
 const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLATE_KW]);
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 struct Restrictions {
     escape_disabled: bool,
     in_disabled: bool,
     is_disabled: bool,
     not_disabled: bool,
     and_disabled: bool,
+    bare_label_disabled: bool,
 }
 
 fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMarker, ExprKind)> {
@@ -3079,17 +3110,20 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
     // to solve this we check if the token following the possible operator looks
     // like an expr, in which case we assume we're dealing with a binary expr,
     // otherwise we assume it's a bare column label.
-    if p.at_ts(OVERLAPPING_TOKENS)
-        && !p.nth_at_ts(1, EXPR_FIRST)
-        // could be start of `is distinct from`
-        && !(p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))
-    {
-        let m = p.start();
-        column_name(p);
-        m.complete(p, AS_NAME);
-        return Some((lhs, expr_kind));
-    }
     loop {
+        if p.at_ts(OVERLAPPING_TOKENS)
+            && !p.nth_at_ts(1, EXPR_FIRST)
+            // could be start of `is distinct from`
+            && !(p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))
+        {
+            if r.bare_label_disabled {
+                break;
+            }
+            let m = p.start();
+            column_name(p);
+            m.complete(p, AS_NAME);
+            return Some((lhs, expr_kind));
+        }
         let (op_bp, op, associativity) = current_op(p, r);
         if op_bp < bp {
             break;
@@ -3114,7 +3148,14 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
             Associativity::Left => op_bp + 1,
             Associativity::Right => op_bp,
         };
-        let _rhs = expr_bp(p, op_bp, r);
+        let _rhs = expr_bp(
+            p,
+            op_bp,
+            &Restrictions {
+                bare_label_disabled: true,
+                ..*r
+            },
+        );
         lhs = m.complete(p, BIN_EXPR);
         expr_kind = ExprKind::Other;
     }
@@ -5107,18 +5148,6 @@ fn table_property(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
-fn opt_operator(p: &mut Parser<'_>) -> bool {
-    let (power, kind, _) = current_op(p, &Restrictions::default());
-    if power == 0 {
-        if p.at_ts(OPERATOR_FIRST) {
-            p.bump_any();
-            return true;
-        }
-        return false;
-    }
-    p.eat(kind)
-}
-
 fn opt_op(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(OPERATOR_FIRST) || p.at(FAT_ARROW) {
         return false;
@@ -6049,6 +6078,12 @@ fn opt_select_all_or_distinct(p: &mut Parser) {
 }
 
 fn paren_expr_list(p: &mut Parser<'_>) {
+    if p.at(L_PAREN) && p.nth_at(1, R_PAREN) {
+        p.bump(L_PAREN);
+        p.error("expected an expression");
+        p.bump(R_PAREN);
+        return;
+    }
     delimited(
         p,
         L_PAREN,
@@ -11466,9 +11501,11 @@ fn alter_element_table_actions(p: &mut Parser<'_>) -> SyntaxKind {
             DROP_VERTEX_EDGE_LABEL_PROPERTIES
         }
     } else {
+        let m = p.start();
         p.expect(ALTER_KW);
         p.expect(LABEL_KW);
         label_ref(p);
+        m.complete(p, ALTER_LABEL);
         if p.eat(ADD_KW) {
             p.expect(PROPERTIES_KW);
             expr_as_property_name_list(p);

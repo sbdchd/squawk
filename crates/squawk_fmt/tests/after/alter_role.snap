@@ -4,7 +4,7 @@ input_file: crates/squawk_fmt/tests/before/alter_role.sql
 ---
 alter /* role */ role /* name */ reporting_user
   /* in */ in /* database */ database /* db */ analytics
-  /* action */ set /* parameter */ work_mem /* assignment */ to /* value */ '128MB'/* end */;
+  /* action */ set /* parameter */ work_mem /* assignment */ to /* value */ '128MB' /* end */;
 
 alter role exceptionally_long_application_service_account_name
   with superuser

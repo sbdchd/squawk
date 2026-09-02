@@ -13,4 +13,4 @@ drop transform if exists for
 drop /* transform */ transform /* if */ if /* exists */ exists /* for */ for
   /* type */ public /* dot */.customer_document
   /* language */ language /* language name */ plpgsql
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

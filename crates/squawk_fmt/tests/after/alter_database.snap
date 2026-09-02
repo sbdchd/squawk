@@ -38,10 +38,10 @@ alter /* database keyword */ database /* database name */ commented_app
   /* next option */ encoding /* equals */ = /* value */ 'UTF8'
   /* owner option */ owner /* equals */ = /* owner value */ app_admin
   /* tablespace option */ tablespace /* equals */ = /* tablespace value */ fast_storage
-  /* template option */ template /* equals */ = /* template value */ template0/* semicolon */;
+  /* template option */ template /* equals */ = /* template value */ template0 /* semicolon */;
 
 alter database /* name */ commented_config
   /* action */ set /* parameter */ statement_timeout /* assignment */ to /* value */ '30s';
 
 alter database /* name */ commented_refresh
-  /* action */ refresh /* collation keyword */ collation /* version keyword */ version/* semicolon */;
+  /* action */ refresh /* collation keyword */ collation /* version keyword */ version /* semicolon */;

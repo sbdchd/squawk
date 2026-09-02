@@ -10,4 +10,4 @@ alter rule rule_with_a_very_long_descriptive_name
 
 alter /* before rule */ rule /* before old name */ commented_rule
   /* before on */ on /* before relation */ public.commented_orders
-  /* before rename */ rename /* before to */ to /* before new name */ renamed_commented_rule/* before semicolon */;
+  /* before rename */ rename /* before to */ to /* before new name */ renamed_commented_rule /* before semicolon */;

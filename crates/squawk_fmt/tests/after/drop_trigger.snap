@@ -13,4 +13,4 @@ drop trigger if exists
 drop /* trigger */ trigger /* if */ if /* exists */ exists
   /* name */ audit_trigger
   /* on */ on /* relation */ public /* dot */.accounts
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

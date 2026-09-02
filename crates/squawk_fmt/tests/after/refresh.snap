@@ -11,4 +11,4 @@ refresh materialized view concurrently
 /* before refresh */
 refresh /* before materialized */ materialized /* before view */ view /* before concurrently */ concurrently
   /* before name */ public /* before dot */./* after dot */ summary
-  /* before with */ with /* before no */ no /* before data */ data/* before semicolon */;
+  /* before with */ with /* before no */ no /* before data */ data /* before semicolon */;

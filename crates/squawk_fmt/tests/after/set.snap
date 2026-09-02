@@ -19,7 +19,7 @@ set search_path = myschema, public;
 set
   /* before list parameter */ search_path
   /* before list equals */ = /* before first value */ myschema /* before list comma */,
-  /* before second value */ public/* before list semicolon */;
+  /* before second value */ public /* before list semicolon */;
 
 set foo to a, 10.0, 1, 'foo', true, false;
 
@@ -47,11 +47,11 @@ set extra_float_digits = -1;
 
 set
   /* before negative config parameter */ extra_float_digits
-  /* before negative config equals */ = /* before config minus */ - /* before config number */ 1/* before negative config semicolon */;
+  /* before negative config equals */ = /* before config minus */ - /* before config number */ 1 /* before negative config semicolon */;
 
 set
   /* before negative scope */ local
-  /* before negative time */ time /* before negative zone */ zone /* before minus */ - /* before timezone number */ 8/* before negative timezone semicolon */;
+  /* before negative time */ time /* before negative zone */ zone /* before minus */ - /* before timezone number */ 8 /* before negative timezone semicolon */;
 
 set
   an_intentionally_long_config_namespace.an_intentionally_long_config_group.an_intentionally_long_parameter_name
@@ -62,10 +62,10 @@ set
   /* before scope */ local
   /* before parameter */ custom /* before dot */./* after dot */ parameter
   /* before equals */ = /* before first value */ first_value /* before comma */,
-  /* after comma */ 'second value'/* before semicolon */;
+  /* after comma */ 'second value' /* before semicolon */;
 
 set
-  /* before time */ time /* before zone */ zone /* before timezone value */ default/* before timezone semicolon */;
+  /* before time */ time /* before zone */ zone /* before timezone value */ default /* before timezone semicolon */;
 
 set
-  /* before xml */ xml /* before option */ option /* before document */ document/* before xml semicolon */;
+  /* before xml */ xml /* before option */ option /* before document */ document /* before xml semicolon */;

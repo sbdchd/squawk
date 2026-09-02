@@ -13,4 +13,4 @@ drop rule if exists
 drop /* rule */ rule /* if */ if /* exists */ exists
   /* rule name */ archive_order
   /* on */ on /* relation schema */ public /* dot */.orders
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

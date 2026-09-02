@@ -11,4 +11,4 @@ drop access method if exists
 -- comments in every position
 drop /* access */ access /* method */ method /* if */ if /* exists */ exists
   /* name */ custom_method
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

@@ -27,4 +27,4 @@ create /* policy */ policy /* name */ account_access
   )
   /* with */ with /* check */ check /* check left paren */ (
     /* check expression */ active /* check right paren */
-  )/* end */;
+  ) /* end */;

@@ -21,4 +21,4 @@ explain /* before options */ (
   /* before analyze */ analyze /* before value */ true /* before comma */,
   /* before format */ format /* before json */ json /* before close */
 )
-  /* before select */ select /* before target */ 1/* before semicolon */;
+  /* before select */ select /* before target */ 1 /* before semicolon */;

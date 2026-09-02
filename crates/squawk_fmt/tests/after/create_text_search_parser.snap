@@ -22,4 +22,4 @@ create /* text keyword */ text /* search keyword */ search /* parser keyword */ 
   /* second option */ gettoken = /* second value */ public.parser_gettoken /* comma two */,
   /* third option */ end = public.parser_end,
   lextypes = public.parser_lextypes /* right parenthesis */
-)/* semicolon */;
+) /* semicolon */;

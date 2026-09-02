@@ -19,6 +19,15 @@ select
   2  not  between  1  and  3,
   2  between  asymmetric  1  and  3,
   2  between  symmetric  1  and  3,
+  1 /* before between */ between /* after between */ 2 /* before and */ and /* after and */ 3,
+  1 /* before not */ not /* before between */ between /* before symmetric */ symmetric /* before start */ 2 /* before and */ and /* before end */ 3,
+  1 -- before not
+    not -- before between
+    between -- before asymmetric
+    asymmetric -- before start
+    2 -- before and
+    and -- before end
+    3,
   a_very_long_between_target_expression between symmetric a_very_long_between_start_expression and a_very_long_between_end_expression,
   -- bin expr
   1 + 1,
@@ -119,6 +128,9 @@ select
   date_trunc('month', now()),
   a_very_long_function_name(first_very_long_argument_name, second_very_long_argument_name, third_very_long_argument_name),
   foo ( ),
+  foo(/* inside empty args */),
+  foo(-- inside empty args
+  ),
   foo ( * ),
   foo ( ALL 1, 2 ),
   foo ( /* before all */ ALL /* after all */ 1 ),
@@ -309,6 +321,11 @@ select
   OPERATOR ( PUBLIC . + ) /* after op */ 1,
   + 1,
   - 1,
+  - -2,
+  - /* between minuses */ -2,
+  - -- between minuses
+    -2,
+  - -a_very_long_double_minus_prefix_input_expression_that_is_long_enough_to_extend_past_eighty_characters,
   not true,
   not - + a_very_long_prefix_input_expression_that_is_long_enough_to_force_wrapping_past_eighty_characters,
   OPERATOR(a_very_long_operator_schema_name.###) a_very_long_custom_prefix_input_expression,
@@ -324,6 +341,9 @@ select
   ( 1 , 2 , 3 ),
   (first_very_long_tuple_expression, second_very_long_tuple_expression, third_very_long_tuple_expression),
   row ( ),
+  row(/* inside empty row */),
+  row(-- inside empty row
+  ),
   row ( 1 ),
   row /* before opening paren */ ( 1 ),
   row ( 1 , 2 ),
@@ -342,3 +362,10 @@ json_object(
 select foo = current_date;
 
 select current_catalog, current_role, current_schema, current_time(2), current_timestamp(3), current_user, localtime(4), localtimestamp(5), session_user, system_user, user;
+
+-- bare column labels after a nested expression
+select +a collate;
+select -1 collate;
+select 1 + 2 and;
+select a or b collate;
+select a and b is;

@@ -33,8 +33,8 @@ create /*a*/ temp /*b*/ table /*c*/ if /*d*/ not /*e*/ exists /*f*/ app /*g*/./*
   /*z*/ tablespace /*aa*/ fast
   /*ab*/ as
   /*ac*/ select id, total from summaries
-  /*ad*/ with /*ae*/ no /*af*/ data/*ag*/;
+  /*ad*/ with /*ae*/ no /*af*/ data /*ag*/;
 
 create table executed /*a*/ as
   /*b*/ execute /*c*/ refresh_report /*d*/(/*e*/ 1 /*f*/, /*g*/ 'full' /*h*/)
-  /*i*/ with /*j*/ data/*k*/;
+  /*i*/ with /*j*/ data /*k*/;

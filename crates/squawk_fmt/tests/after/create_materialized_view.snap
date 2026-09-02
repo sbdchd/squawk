@@ -35,4 +35,4 @@ create /* materialized */ materialized /* view */ view /* if */ if /* not */ not
   /* query */ select /* expression */ account_id, sum(amount)
   from payments
   group by account_id
-  /* with */ with /* no */ no /* data */ data/* semicolon */;
+  /* with */ with /* no */ no /* data */ data /* semicolon */;

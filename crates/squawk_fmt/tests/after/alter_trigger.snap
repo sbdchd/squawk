@@ -4,7 +4,7 @@ input_file: crates/squawk_fmt/tests/before/alter_trigger.sql
 ---
 alter /* trigger */ trigger /* name */ audit_trigger
   /* on */ on /* relation */ public.accounts
-  /* action */ no /* depends */ depends /* on extension */ on /* extension */ extension /* extension name */ audit_support/* end */;
+  /* action */ no /* depends */ depends /* on extension */ on /* extension */ extension /* extension name */ audit_support /* end */;
 
 alter trigger audit_trigger
   on public.accounts

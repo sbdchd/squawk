@@ -23,4 +23,4 @@ drop /* function */ function /* if */ if /* exists */ exists
   /* second function */ reporting.refresh_cache(
     /* second function argument */ text
   )
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

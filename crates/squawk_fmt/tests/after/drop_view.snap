@@ -13,4 +13,4 @@ drop view if exists
 drop /* view */ view /* if */ if /* exists */ exists
   /* first view */ public /* dot */.active_accounts /* before comma */,
   /* second view */ reporting.archived_accounts
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

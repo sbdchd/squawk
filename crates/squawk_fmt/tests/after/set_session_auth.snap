@@ -20,4 +20,4 @@ set
   /* before scope */ local
   /* before session */ session
   /* before authorization */ authorization
-  /* before target */ group /* before role name */ legacy_user/* before semicolon */;
+  /* before target */ group /* before role name */ legacy_user /* before semicolon */;

@@ -19,6 +19,6 @@ deallocate
 /* before deallocate */
 deallocate
   /* before prepare */ prepare
-  /* before target */ statement_name/* before semicolon */;
+  /* before target */ statement_name /* before semicolon */;
 
-deallocate /* before all */ all/* before all semicolon */;
+deallocate /* before all */ all /* before all semicolon */;

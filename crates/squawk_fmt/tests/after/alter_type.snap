@@ -4,7 +4,7 @@ input_file: crates/squawk_fmt/tests/before/alter_type.sql
 ---
 alter /* type */ type /* name */ public.delivery_status
   /* action */ add /* value */ value /* if */ if /* not */ not /* exists */ exists /* new value */ 'an exceptionally long delivery status awaiting additional customer confirmation'
-    /* before */ before /* existing value */ 'delivered'/* end */;
+    /* before */ before /* existing value */ 'delivered' /* end */;
 
 alter type public.delivery_status add value 'returned' after 'delivered';
 

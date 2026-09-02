@@ -5,4 +5,4 @@ input_file: crates/squawk_fmt/tests/before/reset_role.sql
 reset role;
 
 /* before reset */
-reset /* before role */ role/* before semicolon */;
+reset /* before role */ role /* before semicolon */;

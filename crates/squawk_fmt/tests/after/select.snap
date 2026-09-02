@@ -31,3 +31,12 @@ from a_very_long_schema_name.a_very_long_table_name as a_very_long_table_alias
 group by a_very_long_first_target_expression,
   a_very_long_second_target_expression,
   a_very_long_third_target_expression;
+
+-- empty target lists
+select;
+select from onek;
+select where 1 = 1;
+select except select;
+select distinct from onek;
+select all from onek;
+select distinct on (a) from onek;

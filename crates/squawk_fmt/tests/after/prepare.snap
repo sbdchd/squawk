@@ -35,4 +35,4 @@ prepare
     /* after comma */ text /* before right paren */
   )
   /* before as */ as
-  /* before statement */ select /* before value */ $1/* before semicolon */;
+  /* before statement */ select /* before value */ $1 /* before semicolon */;

@@ -19,4 +19,4 @@ security /* before label */ label
   /* before for */ for /* before provider */ selinux
   /* before on */ on /* before foreign */ foreign /* before table */ table
     /* before name */ public /* before dot */./* after dot */ records
-  /* before is */ is /* before value */ 'trusted'/* before semicolon */;
+  /* before is */ is /* before value */ 'trusted' /* before semicolon */;

@@ -13,4 +13,4 @@ drop foreign table if exists
 drop /* foreign */ foreign /* table */ table /* if */ if /* exists */ exists
   /* first table */ public /* dot */.events /* before comma */,
   /* second table */ reporting.archive
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

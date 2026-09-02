@@ -31,9 +31,9 @@ create /* or */ or /* replace */ replace /* rule */ rule /* name */ audit_change
     )
   /* do */ do /* instead */ instead /* action left */ (
     /* notify */ notify /* channel */ account_changes /* comma */,
-      /* payload */ 'changed'/* first semicolon */;
+      /* payload */ 'changed' /* first semicolon */;
     /* update */ update /* table */ audit_log
     /* set */ set
       /* column */ changed
-        /* equals */ = /* value */ true/* second semicolon */; /* action right */
-  )/* end */;
+        /* equals */ = /* value */ true /* second semicolon */; /* action right */
+  ) /* end */;

@@ -4,6 +4,11 @@ input_file: crates/squawk_fmt/tests/before/create_database.sql
 ---
 create database app;
 
+create database database_with_trailing_comment /* trailing comment */;
+
+create database database_with_trailing_line_comment -- trailing comment
+;
+
 create database app_copy
   with
   owner = app_owner
@@ -35,4 +40,4 @@ create /* database keyword */ database /* database name */ commented_database
   /* encoding option */ encoding = /* encoding value */ 'UTF8'
   /* generic option */ locale /* generic equals */ = /* generic value */ 'en_US.UTF-8'
   /* connection option */ connection /* limit keyword */ limit = /* limit value */ 42
-  /* tablespace option */ tablespace = /* tablespace value */ commented_space/* semicolon */;
+  /* tablespace option */ tablespace = /* tablespace value */ commented_space /* semicolon */;

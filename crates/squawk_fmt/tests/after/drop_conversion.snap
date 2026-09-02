@@ -11,4 +11,4 @@ drop conversion if exists
 -- comments in every position
 drop /* conversion */ conversion /* if */ if /* exists */ exists
   /* conversion name */ public.commented_conversion
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

@@ -15,4 +15,4 @@ drop /* owned */ owned /* by */ by
   /* first role */ alice /* first comma */,
   /* second role */ current_user /* second comma */,
   /* group keyword */ group /* group name */ managers
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

@@ -21,4 +21,4 @@ checkpoint (
 checkpoint /* before left paren */ (
   /* after left paren */ mode /* before value */ fast /* before comma */,
   /* after comma */ flush_unlogged /* before second value */ false /* before right paren */
-)/* before semicolon */;
+) /* before semicolon */;

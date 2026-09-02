@@ -13,4 +13,4 @@ drop sequence if exists
 drop /* sequence */ sequence /* if */ if /* exists */ exists
   /* first schema */ public /* first dot */.order_number_seq /* comma */,
   /* second schema */ accounting /* second dot */.invoice_number_seq
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

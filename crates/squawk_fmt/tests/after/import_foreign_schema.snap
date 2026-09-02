@@ -24,4 +24,4 @@ import /* before foreign */ foreign /* before schema */ schema /* before remote 
     /* before second */ users /* before close */
   )
   /* before from */ from /* before server */ server /* before server name */ foreign_server
-  /* before into */ into /* before local */ local/* before semicolon */;
+  /* before into */ into /* before local */ local /* before semicolon */;

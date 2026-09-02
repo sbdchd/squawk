@@ -12,4 +12,4 @@ create access method extraordinarily_long_access_method_name
 
 create /* access keyword */ access /* method keyword */ method /* name */ commented_method
   /* type keyword */ type /* method type */ index
-  /* handler keyword */ handler /* handler name */ public.commented_handler/* semicolon */;
+  /* handler keyword */ handler /* handler name */ public.commented_handler /* semicolon */;

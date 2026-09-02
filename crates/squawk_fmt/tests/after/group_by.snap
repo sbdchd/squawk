@@ -36,4 +36,4 @@ group /* before by */ by /* before distinct */ distinct /* before grouping */ gr
         /* before tuple expression */ 5 /* before tuple close */
       ) /* before nested close */
     ) /* before outer close */
-  )/* before semicolon */;
+  ) /* before semicolon */;

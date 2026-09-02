@@ -4,6 +4,13 @@ input_file: crates/squawk_fmt/tests/before/create_foreign_table.sql
 ---
 create foreign table t () server s;
 
+create foreign table empty_arg_comment ( /* inside empty args */) server s;
+
+create foreign table empty_arg_line_comment (
+  -- inside empty args
+)
+  server s;
+
 create foreign table if not exists public.remote_records (
   id bigint not null,
   name text,
@@ -50,4 +57,4 @@ create /* before foreign */ foreign /* before table */ table /* before if */ if 
   /* before options */ options /* before options left paren */ (
     /* after options left paren */ schema_name /* before option value */ 'public' /* before option comma */,
     /* after option comma */ table_name /* before second option value */ 'records' /* before options right paren */
-  )/* before semicolon */;
+  ) /* before semicolon */;

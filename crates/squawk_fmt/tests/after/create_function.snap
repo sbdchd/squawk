@@ -86,6 +86,22 @@ create function foo( /* no params */) returns t
   as $$select 1$$
   language sql;
 
+-- comments before the first function option
+create function block_comment_before_as()
+  /* before as */ as $$select 1$$
+  language sql;
+
+create function line_comment_before_as()
+  -- before as
+  as $$select 1$$
+  language sql;
+
+create function comment_before_language(
+  out a_very_long_output_parameter_name integer
+)
+  /* before language */ language sql
+  as $$select 1$$;
+
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/./*f*/ commented(
   /*g*/ in /*h*/ value /*i*/ integer /*j*/ default /*k*/ 1 /*l*/,
@@ -93,8 +109,8 @@ create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/./*f*/ commented(
 ) /*q*/ returns /*r*/ table /*s*/ (
   /*t*/ id /*u*/ bigint /*v*/,
   /*w*/ label /*x*/ text /*y*/
-) /*z*/
-  language /*aa*/ sql
+)
+  /*z*/ language /*aa*/ sql
   /*ab*/ immutable
   /*ac*/ strict
   /*ad*/ parallel /*ae*/ safe
@@ -104,7 +120,7 @@ create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/./*f*/ commented(
   /*al*/ set /*am*/ search_path /*an*/ to /*ao*/ public /*ap*/, /*aq*/ pg_temp
   /*ar*/ /*as*/ reset /*at*/ all
   /*au*/ support /*av*/ public /*aw*/./*ax*/ support_fn
-  /*ay*/ as /*az*/ $$ select value::text $$/*ba*/;
+  /*ay*/ as /*az*/ $$ select value::text $$ /*ba*/;
 
 create function increment(value integer) returns integer
   language sql
@@ -130,9 +146,9 @@ create function commented_body(value integer) returns integer
   language sql
   /*bb*/ begin /*bc*/ atomic
     /*bd*/ insert /*be*/ into function_log /*bf*/ (value)
-    /*bg*/ values /*bh*/ (value)/*bi*/;
-    /*bj*/ return /*bk*/ value + 1/*bl*/;
-  /*bm*/ end/*bn*/;
+    /*bg*/ values /*bh*/ (value) /*bi*/;
+    /*bj*/ return /*bk*/ value + 1 /*bl*/;
+  /*bm*/ end /*bn*/;
 
 create function external_add(integer, integer) returns integer
   as '$libdir/example', 'external_add'

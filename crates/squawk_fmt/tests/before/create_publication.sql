@@ -4,6 +4,11 @@ create publication selected_tables for table only public.accounts (id, email) wh
 
 create publication no_tables with (publish = 'insert');
 
+create publication except_table_comments for all tables except (/* before table */ table /* before only */ only /* before relation */ audit.secret_events, /* before omitted table */ internal_jobs);
+
+create publication except_table_line_comment for all tables except (table -- before relation
+internal_jobs);
+
 create publication omitted_table_keywords for table first_table, /* before omitted table */ public.second_table where (id > 100), /* before omitted only */ only third_table;
 
 create publication omitted_schema_keywords for tables in schema first_schema, /* before omitted schema */ second_schema;

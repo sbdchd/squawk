@@ -13,4 +13,4 @@ drop index concurrently if exists
 drop /* index */ index /* concurrently */ concurrently /* if */ if /* exists */ exists
   /* first index */ public /* dot */.events_idx /* before comma */,
   /* second index */ reporting.archive_idx
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

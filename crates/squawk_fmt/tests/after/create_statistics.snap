@@ -28,4 +28,4 @@ create /* statistics */ statistics /* if */ if /* not */ not /* exists */ exists
   /* on */ on
     /* first expression */ customer_id /* expression comma */,
     /* second expression */ (lower(email))
-  /* from */ from /* table */ app.orders/* end */;
+  /* from */ from /* table */ app.orders /* end */;

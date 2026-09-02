@@ -22,4 +22,4 @@ drop /* operator */ operator /* if */ if /* exists */ exists
     /* none */ none /* second comma */,
     /* second type */ text /* second close */
   )
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

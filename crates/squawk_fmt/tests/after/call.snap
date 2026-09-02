@@ -19,4 +19,4 @@ call /* after call */ public /* before dot */./* after dot */ process_record /* 
     1,
     2
   ] /* before right paren */
-)/* before semicolon */;
+) /* before semicolon */;

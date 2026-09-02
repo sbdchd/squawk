@@ -46,4 +46,4 @@ create /* operator */ operator /* class */ class /* schema */ app /* dot */./* n
     /* signature arg */ integer,
     integer
   ) /* second comma */,
-  /* storage */ storage /* storage type */ integer/* end */;
+  /* storage */ storage /* storage type */ integer /* end */;

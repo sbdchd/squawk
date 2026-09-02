@@ -405,15 +405,15 @@ pub struct AddVertexEdgeLabelProperties {
 }
 impl AddVertexEdgeLabelProperties {
     #[inline]
+    pub fn alter_label(&self) -> Option<AlterLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn element_table_ref(&self) -> Option<ElementTableRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn expr_as_property_name_list(&self) -> Option<ExprAsPropertyNameList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn label_ref(&self) -> Option<LabelRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -427,10 +427,6 @@ impl AddVertexEdgeLabelProperties {
     #[inline]
     pub fn edge_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EDGE_KW)
-    }
-    #[inline]
-    pub fn label_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LABEL_KW)
     }
     #[inline]
     pub fn node_token(&self) -> Option<SyntaxToken> {
@@ -1245,6 +1241,25 @@ impl AlterIndex {
     #[inline]
     pub fn index_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INDEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterLabel {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterLabel {
+    #[inline]
+    pub fn label_ref(&self) -> Option<LabelRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn label_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LABEL_KW)
     }
 }
 
@@ -5232,16 +5247,12 @@ pub struct CreateDomain {
 }
 impl CreateDomain {
     #[inline]
-    pub fn collate(&self) -> Option<Collate> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn constraints(&self) -> AstChildren<Constraint> {
-        support::children(&self.syntax)
-    }
-    #[inline]
     pub fn domain(&self) -> Option<Domain> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn domain_qualifiers(&self) -> AstChildren<DomainQualifier> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn ty(&self) -> Option<Type> {
@@ -9796,15 +9807,15 @@ pub struct DropVertexEdgeLabelProperties {
 }
 impl DropVertexEdgeLabelProperties {
     #[inline]
+    pub fn alter_label(&self) -> Option<AlterLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn drop_behavior(&self) -> Option<DropBehavior> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn element_table_ref(&self) -> Option<ElementTableRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn label_ref(&self) -> Option<LabelRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9830,10 +9841,6 @@ impl DropVertexEdgeLabelProperties {
     #[inline]
     pub fn edge_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EDGE_KW)
-    }
-    #[inline]
-    pub fn label_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LABEL_KW)
     }
     #[inline]
     pub fn node_token(&self) -> Option<SyntaxToken> {
@@ -28812,6 +28819,12 @@ pub enum DiscardTarget {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DomainQualifier {
+    Collate(Collate),
+    Constraint(Constraint),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DropBehavior {
     Cascade(Cascade),
     Restrict(Restrict),
@@ -31069,6 +31082,24 @@ impl AstNode for AlterIndex {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ALTER_INDEX
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterLabel {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_LABEL
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -61531,6 +61562,38 @@ impl From<DiscardTemp> for DiscardTarget {
     #[inline]
     fn from(node: DiscardTemp) -> DiscardTarget {
         DiscardTarget::DiscardTemp(node)
+    }
+}
+impl AstNode for DomainQualifier {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::COLLATE) || Constraint::can_cast(kind)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::COLLATE => DomainQualifier::Collate(Collate { syntax }),
+            _ => {
+                if let Some(result) = Constraint::cast(syntax.clone()) {
+                    return Some(DomainQualifier::Constraint(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            DomainQualifier::Collate(it) => &it.syntax,
+            DomainQualifier::Constraint(it) => it.syntax(),
+        }
+    }
+}
+impl From<Collate> for DomainQualifier {
+    #[inline]
+    fn from(node: Collate) -> DomainQualifier {
+        DomainQualifier::Collate(node)
     }
 }
 impl AstNode for DropBehavior {

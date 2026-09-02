@@ -37,7 +37,7 @@ create /*a*/ or /*b*/ replace /*c*/ temp /*d*/ recursive /*e*/ view /*f*/ app /*
   )
   /*x*/ as
   /*y*/ select /*z*/ account_id, total from summaries
-  /*aa*/ with /*ab*/ cascaded /*ac*/ check /*ad*/ option/*ae*/;
+  /*aa*/ with /*ab*/ cascaded /*ac*/ check /*ad*/ option /*ae*/;
 
 create view plain_check as
   select 1

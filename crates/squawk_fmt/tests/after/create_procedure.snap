@@ -24,4 +24,4 @@ create /* or */ or /* replace */ replace /* procedure */ procedure /* schema */ 
   /* language */ language /* language name */ plpgsql
   /* security */ security /* definer */ definer
   /* set */ set /* parameter name */ work_mem /* equals */ = /* setting */ '64MB'
-  /* as */ as /* body */ $$ begin null; end $$/* end */;
+  /* as */ as /* body */ $$ begin null; end $$ /* end */;

@@ -1,5 +1,10 @@
 CREATE FOREIGN TABLE t() SERVER s;
 
+create foreign table empty_arg_comment (/* inside empty args */) server s;
+
+create foreign table empty_arg_line_comment (-- inside empty args
+) server s;
+
 create foreign table if not exists public.remote_records (
   id bigint not null,
   name text,

@@ -20,6 +20,11 @@ select 1 /* before bare alias */ number;
 select 1 -- a line comment
 , 2;
 
+select * /* after star */, a from things;
+
+select * -- after star
+, a from things;
+
 -- line comments before the semicolon
 select 1 -- a
 ;

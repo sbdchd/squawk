@@ -13,4 +13,4 @@ drop collation if exists
 drop /* collation */ collation /* if */ if /* exists */ exists
   /* first collation */ public.english /* before comma */,
   /* second collation */ public.french
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

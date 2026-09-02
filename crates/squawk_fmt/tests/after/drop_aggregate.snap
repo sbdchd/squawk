@@ -23,4 +23,4 @@ drop /* aggregate */ aggregate /* if */ if /* exists */ exists
     /* second argument */ text,
     /* third argument */ numeric /* second close */
   )
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

@@ -30,7 +30,7 @@ create /* cast keyword */ cast /* left parenthesis */ (
     /* function name */ public.convert_text(
       /* argument type */ text /* argument closing parenthesis */
     )
-  /* context */ as /* assignment keyword */ assignment/* semicolon */;
+  /* context */ as /* assignment keyword */ assignment /* semicolon */;
 
 create cast (integer as text)
   /* method */ without /* function keyword */ function

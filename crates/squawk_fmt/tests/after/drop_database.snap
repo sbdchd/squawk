@@ -13,4 +13,4 @@ with (force);
 -- comments in every position
 drop /* database */ database /* if */ if /* exists */ exists
   /* name */ application
-/* with */ with /* left paren */ (/* force */ force /* right paren */)/* end */;
+/* with */ with /* left paren */ (/* force */ force /* right paren */) /* end */;

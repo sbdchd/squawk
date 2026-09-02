@@ -13,4 +13,4 @@ drop statistics if exists
 drop /* statistics */ statistics /* if */ if /* exists */ exists
   /* first statistics */ public /* dot */.user_stats /* before comma */,
   /* second statistics */ reporting.activity_stats
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

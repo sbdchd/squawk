@@ -10,18 +10,20 @@ pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<
     let file = parse.tree();
     for stmt in file.stmts() {
         if let ast::Stmt::CreateDomain(domain) = stmt {
-            let range =
-                domain
-                    .constraints()
-                    .map(|c| c.syntax().text_range())
-                    .fold(None, |prev, cur| match prev {
-                        None => Some(cur),
-                        Some(prev) => {
-                            let new_start = prev.start().min(cur.start());
-                            let new_end = prev.end().max(cur.end());
-                            Some(TextRange::new(new_start, new_end))
-                        }
-                    });
+            let range = domain
+                .domain_qualifiers()
+                .filter_map(|qualifier| match qualifier {
+                    ast::DomainQualifier::Constraint(c) => Some(c.syntax().text_range()),
+                    ast::DomainQualifier::Collate(_) => None,
+                })
+                .fold(None, |prev, cur| match prev {
+                    None => Some(cur),
+                    Some(prev) => {
+                        let new_start = prev.start().min(cur.start());
+                        let new_end = prev.end().max(cur.end());
+                        Some(TextRange::new(new_start, new_end))
+                    }
+                });
             if let Some(range) = range {
                 ctx.report(Violation::for_range(
                 Rule::BanCreateDomainWithConstraint,

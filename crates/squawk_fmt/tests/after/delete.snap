@@ -65,4 +65,4 @@ delete /*a*/ from /*b*/ foo
 /*t*/ returning /*u*/ with /*v*/ (
   /*w*/ old /*x*/ as /*y*/ o /*z*/,
   /*aa*/ new /*ab*/ as /*ac*/ n /*ad*/
-) /*ae*/ o.id /*af*/, /*ag*/ n.id/*ah*/;
+) /*ae*/ o.id /*af*/, /*ag*/ n.id /*ah*/;

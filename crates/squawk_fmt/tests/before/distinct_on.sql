@@ -4,5 +4,3 @@ select distinct on (b) a, b from foo;
 select distinct on (a_very_long_first_distinct_expression, a_very_long_second_distinct_expression, a_very_long_third_distinct_expression) a_very_long_first_target_expression, a_very_long_second_target_expression from a_very_long_source_relation_name;
 
 select /* before distinct */ distinct /* before on */ on /* before opening paren */ (/* before first expression */ a /* before comma */, /* before second expression */ b /* before closing paren */) /* before target */ a /* before from */ from /* before relation */ foo;
-
-select distinct on (/* before empty closing paren */) 1;

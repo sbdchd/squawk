@@ -59,4 +59,4 @@ alter /* default keyword */ default /* privileges keyword */ privileges
   /* on keyword */ on /* target */ tables
   /* to keyword */ to
     /* grantee */ exceedingly_long_reporting_role
-    /* with clause */ with /* grant keyword */ grant /* option keyword */ option/* semicolon */;
+    /* with clause */ with /* grant keyword */ grant /* option keyword */ option /* semicolon */;

@@ -17,7 +17,7 @@ show session authorization;
 
 /* before show */
 show
-  /* before parameter */ custom /* before dot */./* after dot */ parameter/* before semicolon */;
+  /* before parameter */ custom /* before dot */./* after dot */ parameter /* before semicolon */;
 
 show
-  /* before transaction */ transaction /* before isolation */ isolation /* before level */ level/* before semicolon */;
+  /* before transaction */ transaction /* before isolation */ isolation /* before level */ level /* before semicolon */;

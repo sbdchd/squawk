@@ -99,4 +99,4 @@ select
     /* before kind */ content /* before expression */ doc
     /* before as */ as /* before type */ text
     /* before no */ no /* before indent */ indent /* before closing paren */
-  )/* after serialize */;
+  ) /* after serialize */;

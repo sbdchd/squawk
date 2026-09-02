@@ -6,7 +6,7 @@ alter /* procedure */ procedure /* signature */ public.recalculate_account_total
   /* arg */ integer,
   text
 )
-  /* action */ rename /* to */ to /* target */ recalculate_totals/* end */;
+  /* action */ rename /* to */ to /* target */ recalculate_totals /* end */;
 
 alter procedure process_customer_transactions_with_an_exceptionally_long_name(
   integer,

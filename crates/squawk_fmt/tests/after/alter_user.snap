@@ -4,7 +4,7 @@ input_file: crates/squawk_fmt/tests/before/alter_user.sql
 ---
 alter /* user */ user /* role */ reporting_application_user
   /* in */ in /* database */ database /* name */ exceptionally_long_analytics_database_name
-  /* action */ set /* parameter */ work_mem /* assignment */ to /* value */ '128MB'/* end */;
+  /* action */ set /* parameter */ work_mem /* assignment */ to /* value */ '128MB' /* end */;
 
 alter user reporting_application_user
   with superuser

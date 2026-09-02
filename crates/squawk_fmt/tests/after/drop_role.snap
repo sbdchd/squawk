@@ -12,4 +12,4 @@ drop role if exists
 drop /* role */ role /* if */ if /* exists */ exists
   /* first role */ analysts /* comma */,
   /* second role */ current_user /* comma */,
-  /* group */ group /* group name */ reporting_users/* end */;
+  /* group */ group /* group name */ reporting_users /* end */;

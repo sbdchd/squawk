@@ -80,4 +80,4 @@ create /*a*/ or /*b*/ replace /*c*/ constraint /*d*/ trigger /*e*/ commented_tri
     /*as*/ app /*at*/./*au*/ handle_records(
       /*av*/ 1 /*aw*/,
       /*ax*/ 'two' /*ay*/
-    )/*az*/;
+    ) /*az*/;

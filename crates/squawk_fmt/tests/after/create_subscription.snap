@@ -27,4 +27,4 @@ create /* after create */ subscription /* before name */ commented_sub
   connection /* before connection */ 'host=localhost'
   publication /* before publication */ all_changes,
     /* after comma */ selected_tables
-  with /* before params */ (enabled = true)/* before semicolon */;
+  with /* before params */ (enabled = true) /* before semicolon */;

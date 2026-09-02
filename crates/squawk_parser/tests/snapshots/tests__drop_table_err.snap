@@ -54,6 +54,49 @@ SOURCE_FILE
     CASCADE
       CASCADE_KW "cascade"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing comma"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "p"
+    ERROR
+      COMMA ","
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "p"
+    ERROR
+      COMMA ","
+    WHITESPACE " "
+    CASCADE
+      CASCADE_KW "cascade"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "p"
+    ERROR
+      COMMA ","
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA
@@ -64,3 +107,15 @@ error[syntax-error]: unexpected comma, expected a name
   ╭▸ 
 5 │ drop table foo,   , buzz cascade;
   ╰╴                  ━
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+8 │ drop table p,;
+  ╰╴            ━
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+9 │ drop table p, cascade;
+  ╰╴            ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+10 │ drop table p,
+   ╰╴            ━

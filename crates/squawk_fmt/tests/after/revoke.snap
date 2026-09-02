@@ -22,6 +22,19 @@ revoke
   an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters
   restrict;
 
+revoke all on function /* before function */ f(integer) from public;
+
+revoke
+  all
+  on
+    function
+      -- before function
+      f(
+        integer
+      )
+  from
+  public;
+
 /* before revoke */
 revoke
   /* before grant */ grant /* before option */ option /* before for */ for
@@ -32,4 +45,4 @@ revoke
   /* before from */ from
   /* before role */ app_user
   /* before granted */ granted /* before by */ by /* before grantor */ current_user
-  /* before cascade */ cascade/* before semicolon */;
+  /* before cascade */ cascade /* before semicolon */;

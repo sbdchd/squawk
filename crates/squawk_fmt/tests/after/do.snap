@@ -21,8 +21,8 @@ $body$;
 /* before */
 do
   /* after do */ language /* after language */ plpgsql
-  /* before body */ $body$BEGIN NULL; END$body$/* before semicolon */;
+  /* before body */ $body$BEGIN NULL; END$body$ /* before semicolon */;
 
 do
   /* before trailing body */ $body$BEGIN NULL; END$body$
-  /* before trailing language */ language /* before language literal */ 'plpgsql'/* before trailing semicolon */;
+  /* before trailing language */ language /* before language literal */ 'plpgsql' /* before trailing semicolon */;

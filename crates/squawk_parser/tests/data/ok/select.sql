@@ -467,6 +467,18 @@ select 1 or;
 
 select 1 collate;
 
+select +a collate;
+
+select -1 collate;
+
+select 1 + 2 and;
+
+select a or b collate;
+
+select a and b is;
+
+select not a and;
+
 select foo.bar null;
 select foo.bar default;
 

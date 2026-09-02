@@ -11,4 +11,4 @@ drop text search dictionary if exists
 -- comments in every position
 drop /* text */ text /* search */ search /* dictionary */ dictionary /* if */ if /* exists */ exists
   /* dictionary */ public /* dot */.english_stem
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

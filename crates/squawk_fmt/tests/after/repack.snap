@@ -21,4 +21,4 @@ repack
   /* before table */ public /* before dot */./* after dot */ records /* before columns */ (
     /* before column */ id /* before close */
   )
-  /* before using */ using /* before index */ index /* before index name */ public /* before index dot */./* after index dot */ records_idx/* before semicolon */;
+  /* before using */ using /* before index */ index /* before index name */ public /* before index dot */./* after index dot */ records_idx /* before semicolon */;

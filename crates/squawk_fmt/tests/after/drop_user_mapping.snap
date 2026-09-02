@@ -15,4 +15,4 @@ drop user mapping if exists for
 -- comments in every position
 drop /* user */ user /* mapping */ mapping /* if */ if /* exists */ exists /* for */ for
   /* role */ current_user
-  /* server */ server /* server name */ remote_server/* end */;
+  /* server */ server /* server name */ remote_server /* end */;

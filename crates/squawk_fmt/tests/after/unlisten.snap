@@ -10,6 +10,6 @@ unlisten
   an_intentionally_long_channel_name_that_makes_this_statement_longer_than_eighty_characters;
 
 /* before unlisten */
-unlisten /* before channel */ event_channel/* before semicolon */;
+unlisten /* before channel */ event_channel /* before semicolon */;
 
-unlisten /* before star */ */* before semicolon */;
+unlisten /* before star */ * /* before semicolon */;

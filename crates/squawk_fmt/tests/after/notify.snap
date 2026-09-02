@@ -11,4 +11,4 @@ notify an_intentionally_long_channel_name_that_makes_this_statement_longer_than_
 
 /* before notify */
 notify /* before channel */ events /* before comma */,
-  /* before payload */ 'payload'/* before semicolon */;
+  /* before payload */ 'payload' /* before semicolon */;

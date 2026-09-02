@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_fmt/tests/before/drop_cast.sql
 ---
 drop cast (integer as bigint);
@@ -16,4 +15,4 @@ drop /* cast */ cast /* if */ if /* exists */ exists /* signature */ (
   /* source type */ text
   /* as */ as
   /* target type */ varchar
- /* closing parenthesis */) /* behavior */ restrict/* end */;
+ /* closing parenthesis */) /* behavior */ restrict /* end */;

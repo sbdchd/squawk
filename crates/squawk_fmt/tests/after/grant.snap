@@ -30,12 +30,45 @@ grant
   granted by current_user;
 
 grant
+  app_reader
+  to
+  app_user
+  with
+    /* before admin */ admin /* before option */ option /* before comma */,
+    /* before inherit */ inherit /* before true */ true;
+
+grant
+  app_reader
+  to
+  app_user
+  with
+    -- before admin
+    admin option;
+
+grant
   usage
   on
     sequence
       public.an_intentionally_long_sequence_name_that_makes_this_statement_exceed_eighty_characters
   to
   an_intentionally_long_role_name;
+
+grant
+  execute
+  on
+    function
+      /* before first function */ f(
+        integer
+      ),
+      /* before second function */ public.g(
+        text
+      )
+  to
+  app_user;
+
+grant execute on procedure /* before procedure */ p(integer) to app_user;
+
+grant execute on routine /* before routine */ r(integer) to app_user;
 
 /* before grant */
 grant
@@ -48,4 +81,4 @@ grant
   /* before to */ to
   /* before role */ app_user
   /* before with */ with /* before grant option */ grant /* before option */ option
-  /* before granted */ granted /* before by */ by /* before grantor */ current_user/* before semicolon */;
+  /* before granted */ granted /* before by */ by /* before grantor */ current_user /* before semicolon */;

@@ -791,9 +791,14 @@ fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
 
     b.scope.insert(domain_name.clone(), type_id);
 
-    for constraint in create_domain.constraints() {
-        if let Some(constraint_name) = constraint.constraint_name() {
-            bind_constraint_name_node(b, constraint_name, &schema, &domain_name);
+    for qualifier in create_domain.domain_qualifiers() {
+        match qualifier {
+            ast::DomainQualifier::Constraint(constraint) => {
+                if let Some(constraint_name) = constraint.constraint_name() {
+                    bind_constraint_name_node(b, constraint_name, &schema, &domain_name);
+                }
+            }
+            ast::DomainQualifier::Collate(_) => (),
         }
     }
 }

@@ -23,4 +23,4 @@ drop /* procedure */ procedure /* if */ if /* exists */ exists
   /* second procedure */ reporting.rebuild_cache(
     /* argument */ bigint
   )
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

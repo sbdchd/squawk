@@ -11,4 +11,4 @@ drop procedural language if exists
 -- comments in every position
 drop /* procedural */ procedural /* language */ language /* if */ if /* exists */ exists
   /* language name */ old_language
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

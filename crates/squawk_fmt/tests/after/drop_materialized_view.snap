@@ -13,4 +13,4 @@ drop materialized view if exists
 drop /* materialized */ materialized /* view */ view /* if */ if /* exists */ exists
   /* first view */ public /* dot */.monthly_sales /* before comma */,
   /* second view */ reporting.archived_sales
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

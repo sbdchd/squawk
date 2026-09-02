@@ -14,4 +14,4 @@ reassign owned by
 reassign /* before owned */ owned /* before by */ by
   /* before first */ alice /* before comma */,
   /* before second */ bob
-  /* before to */ to /* before new owner */ carol/* before semicolon */;
+  /* before to */ to /* before new owner */ carol /* before semicolon */;

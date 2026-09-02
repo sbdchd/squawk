@@ -21,4 +21,4 @@ create /* tablespace */ tablespace /* name */ reporting_space
   /* with */ with /* open */ (
     /* first name */ random_page_cost /* equals */ = /* first value */ 1.2 /* comma */,
     /* second name */ seq_page_cost /* second equals */ = /* second value */ 1.0 /* close */
-  )/* end */;
+  ) /* end */;

@@ -47,7 +47,7 @@ create /*a*/ unique /*b*/ index /*c*/ concurrently /*d*/ if /*e*/ not /*f*/ exis
     /*ap*/ deduplicate_items /*aq*/ = /*ar*/ on /*as*/
   )
   /*at*/ tablespace /*au*/ fastspace
-  /*av*/ where /*aw*/ active /*ax*/ and email is not null/*ay*/;
+  /*av*/ where /*aw*/ active /*ax*/ and email is not null /*ay*/;
 
 create index on t (
   a text_pattern_ops (strength = primary, variant = default),
