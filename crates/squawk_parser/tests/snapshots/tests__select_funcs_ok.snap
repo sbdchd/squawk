@@ -840,6 +840,38 @@ SOURCE_FILE
                   INT_NUMBER "5"
               R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            SUBSTRING_FN
+              SUBSTRING_KW "substring"
+              L_PAREN "("
+              SUBSTRING_EXPRS
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'hello world'"
+                COMMA ","
+                WHITESPACE " "
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "b"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlconcat"
   WHITESPACE "\n"
@@ -2008,6 +2040,37 @@ SOURCE_FILE
                   JSON_KW "json"
               R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_OBJECT_FN
+              JSON_OBJECT_KW "json_object"
+              L_PAREN "("
+              NAMED_ARG
+                PARAM_NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                FAT_ARROW "=>"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'foo'"
+              COMMA ","
+              WHITESPACE " "
+              NAMED_ARG
+                PARAM_NAME_REF
+                  IDENT "b"
+                WHITESPACE " "
+                COLON_EQ ":="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'bar'"
+              R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_array"
   WHITESPACE "\n"
@@ -2977,6 +3040,160 @@ SOURCE_FILE
                   WHITESPACE " "
                   LITERAL
                     TRUE_KW "true"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- we shouldn't join these into custom ops, it should be `=> -` and `=> + `"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  PREFIX_EXPR
+                    MINUS "-"
+                    LITERAL
+                      INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  PREFIX_EXPR
+                    PLUS "+"
+                    LITERAL
+                      INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  PREFIX_EXPR
+                    MINUS "-"
+                    LITERAL
+                      INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  PREFIX_EXPR
+                    PLUS "+"
+                    LITERAL
+                      INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- unicode escape param name"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "U&\"0064\""
+                    WHITESPACE " "
+                    UESCAPE_KW "uescape"
+                    WHITESPACE " "
+                    STRING "'!'"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAMED_ARG
+                  PARAM_NAME_REF
+                    IDENT "U&\"0064\""
+                    WHITESPACE " "
+                    UESCAPE_KW "uescape"
+                    WHITESPACE " "
+                    STRING "'!'"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

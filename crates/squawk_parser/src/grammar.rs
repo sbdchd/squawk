@@ -335,8 +335,11 @@ fn overlay_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(L_PAREN);
     if !p.at(R_PAREN) {
         let m = p.start();
-        expr(p);
-        let kind = if p.eat(PLACING_KW) {
+        let named_arg = opt_named_arg(p).is_some();
+        if !named_arg {
+            expr(p);
+        }
+        let kind = if !named_arg && p.eat(PLACING_KW) {
             expr(p);
             p.expect(FROM_KW);
             expr(p);
@@ -346,7 +349,7 @@ fn overlay_fn(p: &mut Parser<'_>) -> CompletedMarker {
             OVERLAY_PLACING
         } else {
             if p.eat(COMMA) {
-                opt_expr_list(p);
+                func_arg_list(p);
             }
             OVERLAY_EXPRS
         };
@@ -441,11 +444,14 @@ fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
 // SUBSTRING '(' func_arg_list_opt ')'
 fn substring_args(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    expr(p);
+    let named_arg = opt_named_arg(p).is_some();
+    if !named_arg {
+        expr(p);
+    }
     let kind = match p.current() {
         // FOR a_expr FROM a_expr
         // FOR a_expr
-        FOR_KW => {
+        FOR_KW if !named_arg => {
             p.bump(FOR_KW);
             expr(p);
             // [ from expr ]
@@ -456,7 +462,7 @@ fn substring_args(p: &mut Parser<'_>) -> CompletedMarker {
         }
         // FROM a_expr
         // FROM a_expr FOR a_expr
-        FROM_KW => {
+        FROM_KW if !named_arg => {
             p.bump(FROM_KW);
             expr(p);
             // [ for expr ]
@@ -466,7 +472,7 @@ fn substring_args(p: &mut Parser<'_>) -> CompletedMarker {
             SUBSTRING_FROM_FOR
         }
         // SIMILAR a_expr ESCAPE a_expr
-        SIMILAR_KW => {
+        SIMILAR_KW if !named_arg => {
             p.bump(SIMILAR_KW);
             expr_bp(
                 p,
@@ -482,7 +488,7 @@ fn substring_args(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => {
             if p.eat(COMMA) {
-                opt_expr_list(p);
+                func_arg_list(p);
             }
             SUBSTRING_EXPRS
         }
@@ -660,7 +666,9 @@ fn json_object_fn_arg_list(p: &mut Parser<'_>) {
         // json_object(c_expr ,
         // json_object(a_expr :
         // json_object(a_expr value
-        json_key_value(p);
+        if opt_named_arg(p).is_none() {
+            json_key_value(p);
+        }
         // if we're at a the end of the params or the start of the optional
         // null_clause break
         if p.at_ts(JSON_OBJECT_FN_ARG_FOLLOW) {
@@ -2461,11 +2469,55 @@ fn simple_type_name(p: &mut Parser<'_>) {
     }
 }
 
+// param_name ( ':=' | '=>' ) a_expr
+fn opt_named_arg(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(PARAM_NAME_FIRST) {
+        return None;
+    }
+    // `U&"0066" UESCAPE '!'` is a single name
+    let n = if p.at(IDENT) && p.nth_at(1, UESCAPE_KW) && p.nth_at(2, STRING) {
+        3
+    } else {
+        1
+    };
+    if !(p.nth_at(n, FAT_ARROW) || p.nth_at(n, COLON_EQ)) {
+        return None;
+    }
+    let m = p.start();
+    let name = p.start();
+    if !opt_ident(p) {
+        p.bump_any();
+    }
+    name.complete(p, PARAM_NAME_REF);
+    if !p.eat(FAT_ARROW) {
+        p.bump(COLON_EQ);
+    }
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    Some(m.complete(p, NAMED_ARG))
+}
+
+fn func_arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    opt_named_arg(p).or_else(|| expr(p).map(|(it, _)| it))
+}
+
+fn func_arg_list(p: &mut Parser<'_>) {
+    while !p.at(COMMA) {
+        if func_arg_expr(p).is_none() {
+            break;
+        }
+        if !p.eat(COMMA) {
+            break;
+        }
+    }
+}
+
 fn arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // https://www.postgresql.org/docs/17/typeconv-func.html
     let m = p.start();
     p.eat(VARIADIC_KW);
-    match expr_bp(p, 1, &Restrictions::default()) {
+    match func_arg_expr(p) {
         Some(_) => {
             if p.at(ORDER_KW) {
                 opt_order_by_clause(p);
@@ -2668,12 +2720,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
         _ => pg_name(p),
     }
-    let node_kind = if p.at(FAT_ARROW) || p.at(COLON_EQ) {
-        PARAM_NAME_REF
-    } else {
-        NAME_REF
-    };
-    Some(m.complete(p, node_kind))
+    Some(m.complete(p, NAME_REF))
 }
 
 // [ SYMMETRIC | ASYMMETRIC ]
@@ -2903,12 +2950,11 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         // >=
         R_ANGLE if p.at(GTEQ) => (5, GTEQ, Left), // symbol
         // >
-        R_ANGLE if p.next_not_joined_op(0) => (5, R_ANGLE, Left), // symbol
-        // Later on we return a NAMED_ARG for this instead of BIN_EXPR
-        // =>
-        EQ if p.at(FAT_ARROW) => (7, FAT_ARROW, Right), // symbol
+        R_ANGLE if p.next_not_joined_op() => (5, R_ANGLE, Left), // symbol
+        // `=>` is only valid in a func arg
+        EQ if p.at(FAT_ARROW) => NOT_AN_OP,
         // =
-        EQ if p.next_not_joined_op(0) => (5, EQ, Right), // symbol
+        EQ if p.next_not_joined_op() => (5, EQ, Right), // symbol
         // in
         IN_KW if !r.in_disabled => (6, IN_KW, Right),
         // <>
@@ -2916,9 +2962,9 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         // <=
         L_ANGLE if p.at(LTEQ) => (5, LTEQ, Left), // symbol
         // <
-        L_ANGLE if p.next_not_joined_op(0) => (5, L_ANGLE, Left), // symbol
+        L_ANGLE if p.next_not_joined_op() => (5, L_ANGLE, Left), // symbol
         // +
-        PLUS if p.next_not_joined_op(0) => (8, PLUS, Left), // symbol
+        PLUS if p.next_not_joined_op() => (8, PLUS, Left), // symbol
         // overlaps
         OVERLAPS_KW => (7, OVERLAPS_KW, Left),
         // escape
@@ -2974,24 +3020,21 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         // is
         IS_KW if !r.is_disabled => (4, IS_KW, Left),
         // ^
-        CARET if p.next_not_joined_op(0) => (10, CARET, Left), // symbol
+        CARET if p.next_not_joined_op() => (10, CARET, Left), // symbol
         // %
-        PERCENT if p.next_not_joined_op(0) => (9, PERCENT, Left), // symbol
+        PERCENT if p.next_not_joined_op() => (9, PERCENT, Left), // symbol
         // and
         AND_KW if !r.and_disabled => (2, AND_KW, Left),
         // /
-        SLASH if p.next_not_joined_op(0) => (9, SLASH, Left), // symbol
+        SLASH if p.next_not_joined_op() => (9, SLASH, Left), // symbol
         // *
-        STAR if p.next_not_joined_op(0) => (9, STAR, Left), // symbol
+        STAR if p.next_not_joined_op() => (9, STAR, Left), // symbol
         // !=
         BANG if p.at(NEQ) => (5, NEQ, Left), // symbol
         // collate
         COLLATE_KW => (12, COLLATE_KW, Left),
         // -
-        MINUS if p.next_not_joined_op(0) => (8, MINUS, Left), // symbol
-        // Later on we return a NAMED_ARG for this instead of BIN_EXPR
-        // :=
-        COLON if p.at(COLON_EQ) => (5, COLON_EQ, Right), // symbol
+        MINUS if p.next_not_joined_op() => (8, MINUS, Left), // symbol
         // ::
         COLON if p.at(COLON_COLON) => (15, COLON_COLON, Left), // symbol
         _ if p.at_ts(OPERATOR_FIRST) => (7, CUSTOM_OP, Right),
@@ -3072,11 +3115,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
             Associativity::Right => op_bp,
         };
         let _rhs = expr_bp(p, op_bp, r);
-        lhs = if matches!(op, FAT_ARROW | COLON_EQ) {
-            m.complete(p, NAMED_ARG)
-        } else {
-            m.complete(p, BIN_EXPR)
-        };
+        lhs = m.complete(p, BIN_EXPR);
         expr_kind = ExprKind::Other;
     }
     Some((lhs, expr_kind))
@@ -6031,6 +6070,10 @@ const COL_LABEL_FIRST: TokenSet = TokenSet::new(&[IDENT])
 const NAME_FIRST: TokenSet = TokenSet::new(&[IDENT])
     .union(UNRESERVED_KEYWORDS)
     .union(COL_NAME_KEYWORD_FIRST);
+
+const PARAM_NAME_FIRST: TokenSet = TokenSet::new(&[IDENT])
+    .union(UNRESERVED_KEYWORDS)
+    .union(TYPE_FUNC_NAME_KEYWORDS);
 
 const BARE_COL_LABEL_FIRST: TokenSet = TokenSet::new(&[IDENT]).union(BARE_LABEL_KEYWORDS);
 

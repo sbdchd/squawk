@@ -154,6 +154,10 @@ select * from rows from (f() as t(a int));
 -- column def columns a type
 select * from rows from (f() as (a));
 
+-- only allowed at top level
+select f(1 + (a => 2));
+select f((a) => 2);
+
 -- trailing comma at EOF
 select 1,
 

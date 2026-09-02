@@ -53,6 +53,7 @@ select substring(a similar b escape c);
 
 select substring(a || '', b * 2, c - 1);
 select substring('hello world', 1, 5);
+select substring(a => 'hello world', b := 1);
 
 -- xmlconcat
 select xmlconcat(a, b);
@@ -117,6 +118,7 @@ select json_object('foo': 'bar' null on null without unique);
 
 select json_object('foo': 'bar' returning foo);
 select json_object('foo': 'bar' returning foo format json);
+select json_object(a => 'foo', b := 'bar');
 
 -- json_array
 -- value_expression
@@ -176,6 +178,16 @@ select foo('bar', 'buzz', boo => true);
 
 -- colon equals
 select f('b', a := true);
+
+-- we shouldn't join these into custom ops, it should be `=> -` and `=> + `
+select f(a =>-1);
+select f(a =>+1);
+select f(a :=-1);
+select f(a :=+1);
+
+-- unicode escape param name
+select f(U&"0064" uescape '!' := 1);
+select f(U&"0064" uescape '!' => 1);
 
 -- extract
 select extract(foo from bar || 'buzz');
