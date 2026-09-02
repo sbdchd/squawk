@@ -72,6 +72,20 @@ create function percent_type_table(
   language sql
   as $$ select 1 $$;
 
+create or replace function /* TEMPLATE: schema */ river_job_notify() returns trigger
+  as $$
+DECLARE
+  payload json;
+BEGIN
+  ...
+END;
+$$
+  language plpgsql;
+
+create function foo( /* no params */) returns t
+  as $$select 1$$
+  language sql;
+
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/./*f*/ commented(
   /*g*/ in /*h*/ value /*i*/ integer /*j*/ default /*k*/ 1 /*l*/,

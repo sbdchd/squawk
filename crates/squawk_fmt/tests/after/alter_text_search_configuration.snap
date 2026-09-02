@@ -33,8 +33,7 @@ alter text search configuration public.english
   /* new */ public.new_dictionary;
 
 alter text search configuration public.english
-  drop /* mapping */ mapping
-  /* if */ if /* exists */ exists
+  drop /* mapping */ mapping /* if */ if /* exists */ exists
   /* for */ for
     /* kind */ url /* comma */,
     /* second kind */ host;
