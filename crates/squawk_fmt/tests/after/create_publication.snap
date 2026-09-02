@@ -21,6 +21,22 @@ create publication selected_tables
 
 create publication no_tables with (publish = 'insert');
 
+create publication except_table_comments
+  for
+    all tables
+  except (
+    /* before table */ table /* before only */ only /* before relation */ audit.secret_events,
+    /* before omitted table */ internal_jobs
+  );
+
+create publication except_table_line_comment
+  for
+    all tables
+  except (
+    table -- before relation
+    internal_jobs
+  );
+
 create publication omitted_table_keywords
   for
     table first_table,
@@ -42,4 +58,4 @@ create /* after create */ publication /* after publication */ commented_pub
     /* after object comma */ tables /* after tables */ in /* after in */ schema /* after schema */ current_schema
   with /* after with */ (
     /* before option */ publish /* before equals */ = /* before value */ 'insert' /* before options close */
-  )/* before semicolon */;
+  ) /* before semicolon */;

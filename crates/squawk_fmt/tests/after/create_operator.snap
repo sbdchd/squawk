@@ -47,7 +47,7 @@ create /* operator */ operator /* schema */ app /* dot */./* symbol */ # /* attr
   /* function name */ function /* equals */ = /* function value */ app.compare_values /* comma */,
   /* left argument */ leftarg /* second equals */ = /* type */ integer /* comma */,
   /* marker */ hashes /* closing parenthesis */
-)/* semicolon */;
+) /* semicolon */;
 
 create operator + (
   commutator = +,

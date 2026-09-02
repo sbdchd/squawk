@@ -6225,6 +6225,115 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
+          PREFIX_EXPR
+            PLUS "+"
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              COLLATE_KW "collate"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            MINUS "-"
+            LITERAL
+              INT_NUMBER "1"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              COLLATE_KW "collate"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              AND_KW "and"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            OR_KW "or"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              COLLATE_KW "collate"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              IS_KW "is"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            NOT_KW "not"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              AND_KW "and"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
           FIELD_EXPR
             NAME_REF
               IDENT "foo"

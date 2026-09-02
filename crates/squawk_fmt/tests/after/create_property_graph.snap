@@ -44,6 +44,13 @@ create unlogged property graph extraordinarily_long_social_relationship_property
       properties all columns
   );
 
+create property graph social
+  vertex tables (
+    people
+      default label no properties
+      /* between labels */ label person properties (id)
+  );
+
 -- comments in every position
 create /* persistence */ local /* temporary */ temporary /* property */ property /* graph */ graph /* graph name */ public /* dot */./* name */ social
   /* vertex */ vertex /* tables */ tables  /* left paren */(
@@ -69,4 +76,4 @@ create /* persistence */ local /* temporary */ temporary /* property */ property
         /* destination reference column */ id /* destination reference right */
       )
       /* all properties */ properties /* all */ all /* columns */ columns /* edge right */
-  )/* end */;
+  ) /* end */;

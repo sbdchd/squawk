@@ -7,7 +7,7 @@ alter /* index */ index
     /* owned */ owned /* by */ by /* role one */ first_role_with_a_long_name,
     /* role two */ second_role_with_a_long_name
     /* set */ set /* tablespace */ tablespace /* new */ new_tablespace_with_a_very_long_descriptive_name
-    /* nowait */ nowait/* end */;
+    /* nowait */ nowait /* end */;
 
 alter index /* if */ if /* exists */ exists /* name */ public.index_with_a_very_long_descriptive_name
   /* alter */ alter /* column */ column /* number */ 3

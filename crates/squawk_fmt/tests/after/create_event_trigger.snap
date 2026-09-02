@@ -26,4 +26,4 @@ create /* before event */ event /* before trigger */ trigger /* before name */ c
   /* before execute */ execute /* before function */ function
     /* before call */ audit.log_ddl /* before call left paren */(
        /* before call right paren */
-    )/* before semicolon */;
+    ) /* before semicolon */;

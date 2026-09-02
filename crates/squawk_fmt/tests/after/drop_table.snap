@@ -13,4 +13,4 @@ drop table if exists
 drop /* table */ table /* if */ if /* exists */ exists
   /* first table */ public /* dot */.accounts /* before comma */,
   /* second table */ archive.old_accounts
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

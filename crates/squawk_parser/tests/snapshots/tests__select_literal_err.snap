@@ -495,6 +495,134 @@ SOURCE_FILE
     WHITESPACE " "
     SEMICOLON ";"
   WHITESPACE "\n"
+  COMMENT "-- operators cannot be field names"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "x"
+              DOT "."
+            L_ANGLE "<"
+            WHITESPACE " "
+            ERROR
+              FROM_KW "from"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- type modifiers require a string literal"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            TIMESTAMP_KW "timestamp"
+            WHITESPACE " "
+            WITH_TIMEZONE
+              WITH_KW "with"
+              WHITESPACE " "
+              TIME_KW "time"
+              WHITESPACE " "
+              ZONE_KW "zone"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              TIME_KW "time"
+              WHITESPACE " "
+              WITH_TIMEZONE
+                WITH_KW "with"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  STRING "'04:05:06+08'"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            INTERVAL_KW "interval"
+            WHITESPACE " "
+            INTERVAL_MONTH
+              MONTH_KW "month"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            BIT_KW "bit"
+            WHITESPACE " "
+            VARYING_KW "varying"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NATIONAL_KW "national"
+            WHITESPACE " "
+            CHARACTER_KW "character"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            DOUBLE_KW "double"
+            WHITESPACE " "
+            PRECISION_KW "precision"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            CHARACTER_KW "character"
+            WHITESPACE " "
+            VARYING_KW "varying"
+    SEMICOLON ";"
+  WHITESPACE "\n"
 ---
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
@@ -716,3 +844,39 @@ error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
 44 │ select (1) . 0e ;
    ╰╴              ━
+error[syntax-error]: expected field name, got L_ANGLE
+   ╭▸ 
+46 │ select x.< from t;
+   ╰╴         ━
+error[syntax-error]: expected an expression, found FROM_KW
+   ╭▸ 
+46 │ select x.< from t;
+   ╰╴           ━
+error[syntax-error]: type modifiers require a string literal
+   ╭▸ 
+49 │ select timestamp with time zone;
+   ╰╴                               ━
+error[syntax-error]: type modifiers require a string literal
+   ╭▸ 
+50 │ select time with time zone ('04:05:06+08');
+   ╰╴                          ━
+error[syntax-error]: type modifiers require a string literal
+   ╭▸ 
+51 │ select interval month;
+   ╰╴                     ━
+error[syntax-error]: type modifiers require a string literal
+   ╭▸ 
+52 │ select bit varying;
+   ╰╴                  ━
+error[syntax-error]: type modifiers require a string literal
+   ╭▸ 
+53 │ select national character;
+   ╰╴                         ━
+error[syntax-error]: type modifiers require a string literal
+   ╭▸ 
+54 │ select double precision;
+   ╰╴                       ━
+error[syntax-error]: type modifiers require a string literal
+   ╭▸ 
+55 │ select character varying;
+   ╰╴                        ━

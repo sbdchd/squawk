@@ -1830,6 +1830,71 @@ SOURCE_FILE
     R_PAREN ")"
   EMPTY_STMT
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- postgres' expr_list has no empty production"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_ROLLUP
+          ROLLUP_KW "rollup"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_CUBE
+          CUBE_KW "cube"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      DISTINCT_CLAUSE
+        DISTINCT_KW "distinct"
+        WHITESPACE " "
+        DISTINCT_ON
+          ON_KW "on"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected trailing comma
@@ -2080,3 +2145,15 @@ error[syntax-error]: expected command, found R_PAREN
     ╭▸ 
 165 │ select cast('42' as text collate "C");
     ╰╴                                    ━
+error[syntax-error]: expected an expression
+    ╭▸ 
+168 │ select 1 group by rollup ();
+    ╰╴                          ━
+error[syntax-error]: expected an expression
+    ╭▸ 
+169 │ select 1 group by cube ();
+    ╰╴                        ━
+error[syntax-error]: expected an expression
+    ╭▸ 
+170 │ select distinct on () 1;
+    ╰╴                    ━

@@ -13,4 +13,4 @@ drop foreign data wrapper if exists
 drop /* foreign */ foreign /* data */ data /* wrapper */ wrapper /* if */ if /* exists */ exists
   /* first wrapper */ analytics_fdw /* before comma */,
   /* second wrapper */ reporting_fdw
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

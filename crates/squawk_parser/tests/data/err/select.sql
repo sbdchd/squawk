@@ -163,3 +163,8 @@ select 1,
 
 -- collate must follow cast
 select cast('42' as text collate "C");
+
+-- postgres' expr_list has no empty production
+select 1 group by rollup ();
+select 1 group by cube ();
+select distinct on () 1;

@@ -32,4 +32,4 @@ alter /* domain */ domain /* name */ exceedingly_long_schema_name.exceedingly_lo
     /* constraint keyword */ constraint /* constraint name */ exceedingly_long_constraint_name /* check */ check /* expression */ (
       value is not null and length(value) > 10
     )
-      /* not valid */ not /* valid */ valid/* semicolon */;
+      /* not valid */ not /* valid */ valid /* semicolon */;

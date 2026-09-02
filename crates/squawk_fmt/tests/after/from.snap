@@ -251,7 +251,7 @@ from a
     /*jp*/ using /*jq*/ (
       /*jr*/ first_id /*js*/,
       /*jt*/ second_id /*ju*/
-    ) /*jv*/ as /*jw*/ ids/*jx*/;
+    ) /*jv*/ as /*jw*/ ids /*jx*/;
 
 select a_very_long_column_name
 from a_very_long_schema_name.a_very_long_table_name

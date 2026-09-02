@@ -11,4 +11,4 @@ drop group if exists
 -- comments in every position
 drop /* group */ group /* if */ if /* exists */ exists
   /* first group */ analysts /* before comma */,
-  /* second group */ reporting_users/* end */;
+  /* second group */ reporting_users /* end */;

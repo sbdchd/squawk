@@ -82,4 +82,4 @@ merge /* before into */ into /* before target */ only /* before target open */(/
   )
 /* before fifth when */ when not matched then
   insert /* before default */ default /* before default values */ values
-/* before returning */ returning /* before return target */ t.id/* before semicolon */;
+/* before returning */ returning /* before return target */ t.id /* before semicolon */;

@@ -18,4 +18,4 @@ execute statement_name(
 execute /* before statement */ statement_name /* before left paren */(
   /* after left paren */ 1 /* before comma */,
   /* after comma */ true /* before right paren */
-)/* before semicolon */;
+) /* before semicolon */;

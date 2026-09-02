@@ -13,4 +13,4 @@ drop schema if exists
 drop /* schema */ schema /* if */ if /* exists */ exists
   /* first schema */ analytics /* comma */,
   /* second schema */ reporting
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

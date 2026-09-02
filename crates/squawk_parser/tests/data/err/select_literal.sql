@@ -42,3 +42,14 @@ select 0 . 1e5 ;
 select 0 . .5 ;
 select 1 . 2 . 3e ;
 select (1) . 0e ;
+-- operators cannot be field names
+select x.< from t;
+
+-- type modifiers require a string literal
+select timestamp with time zone;
+select time with time zone ('04:05:06+08');
+select interval month;
+select bit varying;
+select national character;
+select double precision;
+select character varying;

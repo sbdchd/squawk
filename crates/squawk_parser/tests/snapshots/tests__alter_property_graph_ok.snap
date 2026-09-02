@@ -532,12 +532,13 @@ SOURCE_FILE
       ELEMENT_TABLE_REF
         IDENT "v"
       WHITESPACE " "
-      ALTER_KW "alter"
-      WHITESPACE " "
-      LABEL_KW "label"
-      WHITESPACE " "
-      LABEL_REF
-        IDENT "l"
+      ALTER_LABEL
+        ALTER_KW "alter"
+        WHITESPACE " "
+        LABEL_KW "label"
+        WHITESPACE " "
+        LABEL_REF
+          IDENT "l"
       WHITESPACE " "
       ADD_KW "add"
       WHITESPACE " "
@@ -573,12 +574,13 @@ SOURCE_FILE
       ELEMENT_TABLE_REF
         IDENT "e"
       WHITESPACE " "
-      ALTER_KW "alter"
-      WHITESPACE " "
-      LABEL_KW "label"
-      WHITESPACE " "
-      LABEL_REF
-        IDENT "l"
+      ALTER_LABEL
+        ALTER_KW "alter"
+        WHITESPACE " "
+        LABEL_KW "label"
+        WHITESPACE " "
+        LABEL_REF
+          IDENT "l"
       WHITESPACE " "
       DROP_KW "drop"
       WHITESPACE " "

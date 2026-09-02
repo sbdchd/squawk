@@ -17,9 +17,9 @@ reset
 
 /* before reset */
 reset
-  /* before parameter */ custom /* before first dot */./* after first dot */ group_name /* before second dot */./* after second dot */ parameter_name/* before semicolon */;
+  /* before parameter */ custom /* before first dot */./* after first dot */ group_name /* before second dot */./* after second dot */ parameter_name /* before semicolon */;
 
 reset
-  /* before transaction */ transaction /* before isolation */ isolation /* before level */ level/* before transaction semicolon */;
+  /* before transaction */ transaction /* before isolation */ isolation /* before level */ level /* before transaction semicolon */;
 
-reset /* before time */ time /* before zone */ zone/* before time semicolon */;
+reset /* before time */ time /* before zone */ zone /* before time semicolon */;

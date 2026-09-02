@@ -15,4 +15,4 @@ create /* or */ or /* replace */ replace /* trusted */ trusted /* procedural */ 
   /* name */ commented_language
   /* handler */ handler /* handler schema */ handlers /* dot */./* handler function */ call_handler
   /* inline */ inline /* inline function */ handlers.call_inline
-  /* validator */ validator /* validator function */ handlers.call_validator/* semicolon */;
+  /* validator */ validator /* validator function */ handlers.call_validator /* semicolon */;

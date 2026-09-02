@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_fmt/tests/before/alter_text_search_dictionary.sql
 ---
 alter /* text */ text /* search */ search /* dictionary */ dictionary /* name */ public.english /* left paren */ (
   /* first option */ stopwords /* equals */ = /* first value */ english /* comma */,
   /* second option */ language /* second equals */ = /* second value */ 'english' /* right paren */
-)/* end */;
+) /* end */;
 
 alter text search dictionary public.english (
   stopwords = english,

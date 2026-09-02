@@ -34,4 +34,4 @@ create /*a*/ or /*b*/ replace /*c*/ transform /*d*/ for
     /*y*/ app /*z*/./*aa*/ to_sql(
       /*ab*/ integer /*ac*/
     ) /*ad*/
-)/*ae*/;
+) /*ae*/;

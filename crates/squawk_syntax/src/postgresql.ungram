@@ -4268,14 +4268,17 @@ DropVertexEdgeLabel =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
     'drop' 'label' LabelRef DropBehavior?
 
+AlterLabel =
+  'alter' 'label' LabelRef
+
 AddVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
-    'alter' 'label' LabelRef
+    AlterLabel
     'add' 'properties' ExprAsPropertyNameList
 
 DropVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
-    'alter' 'label' LabelRef
+    AlterLabel
     'drop' 'properties' '(' (PropertyNameRef (',' PropertyNameRef)*) ')' DropBehavior?
 
 DropPropertyGraph =
@@ -4410,7 +4413,11 @@ DomainRef =
   PathRef
 
 CreateDomain =
-  'create' 'domain' Domain 'as'? Type Collate? Constraint* ';'?
+  'create' 'domain' Domain 'as'? Type DomainQualifier* ';'?
+
+DomainQualifier =
+  Collate
+| Constraint
 
 CreateEventTrigger =
   'create' 'event' 'trigger' EventTrigger 'on' event:EventTriggerEvent

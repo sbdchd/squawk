@@ -21,4 +21,4 @@ create /* before extension */ extension /* before if */ if /* before not */ not 
   /* before with */ with
   /* before schema */ schema /* before schema name */ extensions
   /* before version */ version /* before version value */ '1.2.3'
-  /* before cascade */ cascade/* before semicolon */;
+  /* before cascade */ cascade /* before semicolon */;

@@ -13,4 +13,4 @@ drop domain if exists
 drop /* domain */ domain /* if */ if /* exists */ exists
   /* first domain */ public.email_address /* before comma */,
   /* second domain */ public.postal_code
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

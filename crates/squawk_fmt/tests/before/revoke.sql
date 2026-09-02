@@ -4,4 +4,9 @@ revoke grant option for all privileges on all tables in schema public, audit fro
 
 revoke admin option for app_reader, app_writer from an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters restrict;
 
+revoke all on function /* before function */ f(integer) from public;
+
+revoke all on function -- before function
+f(integer) from public;
+
 /* before revoke */ REVOKE /* before grant */ GRANT /* before option */ OPTION /* before for */ FOR /* before select */ SELECT /* before on */ ON /* before table */ TABLE /* before object */ public /* before dot */ . /* after dot */ records /* before from */ FROM /* before role */ app_user /* before granted */ GRANTED /* before by */ BY /* before grantor */ current_user /* before cascade */ CASCADE /* before semicolon */;

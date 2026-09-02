@@ -12,7 +12,7 @@ alter /* policy */ policy /* name */ account_access_policy
   /* with */ with /* check */ check /* left paren */ (
     /* expression */ account_is_active
       and account_identifier > 1000000 /* right paren */
-  )/* end */;
+  ) /* end */;
 
 alter policy account_access_policy
   on public.accounts

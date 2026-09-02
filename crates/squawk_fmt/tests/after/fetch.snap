@@ -41,9 +41,9 @@ fetch
 fetch
   /* before action */ forward /* before all */ all
   /* before from */ from
-  /* before cursor */ cursor_name/* before semicolon */;
+  /* before cursor */ cursor_name /* before semicolon */;
 
 fetch
   /* before absolute */ absolute /* before count */ 10
   /* before in */ in
-  /* before second cursor */ cursor_name/* before second semicolon */;
+  /* before second cursor */ cursor_name /* before second semicolon */;

@@ -13,4 +13,4 @@ drop operator family if exists
 drop /* operator */ operator /* family */ family /* if */ if /* exists */ exists
   /* family name */ public /* dot */.integer_ops
   /* using */ using /* method */ hash
-  /* behavior */ cascade/* end */;
+  /* behavior */ cascade /* end */;

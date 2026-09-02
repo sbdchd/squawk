@@ -31,16 +31,16 @@ set
   /* before transaction */ transaction
     /* before first mode */ isolation /* before level */ level /* before serializable */ serializable /* before comma */,
     /* before read */ read /* before only */ only /* before second comma */,
-    /* before not */ not /* before deferrable */ deferrable/* before semicolon */;
+    /* before not */ not /* before deferrable */ deferrable /* before semicolon */;
 
 set
   /* before session */ session
   /* before characteristics */ characteristics
   /* before as */ as
   /* before transaction */ transaction
-    /* before mode */ read /* before write */ write/* before semicolon */;
+    /* before mode */ read /* before write */ write /* before semicolon */;
 
 set
   /* before transaction */ transaction
   /* before snapshot */ snapshot
-    /* before literal */ '00000003-0000001B-1'/* before semicolon */;
+    /* before literal */ '00000003-0000001B-1' /* before semicolon */;

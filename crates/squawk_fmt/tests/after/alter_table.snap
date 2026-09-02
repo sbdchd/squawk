@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_fmt/tests/before/alter_table.sql
 ---
 alter table customers
@@ -21,7 +20,7 @@ alter table tx1 rename to a1;
 alter table temp_view_test.tt1 rename to tmp1;
 
 alter /* table */ table /* old table */ temp_view_test.tt1
-  /* rename */ rename /* to */ to /* new table */ tmp1/* semicolon */;
+  /* rename */ rename /* to */ to /* new table */ tmp1 /* semicolon */;
 
 alter table temporal_children
   add constraint temporal_children_parent_fk
@@ -55,13 +54,13 @@ alter /* table */ table /* if */ if /* exists */ exists /* only */ only /* left 
   /* action */ alter /* column */ column /* column name */ activity_description
     /* set */ set /* default */ default
       /* expression */ 'A very long default activity description used to verify formatter wrapping behavior',
-  /* comma */ rename /* column */ column /* old name */ old_activity_code /* to */ to /* new name */ current_activity_code/* semicolon */;
+  /* comma */ rename /* column */ column /* old name */ old_activity_code /* to */ to /* new name */ current_activity_code /* semicolon */;
 
 alter /* table */ table /* all */ all /* in */ in /* tablespace keyword */ tablespace /* old tablespace */ old_tablespace
   /* owned */ owned /* by */ by /* first role */ role_one,
   /* second role */ role_two
   /* set */ set /* tablespace */ tablespace /* new tablespace */ new_tablespace
-  /* nowait */ nowait/* semicolon */;
+  /* nowait */ nowait /* semicolon */;
 
 alter table only parent_table
   alter constraint inherited_check_constraint enforced;
@@ -75,16 +74,16 @@ alter table parent_table
   alter constraint inherited_not_null_constraint no inherit;
 
 alter /* table */ table /* relation */ parent_table
-  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_check_constraint /* enforced */ enforced/* semicolon */;
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_check_constraint /* enforced */ enforced /* semicolon */;
 
 alter /* table */ table /* relation */ parent_table
-  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_check_constraint /* not */ not /* enforced */ enforced/* semicolon */;
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_check_constraint /* not */ not /* enforced */ enforced /* semicolon */;
 
 alter /* table */ table /* relation */ parent_table
-  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_not_null_constraint /* inherit */ inherit/* semicolon */;
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_not_null_constraint /* inherit */ inherit /* semicolon */;
 
 alter /* table */ table /* relation */ parent_table
-  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_not_null_constraint /* no */ no /* inherit */ inherit/* semicolon */;
+  /* alter */ alter /* constraint */ constraint /* constraint name */ inherited_not_null_constraint /* no */ no /* inherit */ inherit /* semicolon */;
 
 alter table child_table
   add not null a_very_long_inherited_column_name no inherit;
@@ -92,7 +91,7 @@ alter table child_table
 alter /* table */ table /* relation */ child_table
   /* add */ add
     /* not */ not /* null */ null /* column */ inherited_column
-      /* no */ no /* inherit */ inherit/* semicolon */;
+      /* no */ no /* inherit */ inherit /* semicolon */;
 
 alter table parent_table
   alter constraint source_ordered_constraint /* enforced */ enforced /* not */ not /* deferrable */ deferrable;
@@ -110,7 +109,7 @@ alter /* table */ table /* relation */ comment_test
     /* set */ set /* data */ data /* type keyword */ type /* type */ character varying(100)
       /* collate */ collate /* collation */ "POSIX"
       /* using */ using
-      /* expression */ description::character varying/* semicolon */;
+      /* expression */ description::character varying /* semicolon */;
 
 alter table sales_range
   merge partitions (sales_jan2022, sales_feb2022) into sales_jan_feb2022;
@@ -128,7 +127,7 @@ alter /* table */ table /* relation */ partitions_merge_schema.sales_range
     /* second partition */ sales_feb2022,
     /* third partition */ sales_mar2022 /* right paren */
   )
-  /* into */ into /* target partition */ partitions_merge_schema./* target name */ sales_jan_feb_mar2022/* semicolon */;
+  /* into */ into /* target partition */ partitions_merge_schema./* target name */ sales_jan_feb_mar2022 /* semicolon */;
 
 alter table sales_range
   split partition sales_feb_mar_apr2022 into (
@@ -154,7 +153,7 @@ alter /* table */ table /* relation */ sales_range
       ),
     /* default partition */ partition /* default name */ sales_other
       /* default */ default /* list right */
-  )/* semicolon */;
+  ) /* semicolon */;
 
 alter table options_test alter column metadata set (json = constraint);
 
@@ -162,4 +161,4 @@ alter /* table */ table /* relation */ options_test
   /* alter */ alter /* column */ column /* name */ metadata
     /* set */ set /* left paren */ (
       /* option */ json /* equals */ = /* value */ constraint /* right paren */
-    )/* semicolon */;
+    ) /* semicolon */;

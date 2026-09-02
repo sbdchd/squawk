@@ -29,4 +29,4 @@ create /* group */ group
   /* connection */ connection /* limit */ limit /* number */ 100
   /* in */ in /* role */ role /* first role */ foo /* comma */,
     /* second role */ bar
-  /* admin */ admin /* admin role */ current_user/* semicolon */;
+  /* admin */ admin /* admin role */ current_user /* semicolon */;

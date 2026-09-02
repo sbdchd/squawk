@@ -8,6 +8,20 @@ alter property graph social_graph alter /* kind */ vertex /* table */ table /* e
 
 alter property graph social_graph alter relationship table follows alter label connection drop properties (created_at, source_system);
 
+alter property graph social_graph alter vertex table people /* before alter */ alter label person add properties (id);
+
+alter property graph social_graph alter vertex table people -- before alter
+alter label person drop properties (id);
+
+alter property graph social_graph add vertex tables (people key (id) label person properties (name) /* between labels */ label human properties (nickname));
+
+alter property graph social_graph alter /* before vertex */ vertex /* before table */ table /* before element */ people /* before drop */ drop /* before label */ label /* before label name */ person;
+
+alter property graph social_graph alter vertex -- before table
+table people drop label person;
+
+alter property graph social_graph alter relationship /* before table */ table follows alter label connection drop properties (created_at);
+
 alter property graph social_graph drop vertex tables (people, organizations) cascade;
 
 alter property graph social_graph owner /* to */ to /* role */ graph_administrator;

@@ -12,4 +12,4 @@ drop user if exists
 -- comments in every position
 drop /* user */ user /* if */ if /* exists */ exists
   /* first */ alice /* comma */,
-  /* second */ current_user/* end */;
+  /* second */ current_user /* end */;

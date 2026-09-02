@@ -21,4 +21,5 @@ create conversion extraordinarily_long_schema_name.extraordinarily_long_conversi
 create /* default keyword */ default /* conversion keyword */ conversion /* name */ public.commented_conversion
   /* for keyword */ for /* source encoding */ 'LATIN1'
   /* to keyword */ to /* destination encoding */ 'UTF8'
-  /* from keyword */ from /* function */ public.convert_encoding/* semicolon */;
+  /* from keyword */ from
+    /* function */ public.convert_encoding /* semicolon */;

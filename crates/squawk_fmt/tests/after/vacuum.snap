@@ -42,7 +42,7 @@ vacuum /* after vacuum */ (
     /* after columns left paren */ id /* before column comma */,
     /* after column comma */ name /* before columns right paren */
   ) /* before table comma */,
-  /* after table comma */ archived_records/* before semicolon */;
+  /* after table comma */ archived_records /* before semicolon */;
 
 vacuum /* before full */ full /* before freeze */ freeze /* before verbose */ verbose /* before analyse */ analyse
-  /* before legacy table */ records/* before legacy semicolon */;
+  /* before legacy table */ records /* before legacy semicolon */;

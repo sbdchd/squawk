@@ -24,4 +24,4 @@ create /* server */ server /* if */ if /* not */ not /* exists */ exists
   /* options */ options /* open */ (
     /* option name */ host /* option value */ 'localhost' /* comma */,
     /* second name */ port /* second value */ '5432' /* close */
-  )/* end */;
+  ) /* end */;

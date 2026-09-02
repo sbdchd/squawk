@@ -13,4 +13,4 @@ drop extension if exists
 drop /* extension */ extension /* if */ if /* exists */ exists
   /* first extension */ hstore /* before comma */,
   /* second extension */ pg_trgm
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

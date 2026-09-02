@@ -12,7 +12,7 @@ alter conversion extraordinarily_long_schema_name.extraordinarily_long_conversio
   rename to another_extraordinarily_long_conversion_name;
 
 alter /* conversion keyword */ conversion /* conversion name */ public.commented_conversion
-  /* action */ rename /* to keyword */ to /* new name */ renamed_conversion/* semicolon */;
+  /* action */ rename /* to keyword */ to /* new name */ renamed_conversion /* semicolon */;
 
 alter conversion /* conversion name */ public.schema_comments
   /* action */ set /* schema keyword */ schema /* schema name */ archived_encodings;

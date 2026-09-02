@@ -23,4 +23,4 @@ drop /* routine */ routine /* if */ if /* exists */ exists
   /* second routine */ reporting.refresh_cache(
     /* argument */ text
   )
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

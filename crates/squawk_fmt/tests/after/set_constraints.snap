@@ -17,9 +17,9 @@ set
   /* before constraints */ constraints
   /* before first name */ first_constraint /* before comma */,
   /* before second name */ public /* before dot */./* after dot */ second_constraint
-  /* before timing */ immediate/* before semicolon */;
+  /* before timing */ immediate /* before semicolon */;
 
 set
   /* before constraints */ constraints
   /* before all */ all
-  /* before deferred */ deferred/* before semicolon */;
+  /* before deferred */ deferred /* before semicolon */;

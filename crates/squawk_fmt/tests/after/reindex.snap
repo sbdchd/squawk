@@ -38,4 +38,4 @@ reindex /* before left paren */ (
   /* after comma */ tablespace /* before tablespace */ new_tablespace /* before second comma */,
   /* after second comma */ verbose /* before verbose value */ no /* before right paren */
 )
-  /* before target */ table /* before concurrently */ concurrently /* before table name */ public /* before dot */./* after dot */ records/* before semicolon */;
+  /* before target */ table /* before concurrently */ concurrently /* before table name */ public /* before dot */./* after dot */ records /* before semicolon */;

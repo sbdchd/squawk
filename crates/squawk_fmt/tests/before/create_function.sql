@@ -29,6 +29,14 @@ create function foo(/* no params */) returns t
   as $$select 1$$
   language sql;
 
+-- comments before the first function option
+create function block_comment_before_as() /* before as */ as $$select 1$$ language sql;
+
+create function line_comment_before_as() -- before as
+as $$select 1$$ language sql;
+
+create function comment_before_language(out a_very_long_output_parameter_name integer) /* before language */ language sql as $$select 1$$;
+
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/. /*f*/ commented
 (/*g*/ in /*h*/ value /*i*/ integer /*j*/ default /*k*/ 1 /*l*/, /*m*/ in /*n*/ result /*o*/ text /*p*/)

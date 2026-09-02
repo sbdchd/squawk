@@ -874,6 +874,151 @@ SOURCE_FILE
             R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- an empty partition bound list is a syntax error in postgres"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "p"
+    WHITESPACE " "
+    PARTITION_FOR_VALUES_IN
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      IN_KW "in"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "p"
+    WHITESPACE " "
+    PARTITION_FOR_VALUES_IN
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      IN_KW "in"
+      WHITESPACE " "
+      L_PAREN "("
+      COMMENT "/* c */"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "p"
+    WHITESPACE " "
+    PARTITION_FOR_VALUES_FROM
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        R_PAREN ")"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "p"
+    WHITESPACE " "
+    PARTITION_FOR_VALUES_FROM
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected path name
@@ -944,3 +1089,19 @@ error[syntax-error]: expected expression after comma
    ╭▸ 
 84 │ create table error_tbl (i int default (100, ));
    ╰╴                                           ━
+error[syntax-error]: expected an expression
+   ╭▸ 
+87 │ create table t partition of p for values in ();
+   ╰╴                                             ━
+error[syntax-error]: expected an expression
+   ╭▸ 
+88 │ create table t partition of p for values in (/* c */);
+   ╰╴                                             ━
+error[syntax-error]: expected an expression
+   ╭▸ 
+89 │ create table t partition of p for values from () to (1);
+   ╰╴                                               ━
+error[syntax-error]: expected an expression
+   ╭▸ 
+90 │ create table t partition of p for values from (1) to ();
+   ╰╴                                                      ━

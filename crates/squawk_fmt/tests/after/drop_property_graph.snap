@@ -11,4 +11,4 @@ drop property graph if exists
 -- comments in every position
 drop /* property */ property /* graph */ graph /* if */ if /* exists */ exists
   /* schema */ public /* dot */./* graph name */ social_graph
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

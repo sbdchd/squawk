@@ -28,7 +28,7 @@ with /* before recursive */ recursive /* before cte */ cte /* before as */ as /*
   /* before order expression */ x /* before desc */ desc
 /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait
 /* before limit */ limit /* before limit value */ 10
-/* before offset */ offset /* before offset value */ 2 /* before rows */ rows/* before semicolon */;
+/* before offset */ offset /* before offset value */ 2 /* before rows */ rows /* before semicolon */;
 
 (/* before select */ select 1 /* before close */)
 /* before fetch */ fetch /* before first */ first /* before quantity */ 5 /* before rows */ rows /* before with ties */ with /* before ties */ ties;

@@ -14,4 +14,4 @@ discard temp;
 
 /* before discard */
 discard
-  /* first comment before target */ /* second comment before target */ /* third comment before target */ all/* before semicolon */;
+  /* first comment before target */ /* second comment before target */ /* third comment before target */ all /* before semicolon */;

@@ -18,7 +18,7 @@ alter system reset work_mem;
 alter system reset all;
 
 alter /* system */ system
-  /* action */ set /* parameter */ autovacuum_vacuum_cost_limit /* equals */ = /* value */ 4000/* semicolon */;
+  /* action */ set /* parameter */ autovacuum_vacuum_cost_limit /* equals */ = /* value */ 4000 /* semicolon */;
 
 alter /* system */ system
-  /* reset */ reset /* parameter */ autovacuum_analyze_scale_factor/* semicolon */;
+  /* reset */ reset /* parameter */ autovacuum_analyze_scale_factor /* semicolon */;

@@ -52,7 +52,7 @@ with /* before recursive */ recursive /* before cte */ cte/* before columns */ (
   /* before order expression */ x /* before desc */ desc
 /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait
 /* before limit */ limit /* before limit value */ 10
-/* before offset */ offset /* before offset value */ 2 /* before rows */ rows/* before semicolon */;
+/* before offset */ offset /* before offset value */ 2 /* before rows */ rows /* before semicolon */;
 
 select
   x

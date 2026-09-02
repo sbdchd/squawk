@@ -71,4 +71,4 @@ with /*a*/ inserted/*b*/ (
   ) /*bg*/ new_row.id /*bh*/
 )
 /*bi*/ select /*bj*/ result_id
-/*bk*/ from /*bl*/ inserted/*bm*/;
+/*bk*/ from /*bl*/ inserted /*bm*/;

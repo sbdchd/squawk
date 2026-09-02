@@ -41,4 +41,4 @@ create /* temporary */ temporary /* sequence */ sequence /* if */ if /* not */ n
   /* start */ start /* with */ with /* start value */ 10
   /* cache */ cache /* cache value */ 20
   /* no cycle */ no /* cycle */ cycle
-  /* owned */ owned /* by */ by /* owner */ app.orders.id/* end */;
+  /* owned */ owned /* by */ by /* owner */ app.orders.id /* end */;

@@ -13,4 +13,4 @@ drop server if exists
 drop /* server */ server /* if */ if /* exists */ exists
   /* first server */ reporting_server /* comma */,
   /* second server */ archive_server
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

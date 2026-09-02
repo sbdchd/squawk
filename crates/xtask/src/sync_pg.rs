@@ -120,6 +120,7 @@ const IGNORED_LINES: &[&str] = &[
     "CREATE INDEX IF NOT EXISTS ON onek USING btree(unique1 int4_ops);",
     "SELECT 10 !=-;",
     "CREATE TABLE withoid() WITH OIDS;",
+    "CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();",
     "update dposintatable set (f1[2])[1] = array[98];",
     "CREATE FOREIGN TABLE ft1 ();                                    -- ERROR",
     r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
@@ -558,6 +559,10 @@ mod tests {
             (
                 "CREATE TABLE error_tbl (i int DEFAULT (100, ));",
                 "-- CREATE TABLE error_tbl (i int DEFAULT (100, ));",
+            ),
+            (
+                "CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();",
+                "-- CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();",
             ),
             ("    AS $$ SELECT x * 2 $$", "--     AS $$ SELECT x * 2 $$"),
             (

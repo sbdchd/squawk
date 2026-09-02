@@ -70,6 +70,19 @@ select
   2 not between 1 and 3,
   2 between asymmetric 1 and 3,
   2 between symmetric 1 and 3,
+  1 /* before between */
+    between /* after between */ 2 /* before and */
+    and /* after and */ 3,
+  1 /* before not */
+    not /* before between */ between /* before symmetric */ symmetric /* before start */ 2 /* before and */
+    and /* before end */ 3,
+  1 -- before not
+    not -- before between
+    between -- before asymmetric
+    asymmetric -- before start
+    2 -- before and
+    and -- before end
+    3,
   a_very_long_between_target_expression
     between symmetric a_very_long_between_start_expression
     and a_very_long_between_end_expression,
@@ -274,6 +287,10 @@ select
     third_very_long_argument_name
   ),
   foo(),
+  foo( /* inside empty args */),
+  foo(
+    -- inside empty args
+  ),
   foo(*),
   foo(all 1, 2),
   foo(/* before all */ all /* after all */ 1),
@@ -761,6 +778,11 @@ select
   operator(public.+) /* after op */ 1,
   +1,
   -1,
+  - -2,
+  - /* between minuses */ -2,
+  - -- between minuses
+  -2,
+  - -a_very_long_double_minus_prefix_input_expression_that_is_long_enough_to_extend_past_eighty_characters,
   not true,
   not -+a_very_long_prefix_input_expression_that_is_long_enough_to_force_wrapping_past_eighty_characters,
   operator(a_very_long_operator_schema_name.###) a_very_long_custom_prefix_input_expression,
@@ -780,6 +802,10 @@ select
     third_very_long_tuple_expression
   ),
   row(),
+  row( /* inside empty row */),
+  row(
+    -- inside empty row
+  ),
   row(1),
   row /* before opening paren */(1),
   row(1, 2),
@@ -829,3 +855,10 @@ select
   session_user,
   system_user,
   user;
+
+-- bare column labels after a nested expression
+select +a collate;
+select -1 collate;
+select 1 + 2 and;
+select a or b collate;
+select a and b is;

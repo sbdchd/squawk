@@ -13,4 +13,4 @@ drop type if exists
 drop /* type */ type /* if */ if /* exists */ exists
   /* first */ public /* dot */.customer_kind /* comma */,
   /* second */ reporting.event_kind
-  /* behavior */ restrict/* end */;
+  /* behavior */ restrict /* end */;

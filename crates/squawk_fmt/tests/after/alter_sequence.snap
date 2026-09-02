@@ -51,7 +51,7 @@ alter /* before sequence */ sequence /* before if */ if /* before exists */ exis
   /* before start */ start /* before with */ with /* before start value */ 10
   /* before cache */ cache /* before cache value */ 20
   /* before cycle */ no /* before cycle keyword */ cycle
-  /* before owned */ owned /* before owned by */ by /* before owner target */ public.orders.sequence_id/* before semicolon */;
+  /* before owned */ owned /* before owned by */ by /* before owner target */ public.orders.sequence_id /* before semicolon */;
 
 alter sequence public.other_sequence
   /* before set */ set /* before logged */ logged;

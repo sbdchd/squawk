@@ -35,4 +35,4 @@ declare
   /* before cursor keyword */ cursor
   /* before without */ without /* before hold */ hold
 /* before for */ for /* before query */ select
-  /* before value */ 1/* before semicolon */;
+  /* before value */ 1 /* before semicolon */;

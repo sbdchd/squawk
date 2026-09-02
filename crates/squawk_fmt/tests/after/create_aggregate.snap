@@ -34,7 +34,7 @@ create /* or replace */ or /* replace keyword */ replace /* aggregate keyword */
 ) /* attributes */ (
   /* first attribute */ sfunc /* equals */ = /* value */ public.commented_state,
   /* second attribute */ stype = /* type value */ bigint /* closing parenthesis */
-)/* semicolon */;
+) /* semicolon */;
 
 create aggregate public.ordered_set_aggregate(
   /* direct parameter */ double precision

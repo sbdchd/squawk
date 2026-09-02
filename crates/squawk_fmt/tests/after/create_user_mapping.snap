@@ -20,4 +20,4 @@ create /* user */ user /* mapping */ mapping /* if */ if /* not */ not /* exists
   /* options */ options /* open */ (
     /* option */ "user" /* value */ 'remote_user' /* comma */,
     /* next option */ password /* next value */ 'secret' /* close */
-  )/* end */;
+  ) /* end */;

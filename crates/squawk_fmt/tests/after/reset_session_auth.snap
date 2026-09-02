@@ -5,4 +5,4 @@ input_file: crates/squawk_fmt/tests/before/reset_session_auth.sql
 reset session authorization;
 
 /* before reset */
-reset /* before session */ session /* before authorization */ authorization/* before semicolon */;
+reset /* before session */ session /* before authorization */ authorization /* before semicolon */;

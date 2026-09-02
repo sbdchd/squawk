@@ -82,3 +82,9 @@ create table t (a int, b daterange, foreign key (period b, a) references u (c, p
 
 -- trailing comma in a parenthesized default expression
 create table error_tbl (i int default (100, ));
+
+-- an empty partition bound list is a syntax error in postgres
+create table t partition of p for values in ();
+create table t partition of p for values in (/* c */);
+create table t partition of p for values from () to (1);
+create table t partition of p for values from (1) to ();

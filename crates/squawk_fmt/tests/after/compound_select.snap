@@ -41,7 +41,7 @@ from a_very_long_first_table_name
 /* before rhs */ select
   /* rhs select */ a_very_long_first_column_name,
   a_very_long_second_column_name
-from a_very_long_second_table_name/* before semicolon */;
+from a_very_long_second_table_name /* before semicolon */;
 
 select 1
 /* before operator */ union /* before quantifier */ distinct

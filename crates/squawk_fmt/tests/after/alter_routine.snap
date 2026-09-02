@@ -5,7 +5,7 @@ input_file: crates/squawk_fmt/tests/before/alter_routine.sql
 alter /* routine */ routine /* signature */ public.calculate_customer_balance(
   /* arg */ integer
 )
-  /* action */ owner /* to */ to /* owner */ current_user/* end */;
+  /* action */ owner /* to */ to /* owner */ current_user /* end */;
 
 alter routine calculate_customer_balance_for_all_historical_transactions(
   integer,

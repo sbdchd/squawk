@@ -48,7 +48,7 @@ copy /* after copy */ binary /* after binary */ public /* before dot */./* after
     /* after nested comma */ description /* before nested right paren */
   ) /* before options right paren */
 )
-/* before where */ where /* after where */ id > 0/* before semicolon */;
+/* before where */ where /* after where */ id > 0 /* before semicolon */;
 
 copy (
   /* after query left paren */ select /* after select */ id

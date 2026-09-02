@@ -8,7 +8,7 @@ alter /* text */ text /* search */ search /* configuration */ configuration /* n
     /* kind two */ asciihword
   /* with */ with
     /* dictionary one */ public.simple /* dictionary comma */,
-    /* dictionary two */ public.english_stem/* end */;
+    /* dictionary two */ public.english_stem /* end */;
 
 alter text search configuration public.english
   alter /* mapping */ mapping

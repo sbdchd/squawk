@@ -19,4 +19,4 @@ create /* user */ user /* name */ reporting_user
   /* valid */ valid /* until */ until /* timestamp */ '2030-01-01'
   /* connection */ connection /* limit */ limit /* count */ 10
   /* in */ in /* role option */ role /* first role */ readers /* comma */,
-    /* second role */ writers/* end */;
+    /* second role */ writers /* end */;

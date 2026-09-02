@@ -1,5 +1,10 @@
 create table u();
 
+create table empty_table_arg_comment (/* inside empty args */);
+
+create table empty_table_arg_line_comment (-- inside empty args
+);
+
 create table t(a int,b text);
 
 -- users table
@@ -27,6 +32,15 @@ create table t (U&"c!006fl" uescape /* c */ '!' int);
 create table foo/*a*//*b*/.bar (id int);
 create table foo -- a line comment
 . bar (id int);
+
+-- comments before table argument lists
+create table table_arg_comment /* before args */ (a int);
+create temporary table temporary_table_arg_comment -- before args
+(a int);
+create unlogged table unlogged_table_arg_comment /* before args */ (a int);
+create table partition_table_arg_comment partition of parent_table /* before args */ (a) default;
+create table typed_table_arg_comment of composite_type /* before args */ (a with options);
+create table a_very_long_schema_name.a_very_long_table_name_with_a_comment_before_its_arguments /* before args */ (a_very_long_integer_column_name int, a_very_long_text_column_name text);
 
 -- comments between table args
 create table t (a int /*x*/, b int);

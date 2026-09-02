@@ -8,7 +8,7 @@ alter /* user */ user /* mapping */ mapping /* for */ for /* role */ current_use
     /* add */ add /* option */ authentication_token /* value */ 'an-exceptionally-long-authentication-token-value',
     /* set */ set /* option */ endpoint /* value */ 'https://analytics.example.test/foreign-data',
     /* drop */ drop /* option */ obsolete_setting /* right */
-  )/* end */;
+  ) /* end */;
 
 alter user mapping for public
   server short_server

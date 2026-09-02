@@ -1,5 +1,10 @@
 create database app;
 
+create database database_with_trailing_comment /* trailing comment */;
+
+create database database_with_trailing_line_comment -- trailing comment
+;
+
 create database app_copy with owner = app_owner template = template0 encoding = 'UTF8' locale = 'en_US.UTF-8' tablespace = app_space connection limit = 100;
 
 create database extraordinarily_long_database_name with owner = extraordinarily_long_database_owner template = extraordinarily_long_template_database encoding = 'UTF8' strategy = wal_log locale_provider = icu icu_locale = 'en-US-u-va-posix' collation_version = '153.120' tablespace = extraordinarily_long_tablespace_name allow_connections = true connection limit = 250 is_template = false oid = 16384;

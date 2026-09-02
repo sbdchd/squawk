@@ -23,4 +23,7 @@ create /* before domain */ domain /* before name */ public.commented_domain
   /* before constraint */ constraint /* before constraint name */ valid_value /* before check */ check /* before left paren */ (
     /* before expression */ value <> '' /* before right paren */
   )
-  /* before not */ not /* before null */ null/* before semicolon */;
+  /* before not */ not /* before null */ null /* before semicolon */;
+
+create domain d text null collate "C";
+create domain d text default 5 collate "C" not null;

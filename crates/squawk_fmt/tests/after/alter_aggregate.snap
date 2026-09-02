@@ -19,4 +19,4 @@ alter /* aggregate keyword */ aggregate /* aggregate signature */ public.comment
   /* first parameter */ numeric,
   /* second parameter */ bigint
 )
-  /* action */ rename /* to keyword */ to /* new name */ commented_revenue/* semicolon */;
+  /* action */ rename /* to keyword */ to /* new name */ commented_revenue /* semicolon */;

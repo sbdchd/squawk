@@ -15,4 +15,4 @@ move
 move
   /* before backward */ backward /* before all */ all
   /* before from */ from
-  /* before cursor */ cursor_name/* before semicolon */;
+  /* before cursor */ cursor_name /* before semicolon */;

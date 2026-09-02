@@ -14,4 +14,4 @@ create text search template extraordinarily_long_schema_name.extraordinarily_lon
 create /* text keyword */ text /* search keyword */ search /* template keyword */ template /* name */ public /* dot */./* name segment */ commented_template /* left parenthesis */ (
   /* first option */ init /* equals */ = /* value */ public.simple_init /* comma */,
   /* second option */ lexize = /* second value */ public.simple_lexize /* right parenthesis */
-)/* semicolon */;
+) /* semicolon */;

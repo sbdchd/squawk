@@ -39,21 +39,21 @@ create /* type */ type /* name */ commented_composite /* as */ as /* open */ (
   /* field */ first_field /* type */ text
   /* collate */ collate /* collation */ "C" /* comma */,
   /* next field */ second_field /* next type */ integer /* close */
-)/* end */;
+) /* end */;
 
 -- comments in every enum type position
 create type /* enum name */ commented_enum /* as */ as /* enum */ enum /* open */ (
   /* first */ 'one' /* comma */,
   /* second */ 'two' /* close */
-)/* end */;
+) /* end */;
 
 -- comments in every range/base type position
 create type /* range name */ commented_range /* as */ as /* range */ range /* attributes */ (
   /* option */ subtype /* equals */ = /* value */ numeric /* comma */,
   /* option two */ multirange_type_name = commented_multirange /* close */
-)/* end */;
+) /* end */;
 
 create type /* base name */ commented_base /* attributes */ (
   /* input */ input /* equals */ = /* value */ commented_in /* comma */,
   /* output */ output = commented_out /* close */
-)/* end */;
+) /* end */;

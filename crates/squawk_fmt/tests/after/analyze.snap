@@ -27,4 +27,4 @@ analyze /* before options */ (
     /* before id */ id /* before column comma */,
     /* before payload */ payload /* before columns close */
   ) /* before table comma */,
-  /* before second table */ archived_records/* before semicolon */;
+  /* before second table */ archived_records /* before semicolon */;

@@ -21,4 +21,4 @@ set
 set
   /* before scope */ local
   /* before role */ role
-  /* before target */ group /* before role name */ legacy_user/* before semicolon */;
+  /* before target */ group /* before role name */ legacy_user /* before semicolon */;

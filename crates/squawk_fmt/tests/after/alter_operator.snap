@@ -6,7 +6,7 @@ alter /* operator */ operator /* signature */ public.+ /* left paren */(
   /* left type */ integer /* comma */,
   /* right type */ integer /* right paren */
 )
-  /* owner */ owner /* to */ to /* role */ application_owner/* end */;
+  /* owner */ owner /* to */ to /* role */ application_owner /* end */;
 
 alter operator public.##(none, integer) set (
   restrict = schema_a.restrict_function_with_a_very_long_name,

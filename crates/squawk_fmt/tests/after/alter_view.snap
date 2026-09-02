@@ -26,4 +26,4 @@ alter /* view keyword */ view /* if exists */ if /* exists keyword */ exists /* 
   /* expression */ coalesce(
     current_setting('app.default_status'),
     'pending'
-  )/* semicolon */;
+  ) /* semicolon */;

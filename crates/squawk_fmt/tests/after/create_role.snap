@@ -21,4 +21,4 @@ create /* role */ role /* name */ reporting_user
   /* connection */ connection /* limit */ limit /* count */ 10
   /* in */ in /* role option */ role /* first role */ readers /* comma */,
     /* second role */ writers
-  /* admin */ admin /* admin role */ role_admin/* end */;
+  /* admin */ admin /* admin role */ role_admin /* end */;
