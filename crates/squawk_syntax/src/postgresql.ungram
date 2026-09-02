@@ -186,7 +186,7 @@ JsonExistsFn =
 
 JsonObjectFn =
   'json_object' '('
-    ((Expr (',' Expr)*)
+    ((FuncArgExpr (',' FuncArgExpr)*)
     | ((JsonKeyValue (',' JsonKeyValue)*)
        JsonNullClause?
        JsonKeysUniqueClause?
@@ -355,7 +355,7 @@ SubstringSimilarEscape =
   Expr 'similar' Expr 'escape' Expr
 
 SubstringExprs =
-  Expr (',' Expr)*
+  FuncArgExpr (',' FuncArgExpr)*
 
 PositionFn =
   'position' '(' pos:Expr 'in' string:Expr ')'
@@ -371,9 +371,9 @@ OverlayPlacing =
   string:Expr 'placing' placing:Expr 'from' from:Expr ('for' for:Expr)?
 
 OverlayExprs =
-  OverlayExpr (',' OverlayExpr)*
+  FuncArgExpr (',' FuncArgExpr)*
 
-OverlayExpr =
+FuncArgExpr =
   Expr
 | NamedArg
 
@@ -869,7 +869,7 @@ TypeNameRef =
 
 Arg =
   'variadic'?
-  (Expr | NamedArg) OrderByClause?
+  FuncArgExpr OrderByClause?
 
 EventTrigger =
   '#name'?

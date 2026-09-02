@@ -39,7 +39,7 @@ pub(super) fn unnest_call(call_expr: &ast::CallExpr) -> Option<UnnestCall> {
     let mut args = vec![];
     for arg in arg_list.args() {
         if arg.variadic_token().is_some()
-            || arg.named_arg().is_some()
+            || matches!(arg.func_arg_expr(), Some(ast::FuncArgExpr::NamedArg(_)))
             || arg.order_by_clause().is_some()
         {
             return None;

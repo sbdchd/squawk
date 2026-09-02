@@ -18702,12 +18702,7 @@ fn build_json_object_fn<'a>(json_object_fn: ast::JsonObjectFn) -> Doc<'a> {
 
     let mut body = Doc::nil();
 
-    let exprs = json_object_fn.exprs().map(|expr| {
-        (
-            leading_comments(expr.syntax()).append(build_expr(expr.clone())),
-            expr.syntax().clone(),
-        )
-    });
+    let exprs = json_object_fn.func_arg_exprs().map(func_arg_expr_item);
     let key_values = json_object_fn.json_key_values().map(|key_value| {
         (
             leading_comments(key_value.syntax()).append(build_json_key_value(key_value.clone())),
@@ -19258,6 +19253,19 @@ fn build_json_array_fn<'a>(json_array_fn: ast::JsonArrayFn) -> Doc<'a> {
     doc.append(wrap_body(body)).append(Doc::text(")")).group()
 }
 
+fn build_func_arg_expr<'a>(arg: ast::FuncArgExpr) -> Doc<'a> {
+    match arg {
+        ast::FuncArgExpr::Expr(expr) => build_expr(expr),
+        ast::FuncArgExpr::NamedArg(arg) => build_named_call_arg(arg),
+    }
+}
+
+fn func_arg_expr_item<'a>(arg: ast::FuncArgExpr) -> (Doc<'a>, SyntaxNode) {
+    let syntax = arg.syntax().clone();
+    let doc = leading_comments(arg.syntax()).append(build_func_arg_expr(arg));
+    (doc, syntax)
+}
+
 fn build_comma_separated_docs<'a>(
     mut items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
 ) -> Option<Doc<'a>> {
@@ -19447,15 +19455,8 @@ fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
                     append_line_keyword_expr(doc, args.for_token(), "for", args.for_()).group()
                 }
                 ast::OverlayArgs::OverlayExprs(args) => {
-                    let items = args.overlay_exprs().map(|arg| {
-                        let syntax = arg.syntax().clone();
-                        let doc = leading_comments(arg.syntax()).append(match arg {
-                            ast::OverlayExpr::Expr(expr) => build_expr(expr),
-                            ast::OverlayExpr::NamedArg(arg) => build_named_call_arg(arg),
-                        });
-                        (doc, syntax)
-                    });
-                    build_comma_separated_docs(items).unwrap_or_else(Doc::nil)
+                    build_comma_separated_docs(args.func_arg_exprs().map(func_arg_expr_item))
+                        .unwrap_or_else(Doc::nil)
                 }
             });
     }
@@ -19501,7 +19502,9 @@ fn build_substring_fn<'a>(substring_fn: ast::SubstringFn) -> Doc<'a> {
                     append_line_keyword_expr(body, args.escape_token(), "escape", args.escape())
                 }
                 ast::SubstringArgs::SubstringExprs(args) => {
-                    build_comma_separated_exprs(args.exprs()).unwrap_or_else(Doc::nil)
+                    build_comma_separated_docs(args.func_arg_exprs().map(func_arg_expr_item))
+                        .map(Doc::group)
+                        .unwrap_or_else(Doc::nil)
                 }
             });
     }
@@ -19825,14 +19828,10 @@ fn build_call_arg<'a>(arg: ast::Arg) -> Doc<'a> {
     if arg.variadic_token().is_some() {
         doc = doc.append(Doc::text("variadic")).append(Doc::space());
     }
-    if let Some(named_arg) = arg.named_arg() {
+    if let Some(arg_expr) = arg.func_arg_expr() {
         doc = doc
-            .append(leading_comments(named_arg.syntax()))
-            .append(build_named_call_arg(named_arg));
-    } else if let Some(expr) = arg.expr() {
-        doc = doc
-            .append(leading_comments(expr.syntax()))
-            .append(build_expr(expr));
+            .append(leading_comments(arg_expr.syntax()))
+            .append(build_func_arg_expr(arg_expr));
     }
 
     if let Some(order_by_clause) = arg.order_by_clause() {
@@ -21249,7 +21248,10 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
 
     if let Some(as_name) = target.as_name() {
         if as_name.as_token().is_some() {
-            doc = doc.append(Doc::space()).append(Doc::text("as"))
+            doc = doc
+                .append(Doc::space())
+                .append(leading_comments(as_name.syntax()))
+                .append(Doc::text("as"));
         }
 
         if let Some(column_name) = as_name.name() {
@@ -21258,7 +21260,15 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
             } else {
                 quote_bare_column_alias(&column_name.text())
             };
-            doc = doc.append(Doc::space()).append(Doc::text(alias));
+            let comments = if as_name.as_token().is_some() {
+                leading_comments(column_name.syntax())
+            } else {
+                leading_comments(as_name.syntax())
+            };
+            doc = doc
+                .append(Doc::space())
+                .append(comments)
+                .append(Doc::text(alias));
         }
     }
 

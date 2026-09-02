@@ -196,7 +196,8 @@ fn validate_type_modifiers(ty: ast::Type, acc: &mut Vec<SyntaxError>) {
             ));
             continue;
         }
-        if let Some(named_arg) = arg.named_arg() {
+        let arg_expr = arg.func_arg_expr();
+        if let Some(ast::FuncArgExpr::NamedArg(named_arg)) = &arg_expr {
             acc.push(SyntaxError::new(
                 "Type modifier cannot have parameter name",
                 named_arg.syntax().text_range(),
@@ -210,7 +211,7 @@ fn validate_type_modifiers(ty: ast::Type, acc: &mut Vec<SyntaxError>) {
             ));
             continue;
         }
-        let Some(expr) = arg.expr() else {
+        let Some(ast::FuncArgExpr::Expr(expr)) = arg_expr else {
             continue;
         };
         if !is_simple_type_modifier(&expr) {

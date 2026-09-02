@@ -142,6 +142,15 @@ impl ast::Type {
     }
 }
 
+impl ast::Arg {
+    pub fn expr(&self) -> Option<ast::Expr> {
+        match self.func_arg_expr()? {
+            ast::FuncArgExpr::Expr(expr) => Some(expr),
+            ast::FuncArgExpr::NamedArg(_) => None,
+        }
+    }
+}
+
 impl ast::CastExpr {
     pub fn kind(&self) -> Option<CastKind> {
         if self.cast_token().is_some() {

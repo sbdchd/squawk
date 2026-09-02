@@ -1720,6 +1720,71 @@ SOURCE_FILE
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- only allowed at top level"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                BIN_EXPR
+                  LITERAL
+                    INT_NUMBER "1"
+                  WHITESPACE " "
+                  PLUS "+"
+                  WHITESPACE " "
+                  TUPLE_EXPR
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "a"
+                    WHITESPACE " "
+                    PREFIX_EXPR
+                      CUSTOM_OP
+                        EQ "="
+                        R_ANGLE ">"
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "2"
+                    R_PAREN ")"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                PAREN_EXPR
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "a"
+                  R_PAREN ")"
+              WHITESPACE " "
+              ARG
+                PREFIX_EXPR
+                  CUSTOM_OP
+                    EQ "="
+                    R_ANGLE ">"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "2"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
   SELECT
@@ -1995,15 +2060,23 @@ error[syntax-error]: expected a type
     ╭▸ 
 155 │ select * from rows from (f() as (a));
     ╰╴                                  ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+158 │ select f(1 + (a => 2));
+    ╰╴               ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+159 │ select f((a) => 2);
+    ╰╴            ━
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-158 │ select 1,
+162 │ select 1,
     ╰╴        ━
 error[syntax-error]: expected R_PAREN
     ╭▸ 
-161 │ select cast('42' as text collate "C");
+165 │ select cast('42' as text collate "C");
     ╰╴                        ━
 error[syntax-error]: expected command, found R_PAREN
     ╭▸ 
-161 │ select cast('42' as text collate "C");
+165 │ select cast('42' as text collate "C");
     ╰╴                                    ━

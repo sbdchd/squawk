@@ -2485,11 +2485,7 @@ pub struct Arg {
 }
 impl Arg {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn named_arg(&self) -> Option<NamedArg> {
+    pub fn func_arg_expr(&self) -> Option<FuncArgExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14162,7 +14158,7 @@ pub struct JsonObjectFn {
 }
 impl JsonObjectFn {
     #[inline]
-    pub fn exprs(&self) -> AstChildren<Expr> {
+    pub fn func_arg_exprs(&self) -> AstChildren<FuncArgExpr> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -18431,7 +18427,7 @@ pub struct OverlayExprs {
 }
 impl OverlayExprs {
     #[inline]
-    pub fn overlay_exprs(&self) -> AstChildren<OverlayExpr> {
+    pub fn func_arg_exprs(&self) -> AstChildren<FuncArgExpr> {
         support::children(&self.syntax)
     }
 }
@@ -24831,7 +24827,7 @@ pub struct SubstringExprs {
 }
 impl SubstringExprs {
     #[inline]
-    pub fn exprs(&self) -> AstChildren<Expr> {
+    pub fn func_arg_exprs(&self) -> AstChildren<FuncArgExpr> {
         support::children(&self.syntax)
     }
 }
@@ -29003,6 +28999,12 @@ pub enum FromListItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum FuncArgExpr {
+    NamedArg(NamedArg),
+    Expr(Expr),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FuncOption {
     AsFuncOption(AsFuncOption),
     CalledOnNullInputFuncOption(CalledOnNullInputFuncOption),
@@ -29285,12 +29287,6 @@ pub enum OverTarget {
 pub enum OverlayArgs {
     OverlayExprs(OverlayExprs),
     OverlayPlacing(OverlayPlacing),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OverlayExpr {
-    NamedArg(NamedArg),
-    Expr(Expr),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -63030,6 +63026,38 @@ impl From<JoinExpr> for FromListItem {
         FromListItem::JoinExpr(node)
     }
 }
+impl AstNode for FuncArgExpr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::NAMED_ARG) || Expr::can_cast(kind)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::NAMED_ARG => FuncArgExpr::NamedArg(NamedArg { syntax }),
+            _ => {
+                if let Some(result) = Expr::cast(syntax.clone()) {
+                    return Some(FuncArgExpr::Expr(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            FuncArgExpr::NamedArg(it) => &it.syntax,
+            FuncArgExpr::Expr(it) => it.syntax(),
+        }
+    }
+}
+impl From<NamedArg> for FuncArgExpr {
+    #[inline]
+    fn from(node: NamedArg) -> FuncArgExpr {
+        FuncArgExpr::NamedArg(node)
+    }
+}
 impl AstNode for FuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -65133,38 +65161,6 @@ impl From<OverlayPlacing> for OverlayArgs {
     #[inline]
     fn from(node: OverlayPlacing) -> OverlayArgs {
         OverlayArgs::OverlayPlacing(node)
-    }
-}
-impl AstNode for OverlayExpr {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, SyntaxKind::NAMED_ARG) || Expr::can_cast(kind)
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        let res = match syntax.kind() {
-            SyntaxKind::NAMED_ARG => OverlayExpr::NamedArg(NamedArg { syntax }),
-            _ => {
-                if let Some(result) = Expr::cast(syntax.clone()) {
-                    return Some(OverlayExpr::Expr(result));
-                }
-                return None;
-            }
-        };
-        Some(res)
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            OverlayExpr::NamedArg(it) => &it.syntax,
-            OverlayExpr::Expr(it) => it.syntax(),
-        }
-    }
-}
-impl From<NamedArg> for OverlayExpr {
-    #[inline]
-    fn from(node: NamedArg) -> OverlayExpr {
-        OverlayExpr::NamedArg(node)
     }
 }
 impl AstNode for OverridingClause {

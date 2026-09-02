@@ -13,6 +13,10 @@ select/*a*/distinct/*b*/1;
 
 select 1 /*a*/ /*b*/ group by 1;
 
+select 1 /* before as */ as /* before alias */ number;
+
+select 1 /* before bare alias */ number;
+
 select 1 -- a line comment
 , 2;
 
