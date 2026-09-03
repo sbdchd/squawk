@@ -192,6 +192,7 @@ fn tuple_expr(p: &mut Parser<'_>) -> (CompletedMarker, ExprKind) {
             if select.is_none() || p.at(EOF) || p.at(R_PAREN) {
                 break;
             }
+            p.error("unexpected expression after SELECT");
         }
         let Some((expr, expr_kind)) = expr(p) else {
             break;
@@ -1092,10 +1093,17 @@ fn type_literal(p: &mut Parser<'_>) -> CompletedMarker {
 // literal, path, tuple, array
 fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     if at_type_literal(p) {
-        return Some((type_literal(p), ExprKind::Other));
+        let literal = type_literal(p);
+        if at_field_selection(p) {
+            p.error("field selection requires a parenthesized expression");
+        }
+        return Some((literal, ExprKind::Other));
     }
-    if let Some(m) = literal(p) {
-        return Some((m, ExprKind::Other));
+    if let Some(literal) = literal(p) {
+        if at_field_selection(p) {
+            p.error("field selection requires a parenthesized expression");
+        }
+        return Some((literal, ExprKind::Other));
     }
     let done = match (p.current(), p.nth(1)) {
         (POSITIONAL_PARAM, _) => {
@@ -1941,7 +1949,7 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<(CompletedMarker, ExprKin
         p,
         prefix_bp,
         &Restrictions {
-            bare_label_disabled: true,
+            bare_label: r.bare_label.deferred(),
             ..Default::default()
         },
     );
@@ -1956,13 +1964,32 @@ fn bind_param_name_ref(p: &mut Parser<'_>) {
 }
 
 fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker {
+    let mut is_func_name = lhs.kind() == NAME_REF;
     loop {
         lhs = match p.current() {
-            NOT_KW if p.nth_at(1, BETWEEN_KW) => between_expr(p),
-            BETWEEN_KW => between_expr(p),
-            L_PAREN => call_expr_args(p, lhs),
-            L_BRACK => index_expr(p, lhs),
-            DOT => field_expr(p, lhs),
+            NOT_KW if p.nth_at(1, BETWEEN_KW) => {
+                is_func_name = false;
+                between_expr(p)
+            }
+            BETWEEN_KW => {
+                is_func_name = false;
+                between_expr(p)
+            }
+            L_PAREN => {
+                lhs = call_expr_args(p, lhs, is_func_name);
+                is_func_name = false;
+                lhs
+            }
+            L_BRACK => {
+                is_func_name = false;
+                index_expr(p, lhs)
+            }
+            DOT => {
+                is_func_name &= p.nth_at(1, IDENT)
+                    || p.nth_at_ts(1, TYPE_KEYWORDS)
+                    || p.nth_at_ts(1, ALL_KEYWORDS);
+                field_expr(p, lhs)
+            }
             AT_KW if p.at(AT_LOCAL) => {
                 let m = lhs.precede(p);
                 p.bump(AT_LOCAL);
@@ -2777,8 +2804,11 @@ fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, BETWEEN_EXPR)
 }
 
-fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
+fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker, is_func_name: bool) -> CompletedMarker {
     assert!(p.at(L_PAREN));
+    if !is_func_name {
+        p.error("expected function name before argument list");
+    }
     let m = lhs.precede(p);
     arg_list(p);
     opt_agg_clauses(p);
@@ -2892,6 +2922,10 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
         p.expect(R_BRACK);
     }
     m.complete(p, INDEX_EXPR)
+}
+
+fn at_field_selection(p: &Parser<'_>) -> bool {
+    p.at(DOT) && (p.nth_at_ts(1, COL_LABEL_FIRST) || p.nth_at(1, STAR))
 }
 
 fn field_name(p: &mut Parser<'_>) {
@@ -3076,13 +3110,30 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
 const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLATE_KW]);
 
 #[derive(Default, Clone, Copy)]
+enum BareLabelBehavior {
+    Allowed,
+    Deferred,
+    #[default]
+    Forbidden,
+}
+
+impl BareLabelBehavior {
+    fn deferred(self) -> Self {
+        match self {
+            Self::Allowed => Self::Deferred,
+            behavior => behavior,
+        }
+    }
+}
+
+#[derive(Default, Clone, Copy)]
 struct Restrictions {
     escape_disabled: bool,
     in_disabled: bool,
     is_disabled: bool,
     not_disabled: bool,
     and_disabled: bool,
-    bare_label_disabled: bool,
+    bare_label: BareLabelBehavior,
 }
 
 fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMarker, ExprKind)> {
@@ -3116,13 +3167,16 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
             // could be start of `is distinct from`
             && !(p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))
         {
-            if r.bare_label_disabled {
-                break;
+            match r.bare_label {
+                BareLabelBehavior::Allowed => {
+                    let m = p.start();
+                    column_name(p);
+                    m.complete(p, AS_NAME);
+                    return Some((lhs, expr_kind));
+                }
+                BareLabelBehavior::Deferred => break,
+                BareLabelBehavior::Forbidden => (),
             }
-            let m = p.start();
-            column_name(p);
-            m.complete(p, AS_NAME);
-            return Some((lhs, expr_kind));
         }
         let (op_bp, op, associativity) = current_op(p, r);
         if op_bp < bp {
@@ -3152,7 +3206,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
             p,
             op_bp,
             &Restrictions {
-                bare_label_disabled: true,
+                bare_label: r.bare_label.deferred(),
                 ..*r
             },
         );
@@ -6230,7 +6284,16 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
         return None;
     } else if p.at(STAR) && !p.nth_at_ts(1, OPERATOR_FIRST) {
         p.bump(STAR);
-    } else if expr(p).is_some() {
+    } else if expr_bp(
+        p,
+        1,
+        &Restrictions {
+            bare_label: BareLabelBehavior::Allowed,
+            ..Restrictions::default()
+        },
+    )
+    .is_some()
+    {
         opt_as_col_label(p);
     } else {
         m.abandon(p);
@@ -8769,6 +8832,10 @@ fn opt_alter_table_action_list(p: &mut Parser<'_>) {
         if opt_alter_table_action(p).is_none() {
             break;
         };
+        if p.at(COMMA) && matches!(p.nth(1), EOF | SEMICOLON) {
+            p.err_and_bump("unexpected trailing comma");
+            break;
+        }
         if !p.eat(COMMA) {
             if p.at_ts(ALTER_TABLE_ACTION_FIRST) {
                 p.error("missing comma");
@@ -18174,23 +18241,24 @@ fn config_value(p: &mut Parser<'_>) -> bool {
     if p.eat(DEFAULT_KW) {
         return true;
     }
-    let mut found_value = false;
-    // ident, number or comma separated list of strings, idents, numbers
-    while !p.at(EOF) {
-        if opt_string_literal(p).is_none()
-            && opt_numeric_literal(p).is_none()
-            && !opt_config_value_name(p)
-            && !opt_bool_literal(p)
-            && !opt_null_literal(p)
-        {
-            break;
-        }
-        found_value = true;
-        if !p.eat(COMMA) {
+    if !config_value_item(p) {
+        return false;
+    }
+    while p.eat(COMMA) {
+        if !config_value_item(p) {
+            p.error("expected config value after comma");
             break;
         }
     }
-    found_value
+    true
+}
+
+fn config_value_item(p: &mut Parser<'_>) -> bool {
+    opt_string_literal(p).is_some()
+        || opt_numeric_literal(p).is_some()
+        || opt_config_value_name(p)
+        || opt_bool_literal(p)
+        || opt_null_literal(p)
 }
 
 fn zone_value(p: &mut Parser<'_>) -> bool {

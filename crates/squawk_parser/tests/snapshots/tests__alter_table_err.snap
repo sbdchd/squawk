@@ -215,6 +215,91 @@ SOURCE_FILE
                 INT_NUMBER "1"
           R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing comma in action list"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    ADD_COLUMN
+      ADD_KW "ADD"
+      WHITESPACE " "
+      COLUMN_NAME
+        IDENT "c"
+      WHITESPACE " "
+      ARRAY_TYPE
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+        ARRAY_BOUND
+          L_BRACK "["
+          R_BRACK "]"
+      WHITESPACE " "
+      DEFAULT_CONSTRAINT
+        DEFAULT_KW "DEFAULT"
+        WHITESPACE " "
+        CAST_EXPR
+          PAREN_EXPR
+            L_PAREN "("
+            TUPLE_EXPR
+              L_PAREN "("
+              R_PAREN ")"
+            R_PAREN ")"
+          COLON_COLON
+            COLON ":"
+            COLON ":"
+          ARRAY_TYPE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "t"
+            ARRAY_BOUND
+              L_BRACK "["
+              R_BRACK "]"
+    COMMA ","
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      SET_DEFAULT
+        SET_KW "SET"
+        WHITESPACE " "
+        DEFAULT_KW "DEFAULT"
+        WHITESPACE " "
+        BIN_EXPR
+          CAST_EXPR
+            LITERAL
+              STRING "''"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "d"
+          WHITESPACE " "
+          PLUS "+"
+          WHITESPACE " "
+          PAREN_EXPR
+            L_PAREN "("
+            TUPLE_EXPR
+              L_PAREN "("
+              R_PAREN ")"
+            R_PAREN ")"
+    ERROR
+      COMMA ","
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected command, found ADD_KW
@@ -245,3 +330,7 @@ error[syntax-error]: unexpected comma
    ╭▸ 
 20 │   alter c set (a, , b = 1);
    ╰╴                  ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+25 │   ALTER c SET DEFAULT ''::d + (()),
+   ╰╴                                  ━

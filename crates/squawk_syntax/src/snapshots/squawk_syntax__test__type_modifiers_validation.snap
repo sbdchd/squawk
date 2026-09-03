@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/type_modifiers.sql
 ---
-SOURCE_FILE@0..655
+SOURCE_FILE@0..694
   COMMENT@0..5 "-- ok"
   WHITESPACE@5..6 "\n"
   SELECT@6..32
@@ -597,6 +597,32 @@ SOURCE_FILE@0..655
               STRING@650..653 "'1'"
     SEMICOLON@653..654 ";"
   WHITESPACE@654..655 "\n"
+  SELECT@655..693
+    SELECT_CLAUSE@655..692
+      SELECT_KW@655..661 "select"
+      TARGET_LIST@661..692
+        TARGET@661..692
+          CAST_EXPR@661..692
+            LITERAL@661..663
+              STRING@661..663 "''"
+            COLON_COLON@663..665
+              COLON@663..664 ":"
+              COLON@664..665 ":"
+            TIMESTAMP_TYPE@665..692
+              TIMESTAMP_KW@665..674 "timestamp"
+              L_PAREN@674..675 "("
+              TUPLE_EXPR@675..677
+                L_PAREN@675..676 "("
+                R_PAREN@676..677 ")"
+              R_PAREN@677..678 ")"
+              WITH_TIMEZONE@678..692
+                WITH_KW@678..682 "with"
+                WHITESPACE@682..683 " "
+                TIME_KW@683..687 "time"
+                WHITESPACE@687..688 " "
+                ZONE_KW@688..692 "zone"
+    SEMICOLON@692..693 ";"
+  WHITESPACE@693..694 "\n"
 
 error[syntax-error]: Type modifier cannot have parameter name
    ╭▸ 
@@ -654,3 +680,7 @@ error[syntax-error]: Type modifiers must be simple constants or identifiers
    ╭▸ 
 26 │ select numeric(variadic 1) '1';
    ╰╴               ━━━━━━━━━━
+error[syntax-error]: Timestamp precision must be an integer constant
+   ╭▸ 
+27 │ select''::timestamp(())with time zone;
+   ╰╴                    ━━

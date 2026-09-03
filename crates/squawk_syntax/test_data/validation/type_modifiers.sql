@@ -24,3 +24,4 @@ select numeric(b'1') '1';
 select numeric(x'1') '1';
 select numeric(n'1') '1';
 select numeric(variadic 1) '1';
+select''::timestamp(())with time zone;

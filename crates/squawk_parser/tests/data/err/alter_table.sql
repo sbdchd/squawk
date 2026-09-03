@@ -18,3 +18,8 @@ alter foreign table t
 -- extra comma
 alter foreign table t
   alter c set (a, , b = 1);
+
+-- trailing comma in action list
+ALTER TABLE t
+  ADD c t[] DEFAULT (())::t[],
+  ALTER c SET DEFAULT ''::d + (()),

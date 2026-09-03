@@ -802,19 +802,19 @@ Timezone =
 TimeType =
   'setof'?
   'time'
-  ('(' Literal ')')?
+  ('(' Expr ')')?
   Timezone?
 
 TimestampType =
   'setof'?
   'timestamp'
-  ('(' Literal ')')?
+  ('(' Expr ')')?
   Timezone?
 
 IntervalType =
   'setof'?
   'interval'
-  ('(' Literal ')' | IntervalQualifier)?
+  ('(' Expr ')' | IntervalQualifier)?
 
 IntervalQualifier =
   IntervalYear
@@ -2994,7 +2994,7 @@ RelationFromItem =
   'only'? RelationNameRef '*'? alias:FromAlias? TablesampleClause?
 
 FunctionFromItem =
-  'lateral'? CallExpr WithOrdinality? alias:FromAlias?
+  'only'? 'lateral'? CallExpr WithOrdinality? alias:FromAlias?
 
 WithOrdinality =
   'with' 'ordinality'

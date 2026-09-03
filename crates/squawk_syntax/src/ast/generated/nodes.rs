@@ -11980,6 +11980,10 @@ impl FunctionFromItem {
     pub fn lateral_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LATERAL_KW)
     }
+    #[inline]
+    pub fn only_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ONLY_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -13193,11 +13197,11 @@ pub struct IntervalType {
 }
 impl IntervalType {
     #[inline]
-    pub fn interval_qualifier(&self) -> Option<IntervalQualifier> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn interval_qualifier(&self) -> Option<IntervalQualifier> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25461,7 +25465,7 @@ pub struct TimeType {
 }
 impl TimeType {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25507,7 +25511,7 @@ pub struct TimestampType {
 }
 impl TimestampType {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]

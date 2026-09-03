@@ -1,0 +1,51 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/alter_policy.sql
+---
+SOURCE_FILE
+  ALTER_POLICY
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    POLICY_KW "POLICY"
+    WHITESPACE " "
+    POLICY_REF
+      IDENT "r"
+    WHITESPACE " "
+    ON_TABLE
+      ON_KW "ON"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "r"
+    WHITESPACE " "
+    ALTER_POLICY_TO
+      USING_EXPR_CLAUSE
+        USING_KW "USING"
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "x"
+          EQ "="
+          PAREN_EXPR
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "SELECT"
+              WHITESPACE " "
+              WHERE_CLAUSE
+                WHERE_KW "WHERE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "t"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "y"
+            R_PAREN ")"
+        R_PAREN ")"
+  WHITESPACE "\n"
+---
+error[syntax-error]: unexpected expression after SELECT
+  ╭▸ 
+1 │ ALTER POLICY r ON r USING(x=(SELECT WHERE t y))
+  ╰╴                                           ━

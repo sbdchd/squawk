@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/select.sql
 ---
-SOURCE_FILE@0..64
+SOURCE_FILE@0..121
   WHITESPACE@0..1 "\n"
   SELECT@1..17
     FROM_CLAUSE@1..7
@@ -34,45 +34,103 @@ SOURCE_FILE@0..64
               IDENT@24..25 "t"
     SEMICOLON@25..26 ";"
   WHITESPACE@26..28 "\n\n"
-  SELECT@28..63
-    WITH_CLAUSE@28..46
-      WITH_KW@28..32 "with"
-      WHITESPACE@32..33 " "
-      WITH_TABLE@33..46
-        CTE_NAME@33..34
-          IDENT@33..34 "t"
-        WHITESPACE@34..35 " "
-        AS_KW@35..37 "as"
-        WHITESPACE@37..38 " "
-        L_PAREN@38..39 "("
-        SELECT@39..45
-          FROM_CLAUSE@39..45
-            FROM_KW@39..43 "from"
-            WHITESPACE@43..44 " "
-            RELATION_FROM_ITEM@44..45
-              RELATION_NAME_REF@44..45
-                PATH_REF@44..45
-                  PATH_SEGMENT_REF@44..45
-                    IDENT@44..45 "k"
-        R_PAREN@45..46 ")"
-    WHITESPACE@46..47 "\n"
-    SELECT_CLAUSE@47..55
-      SELECT_KW@47..53 "select"
-      WHITESPACE@53..54 " "
-      TARGET_LIST@54..55
-        TARGET@54..55
-          STAR@54..55 "*"
-    WHITESPACE@55..56 " "
-    FROM_CLAUSE@56..62
-      FROM_KW@56..60 "from"
-      WHITESPACE@60..61 " "
-      RELATION_FROM_ITEM@61..62
-        RELATION_NAME_REF@61..62
-          PATH_REF@61..62
-            PATH_SEGMENT_REF@61..62
-              IDENT@61..62 "t"
-    SEMICOLON@62..63 ";"
-  WHITESPACE@63..64 "\n"
+  SELECT@28..55
+    SELECT_CLAUSE@28..44
+      SELECT_KW@28..34 "SELECT"
+      TARGET_LIST@34..44
+        TARGET@34..44
+          TUPLE_EXPR@34..44
+            L_PAREN@34..35 "("
+            NAME_REF@35..36
+              IDENT@35..36 "o"
+            COMMA@36..37 ","
+            SELECT@37..43
+              SELECT_CLAUSE@37..43
+                SELECT_KW@37..43 "select"
+            R_PAREN@43..44 ")"
+    WHERE_CLAUSE@44..54
+      WHERE_KW@44..49 "WHERE"
+      CAST_EXPR@49..54
+        LITERAL@49..51
+          STRING@49..51 "''"
+        COLON_COLON@51..53
+          COLON@51..52 ":"
+          COLON@52..53 ":"
+        PATH_TYPE@53..54
+          PATH_REF@53..54
+            PATH_SEGMENT_REF@53..54
+              IDENT@53..54 "r"
+    SEMICOLON@54..55 ";"
+  WHITESPACE@55..57 "\n\n"
+  SELECT@57..83
+    SELECT_CLAUSE@57..69
+      SELECT_KW@57..63 "SELECT"
+      TARGET_LIST@63..69
+        TARGET@63..69
+          CALL_EXPR@63..69
+            FIELD_EXPR@63..67
+              TUPLE_EXPR@63..65
+                L_PAREN@63..64 "("
+                R_PAREN@64..65 ")"
+              DOT@65..66 "."
+              NAME_REF@66..67
+                IDENT@66..67 "n"
+            ARG_LIST@67..69
+              L_PAREN@67..68 "("
+              R_PAREN@68..69 ")"
+    FROM_CLAUSE@69..82
+      FROM_KW@69..73 "FROM"
+      WHITESPACE@73..74 " "
+      FUNCTION_FROM_ITEM@74..82
+        ONLY_KW@74..78 "ONLY"
+        WHITESPACE@78..79 " "
+        CALL_EXPR@79..82
+          NAME_REF@79..80
+            IDENT@79..80 "p"
+          ARG_LIST@80..82
+            L_PAREN@80..81 "("
+            R_PAREN@81..82 ")"
+    SEMICOLON@82..83 ";"
+  WHITESPACE@83..85 "\n\n"
+  SELECT@85..120
+    WITH_CLAUSE@85..103
+      WITH_KW@85..89 "with"
+      WHITESPACE@89..90 " "
+      WITH_TABLE@90..103
+        CTE_NAME@90..91
+          IDENT@90..91 "t"
+        WHITESPACE@91..92 " "
+        AS_KW@92..94 "as"
+        WHITESPACE@94..95 " "
+        L_PAREN@95..96 "("
+        SELECT@96..102
+          FROM_CLAUSE@96..102
+            FROM_KW@96..100 "from"
+            WHITESPACE@100..101 " "
+            RELATION_FROM_ITEM@101..102
+              RELATION_NAME_REF@101..102
+                PATH_REF@101..102
+                  PATH_SEGMENT_REF@101..102
+                    IDENT@101..102 "k"
+        R_PAREN@102..103 ")"
+    WHITESPACE@103..104 "\n"
+    SELECT_CLAUSE@104..112
+      SELECT_KW@104..110 "select"
+      WHITESPACE@110..111 " "
+      TARGET_LIST@111..112
+        TARGET@111..112
+          STAR@111..112 "*"
+    WHITESPACE@112..113 " "
+    FROM_CLAUSE@113..119
+      FROM_KW@113..117 "from"
+      WHITESPACE@117..118 " "
+      RELATION_FROM_ITEM@118..119
+        RELATION_NAME_REF@118..119
+          PATH_REF@118..119
+            PATH_SEGMENT_REF@118..119
+              IDENT@118..119 "t"
+    SEMICOLON@119..120 ";"
+  WHITESPACE@120..121 "\n"
 
 error[syntax-error]: Leading from clauses are not supported in Postgres
   ╭▸ 
@@ -82,7 +140,19 @@ error[syntax-error]: Missing select clause
   ╭▸ 
 4 │ from t;
   ╰╴━
-error[syntax-error]: Missing select clause
+error[syntax-error]: Expected a target after SELECT
   ╭▸ 
-6 │ with t as (from k)
-  ╰╴           ━
+6 │ SELECT(o,select)WHERE''::r;
+  ╰╴         ━━━━━━
+error[syntax-error]: Field access requires an expression before the field name
+  ╭▸ 
+8 │ SELECT().n()FROM ONLY p();
+  ╰╴      ━━
+error[syntax-error]: ONLY cannot be used with a function call
+  ╭▸ 
+8 │ SELECT().n()FROM ONLY p();
+  ╰╴                 ━━━━
+error[syntax-error]: Missing select clause
+   ╭▸ 
+10 │ with t as (from k)
+   ╰╴           ━

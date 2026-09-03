@@ -168,3 +168,19 @@ select cast('42' as text collate "C");
 select 1 group by rollup ();
 select 1 group by cube ();
 select distinct on () 1;
+
+-- only function names can be followed by an argument list
+select ()();
+select 1();
+select (f)();
+select f()();
+select f[1]();
+select (f).g();
+
+-- bare aliases are only allowed in target elements
+SELECT (
+  (1 AND p[] = ''::r) OR,
+  (2 AND p[] = ''::r AND p[] = ''::r)(
+    3 AND p[] = ''::r AND p[] = ''::r AND p[] = ''::r
+  )
+);

@@ -34,6 +34,8 @@ SELECT $;
 SELECT $0111111111111111111111111111111111111111111111111111;
 SELECT "";
 SELECT U&"";
+-- field selection can't be applied directly to a literal
+select 1 .x;
 -- numeric field accesses used to panic in some cases
 select 0 . 0e ;
 select t . 0e ;
