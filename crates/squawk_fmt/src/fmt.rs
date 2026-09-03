@@ -3,8 +3,10 @@ use either::Either;
 use itertools::Itertools;
 use rowan::Direction;
 use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
-use squawk_syntax::ast::{self, AstNode, LitKind, normalize_name_node};
-use squawk_syntax::quote::{quote_bare_column_alias, quote_column_alias, quote_ident};
+use squawk_syntax::ast::{self, AstNode, LitKind, is_quoted_name_node, normalize_name_node};
+use squawk_syntax::quote::{
+    quote_bare_column_alias, quote_column_alias, quote_ident, quote_quoted_ident,
+};
 use squawk_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 use tiny_pretty::Doc;
 use tiny_pretty::{LineBreak, PrintOptions, print};
@@ -8024,7 +8026,11 @@ fn build_path_parts<'a>(
 }
 
 fn build_name<'a>(node: &SyntaxNode) -> Doc<'a> {
-    build_name_with(node, quote_ident)
+    if is_quoted_name_node(node) {
+        build_name_with(node, quote_quoted_ident)
+    } else {
+        build_name_with(node, quote_ident)
+    }
 }
 
 fn build_column_label<'a>(node: &SyntaxNode) -> Doc<'a> {

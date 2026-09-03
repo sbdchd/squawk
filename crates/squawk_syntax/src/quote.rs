@@ -1,5 +1,7 @@
 use crate::SyntaxNode;
-use crate::generated::keywords::{AS_LABEL_KEYWORDS, RESERVED_KEYWORDS, TYPE_FUNC_NAME_KEYWORDS};
+use crate::generated::keywords::{
+    AS_LABEL_KEYWORDS, COL_NAME_KEYWORDS, RESERVED_KEYWORDS, TYPE_FUNC_NAME_KEYWORDS,
+};
 
 pub fn quote_string_literal(text: &str) -> String {
     format!("'{}'", text.replace('\'', "''"))
@@ -30,6 +32,14 @@ pub fn quote_ident(text: &str) -> String {
         quote(text)
     } else {
         text.to_string()
+    }
+}
+
+pub fn quote_quoted_ident(text: &str) -> String {
+    if is_col_name_word(text) {
+        quote(text)
+    } else {
+        quote_ident(text)
     }
 }
 
@@ -96,6 +106,12 @@ pub fn needs_quoting(text: &str) -> bool {
 
 pub fn is_reserved_word(text: &str) -> bool {
     RESERVED_KEYWORDS
+        .binary_search(&text.to_ascii_lowercase().as_str())
+        .is_ok()
+}
+
+fn is_col_name_word(text: &str) -> bool {
+    COL_NAME_KEYWORDS
         .binary_search(&text.to_ascii_lowercase().as_str())
         .is_ok()
 }
@@ -210,6 +226,21 @@ mod tests {
     fn quote_ident_quotes_type_func_name_words() {
         assert_snapshot!(quote_ident("left"), @r#""left""#);
         assert_snapshot!(quote_ident("join"), @r#""join""#);
+    }
+
+    #[test]
+    fn quote_quoted_ident_keeps_col_name_keywords_quoted() {
+        assert_snapshot!(quote_quoted_ident("int"), @r#""int""#);
+        assert_snapshot!(quote_quoted_ident("coalesce"), @r#""coalesce""#);
+        assert_snapshot!(quote_quoted_ident("normalize"), @r#""normalize""#);
+    }
+
+    #[test]
+    fn quote_quoted_ident_unquotes_everything_else() {
+        assert_snapshot!(quote_quoted_ident("col_name"), @"col_name");
+        assert_snapshot!(quote_quoted_ident("data"), @"data");
+        assert_snapshot!(quote_quoted_ident("select"), @r#""select""#);
+        assert_snapshot!(quote_quoted_ident("Mixed"), @r#""Mixed""#);
     }
 
     #[test]
