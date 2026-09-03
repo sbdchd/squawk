@@ -252,6 +252,7 @@ fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
     };
     let reserved_keywords = sorted(&keyword_kinds.reserved_keywords);
     let type_func_name_keywords = sorted(&keyword_kinds.type_func_name_keywords);
+    let col_name_keywords = sorted(&keyword_kinds.col_name_keywords);
     let as_label_keywords = sorted(&keyword_kinds.as_label_keywords);
 
     let output = reformat(
@@ -262,6 +263,10 @@ fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
 
             pub(crate) const TYPE_FUNC_NAME_KEYWORDS: &[&str] = &[
                 #(#type_func_name_keywords),*
+            ];
+
+            pub(crate) const COL_NAME_KEYWORDS: &[&str] = &[
+                #(#col_name_keywords),*
             ];
 
             pub(crate) const AS_LABEL_KEYWORDS: &[&str] = &[

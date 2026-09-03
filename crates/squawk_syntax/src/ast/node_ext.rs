@@ -750,7 +750,7 @@ impl ast::NameRef {
 
     #[inline]
     pub fn is_quoted(&self) -> bool {
-        is_quoted(self.syntax())
+        is_quoted_name_node(self.syntax())
     }
 }
 
@@ -762,7 +762,7 @@ impl ast::ColumnName {
 
     #[inline]
     pub fn is_quoted(&self) -> bool {
-        is_quoted(self.syntax())
+        is_quoted_name_node(self.syntax())
     }
 }
 
@@ -774,7 +774,7 @@ impl ast::PathSegment {
 
     #[inline]
     pub fn is_quoted(&self) -> bool {
-        is_quoted(self.syntax())
+        is_quoted_name_node(self.syntax())
     }
 }
 
@@ -786,11 +786,11 @@ impl ast::PathSegmentRef {
 
     #[inline]
     pub fn is_quoted(&self) -> bool {
-        is_quoted(self.syntax())
+        is_quoted_name_node(self.syntax())
     }
 }
 
-fn is_quoted(node: &SyntaxNode) -> bool {
+pub fn is_quoted_name_node(node: &SyntaxNode) -> bool {
     let text = node.text();
     let first = text.char_at(0.into());
     let second = text.char_at(1.into());
@@ -1405,7 +1405,7 @@ where
 
     #[inline]
     fn is_quoted(&self) -> bool {
-        is_quoted(self.syntax())
+        is_quoted_name_node(self.syntax())
     }
 }
 
