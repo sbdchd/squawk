@@ -148,6 +148,10 @@ error[syntax-error]: Field access requires an expression before the field name
   ╭▸ 
 8 │ SELECT().n()FROM ONLY p();
   ╰╴      ━━
+error[syntax-error]: expected function name before argument list
+  ╭▸ 
+8 │ SELECT().n()FROM ONLY p();
+  ╰╴          ━
 error[syntax-error]: ONLY cannot be used with a function call
   ╭▸ 
 8 │ SELECT().n()FROM ONLY p();
