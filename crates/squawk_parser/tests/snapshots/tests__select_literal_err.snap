@@ -365,6 +365,23 @@ SOURCE_FILE
             IDENT "U&\"\""
     SEMICOLON ";"
   WHITESPACE "\n"
+  COMMENT "-- field selection can't be applied directly to a literal"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            DOT "."
+            NAME_REF
+              IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n"
   COMMENT "-- numeric field accesses used to panic in some cases"
   WHITESPACE "\n"
   SELECT
@@ -792,91 +809,95 @@ error[syntax-error]: empty delimited identifier
    ╭▸ 
 36 │ SELECT U&"";
    ╰╴       ━━━━
+error[syntax-error]: field selection requires a parenthesized expression
+   ╭▸ 
+38 │ select 1 .x;
+   ╰╴        ━
 error[syntax-error]: expected field name
    ╭▸ 
-38 │ select 0 . 0e ;
+40 │ select 0 . 0e ;
    ╰╴           ━
 error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
-38 │ select 0 . 0e ;
+40 │ select 0 . 0e ;
    ╰╴            ━
 error[syntax-error]: expected field name
    ╭▸ 
-39 │ select t . 0e ;
+41 │ select t . 0e ;
    ╰╴           ━
 error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
-39 │ select t . 0e ;
+41 │ select t . 0e ;
    ╰╴            ━
 error[syntax-error]: expected field name
    ╭▸ 
-40 │ select 1 . 2e ;
+42 │ select 1 . 2e ;
    ╰╴           ━
 error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
-40 │ select 1 . 2e ;
+42 │ select 1 . 2e ;
    ╰╴            ━
 error[syntax-error]: expected field name
    ╭▸ 
-41 │ select 0 . 1e5 ;
+43 │ select 0 . 1e5 ;
    ╰╴           ━
 error[syntax-error]: expected field name
    ╭▸ 
-42 │ select 0 . .5 ;
+44 │ select 0 . .5 ;
    ╰╴           ━
 error[syntax-error]: expected field name
    ╭▸ 
-43 │ select 1 . 2 . 3e ;
+45 │ select 1 . 2 . 3e ;
    ╰╴           ━
 error[syntax-error]: expected field name
    ╭▸ 
-43 │ select 1 . 2 . 3e ;
+45 │ select 1 . 2 . 3e ;
    ╰╴               ━
 error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
-43 │ select 1 . 2 . 3e ;
+45 │ select 1 . 2 . 3e ;
    ╰╴                ━
 error[syntax-error]: expected field name
    ╭▸ 
-44 │ select (1) . 0e ;
+46 │ select (1) . 0e ;
    ╰╴             ━
 error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
-44 │ select (1) . 0e ;
+46 │ select (1) . 0e ;
    ╰╴              ━
 error[syntax-error]: expected field name, got L_ANGLE
    ╭▸ 
-46 │ select x.< from t;
+48 │ select x.< from t;
    ╰╴         ━
 error[syntax-error]: expected an expression, found FROM_KW
    ╭▸ 
-46 │ select x.< from t;
+48 │ select x.< from t;
    ╰╴           ━
 error[syntax-error]: type modifiers require a string literal
    ╭▸ 
-49 │ select timestamp with time zone;
+51 │ select timestamp with time zone;
    ╰╴                               ━
 error[syntax-error]: type modifiers require a string literal
    ╭▸ 
-50 │ select time with time zone ('04:05:06+08');
+52 │ select time with time zone ('04:05:06+08');
    ╰╴                          ━
 error[syntax-error]: type modifiers require a string literal
    ╭▸ 
-51 │ select interval month;
+53 │ select interval month;
    ╰╴                     ━
 error[syntax-error]: type modifiers require a string literal
    ╭▸ 
-52 │ select bit varying;
+54 │ select bit varying;
    ╰╴                  ━
 error[syntax-error]: type modifiers require a string literal
    ╭▸ 
-53 │ select national character;
+55 │ select national character;
    ╰╴                         ━
 error[syntax-error]: type modifiers require a string literal
    ╭▸ 
-54 │ select double precision;
+56 │ select double precision;
    ╰╴                       ━
 error[syntax-error]: type modifiers require a string literal
    ╭▸ 
-55 │ select character varying;
+57 │ select character varying;
    ╰╴                        ━

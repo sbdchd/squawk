@@ -21038,7 +21038,7 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
             }
             doc = doc.append(build_type_precision(
                 interval_type.l_paren_token(),
-                interval_type.literal(),
+                interval_type.expr(),
                 interval_type.r_paren_token(),
             ));
             if let Some(qualifier) = interval_type.interval_qualifier() {
@@ -21071,7 +21071,7 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
             }
             doc.append(build_type_precision(
                 time_type.l_paren_token(),
-                time_type.literal(),
+                time_type.expr(),
                 time_type.r_paren_token(),
             ))
             .append(build_timezone(time_type.timezone()))
@@ -21085,7 +21085,7 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
             }
             doc.append(build_type_precision(
                 timestamp_type.l_paren_token(),
-                timestamp_type.literal(),
+                timestamp_type.expr(),
                 timestamp_type.r_paren_token(),
             ))
             .append(build_timezone(timestamp_type.timezone()))
@@ -21142,17 +21142,17 @@ fn build_type_args<'a>(arg_list: Option<ast::ArgList>) -> Doc<'a> {
 
 fn build_type_precision<'a>(
     l_paren: Option<SyntaxToken>,
-    literal: Option<ast::Literal>,
+    expr: Option<ast::Expr>,
     r_paren: Option<SyntaxToken>,
 ) -> Doc<'a> {
     let Some(l_paren) = l_paren else {
         return Doc::nil();
     };
     let mut doc = comments_before(l_paren).append(Doc::text("("));
-    if let Some(literal) = literal {
+    if let Some(expr) = expr {
         doc = doc
-            .append(leading_comments(literal.syntax()))
-            .append(build_literal(literal));
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(expr));
     }
     if let Some(r_paren) = r_paren {
         doc = doc.append(comments_before(r_paren));
@@ -21201,7 +21201,7 @@ fn build_interval_qualifier<'a>(qualifier: &ast::IntervalQualifier) -> Doc<'a> {
             }
             doc.append(build_type_precision(
                 second.l_paren_token(),
-                second.literal(),
+                second.literal().map(ast::Expr::Literal),
                 second.r_paren_token(),
             ))
         }

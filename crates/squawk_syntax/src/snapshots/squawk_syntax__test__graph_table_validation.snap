@@ -1,0 +1,50 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/graph_table.sql
+---
+SOURCE_FILE@0..48
+  SELECT@0..47
+    SELECT_CLAUSE@0..6
+      SELECT_KW@0..6 "select"
+    WHITESPACE@6..7 " "
+    FROM_CLAUSE@7..46
+      FROM_KW@7..11 "from"
+      WHITESPACE@11..12 " "
+      GRAPH_TABLE_FROM_ITEM@12..46
+        GRAPH_TABLE_FN@12..46
+          GRAPH_TABLE_KW@12..23 "graph_table"
+          L_PAREN@23..24 "("
+          PROPERTY_GRAPH_REF@24..25
+            PATH_REF@24..25
+              PATH_SEGMENT_REF@24..25
+                IDENT@24..25 "f"
+          WHITESPACE@25..26 " "
+          MATCH_KW@26..31 "match"
+          PATH_PATTERN_LIST@31..36
+            PATH_PATTERN@31..36
+              PATH_FACTOR@31..36
+                EDGE_ANY@31..32
+                  MINUS@31..32 "-"
+                GRAPH_PATTERN_QUALIFIER@32..36
+                  L_CURLY@32..33 "{"
+                  QUALIFIER_MIN@33..35
+                    TUPLE_EXPR@33..35
+                      L_PAREN@33..34 "("
+                      R_PAREN@34..35 ")"
+                  R_CURLY@35..36 "}"
+          COLUMNS_KW@36..43 "columns"
+          EXPR_AS_COLUMN_NAME_LIST@43..45
+            L_PAREN@43..44 "("
+            R_PAREN@44..45 ")"
+          R_PAREN@45..46 ")"
+    SEMICOLON@46..47 ";"
+  WHITESPACE@47..48 "\n"
+
+error[syntax-error]: Graph pattern qualifier bounds must be integer constants
+  ╭▸ 
+1 │ select from graph_table(f match-{()}columns());
+  ╰╴                                 ━━
+error[syntax-error]: Expected at least one column
+  ╭▸ 
+1 │ select from graph_table(f match-{()}columns());
+  ╰╴                                           ━━

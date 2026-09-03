@@ -1895,6 +1895,290 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- only function names can be followed by an argument list"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            TUPLE_EXPR
+              L_PAREN "("
+              R_PAREN ")"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              NAME_REF
+                IDENT "f"
+              R_PAREN ")"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "f"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            INDEX_EXPR
+              NAME_REF
+                IDENT "f"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              R_BRACK "]"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                NAME_REF
+                  IDENT "f"
+                R_PAREN ")"
+              DOT "."
+              NAME_REF
+                IDENT "g"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bare aliases are only allowed in target elements"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          TUPLE_EXPR
+            L_PAREN "("
+            WHITESPACE "\n  "
+            BIN_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  LITERAL
+                    INT_NUMBER "1"
+                  WHITESPACE " "
+                  AND_KW "AND"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    INDEX_EXPR
+                      NAME_REF
+                        IDENT "p"
+                      L_BRACK "["
+                      R_BRACK "]"
+                    WHITESPACE " "
+                    EQ "="
+                    WHITESPACE " "
+                    CAST_EXPR
+                      LITERAL
+                        STRING "''"
+                      COLON_COLON
+                        COLON ":"
+                        COLON ":"
+                      PATH_TYPE
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            IDENT "r"
+                R_PAREN ")"
+              WHITESPACE " "
+              OR_KW "OR"
+              ERROR
+                COMMA ","
+            WHITESPACE "\n  "
+            CALL_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  BIN_EXPR
+                    LITERAL
+                      INT_NUMBER "2"
+                    WHITESPACE " "
+                    AND_KW "AND"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      INDEX_EXPR
+                        NAME_REF
+                          IDENT "p"
+                        L_BRACK "["
+                        R_BRACK "]"
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      CAST_EXPR
+                        LITERAL
+                          STRING "''"
+                        COLON_COLON
+                          COLON ":"
+                          COLON ":"
+                        PATH_TYPE
+                          PATH_REF
+                            PATH_SEGMENT_REF
+                              IDENT "r"
+                  WHITESPACE " "
+                  AND_KW "AND"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    INDEX_EXPR
+                      NAME_REF
+                        IDENT "p"
+                      L_BRACK "["
+                      R_BRACK "]"
+                    WHITESPACE " "
+                    EQ "="
+                    WHITESPACE " "
+                    CAST_EXPR
+                      LITERAL
+                        STRING "''"
+                      COLON_COLON
+                        COLON ":"
+                        COLON ":"
+                      PATH_TYPE
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            IDENT "r"
+                R_PAREN ")"
+              ARG_LIST
+                L_PAREN "("
+                WHITESPACE "\n    "
+                ARG
+                  BIN_EXPR
+                    BIN_EXPR
+                      BIN_EXPR
+                        LITERAL
+                          INT_NUMBER "3"
+                        WHITESPACE " "
+                        AND_KW "AND"
+                        WHITESPACE " "
+                        BIN_EXPR
+                          INDEX_EXPR
+                            NAME_REF
+                              IDENT "p"
+                            L_BRACK "["
+                            R_BRACK "]"
+                          WHITESPACE " "
+                          EQ "="
+                          WHITESPACE " "
+                          CAST_EXPR
+                            LITERAL
+                              STRING "''"
+                            COLON_COLON
+                              COLON ":"
+                              COLON ":"
+                            PATH_TYPE
+                              PATH_REF
+                                PATH_SEGMENT_REF
+                                  IDENT "r"
+                      WHITESPACE " "
+                      AND_KW "AND"
+                      WHITESPACE " "
+                      BIN_EXPR
+                        INDEX_EXPR
+                          NAME_REF
+                            IDENT "p"
+                          L_BRACK "["
+                          R_BRACK "]"
+                        WHITESPACE " "
+                        EQ "="
+                        WHITESPACE " "
+                        CAST_EXPR
+                          LITERAL
+                            STRING "''"
+                          COLON_COLON
+                            COLON ":"
+                            COLON ":"
+                          PATH_TYPE
+                            PATH_REF
+                              PATH_SEGMENT_REF
+                                IDENT "r"
+                    WHITESPACE " "
+                    AND_KW "AND"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      INDEX_EXPR
+                        NAME_REF
+                          IDENT "p"
+                        L_BRACK "["
+                        R_BRACK "]"
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      CAST_EXPR
+                        LITERAL
+                          STRING "''"
+                        COLON_COLON
+                          COLON ":"
+                          COLON ":"
+                        PATH_TYPE
+                          PATH_REF
+                            PATH_SEGMENT_REF
+                              IDENT "r"
+                WHITESPACE "\n  "
+                R_PAREN ")"
+            WHITESPACE "\n"
+            R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected trailing comma
@@ -2157,3 +2441,41 @@ error[syntax-error]: expected an expression
     ╭▸ 
 170 │ select distinct on () 1;
     ╰╴                    ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+173 │ select ()();
+    ╰╴         ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+174 │ select 1();
+    ╰╴        ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+175 │ select (f)();
+    ╰╴          ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+176 │ select f()();
+    ╰╴          ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+177 │ select f[1]();
+    ╰╴           ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+178 │ select (f).g();
+    ╰╴            ━
+error[syntax-error]: expected an expression, found COMMA
+    ╭▸ 
+182 │   (1 AND p[] = ''::r) OR,
+    ╰╴                        ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+182 │     (1 AND p[] = ''::r) OR,
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+183 │ ┃   (2 AND p[] = ''::r AND p[] = ''::r)(
+    ╰╴┗━┛
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+183 │   (2 AND p[] = ''::r AND p[] = ''::r)(
+    ╰╴                                     ━

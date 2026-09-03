@@ -56,6 +56,58 @@ SOURCE_FILE
     NULL_KW "null"
   EMPTY_STMT
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- configuration value lists cannot have a trailing comma"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "s"
+      TO_CONFIG_VALUE
+        EQ "="
+        LITERAL
+          STRING "''"
+        COMMA ","
+        CONFIG_VALUE_NAME
+          IDENT "F"
+        COMMA ","
+        LITERAL
+          STRING "''''"
+        COMMA ","
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "c"
+      TO_CONFIG_VALUE
+        EQ "="
+        LITERAL
+          STRING "''"
+        COMMA ","
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "m"
+      TO_CONFIG_VALUE
+        EQ "="
+        LITERAL
+          INT_NUMBER "2"
+        COMMA ","
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected command, found COMMA
@@ -82,3 +134,15 @@ error[syntax-error]: expected command, found NULL_KW
   ╭▸ 
 8 │ set time zone null;
   ╰╴              ━
+error[syntax-error]: expected config value after comma
+   ╭▸ 
+11 │ set s='',F,'''',;
+   ╰╴                ━
+error[syntax-error]: expected config value after comma
+   ╭▸ 
+13 │ set c='',;
+   ╰╴         ━
+error[syntax-error]: expected config value after comma
+   ╭▸ 
+15 │ set m=2,
+   ╰╴        ━

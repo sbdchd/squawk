@@ -32,8 +32,11 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::CustomOp(it) => validate_custom_op_length(it, errors),
                 ast::Do(it) => validate_do(it, errors),
                 ast::FuncOptionList(it) => validate_func_option_list(it, errors),
+                ast::FunctionFromItem(it) => validate_function_from_item(it, errors),
                 ast::FunctionSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::FromAlias(it) => validate_non_empty_column_list(it.columns(), errors),
+                ast::GraphPatternQualifier(it) => validate_graph_pattern_qualifier(it, errors),
+                ast::GraphTableFn(it) => validate_graph_table_fn(it, errors),
                 ast::RetType(it) => validate_non_empty_column_list(it.return_table_arg_list(), errors),
                 ast::WithTable(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
@@ -48,7 +51,9 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::SelectInto(it) => validate_select_into(it, errors),
                 ast::SetSingleColumn(it) => validate_set_single_column(it, errors),
                 ast::SourceFile(it) => validate_source_file(it, errors),
+                ast::TimestampType(it) => validate_timestamp_precision(it, errors),
                 ast::Type(it) => validate_type_modifiers(it, errors),
+                ast::TupleExpr(it) => validate_tuple_expr(it, errors),
                 _ => (),
             }
         }
@@ -76,6 +81,60 @@ fn validate_non_empty_column_list(column_list: Option<impl AstNode>, acc: &mut V
         "Expected at least one column",
         syntax.text_range(),
     ));
+}
+
+fn validate_function_from_item(item: ast::FunctionFromItem, acc: &mut Vec<SyntaxError>) {
+    if let Some(only) = item.only_token() {
+        acc.push(SyntaxError::new(
+            "ONLY cannot be used with a function call",
+            only.text_range(),
+        ));
+    }
+}
+
+fn validate_tuple_expr(tuple: ast::TupleExpr, acc: &mut Vec<SyntaxError>) {
+    if tuple.exprs().next().is_none()
+        && tuple
+            .syntax()
+            .parent()
+            .is_some_and(|parent| parent.kind() == FIELD_EXPR)
+    {
+        acc.push(SyntaxError::new(
+            "Field access requires an expression before the field name",
+            tuple.syntax().text_range(),
+        ));
+    }
+}
+
+fn validate_graph_pattern_qualifier(
+    qualifier: ast::GraphPatternQualifier,
+    acc: &mut Vec<SyntaxError>,
+) {
+    for bound in [
+        qualifier
+            .min()
+            .map(|bound| (bound.literal(), bound.syntax().clone())),
+        qualifier
+            .max()
+            .map(|bound| (bound.literal(), bound.syntax().clone())),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        if !matches!(
+            bound.0.and_then(|literal| literal.kind()),
+            Some(LitKind::IntNumber(_))
+        ) {
+            acc.push(SyntaxError::new(
+                "Graph pattern qualifier bounds must be integer constants",
+                bound.1.text_range(),
+            ));
+        }
+    }
+}
+
+fn validate_graph_table_fn(graph_table: ast::GraphTableFn, acc: &mut Vec<SyntaxError>) {
+    validate_non_empty_column_list(graph_table.expr_as_column_name_list(), acc);
 }
 
 fn validate_atomic_body(it: ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
@@ -141,6 +200,20 @@ fn validate_source_file(it: ast::SourceFile, acc: &mut Vec<SyntaxError>) {
 }
 
 fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
+    if it
+        .select_clause()
+        .is_some_and(|clause| clause.target_list().is_none())
+        && it
+            .syntax()
+            .parent()
+            .is_some_and(|parent| parent.kind() == TUPLE_EXPR)
+    {
+        acc.push(SyntaxError::new(
+            "Expected a target after SELECT",
+            it.syntax().text_range(),
+        ));
+    }
+
     let Some(from_clause) = it.from_clause() else {
         return;
     };
@@ -181,6 +254,23 @@ fn validate_cast_expr(it: ast::CastExpr, acc: &mut Vec<SyntaxError>) {
         _ => return,
     };
     acc.push(SyntaxError::new(message, token.text_range()));
+}
+
+fn validate_timestamp_precision(timestamp: ast::TimestampType, acc: &mut Vec<SyntaxError>) {
+    let Some(expr) = timestamp.expr() else {
+        return;
+    };
+    if matches!(
+        expr,
+        ast::Expr::Literal(ref literal)
+            if matches!(literal.kind(), Some(LitKind::IntNumber(_)))
+    ) {
+        return;
+    }
+    acc.push(SyntaxError::new(
+        "Timestamp precision must be an integer constant",
+        expr.syntax().text_range(),
+    ));
 }
 
 fn validate_type_modifiers(ty: ast::Type, acc: &mut Vec<SyntaxError>) {
