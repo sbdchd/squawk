@@ -639,6 +639,88 @@ SOURCE_FILE
             WHITESPACE " "
             VARYING_KW "varying"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- timestamp and time precision requires an unsigned integer"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "''"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            TIMESTAMP_TYPE
+              TIMESTAMP_KW "timestamp"
+              L_PAREN "("
+              ERROR
+                LITERAL
+                  NUMERIC_NUMBER "1.5"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "''"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            TIME_TYPE
+              TIME_KW "time"
+              L_PAREN "("
+              ERROR
+                PREFIX_EXPR
+                  MINUS "-"
+                  LITERAL
+                    INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            TIMESTAMP_TYPE
+              TIMESTAMP_KW "timestamp"
+              L_PAREN "("
+              ERROR
+                NAME_REF
+                  IDENT "foo"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "''"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            TIME_TYPE
+              TIME_KW "time"
+              L_PAREN "("
+              ERROR
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "''"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: trailing junk after numeric literal
@@ -901,3 +983,23 @@ error[syntax-error]: type modifiers require a string literal
    ╭▸ 
 57 │ select character varying;
    ╰╴                        ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+60 │ select ''::timestamp(1.5);
+   ╰╴                     ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+61 │ select ''::time(-1);
+   ╰╴                ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+62 │ select timestamp(foo) '';
+   ╰╴                 ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+63 │ select time() '';
+   ╰╴            ━
+error[syntax-error]: expected an expression, found R_PAREN
+   ╭▸ 
+63 │ select time() '';
+   ╰╴            ━

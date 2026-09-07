@@ -7940,14 +7940,20 @@ fn build_create_table_partition_type<'a>(partition_type: ast::PartitionType) -> 
             if let Some(modulus) = values.modulus() {
                 parts.push(
                     leading_comments(modulus.syntax())
-                        .append(build_keyword_node(modulus.syntax()))
+                        .append(append_literal(
+                            build_keyword_tokens([(modulus.ident_token(), "modulus")]),
+                            modulus.literal(),
+                        ))
                         .append(trailing_comments(modulus.syntax())),
                 );
             }
             if let Some(remainder) = values.remainder() {
                 parts.push(
                     leading_comments(remainder.syntax())
-                        .append(build_keyword_node(remainder.syntax()))
+                        .append(append_literal(
+                            build_keyword_tokens([(remainder.ident_token(), "remainder")]),
+                            remainder.literal(),
+                        ))
                         .append(trailing_comments(remainder.syntax())),
                 );
             }
@@ -12143,12 +12149,12 @@ fn build_role_option<'a>(option: ast::RoleOption) -> Doc<'a> {
     match option {
         ast::RoleOption::RoleOptionGeneric(n) => build_name(n.syntax()),
         ast::RoleOption::RoleOptionInherit(_) => Doc::text("inherit"),
-        ast::RoleOption::RoleOptionConnectionLimit(n) => append_literal(
+        ast::RoleOption::RoleOptionConnectionLimit(n) => append_expr(
             build_keyword_tokens([
                 (n.connection_token(), "connection"),
                 (n.limit_token(), "limit"),
             ]),
-            n.literal(),
+            n.expr(),
         ),
         ast::RoleOption::RoleOptionEncryptedPassword(n) => append_literal(
             build_keyword_tokens([
@@ -12203,6 +12209,17 @@ fn append_literal<'a>(mut doc: Doc<'a>, literal: Option<ast::Literal>) -> Doc<'a
     }
     doc
 }
+
+fn append_expr<'a>(mut doc: Doc<'a>, expr: Option<ast::Expr>) -> Doc<'a> {
+    if let Some(x) = expr {
+        doc = doc
+            .append(Doc::space())
+            .append(leading_comments(x.syntax()))
+            .append(build_expr(x));
+    }
+    doc
+}
+
 fn append_role_list<'a>(mut doc: Doc<'a>, roles: Option<ast::RoleRefList>) -> Doc<'a> {
     if let Some(x) = roles {
         doc = doc.append(
@@ -17808,7 +17825,7 @@ fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
 }
 
 fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren: bool) -> Doc<'a> {
-    if let (Some(expr), Some(arg_list)) = (call_expr.expr(), call_expr.arg_list()) {
+    let doc = if let (Some(expr), Some(arg_list)) = (call_expr.expr(), call_expr.arg_list()) {
         let mut doc = build_expr(expr);
         if space_before_paren && comment_tokens_before(arg_list.syntax().clone()).is_empty() {
             doc = doc.append(Doc::space());
@@ -17816,7 +17833,7 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
         doc = doc
             .append(comments_before(arg_list.syntax().clone()))
             .append(build_call_arg_list(arg_list));
-        build_call_expr_postfix_clauses(doc, &call_expr)
+        doc
     } else if let Some(all_fn) = call_expr.all_fn() {
         build_parenthesized_expr_or_select_fn(
             "all",
@@ -17848,7 +17865,7 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
     } else if let Some(graph_table_fn) = call_expr.graph_table_fn() {
         build_graph_table_fn(graph_table_fn)
     } else if let Some(json_array_agg_fn) = call_expr.json_array_agg_fn() {
-        build_call_expr_postfix_clauses(build_json_array_agg_fn(json_array_agg_fn), &call_expr)
+        build_json_array_agg_fn(json_array_agg_fn)
     } else if let Some(json_array_fn) = call_expr.json_array_fn() {
         build_json_array_fn(json_array_fn)
     } else if let Some(json_exists_fn) = call_expr.json_exists_fn() {
@@ -17856,7 +17873,7 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
     } else if let Some(json_fn) = call_expr.json_fn() {
         build_json_fn(json_fn)
     } else if let Some(json_object_agg_fn) = call_expr.json_object_agg_fn() {
-        build_call_expr_postfix_clauses(build_json_object_agg_fn(json_object_agg_fn), &call_expr)
+        build_json_object_agg_fn(json_object_agg_fn)
     } else if let Some(json_object_fn) = call_expr.json_object_fn() {
         build_json_object_fn(json_object_fn)
     } else if let Some(json_query_fn) = call_expr.json_query_fn() {
@@ -17899,7 +17916,8 @@ fn build_call_expr_with_spacing<'a>(call_expr: ast::CallExpr, space_before_paren
         build_xml_serialize_fn(xml_serialize_fn)
     } else {
         unreachable!("a call expression should contain a supported function node")
-    }
+    };
+    build_call_expr_postfix_clauses(doc, &call_expr)
 }
 
 fn build_call_expr_postfix_clauses<'a>(mut doc: Doc<'a>, call_expr: &ast::CallExpr) -> Doc<'a> {
@@ -18012,7 +18030,12 @@ fn build_path_factor<'a>(factor: ast::PathFactor) -> Doc<'a> {
         .unwrap_or_else(Doc::nil);
     if let Some(qualifier) = factor.graph_pattern_qualifier() {
         doc = doc
-            .append(leading_comments(qualifier.syntax()))
+            .append(
+                match comment_tokens_before(qualifier.syntax().clone()).as_slice() {
+                    [] => Doc::nil(),
+                    comments => Doc::space().append(build_leading_comments(comments)),
+                },
+            )
             .append(build_graph_pattern_qualifier(qualifier));
     }
     doc
@@ -21038,7 +21061,7 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
             }
             doc = doc.append(build_type_precision(
                 interval_type.l_paren_token(),
-                interval_type.expr(),
+                interval_type.literal(),
                 interval_type.r_paren_token(),
             ));
             if let Some(qualifier) = interval_type.interval_qualifier() {
@@ -21071,7 +21094,7 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
             }
             doc.append(build_type_precision(
                 time_type.l_paren_token(),
-                time_type.expr(),
+                time_type.literal(),
                 time_type.r_paren_token(),
             ))
             .append(build_timezone(time_type.timezone()))
@@ -21085,7 +21108,7 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
             }
             doc.append(build_type_precision(
                 timestamp_type.l_paren_token(),
-                timestamp_type.expr(),
+                timestamp_type.literal(),
                 timestamp_type.r_paren_token(),
             ))
             .append(build_timezone(timestamp_type.timezone()))
@@ -21142,17 +21165,17 @@ fn build_type_args<'a>(arg_list: Option<ast::ArgList>) -> Doc<'a> {
 
 fn build_type_precision<'a>(
     l_paren: Option<SyntaxToken>,
-    expr: Option<ast::Expr>,
+    literal: Option<ast::Literal>,
     r_paren: Option<SyntaxToken>,
 ) -> Doc<'a> {
     let Some(l_paren) = l_paren else {
         return Doc::nil();
     };
     let mut doc = comments_before(l_paren).append(Doc::text("("));
-    if let Some(expr) = expr {
+    if let Some(literal) = literal {
         doc = doc
-            .append(leading_comments(expr.syntax()))
-            .append(build_expr(expr));
+            .append(leading_comments(literal.syntax()))
+            .append(build_literal(literal));
     }
     if let Some(r_paren) = r_paren {
         doc = doc.append(comments_before(r_paren));
@@ -21201,7 +21224,7 @@ fn build_interval_qualifier<'a>(qualifier: &ast::IntervalQualifier) -> Doc<'a> {
             }
             doc.append(build_type_precision(
                 second.l_paren_token(),
-                second.literal().map(ast::Expr::Literal),
+                second.literal(),
                 second.r_paren_token(),
             ))
         }
@@ -21214,17 +21237,7 @@ fn build_interval_qualifier<'a>(qualifier: &ast::IntervalQualifier) -> Doc<'a> {
 }
 
 fn space_before_l_paren<'a>(l_paren: SyntaxToken) -> Doc<'a> {
-    let comments = comment_tokens_before(l_paren.clone());
-    if comments.is_empty() {
-        return Doc::space();
-    }
-    let ends_with_line_comment = comments.last().is_some_and(is_line_comment);
-    let doc = comments_before(l_paren);
-    if ends_with_line_comment {
-        doc
-    } else {
-        doc.append(Doc::space())
-    }
+    Doc::space().append(leading_comments_token(&l_paren))
 }
 
 fn comments_before<'a>(el: impl Into<SyntaxElement>) -> Doc<'a> {

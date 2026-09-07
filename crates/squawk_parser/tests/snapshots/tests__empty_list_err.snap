@@ -1,0 +1,2302 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/empty_list.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          LITERAL
+            STRING "'[]'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$'"
+          WHITESPACE " "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            XML_ELEMENT_FN
+              XMLELEMENT_KW "xmlelement"
+              L_PAREN "("
+              NAME_KW "name"
+              WHITESPACE " "
+              ELEMENT_TAG
+                IDENT "foo"
+              COMMA ","
+              WHITESPACE " "
+              XMLATTRIBUTES_KW "xmlattributes"
+              EXPR_AS_XML_ATTR_LIST
+                L_PAREN "("
+                R_PAREN ")"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            XML_FOREST_FN
+              XMLFOREST_KW "xmlforest"
+              EXPR_AS_ELEMENT_TAG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  ELEMENT_VARIABLE
+                    IDENT "a"
+                  R_PAREN ")"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            R_PAREN ")"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "g"
+    WHITESPACE " "
+    ADD_VERTEX_EDGE_LABEL_PROPERTIES
+      ALTER_KW "alter"
+      WHITESPACE " "
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      ELEMENT_TABLE_REF
+        IDENT "t"
+      WHITESPACE " "
+      ALTER_LABEL
+        ALTER_KW "alter"
+        WHITESPACE " "
+        LABEL_KW "label"
+        WHITESPACE " "
+        LABEL_REF
+          IDENT "l"
+      WHITESPACE " "
+      ADD_KW "add"
+      WHITESPACE " "
+      PROPERTIES_KW "properties"
+      WHITESPACE " "
+      EXPR_AS_PROPERTY_NAME_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "g"
+    WHITESPACE " "
+    DROP_VERTEX_EDGE_LABEL_PROPERTIES
+      ALTER_KW "alter"
+      WHITESPACE " "
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      ELEMENT_TABLE_REF
+        IDENT "t"
+      WHITESPACE " "
+      DROP_KW "drop"
+      WHITESPACE " "
+      PROPERTIES_KW "properties"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NUMERIC_KW "numeric"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      ROWS_FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      XML_TABLE_FROM_ITEM
+        XML_TABLE
+          XMLTABLE_KW "xmltable"
+          L_PAREN "("
+          XMLNAMESPACES_KW "xmlnamespaces"
+          XML_NAMESPACE_LIST
+            L_PAREN "("
+            R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          XML_ROW_PASSING_CLAUSE
+            LITERAL
+              STRING "'/a'"
+            WHITESPACE " "
+            PASSING_KW "passing"
+            WHITESPACE " "
+            XML_PASSING_DOC
+              NAME_REF
+                IDENT "x"
+          WHITESPACE " "
+          XML_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            XML_TABLE_COLUMN
+              COLUMN_NAME
+                IDENT "b"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    TEXT_KW "text"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_INDEX_METHOD
+          USING_KW "using"
+          WHITESPACE " "
+          ACCESS_METHOD_REF
+            IDENT "gist"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_SETS
+          GROUPING_KW "grouping"
+          WHITESPACE " "
+          SETS_KW "sets"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_ROLLUP
+          ROLLUP_KW "rollup"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_CUBE
+          CUBE_KW "cube"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      DISTINCT_CLAUSE
+        DISTINCT_KW "distinct"
+        WHITESPACE " "
+        DISTINCT_ON
+          ON_KW "on"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_FOR_VALUES_IN
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      IN_KW "in"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_FOR_VALUES_FROM
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      PARTITION_FROM_VALUES
+        L_PAREN "("
+        R_PAREN ")"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PARTITION_TO_VALUES
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    MERGE_PARTITIONS
+      MERGE_KW "merge"
+      WHITESPACE " "
+      PARTITIONS_KW "partitions"
+      WHITESPACE " "
+      TABLE_NAME_REF_LIST
+        L_PAREN "("
+        R_PAREN ")"
+      WHITESPACE " "
+      INTO_KW "into"
+      WHITESPACE " "
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            IDENT "p"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    SPLIT_PARTITION
+      SPLIT_KW "split"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "p"
+      WHITESPACE " "
+      INTO_KW "into"
+      WHITESPACE " "
+      PARTITION_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ANALYZE
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    OPTION_ITEM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLUSTER
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    OPTION_ITEM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REPACK
+    REPACK_KW "repack"
+    WHITESPACE " "
+    OPTION_ITEM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          IDENT "g"
+    WHITESPACE " "
+    VERTEX_TABLES
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          IDENT "g"
+    WHITESPACE " "
+    VERTEX_TABLES
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      VERTEX_TABLE_DEF
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "a"
+      R_PAREN ")"
+    WHITESPACE " "
+    EDGE_TABLES
+      EDGE_KW "edge"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "g"
+    WHITESPACE " "
+    DROP_EDGE_TABLES
+      DROP_KW "drop"
+      WHITESPACE " "
+      EDGE_KW "edge"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "g"
+    WHITESPACE " "
+    DROP_VERTEX_TABLES
+      DROP_KW "drop"
+      WHITESPACE " "
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PUBLICATION
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    PUBLICATION
+      IDENT "p"
+    WHITESPACE " "
+    FOR_ALL_PUBLICATION_OBJECTS
+      FOR_KW "for"
+      WHITESPACE " "
+      ALL_PUBLICATION_TABLES
+        ALL_KW "all"
+        WHITESPACE " "
+        TABLES_KW "tables"
+      WHITESPACE " "
+      EXCEPT_TABLE_CLAUSE
+        EXCEPT_KW "except"
+        WHITESPACE " "
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_STATISTICS
+    CREATE_KW "create"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    STATISTICS
+      PATH
+        PATH_SEGMENT
+          IDENT "s"
+    WHITESPACE " "
+    STAT_TYPES
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    STATISTICS_ON_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+    WHITESPACE " "
+    FROM_TABLE
+      FROM_KW "from"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_SERVER
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    SERVER_REF
+      IDENT "s"
+    WHITESPACE " "
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REINDEX
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    REINDEX_OPTION_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    REINDEX_TARGET_INDEX
+      INDEX_KW "index"
+      WHITESPACE " "
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "i"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CHECKPOINT
+    CHECKPOINT_KW "checkpoint"
+    WHITESPACE " "
+    CHECKPOINT_OPTION_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    VACUUM_OPTION_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    COPY_TO
+      TO_KW "to"
+      WHITESPACE " "
+      COPY_STDOUT
+        STDOUT_KW "stdout"
+    WHITESPACE " "
+    COPY_OPTION_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    COPY_TO
+      TO_KW "to"
+      WHITESPACE " "
+      COPY_STDOUT
+        STDOUT_KW "stdout"
+    WHITESPACE " "
+    COPY_OPTION_LIST
+      L_PAREN "("
+      COPY_OPTION
+        COPY_OPTION_KEY
+          IDENT "force_quote"
+        WHITESPACE " "
+        COPY_OPTION_VALUE
+          COPY_OPTION_LIST
+            L_PAREN "("
+            R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "t"
+    WHITESPACE " "
+    VALUES
+      VALUES_KW "values"
+      WHITESPACE " "
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+    WHITESPACE " "
+    ON_CONFLICT_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      CONFLICT_KW "conflict"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "t"
+    WHITESPACE " "
+    VALUES
+      VALUES_KW "values"
+      WHITESPACE " "
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+    WHITESPACE " "
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
+      WHITESPACE " "
+      RETURNING_OPTION_LIST
+        WITH_KW "with"
+        WHITESPACE " "
+        L_PAREN "("
+        R_PAREN ")"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE
+    UPDATE_KW "update"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "set"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_MULTIPLE_COLUMNS
+          COLUMN_TARGET_LIST
+            L_PAREN "("
+            COLUMN_TARGET
+              COLUMN_NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR_LIST
+            L_PAREN "("
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DATABASE
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    DATABASE_REF
+      IDENT "d"
+    WHITESPACE " "
+    DROP_DATABASE_FORCE_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_BY
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      PARTITION_STRATEGY
+        RANGE_KW "range"
+      WHITESPACE " "
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "a"
+      R_PAREN ")"
+    WHITESPACE " "
+    INDEX_INCLUDE_CLAUSE
+      INCLUDE_KW "include"
+      WHITESPACE " "
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        OP_CLASS_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "int4_ops"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      RETURN_TABLE_ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    WITH_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    RESET_OPTIONS
+      RESET_KW "reset"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_COLLATION
+    CREATE_KW "create"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    COLLATION
+      PATH
+        PATH_SEGMENT
+          IDENT "c"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      CUSTOM_OP
+        AT "@"
+        AT "@"
+        AT "@"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TYPE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TYPE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "x"
+    WHITESPACE " "
+    RANGE_TYPE
+      AS_KW "as"
+      WHITESPACE " "
+      RANGE_KW "range"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TYPE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TYPE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "x"
+    WHITESPACE " "
+    BASE_TYPE
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TEXT_SEARCH_PARSER
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    TEXT_SEARCH_PARSER
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_SUBSCRIPTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SUBSCRIPTION_KW "subscription"
+    WHITESPACE " "
+    SUBSCRIPTION_REF
+      IDENT "s"
+    WHITESPACE " "
+    SKIP_SUBSCRIPTION
+      SKIP_KW "skip"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        CTE_NAME
+          IDENT "t"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          R_PAREN ")"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+    WHITESPACE " "
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_MATERIALIZED_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "mv"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "x"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      ROWS_FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        ROWS_FROM_ARG
+          CALL_EXPR
+            NAME_REF
+              IDENT "generate_series"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              ARG
+                LITERAL
+                  INT_NUMBER "2"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          COLUMN_DEF_LIST
+            L_PAREN "("
+            R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        RELATION_FROM_ITEM
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "a"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          RELATION_FROM_ITEM
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "b"
+          WHITESPACE " "
+          JOIN_USING_CLAUSE
+            USING_KW "using"
+            WHITESPACE " "
+            COLUMN_REF_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      UNIQUE_CONSTRAINT
+        UNIQUE_KW "unique"
+        WHITESPACE " "
+        INDEX_PARAMETERS
+          CONSTRAINT_COLUMN_REF_LIST
+            L_PAREN "("
+            R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      UNIQUE_CONSTRAINT
+        UNIQUE_KW "unique"
+        WHITESPACE " "
+        INDEX_PARAMETERS
+          CONSTRAINT_COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+          WHITESPACE " "
+          CONSTRAINT_INCLUDE_CLAUSE
+            INCLUDE_KW "include"
+            WHITESPACE " "
+            COLUMN_REF_LIST
+              L_PAREN "("
+              R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        FOREIGN_KEY_COLUMN_LIST
+          L_PAREN "("
+          COLUMN_NAME_REF
+            IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "u"
+        WHITESPACE " "
+        FOREIGN_KEY_COLUMN_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "u"
+          WHITESPACE " "
+          L_PAREN "("
+          COLUMN_NAME_REF
+            IDENT "a"
+          R_PAREN ")"
+          WHITESPACE " "
+          ON_DELETE_ACTION
+            ON_KW "on"
+            WHITESPACE " "
+            DELETE_KW "delete"
+            WHITESPACE " "
+            SET_NULL_COLUMNS
+              SET_KW "set"
+              WHITESPACE " "
+              NULL_KW "null"
+              WHITESPACE " "
+              COLUMN_REF_LIST
+                L_PAREN "("
+                R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "u"
+          WHITESPACE " "
+          L_PAREN "("
+          COLUMN_NAME_REF
+            IDENT "a"
+          R_PAREN ")"
+          WHITESPACE " "
+          ON_DELETE_ACTION
+            ON_KW "on"
+            WHITESPACE " "
+            DELETE_KW "delete"
+            WHITESPACE " "
+            SET_DEFAULT_COLUMNS
+              SET_KW "set"
+              WHITESPACE " "
+              DEFAULT_KW "default"
+              WHITESPACE " "
+              COLUMN_REF_LIST
+                L_PAREN "("
+                R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_TARGET_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    VALUES
+      VALUES_KW "values"
+      WHITESPACE " "
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE
+    UPDATE_KW "update"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "set"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_MULTIPLE_COLUMNS
+          COLUMN_TARGET_LIST
+            L_PAREN "("
+            R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR_LIST
+            L_PAREN "("
+            SET_EXPR
+              LITERAL
+                INT_NUMBER "1"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_PUBLICATION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    PUBLICATION_REF
+      IDENT "p"
+    WHITESPACE " "
+    ADD_PUBLICATION_OBJECTS
+      ADD_KW "add"
+      WHITESPACE " "
+      PUBLICATION_OBJECT_TABLE
+        TABLE_KW "table"
+        WHITESPACE " "
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+        WHITESPACE " "
+        COLUMN_REF_LIST
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      COLUMN_REF_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "public"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        SELECT_KW "select"
+        WHITESPACE " "
+        COLUMN_REF_LIST
+          L_PAREN "("
+          R_PAREN ")"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "public"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REVOKE
+    REVOKE_KW "revoke"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        SELECT_KW "select"
+        WHITESPACE " "
+        COLUMN_REF_LIST
+          L_PAREN "("
+          R_PAREN ")"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "public"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    TABLE_AND_COLUMNS_LIST
+      TABLE_AND_COLUMNS
+        TABLE_RELATION_NAME
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "t"
+        WHITESPACE " "
+        COLUMN_REF_LIST
+          L_PAREN "("
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+      WHITESPACE " "
+      COLUMN_REF_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "stdin"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          IDENT "g"
+    WHITESPACE " "
+    VERTEX_TABLES
+      VERTEX_KW "vertex"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      VERTEX_TABLE_DEF
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+        WHITESPACE " "
+        ELEMENT_TABLE_KEY_CLAUSE
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          IDENT "g"
+    WHITESPACE " "
+    EDGE_TABLES
+      EDGE_KW "edge"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      EDGE_TABLE_DEF
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "e"
+        WHITESPACE " "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "source"
+          WHITESPACE " "
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_TABLE
+            REFERENCES_KW "references"
+            WHITESPACE " "
+            VERTEX_TABLE_REF
+              IDENT "v"
+            WHITESPACE " "
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+        WHITESPACE " "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "destination"
+          WHITESPACE " "
+          VERTEX_TABLE_REF
+            IDENT "w"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          IDENT "g"
+    WHITESPACE " "
+    EDGE_TABLES
+      EDGE_KW "edge"
+      WHITESPACE " "
+      TABLES_KW "tables"
+      WHITESPACE " "
+      L_PAREN "("
+      EDGE_TABLE_DEF
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "e"
+        WHITESPACE " "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "source"
+          WHITESPACE " "
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_TABLE
+            REFERENCES_KW "references"
+            WHITESPACE " "
+            VERTEX_TABLE_REF
+              IDENT "v"
+            WHITESPACE " "
+            COLUMN_REF_LIST
+              L_PAREN "("
+              R_PAREN ")"
+        WHITESPACE " "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "destination"
+          WHITESPACE " "
+          VERTEX_TABLE_REF
+            IDENT "w"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: Expected at least one item
+  ╭▸ 
+1 │ select * from json_table('[]', '$' columns ()) x;
+  ╰╴                                            ━
+error[syntax-error]: Expected at least one item
+  ╭▸ 
+3 │ select xmlelement(name foo, xmlattributes());
+  ╰╴                                          ━
+error[syntax-error]: Expected at least one item
+  ╭▸ 
+5 │ select xmlforest();
+  ╰╴                 ━
+error[syntax-error]: Expected at least one item
+  ╭▸ 
+7 │ select * from graph_table(g match (a) columns ());
+  ╰╴                                               ━
+error[syntax-error]: Expected at least one item
+  ╭▸ 
+9 │ alter property graph g alter vertex table t alter label l add properties ();
+  ╰╴                                                                          ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+11 │ alter property graph g alter vertex table t drop properties ();
+   ╰╴                                                             ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+13 │ select 1::numeric();
+   ╰╴                  ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+15 │ select * from rows from ();
+   ╰╴                         ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+17 │ select * from xmltable(xmlnamespaces(), '/a' passing x columns b text);
+   ╰╴                                     ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+19 │ create table t (a int, exclude using gist ());
+   ╰╴                                           ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+21 │ select 1 group by grouping sets ();
+   ╰╴                                 ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+23 │ select 1 group by rollup ();
+   ╰╴                          ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+25 │ select 1 group by cube ();
+   ╰╴                        ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+27 │ select distinct on () 1;
+   ╰╴                    ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+29 │ create table p partition of t for values in ();
+   ╰╴                                             ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+31 │ create table p partition of t for values from () to ();
+   ╰╴                                               ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+31 │ create table p partition of t for values from () to ();
+   ╰╴                                                     ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+33 │ alter table t merge partitions () into p;
+   ╰╴                                ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+35 │ alter table t split partition p into ();
+   ╰╴                                      ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+37 │ analyze ();
+   ╰╴         ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+39 │ cluster ();
+   ╰╴         ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+41 │ repack ();
+   ╰╴        ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+43 │ create property graph g vertex tables ();
+   ╰╴                                       ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+45 │ create property graph g vertex tables (a) edge tables ();
+   ╰╴                                                       ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+47 │ alter property graph g drop edge tables ();
+   ╰╴                                         ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+49 │ alter property graph g drop vertex tables ();
+   ╰╴                                           ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+51 │ create publication p for all tables except ();
+   ╰╴                                            ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+53 │ create statistics s () on a, b from t;
+   ╰╴                     ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+55 │ explain () select 1;
+   ╰╴         ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+57 │ alter server s options ();
+   ╰╴                        ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+59 │ reindex () index i;
+   ╰╴         ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+61 │ checkpoint ();
+   ╰╴            ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+63 │ vacuum ();
+   ╰╴        ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+65 │ copy t to stdout ();
+   ╰╴                  ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+67 │ copy t to stdout (force_quote ());
+   ╰╴                               ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+69 │ insert into t values (1) on conflict () do nothing;
+   ╰╴                                      ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+71 │ insert into t values (1) returning with () *;
+   ╰╴                                         ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+73 │ update t set (a) = ();
+   ╰╴                    ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+75 │ drop database d with ();
+   ╰╴                      ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+77 │ create table t (a int) partition by range ();
+   ╰╴                                           ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+79 │ create index on t ();
+   ╰╴                   ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+81 │ create index on t (a) include ();
+   ╰╴                               ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+83 │ create index on t (a int4_ops ());
+   ╰╴                               ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+85 │ create function f() returns table () as $$ $$ language sql;
+   ╰╴                                   ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+87 │ create table t (a int) with ();
+   ╰╴                             ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+89 │ alter table t reset ();
+   ╰╴                     ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+91 │ alter table t alter column a set ();
+   ╰╴                                  ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+93 │ create collation c ();
+   ╰╴                    ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+95 │ create operator @@@ ();
+   ╰╴                     ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+97 │ create type x as range ();
+   ╰╴                        ━
+error[syntax-error]: Expected at least one item
+   ╭▸ 
+99 │ create type x ();
+   ╰╴               ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+101 │ create text search parser p ();
+    ╰╴                             ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+103 │ alter subscription s skip ();
+    ╰╴                           ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+105 │ with t () as (select 1) select * from t;
+    ╰╴        ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+107 │ create view v () as select 1;
+    ╰╴               ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+109 │ create materialized view mv () as select 1;
+    ╰╴                             ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+111 │ select * from t x ();
+    ╰╴                   ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+113 │ select * from rows from (generate_series(1, 2) as ());
+    ╰╴                                                   ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+115 │ select * from a join b using ();
+    ╰╴                              ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+117 │ create table t (a int, unique ());
+    ╰╴                               ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+119 │ create table t (a int, unique (a) include ());
+    ╰╴                                           ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+121 │ create table t (a int, foreign key (a) references u ());
+    ╰╴                                                     ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+123 │ create table t (a int references u (a) on delete set null ());
+    ╰╴                                                           ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+125 │ create table t (a int references u (a) on delete set default ());
+    ╰╴                                                              ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+127 │ insert into t () values (1);
+    ╰╴               ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+129 │ update t set () = (1);
+    ╰╴              ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+131 │ alter publication p add table t ();
+    ╰╴                                 ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+133 │ grant all () on t to public;
+    ╰╴           ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+135 │ grant select () on t to public;
+    ╰╴              ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+137 │ revoke select () on t from public;
+    ╰╴               ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+139 │ vacuum t ();
+    ╰╴          ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+141 │ copy t () from stdin;
+    ╰╴        ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+143 │ create property graph g vertex tables (t key ());
+    ╰╴                                              ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+145 │ create property graph g edge tables (e source key () references v (a) destination w);
+    ╰╴                                                   ━
+error[syntax-error]: Expected at least one item
+    ╭▸ 
+147 │ create property graph g edge tables (e source key (a) references v () destination w);
+    ╰╴                                                                    ━

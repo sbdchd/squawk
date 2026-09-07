@@ -1,0 +1,188 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/alter_index_set_statistics.sql
+---
+SOURCE_FILE
+  ALTER_INDEX
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "i"
+    WHITESPACE " "
+    ALTER_SET_STATISTICS
+      ALTER_KW "alter"
+      ERROR
+        PREFIX_EXPR
+          MINUS "-"
+          PREFIX_EXPR
+            CUSTOM_OP
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              INT_NUMBER "1"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_INDEX
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "i"
+    WHITESPACE " "
+    ALTER_SET_STATISTICS
+      ALTER_KW "alter"
+      WHITESPACE " "
+      ERROR
+        LITERAL
+          NUMERIC_NUMBER "1.5"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_INDEX
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "i"
+    WHITESPACE " "
+    ALTER_SET_STATISTICS
+      ALTER_KW "alter"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        ERROR
+          LITERAL
+            NUMERIC_NUMBER "1.5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_INDEX
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "i"
+    WHITESPACE " "
+    ALTER_SET_STATISTICS
+      ALTER_KW "alter"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        ERROR
+          PREFIX_EXPR
+            MINUS "-"
+            LITERAL
+              NUMERIC_NUMBER "1.5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_STATISTICS
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    SET_STATISTICS
+      SET_KW "set"
+      WHITESPACE " "
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      ERROR
+        LITERAL
+          NUMERIC_NUMBER "1.5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        ERROR
+          LITERAL
+            NUMERIC_NUMBER "1.5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected unsigned integer literal
+  ╭▸ 
+1 │ alter index i alter->>1 set statistics 1;
+  ╰╴                   ━
+error[syntax-error]: expected unsigned integer literal
+  ╭▸ 
+2 │ alter index i alter 1.5 set statistics 1;
+  ╰╴                    ━
+error[syntax-error]: expected integer literal
+  ╭▸ 
+3 │ alter index i alter 1 set statistics 1.5;
+  ╰╴                                     ━
+error[syntax-error]: expected integer literal
+  ╭▸ 
+4 │ alter index i alter 1 set statistics -1.5;
+  ╰╴                                     ━
+error[syntax-error]: expected integer literal
+  ╭▸ 
+5 │ alter statistics s set statistics 1.5;
+  ╰╴                                  ━
+error[syntax-error]: expected integer literal
+  ╭▸ 
+6 │ alter table t alter c set statistics 1.5;
+  ╰╴                                     ━

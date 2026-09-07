@@ -8,7 +8,7 @@ use std::ops::Range;
 
 use either::Either;
 
-use crate::ast::{AstNode, CastKind, LitKind, PrefixOp};
+use crate::ast::{AstNode, LitKind, PrefixOp};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
@@ -20,7 +20,6 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::Aggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::AtomicBody(it) => validate_atomic_body(it, errors),
                 ast::BinExpr(it) => validate_bin_expr(it, errors),
-                ast::CastExpr(it) => validate_cast_expr(it, errors),
                 ast::CreateAggregate(it) => {
                     validate_aggregate_params(it.param_list(), errors);
                     validate_aggregate_variadic_params(it.param_list(), errors);
@@ -28,17 +27,12 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::CreateFunction(it) => validate_create_function(it, errors),
                 ast::CreateProcedure(it) => validate_create_procedure(it, errors),
                 ast::CreateTable(it) => validate_create_table(it, errors),
-                ast::CreateViewLike(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::CustomOp(it) => validate_custom_op_length(it, errors),
                 ast::Do(it) => validate_do(it, errors),
+                ast::ExceptTableClause(it) => validate_except_table_clause(it, errors),
                 ast::FuncOptionList(it) => validate_func_option_list(it, errors),
                 ast::FunctionFromItem(it) => validate_function_from_item(it, errors),
                 ast::FunctionSig(it) => validate_param_defaults(it.param_list(), errors),
-                ast::FromAlias(it) => validate_non_empty_column_list(it.columns(), errors),
-                ast::GraphPatternQualifier(it) => validate_graph_pattern_qualifier(it, errors),
-                ast::GraphTableFn(it) => validate_graph_table_fn(it, errors),
-                ast::RetType(it) => validate_non_empty_column_list(it.return_table_arg_list(), errors),
-                ast::WithTable(it) => validate_non_empty_column_list(it.column_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ProcedureSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::RoutineSig(it) => validate_param_defaults(it.param_list(), errors),
@@ -46,14 +40,14 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
+                ast::ParenFromItem(it) => validate_paren_from_item(it, errors),
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
                 ast::Select(it) => validate_select(it, errors),
                 ast::SelectInto(it) => validate_select_into(it, errors),
+                ast::SetColumnList(it) => validate_set_column_list(it, errors),
                 ast::SetSingleColumn(it) => validate_set_single_column(it, errors),
                 ast::SourceFile(it) => validate_source_file(it, errors),
-                ast::TimestampType(it) => validate_timestamp_precision(it, errors),
                 ast::Type(it) => validate_type_modifiers(it, errors),
-                ast::TupleExpr(it) => validate_tuple_expr(it, errors),
                 _ => (),
             }
         }
@@ -67,20 +61,25 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     }
 }
 
-// an empty column list is only valid for a composite type:
-// `create type t as ()`
-fn validate_non_empty_column_list(column_list: Option<impl AstNode>, acc: &mut Vec<SyntaxError>) {
-    let Some(column_list) = column_list else {
+fn validate_except_table_clause(clause: ast::ExceptTableClause, acc: &mut Vec<SyntaxError>) {
+    let mut names = clause.except_table_names();
+    let Some(first) = names.next() else {
         return;
     };
-    let syntax = column_list.syntax();
-    if syntax.children().next().is_some() {
-        return;
+    if first.table_token().is_none() {
+        acc.push(SyntaxError::new(
+            "The first table in an EXCEPT list must use the TABLE keyword",
+            first.syntax().text_range(),
+        ));
     }
-    acc.push(SyntaxError::new(
-        "Expected at least one column",
-        syntax.text_range(),
-    ));
+    for name in std::iter::once(first).chain(names) {
+        if name.table_relation_name().is_none() {
+            acc.push(SyntaxError::new(
+                "Expected a table relation name",
+                name.syntax().text_range(),
+            ));
+        }
+    }
 }
 
 fn validate_function_from_item(item: ast::FunctionFromItem, acc: &mut Vec<SyntaxError>) {
@@ -92,49 +91,20 @@ fn validate_function_from_item(item: ast::FunctionFromItem, acc: &mut Vec<Syntax
     }
 }
 
-fn validate_tuple_expr(tuple: ast::TupleExpr, acc: &mut Vec<SyntaxError>) {
-    if tuple.exprs().next().is_none()
-        && tuple
-            .syntax()
-            .parent()
-            .is_some_and(|parent| parent.kind() == FIELD_EXPR)
+fn validate_paren_from_item(item: ast::ParenFromItem, acc: &mut Vec<SyntaxError>) {
+    let Some(alias) = item.alias() else {
+        return;
+    };
+    if item
+        .syntax()
+        .parent()
+        .is_some_and(|parent| parent.kind() == PAREN_SELECT)
     {
         acc.push(SyntaxError::new(
-            "Field access requires an expression before the field name",
-            tuple.syntax().text_range(),
+            "A subquery alias must follow all closing parentheses",
+            alias.syntax().text_range(),
         ));
     }
-}
-
-fn validate_graph_pattern_qualifier(
-    qualifier: ast::GraphPatternQualifier,
-    acc: &mut Vec<SyntaxError>,
-) {
-    for bound in [
-        qualifier
-            .min()
-            .map(|bound| (bound.literal(), bound.syntax().clone())),
-        qualifier
-            .max()
-            .map(|bound| (bound.literal(), bound.syntax().clone())),
-    ]
-    .into_iter()
-    .flatten()
-    {
-        if !matches!(
-            bound.0.and_then(|literal| literal.kind()),
-            Some(LitKind::IntNumber(_))
-        ) {
-            acc.push(SyntaxError::new(
-                "Graph pattern qualifier bounds must be integer constants",
-                bound.1.text_range(),
-            ));
-        }
-    }
-}
-
-fn validate_graph_table_fn(graph_table: ast::GraphTableFn, acc: &mut Vec<SyntaxError>) {
-    validate_non_empty_column_list(graph_table.expr_as_column_name_list(), acc);
 }
 
 fn validate_atomic_body(it: ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
@@ -200,13 +170,23 @@ fn validate_source_file(it: ast::SourceFile, acc: &mut Vec<SyntaxError>) {
 }
 
 fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
-    if it
-        .select_clause()
-        .is_some_and(|clause| clause.target_list().is_none())
+    let parent_kind = it.syntax().parent().map(|parent| parent.kind());
+    if parent_kind == Some(TUPLE_EXPR) {
+        let message = if it
+            .select_clause()
+            .is_some_and(|clause| clause.target_list().is_none())
+        {
+            "Expected a target after SELECT"
+        } else {
+            "Subqueries in tuple expressions must be parenthesized"
+        };
+        acc.push(SyntaxError::new(message, it.syntax().text_range()));
+    }
+
+    if parent_kind == Some(PAREN_EXPR)
         && it
-            .syntax()
-            .parent()
-            .is_some_and(|parent| parent.kind() == TUPLE_EXPR)
+            .select_clause()
+            .is_none_or(|clause| clause.target_list().is_none())
     {
         acc.push(SyntaxError::new(
             "Expected a target after SELECT",
@@ -218,7 +198,7 @@ fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
         return;
     };
     if let Some(select_clause) = it.select_clause() {
-        if from_clause.syntax().text_range().end() < select_clause.syntax().text_range().start() {
+        if from_clause.syntax().text_range().end() <= select_clause.syntax().text_range().start() {
             // Postgres dialect doesn't support leading from clauses, e.g., `from t select c`
             acc.push(SyntaxError::new(
                 "Leading from clauses are not supported in Postgres",
@@ -232,45 +212,6 @@ fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
             TextRange::empty(from_clause.syntax().text_range().start()),
         ));
     }
-}
-
-fn validate_cast_expr(it: ast::CastExpr, acc: &mut Vec<SyntaxError>) {
-    if it.kind() != Some(CastKind::TypeLiteral) {
-        return;
-    }
-    let Some(literal) = it.literal().and_then(|literal| literal.kind()) else {
-        return;
-    };
-    let (message, token) = match literal {
-        LitKind::BitString(token) => ("Bit string literals cannot be used in type literals", token),
-        LitKind::ByteString(token) => (
-            "Hexadecimal string literals cannot be used in type literals",
-            token,
-        ),
-        LitKind::NationalString(token) => (
-            "National character string literals cannot be used in type literals",
-            token,
-        ),
-        _ => return,
-    };
-    acc.push(SyntaxError::new(message, token.text_range()));
-}
-
-fn validate_timestamp_precision(timestamp: ast::TimestampType, acc: &mut Vec<SyntaxError>) {
-    let Some(expr) = timestamp.expr() else {
-        return;
-    };
-    if matches!(
-        expr,
-        ast::Expr::Literal(ref literal)
-            if matches!(literal.kind(), Some(LitKind::IntNumber(_)))
-    ) {
-        return;
-    }
-    acc.push(SyntaxError::new(
-        "Timestamp precision must be an integer constant",
-        expr.syntax().text_range(),
-    ));
 }
 
 fn validate_type_modifiers(ty: ast::Type, acc: &mut Vec<SyntaxError>) {
@@ -482,7 +423,6 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
     }
 
     validate_unicode_esc_string(&lit, acc);
-    validate_prefixed_strings(&lit, acc);
     validate_default_literal(&lit, acc);
 }
 
@@ -523,6 +463,15 @@ fn is_row_in_insert_values(row: &SyntaxNode) -> bool {
         .is_some_and(|p| matches!(p.kind(), INSERT | MERGE_INSERT))
 }
 
+fn validate_set_column_list(list: ast::SetColumnList, acc: &mut Vec<SyntaxError>) {
+    if list.set_columns().next().is_none() {
+        acc.push(SyntaxError::new(
+            "Expected at least one column assignment after SET",
+            list.syntax().text_range(),
+        ));
+    }
+}
+
 fn validate_set_single_column(it: ast::SetSingleColumn, acc: &mut Vec<SyntaxError>) {
     let Some(set_expr) = it.set_expr() else {
         return;
@@ -546,134 +495,6 @@ fn validate_set_single_column(it: ast::SetSingleColumn, acc: &mut Vec<SyntaxErro
         message,
         column_target.syntax().text_range(),
     ));
-}
-
-#[derive(Clone, Copy)]
-enum PrefixedKind {
-    Bit,
-    Byte,
-    Esc,
-}
-
-fn validate_prefixed_strings(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
-    let mut continuation: Option<PrefixedKind> = None;
-    for e in lit.syntax().children_with_tokens() {
-        let Some(token) = e.into_token() else {
-            continue;
-        };
-        match token.kind() {
-            ESC_STRING => {
-                let Some((inner, inner_start)) = prefixed_str_inner(&token, ['e', 'E']) else {
-                    continue;
-                };
-                validate_escape_string_content(inner, inner_start, acc);
-                continuation = Some(PrefixedKind::Esc);
-            }
-            BIT_STRING => {
-                let Some((inner, inner_start)) = prefixed_str_inner(&token, ['b', 'B']) else {
-                    continue;
-                };
-                validate_bit_string_content(inner, inner_start, acc);
-                continuation = Some(PrefixedKind::Bit);
-            }
-            BYTE_STRING => {
-                let Some((inner, inner_start)) = prefixed_str_inner(&token, ['x', 'X']) else {
-                    continue;
-                };
-                validate_byte_string_content(inner, inner_start, acc);
-                continuation = Some(PrefixedKind::Byte);
-            }
-            STRING => {
-                let Some(continuation) = continuation else {
-                    continue;
-                };
-                let Some(inner) = token
-                    .text()
-                    .strip_prefix('\'')
-                    .and_then(|s| s.strip_suffix('\''))
-                else {
-                    continue;
-                };
-                let inner_start = token.text_range().start() + TextSize::new(1);
-                match continuation {
-                    PrefixedKind::Esc => validate_escape_string_content(inner, inner_start, acc),
-                    PrefixedKind::Bit => validate_bit_string_content(inner, inner_start, acc),
-                    PrefixedKind::Byte => validate_byte_string_content(inner, inner_start, acc),
-                };
-            }
-            WHITESPACE | COMMENT => (),
-            _ => continuation = None,
-        }
-    }
-}
-
-fn validate_bit_string_content(inner: &str, inner_start: TextSize, acc: &mut Vec<SyntaxError>) {
-    for (i, c) in inner.char_indices() {
-        if c != '0' && c != '1' {
-            acc.push(SyntaxError::new(
-                format!(r#""{c}" is not a valid binary digit"#),
-                offset_range(inner_start, i..i + c.len_utf8()),
-            ));
-        }
-    }
-}
-
-fn validate_byte_string_content(inner: &str, inner_start: TextSize, acc: &mut Vec<SyntaxError>) {
-    for (i, c) in inner.char_indices() {
-        if !c.is_ascii_hexdigit() {
-            acc.push(SyntaxError::new(
-                format!(r#""{c}" is not a valid hexadecimal digit"#),
-                offset_range(inner_start, i..i + c.len_utf8()),
-            ));
-        }
-    }
-}
-
-fn prefixed_str_inner(token: &SyntaxToken, prefix: [char; 2]) -> Option<(&str, TextSize)> {
-    let inner = token
-        .text()
-        .strip_prefix(prefix)
-        .and_then(|s| s.strip_prefix('\''))
-        .and_then(|s| s.strip_suffix('\''))?;
-    let inner_start = token.text_range().start() + TextSize::new(2);
-    Some((inner, inner_start))
-}
-
-fn validate_escape_string_content(inner: &str, inner_start: TextSize, acc: &mut Vec<SyntaxError>) {
-    let mut chars = inner.char_indices().peekable();
-    while let Some((esc_start, c)) = chars.next() {
-        if c != '\\' {
-            continue;
-        }
-        let Some((next_pos, next_c)) = chars.next() else {
-            return;
-        };
-        let (required, example) = match next_c {
-            'u' => (4usize, r"\uXXXX"),
-            'U' => (8usize, r"\UXXXXXXXX"),
-            _ => continue,
-        };
-        let mut end = next_pos + next_c.len_utf8();
-        let mut got_all = true;
-        for _ in 0..required {
-            match chars.peek() {
-                Some(&(i, ch)) if ch.is_ascii_hexdigit() => {
-                    end = i + ch.len_utf8();
-                    chars.next();
-                }
-                _ => {
-                    got_all = false;
-                    break;
-                }
-            }
-        }
-        if !got_all {
-            acc.push(SyntaxError::new(
-                format!("Unicode escape requires {required} hex digits: {example}"),
-                offset_range(inner_start, esc_start..end),
-            ));
-        }
-    }
 }
 
 fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
@@ -746,23 +567,23 @@ fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
 }
 
 fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
-    let Some(inner) = token
+    let inner = token
         .text()
         .strip_prefix(['u', 'U'])
         .and_then(|s| s.strip_prefix("&\""))
-        .and_then(|s| s.strip_suffix('"'))
-    else {
-        return;
-    };
+        .and_then(|s| s.strip_suffix('"'));
 
     let mut escape_char = '\\';
-    let mut seen_uescape = false;
+    let mut uescape_token = None;
     let mut next = token.next_sibling_or_token();
     while let Some(element) = next {
         match element.kind() {
             WHITESPACE | COMMENT => (),
-            UESCAPE_KW => seen_uescape = true,
-            STRING if seen_uescape => {
+            UESCAPE_KW => uescape_token = element.as_token().cloned(),
+            STRING if uescape_token.is_some() => {
+                if inner.is_none() {
+                    break;
+                }
                 if let Some(string_token) = element.as_token() {
                     escape_char = match uescape_char(string_token.text()) {
                         Some(ch) => ch,
@@ -781,6 +602,16 @@ fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
         }
         next = element.next_sibling_or_token();
     }
+
+    let Some(inner) = inner else {
+        if let Some(uescape_token) = uescape_token {
+            acc.push(SyntaxError::new(
+                "UESCAPE can only follow a Unicode escape identifier",
+                uescape_token.text_range(),
+            ));
+        }
+        return;
+    };
 
     let inner_start = token.text_range().start() + TextSize::new(3);
     escape_unicode_esc_str(inner, escape_char, |range, result| {

@@ -23,8 +23,6 @@ reindex (concurrently no, verbose auto) index public.my_index;
 
 reindex (concurrently, verbose) table public.my_table;
 
-reindex () table my_table;
-
 reindex (
   concurrently true,
   tablespace an_intentionally_long_tablespace_name,

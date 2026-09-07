@@ -1896,6 +1896,219 @@ SOURCE_FILE
             INT_NUMBER "1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- GROUP BY requires at least one item"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      DISTINCT
+        DISTINCT_KW "distinct"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- GROUP BY lists cannot end before the following clause"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "b"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        CTE_NAME
+          IDENT "x"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+          WHITESPACE " "
+          GROUP_BY_CLAUSE
+            GROUP_KW "group"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            GROUP_BY_LIST
+              GROUPING_EXPR
+                NAME_REF
+                  IDENT "a"
+              COMMA ","
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ORDER BY requires an item and cannot end with a comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      SORT_BY_LIST
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  SORT_BY_LIST
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        IDENT "a"
+                    COMMA ","
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- only function names can be followed by an argument list"
   WHITESPACE "\n"
   SELECT
@@ -2429,53 +2642,89 @@ error[syntax-error]: expected command, found R_PAREN
     ╭▸ 
 165 │ select cast('42' as text collate "C");
     ╰╴                                    ━
-error[syntax-error]: expected an expression
+error[syntax-error]: Expected at least one item
     ╭▸ 
 168 │ select 1 group by rollup ();
     ╰╴                          ━
-error[syntax-error]: expected an expression
+error[syntax-error]: Expected at least one item
     ╭▸ 
 169 │ select 1 group by cube ();
     ╰╴                        ━
-error[syntax-error]: expected an expression
+error[syntax-error]: Expected at least one item
     ╭▸ 
 170 │ select distinct on () 1;
     ╰╴                    ━
-error[syntax-error]: expected function name before argument list
+error[syntax-error]: Expected at least one GROUP BY item
     ╭▸ 
-173 │ select ()();
-    ╰╴         ━
-error[syntax-error]: expected function name before argument list
+173 │ select 1 group by;
+    ╰╴                 ━
+error[syntax-error]: Expected at least one GROUP BY item
     ╭▸ 
-174 │ select 1();
+174 │ select 1 group by distinct;
+    ╰╴                          ━
+error[syntax-error]: Expected a GROUP BY item after comma
+    ╭▸ 
+177 │ select 1 group by a, order by b;
+    ╰╴                    ━
+error[syntax-error]: Expected a GROUP BY item after comma
+    ╭▸ 
+178 │ with x as (select 1 group by a,)
+    ╰╴                               ━
+error[syntax-error]: Expected at least one ORDER BY item
+    ╭▸ 
+182 │ select 1 order by;
+    ╰╴                 ━
+error[syntax-error]: Expected an ORDER BY item after comma
+    ╭▸ 
+183 │ select 1 order by a, limit 1;
+    ╰╴                    ━
+error[syntax-error]: Expected at least one ORDER BY item
+    ╭▸ 
+184 │ select array_agg(a order by);
+    ╰╴                           ━
+error[syntax-error]: Expected an ORDER BY item after comma
+    ╭▸ 
+185 │ select array_agg(a order by a,);
+    ╰╴                              ━
+error[syntax-error]: Expected an expression
+    ╭▸ 
+188 │ select ()();
     ╰╴        ━
 error[syntax-error]: expected function name before argument list
     ╭▸ 
-175 │ select (f)();
+188 │ select ()();
+    ╰╴         ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+189 │ select 1();
+    ╰╴        ━
+error[syntax-error]: expected function name before argument list
+    ╭▸ 
+190 │ select (f)();
     ╰╴          ━
 error[syntax-error]: expected function name before argument list
     ╭▸ 
-176 │ select f()();
+191 │ select f()();
     ╰╴          ━
 error[syntax-error]: expected function name before argument list
     ╭▸ 
-177 │ select f[1]();
+192 │ select f[1]();
     ╰╴           ━
 error[syntax-error]: expected function name before argument list
     ╭▸ 
-178 │ select (f).g();
+193 │ select (f).g();
     ╰╴            ━
 error[syntax-error]: expected an expression, found COMMA
     ╭▸ 
-182 │   (1 AND p[] = ''::r) OR,
+197 │   (1 AND p[] = ''::r) OR,
     ╰╴                        ━
 error[syntax-error]: expected COMMA
     ╭▸ 
-182 │     (1 AND p[] = ''::r) OR,
+197 │     (1 AND p[] = ''::r) OR,
     │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-183 │ ┃   (2 AND p[] = ''::r AND p[] = ''::r)(
+198 │ ┃   (2 AND p[] = ''::r AND p[] = ''::r)(
     ╰╴┗━┛
 error[syntax-error]: expected function name before argument list
     ╭▸ 
-183 │   (2 AND p[] = ''::r AND p[] = ''::r)(
+198 │   (2 AND p[] = ''::r AND p[] = ''::r)(
     ╰╴                                     ━

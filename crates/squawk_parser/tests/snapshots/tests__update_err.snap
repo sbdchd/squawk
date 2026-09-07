@@ -82,6 +82,208 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--                ^ missing comma"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing SET commas in nested statements must not consume the outer clause"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_QUERY
+      L_PAREN "("
+      UPDATE
+        UPDATE_KW "update"
+        WHITESPACE " "
+        RELATION_NAME
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "t"
+        WHITESPACE " "
+        SET_CLAUSE
+          SET_KW "set"
+          WHITESPACE " "
+          SET_COLUMN_LIST
+            SET_SINGLE_COLUMN
+              COLUMN_TARGET
+                COLUMN_NAME_REF
+                  IDENT "v"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              SET_EXPR
+                LITERAL
+                  INT_NUMBER "1"
+            ERROR
+              COMMA ","
+      R_PAREN ")"
+    WHITESPACE " "
+    COPY_TO
+      TO_KW "to"
+      WHITESPACE " "
+      COPY_STDOUT
+        STDOUT_KW "stdout"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        CTE_NAME
+          IDENT "q"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        UPDATE
+          UPDATE_KW "update"
+          WHITESPACE " "
+          RELATION_NAME
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "t"
+          WHITESPACE " "
+          SET_CLAUSE
+            SET_KW "set"
+            WHITESPACE " "
+            SET_COLUMN_LIST
+              SET_SINGLE_COLUMN
+                COLUMN_TARGET
+                  COLUMN_NAME_REF
+                    IDENT "v"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                SET_EXPR
+                  LITERAL
+                    INT_NUMBER "1"
+              ERROR
+                COMMA ","
+        R_PAREN ")"
+    WHITESPACE " "
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "q"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  MERGE
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    USING_ON_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "s"
+      WHITESPACE " "
+      ON_CLAUSE
+        ON_KW "on"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+    WHITESPACE "\n"
+    MERGE_WHEN_MATCHED
+      WHEN_KW "when"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE " "
+      MERGE_UPDATE
+        UPDATE_KW "update"
+        WHITESPACE " "
+        SET_CLAUSE
+          SET_KW "set"
+          WHITESPACE " "
+          SET_COLUMN_LIST
+            SET_SINGLE_COLUMN
+              COLUMN_TARGET
+                COLUMN_NAME_REF
+                  IDENT "v"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              SET_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "s"
+                  DOT "."
+                  NAME_REF
+                    IDENT "v"
+            ERROR
+              COMMA ","
+    WHITESPACE "\n"
+    MERGE_WHEN_NOT_MATCHED_TARGET
+      WHEN_KW "when"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE " "
+      MERGE_INSERT
+        INSERT_KW "insert"
+        WHITESPACE " "
+        VALUES
+          VALUES_KW "values"
+          WHITESPACE " "
+          ROW_LIST
+            ROW
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "s"
+                DOT "."
+                NAME_REF
+                  IDENT "id"
+              COMMA ","
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "s"
+                DOT "."
+                NAME_REF
+                  IDENT "v"
+              R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA
@@ -92,3 +294,15 @@ error[syntax-error]: expected COMMA
   ╭▸ 
 4 │ update t set a = 1 b = 2;
   ╰╴                  ━
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+8 │ copy (update t set v = 1,) to stdout;
+  ╰╴                        ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+10 │ with q as (update t set v = 1,) select * from q;
+   ╰╴                             ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+13 │ when matched then update set v = s.v,
+   ╰╴                                    ━

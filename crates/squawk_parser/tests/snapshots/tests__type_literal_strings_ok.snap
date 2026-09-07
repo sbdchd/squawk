@@ -1,0 +1,96 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/type_literal_strings.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            NATIONAL_STRING "n'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              NATIONAL_STRING "n'a'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_KW "cast"
+            L_PAREN "("
+            LITERAL
+              NATIONAL_STRING "n'a'"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              BIT_STRING "b'01'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              BYTE_STRING "x'0a'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"

@@ -12,3 +12,6 @@ language sql;
 -- regression partial definition
 create function
 
+-- transform list cannot end with a comma
+create function f() returns int language sql as '' transform for type int,
+

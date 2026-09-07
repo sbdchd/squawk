@@ -15,3 +15,5 @@ insert into t (a, b, c)
 
 -- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint
 insert into t (a without overlaps) values (1);
+
+insert into t values

@@ -49,9 +49,453 @@ SOURCE_FILE
           WHITESPACE "\n"
           R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- graph pattern qualifiers require unsigned integer bounds"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+                WHITESPACE " "
+                GRAPH_PATTERN_QUALIFIER
+                  L_CURLY "{"
+                  QUALIFIER_MIN
+                    ERROR
+                      LITERAL
+                        NUMERIC_NUMBER "1.5"
+                  R_CURLY "}"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+                WHITESPACE " "
+                GRAPH_PATTERN_QUALIFIER
+                  L_CURLY "{"
+                  QUALIFIER_MIN
+                    ERROR
+                      NAME_REF
+                        IDENT "n"
+                  R_CURLY "}"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+                WHITESPACE " "
+                GRAPH_PATTERN_QUALIFIER
+                  L_CURLY "{"
+                  QUALIFIER_MIN
+                    LITERAL
+                      INT_NUMBER "1"
+                  COMMA ","
+                  QUALIFIER_MAX
+                    ERROR
+                      NAME_REF
+                        IDENT "n"
+                  R_CURLY "}"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+                WHITESPACE " "
+                GRAPH_PATTERN_QUALIFIER
+                  L_CURLY "{"
+                  COMMA ","
+                  QUALIFIER_MAX
+                    ERROR
+                      NAME_REF
+                        IDENT "n"
+                  R_CURLY "}"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+                WHITESPACE " "
+                GRAPH_PATTERN_QUALIFIER
+                  L_CURLY "{"
+                  QUALIFIER_MIN
+                    ERROR
+                      ERROR
+                        R_CURLY "}"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+                WHITESPACE " "
+                GRAPH_PATTERN_QUALIFIER
+                  L_CURLY "{"
+                  COMMA ","
+                  QUALIFIER_MAX
+                    ERROR
+                      ERROR
+                        R_CURLY "}"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- path pattern lists cannot end with a comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          WHITESPACE " "
+          L_PAREN "("
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  ELEMENT_VARIABLE
+                    IDENT "a"
+                  R_PAREN ")"
+            COMMA ","
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          WHITESPACE " "
+          L_PAREN "("
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  ELEMENT_VARIABLE
+                    IDENT "a"
+                  R_PAREN ")"
+            COMMA ","
+          WHITESPACE " "
+          WHERE_CLAUSE
+            WHERE_KW "where"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA
   ╭▸ 
 2 │   foo match - columns (a b)
   ╰╴                        ━
+error[syntax-error]: expected unsigned integer literal
+  ╭▸ 
+8 │   g match - {1.5} columns (a)
+  ╰╴             ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+12 │   g match - {n} columns (a)
+   ╰╴             ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+16 │   g match - {1,n} columns (a)
+   ╰╴               ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+20 │   g match - {,n} columns (a)
+   ╰╴              ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+24 │   g match - {} columns (a)
+   ╰╴             ━
+error[syntax-error]: expected an expression, found R_CURLY
+   ╭▸ 
+24 │   g match - {} columns (a)
+   ╰╴             ━
+error[syntax-error]: expected R_CURLY
+   ╭▸ 
+24 │   g match - {} columns (a)
+   ╰╴              ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+28 │   g match - {,} columns (a)
+   ╰╴              ━
+error[syntax-error]: expected an expression, found R_CURLY
+   ╭▸ 
+28 │   g match - {,} columns (a)
+   ╰╴              ━
+error[syntax-error]: expected R_CURLY
+   ╭▸ 
+28 │   g match - {,} columns (a)
+   ╰╴               ━
+error[syntax-error]: expected path pattern after comma
+   ╭▸ 
+32 │ select * from graph_table (g match (a), columns (a));
+   ╰╴                                       ━
+error[syntax-error]: expected path pattern after comma
+   ╭▸ 
+34 │ select * from graph_table (g match (a), where true columns (a));
+   ╰╴                                       ━

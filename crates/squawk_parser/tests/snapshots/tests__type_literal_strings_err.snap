@@ -1,0 +1,103 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/type_literal_strings.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            WHITESPACE " "
+            ERROR
+              LITERAL
+                NATIONAL_STRING "n'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NCHAR_KW "nchar"
+            WHITESPACE " "
+            ERROR
+              LITERAL
+                NATIONAL_STRING "n'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CHARACTER_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+            WHITESPACE " "
+            ERROR
+              LITERAL
+                NATIONAL_STRING "n'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            WHITESPACE " "
+            ERROR
+              LITERAL
+                BIT_STRING "b'01'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            VARCHAR_TYPE
+              VARCHAR_KW "varchar"
+            WHITESPACE " "
+            ERROR
+              LITERAL
+                BYTE_STRING "x'0a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: National character string literals cannot be used in type literals
+  ╭▸ 
+1 │ select varchar n'a';
+  ╰╴               ━
+error[syntax-error]: National character string literals cannot be used in type literals
+  ╭▸ 
+2 │ select nchar n'a';
+  ╰╴             ━
+error[syntax-error]: National character string literals cannot be used in type literals
+  ╭▸ 
+3 │ select national character n'a';
+  ╰╴                          ━
+error[syntax-error]: Bit string literals cannot be used in type literals
+  ╭▸ 
+4 │ select varchar b'01';
+  ╰╴               ━
+error[syntax-error]: Hexadecimal string literals cannot be used in type literals
+  ╭▸ 
+5 │ select varchar x'0a';
+  ╰╴               ━

@@ -1,0 +1,78 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/publication_except.sql
+---
+SOURCE_FILE@0..111
+  CREATE_PUBLICATION@0..58
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    PUBLICATION_KW@7..18 "publication"
+    WHITESPACE@18..19 " "
+    PUBLICATION@19..20
+      IDENT@19..20 "p"
+    WHITESPACE@20..21 " "
+    FOR_ALL_PUBLICATION_OBJECTS@21..57
+      FOR_KW@21..24 "for"
+      WHITESPACE@24..25 " "
+      ALL_PUBLICATION_TABLES@25..35
+        ALL_KW@25..28 "all"
+        WHITESPACE@28..29 " "
+        TABLES_KW@29..35 "tables"
+      WHITESPACE@35..36 " "
+      EXCEPT_TABLE_CLAUSE@36..57
+        EXCEPT_KW@36..42 "except"
+        WHITESPACE@42..43 " "
+        L_PAREN@43..44 "("
+        EXCEPT_TABLE_NAME@44..46
+          TABLE_RELATION_NAME@44..46
+            TABLE_NAME_REF@44..46
+              PATH_REF@44..46
+                PATH_SEGMENT_REF@44..46
+                  IDENT@44..46 "t1"
+        COMMA@46..47 ","
+        WHITESPACE@47..48 " "
+        EXCEPT_TABLE_NAME@48..56
+          TABLE_KW@48..53 "table"
+          WHITESPACE@53..54 " "
+          TABLE_RELATION_NAME@54..56
+            TABLE_NAME_REF@54..56
+              PATH_REF@54..56
+                PATH_SEGMENT_REF@54..56
+                  IDENT@54..56 "t2"
+        R_PAREN@56..57 ")"
+    SEMICOLON@57..58 ";"
+  WHITESPACE@58..59 "\n"
+  CREATE_PUBLICATION@59..110
+    CREATE_KW@59..65 "create"
+    WHITESPACE@65..66 " "
+    PUBLICATION_KW@66..77 "publication"
+    WHITESPACE@77..78 " "
+    PUBLICATION@78..79
+      IDENT@78..79 "p"
+    WHITESPACE@79..80 " "
+    FOR_ALL_PUBLICATION_OBJECTS@80..109
+      FOR_KW@80..83 "for"
+      WHITESPACE@83..84 " "
+      ALL_PUBLICATION_TABLES@84..94
+        ALL_KW@84..87 "all"
+        WHITESPACE@87..88 " "
+        TABLES_KW@88..94 "tables"
+      WHITESPACE@94..95 " "
+      EXCEPT_TABLE_CLAUSE@95..109
+        EXCEPT_KW@95..101 "except"
+        WHITESPACE@101..102 " "
+        L_PAREN@102..103 "("
+        EXCEPT_TABLE_NAME@103..108
+          TABLE_KW@103..108 "table"
+        R_PAREN@108..109 ")"
+    SEMICOLON@109..110 ";"
+  WHITESPACE@110..111 "\n"
+
+error[syntax-error]: The first table in an EXCEPT list must use the TABLE keyword
+  ╭▸ 
+1 │ create publication p for all tables except (t1, table t2);
+  ╰╴                                            ━━
+error[syntax-error]: Expected a table relation name
+  ╭▸ 
+2 │ create publication p for all tables except (table);
+  ╰╴                                            ━━━━━

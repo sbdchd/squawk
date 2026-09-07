@@ -1,0 +1,97 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/grant_role_option_trailing_comma.sql
+---
+SOURCE_FILE
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          IDENT "r"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "u"
+    WHITESPACE " "
+    GRANT_WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_ROLE_OPTION_LIST
+        GRANT_ROLE_OPTION
+          GRANT_ROLE_OPTION_NAME
+            ADMIN_KW "admin"
+          WHITESPACE " "
+          OPTION_KW "option"
+        COMMA ","
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          IDENT "r"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "u"
+    WHITESPACE " "
+    GRANT_WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_ROLE_OPTION_LIST
+        GRANT_ROLE_OPTION
+          GRANT_ROLE_OPTION_NAME
+            ADMIN_KW "admin"
+          WHITESPACE " "
+          TRUE_KW "true"
+        COMMA ","
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing comma at EOF"
+  WHITESPACE "\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          IDENT "r"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "u"
+    WHITESPACE " "
+    GRANT_WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_ROLE_OPTION_LIST
+        GRANT_ROLE_OPTION
+          GRANT_ROLE_OPTION_NAME
+            ADMIN_KW "admin"
+          WHITESPACE " "
+          OPTION_KW "option"
+        COMMA ","
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected role option after comma
+  ╭▸ 
+1 │ grant r to u with admin option,;
+  ╰╴                               ━
+error[syntax-error]: expected role option after comma
+  ╭▸ 
+3 │ grant r to u with admin true,;
+  ╰╴                             ━
+error[syntax-error]: expected role option after comma
+  ╭▸ 
+6 │ grant r to u with admin option,
+  ╰╴                               ━

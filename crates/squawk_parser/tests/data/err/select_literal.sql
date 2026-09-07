@@ -55,3 +55,9 @@ select bit varying;
 select national character;
 select double precision;
 select character varying;
+
+-- timestamp and time precision requires an unsigned integer
+select ''::timestamp(1.5);
+select ''::time(-1);
+select timestamp(foo) '';
+select time() '';

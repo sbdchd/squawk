@@ -124,7 +124,7 @@ CREATE PUBLICATION testpub_foralltables_excepttable1 FOR ALL TABLES EXCEPT (TABL
 -- in the EXCEPT clause
 -- \d testpub_tbl1
 -- fail - first table in the EXCEPT list should use TABLE keyword
-CREATE PUBLICATION testpub_foralltables_excepttable2 FOR ALL TABLES EXCEPT (testpub_tbl1, testpub_tbl2);
+-- CREATE PUBLICATION testpub_foralltables_excepttable2 FOR ALL TABLES EXCEPT (testpub_tbl1, testpub_tbl2);
 
 ---------------------------------------------
 -- SET ALL TABLES/SEQUENCES

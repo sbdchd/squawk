@@ -1,0 +1,22 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/table_and_columns_list.sql
+---
+SOURCE_FILE@0..11
+  ANALYZE@0..10
+    ANALYZE_KW@0..7 "ANALYZE"
+    WHITESPACE@7..8 " "
+    TABLE_AND_COLUMNS_LIST@8..10
+      TABLE_AND_COLUMNS@8..9
+        TABLE_RELATION_NAME@8..9
+          TABLE_NAME_REF@8..9
+            PATH_REF@8..9
+              PATH_SEGMENT_REF@8..9
+                IDENT@8..9 "v"
+      COMMA@9..10 ","
+  WHITESPACE@10..11 "\n"
+
+error[syntax-error]: expected table name after comma
+  ╭▸ 
+1 │ ANALYZE v,
+  ╰╴          ━

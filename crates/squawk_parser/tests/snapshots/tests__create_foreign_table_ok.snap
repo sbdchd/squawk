@@ -598,13 +598,15 @@ SOURCE_FILE
       PARTITION_MODULUS
         IDENT "modulus"
         WHITESPACE " "
-        INT_NUMBER "10"
+        LITERAL
+          INT_NUMBER "10"
       COMMA ","
       WHITESPACE " "
       PARTITION_REMAINDER
         IDENT "remainder"
         WHITESPACE " "
-        INT_NUMBER "2"
+        LITERAL
+          INT_NUMBER "2"
       R_PAREN ")"
     WHITESPACE "\n    "
     SERVER_CLAUSE

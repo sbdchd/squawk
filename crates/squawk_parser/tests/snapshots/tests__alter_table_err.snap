@@ -330,6 +330,14 @@ error[syntax-error]: unexpected comma
    ╭▸ 
 20 │   alter c set (a, , b = 1);
    ╰╴                  ━
+error[syntax-error]: Expected an expression
+   ╭▸ 
+24 │   ADD c t[] DEFAULT (())::t[],
+   ╰╴                      ━
+error[syntax-error]: Expected an expression
+   ╭▸ 
+25 │   ALTER c SET DEFAULT ''::d + (()),
+   ╰╴                                ━
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
 25 │   ALTER c SET DEFAULT ''::d + (()),

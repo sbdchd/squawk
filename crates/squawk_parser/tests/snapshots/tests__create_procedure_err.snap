@@ -1,0 +1,101 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/create_procedure.sql
+---
+SOURCE_FILE
+  COMMENT "-- transform list cannot end with a comma before a semicolon"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "''"
+      WHITESPACE "\n"
+      TRANSFORM_FUNC_OPTION
+        TRANSFORM_KW "transform"
+        WHITESPACE " "
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+        COMMA ","
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- transform list cannot end with a comma at EOF"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "''"
+      WHITESPACE " "
+      TRANSFORM_FUNC_OPTION
+        TRANSFORM_KW "transform"
+        WHITESPACE " "
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+        COMMA ","
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected FOR TYPE entry after comma
+  ╭▸ 
+5 │ transform for type int,;
+  ╰╴                       ━
+error[syntax-error]: expected FOR TYPE entry after comma
+  ╭▸ 
+8 │ create procedure p() language sql as '' transform for type int,
+  ╰╴                                                               ━

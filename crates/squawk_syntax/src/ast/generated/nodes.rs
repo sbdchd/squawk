@@ -1862,7 +1862,7 @@ impl AlterSetStatistics {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13197,11 +13197,11 @@ pub struct IntervalType {
 }
 impl IntervalType {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn interval_qualifier(&self) -> Option<IntervalQualifier> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn interval_qualifier(&self) -> Option<IntervalQualifier> {
+    pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19128,8 +19128,8 @@ pub struct PartitionModulus {
 }
 impl PartitionModulus {
     #[inline]
-    pub fn int_number_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INT_NUMBER)
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
@@ -19162,8 +19162,8 @@ pub struct PartitionRemainder {
 }
 impl PartitionRemainder {
     #[inline]
-    pub fn int_number_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INT_NUMBER)
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
@@ -21670,7 +21670,7 @@ pub struct Restart {
 }
 impl Restart {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -22104,7 +22104,7 @@ pub struct RoleOptionConnectionLimit {
 }
 impl RoleOptionConnectionLimit {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25465,7 +25465,7 @@ pub struct TimeType {
 }
 impl TimeType {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25511,7 +25511,7 @@ pub struct TimestampType {
 }
 impl TimestampType {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
     #[inline]

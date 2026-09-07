@@ -114,6 +114,14 @@ impl<'a> LexedStr<'a> {
 struct Converter<'a> {
     res: LexedStr<'a>,
     offset: usize,
+    prefixed_string_continuation: Option<PrefixedStringKind>,
+}
+
+#[derive(Clone, Copy)]
+enum PrefixedStringKind {
+    Bit,
+    Byte,
+    Escape,
 }
 
 fn is_empty_quoted_ident(token_text: &str, uescape: bool) -> bool {
@@ -137,6 +145,7 @@ impl<'a> Converter<'a> {
                 error: Vec::new(),
             },
             offset: 0,
+            prefixed_string_continuation: None,
         }
     }
 
@@ -159,6 +168,16 @@ impl<'a> Converter<'a> {
     }
 
     fn extend_token(&mut self, kind: &squawk_lexer::TokenKind, token_text: &str) {
+        if !matches!(
+            kind,
+            squawk_lexer::TokenKind::Whitespace
+                | squawk_lexer::TokenKind::LineComment
+                | squawk_lexer::TokenKind::BlockComment { .. }
+                | squawk_lexer::TokenKind::Literal { .. }
+        ) {
+            self.prefixed_string_continuation = None;
+        }
+
         // A note on an intended tradeoff:
         // We drop some useful information here (see patterns with double dots `..`)
         // Storing that info in `SyntaxKind` is not possible due to its layout requirements of
@@ -254,6 +273,7 @@ impl<'a> Converter<'a> {
     fn extend_literal(&mut self, token_text: &str, kind: &squawk_lexer::LiteralKind) {
         let mut err: Option<String> = None;
         let mut err_range: Option<ops::Range<u32>> = None;
+        let continuation = self.prefixed_string_continuation.take();
 
         let syntax_kind = match *kind {
             squawk_lexer::LiteralKind::Int {
@@ -304,6 +324,9 @@ impl<'a> Converter<'a> {
                 if !terminated {
                     err =
                         Some("Missing trailing `'` symbol to terminate the string literal".into());
+                } else if let Some(kind) = continuation {
+                    self.validate_prefixed_string_content(token_text, 1, kind);
+                    self.prefixed_string_continuation = Some(kind);
                 }
                 SyntaxKind::STRING
             }
@@ -322,8 +345,10 @@ impl<'a> Converter<'a> {
                         "Missing trailing `'` symbol to terminate the hex bit string literal"
                             .into(),
                     );
+                } else {
+                    self.validate_prefixed_string_content(token_text, 2, PrefixedStringKind::Byte);
+                    self.prefixed_string_continuation = Some(PrefixedStringKind::Byte);
                 }
-                // digit validation in squawk_syntax
                 SyntaxKind::BYTE_STRING
             }
             squawk_lexer::LiteralKind::BitStr { terminated } => {
@@ -331,8 +356,10 @@ impl<'a> Converter<'a> {
                     err = Some(
                         "Missing trailing `'` symbol to terminate the bit string literal".into(),
                     );
+                } else {
+                    self.validate_prefixed_string_content(token_text, 2, PrefixedStringKind::Bit);
+                    self.prefixed_string_continuation = Some(PrefixedStringKind::Bit);
                 }
-                // digit validation in squawk_syntax
                 SyntaxKind::BIT_STRING
             }
             squawk_lexer::LiteralKind::DollarQuotedString { terminated } => {
@@ -357,8 +384,14 @@ impl<'a> Converter<'a> {
                     err = Some(
                         "Missing trailing `'` symbol to terminate the escape string literal".into(),
                     );
+                } else {
+                    self.validate_prefixed_string_content(
+                        token_text,
+                        2,
+                        PrefixedStringKind::Escape,
+                    );
+                    self.prefixed_string_continuation = Some(PrefixedStringKind::Escape);
                 }
-                // unicode escape sequences validated in squawk_syntax
                 SyntaxKind::ESC_STRING
             }
         };
@@ -368,12 +401,91 @@ impl<'a> Converter<'a> {
             .map(|msg| (msg, err_range.unwrap_or(0..token_text.len() as u32)));
         self.push(syntax_kind, token_text.len(), err);
     }
+
+    fn validate_prefixed_string_content(
+        &mut self,
+        token_text: &str,
+        inner_start: usize,
+        kind: PrefixedStringKind,
+    ) {
+        let inner = &token_text[inner_start..token_text.len() - 1];
+        match kind {
+            PrefixedStringKind::Bit => {
+                for (i, c) in inner.char_indices() {
+                    if !matches!(c, '0' | '1') {
+                        self.push_content_error(
+                            format!(r#""{c}" is not a valid binary digit"#),
+                            inner_start + i,
+                            c.len_utf8(),
+                        );
+                    }
+                }
+            }
+            PrefixedStringKind::Byte => {
+                for (i, c) in inner.char_indices() {
+                    if !c.is_ascii_hexdigit() {
+                        self.push_content_error(
+                            format!(r#""{c}" is not a valid hexadecimal digit"#),
+                            inner_start + i,
+                            c.len_utf8(),
+                        );
+                    }
+                }
+            }
+            PrefixedStringKind::Escape => {
+                let mut chars = inner.char_indices().peekable();
+                while let Some((escape_start, c)) = chars.next() {
+                    if c != '\\' {
+                        continue;
+                    }
+                    let Some((next_pos, next_c)) = chars.next() else {
+                        break;
+                    };
+                    let (required, example) = match next_c {
+                        'u' => (4usize, r"\uXXXX"),
+                        'U' => (8usize, r"\UXXXXXXXX"),
+                        _ => continue,
+                    };
+                    let mut end = next_pos + next_c.len_utf8();
+                    let mut got_all = true;
+                    for _ in 0..required {
+                        match chars.peek() {
+                            Some(&(i, ch)) if ch.is_ascii_hexdigit() => {
+                                end = i + ch.len_utf8();
+                                chars.next();
+                            }
+                            _ => {
+                                got_all = false;
+                                break;
+                            }
+                        }
+                    }
+                    if !got_all {
+                        self.push_content_error(
+                            format!("Unicode escape requires {required} hex digits: {example}"),
+                            inner_start + escape_start,
+                            end - escape_start,
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    fn push_content_error(&mut self, msg: String, start: usize, len: usize) {
+        let token_start = self.offset as u32;
+        let start = token_start + start as u32;
+        self.res.error.push(LexError {
+            msg,
+            range: start..start + len as u32,
+        });
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
-    use insta::assert_snapshot;
+    use insta::{assert_debug_snapshot, assert_snapshot};
 
     use super::LexedStr;
 
@@ -394,6 +506,70 @@ mod tests {
         }
 
         res
+    }
+
+    fn lex_errors(text: &str) -> Vec<(std::ops::Range<u32>, String)> {
+        LexedStr::new(text)
+            .errors()
+            .map(|(range, msg)| (range.clone(), msg.to_owned()))
+            .collect()
+    }
+
+    #[test]
+    fn prefixed_string_content_errors() {
+        assert_debug_snapshot!(lex_errors("B'102' X'1G' E'\\u00'"), @r#"
+        [
+            (
+                4..5,
+                "\"2\" is not a valid binary digit",
+            ),
+            (
+                10..11,
+                "\"G\" is not a valid hexadecimal digit",
+            ),
+            (
+                15..19,
+                "Unicode escape requires 4 hex digits: \\uXXXX",
+            ),
+        ]
+        "#);
+    }
+
+    #[test]
+    fn prefixed_string_continuations_use_the_initial_string_kind() {
+        assert_debug_snapshot!(lex_errors("B'0'\n'2'"), @r#"
+        [
+            (
+                6..7,
+                "\"2\" is not a valid binary digit",
+            ),
+        ]
+        "#);
+        assert_debug_snapshot!(lex_errors("X'F'\n'G'"), @r#"
+        [
+            (
+                6..7,
+                "\"G\" is not a valid hexadecimal digit",
+            ),
+        ]
+        "#);
+        assert_debug_snapshot!(lex_errors("E'ok'\n'\\u0'"), @r#"
+        [
+            (
+                7..10,
+                "Unicode escape requires 4 hex digits: \\uXXXX",
+            ),
+        ]
+        "#);
+    }
+
+    #[test]
+    fn prefixed_string_continuation_state_resets() {
+        assert_debug_snapshot!(
+            lex_errors("B'01' || '2'; X'0F' N'x' 'G'; E'ok' $tag$x$tag$ '\\u0'"),
+            @"[]"
+        );
+        assert_debug_snapshot!(lex_errors("B'01' 2 '2'; X'0F' 1.5 'G'"), @"[]");
     }
 
     #[test]

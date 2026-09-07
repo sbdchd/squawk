@@ -1,0 +1,195 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/restart_values.sql
+---
+SOURCE_FILE
+  ALTER_SEQUENCE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    OPTION_RESTART
+      RESTART_KW "restart"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_SEQUENCE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    OPTION_RESTART
+      RESTART_KW "restart"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        LITERAL
+          INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_SEQUENCE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    OPTION_RESTART
+      RESTART_KW "restart"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      PREFIX_EXPR
+        PLUS "+"
+        LITERAL
+          NUMERIC_NUMBER "1.5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTART
+        RESTART_KW "restart"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTART
+        RESTART_KW "restart"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTART
+        RESTART_KW "restart"
+        WHITESPACE " "
+        WITH_KW "with"
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTART
+        RESTART_KW "restart"
+        WHITESPACE " "
+        PREFIX_EXPR
+          PLUS "+"
+          LITERAL
+            NUMERIC_NUMBER "1.5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      SET_GENERATED_OPTIONS
+        SET_GENERATED
+          SET_KW "set"
+          WHITESPACE " "
+          GENERATED_KW "generated"
+          WHITESPACE " "
+          GENERATED_ALWAYS
+            ALWAYS_KW "always"
+        WHITESPACE " "
+        RESTART
+          RESTART_KW "restart"
+          WHITESPACE " "
+          WITH_KW "with"
+          WHITESPACE " "
+          PREFIX_EXPR
+            MINUS "-"
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"

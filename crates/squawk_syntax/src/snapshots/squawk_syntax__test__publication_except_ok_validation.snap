@@ -1,0 +1,85 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/publication_except_ok.sql
+---
+SOURCE_FILE@0..124
+  CREATE_PUBLICATION@0..54
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    PUBLICATION_KW@7..18 "publication"
+    WHITESPACE@18..19 " "
+    PUBLICATION@19..20
+      IDENT@19..20 "p"
+    WHITESPACE@20..21 " "
+    FOR_ALL_PUBLICATION_OBJECTS@21..53
+      FOR_KW@21..24 "for"
+      WHITESPACE@24..25 " "
+      ALL_PUBLICATION_TABLES@25..35
+        ALL_KW@25..28 "all"
+        WHITESPACE@28..29 " "
+        TABLES_KW@29..35 "tables"
+      WHITESPACE@35..36 " "
+      EXCEPT_TABLE_CLAUSE@36..53
+        EXCEPT_KW@36..42 "except"
+        WHITESPACE@42..43 " "
+        L_PAREN@43..44 "("
+        EXCEPT_TABLE_NAME@44..52
+          TABLE_KW@44..49 "table"
+          WHITESPACE@49..50 " "
+          TABLE_RELATION_NAME@50..52
+            TABLE_NAME_REF@50..52
+              PATH_REF@50..52
+                PATH_SEGMENT_REF@50..52
+                  IDENT@50..52 "t1"
+        R_PAREN@52..53 ")"
+    SEMICOLON@53..54 ";"
+  WHITESPACE@54..55 "\n"
+  CREATE_PUBLICATION@55..123
+    CREATE_KW@55..61 "create"
+    WHITESPACE@61..62 " "
+    PUBLICATION_KW@62..73 "publication"
+    WHITESPACE@73..74 " "
+    PUBLICATION@74..75
+      IDENT@74..75 "p"
+    WHITESPACE@75..76 " "
+    FOR_ALL_PUBLICATION_OBJECTS@76..122
+      FOR_KW@76..79 "for"
+      WHITESPACE@79..80 " "
+      ALL_PUBLICATION_TABLES@80..90
+        ALL_KW@80..83 "all"
+        WHITESPACE@83..84 " "
+        TABLES_KW@84..90 "tables"
+      WHITESPACE@90..91 " "
+      EXCEPT_TABLE_CLAUSE@91..122
+        EXCEPT_KW@91..97 "except"
+        WHITESPACE@97..98 " "
+        L_PAREN@98..99 "("
+        EXCEPT_TABLE_NAME@99..107
+          TABLE_KW@99..104 "table"
+          WHITESPACE@104..105 " "
+          TABLE_RELATION_NAME@105..107
+            TABLE_NAME_REF@105..107
+              PATH_REF@105..107
+                PATH_SEGMENT_REF@105..107
+                  IDENT@105..107 "t1"
+        COMMA@107..108 ","
+        WHITESPACE@108..109 " "
+        EXCEPT_TABLE_NAME@109..111
+          TABLE_RELATION_NAME@109..111
+            TABLE_NAME_REF@109..111
+              PATH_REF@109..111
+                PATH_SEGMENT_REF@109..111
+                  IDENT@109..111 "t2"
+        COMMA@111..112 ","
+        WHITESPACE@112..113 " "
+        EXCEPT_TABLE_NAME@113..121
+          TABLE_KW@113..118 "table"
+          WHITESPACE@118..119 " "
+          TABLE_RELATION_NAME@119..121
+            TABLE_NAME_REF@119..121
+              PATH_REF@119..121
+                PATH_SEGMENT_REF@119..121
+                  IDENT@119..121 "t3"
+        R_PAREN@121..122 ")"
+    SEMICOLON@122..123 ";"
+  WHITESPACE@123..124 "\n"

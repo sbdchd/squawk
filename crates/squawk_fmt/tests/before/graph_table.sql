@@ -27,3 +27,8 @@ select * from
       /* before columns closing paren */ )
     /* before outer closing paren */
   ) /* after graph table */ AS /* before alias */ result;
+
+select * from graph_table(
+  g match (a) - -- before qualifier
+  {1,3} (b) columns (a.name)
+);

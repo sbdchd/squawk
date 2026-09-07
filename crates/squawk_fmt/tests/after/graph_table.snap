@@ -62,7 +62,7 @@ from /* before graph table */ graph_table /* before outer opening paren */(
         /* before edge is */ is /* before edge label */ knows
         /* before edge where */ where
           /* before edge expression */ e.active /* before edge closing bracket */] /* before edge ending minus */- /* before right angle */>
-      /* before second vertex */ (b)/* before qualifier opening curly */ {/* before qualifier min */ 1 /* before qualifier comma */, /* before qualifier max */ 3 /* before qualifier closing curly */} /* before pattern comma */,
+      /* before second vertex */ (b) /* before qualifier opening curly */ {/* before qualifier min */ 1 /* before qualifier comma */, /* before qualifier max */ 3 /* before qualifier closing curly */} /* before pattern comma */,
     /* before second pattern */ /* before left angle */ < /* before left minus */- /* before left opening bracket */[left_edge /* before left closing bracket */] /* before left ending minus */-
       (c),
     (d)
@@ -78,3 +78,14 @@ from /* before graph table */ graph_table /* before outer opening paren */(
     /* before second column */ b.name /* before columns closing paren */
   ) /* before outer closing paren */
 ) /* after graph table */ as /* before alias */ result;
+
+select *
+from graph_table(
+  g
+  match
+    (a)
+      - -- before qualifier
+      {1, 3}
+      (b)
+  columns (a.name)
+);

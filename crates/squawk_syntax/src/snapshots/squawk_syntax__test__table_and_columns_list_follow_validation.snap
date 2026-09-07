@@ -1,0 +1,94 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/table_and_columns_list_follow.sql
+---
+SOURCE_FILE@0..65
+  ANALYZE@0..11
+    ANALYZE_KW@0..7 "ANALYZE"
+    WHITESPACE@7..8 " "
+    TABLE_AND_COLUMNS_LIST@8..10
+      TABLE_AND_COLUMNS@8..9
+        TABLE_RELATION_NAME@8..9
+          TABLE_NAME_REF@8..9
+            PATH_REF@8..9
+              PATH_SEGMENT_REF@8..9
+                IDENT@8..9 "v"
+      COMMA@9..10 ","
+    SEMICOLON@10..11 ";"
+  WHITESPACE@11..12 "\n"
+  VACUUM@12..22
+    VACUUM_KW@12..18 "VACUUM"
+    WHITESPACE@18..19 " "
+    TABLE_AND_COLUMNS_LIST@19..21
+      TABLE_AND_COLUMNS@19..20
+        TABLE_RELATION_NAME@19..20
+          TABLE_NAME_REF@19..20
+            PATH_REF@19..20
+              PATH_SEGMENT_REF@19..20
+                IDENT@19..20 "v"
+      COMMA@20..21 ","
+    SEMICOLON@21..22 ";"
+  WHITESPACE@22..23 "\n"
+  VACUUM@23..36
+    VACUUM_KW@23..29 "vacuum"
+    WHITESPACE@29..30 " "
+    TABLE_AND_COLUMNS_LIST@30..35
+      TABLE_AND_COLUMNS@30..34
+        TABLE_RELATION_NAME@30..31
+          TABLE_NAME_REF@30..31
+            PATH_REF@30..31
+              PATH_SEGMENT_REF@30..31
+                IDENT@30..31 "t"
+        COLUMN_REF_LIST@31..34
+          L_PAREN@31..32 "("
+          COLUMN_NAME_REF@32..33
+            IDENT@32..33 "a"
+          R_PAREN@33..34 ")"
+      COMMA@34..35 ","
+    SEMICOLON@35..36 ";"
+  WHITESPACE@36..37 "\n"
+  REPACK@37..64
+    REPACK_KW@37..43 "repack"
+    WHITESPACE@43..44 " "
+    TABLE_AND_COLUMNS_LIST@44..49
+      TABLE_AND_COLUMNS@44..48
+        TABLE_RELATION_NAME@44..45
+          TABLE_NAME_REF@44..45
+            PATH_REF@44..45
+              PATH_SEGMENT_REF@44..45
+                IDENT@44..45 "t"
+        COLUMN_REF_LIST@45..48
+          L_PAREN@45..46 "("
+          COLUMN_NAME_REF@46..47
+            IDENT@46..47 "a"
+          R_PAREN@47..48 ")"
+      COMMA@48..49 ","
+    WHITESPACE@49..50 " "
+    USING_INDEX@50..63
+      USING_KW@50..55 "using"
+      WHITESPACE@55..56 " "
+      INDEX_KW@56..61 "index"
+      WHITESPACE@61..62 " "
+      INDEX_REF@62..63
+        PATH_REF@62..63
+          PATH_SEGMENT_REF@62..63
+            IDENT@62..63 "i"
+    SEMICOLON@63..64 ";"
+  WHITESPACE@64..65 "\n"
+
+error[syntax-error]: expected table name after comma
+  ╭▸ 
+1 │ ANALYZE v,;
+  ╰╴          ━
+error[syntax-error]: expected table name after comma
+  ╭▸ 
+2 │ VACUUM v,;
+  ╰╴         ━
+error[syntax-error]: expected table name after comma
+  ╭▸ 
+3 │ vacuum t(a),;
+  ╰╴            ━
+error[syntax-error]: expected table name after comma
+  ╭▸ 
+4 │ repack t(a), using index i;
+  ╰╴            ━

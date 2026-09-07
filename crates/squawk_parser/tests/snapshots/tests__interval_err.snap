@@ -58,6 +58,108 @@ SOURCE_FILE
               WHITESPACE " "
               SECOND_KW "second"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SECOND precision requires an unsigned integer"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              INTERVAL_SECOND
+                SECOND_KW "second"
+                L_PAREN "("
+                ERROR
+                  LITERAL
+                    NUMERIC_NUMBER "1.5"
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              INTERVAL_SECOND
+                SECOND_KW "second"
+                L_PAREN "("
+                ERROR
+                  PREFIX_EXPR
+                    MINUS "-"
+                    LITERAL
+                      INT_NUMBER "1"
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              INTERVAL_SECOND
+                DAY_KW "day"
+                WHITESPACE " "
+                TO_KW "to"
+                WHITESPACE " "
+                SECOND_KW "second"
+                L_PAREN "("
+                ERROR
+                  NAME_REF
+                    IDENT "foo"
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              INTERVAL_SECOND
+                SECOND_KW "second"
+                L_PAREN "("
+                ERROR
+                R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected interval qualifier
@@ -68,3 +170,23 @@ error[syntax-error]: unexpected interval qualifier
   ╭▸ 
 2 │ select interval(6) '1 day' day to second;
   ╰╴                          ━
+error[syntax-error]: expected unsigned integer literal
+  ╭▸ 
+5 │ select '1'::interval second(1.5);
+  ╰╴                            ━
+error[syntax-error]: expected unsigned integer literal
+  ╭▸ 
+6 │ select '1'::interval second(-1);
+  ╰╴                            ━
+error[syntax-error]: expected unsigned integer literal
+  ╭▸ 
+7 │ select '1'::interval day to second(foo);
+  ╰╴                                   ━
+error[syntax-error]: expected unsigned integer literal
+  ╭▸ 
+8 │ select '1'::interval second();
+  ╰╴                            ━
+error[syntax-error]: expected an expression, found R_PAREN
+  ╭▸ 
+8 │ select '1'::interval second();
+  ╰╴                            ━

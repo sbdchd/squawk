@@ -1,0 +1,85 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/large_object_privilege_invalid_oid.sql
+---
+SOURCE_FILE
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        SELECT_KW "select"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_LARGE_OBJECT
+        LARGE_KW "large"
+        WHITESPACE " "
+        OBJECT_KW "object"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        ERROR
+          PREFIX_EXPR
+            MINUS "-"
+            PREFIX_EXPR
+              CUSTOM_OP
+                R_ANGLE ">"
+                R_ANGLE ">"
+              LITERAL
+                INT_NUMBER "1"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REVOKE
+    REVOKE_KW "revoke"
+    WHITESPACE " "
+    ALL_PRIVILEGES
+      ALL_KW "all"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_LARGE_OBJECT
+        LARGE_KW "large"
+        WHITESPACE " "
+        OBJECT_KW "object"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        ERROR
+          PREFIX_EXPR
+            MINUS "-"
+            PREFIX_EXPR
+              CUSTOM_OP
+                R_ANGLE ">"
+                R_ANGLE ">"
+              LITERAL
+                INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected numeric literal
+  ╭▸ 
+1 │ grant select on large object 1, ->>1 to u;
+  ╰╴                                ━
+error[syntax-error]: expected numeric literal
+  ╭▸ 
+3 │ revoke all on large object 1, ->>1 from u;
+  ╰╴                              ━

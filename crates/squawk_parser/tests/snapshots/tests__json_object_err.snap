@@ -83,6 +83,302 @@ SOURCE_FILE
                       JSON_ENCODING
               R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- JSON array value lists cannot end with a comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_ARRAY_FN
+              JSON_ARRAY_KW "json_array"
+              L_PAREN "("
+              JSON_EXPR_FORMAT
+                LITERAL
+                  STRING "''"
+                WHITESPACE " "
+                JSON_FORMAT_CLAUSE
+                  FORMAT_KW "format"
+                  WHITESPACE " "
+                  JSON_KW "json"
+              COMMA ","
+              WHITESPACE " "
+              JSON_EXPR_FORMAT
+                LITERAL
+                  INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              JSON_RETURNING_CLAUSE
+                RETURNING_KW "returning"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "j"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_ARRAY_FN
+              JSON_ARRAY_KW "json_array"
+              L_PAREN "("
+              JSON_EXPR_FORMAT
+                LITERAL
+                  INT_NUMBER "3"
+              COMMA ","
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_ARRAY_FN
+              JSON_ARRAY_KW "json_array"
+              L_PAREN "("
+              JSON_EXPR_FORMAT
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              JSON_EXPR_FORMAT
+                LITERAL
+                  STRING "''"
+                WHITESPACE " "
+                JSON_FORMAT_CLAUSE
+                  FORMAT_KW "format"
+                  WHITESPACE " "
+                  JSON_KW "json"
+              COMMA ","
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_ARRAY_FN
+              JSON_ARRAY_KW "json_array"
+              L_PAREN "("
+              JSON_SELECT_FORMAT
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                WHITESPACE " "
+                JSON_FORMAT_CLAUSE
+                  FORMAT_KW "format"
+                  WHITESPACE " "
+                  JSON_KW "json"
+              COMMA ","
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- malformed JSON_OBJECTAGG options"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_OBJECT_AGG_FN
+              JSON_OBJECTAGG_KW "json_objectagg"
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "k"
+                COLON_COLON
+                  COLON ":"
+                  COLON ":"
+                PATH_TYPE
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "v"
+              WHITESPACE " "
+              JSON_WITH_UNIQUE_KEYS
+                WITH_KW "with"
+                WHITESPACE " "
+                UNIQUE_KW "unique"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- JSON PASSING lists cannot end with a comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_VALUE_FN
+              JSON_VALUE_KW "json_value"
+              L_PAREN "("
+              NAME_REF
+                IDENT "x"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.a'"
+              WHITESPACE " "
+              JSON_PASSING_CLAUSE
+                PASSING_KW "passing"
+                WHITESPACE " "
+                JSON_PASSING_ARG
+                  NAME_REF
+                    IDENT "y"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  JSON_VARIABLE_NAME
+                    IDENT "z"
+                COMMA ","
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_QUERY_FN
+              JSON_QUERY_KW "json_query"
+              L_PAREN "("
+              NAME_REF
+                IDENT "x"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.a'"
+              WHITESPACE " "
+              JSON_PASSING_CLAUSE
+                PASSING_KW "passing"
+                WHITESPACE " "
+                JSON_PASSING_ARG
+                  NAME_REF
+                    IDENT "y"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  JSON_VARIABLE_NAME
+                    IDENT "z"
+                COMMA ","
+              WHITESPACE " "
+              JSON_RETURNING_CLAUSE
+                RETURNING_KW "returning"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      JSON_KW "json"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_EXISTS_FN
+              JSON_EXISTS_KW "json_exists"
+              L_PAREN "("
+              NAME_REF
+                IDENT "x"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.a'"
+              WHITESPACE " "
+              JSON_PASSING_CLAUSE
+                PASSING_KW "passing"
+                WHITESPACE " "
+                JSON_PASSING_ARG
+                  NAME_REF
+                    IDENT "y"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  JSON_VARIABLE_NAME
+                    IDENT "z"
+                COMMA ","
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          NAME_REF
+            IDENT "x"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.a'"
+          WHITESPACE " "
+          JSON_PASSING_CLAUSE
+            PASSING_KW "passing"
+            WHITESPACE " "
+            JSON_PASSING_ARG
+              NAME_REF
+                IDENT "y"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              JSON_VARIABLE_NAME
+                IDENT "z"
+            COMMA ","
+          WHITESPACE " "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_VALUE_COLUMN
+              COLUMN_NAME
+                IDENT "a"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    INT_KW "int"
+            R_PAREN ")"
+          R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected an expression, found R_BRACK
@@ -125,3 +421,39 @@ error[syntax-error]: expected name
   ╭▸ 
 5 │ select json_object('foo': 'bar' format json encoding);
   ╰╴                                                    ━
+error[syntax-error]: expected JSON array item after comma
+  ╭▸ 
+8 │ select json_array('' format json, 2, returning j);
+  ╰╴                                    ━
+error[syntax-error]: expected JSON array item after comma
+  ╭▸ 
+9 │ select json_array(3,);
+  ╰╴                    ━
+error[syntax-error]: expected JSON array item after comma
+   ╭▸ 
+10 │ select json_array(1, '' format json,);
+   ╰╴                                    ━
+error[syntax-error]: expected JSON array item after comma
+   ╭▸ 
+11 │ select json_array(select 1 format json,);
+   ╰╴                                       ━
+error[syntax-error]: expected VALUE or ':' after JSON_OBJECTAGG key
+   ╭▸ 
+14 │ select json_objectagg(k::v with unique);
+   ╰╴                          ━
+error[syntax-error]: expected SQL/JSON PASSING argument after comma
+   ╭▸ 
+17 │ select json_value(x, '$.a' passing y as z,);
+   ╰╴                                          ━
+error[syntax-error]: expected SQL/JSON PASSING argument after comma
+   ╭▸ 
+18 │ select json_query(x, '$.a' passing y as z, returning json);
+   ╰╴                                          ━
+error[syntax-error]: expected SQL/JSON PASSING argument after comma
+   ╭▸ 
+19 │ select json_exists(x, '$.a' passing y as z,);
+   ╰╴                                           ━
+error[syntax-error]: expected SQL/JSON PASSING argument after comma
+   ╭▸ 
+20 │ select * from json_table(x, '$.a' passing y as z, columns (a int));
+   ╰╴                                                 ━

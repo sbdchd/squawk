@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/type_modifiers.sql
 ---
-SOURCE_FILE@0..694
+SOURCE_FILE@0..733
   COMMENT@0..5 "-- ok"
   WHITESPACE@5..6 "\n"
   SELECT@6..32
@@ -611,9 +611,10 @@ SOURCE_FILE@0..694
             TIMESTAMP_TYPE@665..692
               TIMESTAMP_KW@665..674 "timestamp"
               L_PAREN@674..675 "("
-              TUPLE_EXPR@675..677
-                L_PAREN@675..676 "("
-                R_PAREN@676..677 ")"
+              ERROR@675..677
+                TUPLE_EXPR@675..677
+                  L_PAREN@675..676 "("
+                  R_PAREN@676..677 ")"
               R_PAREN@677..678 ")"
               WITH_TIMEZONE@678..692
                 WITH_KW@678..682 "with"
@@ -623,6 +624,36 @@ SOURCE_FILE@0..694
                 ZONE_KW@688..692 "zone"
     SEMICOLON@692..693 ";"
   WHITESPACE@693..694 "\n"
+  SELECT@694..732
+    SELECT_CLAUSE@694..731
+      SELECT_KW@694..700 "select"
+      WHITESPACE@700..701 " "
+      TARGET_LIST@701..731
+        TARGET@701..731
+          CAST_EXPR@701..731
+            INTERVAL_TYPE@701..709
+              INTERVAL_KW@701..709 "interval"
+            LITERAL@709..711
+              STRING@709..711 "''"
+            INTERVAL_SECOND@711..731
+              HOUR_KW@711..715 "hour"
+              WHITESPACE@715..716 " "
+              TO_KW@716..718 "to"
+              WHITESPACE@718..719 " "
+              SECOND_KW@719..725 "second"
+              L_PAREN@725..726 "("
+              ERROR@726..730
+                PREFIX_EXPR@726..730
+                  MINUS@726..727 "-"
+                  PREFIX_EXPR@727..730
+                    CUSTOM_OP@727..729
+                      R_ANGLE@727..728 ">"
+                      R_ANGLE@728..729 ">"
+                    LITERAL@729..730
+                      INT_NUMBER@729..730 "2"
+              R_PAREN@730..731 ")"
+    SEMICOLON@731..732 ";"
+  WHITESPACE@732..733 "\n"
 
 error[syntax-error]: Type modifier cannot have parameter name
    ╭▸ 
@@ -680,7 +711,15 @@ error[syntax-error]: Type modifiers must be simple constants or identifiers
    ╭▸ 
 26 │ select numeric(variadic 1) '1';
    ╰╴               ━━━━━━━━━━
-error[syntax-error]: Timestamp precision must be an integer constant
+error[syntax-error]: expected unsigned integer literal
    ╭▸ 
 27 │ select''::timestamp(())with time zone;
-   ╰╴                    ━━
+   ╰╴                    ━
+error[syntax-error]: Expected an expression
+   ╭▸ 
+27 │ select''::timestamp(())with time zone;
+   ╰╴                     ━
+error[syntax-error]: expected unsigned integer literal
+   ╭▸ 
+28 │ select interval''hour to second(->>2);
+   ╰╴                                ━

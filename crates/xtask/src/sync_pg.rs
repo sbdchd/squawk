@@ -106,6 +106,7 @@ const IGNORED_LINES: &[&str] = &[
     "CHECKPOINT (MODE FAST, FLUSH_UNLOGGED FALSE);",
     "CHECKPOINT (FLUSH_UNLOGGED);",
     "ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo (a, b);",
+    "CREATE PUBLICATION testpub_foralltables_excepttable2 FOR ALL TABLES EXCEPT (testpub_tbl1, testpub_tbl2);",
     "CREATE SCHEMA IF NOT EXISTS test_ns_schema_renamed -- fail, disallowed",
     "insert into insertconflicttest values (1) on conflict (key int4_ops (fillfactor=10)) do nothing;",
     "insert into insertconflicttest values (1) on conflict (key asc) do nothing;",
@@ -563,6 +564,10 @@ mod tests {
             (
                 "CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();",
                 "-- CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();",
+            ),
+            (
+                "CREATE PUBLICATION testpub_foralltables_excepttable2 FOR ALL TABLES EXCEPT (testpub_tbl1, testpub_tbl2);",
+                "-- CREATE PUBLICATION testpub_foralltables_excepttable2 FOR ALL TABLES EXCEPT (testpub_tbl1, testpub_tbl2);",
             ),
             ("    AS $$ SELECT x * 2 $$", "--     AS $$ SELECT x * 2 $$"),
             (

@@ -1089,19 +1089,19 @@ error[syntax-error]: expected expression after comma
    ╭▸ 
 84 │ create table error_tbl (i int default (100, ));
    ╰╴                                           ━
-error[syntax-error]: expected an expression
+error[syntax-error]: Expected at least one item
    ╭▸ 
 87 │ create table t partition of p for values in ();
    ╰╴                                             ━
-error[syntax-error]: expected an expression
+error[syntax-error]: Expected at least one item
    ╭▸ 
 88 │ create table t partition of p for values in (/* c */);
    ╰╴                                             ━
-error[syntax-error]: expected an expression
+error[syntax-error]: Expected at least one item
    ╭▸ 
 89 │ create table t partition of p for values from () to (1);
    ╰╴                                               ━
-error[syntax-error]: expected an expression
+error[syntax-error]: Expected at least one item
    ╭▸ 
 90 │ create table t partition of p for values from (1) to ();
    ╰╴                                                      ━

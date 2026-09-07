@@ -1,0 +1,78 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/large_object_privilege_signed_oid.sql
+---
+SOURCE_FILE
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        SELECT_KW "select"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_LARGE_OBJECT
+        LARGE_KW "large"
+        WHITESPACE " "
+        OBJECT_KW "object"
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        PREFIX_EXPR
+          PLUS "+"
+          LITERAL
+            INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          NUMERIC_NUMBER "3.5"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REVOKE
+    REVOKE_KW "revoke"
+    WHITESPACE " "
+    ALL_PRIVILEGES
+      ALL_KW "all"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_LARGE_OBJECT
+        LARGE_KW "large"
+        WHITESPACE " "
+        OBJECT_KW "object"
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        PREFIX_EXPR
+          PLUS "+"
+          LITERAL
+            INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          NUMERIC_NUMBER "3.5"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"

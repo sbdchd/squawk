@@ -1,0 +1,27 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/table_and_columns_list_vacuum_columns.sql
+---
+SOURCE_FILE@0..13
+  VACUUM@0..12
+    VACUUM_KW@0..6 "vacuum"
+    WHITESPACE@6..7 " "
+    TABLE_AND_COLUMNS_LIST@7..12
+      TABLE_AND_COLUMNS@7..11
+        TABLE_RELATION_NAME@7..8
+          TABLE_NAME_REF@7..8
+            PATH_REF@7..8
+              PATH_SEGMENT_REF@7..8
+                IDENT@7..8 "t"
+        COLUMN_REF_LIST@8..11
+          L_PAREN@8..9 "("
+          COLUMN_NAME_REF@9..10
+            IDENT@9..10 "a"
+          R_PAREN@10..11 ")"
+      COMMA@11..12 ","
+  WHITESPACE@12..13 "\n"
+
+error[syntax-error]: expected table name after comma
+  ╭▸ 
+1 │ vacuum t(a),
+  ╰╴            ━

@@ -3195,13 +3195,15 @@ SOURCE_FILE
       PARTITION_MODULUS
         IDENT "modulus"
         WHITESPACE " "
-        INT_NUMBER "1"
+        LITERAL
+          INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
       PARTITION_REMAINDER
         IDENT "remainder"
         WHITESPACE " "
-        INT_NUMBER "1"
+        LITERAL
+          INT_NUMBER "1"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

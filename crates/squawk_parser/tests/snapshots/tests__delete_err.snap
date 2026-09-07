@@ -1,0 +1,89 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/delete.sql
+---
+SOURCE_FILE
+  DELETE
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "x"
+    WHITESPACE " "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "f"
+      COMMA ","
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "x"
+    WHITESPACE " "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "f"
+      COMMA ","
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "x"
+    WHITESPACE " "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "f"
+      COMMA ","
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected FROM item after comma
+  ╭▸ 
+1 │ delete from x using f, where true;
+  ╰╴                      ━
+error[syntax-error]: expected FROM item after comma
+  ╭▸ 
+3 │ delete from x using f,;
+  ╰╴                      ━
+error[syntax-error]: expected FROM item after comma
+  ╭▸ 
+5 │ delete from x using f,
+  ╰╴                      ━

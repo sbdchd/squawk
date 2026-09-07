@@ -130,7 +130,58 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE "\n\n"
+    COMMENT "-- transform list cannot end with a comma"
+    WHITESPACE "\n"
     FUNCTION_NAME
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "''"
+      WHITESPACE " "
+      TRANSFORM_FUNC_OPTION
+        TRANSFORM_KW "transform"
+        WHITESPACE " "
+        TRANSFORM_FOR_TYPE
+          FOR_KW "for"
+          WHITESPACE " "
+          TYPE_KW "type"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+        COMMA ","
+  WHITESPACE "\n\n"
 ---
 error[syntax-error]: expected COMMA
   ╭▸ 
@@ -142,9 +193,19 @@ error[syntax-error]: expected COMMA
   ╰╴                                 ━
 error[syntax-error]: expected path name
    ╭▸ 
-14 │
+16 │ create function f() returns int language sql as '' transform for type int,
    ╰╴━
 error[syntax-error]: expected param list
    ╭▸ 
-14 │
+16 │ create function f() returns int language sql as '' transform for type int,
    ╰╴━
+error[syntax-error]: expected function option
+   ╭▸ 
+16 │ create function f() returns int language sql as '' transform for type int,
+   ╰╴━
+error[syntax-error]: expected FOR TYPE entry after comma
+   ╭▸ 
+16 │   create function f() returns int language sql as '' transform for type int,
+   │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+17 │ ┃
+   ╰╴┗━┛

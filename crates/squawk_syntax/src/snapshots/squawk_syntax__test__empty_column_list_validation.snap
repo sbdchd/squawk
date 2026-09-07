@@ -371,23 +371,23 @@ SOURCE_FILE@0..573
     SEMICOLON@571..572 ";"
   WHITESPACE@572..573 "\n"
 
-error[syntax-error]: Expected at least one column
+error[syntax-error]: Expected at least one item
    ╭▸ 
 12 │ create view v () as select 1;
-   ╰╴              ━━
-error[syntax-error]: Expected at least one column
+   ╰╴               ━
+error[syntax-error]: Expected at least one item
    ╭▸ 
 13 │ create materialized view mv () as select 1;
-   ╰╴                            ━━
-error[syntax-error]: Expected at least one column
+   ╰╴                             ━
+error[syntax-error]: Expected at least one item
    ╭▸ 
 14 │ with t () as (select 1) select * from t;
-   ╰╴       ━━
-error[syntax-error]: Expected at least one column
+   ╰╴        ━
+error[syntax-error]: Expected at least one item
    ╭▸ 
 15 │ select * from t x ();
-   ╰╴                  ━━
-error[syntax-error]: Expected at least one column
+   ╰╴                   ━
+error[syntax-error]: Expected at least one item
    ╭▸ 
 16 │ create function f() returns table () language sql as 'select 1';
-   ╰╴                                  ━━
+   ╰╴                                   ━

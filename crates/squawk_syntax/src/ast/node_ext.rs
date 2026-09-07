@@ -233,6 +233,24 @@ impl ast::CreateSchema {
     }
 }
 
+impl ast::AlterSetStatistics {
+    pub fn literal(&self) -> Option<ast::Literal> {
+        match self.expr()? {
+            ast::Expr::Literal(literal) => Some(literal),
+            _ => None,
+        }
+    }
+}
+
+impl ast::Restart {
+    pub fn literal(&self) -> Option<ast::Literal> {
+        match self.expr()? {
+            ast::Expr::Literal(literal) => Some(literal),
+            _ => None,
+        }
+    }
+}
+
 impl ast::FromItem {
     pub fn alias(&self) -> Option<ast::FromAlias> {
         match self {
@@ -253,6 +271,38 @@ impl ast::FromItem {
             ast::FromItem::RowsFromItem(it) => it.with_ordinality(),
             _ => None,
         }
+    }
+}
+
+impl ast::RowList {
+    pub fn trailing_comma_token(&self) -> Option<SyntaxToken> {
+        self.syntax()
+            .last_token()
+            .filter(|token| token.kind() == SyntaxKind::COMMA)
+    }
+}
+
+impl ast::TableAndColumnsList {
+    pub fn trailing_comma_token(&self) -> Option<SyntaxToken> {
+        self.syntax()
+            .last_token()
+            .filter(|token| token.kind() == SyntaxKind::COMMA)
+    }
+}
+
+impl ast::GroupByList {
+    pub fn trailing_comma_token(&self) -> Option<SyntaxToken> {
+        self.syntax()
+            .last_token()
+            .filter(|token| token.kind() == SyntaxKind::COMMA)
+    }
+}
+
+impl ast::SortByList {
+    pub fn trailing_comma_token(&self) -> Option<SyntaxToken> {
+        self.syntax()
+            .last_token()
+            .filter(|token| token.kind() == SyntaxKind::COMMA)
     }
 }
 

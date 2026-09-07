@@ -209,6 +209,19 @@ SOURCE_FILE
             INT_NUMBER "1"
           R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "t"
+    WHITESPACE " "
+    VALUES
+      VALUES_KW "values"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA
@@ -235,3 +248,7 @@ error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE 
    ╭▸ 
 17 │ insert into t (a without overlaps) values (1);
    ╰╴                 ━
+error[syntax-error]: expected row list
+   ╭▸ 
+19 │ insert into t values
+   ╰╴                    ━

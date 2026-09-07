@@ -169,6 +169,21 @@ select 1 group by rollup ();
 select 1 group by cube ();
 select distinct on () 1;
 
+-- GROUP BY requires at least one item
+select 1 group by;
+select 1 group by distinct;
+
+-- GROUP BY lists cannot end before the following clause
+select 1 group by a, order by b;
+with x as (select 1 group by a,)
+select * from x;
+
+-- ORDER BY requires an item and cannot end with a comma
+select 1 order by;
+select 1 order by a, limit 1;
+select array_agg(a order by);
+select array_agg(a order by a,);
+
 -- only function names can be followed by an argument list
 select ()();
 select 1();

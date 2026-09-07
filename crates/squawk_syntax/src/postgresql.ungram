@@ -802,19 +802,19 @@ Timezone =
 TimeType =
   'setof'?
   'time'
-  ('(' Expr ')')?
+  ('(' Literal ')')?
   Timezone?
 
 TimestampType =
   'setof'?
   'timestamp'
-  ('(' Expr ')')?
+  ('(' Literal ')')?
   Timezone?
 
 IntervalType =
   'setof'?
   'interval'
-  ('(' Expr ')' | IntervalQualifier)?
+  ('(' Literal ')' | IntervalQualifier)?
 
 IntervalQualifier =
   IntervalYear
@@ -4476,7 +4476,7 @@ RoleOptionAdmin =
   'admin' RoleRefList
 
 RoleOptionConnectionLimit =
-  'connection' 'limit' Literal
+  'connection' 'limit' Expr
 
 RoleOptionEncryptedPassword =
   'encrypted' 'password' Literal
@@ -6077,10 +6077,10 @@ PartitionForValuesWith =
   'for' 'values' 'with' '(' modulus:PartitionModulus ',' remainder:PartitionRemainder ')'
 
 PartitionModulus =
-  '#ident' '@int_number'
+  '#ident' Literal
 
 PartitionRemainder =
-  '#ident' '@int_number'
+  '#ident' Literal
 
 PartitionForValuesIn =
   'for' 'values' 'in' '(' (Expr (',' Expr)*) ')'
@@ -6161,7 +6161,7 @@ AlterColumn =
   'alter' 'column'? ColumnNameRef option:AlterColumnOption
 
 Restart =
-  'restart' ('with'? Literal)?
+  'restart' ('with'? Expr)?
 
 SetSequenceOption =
   'set' SequenceOption
@@ -6199,7 +6199,7 @@ SetOptionsList =
   'set' 'options' AlterOptionList
 
 AlterSetStatistics =
-  'alter' 'column'? (Literal | ColumnNameRef)
+  'alter' 'column'? (Expr | ColumnNameRef)
   (SetStatistics | SetOptions)
 
 SetExpression =

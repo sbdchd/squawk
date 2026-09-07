@@ -28,9 +28,10 @@ SOURCE_FILE@0..48
                 GRAPH_PATTERN_QUALIFIER@32..36
                   L_CURLY@32..33 "{"
                   QUALIFIER_MIN@33..35
-                    TUPLE_EXPR@33..35
-                      L_PAREN@33..34 "("
-                      R_PAREN@34..35 ")"
+                    ERROR@33..35
+                      TUPLE_EXPR@33..35
+                        L_PAREN@33..34 "("
+                        R_PAREN@34..35 ")"
                   R_CURLY@35..36 "}"
           COLUMNS_KW@36..43 "columns"
           EXPR_AS_COLUMN_NAME_LIST@43..45
@@ -40,11 +41,15 @@ SOURCE_FILE@0..48
     SEMICOLON@46..47 ";"
   WHITESPACE@47..48 "\n"
 
-error[syntax-error]: Graph pattern qualifier bounds must be integer constants
+error[syntax-error]: expected unsigned integer literal
   ╭▸ 
 1 │ select from graph_table(f match-{()}columns());
-  ╰╴                                 ━━
-error[syntax-error]: Expected at least one column
+  ╰╴                                 ━
+error[syntax-error]: Expected an expression
   ╭▸ 
 1 │ select from graph_table(f match-{()}columns());
-  ╰╴                                           ━━
+  ╰╴                                  ━
+error[syntax-error]: Expected at least one item
+  ╭▸ 
+1 │ select from graph_table(f match-{()}columns());
+  ╰╴                                            ━

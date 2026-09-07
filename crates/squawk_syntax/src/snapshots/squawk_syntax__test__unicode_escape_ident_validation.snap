@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/unicode_escape_ident.sql
 ---
-SOURCE_FILE@0..489
+SOURCE_FILE@0..519
   COMMENT@0..5 "-- ok"
   WHITESPACE@5..6 "\n"
   SELECT@6..33
@@ -217,6 +217,31 @@ SOURCE_FILE@0..489
             STRING@482..487 "'foo'"
     SEMICOLON@487..488 ";"
   WHITESPACE@488..489 "\n"
+  SELECT@489..518
+    SELECT_CLAUSE@489..517
+      SELECT_KW@489..495 "select"
+      WHITESPACE@495..496 " "
+      TARGET_LIST@496..517
+        TARGET@496..517
+          BIN_EXPR@496..517
+            CAST_EXPR@496..504
+              LITERAL@496..497
+                INT_NUMBER@496..497 "2"
+              COLON_COLON@497..499
+                COLON@497..498 ":"
+                COLON@498..499 ":"
+              PATH_TYPE@499..504
+                PATH_REF@499..504
+                  PATH_SEGMENT_REF@499..504
+                    IDENT@499..504 "U&\"!\""
+            CUSTOM_OP@504..505
+              AMP@504..505 "&"
+            NAME_REF@505..517
+              IDENT@505..508 "\"0\""
+              UESCAPE_KW@508..515 "UESCAPE"
+              STRING@515..517 "''"
+    SEMICOLON@517..518 ";"
+  WHITESPACE@518..519 "\n"
 
 error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
   ╭▸ 
@@ -282,3 +307,7 @@ error[syntax-error]: Invalid unicode escape character
    ╭▸ 
 20 │ select U&"error" UESCAPE 'foo';
    ╰╴                         ━━━━━
+error[syntax-error]: UESCAPE can only follow a Unicode escape identifier
+   ╭▸ 
+21 │ select 2::U&"!"&"0"UESCAPE'';
+   ╰╴                   ━━━━━━━

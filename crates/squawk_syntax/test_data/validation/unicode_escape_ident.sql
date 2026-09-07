@@ -18,3 +18,4 @@ select U&"error" UESCAPE '+';
 select U&"error" UESCAPE 'A';
 select U&"error" UESCAPE 'é';
 select U&"error" UESCAPE 'foo';
+select 2::U&"!"&"0"UESCAPE'';
