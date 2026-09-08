@@ -12,6 +12,8 @@ grant
 
 grant select on public.records to app_user;
 
+grant select on public.records to group exclude;
+
 grant
   all privileges
   on

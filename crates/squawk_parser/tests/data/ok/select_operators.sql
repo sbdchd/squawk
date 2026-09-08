@@ -565,3 +565,8 @@ select &n;
 select |o;
 select ?q;
 select `p;
+
+select -> 5;
+select ->5;
+select ->> 5;
+select 1 -> 2;

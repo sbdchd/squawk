@@ -1079,4 +1079,30 @@ SOURCE_FILE
               R_PAREN ")"
         R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    INDEX
+      PATH
+        PATH_SEGMENT
+          IF_KW "if"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "a"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

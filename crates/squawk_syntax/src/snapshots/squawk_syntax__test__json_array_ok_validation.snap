@@ -1,0 +1,191 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/json_array_ok.sql
+---
+SOURCE_FILE@0..253
+  SELECT@0..20
+    SELECT_CLAUSE@0..19
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..19
+        TARGET@7..19
+          CALL_EXPR@7..19
+            JSON_ARRAY_FN@7..19
+              JSON_ARRAY_KW@7..17 "json_array"
+              L_PAREN@17..18 "("
+              R_PAREN@18..19 ")"
+    SEMICOLON@19..20 ";"
+  WHITESPACE@20..21 "\n"
+  SELECT@21..56
+    SELECT_CLAUSE@21..55
+      SELECT_KW@21..27 "select"
+      WHITESPACE@27..28 " "
+      TARGET_LIST@28..55
+        TARGET@28..55
+          CALL_EXPR@28..55
+            JSON_ARRAY_FN@28..55
+              JSON_ARRAY_KW@28..38 "json_array"
+              L_PAREN@38..39 "("
+              JSON_RETURNING_CLAUSE@39..54
+                RETURNING_KW@39..48 "returning"
+                WHITESPACE@48..49 " "
+                PATH_TYPE@49..54
+                  PATH_REF@49..54
+                    PATH_SEGMENT_REF@49..54
+                      IDENT@49..54 "jsonb"
+              R_PAREN@54..55 ")"
+    SEMICOLON@55..56 ";"
+  WHITESPACE@56..57 "\n"
+  SELECT@57..85
+    SELECT_CLAUSE@57..84
+      SELECT_KW@57..63 "select"
+      WHITESPACE@63..64 " "
+      TARGET_LIST@64..84
+        TARGET@64..84
+          CALL_EXPR@64..84
+            JSON_ARRAY_FN@64..84
+              JSON_ARRAY_KW@64..74 "json_array"
+              L_PAREN@74..75 "("
+              JSON_SELECT_FORMAT@75..83
+                SELECT@75..83
+                  SELECT_CLAUSE@75..83
+                    SELECT_KW@75..81 "select"
+                    WHITESPACE@81..82 " "
+                    TARGET_LIST@82..83
+                      TARGET@82..83
+                        LITERAL@82..83
+                          INT_NUMBER@82..83 "1"
+              R_PAREN@83..84 ")"
+    SEMICOLON@84..85 ";"
+  WHITESPACE@85..86 "\n"
+  SELECT@86..136
+    SELECT_CLAUSE@86..135
+      SELECT_KW@86..92 "select"
+      WHITESPACE@92..93 " "
+      TARGET_LIST@93..135
+        TARGET@93..135
+          CALL_EXPR@93..135
+            JSON_ARRAY_FN@93..135
+              JSON_ARRAY_KW@93..103 "json_array"
+              L_PAREN@103..104 "("
+              JSON_SELECT_FORMAT@104..119
+                SELECT@104..119
+                  SELECT_CLAUSE@104..112
+                    SELECT_KW@104..110 "select"
+                    WHITESPACE@110..111 " "
+                    TARGET_LIST@111..112
+                      TARGET@111..112
+                        NAME_REF@111..112
+                          IDENT@111..112 "a"
+                  WHITESPACE@112..113 " "
+                  FROM_CLAUSE@113..119
+                    FROM_KW@113..117 "from"
+                    WHITESPACE@117..118 " "
+                    RELATION_FROM_ITEM@118..119
+                      RELATION_NAME_REF@118..119
+                        PATH_REF@118..119
+                          PATH_SEGMENT_REF@118..119
+                            IDENT@118..119 "t"
+              WHITESPACE@119..120 " "
+              JSON_RETURNING_CLAUSE@120..134
+                RETURNING_KW@120..129 "returning"
+                WHITESPACE@129..130 " "
+                PATH_TYPE@130..134
+                  PATH_REF@130..134
+                    PATH_SEGMENT_REF@130..134
+                      TEXT_KW@130..134 "text"
+              R_PAREN@134..135 ")"
+    SEMICOLON@135..136 ";"
+  WHITESPACE@136..137 "\n"
+  SELECT@137..164
+    SELECT_CLAUSE@137..163
+      SELECT_KW@137..143 "select"
+      WHITESPACE@143..144 " "
+      TARGET_LIST@144..163
+        TARGET@144..163
+          CALL_EXPR@144..163
+            JSON_ARRAY_FN@144..163
+              JSON_ARRAY_KW@144..154 "json_array"
+              L_PAREN@154..155 "("
+              JSON_EXPR_FORMAT@155..156
+                LITERAL@155..156
+                  INT_NUMBER@155..156 "1"
+              COMMA@156..157 ","
+              WHITESPACE@157..158 " "
+              JSON_EXPR_FORMAT@158..159
+                LITERAL@158..159
+                  INT_NUMBER@158..159 "2"
+              COMMA@159..160 ","
+              WHITESPACE@160..161 " "
+              JSON_EXPR_FORMAT@161..162
+                LITERAL@161..162
+                  INT_NUMBER@161..162 "3"
+              R_PAREN@162..163 ")"
+    SEMICOLON@163..164 ";"
+  WHITESPACE@164..165 "\n"
+  SELECT@165..198
+    SELECT_CLAUSE@165..197
+      SELECT_KW@165..171 "select"
+      WHITESPACE@171..172 " "
+      TARGET_LIST@172..197
+        TARGET@172..197
+          CALL_EXPR@172..197
+            JSON_ARRAY_FN@172..197
+              JSON_ARRAY_KW@172..182 "json_array"
+              L_PAREN@182..183 "("
+              JSON_EXPR_FORMAT@183..193
+                PAREN_EXPR@183..193
+                  L_PAREN@183..184 "("
+                  SELECT@184..192
+                    SELECT_CLAUSE@184..192
+                      SELECT_KW@184..190 "select"
+                      WHITESPACE@190..191 " "
+                      TARGET_LIST@191..192
+                        TARGET@191..192
+                          LITERAL@191..192
+                            INT_NUMBER@191..192 "1"
+                  R_PAREN@192..193 ")"
+              COMMA@193..194 ","
+              WHITESPACE@194..195 " "
+              JSON_EXPR_FORMAT@195..196
+                LITERAL@195..196
+                  INT_NUMBER@195..196 "2"
+              R_PAREN@196..197 ")"
+    SEMICOLON@197..198 ";"
+  WHITESPACE@198..199 "\n"
+  SELECT@199..252
+    SELECT_CLAUSE@199..251
+      SELECT_KW@199..205 "select"
+      WHITESPACE@205..206 " "
+      TARGET_LIST@206..251
+        TARGET@206..251
+          CALL_EXPR@206..251
+            JSON_ARRAY_FN@206..251
+              JSON_ARRAY_KW@206..216 "json_array"
+              L_PAREN@216..217 "("
+              JSON_EXPR_FORMAT@217..218
+                LITERAL@217..218
+                  INT_NUMBER@217..218 "1"
+              COMMA@218..219 ","
+              WHITESPACE@219..220 " "
+              JSON_EXPR_FORMAT@220..221
+                LITERAL@220..221
+                  INT_NUMBER@220..221 "2"
+              WHITESPACE@221..222 " "
+              JSON_NULL_ON_NULL@222..234
+                NULL_KW@222..226 "null"
+                WHITESPACE@226..227 " "
+                ON_KW@227..229 "on"
+                WHITESPACE@229..230 " "
+                NULL_KW@230..234 "null"
+              WHITESPACE@234..235 " "
+              JSON_RETURNING_CLAUSE@235..250
+                RETURNING_KW@235..244 "returning"
+                WHITESPACE@244..245 " "
+                PATH_TYPE@245..250
+                  PATH_REF@245..250
+                    PATH_SEGMENT_REF@245..250
+                      IDENT@245..250 "jsonb"
+              R_PAREN@250..251 ")"
+    SEMICOLON@251..252 ";"
+  WHITESPACE@252..253 "\n"

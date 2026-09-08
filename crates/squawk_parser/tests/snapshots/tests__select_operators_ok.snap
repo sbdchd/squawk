@@ -5748,4 +5748,67 @@ SOURCE_FILE
             NAME_REF
               IDENT "p"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            LITERAL
+              INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    SEMICOLON ";"
   WHITESPACE "\n"

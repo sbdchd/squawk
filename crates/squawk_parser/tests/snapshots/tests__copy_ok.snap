@@ -428,25 +428,25 @@ SOURCE_FILE
           IDENT "force_quote"
         WHITESPACE " "
         COPY_OPTION_VALUE
-          COPY_OPTION_LIST
+          COPY_OPTION_ARG_LIST
             L_PAREN "("
-            COPY_OPTION
-              COPY_OPTION_KEY
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COPY_OPTION
-              COPY_OPTION_KEY
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COPY_OPTION
-              COPY_OPTION_KEY
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
                 IDENT "c"
             COMMA ","
             WHITESPACE " "
-            COPY_OPTION
-              COPY_OPTION_KEY
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
                 IDENT "d"
             R_PAREN ")"
       COMMA ","
@@ -464,10 +464,10 @@ SOURCE_FILE
           IDENT "force_not_null"
         WHITESPACE " "
         COPY_OPTION_VALUE
-          COPY_OPTION_LIST
+          COPY_OPTION_ARG_LIST
             L_PAREN "("
-            COPY_OPTION
-              COPY_OPTION_KEY
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
                 IDENT "a"
             R_PAREN ")"
       COMMA ","
@@ -485,15 +485,15 @@ SOURCE_FILE
           IDENT "force_null"
         WHITESPACE " "
         COPY_OPTION_VALUE
-          COPY_OPTION_LIST
+          COPY_OPTION_ARG_LIST
             L_PAREN "("
-            COPY_OPTION
-              COPY_OPTION_KEY
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COPY_OPTION
-              COPY_OPTION_KEY
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
                 IDENT "b"
             R_PAREN ")"
       COMMA ","
@@ -731,3 +731,90 @@ SOURCE_FILE
         STRING "'utf8'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- parenthesized option arguments"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "stdin"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    COPY_OPTION_LIST
+      L_PAREN "("
+      COPY_OPTION
+        COPY_OPTION_KEY
+          DEFAULT_KW "default"
+        WHITESPACE " "
+        COPY_OPTION_VALUE
+          COPY_OPTION_ARG_LIST
+            L_PAREN "("
+            COPY_OPTION_ARG
+              LITERAL
+                STRING "'x'"
+            R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "stdin"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    COPY_OPTION_LIST
+      L_PAREN "("
+      COPY_OPTION
+        COPY_OPTION_KEY
+          FORMAT_KW "format"
+        WHITESPACE " "
+        COPY_OPTION_VALUE
+          COPY_OPTION_ARG_LIST
+            L_PAREN "("
+            COPY_OPTION_ARG
+              LITERAL
+                STRING "'csv'"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION_ARG
+              COPY_OPTION_VALUE_NAME
+                OFF_KW "off"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION_ARG
+              ON_KW "on"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION_ARG
+              LITERAL
+                TRUE_KW "true"
+            COMMA ","
+            WHITESPACE " "
+            COPY_OPTION_ARG
+              LITERAL
+                FALSE_KW "false"
+            R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

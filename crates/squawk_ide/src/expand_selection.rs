@@ -51,6 +51,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::CONFLICT_INDEX_ITEM_LIST,
     SyntaxKind::CONSTRAINT_COLUMN_REF_LIST,
     SyntaxKind::CONSTRAINT_EXCLUSION_LIST,
+    SyntaxKind::COPY_OPTION_ARG_LIST,
     SyntaxKind::COPY_OPTION_LIST,
     SyntaxKind::DROP_OP_CLASS_OPTION_LIST,
     SyntaxKind::EXPLAIN_OPTION_LIST,

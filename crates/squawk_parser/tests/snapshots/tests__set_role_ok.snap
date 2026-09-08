@@ -44,7 +44,8 @@ SOURCE_FILE
     ROLE_KW "ROLE"
     WHITESPACE " "
     ROLE_REF
-      IDENT "foo"
+      ROLE_NAME_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE

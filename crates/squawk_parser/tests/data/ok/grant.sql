@@ -247,3 +247,12 @@ grant public, t(a, b)
 
 grant public
   to current_user;
+
+grant usage on type to u;
+grant usage on type.foo to u;
+grant usage on function to u;
+grant usage on sequence, domain to u;
+
+grant usage on type t to u;
+grant execute on function f() to u;
+grant usage on schema s to u;

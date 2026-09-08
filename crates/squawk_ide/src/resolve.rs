@@ -1476,7 +1476,7 @@ pub(crate) fn resolve_publication_ref(
 
 pub(crate) fn resolve_role_ref(
     db: &dyn Db,
-    role_ref: InFile<&ast::RoleRef>,
+    role_ref: InFile<&ast::RoleNameRef>,
 ) -> Option<SmallVec<[Location; 1]>> {
     resolve_unqualified_ref(
         db,

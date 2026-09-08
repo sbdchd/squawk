@@ -1,5 +1,11 @@
 create user app_user;
 
+create user u "admin" foo;
+
+create user u "role" foo;
+
+create user u "encrypted" password 'x';
+
 create user extraordinarily_long_application_reporting_user with login encrypted password 'an-extraordinarily-long-secret-value' valid until '2035-12-31 23:59:59+00' connection limit 25 in role extraordinarily_long_read_only_reporting_role, extraordinarily_long_data_warehouse_role;
 
 -- comments in every position

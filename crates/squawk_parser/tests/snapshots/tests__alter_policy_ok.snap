@@ -54,7 +54,8 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            IDENT "r"
+            ROLE_NAME_REF
+              IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_multiple_roles"
@@ -81,15 +82,18 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            IDENT "r"
+            ROLE_NAME_REF
+              IDENT "r"
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            IDENT "public"
+            ROLE_NAME_REF
+              IDENT "public"
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            CURRENT_USER_KW "current_user"
+            ROLE_REF_CURRENT_USER
+              CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using_expr"
@@ -186,11 +190,13 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            IDENT "r"
+            ROLE_NAME_REF
+              IDENT "r"
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            IDENT "s"
+            ROLE_NAME_REF
+              IDENT "s"
       WHITESPACE "\n  "
       USING_EXPR_CLAUSE
         USING_KW "using"

@@ -3,6 +3,7 @@ source: crates/squawk_fmt/tests/tests.rs
 input_file: crates/squawk_fmt/tests/before/group_by.sql
 ---
 select 1 group by 1, foo + 2;
+select sum(c) from gs group by "rollup"(c), "cube" /* before args */(c);
 select 1 group by all rollup (1, 2), cube (3, 4);
 select 1 group by distinct grouping sets ((), (1, 2), rollup (3), cube (4));
 select

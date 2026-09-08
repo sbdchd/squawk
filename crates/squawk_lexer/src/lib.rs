@@ -14,6 +14,8 @@ const fn is_ident_cont(c: char) -> bool {
     matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '$' | '\u{80}'..)
 }
 
+pub const BOM: &str = "\u{feff}";
+
 // see:
 // - https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scansup.c#L107-L128
 // - https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L204-L229
@@ -560,15 +562,22 @@ impl Cursor<'_> {
 
 /// Creates an iterator that produces tokens from the input string.
 pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
+    let (bom, input) = match input.strip_prefix(BOM) {
+        Some(input) => (
+            Some(Token::new(TokenKind::Whitespace, BOM.len() as u32)),
+            input,
+        ),
+        None => (None, input),
+    };
     let mut cursor = Cursor::new(input);
-    std::iter::from_fn(move || {
+    bom.into_iter().chain(std::iter::from_fn(move || {
         let token = cursor.advance_token();
         if token.kind != TokenKind::Eof {
             Some(token)
         } else {
             None
         }
-    })
+    }))
 }
 
 #[cfg(test)]
@@ -1009,6 +1018,36 @@ U&"d!0061t!+000061" UESCAPE '!'
             "table" @ Ident,
             " " @ Whitespace,
             "users" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn bom_at_start() {
+        assert_debug_snapshot!(lex("\u{feff}select 1;"), @r#"
+        [
+            "\u{feff}" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn bom_after_start_is_an_ident_char() {
+        assert_debug_snapshot!(lex("select 1;\n\u{feff}select 2;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            "\n" @ Whitespace,
+            "\u{feff}select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
             ";" @ Semi,
         ]
         "#);

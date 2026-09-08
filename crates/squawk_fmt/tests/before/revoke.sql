@@ -1,5 +1,7 @@
 revoke select, update (payload) on table public.records from app_user;
 
+revoke select on public.records from group cascade;
+
 revoke grant option for all privileges on all tables in schema public, audit from app_user granted by current_user cascade;
 
 revoke admin option for app_reader, app_writer from an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters restrict;

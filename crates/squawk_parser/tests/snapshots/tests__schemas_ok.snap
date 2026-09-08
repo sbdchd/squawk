@@ -27,7 +27,8 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        IDENT "foo"
+        ROLE_NAME_REF
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -42,7 +43,8 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        CURRENT_ROLE_KW "current_role"
+        ROLE_REF_CURRENT_ROLE
+          CURRENT_ROLE_KW "current_role"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -57,7 +59,8 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -72,7 +75,8 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        SESSION_USER_KW "session_user"
+        ROLE_REF_SESSION_USER
+          SESSION_USER_KW "session_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -123,7 +127,8 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        IDENT "bar"
+        ROLE_NAME_REF
+          IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -313,7 +318,8 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        IDENT "user_name"
+        ROLE_NAME_REF
+          IDENT "user_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_schema_with_sequence"
@@ -486,7 +492,8 @@ SOURCE_FILE
     ROLE_KW "role"
     WHITESPACE " "
     ROLE_REF
-      IDENT "foo"
+      ROLE_NAME_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET

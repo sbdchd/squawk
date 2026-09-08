@@ -106,19 +106,23 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF_LIST
         ROLE_REF
-          IDENT "public"
+          ROLE_NAME_REF
+            IDENT "public"
         COMMA ","
         WHITESPACE " "
         ROLE_REF
-          CURRENT_ROLE_KW "current_role"
+          ROLE_REF_CURRENT_ROLE
+            CURRENT_ROLE_KW "current_role"
         COMMA ","
         WHITESPACE " "
         ROLE_REF
-          CURRENT_USER_KW "current_user"
+          ROLE_REF_CURRENT_USER
+            CURRENT_USER_KW "current_user"
         COMMA ","
         WHITESPACE " "
         ROLE_REF
-          SESSION_USER_KW "session_user"
+          ROLE_REF_SESSION_USER
+            SESSION_USER_KW "session_user"
     WHITESPACE "\n  "
     USING_EXPR_CLAUSE
       USING_KW "using"

@@ -11,7 +11,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "foo"
+      ROLE_NAME_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -27,14 +28,17 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     ROLE_REF
-      IDENT "a"
+      ROLE_NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
     ROLE_REF
-      IDENT "b"
+      ROLE_NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
     ROLE_REF
-      IDENT "c"
+      ROLE_NAME_REF
+        IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"

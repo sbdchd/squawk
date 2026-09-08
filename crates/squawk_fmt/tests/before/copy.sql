@@ -11,3 +11,6 @@ copy binary foo from stdin binary freeze csv header json delimiter as ',' null a
 /* before */ COPY /* after copy */ BINARY /* after binary */ public /* before dot */ . /* after dot */ records /* before columns */ (/* after left paren */ id /* before comma */, /* after comma */ description /* before right paren */) /* before from */ FROM /* after from */ PROGRAM /* after program */ 'cat /tmp/records' /* before with */ WITH /* before options */ (/* after options left paren */ FORMAT /* before format value */ CSV /* before option comma */, /* after option comma */ HEADER /* before header value */ ON /* before second option comma */, /* after second option comma */ FORCE_NULL /* before nested options */ (/* after nested left paren */ id /* before nested comma */, /* after nested comma */ description /* before nested right paren */) /* before options right paren */) /* before where */ WHERE /* after where */ id > 0 /* before semicolon */;
 
 copy (/* after query left paren */ select /* after select */ id from records /* before query right paren */) to /* before stdout */ stdout;
+
+copy ((select 1)) to stdout;
+copy ((table t)) to stdout;

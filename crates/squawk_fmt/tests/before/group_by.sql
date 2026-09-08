@@ -1,4 +1,5 @@
 select 1 group by 1, foo + 2;
+select sum(c) from gs group by "rollup"(c), "cube" /* before args */ (c);
 select 1 group by all rollup (1, 2), cube (3, 4);
 select 1 group by distinct grouping sets ((), (1, 2), rollup (3), cube (4));
 select 1 group by grouping sets ((first_very_long_grouping_expression, second_very_long_grouping_expression), rollup (third_very_long_grouping_expression, fourth_very_long_grouping_expression), cube (fifth_very_long_grouping_expression, sixth_very_long_grouping_expression));

@@ -2,6 +2,8 @@ grant select, update (payload) on table public.records, archived_records to app_
 
 grant select on public.records to app_user;
 
+grant select on public.records to group exclude;
+
 grant all privileges on all tables in schema public, audit to app_user with grant option granted by current_user;
 
 grant app_reader, app_writer to app_user with admin option, inherit true granted by current_user;

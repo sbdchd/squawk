@@ -7,13 +7,13 @@ pub fn quote_string_literal(text: &str) -> String {
     format!("'{}'", text.replace('\'', "''"))
 }
 
-fn quote(text: &str) -> String {
+pub fn quote_ident_always(text: &str) -> String {
     format!(r#""{}""#, text.replace('"', r#""""#))
 }
 
 pub fn quote_column_alias(text: &str) -> String {
     if needs_quoting(text) {
-        quote(text)
+        quote_ident_always(text)
     } else {
         text.to_string()
     }
@@ -21,7 +21,7 @@ pub fn quote_column_alias(text: &str) -> String {
 
 pub fn quote_bare_column_alias(text: &str) -> String {
     if needs_quoting(text) || is_as_label_word(text) {
-        quote(text)
+        quote_ident_always(text)
     } else {
         text.to_string()
     }
@@ -29,7 +29,7 @@ pub fn quote_bare_column_alias(text: &str) -> String {
 
 pub fn quote_ident(text: &str) -> String {
     if needs_quoting(text) || is_reserved_word(text) || is_type_func_name_word(text) {
-        quote(text)
+        quote_ident_always(text)
     } else {
         text.to_string()
     }
@@ -37,7 +37,7 @@ pub fn quote_ident(text: &str) -> String {
 
 pub fn quote_quoted_ident(text: &str) -> String {
     if is_col_name_word(text) {
-        quote(text)
+        quote_ident_always(text)
     } else {
         quote_ident(text)
     }

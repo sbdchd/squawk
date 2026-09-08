@@ -67,3 +67,6 @@ copy country from stdin with csv force not null *;
 -- legacy_options
 copy country from stdin with binary delimiter as '|' null as '\n' quote '"' escape '\' encoding 'utf8';
 
+-- parenthesized option arguments
+copy t from stdin with (default ('x'));
+copy t from stdin with (format ('csv', off, on, true, false));

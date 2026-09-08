@@ -4,4 +4,6 @@ alter role exceptionally_long_application_service_account_name with superuser cr
 
 alter role current_user rename /* to */ to /* target */ renamed_user;
 
+alter role r "reset" /* parameter */ param;
+
 alter role all reset /* all */ all;

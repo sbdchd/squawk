@@ -1,0 +1,174 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/json_object_ok.sql
+---
+SOURCE_FILE@0..266
+  SELECT@0..21
+    SELECT_CLAUSE@0..20
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..20
+        TARGET@7..20
+          CALL_EXPR@7..20
+            JSON_OBJECT_FN@7..20
+              JSON_OBJECT_KW@7..18 "json_object"
+              L_PAREN@18..19 "("
+              R_PAREN@19..20 ")"
+    SEMICOLON@20..21 ";"
+  WHITESPACE@21..22 "\n"
+  SELECT@22..58
+    SELECT_CLAUSE@22..57
+      SELECT_KW@22..28 "select"
+      WHITESPACE@28..29 " "
+      TARGET_LIST@29..57
+        TARGET@29..57
+          CALL_EXPR@29..57
+            JSON_OBJECT_FN@29..57
+              JSON_OBJECT_KW@29..40 "json_object"
+              L_PAREN@40..41 "("
+              JSON_RETURNING_CLAUSE@41..56
+                RETURNING_KW@41..50 "returning"
+                WHITESPACE@50..51 " "
+                PATH_TYPE@51..56
+                  PATH_REF@51..56
+                    PATH_SEGMENT_REF@51..56
+                      IDENT@51..56 "jsonb"
+              R_PAREN@56..57 ")"
+    SEMICOLON@57..58 ";"
+  WHITESPACE@58..59 "\n"
+  SELECT@59..88
+    SELECT_CLAUSE@59..87
+      SELECT_KW@59..65 "select"
+      WHITESPACE@65..66 " "
+      TARGET_LIST@66..87
+        TARGET@66..87
+          CALL_EXPR@66..87
+            JSON_OBJECT_FN@66..87
+              JSON_OBJECT_KW@66..77 "json_object"
+              L_PAREN@77..78 "("
+              LITERAL@78..81
+                STRING@78..81 "'a'"
+              COMMA@81..82 ","
+              WHITESPACE@82..83 " "
+              LITERAL@83..86
+                STRING@83..86 "'b'"
+              R_PAREN@86..87 ")"
+    SEMICOLON@87..88 ";"
+  WHITESPACE@88..89 "\n"
+  SELECT@89..128
+    SELECT_CLAUSE@89..127
+      SELECT_KW@89..95 "select"
+      WHITESPACE@95..96 " "
+      TARGET_LIST@96..127
+        TARGET@96..127
+          CALL_EXPR@96..127
+            JSON_OBJECT_FN@96..127
+              JSON_OBJECT_KW@96..107 "json_object"
+              L_PAREN@107..108 "("
+              NAMED_ARG@108..116
+                PARAM_NAME_REF@108..109
+                  IDENT@108..109 "a"
+                WHITESPACE@109..110 " "
+                FAT_ARROW@110..112 "=>"
+                WHITESPACE@112..113 " "
+                LITERAL@113..116
+                  STRING@113..116 "'x'"
+              COMMA@116..117 ","
+              WHITESPACE@117..118 " "
+              NAMED_ARG@118..126
+                PARAM_NAME_REF@118..119
+                  IDENT@118..119 "b"
+                WHITESPACE@119..120 " "
+                FAT_ARROW@120..122 "=>"
+                WHITESPACE@122..123 " "
+                LITERAL@123..126
+                  STRING@123..126 "'y'"
+              R_PAREN@126..127 ")"
+    SEMICOLON@127..128 ";"
+  WHITESPACE@128..129 "\n"
+  SELECT@129..168
+    SELECT_CLAUSE@129..167
+      SELECT_KW@129..135 "select"
+      WHITESPACE@135..136 " "
+      TARGET_LIST@136..167
+        TARGET@136..167
+          CALL_EXPR@136..167
+            JSON_OBJECT_FN@136..167
+              JSON_OBJECT_KW@136..147 "json_object"
+              L_PAREN@147..148 "("
+              JSON_KEY_VALUE@148..156
+                LITERAL@148..151
+                  STRING@148..151 "'k'"
+                COLON@151..152 ":"
+                WHITESPACE@152..153 " "
+                JSON_VALUE_EXPR@153..156
+                  LITERAL@153..156
+                    STRING@153..156 "'v'"
+              COMMA@156..157 ","
+              WHITESPACE@157..158 " "
+              JSON_KEY_VALUE@158..166
+                LITERAL@158..161
+                  STRING@158..161 "'a'"
+                COLON@161..162 ":"
+                WHITESPACE@162..163 " "
+                JSON_VALUE_EXPR@163..166
+                  LITERAL@163..166
+                    STRING@163..166 "'b'"
+              R_PAREN@166..167 ")"
+    SEMICOLON@167..168 ";"
+  WHITESPACE@168..169 "\n"
+  SELECT@169..265
+    SELECT_CLAUSE@169..264
+      SELECT_KW@169..175 "select"
+      WHITESPACE@175..176 " "
+      TARGET_LIST@176..264
+        TARGET@176..264
+          CALL_EXPR@176..264
+            JSON_OBJECT_FN@176..264
+              JSON_OBJECT_KW@176..187 "json_object"
+              L_PAREN@187..188 "("
+              JSON_KEY_VALUE@188..201
+                LITERAL@188..191
+                  STRING@188..191 "'k'"
+                WHITESPACE@191..192 " "
+                VALUE_KW@192..197 "value"
+                WHITESPACE@197..198 " "
+                JSON_VALUE_EXPR@198..201
+                  LITERAL@198..201
+                    STRING@198..201 "'v'"
+              COMMA@201..202 ","
+              WHITESPACE@202..203 " "
+              JSON_KEY_VALUE@203..216
+                LITERAL@203..206
+                  STRING@203..206 "'a'"
+                WHITESPACE@206..207 " "
+                VALUE_KW@207..212 "value"
+                WHITESPACE@212..213 " "
+                JSON_VALUE_EXPR@213..216
+                  LITERAL@213..216
+                    STRING@213..216 "'b'"
+              WHITESPACE@216..217 " "
+              JSON_ABSENT_ON_NULL@217..231
+                ABSENT_KW@217..223 "absent"
+                WHITESPACE@223..224 " "
+                ON_KW@224..226 "on"
+                WHITESPACE@226..227 " "
+                NULL_KW@227..231 "null"
+              WHITESPACE@231..232 " "
+              JSON_WITH_UNIQUE_KEYS@232..248
+                WITH_KW@232..236 "with"
+                WHITESPACE@236..237 " "
+                UNIQUE_KW@237..243 "unique"
+                WHITESPACE@243..244 " "
+                KEYS_KW@244..248 "keys"
+              WHITESPACE@248..249 " "
+              JSON_RETURNING_CLAUSE@249..263
+                RETURNING_KW@249..258 "returning"
+                WHITESPACE@258..259 " "
+                PATH_TYPE@259..263
+                  PATH_REF@259..263
+                    PATH_SEGMENT_REF@259..263
+                      TEXT_KW@259..263 "text"
+              R_PAREN@263..264 ")"
+    SEMICOLON@264..265 ";"
+  WHITESPACE@265..266 "\n"

@@ -106,7 +106,8 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        IDENT "u"
+        ROLE_NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_current_role"
@@ -136,7 +137,8 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        CURRENT_ROLE_KW "current_role"
+        ROLE_REF_CURRENT_ROLE
+          CURRENT_ROLE_KW "current_role"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_current_user"
@@ -157,7 +159,8 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_session_user"
@@ -178,7 +181,8 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        SESSION_USER_KW "session_user"
+        ROLE_REF_SESSION_USER
+          SESSION_USER_KW "session_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_to"

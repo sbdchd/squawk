@@ -433,3 +433,7 @@ CREATE TABLE t (id varchar NOT NULL COLLATE "C" UNIQUE);
 CREATE TABLE foo (
     id int GENERATED ALWAYS AS IDENTITY (SEQUENCE NAME public.myseq START 1)
 );
+
+create table sequence (a int);
+
+create table if (a int);

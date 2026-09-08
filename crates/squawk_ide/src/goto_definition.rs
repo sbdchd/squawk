@@ -250,9 +250,11 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
                 })
             }
             ast::AnyNameRef::RemoteTableNameRef(_) => None,
-            ast::AnyNameRef::RoleRef(name_ref) => resolve_in_files(db, file, |definition_file| {
-                resolve::resolve_role_ref(db, InFile::new(definition_file, &name_ref))
-            }),
+            ast::AnyNameRef::RoleNameRef(name_ref) => {
+                resolve_in_files(db, file, |definition_file| {
+                    resolve::resolve_role_ref(db, InFile::new(definition_file, &name_ref))
+                })
+            }
             ast::AnyNameRef::RuleRef(name_ref) => resolve_in_files(db, file, |definition_file| {
                 resolve::resolve_rule_ref(db, InFile::new(definition_file, &name_ref))
             }),

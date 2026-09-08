@@ -555,3 +555,9 @@ select * from (select 1) t limit 5;
 
 -- but inside the parens they belong to the subquery
 select * from ((select 1) limit 1) t;
+
+-- keyword table names
+select * from xmltable;
+select * from json_table;
+select * from graph_table;
+select * from json_table, xmltable x;

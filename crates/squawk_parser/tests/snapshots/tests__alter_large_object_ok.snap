@@ -20,7 +20,8 @@ SOURCE_FILE
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_role"
@@ -40,6 +41,7 @@ SOURCE_FILE
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF
-      CURRENT_ROLE_KW "current_role"
+      ROLE_REF_CURRENT_ROLE
+        CURRENT_ROLE_KW "current_role"
     SEMICOLON ";"
   WHITESPACE "\n\n"

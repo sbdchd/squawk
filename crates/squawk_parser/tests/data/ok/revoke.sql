@@ -235,3 +235,4 @@ revoke set option for
 revoke public
   from current_user;
 
+revoke usage on schema from u;

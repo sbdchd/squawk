@@ -798,7 +798,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        IDENT "u"
+        ROLE_NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- where with missing expr"
