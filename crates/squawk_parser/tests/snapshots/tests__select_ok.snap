@@ -7252,4 +7252,89 @@ SOURCE_FILE
           TABLE_ALIAS
             IDENT "t"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- keyword table names"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              XMLTABLE_KW "xmltable"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              JSON_TABLE_KW "json_table"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              GRAPH_TABLE_KW "graph_table"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              JSON_TABLE_KW "json_table"
+      COMMA ","
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              XMLTABLE_KW "xmltable"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "x"
+    SEMICOLON ";"
   WHITESPACE "\n"

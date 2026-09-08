@@ -1947,7 +1947,7 @@ fn opt_json_passing_clause(p: &mut Parser<'_>, follow: TokenSet) {
 fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<(CompletedMarker, ExprKind)> {
     let m;
     let (kind, prefix_bp) = match p.current() {
-        MINUS | PLUS => {
+        MINUS | PLUS if p.op_len() == 1 => {
             m = p.start();
             p.bump_any();
             (PREFIX_EXPR, 13)
@@ -4002,17 +4002,17 @@ fn data_source(p: &mut Parser<'_>, in_parens: bool) -> DataSource {
             }
             PAREN_FROM_ITEM
         }
-        JSON_TABLE_KW => {
+        JSON_TABLE_KW if p.nth_at(1, L_PAREN) => {
             json_table_fn(p);
             opt_from_alias(p);
             JSON_TABLE_FROM_ITEM
         }
-        GRAPH_TABLE_KW => {
+        GRAPH_TABLE_KW if p.nth_at(1, L_PAREN) => {
             graph_table_fn(p);
             opt_from_alias(p);
             GRAPH_TABLE_FROM_ITEM
         }
-        XMLTABLE_KW => {
+        XMLTABLE_KW if p.nth_at(1, L_PAREN) => {
             xml_table_fn(p);
             opt_from_alias(p);
             XML_TABLE_FROM_ITEM
@@ -6469,7 +6469,7 @@ fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
 }
 
 fn opt_if_not_exists(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at(IF_KW) {
+    if p.at(IF_KW) && p.nth_at(1, NOT_KW) {
         let m = p.start();
         p.bump(IF_KW);
         p.expect(NOT_KW);
@@ -6481,7 +6481,7 @@ fn opt_if_not_exists(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 fn opt_if_exists(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at(IF_KW) {
+    if p.at(IF_KW) && p.nth_at(1, EXISTS_KW) {
         let m = p.start();
         p.bump(IF_KW);
         p.expect(EXISTS_KW);
@@ -8076,7 +8076,8 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (CREATE_KW, LOCAL_KW | GLOBAL_KW) if p.nth_at(3, PROPERTY_KW) => {
             Some(create_property_graph(p))
         }
-        (CREATE_KW, TABLE_KW | GLOBAL_KW | LOCAL_KW | UNLOGGED_KW) if !p.nth_at(2, SEQUENCE_KW) => {
+        (CREATE_KW, TABLE_KW) => Some(create_table(p)),
+        (CREATE_KW, GLOBAL_KW | LOCAL_KW | UNLOGGED_KW) if !p.nth_at(2, SEQUENCE_KW) => {
             Some(create_table(p))
         }
         (CREATE_KW, TABLESPACE_KW) => Some(create_tablespace(p)),
@@ -8485,7 +8486,7 @@ fn alter_routine(p: &mut Parser<'_>) -> CompletedMarker {
             depends_on_extension(p);
         }
         _ => {
-            func_option_list(p, false);
+            func_option_list(p, FuncOptionListKind::OptionsOnly);
         }
     }
     p.eat(RESTRICT_KW);
@@ -8663,7 +8664,7 @@ fn alter_procedure(p: &mut Parser<'_>) -> CompletedMarker {
             depends_on_extension(p);
         }
         _ => {
-            func_option_list(p, false);
+            func_option_list(p, FuncOptionListKind::OptionsOnly);
             p.eat(RESTRICT_KW);
         }
     }
@@ -9165,7 +9166,7 @@ fn alter_function(p: &mut Parser<'_>) -> CompletedMarker {
             depends_on_extension(p);
         }
         _ => {
-            func_option_list(p, false);
+            func_option_list(p, FuncOptionListKind::OptionsOnly);
         }
     }
     p.eat(RESTRICT_KW);
@@ -12828,7 +12829,7 @@ fn create_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(PROCEDURE_KW);
     procedure_name(p);
     param_list(p, ParamKind::All);
-    func_option_list(p, true);
+    func_option_list(p, FuncOptionListKind::WithRoutineBody);
     opt_routine_body(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_PROCEDURE)
@@ -14795,6 +14796,8 @@ fn opt_on_privilege_objects_clause(p: &mut Parser<'_>) {
     }
 }
 
+const PRIVILEGE_TARGET_FOLLOW: TokenSet = TokenSet::new(&[TO_KW, FROM_KW, COMMA, DOT]);
+
 fn privilege_target(p: &mut Parser<'_>) {
     let m = p.start();
     if p.eat(ALL_KW) {
@@ -14818,60 +14821,60 @@ fn privilege_target(p: &mut Parser<'_>) {
         m.complete(p, kind);
     } else {
         match p.current() {
-            PARAMETER_KW => {
+            PARAMETER_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(PARAMETER_KW);
                 config_parameter_ref_list(p);
                 m.complete(p, PRIVILEGE_PARAMETER);
             }
-            FUNCTION_KW => {
+            FUNCTION_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(FUNCTION_KW);
                 function_sig_list(p);
                 m.complete(p, PRIVILEGE_FUNCTION);
             }
-            PROCEDURE_KW => {
+            PROCEDURE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(PROCEDURE_KW);
                 procedure_sig_list(p);
                 m.complete(p, PRIVILEGE_PROCEDURE);
             }
-            ROUTINE_KW => {
+            ROUTINE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(ROUTINE_KW);
                 routine_sig_list(p);
                 m.complete(p, PRIVILEGE_ROUTINE);
             }
             // TYPE type_name [, ...]
-            TYPE_KW => {
+            TYPE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(TYPE_KW);
                 type_name_ref_list(p);
                 m.complete(p, PRIVILEGE_TYPE);
             }
             // no schema allowed for the name
-            DATABASE_KW => {
+            DATABASE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(DATABASE_KW);
                 database_ref_list(p);
                 m.complete(p, PRIVILEGE_DATABASE);
             }
-            LANGUAGE_KW => {
+            LANGUAGE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(LANGUAGE_KW);
                 language_ref_list(p);
                 m.complete(p, PRIVILEGE_LANGUAGE);
             }
-            SCHEMA_KW => {
+            SCHEMA_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(SCHEMA_KW);
                 schema_ref_list(p);
                 m.complete(p, PRIVILEGE_SCHEMA);
             }
-            TABLESPACE_KW => {
+            TABLESPACE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(TABLESPACE_KW);
                 tablespace_ref_list(p);
                 m.complete(p, PRIVILEGE_TABLESPACE);
             }
             // these allow schema
-            SEQUENCE_KW => {
+            SEQUENCE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(SEQUENCE_KW);
                 sequence_ref_list(p);
                 m.complete(p, PRIVILEGE_SEQUENCE);
             }
-            DOMAIN_KW => {
+            DOMAIN_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(DOMAIN_KW);
                 domain_ref_list(p);
                 m.complete(p, PRIVILEGE_DOMAIN);
@@ -14893,7 +14896,7 @@ fn privilege_target(p: &mut Parser<'_>) {
                     m.complete(p, PRIVILEGE_FOREIGN_SERVER);
                 }
             }
-            LARGE_KW => {
+            LARGE_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(LARGE_KW);
                 p.expect(OBJECT_KW);
                 numeric_literal(p);
@@ -14902,7 +14905,7 @@ fn privilege_target(p: &mut Parser<'_>) {
                 }
                 m.complete(p, PRIVILEGE_LARGE_OBJECT);
             }
-            PROPERTY_KW => {
+            PROPERTY_KW if !p.nth_at_ts(1, PRIVILEGE_TARGET_FOLLOW) => {
                 p.bump(PROPERTY_KW);
                 p.expect(GRAPH_KW);
                 property_graph_ref_list(p);
@@ -15081,21 +15084,28 @@ fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
     match p.current() {
         GROUP_KW => {
             p.bump(GROUP_KW);
-            pg_name(p);
+            if matches!(
+                p.current(),
+                CURRENT_ROLE_KW | CURRENT_USER_KW | SESSION_USER_KW
+            ) {
+                role_ref_keyword(p, kind);
+            } else {
+                role_name(p, kind);
+            }
         }
         CURRENT_ROLE_KW | CURRENT_USER_KW | SESSION_USER_KW => {
-            p.bump_any();
+            role_ref_keyword(p, kind);
         }
         ALTER_KW => {
             if !p.nth_at(1, SYSTEM_KW) {
-                pg_name(p);
+                role_name(p, kind);
             } else {
                 m.abandon(p);
                 return false;
             }
         }
         _ if p.at_ts(NON_RESERVED_WORD) => {
-            pg_name(p);
+            role_name(p, kind);
         }
         _ => {
             m.abandon(p);
@@ -15104,6 +15114,34 @@ fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
     }
     m.complete(p, kind);
     true
+}
+
+fn role_ref_keyword(p: &mut Parser<'_>, role_kind: SyntaxKind) {
+    assert!(matches!(role_kind, ROLE | ROLE_REF));
+    if role_kind == ROLE_REF {
+        let m = p.start();
+        let kind = match p.current() {
+            CURRENT_ROLE_KW => ROLE_REF_CURRENT_ROLE,
+            CURRENT_USER_KW => ROLE_REF_CURRENT_USER,
+            SESSION_USER_KW => ROLE_REF_SESSION_USER,
+            _ => unreachable!(),
+        };
+        p.bump_any();
+        m.complete(p, kind);
+    } else {
+        p.bump_any();
+    }
+}
+
+fn role_name(p: &mut Parser<'_>, role_kind: SyntaxKind) {
+    assert!(matches!(role_kind, ROLE | ROLE_REF));
+    if role_kind == ROLE_REF {
+        let m = p.start();
+        pg_name(p);
+        m.complete(p, ROLE_NAME_REF);
+    } else {
+        pg_name(p);
+    }
 }
 
 // SECURITY LABEL [ FOR provider ] ON
@@ -15353,6 +15391,8 @@ fn set_constraints(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, SET_CONSTRAINTS)
 }
 
+const SET_SCOPE_FOLLOW: TokenSet = TokenSet::new(&[EQ, TO_KW, DOT, FROM_KW]);
+
 // [ SESSION | LOCAL ]
 fn opt_set_scope(p: &mut Parser<'_>) {
     let kind = match p.current() {
@@ -15360,6 +15400,9 @@ fn opt_set_scope(p: &mut Parser<'_>) {
         LOCAL_KW => LOCAL_SCOPE,
         _ => return,
     };
+    if p.nth_at_ts(1, SET_SCOPE_FOLLOW) {
+        return;
+    }
     let m = p.start();
     p.bump_any();
     m.complete(p, kind);
@@ -16366,7 +16409,7 @@ fn copy_option_value(p: &mut Parser<'_>) {
             p.bump_any();
         }
         L_PAREN => {
-            copy_option_list(p);
+            copy_option_arg_list(p);
         }
         _ => {
             if p.at_ts(NON_RESERVED_WORD) {
@@ -16383,6 +16426,52 @@ fn copy_option_value(p: &mut Parser<'_>) {
         }
     }
     m.complete(p, COPY_OPTION_VALUE);
+}
+
+fn copy_option_arg_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        ListItems::Required,
+        || "unexpected comma".to_string(),
+        COPY_OPTION_ARG_FIRST,
+        opt_copy_option_arg,
+    );
+    m.complete(p, COPY_OPTION_ARG_LIST);
+}
+
+const COPY_OPTION_ARG_FIRST: TokenSet = TokenSet::new(&[TRUE_KW, FALSE_KW, ON_KW])
+    .union(NON_RESERVED_WORD)
+    .union(STRING_FIRST);
+
+fn opt_copy_option_arg(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(COPY_OPTION_ARG_FIRST) {
+        return false;
+    }
+    let m = p.start();
+    match p.current() {
+        TRUE_KW | FALSE_KW => {
+            let m = p.start();
+            p.bump_any();
+            m.complete(p, LITERAL);
+        }
+        ON_KW => {
+            p.bump(ON_KW);
+        }
+        _ if p.at_ts(NON_RESERVED_WORD) => {
+            let m = p.start();
+            p.bump_any();
+            m.complete(p, COPY_OPTION_VALUE_NAME);
+        }
+        _ => {
+            string_literal(p);
+        }
+    }
+    m.complete(p, COPY_OPTION_ARG);
+    true
 }
 
 fn copy_option_list(p: &mut Parser<'_>) {
@@ -18100,12 +18189,19 @@ fn opt_routine_body(p: &mut Parser<'_>) {
 
 const ROUTINE_BODY_FIRST: TokenSet = TokenSet::new(&[RETURN_KW, BEGIN_KW]);
 
-fn func_option_list(p: &mut Parser<'_>, allow_routine_body: bool) {
+#[derive(PartialEq, Clone, Copy)]
+enum FuncOptionListKind {
+    WithRoutineBody,
+    OptionsOnly,
+}
+
+fn func_option_list(p: &mut Parser<'_>, kind: FuncOptionListKind) {
     let m = p.start();
     let mut seen_func_option = false;
     while !p.at(EOF) {
         if !opt_function_option(p) {
-            let at_routine_body = allow_routine_body && p.at_ts(ROUTINE_BODY_FIRST);
+            let at_routine_body =
+                kind == FuncOptionListKind::WithRoutineBody && p.at_ts(ROUTINE_BODY_FIRST);
             if !seen_func_option && !at_routine_body {
                 p.error("expected function option");
             }
@@ -18188,7 +18284,7 @@ fn create_function(p: &mut Parser<'_>) -> CompletedMarker {
     function_name(p);
     param_list(p, ParamKind::All);
     opt_ret_type(p);
-    func_option_list(p, true);
+    func_option_list(p, FuncOptionListKind::WithRoutineBody);
     opt_routine_body(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_FUNCTION)

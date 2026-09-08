@@ -89,3 +89,23 @@ from graph_table(
       (b)
   columns (a.name)
 );
+
+select *
+from graph_table(
+  g
+  match
+    (src is vl1 | vl2)- -[conn]->(dest)
+  columns (src.vname as svname)
+);
+
+select * from graph_table(foo match <- - columns (a));
+
+select * from graph_table(g match (a)- ->(b) columns (x));
+
+select * from graph_table(g match (a)-[e]- ->(b) columns (x));
+
+select * from graph_table(g match (a)<-[e]- -(b) columns (x));
+
+select * from graph_table(g match ((a)- -(b)) columns (x));
+
+select * from graph_table(g match (a)-{1, 3}-(b) columns (x));

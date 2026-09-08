@@ -38,6 +38,8 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::RoutineSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
+                ast::JsonArrayFn(it) => validate_json_array_fn(it, errors),
+                ast::JsonObjectFn(it) => validate_json_object_fn(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 ast::ParenFromItem(it) => validate_paren_from_item(it, errors),
@@ -732,6 +734,35 @@ fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
             }
         }
     }
+}
+
+fn validate_json_array_fn(it: ast::JsonArrayFn, acc: &mut Vec<SyntaxError>) {
+    let Some(select) = it.json_select_formats().next() else {
+        return;
+    };
+    if it.json_expr_formats().next().is_none() {
+        return;
+    }
+    acc.push(SyntaxError::new(
+        "Subquery must be the only argument",
+        select.syntax().text_range(),
+    ));
+}
+
+fn validate_json_object_fn(it: ast::JsonObjectFn, acc: &mut Vec<SyntaxError>) {
+    let Some(key_value) = it.json_key_values().next() else {
+        return;
+    };
+    let Some(func_arg) = it.func_arg_exprs().next() else {
+        return;
+    };
+    let key_value = key_value.syntax().text_range();
+    let func_arg = func_arg.syntax().text_range();
+    let range = std::cmp::max_by_key(func_arg, key_value, |range| range.start());
+    acc.push(SyntaxError::new(
+        "Cannot mix `key: value` pairs with other arguments",
+        range,
+    ));
 }
 
 fn validate_array_expr(array_expr: ast::ArrayExpr, acc: &mut Vec<SyntaxError>) {

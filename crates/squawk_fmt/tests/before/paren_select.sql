@@ -14,3 +14,8 @@ select * from (/* after outer open */ ((/* before left select */ select 1 /* bef
 
 ((select 1) limit 2) order by 3;
 (select 1) offset 1 limit 2;
+
+select (with cte as (select 1) (select 2));
+select (with cte as (select 1) (values (2)));
+select (with cte(foo) as (values (1)) (values ((select foo from cte))));
+select (with cte as (select 1) (table cte));

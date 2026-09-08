@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 29
 input_file: crates/squawk_fmt/tests/before/prepare.sql
 ---
 prepare statement_name as
@@ -36,3 +37,14 @@ prepare
   )
   /* before as */ as
   /* before statement */ select /* before value */ $1 /* before semicolon */;
+
+prepare p1(int) as
+  (select $1);
+prepare p1 as
+  (select 1);
+prepare p1 as
+  ((select 1));
+prepare p1 as
+  (table t);
+prepare p1 as
+  (values (1));

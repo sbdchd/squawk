@@ -186,7 +186,8 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        IDENT "u"
+        ROLE_NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_SEQUENCE
@@ -205,7 +206,8 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"

@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 29
 input_file: crates/squawk_fmt/tests/before/copy.sql
 ---
 copy foo from '/tmp/foo.csv';
@@ -55,3 +56,6 @@ copy (
   from records /* before query right paren */
 )
 to /* before stdout */ stdout;
+
+copy ((select 1)) to stdout;
+copy ((table t)) to stdout;

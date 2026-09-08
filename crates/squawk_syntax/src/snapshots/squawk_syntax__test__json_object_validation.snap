@@ -1,0 +1,182 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/json_object.sql
+---
+SOURCE_FILE@0..306
+  COMMENT@0..47 "-- `key: value` pairs ..."
+  WHITESPACE@47..48 "\n"
+  SELECT@48..87
+    SELECT_CLAUSE@48..86
+      SELECT_KW@48..54 "select"
+      WHITESPACE@54..55 " "
+      TARGET_LIST@55..86
+        TARGET@55..86
+          CALL_EXPR@55..86
+            JSON_OBJECT_FN@55..86
+              JSON_OBJECT_KW@55..66 "json_object"
+              L_PAREN@66..67 "("
+              JSON_KEY_VALUE@67..75
+                LITERAL@67..70
+                  STRING@67..70 "'k'"
+                COLON@70..71 ":"
+                WHITESPACE@71..72 " "
+                JSON_VALUE_EXPR@72..75
+                  LITERAL@72..75
+                    STRING@72..75 "'v'"
+              COMMA@75..76 ","
+              WHITESPACE@76..77 " "
+              NAMED_ARG@77..85
+                PARAM_NAME_REF@77..78
+                  IDENT@77..78 "a"
+                WHITESPACE@78..79 " "
+                FAT_ARROW@79..81 "=>"
+                WHITESPACE@81..82 " "
+                LITERAL@82..85
+                  STRING@82..85 "'x'"
+              R_PAREN@85..86 ")"
+    SEMICOLON@86..87 ";"
+  WHITESPACE@87..88 "\n"
+  SELECT@88..132
+    SELECT_CLAUSE@88..131
+      SELECT_KW@88..94 "select"
+      WHITESPACE@94..95 " "
+      TARGET_LIST@95..131
+        TARGET@95..131
+          CALL_EXPR@95..131
+            JSON_OBJECT_FN@95..131
+              JSON_OBJECT_KW@95..106 "json_object"
+              L_PAREN@106..107 "("
+              JSON_KEY_VALUE@107..120
+                LITERAL@107..110
+                  STRING@107..110 "'k'"
+                WHITESPACE@110..111 " "
+                VALUE_KW@111..116 "value"
+                WHITESPACE@116..117 " "
+                JSON_VALUE_EXPR@117..120
+                  LITERAL@117..120
+                    STRING@117..120 "'v'"
+              COMMA@120..121 ","
+              WHITESPACE@121..122 " "
+              NAMED_ARG@122..130
+                PARAM_NAME_REF@122..123
+                  IDENT@122..123 "a"
+                WHITESPACE@123..124 " "
+                COLON_EQ@124..126 ":="
+                WHITESPACE@126..127 " "
+                LITERAL@127..130
+                  STRING@127..130 "'x'"
+              R_PAREN@130..131 ")"
+    SEMICOLON@131..132 ";"
+  WHITESPACE@132..133 "\n"
+  SELECT@133..172
+    SELECT_CLAUSE@133..171
+      SELECT_KW@133..139 "select"
+      WHITESPACE@139..140 " "
+      TARGET_LIST@140..171
+        TARGET@140..171
+          CALL_EXPR@140..171
+            JSON_OBJECT_FN@140..171
+              JSON_OBJECT_KW@140..151 "json_object"
+              L_PAREN@151..152 "("
+              JSON_KEY_VALUE@152..160
+                LITERAL@152..155
+                  STRING@152..155 "'k'"
+                COLON@155..156 ":"
+                WHITESPACE@156..157 " "
+                JSON_VALUE_EXPR@157..160
+                  LITERAL@157..160
+                    STRING@157..160 "'v'"
+              COMMA@160..161 ","
+              WHITESPACE@161..162 " "
+              LITERAL@162..165
+                STRING@162..165 "'a'"
+              COMMA@165..166 ","
+              WHITESPACE@166..167 " "
+              LITERAL@167..170
+                STRING@167..170 "'b'"
+              R_PAREN@170..171 ")"
+    SEMICOLON@171..172 ";"
+  WHITESPACE@172..174 "\n\n"
+  COMMENT@174..225 "-- and args can't be  ..."
+  WHITESPACE@225..226 "\n"
+  SELECT@226..265
+    SELECT_CLAUSE@226..264
+      SELECT_KW@226..232 "select"
+      WHITESPACE@232..233 " "
+      TARGET_LIST@233..264
+        TARGET@233..264
+          CALL_EXPR@233..264
+            JSON_OBJECT_FN@233..264
+              JSON_OBJECT_KW@233..244 "json_object"
+              L_PAREN@244..245 "("
+              LITERAL@245..248
+                STRING@245..248 "'a'"
+              COMMA@248..249 ","
+              WHITESPACE@249..250 " "
+              LITERAL@250..253
+                STRING@250..253 "'b'"
+              COMMA@253..254 ","
+              WHITESPACE@254..255 " "
+              JSON_KEY_VALUE@255..263
+                LITERAL@255..258
+                  STRING@255..258 "'k'"
+                COLON@258..259 ":"
+                WHITESPACE@259..260 " "
+                JSON_VALUE_EXPR@260..263
+                  LITERAL@260..263
+                    STRING@260..263 "'v'"
+              R_PAREN@263..264 ")"
+    SEMICOLON@264..265 ";"
+  WHITESPACE@265..266 "\n"
+  SELECT@266..305
+    SELECT_CLAUSE@266..304
+      SELECT_KW@266..272 "select"
+      WHITESPACE@272..273 " "
+      TARGET_LIST@273..304
+        TARGET@273..304
+          CALL_EXPR@273..304
+            JSON_OBJECT_FN@273..304
+              JSON_OBJECT_KW@273..284 "json_object"
+              L_PAREN@284..285 "("
+              NAMED_ARG@285..293
+                PARAM_NAME_REF@285..286
+                  IDENT@285..286 "a"
+                WHITESPACE@286..287 " "
+                FAT_ARROW@287..289 "=>"
+                WHITESPACE@289..290 " "
+                LITERAL@290..293
+                  STRING@290..293 "'x'"
+              COMMA@293..294 ","
+              WHITESPACE@294..295 " "
+              JSON_KEY_VALUE@295..303
+                LITERAL@295..298
+                  STRING@295..298 "'k'"
+                COLON@298..299 ":"
+                WHITESPACE@299..300 " "
+                JSON_VALUE_EXPR@300..303
+                  LITERAL@300..303
+                    STRING@300..303 "'v'"
+              R_PAREN@303..304 ")"
+    SEMICOLON@304..305 ";"
+  WHITESPACE@305..306 "\n"
+
+error[syntax-error]: Cannot mix `key: value` pairs with other arguments
+  ╭▸ 
+2 │ select json_object('k': 'v', a => 'x');
+  ╰╴                             ━━━━━━━━
+error[syntax-error]: Cannot mix `key: value` pairs with other arguments
+  ╭▸ 
+3 │ select json_object('k' value 'v', a := 'x');
+  ╰╴                                  ━━━━━━━━
+error[syntax-error]: Cannot mix `key: value` pairs with other arguments
+  ╭▸ 
+4 │ select json_object('k': 'v', 'a', 'b');
+  ╰╴                             ━━━
+error[syntax-error]: Cannot mix `key: value` pairs with other arguments
+  ╭▸ 
+7 │ select json_object('a', 'b', 'k': 'v');
+  ╰╴                             ━━━━━━━━
+error[syntax-error]: Cannot mix `key: value` pairs with other arguments
+  ╭▸ 
+8 │ select json_object(a => 'x', 'k': 'v');
+  ╰╴                             ━━━━━━━━

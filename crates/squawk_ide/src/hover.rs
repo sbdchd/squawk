@@ -234,7 +234,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::PropertyNameRef(_)
             | ast::AnyName::PublicationRef(_)
             | ast::AnyName::RemoteTableNameRef(_)
-            | ast::AnyName::RoleRef(_)
+            | ast::AnyName::RoleNameRef(_)
             | ast::AnyName::RuleRef(_)
             | ast::AnyName::SavepointRef(_)
             | ast::AnyName::SchemaRef(_)

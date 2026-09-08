@@ -3407,3 +3407,69 @@ SOURCE_FILE
           SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- the option list may be empty when a routine body follows"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    ATOMIC_BODY
+      BEGIN_KW "begin"
+      WHITESPACE " "
+      ATOMIC_KW "atomic"
+      WHITESPACE " "
+      RETURN_STMT
+        RETURN_KW "return"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        SEMICOLON ";"
+      WHITESPACE " "
+      END_KW "end"
+    SEMICOLON ";"
+  WHITESPACE "\n"

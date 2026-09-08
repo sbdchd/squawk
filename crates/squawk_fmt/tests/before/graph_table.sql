@@ -32,3 +32,17 @@ select * from graph_table(
   g match (a) - -- before qualifier
   {1,3} (b) columns (a.name)
 );
+
+select * from GRAPH_TABLE (g MATCH (src IS vl1|vl2)- - [conn]->(dest) COLUMNS (src.vname AS svname));
+
+select * from GRAPH_TABLE (foo MATCH <-  -  COLUMNS (a));
+
+select * from GRAPH_TABLE (g MATCH (a)- ->(b) COLUMNS (x));
+
+select * from GRAPH_TABLE (g MATCH (a)-[e]- ->(b) COLUMNS (x));
+
+select * from GRAPH_TABLE (g MATCH (a)<-[e]- -(b) COLUMNS (x));
+
+select * from GRAPH_TABLE (g MATCH ((a)- -(b)) COLUMNS (x));
+
+select * from GRAPH_TABLE (g MATCH (a)-{1,3} -(b) COLUMNS (x));

@@ -26,3 +26,5 @@ drop table restrict;
 
 -- restrict
 drop table t restrict;
+
+drop table if;

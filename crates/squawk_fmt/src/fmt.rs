@@ -2,10 +2,12 @@ use anyhow::Result;
 use either::Either;
 use itertools::Itertools;
 use rowan::Direction;
+use squawk_lexer::BOM;
 use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
 use squawk_syntax::ast::{self, AstNode, LitKind, is_quoted_name_node, normalize_name_node};
 use squawk_syntax::quote::{
-    quote_bare_column_alias, quote_column_alias, quote_ident, quote_quoted_ident,
+    quote_bare_column_alias, quote_column_alias, quote_ident, quote_ident_always,
+    quote_quoted_ident,
 };
 use squawk_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 use tiny_pretty::Doc;
@@ -34,7 +36,9 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
             rowan::NodeOrToken::Token(token) => {
                 previous_was_stmt = false;
                 if token.kind() == SyntaxKind::COMMENT {
-                    doc = doc.append(Doc::text(token.text().to_string()));
+                    doc = doc.append(build_comment(&token));
+                } else if token.text() == BOM {
+                    doc = doc.append(Doc::text(BOM));
                 } else if token.kind() == SyntaxKind::WHITESPACE {
                     // TODO: I think we can improve this
                     let lines = token.text().universal_newlines().count();
@@ -2973,6 +2977,7 @@ fn build_preparable_stmt<'a>(stmt: ast::PreparableStmt) -> Doc<'a> {
         ast::PreparableStmt::Delete(stmt) => build_delete(&stmt),
         ast::PreparableStmt::Insert(stmt) => build_insert(&stmt),
         ast::PreparableStmt::Merge(stmt) => build_merge(&stmt),
+        ast::PreparableStmt::ParenSelect(stmt) => build_paren_select(stmt),
         ast::PreparableStmt::Select(stmt) => build_select_doc(&stmt),
         ast::PreparableStmt::SelectInto(stmt) => build_select_into(&stmt),
         ast::PreparableStmt::Table(stmt) => build_table(&stmt),
@@ -3092,9 +3097,40 @@ fn build_copy_option<'a>(option: ast::CopyOption) -> Doc<'a> {
     doc.group()
 }
 
+fn build_copy_option_arg_list<'a>(list: ast::CopyOptionArgList) -> Doc<'a> {
+    let mut body = build_comma_separated_docs(list.copy_option_args().map(|arg| {
+        (
+            leading_comments(arg.syntax()).append(build_copy_option_arg(arg.clone())),
+            arg.syntax().clone(),
+        )
+    }))
+    .unwrap_or_else(Doc::nil);
+    if let Some(r_paren) = list.r_paren_token() {
+        body = body.append(comments_before(r_paren));
+    }
+
+    list.l_paren_token()
+        .map(comments_before)
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("))
+        .append(wrap_body(body))
+        .append(Doc::text(")"))
+        .group()
+}
+
+fn build_copy_option_arg<'a>(arg: ast::CopyOptionArg) -> Doc<'a> {
+    if let Some(name) = arg.copy_option_value_name() {
+        build_keyword_node(name.syntax())
+    } else if let Some(literal) = arg.literal() {
+        build_literal(literal)
+    } else {
+        build_keyword_node(arg.syntax())
+    }
+}
+
 fn build_copy_option_value<'a>(value: ast::CopyOptionValue) -> Doc<'a> {
-    if let Some(list) = value.copy_option_list() {
-        build_copy_option_list(list)
+    if let Some(list) = value.copy_option_arg_list() {
+        build_copy_option_arg_list(list)
     } else if let Some(name) = value.copy_option_value_name() {
         build_keyword_node(name.syntax())
     } else if let Some(expr) = value.expr() {
@@ -6777,36 +6813,36 @@ fn build_set_constraints<'a>(set: &ast::SetConstraints) -> Doc<'a> {
     doc.group().append(build_semicolon(set.semicolon_token()))
 }
 
+fn build_role_ref_value<'a>(value: &ast::RoleRefValue) -> Doc<'a> {
+    match value {
+        ast::RoleRefValue::RoleNameRef(name) => build_name(name.syntax()),
+        ast::RoleRefValue::RoleRefCurrentRole(current_role) => {
+            build_keyword_node(current_role.syntax())
+        }
+        ast::RoleRefValue::RoleRefCurrentUser(current_user) => {
+            build_keyword_node(current_user.syntax())
+        }
+        ast::RoleRefValue::RoleRefSessionUser(session_user) => {
+            build_keyword_node(session_user.syntax())
+        }
+    }
+}
+
 fn build_role_ref<'a>(role: &ast::RoleRef) -> Doc<'a> {
+    let value = role.role_ref_value();
     if let Some(group) = role.group_token() {
         let mut doc = leading_comments_token(&group).append(Doc::text("group"));
-        if let Some(ident) = role.ident_token() {
+        if let Some(value) = value {
             doc = doc
                 .append(Doc::space())
-                .append(leading_comments_token(&ident))
-                .append(build_name(role.syntax()));
-        } else if let Some((token, keyword)) = role
-            .current_role_token()
-            .map(|token| (token, "current_role"))
-            .or_else(|| {
-                role.current_user_token()
-                    .map(|token| (token, "current_user"))
-            })
-            .or_else(|| {
-                role.session_user_token()
-                    .map(|token| (token, "session_user"))
-            })
-        {
-            doc = doc
-                .append(Doc::space())
-                .append(leading_comments_token(&token))
-                .append(Doc::text(keyword));
+                .append(leading_comments(value.syntax()))
+                .append(build_role_ref_value(&value));
         }
         doc
-    } else if role.ident_token().is_some() {
-        build_name(role.syntax())
     } else {
-        build_keyword_node(role.syntax())
+        value
+            .map(|value| build_role_ref_value(&value))
+            .unwrap_or_else(Doc::nil)
     }
 }
 
@@ -8056,11 +8092,12 @@ fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> String) -> Doc<'a> 
     if is_unicode_escape(ident.text()) {
         let mut doc = Doc::text(ident.text().to_string());
         for token in tokens {
-            let text = match token.kind() {
-                SyntaxKind::STRING | SyntaxKind::COMMENT => token.text().to_string(),
-                _ => token.text().to_ascii_lowercase(),
+            let token_doc = match token.kind() {
+                SyntaxKind::COMMENT => build_comment(&token),
+                SyntaxKind::STRING => Doc::text(token.text().to_string()),
+                _ => Doc::text(token.text().to_ascii_lowercase()),
             };
-            doc = doc.append(Doc::space()).append(Doc::text(text));
+            doc = doc.append(Doc::space()).append(token_doc);
             if is_line_comment(&token) {
                 doc = doc.append(Doc::hard_line());
             }
@@ -12147,7 +12184,16 @@ fn build_role_option_list<'a>(list: &ast::RoleOptionList) -> Doc<'a> {
 
 fn build_role_option<'a>(option: ast::RoleOption) -> Doc<'a> {
     match option {
-        ast::RoleOption::RoleOptionGeneric(n) => build_name(n.syntax()),
+        ast::RoleOption::RoleOptionGeneric(n) => {
+            let name = normalize_name_node(n.syntax());
+            if is_quoted_name_node(n.syntax())
+                && matches!(name.as_str(), "admin" | "role" | "encrypted" | "reset")
+            {
+                Doc::text(quote_ident_always(&name))
+            } else {
+                build_name(n.syntax())
+            }
+        }
         ast::RoleOption::RoleOptionInherit(_) => Doc::text("inherit"),
         ast::RoleOption::RoleOptionConnectionLimit(n) => append_expr(
             build_keyword_tokens([
@@ -14071,7 +14117,9 @@ fn build_database_option<'a>(option: ast::DatabaseOption) -> Doc<'a> {
             option.eq_token(),
             option.literal(),
             option.default_token(),
-            option.role_ref().map(|value| build_commented_name(&value)),
+            option
+                .role_ref()
+                .map(|value| leading_comments(value.syntax()).append(build_role_ref(&value))),
         ),
         ast::DatabaseOption::DatabaseOptionTablespace(option) => build_database_option_assignment(
             Doc::text("tablespace"),
@@ -15026,7 +15074,7 @@ fn build_owner_to<'a>(owner: &ast::OwnerTo) -> Doc<'a> {
         doc = doc
             .append(Doc::space())
             .append(leading_comments(role.syntax()))
-            .append(build_name(role.syntax()));
+            .append(build_role_ref(&role));
     }
     doc
 }
@@ -16087,7 +16135,7 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
     build_select_doc_ungrouped(select).group()
 }
 
-fn has_single_call_target(select: &ast::Select) -> bool {
+fn has_single_inline_target(select: &ast::Select) -> bool {
     let Some(select_clause) = select.select_clause() else {
         return false;
     };
@@ -16104,7 +16152,11 @@ fn has_single_call_target(select: &ast::Select) -> bool {
     if targets.next().is_some() {
         return false;
     }
-    matches!(target.expr(), Some(ast::Expr::CallExpr(_)))
+    match target.expr() {
+        Some(ast::Expr::CallExpr(_)) => true,
+        Some(ast::Expr::ParenExpr(paren_expr)) => paren_expr.paren_select().is_some(),
+        _ => false,
+    }
 }
 
 fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
@@ -16129,7 +16181,7 @@ fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
     );
     select_doc = match select_body {
         None => select_doc,
-        Some(select_body) if has_single_call_target(select) => {
+        Some(select_body) if has_single_inline_target(select) => {
             select_doc.append(Doc::space()).append(select_body)
         }
         Some(select_body) if has_distinct_on => {
@@ -17418,7 +17470,7 @@ fn build_group_by<'a>(group_by: ast::GroupBy) -> Doc<'a> {
     match group_by {
         ast::GroupBy::GroupingExpr(grouping_expr) => grouping_expr
             .expr()
-            .map(build_expr)
+            .map(build_grouping_expr)
             .unwrap_or_else(Doc::nil),
         ast::GroupBy::GroupingRollup(rollup) => Doc::text("rollup").append(build_grouping_exprs(
             rollup.l_paren_token(),
@@ -17443,6 +17495,25 @@ fn build_group_by<'a>(group_by: ast::GroupBy) -> Doc<'a> {
                 ))
         }
     }
+}
+
+fn build_grouping_expr<'a>(expr: ast::Expr) -> Doc<'a> {
+    if let ast::Expr::CallExpr(call) = &expr
+        && let Some(ast::Expr::NameRef(name)) = call.expr()
+        && is_quoted_name_node(name.syntax())
+    {
+        let name = normalize_name_node(name.syntax());
+        if matches!(name.as_str(), "rollup" | "cube") {
+            let mut doc = Doc::text(quote_ident_always(&name));
+            if let Some(arg_list) = call.arg_list() {
+                doc = doc
+                    .append(comments_before(arg_list.syntax().clone()))
+                    .append(build_call_arg_list(arg_list));
+            }
+            return build_call_expr_postfix_clauses(doc, call);
+        }
+    }
+    build_expr(expr)
 }
 
 fn build_grouping_exprs<'a>(
@@ -17528,7 +17599,7 @@ fn wrap_empty_body<'a>(r_delimiter: Option<SyntaxToken>) -> Doc<'a> {
 
     let mut comments_doc = Doc::nil();
     for (index, comment) in comments.iter().enumerate() {
-        comments_doc = comments_doc.append(Doc::text(comment.text().to_string()));
+        comments_doc = comments_doc.append(build_comment(comment));
         if index + 1 < comments.len() {
             comments_doc = comments_doc.append(if is_line_comment(comment) {
                 Doc::hard_line()
@@ -17553,7 +17624,7 @@ fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
         if !after_line_comment {
             doc = doc.append(Doc::space());
         }
-        doc = doc.append(Doc::text(comment.text().to_string()));
+        doc = doc.append(build_comment(&comment));
         after_line_comment = is_line_comment(&comment);
         if after_line_comment {
             doc = doc.append(Doc::hard_line());
@@ -18010,17 +18081,32 @@ fn build_path_pattern_list<'a>(patterns: ast::PathPatternList) -> Doc<'a> {
 }
 
 fn build_path_pattern<'a>(pattern: ast::PathPattern) -> Doc<'a> {
-    Doc::list(
-        Itertools::intersperse(
-            pattern
-                .path_factors()
-                .map(|factor| leading_comments(factor.syntax()).append(build_path_factor(factor))),
-            Doc::line_or_nil(),
-        )
-        .collect(),
-    )
-    .nest(2)
-    .group()
+    let mut doc = Doc::nil();
+    let mut prev_ends_with_minus = false;
+    for (i, factor) in pattern.path_factors().enumerate() {
+        let primary = factor.path_primary();
+        if i > 0 {
+            let starts_with_minus = matches!(
+                primary,
+                Some(ast::PathPrimary::EdgeAny(_) | ast::PathPrimary::EdgeRight(_))
+            );
+            doc = doc.append(if prev_ends_with_minus && starts_with_minus {
+                // avoid accidently making a line comment
+                Doc::line_or_space()
+            } else {
+                Doc::line_or_nil()
+            });
+        }
+        prev_ends_with_minus = factor.graph_pattern_qualifier().is_none()
+            && matches!(
+                primary,
+                Some(ast::PathPrimary::EdgeAny(_) | ast::PathPrimary::EdgeLeft(_))
+            );
+        doc = doc
+            .append(leading_comments(factor.syntax()))
+            .append(build_path_factor(factor));
+    }
+    doc.nest(2).group()
 }
 
 fn build_path_factor<'a>(factor: ast::PathFactor) -> Doc<'a> {
@@ -20211,6 +20297,10 @@ fn build_paren_expr<'a>(paren_expr: ast::ParenExpr) -> Doc<'a> {
         body = body
             .append(leading_comments(select.syntax()))
             .append(build_select_doc(&select));
+    } else if let Some(select) = paren_expr.paren_select() {
+        body = body
+            .append(leading_comments(select.syntax()))
+            .append(build_paren_select(select));
     } else if let Some(table) = paren_expr.table() {
         body = body
             .append(leading_comments(table.syntax()))
@@ -20782,7 +20872,7 @@ fn build_keyword_node<'a>(node: &SyntaxNode) -> Doc<'a> {
                 if !docs.is_empty() && !after_line_comment {
                     docs.push(Doc::space());
                 }
-                docs.push(Doc::text(token.text().to_string()));
+                docs.push(build_comment(&token));
                 after_line_comment = is_line_comment(&token);
                 if after_line_comment {
                     docs.push(Doc::hard_line());
@@ -20923,7 +21013,7 @@ fn build_operator_token<'a>(token: &SyntaxToken) -> Doc<'a> {
     match token.kind() {
         SyntaxKind::WHITESPACE => Doc::nil(),
         SyntaxKind::COMMENT => {
-            let doc = Doc::text(token.text().to_string());
+            let doc = build_comment(token);
             if is_line_comment(token) {
                 doc.append(Doc::hard_line())
             } else {
@@ -21240,12 +21330,24 @@ fn space_before_l_paren<'a>(l_paren: SyntaxToken) -> Doc<'a> {
     Doc::space().append(leading_comments_token(&l_paren))
 }
 
+fn build_comment<'a>(token: &SyntaxToken) -> Doc<'a> {
+    let mut docs = Vec::new();
+    let mut text = token.text();
+    while let Some((position, line_ending)) = find_newline(text) {
+        docs.push(Doc::text(
+            text[..position].trim_end_matches([' ', '\t']).to_string(),
+        ));
+        docs.push(Doc::empty_line());
+        text = &text[position + line_ending.len()..];
+    }
+    docs.push(Doc::text(text.trim_end_matches([' ', '\t']).to_string()));
+    Doc::list(docs)
+}
+
 fn comments_before<'a>(el: impl Into<SyntaxElement>) -> Doc<'a> {
     let mut doc = Doc::nil();
     for token in comment_tokens_before(el) {
-        doc = doc
-            .append(Doc::space())
-            .append(Doc::text(token.text().to_string()));
+        doc = doc.append(Doc::space()).append(build_comment(&token));
         if is_line_comment(&token) {
             doc = doc.append(Doc::hard_line());
         }
@@ -21283,7 +21385,7 @@ fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
 fn build_leading_comments<'a>(tokens: &[SyntaxToken]) -> Doc<'a> {
     let mut doc = Doc::nil();
     for token in tokens {
-        doc = doc.append(Doc::text(token.text().to_string()));
+        doc = doc.append(build_comment(token));
         doc = doc.append(if is_line_comment(token) {
             Doc::hard_line()
         } else {
@@ -21306,7 +21408,7 @@ fn trailing_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
                     if !after_line_comment {
                         doc = doc.append(Doc::space());
                     }
-                    doc = doc.append(Doc::text(token.text().to_string()));
+                    doc = doc.append(build_comment(&token));
                     after_line_comment = is_line_comment(&token);
                     if after_line_comment {
                         doc = doc.append(Doc::hard_line());

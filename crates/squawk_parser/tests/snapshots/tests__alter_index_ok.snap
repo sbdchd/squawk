@@ -477,11 +477,13 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            IDENT "r"
+            ROLE_NAME_REF
+              IDENT "r"
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            IDENT "s"
+            ROLE_NAME_REF
+              IDENT "s"
       WHITESPACE "\n  "
       SET_TABLESPACE
         SET_KW "set"

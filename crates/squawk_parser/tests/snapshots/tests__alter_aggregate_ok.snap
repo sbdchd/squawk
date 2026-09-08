@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/alter_aggregate.sql
 ---
 SOURCE_FILE
@@ -105,7 +104,8 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_order_by"

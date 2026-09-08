@@ -804,7 +804,7 @@ SOURCE_FILE
           IDENT "force_quote"
         WHITESPACE " "
         COPY_OPTION_VALUE
-          COPY_OPTION_LIST
+          COPY_OPTION_ARG_LIST
             L_PAREN "("
             R_PAREN ")"
       R_PAREN ")"
@@ -1767,7 +1767,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        IDENT "public"
+        ROLE_NAME_REF
+          IDENT "public"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1794,7 +1795,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        IDENT "public"
+        ROLE_NAME_REF
+          IDENT "public"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
@@ -1821,7 +1823,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        IDENT "public"
+        ROLE_NAME_REF
+          IDENT "public"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   VACUUM

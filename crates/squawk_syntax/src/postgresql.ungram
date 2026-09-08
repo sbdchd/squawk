@@ -926,10 +926,25 @@ PublicationRef =
   '#name'?
 
 RoleRef =
-  'group'? '#name'?
-| 'current_role'
-| 'current_user'
-| 'session_user'
+  'group'? RoleRefValue
+
+RoleRefValue =
+  RoleNameRef
+| RoleRefCurrentRole
+| RoleRefCurrentUser
+| RoleRefSessionUser
+
+RoleRefCurrentRole =
+  'current_role'
+
+RoleRefCurrentUser =
+  'current_user'
+
+RoleRefSessionUser =
+  'session_user'
+
+RoleNameRef =
+  '#name'?
 
 UserMappingRole =
   RoleRef
@@ -2531,7 +2546,7 @@ ReleaseSavepoint =
   'release' 'savepoint' SavepointRef ';'?
 
 ParenExpr =
-  '(' (Expr | Select | CompoundSelect | Table | Values | FromListItem) ')'
+  '(' (Expr | Select | CompoundSelect | ParenSelect | Table | Values | FromListItem) ')'
 
 TupleExpr =
   'row' '(' (Expr (',' Expr)*)? ')'
@@ -5367,6 +5382,7 @@ PreparableStmt =
   Select
 | SelectInto
 | CompoundSelect
+| ParenSelect
 | Table
 | Values
 | Insert
@@ -5558,13 +5574,21 @@ CopyOptionKey =
   '#name'?
 
 CopyOptionValue =
-  CopyOptionList
+  CopyOptionArgList
 | CopyOptionValueName
 | Expr
 | 'default'
 | 'on'
 | 'off'
 | '*'
+
+CopyOptionArgList =
+  '(' (CopyOptionArg (',' CopyOptionArg)*)? ')'
+
+CopyOptionArg =
+  CopyOptionValueName
+| Literal
+| 'on'
 
 CopyOptionValueName =
   '#name'?

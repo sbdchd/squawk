@@ -4,6 +4,12 @@ input_file: crates/squawk_fmt/tests/before/create_user.sql
 ---
 create user app_user;
 
+create user u  "admin" foo;
+
+create user u  "role" foo;
+
+create user u  "encrypted" password 'x';
+
 create user extraordinarily_long_application_reporting_user
   with login
   encrypted password 'an-extraordinarily-long-secret-value'

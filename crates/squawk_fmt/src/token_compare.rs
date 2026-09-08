@@ -1,4 +1,5 @@
 use squawk_lexer::{Token, TokenKind, tokenize};
+use squawk_line_index::UniversalNewlines;
 
 fn meaningful_tokens(text: &str) -> Vec<(TokenKind, &str)> {
     let mut tokens = Vec::new();
@@ -18,6 +19,18 @@ fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> boo
     let (after_kind, after_text) = after;
 
     if before_kind == after_kind {
+        if matches!(
+            before_kind,
+            TokenKind::LineComment | TokenKind::BlockComment { .. }
+        ) {
+            let normalize = |text: &str| {
+                text.universal_newlines()
+                    .map(|line| line.as_str().trim_end_matches([' ', '\t']))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            };
+            return normalize(before_text) == normalize(after_text);
+        }
         return before_text.eq_ignore_ascii_case(after_text);
     }
 

@@ -644,13 +644,12 @@ SOURCE_FILE@0..733
               L_PAREN@725..726 "("
               ERROR@726..730
                 PREFIX_EXPR@726..730
-                  MINUS@726..727 "-"
-                  PREFIX_EXPR@727..730
-                    CUSTOM_OP@727..729
-                      R_ANGLE@727..728 ">"
-                      R_ANGLE@728..729 ">"
-                    LITERAL@729..730
-                      INT_NUMBER@729..730 "2"
+                  CUSTOM_OP@726..729
+                    MINUS@726..727 "-"
+                    R_ANGLE@727..728 ">"
+                    R_ANGLE@728..729 ">"
+                  LITERAL@729..730
+                    INT_NUMBER@729..730 "2"
               R_PAREN@730..731 ")"
     SEMICOLON@731..732 ";"
   WHITESPACE@732..733 "\n"

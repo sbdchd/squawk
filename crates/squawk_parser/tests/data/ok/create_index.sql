@@ -70,3 +70,5 @@ CREATE INDEX index_name ON public.table_name USING GIN (column_name public.gin__
 CREATE INDEX ON tbl (c1) INCLUDE ((c2 + c3));
 CREATE INDEX ON tbl (c1) INCLUDE ((c2));
 CREATE INDEX ON tbl (c1) INCLUDE (c2, (c3 + c4), lower(c5));
+
+create index if on t (a);

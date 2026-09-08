@@ -88,6 +88,36 @@ fn fmt_cr_line_endings() {
     assert_snapshot!(fmt_with_line_ending("\r"), @"-- a comment<CR>select 1;<CR><CR>/* a comment<CR> * spanning lines<CR> */<CR>select<CR>  'a',<CR>  'really long string                                                    ';<CR>");
 }
 
+#[test]
+fn normalizes_line_endings_inside_block_comments() {
+    let sql = "select 1;\r\n/* a\n * comment\n */\nselect 2;\n";
+    let expected = "select 1;\r\n/* a\r\n * comment\r\n */\r\nselect 2;\r\n";
+
+    let formatted = squawk_fmt::fmt_str(sql).unwrap();
+    assert_eq!(formatted, expected);
+    assert_eq!(squawk_fmt::fmt_str(&formatted).unwrap(), expected);
+}
+
+#[test]
+fn removes_trailing_whitespace_from_comments() {
+    let sql = "select 1; -- ok   \n/* a  \n * comment\t\n */\nselect 2;\n";
+    let expected = "select 1;\n-- ok\n/* a\n * comment\n */\nselect 2;\n";
+
+    assert_eq!(squawk_fmt::fmt_str(sql).unwrap(), expected);
+}
+
+#[test]
+fn preserves_a_leading_bom() {
+    let sql = "\u{feff}select   1;\n";
+    let expected = "\u{feff}select 1;\n";
+
+    let formatted = squawk_fmt::fmt_str(sql).unwrap();
+    assert_no_dropped_tokens(sql, &formatted);
+    assert_parses(&formatted);
+    assert_eq!(formatted, expected);
+    assert_eq!(squawk_fmt::fmt_str(&formatted).unwrap(), expected);
+}
+
 fn assert_parses(formatted: &str) {
     let parse = squawk_syntax::ast::SourceFile::parse(formatted);
     assert!(

@@ -11,7 +11,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     ROLE_OPTION_LIST
       ROLE_OPTION_GENERIC
@@ -27,7 +28,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     ROLE_OPTION_LIST
       WITH_KW "with"
@@ -119,7 +121,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     ROLE_RENAME_TO
       RENAME_KW "rename"
@@ -139,7 +142,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -162,7 +166,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -185,7 +190,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -207,7 +213,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     IN_DATABASE
       IN_KW "in"
@@ -238,7 +245,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -262,7 +270,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     RESET_CONFIG_PARAM
       RESET_KW "reset"
@@ -279,7 +288,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     RESET_CONFIG_PARAM
       RESET_KW "reset"
@@ -293,7 +303,8 @@ SOURCE_FILE
     USER_KW "user"
     WHITESPACE " "
     ROLE_REF
-      IDENT "u"
+      ROLE_NAME_REF
+        IDENT "u"
     WHITESPACE " "
     IN_DATABASE
       IN_KW "in"

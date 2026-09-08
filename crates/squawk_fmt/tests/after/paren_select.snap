@@ -1,5 +1,6 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
+assertion_line: 29
 input_file: crates/squawk_fmt/tests/before/paren_select.sql
 ---
 (select 1) order by 1 for update limit 10 offset 2 rows;
@@ -47,3 +48,28 @@ from (
 
 ((select 1) limit 2) order by 3;
 (select 1) offset 1 limit 2;
+
+select (
+  with cte as (
+    select 1
+  )
+  (select 2)
+);
+select (
+  with cte as (
+    select 1
+  )
+  (values (2))
+);
+select (
+  with cte(foo) as (
+    values (1)
+  )
+  (values ((select foo from cte)))
+);
+select (
+  with cte as (
+    select 1
+  )
+  (table cte)
+);

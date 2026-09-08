@@ -1,0 +1,75 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/json_array.sql
+---
+SOURCE_FILE@0..100
+  COMMENT@0..32 "-- subquery must be t ..."
+  WHITESPACE@32..33 "\n"
+  SELECT@33..64
+    SELECT_CLAUSE@33..63
+      SELECT_KW@33..39 "select"
+      WHITESPACE@39..40 " "
+      TARGET_LIST@40..63
+        TARGET@40..63
+          CALL_EXPR@40..63
+            JSON_ARRAY_FN@40..63
+              JSON_ARRAY_KW@40..50 "json_array"
+              L_PAREN@50..51 "("
+              JSON_EXPR_FORMAT@51..52
+                LITERAL@51..52
+                  INT_NUMBER@51..52 "1"
+              COMMA@52..53 ","
+              WHITESPACE@53..54 " "
+              JSON_SELECT_FORMAT@54..62
+                SELECT@54..62
+                  SELECT_CLAUSE@54..62
+                    SELECT_KW@54..60 "select"
+                    WHITESPACE@60..61 " "
+                    TARGET_LIST@61..62
+                      TARGET@61..62
+                        LITERAL@61..62
+                          INT_NUMBER@61..62 "2"
+              R_PAREN@62..63 ")"
+    SEMICOLON@63..64 ";"
+  WHITESPACE@64..65 "\n"
+  SELECT@65..99
+    SELECT_CLAUSE@65..98
+      SELECT_KW@65..71 "select"
+      WHITESPACE@71..72 " "
+      TARGET_LIST@72..98
+        TARGET@72..98
+          CALL_EXPR@72..98
+            JSON_ARRAY_FN@72..98
+              JSON_ARRAY_KW@72..82 "json_array"
+              L_PAREN@82..83 "("
+              JSON_EXPR_FORMAT@83..84
+                LITERAL@83..84
+                  INT_NUMBER@83..84 "1"
+              COMMA@84..85 ","
+              WHITESPACE@85..86 " "
+              JSON_EXPR_FORMAT@86..87
+                LITERAL@86..87
+                  INT_NUMBER@86..87 "2"
+              COMMA@87..88 ","
+              WHITESPACE@88..89 " "
+              JSON_SELECT_FORMAT@89..97
+                SELECT@89..97
+                  SELECT_CLAUSE@89..97
+                    SELECT_KW@89..95 "select"
+                    WHITESPACE@95..96 " "
+                    TARGET_LIST@96..97
+                      TARGET@96..97
+                        LITERAL@96..97
+                          INT_NUMBER@96..97 "3"
+              R_PAREN@97..98 ")"
+    SEMICOLON@98..99 ";"
+  WHITESPACE@99..100 "\n"
+
+error[syntax-error]: Subquery must be the only argument
+  ╭▸ 
+2 │ select json_array(1, select 2);
+  ╰╴                     ━━━━━━━━
+error[syntax-error]: Subquery must be the only argument
+  ╭▸ 
+3 │ select json_array(1, 2, select 3);
+  ╰╴                        ━━━━━━━━

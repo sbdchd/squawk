@@ -109,6 +109,31 @@ fn regression_suite(fixture: Fixture<&str>) {
     }
 }
 
+#[test]
+fn bom_at_start_is_trivia() {
+    let (parsed, errors) = parse_text("\u{feff}select 1;");
+    assert!(errors.is_none());
+    assert_snapshot!(parsed, @r#"
+    SOURCE_FILE
+      WHITESPACE "\u{feff}"
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+        SEMICOLON ";"
+    "#);
+}
+
+#[test]
+fn bom_after_start_is_an_ident_char() {
+    let (_parsed, errors) = parse_text("select 1;\n\u{feff}select 2;");
+    assert!(errors.is_some());
+}
+
 #[must_use]
 fn parse_text(text: &str) -> (String, Option<String>) {
     let lexed = LexedStr::new(text);
@@ -140,7 +165,11 @@ fn parse_text(text: &str) -> (String, Option<String>) {
         }
         squawk_parser::StrStep::Error { msg, pos } => {
             assert!(depth > 0);
-            errors.push((pos..pos + 1, msg.to_string()));
+            let end = text[pos..]
+                .chars()
+                .next()
+                .map_or(pos, |c| pos + c.len_utf8());
+            errors.push((pos..end, msg.to_string()));
         }
     });
     assert_eq!(

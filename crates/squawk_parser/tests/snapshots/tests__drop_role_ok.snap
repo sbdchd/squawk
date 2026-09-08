@@ -11,7 +11,8 @@ SOURCE_FILE
     ROLE_KW "role"
     WHITESPACE " "
     ROLE_REF
-      IDENT "s"
+      ROLE_NAME_REF
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -27,15 +28,18 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     ROLE_REF
-      IDENT "a"
+      ROLE_NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
     ROLE_REF
-      IDENT "b"
+      ROLE_NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
     ROLE_REF
-      IDENT "c"
+      ROLE_NAME_REF
+        IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_ROLE
@@ -49,14 +53,17 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     ROLE_REF
-      IDENT "a"
+      ROLE_NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
     ROLE_REF
-      IDENT "b"
+      ROLE_NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
     ROLE_REF
-      IDENT "c"
+      ROLE_NAME_REF
+        IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"

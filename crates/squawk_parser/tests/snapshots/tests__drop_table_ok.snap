@@ -171,4 +171,15 @@ SOURCE_FILE
     RESTRICT
       RESTRICT_KW "restrict"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IF_KW "if"
+    SEMICOLON ";"
   WHITESPACE "\n"

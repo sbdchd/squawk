@@ -1,0 +1,234 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/set.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "work_mem"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "work_mem"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "work_mem"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "work_mem"
+      WHITESPACE " "
+      FROM_CURRENT
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "search_path"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        CONFIG_VALUE_NAME
+          IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        CONFIG_VALUE_NAME
+          IDENT "b"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- scopes"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    LOCAL_SCOPE
+      LOCAL_KW "local"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "work_mem"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SESSION_SCOPE
+      SESSION_KW "session"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "work_mem"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- session and local are the configuration parameter"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            LOCAL_KW "local"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            LOCAL_KW "local"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              LOCAL_KW "local"
+          DOT "."
+          PATH_SEGMENT_REF
+            IDENT "x"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            LOCAL_KW "local"
+      WHITESPACE " "
+      FROM_CURRENT
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            SESSION_KW "session"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              SESSION_KW "session"
+          DOT "."
+          PATH_SEGMENT_REF
+            IDENT "x"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"

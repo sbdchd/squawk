@@ -15,22 +15,26 @@ SOURCE_FILE
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          INSERT_KW "insert"
+          ROLE_NAME_REF
+            INSERT_KW "insert"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          UPDATE_KW "update"
+          ROLE_NAME_REF
+            UPDATE_KW "update"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          DELETE_KW "delete"
+          ROLE_NAME_REF
+            DELETE_KW "delete"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          TRUNCATE_KW "truncate"
+          ROLE_NAME_REF
+            TRUNCATE_KW "truncate"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
@@ -39,12 +43,14 @@ SOURCE_FILE
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          TRIGGER_KW "trigger"
+          ROLE_NAME_REF
+            TRIGGER_KW "trigger"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "maintain"
+          ROLE_NAME_REF
+            IDENT "maintain"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -59,7 +65,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_table"
@@ -99,11 +106,13 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
       COMMA ","
       WHITESPACE " "
       ROLE_REF
-        CURRENT_ROLE_KW "current_role"
+        ROLE_REF_CURRENT_ROLE
+          CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -119,7 +128,8 @@ SOURCE_FILE
       BY_KW "by"
       WHITESPACE " "
       ROLE_REF
-        IDENT "public"
+        ROLE_NAME_REF
+          IDENT "public"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -149,7 +159,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -173,7 +184,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_all_tables"
@@ -209,7 +221,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_ROLE_KW "current_role"
+        ROLE_REF_CURRENT_ROLE
+          CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -255,7 +268,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -264,7 +278,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          INSERT_KW "insert"
+          ROLE_NAME_REF
+            INSERT_KW "insert"
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_NAME_REF
@@ -292,7 +307,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -301,7 +317,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          UPDATE_KW "update"
+          ROLE_NAME_REF
+            UPDATE_KW "update"
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_NAME_REF
@@ -329,7 +346,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -365,7 +383,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -394,7 +413,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -421,7 +441,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
@@ -448,7 +469,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -477,7 +499,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -486,7 +509,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "usage"
+          ROLE_NAME_REF
+            IDENT "usage"
     WHITESPACE " "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -515,7 +539,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -524,7 +549,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          UPDATE_KW "update"
+          ROLE_NAME_REF
+            UPDATE_KW "update"
     WHITESPACE " "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -541,7 +567,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -569,7 +596,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -607,7 +635,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- database"
@@ -640,7 +669,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -661,17 +691,20 @@ SOURCE_FILE
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "connect"
+          ROLE_NAME_REF
+            IDENT "connect"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          TEMPORARY_KW "temporary"
+          ROLE_NAME_REF
+            TEMPORARY_KW "temporary"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          TEMP_KW "temp"
+          ROLE_NAME_REF
+            TEMP_KW "temp"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -686,7 +719,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -708,7 +742,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- domain"
@@ -719,7 +754,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "usage"
+          ROLE_NAME_REF
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -748,7 +784,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -782,7 +819,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -812,7 +850,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data"
@@ -823,7 +862,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "usage"
+          ROLE_NAME_REF
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -850,7 +890,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -886,7 +927,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_server"
@@ -897,7 +939,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "usage"
+          ROLE_NAME_REF
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -922,7 +965,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -956,7 +1000,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function"
@@ -967,7 +1012,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          EXECUTE_KW "execute"
+          ROLE_NAME_REF
+            EXECUTE_KW "execute"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -993,7 +1039,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -1010,7 +1057,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          EXECUTE_KW "execute"
+          ROLE_NAME_REF
+            EXECUTE_KW "execute"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -1088,7 +1136,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1114,7 +1163,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1150,7 +1200,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1178,7 +1229,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1206,7 +1258,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1275,7 +1328,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- language"
@@ -1286,7 +1340,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "usage"
+          ROLE_NAME_REF
+            IDENT "usage"
     WHITESPACE " \n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -1309,7 +1364,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1339,7 +1395,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1371,7 +1428,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
@@ -1386,7 +1444,8 @@ SOURCE_FILE
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          UPDATE_KW "update"
+          ROLE_NAME_REF
+            UPDATE_KW "update"
     WHITESPACE " \n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -1407,7 +1466,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1437,7 +1497,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- param"
@@ -1448,7 +1509,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          SET_KW "set"
+          ROLE_NAME_REF
+            SET_KW "set"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
@@ -1483,7 +1545,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1510,7 +1573,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1534,7 +1598,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge_case"
@@ -1545,23 +1610,27 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          SET_KW "set"
+          ROLE_NAME_REF
+            SET_KW "set"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          SET_KW "set"
+          ROLE_NAME_REF
+            SET_KW "set"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          SET_KW "set"
+          ROLE_NAME_REF
+            SET_KW "set"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -1580,23 +1649,27 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          SET_KW "set"
+          ROLE_NAME_REF
+            SET_KW "set"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          SET_KW "set"
+          ROLE_NAME_REF
+            SET_KW "set"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          SET_KW "set"
+          ROLE_NAME_REF
+            SET_KW "set"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE " \n\n"
   COMMENT "-- schema"
@@ -1621,7 +1694,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1634,7 +1708,8 @@ SOURCE_FILE
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "usage"
+          ROLE_NAME_REF
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -1657,25 +1732,30 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
       COMMA ","
       WHITESPACE " "
       ROLE_REF
-        IDENT "public"
+        ROLE_NAME_REF
+          IDENT "public"
       COMMA ","
       WHITESPACE " "
       ROLE_REF
         GROUP_KW "group"
         WHITESPACE " "
-        IDENT "foo"
+        ROLE_NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
       ROLE_REF
-        CURRENT_ROLE_KW "current_role"
+        ROLE_REF_CURRENT_ROLE
+          CURRENT_ROLE_KW "current_role"
       COMMA ","
       WHITESPACE " "
       ROLE_REF
-        SESSION_USER_KW "session_user"
+        ROLE_REF_SESSION_USER
+          SESSION_USER_KW "session_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1705,7 +1785,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
@@ -1738,7 +1819,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1768,7 +1850,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type_"
@@ -1779,7 +1862,8 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "usage"
+          ROLE_NAME_REF
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_PRIVILEGE_OBJECTS_CLAUSE
       ON_KW "on"
@@ -1808,7 +1892,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1832,7 +1917,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
@@ -1860,7 +1946,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option"
@@ -1871,13 +1958,15 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "public"
+          ROLE_NAME_REF
+            IDENT "public"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -1896,13 +1985,15 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "public"
+          ROLE_NAME_REF
+            IDENT "public"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -1921,13 +2012,15 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "public"
+          ROLE_NAME_REF
+            IDENT "public"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -1946,13 +2039,15 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "public"
+          ROLE_NAME_REF
+            IDENT "public"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -1971,12 +2066,14 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "public"
+          ROLE_NAME_REF
+            IDENT "public"
       COMMA ","
       WHITESPACE " "
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "t"
+          ROLE_NAME_REF
+            IDENT "t"
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_NAME_REF
@@ -1991,7 +2088,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     GRANT_WITH_CLAUSE
       WITH_KW "with"
@@ -2010,12 +2108,215 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         ROLE_REF
-          IDENT "public"
+          ROLE_NAME_REF
+            IDENT "public"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        CURRENT_USER_KW "current_user"
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "usage"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              TYPE_KW "type"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "usage"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                TYPE_KW "type"
+            DOT "."
+            PATH_SEGMENT_REF
+              IDENT "foo"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "usage"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              FUNCTION_KW "function"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "usage"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_DEFAULT
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              SEQUENCE_KW "sequence"
+        COMMA ","
+        WHITESPACE " "
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              DOMAIN_KW "domain"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "usage"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TYPE
+        TYPE_KW "type"
+        WHITESPACE " "
+        TYPE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            EXECUTE_KW "execute"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_FUNCTION
+        FUNCTION_KW "function"
+        WHITESPACE " "
+        FUNCTION_SIG_LIST
+          FUNCTION_SIG
+            FUNCTION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "f"
+            PARAM_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "usage"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_SCHEMA
+        SCHEMA_KW "schema"
+        WHITESPACE " "
+        SCHEMA_REF
+          IDENT "s"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"

@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
-assertion_line: 28
 input_file: crates/squawk_parser/tests/data/ok/comment.sql
 ---
 SOURCE_FILE
@@ -895,7 +894,8 @@ SOURCE_FILE
       ROLE_KW "role"
       WHITESPACE " "
       ROLE_REF
-        IDENT "r"
+        ROLE_NAME_REF
+          IDENT "r"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "

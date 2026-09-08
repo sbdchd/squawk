@@ -42,7 +42,8 @@ SOURCE_FILE
     WHITESPACE " "
     USER_MAPPING_ROLE
       ROLE_REF
-        CURRENT_ROLE_KW "current_role"
+        ROLE_REF_CURRENT_ROLE
+          CURRENT_ROLE_KW "current_role"
     WHITESPACE " "
     SERVER_CLAUSE
       SERVER_KW "server"
