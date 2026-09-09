@@ -1,0 +1,154 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/type_func_name_table_name_ok.sql
+---
+SOURCE_FILE@0..177
+  CREATE_TABLE@0..28
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    TABLE_KW@7..12 "table"
+    WHITESPACE@12..13 " "
+    TABLE_NAME@13..19
+      PATH@13..19
+        PATH_SEGMENT@13..19
+          IDENT@13..19 "\"left\""
+    WHITESPACE@19..20 " "
+    TABLE_ARG_LIST@20..27
+      L_PAREN@20..21 "("
+      COLUMN@21..26
+        COLUMN_NAME@21..22
+          IDENT@21..22 "a"
+        WHITESPACE@22..23 " "
+        PATH_TYPE@23..26
+          PATH_REF@23..26
+            PATH_SEGMENT_REF@23..26
+              INT_KW@23..26 "int"
+      R_PAREN@26..27 ")"
+    SEMICOLON@27..28 ";"
+  WHITESPACE@28..29 "\n"
+  CREATE_TABLE@29..57
+    CREATE_KW@29..35 "create"
+    WHITESPACE@35..36 " "
+    TABLE_KW@36..41 "table"
+    WHITESPACE@41..42 " "
+    TABLE_NAME@42..48
+      PATH@42..48
+        PATH_REF@42..43
+          PATH_SEGMENT_REF@42..43
+            IDENT@42..43 "s"
+        DOT@43..44 "."
+        PATH_SEGMENT@44..48
+          LEFT_KW@44..48 "left"
+    WHITESPACE@48..49 " "
+    TABLE_ARG_LIST@49..56
+      L_PAREN@49..50 "("
+      COLUMN@50..55
+        COLUMN_NAME@50..51
+          IDENT@50..51 "a"
+        WHITESPACE@51..52 " "
+        PATH_TYPE@52..55
+          PATH_REF@52..55
+            PATH_SEGMENT_REF@52..55
+              INT_KW@52..55 "int"
+      R_PAREN@55..56 ")"
+    SEMICOLON@56..57 ";"
+  WHITESPACE@57..58 "\n"
+  CREATE_FOREIGN_TABLE@58..103
+    CREATE_KW@58..64 "create"
+    WHITESPACE@64..65 " "
+    FOREIGN_KW@65..72 "foreign"
+    WHITESPACE@72..73 " "
+    TABLE_KW@73..78 "table"
+    WHITESPACE@78..79 " "
+    TABLE_NAME@79..85
+      PATH@79..85
+        PATH_REF@79..80
+          PATH_SEGMENT_REF@79..80
+            IDENT@79..80 "s"
+        DOT@80..81 "."
+        PATH_SEGMENT@81..85
+          LEFT_KW@81..85 "left"
+    WHITESPACE@85..86 " "
+    TABLE_ARG_LIST@86..93
+      L_PAREN@86..87 "("
+      COLUMN@87..92
+        COLUMN_NAME@87..88
+          IDENT@87..88 "a"
+        WHITESPACE@88..89 " "
+        PATH_TYPE@89..92
+          PATH_REF@89..92
+            PATH_SEGMENT_REF@89..92
+              INT_KW@89..92 "int"
+      R_PAREN@92..93 ")"
+    WHITESPACE@93..94 " "
+    SERVER_CLAUSE@94..102
+      SERVER_KW@94..100 "server"
+      WHITESPACE@100..101 " "
+      SERVER_REF@101..102
+        IDENT@101..102 "s"
+    SEMICOLON@102..103 ";"
+  WHITESPACE@103..104 "\n"
+  SELECT_INTO@104..125
+    SELECT_CLAUSE@104..112
+      SELECT_KW@104..110 "select"
+      WHITESPACE@110..111 " "
+      TARGET_LIST@111..112
+        TARGET@111..112
+          LITERAL@111..112
+            INT_NUMBER@111..112 "1"
+    WHITESPACE@112..113 " "
+    INTO_CLAUSE@113..124
+      INTO_KW@113..117 "into"
+      WHITESPACE@117..118 " "
+      TABLE_NAME@118..124
+        PATH@118..124
+          PATH_REF@118..119
+            PATH_SEGMENT_REF@118..119
+              IDENT@118..119 "s"
+          DOT@119..120 "."
+          PATH_SEGMENT@120..124
+            LEFT_KW@120..124 "left"
+    SEMICOLON@124..125 ";"
+  WHITESPACE@125..126 "\n"
+  ALTER_TABLE@126..176
+    ALTER_KW@126..131 "alter"
+    WHITESPACE@131..132 " "
+    TABLE_KW@132..137 "table"
+    WHITESPACE@137..138 " "
+    TABLE_RELATION_NAME@138..139
+      TABLE_NAME_REF@138..139
+        PATH_REF@138..139
+          PATH_SEGMENT_REF@138..139
+            IDENT@138..139 "t"
+    WHITESPACE@139..140 " "
+    MERGE_PARTITIONS@140..175
+      MERGE_KW@140..145 "merge"
+      WHITESPACE@145..146 " "
+      PARTITIONS_KW@146..156 "partitions"
+      WHITESPACE@156..157 " "
+      TABLE_NAME_REF_LIST@157..163
+        L_PAREN@157..158 "("
+        TABLE_NAME_REF@158..159
+          PATH_REF@158..159
+            PATH_SEGMENT_REF@158..159
+              IDENT@158..159 "a"
+        COMMA@159..160 ","
+        WHITESPACE@160..161 " "
+        TABLE_NAME_REF@161..162
+          PATH_REF@161..162
+            PATH_SEGMENT_REF@161..162
+              IDENT@161..162 "b"
+        R_PAREN@162..163 ")"
+      WHITESPACE@163..164 " "
+      INTO_KW@164..168 "into"
+      WHITESPACE@168..169 " "
+      TABLE_NAME@169..175
+        PATH@169..175
+          PATH_REF@169..170
+            PATH_SEGMENT_REF@169..170
+              IDENT@169..170 "s"
+          DOT@170..171 "."
+          PATH_SEGMENT@171..175
+            LEFT_KW@171..175 "left"
+    SEMICOLON@175..176 ";"
+  WHITESPACE@176..177 "\n"

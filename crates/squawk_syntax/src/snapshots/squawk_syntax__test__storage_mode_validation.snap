@@ -1,0 +1,38 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/storage_mode.sql
+---
+SOURCE_FILE@0..47
+  ALTER_TABLE@0..46
+    ALTER_KW@0..5 "alter"
+    WHITESPACE@5..6 " "
+    TABLE_KW@6..11 "table"
+    WHITESPACE@11..12 " "
+    TABLE_RELATION_NAME@12..13
+      TABLE_NAME_REF@12..13
+        PATH_REF@12..13
+          PATH_SEGMENT_REF@12..13
+            IDENT@12..13 "t"
+    WHITESPACE@13..14 " "
+    ALTER_COLUMN@14..45
+      ALTER_KW@14..19 "alter"
+      WHITESPACE@19..20 " "
+      COLUMN_KW@20..26 "column"
+      WHITESPACE@26..27 " "
+      COLUMN_NAME_REF@27..28
+        IDENT@27..28 "a"
+      WHITESPACE@28..29 " "
+      SET_STORAGE@29..45
+        SET_KW@29..32 "set"
+        WHITESPACE@32..33 " "
+        STORAGE_KW@33..40 "storage"
+        WHITESPACE@40..41 " "
+        STORAGE_MODE@41..45
+          TRUE_KW@41..45 "true"
+    SEMICOLON@45..46 ";"
+  WHITESPACE@46..47 "\n"
+
+error[syntax-error]: Expected PLAIN, EXTERNAL, EXTENDED, MAIN, or DEFAULT
+  ╭▸ 
+1 │ alter table t alter column a set storage true;
+  ╰╴                                         ━━━━

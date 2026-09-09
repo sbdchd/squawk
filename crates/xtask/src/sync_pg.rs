@@ -30,6 +30,7 @@ const START_END_MARKERS: &[(&str, &str)] = &[
 ];
 
 const IGNORED_LINES: &[&str] = &[
+    r#"SELECT JSON_TABLE('[]', '$');"#,
     r#"SELECT rank() OVER (PARTITION BY four, ORDER BY ten) FROM tenk1;"#,
     r#"SELECT q.* FROM (SELECT * FROM test_tablesample) as q TABLESAMPLE BERNOULLI (5);"#,
     r#"CREATE SEQUENCE tableam_seq_heap2 USING heap2;"#,
@@ -548,6 +549,10 @@ mod tests {
             (
                 "SELECT JSON_OBJECT('foo': NULL::int FORMAT JSON);",
                 "SELECT JSON_OBJECT('foo': NULL::int FORMAT JSON);",
+            ),
+            (
+                "SELECT JSON_TABLE('[]', '$');",
+                "-- SELECT JSON_TABLE('[]', '$');",
             ),
             (
                 "SELECT CAST('42' AS text COLLATE \"C\");",

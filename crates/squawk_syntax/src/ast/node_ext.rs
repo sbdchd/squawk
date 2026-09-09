@@ -862,9 +862,7 @@ pub fn normalize_name_node(node: &SyntaxNode) -> String {
     };
     // Support some deprecated syntax where you can plop a `group` keyword
     // before a role name.
-    if matches!(node.kind(), SyntaxKind::ROLE | SyntaxKind::ROLE_REF)
-        && ident_token.kind() == SyntaxKind::GROUP_KW
-    {
+    if node.kind() == SyntaxKind::ROLE_REF && ident_token.kind() == SyntaxKind::GROUP_KW {
         let Some(role_name) = tokens.next() else {
             return String::new();
         };

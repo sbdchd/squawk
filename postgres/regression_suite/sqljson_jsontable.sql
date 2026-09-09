@@ -1,7 +1,7 @@
 -- JSON_TABLE
 
 -- Should fail (JSON_TABLE can be used only in FROM clause)
-SELECT JSON_TABLE('[]', '$');
+-- SELECT JSON_TABLE('[]', '$');
 
 -- Only allow EMPTY and ERROR for ON ERROR
 SELECT * FROM JSON_TABLE('[]', 'strict $.a' COLUMNS (js2 int PATH '$') DEFAULT 1 ON ERROR);

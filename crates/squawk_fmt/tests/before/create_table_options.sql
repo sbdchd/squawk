@@ -16,6 +16,8 @@ create table statuses partition of events for values in ('new', 'ready', 'a stat
 
 create table hash_part partition of events for values with (modulus 4, remainder 0);
 
+create table reversed_hash_part partition of events for values with (REMAINDER 0, MODULUS 4);
+
 create table default_part partition of events default;
 
 create table partitioned (a_very_long_region_column_name text, a_very_long_created_at_column_name timestamptz) partition by range (a_very_long_region_column_name collate "C", a_very_long_created_at_column_name);

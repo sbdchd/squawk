@@ -43,7 +43,9 @@ pub use crate::{
     lexed_str::LexedStr,
     // output::{Output, Step},
     shortcuts::StrStep,
-    syntax_kind::SyntaxKind,
+    syntax_kind::{
+        SyntaxKind, is_col_name_keyword, is_reserved_keyword, is_type_func_name_keyword,
+    },
 };
 
 use crate::input::Input;

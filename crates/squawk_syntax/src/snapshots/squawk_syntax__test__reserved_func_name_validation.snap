@@ -1,0 +1,247 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/reserved_func_name.sql
+---
+SOURCE_FILE@0..243
+  SELECT@0..14
+    SELECT_CLAUSE@0..13
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..13
+        TARGET@7..13
+          CALL_EXPR@7..13
+            ANY_FN@7..13
+              ANY_KW@7..10 "any"
+              L_PAREN@10..11 "("
+              LITERAL@11..12
+                INT_NUMBER@11..12 "1"
+              R_PAREN@12..13 ")"
+    SEMICOLON@13..14 ";"
+  WHITESPACE@14..15 "\n"
+  SELECT@15..31
+    SELECT_CLAUSE@15..30
+      SELECT_KW@15..21 "select"
+      WHITESPACE@21..22 " "
+      TARGET_LIST@22..30
+        TARGET@22..30
+          ARRAY_EXPR@22..30
+            ARRAY_KW@22..27 "array"
+            L_PAREN@27..28 "("
+            LITERAL@28..29
+              INT_NUMBER@28..29 "1"
+            R_PAREN@29..30 ")"
+    SEMICOLON@30..31 ";"
+  WHITESPACE@31..32 "\n"
+  SELECT@32..58
+    SELECT_CLAUSE@32..57
+      SELECT_KW@32..38 "select"
+      WHITESPACE@38..39 " "
+      TARGET_LIST@39..57
+        TARGET@39..57
+          CALL_EXPR@39..57
+            NAME_REF@39..54
+              CURRENT_CATALOG_KW@39..54 "current_catalog"
+            ARG_LIST@54..57
+              L_PAREN@54..55 "("
+              ARG@55..56
+                LITERAL@55..56
+                  INT_NUMBER@55..56 "1"
+              R_PAREN@56..57 ")"
+    SEMICOLON@57..58 ";"
+  WHITESPACE@58..59 "\n"
+  SELECT@59..82
+    SELECT_CLAUSE@59..81
+      SELECT_KW@59..65 "select"
+      WHITESPACE@65..66 " "
+      TARGET_LIST@66..81
+        TARGET@66..81
+          CALL_EXPR@66..81
+            NAME_REF@66..78
+              CURRENT_DATE_KW@66..78 "current_date"
+            ARG_LIST@78..81
+              L_PAREN@78..79 "("
+              ARG@79..80
+                LITERAL@79..80
+                  INT_NUMBER@79..80 "1"
+              R_PAREN@80..81 ")"
+    SEMICOLON@81..82 ";"
+  WHITESPACE@82..83 "\n"
+  SELECT@83..106
+    SELECT_CLAUSE@83..105
+      SELECT_KW@83..89 "select"
+      WHITESPACE@89..90 " "
+      TARGET_LIST@90..105
+        TARGET@90..105
+          CALL_EXPR@90..105
+            NAME_REF@90..102
+              CURRENT_ROLE_KW@90..102 "current_role"
+            ARG_LIST@102..105
+              L_PAREN@102..103 "("
+              ARG@103..104
+                LITERAL@103..104
+                  INT_NUMBER@103..104 "1"
+              R_PAREN@104..105 ")"
+    SEMICOLON@105..106 ";"
+  WHITESPACE@106..107 "\n"
+  SELECT@107..130
+    SELECT_CLAUSE@107..129
+      SELECT_KW@107..113 "select"
+      WHITESPACE@113..114 " "
+      TARGET_LIST@114..129
+        TARGET@114..129
+          CALL_EXPR@114..129
+            NAME_REF@114..126
+              CURRENT_USER_KW@114..126 "current_user"
+            ARG_LIST@126..129
+              L_PAREN@126..127 "("
+              ARG@127..128
+                LITERAL@127..128
+                  INT_NUMBER@127..128 "1"
+              R_PAREN@128..129 ")"
+    SEMICOLON@129..130 ";"
+  WHITESPACE@130..131 "\n"
+  SELECT@131..154
+    SELECT_CLAUSE@131..153
+      SELECT_KW@131..137 "select"
+      WHITESPACE@137..138 " "
+      TARGET_LIST@138..153
+        TARGET@138..153
+          CALL_EXPR@138..153
+            NAME_REF@138..150
+              SESSION_USER_KW@138..150 "session_user"
+            ARG_LIST@150..153
+              L_PAREN@150..151 "("
+              ARG@151..152
+                LITERAL@151..152
+                  INT_NUMBER@151..152 "1"
+              R_PAREN@152..153 ")"
+    SEMICOLON@153..154 ";"
+  WHITESPACE@154..155 "\n"
+  SELECT@155..170
+    SELECT_CLAUSE@155..169
+      SELECT_KW@155..161 "select"
+      WHITESPACE@161..162 " "
+      TARGET_LIST@162..169
+        TARGET@162..169
+          CALL_EXPR@162..169
+            SOME_FN@162..169
+              SOME_KW@162..166 "some"
+              L_PAREN@166..167 "("
+              LITERAL@167..168
+                INT_NUMBER@167..168 "1"
+              R_PAREN@168..169 ")"
+    SEMICOLON@169..170 ";"
+  WHITESPACE@170..171 "\n"
+  SELECT@171..193
+    SELECT_CLAUSE@171..192
+      SELECT_KW@171..177 "select"
+      WHITESPACE@177..178 " "
+      TARGET_LIST@178..192
+        TARGET@178..192
+          CALL_EXPR@178..192
+            NAME_REF@178..189
+              SYSTEM_USER_KW@178..189 "system_user"
+            ARG_LIST@189..192
+              L_PAREN@189..190 "("
+              ARG@190..191
+                LITERAL@190..191
+                  INT_NUMBER@190..191 "1"
+              R_PAREN@191..192 ")"
+    SEMICOLON@192..193 ";"
+  WHITESPACE@193..194 "\n"
+  SELECT@194..209
+    SELECT_CLAUSE@194..208
+      SELECT_KW@194..200 "select"
+      WHITESPACE@200..201 " "
+      TARGET_LIST@201..208
+        TARGET@201..208
+          CALL_EXPR@201..208
+            NAME_REF@201..205
+              USER_KW@201..205 "user"
+            ARG_LIST@205..208
+              L_PAREN@205..206 "("
+              ARG@206..207
+                LITERAL@206..207
+                  INT_NUMBER@206..207 "1"
+              R_PAREN@207..208 ")"
+    SEMICOLON@208..209 ";"
+  WHITESPACE@209..210 "\n"
+  SELECT@210..226
+    SELECT_CLAUSE@210..225
+      SELECT_KW@210..216 "select"
+      WHITESPACE@216..217 " "
+      TARGET_LIST@217..225
+        TARGET@217..225
+          PAREN_EXPR@217..225
+            L_PAREN@217..218 "("
+            CALL_EXPR@218..224
+              ALL_FN@218..224
+                ALL_KW@218..221 "all"
+                L_PAREN@221..222 "("
+                LITERAL@222..223
+                  INT_NUMBER@222..223 "1"
+                R_PAREN@223..224 ")"
+            R_PAREN@224..225 ")"
+    SEMICOLON@225..226 ";"
+  WHITESPACE@226..227 "\n"
+  SELECT@227..242
+    SELECT_CLAUSE@227..241
+      SELECT_KW@227..233 "select"
+      WHITESPACE@233..234 " "
+      TARGET_LIST@234..241
+        TARGET@234..241
+          ARRAY_EXPR@234..241
+            ARRAY_KW@234..239 "array"
+            L_PAREN@239..240 "("
+            R_PAREN@240..241 ")"
+    SEMICOLON@241..242 ";"
+  WHITESPACE@242..243 "\n"
+
+error[syntax-error]: `any` must follow an operator
+  ╭▸ 
+1 │ select any(1);
+  ╰╴       ━━━
+error[syntax-error]: Expected a subquery
+  ╭▸ 
+2 │ select array(1);
+  ╰╴             ━
+error[syntax-error]: `current_catalog` is not a valid function name
+  ╭▸ 
+3 │ select current_catalog(1);
+  ╰╴       ━━━━━━━━━━━━━━━
+error[syntax-error]: `current_date` is not a valid function name
+  ╭▸ 
+4 │ select current_date(1);
+  ╰╴       ━━━━━━━━━━━━
+error[syntax-error]: `current_role` is not a valid function name
+  ╭▸ 
+5 │ select current_role(1);
+  ╰╴       ━━━━━━━━━━━━
+error[syntax-error]: `current_user` is not a valid function name
+  ╭▸ 
+6 │ select current_user(1);
+  ╰╴       ━━━━━━━━━━━━
+error[syntax-error]: `session_user` is not a valid function name
+  ╭▸ 
+7 │ select session_user(1);
+  ╰╴       ━━━━━━━━━━━━
+error[syntax-error]: `some` must follow an operator
+  ╭▸ 
+8 │ select some(1);
+  ╰╴       ━━━━
+error[syntax-error]: `system_user` is not a valid function name
+  ╭▸ 
+9 │ select system_user(1);
+  ╰╴       ━━━━━━━━━━━
+error[syntax-error]: `user` is not a valid function name
+   ╭▸ 
+10 │ select user(1);
+   ╰╴       ━━━━
+error[syntax-error]: `all` must follow an operator
+   ╭▸ 
+11 │ select (all(1));
+   ╰╴        ━━━
+error[syntax-error]: Expected a subquery
+   ╭▸ 
+12 │ select array();
+   ╰╴       ━━━━━━━

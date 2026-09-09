@@ -1,0 +1,12 @@
+select any(1);
+select array(1);
+select current_catalog(1);
+select current_date(1);
+select current_role(1);
+select current_user(1);
+select session_user(1);
+select some(1);
+select system_user(1);
+select user(1);
+select (all(1));
+select array();

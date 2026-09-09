@@ -1,0 +1,36 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/set_config_value.sql
+---
+SOURCE_FILE@0..34
+  SET@0..33
+    SET_KW@0..3 "set"
+    WHITESPACE@3..4 " "
+    SET_CONFIG@4..32
+      CONFIG_PARAMETER_REF@4..22
+        PATH_REF@4..22
+          PATH_SEGMENT_REF@4..22
+            IDENT@4..22 "extra_float_digits"
+      WHITESPACE@22..23 " "
+      TO_CONFIG_VALUE@23..32
+        EQ@23..24 "="
+        WHITESPACE@24..25 " "
+        BIN_EXPR@25..32
+          PREFIX_EXPR@25..27
+            MINUS@25..26 "-"
+            LITERAL@26..27
+              INT_NUMBER@26..27 "1"
+          WHITESPACE@27..28 " "
+          EQ@28..29 "="
+          WHITESPACE@29..30 " "
+          PREFIX_EXPR@30..32
+            MINUS@30..31 "-"
+            LITERAL@31..32
+              INT_NUMBER@31..32 "1"
+    SEMICOLON@32..33 ";"
+  WHITESPACE@33..34 "\n"
+
+error[syntax-error]: Expected DEFAULT, string, identifier, number, or list of values
+  ╭▸ 
+1 │ set extra_float_digits = -1 = -1;
+  ╰╴                       ━━━━━━━━━

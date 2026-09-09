@@ -1,0 +1,474 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/col_name_func_name_ok.sql
+---
+SOURCE_FILE@0..591
+  SELECT@0..20
+    SELECT_CLAUSE@0..19
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..19
+        TARGET@7..19
+          CALL_EXPR@7..19
+            NAME_REF@7..13
+              NULLIF_KW@7..13 "nullif"
+            ARG_LIST@13..19
+              L_PAREN@13..14 "("
+              ARG@14..15
+                LITERAL@14..15
+                  INT_NUMBER@14..15 "1"
+              COMMA@15..16 ","
+              WHITESPACE@16..17 " "
+              ARG@17..18
+                LITERAL@17..18
+                  INT_NUMBER@17..18 "2"
+              R_PAREN@18..19 ")"
+    SEMICOLON@19..20 ";"
+  WHITESPACE@20..21 "\n"
+  SELECT@21..39
+    SELECT_CLAUSE@21..31
+      SELECT_KW@21..27 "select"
+      WHITESPACE@27..28 " "
+      TARGET_LIST@28..31
+        TARGET@28..31
+          NAME_REF@28..31
+            INT_KW@28..31 "int"
+    WHITESPACE@31..32 " "
+    FROM_CLAUSE@32..38
+      FROM_KW@32..36 "from"
+      WHITESPACE@36..37 " "
+      RELATION_FROM_ITEM@37..38
+        RELATION_NAME_REF@37..38
+          PATH_REF@37..38
+            PATH_SEGMENT_REF@37..38
+              IDENT@37..38 "t"
+    SEMICOLON@38..39 ";"
+  WHITESPACE@39..40 "\n"
+  SELECT@40..60
+    SELECT_CLAUSE@40..52
+      SELECT_KW@40..46 "select"
+      WHITESPACE@46..47 " "
+      TARGET_LIST@47..52
+        TARGET@47..52
+          FIELD_EXPR@47..52
+            NAME_REF@47..48
+              IDENT@47..48 "t"
+            DOT@48..49 "."
+            NAME_REF@49..52
+              INT_KW@49..52 "int"
+    WHITESPACE@52..53 " "
+    FROM_CLAUSE@53..59
+      FROM_KW@53..57 "from"
+      WHITESPACE@57..58 " "
+      RELATION_FROM_ITEM@58..59
+        RELATION_NAME_REF@58..59
+          PATH_REF@58..59
+            PATH_SEGMENT_REF@58..59
+              IDENT@58..59 "t"
+    SEMICOLON@59..60 ";"
+  WHITESPACE@60..61 "\n"
+  SELECT@61..79
+    SELECT_CLAUSE@61..78
+      SELECT_KW@61..67 "select"
+      WHITESPACE@67..68 " "
+      TARGET_LIST@68..78
+        TARGET@68..78
+          CALL_EXPR@68..78
+            FIELD_EXPR@68..75
+              NAME_REF@68..71
+                INT_KW@68..71 "int"
+              DOT@71..72 "."
+              NAME_REF@72..75
+                IDENT@72..75 "foo"
+            ARG_LIST@75..78
+              L_PAREN@75..76 "("
+              ARG@76..77
+                LITERAL@76..77
+                  INT_NUMBER@76..77 "1"
+              R_PAREN@77..78 ")"
+    SEMICOLON@78..79 ";"
+  WHITESPACE@79..80 "\n"
+  SELECT@80..96
+    SELECT_CLAUSE@80..95
+      SELECT_KW@80..86 "select"
+      WHITESPACE@86..87 " "
+      TARGET_LIST@87..95
+        TARGET@87..95
+          CALL_EXPR@87..95
+            NAME_REF@87..92
+              IDENT@87..92 "\"int\""
+            ARG_LIST@92..95
+              L_PAREN@92..93 "("
+              ARG@93..94
+                LITERAL@93..94
+                  INT_NUMBER@93..94 "1"
+              R_PAREN@94..95 ")"
+    SEMICOLON@95..96 ";"
+  WHITESPACE@96..97 "\n"
+  SELECT@97..130
+    SELECT_CLAUSE@97..129
+      SELECT_KW@97..103 "select"
+      WHITESPACE@103..104 " "
+      TARGET_LIST@104..129
+        TARGET@104..129
+          CAST_EXPR@104..129
+            CAST_KW@104..108 "cast"
+            L_PAREN@108..109 "("
+            LITERAL@109..110
+              INT_NUMBER@109..110 "1"
+            WHITESPACE@110..111 " "
+            AS_KW@111..113 "as"
+            WHITESPACE@113..114 " "
+            PATH_TYPE@114..128
+              PATH_REF@114..121
+                PATH_SEGMENT_REF@114..121
+                  NUMERIC_KW@114..121 "numeric"
+              ARG_LIST@121..128
+                L_PAREN@121..122 "("
+                ARG@122..124
+                  LITERAL@122..124
+                    INT_NUMBER@122..124 "10"
+                COMMA@124..125 ","
+                WHITESPACE@125..126 " "
+                ARG@126..127
+                  LITERAL@126..127
+                    INT_NUMBER@126..127 "2"
+                R_PAREN@127..128 ")"
+            R_PAREN@128..129 ")"
+    SEMICOLON@129..130 ";"
+  WHITESPACE@130..131 "\n"
+  SELECT@131..209
+    SELECT_CLAUSE@131..139
+      SELECT_KW@131..137 "select"
+      WHITESPACE@137..138 " "
+      TARGET_LIST@138..139
+        TARGET@138..139
+          STAR@138..139 "*"
+    WHITESPACE@139..140 " "
+    FROM_CLAUSE@140..208
+      FROM_KW@140..144 "from"
+      WHITESPACE@144..145 " "
+      XML_TABLE_FROM_ITEM@145..208
+        XML_TABLE@145..208
+          XMLTABLE_KW@145..153 "xmltable"
+          L_PAREN@153..154 "("
+          XMLNAMESPACES_KW@154..167 "xmlnamespaces"
+          XML_NAMESPACE_LIST@167..177
+            L_PAREN@167..168 "("
+            XML_NAMESPACE@168..176
+              LITERAL@168..171
+                STRING@168..171 "'u'"
+              WHITESPACE@171..172 " "
+              AS_KW@172..174 "as"
+              WHITESPACE@174..175 " "
+              XML_NAMESPACE_PREFIX@175..176
+                IDENT@175..176 "x"
+            R_PAREN@176..177 ")"
+          COMMA@177..178 ","
+          WHITESPACE@178..179 " "
+          XML_ROW_PASSING_CLAUSE@179..193
+            LITERAL@179..183
+              STRING@179..183 "'/a'"
+            WHITESPACE@183..184 " "
+            PASSING_KW@184..191 "passing"
+            WHITESPACE@191..192 " "
+            XML_PASSING_DOC@192..193
+              NAME_REF@192..193
+                IDENT@192..193 "y"
+          WHITESPACE@193..194 " "
+          XML_TABLE_COLUMN_LIST@194..207
+            COLUMNS_KW@194..201 "columns"
+            WHITESPACE@201..202 " "
+            XML_TABLE_COLUMN@202..207
+              COLUMN_NAME@202..203
+                IDENT@202..203 "b"
+              WHITESPACE@203..204 " "
+              PATH_TYPE@204..207
+                PATH_REF@204..207
+                  PATH_SEGMENT_REF@204..207
+                    INT_KW@204..207 "int"
+          R_PAREN@207..208 ")"
+    SEMICOLON@208..209 ";"
+  WHITESPACE@209..210 "\n"
+  SELECT@210..272
+    SELECT_CLAUSE@210..218
+      SELECT_KW@210..216 "select"
+      WHITESPACE@216..217 " "
+      TARGET_LIST@217..218
+        TARGET@217..218
+          STAR@217..218 "*"
+    WHITESPACE@218..219 " "
+    FROM_CLAUSE@219..271
+      FROM_KW@219..223 "from"
+      WHITESPACE@223..224 " "
+      JSON_TABLE_FROM_ITEM@224..271
+        JSON_TABLE@224..271
+          JSON_TABLE_KW@224..234 "json_table"
+          L_PAREN@234..235 "("
+          LITERAL@235..240
+            STRING@235..240 "'[1]'"
+          COMMA@240..241 ","
+          WHITESPACE@241..242 " "
+          LITERAL@242..245
+            STRING@242..245 "'$'"
+          WHITESPACE@245..246 " "
+          JSON_TABLE_COLUMN_LIST@246..270
+            COLUMNS_KW@246..253 "columns"
+            WHITESPACE@253..254 " "
+            L_PAREN@254..255 "("
+            JSON_TABLE_VALUE_COLUMN@255..269
+              COLUMN_NAME@255..256
+                IDENT@255..256 "a"
+              WHITESPACE@256..257 " "
+              PATH_TYPE@257..260
+                PATH_REF@257..260
+                  PATH_SEGMENT_REF@257..260
+                    INT_KW@257..260 "int"
+              WHITESPACE@260..261 " "
+              JSON_PATH_CLAUSE@261..269
+                PATH_KW@261..265 "path"
+                WHITESPACE@265..266 " "
+                LITERAL@266..269
+                  STRING@266..269 "'$'"
+            R_PAREN@269..270 ")"
+          R_PAREN@270..271 ")"
+    SEMICOLON@271..272 ";"
+  WHITESPACE@272..273 "\n"
+  SELECT@273..324
+    SELECT_CLAUSE@273..323
+      SELECT_KW@273..279 "select"
+      WHITESPACE@279..280 " "
+      TARGET_LIST@280..323
+        TARGET@280..323
+          CALL_EXPR@280..323
+            XML_ELEMENT_FN@280..323
+              XMLELEMENT_KW@280..290 "xmlelement"
+              L_PAREN@290..291 "("
+              NAME_KW@291..295 "name"
+              WHITESPACE@295..296 " "
+              ELEMENT_TAG@296..299
+                IDENT@296..299 "foo"
+              COMMA@299..300 ","
+              WHITESPACE@300..301 " "
+              XMLATTRIBUTES_KW@301..314 "xmlattributes"
+              EXPR_AS_XML_ATTR_LIST@314..322
+                L_PAREN@314..315 "("
+                EXPR_AS_XML_ATTR@315..321
+                  LITERAL@315..316
+                    INT_NUMBER@315..316 "1"
+                  WHITESPACE@316..317 " "
+                  AS_KW@317..319 "as"
+                  WHITESPACE@319..320 " "
+                  XML_ATTR@320..321
+                    IDENT@320..321 "a"
+                R_PAREN@321..322 ")"
+              R_PAREN@322..323 ")"
+    SEMICOLON@323..324 ";"
+  WHITESPACE@324..325 "\n"
+  MERGE@325..404
+    MERGE_KW@325..330 "merge"
+    WHITESPACE@330..331 " "
+    INTO_KW@331..335 "into"
+    WHITESPACE@335..336 " "
+    TABLE_RELATION_NAME@336..337
+      TABLE_NAME_REF@336..337
+        PATH_REF@336..337
+          PATH_SEGMENT_REF@336..337
+            IDENT@336..337 "t"
+    WHITESPACE@337..338 " "
+    USING_ON_CLAUSE@338..353
+      USING_KW@338..343 "using"
+      WHITESPACE@343..344 " "
+      RELATION_FROM_ITEM@344..345
+        RELATION_NAME_REF@344..345
+          PATH_REF@344..345
+            PATH_SEGMENT_REF@344..345
+              IDENT@344..345 "s"
+      WHITESPACE@345..346 " "
+      ON_CLAUSE@346..353
+        ON_KW@346..348 "on"
+        WHITESPACE@348..349 " "
+        LITERAL@349..353
+          TRUE_KW@349..353 "true"
+    WHITESPACE@353..354 " "
+    MERGE_WHEN_MATCHED@354..378
+      WHEN_KW@354..358 "when"
+      WHITESPACE@358..359 " "
+      MATCHED_KW@359..366 "matched"
+      WHITESPACE@366..367 " "
+      THEN_KW@367..371 "then"
+      WHITESPACE@371..372 " "
+      MERGE_DELETE@372..378
+        DELETE_KW@372..378 "delete"
+    WHITESPACE@378..379 " "
+    RETURNING_CLAUSE@379..403
+      RETURNING_KW@379..388 "returning"
+      WHITESPACE@388..389 " "
+      TARGET_LIST@389..403
+        TARGET@389..403
+          CALL_EXPR@389..403
+            NAME_REF@389..401
+              MERGE_ACTION_KW@389..401 "merge_action"
+            ARG_LIST@401..403
+              L_PAREN@401..402 "("
+              R_PAREN@402..403 ")"
+    SEMICOLON@403..404 ";"
+  WHITESPACE@404..405 "\n"
+  SELECT@405..427
+    SELECT_CLAUSE@405..426
+      SELECT_KW@405..411 "select"
+      WHITESPACE@411..412 " "
+      TARGET_LIST@412..426
+        TARGET@412..426
+          CALL_EXPR@412..426
+            NAME_REF@412..420
+              COALESCE_KW@412..420 "coalesce"
+            ARG_LIST@420..426
+              L_PAREN@420..421 "("
+              ARG@421..422
+                LITERAL@421..422
+                  INT_NUMBER@421..422 "1"
+              COMMA@422..423 ","
+              WHITESPACE@423..424 " "
+              ARG@424..425
+                LITERAL@424..425
+                  INT_NUMBER@424..425 "2"
+              R_PAREN@425..426 ")"
+    SEMICOLON@426..427 ";"
+  WHITESPACE@427..428 "\n"
+  SELECT@428..450
+    SELECT_CLAUSE@428..449
+      SELECT_KW@428..434 "select"
+      WHITESPACE@434..435 " "
+      TARGET_LIST@435..449
+        TARGET@435..449
+          CALL_EXPR@435..449
+            NAME_REF@435..446
+              GRAPH_TABLE_KW@435..446 "graph_table"
+            ARG_LIST@446..449
+              L_PAREN@446..447 "("
+              ARG@447..448
+                LITERAL@447..448
+                  INT_NUMBER@447..448 "1"
+              R_PAREN@448..449 ")"
+    SEMICOLON@449..450 ";"
+  WHITESPACE@450..451 "\n"
+  SELECT@451..473
+    SELECT_CLAUSE@451..472
+      SELECT_KW@451..457 "select"
+      WHITESPACE@457..458 " "
+      TARGET_LIST@458..472
+        TARGET@458..472
+          CALL_EXPR@458..472
+            NAME_REF@458..466
+              GREATEST_KW@458..466 "greatest"
+            ARG_LIST@466..472
+              L_PAREN@466..467 "("
+              ARG@467..468
+                LITERAL@467..468
+                  INT_NUMBER@467..468 "1"
+              COMMA@468..469 ","
+              WHITESPACE@469..470 " "
+              ARG@470..471
+                LITERAL@470..471
+                  INT_NUMBER@470..471 "2"
+              R_PAREN@471..472 ")"
+    SEMICOLON@472..473 ";"
+  WHITESPACE@473..474 "\n"
+  SELECT@474..511
+    SELECT_CLAUSE@474..492
+      SELECT_KW@474..480 "select"
+      WHITESPACE@480..481 " "
+      TARGET_LIST@481..492
+        TARGET@481..492
+          CALL_EXPR@481..492
+            NAME_REF@481..489
+              GROUPING_KW@481..489 "grouping"
+            ARG_LIST@489..492
+              L_PAREN@489..490 "("
+              ARG@490..491
+                NAME_REF@490..491
+                  IDENT@490..491 "a"
+              R_PAREN@491..492 ")"
+    WHITESPACE@492..493 " "
+    FROM_CLAUSE@493..499
+      FROM_KW@493..497 "from"
+      WHITESPACE@497..498 " "
+      RELATION_FROM_ITEM@498..499
+        RELATION_NAME_REF@498..499
+          PATH_REF@498..499
+            PATH_SEGMENT_REF@498..499
+              IDENT@498..499 "t"
+    WHITESPACE@499..500 " "
+    GROUP_BY_CLAUSE@500..510
+      GROUP_KW@500..505 "group"
+      WHITESPACE@505..506 " "
+      BY_KW@506..508 "by"
+      WHITESPACE@508..509 " "
+      GROUP_BY_LIST@509..510
+        GROUPING_EXPR@509..510
+          NAME_REF@509..510
+            IDENT@509..510 "a"
+    SEMICOLON@510..511 ";"
+  WHITESPACE@511..512 "\n"
+  SELECT@512..536
+    SELECT_CLAUSE@512..535
+      SELECT_KW@512..518 "select"
+      WHITESPACE@518..519 " "
+      TARGET_LIST@519..535
+        TARGET@519..535
+          CALL_EXPR@519..535
+            NAME_REF@519..528
+              NORMALIZE_KW@519..528 "normalize"
+            ARG_LIST@528..535
+              L_PAREN@528..529 "("
+              ARG@529..534
+                LITERAL@529..534
+                  STRING@529..534 "'abc'"
+              R_PAREN@534..535 ")"
+    SEMICOLON@535..536 ";"
+  WHITESPACE@536..537 "\n"
+  SELECT@537..556
+    SELECT_CLAUSE@537..555
+      SELECT_KW@537..543 "select"
+      WHITESPACE@543..544 " "
+      TARGET_LIST@544..555
+        TARGET@544..555
+          CALL_EXPR@544..555
+            NAME_REF@544..549
+              LEAST_KW@544..549 "least"
+            ARG_LIST@549..555
+              L_PAREN@549..550 "("
+              ARG@550..551
+                LITERAL@550..551
+                  INT_NUMBER@550..551 "1"
+              COMMA@551..552 ","
+              WHITESPACE@552..553 " "
+              ARG@553..554
+                LITERAL@553..554
+                  INT_NUMBER@553..554 "2"
+              R_PAREN@554..555 ")"
+    SEMICOLON@555..556 ";"
+  WHITESPACE@556..557 "\n"
+  SELECT@557..590
+    SELECT_CLAUSE@557..589
+      SELECT_KW@557..563 "select"
+      WHITESPACE@563..564 " "
+      TARGET_LIST@564..589
+        TARGET@564..589
+          CALL_EXPR@564..589
+            NAME_REF@564..573
+              XMLCONCAT_KW@564..573 "xmlconcat"
+            ARG_LIST@573..589
+              L_PAREN@573..574 "("
+              ARG@574..580
+                LITERAL@574..580
+                  STRING@574..580 "'<a/>'"
+              COMMA@580..581 ","
+              WHITESPACE@581..582 " "
+              ARG@582..588
+                LITERAL@582..588
+                  STRING@582..588 "'<b/>'"
+              R_PAREN@588..589 ")"
+    SEMICOLON@589..590 ";"
+  WHITESPACE@590..591 "\n"

@@ -1,0 +1,726 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/type_func_name_table_name.sql
+---
+SOURCE_FILE@0..798
+  CREATE_TABLE@0..35
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    TABLE_KW@7..12 "table"
+    WHITESPACE@12..13 " "
+    TABLE_NAME@13..26
+      PATH@13..26
+        PATH_SEGMENT@13..26
+          AUTHORIZATION_KW@13..26 "authorization"
+    WHITESPACE@26..27 " "
+    TABLE_ARG_LIST@27..34
+      L_PAREN@27..28 "("
+      COLUMN@28..33
+        COLUMN_NAME@28..29
+          IDENT@28..29 "a"
+        WHITESPACE@29..30 " "
+        PATH_TYPE@30..33
+          PATH_REF@30..33
+            PATH_SEGMENT_REF@30..33
+              INT_KW@30..33 "int"
+      R_PAREN@33..34 ")"
+    SEMICOLON@34..35 ";"
+  WHITESPACE@35..36 "\n"
+  CREATE_TABLE@36..64
+    CREATE_KW@36..42 "create"
+    WHITESPACE@42..43 " "
+    TABLE_KW@43..48 "table"
+    WHITESPACE@48..49 " "
+    TABLE_NAME@49..55
+      PATH@49..55
+        PATH_SEGMENT@49..55
+          BINARY_KW@49..55 "binary"
+    WHITESPACE@55..56 " "
+    TABLE_ARG_LIST@56..63
+      L_PAREN@56..57 "("
+      COLUMN@57..62
+        COLUMN_NAME@57..58
+          IDENT@57..58 "a"
+        WHITESPACE@58..59 " "
+        PATH_TYPE@59..62
+          PATH_REF@59..62
+            PATH_SEGMENT_REF@59..62
+              INT_KW@59..62 "int"
+      R_PAREN@62..63 ")"
+    SEMICOLON@63..64 ";"
+  WHITESPACE@64..65 "\n"
+  CREATE_TABLE@65..96
+    CREATE_KW@65..71 "create"
+    WHITESPACE@71..72 " "
+    TABLE_KW@72..77 "table"
+    WHITESPACE@77..78 " "
+    TABLE_NAME@78..87
+      PATH@78..87
+        PATH_SEGMENT@78..87
+          COLLATION_KW@78..87 "collation"
+    WHITESPACE@87..88 " "
+    TABLE_ARG_LIST@88..95
+      L_PAREN@88..89 "("
+      COLUMN@89..94
+        COLUMN_NAME@89..90
+          IDENT@89..90 "a"
+        WHITESPACE@90..91 " "
+        PATH_TYPE@91..94
+          PATH_REF@91..94
+            PATH_SEGMENT_REF@91..94
+              INT_KW@91..94 "int"
+      R_PAREN@94..95 ")"
+    SEMICOLON@95..96 ";"
+  WHITESPACE@96..97 "\n"
+  CREATE_TABLE@97..131
+    CREATE_KW@97..103 "create"
+    WHITESPACE@103..104 " "
+    TABLE_KW@104..109 "table"
+    WHITESPACE@109..110 " "
+    TABLE_NAME@110..122
+      PATH@110..122
+        PATH_SEGMENT@110..122
+          CONCURRENTLY_KW@110..122 "concurrently"
+    WHITESPACE@122..123 " "
+    TABLE_ARG_LIST@123..130
+      L_PAREN@123..124 "("
+      COLUMN@124..129
+        COLUMN_NAME@124..125
+          IDENT@124..125 "a"
+        WHITESPACE@125..126 " "
+        PATH_TYPE@126..129
+          PATH_REF@126..129
+            PATH_SEGMENT_REF@126..129
+              INT_KW@126..129 "int"
+      R_PAREN@129..130 ")"
+    SEMICOLON@130..131 ";"
+  WHITESPACE@131..132 "\n"
+  CREATE_TABLE@132..159
+    CREATE_KW@132..138 "create"
+    WHITESPACE@138..139 " "
+    TABLE_KW@139..144 "table"
+    WHITESPACE@144..145 " "
+    TABLE_NAME@145..150
+      PATH@145..150
+        PATH_SEGMENT@145..150
+          CROSS_KW@145..150 "cross"
+    WHITESPACE@150..151 " "
+    TABLE_ARG_LIST@151..158
+      L_PAREN@151..152 "("
+      COLUMN@152..157
+        COLUMN_NAME@152..153
+          IDENT@152..153 "a"
+        WHITESPACE@153..154 " "
+        PATH_TYPE@154..157
+          PATH_REF@154..157
+            PATH_SEGMENT_REF@154..157
+              INT_KW@154..157 "int"
+      R_PAREN@157..158 ")"
+    SEMICOLON@158..159 ";"
+  WHITESPACE@159..160 "\n"
+  CREATE_TABLE@160..196
+    CREATE_KW@160..166 "create"
+    WHITESPACE@166..167 " "
+    TABLE_KW@167..172 "table"
+    WHITESPACE@172..173 " "
+    TABLE_NAME@173..187
+      PATH@173..187
+        PATH_SEGMENT@173..187
+          CURRENT_SCHEMA_KW@173..187 "current_schema"
+    WHITESPACE@187..188 " "
+    TABLE_ARG_LIST@188..195
+      L_PAREN@188..189 "("
+      COLUMN@189..194
+        COLUMN_NAME@189..190
+          IDENT@189..190 "a"
+        WHITESPACE@190..191 " "
+        PATH_TYPE@191..194
+          PATH_REF@191..194
+            PATH_SEGMENT_REF@191..194
+              INT_KW@191..194 "int"
+      R_PAREN@194..195 ")"
+    SEMICOLON@195..196 ";"
+  WHITESPACE@196..197 "\n"
+  CREATE_TABLE@197..225
+    CREATE_KW@197..203 "create"
+    WHITESPACE@203..204 " "
+    TABLE_KW@204..209 "table"
+    WHITESPACE@209..210 " "
+    TABLE_NAME@210..216
+      PATH@210..216
+        PATH_SEGMENT@210..216
+          FREEZE_KW@210..216 "freeze"
+    WHITESPACE@216..217 " "
+    TABLE_ARG_LIST@217..224
+      L_PAREN@217..218 "("
+      COLUMN@218..223
+        COLUMN_NAME@218..219
+          IDENT@218..219 "a"
+        WHITESPACE@219..220 " "
+        PATH_TYPE@220..223
+          PATH_REF@220..223
+            PATH_SEGMENT_REF@220..223
+              INT_KW@220..223 "int"
+      R_PAREN@223..224 ")"
+    SEMICOLON@224..225 ";"
+  WHITESPACE@225..226 "\n"
+  CREATE_TABLE@226..252
+    CREATE_KW@226..232 "create"
+    WHITESPACE@232..233 " "
+    TABLE_KW@233..238 "table"
+    WHITESPACE@238..239 " "
+    TABLE_NAME@239..243
+      PATH@239..243
+        PATH_SEGMENT@239..243
+          FULL_KW@239..243 "full"
+    WHITESPACE@243..244 " "
+    TABLE_ARG_LIST@244..251
+      L_PAREN@244..245 "("
+      COLUMN@245..250
+        COLUMN_NAME@245..246
+          IDENT@245..246 "a"
+        WHITESPACE@246..247 " "
+        PATH_TYPE@247..250
+          PATH_REF@247..250
+            PATH_SEGMENT_REF@247..250
+              INT_KW@247..250 "int"
+      R_PAREN@250..251 ")"
+    SEMICOLON@251..252 ";"
+  WHITESPACE@252..253 "\n"
+  CREATE_TABLE@253..280
+    CREATE_KW@253..259 "create"
+    WHITESPACE@259..260 " "
+    TABLE_KW@260..265 "table"
+    WHITESPACE@265..266 " "
+    TABLE_NAME@266..271
+      PATH@266..271
+        PATH_SEGMENT@266..271
+          ILIKE_KW@266..271 "ilike"
+    WHITESPACE@271..272 " "
+    TABLE_ARG_LIST@272..279
+      L_PAREN@272..273 "("
+      COLUMN@273..278
+        COLUMN_NAME@273..274
+          IDENT@273..274 "a"
+        WHITESPACE@274..275 " "
+        PATH_TYPE@275..278
+          PATH_REF@275..278
+            PATH_SEGMENT_REF@275..278
+              INT_KW@275..278 "int"
+      R_PAREN@278..279 ")"
+    SEMICOLON@279..280 ";"
+  WHITESPACE@280..281 "\n"
+  CREATE_TABLE@281..308
+    CREATE_KW@281..287 "create"
+    WHITESPACE@287..288 " "
+    TABLE_KW@288..293 "table"
+    WHITESPACE@293..294 " "
+    TABLE_NAME@294..299
+      PATH@294..299
+        PATH_SEGMENT@294..299
+          INNER_KW@294..299 "inner"
+    WHITESPACE@299..300 " "
+    TABLE_ARG_LIST@300..307
+      L_PAREN@300..301 "("
+      COLUMN@301..306
+        COLUMN_NAME@301..302
+          IDENT@301..302 "a"
+        WHITESPACE@302..303 " "
+        PATH_TYPE@303..306
+          PATH_REF@303..306
+            PATH_SEGMENT_REF@303..306
+              INT_KW@303..306 "int"
+      R_PAREN@306..307 ")"
+    SEMICOLON@307..308 ";"
+  WHITESPACE@308..309 "\n"
+  CREATE_TABLE@309..333
+    CREATE_KW@309..315 "create"
+    WHITESPACE@315..316 " "
+    TABLE_KW@316..321 "table"
+    WHITESPACE@321..322 " "
+    TABLE_NAME@322..324
+      PATH@322..324
+        PATH_SEGMENT@322..324
+          IS_KW@322..324 "is"
+    WHITESPACE@324..325 " "
+    TABLE_ARG_LIST@325..332
+      L_PAREN@325..326 "("
+      COLUMN@326..331
+        COLUMN_NAME@326..327
+          IDENT@326..327 "a"
+        WHITESPACE@327..328 " "
+        PATH_TYPE@328..331
+          PATH_REF@328..331
+            PATH_SEGMENT_REF@328..331
+              INT_KW@328..331 "int"
+      R_PAREN@331..332 ")"
+    SEMICOLON@332..333 ";"
+  WHITESPACE@333..334 "\n"
+  CREATE_TABLE@334..362
+    CREATE_KW@334..340 "create"
+    WHITESPACE@340..341 " "
+    TABLE_KW@341..346 "table"
+    WHITESPACE@346..347 " "
+    TABLE_NAME@347..353
+      PATH@347..353
+        PATH_SEGMENT@347..353
+          ISNULL_KW@347..353 "isnull"
+    WHITESPACE@353..354 " "
+    TABLE_ARG_LIST@354..361
+      L_PAREN@354..355 "("
+      COLUMN@355..360
+        COLUMN_NAME@355..356
+          IDENT@355..356 "a"
+        WHITESPACE@356..357 " "
+        PATH_TYPE@357..360
+          PATH_REF@357..360
+            PATH_SEGMENT_REF@357..360
+              INT_KW@357..360 "int"
+      R_PAREN@360..361 ")"
+    SEMICOLON@361..362 ";"
+  WHITESPACE@362..363 "\n"
+  CREATE_TABLE@363..389
+    CREATE_KW@363..369 "create"
+    WHITESPACE@369..370 " "
+    TABLE_KW@370..375 "table"
+    WHITESPACE@375..376 " "
+    TABLE_NAME@376..380
+      PATH@376..380
+        PATH_SEGMENT@376..380
+          JOIN_KW@376..380 "join"
+    WHITESPACE@380..381 " "
+    TABLE_ARG_LIST@381..388
+      L_PAREN@381..382 "("
+      COLUMN@382..387
+        COLUMN_NAME@382..383
+          IDENT@382..383 "a"
+        WHITESPACE@383..384 " "
+        PATH_TYPE@384..387
+          PATH_REF@384..387
+            PATH_SEGMENT_REF@384..387
+              INT_KW@384..387 "int"
+      R_PAREN@387..388 ")"
+    SEMICOLON@388..389 ";"
+  WHITESPACE@389..390 "\n"
+  CREATE_TABLE@390..416
+    CREATE_KW@390..396 "create"
+    WHITESPACE@396..397 " "
+    TABLE_KW@397..402 "table"
+    WHITESPACE@402..403 " "
+    TABLE_NAME@403..407
+      PATH@403..407
+        PATH_SEGMENT@403..407
+          LEFT_KW@403..407 "left"
+    WHITESPACE@407..408 " "
+    TABLE_ARG_LIST@408..415
+      L_PAREN@408..409 "("
+      COLUMN@409..414
+        COLUMN_NAME@409..410
+          IDENT@409..410 "a"
+        WHITESPACE@410..411 " "
+        PATH_TYPE@411..414
+          PATH_REF@411..414
+            PATH_SEGMENT_REF@411..414
+              INT_KW@411..414 "int"
+      R_PAREN@414..415 ")"
+    SEMICOLON@415..416 ";"
+  WHITESPACE@416..417 "\n"
+  CREATE_TABLE@417..443
+    CREATE_KW@417..423 "create"
+    WHITESPACE@423..424 " "
+    TABLE_KW@424..429 "table"
+    WHITESPACE@429..430 " "
+    TABLE_NAME@430..434
+      PATH@430..434
+        PATH_SEGMENT@430..434
+          LIKE_KW@430..434 "like"
+    WHITESPACE@434..435 " "
+    TABLE_ARG_LIST@435..442
+      L_PAREN@435..436 "("
+      COLUMN@436..441
+        COLUMN_NAME@436..437
+          IDENT@436..437 "a"
+        WHITESPACE@437..438 " "
+        PATH_TYPE@438..441
+          PATH_REF@438..441
+            PATH_SEGMENT_REF@438..441
+              INT_KW@438..441 "int"
+      R_PAREN@441..442 ")"
+    SEMICOLON@442..443 ";"
+  WHITESPACE@443..444 "\n"
+  CREATE_TABLE@444..473
+    CREATE_KW@444..450 "create"
+    WHITESPACE@450..451 " "
+    TABLE_KW@451..456 "table"
+    WHITESPACE@456..457 " "
+    TABLE_NAME@457..464
+      PATH@457..464
+        PATH_SEGMENT@457..464
+          NATURAL_KW@457..464 "natural"
+    WHITESPACE@464..465 " "
+    TABLE_ARG_LIST@465..472
+      L_PAREN@465..466 "("
+      COLUMN@466..471
+        COLUMN_NAME@466..467
+          IDENT@466..467 "a"
+        WHITESPACE@467..468 " "
+        PATH_TYPE@468..471
+          PATH_REF@468..471
+            PATH_SEGMENT_REF@468..471
+              INT_KW@468..471 "int"
+      R_PAREN@471..472 ")"
+    SEMICOLON@472..473 ";"
+  WHITESPACE@473..474 "\n"
+  CREATE_TABLE@474..503
+    CREATE_KW@474..480 "create"
+    WHITESPACE@480..481 " "
+    TABLE_KW@481..486 "table"
+    WHITESPACE@486..487 " "
+    TABLE_NAME@487..494
+      PATH@487..494
+        PATH_SEGMENT@487..494
+          NOTNULL_KW@487..494 "notnull"
+    WHITESPACE@494..495 " "
+    TABLE_ARG_LIST@495..502
+      L_PAREN@495..496 "("
+      COLUMN@496..501
+        COLUMN_NAME@496..497
+          IDENT@496..497 "a"
+        WHITESPACE@497..498 " "
+        PATH_TYPE@498..501
+          PATH_REF@498..501
+            PATH_SEGMENT_REF@498..501
+              INT_KW@498..501 "int"
+      R_PAREN@501..502 ")"
+    SEMICOLON@502..503 ";"
+  WHITESPACE@503..504 "\n"
+  CREATE_TABLE@504..531
+    CREATE_KW@504..510 "create"
+    WHITESPACE@510..511 " "
+    TABLE_KW@511..516 "table"
+    WHITESPACE@516..517 " "
+    TABLE_NAME@517..522
+      PATH@517..522
+        PATH_SEGMENT@517..522
+          OUTER_KW@517..522 "outer"
+    WHITESPACE@522..523 " "
+    TABLE_ARG_LIST@523..530
+      L_PAREN@523..524 "("
+      COLUMN@524..529
+        COLUMN_NAME@524..525
+          IDENT@524..525 "a"
+        WHITESPACE@525..526 " "
+        PATH_TYPE@526..529
+          PATH_REF@526..529
+            PATH_SEGMENT_REF@526..529
+              INT_KW@526..529 "int"
+      R_PAREN@529..530 ")"
+    SEMICOLON@530..531 ";"
+  WHITESPACE@531..532 "\n"
+  CREATE_TABLE@532..562
+    CREATE_KW@532..538 "create"
+    WHITESPACE@538..539 " "
+    TABLE_KW@539..544 "table"
+    WHITESPACE@544..545 " "
+    TABLE_NAME@545..553
+      PATH@545..553
+        PATH_SEGMENT@545..553
+          OVERLAPS_KW@545..553 "overlaps"
+    WHITESPACE@553..554 " "
+    TABLE_ARG_LIST@554..561
+      L_PAREN@554..555 "("
+      COLUMN@555..560
+        COLUMN_NAME@555..556
+          IDENT@555..556 "a"
+        WHITESPACE@556..557 " "
+        PATH_TYPE@557..560
+          PATH_REF@557..560
+            PATH_SEGMENT_REF@557..560
+              INT_KW@557..560 "int"
+      R_PAREN@560..561 ")"
+    SEMICOLON@561..562 ";"
+  WHITESPACE@562..563 "\n"
+  CREATE_TABLE@563..590
+    CREATE_KW@563..569 "create"
+    WHITESPACE@569..570 " "
+    TABLE_KW@570..575 "table"
+    WHITESPACE@575..576 " "
+    TABLE_NAME@576..581
+      PATH@576..581
+        PATH_SEGMENT@576..581
+          RIGHT_KW@576..581 "right"
+    WHITESPACE@581..582 " "
+    TABLE_ARG_LIST@582..589
+      L_PAREN@582..583 "("
+      COLUMN@583..588
+        COLUMN_NAME@583..584
+          IDENT@583..584 "a"
+        WHITESPACE@584..585 " "
+        PATH_TYPE@585..588
+          PATH_REF@585..588
+            PATH_SEGMENT_REF@585..588
+              INT_KW@585..588 "int"
+      R_PAREN@588..589 ")"
+    SEMICOLON@589..590 ";"
+  WHITESPACE@590..591 "\n"
+  CREATE_TABLE@591..620
+    CREATE_KW@591..597 "create"
+    WHITESPACE@597..598 " "
+    TABLE_KW@598..603 "table"
+    WHITESPACE@603..604 " "
+    TABLE_NAME@604..611
+      PATH@604..611
+        PATH_SEGMENT@604..611
+          SIMILAR_KW@604..611 "similar"
+    WHITESPACE@611..612 " "
+    TABLE_ARG_LIST@612..619
+      L_PAREN@612..613 "("
+      COLUMN@613..618
+        COLUMN_NAME@613..614
+          IDENT@613..614 "a"
+        WHITESPACE@614..615 " "
+        PATH_TYPE@615..618
+          PATH_REF@615..618
+            PATH_SEGMENT_REF@615..618
+              INT_KW@615..618 "int"
+      R_PAREN@618..619 ")"
+    SEMICOLON@619..620 ";"
+  WHITESPACE@620..621 "\n"
+  CREATE_TABLE@621..654
+    CREATE_KW@621..627 "create"
+    WHITESPACE@627..628 " "
+    TABLE_KW@628..633 "table"
+    WHITESPACE@633..634 " "
+    TABLE_NAME@634..645
+      PATH@634..645
+        PATH_SEGMENT@634..645
+          TABLESAMPLE_KW@634..645 "tablesample"
+    WHITESPACE@645..646 " "
+    TABLE_ARG_LIST@646..653
+      L_PAREN@646..647 "("
+      COLUMN@647..652
+        COLUMN_NAME@647..648
+          IDENT@647..648 "a"
+        WHITESPACE@648..649 " "
+        PATH_TYPE@649..652
+          PATH_REF@649..652
+            PATH_SEGMENT_REF@649..652
+              INT_KW@649..652 "int"
+      R_PAREN@652..653 ")"
+    SEMICOLON@653..654 ";"
+  WHITESPACE@654..655 "\n"
+  CREATE_TABLE@655..684
+    CREATE_KW@655..661 "create"
+    WHITESPACE@661..662 " "
+    TABLE_KW@662..667 "table"
+    WHITESPACE@667..668 " "
+    TABLE_NAME@668..675
+      PATH@668..675
+        PATH_SEGMENT@668..675
+          VERBOSE_KW@668..675 "verbose"
+    WHITESPACE@675..676 " "
+    TABLE_ARG_LIST@676..683
+      L_PAREN@676..677 "("
+      COLUMN@677..682
+        COLUMN_NAME@677..678
+          IDENT@677..678 "a"
+        WHITESPACE@678..679 " "
+        PATH_TYPE@679..682
+          PATH_REF@679..682
+            PATH_SEGMENT_REF@679..682
+              INT_KW@679..682 "int"
+      R_PAREN@682..683 ")"
+    SEMICOLON@683..684 ";"
+  WHITESPACE@684..685 "\n"
+  CREATE_FOREIGN_TABLE@685..728
+    CREATE_KW@685..691 "create"
+    WHITESPACE@691..692 " "
+    FOREIGN_KW@692..699 "foreign"
+    WHITESPACE@699..700 " "
+    TABLE_KW@700..705 "table"
+    WHITESPACE@705..706 " "
+    TABLE_NAME@706..710
+      PATH@706..710
+        PATH_SEGMENT@706..710
+          LEFT_KW@706..710 "left"
+    WHITESPACE@710..711 " "
+    TABLE_ARG_LIST@711..718
+      L_PAREN@711..712 "("
+      COLUMN@712..717
+        COLUMN_NAME@712..713
+          IDENT@712..713 "a"
+        WHITESPACE@713..714 " "
+        PATH_TYPE@714..717
+          PATH_REF@714..717
+            PATH_SEGMENT_REF@714..717
+              INT_KW@714..717 "int"
+      R_PAREN@717..718 ")"
+    WHITESPACE@718..719 " "
+    SERVER_CLAUSE@719..727
+      SERVER_KW@719..725 "server"
+      WHITESPACE@725..726 " "
+      SERVER_REF@726..727
+        IDENT@726..727 "s"
+    SEMICOLON@727..728 ";"
+  WHITESPACE@728..729 "\n"
+  SELECT_INTO@729..748
+    SELECT_CLAUSE@729..737
+      SELECT_KW@729..735 "select"
+      WHITESPACE@735..736 " "
+      TARGET_LIST@736..737
+        TARGET@736..737
+          LITERAL@736..737
+            INT_NUMBER@736..737 "1"
+    WHITESPACE@737..738 " "
+    INTO_CLAUSE@738..747
+      INTO_KW@738..742 "into"
+      WHITESPACE@742..743 " "
+      TABLE_NAME@743..747
+        PATH@743..747
+          PATH_SEGMENT@743..747
+            LEFT_KW@743..747 "left"
+    SEMICOLON@747..748 ";"
+  WHITESPACE@748..749 "\n"
+  ALTER_TABLE@749..797
+    ALTER_KW@749..754 "alter"
+    WHITESPACE@754..755 " "
+    TABLE_KW@755..760 "table"
+    WHITESPACE@760..761 " "
+    TABLE_RELATION_NAME@761..762
+      TABLE_NAME_REF@761..762
+        PATH_REF@761..762
+          PATH_SEGMENT_REF@761..762
+            IDENT@761..762 "t"
+    WHITESPACE@762..763 " "
+    MERGE_PARTITIONS@763..796
+      MERGE_KW@763..768 "merge"
+      WHITESPACE@768..769 " "
+      PARTITIONS_KW@769..779 "partitions"
+      WHITESPACE@779..780 " "
+      TABLE_NAME_REF_LIST@780..786
+        L_PAREN@780..781 "("
+        TABLE_NAME_REF@781..782
+          PATH_REF@781..782
+            PATH_SEGMENT_REF@781..782
+              IDENT@781..782 "a"
+        COMMA@782..783 ","
+        WHITESPACE@783..784 " "
+        TABLE_NAME_REF@784..785
+          PATH_REF@784..785
+            PATH_SEGMENT_REF@784..785
+              IDENT@784..785 "b"
+        R_PAREN@785..786 ")"
+      WHITESPACE@786..787 " "
+      INTO_KW@787..791 "into"
+      WHITESPACE@791..792 " "
+      TABLE_NAME@792..796
+        PATH@792..796
+          PATH_SEGMENT@792..796
+            LEFT_KW@792..796 "left"
+    SEMICOLON@796..797 ";"
+  WHITESPACE@797..798 "\n"
+
+error[syntax-error]: `authorization` is a reserved keyword
+  ╭▸ 
+1 │ create table authorization (a int);
+  ╰╴             ━━━━━━━━━━━━━
+error[syntax-error]: `binary` is a reserved keyword
+  ╭▸ 
+2 │ create table binary (a int);
+  ╰╴             ━━━━━━
+error[syntax-error]: `collation` is a reserved keyword
+  ╭▸ 
+3 │ create table collation (a int);
+  ╰╴             ━━━━━━━━━
+error[syntax-error]: `concurrently` is a reserved keyword
+  ╭▸ 
+4 │ create table concurrently (a int);
+  ╰╴             ━━━━━━━━━━━━
+error[syntax-error]: `cross` is a reserved keyword
+  ╭▸ 
+5 │ create table cross (a int);
+  ╰╴             ━━━━━
+error[syntax-error]: `current_schema` is a reserved keyword
+  ╭▸ 
+6 │ create table current_schema (a int);
+  ╰╴             ━━━━━━━━━━━━━━
+error[syntax-error]: `freeze` is a reserved keyword
+  ╭▸ 
+7 │ create table freeze (a int);
+  ╰╴             ━━━━━━
+error[syntax-error]: `full` is a reserved keyword
+  ╭▸ 
+8 │ create table full (a int);
+  ╰╴             ━━━━
+error[syntax-error]: `ilike` is a reserved keyword
+  ╭▸ 
+9 │ create table ilike (a int);
+  ╰╴             ━━━━━
+error[syntax-error]: `inner` is a reserved keyword
+   ╭▸ 
+10 │ create table inner (a int);
+   ╰╴             ━━━━━
+error[syntax-error]: `is` is a reserved keyword
+   ╭▸ 
+11 │ create table is (a int);
+   ╰╴             ━━
+error[syntax-error]: `isnull` is a reserved keyword
+   ╭▸ 
+12 │ create table isnull (a int);
+   ╰╴             ━━━━━━
+error[syntax-error]: `join` is a reserved keyword
+   ╭▸ 
+13 │ create table join (a int);
+   ╰╴             ━━━━
+error[syntax-error]: `left` is a reserved keyword
+   ╭▸ 
+14 │ create table left (a int);
+   ╰╴             ━━━━
+error[syntax-error]: `like` is a reserved keyword
+   ╭▸ 
+15 │ create table like (a int);
+   ╰╴             ━━━━
+error[syntax-error]: `natural` is a reserved keyword
+   ╭▸ 
+16 │ create table natural (a int);
+   ╰╴             ━━━━━━━
+error[syntax-error]: `notnull` is a reserved keyword
+   ╭▸ 
+17 │ create table notnull (a int);
+   ╰╴             ━━━━━━━
+error[syntax-error]: `outer` is a reserved keyword
+   ╭▸ 
+18 │ create table outer (a int);
+   ╰╴             ━━━━━
+error[syntax-error]: `overlaps` is a reserved keyword
+   ╭▸ 
+19 │ create table overlaps (a int);
+   ╰╴             ━━━━━━━━
+error[syntax-error]: `right` is a reserved keyword
+   ╭▸ 
+20 │ create table right (a int);
+   ╰╴             ━━━━━
+error[syntax-error]: `similar` is a reserved keyword
+   ╭▸ 
+21 │ create table similar (a int);
+   ╰╴             ━━━━━━━
+error[syntax-error]: `tablesample` is a reserved keyword
+   ╭▸ 
+22 │ create table tablesample (a int);
+   ╰╴             ━━━━━━━━━━━
+error[syntax-error]: `verbose` is a reserved keyword
+   ╭▸ 
+23 │ create table verbose (a int);
+   ╰╴             ━━━━━━━
+error[syntax-error]: `left` is a reserved keyword
+   ╭▸ 
+24 │ create foreign table left (a int) server s;
+   ╰╴                     ━━━━
+error[syntax-error]: `left` is a reserved keyword
+   ╭▸ 
+25 │ select 1 into left;
+   ╰╴              ━━━━
+error[syntax-error]: `left` is a reserved keyword
+   ╭▸ 
+26 │ alter table t merge partitions (a, b) into left;
+   ╰╴                                           ━━━━

@@ -23,3 +23,35 @@ impl SyntaxKind {
         matches!(self, SyntaxKind::WHITESPACE | SyntaxKind::COMMENT)
     }
 }
+
+#[inline]
+pub fn is_reserved_keyword(kind: SyntaxKind) -> bool {
+    kind <= SyntaxKind::WHITESPACE && crate::generated::token_sets::RESERVED_KEYWORDS.contains(kind)
+}
+
+#[inline]
+pub fn is_col_name_keyword(kind: SyntaxKind) -> bool {
+    kind <= SyntaxKind::WHITESPACE
+        && crate::generated::token_sets::COL_NAME_KEYWORD_FIRST.contains(kind)
+}
+
+#[inline]
+pub fn is_type_func_name_keyword(kind: SyntaxKind) -> bool {
+    kind <= SyntaxKind::WHITESPACE
+        && crate::generated::token_sets::TYPE_FUNC_NAME_KEYWORDS.contains(kind)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{SyntaxKind, is_col_name_keyword, is_reserved_keyword, is_type_func_name_keyword};
+
+    #[test]
+    fn keyword_categories() {
+        assert!(is_reserved_keyword(SyntaxKind::SELECT_KW));
+        assert!(is_col_name_keyword(SyntaxKind::BETWEEN_KW));
+        assert!(is_type_func_name_keyword(SyntaxKind::LEFT_KW));
+
+        assert!(!is_reserved_keyword(SyntaxKind::IDENT));
+        assert!(!is_reserved_keyword(SyntaxKind::SELECT));
+    }
+}

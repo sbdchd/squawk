@@ -539,6 +539,10 @@ error[syntax-error]: Expected a target after SELECT
    ╭▸ 
 17 │ select (select);
    ╰╴        ━━━━━━
+error[syntax-error]: Parentheses are not allowed
+   ╭▸ 
+19 │ create view f as select from((select)a);
+   ╰╴                            ━━━━━━━━━━━
 error[syntax-error]: A subquery alias must follow all closing parentheses
    ╭▸ 
 19 │ create view f as select from((select)a);

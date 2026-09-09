@@ -73,7 +73,7 @@ mod test {
     fn not_applicable_to_function_call() {
         assert!(code_action_not_applicable(
             rewrite_system_user_as_function_call,
-            "select system_$0user();"
+            "select pg_catalog.system_$0user();"
         ));
     }
 

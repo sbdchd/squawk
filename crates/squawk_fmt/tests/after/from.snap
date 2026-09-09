@@ -41,19 +41,15 @@ from /* before lateral */ lateral /* before cast */ cast /* before opening paren
   ) /* before alias */ as /* before alias name */ converted;
 select * from (select 1) as selected;
 select *
-from only lateral (
+from lateral (
     select a_very_long_parenthesized_select_expression
     from a_very_long_parenthesized_select_relation_name
   ) as a_very_long_parenthesized_select_alias;
 select *
-from /* before only */ only /* before lateral */ lateral /* before opening paren */ (
+from /* before lateral */ lateral /* before opening paren */ (
     /* before select */ select
       /* before target */ value /* before closing paren */
   ) /* before alias */ as /* before alias name */ selected;
-select *
-from (
-    /* before relation */ foo /* before closing paren */
-  ) as parenthesized_relation;
 select *
 from rows from (
     generate_series(1, 3),

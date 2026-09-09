@@ -1,0 +1,65 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/distinct_on.sql
+---
+SOURCE_FILE@0..68
+  SELECT@0..24
+    SELECT_CLAUSE@0..23
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      DISTINCT_CLAUSE@7..21
+        DISTINCT_KW@7..15 "distinct"
+        WHITESPACE@15..16 " "
+        DISTINCT_ON@16..21
+          ON_KW@16..18 "on"
+          WHITESPACE@18..19 " "
+          L_PAREN@19..20 "("
+          R_PAREN@20..21 ")"
+      WHITESPACE@21..22 " "
+      TARGET_LIST@22..23
+        TARGET@22..23
+          LITERAL@22..23
+            INT_NUMBER@22..23 "1"
+    SEMICOLON@23..24 ";"
+  WHITESPACE@24..26 "\n\n"
+  SELECT@26..49
+    SELECT_CLAUSE@26..48
+      SELECT_KW@26..32 "select"
+      WHITESPACE@32..33 " "
+      DISTINCT_CLAUSE@33..48
+        DISTINCT_KW@33..41 "distinct"
+        WHITESPACE@41..42 " "
+        DISTINCT_ON@42..48
+          ON_KW@42..44 "on"
+          WHITESPACE@44..45 " "
+          L_PAREN@45..46 "("
+          NAME_REF@46..47
+            IDENT@46..47 "a"
+          R_PAREN@47..48 ")"
+    SEMICOLON@48..49 ";"
+  WHITESPACE@49..51 "\n\n"
+  SELECT@51..67
+    SELECT_CLAUSE@51..66
+      SELECT_KW@51..57 "select"
+      WHITESPACE@57..58 " "
+      DISTINCT_CLAUSE@58..66
+        DISTINCT_KW@58..66 "distinct"
+    SEMICOLON@66..67 ";"
+  WHITESPACE@67..68 "\n"
+
+error[syntax-error]: Expected at least one expression in DISTINCT ON list.
+  ╭▸ 
+1 │ select distinct on () 1;
+  ╰╴                ━━━━━
+error[syntax-error]: Expected at least one item
+  ╭▸ 
+1 │ select distinct on () 1;
+  ╰╴                    ━
+error[syntax-error]: Expected a target after SELECT DISTINCT
+  ╭▸ 
+3 │ select distinct on (a);
+  ╰╴       ━━━━━━━━━━━━━━━
+error[syntax-error]: Expected a target after SELECT DISTINCT
+  ╭▸ 
+5 │ select distinct;
+  ╰╴       ━━━━━━━━
