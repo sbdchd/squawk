@@ -1,0 +1,33 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/storage_mode_ok.sql
+---
+SOURCE_FILE@0..50
+  ALTER_TABLE@0..49
+    ALTER_KW@0..5 "alter"
+    WHITESPACE@5..6 " "
+    TABLE_KW@6..11 "table"
+    WHITESPACE@11..12 " "
+    TABLE_RELATION_NAME@12..13
+      TABLE_NAME_REF@12..13
+        PATH_REF@12..13
+          PATH_SEGMENT_REF@12..13
+            IDENT@12..13 "t"
+    WHITESPACE@13..14 " "
+    ALTER_COLUMN@14..48
+      ALTER_KW@14..19 "alter"
+      WHITESPACE@19..20 " "
+      COLUMN_KW@20..26 "column"
+      WHITESPACE@26..27 " "
+      COLUMN_NAME_REF@27..28
+        IDENT@27..28 "a"
+      WHITESPACE@28..29 " "
+      SET_STORAGE@29..48
+        SET_KW@29..32 "set"
+        WHITESPACE@32..33 " "
+        STORAGE_KW@33..40 "storage"
+        WHITESPACE@40..41 " "
+        STORAGE_MODE@41..48
+          IDENT@41..48 "\"PLAIN\""
+    SEMICOLON@48..49 ";"
+  WHITESPACE@49..50 "\n"

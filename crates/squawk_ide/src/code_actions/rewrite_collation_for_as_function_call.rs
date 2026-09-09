@@ -75,7 +75,7 @@ mod test {
     fn not_applicable_outside_collation_for() {
         assert!(code_action_not_applicable(
             rewrite_collation_for_as_function_call,
-            "select collati$0on from t;"
+            "select t.collati$0on from t;"
         ));
     }
 }

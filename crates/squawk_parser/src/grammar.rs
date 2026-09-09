@@ -1776,14 +1776,13 @@ fn opt_json_behavior_clause(p: &mut Parser<'_>) {
     let m = p.start();
     if opt_json_behavior(p).is_some() {
         p.expect(ON_KW);
-        let kind = if p.eat(ERROR_KW) {
-            JSON_ON_ERROR_CLAUSE
+        if p.eat(ERROR_KW) {
+            m.complete(p, JSON_ON_ERROR_CLAUSE);
         } else {
             p.expect(EMPTY_KW);
-            JSON_ON_EMPTY_CLAUSE
-        };
-        m.complete(p, kind);
-        opt_json_on_error_clause(p);
+            m.complete(p, JSON_ON_EMPTY_CLAUSE);
+            opt_json_on_error_clause(p);
+        }
     } else {
         m.abandon(p);
     }
@@ -6606,11 +6605,15 @@ fn table_arg_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 // modulus 5
 // remainder 0
-fn partition_bound_number(p: &mut Parser<'_>, kind: SyntaxKind) {
+fn opt_hash_partition_bound(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(NON_RESERVED_WORD) {
+        return false;
+    }
     let m = p.start();
-    ident(p);
+    pg_name(p);
     uint_literal(p);
-    m.complete(p, kind);
+    m.complete(p, HASH_PARTITION_BOUND);
+    true
 }
 
 // { FOR VALUES partition_bound_spec | DEFAULT }
@@ -6620,11 +6623,16 @@ fn partition_option(p: &mut Parser<'_>) {
         p.expect(VALUES_KW);
         // FOR VALUES WITH (modulus 5, remainder 0)
         if p.eat(WITH_KW) {
-            p.expect(L_PAREN);
-            partition_bound_number(p, PARTITION_MODULUS);
-            p.expect(COMMA);
-            partition_bound_number(p, PARTITION_REMAINDER);
-            p.expect(R_PAREN);
+            delimited(
+                p,
+                L_PAREN,
+                R_PAREN,
+                COMMA,
+                ListItems::Required,
+                || "unexpected comma".to_string(),
+                NON_RESERVED_WORD,
+                opt_hash_partition_bound,
+            );
             PARTITION_FOR_VALUES_WITH
         // FOR VALUES IN '(' expr_list ')'
         } else if p.eat(IN_KW) {
@@ -15074,15 +15082,17 @@ fn opt_role_ref(p: &mut Parser<'_>) -> bool {
     opt_role_(p, ROLE_REF)
 }
 
-fn role(p: &mut Parser<'_>) -> bool {
-    opt_role_(p, ROLE)
+fn role(p: &mut Parser<'_>) {
+    if !opt_role_(p, ROLE) {
+        p.error(format!("expected role, got {:?}", p.current()))
+    }
 }
 
 fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
     assert!(matches!(kind, ROLE | ROLE_REF));
     let m = p.start();
     match p.current() {
-        GROUP_KW => {
+        GROUP_KW if kind == ROLE_REF => {
             p.bump(GROUP_KW);
             if matches!(
                 p.current(),

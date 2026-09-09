@@ -1,0 +1,573 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/type_func_name_keyword.sql
+---
+SOURCE_FILE@0..599
+  SELECT@0..30
+    SELECT_CLAUSE@0..20
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..20
+        TARGET@7..20
+          NAME_REF@7..20
+            AUTHORIZATION_KW@7..20 "authorization"
+    WHITESPACE@20..21 " "
+    FROM_CLAUSE@21..29
+      FROM_KW@21..25 "from"
+      WHITESPACE@25..26 " "
+      RELATION_FROM_ITEM@26..29
+        RELATION_NAME_REF@26..29
+          PATH_REF@26..29
+            PATH_SEGMENT_REF@26..29
+              IDENT@26..29 "zzt"
+    SEMICOLON@29..30 ";"
+  WHITESPACE@30..31 "\n"
+  SELECT@31..54
+    SELECT_CLAUSE@31..44
+      SELECT_KW@31..37 "select"
+      WHITESPACE@37..38 " "
+      TARGET_LIST@38..44
+        TARGET@38..44
+          NAME_REF@38..44
+            BINARY_KW@38..44 "binary"
+    WHITESPACE@44..45 " "
+    FROM_CLAUSE@45..53
+      FROM_KW@45..49 "from"
+      WHITESPACE@49..50 " "
+      RELATION_FROM_ITEM@50..53
+        RELATION_NAME_REF@50..53
+          PATH_REF@50..53
+            PATH_SEGMENT_REF@50..53
+              IDENT@50..53 "zzt"
+    SEMICOLON@53..54 ";"
+  WHITESPACE@54..55 "\n"
+  SELECT@55..81
+    SELECT_CLAUSE@55..71
+      SELECT_KW@55..61 "select"
+      WHITESPACE@61..62 " "
+      TARGET_LIST@62..71
+        TARGET@62..71
+          NAME_REF@62..71
+            COLLATION_KW@62..71 "collation"
+    WHITESPACE@71..72 " "
+    FROM_CLAUSE@72..80
+      FROM_KW@72..76 "from"
+      WHITESPACE@76..77 " "
+      RELATION_FROM_ITEM@77..80
+        RELATION_NAME_REF@77..80
+          PATH_REF@77..80
+            PATH_SEGMENT_REF@77..80
+              IDENT@77..80 "zzt"
+    SEMICOLON@80..81 ";"
+  WHITESPACE@81..82 "\n"
+  SELECT@82..111
+    SELECT_CLAUSE@82..101
+      SELECT_KW@82..88 "select"
+      WHITESPACE@88..89 " "
+      TARGET_LIST@89..101
+        TARGET@89..101
+          NAME_REF@89..101
+            CONCURRENTLY_KW@89..101 "concurrently"
+    WHITESPACE@101..102 " "
+    FROM_CLAUSE@102..110
+      FROM_KW@102..106 "from"
+      WHITESPACE@106..107 " "
+      RELATION_FROM_ITEM@107..110
+        RELATION_NAME_REF@107..110
+          PATH_REF@107..110
+            PATH_SEGMENT_REF@107..110
+              IDENT@107..110 "zzt"
+    SEMICOLON@110..111 ";"
+  WHITESPACE@111..112 "\n"
+  SELECT@112..134
+    SELECT_CLAUSE@112..124
+      SELECT_KW@112..118 "select"
+      WHITESPACE@118..119 " "
+      TARGET_LIST@119..124
+        TARGET@119..124
+          NAME_REF@119..124
+            CROSS_KW@119..124 "cross"
+    WHITESPACE@124..125 " "
+    FROM_CLAUSE@125..133
+      FROM_KW@125..129 "from"
+      WHITESPACE@129..130 " "
+      RELATION_FROM_ITEM@130..133
+        RELATION_NAME_REF@130..133
+          PATH_REF@130..133
+            PATH_SEGMENT_REF@130..133
+              IDENT@130..133 "zzt"
+    SEMICOLON@133..134 ";"
+  WHITESPACE@134..135 "\n"
+  SELECT@135..158
+    SELECT_CLAUSE@135..148
+      SELECT_KW@135..141 "select"
+      WHITESPACE@141..142 " "
+      TARGET_LIST@142..148
+        TARGET@142..148
+          NAME_REF@142..148
+            FREEZE_KW@142..148 "freeze"
+    WHITESPACE@148..149 " "
+    FROM_CLAUSE@149..157
+      FROM_KW@149..153 "from"
+      WHITESPACE@153..154 " "
+      RELATION_FROM_ITEM@154..157
+        RELATION_NAME_REF@154..157
+          PATH_REF@154..157
+            PATH_SEGMENT_REF@154..157
+              IDENT@154..157 "zzt"
+    SEMICOLON@157..158 ";"
+  WHITESPACE@158..159 "\n"
+  SELECT@159..180
+    SELECT_CLAUSE@159..170
+      SELECT_KW@159..165 "select"
+      WHITESPACE@165..166 " "
+      TARGET_LIST@166..170
+        TARGET@166..170
+          NAME_REF@166..170
+            FULL_KW@166..170 "full"
+    WHITESPACE@170..171 " "
+    FROM_CLAUSE@171..179
+      FROM_KW@171..175 "from"
+      WHITESPACE@175..176 " "
+      RELATION_FROM_ITEM@176..179
+        RELATION_NAME_REF@176..179
+          PATH_REF@176..179
+            PATH_SEGMENT_REF@176..179
+              IDENT@176..179 "zzt"
+    SEMICOLON@179..180 ";"
+  WHITESPACE@180..181 "\n"
+  SELECT@181..203
+    SELECT_CLAUSE@181..193
+      SELECT_KW@181..187 "select"
+      WHITESPACE@187..188 " "
+      TARGET_LIST@188..193
+        TARGET@188..193
+          NAME_REF@188..193
+            ILIKE_KW@188..193 "ilike"
+    WHITESPACE@193..194 " "
+    FROM_CLAUSE@194..202
+      FROM_KW@194..198 "from"
+      WHITESPACE@198..199 " "
+      RELATION_FROM_ITEM@199..202
+        RELATION_NAME_REF@199..202
+          PATH_REF@199..202
+            PATH_SEGMENT_REF@199..202
+              IDENT@199..202 "zzt"
+    SEMICOLON@202..203 ";"
+  WHITESPACE@203..204 "\n"
+  SELECT@204..226
+    SELECT_CLAUSE@204..216
+      SELECT_KW@204..210 "select"
+      WHITESPACE@210..211 " "
+      TARGET_LIST@211..216
+        TARGET@211..216
+          NAME_REF@211..216
+            INNER_KW@211..216 "inner"
+    WHITESPACE@216..217 " "
+    FROM_CLAUSE@217..225
+      FROM_KW@217..221 "from"
+      WHITESPACE@221..222 " "
+      RELATION_FROM_ITEM@222..225
+        RELATION_NAME_REF@222..225
+          PATH_REF@222..225
+            PATH_SEGMENT_REF@222..225
+              IDENT@222..225 "zzt"
+    SEMICOLON@225..226 ";"
+  WHITESPACE@226..227 "\n"
+  SELECT@227..246
+    SELECT_CLAUSE@227..236
+      SELECT_KW@227..233 "select"
+      WHITESPACE@233..234 " "
+      TARGET_LIST@234..236
+        TARGET@234..236
+          NAME_REF@234..236
+            IS_KW@234..236 "is"
+    WHITESPACE@236..237 " "
+    FROM_CLAUSE@237..245
+      FROM_KW@237..241 "from"
+      WHITESPACE@241..242 " "
+      RELATION_FROM_ITEM@242..245
+        RELATION_NAME_REF@242..245
+          PATH_REF@242..245
+            PATH_SEGMENT_REF@242..245
+              IDENT@242..245 "zzt"
+    SEMICOLON@245..246 ";"
+  WHITESPACE@246..247 "\n"
+  SELECT@247..270
+    SELECT_CLAUSE@247..260
+      SELECT_KW@247..253 "select"
+      WHITESPACE@253..254 " "
+      TARGET_LIST@254..260
+        TARGET@254..260
+          NAME_REF@254..260
+            ISNULL_KW@254..260 "isnull"
+    WHITESPACE@260..261 " "
+    FROM_CLAUSE@261..269
+      FROM_KW@261..265 "from"
+      WHITESPACE@265..266 " "
+      RELATION_FROM_ITEM@266..269
+        RELATION_NAME_REF@266..269
+          PATH_REF@266..269
+            PATH_SEGMENT_REF@266..269
+              IDENT@266..269 "zzt"
+    SEMICOLON@269..270 ";"
+  WHITESPACE@270..271 "\n"
+  SELECT@271..292
+    SELECT_CLAUSE@271..282
+      SELECT_KW@271..277 "select"
+      WHITESPACE@277..278 " "
+      TARGET_LIST@278..282
+        TARGET@278..282
+          NAME_REF@278..282
+            JOIN_KW@278..282 "join"
+    WHITESPACE@282..283 " "
+    FROM_CLAUSE@283..291
+      FROM_KW@283..287 "from"
+      WHITESPACE@287..288 " "
+      RELATION_FROM_ITEM@288..291
+        RELATION_NAME_REF@288..291
+          PATH_REF@288..291
+            PATH_SEGMENT_REF@288..291
+              IDENT@288..291 "zzt"
+    SEMICOLON@291..292 ";"
+  WHITESPACE@292..293 "\n"
+  SELECT@293..314
+    SELECT_CLAUSE@293..304
+      SELECT_KW@293..299 "select"
+      WHITESPACE@299..300 " "
+      TARGET_LIST@300..304
+        TARGET@300..304
+          NAME_REF@300..304
+            LEFT_KW@300..304 "left"
+    WHITESPACE@304..305 " "
+    FROM_CLAUSE@305..313
+      FROM_KW@305..309 "from"
+      WHITESPACE@309..310 " "
+      RELATION_FROM_ITEM@310..313
+        RELATION_NAME_REF@310..313
+          PATH_REF@310..313
+            PATH_SEGMENT_REF@310..313
+              IDENT@310..313 "zzt"
+    SEMICOLON@313..314 ";"
+  WHITESPACE@314..315 "\n"
+  SELECT@315..336
+    SELECT_CLAUSE@315..326
+      SELECT_KW@315..321 "select"
+      WHITESPACE@321..322 " "
+      TARGET_LIST@322..326
+        TARGET@322..326
+          NAME_REF@322..326
+            LIKE_KW@322..326 "like"
+    WHITESPACE@326..327 " "
+    FROM_CLAUSE@327..335
+      FROM_KW@327..331 "from"
+      WHITESPACE@331..332 " "
+      RELATION_FROM_ITEM@332..335
+        RELATION_NAME_REF@332..335
+          PATH_REF@332..335
+            PATH_SEGMENT_REF@332..335
+              IDENT@332..335 "zzt"
+    SEMICOLON@335..336 ";"
+  WHITESPACE@336..337 "\n"
+  SELECT@337..361
+    SELECT_CLAUSE@337..351
+      SELECT_KW@337..343 "select"
+      WHITESPACE@343..344 " "
+      TARGET_LIST@344..351
+        TARGET@344..351
+          NAME_REF@344..351
+            NATURAL_KW@344..351 "natural"
+    WHITESPACE@351..352 " "
+    FROM_CLAUSE@352..360
+      FROM_KW@352..356 "from"
+      WHITESPACE@356..357 " "
+      RELATION_FROM_ITEM@357..360
+        RELATION_NAME_REF@357..360
+          PATH_REF@357..360
+            PATH_SEGMENT_REF@357..360
+              IDENT@357..360 "zzt"
+    SEMICOLON@360..361 ";"
+  WHITESPACE@361..362 "\n"
+  SELECT@362..386
+    SELECT_CLAUSE@362..376
+      SELECT_KW@362..368 "select"
+      WHITESPACE@368..369 " "
+      TARGET_LIST@369..376
+        TARGET@369..376
+          NAME_REF@369..376
+            NOTNULL_KW@369..376 "notnull"
+    WHITESPACE@376..377 " "
+    FROM_CLAUSE@377..385
+      FROM_KW@377..381 "from"
+      WHITESPACE@381..382 " "
+      RELATION_FROM_ITEM@382..385
+        RELATION_NAME_REF@382..385
+          PATH_REF@382..385
+            PATH_SEGMENT_REF@382..385
+              IDENT@382..385 "zzt"
+    SEMICOLON@385..386 ";"
+  WHITESPACE@386..387 "\n"
+  SELECT@387..409
+    SELECT_CLAUSE@387..399
+      SELECT_KW@387..393 "select"
+      WHITESPACE@393..394 " "
+      TARGET_LIST@394..399
+        TARGET@394..399
+          NAME_REF@394..399
+            OUTER_KW@394..399 "outer"
+    WHITESPACE@399..400 " "
+    FROM_CLAUSE@400..408
+      FROM_KW@400..404 "from"
+      WHITESPACE@404..405 " "
+      RELATION_FROM_ITEM@405..408
+        RELATION_NAME_REF@405..408
+          PATH_REF@405..408
+            PATH_SEGMENT_REF@405..408
+              IDENT@405..408 "zzt"
+    SEMICOLON@408..409 ";"
+  WHITESPACE@409..410 "\n"
+  SELECT@410..435
+    SELECT_CLAUSE@410..425
+      SELECT_KW@410..416 "select"
+      WHITESPACE@416..417 " "
+      TARGET_LIST@417..425
+        TARGET@417..425
+          NAME_REF@417..425
+            OVERLAPS_KW@417..425 "overlaps"
+    WHITESPACE@425..426 " "
+    FROM_CLAUSE@426..434
+      FROM_KW@426..430 "from"
+      WHITESPACE@430..431 " "
+      RELATION_FROM_ITEM@431..434
+        RELATION_NAME_REF@431..434
+          PATH_REF@431..434
+            PATH_SEGMENT_REF@431..434
+              IDENT@431..434 "zzt"
+    SEMICOLON@434..435 ";"
+  WHITESPACE@435..436 "\n"
+  SELECT@436..458
+    SELECT_CLAUSE@436..448
+      SELECT_KW@436..442 "select"
+      WHITESPACE@442..443 " "
+      TARGET_LIST@443..448
+        TARGET@443..448
+          NAME_REF@443..448
+            RIGHT_KW@443..448 "right"
+    WHITESPACE@448..449 " "
+    FROM_CLAUSE@449..457
+      FROM_KW@449..453 "from"
+      WHITESPACE@453..454 " "
+      RELATION_FROM_ITEM@454..457
+        RELATION_NAME_REF@454..457
+          PATH_REF@454..457
+            PATH_SEGMENT_REF@454..457
+              IDENT@454..457 "zzt"
+    SEMICOLON@457..458 ";"
+  WHITESPACE@458..459 "\n"
+  SELECT@459..483
+    SELECT_CLAUSE@459..473
+      SELECT_KW@459..465 "select"
+      WHITESPACE@465..466 " "
+      TARGET_LIST@466..473
+        TARGET@466..473
+          NAME_REF@466..473
+            SIMILAR_KW@466..473 "similar"
+    WHITESPACE@473..474 " "
+    FROM_CLAUSE@474..482
+      FROM_KW@474..478 "from"
+      WHITESPACE@478..479 " "
+      RELATION_FROM_ITEM@479..482
+        RELATION_NAME_REF@479..482
+          PATH_REF@479..482
+            PATH_SEGMENT_REF@479..482
+              IDENT@479..482 "zzt"
+    SEMICOLON@482..483 ";"
+  WHITESPACE@483..484 "\n"
+  SELECT@484..512
+    SELECT_CLAUSE@484..502
+      SELECT_KW@484..490 "select"
+      WHITESPACE@490..491 " "
+      TARGET_LIST@491..502
+        TARGET@491..502
+          NAME_REF@491..502
+            TABLESAMPLE_KW@491..502 "tablesample"
+    WHITESPACE@502..503 " "
+    FROM_CLAUSE@503..511
+      FROM_KW@503..507 "from"
+      WHITESPACE@507..508 " "
+      RELATION_FROM_ITEM@508..511
+        RELATION_NAME_REF@508..511
+          PATH_REF@508..511
+            PATH_SEGMENT_REF@508..511
+              IDENT@508..511 "zzt"
+    SEMICOLON@511..512 ";"
+  WHITESPACE@512..513 "\n"
+  SELECT@513..537
+    SELECT_CLAUSE@513..527
+      SELECT_KW@513..519 "select"
+      WHITESPACE@519..520 " "
+      TARGET_LIST@520..527
+        TARGET@520..527
+          NAME_REF@520..527
+            VERBOSE_KW@520..527 "verbose"
+    WHITESPACE@527..528 " "
+    FROM_CLAUSE@528..536
+      FROM_KW@528..532 "from"
+      WHITESPACE@532..533 " "
+      RELATION_FROM_ITEM@533..536
+        RELATION_NAME_REF@533..536
+          PATH_REF@533..536
+            PATH_SEGMENT_REF@533..536
+              IDENT@533..536 "zzt"
+    SEMICOLON@536..537 ";"
+  WHITESPACE@537..538 "\n"
+  SELECT@538..561
+    SELECT_CLAUSE@538..551
+      SELECT_KW@538..544 "select"
+      WHITESPACE@544..545 " "
+      TARGET_LIST@545..551
+        TARGET@545..551
+          FIELD_EXPR@545..551
+            NAME_REF@545..549
+              LEFT_KW@545..549 "left"
+            DOT@549..550 "."
+            NAME_REF@550..551
+              IDENT@550..551 "a"
+    WHITESPACE@551..552 " "
+    FROM_CLAUSE@552..560
+      FROM_KW@552..556 "from"
+      WHITESPACE@556..557 " "
+      RELATION_FROM_ITEM@557..560
+        RELATION_NAME_REF@557..560
+          PATH_REF@557..560
+            PATH_SEGMENT_REF@557..560
+              IDENT@557..560 "zzt"
+    SEMICOLON@560..561 ";"
+  WHITESPACE@561..562 "\n"
+  SELECT@562..598
+    SELECT_CLAUSE@562..570
+      SELECT_KW@562..568 "select"
+      WHITESPACE@568..569 " "
+      TARGET_LIST@569..570
+        TARGET@569..570
+          STAR@569..570 "*"
+    WHITESPACE@570..571 " "
+    FROM_CLAUSE@571..579
+      FROM_KW@571..575 "from"
+      WHITESPACE@575..576 " "
+      RELATION_FROM_ITEM@576..579
+        RELATION_NAME_REF@576..579
+          PATH_REF@576..579
+            PATH_SEGMENT_REF@576..579
+              IDENT@576..579 "zzt"
+    WHITESPACE@579..580 " "
+    WHERE_CLAUSE@580..597
+      WHERE_KW@580..585 "where"
+      WHITESPACE@585..586 " "
+      BIN_EXPR@586..597
+        NAME_REF@586..593
+          VERBOSE_KW@586..593 "verbose"
+        WHITESPACE@593..594 " "
+        EQ@594..595 "="
+        WHITESPACE@595..596 " "
+        LITERAL@596..597
+          INT_NUMBER@596..597 "1"
+    SEMICOLON@597..598 ";"
+  WHITESPACE@598..599 "\n"
+
+error[syntax-error]: `authorization` is a reserved keyword
+  ╭▸ 
+1 │ select authorization from zzt;
+  ╰╴       ━━━━━━━━━━━━━
+error[syntax-error]: `binary` is a reserved keyword
+  ╭▸ 
+2 │ select binary from zzt;
+  ╰╴       ━━━━━━
+error[syntax-error]: `collation` is a reserved keyword
+  ╭▸ 
+3 │ select collation from zzt;
+  ╰╴       ━━━━━━━━━
+error[syntax-error]: `concurrently` is a reserved keyword
+  ╭▸ 
+4 │ select concurrently from zzt;
+  ╰╴       ━━━━━━━━━━━━
+error[syntax-error]: `cross` is a reserved keyword
+  ╭▸ 
+5 │ select cross from zzt;
+  ╰╴       ━━━━━
+error[syntax-error]: `freeze` is a reserved keyword
+  ╭▸ 
+6 │ select freeze from zzt;
+  ╰╴       ━━━━━━
+error[syntax-error]: `full` is a reserved keyword
+  ╭▸ 
+7 │ select full from zzt;
+  ╰╴       ━━━━
+error[syntax-error]: `ilike` is a reserved keyword
+  ╭▸ 
+8 │ select ilike from zzt;
+  ╰╴       ━━━━━
+error[syntax-error]: `inner` is a reserved keyword
+  ╭▸ 
+9 │ select inner from zzt;
+  ╰╴       ━━━━━
+error[syntax-error]: `is` is a reserved keyword
+   ╭▸ 
+10 │ select is from zzt;
+   ╰╴       ━━
+error[syntax-error]: `isnull` is a reserved keyword
+   ╭▸ 
+11 │ select isnull from zzt;
+   ╰╴       ━━━━━━
+error[syntax-error]: `join` is a reserved keyword
+   ╭▸ 
+12 │ select join from zzt;
+   ╰╴       ━━━━
+error[syntax-error]: `left` is a reserved keyword
+   ╭▸ 
+13 │ select left from zzt;
+   ╰╴       ━━━━
+error[syntax-error]: `like` is a reserved keyword
+   ╭▸ 
+14 │ select like from zzt;
+   ╰╴       ━━━━
+error[syntax-error]: `natural` is a reserved keyword
+   ╭▸ 
+15 │ select natural from zzt;
+   ╰╴       ━━━━━━━
+error[syntax-error]: `notnull` is a reserved keyword
+   ╭▸ 
+16 │ select notnull from zzt;
+   ╰╴       ━━━━━━━
+error[syntax-error]: `outer` is a reserved keyword
+   ╭▸ 
+17 │ select outer from zzt;
+   ╰╴       ━━━━━
+error[syntax-error]: `overlaps` is a reserved keyword
+   ╭▸ 
+18 │ select overlaps from zzt;
+   ╰╴       ━━━━━━━━
+error[syntax-error]: `right` is a reserved keyword
+   ╭▸ 
+19 │ select right from zzt;
+   ╰╴       ━━━━━
+error[syntax-error]: `similar` is a reserved keyword
+   ╭▸ 
+20 │ select similar from zzt;
+   ╰╴       ━━━━━━━
+error[syntax-error]: `tablesample` is a reserved keyword
+   ╭▸ 
+21 │ select tablesample from zzt;
+   ╰╴       ━━━━━━━━━━━
+error[syntax-error]: `verbose` is a reserved keyword
+   ╭▸ 
+22 │ select verbose from zzt;
+   ╰╴       ━━━━━━━
+error[syntax-error]: `left` is a reserved keyword
+   ╭▸ 
+23 │ select left.a from zzt;
+   ╰╴       ━━━━
+error[syntax-error]: `verbose` is a reserved keyword
+   ╭▸ 
+24 │ select * from zzt where verbose = 1;
+   ╰╴                        ━━━━━━━

@@ -1,0 +1,145 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/create_role.sql
+---
+SOURCE_FILE
+  COMMENT "-- GROUP is only allowed as a grantee prefix, not when naming a role"
+  WHITESPACE "\n"
+  CREATE_GROUP
+    CREATE_KW "create"
+    WHITESPACE " "
+    GROUP_KW "group"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "group"
+  WHITESPACE " "
+  ERROR
+    IDENT "g"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    ROLE_KW "role"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "group"
+  WHITESPACE " "
+  ERROR
+    IDENT "r"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_USER
+    CREATE_KW "create"
+    WHITESPACE " "
+    USER_KW "user"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "group"
+  WHITESPACE " "
+  ERROR
+    IDENT "u"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    AUTHORIZATION_SCHEMA
+      AUTHORIZATION_KW "authorization"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "group"
+  WHITESPACE " "
+  ERROR
+    IDENT "g"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_ROLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    ROLE_REF
+      ROLE_NAME_REF
+        IDENT "foo"
+    WHITESPACE " "
+    ROLE_RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "group"
+  WHITESPACE " "
+  ERROR
+    IDENT "bar"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected role, got GROUP_KW
+  ╭▸ 
+2 │ create group group g;
+  ╰╴            ━
+error[syntax-error]: expected command, found GROUP_KW
+  ╭▸ 
+2 │ create group group g;
+  ╰╴             ━
+error[syntax-error]: expected command, found IDENT
+  ╭▸ 
+2 │ create group group g;
+  ╰╴                   ━
+error[syntax-error]: expected role, got GROUP_KW
+  ╭▸ 
+3 │ create role group r;
+  ╰╴           ━
+error[syntax-error]: expected command, found GROUP_KW
+  ╭▸ 
+3 │ create role group r;
+  ╰╴            ━
+error[syntax-error]: expected command, found IDENT
+  ╭▸ 
+3 │ create role group r;
+  ╰╴                  ━
+error[syntax-error]: expected role, got GROUP_KW
+  ╭▸ 
+4 │ create user group u;
+  ╰╴           ━
+error[syntax-error]: expected command, found GROUP_KW
+  ╭▸ 
+4 │ create user group u;
+  ╰╴            ━
+error[syntax-error]: expected command, found IDENT
+  ╭▸ 
+4 │ create user group u;
+  ╰╴                  ━
+error[syntax-error]: expected role, got GROUP_KW
+  ╭▸ 
+5 │ create schema authorization group g;
+  ╰╴                           ━
+error[syntax-error]: expected command, found GROUP_KW
+  ╭▸ 
+5 │ create schema authorization group g;
+  ╰╴                            ━
+error[syntax-error]: expected command, found IDENT
+  ╭▸ 
+5 │ create schema authorization group g;
+  ╰╴                                  ━
+error[syntax-error]: expected role, got GROUP_KW
+  ╭▸ 
+6 │ alter role foo rename to group bar;
+  ╰╴                        ━
+error[syntax-error]: expected command, found GROUP_KW
+  ╭▸ 
+6 │ alter role foo rename to group bar;
+  ╰╴                         ━
+error[syntax-error]: expected command, found IDENT
+  ╭▸ 
+6 │ alter role foo rename to group bar;
+  ╰╴                               ━

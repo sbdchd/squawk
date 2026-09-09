@@ -595,14 +595,14 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("
-      PARTITION_MODULUS
+      HASH_PARTITION_BOUND
         IDENT "modulus"
         WHITESPACE " "
         LITERAL
           INT_NUMBER "10"
       COMMA ","
       WHITESPACE " "
-      PARTITION_REMAINDER
+      HASH_PARTITION_BOUND
         IDENT "remainder"
         WHITESPACE " "
         LITERAL

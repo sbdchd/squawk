@@ -1,0 +1,566 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/hash_partition_bounds.sql
+---
+SOURCE_FILE@0..892
+  CREATE_TABLE@0..72
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    TABLE_KW@7..12 "table"
+    WHITESPACE@12..13 " "
+    TABLE_NAME@13..15
+      PATH@13..15
+        PATH_SEGMENT@13..15
+          IDENT@13..15 "p1"
+    WHITESPACE@15..16 " "
+    PARTITION_OF@16..30
+      PARTITION_KW@16..25 "partition"
+      WHITESPACE@25..26 " "
+      OF_KW@26..28 "of"
+      WHITESPACE@28..29 " "
+      TABLE_NAME_REF@29..30
+        PATH_REF@29..30
+          PATH_SEGMENT_REF@29..30
+            IDENT@29..30 "p"
+    WHITESPACE@30..31 " "
+    PARTITION_FOR_VALUES_WITH@31..71
+      FOR_KW@31..34 "for"
+      WHITESPACE@34..35 " "
+      VALUES_KW@35..41 "values"
+      WHITESPACE@41..42 " "
+      WITH_KW@42..46 "with"
+      WHITESPACE@46..47 " "
+      L_PAREN@47..48 "("
+      HASH_PARTITION_BOUND@48..57
+        IDENT@48..55 "modulus"
+        WHITESPACE@55..56 " "
+        LITERAL@56..57
+          INT_NUMBER@56..57 "3"
+      COMMA@57..58 ","
+      WHITESPACE@58..59 " "
+      HASH_PARTITION_BOUND@59..70
+        IDENT@59..68 "remainder"
+        WHITESPACE@68..69 " "
+        LITERAL@69..70
+          INT_NUMBER@69..70 "2"
+      R_PAREN@70..71 ")"
+    SEMICOLON@71..72 ";"
+  WHITESPACE@72..73 "\n"
+  CREATE_TABLE@73..145
+    CREATE_KW@73..79 "create"
+    WHITESPACE@79..80 " "
+    TABLE_KW@80..85 "table"
+    WHITESPACE@85..86 " "
+    TABLE_NAME@86..88
+      PATH@86..88
+        PATH_SEGMENT@86..88
+          IDENT@86..88 "p1"
+    WHITESPACE@88..89 " "
+    PARTITION_OF@89..103
+      PARTITION_KW@89..98 "partition"
+      WHITESPACE@98..99 " "
+      OF_KW@99..101 "of"
+      WHITESPACE@101..102 " "
+      TABLE_NAME_REF@102..103
+        PATH_REF@102..103
+          PATH_SEGMENT_REF@102..103
+            IDENT@102..103 "p"
+    WHITESPACE@103..104 " "
+    PARTITION_FOR_VALUES_WITH@104..144
+      FOR_KW@104..107 "for"
+      WHITESPACE@107..108 " "
+      VALUES_KW@108..114 "values"
+      WHITESPACE@114..115 " "
+      WITH_KW@115..119 "with"
+      WHITESPACE@119..120 " "
+      L_PAREN@120..121 "("
+      HASH_PARTITION_BOUND@121..130
+        IDENT@121..128 "MODULUS"
+        WHITESPACE@128..129 " "
+        LITERAL@129..130
+          INT_NUMBER@129..130 "3"
+      COMMA@130..131 ","
+      WHITESPACE@131..132 " "
+      HASH_PARTITION_BOUND@132..143
+        IDENT@132..141 "REMAINDER"
+        WHITESPACE@141..142 " "
+        LITERAL@142..143
+          INT_NUMBER@142..143 "2"
+      R_PAREN@143..144 ")"
+    SEMICOLON@144..145 ";"
+  WHITESPACE@145..146 "\n"
+  CREATE_TABLE@146..222
+    CREATE_KW@146..152 "create"
+    WHITESPACE@152..153 " "
+    TABLE_KW@153..158 "table"
+    WHITESPACE@158..159 " "
+    TABLE_NAME@159..161
+      PATH@159..161
+        PATH_SEGMENT@159..161
+          IDENT@159..161 "p1"
+    WHITESPACE@161..162 " "
+    PARTITION_OF@162..176
+      PARTITION_KW@162..171 "partition"
+      WHITESPACE@171..172 " "
+      OF_KW@172..174 "of"
+      WHITESPACE@174..175 " "
+      TABLE_NAME_REF@175..176
+        PATH_REF@175..176
+          PATH_SEGMENT_REF@175..176
+            IDENT@175..176 "p"
+    WHITESPACE@176..177 " "
+    PARTITION_FOR_VALUES_WITH@177..221
+      FOR_KW@177..180 "for"
+      WHITESPACE@180..181 " "
+      VALUES_KW@181..187 "values"
+      WHITESPACE@187..188 " "
+      WITH_KW@188..192 "with"
+      WHITESPACE@192..193 " "
+      L_PAREN@193..194 "("
+      HASH_PARTITION_BOUND@194..205
+        IDENT@194..203 "\"modulus\""
+        WHITESPACE@203..204 " "
+        LITERAL@204..205
+          INT_NUMBER@204..205 "3"
+      COMMA@205..206 ","
+      WHITESPACE@206..207 " "
+      HASH_PARTITION_BOUND@207..220
+        IDENT@207..218 "\"remainder\""
+        WHITESPACE@218..219 " "
+        LITERAL@219..220
+          INT_NUMBER@219..220 "2"
+      R_PAREN@220..221 ")"
+    SEMICOLON@221..222 ";"
+  WHITESPACE@222..223 "\n"
+  CREATE_TABLE@223..296
+    CREATE_KW@223..229 "create"
+    WHITESPACE@229..230 " "
+    TABLE_KW@230..235 "table"
+    WHITESPACE@235..236 " "
+    TABLE_NAME@236..238
+      PATH@236..238
+        PATH_SEGMENT@236..238
+          IDENT@236..238 "p1"
+    WHITESPACE@238..239 " "
+    PARTITION_OF@239..253
+      PARTITION_KW@239..248 "partition"
+      WHITESPACE@248..249 " "
+      OF_KW@249..251 "of"
+      WHITESPACE@251..252 " "
+      TABLE_NAME_REF@252..253
+        PATH_REF@252..253
+          PATH_SEGMENT_REF@252..253
+            IDENT@252..253 "p"
+    WHITESPACE@253..254 " "
+    PARTITION_FOR_VALUES_WITH@254..295
+      FOR_KW@254..257 "for"
+      WHITESPACE@257..258 " "
+      VALUES_KW@258..264 "values"
+      WHITESPACE@264..265 " "
+      WITH_KW@265..269 "with"
+      WHITESPACE@269..270 " "
+      L_PAREN@270..271 "("
+      WHITESPACE@271..272 " "
+      HASH_PARTITION_BOUND@272..283
+        IDENT@272..281 "REMAINDER"
+        WHITESPACE@281..282 " "
+        LITERAL@282..283
+          INT_NUMBER@282..283 "2"
+      COMMA@283..284 ","
+      WHITESPACE@284..285 " "
+      HASH_PARTITION_BOUND@285..294
+        IDENT@285..292 "modulus"
+        WHITESPACE@292..293 " "
+        LITERAL@293..294
+          INT_NUMBER@293..294 "3"
+      R_PAREN@294..295 ")"
+    SEMICOLON@295..296 ";"
+  WHITESPACE@296..298 "\n\n"
+  CREATE_TABLE@298..357
+    CREATE_KW@298..304 "create"
+    WHITESPACE@304..305 " "
+    TABLE_KW@305..310 "table"
+    WHITESPACE@310..311 " "
+    TABLE_NAME@311..313
+      PATH@311..313
+        PATH_SEGMENT@311..313
+          IDENT@311..313 "p1"
+    WHITESPACE@313..314 " "
+    PARTITION_OF@314..328
+      PARTITION_KW@314..323 "partition"
+      WHITESPACE@323..324 " "
+      OF_KW@324..326 "of"
+      WHITESPACE@326..327 " "
+      TABLE_NAME_REF@327..328
+        PATH_REF@327..328
+          PATH_SEGMENT_REF@327..328
+            IDENT@327..328 "p"
+    WHITESPACE@328..329 " "
+    PARTITION_FOR_VALUES_WITH@329..356
+      FOR_KW@329..332 "for"
+      WHITESPACE@332..333 " "
+      VALUES_KW@333..339 "values"
+      WHITESPACE@339..340 " "
+      WITH_KW@340..344 "with"
+      WHITESPACE@344..345 " "
+      L_PAREN@345..346 "("
+      HASH_PARTITION_BOUND@346..355
+        IDENT@346..353 "modulus"
+        WHITESPACE@353..354 " "
+        LITERAL@354..355
+          INT_NUMBER@354..355 "3"
+      R_PAREN@355..356 ")"
+    SEMICOLON@356..357 ";"
+  WHITESPACE@357..358 "\n"
+  CREATE_TABLE@358..419
+    CREATE_KW@358..364 "create"
+    WHITESPACE@364..365 " "
+    TABLE_KW@365..370 "table"
+    WHITESPACE@370..371 " "
+    TABLE_NAME@371..373
+      PATH@371..373
+        PATH_SEGMENT@371..373
+          IDENT@371..373 "p1"
+    WHITESPACE@373..374 " "
+    PARTITION_OF@374..388
+      PARTITION_KW@374..383 "partition"
+      WHITESPACE@383..384 " "
+      OF_KW@384..386 "of"
+      WHITESPACE@386..387 " "
+      TABLE_NAME_REF@387..388
+        PATH_REF@387..388
+          PATH_SEGMENT_REF@387..388
+            IDENT@387..388 "p"
+    WHITESPACE@388..389 " "
+    PARTITION_FOR_VALUES_WITH@389..418
+      FOR_KW@389..392 "for"
+      WHITESPACE@392..393 " "
+      VALUES_KW@393..399 "values"
+      WHITESPACE@399..400 " "
+      WITH_KW@400..404 "with"
+      WHITESPACE@404..405 " "
+      L_PAREN@405..406 "("
+      HASH_PARTITION_BOUND@406..417
+        IDENT@406..415 "remainder"
+        WHITESPACE@415..416 " "
+        LITERAL@416..417
+          INT_NUMBER@416..417 "2"
+      R_PAREN@417..418 ")"
+    SEMICOLON@418..419 ";"
+  WHITESPACE@419..420 "\n"
+  CREATE_TABLE@420..516
+    CREATE_KW@420..426 "create"
+    WHITESPACE@426..427 " "
+    TABLE_KW@427..432 "table"
+    WHITESPACE@432..433 " "
+    TABLE_NAME@433..435
+      PATH@433..435
+        PATH_SEGMENT@433..435
+          IDENT@433..435 "p1"
+    WHITESPACE@435..436 " "
+    PARTITION_OF@436..450
+      PARTITION_KW@436..445 "partition"
+      WHITESPACE@445..446 " "
+      OF_KW@446..448 "of"
+      WHITESPACE@448..449 " "
+      TABLE_NAME_REF@449..450
+        PATH_REF@449..450
+          PATH_SEGMENT_REF@449..450
+            IDENT@449..450 "p"
+    WHITESPACE@450..451 " "
+    PARTITION_FOR_VALUES_WITH@451..515
+      FOR_KW@451..454 "for"
+      WHITESPACE@454..455 " "
+      VALUES_KW@455..461 "values"
+      WHITESPACE@461..462 " "
+      WITH_KW@462..466 "with"
+      WHITESPACE@466..467 " "
+      L_PAREN@467..468 "("
+      HASH_PARTITION_BOUND@468..477
+        IDENT@468..475 "modulus"
+        WHITESPACE@475..476 " "
+        LITERAL@476..477
+          INT_NUMBER@476..477 "3"
+      COMMA@477..478 ","
+      WHITESPACE@478..479 " "
+      HASH_PARTITION_BOUND@479..490
+        IDENT@479..488 "remainder"
+        WHITESPACE@488..489 " "
+        LITERAL@489..490
+          INT_NUMBER@489..490 "2"
+      COMMA@490..491 ","
+      WHITESPACE@491..492 " "
+      HASH_PARTITION_BOUND@492..501
+        IDENT@492..499 "modulus"
+        WHITESPACE@499..500 " "
+        LITERAL@500..501
+          INT_NUMBER@500..501 "3"
+      COMMA@501..502 ","
+      WHITESPACE@502..503 " "
+      HASH_PARTITION_BOUND@503..514
+        IDENT@503..512 "remainder"
+        WHITESPACE@512..513 " "
+        LITERAL@513..514
+          INT_NUMBER@513..514 "2"
+      R_PAREN@514..515 ")"
+    SEMICOLON@515..516 ";"
+  WHITESPACE@516..517 "\n"
+  CREATE_TABLE@517..596
+    CREATE_KW@517..523 "create"
+    WHITESPACE@523..524 " "
+    TABLE_KW@524..529 "table"
+    WHITESPACE@529..530 " "
+    TABLE_NAME@530..532
+      PATH@530..532
+        PATH_SEGMENT@530..532
+          IDENT@530..532 "p1"
+    WHITESPACE@532..533 " "
+    PARTITION_OF@533..547
+      PARTITION_KW@533..542 "partition"
+      WHITESPACE@542..543 " "
+      OF_KW@543..545 "of"
+      WHITESPACE@545..546 " "
+      TABLE_NAME_REF@546..547
+        PATH_REF@546..547
+          PATH_SEGMENT_REF@546..547
+            IDENT@546..547 "p"
+    WHITESPACE@547..548 " "
+    PARTITION_FOR_VALUES_WITH@548..595
+      FOR_KW@548..551 "for"
+      WHITESPACE@551..552 " "
+      VALUES_KW@552..558 "values"
+      WHITESPACE@558..559 " "
+      WITH_KW@559..563 "with"
+      WHITESPACE@563..564 " "
+      L_PAREN@564..565 "("
+      HASH_PARTITION_BOUND@565..581
+        IDENT@565..579 "MODULUSMODULUS"
+        WHITESPACE@579..580 " "
+        LITERAL@580..581
+          INT_NUMBER@580..581 "3"
+      COMMA@581..582 ","
+      WHITESPACE@582..583 " "
+      HASH_PARTITION_BOUND@583..594
+        IDENT@583..592 "REMAINDER"
+        WHITESPACE@592..593 " "
+        LITERAL@593..594
+          INT_NUMBER@593..594 "2"
+      R_PAREN@594..595 ")"
+    SEMICOLON@595..596 ";"
+  WHITESPACE@596..597 "\n"
+  CREATE_TABLE@597..669
+    CREATE_KW@597..603 "create"
+    WHITESPACE@603..604 " "
+    TABLE_KW@604..609 "table"
+    WHITESPACE@609..610 " "
+    TABLE_NAME@610..612
+      PATH@610..612
+        PATH_SEGMENT@610..612
+          IDENT@610..612 "p1"
+    WHITESPACE@612..613 " "
+    PARTITION_OF@613..627
+      PARTITION_KW@613..622 "partition"
+      WHITESPACE@622..623 " "
+      OF_KW@623..625 "of"
+      WHITESPACE@625..626 " "
+      TABLE_NAME_REF@626..627
+        PATH_REF@626..627
+          PATH_SEGMENT_REF@626..627
+            IDENT@626..627 "p"
+    WHITESPACE@627..628 " "
+    PARTITION_FOR_VALUES_WITH@628..668
+      FOR_KW@628..631 "for"
+      WHITESPACE@631..632 " "
+      VALUES_KW@632..638 "values"
+      WHITESPACE@638..639 " "
+      WITH_KW@639..643 "with"
+      WHITESPACE@643..644 " "
+      L_PAREN@644..645 "("
+      HASH_PARTITION_BOUND@645..654
+        IDENT@645..652 "modulus"
+        WHITESPACE@652..653 " "
+        LITERAL@653..654
+          INT_NUMBER@653..654 "3"
+      COMMA@654..655 ","
+      WHITESPACE@655..656 " "
+      HASH_PARTITION_BOUND@656..667
+        IDENT@656..665 "remaining"
+        WHITESPACE@665..666 " "
+        LITERAL@666..667
+          INT_NUMBER@666..667 "2"
+      R_PAREN@667..668 ")"
+    SEMICOLON@668..669 ";"
+  WHITESPACE@669..670 "\n"
+  CREATE_TABLE@670..739
+    CREATE_KW@670..676 "create"
+    WHITESPACE@676..677 " "
+    TABLE_KW@677..682 "table"
+    WHITESPACE@682..683 " "
+    TABLE_NAME@683..685
+      PATH@683..685
+        PATH_SEGMENT@683..685
+          IDENT@683..685 "p1"
+    WHITESPACE@685..686 " "
+    PARTITION_OF@686..700
+      PARTITION_KW@686..695 "partition"
+      WHITESPACE@695..696 " "
+      OF_KW@696..698 "of"
+      WHITESPACE@698..699 " "
+      TABLE_NAME_REF@699..700
+        PATH_REF@699..700
+          PATH_SEGMENT_REF@699..700
+            IDENT@699..700 "p"
+    WHITESPACE@700..701 " "
+    PARTITION_FOR_VALUES_WITH@701..738
+      FOR_KW@701..704 "for"
+      WHITESPACE@704..705 " "
+      VALUES_KW@705..711 "values"
+      WHITESPACE@711..712 " "
+      WITH_KW@712..716 "with"
+      WHITESPACE@716..717 " "
+      L_PAREN@717..718 "("
+      HASH_PARTITION_BOUND@718..724
+        YEAR_KW@718..722 "year"
+        WHITESPACE@722..723 " "
+        LITERAL@723..724
+          INT_NUMBER@723..724 "3"
+      COMMA@724..725 ","
+      WHITESPACE@725..726 " "
+      HASH_PARTITION_BOUND@726..737
+        IDENT@726..735 "remainder"
+        WHITESPACE@735..736 " "
+        LITERAL@736..737
+          INT_NUMBER@736..737 "2"
+      R_PAREN@737..738 ")"
+    SEMICOLON@738..739 ";"
+  WHITESPACE@739..740 "\n"
+  CREATE_TABLE@740..812
+    CREATE_KW@740..746 "create"
+    WHITESPACE@746..747 " "
+    TABLE_KW@747..752 "table"
+    WHITESPACE@752..753 " "
+    TABLE_NAME@753..755
+      PATH@753..755
+        PATH_SEGMENT@753..755
+          IDENT@753..755 "p1"
+    WHITESPACE@755..756 " "
+    PARTITION_OF@756..770
+      PARTITION_KW@756..765 "partition"
+      WHITESPACE@765..766 " "
+      OF_KW@766..768 "of"
+      WHITESPACE@768..769 " "
+      TABLE_NAME_REF@769..770
+        PATH_REF@769..770
+          PATH_SEGMENT_REF@769..770
+            IDENT@769..770 "p"
+    WHITESPACE@770..771 " "
+    PARTITION_FOR_VALUES_WITH@771..811
+      FOR_KW@771..774 "for"
+      WHITESPACE@774..775 " "
+      VALUES_KW@775..781 "values"
+      WHITESPACE@781..782 " "
+      WITH_KW@782..786 "with"
+      WHITESPACE@786..787 " "
+      L_PAREN@787..788 "("
+      HASH_PARTITION_BOUND@788..797
+        IDENT@788..795 "modulus"
+        WHITESPACE@795..796 " "
+        LITERAL@796..797
+          INT_NUMBER@796..797 "3"
+      COMMA@797..798 ","
+      WHITESPACE@798..799 " "
+      HASH_PARTITION_BOUND@799..810
+        COLLATION_KW@799..808 "collation"
+        WHITESPACE@808..809 " "
+        LITERAL@809..810
+          INT_NUMBER@809..810 "2"
+      R_PAREN@810..811 ")"
+    SEMICOLON@811..812 ";"
+  WHITESPACE@812..813 "\n"
+  CREATE_TABLE@813..891
+    CREATE_KW@813..819 "create"
+    WHITESPACE@819..820 " "
+    TABLE_KW@820..825 "table"
+    WHITESPACE@825..826 " "
+    TABLE_NAME@826..827
+      PATH@826..827
+        PATH_SEGMENT@826..827
+          IDENT@826..827 "p"
+    WHITESPACE@827..828 " "
+    PARTITION_OF@828..842
+      PARTITION_KW@828..837 "partition"
+      WHITESPACE@837..838 " "
+      OF_KW@838..840 "of"
+      WHITESPACE@840..841 " "
+      TABLE_NAME_REF@841..842
+        PATH_REF@841..842
+          PATH_SEGMENT_REF@841..842
+            IDENT@841..842 "e"
+    WHITESPACE@842..843 " "
+    PARTITION_FOR_VALUES_WITH@843..890
+      FOR_KW@843..846 "for"
+      WHITESPACE@846..847 " "
+      VALUES_KW@847..853 "values"
+      WHITESPACE@853..854 " "
+      WITH_KW@854..858 "with"
+      WHITESPACE@858..859 " "
+      L_PAREN@859..860 "("
+      HASH_PARTITION_BOUND@860..869
+        IDENT@860..867 "modulus"
+        WHITESPACE@867..868 " "
+        LITERAL@868..869
+          INT_NUMBER@868..869 "1"
+      COMMA@869..870 ","
+      WHITESPACE@870..871 " "
+      HASH_PARTITION_BOUND@871..882
+        IDENT@871..880 "remainder"
+        WHITESPACE@880..881 " "
+        LITERAL@881..882
+          INT_NUMBER@881..882 "2"
+      COMMA@882..883 ","
+      WHITESPACE@883..884 " "
+      HASH_PARTITION_BOUND@884..889
+        IDENT@884..887 "foo"
+        WHITESPACE@887..888 " "
+        LITERAL@888..889
+          INT_NUMBER@888..889 "3"
+      R_PAREN@889..890 ")"
+    SEMICOLON@890..891 ";"
+  WHITESPACE@891..892 "\n"
+
+error[syntax-error]: Expected remainder and modulus
+  ╭▸ 
+6 │ create table p1 partition of p for values with (modulus 3);
+  ╰╴                               ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Expected remainder and modulus
+  ╭▸ 
+7 │ create table p1 partition of p for values with (remainder 2);
+  ╰╴                               ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: modulus provided more than once
+  ╭▸ 
+8 │ create table p1 partition of p for values with (modulus 3, remainder 2, modulus 3, remainder 2);
+  ╰╴                                                                        ━━━━━━━━━
+error[syntax-error]: remainder provided more than once
+  ╭▸ 
+8 │ create table p1 partition of p for values with (modulus 3, remainder 2, modulus 3, remainder 2);
+  ╰╴                                                                                   ━━━━━━━━━━━
+error[syntax-error]: Expected modulus but found modulusmodulus
+  ╭▸ 
+9 │ create table p1 partition of p for values with (MODULUSMODULUS 3, REMAINDER 2);
+  ╰╴                                                ━━━━━━━━━━━━━━
+error[syntax-error]: Expected remainder but found remaining
+   ╭▸ 
+10 │ create table p1 partition of p for values with (modulus 3, remaining 2);
+   ╰╴                                                           ━━━━━━━━━
+error[syntax-error]: Expected modulus but found year
+   ╭▸ 
+11 │ create table p1 partition of p for values with (year 3, remainder 2);
+   ╰╴                                                ━━━━
+error[syntax-error]: Expected remainder but found collation
+   ╭▸ 
+12 │ create table p1 partition of p for values with (modulus 3, collation 2);
+   ╰╴                                                           ━━━━━━━━━
+error[syntax-error]: unrecognized hash partition bound specification "foo"
+   ╭▸ 
+13 │ create table p partition of e for values with (modulus 1, remainder 2, foo 3);
+   ╰╴                                                                       ━━━

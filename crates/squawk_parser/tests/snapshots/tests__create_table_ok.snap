@@ -3192,18 +3192,65 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("
-      PARTITION_MODULUS
+      HASH_PARTITION_BOUND
         IDENT "modulus"
         WHITESPACE " "
         LITERAL
           INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
-      PARTITION_REMAINDER
+      HASH_PARTITION_BOUND
         IDENT "remainder"
         WHITESPACE " "
         LITERAL
           INT_NUMBER "1"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE "\n"
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "foo"
+          DOT "."
+          PATH_SEGMENT_REF
+            IDENT "bar"
+    WHITESPACE "\n"
+    PARTITION_FOR_VALUES_WITH
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      HASH_PARTITION_BOUND
+        IDENT "remainder"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      HASH_PARTITION_BOUND
+        IDENT "modulus"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -22,6 +22,4 @@ select;
 select from onek;
 select where 1 = 1;
 select except select;
-select distinct from onek;
 select all from onek;
-select distinct on (a) from onek;

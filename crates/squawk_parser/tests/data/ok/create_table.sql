@@ -328,6 +328,10 @@ create table t
 partition of foo.bar 
 for values with (modulus 1, remainder 1);
 
+create table t
+partition of foo.bar
+for values with (remainder 1, modulus 2);
+
 -- partition in
 create table t
 partition of foo.bar 

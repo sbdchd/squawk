@@ -1,0 +1,90 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/lateral.sql
+---
+SOURCE_FILE@0..110
+  SELECT@0..31
+    SELECT_CLAUSE@0..8
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..8
+        TARGET@7..8
+          STAR@7..8 "*"
+    WHITESPACE@8..9 " "
+    FROM_CLAUSE@9..30
+      FROM_KW@9..13 "from"
+      WHITESPACE@13..14 " "
+      RELATION_FROM_ITEM@14..30
+        LATERAL_KW@14..21 "lateral"
+        WHITESPACE@21..22 " "
+        RELATION_NAME_REF@22..30
+          PATH_REF@22..30
+            PATH_SEGMENT_REF@22..30
+              IDENT@22..30 "arrtest1"
+    SEMICOLON@30..31 ";"
+  WHITESPACE@31..32 "\n"
+  SELECT@32..75
+    SELECT_CLAUSE@32..40
+      SELECT_KW@32..38 "select"
+      WHITESPACE@38..39 " "
+      TARGET_LIST@39..40
+        TARGET@39..40
+          STAR@39..40 "*"
+    WHITESPACE@40..41 " "
+    FROM_CLAUSE@41..74
+      FROM_KW@41..45 "from"
+      WHITESPACE@45..46 " "
+      RELATION_FROM_ITEM@46..74
+        ONLY_KW@46..50 "only"
+        WHITESPACE@50..51 " "
+        LATERAL_KW@51..58 "lateral"
+        WHITESPACE@58..59 " "
+        RELATION_NAME_REF@59..74
+          PATH_REF@59..74
+            PATH_REF@59..65
+              PATH_SEGMENT_REF@59..65
+                IDENT@59..65 "public"
+            DOT@65..66 "."
+            PATH_SEGMENT_REF@66..74
+              IDENT@66..74 "arrtest1"
+    SEMICOLON@74..75 ";"
+  WHITESPACE@75..76 "\n"
+  SELECT@76..109
+    SELECT_CLAUSE@76..84
+      SELECT_KW@76..82 "select"
+      WHITESPACE@82..83 " "
+      TARGET_LIST@83..84
+        TARGET@83..84
+          STAR@83..84 "*"
+    WHITESPACE@84..85 " "
+    FROM_CLAUSE@85..108
+      FROM_KW@85..89 "from"
+      WHITESPACE@89..90 " "
+      PAREN_FROM_ITEM@90..108
+        ONLY_KW@90..94 "only"
+        WHITESPACE@94..95 " "
+        LATERAL_KW@95..102 "lateral"
+        WHITESPACE@102..103 " "
+        PAREN_EXPR@103..108
+          L_PAREN@103..104 "("
+          RELATION_FROM_ITEM@104..107
+            RELATION_NAME_REF@104..107
+              PATH_REF@104..107
+                PATH_SEGMENT_REF@104..107
+                  IDENT@104..107 "foo"
+          R_PAREN@107..108 ")"
+    SEMICOLON@108..109 ";"
+  WHITESPACE@109..110 "\n"
+
+error[syntax-error]: LATERAL cannot be used with a bare relation
+  ╭▸ 
+1 │ select * from lateral arrtest1;
+  ╰╴              ━━━━━━━
+error[syntax-error]: LATERAL cannot be used with a bare relation
+  ╭▸ 
+2 │ select * from only lateral public.arrtest1;
+  ╰╴                   ━━━━━━━
+error[syntax-error]: LATERAL cannot be used with a bare relation
+  ╭▸ 
+3 │ select * from only lateral (foo);
+  ╰╴                   ━━━━━━━

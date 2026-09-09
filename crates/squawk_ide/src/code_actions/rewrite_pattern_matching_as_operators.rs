@@ -193,7 +193,7 @@ mod test {
     fn not_applicable_to_other_binary_expressions() {
         assert!(code_action_not_applicable(
             rewrite_pattern_matching_as_operators,
-            "select left +$0 right;"
+            "select lhs +$0 rhs;"
         ));
     }
 }

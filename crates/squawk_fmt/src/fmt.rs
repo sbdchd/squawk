@@ -7973,24 +7973,17 @@ fn build_create_table_partition_type<'a>(partition_type: ast::PartitionType) -> 
                 }
             }
             let mut parts = Vec::new();
-            if let Some(modulus) = values.modulus() {
+            for bound in values.bounds() {
+                let mut bound_doc = Doc::nil();
+                if let Some(token) = bound.ident_token() {
+                    bound_doc = bound_doc
+                        .append(leading_comments_token(&token))
+                        .append(Doc::text(ast::normalize_name_node(bound.syntax())));
+                }
                 parts.push(
-                    leading_comments(modulus.syntax())
-                        .append(append_literal(
-                            build_keyword_tokens([(modulus.ident_token(), "modulus")]),
-                            modulus.literal(),
-                        ))
-                        .append(trailing_comments(modulus.syntax())),
-                );
-            }
-            if let Some(remainder) = values.remainder() {
-                parts.push(
-                    leading_comments(remainder.syntax())
-                        .append(append_literal(
-                            build_keyword_tokens([(remainder.ident_token(), "remainder")]),
-                            remainder.literal(),
-                        ))
-                        .append(trailing_comments(remainder.syntax())),
+                    leading_comments(bound.syntax())
+                        .append(append_literal(bound_doc, bound.literal()))
+                        .append(trailing_comments(bound.syntax())),
                 );
             }
             let body = Doc::list(

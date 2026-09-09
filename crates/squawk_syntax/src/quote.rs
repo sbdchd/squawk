@@ -110,13 +110,13 @@ pub fn is_reserved_word(text: &str) -> bool {
         .is_ok()
 }
 
-fn is_col_name_word(text: &str) -> bool {
+pub(crate) fn is_col_name_word(text: &str) -> bool {
     COL_NAME_KEYWORDS
         .binary_search(&text.to_ascii_lowercase().as_str())
         .is_ok()
 }
 
-fn is_type_func_name_word(text: &str) -> bool {
+pub(crate) fn is_type_func_name_word(text: &str) -> bool {
     TYPE_FUNC_NAME_KEYWORDS
         .binary_search(&text.to_ascii_lowercase().as_str())
         .is_ok()

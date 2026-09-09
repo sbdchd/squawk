@@ -12,7 +12,9 @@ use crate::ast::{AstNode, LitKind, PrefixOp};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
-use squawk_parser::SyntaxKind::*;
+use squawk_parser::{
+    SyntaxKind::*, is_col_name_keyword, is_reserved_keyword, is_type_func_name_keyword,
+};
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for node in root.descendants() {
         match_ast! {
@@ -20,6 +22,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::Aggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::AtomicBody(it) => validate_atomic_body(it, errors),
                 ast::BinExpr(it) => validate_bin_expr(it, errors),
+                ast::CallExpr(it) => validate_call_expr(it, errors),
                 ast::CreateAggregate(it) => {
                     validate_aggregate_params(it.param_list(), errors);
                     validate_aggregate_variadic_params(it.param_list(), errors);
@@ -29,6 +32,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::CustomOp(it) => validate_custom_op_length(it, errors),
                 ast::Do(it) => validate_do(it, errors),
+                ast::DistinctOn(it) => validate_distinct_on(it, errors),
                 ast::ExceptTableClause(it) => validate_except_table_clause(it, errors),
                 ast::FuncOptionList(it) => validate_func_option_list(it, errors),
                 ast::FunctionFromItem(it) => validate_function_from_item(it, errors),
@@ -41,14 +45,21 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::JsonArrayFn(it) => validate_json_array_fn(it, errors),
                 ast::JsonObjectFn(it) => validate_json_object_fn(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
+                ast::NameRef(it) => validate_name_ref(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 ast::ParenFromItem(it) => validate_paren_from_item(it, errors),
+                ast::PartitionForValuesWith(it) => validate_hash_partition_bounds(it, errors),
+                ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
                 ast::Select(it) => validate_select(it, errors),
+                ast::SelectClause(it) => validate_select_clause(it, errors),
                 ast::SelectInto(it) => validate_select_into(it, errors),
                 ast::SetColumnList(it) => validate_set_column_list(it, errors),
                 ast::SetSingleColumn(it) => validate_set_single_column(it, errors),
+                ast::ToConfigValue(it) => validate_to_config_value(it, errors),
                 ast::SourceFile(it) => validate_source_file(it, errors),
+                ast::StorageMode(it) => validate_storage_mode(it, errors),
+                ast::TableName(it) => validate_table_name(it, errors),
                 ast::Type(it) => validate_type_modifiers(it, errors),
                 _ => (),
             }
@@ -60,6 +71,15 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
         {
             validate_unicode_esc_ident(&token, errors);
         }
+    }
+}
+
+fn validate_distinct_on(distinct_on: ast::DistinctOn, acc: &mut Vec<SyntaxError>) {
+    if distinct_on.exprs().next().is_none() {
+        acc.push(SyntaxError::new(
+            "Expected at least one expression in DISTINCT ON list.",
+            distinct_on.syntax().text_range(),
+        ));
     }
 }
 
@@ -93,7 +113,184 @@ fn validate_function_from_item(item: ast::FunctionFromItem, acc: &mut Vec<Syntax
     }
 }
 
+fn validate_hash_partition_bounds(it: ast::PartitionForValuesWith, acc: &mut Vec<SyntaxError>) {
+    let mut seen_modulus = false;
+    let mut seen_remainder = false;
+    for bound in it.bounds() {
+        let Some(token) = bound.syntax().first_token() else {
+            continue;
+        };
+        let actual = ast::normalize_name_node(bound.syntax());
+        match actual.as_str() {
+            "modulus" if !seen_modulus => seen_modulus = true,
+            "remainder" if !seen_remainder => seen_remainder = true,
+            "modulus" | "remainder" => {
+                acc.push(SyntaxError::new(
+                    format!("{actual} provided more than once"),
+                    bound.syntax().text_range(),
+                ));
+            }
+            _ => {
+                let message = if !seen_modulus {
+                    format!("Expected modulus but found {actual}")
+                } else if !seen_remainder {
+                    format!("Expected remainder but found {actual}")
+                } else {
+                    format!(r#"unrecognized hash partition bound specification "{actual}""#)
+                };
+                acc.push(SyntaxError::new(message, token.text_range()));
+                return;
+            }
+        }
+    }
+    if !seen_modulus || !seen_remainder {
+        acc.push(SyntaxError::new(
+            "Expected remainder and modulus",
+            it.syntax().text_range(),
+        ));
+    }
+}
+
+fn validate_name_ref(name_ref: ast::NameRef, acc: &mut Vec<SyntaxError>) {
+    let Some(token) = name_ref.syntax().first_token() else {
+        return;
+    };
+    if token.kind() == CURRENT_SCHEMA_KW || !is_type_func_name_keyword(token.kind()) {
+        return;
+    }
+    let Some(parent) = name_ref.syntax().parent() else {
+        return;
+    };
+    match parent.kind() {
+        CALL_EXPR => return,
+        // okay when it's namespaced `t.left`
+        FIELD_EXPR if parent.first_child().as_ref() != Some(name_ref.syntax()) => return,
+        _ => (),
+    }
+    acc.push(SyntaxError::new(
+        format!("`{}` is a reserved keyword", token.text()),
+        token.text_range(),
+    ));
+}
+
+// err: `create table left ()`
+// ok:  `create table foo.left ()`
+fn validate_table_name(table_name: ast::TableName, acc: &mut Vec<SyntaxError>) {
+    let Some(token) = table_name.syntax().first_token() else {
+        return;
+    };
+    if !is_type_func_name_keyword(token.kind()) {
+        return;
+    }
+    acc.push(SyntaxError::new(
+        format!("`{}` is a reserved keyword", token.text()),
+        token.text_range(),
+    ));
+}
+
+fn validate_call_expr(call_expr: ast::CallExpr, acc: &mut Vec<SyntaxError>) {
+    validate_sub_type_fn(&call_expr, acc);
+    let Some(ast::Expr::NameRef(name_ref)) = call_expr.expr() else {
+        return;
+    };
+    let Some(token) = name_ref.syntax().first_token() else {
+        return;
+    };
+    if !is_col_name_keyword(token.kind()) && !is_reserved_keyword(token.kind()) {
+        return;
+    }
+    let arg_count = call_expr.arg_list().map_or(0, |arg_list| {
+        if arg_list.star_token().is_some() {
+            1
+        } else {
+            arg_list.args().count()
+        }
+    });
+    let message = match token.kind() {
+        NULLIF_KW if arg_count != 2 => "`nullif` takes two arguments".to_string(),
+        MERGE_ACTION_KW if arg_count != 0 => "`merge_action` takes no arguments".to_string(),
+        COALESCE_KW | GREATEST_KW | GROUPING_KW | LEAST_KW | NORMALIZE_KW | XMLCONCAT_KW
+            if arg_count == 0 =>
+        {
+            format!("`{}` takes at least one argument", token.text())
+        }
+        COALESCE_KW | GRAPH_TABLE_KW | GREATEST_KW | GROUPING_KW | LEAST_KW | MERGE_ACTION_KW
+        | NORMALIZE_KW | NULLIF_KW | XMLCONCAT_KW => return,
+        // `current_time` and `current_time(0)` both valid
+        CURRENT_TIME_KW | CURRENT_TIMESTAMP_KW | LOCALTIME_KW | LOCALTIMESTAMP_KW => return,
+        _ => format!("`{}` is not a valid function name", token.text()),
+    };
+    acc.push(SyntaxError::new(message, token.text_range()));
+}
+
+fn validate_sub_type_fn(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
+    let token = call_expr
+        .any_fn()
+        .and_then(|it| it.any_token())
+        .or_else(|| call_expr.some_fn().and_then(|it| it.some_token()))
+        .or_else(|| call_expr.all_fn().and_then(|it| it.all_token()));
+    let Some(token) = token else {
+        return;
+    };
+    let is_rhs = call_expr
+        .syntax()
+        .parent()
+        .and_then(ast::BinExpr::cast)
+        .and_then(|bin_expr| bin_expr.rhs())
+        .is_some_and(|rhs| rhs.syntax() == call_expr.syntax());
+    if !is_rhs {
+        acc.push(SyntaxError::new(
+            format!("`{}` must follow an operator", token.text()),
+            token.text_range(),
+        ));
+    }
+}
+
+fn validate_relation_from_item(item: ast::RelationFromItem, acc: &mut Vec<SyntaxError>) {
+    if let Some(lateral) = item.lateral_token() {
+        acc.push(SyntaxError::new(
+            "LATERAL cannot be used with a bare relation",
+            lateral.text_range(),
+        ));
+    }
+}
+
 fn validate_paren_from_item(item: ast::ParenFromItem, acc: &mut Vec<SyntaxError>) {
+    if item.only_token().is_some()
+        && let Some(lateral) = item.lateral_token()
+    {
+        acc.push(SyntaxError::new(
+            "LATERAL cannot be used with a bare relation",
+            lateral.text_range(),
+        ));
+    }
+
+    let invalid_parenthesized_table_ref = if let Some(paren_select) = item.paren_select() {
+        paren_select.select().is_none()
+    } else if let Some(paren_expr) = item.paren_expr() {
+        match paren_expr.from_list_item() {
+            Some(ast::FromListItem::JoinExpr(_)) => false,
+            Some(ast::FromListItem::FromItem(ast::FromItem::RelationFromItem(_)))
+                if item.only_token().is_some() =>
+            {
+                false
+            }
+            Some(ast::FromListItem::FromItem(ast::FromItem::ParenFromItem(item))) => {
+                !paren_from_item_contains_join(item)
+            }
+            Some(ast::FromListItem::FromItem(_)) => true,
+            None => false,
+        }
+    } else {
+        false
+    };
+    if invalid_parenthesized_table_ref {
+        acc.push(SyntaxError::new(
+            "Parentheses are not allowed",
+            item.syntax().text_range(),
+        ));
+    }
+
     let Some(alias) = item.alias() else {
         return;
     };
@@ -106,6 +303,22 @@ fn validate_paren_from_item(item: ast::ParenFromItem, acc: &mut Vec<SyntaxError>
             "A subquery alias must follow all closing parentheses",
             alias.syntax().text_range(),
         ));
+    }
+}
+
+fn paren_from_item_contains_join(item: ast::ParenFromItem) -> bool {
+    if item.alias().is_some() {
+        return false;
+    }
+    let Some(paren_expr) = item.paren_expr() else {
+        return false;
+    };
+    match paren_expr.from_list_item() {
+        Some(ast::FromListItem::JoinExpr(_)) => true,
+        Some(ast::FromListItem::FromItem(ast::FromItem::ParenFromItem(item))) => {
+            paren_from_item_contains_join(item)
+        }
+        Some(ast::FromListItem::FromItem(_)) | None => false,
     }
 }
 
@@ -171,6 +384,18 @@ fn validate_source_file(it: ast::SourceFile, acc: &mut Vec<SyntaxError>) {
     }
 }
 
+fn validate_select_clause(clause: ast::SelectClause, acc: &mut Vec<SyntaxError>) {
+    let Some(ast::SelectQuantifier::DistinctClause(distinct)) = clause.select_quantifier() else {
+        return;
+    };
+    if clause.target_list().is_none() {
+        acc.push(SyntaxError::new(
+            "Expected a target after SELECT DISTINCT",
+            distinct.syntax().text_range(),
+        ));
+    }
+}
+
 fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
     let parent_kind = it.syntax().parent().map(|parent| parent.kind());
     if parent_kind == Some(TUPLE_EXPR) {
@@ -212,6 +437,19 @@ fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
         acc.push(SyntaxError::new(
             "Missing select clause",
             TextRange::empty(from_clause.syntax().text_range().start()),
+        ));
+    }
+}
+
+fn validate_storage_mode(mode: ast::StorageMode, acc: &mut Vec<SyntaxError>) {
+    let mode_name = ast::normalize_name_node(mode.syntax());
+    if !["plain", "external", "extended", "main", "default"]
+        .iter()
+        .any(|valid_mode| mode_name.eq_ignore_ascii_case(valid_mode))
+    {
+        acc.push(SyntaxError::new(
+            "Expected PLAIN, EXTERNAL, EXTENDED, MAIN, or DEFAULT",
+            mode.syntax().text_range(),
         ));
     }
 }
@@ -470,6 +708,15 @@ fn validate_set_column_list(list: ast::SetColumnList, acc: &mut Vec<SyntaxError>
         acc.push(SyntaxError::new(
             "Expected at least one column assignment after SET",
             list.syntax().text_range(),
+        ));
+    }
+}
+
+fn validate_to_config_value(it: ast::ToConfigValue, acc: &mut Vec<SyntaxError>) {
+    if it.default_token().is_none() && it.config_values().next().is_none() {
+        acc.push(SyntaxError::new(
+            "Expected DEFAULT, string, identifier, number, or list of values",
+            it.syntax().text_range(),
         ));
     }
 }
@@ -775,6 +1022,20 @@ fn validate_array_expr(array_expr: ast::ArrayExpr, acc: &mut Vec<SyntaxError>) {
         let range = TextRange::new(expr_range.start(), expr_range.start());
         acc.push(SyntaxError::new("Array missing ARRAY keyword.", range));
     }
+    if array_expr.l_paren_token().is_some() && !has_select_variant(array_expr.syntax()) {
+        let range = match array_expr.exprs().next() {
+            Some(expr) => expr.syntax().text_range(),
+            None => array_expr.syntax().text_range(),
+        };
+        acc.push(SyntaxError::new("Expected a subquery", range));
+    }
+}
+
+fn has_select_variant(node: &SyntaxNode) -> bool {
+    node.children().any(|child| {
+        ast::SelectVariant::can_cast(child.kind())
+            || (child.kind() == PAREN_EXPR && has_select_variant(&child))
+    })
 }
 
 fn validate_prefix_expr(prefix_expr: ast::PrefixExpr, acc: &mut Vec<SyntaxError>) {

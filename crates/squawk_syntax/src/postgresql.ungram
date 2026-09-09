@@ -951,7 +951,7 @@ UserMappingRole =
 | 'user'
 
 Role =
-  'group'? '#name'?
+  '#name'?
 | 'current_role'
 | 'current_user'
 | 'session_user'
@@ -3006,7 +3006,7 @@ FromListItem =
 | JoinExpr
 
 RelationFromItem =
-  'only'? RelationNameRef '*'? alias:FromAlias? TablesampleClause?
+  'only'? 'lateral'? RelationNameRef '*'? alias:FromAlias? TablesampleClause?
 
 FunctionFromItem =
   'only'? 'lateral'? CallExpr WithOrdinality? alias:FromAlias?
@@ -6098,12 +6098,9 @@ AddColumn =
   'add' 'column'? IfNotExists? ColumnName Type AlterOptionList? Collate? constraints:Constraint*
 
 PartitionForValuesWith =
-  'for' 'values' 'with' '(' modulus:PartitionModulus ',' remainder:PartitionRemainder ')'
+  'for' 'values' 'with' '(' bounds:(HashPartitionBound (',' HashPartitionBound)*) ')'
 
-PartitionModulus =
-  '#ident' Literal
-
-PartitionRemainder =
+HashPartitionBound =
   '#ident' Literal
 
 PartitionForValuesIn =

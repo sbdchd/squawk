@@ -12619,6 +12619,21 @@ impl HandlerClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct HashPartitionBound {
+    pub(crate) syntax: SyntaxNode,
+}
+impl HashPartitionBound {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct HavingClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19043,12 +19058,8 @@ pub struct PartitionForValuesWith {
 }
 impl PartitionForValuesWith {
     #[inline]
-    pub fn modulus(&self) -> Option<PartitionModulus> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn remainder(&self) -> Option<PartitionRemainder> {
-        support::child(&self.syntax)
+    pub fn bounds(&self) -> AstChildren<HashPartitionBound> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
@@ -19057,10 +19068,6 @@ impl PartitionForValuesWith {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn comma_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COMMA)
     }
     #[inline]
     pub fn for_token(&self) -> Option<SyntaxToken> {
@@ -19165,21 +19172,6 @@ impl PartitionList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PartitionModulus {
-    pub(crate) syntax: SyntaxNode,
-}
-impl PartitionModulus {
-    #[inline]
-    pub fn literal(&self) -> Option<Literal> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PartitionOf {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19195,21 +19187,6 @@ impl PartitionOf {
     #[inline]
     pub fn partition_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PARTITION_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PartitionRemainder {
-    pub(crate) syntax: SyntaxNode,
-}
-impl PartitionRemainder {
-    #[inline]
-    pub fn literal(&self) -> Option<Literal> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -21181,6 +21158,10 @@ impl RelationFromItem {
         support::token(&self.syntax, SyntaxKind::STAR)
     }
     #[inline]
+    pub fn lateral_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LATERAL_KW)
+    }
+    #[inline]
     pub fn only_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ONLY_KW)
     }
@@ -22110,10 +22091,6 @@ impl Role {
     #[inline]
     pub fn current_user_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CURRENT_USER_KW)
-    }
-    #[inline]
-    pub fn group_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::GROUP_KW)
     }
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
@@ -39697,6 +39674,24 @@ impl AstNode for HandlerClause {
         &self.syntax
     }
 }
+impl AstNode for HashPartitionBound {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::HASH_PARTITION_BOUND
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for HavingClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -45763,46 +45758,10 @@ impl AstNode for PartitionList {
         &self.syntax
     }
 }
-impl AstNode for PartitionModulus {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PARTITION_MODULUS
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for PartitionOf {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PARTITION_OF
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for PartitionRemainder {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PARTITION_REMAINDER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

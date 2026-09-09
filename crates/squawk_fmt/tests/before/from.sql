@@ -19,7 +19,6 @@ select * from /* before lateral */ lateral /* before cast */ cast /* before open
 select * from (select 1) as selected;
 select * from only lateral (select a_very_long_parenthesized_select_expression from a_very_long_parenthesized_select_relation_name) as a_very_long_parenthesized_select_alias;
 select * from /* before only */ only /* before lateral */ lateral /* before opening paren */ ( /* before select */ select /* before target */ value /* before closing paren */ ) /* before alias */ as /* before alias name */ selected;
-select * from (/* before relation */ foo /* before closing paren */) as parenthesized_relation;
 select * from rows from (generate_series(1, 3), unnest(array[1, 2]) as (value int8)) with ordinality as generated(first_value, second_value, ordinality);
 select * from /* before lateral */ lateral /* before rows */ rows /* before from */ from /* before opening paren */ ( /* before first argument */ generate_series(1, 3) /* before argument comma */, /* before second argument */ unnest(array[1, 2]) /* before as */ as /* before column list */ ( /* before column */ value /* before type */ int8 /* before column list close */ ) /* before rows close */ ) /* before with */ with /* before ordinality */ ordinality /* before alias */ as /* before alias name */ generated(value, ordinality);
 select * from xmltable('/rows/row' passing doc columns id int8 path '@id' not null, ord for ordinality, value text default 'unknown' null) as parsed;

@@ -1,0 +1,392 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/parenthesized_from_item.sql
+---
+SOURCE_FILE@0..389
+  SELECT@0..63
+    SELECT_CLAUSE@0..8
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..8
+        TARGET@7..8
+          STAR@7..8 "*"
+    WHITESPACE@8..9 " "
+    FROM_CLAUSE@9..62
+      FROM_KW@9..13 "from"
+      WHITESPACE@13..14 " "
+      PAREN_FROM_ITEM@14..39
+        PAREN_SELECT@14..31
+          L_PAREN@14..15 "("
+          VALUES@15..30
+            VALUES_KW@15..21 "values"
+            WHITESPACE@21..22 " "
+            ROW_LIST@22..30
+              ROW@22..30
+                L_PAREN@22..23 "("
+                LITERAL@23..24
+                  INT_NUMBER@23..24 "0"
+                COMMA@24..25 ","
+                LITERAL@25..29
+                  INT_NUMBER@25..29 "9998"
+                R_PAREN@29..30 ")"
+          R_PAREN@30..31 ")"
+        WHITESPACE@31..32 " "
+        FROM_ALIAS@32..39
+          TABLE_ALIAS@32..33
+            IDENT@32..33 "v"
+          COLUMN_LIST@33..39
+            L_PAREN@33..34 "("
+            COLUMN_NAME@34..36
+              IDENT@34..36 "id"
+            COMMA@36..37 ","
+            COLUMN_NAME@37..38
+              IDENT@37..38 "x"
+            R_PAREN@38..39 ")"
+      COMMA@39..40 ","
+      WHITESPACE@40..41 " "
+      PAREN_FROM_ITEM@41..62
+        LATERAL_KW@41..48 "lateral"
+        WHITESPACE@48..49 " "
+        PAREN_SELECT@49..59
+          L_PAREN@49..50 "("
+          SELECT@50..58
+            SELECT_CLAUSE@50..58
+              SELECT_KW@50..56 "select"
+              WHITESPACE@56..57 " "
+              TARGET_LIST@57..58
+                TARGET@57..58
+                  LITERAL@57..58
+                    INT_NUMBER@57..58 "1"
+          R_PAREN@58..59 ")"
+        WHITESPACE@59..60 " "
+        FROM_ALIAS@60..62
+          TABLE_ALIAS@60..62
+            IDENT@60..62 "ss"
+    SEMICOLON@62..63 ";"
+  WHITESPACE@63..64 "\n"
+  SELECT@64..112
+    SELECT_CLAUSE@64..72
+      SELECT_KW@64..70 "select"
+      WHITESPACE@70..71 " "
+      TARGET_LIST@71..72
+        TARGET@71..72
+          STAR@71..72 "*"
+    WHITESPACE@72..73 " "
+    FROM_CLAUSE@73..111
+      FROM_KW@73..77 "from"
+      WHITESPACE@77..78 " "
+      PAREN_FROM_ITEM@78..111
+        PAREN_EXPR@78..111
+          L_PAREN@78..79 "("
+          JOIN_EXPR@79..110
+            RELATION_FROM_ITEM@79..82
+              RELATION_NAME_REF@79..82
+                PATH_REF@79..82
+                  PATH_SEGMENT_REF@79..82
+                    IDENT@79..82 "foo"
+            WHITESPACE@82..83 " "
+            JOIN@83..110
+              JOIN_INNER@83..87
+                JOIN_KW@83..87 "join"
+              WHITESPACE@87..88 " "
+              RELATION_FROM_ITEM@88..91
+                RELATION_NAME_REF@88..91
+                  PATH_REF@88..91
+                    PATH_SEGMENT_REF@88..91
+                      IDENT@88..91 "bar"
+              WHITESPACE@91..92 " "
+              ON_CLAUSE@92..110
+                ON_KW@92..94 "on"
+                WHITESPACE@94..95 " "
+                BIN_EXPR@95..110
+                  FIELD_EXPR@95..101
+                    NAME_REF@95..98
+                      IDENT@95..98 "foo"
+                    DOT@98..99 "."
+                    NAME_REF@99..101
+                      IDENT@99..101 "id"
+                  WHITESPACE@101..102 " "
+                  EQ@102..103 "="
+                  WHITESPACE@103..104 " "
+                  FIELD_EXPR@104..110
+                    NAME_REF@104..107
+                      IDENT@104..107 "bar"
+                    DOT@107..108 "."
+                    NAME_REF@108..110
+                      IDENT@108..110 "id"
+          R_PAREN@110..111 ")"
+    SEMICOLON@111..112 ";"
+  WHITESPACE@112..114 "\n\n"
+  SELECT@114..179
+    SELECT_CLAUSE@114..122
+      SELECT_KW@114..120 "select"
+      WHITESPACE@120..121 " "
+      TARGET_LIST@121..122
+        TARGET@121..122
+          STAR@121..122 "*"
+    WHITESPACE@122..123 " "
+    FROM_CLAUSE@123..178
+      FROM_KW@123..127 "from"
+      WHITESPACE@127..128 " "
+      PAREN_FROM_ITEM@128..153
+        PAREN_SELECT@128..145
+          L_PAREN@128..129 "("
+          VALUES@129..144
+            VALUES_KW@129..135 "values"
+            WHITESPACE@135..136 " "
+            ROW_LIST@136..144
+              ROW@136..144
+                L_PAREN@136..137 "("
+                LITERAL@137..138
+                  INT_NUMBER@137..138 "0"
+                COMMA@138..139 ","
+                LITERAL@139..143
+                  INT_NUMBER@139..143 "9998"
+                R_PAREN@143..144 ")"
+          R_PAREN@144..145 ")"
+        WHITESPACE@145..146 " "
+        FROM_ALIAS@146..153
+          TABLE_ALIAS@146..147
+            IDENT@146..147 "v"
+          COLUMN_LIST@147..153
+            L_PAREN@147..148 "("
+            COLUMN_NAME@148..150
+              IDENT@148..150 "id"
+            COMMA@150..151 ","
+            COLUMN_NAME@151..152
+              IDENT@151..152 "x"
+            R_PAREN@152..153 ")"
+      COMMA@153..154 ","
+      WHITESPACE@154..155 " "
+      PAREN_FROM_ITEM@155..178
+        PAREN_SELECT@155..175
+          L_PAREN@155..156 "("
+          PAREN_FROM_ITEM@156..174
+            LATERAL_KW@156..163 "lateral"
+            WHITESPACE@163..164 " "
+            PAREN_SELECT@164..174
+              L_PAREN@164..165 "("
+              SELECT@165..173
+                SELECT_CLAUSE@165..173
+                  SELECT_KW@165..171 "select"
+                  WHITESPACE@171..172 " "
+                  TARGET_LIST@172..173
+                    TARGET@172..173
+                      LITERAL@172..173
+                        INT_NUMBER@172..173 "1"
+              R_PAREN@173..174 ")"
+          R_PAREN@174..175 ")"
+        WHITESPACE@175..176 " "
+        FROM_ALIAS@176..178
+          TABLE_ALIAS@176..178
+            IDENT@176..178 "ss"
+    SEMICOLON@178..179 ";"
+  WHITESPACE@179..180 "\n"
+  SELECT@180..200
+    SELECT_CLAUSE@180..188
+      SELECT_KW@180..186 "select"
+      WHITESPACE@186..187 " "
+      TARGET_LIST@187..188
+        TARGET@187..188
+          STAR@187..188 "*"
+    WHITESPACE@188..189 " "
+    FROM_CLAUSE@189..199
+      FROM_KW@189..193 "from"
+      WHITESPACE@193..194 " "
+      PAREN_FROM_ITEM@194..199
+        PAREN_EXPR@194..199
+          L_PAREN@194..195 "("
+          RELATION_FROM_ITEM@195..198
+            RELATION_NAME_REF@195..198
+              PATH_REF@195..198
+                PATH_SEGMENT_REF@195..198
+                  IDENT@195..198 "foo"
+          R_PAREN@198..199 ")"
+    SEMICOLON@199..200 ";"
+  WHITESPACE@200..201 "\n"
+  SELECT@201..223
+    SELECT_CLAUSE@201..209
+      SELECT_KW@201..207 "select"
+      WHITESPACE@207..208 " "
+      TARGET_LIST@208..209
+        TARGET@208..209
+          STAR@208..209 "*"
+    WHITESPACE@209..210 " "
+    FROM_CLAUSE@210..222
+      FROM_KW@210..214 "from"
+      WHITESPACE@214..215 " "
+      PAREN_FROM_ITEM@215..222
+        PAREN_EXPR@215..222
+          L_PAREN@215..216 "("
+          RELATION_FROM_ITEM@216..221
+            RELATION_NAME_REF@216..219
+              PATH_REF@216..219
+                PATH_SEGMENT_REF@216..219
+                  IDENT@216..219 "foo"
+            WHITESPACE@219..220 " "
+            STAR@220..221 "*"
+          R_PAREN@221..222 ")"
+    SEMICOLON@222..223 ";"
+  WHITESPACE@223..224 "\n"
+  SELECT@224..262
+    SELECT_CLAUSE@224..232
+      SELECT_KW@224..230 "select"
+      WHITESPACE@230..231 " "
+      TARGET_LIST@231..232
+        TARGET@231..232
+          STAR@231..232 "*"
+    WHITESPACE@232..233 " "
+    FROM_CLAUSE@233..261
+      FROM_KW@233..237 "from"
+      WHITESPACE@237..238 " "
+      PAREN_FROM_ITEM@238..261
+        PAREN_EXPR@238..261
+          L_PAREN@238..239 "("
+          FUNCTION_FROM_ITEM@239..260
+            CALL_EXPR@239..260
+              NAME_REF@239..254
+                IDENT@239..254 "generate_series"
+              ARG_LIST@254..260
+                L_PAREN@254..255 "("
+                ARG@255..256
+                  LITERAL@255..256
+                    INT_NUMBER@255..256 "1"
+                COMMA@256..257 ","
+                WHITESPACE@257..258 " "
+                ARG@258..259
+                  LITERAL@258..259
+                    INT_NUMBER@258..259 "2"
+                R_PAREN@259..260 ")"
+          R_PAREN@260..261 ")"
+    SEMICOLON@261..262 ";"
+  WHITESPACE@262..263 "\n"
+  SELECT@263..309
+    SELECT_CLAUSE@263..271
+      SELECT_KW@263..269 "select"
+      WHITESPACE@269..270 " "
+      TARGET_LIST@270..271
+        TARGET@270..271
+          STAR@270..271 "*"
+    WHITESPACE@271..272 " "
+    FROM_CLAUSE@272..308
+      FROM_KW@272..276 "from"
+      WHITESPACE@276..277 " "
+      PAREN_FROM_ITEM@277..308
+        PAREN_EXPR@277..308
+          L_PAREN@277..278 "("
+          FUNCTION_FROM_ITEM@278..307
+            LATERAL_KW@278..285 "lateral"
+            WHITESPACE@285..286 " "
+            CALL_EXPR@286..307
+              NAME_REF@286..301
+                IDENT@286..301 "generate_series"
+              ARG_LIST@301..307
+                L_PAREN@301..302 "("
+                ARG@302..303
+                  LITERAL@302..303
+                    INT_NUMBER@302..303 "1"
+                COMMA@303..304 ","
+                WHITESPACE@304..305 " "
+                ARG@305..306
+                  LITERAL@305..306
+                    INT_NUMBER@305..306 "2"
+                R_PAREN@306..307 ")"
+          R_PAREN@307..308 ")"
+    SEMICOLON@308..309 ";"
+  WHITESPACE@309..310 "\n"
+  SELECT@310..360
+    SELECT_CLAUSE@310..318
+      SELECT_KW@310..316 "select"
+      WHITESPACE@316..317 " "
+      TARGET_LIST@317..318
+        TARGET@317..318
+          STAR@317..318 "*"
+    WHITESPACE@318..319 " "
+    FROM_CLAUSE@319..359
+      FROM_KW@319..323 "from"
+      WHITESPACE@323..324 " "
+      PAREN_FROM_ITEM@324..359
+        PAREN_EXPR@324..359
+          L_PAREN@324..325 "("
+          ROWS_FROM_ITEM@325..358
+            ROWS_KW@325..329 "rows"
+            WHITESPACE@329..330 " "
+            FROM_KW@330..334 "from"
+            WHITESPACE@334..335 " "
+            L_PAREN@335..336 "("
+            ROWS_FROM_ARG@336..357
+              CALL_EXPR@336..357
+                NAME_REF@336..351
+                  IDENT@336..351 "generate_series"
+                ARG_LIST@351..357
+                  L_PAREN@351..352 "("
+                  ARG@352..353
+                    LITERAL@352..353
+                      INT_NUMBER@352..353 "1"
+                  COMMA@353..354 ","
+                  WHITESPACE@354..355 " "
+                  ARG@355..356
+                    LITERAL@355..356
+                      INT_NUMBER@355..356 "2"
+                  R_PAREN@356..357 ")"
+            R_PAREN@357..358 ")"
+          R_PAREN@358..359 ")"
+    SEMICOLON@359..360 ";"
+  WHITESPACE@360..361 "\n"
+  SELECT@361..388
+    SELECT_CLAUSE@361..369
+      SELECT_KW@361..367 "select"
+      WHITESPACE@367..368 " "
+      TARGET_LIST@368..369
+        TARGET@368..369
+          STAR@368..369 "*"
+    WHITESPACE@369..370 " "
+    FROM_CLAUSE@370..387
+      FROM_KW@370..374 "from"
+      WHITESPACE@374..375 " "
+      PAREN_FROM_ITEM@375..387
+        PAREN_EXPR@375..387
+          L_PAREN@375..376 "("
+          PAREN_FROM_ITEM@376..386
+            ONLY_KW@376..380 "only"
+            WHITESPACE@380..381 " "
+            PAREN_EXPR@381..386
+              L_PAREN@381..382 "("
+              RELATION_FROM_ITEM@382..385
+                RELATION_NAME_REF@382..385
+                  PATH_REF@382..385
+                    PATH_SEGMENT_REF@382..385
+                      IDENT@382..385 "foo"
+              R_PAREN@385..386 ")"
+          R_PAREN@386..387 ")"
+    SEMICOLON@387..388 ";"
+  WHITESPACE@388..389 "\n"
+
+error[syntax-error]: Parentheses are not allowed
+  ╭▸ 
+4 │ select * from (values (0,9998)) v(id,x), (lateral (select 1)) ss;
+  ╰╴                                         ━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Parentheses are not allowed
+  ╭▸ 
+5 │ select * from (foo);
+  ╰╴              ━━━━━
+error[syntax-error]: Parentheses are not allowed
+  ╭▸ 
+6 │ select * from (foo *);
+  ╰╴              ━━━━━━━
+error[syntax-error]: Parentheses are not allowed
+  ╭▸ 
+7 │ select * from (generate_series(1, 2));
+  ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Parentheses are not allowed
+  ╭▸ 
+8 │ select * from (lateral generate_series(1, 2));
+  ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Parentheses are not allowed
+  ╭▸ 
+9 │ select * from (rows from (generate_series(1, 2)));
+  ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Parentheses are not allowed
+   ╭▸ 
+10 │ select * from (only (foo));
+   ╰╴              ━━━━━━━━━━━━

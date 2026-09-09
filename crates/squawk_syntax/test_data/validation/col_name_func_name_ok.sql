@@ -1,0 +1,17 @@
+select nullif(1, 2);
+select int from t;
+select t.int from t;
+select int.foo(1);
+select "int"(1);
+select cast(1 as numeric(10, 2));
+select * from xmltable(xmlnamespaces('u' as x), '/a' passing y columns b int);
+select * from json_table('[1]', '$' columns (a int path '$'));
+select xmlelement(name foo, xmlattributes(1 as a));
+merge into t using s on true when matched then delete returning merge_action();
+select coalesce(1, 2);
+select graph_table(1);
+select greatest(1, 2);
+select grouping(a) from t group by a;
+select normalize('abc');
+select least(1, 2);
+select xmlconcat('<a/>', '<b/>');

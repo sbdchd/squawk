@@ -1,0 +1,143 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/type_func_name_keyword_ok.sql
+---
+SOURCE_FILE@0..170
+  SELECT@0..22
+    SELECT_CLAUSE@0..21
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..21
+        TARGET@7..21
+          NAME_REF@7..21
+            CURRENT_SCHEMA_KW@7..21 "current_schema"
+    SEMICOLON@21..22 ";"
+  WHITESPACE@22..23 "\n"
+  SELECT@23..45
+    SELECT_CLAUSE@23..44
+      SELECT_KW@23..29 "select"
+      WHITESPACE@29..30 " "
+      TARGET_LIST@30..44
+        TARGET@30..44
+          CALL_EXPR@30..44
+            NAME_REF@30..34
+              LEFT_KW@30..34 "left"
+            ARG_LIST@34..44
+              L_PAREN@34..35 "("
+              ARG@35..40
+                LITERAL@35..40
+                  STRING@35..40 "'foo'"
+              COMMA@40..41 ","
+              WHITESPACE@41..42 " "
+              ARG@42..43
+                LITERAL@42..43
+                  INT_NUMBER@42..43 "1"
+              R_PAREN@43..44 ")"
+    SEMICOLON@44..45 ";"
+  WHITESPACE@45..46 "\n"
+  SELECT@46..79
+    SELECT_CLAUSE@46..78
+      SELECT_KW@46..52 "select"
+      WHITESPACE@52..53 " "
+      TARGET_LIST@53..78
+        TARGET@53..78
+          CALL_EXPR@53..78
+            FIELD_EXPR@53..68
+              NAME_REF@53..63
+                IDENT@53..63 "pg_catalog"
+              DOT@63..64 "."
+              NAME_REF@64..68
+                LEFT_KW@64..68 "left"
+            ARG_LIST@68..78
+              L_PAREN@68..69 "("
+              ARG@69..74
+                LITERAL@69..74
+                  STRING@69..74 "'foo'"
+              COMMA@74..75 ","
+              WHITESPACE@75..76 " "
+              ARG@76..77
+                LITERAL@76..77
+                  INT_NUMBER@76..77 "1"
+              R_PAREN@77..78 ")"
+    SEMICOLON@78..79 ";"
+  WHITESPACE@79..80 "\n"
+  SELECT@80..115
+    SELECT_CLAUSE@80..105
+      SELECT_KW@80..86 "select"
+      WHITESPACE@86..87 " "
+      TARGET_LIST@87..105
+        TARGET@87..95
+          FIELD_EXPR@87..95
+            NAME_REF@87..90
+              IDENT@87..90 "zzt"
+            DOT@90..91 "."
+            NAME_REF@91..95
+              LEFT_KW@91..95 "left"
+        COMMA@95..96 ","
+        WHITESPACE@96..97 " "
+        TARGET@97..105
+          FIELD_EXPR@97..105
+            NAME_REF@97..100
+              IDENT@97..100 "zzt"
+            DOT@100..101 "."
+            NAME_REF@101..105
+              FULL_KW@101..105 "full"
+    WHITESPACE@105..106 " "
+    FROM_CLAUSE@106..114
+      FROM_KW@106..110 "from"
+      WHITESPACE@110..111 " "
+      RELATION_FROM_ITEM@111..114
+        RELATION_NAME_REF@111..114
+          PATH_REF@111..114
+            PATH_SEGMENT_REF@111..114
+              IDENT@111..114 "zzt"
+    SEMICOLON@114..115 ";"
+  WHITESPACE@115..116 "\n"
+  SELECT@116..133
+    SELECT_CLAUSE@116..132
+      SELECT_KW@116..122 "select"
+      WHITESPACE@122..123 " "
+      TARGET_LIST@123..132
+        TARGET@123..132
+          LITERAL@123..124
+            INT_NUMBER@123..124 "1"
+          WHITESPACE@124..125 " "
+          AS_NAME@125..132
+            AS_KW@125..127 "as"
+            WHITESPACE@127..128 " "
+            COLUMN_NAME@128..132
+              LEFT_KW@128..132 "left"
+    SEMICOLON@132..133 ";"
+  WHITESPACE@133..134 "\n"
+  SELECT@134..153
+    SELECT_CLAUSE@134..152
+      SELECT_KW@134..140 "select"
+      WHITESPACE@140..141 " "
+      TARGET_LIST@141..152
+        TARGET@141..152
+          LITERAL@141..142
+            INT_NUMBER@141..142 "1"
+          WHITESPACE@142..143 " "
+          AS_NAME@143..152
+            COLUMN_NAME@143..152
+              COLLATION_KW@143..152 "collation"
+    SEMICOLON@152..153 ";"
+  WHITESPACE@153..154 "\n"
+  SELECT@154..169
+    SELECT_CLAUSE@154..168
+      SELECT_KW@154..160 "select"
+      WHITESPACE@160..161 " "
+      TARGET_LIST@161..168
+        TARGET@161..168
+          CAST_EXPR@161..168
+            LITERAL@161..162
+              INT_NUMBER@161..162 "1"
+            COLON_COLON@162..164
+              COLON@162..163 ":"
+              COLON@163..164 ":"
+            PATH_TYPE@164..168
+              PATH_REF@164..168
+                PATH_SEGMENT_REF@164..168
+                  LEFT_KW@164..168 "left"
+    SEMICOLON@168..169 ";"
+  WHITESPACE@169..170 "\n"
