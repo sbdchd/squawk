@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 29
 input_file: crates/squawk_fmt/tests/before/paren_select.sql
 ---
 (select 1) order by 1 for update limit 10 offset 2 rows;
@@ -38,13 +37,13 @@ select * from (((select 1) union select 2) limit 1) as t;
 
 select *
 from (
-    /* after outer open */ (
-      (/* before left select */ select 1 /* before left close */)
-      /* before union */ union
-      /* before right select */ select 2 /* before compound close */
-    )
-    /* before inner limit */ limit /* before limit value */ 1 /* before outer close */
-  ) /* before alias */ as t;
+  /* after outer open */ (
+    (/* before left select */ select 1 /* before left close */)
+    /* before union */ union
+    /* before right select */ select 2 /* before compound close */
+  )
+  /* before inner limit */ limit /* before limit value */ 1 /* before outer close */
+) /* before alias */ as t;
 
 ((select 1) limit 2) order by 3;
 (select 1) offset 1 limit 2;

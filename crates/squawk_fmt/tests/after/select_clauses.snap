@@ -27,9 +27,9 @@ where a_very_long_filter_column_name > a_very_long_filter_threshold_value
 group by a_very_long_result_column_name
 having count(*) > a_very_long_having_threshold_value
 window a_very_long_window_name as (
-    partition by a_very_long_partition_column_name
-    order by a_very_long_order_column_name
-  )
+  partition by a_very_long_partition_column_name
+  order by a_very_long_order_column_name
+)
 order by a_very_long_result_column_name desc
 for no key update of a_very_long_common_table_expression_name skip locked
 limit a_very_long_limit_expression
@@ -46,8 +46,8 @@ with /* before recursive */ recursive /* before cte */ cte/* before columns */ (
 /* before group */ group /* before by */ by /* before group expression */ x
 /* before having */ having /* before having expression */ count(*) > 0
 /* before window */ window /* before window name */ win /* before window as */ as /* before window open */ (
-    /* before partition */ partition /* before partition by */ by /* before partition expression */ x /* before window close */
-  )
+  /* before partition */ partition /* before partition by */ by /* before partition expression */ x /* before window close */
+)
 /* before order */ order /* before order by */ by
   /* before order expression */ x /* before desc */ desc
 /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait
@@ -80,3 +80,9 @@ order by thousand
 
 select x from foo offset 1 limit 2;
 select x from foo limit 2 for update;
+
+select *
+from t
+window
+  w as (partition by aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa),
+  w2 as (partition by bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb);

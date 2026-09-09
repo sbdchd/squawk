@@ -18,3 +18,13 @@ group /* before by */ by /* before distinct */ distinct /* before grouping */ gr
     /* before grouping expression */ (4 /* before tuple comma */, /* before tuple expression */ 5 /* before tuple close */) /* before nested close */
   ) /* before outer close */
 ) /* before semicolon */;
+
+select * from t group by grouping sets ((long, nameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee), (long)) window w as (partition by loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong);
+
+select * from t group by rollup (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb);
+
+select * from t group by cube (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa), rollup (bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb);
+
+select * from t group by a_very_long_column_name_one + a_very_long_column_name_two + a_very_long_column_name_three;
+
+select * from t group by grouping sets ((long, nameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee), (long)), rollup (other, another) window w as (partition by loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong), w2 as (partition by shortish order by other_column);

@@ -9888,6 +9888,7 @@ fn build_having_clause<'a>(having: ast::HavingClause) -> Doc<'a> {
 }
 
 fn build_window_clause<'a>(window: ast::WindowClause) -> Doc<'a> {
+    let single_def = window.window_defs().count() == 1;
     let defs = window.window_defs().map(|def| {
         (
             leading_comments(def.syntax()).append(build_window_def(def.clone())),
@@ -9896,7 +9897,11 @@ fn build_window_clause<'a>(window: ast::WindowClause) -> Doc<'a> {
     });
     let mut doc = Doc::text("window");
     if let Some(defs) = build_comma_separated_docs(defs) {
-        doc = doc.append(Doc::space()).append(defs.nest(2));
+        doc = if single_def {
+            doc.append(Doc::space()).append(defs)
+        } else {
+            doc.append(Doc::line_or_space().append(defs).nest(2))
+        };
     }
     doc.group()
 }
@@ -9958,20 +9963,20 @@ fn build_select_group_by_clause<'a>(group: ast::GroupByClause) -> Doc<'a> {
     if let Some(by_token) = group.by_token() {
         doc = doc.append(leading_comments_token(&by_token));
     }
-    doc = doc.append(Doc::text("by")).append(Doc::space());
+    doc = doc.append(Doc::text("by"));
     if let Some(quantifier) = group.all_or_distinct() {
         doc = doc
+            .append(Doc::space())
             .append(leading_comments(quantifier.syntax()))
             .append(match quantifier {
                 ast::AllOrDistinct::All(_) => Doc::text("all"),
                 ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
-            })
-            .append(Doc::space());
+            });
     }
     if let Some(list) = group.group_by_list() {
         doc = doc.append(build_group_by_list(list));
     }
-    doc
+    doc.group()
 }
 
 fn build_create_publication<'a>(stmt: &ast::CreatePublication) -> Doc<'a> {
@@ -16242,14 +16247,8 @@ fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
 
 fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
     let mut single_item = from.items();
-    let single_nested_table = matches!(
-        single_item.next(),
-        Some(ast::FromListItem::FromItem(
-            ast::FromItem::GraphTableFromItem(_)
-                | ast::FromItem::JsonTableFromItem(_)
-                | ast::FromItem::XmlTableFromItem(_)
-        ))
-    ) && single_item.next().is_none();
+    let single_from_item = matches!(single_item.next(), Some(ast::FromListItem::FromItem(_)))
+        && single_item.next().is_none();
 
     let items = from.items().map(|item| {
         let syntax = item.syntax().clone();
@@ -16259,11 +16258,7 @@ fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
         )
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
-    let body = if single_nested_table {
-        body
-    } else {
-        body.nest(2)
-    };
+    let body = if single_from_item { body } else { body.nest(2) };
 
     Doc::text("from").append(Doc::space()).append(body)
 }
@@ -17441,22 +17436,27 @@ fn build_from_alias_column_list<'a>(
 }
 
 fn build_group_by_list<'a>(list: ast::GroupByList) -> Doc<'a> {
-    leading_comments(list.syntax()).append(build_group_bys(list.group_bys()))
-}
-
-fn build_group_bys<'a>(group_bys: impl Iterator<Item = ast::GroupBy>) -> Doc<'a> {
-    Doc::list(
+    let group_bys: Vec<_> = list
+        .group_bys()
+        .map(|group_by| {
+            let leading = leading_comments(group_by.syntax());
+            let trailing = trailing_comments(group_by.syntax());
+            leading.append(build_group_by(group_by)).append(trailing)
+        })
+        .collect();
+    let single_group_by = group_bys.len() == 1;
+    let body = leading_comments(list.syntax()).append(Doc::list(
         Itertools::intersperse(
-            group_bys.map(|group_by| {
-                let leading = leading_comments(group_by.syntax());
-                let trailing = trailing_comments(group_by.syntax());
-                leading.append(build_group_by(group_by)).append(trailing)
-            }),
+            group_bys.into_iter(),
             Doc::text(",").append(Doc::line_or_space()),
         )
         .collect(),
-    )
-    .nest(2)
+    ));
+    if single_group_by {
+        Doc::space().append(body)
+    } else {
+        Doc::line_or_space().append(body).nest(2)
+    }
 }
 
 fn build_group_by<'a>(group_by: ast::GroupBy) -> Doc<'a> {
