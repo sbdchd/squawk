@@ -8,15 +8,15 @@ select * from foo as f (id, display_name);
 select * from foo f (id int, display_name text collate "C");
 select *
 from foo /* before alias */ as /* before alias name */ f /* before open paren */ (
-    /* after open paren */ id /* before comma */,
-    /* after comma */ display_name /* before close paren */
-  );
+  /* after open paren */ id /* before comma */,
+  /* after comma */ display_name /* before close paren */
+);
 select * from users tablesample bernoulli (10) repeatable (42);
 select t.id from test_tablesample as t tablesample system (50) repeatable (0);
 select *
 from users /* before alias */ as /* before alias name */ u /* before tablesample */ tablesample /* before method */ bernoulli /* before sample opening paren */(
-    /* before percentage */ 10 /* before sample closing paren */
-  ) /* before repeatable */ repeatable /* before seed opening paren */(/* before seed */ 42 /* before seed closing paren */);
+  /* before percentage */ 10 /* before sample closing paren */
+) /* before repeatable */ repeatable /* before seed opening paren */(/* before seed */ 42 /* before seed closing paren */);
 select * from generate_series(1, 3);
 select * from lateral generate_series(1, 3) with ordinality as g (n, ord);
 select *
@@ -30,46 +30,43 @@ from /* before lateral */ lateral /* before call */ generate_series /* before op
   other;
 select *
 from lateral cast(
-    a_very_long_expression_name as a_very_long_schema_name.a_very_long_type_name
-  ) as converted;
+  a_very_long_expression_name as a_very_long_schema_name.a_very_long_type_name
+) as converted;
 select * from collation for (foo) as collation_name;
 select *
 from /* before lateral */ lateral /* before cast */ cast /* before opening paren */(
-    /* before expression */ value
-    /* before as */ as
-    /* before type */ int8 /* before closing paren */
-  ) /* before alias */ as /* before alias name */ converted;
+  /* before expression */ value
+  /* before as */ as
+  /* before type */ int8 /* before closing paren */
+) /* before alias */ as /* before alias name */ converted;
 select * from (select 1) as selected;
 select *
 from lateral (
-    select a_very_long_parenthesized_select_expression
-    from a_very_long_parenthesized_select_relation_name
-  ) as a_very_long_parenthesized_select_alias;
+  select a_very_long_parenthesized_select_expression
+  from a_very_long_parenthesized_select_relation_name
+) as a_very_long_parenthesized_select_alias;
 select *
 from /* before lateral */ lateral /* before opening paren */ (
-    /* before select */ select
-      /* before target */ value /* before closing paren */
-  ) /* before alias */ as /* before alias name */ selected;
+  /* before select */ select
+    /* before target */ value /* before closing paren */
+) /* before alias */ as /* before alias name */ selected;
 select *
 from rows from (
-    generate_series(1, 3),
-    unnest(array[1, 2]) as (value int8)
-  ) with ordinality as generated (first_value, second_value, ordinality);
+  generate_series(1, 3),
+  unnest(array[1, 2]) as (value int8)
+) with ordinality as generated (first_value, second_value, ordinality);
 select *
 from /* before lateral */ lateral /* before rows */ rows /* before from */ from /* before opening paren */(
-    /* before first argument */ generate_series(
-      1,
-      3
-    ) /* before argument comma */,
-    /* before second argument */ unnest(
-      array[1, 2]
-    ) /* before as */ as /* before column list */ (
-      /* before column */ value /* before type */ int8 /* before column list close */
-    ) /* before rows close */
-  ) /* before with */ with /* before ordinality */ ordinality /* before alias */ as /* before alias name */ generated (
-    value,
-    ordinality
-  );
+  /* before first argument */ generate_series(1, 3) /* before argument comma */,
+  /* before second argument */ unnest(
+    array[1, 2]
+  ) /* before as */ as /* before column list */ (
+    /* before column */ value /* before type */ int8 /* before column list close */
+  ) /* before rows close */
+) /* before with */ with /* before ordinality */ ordinality /* before alias */ as /* before alias name */ generated (
+  value,
+  ordinality
+);
 select *
 from xmltable(
   '/rows/row' passing doc
@@ -180,28 +177,28 @@ select *
 
 select *
 from lateral a_very_long_function_name(
-    a_very_long_first_argument_name,
-    a_very_long_second_argument_name,
-    a_very_long_third_argument_name
-  ) with ordinality as a_very_long_function_alias (
-    a_very_long_value_column_alias,
-    a_very_long_ordinality_column_alias
-  );
+  a_very_long_first_argument_name,
+  a_very_long_second_argument_name,
+  a_very_long_third_argument_name
+) with ordinality as a_very_long_function_alias (
+  a_very_long_value_column_alias,
+  a_very_long_ordinality_column_alias
+);
 select *
 from a_very_long_schema_name.a_very_long_relation_name as a_very_long_relation_alias (
-    a_very_long_first_column_alias,
-    a_very_long_second_column_alias,
-    a_very_long_third_column_alias
-  );
+  a_very_long_first_column_alias,
+  a_very_long_second_column_alias,
+  a_very_long_third_column_alias
+);
 select *
 from a_very_long_relation_name a_very_long_relation_alias (
-    a_very_long_first_column_name a_very_long_type_schema.a_very_long_first_type_name,
-    a_very_long_second_column_name a_very_long_type_schema.a_very_long_second_type_name collate a_very_long_collation_name
-  );
+  a_very_long_first_column_name a_very_long_type_schema.a_very_long_first_type_name,
+  a_very_long_second_column_name a_very_long_type_schema.a_very_long_second_type_name collate a_very_long_collation_name
+);
 select *
 from a_very_long_relation_name tablesample bernoulli (
-    a_very_long_sampling_percentage_expression
-  ) repeatable (a_very_long_repeatable_seed_expression);
+  a_very_long_sampling_percentage_expression
+) repeatable (a_very_long_repeatable_seed_expression);
 select *
 from only a_very_long_schema_name.a_very_long_first_relation_name * as a_very_long_first_alias,
   a_very_long_schema_name.a_very_long_second_relation_name as a_very_long_second_alias;
@@ -276,3 +273,15 @@ from statistics /* before base alias */ s
   /* before nested join */ join /* before nested relation */ attributes /* before nested alias */ a /* before on */ on
     /* before left operand */ a.attnum /* before equals */
       = /* before right operand */ u.attnum;
+
+select *
+from generate_series(
+  1,
+  30000000000000000000000000000000000000000
+) with ordinality as g (n, ord);
+
+select *
+from unnest(fooooooooooooooooooooooooooooooooooooooooo) as u (
+  value int8,
+  other text
+);

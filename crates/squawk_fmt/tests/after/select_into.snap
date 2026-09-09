@@ -64,8 +64,8 @@ from source
 /* before where */ where /* before where expression */ a > 1
 /* before having */ having /* before having expression */ count(*) > 1
 /* before window */ window /* before window name */ named_window /* before window as */ as /* before window open */ (
-    /* before partition */ partition /* before partition by */ by a /* before window close */
-  )
+  /* before partition */ partition /* before partition by */ by a /* before window close */
+)
 /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ source /* before lock wait */ nowait
 /* before limit */ limit /* before limit value */ 10
 /* before offset */ offset /* before offset value */ 2 /* before rows */ rows;

@@ -16,3 +16,5 @@ select thousand from onek where thousand < 995 order by thousand /* before offse
 
 select x from foo offset 1 limit 2;
 select x from foo limit 2 for update;
+
+select * from t window w as (partition by aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa), w2 as (partition by bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb);

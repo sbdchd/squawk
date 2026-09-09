@@ -63,3 +63,7 @@ select a_very_long_column_name from a_very_long_schema_name.a_very_long_table_na
 select s.stxrelid::regclass as relation, array_agg(a.attname order by u.ord) as stats_columns from pg_statistic_ext s cross join lateral unnest(s.stxkeys::int2[]) with ordinality as u(attnum, ord) join pg_attribute a on a.attrelid = s.stxrelid and a.attnum = u.attnum;
 
 select * from statistics /* before base alias */ s /* before cross */ cross /* before cross join */ join /* before lateral */ lateral /* before function */ unnest /* before function opening paren */ ( /* before argument */ s.keys /* before cast */ ::int2[] /* before function closing paren */ ) /* before with */ with /* before ordinality */ ordinality /* before function alias */ as /* before function alias name */ u /* before alias opening paren */ ( /* before first alias column */ attnum /* before alias comma */, /* before second alias column */ ord /* before alias closing paren */ ) /* before nested join */ join /* before nested relation */ attributes /* before nested alias */ a /* before on */ on /* before left operand */ a.attnum /* before equals */ = /* before right operand */ u.attnum;
+
+select * from generate_series(1, 30000000000000000000000000000000000000000) with ordinality as g (n, ord);
+
+select * from unnest(fooooooooooooooooooooooooooooooooooooooooo) as u (value int8, other text);
