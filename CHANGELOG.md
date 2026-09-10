@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.65.0 - 2026-09-09
+
+### Added
+
+- parser: validation for builtin keyword usages & more (#1338)
+- parser: validation for json_array/json_object, fmt quoting fixes (#1337)
+- parser: validation for empty lists & related (#1336)
+- parser: validation for extra commas/func args/only/graph table (#1335)
+
+### Changed
+
+- parser: refactor named arg to not be a general expr (#1332)
+
+### Fixed
+
+- fmt: fix identing for select clauses (#1339)
+- fmt: fix quoted func names (#1334)
+- fmt: fix more cases where we drop comments (#1333)
+- fmt: adjust values rows & fix keyword quoting (#1330)
+
 ## v2.64.0 - 2026-08-31
 
 ### Added
