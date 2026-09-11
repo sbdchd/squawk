@@ -1,3 +1,4 @@
+mod comment;
 mod fmt;
 pub mod token_compare;
 
