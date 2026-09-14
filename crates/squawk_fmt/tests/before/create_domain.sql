@@ -6,3 +6,6 @@ create domain extraordinarily_long_schema_name.extraordinarily_long_domain_name 
 
 create domain d text null collate "C";
 create domain d text default 5 collate "C" not null;
+
+-- parenthesized default expressions are only indented once
+create domain d as int default (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16);

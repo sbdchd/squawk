@@ -665,11 +665,10 @@ fn build_returning_clause<'a>(returning: ast::ReturningClause) -> Doc<'a> {
     if let Some(target_list) = returning.target_list() {
         let targets = join_comma_separated(build_targets(&target_list), TrailingComments::All)
             .unwrap_or_else(Doc::nil);
-        doc = doc
-            .append(space_before(target_list.syntax()))
-            .append(targets.nest(2).group());
+        let hug = is_single_inline_target_list(&target_list);
+        doc = append_clause_body(doc, target_list.syntax(), targets, hug);
     }
-    doc
+    doc.group()
 }
 
 fn build_returning_option_list<'a>(options: ast::ReturningOptionList) -> Doc<'a> {
@@ -1060,36 +1059,58 @@ fn build_set_clause<'a>(set_clause: ast::SetClause) -> Doc<'a> {
         .map(|token| leading_comments(&token).append(Doc::text("set")))
         .unwrap_or_else(Doc::nil);
     if let Some(columns) = set_clause.set_column_list() {
+        let inline_bracketed_expr = match columns.set_columns().exactly_one() {
+            Ok(ast::SetColumn::SetSingleColumn(column)) => set_column_has_bracketed_expr(&column),
+            _ => false,
+        };
         let items = columns.set_columns().map(|column| {
             let syntax = column.syntax().clone();
             (
-                leading_comments(column.syntax()).append(build_set_column(column)),
+                leading_comments(column.syntax())
+                    .append(build_set_column(column, inline_bracketed_expr)),
                 syntax,
             )
         });
         if let Some(items) = build_comma_separated_docs(items) {
-            doc = doc.append(line_before(columns.syntax()).append(items).nest(2).group());
+            doc = append_clause_body(doc, columns.syntax(), items, inline_bracketed_expr);
         }
     }
-    doc
+    doc.group()
 }
 
-fn build_set_column<'a>(column: ast::SetColumn) -> Doc<'a> {
+fn set_column_has_bracketed_expr(column: &ast::SetSingleColumn) -> bool {
+    column
+        .set_expr()
+        .and_then(|expr| expr.expr())
+        .is_some_and(|expr| is_inline_bracketed_expr(&expr))
+}
+
+fn build_set_column<'a>(column: ast::SetColumn, bracketed_expr: bool) -> Doc<'a> {
     match column {
         ast::SetColumn::SetSingleColumn(column) => {
-            let mut doc = column
+            let doc = column
                 .column_target()
                 .map(build_column_target)
                 .unwrap_or_else(Doc::nil);
+            let mut value = Doc::nil();
             if let Some(eq_token) = column.eq_token() {
-                doc = doc.append(line_before(&eq_token).append(Doc::text("=")).nest(2));
+                let separator = if bracketed_expr {
+                    space_before(&eq_token)
+                } else {
+                    line_before(&eq_token)
+                };
+                value = value.append(separator).append(Doc::text("="));
             }
             if let Some(expr) = column.set_expr() {
-                doc = doc
+                value = value
                     .append(space_before(expr.syntax()))
                     .append(build_set_expr(expr));
             }
-            doc.group()
+            if bracketed_expr {
+                doc.append(value)
+            } else {
+                doc.append(value.nest(2)).group()
+            }
         }
         ast::SetColumn::SetMultipleColumns(columns) => {
             let mut doc = columns
@@ -5194,8 +5215,8 @@ fn build_privileges<'a>(privileges: ast::Privileges) -> Doc<'a> {
     }
 }
 
-fn build_path_items<'a>(items: Vec<(SyntaxNode, ast::PathRef)>) -> Doc<'a> {
-    build_comma_separated_docs(items.into_iter().map(|(syntax, path)| {
+fn build_path_items<'a>(items: impl Iterator<Item = (SyntaxNode, ast::PathRef)>) -> Doc<'a> {
+    build_comma_separated_docs(items.map(|(syntax, path)| {
         (
             leading_comments(&syntax).append(build_path_ref(&path)),
             syntax,
@@ -5204,8 +5225,8 @@ fn build_path_items<'a>(items: Vec<(SyntaxNode, ast::PathRef)>) -> Doc<'a> {
     .unwrap_or_else(Doc::nil)
 }
 
-fn build_name_items<'a>(items: Vec<SyntaxNode>) -> Doc<'a> {
-    build_comma_separated_docs(items.into_iter().map(|syntax| {
+fn build_name_items<'a>(items: impl Iterator<Item = SyntaxNode>) -> Doc<'a> {
+    build_comma_separated_docs(items.map(|syntax| {
         let doc = leading_comments(&syntax).append(build_name(&syntax));
         (doc, syntax)
     }))
@@ -5263,11 +5284,7 @@ fn build_routine_sig<'a>(sig: ast::RoutineSig) -> Doc<'a> {
 fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
     match objects {
         ast::PrivilegeObjects::PrivilegeAllFunctionsInSchema(node) => {
-            let items = build_name_items(
-                node.schema_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5279,11 +5296,7 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeAllProceduresInSchema(node) => {
-            let items = build_name_items(
-                node.schema_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5295,11 +5308,7 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeAllRoutinesInSchema(node) => {
-            let items = build_name_items(
-                node.schema_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5311,11 +5320,7 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeAllSequencesInSchema(node) => {
-            let items = build_name_items(
-                node.schema_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5327,11 +5332,7 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeAllTablesInSchema(node) => {
-            let items = build_name_items(
-                node.schema_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5343,33 +5344,23 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeDatabase(node) => {
-            let items = build_name_items(
-                node.database_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.database_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([(node.database_token(), "database")]),
                 items,
             )
         }
-        ast::PrivilegeObjects::PrivilegeDefault(node) => build_path_items(
-            node.relation_name_refs()
-                .filter_map(|item| {
-                    let syntax = item.syntax().clone();
-                    item.path_ref().map(|path| (syntax, path))
-                })
-                .collect(),
-        ),
+        ast::PrivilegeObjects::PrivilegeDefault(node) => {
+            build_path_items(node.relation_name_refs().filter_map(|item| {
+                let syntax = item.syntax().clone();
+                item.path_ref().map(|path| (syntax, path))
+            }))
+        }
         ast::PrivilegeObjects::PrivilegeDomain(node) => {
-            let items = build_path_items(
-                node.domain_refs()
-                    .filter_map(|item| {
-                        let syntax = item.syntax().clone();
-                        item.path_ref().map(|path| (syntax, path))
-                    })
-                    .collect(),
-            );
+            let items = build_path_items(node.domain_refs().filter_map(|item| {
+                let syntax = item.syntax().clone();
+                item.path_ref().map(|path| (syntax, path))
+            }));
             append_privilege_items(
                 build_keyword_tokens([(node.domain_token(), "domain")]),
                 items,
@@ -5378,8 +5369,7 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
         ast::PrivilegeObjects::PrivilegeForeignDataWrapper(node) => {
             let items = build_name_items(
                 node.foreign_data_wrapper_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
+                    .map(|item| item.syntax().clone()),
             );
             append_privilege_items(
                 build_keyword_tokens([
@@ -5391,11 +5381,7 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeForeignServer(node) => {
-            let items = build_name_items(
-                node.server_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.server_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([
                     (node.foreign_token(), "foreign"),
@@ -5405,11 +5391,7 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeLanguage(node) => {
-            let items = build_name_items(
-                node.language_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.language_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([(node.language_token(), "language")]),
                 items,
@@ -5433,14 +5415,10 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegePropertyGraph(node) => {
-            let items = build_path_items(
-                node.property_graph_refs()
-                    .filter_map(|item| {
-                        let syntax = item.syntax().clone();
-                        item.path_ref().map(|path| (syntax, path))
-                    })
-                    .collect(),
-            );
+            let items = build_path_items(node.property_graph_refs().filter_map(|item| {
+                let syntax = item.syntax().clone();
+                item.path_ref().map(|path| (syntax, path))
+            }));
             append_privilege_items(
                 build_keyword_tokens([
                     (node.property_token(), "property"),
@@ -5450,61 +5428,41 @@ fn build_privilege_objects<'a>(objects: ast::PrivilegeObjects) -> Doc<'a> {
             )
         }
         ast::PrivilegeObjects::PrivilegeSchema(node) => {
-            let items = build_name_items(
-                node.schema_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([(node.schema_token(), "schema")]),
                 items,
             )
         }
         ast::PrivilegeObjects::PrivilegeSequence(node) => {
-            let items = build_path_items(
-                node.sequence_refs()
-                    .filter_map(|item| {
-                        let syntax = item.syntax().clone();
-                        item.path_ref().map(|path| (syntax, path))
-                    })
-                    .collect(),
-            );
+            let items = build_path_items(node.sequence_refs().filter_map(|item| {
+                let syntax = item.syntax().clone();
+                item.path_ref().map(|path| (syntax, path))
+            }));
             append_privilege_items(
                 build_keyword_tokens([(node.sequence_token(), "sequence")]),
                 items,
             )
         }
         ast::PrivilegeObjects::PrivilegeTable(node) => {
-            let items = build_path_items(
-                node.relation_name_refs()
-                    .filter_map(|item| {
-                        let syntax = item.syntax().clone();
-                        item.path_ref().map(|path| (syntax, path))
-                    })
-                    .collect(),
-            );
+            let items = build_path_items(node.relation_name_refs().filter_map(|item| {
+                let syntax = item.syntax().clone();
+                item.path_ref().map(|path| (syntax, path))
+            }));
             append_privilege_items(build_keyword_tokens([(node.table_token(), "table")]), items)
         }
         ast::PrivilegeObjects::PrivilegeTablespace(node) => {
-            let items = build_name_items(
-                node.tablespace_refs()
-                    .map(|item| item.syntax().clone())
-                    .collect(),
-            );
+            let items = build_name_items(node.tablespace_refs().map(|item| item.syntax().clone()));
             append_privilege_items(
                 build_keyword_tokens([(node.tablespace_token(), "tablespace")]),
                 items,
             )
         }
         ast::PrivilegeObjects::PrivilegeType(node) => {
-            let items = build_path_items(
-                node.type_name_refs()
-                    .filter_map(|item| {
-                        let syntax = item.syntax().clone();
-                        item.path_ref().map(|path| (syntax, path))
-                    })
-                    .collect(),
-            );
+            let items = build_path_items(node.type_name_refs().filter_map(|item| {
+                let syntax = item.syntax().clone();
+                item.path_ref().map(|path| (syntax, path))
+            }));
             append_privilege_items(build_keyword_tokens([(node.type_token(), "type")]), items)
         }
         ast::PrivilegeObjects::PrivilegeLargeObject(node) => {
@@ -7432,6 +7390,14 @@ fn append_nested_clause<'a>(doc: Doc<'a>, syntax: &SyntaxNode, clause: Doc<'a>) 
     doc.append(line_before(syntax).append(clause).nest(2))
 }
 
+fn append_clause_body<'a>(doc: Doc<'a>, syntax: &SyntaxNode, body: Doc<'a>, hug: bool) -> Doc<'a> {
+    if hug {
+        doc.append(space_before(syntax).nest(2)).append(body)
+    } else {
+        doc.append(line_before(syntax).append(body).nest(2).group())
+    }
+}
+
 fn build_alter_option_list<'a>(list: &ast::AlterOptionList) -> Doc<'a> {
     let mut doc = Doc::text("options");
     if let Some(l_paren) = list.l_paren_token() {
@@ -7497,24 +7463,62 @@ fn build_alter_option<'a>(option: &ast::AlterOption) -> Doc<'a> {
     }
 }
 
+fn build_default_constraint<'a>(constraint: ast::DefaultConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(default) = constraint.default_token() {
+        doc = doc
+            .append(leading_comments(&default))
+            .append(Doc::text("default"));
+    }
+    if let Some(expr) = constraint.expr() {
+        doc = doc
+            .append(space_before(expr.syntax()))
+            .append(build_expr(expr));
+    }
+    let mut doc = doc.group();
+    for option in constraint.constraint_options() {
+        doc = doc.append(
+            line_before(option.syntax())
+                .append(build_constraint_option(option))
+                .nest(2),
+        );
+    }
+    doc.group()
+}
+
+fn build_not_null_constraint<'a>(constraint: ast::NotNullConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    doc = doc.append(build_keyword_tokens([
+        (constraint.not_token(), "not"),
+        (constraint.null_token(), "null"),
+    ]));
+    if let Some(column) = constraint.column_name_ref() {
+        doc = doc
+            .append(space_before(column.syntax()))
+            .append(build_name(column.syntax()));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
+fn build_null_constraint<'a>(constraint: ast::NullConstraint) -> Doc<'a> {
+    let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
+    if let Some(null) = constraint.null_token() {
+        doc = doc
+            .append(leading_comments(&null))
+            .append(Doc::text("null"));
+    }
+    append_constraint_options(doc, constraint.constraint_options())
+        .nest(2)
+        .group()
+}
+
 fn build_column_constraint<'a>(constraint: ast::ColumnConstraint) -> Doc<'a> {
     match constraint {
         ast::ColumnConstraint::CheckConstraint(constraint) => build_check_constraint(constraint),
         ast::ColumnConstraint::DefaultConstraint(constraint) => {
-            let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
-            if let Some(default) = constraint.default_token() {
-                doc = doc
-                    .append(leading_comments(&default))
-                    .append(Doc::text("default"));
-            }
-            if let Some(expr) = constraint.expr() {
-                doc = doc
-                    .append(space_before(expr.syntax()))
-                    .append(build_expr(expr));
-            }
-            append_constraint_options(doc, constraint.constraint_options())
-                .nest(2)
-                .group()
+            build_default_constraint(constraint)
         }
         ast::ColumnConstraint::ExcludeConstraint(constraint) => {
             build_exclude_constraint(constraint)
@@ -7523,33 +7527,9 @@ fn build_column_constraint<'a>(constraint: ast::ColumnConstraint) -> Doc<'a> {
             build_generated_constraint(constraint)
         }
         ast::ColumnConstraint::NotNullConstraint(constraint) => {
-            let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
-            if let Some(not) = constraint.not_token() {
-                doc = doc.append(leading_comments(&not)).append(Doc::text("not"));
-            }
-            if let Some(null) = constraint.null_token() {
-                doc = doc.append(space_before(&null)).append(Doc::text("null"));
-            }
-            if let Some(column) = constraint.column_name_ref() {
-                doc = doc
-                    .append(space_before(column.syntax()))
-                    .append(build_name(column.syntax()));
-            }
-            append_constraint_options(doc, constraint.constraint_options())
-                .nest(2)
-                .group()
+            build_not_null_constraint(constraint)
         }
-        ast::ColumnConstraint::NullConstraint(constraint) => {
-            let mut doc = build_constraint_name_clause(constraint.constraint_name_clause());
-            if let Some(null) = constraint.null_token() {
-                doc = doc
-                    .append(leading_comments(&null))
-                    .append(Doc::text("null"));
-            }
-            append_constraint_options(doc, constraint.constraint_options())
-                .nest(2)
-                .group()
-        }
+        ast::ColumnConstraint::NullConstraint(constraint) => build_null_constraint(constraint),
         ast::ColumnConstraint::PrimaryKeyConstraint(constraint) => {
             build_primary_key_constraint(constraint)
         }
@@ -7801,7 +7781,7 @@ fn build_table_constraint<'a>(constraint: ast::TableConstraint) -> Doc<'a> {
             build_foreign_key_constraint(constraint)
         }
         ast::TableConstraint::NotNullConstraint(constraint) => {
-            build_domain_constraint(constraint.into())
+            build_not_null_constraint(constraint)
         }
         ast::TableConstraint::PrimaryKeyConstraint(constraint) => {
             build_primary_key_constraint(constraint)
@@ -7852,11 +7832,11 @@ fn build_check_constraint<'a>(constraint: ast::CheckConstraint) -> Doc<'a> {
 
     let mut options = Doc::nil();
     for option in constraint.constraint_options() {
-        options = options
-            .append(line_before(option.syntax()))
-            .append(build_keyword_node(option.syntax()));
+        options = append_nested_node(options, option, |option| {
+            build_keyword_node(option.syntax())
+        });
     }
-    doc.append(options.nest(2)).group()
+    doc.append(options).group()
 }
 
 fn build_primary_key_constraint<'a>(constraint: ast::PrimaryKeyConstraint) -> Doc<'a> {
@@ -8943,7 +8923,7 @@ fn build_having_clause<'a>(having: ast::HavingClause) -> Doc<'a> {
 }
 
 fn build_window_clause<'a>(window: ast::WindowClause) -> Doc<'a> {
-    let single_def = window.window_defs().count() == 1;
+    let single_def = window.window_defs().exactly_one().is_ok();
     let defs = window.window_defs().map(|def| {
         (
             leading_comments(def.syntax()).append(build_window_def(def.clone())),
@@ -13002,51 +12982,12 @@ fn build_alter_domain<'a>(stmt: &ast::AlterDomain) -> Doc<'a> {
 fn build_domain_constraint<'a>(constraint: ast::Constraint) -> Doc<'a> {
     match constraint {
         ast::Constraint::CheckConstraint(node) => build_check_constraint(node),
-        ast::Constraint::DefaultConstraint(node) => {
-            let mut doc = build_constraint_name_clause(node.constraint_name_clause());
-            if let Some(default) = node.default_token() {
-                doc = doc
-                    .append(leading_comments(&default))
-                    .append(Doc::text("default"));
-            }
-            if let Some(expr) = node.expr() {
-                doc = doc
-                    .append(space_before(expr.syntax()))
-                    .append(build_expr(expr));
-            }
-            append_constraint_options(doc, node.constraint_options())
-                .nest(2)
-                .group()
-        }
+        ast::Constraint::DefaultConstraint(node) => build_default_constraint(node),
         ast::Constraint::ExcludeConstraint(node) => build_exclude_constraint(node),
         ast::Constraint::ForeignKeyConstraint(node) => build_foreign_key_constraint(node),
         ast::Constraint::GeneratedConstraint(node) => build_generated_constraint(node),
-        ast::Constraint::NotNullConstraint(node) => {
-            let mut doc = build_constraint_name_clause(node.constraint_name_clause());
-            doc = doc.append(build_keyword_tokens([
-                (node.not_token(), "not"),
-                (node.null_token(), "null"),
-            ]));
-            if let Some(column) = node.column_name_ref() {
-                doc = doc
-                    .append(space_before(column.syntax()))
-                    .append(build_name(column.syntax()));
-            }
-            append_constraint_options(doc, node.constraint_options())
-                .nest(2)
-                .group()
-        }
-        ast::Constraint::NullConstraint(node) => {
-            let mut doc = build_constraint_name_clause(node.constraint_name_clause());
-            if let Some(null) = node.null_token() {
-                doc = doc
-                    .append(leading_comments(&null))
-                    .append(Doc::text("null"));
-            }
-            append_constraint_options(doc, node.constraint_options())
-                .nest(2)
-                .group()
-        }
+        ast::Constraint::NotNullConstraint(node) => build_not_null_constraint(node),
+        ast::Constraint::NullConstraint(node) => build_null_constraint(node),
         ast::Constraint::PrimaryKeyConstraint(node) => build_primary_key_constraint(node),
         ast::Constraint::ReferencesConstraint(node) => build_references_constraint(node),
         ast::Constraint::UniqueConstraint(node) => build_unique_constraint(node),
@@ -14704,6 +14645,41 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
     build_select_doc_ungrouped(select).group()
 }
 
+fn is_inline_bracketed_expr(expr: &ast::Expr) -> bool {
+    match expr {
+        ast::Expr::ArrayExpr(array_expr) => {
+            array_expr.select_variant().is_some() || array_expr.exprs().next().is_some()
+        }
+        ast::Expr::CallExpr(call_expr) => match call_expr.arg_list() {
+            Some(arg_list) => arg_list_has_body(&arg_list),
+            None => true,
+        },
+        ast::Expr::ParenExpr(_) => true,
+        ast::Expr::TupleExpr(tuple_expr) => tuple_expr.exprs().next().is_some(),
+        ast::Expr::CastExpr(cast_expr) => {
+            cast_expr.cast_token().is_some() || cast_expr.treat_token().is_some()
+        }
+        _ => false,
+    }
+}
+
+fn ends_with_inline_bracketed_expr(expr: &ast::Expr) -> bool {
+    match expr {
+        ast::Expr::BinExpr(bin_expr) => bin_expr
+            .rhs()
+            .as_ref()
+            .is_some_and(is_inline_bracketed_expr),
+        expr => is_inline_bracketed_expr(expr),
+    }
+}
+
+fn is_single_inline_target_list(target_list: &ast::TargetList) -> bool {
+    match target_list.targets().exactly_one() {
+        Ok(target) => target.expr().as_ref().is_some_and(is_inline_bracketed_expr),
+        Err(_) => false,
+    }
+}
+
 fn has_single_inline_target(select: &ast::Select) -> bool {
     let Some(select_clause) = select.select_clause() else {
         return false;
@@ -14711,22 +14687,10 @@ fn has_single_inline_target(select: &ast::Select) -> bool {
     if select_clause.select_quantifier().is_some() {
         return false;
     }
-    let Some(target_list) = select_clause.target_list() else {
-        return false;
-    };
-    let mut targets = target_list.targets();
-    let Some(target) = targets.next() else {
-        return false;
-    };
-    if targets.next().is_some() {
-        return false;
-    }
-    matches!(
-        target.expr(),
-        Some(ast::Expr::ArrayExpr(_))
-            | Some(ast::Expr::CallExpr(_))
-            | Some(ast::Expr::ParenExpr(_))
-    )
+    select_clause
+        .target_list()
+        .as_ref()
+        .is_some_and(is_single_inline_target_list)
 }
 
 fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
@@ -14889,8 +14853,9 @@ fn build_join<'a>(join: ast::Join) -> Doc<'a> {
 fn build_join_on_clause<'a>(on_clause: ast::OnClause) -> Doc<'a> {
     let mut doc = Doc::text("on");
     if let Some(expr) = on_clause.expr() {
-        let expr_doc = leading_comments(expr.syntax()).append(build_expr(expr));
-        doc = doc.append(Doc::line_or_space().append(expr_doc).nest(2));
+        let syntax = expr.syntax().clone();
+        let hug = ends_with_inline_bracketed_expr(&expr);
+        doc = append_clause_body(doc, &syntax, build_expr(expr), hug);
     }
     doc
 }
@@ -15826,16 +15791,13 @@ fn build_from_alias<'a>(alias: Option<ast::FromAlias>) -> Doc<'a> {
 fn build_from_alias_columns<'a>(columns: ast::FromAliasColumns) -> Doc<'a> {
     match columns {
         ast::FromAliasColumns::ColumnList(list) => {
-            let items = list
-                .column_names()
-                .map(|name| {
-                    let syntax = name.syntax().clone();
-                    (
-                        leading_comments(&syntax).append(build_name(&syntax)),
-                        syntax,
-                    )
-                })
-                .collect();
+            let items = list.column_names().map(|name| {
+                let syntax = name.syntax().clone();
+                (
+                    leading_comments(&syntax).append(build_name(&syntax)),
+                    syntax,
+                )
+            });
             comments_before(list.syntax()).append(build_from_alias_column_list(
                 list.l_paren_token(),
                 items,
@@ -15843,25 +15805,22 @@ fn build_from_alias_columns<'a>(columns: ast::FromAliasColumns) -> Doc<'a> {
             ))
         }
         ast::FromAliasColumns::ColumnDefList(list) => {
-            let items = list
-                .column_defs()
-                .map(|column| {
-                    let syntax = column.syntax().clone();
-                    let mut doc = leading_comments(&syntax);
-                    if let Some(name) = column.name() {
-                        doc = doc.append(build_name(name.syntax()));
-                    }
-                    if let Some(ty) = column.ty() {
-                        doc = doc.append(space_before(ty.syntax())).append(build_type(ty));
-                    }
-                    if let Some(collate) = column.collate() {
-                        doc = doc
-                            .append(space_before(collate.syntax()))
-                            .append(build_collate_expr(collate));
-                    }
-                    (doc, syntax)
-                })
-                .collect();
+            let items = list.column_defs().map(|column| {
+                let syntax = column.syntax().clone();
+                let mut doc = leading_comments(&syntax);
+                if let Some(name) = column.name() {
+                    doc = doc.append(build_name(name.syntax()));
+                }
+                if let Some(ty) = column.ty() {
+                    doc = doc.append(space_before(ty.syntax())).append(build_type(ty));
+                }
+                if let Some(collate) = column.collate() {
+                    doc = doc
+                        .append(space_before(collate.syntax()))
+                        .append(build_collate_expr(collate));
+                }
+                (doc, syntax)
+            });
             comments_before(list.syntax()).append(build_from_alias_column_list(
                 list.l_paren_token(),
                 items,
@@ -15873,7 +15832,7 @@ fn build_from_alias_columns<'a>(columns: ast::FromAliasColumns) -> Doc<'a> {
 
 fn build_from_alias_column_list<'a>(
     l_paren: Option<SyntaxToken>,
-    items: Vec<(Doc<'a>, SyntaxNode)>,
+    items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
     r_paren: Option<SyntaxToken>,
 ) -> Doc<'a> {
     let mut doc = Doc::nil();
@@ -15882,27 +15841,23 @@ fn build_from_alias_column_list<'a>(
     }
     doc = doc.append(Doc::text("("));
 
-    let body = build_comma_separated_docs(items.into_iter()).unwrap_or_else(Doc::nil);
+    let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
     doc.append(wrap_body(body, r_paren))
         .append(Doc::text(")"))
         .group()
 }
 
 fn build_group_by_list<'a>(list: ast::GroupByList) -> Doc<'a> {
-    let group_bys: Vec<_> = list
-        .group_bys()
-        .map(|group_by| {
-            let syntax = group_by.syntax().clone();
-            (
-                leading_comments(&syntax).append(build_group_by(group_by)),
-                syntax,
-            )
-        })
-        .collect();
-    let single_group_by = group_bys.len() == 1;
-    let body = leading_comments(list.syntax()).append(
-        join_comma_separated(group_bys.into_iter(), TrailingComments::All).unwrap_or_else(Doc::nil),
-    );
+    let single_group_by = list.group_bys().exactly_one().is_ok();
+    let group_bys = list.group_bys().map(|group_by| {
+        let syntax = group_by.syntax().clone();
+        (
+            leading_comments(&syntax).append(build_group_by(group_by)),
+            syntax,
+        )
+    });
+    let body = leading_comments(list.syntax())
+        .append(join_comma_separated(group_bys, TrailingComments::All).unwrap_or_else(Doc::nil));
     if single_group_by {
         Doc::space().append(body)
     } else {
@@ -15965,12 +15920,10 @@ fn build_grouping_exprs<'a>(
     exprs: impl Iterator<Item = ast::Expr>,
     r_paren: Option<SyntaxToken>,
 ) -> Doc<'a> {
-    let exprs: Vec<_> = exprs
-        .map(|expr| {
-            let syntax = expr.syntax().clone();
-            (leading_comments(&syntax).append(build_expr(expr)), syntax)
-        })
-        .collect();
+    let exprs = exprs.map(|expr| {
+        let syntax = expr.syntax().clone();
+        (leading_comments(&syntax).append(build_expr(expr)), syntax)
+    });
     build_grouping_list(l_paren, exprs, r_paren)
 }
 
@@ -15979,21 +15932,19 @@ fn build_grouping_group_bys<'a>(
     group_bys: impl Iterator<Item = ast::GroupBy>,
     r_paren: Option<SyntaxToken>,
 ) -> Doc<'a> {
-    let group_bys = group_bys
-        .map(|group_by| {
-            let syntax = group_by.syntax().clone();
-            (
-                leading_comments(&syntax).append(build_group_by(group_by)),
-                syntax,
-            )
-        })
-        .collect();
+    let group_bys = group_bys.map(|group_by| {
+        let syntax = group_by.syntax().clone();
+        (
+            leading_comments(&syntax).append(build_group_by(group_by)),
+            syntax,
+        )
+    });
     build_grouping_list(l_paren, group_bys, r_paren)
 }
 
 fn build_grouping_list<'a>(
     l_paren: Option<SyntaxToken>,
-    items: Vec<(Doc<'a>, SyntaxNode)>,
+    items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
     r_paren: Option<SyntaxToken>,
 ) -> Doc<'a> {
     let mut doc = Doc::nil();
@@ -16002,7 +15953,7 @@ fn build_grouping_list<'a>(
     }
     doc = doc.append(Doc::text("("));
 
-    doc = doc.append(match build_comma_separated_docs(items.into_iter()) {
+    doc = doc.append(match build_comma_separated_docs(items) {
         Some(body) => wrap_body(body, r_paren),
         None => wrap_empty_body(r_paren),
     });
@@ -16661,17 +16612,24 @@ fn build_where_clause<'a>(where_clause: ast::WhereClause) -> Doc<'a> {
         .map(|token| leading_comments(&token).append(Doc::text("where")))
         .unwrap_or_else(Doc::nil);
     if let Some(expr) = where_clause.expr() {
-        let expr_doc = match expr.clone() {
-            ast::Expr::BinExpr(bin_expr) => {
-                if let Some(logical) = bin_expr.op().as_ref().and_then(logical_op) {
-                    build_logical_expr(bin_expr, logical)
-                } else {
-                    build_expr(expr.clone())
-                }
-            }
-            _ => build_expr(expr.clone()),
+        let syntax = expr.syntax().clone();
+        let logical = match &expr {
+            ast::Expr::BinExpr(bin_expr) => bin_expr
+                .op()
+                .as_ref()
+                .and_then(logical_op)
+                .map(|logical| (bin_expr.clone(), logical)),
+            _ => None,
         };
-        doc = append_nested_clause(doc, expr.syntax(), expr_doc);
+        doc = match logical {
+            Some((bin_expr, logical)) => {
+                append_nested_clause(doc, &syntax, build_logical_expr(bin_expr, logical))
+            }
+            None => {
+                let hug = ends_with_inline_bracketed_expr(&expr);
+                append_clause_body(doc, &syntax, build_expr(expr), hug)
+            }
+        };
     }
     doc.group()
 }
@@ -18179,7 +18137,14 @@ fn build_parenthesized_expr_or_select_fn<'a>(
         body = body
             .append(leading_comments(select.syntax()))
             .append(match select {
-                ast::SelectVariant::Select(select) => build_select_doc_ungrouped(&select),
+                ast::SelectVariant::Select(select) => {
+                    let doc = build_select_doc_ungrouped(&select);
+                    if select.from_clause().is_none() {
+                        doc.group()
+                    } else {
+                        doc
+                    }
+                }
                 select => build_select_variant(select),
             });
     }
@@ -18188,10 +18153,14 @@ fn build_parenthesized_expr_or_select_fn<'a>(
     doc.append(Doc::text(")")).group()
 }
 
-fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
-    let has_body = arg_list.star_token().is_some()
+fn arg_list_has_body(arg_list: &ast::ArgList) -> bool {
+    arg_list.star_token().is_some()
         || arg_list.all_or_distinct().is_some()
-        || arg_list.args().next().is_some();
+        || arg_list.args().next().is_some()
+}
+
+fn build_call_arg_list<'a>(arg_list: ast::ArgList) -> Doc<'a> {
+    let has_body = arg_list_has_body(&arg_list);
     let mut doc = Doc::nil();
     if let Some(l_paren) = arg_list.l_paren_token() {
         doc = doc.append(comments_before(&l_paren));
@@ -18267,6 +18236,12 @@ fn build_order_by_clause<'a>(clause: ast::OrderByClause) -> Doc<'a> {
     doc = doc.append(Doc::text("by"));
 
     if let Some(list) = clause.sort_by_list() {
+        let hug = match list.sort_bys().exactly_one() {
+            Ok(sort_by) => sort_by
+                .expr()
+                .is_some_and(|expr| is_inline_bracketed_expr(&expr)),
+            Err(_) => false,
+        };
         let items = list.sort_bys().map(|sort_by| {
             let syntax = sort_by.syntax().clone();
             (
@@ -18274,9 +18249,8 @@ fn build_order_by_clause<'a>(clause: ast::OrderByClause) -> Doc<'a> {
                 syntax,
             )
         });
-        let body = leading_comments(list.syntax())
-            .append(join_comma_separated(items, TrailingComments::All).unwrap_or_else(Doc::nil));
-        doc = doc.append(Doc::line_or_space().append(body).nest(2));
+        let body = join_comma_separated(items, TrailingComments::All).unwrap_or_else(Doc::nil);
+        doc = append_clause_body(doc, list.syntax(), body, hug);
     }
     doc.group()
 }
@@ -18442,13 +18416,15 @@ fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
         if let Some(l_paren) = cast_expr.l_paren_token() {
             doc = doc.append(comments_before(&l_paren));
         }
+        let as_and_type = Doc::text("as")
+            .append(line_before(ty.syntax()))
+            .append(build_type(ty))
+            .group();
         let body = leading_comments(expr.syntax())
             .append(build_expr(expr))
             .append(line_before(&as_token))
-            .append(Doc::text("as"))
-            .append(line_before(ty.syntax()))
-            .append(build_type(ty));
-        let body = body.group();
+            .append(as_and_type)
+            .group();
         doc = doc
             .append(Doc::text("("))
             .append(wrap_body(body, cast_expr.r_paren_token()))
@@ -18751,14 +18727,8 @@ fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
     let rhs = bin_expr.rhs().unwrap();
     let comments = comment_run_before(rhs.syntax());
     let after_op = comments.before_node(Doc::space());
-    let rhs_is_uncommented_quantifier = comments.is_empty()
-        && match &rhs {
-            ast::Expr::CallExpr(call) => {
-                call.all_fn().is_some() || call.any_fn().is_some() || call.some_fn().is_some()
-            }
-            _ => false,
-        };
-    let separator = if rhs_is_uncommented_quantifier {
+    let rhs_requires_inline_separator = comments.is_empty() && is_inline_bracketed_expr(&rhs);
+    let separator = if rhs_requires_inline_separator {
         Doc::space()
     } else {
         Doc::line_or_space()
@@ -18770,7 +18740,7 @@ fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
         .append(build_op(bin_expr.op().unwrap()))
         .append(after_op)
         .append(build_expr(rhs));
-    if rhs_is_uncommented_quantifier {
+    if rhs_requires_inline_separator {
         doc
     } else {
         doc.nest(2).group()
@@ -19230,7 +19200,7 @@ fn build_literal<'a>(lit: ast::Literal) -> Doc<'a> {
 }
 
 fn build_string_literal<'a>(lit: &ast::Literal) -> Doc<'a> {
-    let parts: Vec<Doc<'a>> = lit
+    let parts = lit
         .syntax()
         .children_with_tokens()
         .filter_map(|el| match el {
@@ -19238,9 +19208,8 @@ fn build_string_literal<'a>(lit: &ast::Literal) -> Doc<'a> {
                 Some(Doc::text(format_string_token(&t)))
             }
             _ => None,
-        })
-        .collect();
-    Doc::list(Itertools::intersperse(parts.into_iter(), Doc::hard_line()).collect())
+        });
+    Doc::list(Itertools::intersperse(parts, Doc::hard_line()).collect())
 }
 
 fn format_string_token(t: &SyntaxToken) -> String {

@@ -63,3 +63,61 @@ from source -- trailing from
 where foo.id = source.id -- trailing where
 returning foo.id; -- trailing returning
 -- bottom
+
+update foo
+set a = (
+  select count(*)
+  from a_very_long_relation_name_that_forces_the_subquery_to_wrap_ab
+);
+
+update foo
+set a = array[
+  a_very_long_first_array_expression,
+  a_very_long_second_array_expression,
+  a_very_long_third_array_expression
+];
+
+update foo
+set a = coalesce(
+  a_very_long_first_expression,
+  a_very_long_second_expression,
+  a_very_long_third_expression
+);
+
+update foo
+set a = 1
+returning (
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbb
+);
+
+update foo
+set a = 1
+returning
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbb;
+
+update foo
+set -- before column
+  a = f(1);
+
+update foo
+set -- before column
+  a = 1,
+  b = 2;
+
+update foo
+set a = 1
+returning -- before target
+  f(a);
+
+update foo
+set a = 1
+returning -- before target
+  a,
+  b;
+
+update foo
+set a = 1
+returning
+  a_very_long_returning_target_name_that_definitely_does_not_fit_here_okay;

@@ -69,3 +69,6 @@ ALTER /* table */ TABLE /* relation */ sales_range /* split */ SPLIT /* partitio
 ALTER TABLE options_test ALTER COLUMN metadata SET (json = constraint);
 
 ALTER /* table */ TABLE /* relation */ options_test /* alter */ ALTER /* column */ COLUMN /* name */ metadata /* set */ SET /* left paren */ (/* option */ json /* equals */ = /* value */ constraint /* right paren */) /* semicolon */;
+
+-- parenthesized default expressions are only indented once
+alter table t add column a int default (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16);

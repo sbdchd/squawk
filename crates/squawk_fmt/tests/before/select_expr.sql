@@ -75,6 +75,7 @@ select
   3 = SOME ( ARRAY [ 3 ] ),
   4 /* before op */ = /* before any */ ANY /* before opening paren */ ( /* before expr */ ARRAY [ 4 ] /* before closing paren */ ) /* after any */,
   EXISTS ( SELECT 1 FROM things ),
+  EXISTS(SELECT 10000000000000000000000000000000000000000000000000000000000000000),
   EXISTS((SELECT 1)),
   EXISTS(TABLE things),
   5 = ANY(VALUES (1), (5)),
@@ -384,3 +385,6 @@ select array[1, -- array expr
 
 select count(a, -- call args
 b);
+
+select cast(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa as numeric(
+ 10, 2));

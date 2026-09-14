@@ -92,3 +92,8 @@ create table t (
 ); -- trailing end
 -- after
 
+-- parenthesized default expressions are only indented once
+create table t (a int default (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16));
+
+-- comments in parenthesized default expressions
+create table default_expression_comments (a int /* before default */ default /* before open */ (/* before expression */ greatest(/* before first */ 1 /* before comma */, /* before second */ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 /* before call close */) /* before default close */) /* before comma */, b int);

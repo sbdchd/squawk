@@ -90,5 +90,6 @@ values (
   1, -- values
   2
 )
-returning a, -- returning
+returning
+  a, -- returning
   b;

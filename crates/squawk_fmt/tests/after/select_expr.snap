@@ -140,6 +140,9 @@ select
       /* before expr */ array[4] /* before closing paren */
     ) /* after any */,
   exists(select 1 from things),
+  exists(
+    select 10000000000000000000000000000000000000000000000000000000000000000
+  ),
   exists((select 1)),
   exists(table things),
   5 = any(values (1), (5)),
@@ -158,8 +161,7 @@ select
     from a_very_long_exists_relation_name
   ),
   /* before exists */ exists /* before opening paren */(
-    /* before select */ select
-      1 /* before closing paren */
+    /* before select */ select 1 /* before closing paren */
   ) /* after exists */,
   collation for (b + c),
   collation for (
@@ -657,13 +659,11 @@ select
   int8 '1',
   cast(
     a_very_long_cast_input_expression
-    as
-    a_very_long_type_schema_name.a_very_long_cast_type_name
+    as a_very_long_type_schema_name.a_very_long_cast_type_name
   ),
   treat(
     a_very_long_treat_input_expression
-    as
-    a_very_long_type_schema_name.a_very_long_treat_type_name
+    as a_very_long_type_schema_name.a_very_long_treat_type_name
   ),
   a_very_long_postgres_cast_input_expression::a_very_long_type_schema_name.a_very_long_postgres_cast_type_name,
   a_very_long_type_schema_name.a_very_long_type_literal_type_name 'a very long type literal input value',
@@ -870,17 +870,15 @@ select array[
   1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 ];
 
-select
-  (
-    1, -- tuple expr
-    2
-  );
+select (
+  1, -- tuple expr
+  2
+);
 
-select
-  row(
-    1, -- row expr
-    2
-  );
+select row(
+  1, -- row expr
+  2
+);
 
 select array[
   1, -- array expr
@@ -890,4 +888,9 @@ select array[
 select count(
   a, -- call args
   b
+);
+
+select cast(
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  as numeric(10, 2)
 );

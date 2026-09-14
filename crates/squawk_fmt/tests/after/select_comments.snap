@@ -77,10 +77,9 @@ select (
   1 -- final paren item
 );
 
-select
-  (
-    1, 2 -- final tuple item
-  );
+select (
+  1, 2 -- final tuple item
+);
 
 select array[
   1 -- final array item
