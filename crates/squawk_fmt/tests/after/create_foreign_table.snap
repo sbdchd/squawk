@@ -4,7 +4,7 @@ input_file: crates/squawk_fmt/tests/before/create_foreign_table.sql
 ---
 create foreign table t () server s;
 
-create foreign table empty_arg_comment ( /* inside empty args */) server s;
+create foreign table empty_arg_comment ( /* inside empty args */ ) server s;
 
 create foreign table empty_arg_line_comment (
   -- inside empty args

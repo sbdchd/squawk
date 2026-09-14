@@ -37,3 +37,9 @@ create table child /*a*/ partition /*b*/ of /*c*/ parent
 /*l*/ to /*m*/ (/*n*/ maxvalue /*o*/, /*p*/ 100 /*q*/);
 create table child_in partition of parent for /*a*/ values /*b*/ in /*c*/ (/*d*/ 1 /*e*/, /*f*/ 2 /*g*/);
 create table child_hash partition of parent for /*a*/ values /*b*/ with /*c*/ (/*d*/ modulus /*e*/ 4 /*f*/, /*g*/ remainder /*h*/ 0 /*i*/);
+
+create table p partition of t for values with (modulus 2, -- for values with
+remainder 1);
+
+create table q partition of t for values in (1, -- for values in
+2);

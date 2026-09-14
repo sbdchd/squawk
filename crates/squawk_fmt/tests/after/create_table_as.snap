@@ -5,6 +5,16 @@ input_file: crates/squawk_fmt/tests/before/create_table_as.sql
 create table active_users as
   select id, name from users where active = true;
 
+create table empty_table_arg_comment (
+  /* inside empty args */
+) as
+  select 1;
+
+create table empty_table_arg_line_comment (
+  -- inside empty args
+) as
+  select 1;
+
 create temporary table if not exists reporting.a_very_long_destination_table_name (
   a_very_long_identifier_column,
   another_very_long_identifier_column

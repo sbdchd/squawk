@@ -72,3 +72,23 @@ with /*a*/ inserted/*b*/ (
 )
 /*bi*/ select /*bj*/ result_id
 /*bk*/ from /*bl*/ inserted /*bm*/;
+
+-- top
+insert into products (product_no, name, price) values -- after insert
+  -- before row 1
+  (1, 'Cheese', 9.99), -- after row 1
+  -- before row 2
+  (2, 'Bread', 1.99), -- after row 2
+  -- before row 3
+  (3, 'Milk', 2.99), -- after row 3
+  -- before row 4
+  (4, 'Eggs', 3.99); -- after row 4
+-- bottom
+
+insert into t
+values (
+  1, -- values
+  2
+)
+returning a, -- returning
+  b;

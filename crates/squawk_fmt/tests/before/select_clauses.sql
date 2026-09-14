@@ -18,3 +18,6 @@ select x from foo offset 1 limit 2;
 select x from foo limit 2 for update;
 
 select * from t window w as (partition by aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa), w2 as (partition by bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb);
+
+select 1 order by a, -- order by
+b;

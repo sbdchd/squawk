@@ -4,6 +4,8 @@ input_file: crates/squawk_fmt/tests/before/create_group.sql
 ---
 create group analysts;
 
+create group developers login;
+
 create group
   extraordinarily_long_group_name_for_business_intelligence_and_reporting
   with superuser

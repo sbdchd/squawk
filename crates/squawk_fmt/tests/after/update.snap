@@ -51,3 +51,15 @@ update /*a*/ only /*b*/(/*c*/ public /*d*/./*e*/ foo /*f*/)
 /*ao*/ from /*ap*/ bar
 /*aq*/ where /*ar*/ f.id = bar.id
 /*as*/ returning /*at*/ f.id /*au*/, /*av*/ f.payload /*aw*/;
+
+-- top
+with source as (
+  -- trailing with
+  select id, value from incoming -- trailing select
+) -- trailing paren
+update foo -- trailing update
+set value = source.value -- trailing set
+from source -- trailing from
+where foo.id = source.id -- trailing where
+returning foo.id; -- trailing returning
+-- bottom

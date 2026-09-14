@@ -1,5 +1,7 @@
 create role analyst;
 
+create role auditor login;
+
 create role extraordinarily_long_reporting_and_data_warehouse_administrator with login encrypted password 'an-extraordinarily-long-secret-value' valid until '2035-12-31 23:59:59+00' connection limit 25 in role extraordinarily_long_read_only_reporting_role, extraordinarily_long_data_warehouse_role admin database_administrator;
 
 -- comments in every position

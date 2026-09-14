@@ -18,3 +18,7 @@ truncate table
   another_very_long_schema_name.another_very_long_table_name
 restart identity
 cascade;
+
+truncate table
+  a, -- truncate
+  b;
