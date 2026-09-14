@@ -36,8 +36,7 @@ select * from collation for (foo) as collation_name;
 select *
 from /* before lateral */ lateral /* before cast */ cast /* before opening paren */(
   /* before expression */ value
-  /* before as */ as
-  /* before type */ int8 /* before closing paren */
+  /* before as */ as /* before type */ int8 /* before closing paren */
 ) /* before alias */ as /* before alias name */ converted;
 select * from (select 1) as selected;
 select *

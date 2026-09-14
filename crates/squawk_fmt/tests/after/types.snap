@@ -165,13 +165,11 @@ select
   ),
   cast(
     a_very_long_expression_name_long_long_long_long_long_long
-    as
-    character varying(12345)
+    as character varying(12345)
   ),
   treat(
     a_very_long_expression_name
-    as
-    a_very_long_type_schema_name.a_very_long_type_name
+    as a_very_long_type_schema_name.a_very_long_type_name
   ),
   a_very_long_type_schema_name.a_very_long_type_name(12345) 'a very long typed string literal value',
   interval 'a very long interval literal value' day to second(12345);

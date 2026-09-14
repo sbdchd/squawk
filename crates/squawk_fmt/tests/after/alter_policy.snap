@@ -17,11 +17,10 @@ alter /* policy */ policy /* name */ account_access_policy
 alter policy account_access_policy
   on public.accounts
   using (
-    account_identifier
-      = a_very_long_session_account_identifier_function(
-        current_user,
-        current_role
-      )
+    account_identifier = a_very_long_session_account_identifier_function(
+      current_user,
+      current_role
+    )
   );
 
 alter policy account_access_policy

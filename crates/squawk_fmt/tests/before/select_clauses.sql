@@ -21,3 +21,79 @@ select * from t window w as (partition by aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa), w2
 
 select 1 order by a, -- order by
 b;
+
+select 1 order by (select count(*) from a_very_long_relation_name_that_forces_the_parenthesized_subquery_to_wrap);
+
+select 1 order /* before by */ by /* before expression */ (/* before select */ select count(*) from a_very_long_relation_name_that_forces_the_parenthesized_subquery_to_wrap /* before close */) /* before semicolon */;
+
+select
+  category,
+  current_price > (
+    select avg(current_price)
+    from a_very_long_relation_name_that_forces_the_parenthesized_subquery_to_wrap
+  ) as above_average,
+  count(*) filter (where current_price > (
+    select avg(current_price)
+    from a_very_long_relation_name_that_forces_the_parenthesized_subquery_to_wrap
+  )) as expensive_count
+from item i
+join category_prices p on i.current_price > (
+  select avg(current_price)
+  from a_very_long_relation_name_that_forces_the_parenthesized_subquery_to_wrap
+)
+where current_price > (
+  select avg(current_price)
+  from item
+  where category = i.category or color = i.color
+)
+group by category
+having count(*) > (
+  select count(*)
+  from a_very_long_relation_name_that_forces_the_parenthesized_subquery_to_wrap
+)
+order by count;
+
+select 1
+from t
+where current_price = any(select 10000000000000000000000000000000000000000000000000
+);
+
+select 1
+from t
+where current_price = any(select 1 -- foo
+);
+
+select * from item where exists(select current_price from a_very_long_relation_name_abcdefghijklmn);
+
+select * from item where my_predicate_function(aaaaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbbbbbbbbb);
+
+select * from item where cast(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa as boolean);
+
+select * from item where /* before predicate */ exists(/* before subquery */ select current_price from a_very_long_relation_name_abcdefghijklmn /* before close */);
+
+select * from item where -- before predicate
+exists(select current_price from a_very_long_relation_name_abcdefghijklmn);
+
+select 1 from t where a = array[a_very_long_first_array_expression, a_very_long_second_array_expression, a_very_long_third_array_expressiona_very_long_second_array_expression];
+
+select * from item where aaaaaaaaaaaaaaaaaaaaaaaaaa = 1 and my_predicate_function(bbbbbbbbbbbbbbbbbbbbbbbbb);
+
+select * from t order by -- before sort expression
+f(a);
+
+select * from t order by -- before sort expression
+a desc;
+
+select * from t order by a_very_long_sort_expression_name_that_does_not_fit_on_a_single_line_abcdef;
+
+select * from a join b on -- before condition
+a.id = f(b.id);
+
+select * from a join b on -- before condition
+a.id = b.id;
+
+select * from a join b on
+-- own line
+a.id = b.id;
+
+select * from t where aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa = calculate_something();

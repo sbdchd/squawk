@@ -162,3 +162,10 @@ alter /* table */ table /* relation */ options_test
     /* set */ set /* left paren */ (
       /* option */ json /* equals */ = /* value */ constraint /* right paren */
     ) /* semicolon */;
+
+-- parenthesized default expressions are only indented once
+alter table t
+  add column a int
+    default (
+      1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16
+    );
