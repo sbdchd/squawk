@@ -82,3 +82,13 @@ create table extraordinarily_long_collated_column_clause_order (
   second_identifier varchar /* before not */ not /* before null */ null /* before second collate */ collate /* before second collation */ "POSIX" /* before unique */ unique
 );
 
+-- before
+create table t (
+  -- above a
+  a text, -- trailing a
+  -- above b
+  b text -- trailing b
+  -- end inner
+); -- trailing end
+-- after
+

@@ -35,3 +35,44 @@ select 1, 2 -- d
 ;
 select 1 /*e*/ -- f
 ;
+
+-- top
+select generate_series( -- trailing func
+  -- above first arg
+  now() - interval '1day', -- trailing first arg
+  -- above second arg
+  now() - interval '1s', -- trailing second arg
+  -- above third arg
+  interval '1s' -- trailing third arg
+  -- end of inner
+) as time; -- after alias & semi
+-- bottom
+
+select a, -- target
+b;
+
+-- a comment that was already on its own line keeps it
+select a,
+-- own line
+b;
+
+select (1 -- final paren item
+);
+
+select (1, 2 -- final tuple item
+);
+
+select array[1 -- final array item
+];
+
+select foo(1 -- final argument
+);
+
+select a -- lhs
++ b;
+
+select a -- lhs
+and b;
+
+select 1 between a -- lower bound
+and b;

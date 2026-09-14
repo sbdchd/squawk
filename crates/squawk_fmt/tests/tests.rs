@@ -101,7 +101,7 @@ fn normalizes_line_endings_inside_block_comments() {
 #[test]
 fn removes_trailing_whitespace_from_comments() {
     let sql = "select 1; -- ok   \n/* a  \n * comment\t\n */\nselect 2;\n";
-    let expected = "select 1;\n-- ok\n/* a\n * comment\n */\nselect 2;\n";
+    let expected = "select 1; -- ok\n/* a\n * comment\n */\nselect 2;\n";
 
     assert_eq!(squawk_fmt::fmt_str(sql).unwrap(), expected);
 }

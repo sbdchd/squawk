@@ -66,3 +66,17 @@ delete /*a*/ from /*b*/ foo
   /*w*/ old /*x*/ as /*y*/ o /*z*/,
   /*aa*/ new /*ab*/ as /*ac*/ n /*ad*/
 ) /*ae*/ o.id /*af*/, /*ag*/ n.id /*ah*/;
+
+-- top
+delete from foo -- trailing delete from
+-- above for portion
+for portion of valid_at from 1 to 2 -- trailing portion of
+-- above where
+where -- trailing where
+  -- above org check
+  organization_id = 12345 -- trailing org check
+  -- above status check
+  and status = 'inactive' -- trailing status check
+  -- above archived_at check
+  and archived_at is not null; -- trailing archived at check
+-- bottom

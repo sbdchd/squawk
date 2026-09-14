@@ -86,5 +86,5 @@ alter /* extension */ extension /* name */ an_exceedingly_long_extension_name_fo
       /* operator name */ application_schema.===
        /* open paren */(
         /* left type */ application_schema.exceedingly_long_left_operand_type,
-        /* right type */ application_schema.exceedingly_long_right_operand_type
-       /* close paren */) /* semicolon */;
+        /* right type */ application_schema.exceedingly_long_right_operand_type /* close paren */
+      ) /* semicolon */;

@@ -24,8 +24,8 @@ create cast (
 create /* cast keyword */ cast /* left parenthesis */ (
   /* source type */ text
   /* as keyword */ as
-  /* target type */ varchar
- /* right parenthesis */)
+  /* target type */ varchar /* right parenthesis */
+)
   /* method */ with /* function keyword */ function
     /* function name */ public.convert_text(
       /* argument type */ text /* argument closing parenthesis */

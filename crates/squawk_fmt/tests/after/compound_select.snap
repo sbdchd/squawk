@@ -48,8 +48,7 @@ select 1
 /* before right select */ select 2;
 select 1
 -- before operator
-union all
--- before right select
+union all -- before right select
 select 2;
 
 select 1

@@ -68,3 +68,10 @@ create function mode_after_name(input /*bp1*/ in /*bp2*/ bytea, result /*bp3*/ o
 create function commented_external() returns integer as /*bo*/ '$libdir/example' /*bp*/, /*bq*/ 'commented_external' /*br*/ language c;
 
 create function function_with_a_very_long_external_definition() returns integer as '$libdir/a_very_long_object_file_name_that_does_not_fit_on_the_same_line', 'a_very_long_link_symbol_name_that_does_not_fit_on_the_same_line' language c;
+
+create function empty_params_with_comment( -- no params
+) returns integer as $$ select 1 $$ language sql;
+
+create function f(a int, -- function params
+b int) returns table (c int, -- returns table
+d int) as $$ select 1 $$ language sql;

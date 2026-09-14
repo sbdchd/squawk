@@ -1,5 +1,7 @@
 create group analysts;
 
+create group developers login;
+
 create group extraordinarily_long_group_name_for_business_intelligence_and_reporting with superuser createdb createrole inherit login replication bypassrls connection limit 250 encrypted password 'an extraordinarily long password value used to exercise formatter wrapping' valid until '2042-02-22' in role analysts, developers, administrators admin current_user, session_user;
 
 -- comments in every position

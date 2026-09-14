@@ -76,3 +76,9 @@ alter property graph social_graph
 
 alter property graph social_graph
   owner /* to */ to /* role */ graph_administrator;
+
+alter property graph social_graph
+  drop vertex tables (
+    people,
+    organizations -- trailing
+  ) cascade;

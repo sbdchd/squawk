@@ -14,5 +14,5 @@ drop cast if exists (
 drop /* cast */ cast /* if */ if /* exists */ exists /* signature */ (
   /* source type */ text
   /* as */ as
-  /* target type */ varchar
- /* closing parenthesis */) /* behavior */ restrict /* end */;
+  /* target type */ varchar /* closing parenthesis */
+) /* behavior */ restrict /* end */;

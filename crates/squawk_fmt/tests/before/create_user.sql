@@ -1,5 +1,7 @@
 create user app_user;
 
+create user service_user login;
+
 create user u "admin" foo;
 
 create user u "role" foo;

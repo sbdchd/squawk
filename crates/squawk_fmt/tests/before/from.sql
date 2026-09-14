@@ -67,3 +67,11 @@ select * from statistics /* before base alias */ s /* before cross */ cross /* b
 select * from generate_series(1, 30000000000000000000000000000000000000000) with ordinality as g (n, ord);
 
 select * from unnest(fooooooooooooooooooooooooooooooooooooooooo) as u (value int8, other text);
+
+select *, random() as value from (select generate_series(min_date - interval '1day', min_date - interval '1s', interval '1s') as time from (select least(now(), min(time)) as min_date from iiot_history)), generate_series(1, 10000) as tag_id;
+
+select * from t as x (a, -- from alias columns
+b);
+
+select * from foo() as t (a int, -- from alias column defs
+b int);

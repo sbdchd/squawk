@@ -1,3 +1,4 @@
+select 1 group by all;
 select 1 group by 1, foo + 2;
 select sum(c) from gs group by "rollup"(c), "cube" /* before args */ (c);
 select 1 group by all rollup (1, 2), cube (3, 4);
@@ -28,3 +29,12 @@ select * from t group by cube (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa), roll
 select * from t group by a_very_long_column_name_one + a_very_long_column_name_two + a_very_long_column_name_three;
 
 select * from t group by grouping sets ((long, nameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee), (long)), rollup (other, another) window w as (partition by loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong), w2 as (partition by shortish order by other_column);
+
+select 1 group by a, -- group by
+b;
+
+select 1 group by rollup (a, -- rollup
+b);
+
+select 1 group by grouping sets ((a), -- grouping sets
+(b));
