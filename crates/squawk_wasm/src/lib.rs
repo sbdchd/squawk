@@ -102,6 +102,45 @@ impl SemanticTokenEncoder {
     }
 }
 
+fn encode_semantic_tokens(db: &Database, file: File) -> Vec<u32> {
+    let line_index = db::line_index(db, file);
+    let content = file.content(db);
+    let tokens = semantic_tokens(db, file, None);
+
+    let mut encoder = SemanticTokenEncoder::with_capacity(tokens.len());
+
+    // Duplicated from squawk-server, fyi
+    for token in &tokens {
+        // Taken from rust-analyzer, this solves the case where we have a
+        // multi line semantic token which isn't supported by the LSP spec.
+        // see: https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/lsp/to_proto.rs#L781C28-L781C28
+        for mut text_range in line_index.lines(token.range) {
+            if let Some((index, _)) = find_newline(&content[text_range]) {
+                text_range = TextRange::at(text_range.start(), TextSize::try_from(index).unwrap());
+            }
+            let start_lc = line_index.line_col(text_range.start());
+            let end_lc = line_index.line_col(text_range.end());
+            let start_wide = line_index
+                .to_wide(squawk_line_index::WideEncoding::Utf16, start_lc)
+                .unwrap();
+            let end_wide = line_index
+                .to_wide(squawk_line_index::WideEncoding::Utf16, end_lc)
+                .unwrap();
+
+            encoder.push(EncodedSemanticToken {
+                line: start_wide.line,
+                start: start_wide.col,
+                length: end_wide.col - start_wide.col,
+                token_type: token.token_type,
+                // TODO: once we get modifiers going, we'll need to update this
+                modifiers: 0,
+            });
+        }
+    }
+
+    encoder.finish()
+}
+
 #[wasm_bindgen(start)]
 pub fn run() {
     use log::Level;
@@ -122,6 +161,7 @@ pub fn run() {
 pub struct SquawkDatabase {
     db: Database,
     file: Option<File>,
+    formatted_file: Option<File>,
 }
 
 #[wasm_bindgen]
@@ -132,6 +172,7 @@ impl SquawkDatabase {
         SquawkDatabase {
             db: Database::default(),
             file: None,
+            formatted_file: None,
         }
     }
 
@@ -535,43 +576,22 @@ impl SquawkDatabase {
 
     pub fn semantic_tokens(&self) -> Result<Vec<u32>, Error> {
         let file = self.file()?;
-        let line_index = db::line_index(&self.db, file);
-        let content = file.content(&self.db);
-        let tokens = semantic_tokens(&self.db, file, None);
+        Ok(encode_semantic_tokens(&self.db, file))
+    }
 
-        let mut encoder = SemanticTokenEncoder::with_capacity(tokens.len());
-
-        // Duplicated from squawk-server, fyi
-        for token in &tokens {
-            // Taken from rust-analyzer, this solves the case where we have a
-            // multi line semantic token which isn't supported by the LSP spec.
-            // see: https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/lsp/to_proto.rs#L781C28-L781C28
-            for mut text_range in line_index.lines(token.range) {
-                if let Some((index, _)) = find_newline(&content[text_range]) {
-                    text_range =
-                        TextRange::at(text_range.start(), TextSize::try_from(index).unwrap());
-                }
-                let start_lc = line_index.line_col(text_range.start());
-                let end_lc = line_index.line_col(text_range.end());
-                let start_wide = line_index
-                    .to_wide(squawk_line_index::WideEncoding::Utf16, start_lc)
-                    .unwrap();
-                let end_wide = line_index
-                    .to_wide(squawk_line_index::WideEncoding::Utf16, end_lc)
-                    .unwrap();
-
-                encoder.push(EncodedSemanticToken {
-                    line: start_wide.line,
-                    start: start_wide.col,
-                    length: end_wide.col - start_wide.col,
-                    token_type: token.token_type,
-                    // TODO: once we get modifiers going, we'll need to update this
-                    modifiers: 0,
-                });
+    pub fn formatted_semantic_tokens(&mut self, content: String) -> Vec<u32> {
+        let file = match self.formatted_file {
+            Some(file) => {
+                file.set_content(&mut self.db).to(content.into());
+                file
             }
-        }
-
-        Ok(encoder.finish())
+            None => {
+                let file = File::new(&self.db, content.into());
+                self.formatted_file = Some(file);
+                file
+            }
+        };
+        encode_semantic_tokens(&self.db, file)
     }
 
     pub fn semantic_tokens_legend() -> Result<JsValue, Error> {

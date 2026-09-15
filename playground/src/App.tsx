@@ -32,6 +32,7 @@ import {
   provideSelectionRanges,
   provideCompletionItems,
   semanticTokensProvider,
+  formattedSemanticTokensProvider,
 } from "./providers"
 import { language as pgsqlMonarchLanguage } from "./pgsql"
 import { breakpoints, colors, transitions } from "./tokens.stylex"
@@ -591,6 +592,11 @@ function registerMonacoProvidersOnce() {
     "pgsql-formatted",
     pgsqlMonarchLanguage,
   )
+  const pgsqlFormattedSemanticTokensProvider =
+    monaco.languages.registerDocumentSemanticTokensProvider(
+      "pgsql-formatted",
+      formattedSemanticTokensProvider,
+    )
 
   monaco.languages.register({ id: "rast" })
   const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
@@ -720,6 +726,7 @@ function registerMonacoProvidersOnce() {
     languageConfig.dispose()
     pgsqlTokenProvider.dispose()
     pgsqlFormattedTokenProvider.dispose()
+    pgsqlFormattedSemanticTokensProvider.dispose()
     codeActionProvider.dispose()
     hoverProvider.dispose()
     definitionProvider.dispose()

@@ -11,6 +11,7 @@ import {
   selection_ranges,
   semantic_tokens,
   semantic_tokens_legend,
+  formatted_semantic_tokens,
   DocumentSymbol,
 } from "./squawk"
 
@@ -342,6 +343,27 @@ export const semanticTokensProvider: monaco.languages.DocumentSemanticTokensProv
 
       try {
         const data = semantic_tokens(content, version)
+        return { data, resultId: undefined }
+      } catch (e) {
+        console.error("Error in provideDocumentSemanticTokens:", e)
+        return null
+      }
+    },
+    releaseDocumentSemanticTokens() {},
+  }
+
+export const formattedSemanticTokensProvider: monaco.languages.DocumentSemanticTokensProvider =
+  {
+    getLegend() {
+      return semantic_tokens_legend()
+    },
+    provideDocumentSemanticTokens(model) {
+      if (model.getLineCount() > 2000) return null
+      const content = model.getValue()
+      if (!content) return null
+
+      try {
+        const data = formatted_semantic_tokens(content)
         return { data, resultId: undefined }
       } catch (e) {
         console.error("Error in provideDocumentSemanticTokens:", e)

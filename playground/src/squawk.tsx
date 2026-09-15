@@ -35,6 +35,14 @@ export interface HoverResult {
 
 let db: SquawkDatabase | null = null
 
+function openDb(): SquawkDatabase {
+  if (db == null) {
+    db = new SquawkDatabase()
+    db.open_file("")
+  }
+  return db
+}
+
 // We pass in content and version here so that we:
 // 1. update the database
 // 2. so the react compiler doesn't just cache the functions at their initial
@@ -42,10 +50,7 @@ let db: SquawkDatabase | null = null
 //
 // We can probably do better than this.
 function getDb(content: string, version: number): SquawkDatabase {
-  if (db == null) {
-    db = new SquawkDatabase()
-    db.open_file(content)
-  }
+  const db = openDb()
   db.update_file(content, version)
 
   return db
@@ -133,6 +138,10 @@ export interface SemanticTokensLegend {
 
 export function semantic_tokens(content: string, version: number): Uint32Array {
   return getDb(content, version).semantic_tokens()
+}
+
+export function formatted_semantic_tokens(formatted: string): Uint32Array {
+  return openDb().formatted_semantic_tokens(formatted)
 }
 
 export function semantic_tokens_legend(): SemanticTokensLegend {
