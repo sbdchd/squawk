@@ -38,7 +38,13 @@ use rowan::Direction;
 
 use crate::ast;
 use crate::ast::AstNode;
-use crate::unescape::{escape_unicode_esc_str, uescape_char};
+use crate::quote::{
+    strip_dollar_quotes, strip_prefixed_quotes, strip_quotes, strip_unicode_esc_prefix,
+};
+use crate::unescape::{
+    decode_esc_string, decode_plain_string, decode_unicode_esc_string, escape_unicode_esc_str,
+    uescape_char,
+};
 use crate::{SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
 
 use super::support;
@@ -190,6 +196,93 @@ impl ast::Literal {
             _ => return None,
         };
         Some(kind)
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum StringDecoding {
+    BitOrByte,
+    EscString,
+    UnicodeEscString,
+}
+
+impl ast::Literal {
+    pub fn string_value(&self) -> Option<String> {
+        let escape_char = self.unicode_escape_char();
+        let mut out = String::with_capacity(self.syntax().text().len().into());
+        let mut decoding: Option<StringDecoding> = None;
+
+        for element in self.syntax().children_with_tokens() {
+            let Some(token) = element.into_token() else {
+                continue;
+            };
+            match token.kind() {
+                SyntaxKind::ESC_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['e', 'E'])?;
+                    decode_esc_string(inner, &mut out);
+                    decoding = Some(StringDecoding::EscString);
+                }
+                SyntaxKind::UNICODE_ESC_STRING => {
+                    let inner = strip_unicode_esc_prefix(token.text())?;
+                    decode_unicode_esc_string(inner, escape_char, &mut out);
+                    decoding = Some(StringDecoding::UnicodeEscString);
+                }
+                SyntaxKind::BIT_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['b', 'B'])?;
+                    out.push_str(inner);
+                    decoding = Some(StringDecoding::BitOrByte);
+                }
+                SyntaxKind::BYTE_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['x', 'X'])?;
+                    out.push_str(inner);
+                    decoding = Some(StringDecoding::BitOrByte);
+                }
+                SyntaxKind::DOLLAR_QUOTED_STRING => {
+                    let inner = strip_dollar_quotes(token.text())?;
+                    out.push_str(inner);
+                    return Some(out);
+                }
+                SyntaxKind::NATIONAL_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['n', 'N'])?;
+                    decode_plain_string(inner, &mut out);
+                }
+                SyntaxKind::STRING => {
+                    let inner = strip_quotes(token.text())?;
+                    match decoding {
+                        Some(StringDecoding::EscString) => decode_esc_string(inner, &mut out),
+                        Some(StringDecoding::UnicodeEscString) => {
+                            decode_unicode_esc_string(inner, escape_char, &mut out)
+                        }
+                        Some(StringDecoding::BitOrByte) => out.push_str(inner),
+                        None => decode_plain_string(inner, &mut out),
+                    }
+                }
+                SyntaxKind::UESCAPE_KW => break,
+                _ => (),
+            }
+        }
+
+        Some(out)
+    }
+
+    fn unicode_escape_char(&self) -> char {
+        let mut seen_uescape = false;
+        for element in self.syntax().children_with_tokens() {
+            let Some(token) = element.into_token() else {
+                continue;
+            };
+            match token.kind() {
+                SyntaxKind::UESCAPE_KW => seen_uescape = true,
+                SyntaxKind::STRING if seen_uescape => {
+                    if let Some(ch) = uescape_char(token.text()) {
+                        return ch;
+                    }
+                    return '\\';
+                }
+                _ => (),
+            }
+        }
+        '\\'
     }
 }
 

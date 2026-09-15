@@ -6,7 +6,6 @@ use crate::file::InFile;
 use crate::infer::{infer_type_from_expr, infer_type_from_literal};
 use crate::literals::binary_digits_to_hex;
 use crate::literals::hex_digits_to_binary;
-use crate::literals::literal_string_value;
 use crate::location::{Location, LocationKind};
 use crate::name;
 use crate::offsets::token_from_offset;
@@ -275,7 +274,7 @@ fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
         return None;
     }
 
-    let value = literal_string_value(literal)?;
+    let value = literal.string_value()?;
     let ty = infer_type_from_literal(literal)?.to_string();
 
     let comment = match kind {

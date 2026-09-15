@@ -6,7 +6,6 @@ use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 
-use crate::literals::literal_string_value;
 use crate::name::{AsName, schema_and_func_name};
 use crate::scope::Scope;
 use crate::symbols::{Name, Schema, Symbol, SymbolKind};
@@ -1775,7 +1774,7 @@ fn bind_prepare_transaction(b: &mut Binder, prepare: ast::PrepareTransaction) {
     let Some(literal) = prepare.literal() else {
         return;
     };
-    let Some(transaction_id) = literal_string_value(&literal) else {
+    let Some(transaction_id) = literal.string_value() else {
         return;
     };
 
@@ -1787,7 +1786,7 @@ fn bind_prepared_transaction_ref(b: &mut Binder, literal: Option<ast::Literal>) 
     let Some(literal) = literal else {
         return;
     };
-    let Some(transaction_id) = literal_string_value(&literal) else {
+    let Some(transaction_id) = literal.string_value() else {
         return;
     };
 
@@ -2063,7 +2062,7 @@ fn bind_select_set_config(b: &mut Binder, select: &ast::Select, position: TextSi
     let Some(ast::Expr::Literal(setting_name_literal)) = args.next().and_then(|a| a.expr()) else {
         return;
     };
-    let Some(setting_name) = literal_string_value(&setting_name_literal) else {
+    let Some(setting_name) = setting_name_literal.string_value() else {
         return;
     };
     if !setting_name.eq_ignore_ascii_case("search_path") {
@@ -2073,7 +2072,7 @@ fn bind_select_set_config(b: &mut Binder, select: &ast::Select, position: TextSi
     let Some(ast::Expr::Literal(new_value_literal)) = args.next().and_then(|a| a.expr()) else {
         return;
     };
-    let Some(new_value) = literal_string_value(&new_value_literal) else {
+    let Some(new_value) = new_value_literal.string_value() else {
         return;
     };
 
