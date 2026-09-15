@@ -37,6 +37,7 @@ pub enum SyntaxKind {
     PERCENT,
     UNDERSCORE,
     DOT,
+    DOT_DOT,
     COLON,
     COLON_EQ,
     EQ,

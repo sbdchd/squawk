@@ -206,6 +206,7 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::Semi => SyntaxKind::SEMICOLON,
                 squawk_lexer::TokenKind::Comma => SyntaxKind::COMMA,
                 squawk_lexer::TokenKind::Dot => SyntaxKind::DOT,
+                squawk_lexer::TokenKind::DotDot => SyntaxKind::DOT_DOT,
                 squawk_lexer::TokenKind::OpenParen => SyntaxKind::L_PAREN,
                 squawk_lexer::TokenKind::CloseParen => SyntaxKind::R_PAREN,
                 squawk_lexer::TokenKind::OpenBracket => SyntaxKind::L_BRACK,

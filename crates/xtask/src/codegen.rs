@@ -147,6 +147,7 @@ const PUNCT: &[(&str, &str)] = &[
     ("%", "PERCENT"),
     ("_", "UNDERSCORE"),
     (".", "DOT"),
+    ("..", "DOT_DOT"),
     (":", "COLON"),
     (":=", "COLON_EQ"),
     ("=", "EQ"),
@@ -198,7 +199,9 @@ fn generate_kind_src(
         .zip(used_puncts)
         .filter(|(_, used)| !used)
         .for_each(|((punct, _), _)| {
-            if *punct != "_" {
+            // `..` is unused in SQL, but used for PL/pgSQL
+            // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/gram.y#L692
+            if *punct != "_" && *punct != ".." {
                 panic!("Punctuation {punct:?} is not used in grammar");
             }
         });

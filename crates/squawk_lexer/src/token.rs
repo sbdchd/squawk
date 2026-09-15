@@ -35,6 +35,8 @@ pub enum TokenKind {
     Colon,
     /// `.`
     Dot,
+    /// `..`
+    DotDot,
     /// `=`
     Eq,
     /// `>`
