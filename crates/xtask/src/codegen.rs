@@ -32,7 +32,7 @@ use ungrammar::{Grammar, Rule};
 use xshell::{Shell, cmd};
 
 use crate::{
-    keywords::{KeywordKinds, keyword_kinds},
+    keywords::{KeywordKinds, contextual_keywords, keyword_kinds},
     path::project_root,
 };
 
@@ -92,7 +92,12 @@ pub(crate) fn codegen() -> Result<()> {
     let keyword_arrays = generate_keyword_arrays(&keyword_kinds)?;
     std::fs::write(syntax_keywords, keyword_arrays).context("problem writing keyword arrays")?;
 
-    let kinds = generate_kind_src(&ast_src.nodes, &grammar, keyword_kinds.all_keywords);
+    let kinds = generate_kind_src(
+        &ast_src.nodes,
+        &grammar,
+        keyword_kinds.all_keywords,
+        contextual_keywords()?,
+    );
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
     let syntax_kinds_file =
@@ -106,6 +111,7 @@ pub(crate) fn codegen() -> Result<()> {
 pub(crate) struct KindsSrc {
     pub(crate) punct: &'static [(&'static str, &'static str)],
     pub(crate) keywords: &'static [&'static str],
+    pub(crate) contextual_keywords: &'static [&'static str],
     pub(crate) literals: &'static [&'static str],
     pub(crate) tokens: &'static [&'static str],
     pub(crate) nodes: &'static [&'static str],
@@ -162,6 +168,7 @@ fn generate_kind_src(
     nodes: &[AstNodeSrc],
     grammar: &ungrammar::Grammar,
     pg_keywords: Vec<String>,
+    pl_keywords: Vec<String>,
 ) -> KindsSrc {
     let mut keywords: Vec<&_> = Vec::new();
     let mut tokens: Vec<&_> = TOKENS.to_vec();
@@ -209,6 +216,14 @@ fn generate_kind_src(
     keywords.sort();
     keywords.dedup();
 
+    let mut contextual_keywords: Vec<&_> = pl_keywords
+        .into_iter()
+        .map(|s| &*s.leak())
+        .collect::<Vec<_>>();
+    contextual_keywords.sort();
+    contextual_keywords.dedup();
+    let contextual_keywords = Vec::leak(contextual_keywords);
+
     // we leak things here for simplicity, that way we don't have to deal with lifetimes
     // The execution is a one shot job so thats fine
     let nodes = nodes
@@ -233,6 +248,7 @@ fn generate_kind_src(
         punct: PUNCT,
         nodes,
         keywords,
+        contextual_keywords,
         literals,
         tokens,
     }
@@ -283,10 +299,8 @@ fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
     Ok(format!("{PRELUDE}{}", output.trim_start()))
 }
 
-fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
-    // TODO: we should have a check to make sure each keyword is used in the grammar once the grammar is ready
-    let conditions = grammar
-        .keywords
+fn keyword_lookup_conditions(keywords: &[&str]) -> Vec<proc_macro2::TokenStream> {
+    keywords
         .iter()
         .enumerate()
         .map(|(i, keyword)| {
@@ -305,7 +319,13 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
                 }
             }
         })
-        .collect::<Vec<_>>();
+        .collect()
+}
+
+fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
+    // TODO: we should have a check to make sure each keyword is used in the grammar once the grammar is ready
+    let conditions = keyword_lookup_conditions(grammar.keywords);
+    let contextual_conditions = keyword_lookup_conditions(grammar.contextual_keywords);
 
     let punctuation = grammar
         .punct
@@ -313,7 +333,12 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         .map(|(_token, name)| format_ident!("{}", name))
         .collect::<Vec<_>>();
 
-    let all_keywords_values = grammar.keywords.to_vec();
+    let all_keywords_values = grammar
+        .keywords
+        .iter()
+        .chain(grammar.contextual_keywords)
+        .copied()
+        .collect::<Vec<_>>();
     let all_keywords = all_keywords_values
         .iter()
         .map(|&name| match name {
@@ -368,6 +393,14 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
             impl SyntaxKind {
                 pub(crate) fn from_keyword(ident: &str) -> Option<SyntaxKind> {
                     let kw = #(#conditions)* else {
+                        return None;
+                    };
+                    Some(kw)
+                }
+
+                #[doc = r"PL/pgSQL keywords that aren't SQL keywords. These stay `IDENT` in the token stream so SQL is unaffected; the PL/pgSQL grammar matches on the contextual kind instead."]
+                pub(crate) fn from_contextual_keyword(ident: &str) -> Option<SyntaxKind> {
+                    let kw = #(#contextual_conditions)* else {
                         return None;
                     };
                     Some(kw)

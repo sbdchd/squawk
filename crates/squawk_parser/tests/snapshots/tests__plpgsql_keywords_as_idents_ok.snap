@@ -1,0 +1,331 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/plpgsql_keywords_as_idents.sql
+---
+SOURCE_FILE
+  COMMENT "-- PL/pgSQL keywords live in their own namespace and stay plain identifiers in"
+  WHITESPACE "\n"
+  COMMENT "-- SQL. See postgres's pl_reserved_kwlist.h / pl_unreserved_kwlist.h."
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "alias"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "assert"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "constant"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "datatype"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "detail"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "diagnostics"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "elsif"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "exception"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "hint"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "info"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "log"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "loop"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "message"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "notice"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "perform"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "query"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "raise"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "reverse"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "rowtype"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "slice"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "sqlstate"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "stacked"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "warning"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        COLUMN_NAME
+          IDENT "while"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "message"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "detail"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "hint"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "query"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "slice"
+      COMMA ","
+      WHITESPACE " "
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "reverse"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

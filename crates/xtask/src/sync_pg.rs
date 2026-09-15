@@ -9,6 +9,8 @@ use xshell::{Shell, cmd};
 const SQL_REGRESSION_SUITE_DIR: &str = "postgres/regression_suite";
 const PLPGSQL_REGRESSION_SUITE_DIR: &str = "postgres/plpgsql";
 const KWLIST_PATH: &str = "postgres/kwlist.h";
+const PL_RESERVED_KWLIST_PATH: &str = "postgres/pl_reserved_kwlist.h";
+const PL_UNRESERVED_KWLIST_PATH: &str = "postgres/pl_unreserved_kwlist.h";
 
 const START_END_MARKERS: &[(&str, &str)] = &[
     (
@@ -181,7 +183,27 @@ pub(crate) fn sync_pg() -> Result<()> {
     let clone_dir = clone_postgres()?;
     let (sha, date) = git_head_info(&clone_dir)?;
 
-    sync_kwlist(&clone_dir, &sha, &date)?;
+    sync_kwlist(
+        &clone_dir,
+        &sha,
+        &date,
+        "src/include/parser/kwlist.h",
+        KWLIST_PATH,
+    )?;
+    sync_kwlist(
+        &clone_dir,
+        &sha,
+        &date,
+        "src/pl/plpgsql/src/pl_reserved_kwlist.h",
+        PL_RESERVED_KWLIST_PATH,
+    )?;
+    sync_kwlist(
+        &clone_dir,
+        &sha,
+        &date,
+        "src/pl/plpgsql/src/pl_unreserved_kwlist.h",
+        PL_UNRESERVED_KWLIST_PATH,
+    )?;
     sync_regression_suite(&clone_dir)?;
     sync_plpgsql_suite(&clone_dir)?;
 
@@ -215,7 +237,7 @@ fn clone_postgres() -> Result<Utf8PathBuf> {
     sh.change_dir(&clone_dir);
     cmd!(
         sh,
-        "git sparse-checkout set --no-cone /src/test/regress/sql /src/pl/plpgsql/src/sql /src/include/parser/kwlist.h"
+        "git sparse-checkout set --no-cone /src/test/regress/sql /src/pl/plpgsql/src/sql /src/include/parser/kwlist.h /src/pl/plpgsql/src/pl_reserved_kwlist.h /src/pl/plpgsql/src/pl_unreserved_kwlist.h"
     )
     .run()?;
 
@@ -230,16 +252,22 @@ fn git_head_info(clone_dir: &Utf8Path) -> Result<(String, String)> {
     Ok((sha, date))
 }
 
-fn sync_kwlist(clone_dir: &Utf8Path, sha: &str, date: &str) -> Result<()> {
-    println!("Syncing kwlist.h...");
-    let source = clone_dir.join("src/include/parser/kwlist.h");
+fn sync_kwlist(
+    clone_dir: &Utf8Path,
+    sha: &str,
+    date: &str,
+    source_path: &str,
+    dest_path: &str,
+) -> Result<()> {
+    println!("Syncing {source_path}...");
+    let source = clone_dir.join(source_path);
     let file_content = std::fs::read_to_string(&source)?;
 
     let preamble = format!(
         r"// synced from:
 //   commit: {sha}
 //   committed at: {date}
-//   file: https://github.com/postgres/postgres/blob/{sha}/src/include/parser/kwlist.h
+//   file: https://github.com/postgres/postgres/blob/{sha}/{source_path}
 //
 // update via:
 //   cargo xtask sync-pg
@@ -247,7 +275,7 @@ fn sync_kwlist(clone_dir: &Utf8Path, sha: &str, date: &str) -> Result<()> {
 "
     );
 
-    let kwlist_file = project_root().join(KWLIST_PATH);
+    let kwlist_file = project_root().join(dest_path);
     let mut file = File::create(kwlist_file)?;
     file.write_all((preamble + &file_content).as_bytes())?;
     Ok(())
