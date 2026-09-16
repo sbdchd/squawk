@@ -19394,6 +19394,32 @@ impl PeriodColumn {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Plpgsql {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Plpgsql {
+    #[inline]
+    pub fn stmts(&self) -> AstChildren<PlpgsqlNullStmt> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlNullStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlNullStmt {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn null_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Policy {
     pub(crate) syntax: SyntaxNode,
 }
@@ -45996,6 +46022,42 @@ impl AstNode for PeriodColumn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PERIOD_COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Plpgsql {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlNullStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_NULL_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

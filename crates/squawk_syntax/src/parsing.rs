@@ -31,7 +31,15 @@ use crate::{syntax_error::SyntaxError, syntax_node::SyntaxTreeBuilder};
 pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
     let lexed = squawk_parser::LexedStr::new(text);
     let parser_input = lexed.to_input();
-    let parser_output = squawk_parser::parse(&parser_input);
+    let parser_output = squawk_parser::EntryPoint::SourceFile.parse(&parser_input);
+    let (node, errors, _eof) = build_tree(lexed, parser_output);
+    (node, errors)
+}
+
+pub(crate) fn parse_plpgsql_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
+    let lexed = squawk_parser::LexedStr::new(text);
+    let parser_input = lexed.to_input();
+    let parser_output = squawk_parser::EntryPoint::Plpgsql.parse(&parser_input);
     let (node, errors, _eof) = build_tree(lexed, parser_output);
     (node, errors)
 }

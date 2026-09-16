@@ -26,8 +26,10 @@
 
 pub mod ast;
 pub mod column_name;
+pub mod decoded_text;
 mod generated;
 mod parsing;
+pub mod plpgsql;
 mod ptr;
 pub mod quote;
 pub mod syntax_error;

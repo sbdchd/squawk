@@ -151,14 +151,25 @@ impl CompletedMarker {
     }
 }
 
-pub fn parse(input: &Input) -> Output {
-    let mut p = Parser::new(input);
-    // 2. lex tokens to event vec via parser aka actually run the parser code,
-    // it calls the methods on the parser to create a vector of events
-    grammar::entry_point(&mut p);
-    let events = p.finish();
-    // 3. forward parents
-    event::process(events)
+#[derive(Clone, Copy, Debug)]
+pub enum EntryPoint {
+    SourceFile,
+    Plpgsql,
+}
+
+impl EntryPoint {
+    pub fn parse(&self, input: &Input) -> Output {
+        let mut p = Parser::new(input);
+        // 2. lex tokens to event vec via parser aka actually run the parser code,
+        // it calls the methods on the parser to create a vector of events
+        match self {
+            Self::SourceFile => grammar::entry_point(&mut p),
+            Self::Plpgsql => grammar::plpgsql_entry_point(&mut p),
+        }
+        let events = p.finish();
+        // 3. forward parents
+        event::process(events)
+    }
 }
 
 pub(crate) struct Parser<'t> {

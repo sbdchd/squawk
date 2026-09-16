@@ -3,7 +3,7 @@ use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::Deco
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
-use squawk_parser::{LexedStr, parse};
+use squawk_parser::{EntryPoint, LexedStr};
 use std::fmt::Write;
 
 #[dir_test(
@@ -138,7 +138,7 @@ fn bom_after_start_is_an_ident_char() {
 fn parse_text(text: &str) -> (String, Option<String>) {
     let lexed = LexedStr::new(text);
     let input = lexed.to_input();
-    let output = parse(&input);
+    let output = EntryPoint::SourceFile.parse(&input);
 
     let mut buf = String::new();
     let mut errors: Vec<(std::ops::Range<usize>, String)> = Vec::new();

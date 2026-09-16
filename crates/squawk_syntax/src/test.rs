@@ -1,10 +1,15 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/tests.rs
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
-use camino::Utf8Path;
+use camino::{Utf8Path, Utf8PathBuf};
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
 
-use crate::{SourceFile, syntax_error::SyntaxError};
+use crate::{
+    Parse, SourceFile, SyntaxKind, SyntaxNode,
+    ast::{self, AstNode},
+    plpgsql::Plpgsql,
+    syntax_error::SyntaxError,
+};
 
 fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
     let mut rendered = String::new();
@@ -95,6 +100,100 @@ fn regression_suite_validation(fixture: Fixture<&str>) {
         "regression test `{test_name}` has syntax validation errors:\n{}",
         render_errors(content, &errors)
     );
+}
+
+fn plpgsql_bodies(parse: &Parse<SourceFile>) -> Vec<Plpgsql> {
+    parse
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(|node| {
+            ast::CreateFunction::cast(node.clone())
+                .and_then(|it| it.plpgsql())
+                .or_else(|| ast::CreateProcedure::cast(node.clone()).and_then(|it| it.plpgsql()))
+                .or_else(|| ast::Do::cast(node).and_then(|it| it.plpgsql()))
+        })
+        .collect()
+}
+
+fn token_counts(node: &SyntaxNode) -> (usize, usize) {
+    let mut total = 0;
+    let mut unparsed = 0;
+    for token in node
+        .descendants_with_tokens()
+        .filter_map(|element| element.into_token())
+        .filter(|token| !token.kind().is_trivia())
+    {
+        total += 1;
+        if token
+            .parent_ancestors()
+            .any(|ancestor| ancestor.kind() == SyntaxKind::ERROR)
+        {
+            unparsed += 1;
+        }
+    }
+    (total, unparsed)
+}
+
+#[test]
+fn plpgsql_suite_score() {
+    let dir = Utf8Path::new(env!("CARGO_MANIFEST_DIR")).join("../../postgres/plpgsql");
+    let mut files = std::fs::read_dir(&dir)
+        .unwrap()
+        .map(|entry| Utf8PathBuf::try_from(entry.unwrap().path()).unwrap())
+        .filter(|path| path.extension() == Some("sql"))
+        .collect::<Vec<_>>();
+    files.sort();
+
+    let row = |label: &str, counts: [usize; 5]| {
+        let [sql, bodies, tokens, unparsed, err] = counts;
+        format!("{label:<25}{sql:>6}{bodies:>8}{tokens:>8}{unparsed:>10}{err:>6}\n")
+    };
+
+    let mut table = format!(
+        "{:<25}{:>6}{:>8}{:>8}{:>10}{:>6}\n",
+        "file", "sql", "bodies", "tokens", "unparsed", "err"
+    );
+    let mut totals = [0; 5];
+
+    for path in &files {
+        let content = std::fs::read_to_string(path).unwrap();
+        let parse = SourceFile::parse(&content);
+        let bodies = plpgsql_bodies(&parse);
+
+        let mut counts = [parse.errors().len(), bodies.len(), 0, 0, 0];
+        for body in &bodies {
+            let (tokens, unparsed) = token_counts(&body.syntax());
+            counts[2] += tokens;
+            counts[3] += unparsed;
+            counts[4] += body.errors().len();
+        }
+
+        table.push_str(&row(path.file_name().unwrap(), counts));
+        for (total, count) in totals.iter_mut().zip(counts) {
+            *total += count;
+        }
+    }
+
+    table.push_str(&row("total", totals));
+
+    assert_snapshot!(table, @"
+    file                        sql  bodies  tokens  unparsed   err
+    plpgsql_array.sql             0      26     949       949   949
+    plpgsql_cache.sql             0       2      60        60    60
+    plpgsql_call.sql              0      45    1698      1696  1696
+    plpgsql_control.sql           0      27    1424      1422  1422
+    plpgsql_copy.sql             79       4      28        28    28
+    plpgsql_domain.sql            0      23     307       307   307
+    plpgsql_misc.sql              6      16     261       261   261
+    plpgsql_record.sql           27      65    2008      2000  2000
+    plpgsql_simple.sql            3       9     217       217   217
+    plpgsql_transaction.sql       0      37    1203      1199  1199
+    plpgsql_trap.sql              0       7     354       354   354
+    plpgsql_trigger.sql           0       1      55        55    55
+    plpgsql_varprops.sql          0      33     736       706   706
+    total                       115     295    9300      9254  9254
+    ");
 }
 
 #[dir_test(

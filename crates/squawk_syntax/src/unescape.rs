@@ -1,6 +1,10 @@
 use std::fmt;
 use std::ops::{Range, RangeInclusive};
 
+use rowan::TextSize;
+
+use crate::decoded_text::DecodedText;
+
 pub enum UnicodeEscapeKind {
     Extended,
     Short,
@@ -172,68 +176,115 @@ pub fn uescape_char(text: &str) -> Option<char> {
     is_valid_uescape_char(byte).then(|| char::from(byte))
 }
 
-pub fn decode_plain_string(inner: &str, out: &mut String) {
-    let mut chars = inner.chars().peekable();
-    while let Some(c) = chars.next() {
-        if c == '\'' && chars.peek() == Some(&'\'') {
+pub fn decode_plain_string(inner: &str, start_pos: TextSize, out: &mut DecodedText) {
+    let mut chars = inner.char_indices().peekable();
+    while let Some((i, c)) = chars.next() {
+        let pos = start_pos + TextSize::new(i as u32);
+        if c == '\'' && chars.peek().is_some_and(|&(_, next)| next == '\'') {
             chars.next();
-            out.push('\'');
-        } else {
-            out.push(c);
         }
+        out.push_char(c, pos);
     }
 }
 
-fn push_char_bytes(c: char, bytes: &mut Vec<u8>) {
-    let mut buf = [0; 4];
-    let encoded = c.encode_utf8(&mut buf);
-    bytes.extend_from_slice(encoded.as_bytes());
+struct EscBuffer {
+    bytes: Vec<u8>,
+    pos: TextSize,
 }
 
-pub fn decode_esc_string(inner: &str, out: &mut String) {
-    let mut chars = inner.chars().peekable();
-    let mut bytes = vec![];
+impl EscBuffer {
+    fn new(pos: TextSize) -> Self {
+        Self { bytes: vec![], pos }
+    }
 
-    while let Some(c) = chars.next() {
-        if c == '\'' && chars.peek() == Some(&'\'') {
+    fn push(&mut self, byte: u8, pos: TextSize) {
+        if self.bytes.is_empty() {
+            self.pos = pos;
+        }
+        self.bytes.push(byte);
+    }
+
+    fn push_char(&mut self, c: char, pos: TextSize) {
+        if self.bytes.is_empty() {
+            self.pos = pos;
+        }
+        let mut buf = [0; 4];
+        self.bytes
+            .extend_from_slice(c.encode_utf8(&mut buf).as_bytes());
+    }
+
+    fn drain(&mut self, out: &mut DecodedText) {
+        if self.bytes.is_empty() {
+            return;
+        }
+        match std::str::from_utf8(&self.bytes) {
+            Ok(text) => out.push_str(text, self.pos),
+            Err(err) if err.error_len().is_some() => {
+                out.push_str(&String::from_utf8_lossy(&self.bytes), self.pos);
+            }
+            Err(_) => return,
+        }
+        self.bytes.clear();
+    }
+
+    fn flush(&mut self, out: &mut DecodedText) {
+        if self.bytes.is_empty() {
+            return;
+        }
+        out.push_str(&String::from_utf8_lossy(&self.bytes), self.pos);
+        self.bytes.clear();
+    }
+}
+
+pub fn decode_esc_string(inner: &str, start_pos: TextSize, out: &mut DecodedText) {
+    let mut chars = inner.char_indices().peekable();
+    let mut esc = EscBuffer::new(start_pos);
+
+    while let Some((i, c)) = chars.next() {
+        let pos = start_pos + TextSize::new(i as u32);
+
+        if c == '\'' && chars.peek().is_some_and(|&(_, next)| next == '\'') {
             chars.next();
-            bytes.push(b'\'');
+            esc.flush(out);
+            out.push_char('\'', pos);
             continue;
         }
         if c != '\\' {
-            push_char_bytes(c, &mut bytes);
+            esc.flush(out);
+            out.push_char(c, pos);
             continue;
         }
-        let Some(&next) = chars.peek() else {
-            bytes.push(b'\\');
+        let Some(&(_, next)) = chars.peek() else {
+            esc.flush(out);
+            out.push_char('\\', pos);
             break;
         };
         match next {
             'b' => {
                 chars.next();
-                bytes.push(b'\x08');
+                esc.push(b'\x08', pos);
             }
             'f' => {
                 chars.next();
-                bytes.push(b'\x0C');
+                esc.push(b'\x0C', pos);
             }
             'n' => {
                 chars.next();
-                bytes.push(b'\n');
+                esc.push(b'\n', pos);
             }
             'r' => {
                 chars.next();
-                bytes.push(b'\r');
+                esc.push(b'\r', pos);
             }
             't' => {
                 chars.next();
-                bytes.push(b'\t');
+                esc.push(b'\t', pos);
             }
             '0'..='7' => {
                 let mut value: u32 = 0;
                 for _ in 0..3 {
                     match chars.peek() {
-                        Some(&d) if ('0'..='7').contains(&d) => {
+                        Some(&(_, d)) if ('0'..='7').contains(&d) => {
                             chars.next();
                             value = value * 8 + d.to_digit(8).unwrap();
                         }
@@ -241,7 +292,7 @@ pub fn decode_esc_string(inner: &str, out: &mut String) {
                     }
                 }
                 if value != 0 {
-                    bytes.push(value as u8);
+                    esc.push(value as u8, pos);
                 }
             }
             'x' => {
@@ -250,7 +301,7 @@ pub fn decode_esc_string(inner: &str, out: &mut String) {
                 let mut got_any = false;
                 for _ in 0..2 {
                     match chars.peek() {
-                        Some(&d) if d.is_ascii_hexdigit() => {
+                        Some(&(_, d)) if d.is_ascii_hexdigit() => {
                             chars.next();
                             value = value * 16 + d.to_digit(16).unwrap() as u8;
                             got_any = true;
@@ -260,10 +311,10 @@ pub fn decode_esc_string(inner: &str, out: &mut String) {
                 }
                 if got_any {
                     if value != 0 {
-                        bytes.push(value);
+                        esc.push(value, pos);
                     }
                 } else {
-                    bytes.push(b'x');
+                    esc.push(b'x', pos);
                 }
             }
             'u' | 'U' => {
@@ -273,7 +324,7 @@ pub fn decode_esc_string(inner: &str, out: &mut String) {
                 let mut got_all = true;
                 for _ in 0..required {
                     match chars.peek() {
-                        Some(&d) if d.is_ascii_hexdigit() => {
+                        Some(&(_, d)) if d.is_ascii_hexdigit() => {
                             chars.next();
                             value = value * 16 + d.to_digit(16).unwrap();
                         }
@@ -287,24 +338,32 @@ pub fn decode_esc_string(inner: &str, out: &mut String) {
                     && let Some(ch) = char::from_u32(value)
                     && ch != '\0'
                 {
-                    push_char_bytes(ch, &mut bytes);
+                    esc.push_char(ch, pos);
                 }
             }
             _ => {
                 chars.next();
-                push_char_bytes(next, &mut bytes);
+                esc.push_char(next, pos);
             }
         }
+        esc.drain(out);
     }
 
-    out.push_str(&String::from_utf8_lossy(&bytes));
+    esc.flush(out);
 }
 
-pub fn decode_unicode_esc_string(inner: &str, escape_char: char, out: &mut String) {
-    let inner = inner.replace("''", "'");
-    escape_unicode_esc_str(&inner, escape_char, |_range, result| {
+pub fn decode_unicode_esc_string(
+    inner: &str,
+    start_pos: TextSize,
+    escape_char: char,
+    out: &mut DecodedText,
+) {
+    let mut dequoted = DecodedText::new(start_pos);
+    decode_plain_string(inner, start_pos, &mut dequoted);
+
+    escape_unicode_esc_str(dequoted.text(), escape_char, |range, result| {
         if let Ok(ch) = result {
-            out.push(ch);
+            out.push_char(ch, dequoted.source_pos(TextSize::new(range.start as u32)));
         }
     });
 }
@@ -330,15 +389,15 @@ mod tests {
     }
 
     fn decode_escape_string(inner: &str) -> String {
-        let mut out = String::new();
-        decode_esc_string(inner, &mut out);
-        out
+        let mut out = DecodedText::new(TextSize::new(0));
+        decode_esc_string(inner, TextSize::new(0), &mut out);
+        out.into_text()
     }
 
     fn decode_unicode_escape_string(inner: &str, escape_char: char) -> String {
-        let mut out = String::new();
-        decode_unicode_esc_string(inner, escape_char, &mut out);
-        out
+        let mut out = DecodedText::new(TextSize::new(0));
+        decode_unicode_esc_string(inner, TextSize::new(0), escape_char, &mut out);
+        out.into_text()
     }
 
     #[test]
@@ -409,6 +468,18 @@ mod tests {
     #[test]
     fn decode_escape_string_skips_nul_byte() {
         assert_snapshot!(decode_escape_string(r"a\000b"), @"ab");
+    }
+
+    #[test]
+    fn escape_string_incomplete_byte_escape() {
+        assert_snapshot!(decode_escape_string(r"\xc3a"), @"�a");
+        assert_snapshot!(decode_escape_string(r"\xc3"), @"�");
+    }
+
+    #[test]
+    fn escape_string_trailing_backslash() {
+        assert_snapshot!(decode_escape_string(r"a\"), @r"a\");
+        assert_snapshot!(decode_escape_string(r"\xC3\"), @r"�\");
     }
 
     #[test]
