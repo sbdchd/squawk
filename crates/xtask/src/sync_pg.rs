@@ -151,6 +151,9 @@ const IGNORED_LINES: &[&str] = &[
     r#"SELECT x' 0';"#,
     r#"SELECT b' 0';"#,
     r#"SELECT b'0 ';"#,
+    // the psql variable this reads is set by a \set we comment out, so the body
+    // would otherwise parse as the literal string `dobody`
+    "DO LANGUAGE plpgsql :'dobody';",
 ];
 
 const VARIABLE_REPLACEMENTS: &[(&str, &str)] = &[
@@ -304,13 +307,15 @@ fn sync_regression_suite(clone_dir: &Utf8Path) -> Result<()> {
     }
 
     files.sort();
-    let total_files = files.len();
+    preprocess_files(&files, &output_dir)
+}
 
+fn preprocess_files(files: &[Utf8PathBuf], output_dir: &Utf8Path) -> Result<()> {
     for (index, input_path) in files.iter().enumerate() {
         let filename = input_path.file_name().unwrap();
         let output_path = output_dir.join(filename);
 
-        println!("[{}/{}] Processing {}...", index + 1, total_files, filename);
+        println!("[{}/{}] Processing {}...", index + 1, files.len(), filename);
 
         let input_file = File::open(input_path)?;
         let reader = std::io::BufReader::new(input_file);
@@ -338,19 +343,17 @@ fn sync_plpgsql_suite(clone_dir: &Utf8Path) -> Result<()> {
     }
     create_dir_all(&output_dir)?;
 
-    let mut file_count = 0;
+    let mut files: Vec<Utf8PathBuf> = vec![];
     for entry in std::fs::read_dir(&source_dir)? {
         let entry = entry?;
         let path = Utf8PathBuf::try_from(entry.path())?;
         if path.extension() == Some("sql") {
-            let filename = path.file_name().unwrap();
-            std::fs::copy(&path, output_dir.join(filename))?;
-            file_count += 1;
+            files.push(path);
         }
     }
 
-    println!("Copied {file_count} PL/pgSQL files to {output_dir}");
-    Ok(())
+    files.sort();
+    preprocess_files(&files, &output_dir)
 }
 
 // The regression suite from postgres has a mix of valid and invalid sql. We

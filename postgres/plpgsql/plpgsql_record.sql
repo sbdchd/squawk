@@ -302,9 +302,9 @@ select getf1(row(1,2)::two_int4s);
 select getf1(row('foo',123,456)::more_int4s);
 -- the context stack is different when debug_discard_caches
 -- is set, so suppress context output
-\set SHOW_CONTEXT never
+-- \set SHOW_CONTEXT never
 select getf1(row(1,2)::two_int8s);
-\set SHOW_CONTEXT errors
+-- \set SHOW_CONTEXT errors
 select getf1(row(1,2));
 
 -- this seemingly-equivalent case behaves a bit differently,
@@ -377,9 +377,9 @@ select sillyaddone(42);
 alter table mutable drop column f1;
 -- the context stack is different when debug_discard_caches
 -- is set, so suppress context output
-\set SHOW_CONTEXT never
+-- \set SHOW_CONTEXT never
 select sillyaddone(42);  -- fail
-\set SHOW_CONTEXT errors
+-- \set SHOW_CONTEXT errors
 
 create function getf3(x mutable) returns int language plpgsql as
 $$ begin return x.f3; end $$;
@@ -389,9 +389,9 @@ select getf3(null::mutable);  -- now it works
 alter table mutable drop column f3;
 -- the context stack is different when debug_discard_caches
 -- is set, so suppress context output
-\set SHOW_CONTEXT never
+-- \set SHOW_CONTEXT never
 select getf3(null::mutable);  -- fails again
-\set SHOW_CONTEXT errors
+-- \set SHOW_CONTEXT errors
 
 -- check behavior with creating/dropping a named rowtype
 set check_function_bodies = off;  -- else reference to nonexistent type fails
@@ -407,9 +407,9 @@ select sillyaddtwo(42);
 drop table mutable2;
 -- the context stack is different when debug_discard_caches
 -- is set, so suppress context output
-\set SHOW_CONTEXT never
+-- \set SHOW_CONTEXT never
 select sillyaddtwo(42);  -- fail
-\set SHOW_CONTEXT errors
+-- \set SHOW_CONTEXT errors
 create table mutable2(f0 text, f1 int, f2 text);
 select sillyaddtwo(42);
 select sillyaddtwo(43);
@@ -575,5 +575,5 @@ $$ declare r record; begin r := row($1,$1); return r; end $$;
 create table two_int8s_tab (f1 two_int8s);
 insert into two_int8s_tab values (compresult(42));
 -- reconnect so we lose any local knowledge of anonymous record types
-\c -
+-- \c -
 table two_int8s_tab;

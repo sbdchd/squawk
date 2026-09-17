@@ -56,7 +56,7 @@ alter function simpletarget(int) immutable;
 select simplecaller();
 
 -- make sure flushing local caches changes nothing
-\c -
+-- \c -
 
 select simplecaller();
 

@@ -228,31 +228,39 @@ fn plpgsql_suite_score() {
         .collect::<Vec<_>>();
     files.sort();
 
-    let row = |label: &str, counts: [usize; 5]| {
-        let [sql, bodies, tokens, unparsed, err] = counts;
-        format!("{label:<25}{sql:>6}{bodies:>8}{tokens:>8}{unparsed:>10}{err:>6}\n")
+    let row = |label: &str, counts: [usize; 4]| {
+        let [bodies, tokens, unparsed, err] = counts;
+        format!("{label:<25}{bodies:>8}{tokens:>8}{unparsed:>10}{err:>6}\n")
     };
 
     let mut table = format!(
-        "{:<25}{:>6}{:>8}{:>8}{:>10}{:>6}\n",
-        "file", "sql", "bodies", "tokens", "unparsed", "err"
+        "{:<25}{:>8}{:>8}{:>10}{:>6}\n",
+        "file", "bodies", "tokens", "unparsed", "err"
     );
-    let mut totals = [0; 5];
+    let mut totals = [0; 4];
 
     for path in &files {
         let content = std::fs::read_to_string(path).unwrap();
         let parse = SourceFile::parse(&content);
+        let file_name = path.file_name().unwrap();
+
+        assert!(
+            parse.errors().is_empty(),
+            "`{file_name}` must parse as sql, otherwise the tree can hide bodies:\n{}",
+            render_errors(&content, &parse.errors())
+        );
+
         let bodies = plpgsql_bodies(&parse);
 
-        let mut counts = [parse.errors().len(), bodies.len(), 0, 0, 0];
+        let mut counts = [bodies.len(), 0, 0, 0];
         for body in &bodies {
             let (tokens, unparsed) = token_counts(&body.syntax());
-            counts[2] += tokens;
-            counts[3] += unparsed;
-            counts[4] += body.errors().len();
+            counts[1] += tokens;
+            counts[2] += unparsed;
+            counts[3] += body.errors().len();
         }
 
-        table.push_str(&row(path.file_name().unwrap(), counts));
+        table.push_str(&row(file_name, counts));
         for (total, count) in totals.iter_mut().zip(counts) {
             *total += count;
         }
@@ -261,21 +269,21 @@ fn plpgsql_suite_score() {
     table.push_str(&row("total", totals));
 
     assert_snapshot!(table, @"
-    file                        sql  bodies  tokens  unparsed   err
-    plpgsql_array.sql             0      26     949       949   949
-    plpgsql_cache.sql             0       2      60        60    60
-    plpgsql_call.sql              0      45    1698      1696  1696
-    plpgsql_control.sql           0      27    1424      1422  1422
-    plpgsql_copy.sql             79       4      28        28    28
-    plpgsql_domain.sql            0      23     307       307   307
-    plpgsql_misc.sql              6      16     261       261   261
-    plpgsql_record.sql           27      65    2008      2000  2000
-    plpgsql_simple.sql            3       9     217       217   217
-    plpgsql_transaction.sql       0      37    1203      1199  1199
-    plpgsql_trap.sql              0       7     354       354   354
-    plpgsql_trigger.sql           0       1      55        55    55
-    plpgsql_varprops.sql          0      33     736       706   706
-    total                       115     295    9300      9254  9254
+    file                       bodies  tokens  unparsed   err
+    plpgsql_array.sql              26     949       949   949
+    plpgsql_cache.sql               2      60        60    60
+    plpgsql_call.sql               45    1698      1696  1696
+    plpgsql_control.sql            27    1424      1422  1422
+    plpgsql_copy.sql                4      28        28    28
+    plpgsql_domain.sql             23     307       307   307
+    plpgsql_misc.sql               16     261       261   261
+    plpgsql_record.sql             65    2008      2000  2000
+    plpgsql_simple.sql              9     217       217   217
+    plpgsql_transaction.sql        37    1203      1199  1199
+    plpgsql_trap.sql                7     354       354   354
+    plpgsql_trigger.sql             1      55        55    55
+    plpgsql_varprops.sql           33     736       706   706
+    total                         295    9300      9254  9254
     ");
 }
 
