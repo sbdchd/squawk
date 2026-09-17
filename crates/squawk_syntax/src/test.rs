@@ -220,13 +220,14 @@ fn token_counts(node: &SyntaxNode) -> (usize, usize) {
 
 #[test]
 fn plpgsql_suite_score() {
-    let dir = Utf8Path::new(env!("CARGO_MANIFEST_DIR")).join("../../postgres/plpgsql");
-    let mut files = std::fs::read_dir(&dir)
+    let root = Utf8Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let mut files = std::fs::read_dir(root.join("postgres/plpgsql"))
         .unwrap()
         .map(|entry| Utf8PathBuf::try_from(entry.unwrap().path()).unwrap())
         .filter(|path| path.extension() == Some("sql"))
         .collect::<Vec<_>>();
-    files.sort();
+    files.push(root.join("postgres/regression_suite/plpgsql.sql"));
+    files.sort_by(|a, b| a.file_name().cmp(&b.file_name()));
 
     let row = |label: &str, counts: [usize; 4]| {
         let [bodies, tokens, unparsed, err] = counts;
@@ -270,6 +271,7 @@ fn plpgsql_suite_score() {
 
     assert_snapshot!(table, @"
     file                       bodies  tokens  unparsed   err
+    plpgsql.sql                   254    9965      9931  9931
     plpgsql_array.sql              26     949       949   949
     plpgsql_cache.sql               2      60        60    60
     plpgsql_call.sql               45    1698      1696  1696
@@ -283,7 +285,7 @@ fn plpgsql_suite_score() {
     plpgsql_trap.sql                7     354       354   354
     plpgsql_trigger.sql             1      55        55    55
     plpgsql_varprops.sql           33     736       706   706
-    total                         295    9300      9254  9254
+    total                         549   19265     19185 19185
     ");
 }
 
