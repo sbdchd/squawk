@@ -3,6 +3,7 @@ use crate::{
     generated::token_sets::{
         ALL_KEYWORDS, PLPGSQL_RESERVED_CONTEXTUAL_KEYWORDS, PLPGSQL_RESERVED_KEYWORDS,
     },
+    grammar,
     syntax_kind::SyntaxKind::*,
     token_set::TokenSet,
 };
@@ -68,9 +69,51 @@ fn opt_declare_section(p: &mut Parser) {
     let m = p.start();
     p.bump(DECLARE_KW);
     while !p.at(EOF) && !p.at(BEGIN_KW) {
-        temp_unknown(p, "expected a declaration");
+        if at_var_decl(p) {
+            var_decl(p);
+        } else {
+            temp_unknown(p, "expected a declaration");
+        }
     }
     m.complete(p, PLPGSQL_DECLARE_SECTION);
+}
+
+fn var_decl(p: &mut Parser) {
+    let m = p.start();
+    name(p, PLPGSQL_VAR_NAME);
+    if p.nth_at_contextual_kw(0, CONSTANT_KW) {
+        p.bump_remap(CONSTANT_KW);
+    }
+    grammar::func_type(p);
+    grammar::opt_collate(p);
+    opt_not_null(p);
+    opt_var_init(p);
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_VAR_DECL);
+}
+
+fn opt_not_null(p: &mut Parser) {
+    if !p.at(NOT_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump(NOT_KW);
+    p.expect(NULL_KW);
+    m.complete(p, PLPGSQL_NOT_NULL);
+}
+
+fn opt_var_init(p: &mut Parser) {
+    if !p.at(COLON_EQ) && !p.at(EQ) && !p.at(DEFAULT_KW) {
+        return;
+    }
+    let m = p.start();
+    if !p.eat(COLON_EQ) && !p.eat(EQ) {
+        p.bump(DEFAULT_KW);
+    }
+    if grammar::expr(p).is_none() {
+        p.error("expected an expression");
+    }
+    m.complete(p, PLPGSQL_VAR_INIT);
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -161,6 +204,14 @@ fn condition(p: &mut Parser) {
         p.error(format!("expected a condition name, found {kind:?}"));
     }
     m.complete(p, PLPGSQL_CONDITION);
+}
+
+fn at_var_decl(p: &Parser) -> bool {
+    at_name(p, 0)
+        && !p.nth_at_contextual_kw(1, ALIAS_KW)
+        && !p.nth_at(1, CURSOR_KW)
+        && !p.nth_at(1, SCROLL_KW)
+        && !p.nth_at(1, NO_KW)
 }
 
 fn at_block_start(p: &Parser) -> bool {

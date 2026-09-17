@@ -2037,16 +2037,16 @@ RoutineBody =
 | AtomicBody
 
 Plpgsql =
-  PlpgsqlBlock?
+  block:PlpgsqlBlock?
 
 PlpgsqlBlock =
-  PlpgsqlLabel?
-  PlpgsqlDeclareSection?
+  label:PlpgsqlLabel?
+  declare_section:PlpgsqlDeclareSection?
   'begin'
-  PlpgsqlBody
-  PlpgsqlExceptionSection?
+  body:PlpgsqlBody
+  exception:PlpgsqlExceptionSection?
   'end'
-  PlpgsqlLabelNameRef?
+  end_label:PlpgsqlLabelNameRef?
   ';'?
 
 PlpgsqlExceptionSection =
@@ -2057,14 +2057,14 @@ PlpgsqlExceptionHandler =
   'when'
   conditions:(PlpgsqlCondition*)
   'then'
-  PlpgsqlBody
+  body:PlpgsqlBody
 
 PlpgsqlCondition =
   '#name'?
   '@string'?
 
 PlpgsqlLabel =
-  '<<' PlpgsqlLabelName '>>'
+  '<<' name:PlpgsqlLabelName '>>'
 
 PlpgsqlLabelName =
   '#name'?
@@ -2074,6 +2074,26 @@ PlpgsqlLabelNameRef =
 
 PlpgsqlDeclareSection =
   'declare'
+  decls:(PlpgsqlVarDecl*)
+
+PlpgsqlVarDecl =
+  name:PlpgsqlVarName
+  'constant'?
+  FuncType
+  Collate?
+  not_null:PlpgsqlNotNull?
+  init:PlpgsqlVarInit?
+  ';'
+
+PlpgsqlNotNull =
+  'not' 'null'
+
+PlpgsqlVarName =
+  '#name'?
+
+PlpgsqlVarInit =
+  (':=' | '=' | 'default')
+  Expr
 
 PlpgsqlBody =
   stmts:(PlpgsqlStmt*)

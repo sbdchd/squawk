@@ -230,6 +230,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::PlpgsqlCondition(_)
             | ast::AnyName::PlpgsqlLabelName(_)
             | ast::AnyName::PlpgsqlLabelNameRef(_)
+            | ast::AnyName::PlpgsqlVarName(_)
             | ast::AnyName::PolicyRef(_)
             | ast::AnyName::PreparedStatementRef(_)
             | ast::AnyName::PropertyName(_)

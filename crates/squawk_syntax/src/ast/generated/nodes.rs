@@ -19399,7 +19399,7 @@ pub struct Plpgsql {
 }
 impl Plpgsql {
     #[inline]
-    pub fn plpgsql_block(&self) -> Option<PlpgsqlBlock> {
+    pub fn block(&self) -> Option<PlpgsqlBlock> {
         support::child(&self.syntax)
     }
 }
@@ -19410,23 +19410,23 @@ pub struct PlpgsqlBlock {
 }
 impl PlpgsqlBlock {
     #[inline]
-    pub fn plpgsql_body(&self) -> Option<PlpgsqlBody> {
+    pub fn body(&self) -> Option<PlpgsqlBody> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn plpgsql_declare_section(&self) -> Option<PlpgsqlDeclareSection> {
+    pub fn declare_section(&self) -> Option<PlpgsqlDeclareSection> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn plpgsql_exception_section(&self) -> Option<PlpgsqlExceptionSection> {
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn plpgsql_label(&self) -> Option<PlpgsqlLabel> {
+    pub fn exception(&self) -> Option<PlpgsqlExceptionSection> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn plpgsql_label_name_ref(&self) -> Option<PlpgsqlLabelNameRef> {
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19475,6 +19475,10 @@ pub struct PlpgsqlDeclareSection {
 }
 impl PlpgsqlDeclareSection {
     #[inline]
+    pub fn decls(&self) -> AstChildren<PlpgsqlVarDecl> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn declare_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DECLARE_KW)
     }
@@ -19486,12 +19490,12 @@ pub struct PlpgsqlExceptionHandler {
 }
 impl PlpgsqlExceptionHandler {
     #[inline]
-    pub fn conditions(&self) -> AstChildren<PlpgsqlCondition> {
-        support::children(&self.syntax)
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
     }
     #[inline]
-    pub fn plpgsql_body(&self) -> Option<PlpgsqlBody> {
-        support::child(&self.syntax)
+    pub fn conditions(&self) -> AstChildren<PlpgsqlCondition> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn then_token(&self) -> Option<SyntaxToken> {
@@ -19524,7 +19528,7 @@ pub struct PlpgsqlLabel {
 }
 impl PlpgsqlLabel {
     #[inline]
-    pub fn plpgsql_label_name(&self) -> Option<PlpgsqlLabelName> {
+    pub fn name(&self) -> Option<PlpgsqlLabelName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19560,6 +19564,21 @@ impl PlpgsqlLabelNameRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlNotNull {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlNotNull {
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn null_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlNullStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19571,6 +19590,75 @@ impl PlpgsqlNullStmt {
     #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NULL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlVarDecl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlVarDecl {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn func_type(&self) -> Option<FuncType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn init(&self) -> Option<PlpgsqlVarInit> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_null(&self) -> Option<PlpgsqlNotNull> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn constant_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTANT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlVarInit {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlVarInit {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlVarName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlVarName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -28685,6 +28773,7 @@ pub enum AnyName {
     PlpgsqlCondition(PlpgsqlCondition),
     PlpgsqlLabelName(PlpgsqlLabelName),
     PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
+    PlpgsqlVarName(PlpgsqlVarName),
     Policy(Policy),
     PolicyRef(PolicyRef),
     PreparedStatement(PreparedStatement),
@@ -46381,10 +46470,82 @@ impl AstNode for PlpgsqlLabelNameRef {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlNotNull {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_NOT_NULL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlNullStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_NULL_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlVarDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_VAR_DECL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlVarInit {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_VAR_INIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlVarName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_VAR_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -58777,6 +58938,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::PLPGSQL_CONDITION
                 | SyntaxKind::PLPGSQL_LABEL_NAME
                 | SyntaxKind::PLPGSQL_LABEL_NAME_REF
+                | SyntaxKind::PLPGSQL_VAR_NAME
                 | SyntaxKind::POLICY
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT
@@ -58895,6 +59057,7 @@ impl AstNode for AnyName {
             SyntaxKind::PLPGSQL_LABEL_NAME_REF => {
                 AnyName::PlpgsqlLabelNameRef(PlpgsqlLabelNameRef { syntax })
             }
+            SyntaxKind::PLPGSQL_VAR_NAME => AnyName::PlpgsqlVarName(PlpgsqlVarName { syntax }),
             SyntaxKind::POLICY => AnyName::Policy(Policy { syntax }),
             SyntaxKind::POLICY_REF => AnyName::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT => {
@@ -59003,6 +59166,7 @@ impl AstNode for AnyName {
             AnyName::PlpgsqlCondition(it) => &it.syntax,
             AnyName::PlpgsqlLabelName(it) => &it.syntax,
             AnyName::PlpgsqlLabelNameRef(it) => &it.syntax,
+            AnyName::PlpgsqlVarName(it) => &it.syntax,
             AnyName::Policy(it) => &it.syntax,
             AnyName::PolicyRef(it) => &it.syntax,
             AnyName::PreparedStatement(it) => &it.syntax,
@@ -59339,6 +59503,12 @@ impl From<PlpgsqlLabelNameRef> for AnyName {
     #[inline]
     fn from(node: PlpgsqlLabelNameRef) -> AnyName {
         AnyName::PlpgsqlLabelNameRef(node)
+    }
+}
+impl From<PlpgsqlVarName> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlVarName) -> AnyName {
+        AnyName::PlpgsqlVarName(node)
     }
 }
 impl From<Policy> for AnyName {

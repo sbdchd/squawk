@@ -1,0 +1,120 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/var_decl.sql
+---
+PLPGSQL@0..159
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..158
+    PLPGSQL_DECLARE_SECTION@1..140
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..17
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "a"
+        WHITESPACE@12..13 " "
+        PATH_TYPE@13..16
+          PATH_REF@13..16
+            PATH_SEGMENT_REF@13..16
+              INT_KW@13..16 "int"
+        SEMICOLON@16..17 ";"
+      WHITESPACE@17..20 "\n  "
+      PLPGSQL_VAR_DECL@20..43
+        PLPGSQL_VAR_NAME@20..21
+          IDENT@20..21 "b"
+        WHITESPACE@21..22 " "
+        CONSTANT_KW@22..30 "constant"
+        WHITESPACE@30..31 " "
+        PATH_TYPE@31..35
+          PATH_REF@31..35
+            PATH_SEGMENT_REF@31..35
+              TEXT_KW@31..35 "text"
+        WHITESPACE@35..36 " "
+        PLPGSQL_VAR_INIT@36..42
+          COLON_EQ@36..38 ":="
+          WHITESPACE@38..39 " "
+          LITERAL@39..42
+            STRING@39..42 "'x'"
+        SEMICOLON@42..43 ";"
+      WHITESPACE@43..46 "\n  "
+      PLPGSQL_VAR_DECL@46..73
+        PLPGSQL_VAR_NAME@46..47
+          IDENT@46..47 "c"
+        WHITESPACE@47..48 " "
+        PATH_TYPE@48..62
+          PATH_REF@48..55
+            PATH_SEGMENT_REF@48..55
+              NUMERIC_KW@48..55 "numeric"
+          ARG_LIST@55..62
+            L_PAREN@55..56 "("
+            ARG@56..58
+              LITERAL@56..58
+                INT_NUMBER@56..58 "10"
+            COMMA@58..59 ","
+            WHITESPACE@59..60 " "
+            ARG@60..61
+              LITERAL@60..61
+                INT_NUMBER@60..61 "2"
+            R_PAREN@61..62 ")"
+        WHITESPACE@62..63 " "
+        PLPGSQL_VAR_INIT@63..72
+          DEFAULT_KW@63..70 "default"
+          WHITESPACE@70..71 " "
+          LITERAL@71..72
+            INT_NUMBER@71..72 "0"
+        SEMICOLON@72..73 ";"
+      WHITESPACE@73..76 "\n  "
+      PLPGSQL_VAR_DECL@76..110
+        PLPGSQL_VAR_NAME@76..77
+          IDENT@76..77 "d"
+        WHITESPACE@77..78 " "
+        PATH_TYPE@78..82
+          PATH_REF@78..82
+            PATH_SEGMENT_REF@78..82
+              TEXT_KW@78..82 "text"
+        WHITESPACE@82..83 " "
+        COLLATE@83..94
+          COLLATE_KW@83..90 "collate"
+          WHITESPACE@90..91 " "
+          COLLATION_REF@91..94
+            PATH_REF@91..94
+              PATH_SEGMENT_REF@91..94
+                IDENT@91..94 "\"C\""
+        WHITESPACE@94..95 " "
+        PLPGSQL_NOT_NULL@95..103
+          NOT_KW@95..98 "not"
+          WHITESPACE@98..99 " "
+          NULL_KW@99..103 "null"
+        WHITESPACE@103..104 " "
+        PLPGSQL_VAR_INIT@104..109
+          EQ@104..105 "="
+          WHITESPACE@105..106 " "
+          LITERAL@106..109
+            STRING@106..109 "'y'"
+        SEMICOLON@109..110 ";"
+      WHITESPACE@110..113 "\n  "
+      PLPGSQL_VAR_DECL@113..140
+        PLPGSQL_VAR_NAME@113..114
+          IDENT@113..114 "e"
+        WHITESPACE@114..115 " "
+        PERCENT_TYPE@115..139
+          PATH_REF@115..134
+            PATH_REF@115..125
+              PATH_SEGMENT_REF@115..125
+                IDENT@115..125 "some_table"
+            DOT@125..126 "."
+            PATH_SEGMENT_REF@126..134
+              IDENT@126..134 "some_col"
+          PERCENT_TYPE_CLAUSE@134..139
+            PERCENT@134..135 "%"
+            TYPE_KW@135..139 "type"
+        SEMICOLON@139..140 ";"
+    WHITESPACE@140..141 "\n"
+    BEGIN_KW@141..146 "begin"
+    WHITESPACE@146..149 "\n  "
+    PLPGSQL_BODY@149..154
+      PLPGSQL_NULL_STMT@149..154
+        NULL_KW@149..153 "null"
+        SEMICOLON@153..154 ";"
+    WHITESPACE@154..155 "\n"
+    END_KW@155..158 "end"
+  WHITESPACE@158..159 "\n"

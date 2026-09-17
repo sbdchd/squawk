@@ -166,7 +166,7 @@ fn is_select_marker(cm: &CompletedMarker) -> bool {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum ExprKind {
+pub(crate) enum ExprKind {
     Other,
     Select,
 }
@@ -2547,7 +2547,7 @@ fn type_name(p: &mut Parser<'_>) {
     }
 }
 
-fn func_type(p: &mut Parser<'_>) {
+pub(crate) fn func_type(p: &mut Parser<'_>) {
     if opt_type_name_with(p, true, true).is_none() {
         p.error("expected type name");
     }
@@ -2997,7 +2997,7 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     m.complete(p, FIELD_EXPR)
 }
 
-fn expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
+pub(crate) fn expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     expr_bp(p, 1, &Restrictions::default())
 }
 
@@ -19522,7 +19522,7 @@ fn attribute_list(p: &mut Parser<'_>) {
     m.complete(p, ATTRIBUTE_LIST);
 }
 
-fn opt_collate(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+pub(crate) fn opt_collate(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if p.eat(COLLATE_KW) {
         collation_ref(p);
