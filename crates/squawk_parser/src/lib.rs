@@ -670,6 +670,12 @@ impl<'t> Parser<'t> {
         kinds.contains(self.nth(n))
     }
 
+    /// Checks if the nth token is a contextual keyword in `kinds`.
+    #[must_use]
+    pub(crate) fn nth_at_contextual_ts(&self, n: usize, kinds: TokenSet) -> bool {
+        kinds.contains(self.inp.contextual_kind(self.pos + n))
+    }
+
     #[must_use]
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
         match kind {

@@ -2362,3 +2362,31 @@ pub(crate) const RESERVED_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::WINDOW_KW,
     SyntaxKind::WITH_KW,
 ]);
+
+pub(crate) const PLPGSQL_RESERVED_KEYWORDS: TokenSet = TokenSet::new(&[
+    SyntaxKind::ALL_KW,
+    SyntaxKind::BEGIN_KW,
+    SyntaxKind::BY_KW,
+    SyntaxKind::CASE_KW,
+    SyntaxKind::DECLARE_KW,
+    SyntaxKind::ELSE_KW,
+    SyntaxKind::END_KW,
+    SyntaxKind::FOR_KW,
+    SyntaxKind::FROM_KW,
+    SyntaxKind::IF_KW,
+    SyntaxKind::IN_KW,
+    SyntaxKind::INTO_KW,
+    SyntaxKind::NOT_KW,
+    SyntaxKind::NULL_KW,
+    SyntaxKind::OR_KW,
+    SyntaxKind::THEN_KW,
+    SyntaxKind::TO_KW,
+    SyntaxKind::USING_KW,
+    SyntaxKind::WHEN_KW,
+]);
+
+pub(crate) const PLPGSQL_RESERVED_CONTEXTUAL_KEYWORDS: TokenSet = TokenSet::new(&[
+    SyntaxKind::FOREACH_KW,
+    SyntaxKind::LOOP_KW,
+    SyntaxKind::WHILE_KW,
+]);

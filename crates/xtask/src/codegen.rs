@@ -460,6 +460,16 @@ fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
+    let plpgsql_reserved_keywords = &keyword_kinds
+        .plpgsql_reserved_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
+    let plpgsql_reserved_contextual_keywords = &keyword_kinds
+        .plpgsql_reserved_contextual_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
 
     let output = reformat(
         quote! {
@@ -496,6 +506,14 @@ fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
 
             pub(crate) const RESERVED_KEYWORDS: TokenSet = TokenSet::new(&[
                 #(SyntaxKind::#reserved_keywords),*
+            ]);
+
+            pub(crate) const PLPGSQL_RESERVED_KEYWORDS: TokenSet = TokenSet::new(&[
+                #(SyntaxKind::#plpgsql_reserved_keywords),*
+            ]);
+
+            pub(crate) const PLPGSQL_RESERVED_CONTEXTUAL_KEYWORDS: TokenSet = TokenSet::new(&[
+                #(SyntaxKind::#plpgsql_reserved_contextual_keywords),*
             ]);
         }
         .to_string(),

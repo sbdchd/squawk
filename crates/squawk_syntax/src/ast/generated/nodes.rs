@@ -19418,6 +19418,14 @@ impl PlpgsqlBlock {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn plpgsql_label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn plpgsql_label_name_ref(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
@@ -19450,6 +19458,47 @@ impl PlpgsqlDeclareSection {
     #[inline]
     pub fn declare_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DECLARE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLabel {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLabel {
+    #[inline]
+    pub fn plpgsql_label_name(&self) -> Option<PlpgsqlLabelName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn less_less_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LESS_LESS)
+    }
+    #[inline]
+    pub fn greater_greater_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GREATER_GREATER)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLabelName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLabelName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLabelNameRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLabelNameRef {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -28576,6 +28625,8 @@ pub enum AnyName {
     ParamNameRef(ParamNameRef),
     PathSegment(PathSegment),
     PathSegmentRef(PathSegmentRef),
+    PlpgsqlLabelName(PlpgsqlLabelName),
+    PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
     Policy(Policy),
     PolicyRef(PolicyRef),
     PreparedStatement(PreparedStatement),
@@ -28632,6 +28683,7 @@ pub enum AnyNameRef {
     NameRef(NameRef),
     ParamNameRef(ParamNameRef),
     PathSegmentRef(PathSegmentRef),
+    PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
     PolicyRef(PolicyRef),
     PreparedStatementRef(PreparedStatementRef),
     PropertyNameRef(PropertyNameRef),
@@ -46163,6 +46215,60 @@ impl AstNode for PlpgsqlDeclareSection {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlLabel {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LABEL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlLabelName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LABEL_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlLabelNameRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LABEL_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlNullStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -58556,6 +58662,8 @@ impl AstNode for AnyName {
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT
                 | SyntaxKind::PATH_SEGMENT_REF
+                | SyntaxKind::PLPGSQL_LABEL_NAME
+                | SyntaxKind::PLPGSQL_LABEL_NAME_REF
                 | SyntaxKind::POLICY
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT
@@ -58667,6 +58775,12 @@ impl AstNode for AnyName {
             SyntaxKind::PARAM_NAME_REF => AnyName::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::PATH_SEGMENT => AnyName::PathSegment(PathSegment { syntax }),
             SyntaxKind::PATH_SEGMENT_REF => AnyName::PathSegmentRef(PathSegmentRef { syntax }),
+            SyntaxKind::PLPGSQL_LABEL_NAME => {
+                AnyName::PlpgsqlLabelName(PlpgsqlLabelName { syntax })
+            }
+            SyntaxKind::PLPGSQL_LABEL_NAME_REF => {
+                AnyName::PlpgsqlLabelNameRef(PlpgsqlLabelNameRef { syntax })
+            }
             SyntaxKind::POLICY => AnyName::Policy(Policy { syntax }),
             SyntaxKind::POLICY_REF => AnyName::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT => {
@@ -58772,6 +58886,8 @@ impl AstNode for AnyName {
             AnyName::ParamNameRef(it) => &it.syntax,
             AnyName::PathSegment(it) => &it.syntax,
             AnyName::PathSegmentRef(it) => &it.syntax,
+            AnyName::PlpgsqlLabelName(it) => &it.syntax,
+            AnyName::PlpgsqlLabelNameRef(it) => &it.syntax,
             AnyName::Policy(it) => &it.syntax,
             AnyName::PolicyRef(it) => &it.syntax,
             AnyName::PreparedStatement(it) => &it.syntax,
@@ -59092,6 +59208,18 @@ impl From<PathSegmentRef> for AnyName {
         AnyName::PathSegmentRef(node)
     }
 }
+impl From<PlpgsqlLabelName> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlLabelName) -> AnyName {
+        AnyName::PlpgsqlLabelName(node)
+    }
+}
+impl From<PlpgsqlLabelNameRef> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlLabelNameRef) -> AnyName {
+        AnyName::PlpgsqlLabelNameRef(node)
+    }
+}
 impl From<Policy> for AnyName {
     #[inline]
     fn from(node: Policy) -> AnyName {
@@ -59324,6 +59452,7 @@ impl AstNode for AnyNameRef {
                 | SyntaxKind::NAME_REF
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT_REF
+                | SyntaxKind::PLPGSQL_LABEL_NAME_REF
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT_REF
                 | SyntaxKind::PROPERTY_NAME_REF
@@ -59375,6 +59504,9 @@ impl AstNode for AnyNameRef {
             SyntaxKind::NAME_REF => AnyNameRef::NameRef(NameRef { syntax }),
             SyntaxKind::PARAM_NAME_REF => AnyNameRef::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::PATH_SEGMENT_REF => AnyNameRef::PathSegmentRef(PathSegmentRef { syntax }),
+            SyntaxKind::PLPGSQL_LABEL_NAME_REF => {
+                AnyNameRef::PlpgsqlLabelNameRef(PlpgsqlLabelNameRef { syntax })
+            }
             SyntaxKind::POLICY_REF => AnyNameRef::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT_REF => {
                 AnyNameRef::PreparedStatementRef(PreparedStatementRef { syntax })
@@ -59422,6 +59554,7 @@ impl AstNode for AnyNameRef {
             AnyNameRef::NameRef(it) => &it.syntax,
             AnyNameRef::ParamNameRef(it) => &it.syntax,
             AnyNameRef::PathSegmentRef(it) => &it.syntax,
+            AnyNameRef::PlpgsqlLabelNameRef(it) => &it.syntax,
             AnyNameRef::PolicyRef(it) => &it.syntax,
             AnyNameRef::PreparedStatementRef(it) => &it.syntax,
             AnyNameRef::PropertyNameRef(it) => &it.syntax,
@@ -59540,6 +59673,12 @@ impl From<PathSegmentRef> for AnyNameRef {
     #[inline]
     fn from(node: PathSegmentRef) -> AnyNameRef {
         AnyNameRef::PathSegmentRef(node)
+    }
+}
+impl From<PlpgsqlLabelNameRef> for AnyNameRef {
+    #[inline]
+    fn from(node: PlpgsqlLabelNameRef) -> AnyNameRef {
+        AnyNameRef::PlpgsqlLabelNameRef(node)
     }
 }
 impl From<PolicyRef> for AnyNameRef {

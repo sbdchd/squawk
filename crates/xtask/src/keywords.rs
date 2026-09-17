@@ -132,6 +132,8 @@ pub(crate) struct KeywordKinds {
     pub(crate) type_func_name_keywords: Vec<String>,
     pub(crate) col_table_keywords: Vec<String>,
     pub(crate) type_keywords: Vec<String>,
+    pub(crate) plpgsql_reserved_keywords: Vec<String>,
+    pub(crate) plpgsql_reserved_contextual_keywords: Vec<String>,
 }
 
 pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
@@ -220,6 +222,20 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
         .collect::<Vec<String>>();
     type_keywords.sort();
 
+    let pl_reserved = parse_pl_header(PL_RESERVED_KWLIST)?;
+    let mut plpgsql_reserved_keywords = pl_reserved
+        .iter()
+        .filter(|keyword| keywords.contains_key(*keyword))
+        .map(|keyword| keyword.to_owned())
+        .collect::<Vec<String>>();
+    plpgsql_reserved_keywords.sort();
+    let mut plpgsql_reserved_contextual_keywords = pl_reserved
+        .iter()
+        .filter(|keyword| !keywords.contains_key(*keyword))
+        .map(|keyword| keyword.to_owned())
+        .collect::<Vec<String>>();
+    plpgsql_reserved_contextual_keywords.sort();
+
     Ok(KeywordKinds {
         all_keywords,
         bare_label_keywords,
@@ -230,6 +246,8 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
         type_func_name_keywords,
         col_table_keywords,
         type_keywords,
+        plpgsql_reserved_keywords,
+        plpgsql_reserved_contextual_keywords,
     })
 }
 

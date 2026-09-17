@@ -2040,11 +2040,22 @@ Plpgsql =
   PlpgsqlBlock?
 
 PlpgsqlBlock =
+  PlpgsqlLabel?
   PlpgsqlDeclareSection?
   'begin'
   PlpgsqlBody
   'end'
+  PlpgsqlLabelNameRef?
   ';'?
+
+PlpgsqlLabel =
+  '<<' PlpgsqlLabelName '>>'
+
+PlpgsqlLabelName =
+  '#name'?
+
+PlpgsqlLabelNameRef =
+  '#name'?
 
 PlpgsqlDeclareSection =
   'declare'
