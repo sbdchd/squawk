@@ -42,7 +42,6 @@ type bits = u64;
 pub struct Input {
     kind: Vec<SyntaxKind>,
     joint: Vec<bits>,
-    // TODO: I think we can remove this
     contextual_kind: Vec<SyntaxKind>,
 }
 
@@ -52,10 +51,10 @@ impl Input {
     pub(crate) fn push(&mut self, kind: SyntaxKind) {
         self.push_impl(kind, SyntaxKind::EOF)
     }
-    // #[inline]
-    // pub(crate) fn push_ident(&mut self, contextual_kind: SyntaxKind) {
-    //     self.push_impl(SyntaxKind::IDENT, contextual_kind)
-    // }
+    #[inline]
+    pub(crate) fn push_ident(&mut self, contextual_kind: SyntaxKind) {
+        self.push_impl(SyntaxKind::IDENT, contextual_kind)
+    }
     /// Sets jointness for the last token we've pushed.
     ///
     /// This is a separate API rather than an argument to the `push` to make it
@@ -94,14 +93,14 @@ impl Input {
     pub(crate) fn kind(&self, idx: usize) -> SyntaxKind {
         self.kind.get(idx).copied().unwrap_or(SyntaxKind::EOF)
     }
-    // TODO: we may want to use this in the parser since we have a lot of
-    // "keywords" that are actually contextual.
-    // pub(crate) fn contextual_kind(&self, idx: usize) -> SyntaxKind {
-    //     self.contextual_kind
-    //         .get(idx)
-    //         .copied()
-    //         .unwrap_or(SyntaxKind::EOF)
-    // }
+    /// For an `IDENT`, the PL/pgSQL keyword it spells, or `IDENT` if it spells
+    /// none. `EOF` for every other token.
+    pub(crate) fn contextual_kind(&self, idx: usize) -> SyntaxKind {
+        self.contextual_kind
+            .get(idx)
+            .copied()
+            .unwrap_or(SyntaxKind::EOF)
+    }
     pub(crate) fn is_joint(&self, n: usize) -> bool {
         let (idx, b_idx) = self.bit_index(n);
         self.joint[idx] & 1 << b_idx != 0

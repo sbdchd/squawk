@@ -29,7 +29,7 @@ use std::borrow::Cow;
 use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
-use rowan::{GreenNodeData, GreenTokenData, NodeOrToken};
+use rowan::{GreenNodeData, GreenTokenData, NodeOrToken, TextSize};
 use squawk_line_index::{LineEnding, find_newline};
 
 #[cfg(test)]
@@ -38,7 +38,15 @@ use rowan::Direction;
 
 use crate::ast;
 use crate::ast::AstNode;
-use crate::unescape::{escape_unicode_esc_str, uescape_char};
+use crate::decoded_text::DecodedText;
+use crate::quote::{
+    dollar_quote_tag, strip_dollar_quotes, strip_prefixed_quotes, strip_quotes,
+    strip_unicode_esc_prefix,
+};
+use crate::unescape::{
+    decode_esc_string, decode_plain_string, decode_unicode_esc_string, escape_unicode_esc_str,
+    uescape_char,
+};
 use crate::{SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
 
 use super::support;
@@ -190,6 +198,109 @@ impl ast::Literal {
             _ => return None,
         };
         Some(kind)
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum StringDecoding {
+    BitOrByte,
+    EscString,
+    UnicodeEscString,
+}
+
+impl ast::Literal {
+    pub fn string_value(&self) -> Option<String> {
+        Some(self.decoded_value()?.into_text())
+    }
+
+    pub fn decoded_value(&self) -> Option<DecodedText> {
+        let escape_char = self.unicode_escape_char();
+        let mut out = DecodedText::new(self.syntax().text_range().start());
+        let mut decoding: Option<StringDecoding> = None;
+
+        for element in self.syntax().children_with_tokens() {
+            let Some(token) = element.into_token() else {
+                continue;
+            };
+            let start = token.text_range().start();
+            match token.kind() {
+                SyntaxKind::ESC_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['e', 'E'])?;
+                    let inner_start = start + TextSize::new(2);
+                    decode_esc_string(inner, inner_start, &mut out);
+                    out.mark_end(inner_start + TextSize::of(inner));
+                    decoding = Some(StringDecoding::EscString);
+                }
+                SyntaxKind::UNICODE_ESC_STRING => {
+                    let inner = strip_unicode_esc_prefix(token.text())?;
+                    let inner_start = start + TextSize::new(3);
+                    decode_unicode_esc_string(inner, inner_start, escape_char, &mut out);
+                    out.mark_end(inner_start + TextSize::of(inner));
+                    decoding = Some(StringDecoding::UnicodeEscString);
+                }
+                SyntaxKind::BIT_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['b', 'B'])?;
+                    out.push_str(inner, start + TextSize::new(2));
+                    decoding = Some(StringDecoding::BitOrByte);
+                }
+                SyntaxKind::BYTE_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['x', 'X'])?;
+                    out.push_str(inner, start + TextSize::new(2));
+                    decoding = Some(StringDecoding::BitOrByte);
+                }
+                SyntaxKind::DOLLAR_QUOTED_STRING => {
+                    let tag = dollar_quote_tag(token.text())?;
+                    let inner = strip_dollar_quotes(token.text())?;
+                    out.push_str(inner, start + TextSize::new(tag.len() as u32 + 2));
+                    return Some(out);
+                }
+                SyntaxKind::NATIONAL_STRING => {
+                    let inner = strip_prefixed_quotes(token.text(), ['n', 'N'])?;
+                    let inner_start = start + TextSize::new(2);
+                    decode_plain_string(inner, inner_start, &mut out);
+                    out.mark_end(inner_start + TextSize::of(inner));
+                }
+                SyntaxKind::STRING => {
+                    let inner = strip_quotes(token.text())?;
+                    let inner_start = start + TextSize::new(1);
+                    match decoding {
+                        Some(StringDecoding::EscString) => {
+                            decode_esc_string(inner, inner_start, &mut out);
+                        }
+                        Some(StringDecoding::UnicodeEscString) => {
+                            decode_unicode_esc_string(inner, inner_start, escape_char, &mut out);
+                        }
+                        Some(StringDecoding::BitOrByte) => out.push_str(inner, inner_start),
+                        None => decode_plain_string(inner, inner_start, &mut out),
+                    }
+                    out.mark_end(inner_start + TextSize::of(inner));
+                }
+                SyntaxKind::UESCAPE_KW => break,
+                _ => (),
+            }
+        }
+
+        Some(out)
+    }
+
+    fn unicode_escape_char(&self) -> char {
+        let mut seen_uescape = false;
+        for element in self.syntax().children_with_tokens() {
+            let Some(token) = element.into_token() else {
+                continue;
+            };
+            match token.kind() {
+                SyntaxKind::UESCAPE_KW => seen_uescape = true,
+                SyntaxKind::STRING if seen_uescape => {
+                    if let Some(ch) = uescape_char(token.text()) {
+                        return ch;
+                    }
+                    return '\\';
+                }
+                _ => (),
+            }
+        }
+        '\\'
     }
 }
 
@@ -1948,4 +2059,144 @@ fn vacuum_full_dollar_quoted_off_is_not_full() {
 #[test]
 fn vacuum_full_0_is_not_full() {
     assert!(!extract_vacuum("VACUUM (FULL 0) foo;").is_full());
+}
+
+#[cfg(test)]
+fn decode_literal(sql: &str) -> String {
+    let parse = SourceFile::parse(sql);
+    assert!(parse.errors().is_empty(), "{:?}", parse.errors());
+    let literal = parse
+        .tree()
+        .syntax()
+        .descendants()
+        .find_map(ast::Literal::cast)
+        .unwrap();
+    let decoded = literal.decoded_value().unwrap();
+    let text = decoded.text();
+
+    let offsets = text
+        .char_indices()
+        .map(|(i, _)| i)
+        .chain(std::iter::once(text.len()));
+
+    let mut out = format!("{text:?}\n");
+    for offset in offsets {
+        let pos = usize::from(decoded.source_pos(TextSize::new(offset as u32)));
+        let at = sql[pos..].chars().next();
+        out.push_str(&format!("  {offset} -> {pos} {at:?}\n"));
+    }
+    out
+}
+
+#[test]
+fn decoded_value_maps_doubled_quotes() {
+    assert_snapshot!(decode_literal("select 'a''b';"), @r#"
+    "a'b"
+      0 -> 8 Some('a')
+      1 -> 9 Some('\'')
+      2 -> 11 Some('b')
+      3 -> 12 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_escape_string() {
+    assert_snapshot!(decode_literal(r"select E'a\nb';"), @r#"
+    "a\nb"
+      0 -> 9 Some('a')
+      1 -> 10 Some('\\')
+      2 -> 12 Some('b')
+      3 -> 13 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_multibyte_escape() {
+    assert_snapshot!(decode_literal(r"select E'a\xc3\xa9b';"), @r#"
+    "aéb"
+      0 -> 9 Some('a')
+      1 -> 10 Some('\\')
+      3 -> 18 Some('b')
+      4 -> 19 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_unicode_escape() {
+    assert_snapshot!(decode_literal(r"select U&'a\0062c';"), @r#"
+    "abc"
+      0 -> 10 Some('a')
+      1 -> 11 Some('\\')
+      2 -> 16 Some('c')
+      3 -> 17 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_doubled_quote_before_unicode_escape() {
+    assert_snapshot!(decode_literal(r"select U&'a''b\0063';"), @r#"
+    "a'bc"
+      0 -> 10 Some('a')
+      1 -> 11 Some('\'')
+      2 -> 13 Some('b')
+      3 -> 14 Some('\\')
+      4 -> 19 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_escape_that_produces_nothing() {
+    assert_snapshot!(decode_literal(r"select E'ab\udb99';"), @r#"
+    "ab"
+      0 -> 9 Some('a')
+      1 -> 10 Some('b')
+      2 -> 17 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_end_past_a_trailing_escape() {
+    assert_snapshot!(decode_literal(r"select E'null;\n';"), @r#"
+    "null;\n"
+      0 -> 9 Some('n')
+      1 -> 10 Some('u')
+      2 -> 11 Some('l')
+      3 -> 12 Some('l')
+      4 -> 13 Some(';')
+      5 -> 14 Some('\\')
+      6 -> 16 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_end_past_a_trailing_doubled_quote() {
+    assert_snapshot!(decode_literal("select 'ab''';"), @r#"
+    "ab'"
+      0 -> 8 Some('a')
+      1 -> 9 Some('b')
+      2 -> 10 Some('\'')
+      3 -> 12 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_string_continuation() {
+    assert_snapshot!(decode_literal("select 'ab'\n'cd';"), @r#"
+    "abcd"
+      0 -> 8 Some('a')
+      1 -> 9 Some('b')
+      2 -> 13 Some('c')
+      3 -> 14 Some('d')
+      4 -> 15 Some('\'')
+    "#);
+}
+
+#[test]
+fn decoded_value_maps_dollar_quoted() {
+    assert_snapshot!(decode_literal("select $tag$ab$tag$;"), @r#"
+    "ab"
+      0 -> 12 Some('a')
+      1 -> 13 Some('b')
+      2 -> 14 Some('$')
+    "#);
 }

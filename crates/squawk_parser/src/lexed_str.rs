@@ -68,6 +68,10 @@ impl<'a> LexedStr<'a> {
         self.kind[i]
     }
 
+    pub(crate) fn text(&self, i: usize) -> &str {
+        self.range_text(i..i + 1)
+    }
+
     pub(crate) fn range_text(&self, r: ops::Range<usize>) -> &str {
         assert!(r.start < r.end && r.end <= self.len());
         let lo = self.start[r.start] as usize;
@@ -206,6 +210,7 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::Semi => SyntaxKind::SEMICOLON,
                 squawk_lexer::TokenKind::Comma => SyntaxKind::COMMA,
                 squawk_lexer::TokenKind::Dot => SyntaxKind::DOT,
+                squawk_lexer::TokenKind::DotDot => SyntaxKind::DOT_DOT,
                 squawk_lexer::TokenKind::OpenParen => SyntaxKind::L_PAREN,
                 squawk_lexer::TokenKind::CloseParen => SyntaxKind::R_PAREN,
                 squawk_lexer::TokenKind::OpenBracket => SyntaxKind::L_BRACK,

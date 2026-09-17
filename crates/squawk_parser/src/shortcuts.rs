@@ -115,18 +115,17 @@ impl LexedStr<'_> {
                 was_joint = false;
                 // skip over any triva since the parser shouldn't have to deal
                 // with it
-            }
-            // else if kind == SyntaxKind::IDENT {
-            //     let token_text = self.text(i);
-            //     let contextual_kw =
-            //         SyntaxKind::from_contextual_keyword(token_text).unwrap_or(SyntaxKind::IDENT);
-            //     res.push_ident(contextual_kw);
-            // }
-            else {
+            } else {
                 if was_joint {
                     res.was_joint();
                 }
-                res.push(kind);
+                if kind == SyntaxKind::IDENT {
+                    let contextual_kind = SyntaxKind::from_contextual_keyword(self.text(i))
+                        .unwrap_or(SyntaxKind::IDENT);
+                    res.push_ident(contextual_kind);
+                } else {
+                    res.push(kind);
+                }
                 was_joint = true;
             }
         }
@@ -167,5 +166,54 @@ impl LexedStr<'_> {
 
         // is_eof?
         builder.pos == builder.lexed.len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::LexedStr;
+    use crate::SyntaxKind;
+
+    fn kinds(text: &str) -> Vec<(SyntaxKind, SyntaxKind)> {
+        let lexed = LexedStr::new(text);
+        let input = lexed.to_input();
+        (0..text.split_whitespace().count())
+            .map(|i| (input.kind(i), input.contextual_kind(i)))
+            .collect()
+    }
+
+    #[test]
+    fn plpgsql_keywords_stay_idents_with_a_contextual_kind() {
+        assert_eq!(
+            kinds("message raise elsif"),
+            vec![
+                (SyntaxKind::IDENT, SyntaxKind::MESSAGE_KW),
+                (SyntaxKind::IDENT, SyntaxKind::RAISE_KW),
+                (SyntaxKind::IDENT, SyntaxKind::ELSIF_KW),
+            ]
+        );
+    }
+
+    #[test]
+    fn sql_keywords_are_not_contextual() {
+        assert_eq!(
+            kinds("select begin declare"),
+            vec![
+                (SyntaxKind::SELECT_KW, SyntaxKind::EOF),
+                (SyntaxKind::BEGIN_KW, SyntaxKind::EOF),
+                (SyntaxKind::DECLARE_KW, SyntaxKind::EOF),
+            ]
+        );
+    }
+
+    #[test]
+    fn plain_idents_have_no_contextual_kind() {
+        assert_eq!(
+            kinds("foo bar"),
+            vec![
+                (SyntaxKind::IDENT, SyntaxKind::IDENT),
+                (SyntaxKind::IDENT, SyntaxKind::IDENT),
+            ]
+        );
     }
 }

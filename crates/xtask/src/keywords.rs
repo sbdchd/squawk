@@ -4,6 +4,10 @@ use enum_iterator::{Sequence, all};
 use rustc_hash::{FxHashMap, FxHashSet};
 use squawk_line_index::UniversalNewlines;
 
+const KWLIST: &str = "postgres/kwlist.h";
+const PL_RESERVED_KWLIST: &str = "postgres/pl_reserved_kwlist.h";
+const PL_UNRESERVED_KWLIST: &str = "postgres/pl_unreserved_kwlist.h";
+
 struct KeywordMeta {
     pub(crate) category: KeywordCategory,
     pub(crate) label: KeywordLabel,
@@ -76,7 +80,7 @@ fn keyword_allowed(cat: KeywordCategory, kw_type: KWType) -> bool {
 }
 
 fn parse_header() -> Result<FxHashMap<String, KeywordMeta>> {
-    let kwlist_file = project_root().join("postgres/kwlist.h");
+    let kwlist_file = project_root().join(KWLIST);
     let data = std::fs::read_to_string(kwlist_file).context("Failed to read kwlist.h")?;
 
     let mut keywords = FxHashMap::default();
@@ -227,4 +231,42 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
         col_table_keywords,
         type_keywords,
     })
+}
+
+fn parse_pl_header(path: &str) -> Result<Vec<String>> {
+    let file = project_root().join(path);
+    let data = std::fs::read_to_string(file).with_context(|| format!("Failed to read {path}"))?;
+
+    let mut keywords = vec![];
+    for line in data.universal_newlines() {
+        if !line.starts_with("PG_KEYWORD") {
+            continue;
+        }
+        let row = line
+            .split(&['(', ')'])
+            .nth(1)
+            .with_context(|| format!("Invalid {path} structure"))?;
+        let name = row
+            .split(',')
+            .next()
+            .with_context(|| format!("Invalid {path} row"))?;
+        keywords.push(name.trim().replace('"', ""));
+    }
+
+    Ok(keywords)
+}
+
+// PL/pgSQL keywords that aren't SQL keywords
+pub(crate) fn contextual_keywords() -> Result<Vec<String>> {
+    let sql_keywords = parse_header()?;
+
+    let mut keywords = parse_pl_header(PL_RESERVED_KWLIST)?
+        .into_iter()
+        .chain(parse_pl_header(PL_UNRESERVED_KWLIST)?)
+        .filter(|keyword| !sql_keywords.contains_key(keyword))
+        .collect::<Vec<_>>();
+    keywords.sort();
+    keywords.dedup();
+
+    Ok(keywords)
 }

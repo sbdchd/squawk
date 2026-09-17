@@ -61,3 +61,10 @@ select ''::timestamp(1.5);
 select ''::time(-1);
 select timestamp(foo) '';
 select time() '';
+
+-- `..` lexes as a single token for PLPGSQL usage, but error in SQL
+select 1..10;
+select 1 .. 10;
+select 1.5..2;
+select 1...2;
+select a[1..2];

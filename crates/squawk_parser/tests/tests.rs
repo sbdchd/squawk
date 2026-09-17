@@ -3,7 +3,7 @@ use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::Deco
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
-use squawk_parser::{LexedStr, parse};
+use squawk_parser::{EntryPoint, LexedStr};
 use std::fmt::Write;
 
 #[dir_test(
@@ -61,6 +61,62 @@ fn parser_err(fixture: Fixture<&str>) {
     assert!(
         errors.is_some(),
         "tests defined in the `err` directory must have parser errors."
+    );
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/tests/data/plpgsql/ok",
+    glob: "*.sql",
+)]
+fn plpgsql_ok(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let input_file = absolute_fixture_path;
+    let test_name = absolute_fixture_path
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let (parsed, errors) = parse(content, EntryPoint::Plpgsql);
+
+    with_settings!({
+      omit_expression => true,
+      input_file => input_file,
+    }, {
+      assert_snapshot!(format!("plpgsql_{test_name}_ok"), parsed);
+    });
+
+    assert!(
+        errors.is_none(),
+        "tests defined in `plpgsql/ok` can't have parser errors."
+    );
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/tests/data/plpgsql/err",
+    glob: "*.sql",
+)]
+fn plpgsql_err(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let input_file = absolute_fixture_path;
+    let test_name = absolute_fixture_path
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let (parsed, errors) = parse(content, EntryPoint::Plpgsql);
+
+    with_settings!({
+      omit_expression => true,
+      input_file => input_file,
+    }, {
+      assert_snapshot!(format!("plpgsql_{test_name}_err"), parsed);
+    });
+
+    assert!(
+        errors.is_some(),
+        "tests defined in `plpgsql/err` must have parser errors."
     );
 }
 
@@ -136,9 +192,14 @@ fn bom_after_start_is_an_ident_char() {
 
 #[must_use]
 fn parse_text(text: &str) -> (String, Option<String>) {
+    parse(text, EntryPoint::SourceFile)
+}
+
+#[must_use]
+fn parse(text: &str, entry_point: EntryPoint) -> (String, Option<String>) {
     let lexed = LexedStr::new(text);
     let input = lexed.to_input();
-    let output = parse(&input);
+    let output = entry_point.parse(&input);
 
     let mut buf = String::new();
     let mut errors: Vec<(std::ops::Range<usize>, String)> = Vec::new();

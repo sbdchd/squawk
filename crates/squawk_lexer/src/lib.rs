@@ -106,6 +106,11 @@ impl Cursor<'_> {
                 TokenKind::Literal { kind: literal_kind }
             }
             '.' => match self.first() {
+                // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L353
+                '.' => {
+                    self.bump();
+                    TokenKind::DotDot
+                }
                 '0'..='9' => {
                     let literal_kind = self.number('.');
                     TokenKind::Literal { kind: literal_kind }
@@ -302,7 +307,9 @@ impl Cursor<'_> {
         };
 
         match self.first() {
-            '.' => {
+            // `1..10` lexes as 1, .., 10 rather than `1.` followed by `.10`
+            // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L410
+            '.' if self.second() != '.' => {
                 self.bump();
                 self.eat_fractional()
             }
@@ -792,6 +799,63 @@ $foo$hello$world$bar$
             ".1_2e3" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 6 } },
         ]
         "#)
+    }
+
+    #[test]
+    fn dot_dot_is_its_own_token() {
+        assert_debug_snapshot!(lex("1..10 1 .. 10 1.5..2 1...2 .. a[1..2]"), @r#"
+        [
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ".." @ DotDot,
+            "10" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 2 } },
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            " " @ Whitespace,
+            ".." @ DotDot,
+            " " @ Whitespace,
+            "10" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 2 } },
+            " " @ Whitespace,
+            "1.5" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 3 } },
+            ".." @ DotDot,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ".." @ DotDot,
+            ".2" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 2 } },
+            " " @ Whitespace,
+            ".." @ DotDot,
+            " " @ Whitespace,
+            "a" @ Ident,
+            "[" @ OpenBracket,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ".." @ DotDot,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            "]" @ CloseBracket,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn dot_dot_does_not_disturb_neighboring_numerics() {
+        assert_debug_snapshot!(lex("1. .10 0 . .5 a.b 1.5"), @r#"
+        [
+            "1." @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 2 } },
+            " " @ Whitespace,
+            ".10" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 3 } },
+            " " @ Whitespace,
+            "0" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            " " @ Whitespace,
+            "." @ Dot,
+            " " @ Whitespace,
+            ".5" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 2 } },
+            " " @ Whitespace,
+            "a" @ Ident,
+            "." @ Dot,
+            "b" @ Ident,
+            " " @ Whitespace,
+            "1.5" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 3 } },
+        ]
+        "#);
     }
 
     #[test]

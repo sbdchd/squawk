@@ -721,6 +721,91 @@ SOURCE_FILE
             LITERAL
               STRING "''"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- `..` lexes as a single token for PLPGSQL usage, but error in SQL"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+  ERROR
+    DOT_DOT ".."
+  ERROR
+    INT_NUMBER "10"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+  WHITESPACE " "
+  ERROR
+    DOT_DOT ".."
+  WHITESPACE " "
+  ERROR
+    INT_NUMBER "10"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            NUMERIC_NUMBER "1.5"
+  ERROR
+    DOT_DOT ".."
+  ERROR
+    INT_NUMBER "2"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+  ERROR
+    DOT_DOT ".."
+  ERROR
+    NUMERIC_NUMBER ".2"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            NAME_REF
+              IDENT "a"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+  ERROR
+    DOT_DOT ".."
+  ERROR
+    INT_NUMBER "2"
+  ERROR
+    R_BRACK "]"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: trailing junk after numeric literal
@@ -1003,3 +1088,51 @@ error[syntax-error]: expected an expression, found R_PAREN
    ╭▸ 
 63 │ select time() '';
    ╰╴            ━
+error[syntax-error]: expected command, found DOT_DOT
+   ╭▸ 
+66 │ select 1..10;
+   ╰╴        ━
+error[syntax-error]: expected command, found INT_NUMBER
+   ╭▸ 
+66 │ select 1..10;
+   ╰╴          ━
+error[syntax-error]: expected command, found DOT_DOT
+   ╭▸ 
+67 │ select 1 .. 10;
+   ╰╴         ━
+error[syntax-error]: expected command, found INT_NUMBER
+   ╭▸ 
+67 │ select 1 .. 10;
+   ╰╴            ━
+error[syntax-error]: expected command, found DOT_DOT
+   ╭▸ 
+68 │ select 1.5..2;
+   ╰╴          ━
+error[syntax-error]: expected command, found INT_NUMBER
+   ╭▸ 
+68 │ select 1.5..2;
+   ╰╴            ━
+error[syntax-error]: expected command, found DOT_DOT
+   ╭▸ 
+69 │ select 1...2;
+   ╰╴        ━
+error[syntax-error]: expected command, found NUMERIC_NUMBER
+   ╭▸ 
+69 │ select 1...2;
+   ╰╴          ━
+error[syntax-error]: expected R_BRACK
+   ╭▸ 
+70 │ select a[1..2];
+   ╰╴          ━
+error[syntax-error]: expected command, found DOT_DOT
+   ╭▸ 
+70 │ select a[1..2];
+   ╰╴          ━
+error[syntax-error]: expected command, found INT_NUMBER
+   ╭▸ 
+70 │ select a[1..2];
+   ╰╴            ━
+error[syntax-error]: expected command, found R_BRACK
+   ╭▸ 
+70 │ select a[1..2];
+   ╰╴             ━

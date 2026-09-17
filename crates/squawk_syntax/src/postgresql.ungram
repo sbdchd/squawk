@@ -2036,6 +2036,12 @@ RoutineBody =
   ReturnStmt
 | AtomicBody
 
+Plpgsql =
+  stmts:(PlpgsqlNullStmt*)
+
+PlpgsqlNullStmt =
+  'null' ';'
+
 FuncOptionList =
   options:(FuncOption*)
 
