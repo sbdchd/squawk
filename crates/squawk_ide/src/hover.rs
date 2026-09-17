@@ -227,6 +227,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::OptionItemValueName(_)
             | ast::AnyName::ParamNameRef(_)
             | ast::AnyName::PathSegmentRef(_)
+            | ast::AnyName::PlpgsqlCondition(_)
             | ast::AnyName::PlpgsqlLabelName(_)
             | ast::AnyName::PlpgsqlLabelNameRef(_)
             | ast::AnyName::PolicyRef(_)

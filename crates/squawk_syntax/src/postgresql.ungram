@@ -2044,9 +2044,24 @@ PlpgsqlBlock =
   PlpgsqlDeclareSection?
   'begin'
   PlpgsqlBody
+  PlpgsqlExceptionSection?
   'end'
   PlpgsqlLabelNameRef?
   ';'?
+
+PlpgsqlExceptionSection =
+  'exception'
+  handlers:(PlpgsqlExceptionHandler*)
+
+PlpgsqlExceptionHandler =
+  'when'
+  conditions:(PlpgsqlCondition*)
+  'then'
+  PlpgsqlBody
+
+PlpgsqlCondition =
+  '#name'?
+  '@string'?
 
 PlpgsqlLabel =
   '<<' PlpgsqlLabelName '>>'

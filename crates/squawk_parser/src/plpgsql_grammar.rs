@@ -27,7 +27,8 @@ fn block(p: &mut Parser) {
     opt_block_label(p);
     opt_declare_section(p);
     p.expect(BEGIN_KW);
-    body(p);
+    body(p, BodyKind::Block);
+    opt_exception_section(p);
     p.expect(END_KW);
     opt_label_name_ref(p);
     // TODO: add validation, sometimes this is required
@@ -72,9 +73,15 @@ fn opt_declare_section(p: &mut Parser) {
     m.complete(p, PLPGSQL_DECLARE_SECTION);
 }
 
-fn body(p: &mut Parser) {
+#[derive(Clone, Copy, PartialEq)]
+enum BodyKind {
+    Block,
+    ExceptionHandler,
+}
+
+fn body(p: &mut Parser, kind: BodyKind) {
     let m = p.start();
-    while !p.at(EOF) && !at_block_end(p) {
+    while !p.at(EOF) && !at_body_end(p, kind) {
         stmt(p);
     }
     m.complete(p, PLPGSQL_BODY);
@@ -115,6 +122,47 @@ fn temp_unknown(p: &mut Parser, message: &str) {
     m.complete(p, ERROR);
 }
 
+fn opt_exception_section(p: &mut Parser) {
+    if !p.nth_at_contextual_kw(0, EXCEPTION_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump_remap(EXCEPTION_KW);
+    while p.at(WHEN_KW) {
+        exception_handler(p);
+    }
+    m.complete(p, PLPGSQL_EXCEPTION_SECTION);
+}
+
+fn exception_handler(p: &mut Parser) {
+    assert!(p.at(WHEN_KW));
+    let m = p.start();
+    // TODO: use delimited
+    p.bump(WHEN_KW);
+    condition(p);
+    while p.eat(OR_KW) {
+        condition(p);
+    }
+    p.expect(THEN_KW);
+    body(p, BodyKind::ExceptionHandler);
+    m.complete(p, PLPGSQL_EXCEPTION_HANDLER);
+}
+
+fn condition(p: &mut Parser) {
+    let m = p.start();
+    if at_name(p, 0) {
+        let sqlstate = p.nth_at_contextual_kw(0, SQLSTATE_KW);
+        p.bump_any();
+        if sqlstate {
+            p.expect(STRING);
+        }
+    } else {
+        let kind = p.current();
+        p.error(format!("expected a condition name, found {kind:?}"));
+    }
+    m.complete(p, PLPGSQL_CONDITION);
+}
+
 fn at_block_start(p: &Parser) -> bool {
     p.at_ts(BLOCK_FIRST) || at_block_label(p)
 }
@@ -128,6 +176,13 @@ fn at_name(p: &Parser, n: usize) -> bool {
         return !p.nth_at_contextual_ts(n, PLPGSQL_RESERVED_CONTEXTUAL_KEYWORDS);
     }
     p.nth_at_ts(n, ALL_KEYWORDS) && !p.nth_at_ts(n, PLPGSQL_RESERVED_KEYWORDS)
+}
+
+fn at_body_end(p: &Parser, kind: BodyKind) -> bool {
+    at_block_end(p)
+        || p.nth_at_contextual_kw(0, EXCEPTION_KW)
+        // TODO: do we need this kind param?
+        || (kind == BodyKind::ExceptionHandler && p.at(WHEN_KW))
 }
 
 fn at_block_end(p: &Parser) -> bool {

@@ -1,0 +1,98 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/exception.sql
+---
+PLPGSQL@0..117
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..116
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..14
+      PLPGSQL_NULL_STMT@9..14
+        NULL_KW@9..13 "null"
+        SEMICOLON@13..14 ";"
+    WHITESPACE@14..15 "\n"
+    PLPGSQL_EXCEPTION_SECTION@15..112
+      EXCEPTION_KW@15..24 "exception"
+      WHITESPACE@24..27 "\n  "
+      PLPGSQL_EXCEPTION_HANDLER@27..53
+        WHEN_KW@27..31 "when"
+        WHITESPACE@31..32 " "
+        PLPGSQL_CONDITION@32..38
+          OTHERS_KW@32..38 "others"
+        WHITESPACE@38..39 " "
+        THEN_KW@39..43 "then"
+        WHITESPACE@43..48 "\n    "
+        PLPGSQL_BODY@48..53
+          PLPGSQL_NULL_STMT@48..53
+            NULL_KW@48..52 "null"
+            SEMICOLON@52..53 ";"
+      WHITESPACE@53..56 "\n  "
+      PLPGSQL_EXCEPTION_HANDLER@56..112
+        WHEN_KW@56..60 "when"
+        WHITESPACE@60..61 " "
+        PLPGSQL_CONDITION@61..77
+          IDENT@61..77 "division_by_zero"
+        WHITESPACE@77..78 " "
+        OR_KW@78..80 "or"
+        WHITESPACE@80..81 " "
+        PLPGSQL_CONDITION@81..97
+          IDENT@81..89 "sqlstate"
+          WHITESPACE@89..90 " "
+          STRING@90..97 "'22012'"
+        WHITESPACE@97..98 " "
+        THEN_KW@98..102 "then"
+        WHITESPACE@102..107 "\n    "
+        PLPGSQL_BODY@107..112
+          PLPGSQL_NULL_STMT@107..112
+            NULL_KW@107..111 "null"
+            SEMICOLON@111..112 ";"
+    WHITESPACE@112..113 "\n"
+    END_KW@113..116 "end"
+  WHITESPACE@116..117 "\n"
+---
+PLPGSQL@0..101
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..100
+    PLPGSQL_LABEL@1..8
+      LESS_LESS@1..3 "<<"
+      PLPGSQL_LABEL_NAME@3..6
+        IDENT@3..6 "lbl"
+      GREATER_GREATER@6..8 ">>"
+    WHITESPACE@8..9 "\n"
+    BEGIN_KW@9..14 "begin"
+    WHITESPACE@14..17 "\n  "
+    PLPGSQL_BODY@17..91
+      PLPGSQL_BLOCK@17..91
+        BEGIN_KW@17..22 "begin"
+        WHITESPACE@22..27 "\n    "
+        PLPGSQL_BODY@27..32
+          PLPGSQL_NULL_STMT@27..32
+            NULL_KW@27..31 "null"
+            SEMICOLON@31..32 ";"
+        WHITESPACE@32..35 "\n  "
+        PLPGSQL_EXCEPTION_SECTION@35..84
+          EXCEPTION_KW@35..44 "exception"
+          WHITESPACE@44..49 "\n    "
+          PLPGSQL_EXCEPTION_HANDLER@49..84
+            WHEN_KW@49..53 "when"
+            WHITESPACE@53..54 " "
+            PLPGSQL_CONDITION@54..67
+              IDENT@54..67 "no_data_found"
+            WHITESPACE@67..68 " "
+            THEN_KW@68..72 "then"
+            WHITESPACE@72..79 "\n      "
+            PLPGSQL_BODY@79..84
+              PLPGSQL_NULL_STMT@79..84
+                NULL_KW@79..83 "null"
+                SEMICOLON@83..84 ";"
+        WHITESPACE@84..87 "\n  "
+        END_KW@87..90 "end"
+        SEMICOLON@90..91 ";"
+    WHITESPACE@91..92 "\n"
+    END_KW@92..95 "end"
+    WHITESPACE@95..96 " "
+    PLPGSQL_LABEL_NAME_REF@96..99
+      IDENT@96..99 "lbl"
+    SEMICOLON@99..100 ";"
+  WHITESPACE@100..101 "\n"

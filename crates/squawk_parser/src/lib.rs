@@ -587,7 +587,6 @@ impl<'t> Parser<'t> {
     /// Advances the parser by one token, remapping its kind.
     /// This is useful to create contextual keywords from
     /// identifiers.
-    #[expect(dead_code, reason = "used by the PL/pgSQL grammar")]
     pub(crate) fn bump_remap(&mut self, kind: SyntaxKind) {
         if self.nth(0) == SyntaxKind::EOF {
             // FIXME: panic!?

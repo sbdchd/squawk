@@ -19418,6 +19418,10 @@ impl PlpgsqlBlock {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn plpgsql_exception_section(&self) -> Option<PlpgsqlExceptionSection> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn plpgsql_label(&self) -> Option<PlpgsqlLabel> {
         support::child(&self.syntax)
     }
@@ -19451,6 +19455,21 @@ impl PlpgsqlBody {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCondition {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCondition {
+    #[inline]
+    pub fn string_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STRING)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlDeclareSection {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19458,6 +19477,44 @@ impl PlpgsqlDeclareSection {
     #[inline]
     pub fn declare_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DECLARE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExceptionHandler {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExceptionHandler {
+    #[inline]
+    pub fn conditions(&self) -> AstChildren<PlpgsqlCondition> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn plpgsql_body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExceptionSection {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExceptionSection {
+    #[inline]
+    pub fn handlers(&self) -> AstChildren<PlpgsqlExceptionHandler> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn exception_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXCEPTION_KW)
     }
 }
 
@@ -28625,6 +28682,7 @@ pub enum AnyName {
     ParamNameRef(ParamNameRef),
     PathSegment(PathSegment),
     PathSegmentRef(PathSegmentRef),
+    PlpgsqlCondition(PlpgsqlCondition),
     PlpgsqlLabelName(PlpgsqlLabelName),
     PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
     Policy(Policy),
@@ -46197,10 +46255,64 @@ impl AstNode for PlpgsqlBody {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlCondition {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CONDITION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlDeclareSection {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_DECLARE_SECTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExceptionHandler {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXCEPTION_HANDLER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExceptionSection {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXCEPTION_SECTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -58662,6 +58774,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT
                 | SyntaxKind::PATH_SEGMENT_REF
+                | SyntaxKind::PLPGSQL_CONDITION
                 | SyntaxKind::PLPGSQL_LABEL_NAME
                 | SyntaxKind::PLPGSQL_LABEL_NAME_REF
                 | SyntaxKind::POLICY
@@ -58775,6 +58888,7 @@ impl AstNode for AnyName {
             SyntaxKind::PARAM_NAME_REF => AnyName::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::PATH_SEGMENT => AnyName::PathSegment(PathSegment { syntax }),
             SyntaxKind::PATH_SEGMENT_REF => AnyName::PathSegmentRef(PathSegmentRef { syntax }),
+            SyntaxKind::PLPGSQL_CONDITION => AnyName::PlpgsqlCondition(PlpgsqlCondition { syntax }),
             SyntaxKind::PLPGSQL_LABEL_NAME => {
                 AnyName::PlpgsqlLabelName(PlpgsqlLabelName { syntax })
             }
@@ -58886,6 +59000,7 @@ impl AstNode for AnyName {
             AnyName::ParamNameRef(it) => &it.syntax,
             AnyName::PathSegment(it) => &it.syntax,
             AnyName::PathSegmentRef(it) => &it.syntax,
+            AnyName::PlpgsqlCondition(it) => &it.syntax,
             AnyName::PlpgsqlLabelName(it) => &it.syntax,
             AnyName::PlpgsqlLabelNameRef(it) => &it.syntax,
             AnyName::Policy(it) => &it.syntax,
@@ -59206,6 +59321,12 @@ impl From<PathSegmentRef> for AnyName {
     #[inline]
     fn from(node: PathSegmentRef) -> AnyName {
         AnyName::PathSegmentRef(node)
+    }
+}
+impl From<PlpgsqlCondition> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlCondition) -> AnyName {
+        AnyName::PlpgsqlCondition(node)
     }
 }
 impl From<PlpgsqlLabelName> for AnyName {
