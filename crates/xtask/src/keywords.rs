@@ -256,13 +256,7 @@ fn parse_pl_header(path: &str) -> Result<Vec<String>> {
     Ok(keywords)
 }
 
-/// PL/pgSQL keywords that aren't also SQL keywords.
-///
-/// Postgres keeps these in their own namespace: the PL/pgSQL scanner wraps the
-/// shared SQL scanner and re-looks-up words against `pl_reserved_kwlist.h` and
-/// `pl_unreserved_kwlist.h` afterwards, so `message` is an ordinary identifier in
-/// SQL and a keyword in PL/pgSQL. We lex them as IDENT and record the keyword
-/// as a contextual kind so the SQL token stream is unaffected.
+// PL/pgSQL keywords that aren't SQL keywords
 pub(crate) fn contextual_keywords() -> Result<Vec<String>> {
     let sql_keywords = parse_header()?;
 
