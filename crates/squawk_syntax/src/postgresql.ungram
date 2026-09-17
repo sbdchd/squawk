@@ -35,6 +35,8 @@ PathSegment =
 
 PathSegmentRef =
   '#name'?
+   // '@positional_param' is only used in pl/pgsql, in an alias target
+  '@positional_param'?
 
 Path =
   qualifier:PathRef?
@@ -767,7 +769,8 @@ ArrayBound =
   '[' Expr? ']'
 
 PercentType =
-  'setof'? PathRef PercentTypeClause
+   // 'array' and ArrayBound are only used in pl/pgsql
+  'setof'? PathRef PercentTypeClause 'array'? ArrayBound*
 
 PathType =
   'setof'? PathRef ArgList?
@@ -2061,6 +2064,7 @@ PlpgsqlExceptionHandler =
 
 PlpgsqlCondition =
   '#name'?
+  '@positional_param'?
   '@string'?
 
 PlpgsqlLabel =
@@ -2068,42 +2072,117 @@ PlpgsqlLabel =
 
 PlpgsqlLabelName =
   '#name'?
+  '@positional_param'?
 
 PlpgsqlLabelNameRef =
   '#name'?
+  '@positional_param'?
 
 PlpgsqlDeclareSection =
   'declare'
-  decls:(PlpgsqlVarDecl*)
+  decls:(PlpgsqlDecl*)
+
+PlpgsqlDecl =
+  PlpgsqlVarDecl
+| PlpgsqlAliasDecl
+| PlpgsqlCursorDecl
 
 PlpgsqlVarDecl =
   name:PlpgsqlVarName
   'constant'?
-  FuncType
+  ty:PlpgsqlDeclType
   Collate?
   not_null:PlpgsqlNotNull?
   init:PlpgsqlVarInit?
   ';'
+
+PlpgsqlDeclType =
+  FuncType
+| PlpgsqlPercentRowtype
+
+PlpgsqlPercentRowtype =
+  PathRef '%' 'rowtype' 'array'? ArrayBound*
 
 PlpgsqlNotNull =
   'not' 'null'
 
 PlpgsqlVarName =
   '#name'?
+  '@positional_param'?
 
 PlpgsqlVarInit =
   (':=' | '=' | 'default')
   Expr
+
+PlpgsqlAliasDecl =
+  name:PlpgsqlVarName
+  'alias'
+  'for'
+  target:PlpgsqlAliasTarget
+  ';'
+
+PlpgsqlAliasTarget =
+  PathRef
+
+PlpgsqlCursorDecl =
+  name:PlpgsqlVarName
+  scroll:CursorScroll?
+  'cursor'
+  args:PlpgsqlCursorArgList?
+  ('is' | 'for')
+  query:Stmt
+  ';'
+
+PlpgsqlCursorArgList =
+  '(' (PlpgsqlCursorArg (',' PlpgsqlCursorArg)*) ')'
+
+PlpgsqlCursorArg =
+  name:PlpgsqlVarName
+  ty:PlpgsqlDeclType
 
 PlpgsqlBody =
   stmts:(PlpgsqlStmt*)
 
 PlpgsqlStmt =
   PlpgsqlBlock
+| PlpgsqlCaseStmt
+| PlpgsqlIfStmt
 | PlpgsqlNullStmt
 
 PlpgsqlNullStmt =
   'null' ';'
+
+PlpgsqlIfStmt =
+  'if'
+  cond:Expr
+  'then'
+  then_body:PlpgsqlBody
+  elsifs:(PlpgsqlElsifClause*)
+  else_clause:PlpgsqlElseClause?
+  'end' 'if' ';'
+
+PlpgsqlElsifClause =
+  ('elsif' | 'elseif')
+  cond:Expr
+  'then'
+  body:PlpgsqlBody
+
+PlpgsqlElseClause =
+  'else'
+  body:PlpgsqlBody
+
+PlpgsqlCaseStmt =
+  'case'
+  subject:Expr?
+  whens:(PlpgsqlCaseWhen*)
+  else_clause:PlpgsqlElseClause?
+  'end' 'case' ';'
+
+PlpgsqlCaseWhen =
+  'when'
+  conds:(Expr (',' Expr)*)
+  'then'
+  body:PlpgsqlBody
 
 FuncOptionList =
   options:(FuncOption*)

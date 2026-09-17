@@ -128,7 +128,8 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         SyntaxKind::ARG_LIST
         | SyntaxKind::TABLE_ARG_LIST
         | SyntaxKind::RETURN_TABLE_ARG_LIST
-        | SyntaxKind::PARAM_LIST => Some(FoldKind::ArgList),
+        | SyntaxKind::PARAM_LIST
+        | SyntaxKind::PLPGSQL_CURSOR_ARG_LIST => Some(FoldKind::ArgList),
         SyntaxKind::ARRAY_EXPR => Some(FoldKind::Array),
         SyntaxKind::CALL_EXPR => Some(FoldKind::FunctionCall),
         SyntaxKind::JOIN => Some(FoldKind::Join),

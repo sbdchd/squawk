@@ -129,12 +129,12 @@ fn plpgsql_fixture(sql: &str) -> (String, Vec<SyntaxError>) {
 
     let mut buffer = String::new();
     let mut errors = vec![];
-    for body in &bodies {
+    for body in bodies {
         if !buffer.is_empty() {
             buffer.push_str("---\n");
         }
         buffer.push_str(&format!("{:#?}", body.syntax()));
-        errors.extend_from_slice(body.errors());
+        errors.extend(body.errors());
     }
 
     if !errors.is_empty() {
@@ -254,7 +254,7 @@ fn plpgsql_suite_score() {
         let bodies = plpgsql_bodies(&parse);
 
         let mut counts = [bodies.len(), 0, 0, 0];
-        for body in &bodies {
+        for body in bodies {
             let (tokens, unparsed) = token_counts(&body.syntax());
             counts[1] += tokens;
             counts[2] += unparsed;
@@ -271,21 +271,21 @@ fn plpgsql_suite_score() {
 
     assert_snapshot!(table, @"
     file                       bodies  tokens  unparsed   err
-    plpgsql.sql                   254    9926      8183   984
-    plpgsql_array.sql              26     948       681   102
+    plpgsql.sql                   254    9887      6445   807
+    plpgsql_array.sql              26     948       629    70
     plpgsql_cache.sql               2      60        44     5
-    plpgsql_call.sql               45    1687      1374   177
-    plpgsql_control.sql            27    1400      1212   164
+    plpgsql_call.sql               45    1687      1366   176
+    plpgsql_control.sql            27    1400      1152   161
     plpgsql_copy.sql                4      28        16     4
     plpgsql_domain.sql             23     300       179    30
-    plpgsql_misc.sql               16     261       132    24
-    plpgsql_record.sql             65    1994      1576   187
-    plpgsql_simple.sql              9     213       145    21
-    plpgsql_transaction.sql        37    1202       999   136
-    plpgsql_trap.sql                7     354       255    45
-    plpgsql_trigger.sql             1      55        53     6
-    plpgsql_varprops.sql           33     716       387    57
-    total                         549   19144     15236  1942
+    plpgsql_misc.sql               16     261       114    12
+    plpgsql_record.sql             65    1994      1573   185
+    plpgsql_simple.sql              9     213       129    19
+    plpgsql_transaction.sql        37    1202       929   130
+    plpgsql_trap.sql                7     354       247    44
+    plpgsql_trigger.sql             1      55        42     5
+    plpgsql_varprops.sql           33     716       379    56
+    total                         549   19105     13244  1704
     ");
 }
 

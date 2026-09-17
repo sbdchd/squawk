@@ -2323,7 +2323,7 @@ fn path_for_qualifier(
     }
 }
 
-fn opt_percent_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+pub(crate) fn opt_percent_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(PERCENT) && p.nth_at(1, TYPE_KW) {
         let m = p.start();
         p.bump(PERCENT);
@@ -2334,7 +2334,7 @@ fn opt_percent_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn opt_array_bound(p: &mut Parser<'_>) -> bool {
+pub(crate) fn opt_array_bound(p: &mut Parser<'_>) -> bool {
     if !p.at(L_BRACK) {
         return false;
     }
@@ -7960,12 +7960,12 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 #[derive(Default)]
-struct StmtRestrictions {
+pub(crate) struct StmtRestrictions {
     begin_end_allowed: bool,
     semi_allowed: bool,
 }
 
-fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
+pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
     match (p.current(), p.nth(1)) {
         (SEMICOLON, _) => Some(empty_stmt(p)),
         (ABORT_KW, _) => Some(rollback(p)),
@@ -15998,6 +15998,23 @@ fn do_(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, DO)
 }
 
+pub(crate) fn opt_cursor_scroll(p: &mut Parser<'_>) {
+    match p.current() {
+        NO_KW => {
+            let m = p.start();
+            p.bump(NO_KW);
+            p.expect(SCROLL_KW);
+            m.complete(p, NO_SCROLL);
+        }
+        SCROLL_KW => {
+            let m = p.start();
+            p.bump(SCROLL_KW);
+            m.complete(p, SCROLL);
+        }
+        _ => (),
+    }
+}
+
 // DECLARE name [ BINARY ] [ ASENSITIVE | INSENSITIVE ] [ [ NO ] SCROLL ]
 //     CURSOR [ { WITH | WITHOUT } HOLD ] FOR query
 fn declare(p: &mut Parser<'_>) -> CompletedMarker {
@@ -16022,20 +16039,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
         _ => (),
     }
     // [ [ NO ] SCROLL ]
-    match p.current() {
-        NO_KW => {
-            let m = p.start();
-            p.bump(NO_KW);
-            p.expect(SCROLL_KW);
-            m.complete(p, NO_SCROLL);
-        }
-        SCROLL_KW => {
-            let m = p.start();
-            p.bump(SCROLL_KW);
-            m.complete(p, SCROLL);
-        }
-        _ => (),
-    }
+    opt_cursor_scroll(p);
     p.expect(CURSOR_KW);
     // [ { WITH | WITHOUT } HOLD ]
     match p.current() {

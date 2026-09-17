@@ -1,0 +1,101 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/cursor_decl.sql
+---
+PLPGSQL@0..113
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..112
+    PLPGSQL_DECLARE_SECTION@1..94
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..36
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "a"
+        WHITESPACE@12..13 " "
+        CURSOR_KW@13..19 "cursor"
+        WHITESPACE@19..20 " "
+        PLPGSQL_CURSOR_ARG_LIST@20..22
+          L_PAREN@20..21 "("
+          R_PAREN@21..22 ")"
+        WHITESPACE@22..23 " "
+        FOR_KW@23..26 "for"
+        WHITESPACE@26..27 " "
+        SELECT@27..35
+          SELECT_CLAUSE@27..35
+            SELECT_KW@27..33 "select"
+            WHITESPACE@33..34 " "
+            TARGET_LIST@34..35
+              TARGET@34..35
+                LITERAL@34..35
+                  INT_NUMBER@34..35 "1"
+        SEMICOLON@35..36 ";"
+      WHITESPACE@36..39 "\n  "
+      PLPGSQL_CURSOR_DECL@39..64
+        PLPGSQL_VAR_NAME@39..40
+          IDENT@39..40 "b"
+        WHITESPACE@40..41 " "
+        NO_SCROLL@41..43
+          NO_KW@41..43 "no"
+        WHITESPACE@43..44 " "
+        CURSOR_KW@44..50 "cursor"
+        WHITESPACE@50..51 " "
+        FOR_KW@51..54 "for"
+        WHITESPACE@54..55 " "
+        SELECT@55..63
+          SELECT_CLAUSE@55..63
+            SELECT_KW@55..61 "select"
+            WHITESPACE@61..62 " "
+            TARGET_LIST@62..63
+              TARGET@62..63
+                LITERAL@62..63
+                  INT_NUMBER@62..63 "1"
+        SEMICOLON@63..64 ";"
+      WHITESPACE@64..67 "\n  "
+      PLPGSQL_CURSOR_DECL@67..85
+        PLPGSQL_VAR_NAME@67..68
+          IDENT@67..68 "c"
+        WHITESPACE@68..69 " "
+        CURSOR_KW@69..75 "cursor"
+        WHITESPACE@75..76 " "
+        SELECT@76..84
+          SELECT_CLAUSE@76..84
+            SELECT_KW@76..82 "select"
+            WHITESPACE@82..83 " "
+            TARGET_LIST@83..84
+              TARGET@83..84
+                LITERAL@83..84
+                  INT_NUMBER@83..84 "1"
+        SEMICOLON@84..85 ";"
+      WHITESPACE@85..88 "\n  "
+      PLPGSQL_VAR_DECL@88..94
+        PLPGSQL_VAR_NAME@88..89
+          IDENT@88..89 "d"
+        WHITESPACE@89..90 " "
+        PATH_TYPE@90..93
+          PATH_REF@90..93
+            PATH_SEGMENT_REF@90..93
+              INT_KW@90..93 "int"
+        SEMICOLON@93..94 ";"
+    WHITESPACE@94..95 "\n"
+    BEGIN_KW@95..100 "begin"
+    WHITESPACE@100..103 "\n  "
+    PLPGSQL_BODY@103..108
+      PLPGSQL_NULL_STMT@103..108
+        NULL_KW@103..107 "null"
+        SEMICOLON@107..108 ";"
+    WHITESPACE@108..109 "\n"
+    END_KW@109..112 "end"
+  WHITESPACE@112..113 "\n"
+
+error[syntax-error]: expected at least one cursor argument
+  ╭▸ 
+3 │   a cursor () for select 1;
+  ╰╴            ━
+error[syntax-error]: expected SCROLL_KW
+  ╭▸ 
+4 │   b no cursor for select 1;
+  ╰╴      ━
+error[syntax-error]: expected FOR_KW
+  ╭▸ 
+5 │   c cursor select 1;
+  ╰╴          ━

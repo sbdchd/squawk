@@ -19320,6 +19320,10 @@ pub struct PathSegmentRef {
 }
 impl PathSegmentRef {
     #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
     }
@@ -19350,12 +19354,20 @@ pub struct PercentType {
 }
 impl PercentType {
     #[inline]
+    pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn percent_type_clause(&self) -> Option<PercentTypeClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
     }
     #[inline]
     pub fn setof_token(&self) -> Option<SyntaxToken> {
@@ -19400,6 +19412,40 @@ pub struct Plpgsql {
 impl Plpgsql {
     #[inline]
     pub fn block(&self) -> Option<PlpgsqlBlock> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlAliasDecl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlAliasDecl {
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn alias_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALIAS_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlAliasTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlAliasTarget {
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
 }
@@ -19455,10 +19501,68 @@ impl PlpgsqlBody {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCaseStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCaseStmt {
+    #[inline]
+    pub fn else_clause(&self) -> Option<PlpgsqlElseClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn subject(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn whens(&self) -> AstChildren<PlpgsqlCaseWhen> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn case_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASE_KW)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCaseWhen {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCaseWhen {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn conds(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlCondition {
     pub(crate) syntax: SyntaxNode,
 }
 impl PlpgsqlCondition {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
     #[inline]
     pub fn string_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STRING)
@@ -19470,17 +19574,132 @@ impl PlpgsqlCondition {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCursorArg {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCursorArg {
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<PlpgsqlDeclType> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCursorArgList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCursorArgList {
+    #[inline]
+    pub fn plpgsql_cursor_args(&self) -> AstChildren<PlpgsqlCursorArg> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCursorDecl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCursorDecl {
+    #[inline]
+    pub fn args(&self) -> Option<PlpgsqlCursorArgList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn query(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn scroll(&self) -> Option<CursorScroll> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn cursor_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURSOR_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlDeclareSection {
     pub(crate) syntax: SyntaxNode,
 }
 impl PlpgsqlDeclareSection {
     #[inline]
-    pub fn decls(&self) -> AstChildren<PlpgsqlVarDecl> {
+    pub fn decls(&self) -> AstChildren<PlpgsqlDecl> {
         support::children(&self.syntax)
     }
     #[inline]
     pub fn declare_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DECLARE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlElseClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlElseClause {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn else_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ELSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlElsifClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlElsifClause {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn elseif_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ELSEIF_KW)
+    }
+    #[inline]
+    pub fn elsif_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ELSIF_KW)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
     }
 }
 
@@ -19523,6 +19742,45 @@ impl PlpgsqlExceptionSection {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlIfStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlIfStmt {
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn else_clause(&self) -> Option<PlpgsqlElseClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn elsifs(&self) -> AstChildren<PlpgsqlElsifClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn then_body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn if_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IF_KW)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlLabel {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19547,6 +19805,10 @@ pub struct PlpgsqlLabelName {
 }
 impl PlpgsqlLabelName {
     #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
     }
@@ -19557,6 +19819,10 @@ pub struct PlpgsqlLabelNameRef {
     pub(crate) syntax: SyntaxNode,
 }
 impl PlpgsqlLabelNameRef {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
@@ -19594,16 +19860,39 @@ impl PlpgsqlNullStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlPercentRowtype {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlPercentRowtype {
+    #[inline]
+    pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn percent_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PERCENT)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
+    }
+    #[inline]
+    pub fn rowtype_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROWTYPE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlVarDecl {
     pub(crate) syntax: SyntaxNode,
 }
 impl PlpgsqlVarDecl {
     #[inline]
     pub fn collate(&self) -> Option<Collate> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn func_type(&self) -> Option<FuncType> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19616,6 +19905,10 @@ impl PlpgsqlVarDecl {
     }
     #[inline]
     pub fn not_null(&self) -> Option<PlpgsqlNotNull> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<PlpgsqlDeclType> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19656,6 +19949,10 @@ pub struct PlpgsqlVarName {
     pub(crate) syntax: SyntaxNode,
 }
 impl PlpgsqlVarName {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
@@ -29675,8 +29972,23 @@ pub enum Persistence {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlDecl {
+    PlpgsqlAliasDecl(PlpgsqlAliasDecl),
+    PlpgsqlCursorDecl(PlpgsqlCursorDecl),
+    PlpgsqlVarDecl(PlpgsqlVarDecl),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlDeclType {
+    PlpgsqlPercentRowtype(PlpgsqlPercentRowtype),
+    FuncType(FuncType),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlpgsqlStmt {
     PlpgsqlBlock(PlpgsqlBlock),
+    PlpgsqlCaseStmt(PlpgsqlCaseStmt),
+    PlpgsqlIfStmt(PlpgsqlIfStmt),
     PlpgsqlNullStmt(PlpgsqlNullStmt),
 }
 
@@ -46308,6 +46620,42 @@ impl AstNode for Plpgsql {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlAliasDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ALIAS_DECL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlAliasTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ALIAS_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlBlock {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -46344,6 +46692,42 @@ impl AstNode for PlpgsqlBody {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlCaseStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CASE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCaseWhen {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CASE_WHEN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlCondition {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -46362,10 +46746,100 @@ impl AstNode for PlpgsqlCondition {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlCursorArg {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CURSOR_ARG
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCursorArgList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CURSOR_ARG_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCursorDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CURSOR_DECL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlDeclareSection {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_DECLARE_SECTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlElseClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ELSE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlElsifClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ELSIF_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -46402,6 +46876,24 @@ impl AstNode for PlpgsqlExceptionSection {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_EXCEPTION_SECTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlIfStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_IF_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -46492,6 +46984,24 @@ impl AstNode for PlpgsqlNullStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_NULL_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlPercentRowtype {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_PERCENT_ROWTYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -66294,18 +66804,112 @@ impl From<Unlogged> for Persistence {
         Persistence::Unlogged(node)
     }
 }
+impl AstNode for PlpgsqlDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PLPGSQL_ALIAS_DECL
+                | SyntaxKind::PLPGSQL_CURSOR_DECL
+                | SyntaxKind::PLPGSQL_VAR_DECL
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_ALIAS_DECL => {
+                PlpgsqlDecl::PlpgsqlAliasDecl(PlpgsqlAliasDecl { syntax })
+            }
+            SyntaxKind::PLPGSQL_CURSOR_DECL => {
+                PlpgsqlDecl::PlpgsqlCursorDecl(PlpgsqlCursorDecl { syntax })
+            }
+            SyntaxKind::PLPGSQL_VAR_DECL => PlpgsqlDecl::PlpgsqlVarDecl(PlpgsqlVarDecl { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlDecl::PlpgsqlAliasDecl(it) => &it.syntax,
+            PlpgsqlDecl::PlpgsqlCursorDecl(it) => &it.syntax,
+            PlpgsqlDecl::PlpgsqlVarDecl(it) => &it.syntax,
+        }
+    }
+}
+impl From<PlpgsqlAliasDecl> for PlpgsqlDecl {
+    #[inline]
+    fn from(node: PlpgsqlAliasDecl) -> PlpgsqlDecl {
+        PlpgsqlDecl::PlpgsqlAliasDecl(node)
+    }
+}
+impl From<PlpgsqlCursorDecl> for PlpgsqlDecl {
+    #[inline]
+    fn from(node: PlpgsqlCursorDecl) -> PlpgsqlDecl {
+        PlpgsqlDecl::PlpgsqlCursorDecl(node)
+    }
+}
+impl From<PlpgsqlVarDecl> for PlpgsqlDecl {
+    #[inline]
+    fn from(node: PlpgsqlVarDecl) -> PlpgsqlDecl {
+        PlpgsqlDecl::PlpgsqlVarDecl(node)
+    }
+}
+impl AstNode for PlpgsqlDeclType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::PLPGSQL_PERCENT_ROWTYPE) || FuncType::can_cast(kind)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_PERCENT_ROWTYPE => {
+                PlpgsqlDeclType::PlpgsqlPercentRowtype(PlpgsqlPercentRowtype { syntax })
+            }
+            _ => {
+                if let Some(result) = FuncType::cast(syntax.clone()) {
+                    return Some(PlpgsqlDeclType::FuncType(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlDeclType::PlpgsqlPercentRowtype(it) => &it.syntax,
+            PlpgsqlDeclType::FuncType(it) => it.syntax(),
+        }
+    }
+}
+impl From<PlpgsqlPercentRowtype> for PlpgsqlDeclType {
+    #[inline]
+    fn from(node: PlpgsqlPercentRowtype) -> PlpgsqlDeclType {
+        PlpgsqlDeclType::PlpgsqlPercentRowtype(node)
+    }
+}
 impl AstNode for PlpgsqlStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            SyntaxKind::PLPGSQL_BLOCK | SyntaxKind::PLPGSQL_NULL_STMT
+            SyntaxKind::PLPGSQL_BLOCK
+                | SyntaxKind::PLPGSQL_CASE_STMT
+                | SyntaxKind::PLPGSQL_IF_STMT
+                | SyntaxKind::PLPGSQL_NULL_STMT
         )
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::PLPGSQL_BLOCK => PlpgsqlStmt::PlpgsqlBlock(PlpgsqlBlock { syntax }),
+            SyntaxKind::PLPGSQL_CASE_STMT => {
+                PlpgsqlStmt::PlpgsqlCaseStmt(PlpgsqlCaseStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_IF_STMT => PlpgsqlStmt::PlpgsqlIfStmt(PlpgsqlIfStmt { syntax }),
             SyntaxKind::PLPGSQL_NULL_STMT => {
                 PlpgsqlStmt::PlpgsqlNullStmt(PlpgsqlNullStmt { syntax })
             }
@@ -66319,6 +66923,8 @@ impl AstNode for PlpgsqlStmt {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             PlpgsqlStmt::PlpgsqlBlock(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlCaseStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlIfStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlNullStmt(it) => &it.syntax,
         }
     }
@@ -66327,6 +66933,18 @@ impl From<PlpgsqlBlock> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlBlock) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlBlock(node)
+    }
+}
+impl From<PlpgsqlCaseStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlCaseStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlCaseStmt(node)
+    }
+}
+impl From<PlpgsqlIfStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlIfStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlIfStmt(node)
     }
 }
 impl From<PlpgsqlNullStmt> for PlpgsqlStmt {

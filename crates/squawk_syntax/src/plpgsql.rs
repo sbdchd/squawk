@@ -2,6 +2,7 @@ use rowan::{GreenNode, TextRange};
 
 use crate::{
     SyntaxNode, ast, ast::AstNode, decoded_text::DecodedText, parsing, syntax_error::SyntaxError,
+    validation,
 };
 
 pub struct Plpgsql {
@@ -44,8 +45,17 @@ impl Plpgsql {
         self.decoded.source_range(range)
     }
 
-    pub fn errors(&self) -> &[SyntaxError] {
-        &self.errors
+    pub fn errors(self) -> Vec<SyntaxError> {
+        let mut validation_errors = vec![];
+        validation::validate(&self.syntax(), &mut validation_errors);
+
+        let mut errors = self.errors;
+        errors.extend(validation_errors.into_iter().map(|error| {
+            let range = self.decoded.source_range(error.range());
+            error.with_range(range)
+        }));
+        errors.sort_by_key(|error| error.range().start());
+        errors
     }
 }
 

@@ -49,6 +49,10 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 ast::ParenFromItem(it) => validate_paren_from_item(it, errors),
                 ast::PartitionForValuesWith(it) => validate_hash_partition_bounds(it, errors),
+                ast::PlpgsqlCaseStmt(it) => validate_no_bare_case(it.subject(), errors),
+                ast::PlpgsqlCaseWhen(it) => validate_no_bare_case_in_conds(it, errors),
+                ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
+                ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
                 ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
                 ast::Select(it) => validate_select(it, errors),
@@ -340,6 +344,37 @@ fn validate_atomic_body(it: ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
             "Missing semicolon after statement",
             TextRange::empty(end),
         ));
+    }
+}
+
+fn validate_no_bare_case_in_conds(it: ast::PlpgsqlCaseWhen, acc: &mut Vec<SyntaxError>) {
+    for cond in it.conds() {
+        validate_no_bare_case(Some(cond), acc);
+    }
+}
+
+// -- err
+// if case when a then 1 end then
+// -- ok
+// if (case when a then 1 end) then
+fn validate_no_bare_case(cond: Option<ast::Expr>, acc: &mut Vec<SyntaxError>) {
+    let Some(cond) = cond else {
+        return;
+    };
+    let mut depth = 0i32;
+    for element in cond.syntax().descendants_with_tokens() {
+        match element.kind() {
+            L_PAREN | L_BRACK => depth += 1,
+            R_PAREN | R_BRACK => depth -= 1,
+            CASE_EXPR if depth == 0 => {
+                acc.push(SyntaxError::new(
+                    "CASE expression must be parenthesized",
+                    element.text_range(),
+                ));
+                return;
+            }
+            _ => (),
+        }
     }
 }
 
