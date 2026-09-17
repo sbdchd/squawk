@@ -116,6 +116,89 @@ fn plpgsql_bodies(parse: &Parse<SourceFile>) -> Vec<Plpgsql> {
         .collect()
 }
 
+fn plpgsql_fixture(sql: &str) -> (String, Vec<SyntaxError>) {
+    let parse = SourceFile::parse(sql);
+    assert!(
+        parse.errors().is_empty(),
+        "plpgsql fixtures must be valid sql:\n{}",
+        render_errors(sql, &parse.errors())
+    );
+
+    let bodies = plpgsql_bodies(&parse);
+    assert!(!bodies.is_empty(), "no plpgsql bodies found");
+
+    let mut buffer = String::new();
+    let mut errors = vec![];
+    for body in &bodies {
+        if !buffer.is_empty() {
+            buffer.push_str("---\n");
+        }
+        buffer.push_str(&format!("{:#?}", body.syntax()));
+        errors.extend_from_slice(body.errors());
+    }
+
+    if !errors.is_empty() {
+        buffer.push('\n');
+        buffer.push_str(&render_errors(sql, &errors));
+    }
+
+    (buffer, errors)
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/../squawk_parser/tests/data/plpgsql/ok",
+    glob: "*.sql",
+)]
+fn plpgsql_ok(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let input_file = Utf8Path::new(fixture.path());
+    let test_name = input_file
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let (buffer, errors) = plpgsql_fixture(content);
+
+    with_settings!({
+      omit_expression => true,
+      input_file => input_file,
+    }, {
+      assert_snapshot!(format!("plpgsql_{test_name}_ok"), buffer);
+    });
+
+    assert!(
+        errors.is_empty(),
+        "tests defined in `plpgsql/ok` can't have parser errors."
+    );
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/../squawk_parser/tests/data/plpgsql/err",
+    glob: "*.sql",
+)]
+fn plpgsql_err(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let input_file = Utf8Path::new(fixture.path());
+    let test_name = input_file
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let (buffer, errors) = plpgsql_fixture(content);
+
+    with_settings!({
+      omit_expression => true,
+      input_file => input_file,
+    }, {
+      assert_snapshot!(format!("plpgsql_{test_name}_err"), buffer);
+    });
+
+    assert!(
+        !errors.is_empty(),
+        "tests defined in `plpgsql/err` must have parser errors."
+    );
+}
+
 fn token_counts(node: &SyntaxNode) -> (usize, usize) {
     let mut total = 0;
     let mut unparsed = 0;

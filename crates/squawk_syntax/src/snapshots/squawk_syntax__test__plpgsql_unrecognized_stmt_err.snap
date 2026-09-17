@@ -1,0 +1,25 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/unrecognized_stmt.sql
+---
+PLPGSQL@0..17
+  WHITESPACE@0..1 "\n"
+  ERROR@1..6
+    BEGIN_KW@1..6 "begin"
+  WHITESPACE@6..7 " "
+  PLPGSQL_NULL_STMT@7..12
+    NULL_KW@7..11 "null"
+    SEMICOLON@11..12 ";"
+  WHITESPACE@12..13 " "
+  ERROR@13..16
+    END_KW@13..16 "end"
+  WHITESPACE@16..17 "\n"
+
+error[syntax-error]: expected a statement, found BEGIN_KW
+  ╭▸ 
+2 │ begin null; end
+  ╰╴━
+error[syntax-error]: expected a statement, found END_KW
+  ╭▸ 
+2 │ begin null; end
+  ╰╴            ━

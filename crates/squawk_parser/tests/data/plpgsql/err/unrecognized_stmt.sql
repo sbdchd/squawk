@@ -1,1 +1,3 @@
+do $$
 begin null; end
+$$;

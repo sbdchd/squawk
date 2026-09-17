@@ -1,9 +1,0 @@
----
-source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/plpgsql/ok/null_stmt.sql
----
-PLPGSQL
-  PLPGSQL_NULL_STMT
-    NULL_KW "null"
-    SEMICOLON ";"
-  WHITESPACE "\n"
