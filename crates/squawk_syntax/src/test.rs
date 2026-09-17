@@ -271,21 +271,21 @@ fn plpgsql_suite_score() {
 
     assert_snapshot!(table, @"
     file                       bodies  tokens  unparsed   err
-    plpgsql.sql                   254    9965      9931  9931
-    plpgsql_array.sql              26     949       949   949
-    plpgsql_cache.sql               2      60        60    60
-    plpgsql_call.sql               45    1698      1696  1696
-    plpgsql_control.sql            27    1424      1422  1422
-    plpgsql_copy.sql                4      28        28    28
-    plpgsql_domain.sql             23     307       307   307
-    plpgsql_misc.sql               16     261       261   261
-    plpgsql_record.sql             65    2008      2000  2000
-    plpgsql_simple.sql              9     217       217   217
-    plpgsql_transaction.sql        37    1203      1199  1199
-    plpgsql_trap.sql                7     354       354   354
-    plpgsql_trigger.sql             1      55        55    55
-    plpgsql_varprops.sql           33     736       706   706
-    total                         549   19265     19185 19185
+    plpgsql.sql                   254    9965      9099  1181
+    plpgsql_array.sql              26     949       867   110
+    plpgsql_cache.sql               2      60        53     8
+    plpgsql_call.sql               45    1698      1557   224
+    plpgsql_control.sql            27    1424      1351   167
+    plpgsql_copy.sql                4      28        16     4
+    plpgsql_domain.sql             23     307       252    39
+    plpgsql_misc.sql               16     261       213    29
+    plpgsql_record.sql             65    2008      1836   252
+    plpgsql_simple.sql              9     217       191    31
+    plpgsql_transaction.sql        37    1203      1084   153
+    plpgsql_trap.sql                7     354       315    52
+    plpgsql_trigger.sql             1      55        53     6
+    plpgsql_varprops.sql           33     736       635    92
+    total                         549   19265     17522  2348
     ");
 }
 

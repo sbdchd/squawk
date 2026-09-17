@@ -2,20 +2,19 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_parser/tests/data/plpgsql/ok/null_stmt.sql
 ---
-PLPGSQL@0..7
+PLPGSQL@0..27
   WHITESPACE@0..1 "\n"
-  PLPGSQL_NULL_STMT@1..6
-    NULL_KW@1..5 "null"
-    SEMICOLON@5..6 ";"
-  WHITESPACE@6..7 "\n"
----
-PLPGSQL@0..13
-  WHITESPACE@0..1 "\n"
-  PLPGSQL_NULL_STMT@1..6
-    NULL_KW@1..5 "null"
-    SEMICOLON@5..6 ";"
-  WHITESPACE@6..7 "\n"
-  PLPGSQL_NULL_STMT@7..12
-    NULL_KW@7..11 "null"
-    SEMICOLON@11..12 ";"
-  WHITESPACE@12..13 "\n"
+  PLPGSQL_BLOCK@1..26
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..22
+      PLPGSQL_NULL_STMT@9..14
+        NULL_KW@9..13 "null"
+        SEMICOLON@13..14 ";"
+      WHITESPACE@14..17 "\n  "
+      PLPGSQL_NULL_STMT@17..22
+        NULL_KW@17..21 "null"
+        SEMICOLON@21..22 ";"
+    WHITESPACE@22..23 "\n"
+    END_KW@23..26 "end"
+  WHITESPACE@26..27 "\n"

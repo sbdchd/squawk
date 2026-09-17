@@ -1,3 +1,0 @@
-do $$
-begin null; end
-$$;

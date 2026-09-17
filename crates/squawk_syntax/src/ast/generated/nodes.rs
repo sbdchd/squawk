@@ -19399,8 +19399,57 @@ pub struct Plpgsql {
 }
 impl Plpgsql {
     #[inline]
-    pub fn stmts(&self) -> AstChildren<PlpgsqlNullStmt> {
+    pub fn plpgsql_block(&self) -> Option<PlpgsqlBlock> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlBlock {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlBlock {
+    #[inline]
+    pub fn plpgsql_body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn plpgsql_declare_section(&self) -> Option<PlpgsqlDeclareSection> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn begin_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BEGIN_KW)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlBody {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlBody {
+    #[inline]
+    pub fn stmts(&self) -> AstChildren<PlpgsqlStmt> {
         support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDeclareSection {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDeclareSection {
+    #[inline]
+    pub fn declare_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DECLARE_KW)
     }
 }
 
@@ -29424,6 +29473,12 @@ pub enum PathPrimary {
 pub enum Persistence {
     Temp(Temp),
     Unlogged(Unlogged),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlStmt {
+    PlpgsqlBlock(PlpgsqlBlock),
+    PlpgsqlNullStmt(PlpgsqlNullStmt),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -46040,6 +46095,60 @@ impl AstNode for Plpgsql {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlBlock {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_BLOCK
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlBody {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_BODY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDeclareSection {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DECLARE_SECTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -65753,6 +65862,47 @@ impl From<Unlogged> for Persistence {
     #[inline]
     fn from(node: Unlogged) -> Persistence {
         Persistence::Unlogged(node)
+    }
+}
+impl AstNode for PlpgsqlStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PLPGSQL_BLOCK | SyntaxKind::PLPGSQL_NULL_STMT
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_BLOCK => PlpgsqlStmt::PlpgsqlBlock(PlpgsqlBlock { syntax }),
+            SyntaxKind::PLPGSQL_NULL_STMT => {
+                PlpgsqlStmt::PlpgsqlNullStmt(PlpgsqlNullStmt { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlStmt::PlpgsqlBlock(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlNullStmt(it) => &it.syntax,
+        }
+    }
+}
+impl From<PlpgsqlBlock> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlBlock) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlBlock(node)
+    }
+}
+impl From<PlpgsqlNullStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlNullStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlNullStmt(node)
     }
 }
 impl AstNode for PolicyCommandKind {

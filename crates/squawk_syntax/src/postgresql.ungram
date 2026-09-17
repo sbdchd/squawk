@@ -2037,7 +2037,24 @@ RoutineBody =
 | AtomicBody
 
 Plpgsql =
-  stmts:(PlpgsqlNullStmt*)
+  PlpgsqlBlock?
+
+PlpgsqlBlock =
+  PlpgsqlDeclareSection?
+  'begin'
+  PlpgsqlBody
+  'end'
+  ';'?
+
+PlpgsqlDeclareSection =
+  'declare'
+
+PlpgsqlBody =
+  stmts:(PlpgsqlStmt*)
+
+PlpgsqlStmt =
+  PlpgsqlBlock
+| PlpgsqlNullStmt
 
 PlpgsqlNullStmt =
   'null' ';'

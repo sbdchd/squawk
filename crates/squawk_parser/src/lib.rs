@@ -597,7 +597,6 @@ impl<'t> Parser<'t> {
     }
 
     /// Checks if the nth token is contextual keyword `kw`.
-    #[expect(dead_code, reason = "used by the PL/pgSQL grammar")]
     pub(crate) fn nth_at_contextual_kw(&self, n: usize, kw: SyntaxKind) -> bool {
         self.inp.contextual_kind(self.pos + n) == kw
     }

@@ -140,16 +140,22 @@ mod tests {
     #[test]
     fn language_after_as() {
         assert_snapshot!(
-            body("create function f() returns int as $$ null; $$ language plpgsql;"),
+            body("create function f() returns int as $$ begin null; end $$ language plpgsql;"),
             @r#"
-        PLPGSQL@0..7
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 37..44 " null; "
+        source 37..54 " begin null; end "
         "#
         );
     }
@@ -157,16 +163,22 @@ mod tests {
     #[test]
     fn language_before_as() {
         assert_snapshot!(
-            body("create function f() returns int language plpgsql as $$ null; $$;"),
+            body("create function f() returns int language plpgsql as $$ begin null; end $$;"),
             @r#"
-        PLPGSQL@0..7
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 54..61 " null; "
+        source 54..71 " begin null; end "
         "#
         );
     }
@@ -179,31 +191,43 @@ mod tests {
     #[test]
     fn procedure() {
         assert_snapshot!(
-            body("create procedure p() as $$ null; $$ language plpgsql;"),
+            body("create procedure p() as $$ begin null; end $$ language plpgsql;"),
             @r#"
-        PLPGSQL@0..7
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 26..33 " null; "
+        source 26..43 " begin null; end "
         "#
         );
     }
 
     #[test]
     fn do_defaults_to_plpgsql() {
-        assert_snapshot!(body("do $$ null; $$;"), @r#"
-        PLPGSQL@0..7
+        assert_snapshot!(body("do $$ begin null; end $$;"), @r#"
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 5..12 " null; "
+        source 5..22 " begin null; end "
         "#
         );
     }
@@ -216,58 +240,66 @@ mod tests {
     #[test]
     fn escaped_body_maps_back_through_the_escapes() {
         assert_snapshot!(
-            body(r"create function f() returns int as E'null;\n' language plpgsql;"),
+            body(r"create function f() returns int as E'begin null; end\n' language plpgsql;"),
             @r#"
-        PLPGSQL@0..6
-          PLPGSQL_NULL_STMT@0..5
-            NULL_KW@0..4 "null"
-            SEMICOLON@4..5 ";"
-          WHITESPACE@5..6 "\n"
+        PLPGSQL@0..16
+          PLPGSQL_BLOCK@0..15
+            BEGIN_KW@0..5 "begin"
+            WHITESPACE@5..6 " "
+            PLPGSQL_BODY@6..11
+              PLPGSQL_NULL_STMT@6..11
+                NULL_KW@6..10 "null"
+                SEMICOLON@10..11 ";"
+            WHITESPACE@11..12 " "
+            END_KW@12..15 "end"
+          WHITESPACE@15..16 "\n"
         ---
-        source 37..44 "null;\\n"
+        source 37..54 "begin null; end\\n"
         "#
         );
     }
 
     #[test]
     fn unparsed_tokens_are_errors() {
-        assert_snapshot!(body("do $$ begin null; end $$;"), @r#"
-        PLPGSQL@0..17
+        assert_snapshot!(body("do $$ begin perform 1; end $$;"), @r#"
+        PLPGSQL@0..22
           WHITESPACE@0..1 " "
-          ERROR@1..6
+          PLPGSQL_BLOCK@1..21
             BEGIN_KW@1..6 "begin"
-          WHITESPACE@6..7 " "
-          PLPGSQL_NULL_STMT@7..12
-            NULL_KW@7..11 "null"
-            SEMICOLON@11..12 ";"
-          WHITESPACE@12..13 " "
-          ERROR@13..16
-            END_KW@13..16 "end"
-          WHITESPACE@16..17 " "
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..17
+              ERROR@7..17
+                IDENT@7..14 "perform"
+                WHITESPACE@14..15 " "
+                INT_NUMBER@15..16 "1"
+                SEMICOLON@16..17 ";"
+            WHITESPACE@17..18 " "
+            END_KW@18..21 "end"
+          WHITESPACE@21..22 " "
         ---
-        source 5..22 " begin null; end "
-        error 6..6 expected a statement, found BEGIN_KW
-        error 18..18 expected a statement, found END_KW
+        source 5..27 " begin perform 1; end "
+        error 12..12 expected a statement, found IDENT
         "#);
     }
 
     #[test]
     fn errors_in_an_escaped_body_map_into_the_file() {
-        assert_snapshot!(body(r"do E'begin\n null;\n end';"), @r#"
-        PLPGSQL@0..17
-          ERROR@0..5
+        assert_snapshot!(body(r"do E'begin\n perform 1;\n end';"), @r#"
+        PLPGSQL@0..22
+          PLPGSQL_BLOCK@0..22
             BEGIN_KW@0..5 "begin"
-          WHITESPACE@5..7 "\n "
-          PLPGSQL_NULL_STMT@7..12
-            NULL_KW@7..11 "null"
-            SEMICOLON@11..12 ";"
-          WHITESPACE@12..14 "\n "
-          ERROR@14..17
-            END_KW@14..17 "end"
+            WHITESPACE@5..7 "\n "
+            PLPGSQL_BODY@7..17
+              ERROR@7..17
+                IDENT@7..14 "perform"
+                WHITESPACE@14..15 " "
+                INT_NUMBER@15..16 "1"
+                SEMICOLON@16..17 ";"
+            WHITESPACE@17..19 "\n "
+            END_KW@19..22 "end"
         ---
-        source 5..24 "begin\\n null;\\n end"
-        error 5..5 expected a statement, found BEGIN_KW
-        error 21..21 expected a statement, found END_KW
+        source 5..29 "begin\\n perform 1;\\n end"
+        error 13..13 expected a statement, found IDENT
         "#);
     }
 }
