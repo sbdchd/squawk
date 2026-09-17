@@ -208,9 +208,9 @@ fn generate_kind_src(
         .zip(used_puncts)
         .filter(|(_, used)| !used)
         .for_each(|((punct, _), _)| {
-            // `..` is unused in SQL, but used for PL/pgSQL
+            // `..`, `<<` and `>>` are unused in SQL, but used for PL/pgSQL
             // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/gram.y#L692
-            if *punct != "_" && *punct != ".." {
+            if *punct != "_" && *punct != ".." && *punct != "<<" && *punct != ">>" {
                 panic!("Punctuation {punct:?} is not used in grammar");
             }
         });

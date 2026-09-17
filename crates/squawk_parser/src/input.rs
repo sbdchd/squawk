@@ -95,7 +95,6 @@ impl Input {
     }
     /// For an `IDENT`, the PL/pgSQL keyword it spells, or `IDENT` if it spells
     /// none. `EOF` for every other token.
-    #[cfg_attr(not(test), expect(dead_code, reason = "read by the PL/pgSQL grammar"))]
     pub(crate) fn contextual_kind(&self, idx: usize) -> SyntaxKind {
         self.contextual_kind
             .get(idx)

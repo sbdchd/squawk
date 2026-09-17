@@ -35,6 +35,7 @@ mod grammar;
 mod input;
 mod lexed_str;
 mod output;
+mod plpgsql_grammar;
 mod shortcuts;
 mod syntax_kind;
 mod token_set;
@@ -164,7 +165,7 @@ impl EntryPoint {
         // it calls the methods on the parser to create a vector of events
         match self {
             Self::SourceFile => grammar::entry_point(&mut p),
-            Self::Plpgsql => grammar::plpgsql_entry_point(&mut p),
+            Self::Plpgsql => plpgsql_grammar::plpgsql_entry_point(&mut p),
         }
         let events = p.finish();
         // 3. forward parents
@@ -230,6 +231,8 @@ impl<'t> Parser<'t> {
             | SyntaxKind::NEQB
             | SyntaxKind::LTEQ
             | SyntaxKind::FAT_ARROW
+            | SyntaxKind::LESS_LESS
+            | SyntaxKind::GREATER_GREATER
             | SyntaxKind::GTEQ => 2,
             SyntaxKind::SIMILAR_TO => {
                 let m = self.start();
@@ -581,6 +584,24 @@ impl<'t> Parser<'t> {
         self.do_bump(kind, 1);
     }
 
+    /// Advances the parser by one token, remapping its kind.
+    /// This is useful to create contextual keywords from
+    /// identifiers.
+    #[expect(dead_code, reason = "used by the PL/pgSQL grammar")]
+    pub(crate) fn bump_remap(&mut self, kind: SyntaxKind) {
+        if self.nth(0) == SyntaxKind::EOF {
+            // FIXME: panic!?
+            return;
+        }
+        self.do_bump(kind, 1);
+    }
+
+    /// Checks if the nth token is contextual keyword `kw`.
+    #[expect(dead_code, reason = "used by the PL/pgSQL grammar")]
+    pub(crate) fn nth_at_contextual_kw(&self, n: usize, kw: SyntaxKind) -> bool {
+        self.inp.contextual_kind(self.pos + n) == kw
+    }
+
     /// Consume the next token if it is `kind` or emit an error
     /// otherwise.
     pub(crate) fn expect(&mut self, kind: SyntaxKind) -> bool {
@@ -892,6 +913,20 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::R_ANGLE,
                 SyntaxKind::EQ,
+                TrivaBetween::NotAllowed,
+            ),
+            // << used for PL/pgSQL
+            SyntaxKind::LESS_LESS => self.at_composite2(
+                n,
+                SyntaxKind::L_ANGLE,
+                SyntaxKind::L_ANGLE,
+                TrivaBetween::NotAllowed,
+            ),
+            // >>
+            SyntaxKind::GREATER_GREATER => self.at_composite2(
+                n,
+                SyntaxKind::R_ANGLE,
+                SyntaxKind::R_ANGLE,
                 TrivaBetween::NotAllowed,
             ),
             SyntaxKind::CUSTOM_OP => {
