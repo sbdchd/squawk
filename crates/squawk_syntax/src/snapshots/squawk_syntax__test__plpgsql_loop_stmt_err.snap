@@ -1,0 +1,84 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/loop_stmt.sql
+---
+PLPGSQL@0..114
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..113
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..113
+      PLPGSQL_LOOP_STMT@9..30
+        LOOP_KW@9..13 "loop"
+        WHITESPACE@13..18 "\n    "
+        PLPGSQL_BODY@18..23
+          PLPGSQL_NULL_STMT@18..23
+            NULL_KW@18..22 "null"
+            SEMICOLON@22..23 ";"
+        WHITESPACE@23..26 "\n  "
+        END_KW@26..29 "end"
+        SEMICOLON@29..30 ";"
+      WHITESPACE@30..34 "\n\n  "
+      PLPGSQL_WHILE_STMT@34..67
+        WHILE_KW@34..39 "while"
+        WHITESPACE@39..40 " "
+        BIN_EXPR@40..45
+          LITERAL@40..41
+            INT_NUMBER@40..41 "1"
+          WHITESPACE@41..42 " "
+          EQ@42..43 "="
+          WHITESPACE@43..44 " "
+          LITERAL@44..45
+            INT_NUMBER@44..45 "1"
+        WHITESPACE@45..50 "\n    "
+        PLPGSQL_BODY@50..55
+          PLPGSQL_NULL_STMT@50..55
+            NULL_KW@50..54 "null"
+            SEMICOLON@54..55 ";"
+        WHITESPACE@55..58 "\n  "
+        END_KW@58..61 "end"
+        WHITESPACE@61..62 " "
+        LOOP_KW@62..66 "loop"
+        SEMICOLON@66..67 ";"
+      WHITESPACE@67..71 "\n\n  "
+      PLPGSQL_LOOP_STMT@71..104
+        LOOP_KW@71..75 "loop"
+        WHITESPACE@75..80 "\n    "
+        PLPGSQL_BODY@80..85
+          PLPGSQL_NULL_STMT@80..85
+            NULL_KW@80..84 "null"
+            SEMICOLON@84..85 ";"
+        WHITESPACE@85..88 "\n  "
+        END_KW@88..91 "end"
+        WHITESPACE@91..92 " "
+        LOOP_KW@92..96 "loop"
+        WHITESPACE@96..100 "\n\n  "
+        PLPGSQL_LABEL_NAME_REF@100..104
+          IDENT@100..104 "exit"
+      WHITESPACE@104..105 " "
+      ERROR@105..113
+        WHEN_KW@105..109 "when"
+        WHITESPACE@109..110 "\n"
+        END_KW@110..113 "end"
+  WHITESPACE@113..114 "\n"
+
+error[syntax-error]: expected LOOP_KW
+  ╭▸ 
+5 │   end;
+  ╰╴     ━
+error[syntax-error]: expected LOOP_KW
+  ╭▸ 
+7 │   while 1 = 1
+  ╰╴             ━
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+15 │   exit when
+   ╰╴      ━
+error[syntax-error]: expected a statement, found WHEN_KW
+   ╭▸ 
+15 │   exit when
+   ╰╴       ━
+error[syntax-error]: expected END_KW
+   ╭▸ 
+16 │ end
+   ╰╴   ━

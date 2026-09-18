@@ -1,0 +1,253 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/loop_stmt.sql
+---
+PLPGSQL@0..452
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..451
+    PLPGSQL_DECLARE_SECTION@1..22
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..22
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "i"
+        WHITESPACE@12..13 " "
+        PATH_TYPE@13..16
+          PATH_REF@13..16
+            PATH_SEGMENT_REF@13..16
+              INT_KW@13..16 "int"
+        WHITESPACE@16..17 " "
+        PLPGSQL_VAR_INIT@17..21
+          COLON_EQ@17..19 ":="
+          WHITESPACE@19..20 " "
+          LITERAL@20..21
+            INT_NUMBER@20..21 "0"
+        SEMICOLON@21..22 ";"
+    WHITESPACE@22..23 "\n"
+    BEGIN_KW@23..28 "begin"
+    WHITESPACE@28..31 "\n  "
+    PLPGSQL_BODY@31..447
+      PLPGSQL_LOOP_STMT@31..57
+        LOOP_KW@31..35 "loop"
+        WHITESPACE@35..40 "\n    "
+        PLPGSQL_BODY@40..45
+          PLPGSQL_EXIT_STMT@40..45
+            EXIT_KW@40..44 "exit"
+            SEMICOLON@44..45 ";"
+        WHITESPACE@45..48 "\n  "
+        END_KW@48..51 "end"
+        WHITESPACE@51..52 " "
+        LOOP_KW@52..56 "loop"
+        SEMICOLON@56..57 ";"
+      WHITESPACE@57..61 "\n\n  "
+      PLPGSQL_LOOP_STMT@61..138
+        LOOP_KW@61..65 "loop"
+        WHITESPACE@65..70 "\n    "
+        PLPGSQL_BODY@70..126
+          PLPGSQL_EXIT_STMT@70..87
+            EXIT_KW@70..74 "exit"
+            WHITESPACE@74..75 " "
+            PLPGSQL_EXIT_WHEN@75..86
+              WHEN_KW@75..79 "when"
+              WHITESPACE@79..80 " "
+              BIN_EXPR@80..86
+                NAME_REF@80..81
+                  IDENT@80..81 "i"
+                WHITESPACE@81..82 " "
+                R_ANGLE@82..83 ">"
+                WHITESPACE@83..84 " "
+                LITERAL@84..86
+                  INT_NUMBER@84..86 "10"
+            SEMICOLON@86..87 ";"
+          WHITESPACE@87..92 "\n    "
+          PLPGSQL_CONTINUE_STMT@92..112
+            CONTINUE_KW@92..100 "continue"
+            WHITESPACE@100..101 " "
+            PLPGSQL_EXIT_WHEN@101..111
+              WHEN_KW@101..105 "when"
+              WHITESPACE@105..106 " "
+              BIN_EXPR@106..111
+                NAME_REF@106..107
+                  IDENT@106..107 "i"
+                WHITESPACE@107..108 " "
+                EQ@108..109 "="
+                WHITESPACE@109..110 " "
+                LITERAL@110..111
+                  INT_NUMBER@110..111 "2"
+            SEMICOLON@111..112 ";"
+          WHITESPACE@112..117 "\n    "
+          PLPGSQL_CONTINUE_STMT@117..126
+            CONTINUE_KW@117..125 "continue"
+            SEMICOLON@125..126 ";"
+        WHITESPACE@126..129 "\n  "
+        END_KW@129..132 "end"
+        WHITESPACE@132..133 " "
+        LOOP_KW@133..137 "loop"
+        SEMICOLON@137..138 ";"
+      WHITESPACE@138..142 "\n\n  "
+      PLPGSQL_WHILE_STMT@142..181
+        WHILE_KW@142..147 "while"
+        WHITESPACE@147..148 " "
+        BIN_EXPR@148..154
+          NAME_REF@148..149
+            IDENT@148..149 "i"
+          WHITESPACE@149..150 " "
+          L_ANGLE@150..151 "<"
+          WHITESPACE@151..152 " "
+          LITERAL@152..154
+            INT_NUMBER@152..154 "10"
+        WHITESPACE@154..155 " "
+        LOOP_KW@155..159 "loop"
+        WHITESPACE@159..164 "\n    "
+        PLPGSQL_BODY@164..169
+          PLPGSQL_NULL_STMT@164..169
+            NULL_KW@164..168 "null"
+            SEMICOLON@168..169 ";"
+        WHITESPACE@169..172 "\n  "
+        END_KW@172..175 "end"
+        WHITESPACE@175..176 " "
+        LOOP_KW@176..180 "loop"
+        SEMICOLON@180..181 ";"
+      WHITESPACE@181..185 "\n\n  "
+      PLPGSQL_WHILE_STMT@185..258
+        WHILE_KW@185..190 "while"
+        WHITESPACE@190..191 " "
+        CASE_EXPR@191..231
+          CASE_KW@191..195 "case"
+          WHITESPACE@195..196 " "
+          WHEN_CLAUSE_LIST@196..216
+            WHEN_CLAUSE@196..216
+              WHEN_KW@196..200 "when"
+              WHITESPACE@200..201 " "
+              BIN_EXPR@201..206
+                NAME_REF@201..202
+                  IDENT@201..202 "i"
+                WHITESPACE@202..203 " "
+                EQ@203..204 "="
+                WHITESPACE@204..205 " "
+                LITERAL@205..206
+                  INT_NUMBER@205..206 "1"
+              WHITESPACE@206..207 " "
+              THEN_KW@207..211 "then"
+              WHITESPACE@211..212 " "
+              LITERAL@212..216
+                TRUE_KW@212..216 "true"
+          WHITESPACE@216..217 " "
+          ELSE_CLAUSE@217..227
+            ELSE_KW@217..221 "else"
+            WHITESPACE@221..222 " "
+            LITERAL@222..227
+              FALSE_KW@222..227 "false"
+          WHITESPACE@227..228 " "
+          END_KW@228..231 "end"
+        WHITESPACE@231..232 " "
+        LOOP_KW@232..236 "loop"
+        WHITESPACE@236..241 "\n    "
+        PLPGSQL_BODY@241..246
+          PLPGSQL_NULL_STMT@241..246
+            NULL_KW@241..245 "null"
+            SEMICOLON@245..246 ";"
+        WHITESPACE@246..249 "\n  "
+        END_KW@249..252 "end"
+        WHITESPACE@252..253 " "
+        LOOP_KW@253..257 "loop"
+        SEMICOLON@257..258 ";"
+      WHITESPACE@258..262 "\n\n  "
+      PLPGSQL_LOOP_STMT@262..403
+        PLPGSQL_LABEL@262..271
+          LESS_LESS@262..264 "<<"
+          PLPGSQL_LABEL_NAME@264..269
+            OUTER_KW@264..269 "outer"
+          GREATER_GREATER@269..271 ">>"
+        WHITESPACE@271..274 "\n  "
+        LOOP_KW@274..278 "loop"
+        WHITESPACE@278..283 "\n    "
+        PLPGSQL_BODY@283..385
+          PLPGSQL_WHILE_STMT@283..385
+            PLPGSQL_LABEL@283..292
+              LESS_LESS@283..285 "<<"
+              PLPGSQL_LABEL_NAME@285..290
+                INNER_KW@285..290 "inner"
+              GREATER_GREATER@290..292 ">>"
+            WHITESPACE@292..297 "\n    "
+            WHILE_KW@297..302 "while"
+            WHITESPACE@302..303 " "
+            BIN_EXPR@303..309
+              NAME_REF@303..304
+                IDENT@303..304 "i"
+              WHITESPACE@304..305 " "
+              L_ANGLE@305..306 "<"
+              WHITESPACE@306..307 " "
+              LITERAL@307..309
+                INT_NUMBER@307..309 "10"
+            WHITESPACE@309..310 " "
+            LOOP_KW@310..314 "loop"
+            WHITESPACE@314..321 "\n      "
+            PLPGSQL_BODY@321..365
+              PLPGSQL_CONTINUE_STMT@321..347
+                CONTINUE_KW@321..329 "continue"
+                WHITESPACE@329..330 " "
+                PLPGSQL_LABEL_NAME_REF@330..335
+                  OUTER_KW@330..335 "outer"
+                WHITESPACE@335..336 " "
+                PLPGSQL_EXIT_WHEN@336..346
+                  WHEN_KW@336..340 "when"
+                  WHITESPACE@340..341 " "
+                  BIN_EXPR@341..346
+                    NAME_REF@341..342
+                      IDENT@341..342 "i"
+                    WHITESPACE@342..343 " "
+                    EQ@343..344 "="
+                    WHITESPACE@344..345 " "
+                    LITERAL@345..346
+                      INT_NUMBER@345..346 "2"
+                SEMICOLON@346..347 ";"
+              WHITESPACE@347..354 "\n      "
+              PLPGSQL_EXIT_STMT@354..365
+                EXIT_KW@354..358 "exit"
+                WHITESPACE@358..359 " "
+                PLPGSQL_LABEL_NAME_REF@359..364
+                  INNER_KW@359..364 "inner"
+                SEMICOLON@364..365 ";"
+            WHITESPACE@365..370 "\n    "
+            END_KW@370..373 "end"
+            WHITESPACE@373..374 " "
+            LOOP_KW@374..378 "loop"
+            WHITESPACE@378..379 " "
+            PLPGSQL_LABEL_NAME_REF@379..384
+              INNER_KW@379..384 "inner"
+            SEMICOLON@384..385 ";"
+        WHITESPACE@385..388 "\n  "
+        END_KW@388..391 "end"
+        WHITESPACE@391..392 " "
+        LOOP_KW@392..396 "loop"
+        WHITESPACE@396..397 " "
+        PLPGSQL_LABEL_NAME_REF@397..402
+          OUTER_KW@397..402 "outer"
+        SEMICOLON@402..403 ";"
+      WHITESPACE@403..407 "\n\n  "
+      PLPGSQL_BLOCK@407..447
+        PLPGSQL_LABEL@407..414
+          LESS_LESS@407..409 "<<"
+          PLPGSQL_LABEL_NAME@409..412
+            IDENT@409..412 "blk"
+          GREATER_GREATER@412..414 ">>"
+        WHITESPACE@414..417 "\n  "
+        BEGIN_KW@417..422 "begin"
+        WHITESPACE@422..427 "\n    "
+        PLPGSQL_BODY@427..436
+          PLPGSQL_EXIT_STMT@427..436
+            EXIT_KW@427..431 "exit"
+            WHITESPACE@431..432 " "
+            PLPGSQL_LABEL_NAME_REF@432..435
+              IDENT@432..435 "blk"
+            SEMICOLON@435..436 ";"
+        WHITESPACE@436..439 "\n  "
+        END_KW@439..442 "end"
+        WHITESPACE@442..443 " "
+        PLPGSQL_LABEL_NAME_REF@443..446
+          IDENT@443..446 "blk"
+        SEMICOLON@446..447 ";"
+    WHITESPACE@447..448 "\n"
+    END_KW@448..451 "end"
+  WHITESPACE@451..452 "\n"

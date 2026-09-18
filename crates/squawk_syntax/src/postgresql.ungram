@@ -2146,8 +2146,12 @@ PlpgsqlBody =
 PlpgsqlStmt =
   PlpgsqlBlock
 | PlpgsqlCaseStmt
+| PlpgsqlContinueStmt
+| PlpgsqlExitStmt
 | PlpgsqlIfStmt
+| PlpgsqlLoopStmt
 | PlpgsqlNullStmt
+| PlpgsqlWhileStmt
 
 PlpgsqlNullStmt =
   'null' ';'
@@ -2183,6 +2187,40 @@ PlpgsqlCaseWhen =
   conds:(Expr (',' Expr)*)
   'then'
   body:PlpgsqlBody
+
+PlpgsqlLoopStmt =
+  label:PlpgsqlLabel?
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlWhileStmt =
+  label:PlpgsqlLabel?
+  'while'
+  cond:Expr
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlExitStmt =
+  'exit'
+  label:PlpgsqlLabelNameRef?
+  when_clause:PlpgsqlExitWhen?
+  ';'
+
+PlpgsqlContinueStmt =
+  'continue'
+  label:PlpgsqlLabelNameRef?
+  when_clause:PlpgsqlExitWhen?
+  ';'
+
+PlpgsqlExitWhen =
+  'when'
+  cond:Expr
 
 FuncOptionList =
   options:(FuncOption*)

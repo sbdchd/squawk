@@ -27,7 +27,7 @@ fn opt_block(p: &mut Parser) {
         return;
     }
     let m = p.start();
-    opt_block_label(p);
+    opt_label(p);
     opt_declare_section(p);
     p.expect(BEGIN_KW);
     body(p, BodyKind::Block);
@@ -40,8 +40,8 @@ fn opt_block(p: &mut Parser) {
 }
 
 // <<foo>>
-fn opt_block_label(p: &mut Parser) {
-    if !at_block_label(p) {
+fn opt_label(p: &mut Parser) {
+    if !at_label(p) {
         return;
     }
     let m = p.start();
@@ -254,6 +254,7 @@ enum BodyKind {
     IfElse,
     CaseWhen,
     CaseElse,
+    Loop,
 }
 
 fn body(p: &mut Parser, kind: BodyKind) {
@@ -267,6 +268,10 @@ fn body(p: &mut Parser, kind: BodyKind) {
 fn stmt(p: &mut Parser) {
     if at_block_start(p) {
         opt_block(p);
+    } else if at_loop_start(p) {
+        loop_stmt(p);
+    } else if at_exit_stmt(p) {
+        exit_stmt(p);
     } else if p.at(CASE_KW) {
         case_stmt(p);
     } else if p.at(IF_KW) {
@@ -327,6 +332,59 @@ fn case_when(p: &mut Parser) {
     p.expect(THEN_KW);
     body(p, BodyKind::CaseWhen);
     m.complete(p, PLPGSQL_CASE_WHEN);
+}
+
+fn loop_stmt(p: &mut Parser) {
+    assert!(at_loop_start(p));
+    let m = p.start();
+    opt_label(p);
+    let kind = if p.nth_at_contextual_kw(0, WHILE_KW) {
+        p.bump_remap(WHILE_KW);
+        expr(p);
+        PLPGSQL_WHILE_STMT
+    } else {
+        PLPGSQL_LOOP_STMT
+    };
+    expect_contextual_kw(p, LOOP_KW);
+    body(p, BodyKind::Loop);
+    p.expect(END_KW);
+    expect_contextual_kw(p, LOOP_KW);
+    opt_label_name_ref(p);
+    p.expect(SEMICOLON);
+    m.complete(p, kind);
+}
+
+fn exit_stmt(p: &mut Parser) {
+    assert!(at_exit_stmt(p));
+    let m = p.start();
+    let kind = if p.eat(CONTINUE_KW) {
+        PLPGSQL_CONTINUE_STMT
+    } else {
+        p.bump_remap(EXIT_KW);
+        PLPGSQL_EXIT_STMT
+    };
+    opt_label_name_ref(p);
+    opt_exit_when(p);
+    p.expect(SEMICOLON);
+    m.complete(p, kind);
+}
+
+fn opt_exit_when(p: &mut Parser) {
+    if !p.at(WHEN_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump(WHEN_KW);
+    expr(p);
+    m.complete(p, PLPGSQL_EXIT_WHEN);
+}
+
+fn expect_contextual_kw(p: &mut Parser, kw: SyntaxKind) {
+    if p.nth_at_contextual_kw(0, kw) {
+        p.bump_remap(kw);
+    } else {
+        p.error(format!("expected {kw:?}"));
+    }
 }
 
 fn opt_elsif_clause(p: &mut Parser) -> bool {
@@ -436,7 +494,23 @@ fn at_block_start(p: &Parser) -> bool {
 }
 
 fn at_block_label(p: &Parser) -> bool {
-    p.at(LESS_LESS) && at_name(p, 2) && p.nth_at(3, GREATER_GREATER) && p.nth_at_ts(5, BLOCK_FIRST)
+    at_label(p) && p.nth_at_ts(5, BLOCK_FIRST)
+}
+
+fn at_label(p: &Parser) -> bool {
+    p.at(LESS_LESS) && at_name(p, 2) && p.nth_at(3, GREATER_GREATER)
+}
+
+fn at_loop_start(p: &Parser) -> bool {
+    at_loop_kw(p, 0) || (at_label(p) && at_loop_kw(p, 5))
+}
+
+fn at_loop_kw(p: &Parser, n: usize) -> bool {
+    p.nth_at_contextual_kw(n, LOOP_KW) || p.nth_at_contextual_kw(n, WHILE_KW)
+}
+
+fn at_exit_stmt(p: &Parser) -> bool {
+    p.at(CONTINUE_KW) || p.nth_at_contextual_kw(0, EXIT_KW)
 }
 
 fn at_name(p: &Parser, n: usize) -> bool {
@@ -464,6 +538,7 @@ fn at_body_end(p: &Parser, kind: BodyKind) -> bool {
         BodyKind::IfElse => at_end_if(p),
         BodyKind::CaseWhen => at_end_case(p) || p.at(WHEN_KW) || p.at(ELSE_KW),
         BodyKind::CaseElse => at_end_case(p),
+        BodyKind::Loop => at_end_loop(p),
     }
 }
 
@@ -473,6 +548,10 @@ fn at_end_if(p: &Parser) -> bool {
 
 fn at_end_case(p: &Parser) -> bool {
     p.at(END_KW) && p.nth_at(1, CASE_KW)
+}
+
+fn at_end_loop(p: &Parser) -> bool {
+    p.at(END_KW) && p.nth_at_contextual_kw(1, LOOP_KW)
 }
 
 fn at_block_end(p: &Parser) -> bool {

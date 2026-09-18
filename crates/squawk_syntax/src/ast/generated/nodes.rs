@@ -19574,6 +19574,29 @@ impl PlpgsqlCondition {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlContinueStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlContinueStmt {
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_clause(&self) -> Option<PlpgsqlExitWhen> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn continue_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONTINUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlCursorArg {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19742,6 +19765,44 @@ impl PlpgsqlExceptionSection {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExitStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExitStmt {
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_clause(&self) -> Option<PlpgsqlExitWhen> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn exit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXIT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExitWhen {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExitWhen {
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlIfStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19826,6 +19887,37 @@ impl PlpgsqlLabelNameRef {
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLoopStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLoopStmt {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOOP_KW)
     }
 }
 
@@ -19956,6 +20048,45 @@ impl PlpgsqlVarName {
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlWhileStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlWhileStmt {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOOP_KW)
+    }
+    #[inline]
+    pub fn while_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHILE_KW)
     }
 }
 
@@ -29988,8 +30119,12 @@ pub enum PlpgsqlDeclType {
 pub enum PlpgsqlStmt {
     PlpgsqlBlock(PlpgsqlBlock),
     PlpgsqlCaseStmt(PlpgsqlCaseStmt),
+    PlpgsqlContinueStmt(PlpgsqlContinueStmt),
+    PlpgsqlExitStmt(PlpgsqlExitStmt),
     PlpgsqlIfStmt(PlpgsqlIfStmt),
+    PlpgsqlLoopStmt(PlpgsqlLoopStmt),
     PlpgsqlNullStmt(PlpgsqlNullStmt),
+    PlpgsqlWhileStmt(PlpgsqlWhileStmt),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -46746,6 +46881,24 @@ impl AstNode for PlpgsqlCondition {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlContinueStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CONTINUE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlCursorArg {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -46890,6 +47043,42 @@ impl AstNode for PlpgsqlExceptionSection {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlExitStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXIT_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExitWhen {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXIT_WHEN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlIfStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -46948,6 +47137,24 @@ impl AstNode for PlpgsqlLabelNameRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_LABEL_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlLoopStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LOOP_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -47056,6 +47263,24 @@ impl AstNode for PlpgsqlVarName {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_VAR_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlWhileStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_WHILE_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -66898,8 +67123,12 @@ impl AstNode for PlpgsqlStmt {
             kind,
             SyntaxKind::PLPGSQL_BLOCK
                 | SyntaxKind::PLPGSQL_CASE_STMT
+                | SyntaxKind::PLPGSQL_CONTINUE_STMT
+                | SyntaxKind::PLPGSQL_EXIT_STMT
                 | SyntaxKind::PLPGSQL_IF_STMT
+                | SyntaxKind::PLPGSQL_LOOP_STMT
                 | SyntaxKind::PLPGSQL_NULL_STMT
+                | SyntaxKind::PLPGSQL_WHILE_STMT
         )
     }
     #[inline]
@@ -66909,9 +67138,21 @@ impl AstNode for PlpgsqlStmt {
             SyntaxKind::PLPGSQL_CASE_STMT => {
                 PlpgsqlStmt::PlpgsqlCaseStmt(PlpgsqlCaseStmt { syntax })
             }
+            SyntaxKind::PLPGSQL_CONTINUE_STMT => {
+                PlpgsqlStmt::PlpgsqlContinueStmt(PlpgsqlContinueStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_EXIT_STMT => {
+                PlpgsqlStmt::PlpgsqlExitStmt(PlpgsqlExitStmt { syntax })
+            }
             SyntaxKind::PLPGSQL_IF_STMT => PlpgsqlStmt::PlpgsqlIfStmt(PlpgsqlIfStmt { syntax }),
+            SyntaxKind::PLPGSQL_LOOP_STMT => {
+                PlpgsqlStmt::PlpgsqlLoopStmt(PlpgsqlLoopStmt { syntax })
+            }
             SyntaxKind::PLPGSQL_NULL_STMT => {
                 PlpgsqlStmt::PlpgsqlNullStmt(PlpgsqlNullStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_WHILE_STMT => {
+                PlpgsqlStmt::PlpgsqlWhileStmt(PlpgsqlWhileStmt { syntax })
             }
             _ => {
                 return None;
@@ -66924,8 +67165,12 @@ impl AstNode for PlpgsqlStmt {
         match self {
             PlpgsqlStmt::PlpgsqlBlock(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlCaseStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlContinueStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlExitStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlIfStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlLoopStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlNullStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlWhileStmt(it) => &it.syntax,
         }
     }
 }
@@ -66941,16 +67186,40 @@ impl From<PlpgsqlCaseStmt> for PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlCaseStmt(node)
     }
 }
+impl From<PlpgsqlContinueStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlContinueStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlContinueStmt(node)
+    }
+}
+impl From<PlpgsqlExitStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlExitStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlExitStmt(node)
+    }
+}
 impl From<PlpgsqlIfStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlIfStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlIfStmt(node)
     }
 }
+impl From<PlpgsqlLoopStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlLoopStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlLoopStmt(node)
+    }
+}
 impl From<PlpgsqlNullStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlNullStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlNullStmt(node)
+    }
+}
+impl From<PlpgsqlWhileStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlWhileStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlWhileStmt(node)
     }
 }
 impl AstNode for PolicyCommandKind {

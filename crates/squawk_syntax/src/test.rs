@@ -271,11 +271,11 @@ fn plpgsql_suite_score() {
 
     assert_snapshot!(table, @"
     file                       bodies  tokens  unparsed   err
-    plpgsql.sql                   254    9887      6445   807
+    plpgsql.sql                   254    9887      6391   796
     plpgsql_array.sql              26     948       629    70
     plpgsql_cache.sql               2      60        44     5
     plpgsql_call.sql               45    1687      1366   176
-    plpgsql_control.sql            27    1400      1152   161
+    plpgsql_control.sql            27    1381       906   120
     plpgsql_copy.sql                4      28        16     4
     plpgsql_domain.sql             23     300       179    30
     plpgsql_misc.sql               16     261       114    12
@@ -285,7 +285,7 @@ fn plpgsql_suite_score() {
     plpgsql_trap.sql                7     354       247    44
     plpgsql_trigger.sql             1      55        42     5
     plpgsql_varprops.sql           33     716       379    56
-    total                         549   19105     13244  1704
+    total                         549   19086     12944  1652
     ");
 }
 
