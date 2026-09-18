@@ -1,0 +1,48 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/do_stmt.sql
+---
+PLPGSQL@0..135
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..134
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..130
+      PLPGSQL_DO_STMT@9..36
+        DO@9..35
+          DO_KW@9..11 "do"
+          WHITESPACE@11..12 " "
+          LITERAL@12..35
+            DOLLAR_QUOTED_STRING@12..35 "$q$ begin null; end $q$"
+        SEMICOLON@35..36 ";"
+      WHITESPACE@36..39 "\n  "
+      PLPGSQL_DO_STMT@39..83
+        DO@39..82
+          DO_KW@39..41 "do"
+          WHITESPACE@41..42 " "
+          DO_LANGUAGE@42..58
+            LANGUAGE_KW@42..50 "language"
+            WHITESPACE@50..51 " "
+            LANGUAGE_REF@51..58
+              IDENT@51..58 "plpgsql"
+          WHITESPACE@58..59 " "
+          LITERAL@59..82
+            DOLLAR_QUOTED_STRING@59..82 "$q$ begin null; end $q$"
+        SEMICOLON@82..83 ";"
+      WHITESPACE@83..86 "\n  "
+      PLPGSQL_DO_STMT@86..130
+        DO@86..129
+          DO_KW@86..88 "do"
+          WHITESPACE@88..89 " "
+          LITERAL@89..112
+            DOLLAR_QUOTED_STRING@89..112 "$q$ begin null; end $q$"
+          WHITESPACE@112..113 " "
+          DO_LANGUAGE@113..129
+            LANGUAGE_KW@113..121 "language"
+            WHITESPACE@121..122 " "
+            LANGUAGE_REF@122..129
+              IDENT@122..129 "plpgsql"
+        SEMICOLON@129..130 ";"
+    WHITESPACE@130..131 "\n"
+    END_KW@131..134 "end"
+  WHITESPACE@134..135 "\n"

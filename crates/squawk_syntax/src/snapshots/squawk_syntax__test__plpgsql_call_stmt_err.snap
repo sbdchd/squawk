@@ -1,0 +1,76 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/call_stmt.sql
+---
+PLPGSQL@0..48
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..47
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..43
+      PLPGSQL_CALL_STMT@9..14
+        CALL@9..13
+          CALL_KW@9..13 "call"
+          PROCEDURE_NAME_REF@13..13
+        SEMICOLON@13..14 ";"
+      WHITESPACE@14..17 "\n  "
+      PLPGSQL_CALL_STMT@17..30
+        CALL@17..30
+          CALL_KW@17..21 "call"
+          WHITESPACE@21..22 " "
+          PROCEDURE_NAME_REF@22..24
+            PATH_REF@22..24
+              PATH_SEGMENT_REF@22..24
+                IDENT@22..24 "p1"
+          ARG_LIST@24..30
+            L_PAREN@24..25 "("
+            ARG@25..26
+              LITERAL@25..26
+                INT_NUMBER@25..26 "1"
+            COMMA@26..27 ","
+            WHITESPACE@27..28 " "
+            ARG@28..29
+              LITERAL@28..29
+                INT_NUMBER@28..29 "2"
+            R_PAREN@29..30 ")"
+      WHITESPACE@30..33 "\n  "
+      PLPGSQL_CALL_STMT@33..40
+        CALL@33..40
+          CALL_KW@33..37 "call"
+          WHITESPACE@37..38 " "
+          PROCEDURE_NAME_REF@38..40
+            PATH_REF@38..40
+              PATH_SEGMENT_REF@38..40
+                IDENT@38..40 "p2"
+      WHITESPACE@40..41 " "
+      ERROR@41..43
+        INT_NUMBER@41..42 "1"
+        SEMICOLON@42..43 ";"
+    WHITESPACE@43..44 "\n"
+    END_KW@44..47 "end"
+  WHITESPACE@47..48 "\n"
+
+error[syntax-error]: expected path name
+  ╭▸ 
+3 │   call;
+  ╰╴      ━
+error[syntax-error]: expected L_PAREN
+  ╭▸ 
+3 │   call;
+  ╰╴      ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+4 │   call p1(1, 2)
+  ╰╴               ━
+error[syntax-error]: expected L_PAREN
+  ╭▸ 
+5 │   call p2 1;
+  ╰╴         ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+5 │   call p2 1;
+  ╰╴         ━
+error[syntax-error]: expected a statement, found INT_NUMBER
+  ╭▸ 
+5 │   call p2 1;
+  ╰╴          ━

@@ -23,7 +23,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use rustc_hash::FxHashSet;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 use anyhow::{Context, Result};
 use convert_case::{Case, Casing};
@@ -601,6 +601,14 @@ fn literal_token_name(token: &str) -> Option<&str> {
         .filter(|name| !name.is_empty())
 }
 
+const RUST_KEYWORDS: &[&str] = &[
+    "abstract", "as", "async", "await", "become", "box", "break", "const", "continue", "crate",
+    "do", "dyn", "else", "enum", "extern", "false", "final", "fn", "for", "gen", "if", "impl",
+    "in", "let", "loop", "macro", "match", "mod", "move", "mut", "override", "priv", "pub", "ref",
+    "return", "self", "static", "struct", "super", "trait", "true", "try", "typeof", "unsafe",
+    "unsized", "use", "virtual", "where", "while", "yield",
+];
+
 impl Field {
     fn is_many(&self) -> bool {
         matches!(
@@ -635,6 +643,8 @@ impl Field {
             Field::Node { name, .. } => {
                 if name == "type" {
                     String::from("ty")
+                } else if RUST_KEYWORDS.contains(&name.as_str()) {
+                    format!("{name}_")
                 } else {
                     name.to_owned()
                 }
@@ -709,6 +719,7 @@ fn lower(grammar: &Grammar) -> AstSrc {
     });
 
     deduplicate_fields(&mut res);
+    drop_ambiguous_fields(&mut res);
     res.nodes.sort_by_key(|it| it.name.clone());
     res.enums.sort_by_key(|it| it.name.clone());
     res.tokens.sort();
@@ -739,6 +750,27 @@ fn deduplicate_fields(ast: &mut AstSrc) {
             }
             i += 1;
         }
+    }
+}
+
+// If two fields have the same type then `support::child`` won't work so drop
+// the fields.
+fn drop_ambiguous_fields(ast: &mut AstSrc) {
+    for node in &mut ast.nodes {
+        let key = |field: &Field| match field {
+            Field::Node {
+                ty, cardinality, ..
+            } => Some((ty.clone(), matches!(cardinality, Cardinality::Many))),
+            Field::Token(_) => None,
+        };
+        let mut seen = FxHashMap::default();
+        for field in &node.fields {
+            if let Some(key) = key(field) {
+                *seen.entry(key).or_insert(0) += 1;
+            }
+        }
+        node.fields
+            .retain(|field| key(field).is_none_or(|key| seen[&key] == 1));
     }
 }
 

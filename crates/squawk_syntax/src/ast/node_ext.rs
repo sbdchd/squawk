@@ -855,6 +855,18 @@ impl ast::ReturningOption {
     }
 }
 
+impl ast::PlpgsqlAssertStmt {
+    #[inline]
+    pub fn cond(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).next()
+    }
+
+    #[inline]
+    pub fn message(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(1)
+    }
+}
+
 impl ast::CompoundSelect {
     #[inline]
     pub fn lhs_operand(&self) -> Option<ast::CompoundSelectOperand> {
@@ -1010,6 +1022,13 @@ pub fn normalize_name_node(node: &SyntaxNode) -> String {
         .and_then(|t| t.strip_suffix('"'))
         .map(|x| x.replace(r#""""#, "\""))
         .unwrap_or_else(|| raw.to_ascii_lowercase())
+}
+
+impl ast::PlpgsqlOptionValue {
+    #[inline]
+    pub fn text(&self) -> String {
+        normalize_name_node(self.syntax())
+    }
 }
 
 impl ast::VarcharType {

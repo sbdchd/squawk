@@ -1,0 +1,117 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/transaction_stmt.sql
+---
+PLPGSQL@0..203
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..202
+    PLPGSQL_DECLARE_SECTION@1..48
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..27
+        PLPGSQL_VAR_NAME@11..17
+          COMMIT_KW@11..17 "commit"
+        WHITESPACE@17..18 " "
+        PATH_TYPE@18..21
+          PATH_REF@18..21
+            PATH_SEGMENT_REF@18..21
+              INT_KW@18..21 "int"
+        WHITESPACE@21..22 " "
+        PLPGSQL_VAR_INIT@22..26
+          COLON_EQ@22..24 ":="
+          WHITESPACE@24..25 " "
+          LITERAL@25..26
+            INT_NUMBER@25..26 "1"
+        SEMICOLON@26..27 ";"
+      WHITESPACE@27..30 "\n  "
+      PLPGSQL_VAR_DECL@30..48
+        PLPGSQL_VAR_NAME@30..38
+          ROLLBACK_KW@30..38 "rollback"
+        WHITESPACE@38..39 " "
+        PATH_TYPE@39..42
+          PATH_REF@39..42
+            PATH_SEGMENT_REF@39..42
+              INT_KW@39..42 "int"
+        WHITESPACE@42..43 " "
+        PLPGSQL_VAR_INIT@43..47
+          COLON_EQ@43..45 ":="
+          WHITESPACE@45..46 " "
+          LITERAL@46..47
+            INT_NUMBER@46..47 "1"
+        SEMICOLON@47..48 ";"
+    WHITESPACE@48..49 "\n"
+    BEGIN_KW@49..54 "begin"
+    WHITESPACE@54..57 "\n  "
+    PLPGSQL_BODY@57..198
+      PLPGSQL_COMMIT_STMT@57..64
+        COMMIT_KW@57..63 "commit"
+        SEMICOLON@63..64 ";"
+      WHITESPACE@64..67 "\n  "
+      PLPGSQL_COMMIT_STMT@67..84
+        COMMIT_KW@67..73 "commit"
+        WHITESPACE@73..74 " "
+        AND_CHAIN@74..83
+          AND_KW@74..77 "and"
+          WHITESPACE@77..78 " "
+          CHAIN_KW@78..83 "chain"
+        SEMICOLON@83..84 ";"
+      WHITESPACE@84..87 "\n  "
+      PLPGSQL_COMMIT_STMT@87..107
+        COMMIT_KW@87..93 "commit"
+        WHITESPACE@93..94 " "
+        AND_NO_CHAIN@94..106
+          AND_KW@94..97 "and"
+          WHITESPACE@97..98 " "
+          NO_KW@98..100 "no"
+          WHITESPACE@100..101 " "
+          CHAIN_KW@101..106 "chain"
+        SEMICOLON@106..107 ";"
+      WHITESPACE@107..110 "\n  "
+      PLPGSQL_ROLLBACK_STMT@110..119
+        ROLLBACK_KW@110..118 "rollback"
+        SEMICOLON@118..119 ";"
+      WHITESPACE@119..122 "\n  "
+      PLPGSQL_ROLLBACK_STMT@122..141
+        ROLLBACK_KW@122..130 "rollback"
+        WHITESPACE@130..131 " "
+        AND_CHAIN@131..140
+          AND_KW@131..134 "and"
+          WHITESPACE@134..135 " "
+          CHAIN_KW@135..140 "chain"
+        SEMICOLON@140..141 ";"
+      WHITESPACE@141..144 "\n  "
+      PLPGSQL_ROLLBACK_STMT@144..166
+        ROLLBACK_KW@144..152 "rollback"
+        WHITESPACE@152..153 " "
+        AND_NO_CHAIN@153..165
+          AND_KW@153..156 "and"
+          WHITESPACE@156..157 " "
+          NO_KW@157..159 "no"
+          WHITESPACE@159..160 " "
+          CHAIN_KW@160..165 "chain"
+        SEMICOLON@165..166 ";"
+      WHITESPACE@166..169 "\n  "
+      PLPGSQL_ASSIGN_STMT@169..181
+        PLPGSQL_ASSIGN_TARGET@169..175
+          PLPGSQL_VAR_NAME_REF@169..175
+            COMMIT_KW@169..175 "commit"
+        WHITESPACE@175..176 " "
+        COLON_EQ@176..178 ":="
+        WHITESPACE@178..179 " "
+        LITERAL@179..180
+          INT_NUMBER@179..180 "2"
+        SEMICOLON@180..181 ";"
+      WHITESPACE@181..184 "\n  "
+      PLPGSQL_ASSIGN_STMT@184..198
+        PLPGSQL_ASSIGN_TARGET@184..192
+          PLPGSQL_VAR_NAME_REF@184..192
+            ROLLBACK_KW@184..192 "rollback"
+        WHITESPACE@192..193 " "
+        COLON_EQ@193..195 ":="
+        WHITESPACE@195..196 " "
+        LITERAL@196..197
+          INT_NUMBER@196..197 "3"
+        SEMICOLON@197..198 ";"
+    WHITESPACE@198..199 "\n"
+    END_KW@199..202 "end"
+  WHITESPACE@202..203 "\n"

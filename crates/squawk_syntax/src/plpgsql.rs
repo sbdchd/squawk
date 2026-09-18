@@ -271,44 +271,44 @@ mod tests {
 
     #[test]
     fn unparsed_tokens_are_errors() {
-        assert_snapshot!(body("do $$ begin perform 1; end $$;"), @r#"
-        PLPGSQL@0..22
+        assert_snapshot!(body("do $$ begin open c; end $$;"), @r#"
+        PLPGSQL@0..19
           WHITESPACE@0..1 " "
-          PLPGSQL_BLOCK@1..21
+          PLPGSQL_BLOCK@1..18
             BEGIN_KW@1..6 "begin"
             WHITESPACE@6..7 " "
-            PLPGSQL_BODY@7..17
-              ERROR@7..17
-                IDENT@7..14 "perform"
-                WHITESPACE@14..15 " "
-                INT_NUMBER@15..16 "1"
-                SEMICOLON@16..17 ";"
-            WHITESPACE@17..18 " "
-            END_KW@18..21 "end"
-          WHITESPACE@21..22 " "
+            PLPGSQL_BODY@7..14
+              ERROR@7..14
+                IDENT@7..11 "open"
+                WHITESPACE@11..12 " "
+                IDENT@12..13 "c"
+                SEMICOLON@13..14 ";"
+            WHITESPACE@14..15 " "
+            END_KW@15..18 "end"
+          WHITESPACE@18..19 " "
         ---
-        source 5..27 " begin perform 1; end "
+        source 5..24 " begin open c; end "
         error 12..12 expected a statement, found IDENT
         "#);
     }
 
     #[test]
     fn errors_in_an_escaped_body_map_into_the_file() {
-        assert_snapshot!(body(r"do E'begin\n perform 1;\n end';"), @r#"
-        PLPGSQL@0..22
-          PLPGSQL_BLOCK@0..22
+        assert_snapshot!(body(r"do E'begin\n open c;\n end';"), @r#"
+        PLPGSQL@0..19
+          PLPGSQL_BLOCK@0..19
             BEGIN_KW@0..5 "begin"
             WHITESPACE@5..7 "\n "
-            PLPGSQL_BODY@7..17
-              ERROR@7..17
-                IDENT@7..14 "perform"
-                WHITESPACE@14..15 " "
-                INT_NUMBER@15..16 "1"
-                SEMICOLON@16..17 ";"
-            WHITESPACE@17..19 "\n "
-            END_KW@19..22 "end"
+            PLPGSQL_BODY@7..14
+              ERROR@7..14
+                IDENT@7..11 "open"
+                WHITESPACE@11..12 " "
+                IDENT@12..13 "c"
+                SEMICOLON@13..14 ";"
+            WHITESPACE@14..16 "\n "
+            END_KW@16..19 "end"
         ---
-        source 5..29 "begin\\n perform 1;\\n end"
+        source 5..26 "begin\\n open c;\\n end"
         error 13..13 expected a statement, found IDENT
         "#);
     }

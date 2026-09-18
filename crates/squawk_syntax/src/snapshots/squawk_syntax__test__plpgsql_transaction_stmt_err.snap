@@ -1,0 +1,90 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/transaction_stmt.sql
+---
+PLPGSQL@0..106
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..105
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..101
+      PLPGSQL_COMMIT_STMT@9..15
+        COMMIT_KW@9..15 "commit"
+      WHITESPACE@15..16 " "
+      ERROR@16..21
+        WORK_KW@16..20 "work"
+        SEMICOLON@20..21 ";"
+      WHITESPACE@21..24 "\n  "
+      PLPGSQL_COMMIT_STMT@24..30
+        COMMIT_KW@24..30 "commit"
+      WHITESPACE@30..31 " "
+      ERROR@31..44
+        PREPARED_KW@31..39 "prepared"
+        WHITESPACE@39..40 " "
+        STRING@40..43 "'x'"
+        SEMICOLON@43..44 ";"
+      WHITESPACE@44..47 "\n  "
+      PLPGSQL_ROLLBACK_STMT@47..55
+        ROLLBACK_KW@47..55 "rollback"
+      WHITESPACE@55..56 " "
+      ERROR@56..71
+        TO_KW@56..58 "to"
+        WHITESPACE@58..59 " "
+        SAVEPOINT_KW@59..68 "savepoint"
+        WHITESPACE@68..69 " "
+        IDENT@69..70 "s"
+        SEMICOLON@70..71 ";"
+      WHITESPACE@71..74 "\n  "
+      PLPGSQL_COMMIT_STMT@74..85
+        COMMIT_KW@74..80 "commit"
+        WHITESPACE@80..81 " "
+        AND_CHAIN@81..84
+          AND_KW@81..84 "and"
+        SEMICOLON@84..85 ";"
+      WHITESPACE@85..88 "\n  "
+      PLPGSQL_COMMIT_STMT@88..94
+        COMMIT_KW@88..94 "commit"
+      WHITESPACE@94..95 " "
+      ERROR@95..101
+        CHAIN_KW@95..100 "chain"
+        SEMICOLON@100..101 ";"
+    WHITESPACE@101..102 "\n"
+    END_KW@102..105 "end"
+  WHITESPACE@105..106 "\n"
+
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+3 │   commit work;
+  ╰╴        ━
+error[syntax-error]: expected a statement, found WORK_KW
+  ╭▸ 
+3 │   commit work;
+  ╰╴         ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+4 │   commit prepared 'x';
+  ╰╴        ━
+error[syntax-error]: expected a statement, found PREPARED_KW
+  ╭▸ 
+4 │   commit prepared 'x';
+  ╰╴         ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+5 │   rollback to savepoint s;
+  ╰╴          ━
+error[syntax-error]: expected a statement, found TO_KW
+  ╭▸ 
+5 │   rollback to savepoint s;
+  ╰╴           ━
+error[syntax-error]: expected CHAIN_KW
+  ╭▸ 
+6 │   commit and;
+  ╰╴            ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+7 │   commit chain;
+  ╰╴        ━
+error[syntax-error]: expected a statement, found CHAIN_KW
+  ╭▸ 
+7 │   commit chain;
+  ╰╴         ━

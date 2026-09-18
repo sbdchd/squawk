@@ -1,0 +1,86 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/return_stmt.sql
+---
+PLPGSQL@0..121
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..120
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..116
+      PLPGSQL_RETURN_NEXT_STMT@9..24
+        RETURN_KW@9..15 "return"
+        WHITESPACE@15..16 " "
+        NEXT_KW@16..20 "next"
+        ARRAY_EXPR@20..23
+          L_BRACK@20..21 "["
+          LITERAL@21..22
+            INT_NUMBER@21..22 "1"
+          R_BRACK@22..23 "]"
+        SEMICOLON@23..24 ";"
+      WHITESPACE@24..27 "\n  "
+      PLPGSQL_RETURN_QUERY_STMT@27..40
+        RETURN_KW@27..33 "return"
+        WHITESPACE@33..34 " "
+        QUERY_KW@34..39 "query"
+        SEMICOLON@39..40 ";"
+      WHITESPACE@40..43 "\n  "
+      PLPGSQL_RETURN_QUERY_EXECUTE_STMT@43..64
+        RETURN_KW@43..49 "return"
+        WHITESPACE@49..50 " "
+        QUERY_KW@50..55 "query"
+        WHITESPACE@55..56 " "
+        EXECUTE_KW@56..63 "execute"
+        SEMICOLON@63..64 ";"
+      WHITESPACE@64..67 "\n  "
+      PLPGSQL_RETURN_QUERY_EXECUTE_STMT@67..105
+        RETURN_KW@67..73 "return"
+        WHITESPACE@73..74 " "
+        QUERY_KW@74..79 "query"
+        WHITESPACE@79..80 " "
+        EXECUTE_KW@80..87 "execute"
+        WHITESPACE@87..88 " "
+        LITERAL@88..98
+          STRING@88..98 "'select 1'"
+        WHITESPACE@98..99 " "
+        PLPGSQL_USING_CLAUSE@99..104
+          USING_KW@99..104 "using"
+        SEMICOLON@104..105 ";"
+      WHITESPACE@105..108 "\n  "
+      PLPGSQL_RETURN_STMT@108..116
+        RETURN_KW@108..114 "return"
+        WHITESPACE@114..115 " "
+        LITERAL@115..116
+          INT_NUMBER@115..116 "1"
+    WHITESPACE@116..117 "\n"
+    END_KW@117..120 "end"
+  WHITESPACE@120..121 "\n"
+
+error[syntax-error]: Array missing ARRAY keyword.
+  ╭▸ 
+3 │   return next[1];
+  ╰╴             ━
+error[syntax-error]: expected a query
+  ╭▸ 
+4 │   return query;
+  ╰╴              ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+5 │   return query execute;
+  ╰╴                      ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+5 │   return query execute;
+  ╰╴                      ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+6 │   return query execute 'select 1' using;
+  ╰╴                                       ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+6 │   return query execute 'select 1' using;
+  ╰╴                                       ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+7 │   return 1
+  ╰╴          ━

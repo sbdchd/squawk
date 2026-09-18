@@ -2040,7 +2040,26 @@ RoutineBody =
 | AtomicBody
 
 Plpgsql =
+  comp_options:(PlpgsqlCompOption*)
   block:PlpgsqlBlock?
+
+PlpgsqlCompOption =
+  PlpgsqlCompOptionDump
+| PlpgsqlCompOptionVariableConflict
+| PlpgsqlCompOptionPrintStrictParams
+
+PlpgsqlCompOptionDump =
+  '#' 'option' 'dump'
+
+PlpgsqlCompOptionVariableConflict =
+  '#' 'variable_conflict' ('error' | 'use_variable' | 'use_column')
+
+PlpgsqlCompOptionPrintStrictParams =
+  '#' 'print_strict_params' option_value:PlpgsqlOptionValue
+
+PlpgsqlOptionValue =
+  '#name'?
+  '@positional_param'?
 
 PlpgsqlBlock =
   label:PlpgsqlLabel?
@@ -2144,17 +2163,137 @@ PlpgsqlBody =
   stmts:(PlpgsqlStmt*)
 
 PlpgsqlStmt =
-  PlpgsqlBlock
+  PlpgsqlAssignStmt
+| PlpgsqlBlock
+| PlpgsqlCallStmt
 | PlpgsqlCaseStmt
 | PlpgsqlContinueStmt
+| PlpgsqlDoStmt
 | PlpgsqlExitStmt
 | PlpgsqlIfStmt
 | PlpgsqlLoopStmt
+| PlpgsqlAssertStmt
+| PlpgsqlCommitStmt
 | PlpgsqlNullStmt
+| PlpgsqlPerformStmt
+| PlpgsqlRaiseStmt
+| PlpgsqlReturnNextStmt
+| PlpgsqlReturnQueryExecuteStmt
+| PlpgsqlReturnQueryStmt
+| PlpgsqlReturnStmt
+| PlpgsqlRollbackStmt
 | PlpgsqlWhileStmt
 
 PlpgsqlNullStmt =
   'null' ';'
+
+PlpgsqlCallStmt =
+  Call
+  ';'
+
+PlpgsqlDoStmt =
+  Do
+  ';'
+
+PlpgsqlPerformStmt =
+  (Select | SelectInto | CompoundSelect)
+  ';'
+
+PlpgsqlReturnStmt =
+  'return'
+  Expr?
+  ';'
+
+PlpgsqlReturnNextStmt =
+  'return' 'next'
+  Expr?
+  ';'
+
+PlpgsqlReturnQueryStmt =
+  'return' 'query'
+  query:Stmt
+  ';'
+
+PlpgsqlReturnQueryExecuteStmt =
+  'return' 'query' 'execute'
+  query:Expr
+  using_clause:PlpgsqlUsingClause?
+  ';'
+
+PlpgsqlUsingClause =
+  'using' (Expr (',' Expr)*)
+
+PlpgsqlRaiseStmt =
+  'raise'
+  level:PlpgsqlRaiseLevel?
+  condition_name:PlpgsqlCondition?
+  message:PlpgsqlRaiseMessage?
+  params:(Expr (',' Expr)*)
+  using_clause:PlpgsqlRaiseUsingClause?
+  ';'
+
+PlpgsqlRaiseLevel =
+  'exception' | 'warning' | 'notice' | 'info' | 'log' | 'debug'
+
+PlpgsqlRaiseMessage =
+  Literal
+
+PlpgsqlRaiseUsingClause =
+  'using' (PlpgsqlRaiseOption (',' PlpgsqlRaiseOption)*)
+
+PlpgsqlRaiseOption =
+  PlpgsqlRaiseOptionErrcode
+| PlpgsqlRaiseOptionMessage
+| PlpgsqlRaiseOptionDetail
+| PlpgsqlRaiseOptionHint
+| PlpgsqlRaiseOptionColumn
+| PlpgsqlRaiseOptionConstraint
+| PlpgsqlRaiseOptionDatatype
+| PlpgsqlRaiseOptionTable
+| PlpgsqlRaiseOptionSchema
+
+PlpgsqlRaiseOptionErrcode =
+  'errcode' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionMessage =
+  'message' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionDetail =
+  'detail' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionHint =
+  'hint' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionColumn =
+  'column' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionConstraint =
+  'constraint' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionDatatype =
+  'datatype' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionTable =
+  'table' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionSchema =
+  'schema' (':=' | '=') Expr
+
+PlpgsqlAssertStmt =
+  'assert'
+  cond:Expr
+  message:Expr?
+  ';'
+
+PlpgsqlCommitStmt =
+  'commit'
+  ChainClause?
+  ';'
+
+PlpgsqlRollbackStmt =
+  'rollback'
+  ChainClause?
+  ';'
 
 PlpgsqlIfStmt =
   'if'
@@ -2221,6 +2360,20 @@ PlpgsqlContinueStmt =
 PlpgsqlExitWhen =
   'when'
   cond:Expr
+
+PlpgsqlAssignStmt =
+  target:PlpgsqlAssignTarget
+  (':=' | '=')
+  value:Expr
+  ';'
+
+PlpgsqlAssignTarget =
+  name:PlpgsqlVarNameRef
+  Accessor*
+
+PlpgsqlVarNameRef =
+  '#name'?
+  '@positional_param'?
 
 FuncOptionList =
   options:(FuncOption*)
@@ -3060,7 +3213,9 @@ WithClause =
   'with' 'recursive'? (WithTable (',' WithTable)*)
 
 SelectClause =
-  'select'
+  // 'perform' is only used in pl/pgsql, postgres rewrites it to select before
+  // parsing
+  ('select' | 'perform')
   SelectQuantifier?
   TargetList?
 

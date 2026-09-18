@@ -1,0 +1,104 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/assign_stmt.sql
+---
+PLPGSQL@0..66
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..65
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..61
+      PLPGSQL_ASSIGN_STMT@9..15
+        PLPGSQL_ASSIGN_TARGET@9..10
+          PLPGSQL_VAR_NAME_REF@9..10
+            IDENT@9..10 "x"
+        WHITESPACE@10..11 " "
+        COLON_EQ@11..13 ":="
+        WHITESPACE@13..14 " "
+        SEMICOLON@14..15 ";"
+      WHITESPACE@15..18 "\n  "
+      PLPGSQL_ASSIGN_STMT@18..27
+        PLPGSQL_ASSIGN_TARGET@18..26
+          PLPGSQL_VAR_NAME_REF@18..19
+            IDENT@18..19 "a"
+          SLICE_ACCESSOR@19..26
+            L_BRACK@19..20 "["
+            LITERAL@20..21
+              INT_NUMBER@20..21 "1"
+            WHITESPACE@21..22 " "
+            COLON@22..23 ":"
+            PREFIX_EXPR@23..26
+              CUSTOM_OP@23..24
+                EQ@23..24 "="
+              WHITESPACE@24..25 " "
+              LITERAL@25..26
+                INT_NUMBER@25..26 "2"
+        SEMICOLON@26..27 ";"
+      WHITESPACE@27..30 "\n  "
+      ERROR@30..34
+        IDENT@30..31 "x"
+        WHITESPACE@31..32 " "
+        INT_NUMBER@32..33 "1"
+        SEMICOLON@33..34 ";"
+      WHITESPACE@34..37 "\n  "
+      ERROR@37..46
+        ALL_KW@37..40 "all"
+        WHITESPACE@40..41 " "
+        COLON@41..42 ":"
+        EQ@42..43 "="
+        WHITESPACE@43..44 " "
+        INT_NUMBER@44..45 "1"
+        SEMICOLON@45..46 ";"
+      WHITESPACE@46..49 "\n  "
+      ERROR@49..61
+        SELECT_KW@49..55 "select"
+        WHITESPACE@55..56 " "
+        COLON@56..57 ":"
+        EQ@57..58 "="
+        WHITESPACE@58..59 " "
+        INT_NUMBER@59..60 "1"
+        SEMICOLON@60..61 ";"
+    WHITESPACE@61..62 "\n"
+    END_KW@62..65 "end"
+  WHITESPACE@65..66 "\n"
+
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+3 │   x := ;
+  ╰╴      ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+3 │   x := ;
+  ╰╴      ━
+error[syntax-error]: Invalid operator.
+  ╭▸ 
+4 │   a[1 := 2;
+  ╰╴       ━
+error[syntax-error]: expected R_BRACK
+  ╭▸ 
+4 │   a[1 := 2;
+  ╰╴          ━
+error[syntax-error]: expected EQ
+  ╭▸ 
+4 │   a[1 := 2;
+  ╰╴          ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+4 │   a[1 := 2;
+  ╰╴          ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+4 │   a[1 := 2;
+  ╰╴          ━
+error[syntax-error]: expected a statement, found IDENT
+  ╭▸ 
+5 │   x 1;
+  ╰╴  ━
+error[syntax-error]: expected a statement, found ALL_KW
+  ╭▸ 
+6 │   all := 1;
+  ╰╴  ━
+error[syntax-error]: expected a statement, found SELECT_KW
+  ╭▸ 
+7 │   select := 1;
+  ╰╴  ━

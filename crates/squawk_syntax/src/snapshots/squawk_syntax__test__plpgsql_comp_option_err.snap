@@ -1,0 +1,211 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/comp_option.sql
+---
+PLPGSQL@0..25
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_DUMP@1..8
+    POUND@1..2 "#"
+    OPTION_KW@2..8 "option"
+  WHITESPACE@8..9 " "
+  ERROR@9..24
+    IDENT@9..14 "dumpp"
+    WHITESPACE@14..15 "\n"
+    BEGIN_KW@15..20 "begin"
+    WHITESPACE@20..21 " "
+    END_KW@21..24 "end"
+  WHITESPACE@24..25 " "
+---
+PLPGSQL@0..20
+  WHITESPACE@0..1 "\n"
+  ERROR@1..2
+    POUND@1..2 "#"
+  ERROR@2..19
+    IDENT@2..5 "foo"
+    WHITESPACE@5..6 " "
+    IDENT@6..9 "bar"
+    WHITESPACE@9..10 "\n"
+    BEGIN_KW@10..15 "begin"
+    WHITESPACE@15..16 " "
+    END_KW@16..19 "end"
+  WHITESPACE@19..20 " "
+---
+PLPGSQL@0..30
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT@1..19
+    POUND@1..2 "#"
+    VARIABLE_CONFLICT_KW@2..19 "variable_conflict"
+  WHITESPACE@19..20 "\n"
+  PLPGSQL_BLOCK@20..29
+    BEGIN_KW@20..25 "begin"
+    WHITESPACE@25..26 " "
+    PLPGSQL_BODY@26..26
+    END_KW@26..29 "end"
+  WHITESPACE@29..30 " "
+---
+PLPGSQL@0..42
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT@1..19
+    POUND@1..2 "#"
+    VARIABLE_CONFLICT_KW@2..19 "variable_conflict"
+  WHITESPACE@19..20 " "
+  ERROR@20..41
+    IDENT@20..31 "use_default"
+    WHITESPACE@31..32 "\n"
+    BEGIN_KW@32..37 "begin"
+    WHITESPACE@37..38 " "
+    END_KW@38..41 "end"
+  WHITESPACE@41..42 " "
+---
+PLPGSQL@0..34
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..21
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+  WHITESPACE@21..22 " "
+  ERROR@22..33
+    INT_NUMBER@22..23 "1"
+    WHITESPACE@23..24 "\n"
+    BEGIN_KW@24..29 "begin"
+    WHITESPACE@29..30 " "
+    END_KW@30..33 "end"
+  WHITESPACE@33..34 " "
+---
+PLPGSQL@0..39
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..28
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+    WHITESPACE@21..22 " "
+    PLPGSQL_OPTION_VALUE@22..28
+      IDENT@22..28 "banana"
+  WHITESPACE@28..29 "\n"
+  PLPGSQL_BLOCK@29..38
+    BEGIN_KW@29..34 "begin"
+    WHITESPACE@34..35 " "
+    PLPGSQL_BODY@35..35
+    END_KW@35..38 "end"
+  WHITESPACE@38..39 " "
+---
+PLPGSQL@0..37
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..26
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+    WHITESPACE@21..22 " "
+    PLPGSQL_OPTION_VALUE@22..26
+      IDENT@22..26 "\"ON\""
+  WHITESPACE@26..27 "\n"
+  PLPGSQL_BLOCK@27..36
+    BEGIN_KW@27..32 "begin"
+    WHITESPACE@32..33 " "
+    PLPGSQL_BODY@33..33
+    END_KW@33..36 "end"
+  WHITESPACE@36..37 " "
+---
+PLPGSQL@0..37
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..21
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+  WHITESPACE@21..22 " "
+  ERROR@22..36
+    IDENT@22..26 "loop"
+    WHITESPACE@26..27 "\n"
+    BEGIN_KW@27..32 "begin"
+    WHITESPACE@32..33 " "
+    END_KW@33..36 "end"
+  WHITESPACE@36..37 " "
+---
+PLPGSQL@0..39
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..39
+    PLPGSQL_DECLARE_SECTION@1..38
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..9 " "
+      PLPGSQL_VAR_DECL@9..15
+        PLPGSQL_VAR_NAME@9..10
+          IDENT@9..10 "x"
+        WHITESPACE@10..11 " "
+        PATH_TYPE@11..14
+          PATH_REF@11..14
+            PATH_SEGMENT_REF@11..14
+              INT_KW@11..14 "int"
+        SEMICOLON@14..15 ";"
+      WHITESPACE@15..16 "\n"
+      ERROR@16..38
+        POUND@16..17 "#"
+        OPTION_KW@17..23 "option"
+        WHITESPACE@23..24 " "
+        IDENT@24..28 "dump"
+        WHITESPACE@28..29 "\n"
+        BEGIN_KW@29..34 "begin"
+        WHITESPACE@34..35 " "
+        END_KW@35..38 "end"
+    WHITESPACE@38..39 " "
+    PLPGSQL_BODY@39..39
+
+error[syntax-error]: expected DUMP_KW
+  ╭▸ 
+2 │ #option dumpp
+  ╰╴       ━
+error[syntax-error]: expected a block, found IDENT
+  ╭▸ 
+2 │ #option dumpp
+  ╰╴        ━
+error[syntax-error]: expected OPTION, PRINT_STRICT_PARAMS, or VARIABLE_CONFLICT
+  ╭▸ 
+6 │ #foo bar
+  ╰╴ ━
+error[syntax-error]: expected a block, found IDENT
+  ╭▸ 
+6 │ #foo bar
+  ╰╴ ━
+error[syntax-error]: expected ERROR, USE_VARIABLE, or USE_COLUMN
+   ╭▸ 
+10 │ #variable_conflict
+   ╰╴                  ━
+error[syntax-error]: expected ERROR, USE_VARIABLE, or USE_COLUMN
+   ╭▸ 
+14 │ #variable_conflict use_default
+   ╰╴                  ━
+error[syntax-error]: expected a block, found IDENT
+   ╭▸ 
+14 │ #variable_conflict use_default
+   ╰╴                   ━
+error[syntax-error]: expected an option value, found INT_NUMBER
+   ╭▸ 
+19 │ #print_strict_params 1
+   ╰╴                    ━
+error[syntax-error]: expected a block, found INT_NUMBER
+   ╭▸ 
+19 │ #print_strict_params 1
+   ╰╴                     ━
+error[syntax-error]: unrecognized print_strict_params option banana
+   ╭▸ 
+24 │ #print_strict_params banana
+   ╰╴                     ━━━━━━
+error[syntax-error]: unrecognized print_strict_params option ON
+   ╭▸ 
+29 │ #print_strict_params "ON"
+   ╰╴                     ━━━━
+error[syntax-error]: expected an option value, found IDENT
+   ╭▸ 
+34 │ #print_strict_params loop
+   ╰╴                    ━
+error[syntax-error]: expected a block, found IDENT
+   ╭▸ 
+34 │ #print_strict_params loop
+   ╰╴                     ━
+error[syntax-error]: expected a declaration, found POUND
+   ╭▸ 
+40 │ #option dump
+   ╰╴━
+error[syntax-error]: expected BEGIN_KW
+   ╭▸ 
+41 │ begin end $$;
+   ╰╴         ━
+error[syntax-error]: expected END_KW
+   ╭▸ 
+41 │ begin end $$;
+   ╰╴          ━

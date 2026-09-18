@@ -50,6 +50,9 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::ParenFromItem(it) => validate_paren_from_item(it, errors),
                 ast::PartitionForValuesWith(it) => validate_hash_partition_bounds(it, errors),
                 ast::PlpgsqlCaseStmt(it) => validate_no_bare_case(it.subject(), errors),
+                ast::PlpgsqlCompOptionPrintStrictParams(it) => {
+                    validate_print_strict_params(it, errors)
+                },
                 ast::PlpgsqlCaseWhen(it) => validate_no_bare_case_in_conds(it, errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
@@ -343,6 +346,22 @@ fn validate_atomic_body(it: ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
         acc.push(SyntaxError::new(
             "Missing semicolon after statement",
             TextRange::empty(end),
+        ));
+    }
+}
+
+fn validate_print_strict_params(
+    it: ast::PlpgsqlCompOptionPrintStrictParams,
+    acc: &mut Vec<SyntaxError>,
+) {
+    let Some(value) = it.option_value() else {
+        return;
+    };
+    let text = value.text();
+    if text != "on" && text != "off" {
+        acc.push(SyntaxError::new(
+            format!("unrecognized print_strict_params option {text}"),
+            value.syntax().text_range(),
         ));
     }
 }
