@@ -413,7 +413,7 @@ fn return_stmt(p: &mut Parser) {
         p.bump_remap(QUERY_KW);
         p.bump(EXECUTE_KW);
         expr(p);
-        opt_using_clause(p);
+        opt_using_clause(p, expr);
         PLPGSQL_RETURN_QUERY_EXECUTE_STMT
     } else if p.nth_at_contextual_kw(0, QUERY_KW) && !composite {
         p.bump_remap(QUERY_KW);
@@ -443,15 +443,15 @@ fn assert_stmt(p: &mut Parser) {
     m.complete(p, PLPGSQL_ASSERT_STMT);
 }
 
-fn opt_using_clause(p: &mut Parser) {
+fn opt_using_clause(p: &mut Parser, param: fn(&mut Parser)) {
     if !p.at(USING_KW) {
         return;
     }
     let m = p.start();
     p.bump(USING_KW);
-    expr(p);
+    param(p);
     while !p.at(EOF) && p.eat(COMMA) {
-        expr(p);
+        param(p);
     }
     m.complete(p, PLPGSQL_USING_CLAUSE);
 }
@@ -676,7 +676,7 @@ fn open_stmt(p: &mut Parser) {
         p.bump(FOR_KW);
         let kind = if p.eat(EXECUTE_KW) {
             expr(p);
-            opt_using_clause(p);
+            opt_using_clause(p, expr);
             PLPGSQL_OPEN_EXECUTE
         } else {
             if grammar::stmt(p, &grammar::StmtRestrictions::default()).is_none() {
@@ -846,14 +846,7 @@ fn loop_stmt(p: &mut Parser) {
         expr(p);
         PLPGSQL_WHILE_STMT
     } else if p.at(FOR_KW) {
-        p.bump(FOR_KW);
-        for_variable_list(p);
-        p.expect(IN_KW);
-        if at_for_reverse(p, 0) {
-            p.bump_remap(REVERSE_KW);
-        }
-        for_range(p);
-        PLPGSQL_FOR_I_STMT
+        for_head(p)
     } else {
         PLPGSQL_LOOP_STMT
     };
@@ -864,6 +857,23 @@ fn loop_stmt(p: &mut Parser) {
     opt_label_name_ref(p);
     p.expect(SEMICOLON);
     m.complete(p, kind);
+}
+
+fn for_head(p: &mut Parser) -> SyntaxKind {
+    assert!(p.at(FOR_KW));
+    p.bump(FOR_KW);
+    for_variable_list(p);
+    p.expect(IN_KW);
+    if p.eat(EXECUTE_KW) {
+        expr_until_loop(p);
+        opt_using_clause(p, expr_until_loop);
+        return PLPGSQL_FOR_DYN_STMT;
+    }
+    if at_for_reverse(p, 0) {
+        p.bump_remap(REVERSE_KW);
+    }
+    for_range(p);
+    PLPGSQL_FOR_I_STMT
 }
 
 fn for_variable_list(p: &mut Parser) {
@@ -894,6 +904,14 @@ fn for_range(p: &mut Parser) {
 
 fn range_bound(p: &mut Parser) {
     if p.nth_at_contextual_kw(0, LOOP_KW) || p.at(BY_KW) {
+        p.error("expected an expression");
+        return;
+    }
+    expr(p);
+}
+
+fn expr_until_loop(p: &mut Parser) {
+    if p.nth_at_contextual_kw(0, LOOP_KW) || p.at(USING_KW) {
         p.error("expected an expression");
         return;
     }
@@ -1053,7 +1071,7 @@ fn at_loop_kw(p: &Parser, n: usize) -> bool {
     p.nth_at_contextual_kw(n, LOOP_KW)
         || p.nth_at_contextual_kw(n, WHILE_KW)
         // TODO: drop when the other FOR forms are parsed
-        || (p.nth_at(n, FOR_KW) && at_for_i_header(p, n))
+        || (p.nth_at(n, FOR_KW) && (at_for_i_header(p, n) || at_for_dyn_header(p, n)))
 }
 
 fn at_for_i_header(p: &Parser, n: usize) -> bool {
@@ -1067,6 +1085,11 @@ fn at_for_i_header(p: &Parser, n: usize) -> bool {
         n + 1
     };
     matches!(for_header_terminator(p, n), Some((DOT_DOT, _)))
+}
+
+fn at_for_dyn_header(p: &Parser, n: usize) -> bool {
+    let n = for_vars_end(p, n + 1).unwrap_or(n + 1);
+    p.nth_at(n, IN_KW) && p.nth_at(n + 1, EXECUTE_KW)
 }
 
 fn at_for_reverse(p: &Parser, n: usize) -> bool {

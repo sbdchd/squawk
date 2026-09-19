@@ -2171,6 +2171,7 @@ PlpgsqlStmt =
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
 | PlpgsqlExitStmt
+| PlpgsqlForDynStmt
 | PlpgsqlForIStmt
 | PlpgsqlFetchStmt
 | PlpgsqlGetDiagStmt
@@ -2452,6 +2453,19 @@ PlpgsqlForRange =
   '..'
   upper:Expr
   ('by' step:Expr)?
+
+PlpgsqlForDynStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in' 'execute'
+  query:Expr
+  using_clause:PlpgsqlUsingClause?
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
 
 PlpgsqlFetchStmt =
   'fetch'
