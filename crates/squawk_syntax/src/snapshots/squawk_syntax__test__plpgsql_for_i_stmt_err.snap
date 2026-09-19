@@ -8,26 +8,30 @@ PLPGSQL@0..59
     BEGIN_KW@1..6 "begin"
     WHITESPACE@6..9 "\n  "
     PLPGSQL_BODY@9..54
-      ERROR@9..42
+      PLPGSQL_FOR_QUERY_STMT@9..54
         FOR_KW@9..12 "for"
         WHITESPACE@12..13 " "
-        IDENT@13..14 "i"
+        PLPGSQL_FOR_VARIABLE@13..14
+          PLPGSQL_VAR_NAME_REF@13..14
+            IDENT@13..14 "i"
         WHITESPACE@14..15 " "
         IN_KW@15..17 "in"
         WHITESPACE@17..18 " "
-        IDENT@18..25 "reverse"
+        REVERSE_KW@18..25 "reverse"
         WHITESPACE@25..26 " "
-        INT_NUMBER@26..27 "1"
+        ERROR@26..27
+          INT_NUMBER@26..27 "1"
         WHITESPACE@27..28 " "
-        IDENT@28..32 "loop"
+        LOOP_KW@28..32 "loop"
         WHITESPACE@32..37 "\n    "
-        NULL_KW@37..41 "null"
-        SEMICOLON@41..42 ";"
-      WHITESPACE@42..45 "\n  "
-      ERROR@45..54
+        PLPGSQL_BODY@37..42
+          PLPGSQL_NULL_STMT@37..42
+            NULL_KW@37..41 "null"
+            SEMICOLON@41..42 ";"
+        WHITESPACE@42..45 "\n  "
         END_KW@45..48 "end"
         WHITESPACE@48..49 " "
-        IDENT@49..53 "loop"
+        LOOP_KW@49..53 "loop"
         SEMICOLON@53..54 ";"
     WHITESPACE@54..55 "\n"
     END_KW@55..58 "end"
@@ -240,14 +244,14 @@ PLPGSQL@0..83
     END_KW@79..82 "end"
   WHITESPACE@82..83 "\n"
 
-error[syntax-error]: expected a statement, got FOR_KW
+error[syntax-error]: cannot specify REVERSE in query FOR loop
   ╭▸ 
 4 │   for i in reverse 1 loop
-  ╰╴  ━
-error[syntax-error]: expected a statement, got END_KW
+  ╰╴           ━━━━━━━
+error[syntax-error]: expected command, found INT_NUMBER
   ╭▸ 
-6 │   end loop;
-  ╰╴  ━
+4 │   for i in reverse 1 loop
+  ╰╴                   ━
 error[syntax-error]: expected a loop variable, got IN_KW
    ╭▸ 
 13 │   for in 1..2 loop

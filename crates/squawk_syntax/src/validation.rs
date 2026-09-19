@@ -58,6 +58,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PlpgsqlFetchStmt(it) => validate_fetch_single_row(it, errors),
                 ast::PlpgsqlForCursorStmt(it) => validate_for_cursor_single_var(it, errors),
                 ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(it, errors),
+                ast::PlpgsqlForQueryStmt(it) => validate_for_query_no_reverse(it, errors),
                 ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
                 ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
@@ -416,6 +417,20 @@ fn validate_for_cursor_single_var(it: ast::PlpgsqlForCursorStmt, acc: &mut Vec<S
             var.syntax().text_range(),
         ));
     }
+}
+
+// -- err
+// for r in reverse select 1 loop null; end loop;
+// -- ok
+// for r in select 1 loop null; end loop;
+fn validate_for_query_no_reverse(it: ast::PlpgsqlForQueryStmt, acc: &mut Vec<SyntaxError>) {
+    let Some(reverse) = it.reverse_token() else {
+        return;
+    };
+    acc.push(SyntaxError::new(
+        "cannot specify REVERSE in query FOR loop",
+        reverse.text_range(),
+    ));
 }
 
 fn validate_no_bare_case_in_conds(it: ast::PlpgsqlCaseWhen, acc: &mut Vec<SyntaxError>) {

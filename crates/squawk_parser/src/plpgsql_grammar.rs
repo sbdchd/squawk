@@ -879,8 +879,30 @@ fn for_head(p: &mut Parser) -> SyntaxKind {
     if at_for_reverse(p, 0) {
         p.bump_remap(REVERSE_KW);
     }
-    for_range(p);
-    PLPGSQL_FOR_I_STMT
+    match for_header_terminator(p, 0) {
+        Some((DOT_DOT, _)) => {
+            for_range(p);
+            PLPGSQL_FOR_I_STMT
+        }
+        terminator => {
+            for_query(p, terminator.map(|(_, n)| n));
+            PLPGSQL_FOR_QUERY_STMT
+        }
+    }
+}
+
+fn for_query(p: &mut Parser, loop_at: Option<usize>) {
+    match loop_at {
+        Some(0) => p.error("expected a query"),
+        Some(n) => {
+            p.with_limit(n, |p| {
+                grammar::stmt(p, &grammar::StmtRestrictions::default());
+            });
+        }
+        None => {
+            grammar::stmt(p, &grammar::StmtRestrictions::default());
+        }
+    }
 }
 
 fn for_variable_list(p: &mut Parser) {
@@ -1075,34 +1097,7 @@ fn at_loop_start(p: &Parser) -> bool {
 }
 
 fn at_loop_kw(p: &Parser, n: usize) -> bool {
-    p.nth_at_contextual_kw(n, LOOP_KW)
-        || p.nth_at_contextual_kw(n, WHILE_KW)
-        // TODO: drop when the other FOR forms are parsed
-        || (p.nth_at(n, FOR_KW)
-            && (at_for_i_header(p, n) || at_for_dyn_header(p, n) || at_for_cursor_header(p, n)))
-}
-
-fn at_for_i_header(p: &Parser, n: usize) -> bool {
-    let n = for_vars_end(p, n + 1).unwrap_or(n + 1);
-    if !p.nth_at(n, IN_KW) {
-        return false;
-    }
-    let n = if at_for_reverse(p, n + 1) {
-        n + 2
-    } else {
-        n + 1
-    };
-    matches!(for_header_terminator(p, n), Some((DOT_DOT, _)))
-}
-
-fn at_for_dyn_header(p: &Parser, n: usize) -> bool {
-    let n = for_vars_end(p, n + 1).unwrap_or(n + 1);
-    p.nth_at(n, IN_KW) && p.nth_at(n + 1, EXECUTE_KW)
-}
-
-fn at_for_cursor_header(p: &Parser, n: usize) -> bool {
-    let n = for_vars_end(p, n + 1).unwrap_or(n + 1);
-    p.nth_at(n, IN_KW) && at_for_cursor(p, n + 1)
+    p.nth_at_contextual_kw(n, LOOP_KW) || p.nth_at_contextual_kw(n, WHILE_KW) || p.nth_at(n, FOR_KW)
 }
 
 const NOT_A_CURSOR_NAME: TokenSet = TokenSet::new(&[SELECT_KW, VALUES_KW]);
@@ -1140,23 +1135,6 @@ fn cursor_args_end(p: &Parser, mut n: usize) -> Option<usize> {
 
 fn at_for_reverse(p: &Parser, n: usize) -> bool {
     p.nth_at_contextual_kw(n, REVERSE_KW) && !p.nth_at(n + 1, DOT)
-}
-
-fn for_vars_end(p: &Parser, mut n: usize) -> Option<usize> {
-    while !p.nth_at(n, EOF) {
-        if !at_name(p, n) {
-            return None;
-        }
-        n += 1;
-        while !p.nth_at(n, EOF) && p.nth_at(n, DOT) && at_name(p, n + 1) {
-            n += 2;
-        }
-        if !p.nth_at(n, COMMA) {
-            return Some(n);
-        }
-        n += 1;
-    }
-    None
 }
 
 // postgres does a similar thing to look ahead until it sees a loop token

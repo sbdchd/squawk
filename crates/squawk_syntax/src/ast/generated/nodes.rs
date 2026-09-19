@@ -20315,6 +20315,57 @@ impl PlpgsqlForIStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlForQueryStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlForQueryStmt {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn query(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn vars(&self) -> AstChildren<PlpgsqlForVariable> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn in_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IN_KW)
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOOP_KW)
+    }
+    #[inline]
+    pub fn reverse_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::REVERSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlForRange {
     pub(crate) syntax: SyntaxNode,
 }
@@ -31358,6 +31409,7 @@ pub enum PlpgsqlStmt {
     PlpgsqlForCursorStmt(PlpgsqlForCursorStmt),
     PlpgsqlForDynStmt(PlpgsqlForDynStmt),
     PlpgsqlForIStmt(PlpgsqlForIStmt),
+    PlpgsqlForQueryStmt(PlpgsqlForQueryStmt),
     PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt),
     PlpgsqlIfStmt(PlpgsqlIfStmt),
     PlpgsqlLoopStmt(PlpgsqlLoopStmt),
@@ -48672,6 +48724,24 @@ impl AstNode for PlpgsqlForIStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_FOR_I_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlForQueryStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_FOR_QUERY_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -69600,6 +69670,7 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_FOR_CURSOR_STMT
                 | SyntaxKind::PLPGSQL_FOR_DYN_STMT
                 | SyntaxKind::PLPGSQL_FOR_I_STMT
+                | SyntaxKind::PLPGSQL_FOR_QUERY_STMT
                 | SyntaxKind::PLPGSQL_GET_DIAG_STMT
                 | SyntaxKind::PLPGSQL_IF_STMT
                 | SyntaxKind::PLPGSQL_LOOP_STMT
@@ -69656,6 +69727,9 @@ impl AstNode for PlpgsqlStmt {
             }
             SyntaxKind::PLPGSQL_FOR_I_STMT => {
                 PlpgsqlStmt::PlpgsqlForIStmt(PlpgsqlForIStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_FOR_QUERY_STMT => {
+                PlpgsqlStmt::PlpgsqlForQueryStmt(PlpgsqlForQueryStmt { syntax })
             }
             SyntaxKind::PLPGSQL_GET_DIAG_STMT => {
                 PlpgsqlStmt::PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt { syntax })
@@ -69720,6 +69794,7 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlForCursorStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForDynStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForIStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlForQueryStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlGetDiagStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlIfStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlLoopStmt(it) => &it.syntax,
@@ -69819,6 +69894,12 @@ impl From<PlpgsqlForIStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlForIStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlForIStmt(node)
+    }
+}
+impl From<PlpgsqlForQueryStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlForQueryStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlForQueryStmt(node)
     }
 }
 impl From<PlpgsqlGetDiagStmt> for PlpgsqlStmt {

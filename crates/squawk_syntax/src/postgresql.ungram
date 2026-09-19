@@ -2174,6 +2174,7 @@ PlpgsqlStmt =
 | PlpgsqlForCursorStmt
 | PlpgsqlForDynStmt
 | PlpgsqlForIStmt
+| PlpgsqlForQueryStmt
 | PlpgsqlFetchStmt
 | PlpgsqlGetDiagStmt
 | PlpgsqlIfStmt
@@ -2475,6 +2476,19 @@ PlpgsqlForCursorStmt =
   'in'
   cursor:PlpgsqlCursorVariableRef
   args:ArgList?
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForQueryStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in'
+  'reverse'?
+  query:Stmt
   'loop'
   body:PlpgsqlBody
   'end' 'loop'
