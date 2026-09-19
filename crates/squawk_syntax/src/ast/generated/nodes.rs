@@ -20112,6 +20112,21 @@ impl PlpgsqlExceptionSection {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExecSqlStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExecSqlStmt {
+    #[inline]
+    pub fn stmt(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlExitStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -31506,6 +31521,7 @@ pub enum PlpgsqlStmt {
     PlpgsqlContinueStmt(PlpgsqlContinueStmt),
     PlpgsqlDoStmt(PlpgsqlDoStmt),
     PlpgsqlDynExecuteStmt(PlpgsqlDynExecuteStmt),
+    PlpgsqlExecSqlStmt(PlpgsqlExecSqlStmt),
     PlpgsqlExitStmt(PlpgsqlExitStmt),
     PlpgsqlFetchStmt(PlpgsqlFetchStmt),
     PlpgsqlForCursorStmt(PlpgsqlForCursorStmt),
@@ -48737,6 +48753,24 @@ impl AstNode for PlpgsqlExceptionSection {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_EXCEPTION_SECTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExecSqlStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXEC_SQL_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -69823,6 +69857,7 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_CONTINUE_STMT
                 | SyntaxKind::PLPGSQL_DO_STMT
                 | SyntaxKind::PLPGSQL_DYN_EXECUTE_STMT
+                | SyntaxKind::PLPGSQL_EXEC_SQL_STMT
                 | SyntaxKind::PLPGSQL_EXIT_STMT
                 | SyntaxKind::PLPGSQL_FETCH_STMT
                 | SyntaxKind::PLPGSQL_FOR_CURSOR_STMT
@@ -69874,6 +69909,9 @@ impl AstNode for PlpgsqlStmt {
             SyntaxKind::PLPGSQL_DO_STMT => PlpgsqlStmt::PlpgsqlDoStmt(PlpgsqlDoStmt { syntax }),
             SyntaxKind::PLPGSQL_DYN_EXECUTE_STMT => {
                 PlpgsqlStmt::PlpgsqlDynExecuteStmt(PlpgsqlDynExecuteStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_EXEC_SQL_STMT => {
+                PlpgsqlStmt::PlpgsqlExecSqlStmt(PlpgsqlExecSqlStmt { syntax })
             }
             SyntaxKind::PLPGSQL_EXIT_STMT => {
                 PlpgsqlStmt::PlpgsqlExitStmt(PlpgsqlExitStmt { syntax })
@@ -69955,6 +69993,7 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlContinueStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlDoStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlDynExecuteStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlExecSqlStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlExitStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlFetchStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForCursorStmt(it) => &it.syntax,
@@ -70037,6 +70076,12 @@ impl From<PlpgsqlDynExecuteStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlDynExecuteStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlDynExecuteStmt(node)
+    }
+}
+impl From<PlpgsqlExecSqlStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlExecSqlStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlExecSqlStmt(node)
     }
 }
 impl From<PlpgsqlExitStmt> for PlpgsqlStmt {

@@ -71,10 +71,15 @@ PLPGSQL@0..138
         PLPGSQL_CURSOR_VARIABLE_REF@109..111
           IDENT@109..111 "rc"
       WHITESPACE@111..112 " "
-      ERROR@112..121
-        SELECT_KW@112..118 "select"
-        WHITESPACE@118..119 " "
-        INT_NUMBER@119..120 "1"
+      PLPGSQL_EXEC_SQL_STMT@112..121
+        SELECT@112..120
+          SELECT_CLAUSE@112..120
+            SELECT_KW@112..118 "select"
+            WHITESPACE@118..119 " "
+            TARGET_LIST@119..120
+              TARGET@119..120
+                LITERAL@119..120
+                  INT_NUMBER@119..120 "1"
         SEMICOLON@120..121 ";"
       WHITESPACE@121..124 "\n  "
       PLPGSQL_OPEN_STMT@124..133
@@ -112,10 +117,6 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 9 │   open rc select 1;
   ╰╴         ━
-error[syntax-error]: expected a statement, got SELECT_KW
-  ╭▸ 
-9 │   open rc select 1;
-  ╰╴          ━
 error[syntax-error]: a cursor variable must be a simple variable
    ╭▸ 
 10 │   open c.x;

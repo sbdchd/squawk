@@ -54,8 +54,9 @@ PLPGSQL@0..168
                 PATH_SEGMENT@60..66
                   STRICT_KW@60..66 "strict"
       WHITESPACE@66..67 " "
-      ERROR@67..69
-        IDENT@67..68 "x"
+      PLPGSQL_EXEC_SQL_STMT@67..69
+        ERROR@67..68
+          IDENT@67..68 "x"
         SEMICOLON@68..69 ";"
       WHITESPACE@69..72 "\n  "
       PLPGSQL_PERFORM_STMT@72..79
@@ -63,26 +64,43 @@ PLPGSQL@0..168
           SELECT_CLAUSE@72..79
             PERFORM_KW@72..79 "perform"
       WHITESPACE@79..80 " "
-      ERROR@80..117
-        WITH_KW@80..84 "with"
-        WHITESPACE@84..85 " "
-        IDENT@85..86 "x"
-        WHITESPACE@86..87 " "
-        AS_KW@87..89 "as"
-        WHITESPACE@89..90 " "
-        L_PAREN@90..91 "("
-        SELECT_KW@91..97 "select"
-        WHITESPACE@97..98 " "
-        INT_NUMBER@98..99 "1"
-        R_PAREN@99..100 ")"
-        WHITESPACE@100..101 " "
-        SELECT_KW@101..107 "select"
-        WHITESPACE@107..108 " "
-        STAR@108..109 "*"
-        WHITESPACE@109..110 " "
-        FROM_KW@110..114 "from"
-        WHITESPACE@114..115 " "
-        IDENT@115..116 "x"
+      PLPGSQL_EXEC_SQL_STMT@80..117
+        SELECT@80..116
+          WITH_CLAUSE@80..100
+            WITH_KW@80..84 "with"
+            WHITESPACE@84..85 " "
+            WITH_TABLE@85..100
+              CTE_NAME@85..86
+                IDENT@85..86 "x"
+              WHITESPACE@86..87 " "
+              AS_KW@87..89 "as"
+              WHITESPACE@89..90 " "
+              L_PAREN@90..91 "("
+              SELECT@91..99
+                SELECT_CLAUSE@91..99
+                  SELECT_KW@91..97 "select"
+                  WHITESPACE@97..98 " "
+                  TARGET_LIST@98..99
+                    TARGET@98..99
+                      LITERAL@98..99
+                        INT_NUMBER@98..99 "1"
+              R_PAREN@99..100 ")"
+          WHITESPACE@100..101 " "
+          SELECT_CLAUSE@101..109
+            SELECT_KW@101..107 "select"
+            WHITESPACE@107..108 " "
+            TARGET_LIST@108..109
+              TARGET@108..109
+                STAR@108..109 "*"
+          WHITESPACE@109..110 " "
+          FROM_CLAUSE@110..116
+            FROM_KW@110..114 "from"
+            WHITESPACE@114..115 " "
+            RELATION_FROM_ITEM@115..116
+              RELATION_NAME_REF@115..116
+                PATH_REF@115..116
+                  PATH_SEGMENT_REF@115..116
+                    IDENT@115..116 "x"
         SEMICOLON@116..117 ";"
       WHITESPACE@117..120 "\n  "
       PLPGSQL_PERFORM_STMT@120..133
@@ -94,8 +112,9 @@ PLPGSQL@0..168
               ERROR@128..133
                 TABLE_KW@128..133 "table"
       WHITESPACE@133..134 " "
-      ERROR@134..141
-        IDENT@134..140 "onecol"
+      PLPGSQL_EXEC_SQL_STMT@134..141
+        ERROR@134..140
+          IDENT@134..140 "onecol"
         SEMICOLON@140..141 ";"
       WHITESPACE@141..144 "\n  "
       PLPGSQL_PERFORM_STMT@144..163
@@ -136,7 +155,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 5 │   perform 1 into strict x;
   ╰╴                       ━
-error[syntax-error]: expected a statement, got IDENT
+error[syntax-error]: expected command, found IDENT
   ╭▸ 
 5 │   perform 1 into strict x;
   ╰╴                        ━
@@ -144,10 +163,6 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 6 │   perform with x as (select 1) select * from x;
   ╰╴         ━
-error[syntax-error]: expected a statement, got WITH_KW
-  ╭▸ 
-6 │   perform with x as (select 1) select * from x;
-  ╰╴          ━
 error[syntax-error]: expected an expression, found TABLE_KW
   ╭▸ 
 7 │   perform table onecol;
@@ -160,7 +175,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 7 │   perform table onecol;
   ╰╴               ━
-error[syntax-error]: expected a statement, got IDENT
+error[syntax-error]: expected command, found IDENT
   ╭▸ 
 7 │   perform table onecol;
   ╰╴                ━

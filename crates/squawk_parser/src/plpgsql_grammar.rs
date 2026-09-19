@@ -356,9 +356,35 @@ fn stmt(p: &mut Parser) {
         p.bump(NULL_KW);
         p.bump(SEMICOLON);
         m.complete(p, PLPGSQL_NULL_STMT);
+    } else if at_exec_sql_stmt(p) {
+        exec_sql_stmt(p);
     } else {
         temp_unknown(p, "expected a statement");
     }
+}
+
+fn exec_sql_stmt(p: &mut Parser) {
+    let m = p.start();
+    // Another hack since postgres just looks for certain tokens and passes the
+    // text in between to the sql parser.
+    match exec_sql_end(p) {
+        Some(n) => {
+            p.with_limit(n, |p| {
+                grammar::stmt(p, &grammar::StmtRestrictions::default());
+            });
+        }
+        None => {
+            grammar::stmt(p, &grammar::StmtRestrictions::default());
+        }
+    }
+    if !p.at(SEMICOLON) {
+        let m = p.start();
+        p.error(format!("expected SEMICOLON, got {:?}", p.current()));
+        skip_to_stmt_end(p);
+        m.complete(p, ERROR);
+    }
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_EXEC_SQL_STMT);
 }
 
 fn call_stmt(p: &mut Parser) {
@@ -1074,7 +1100,12 @@ fn opt_else_clause(p: &mut Parser, kind: BodyKind) {
 fn temp_unknown(p: &mut Parser, message: &str) {
     let m = p.start();
     p.error(format!("{message}, got {:?}", p.current()));
+    skip_to_stmt_end(p);
+    p.eat(SEMICOLON);
+    m.complete(p, ERROR);
+}
 
+fn skip_to_stmt_end(p: &mut Parser) {
     let mut depth = 0;
     while !p.at(EOF) {
         if depth == 0 && p.at(SEMICOLON) {
@@ -1087,8 +1118,6 @@ fn temp_unknown(p: &mut Parser, message: &str) {
         }
         p.bump_any();
     }
-    p.eat(SEMICOLON);
-    m.complete(p, ERROR);
 }
 
 fn opt_exception_section(p: &mut Parser) {
@@ -1220,9 +1249,55 @@ fn for_header_terminator(p: &Parser, mut n: usize) -> Option<(SyntaxKind, usize)
     None
 }
 
+fn at_exec_sql_stmt(p: &Parser) -> bool {
+    if !at_name(p, 0) || at_assign_op(p) {
+        return false;
+    }
+    if p.at(IMPORT_KW) {
+        return true;
+    }
+    let end = exec_sql_end(p).unwrap_or(usize::MAX);
+    let mut paren = 0i32;
+    let mut prev = EOF;
+    let mut n = 0;
+    while n < end && !p.nth_at(n, EOF) {
+        let kind = p.nth(n);
+        match kind {
+            L_PAREN => paren += 1,
+            R_PAREN => paren -= 1,
+            INTO_KW if paren == 0 && prev != INSERT_KW && prev != MERGE_KW => return false,
+            _ => (),
+        }
+        prev = kind;
+        n += 1;
+    }
+    true
+}
+
+fn exec_sql_end(p: &Parser) -> Option<usize> {
+    let mut paren = 0i32;
+    let mut begin = 0i32;
+    let mut n = 0;
+    while !p.nth_at(n, EOF) {
+        match p.nth(n) {
+            L_PAREN => paren += 1,
+            R_PAREN => paren -= 1,
+            BEGIN_KW | CASE_KW => begin += 1,
+            END_KW if begin > 0 => begin -= 1,
+            SEMICOLON if paren == 0 && begin == 0 => return Some(n),
+            _ => (),
+        }
+        n += 1;
+    }
+    None
+}
+
 fn at_assign_stmt(p: &Parser) -> bool {
-    at_assign_target(p)
-        && (p.nth_at(1, COLON_EQ) || p.nth_at(1, EQ) || p.nth_at(1, L_BRACK) || p.nth_at(1, DOT))
+    at_assign_target(p) && at_assign_op(p)
+}
+
+fn at_assign_op(p: &Parser) -> bool {
+    p.nth_at(1, COLON_EQ) || p.nth_at(1, EQ) || p.nth_at(1, L_BRACK) || p.nth_at(1, DOT)
 }
 
 fn at_assign_target(p: &Parser) -> bool {

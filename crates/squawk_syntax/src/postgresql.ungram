@@ -2171,6 +2171,7 @@ PlpgsqlStmt =
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
 | PlpgsqlDynExecuteStmt
+| PlpgsqlExecSqlStmt
 | PlpgsqlExitStmt
 | PlpgsqlForCursorStmt
 | PlpgsqlForDynStmt
@@ -2520,6 +2521,10 @@ PlpgsqlFetchStmt =
   ('from' | 'in')?
   cursor:PlpgsqlCursorVariableRef
   into_clause:PlpgsqlIntoClause
+  ';'
+
+PlpgsqlExecSqlStmt =
+  stmt:Stmt
   ';'
 
 PlpgsqlDynExecuteStmt =
