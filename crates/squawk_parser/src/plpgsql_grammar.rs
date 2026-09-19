@@ -60,8 +60,7 @@ fn variable_conflict_value(p: &mut Parser) {
 
 fn option_value(p: &mut Parser) {
     if !at_name(p, 0) {
-        let kind = p.current();
-        p.error(format!("expected an option value, found {kind:?}"));
+        p.error(format!("expected an option value, got {:?}", p.current()));
         return;
     }
     name(p, PLPGSQL_OPTION_VALUE);
@@ -160,8 +159,7 @@ fn alias_target(p: &mut Parser) {
     if at_path(p).is_some() {
         path_name_ref(p);
     } else {
-        let kind = p.current();
-        p.error(format!("expected an alias target, found {kind:?}"));
+        p.error(format!("expected an alias target, got {:?}", p.current()));
     }
     m.complete(p, PLPGSQL_ALIAS_TARGET);
 }
@@ -208,8 +206,10 @@ fn cursor_arg(p: &mut Parser) {
         name(p, PLPGSQL_VAR_NAME);
         decl_datatype(p);
     } else {
-        let kind = p.current();
-        p.error(format!("expected a cursor argument name, found {kind:?}"));
+        p.error(format!(
+            "expected a cursor argument name, got {:?}",
+            p.current()
+        ));
     }
     m.complete(p, PLPGSQL_CURSOR_ARG);
 }
@@ -333,6 +333,8 @@ fn stmt(p: &mut Parser) {
         assert_stmt(p);
     } else if p.nth_at_contextual_kw(0, RAISE_KW) {
         raise_stmt(p);
+    } else if at_get_diag_stmt(p) {
+        get_diag_stmt(p);
     } else if at_transaction_stmt(p) {
         transaction_stmt(p);
     } else if p.at(CASE_KW) {
@@ -555,6 +557,103 @@ fn transaction_stmt(p: &mut Parser) {
     m.complete(p, kind);
 }
 
+const DIAG_ITEM_KINDS: [SyntaxKind; 13] = [
+    ROW_COUNT_KW,
+    PG_ROUTINE_OID_KW,
+    PG_CONTEXT_KW,
+    PG_EXCEPTION_DETAIL_KW,
+    PG_EXCEPTION_HINT_KW,
+    PG_EXCEPTION_CONTEXT_KW,
+    COLUMN_NAME_KW,
+    CONSTRAINT_NAME_KW,
+    PG_DATATYPE_NAME_KW,
+    MESSAGE_TEXT_KW,
+    TABLE_NAME_KW,
+    SCHEMA_NAME_KW,
+    RETURNED_SQLSTATE_KW,
+];
+
+fn get_diag_stmt(p: &mut Parser) {
+    assert!(at_get_diag_stmt(p));
+    let m = p.start();
+    p.bump_remap(GET_KW);
+    opt_diag_area(p);
+    expect_contextual_kw(p, DIAGNOSTICS_KW);
+    diag_item_list(p);
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_GET_DIAG_STMT);
+}
+
+fn opt_diag_area(p: &mut Parser) {
+    if !p.at(CURRENT_KW) && !p.nth_at_contextual_kw(0, STACKED_KW) {
+        return;
+    }
+    let m = p.start();
+    if !p.eat(CURRENT_KW) {
+        p.bump_remap(STACKED_KW);
+    }
+    m.complete(p, PLPGSQL_DIAG_AREA);
+}
+
+fn diag_item_list(p: &mut Parser) {
+    let m = p.start();
+    diag_item(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        diag_item(p);
+    }
+    m.complete(p, PLPGSQL_DIAG_ITEM_LIST);
+}
+
+fn diag_item(p: &mut Parser) {
+    let m = p.start();
+    if at_name(p, 0) {
+        diag_target(p);
+        if !p.eat(COLON_EQ) {
+            p.expect(EQ);
+        }
+        diag_kind(p);
+    } else {
+        p.error(format!(
+            "expected a diagnostics target, got {:?}",
+            p.current()
+        ));
+    }
+    m.complete(p, PLPGSQL_DIAG_ITEM);
+}
+
+fn diag_target(p: &mut Parser) {
+    assert!(at_name(p, 0));
+    let m = p.start();
+    name(p, PLPGSQL_VAR_NAME_REF);
+    while !p.at(EOF) && p.at(DOT) {
+        grammar::field_accessor(p);
+    }
+    if p.at(L_BRACK) {
+        let m = p.start();
+        p.error("a GET DIAGNOSTICS target can't be subscripted");
+        grammar::accessors(p);
+        m.complete(p, ERROR);
+    }
+    m.complete(p, PLPGSQL_DIAG_TARGET);
+}
+
+fn diag_kind(p: &mut Parser) {
+    let m = p.start();
+    match DIAG_ITEM_KINDS
+        .into_iter()
+        .find(|&kw| p.nth_at_contextual_kw(0, kw))
+    {
+        Some(kw) => p.bump_remap(kw),
+        None => {
+            p.error("unrecognized GET DIAGNOSTICS item");
+            if at_name(p, 0) {
+                p.bump_any();
+            }
+        }
+    }
+    m.complete(p, PLPGSQL_DIAG_KIND);
+}
+
 fn assign_stmt(p: &mut Parser) {
     assert!(at_assign_stmt(p));
     let m = p.start();
@@ -705,8 +804,7 @@ fn opt_else_clause(p: &mut Parser, kind: BodyKind) {
 // TODO: remove this once we get all the ast nodes working
 fn temp_unknown(p: &mut Parser, message: &str) {
     let m = p.start();
-    let kind = p.current();
-    p.error(format!("{message}, found {kind:?}"));
+    p.error(format!("{message}, got {:?}", p.current()));
 
     let mut depth = 0;
     while !p.at(EOF) {
@@ -759,8 +857,7 @@ fn condition(p: &mut Parser) {
             p.expect(STRING);
         }
     } else {
-        let kind = p.current();
-        p.error(format!("expected a condition name, found {kind:?}"));
+        p.error(format!("expected a condition name, got {:?}", p.current()));
     }
     m.complete(p, PLPGSQL_CONDITION);
 }
@@ -804,6 +901,10 @@ fn at_assign_stmt(p: &Parser) -> bool {
 
 fn at_assign_target(p: &Parser) -> bool {
     at_name(p, 0) && (p.at_ts(grammar::NAME_FIRST) || p.at(POSITIONAL_PARAM))
+}
+
+fn at_get_diag_stmt(p: &Parser) -> bool {
+    p.nth_at_contextual_kw(0, GET_KW) && !p.nth_at(1, DOT)
 }
 
 fn at_transaction_stmt(p: &Parser) -> bool {

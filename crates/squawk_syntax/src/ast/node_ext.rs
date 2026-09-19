@@ -855,6 +855,13 @@ impl ast::ReturningOption {
     }
 }
 
+impl ast::PlpgsqlDiagItem {
+    #[inline]
+    pub fn target(&self) -> Option<ast::PlpgsqlDiagTarget> {
+        support::child(self.syntax())
+    }
+}
+
 impl ast::PlpgsqlAssertStmt {
     #[inline]
     pub fn cond(&self) -> Option<ast::Expr> {

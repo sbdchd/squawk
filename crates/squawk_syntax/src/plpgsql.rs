@@ -117,6 +117,7 @@ impl ast::Do {
 mod tests {
     use super::*;
     use crate::SourceFile;
+    use crate::test::render_errors;
     use insta::assert_snapshot;
     use rowan::{TextRange, TextSize};
 
@@ -141,9 +142,7 @@ mod tests {
 
         let mut out = format!("{:#?}", body.syntax());
         out.push_str(&format!("---\nsource {range:?} {:?}\n", &sql[start..end]));
-        for error in body.errors() {
-            out.push_str(&format!("error {:?} {}\n", error.range(), error.message()));
-        }
+        out.push_str(&render_errors(sql, &body.errors()));
         out
     }
 
@@ -288,7 +287,10 @@ mod tests {
           WHITESPACE@18..19 " "
         ---
         source 5..24 " begin open c; end "
-        error 12..12 expected a statement, found IDENT
+        error[syntax-error]: expected a statement, got IDENT
+          ╭▸ 
+        1 │ do $$ begin open c; end $$;
+          ╰╴            ━
         "#);
     }
 
@@ -309,7 +311,10 @@ mod tests {
             END_KW@16..19 "end"
         ---
         source 5..26 "begin\\n open c;\\n end"
-        error 13..13 expected a statement, found IDENT
+        error[syntax-error]: expected a statement, got IDENT
+          ╭▸ 
+        1 │ do E'begin\n open c;\n end';
+          ╰╴             ━
         "#);
     }
 }

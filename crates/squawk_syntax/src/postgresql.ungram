@@ -2170,6 +2170,7 @@ PlpgsqlStmt =
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
 | PlpgsqlExitStmt
+| PlpgsqlGetDiagStmt
 | PlpgsqlIfStmt
 | PlpgsqlLoopStmt
 | PlpgsqlAssertStmt
@@ -2374,6 +2375,43 @@ PlpgsqlAssignTarget =
 PlpgsqlVarNameRef =
   '#name'?
   '@positional_param'?
+
+PlpgsqlGetDiagStmt =
+  'get'
+  area:PlpgsqlDiagArea?
+  'diagnostics'
+  items:PlpgsqlDiagItemList
+  ';'
+
+PlpgsqlDiagArea =
+  'current' | 'stacked'
+
+PlpgsqlDiagItemList =
+  PlpgsqlDiagItem (',' PlpgsqlDiagItem)*
+
+PlpgsqlDiagItem =
+  target:PlpgsqlDiagTarget
+  (':=' | '=')
+  kind:PlpgsqlDiagKind
+
+PlpgsqlDiagTarget =
+  name:PlpgsqlVarNameRef
+  FieldAccessor*
+
+PlpgsqlDiagKind =
+  'row_count'
+| 'pg_routine_oid'
+| 'pg_context'
+| 'pg_exception_detail'
+| 'pg_exception_hint'
+| 'pg_exception_context'
+| 'column_name'
+| 'constraint_name'
+| 'pg_datatype_name'
+| 'message_text'
+| 'table_name'
+| 'schema_name'
+| 'returned_sqlstate'
 
 FuncOptionList =
   options:(FuncOption*)

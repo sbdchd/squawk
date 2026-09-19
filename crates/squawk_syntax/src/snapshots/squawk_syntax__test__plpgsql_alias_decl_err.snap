@@ -52,7 +52,7 @@ PLPGSQL@0..66
     END_KW@62..65 "end"
   WHITESPACE@65..66 "\n"
 
-error[syntax-error]: expected an alias target, found INT_NUMBER
+error[syntax-error]: expected an alias target, got INT_NUMBER
   ╭▸ 
 3 │   a alias for 5;
   ╰╴              ━
@@ -60,7 +60,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 3 │   a alias for 5;
   ╰╴              ━
-error[syntax-error]: expected a declaration, found INT_NUMBER
+error[syntax-error]: expected a declaration, got INT_NUMBER
   ╭▸ 
 3 │   a alias for 5;
   ╰╴              ━
@@ -68,7 +68,7 @@ error[syntax-error]: expected FOR_KW
   ╭▸ 
 4 │   b alias 1;
   ╰╴         ━
-error[syntax-error]: expected an alias target, found INT_NUMBER
+error[syntax-error]: expected an alias target, got INT_NUMBER
   ╭▸ 
 4 │   b alias 1;
   ╰╴          ━
@@ -76,7 +76,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 4 │   b alias 1;
   ╰╴          ━
-error[syntax-error]: expected a declaration, found INT_NUMBER
+error[syntax-error]: expected a declaration, got INT_NUMBER
   ╭▸ 
 4 │   b alias 1;
   ╰╴          ━

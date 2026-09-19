@@ -70,7 +70,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 5 │   call p2 1;
   ╰╴         ━
-error[syntax-error]: expected a statement, found INT_NUMBER
+error[syntax-error]: expected a statement, got INT_NUMBER
   ╭▸ 
 5 │   call p2 1;
   ╰╴          ━

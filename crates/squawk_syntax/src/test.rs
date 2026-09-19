@@ -11,7 +11,7 @@ use crate::{
     syntax_error::SyntaxError,
 };
 
-fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
+pub(crate) fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
     let mut rendered = String::new();
     let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
 
@@ -271,7 +271,7 @@ fn plpgsql_suite_score() {
 
     assert_snapshot!(table, @"
     file                       bodies  tokens  unparsed   err
-    plpgsql.sql                   254    9764      2887   279
+    plpgsql.sql                   254    9764      2753   264
     plpgsql_array.sql              26     913        44    18
     plpgsql_cache.sql               2      59        15     2
     plpgsql_call.sql               45    1591        96    11
@@ -285,7 +285,7 @@ fn plpgsql_suite_score() {
     plpgsql_trap.sql                7     340        58     6
     plpgsql_trigger.sql             1      55         0     0
     plpgsql_varprops.sql           33     700        70     8
-    total                         549   18714      4750   470
+    total                         549   18714      4616   455
     ");
 }
 

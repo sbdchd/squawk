@@ -4819,7 +4819,7 @@ pub(crate) fn accessors(p: &mut Parser<'_>) {
     }
 }
 
-fn field_accessor(p: &mut Parser<'_>) {
+pub(crate) fn field_accessor(p: &mut Parser<'_>) {
     assert!(p.at(DOT));
     let m = p.start();
     p.bump(DOT);

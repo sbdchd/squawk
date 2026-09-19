@@ -90,15 +90,15 @@ error[syntax-error]: expected an expression
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴          ━
-error[syntax-error]: expected a statement, found IDENT
+error[syntax-error]: expected a statement, got IDENT
   ╭▸ 
 5 │   x 1;
   ╰╴  ━
-error[syntax-error]: expected a statement, found ALL_KW
+error[syntax-error]: expected a statement, got ALL_KW
   ╭▸ 
 6 │   all := 1;
   ╰╴  ━
-error[syntax-error]: expected a statement, found SELECT_KW
+error[syntax-error]: expected a statement, got SELECT_KW
   ╭▸ 
 7 │   select := 1;
   ╰╴  ━

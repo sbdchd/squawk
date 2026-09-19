@@ -19837,6 +19837,125 @@ impl PlpgsqlDeclareSection {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagArea {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagArea {
+    #[inline]
+    pub fn current_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_KW)
+    }
+    #[inline]
+    pub fn stacked_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STACKED_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagItem {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagItem {
+    #[inline]
+    pub fn kind(&self) -> Option<PlpgsqlDiagKind> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagItemList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagItemList {
+    #[inline]
+    pub fn plpgsql_diag_items(&self) -> AstChildren<PlpgsqlDiagItem> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagKind {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagKind {
+    #[inline]
+    pub fn column_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMN_NAME_KW)
+    }
+    #[inline]
+    pub fn constraint_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_NAME_KW)
+    }
+    #[inline]
+    pub fn message_text_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MESSAGE_TEXT_KW)
+    }
+    #[inline]
+    pub fn pg_context_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_CONTEXT_KW)
+    }
+    #[inline]
+    pub fn pg_datatype_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_DATATYPE_NAME_KW)
+    }
+    #[inline]
+    pub fn pg_exception_context_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_EXCEPTION_CONTEXT_KW)
+    }
+    #[inline]
+    pub fn pg_exception_detail_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_EXCEPTION_DETAIL_KW)
+    }
+    #[inline]
+    pub fn pg_exception_hint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_EXCEPTION_HINT_KW)
+    }
+    #[inline]
+    pub fn pg_routine_oid_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_ROUTINE_OID_KW)
+    }
+    #[inline]
+    pub fn returned_sqlstate_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RETURNED_SQLSTATE_KW)
+    }
+    #[inline]
+    pub fn row_count_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROW_COUNT_KW)
+    }
+    #[inline]
+    pub fn schema_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCHEMA_NAME_KW)
+    }
+    #[inline]
+    pub fn table_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_NAME_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagTarget {
+    #[inline]
+    pub fn field_accessors(&self) -> AstChildren<FieldAccessor> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarNameRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlDoStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19966,6 +20085,33 @@ impl PlpgsqlExitWhen {
     #[inline]
     pub fn when_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlGetDiagStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlGetDiagStmt {
+    #[inline]
+    pub fn area(&self) -> Option<PlpgsqlDiagArea> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn items(&self) -> Option<PlpgsqlDiagItemList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn diagnostics_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DIAGNOSTICS_KW)
+    }
+    #[inline]
+    pub fn get_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GET_KW)
     }
 }
 
@@ -30802,6 +30948,7 @@ pub enum PlpgsqlStmt {
     PlpgsqlContinueStmt(PlpgsqlContinueStmt),
     PlpgsqlDoStmt(PlpgsqlDoStmt),
     PlpgsqlExitStmt(PlpgsqlExitStmt),
+    PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt),
     PlpgsqlIfStmt(PlpgsqlIfStmt),
     PlpgsqlLoopStmt(PlpgsqlLoopStmt),
     PlpgsqlNullStmt(PlpgsqlNullStmt),
@@ -47803,6 +47950,96 @@ impl AstNode for PlpgsqlDeclareSection {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlDiagArea {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_AREA
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagItem {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_ITEM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagItemList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_ITEM_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagKind {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_KIND
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlDoStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -47915,6 +48152,24 @@ impl AstNode for PlpgsqlExitWhen {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_EXIT_WHEN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlGetDiagStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_GET_DIAG_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -68593,6 +68848,7 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_CONTINUE_STMT
                 | SyntaxKind::PLPGSQL_DO_STMT
                 | SyntaxKind::PLPGSQL_EXIT_STMT
+                | SyntaxKind::PLPGSQL_GET_DIAG_STMT
                 | SyntaxKind::PLPGSQL_IF_STMT
                 | SyntaxKind::PLPGSQL_LOOP_STMT
                 | SyntaxKind::PLPGSQL_NULL_STMT
@@ -68631,6 +68887,9 @@ impl AstNode for PlpgsqlStmt {
             SyntaxKind::PLPGSQL_DO_STMT => PlpgsqlStmt::PlpgsqlDoStmt(PlpgsqlDoStmt { syntax }),
             SyntaxKind::PLPGSQL_EXIT_STMT => {
                 PlpgsqlStmt::PlpgsqlExitStmt(PlpgsqlExitStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_GET_DIAG_STMT => {
+                PlpgsqlStmt::PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt { syntax })
             }
             SyntaxKind::PLPGSQL_IF_STMT => PlpgsqlStmt::PlpgsqlIfStmt(PlpgsqlIfStmt { syntax }),
             SyntaxKind::PLPGSQL_LOOP_STMT => {
@@ -68681,6 +68940,7 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlContinueStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlDoStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlExitStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlGetDiagStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlIfStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlLoopStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlNullStmt(it) => &it.syntax,
@@ -68747,6 +69007,12 @@ impl From<PlpgsqlExitStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlExitStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlExitStmt(node)
+    }
+}
+impl From<PlpgsqlGetDiagStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlGetDiagStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlGetDiagStmt(node)
     }
 }
 impl From<PlpgsqlIfStmt> for PlpgsqlStmt {

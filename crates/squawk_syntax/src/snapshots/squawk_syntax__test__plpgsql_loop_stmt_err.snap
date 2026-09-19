@@ -74,7 +74,7 @@ error[syntax-error]: expected SEMICOLON
    ╭▸ 
 15 │   exit when
    ╰╴      ━
-error[syntax-error]: expected a statement, found WHEN_KW
+error[syntax-error]: expected a statement, got WHEN_KW
    ╭▸ 
 15 │   exit when
    ╰╴       ━

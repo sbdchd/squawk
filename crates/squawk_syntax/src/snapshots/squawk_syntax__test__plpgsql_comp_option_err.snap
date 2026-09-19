@@ -149,7 +149,7 @@ error[syntax-error]: expected DUMP_KW
   ╭▸ 
 2 │ #option dumpp
   ╰╴       ━
-error[syntax-error]: expected a block, found IDENT
+error[syntax-error]: expected a block, got IDENT
   ╭▸ 
 2 │ #option dumpp
   ╰╴        ━
@@ -157,7 +157,7 @@ error[syntax-error]: expected OPTION, PRINT_STRICT_PARAMS, or VARIABLE_CONFLICT
   ╭▸ 
 6 │ #foo bar
   ╰╴ ━
-error[syntax-error]: expected a block, found IDENT
+error[syntax-error]: expected a block, got IDENT
   ╭▸ 
 6 │ #foo bar
   ╰╴ ━
@@ -169,15 +169,15 @@ error[syntax-error]: expected ERROR, USE_VARIABLE, or USE_COLUMN
    ╭▸ 
 14 │ #variable_conflict use_default
    ╰╴                  ━
-error[syntax-error]: expected a block, found IDENT
+error[syntax-error]: expected a block, got IDENT
    ╭▸ 
 14 │ #variable_conflict use_default
    ╰╴                   ━
-error[syntax-error]: expected an option value, found INT_NUMBER
+error[syntax-error]: expected an option value, got INT_NUMBER
    ╭▸ 
 19 │ #print_strict_params 1
    ╰╴                    ━
-error[syntax-error]: expected a block, found INT_NUMBER
+error[syntax-error]: expected a block, got INT_NUMBER
    ╭▸ 
 19 │ #print_strict_params 1
    ╰╴                     ━
@@ -189,15 +189,15 @@ error[syntax-error]: unrecognized print_strict_params option ON
    ╭▸ 
 29 │ #print_strict_params "ON"
    ╰╴                     ━━━━
-error[syntax-error]: expected an option value, found IDENT
+error[syntax-error]: expected an option value, got IDENT
    ╭▸ 
 34 │ #print_strict_params loop
    ╰╴                    ━
-error[syntax-error]: expected a block, found IDENT
+error[syntax-error]: expected a block, got IDENT
    ╭▸ 
 34 │ #print_strict_params loop
    ╰╴                     ━
-error[syntax-error]: expected a declaration, found POUND
+error[syntax-error]: expected a declaration, got POUND
    ╭▸ 
 40 │ #option dump
    ╰╴━

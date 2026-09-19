@@ -56,7 +56,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 3 │   commit work;
   ╰╴        ━
-error[syntax-error]: expected a statement, found WORK_KW
+error[syntax-error]: expected a statement, got WORK_KW
   ╭▸ 
 3 │   commit work;
   ╰╴         ━
@@ -64,7 +64,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 4 │   commit prepared 'x';
   ╰╴        ━
-error[syntax-error]: expected a statement, found PREPARED_KW
+error[syntax-error]: expected a statement, got PREPARED_KW
   ╭▸ 
 4 │   commit prepared 'x';
   ╰╴         ━
@@ -72,7 +72,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 5 │   rollback to savepoint s;
   ╰╴          ━
-error[syntax-error]: expected a statement, found TO_KW
+error[syntax-error]: expected a statement, got TO_KW
   ╭▸ 
 5 │   rollback to savepoint s;
   ╰╴           ━
@@ -84,7 +84,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 7 │   commit chain;
   ╰╴        ━
-error[syntax-error]: expected a statement, found CHAIN_KW
+error[syntax-error]: expected a statement, got CHAIN_KW
   ╭▸ 
 7 │   commit chain;
   ╰╴         ━

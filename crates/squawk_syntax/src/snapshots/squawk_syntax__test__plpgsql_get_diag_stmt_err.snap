@@ -1,0 +1,126 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/get_diag_stmt.sql
+---
+PLPGSQL@0..178
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..177
+    PLPGSQL_DECLARE_SECTION@1..17
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..17
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "x"
+        WHITESPACE@12..13 " "
+        PATH_TYPE@13..16
+          PATH_REF@13..16
+            PATH_SEGMENT_REF@13..16
+              INT_KW@13..16 "int"
+        SEMICOLON@16..17 ";"
+    WHITESPACE@17..18 "\n"
+    BEGIN_KW@18..23 "begin"
+    WHITESPACE@23..26 "\n  "
+    PLPGSQL_BODY@26..173
+      PLPGSQL_GET_DIAG_STMT@26..52
+        GET_KW@26..29 "get"
+        WHITESPACE@29..30 " "
+        DIAGNOSTICS_KW@30..41 "diagnostics"
+        WHITESPACE@41..42 " "
+        PLPGSQL_DIAG_ITEM_LIST@42..51
+          PLPGSQL_DIAG_ITEM@42..51
+            PLPGSQL_DIAG_TARGET@42..43
+              PLPGSQL_VAR_NAME_REF@42..43
+                IDENT@42..43 "x"
+            WHITESPACE@43..44 " "
+            EQ@44..45 "="
+            WHITESPACE@45..46 " "
+            PLPGSQL_DIAG_KIND@46..51
+              IDENT@46..51 "bogus"
+        SEMICOLON@51..52 ";"
+      WHITESPACE@52..55 "\n  "
+      PLPGSQL_GET_DIAG_STMT@55..87
+        GET_KW@55..58 "get"
+        WHITESPACE@58..59 " "
+        DIAGNOSTICS_KW@59..70 "diagnostics"
+        WHITESPACE@70..71 " "
+        PLPGSQL_DIAG_ITEM_LIST@71..86
+          PLPGSQL_DIAG_ITEM@71..86
+            PLPGSQL_DIAG_TARGET@71..72
+              PLPGSQL_VAR_NAME_REF@71..72
+                IDENT@71..72 "x"
+            WHITESPACE@72..73 " "
+            EQ@73..74 "="
+            WHITESPACE@74..75 " "
+            PLPGSQL_DIAG_KIND@75..86
+              IDENT@75..86 "\"row_count\""
+        SEMICOLON@86..87 ";"
+      WHITESPACE@87..90 "\n  "
+      PLPGSQL_GET_DIAG_STMT@90..118
+        GET_KW@90..93 "get"
+        WHITESPACE@93..94 " "
+        DIAGNOSTICS_KW@94..105 "diagnostics"
+        WHITESPACE@105..106 " "
+        PLPGSQL_DIAG_ITEM_LIST@106..117
+          PLPGSQL_DIAG_ITEM@106..117
+            PLPGSQL_DIAG_TARGET@106..107
+              PLPGSQL_VAR_NAME_REF@106..107
+                IDENT@106..107 "x"
+            WHITESPACE@107..108 " "
+            PLPGSQL_DIAG_KIND@108..117
+              ROW_COUNT_KW@108..117 "row_count"
+        SEMICOLON@117..118 ";"
+      WHITESPACE@118..121 "\n  "
+      PLPGSQL_GET_DIAG_STMT@121..154
+        GET_KW@121..124 "get"
+        WHITESPACE@124..125 " "
+        DIAGNOSTICS_KW@125..136 "diagnostics"
+        WHITESPACE@136..137 " "
+        PLPGSQL_DIAG_ITEM_LIST@137..153
+          PLPGSQL_DIAG_ITEM@137..153
+            PLPGSQL_DIAG_TARGET@137..141
+              PLPGSQL_VAR_NAME_REF@137..138
+                IDENT@137..138 "x"
+              ERROR@138..141
+                INDEX_ACCESSOR@138..141
+                  L_BRACK@138..139 "["
+                  LITERAL@139..140
+                    INT_NUMBER@139..140 "1"
+                  R_BRACK@140..141 "]"
+            WHITESPACE@141..142 " "
+            EQ@142..143 "="
+            WHITESPACE@143..144 " "
+            PLPGSQL_DIAG_KIND@144..153
+              ROW_COUNT_KW@144..153 "row_count"
+        SEMICOLON@153..154 ";"
+      WHITESPACE@154..157 "\n  "
+      PLPGSQL_GET_DIAG_STMT@157..173
+        GET_KW@157..160 "get"
+        WHITESPACE@160..161 " "
+        DIAGNOSTICS_KW@161..172 "diagnostics"
+        PLPGSQL_DIAG_ITEM_LIST@172..172
+          PLPGSQL_DIAG_ITEM@172..172
+        SEMICOLON@172..173 ";"
+    WHITESPACE@173..174 "\n"
+    END_KW@174..177 "end"
+  WHITESPACE@177..178 "\n"
+
+error[syntax-error]: unrecognized GET DIAGNOSTICS item
+  ╭▸ 
+5 │   get diagnostics x = bogus;
+  ╰╴                      ━
+error[syntax-error]: unrecognized GET DIAGNOSTICS item
+  ╭▸ 
+6 │   get diagnostics x = "row_count";
+  ╰╴                      ━
+error[syntax-error]: expected EQ
+  ╭▸ 
+7 │   get diagnostics x row_count;
+  ╰╴                   ━
+error[syntax-error]: a GET DIAGNOSTICS target can't be subscripted
+  ╭▸ 
+8 │   get diagnostics x[1] = row_count;
+  ╰╴                   ━
+error[syntax-error]: expected a diagnostics target, got SEMICOLON
+  ╭▸ 
+9 │   get diagnostics;
+  ╰╴                 ━

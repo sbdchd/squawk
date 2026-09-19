@@ -119,7 +119,7 @@ error[syntax-error]: expected STRING
   ╭▸ 
 6 │   raise sqlstate;
   ╰╴                ━
-error[syntax-error]: expected a condition name, found SEMICOLON
+error[syntax-error]: expected a condition name, got SEMICOLON
   ╭▸ 
 7 │   raise exception;
   ╰╴                 ━

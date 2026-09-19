@@ -35,7 +35,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 3 │   do := 1;
   ╰╴    ━
-error[syntax-error]: expected a statement, found COLON
+error[syntax-error]: expected a statement, got COLON
   ╭▸ 
 3 │   do := 1;
   ╰╴     ━
