@@ -845,6 +845,15 @@ fn loop_stmt(p: &mut Parser) {
         p.bump_remap(WHILE_KW);
         expr(p);
         PLPGSQL_WHILE_STMT
+    } else if p.at(FOR_KW) {
+        p.bump(FOR_KW);
+        for_variable_list(p);
+        p.expect(IN_KW);
+        if at_for_reverse(p, 0) {
+            p.bump_remap(REVERSE_KW);
+        }
+        for_range(p);
+        PLPGSQL_FOR_I_STMT
     } else {
         PLPGSQL_LOOP_STMT
     };
@@ -855,6 +864,40 @@ fn loop_stmt(p: &mut Parser) {
     opt_label_name_ref(p);
     p.expect(SEMICOLON);
     m.complete(p, kind);
+}
+
+fn for_variable_list(p: &mut Parser) {
+    for_variable(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        for_variable(p);
+    }
+}
+
+fn for_variable(p: &mut Parser) {
+    if !at_name(p, 0) {
+        p.error(format!("expected a loop variable, got {:?}", p.current()));
+        return;
+    }
+    scalar_target(p, PLPGSQL_FOR_VARIABLE);
+}
+
+fn for_range(p: &mut Parser) {
+    let m = p.start();
+    range_bound(p);
+    p.expect(DOT_DOT);
+    range_bound(p);
+    if p.eat(BY_KW) {
+        range_bound(p);
+    }
+    m.complete(p, PLPGSQL_FOR_RANGE);
+}
+
+fn range_bound(p: &mut Parser) {
+    if p.nth_at_contextual_kw(0, LOOP_KW) || p.at(BY_KW) {
+        p.error("expected an expression");
+        return;
+    }
+    expr(p);
 }
 
 fn exit_stmt(p: &mut Parser) {
@@ -1007,7 +1050,61 @@ fn at_loop_start(p: &Parser) -> bool {
 }
 
 fn at_loop_kw(p: &Parser, n: usize) -> bool {
-    p.nth_at_contextual_kw(n, LOOP_KW) || p.nth_at_contextual_kw(n, WHILE_KW)
+    p.nth_at_contextual_kw(n, LOOP_KW)
+        || p.nth_at_contextual_kw(n, WHILE_KW)
+        // TODO: drop when the other FOR forms are parsed
+        || (p.nth_at(n, FOR_KW) && at_for_i_header(p, n))
+}
+
+fn at_for_i_header(p: &Parser, n: usize) -> bool {
+    let n = for_vars_end(p, n + 1).unwrap_or(n + 1);
+    if !p.nth_at(n, IN_KW) {
+        return false;
+    }
+    let n = if at_for_reverse(p, n + 1) {
+        n + 2
+    } else {
+        n + 1
+    };
+    matches!(for_header_terminator(p, n), Some((DOT_DOT, _)))
+}
+
+fn at_for_reverse(p: &Parser, n: usize) -> bool {
+    p.nth_at_contextual_kw(n, REVERSE_KW) && !p.nth_at(n + 1, DOT)
+}
+
+fn for_vars_end(p: &Parser, mut n: usize) -> Option<usize> {
+    while !p.nth_at(n, EOF) {
+        if !at_name(p, n) {
+            return None;
+        }
+        n += 1;
+        while !p.nth_at(n, EOF) && p.nth_at(n, DOT) && at_name(p, n + 1) {
+            n += 2;
+        }
+        if !p.nth_at(n, COMMA) {
+            return Some(n);
+        }
+        n += 1;
+    }
+    None
+}
+
+// postgres does a similar thing to look ahead until it sees a loop token
+fn for_header_terminator(p: &Parser, mut n: usize) -> Option<(SyntaxKind, usize)> {
+    let mut depth = 0i32;
+    while !p.nth_at(n, EOF) {
+        match p.nth(n) {
+            L_PAREN | L_BRACK => depth += 1,
+            R_PAREN | R_BRACK => depth -= 1,
+            SEMICOLON if depth == 0 => return None,
+            DOT_DOT if depth == 0 => return Some((DOT_DOT, n)),
+            _ if depth == 0 && p.nth_at_contextual_kw(n, LOOP_KW) => return Some((LOOP_KW, n)),
+            _ => (),
+        }
+        n += 1;
+    }
+    None
 }
 
 fn at_assign_stmt(p: &Parser) -> bool {

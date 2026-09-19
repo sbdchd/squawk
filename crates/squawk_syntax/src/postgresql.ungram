@@ -2171,6 +2171,7 @@ PlpgsqlStmt =
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
 | PlpgsqlExitStmt
+| PlpgsqlForIStmt
 | PlpgsqlFetchStmt
 | PlpgsqlGetDiagStmt
 | PlpgsqlIfStmt
@@ -2428,6 +2429,29 @@ PlpgsqlMoveStmt =
   ('from' | 'in')?
   cursor:PlpgsqlCursorVariableRef
   ';'
+
+PlpgsqlForIStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in'
+  'reverse'?
+  range:PlpgsqlForRange
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForVariable =
+  name:PlpgsqlVarNameRef
+  FieldAccessor*
+
+PlpgsqlForRange =
+  lower:Expr
+  '..'
+  upper:Expr
+  ('by' step:Expr)?
 
 PlpgsqlFetchStmt =
   'fetch'

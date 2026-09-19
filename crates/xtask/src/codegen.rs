@@ -561,6 +561,7 @@ fn token_to_name(tk: &str) -> Option<&'static str> {
         "']'" => "r_brack",
         "]" => "r_brack",
         "<" => "l_angle",
+        ".." => "dot_dot",
         "<<" => "less_less",
         ">" => "r_angle",
         ">>" => "greater_greater",

@@ -874,6 +874,23 @@ impl ast::PlpgsqlAssertStmt {
     }
 }
 
+impl ast::PlpgsqlForRange {
+    #[inline]
+    pub fn lower(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).next()
+    }
+
+    #[inline]
+    pub fn upper(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(1)
+    }
+
+    #[inline]
+    pub fn step(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(2)
+    }
+}
+
 impl ast::CompoundSelect {
     #[inline]
     pub fn lhs_operand(&self) -> Option<ast::CompoundSelectOperand> {
