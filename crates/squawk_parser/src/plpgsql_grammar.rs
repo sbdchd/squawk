@@ -335,6 +335,8 @@ fn stmt(p: &mut Parser) {
         raise_stmt(p);
     } else if at_stmt_kw(p, GET_KW) {
         get_diag_stmt(p);
+    } else if at_stmt_kw(p, MOVE_KW) {
+        move_stmt(p);
     } else if at_stmt_kw(p, CLOSE_KW) {
         close_stmt(p);
     } else if at_transaction_stmt(p) {
@@ -654,6 +656,20 @@ fn diag_kind(p: &mut Parser) {
         }
     }
     m.complete(p, PLPGSQL_DIAG_KIND);
+}
+
+fn move_stmt(p: &mut Parser) {
+    assert!(at_stmt_kw(p, MOVE_KW));
+    let m = p.start();
+    p.bump(MOVE_KW);
+    let direction = grammar::opt_direction(p);
+    let from_or_in = p.eat(FROM_KW) || p.eat(IN_KW);
+    if direction && !from_or_in {
+        p.error("expected FROM or IN");
+    }
+    cursor_variable_ref(p);
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_MOVE_STMT);
 }
 
 fn close_stmt(p: &mut Parser) {

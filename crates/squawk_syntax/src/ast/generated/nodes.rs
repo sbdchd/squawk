@@ -20269,6 +20269,37 @@ impl PlpgsqlLoopStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlMoveStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlMoveStmt {
+    #[inline]
+    pub fn cursor(&self) -> Option<PlpgsqlCursorVariableRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn direction(&self) -> Option<CursorAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn in_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IN_KW)
+    }
+    #[inline]
+    pub fn move_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MOVE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlNotNull {
     pub(crate) syntax: SyntaxNode,
 }
@@ -30988,6 +31019,7 @@ pub enum PlpgsqlStmt {
     PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt),
     PlpgsqlIfStmt(PlpgsqlIfStmt),
     PlpgsqlLoopStmt(PlpgsqlLoopStmt),
+    PlpgsqlMoveStmt(PlpgsqlMoveStmt),
     PlpgsqlNullStmt(PlpgsqlNullStmt),
     PlpgsqlPerformStmt(PlpgsqlPerformStmt),
     PlpgsqlRaiseStmt(PlpgsqlRaiseStmt),
@@ -48333,6 +48365,24 @@ impl AstNode for PlpgsqlLoopStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_LOOP_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlMoveStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_MOVE_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -68947,6 +68997,7 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_GET_DIAG_STMT
                 | SyntaxKind::PLPGSQL_IF_STMT
                 | SyntaxKind::PLPGSQL_LOOP_STMT
+                | SyntaxKind::PLPGSQL_MOVE_STMT
                 | SyntaxKind::PLPGSQL_NULL_STMT
                 | SyntaxKind::PLPGSQL_PERFORM_STMT
                 | SyntaxKind::PLPGSQL_RAISE_STMT
@@ -68993,6 +69044,9 @@ impl AstNode for PlpgsqlStmt {
             SyntaxKind::PLPGSQL_IF_STMT => PlpgsqlStmt::PlpgsqlIfStmt(PlpgsqlIfStmt { syntax }),
             SyntaxKind::PLPGSQL_LOOP_STMT => {
                 PlpgsqlStmt::PlpgsqlLoopStmt(PlpgsqlLoopStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_MOVE_STMT => {
+                PlpgsqlStmt::PlpgsqlMoveStmt(PlpgsqlMoveStmt { syntax })
             }
             SyntaxKind::PLPGSQL_NULL_STMT => {
                 PlpgsqlStmt::PlpgsqlNullStmt(PlpgsqlNullStmt { syntax })
@@ -69043,6 +69097,7 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlGetDiagStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlIfStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlLoopStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlMoveStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlNullStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlPerformStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlRaiseStmt(it) => &it.syntax,
@@ -69131,6 +69186,12 @@ impl From<PlpgsqlLoopStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlLoopStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlLoopStmt(node)
+    }
+}
+impl From<PlpgsqlMoveStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlMoveStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlMoveStmt(node)
     }
 }
 impl From<PlpgsqlNullStmt> for PlpgsqlStmt {

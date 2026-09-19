@@ -2174,6 +2174,7 @@ PlpgsqlStmt =
 | PlpgsqlGetDiagStmt
 | PlpgsqlIfStmt
 | PlpgsqlLoopStmt
+| PlpgsqlMoveStmt
 | PlpgsqlAssertStmt
 | PlpgsqlCommitStmt
 | PlpgsqlNullStmt
@@ -2416,6 +2417,13 @@ PlpgsqlDiagKind =
 
 PlpgsqlCloseStmt =
   'close'
+  cursor:PlpgsqlCursorVariableRef
+  ';'
+
+PlpgsqlMoveStmt =
+  'move'
+  direction:CursorAction?
+  ('from' | 'in')?
   cursor:PlpgsqlCursorVariableRef
   ';'
 

@@ -16101,7 +16101,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, DECLARE)
 }
 
-fn opt_direction(p: &mut Parser<'_>) -> bool {
+pub(crate) fn opt_direction(p: &mut Parser<'_>) -> bool {
     match p.current() {
         NEXT_KW => {
             let m = p.start();
