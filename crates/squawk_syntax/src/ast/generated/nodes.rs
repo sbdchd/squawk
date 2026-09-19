@@ -19623,6 +19623,25 @@ impl PlpgsqlCaseWhen {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCloseStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCloseStmt {
+    #[inline]
+    pub fn cursor(&self) -> Option<PlpgsqlCursorVariableRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn close_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CLOSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlCommitStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19818,6 +19837,21 @@ impl PlpgsqlCursorDecl {
     #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCursorVariableRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCursorVariableRef {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -29998,6 +30032,7 @@ pub enum AnyName {
     PathSegment(PathSegment),
     PathSegmentRef(PathSegmentRef),
     PlpgsqlCondition(PlpgsqlCondition),
+    PlpgsqlCursorVariableRef(PlpgsqlCursorVariableRef),
     PlpgsqlLabelName(PlpgsqlLabelName),
     PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
     PlpgsqlOptionValue(PlpgsqlOptionValue),
@@ -30059,6 +30094,7 @@ pub enum AnyNameRef {
     NameRef(NameRef),
     ParamNameRef(ParamNameRef),
     PathSegmentRef(PathSegmentRef),
+    PlpgsqlCursorVariableRef(PlpgsqlCursorVariableRef),
     PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
     PlpgsqlVarNameRef(PlpgsqlVarNameRef),
     PolicyRef(PolicyRef),
@@ -30944,6 +30980,7 @@ pub enum PlpgsqlStmt {
     PlpgsqlBlock(PlpgsqlBlock),
     PlpgsqlCallStmt(PlpgsqlCallStmt),
     PlpgsqlCaseStmt(PlpgsqlCaseStmt),
+    PlpgsqlCloseStmt(PlpgsqlCloseStmt),
     PlpgsqlCommitStmt(PlpgsqlCommitStmt),
     PlpgsqlContinueStmt(PlpgsqlContinueStmt),
     PlpgsqlDoStmt(PlpgsqlDoStmt),
@@ -47770,6 +47807,24 @@ impl AstNode for PlpgsqlCaseWhen {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlCloseStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CLOSE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlCommitStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -47918,6 +47973,24 @@ impl AstNode for PlpgsqlCursorDecl {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_CURSOR_DECL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCursorVariableRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CURSOR_VARIABLE_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -61172,6 +61245,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::PATH_SEGMENT
                 | SyntaxKind::PATH_SEGMENT_REF
                 | SyntaxKind::PLPGSQL_CONDITION
+                | SyntaxKind::PLPGSQL_CURSOR_VARIABLE_REF
                 | SyntaxKind::PLPGSQL_LABEL_NAME
                 | SyntaxKind::PLPGSQL_LABEL_NAME_REF
                 | SyntaxKind::PLPGSQL_OPTION_VALUE
@@ -61289,6 +61363,9 @@ impl AstNode for AnyName {
             SyntaxKind::PATH_SEGMENT => AnyName::PathSegment(PathSegment { syntax }),
             SyntaxKind::PATH_SEGMENT_REF => AnyName::PathSegmentRef(PathSegmentRef { syntax }),
             SyntaxKind::PLPGSQL_CONDITION => AnyName::PlpgsqlCondition(PlpgsqlCondition { syntax }),
+            SyntaxKind::PLPGSQL_CURSOR_VARIABLE_REF => {
+                AnyName::PlpgsqlCursorVariableRef(PlpgsqlCursorVariableRef { syntax })
+            }
             SyntaxKind::PLPGSQL_LABEL_NAME => {
                 AnyName::PlpgsqlLabelName(PlpgsqlLabelName { syntax })
             }
@@ -61408,6 +61485,7 @@ impl AstNode for AnyName {
             AnyName::PathSegment(it) => &it.syntax,
             AnyName::PathSegmentRef(it) => &it.syntax,
             AnyName::PlpgsqlCondition(it) => &it.syntax,
+            AnyName::PlpgsqlCursorVariableRef(it) => &it.syntax,
             AnyName::PlpgsqlLabelName(it) => &it.syntax,
             AnyName::PlpgsqlLabelNameRef(it) => &it.syntax,
             AnyName::PlpgsqlOptionValue(it) => &it.syntax,
@@ -61739,6 +61817,12 @@ impl From<PlpgsqlCondition> for AnyName {
         AnyName::PlpgsqlCondition(node)
     }
 }
+impl From<PlpgsqlCursorVariableRef> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlCursorVariableRef) -> AnyName {
+        AnyName::PlpgsqlCursorVariableRef(node)
+    }
+}
 impl From<PlpgsqlLabelName> for AnyName {
     #[inline]
     fn from(node: PlpgsqlLabelName) -> AnyName {
@@ -62001,6 +62085,7 @@ impl AstNode for AnyNameRef {
                 | SyntaxKind::NAME_REF
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT_REF
+                | SyntaxKind::PLPGSQL_CURSOR_VARIABLE_REF
                 | SyntaxKind::PLPGSQL_LABEL_NAME_REF
                 | SyntaxKind::PLPGSQL_VAR_NAME_REF
                 | SyntaxKind::POLICY_REF
@@ -62054,6 +62139,9 @@ impl AstNode for AnyNameRef {
             SyntaxKind::NAME_REF => AnyNameRef::NameRef(NameRef { syntax }),
             SyntaxKind::PARAM_NAME_REF => AnyNameRef::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::PATH_SEGMENT_REF => AnyNameRef::PathSegmentRef(PathSegmentRef { syntax }),
+            SyntaxKind::PLPGSQL_CURSOR_VARIABLE_REF => {
+                AnyNameRef::PlpgsqlCursorVariableRef(PlpgsqlCursorVariableRef { syntax })
+            }
             SyntaxKind::PLPGSQL_LABEL_NAME_REF => {
                 AnyNameRef::PlpgsqlLabelNameRef(PlpgsqlLabelNameRef { syntax })
             }
@@ -62107,6 +62195,7 @@ impl AstNode for AnyNameRef {
             AnyNameRef::NameRef(it) => &it.syntax,
             AnyNameRef::ParamNameRef(it) => &it.syntax,
             AnyNameRef::PathSegmentRef(it) => &it.syntax,
+            AnyNameRef::PlpgsqlCursorVariableRef(it) => &it.syntax,
             AnyNameRef::PlpgsqlLabelNameRef(it) => &it.syntax,
             AnyNameRef::PlpgsqlVarNameRef(it) => &it.syntax,
             AnyNameRef::PolicyRef(it) => &it.syntax,
@@ -62227,6 +62316,12 @@ impl From<PathSegmentRef> for AnyNameRef {
     #[inline]
     fn from(node: PathSegmentRef) -> AnyNameRef {
         AnyNameRef::PathSegmentRef(node)
+    }
+}
+impl From<PlpgsqlCursorVariableRef> for AnyNameRef {
+    #[inline]
+    fn from(node: PlpgsqlCursorVariableRef) -> AnyNameRef {
+        AnyNameRef::PlpgsqlCursorVariableRef(node)
     }
 }
 impl From<PlpgsqlLabelNameRef> for AnyNameRef {
@@ -68844,6 +68939,7 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_BLOCK
                 | SyntaxKind::PLPGSQL_CALL_STMT
                 | SyntaxKind::PLPGSQL_CASE_STMT
+                | SyntaxKind::PLPGSQL_CLOSE_STMT
                 | SyntaxKind::PLPGSQL_COMMIT_STMT
                 | SyntaxKind::PLPGSQL_CONTINUE_STMT
                 | SyntaxKind::PLPGSQL_DO_STMT
@@ -68877,6 +68973,9 @@ impl AstNode for PlpgsqlStmt {
             }
             SyntaxKind::PLPGSQL_CASE_STMT => {
                 PlpgsqlStmt::PlpgsqlCaseStmt(PlpgsqlCaseStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_CLOSE_STMT => {
+                PlpgsqlStmt::PlpgsqlCloseStmt(PlpgsqlCloseStmt { syntax })
             }
             SyntaxKind::PLPGSQL_COMMIT_STMT => {
                 PlpgsqlStmt::PlpgsqlCommitStmt(PlpgsqlCommitStmt { syntax })
@@ -68936,6 +69035,7 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlBlock(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlCallStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlCaseStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlCloseStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlCommitStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlContinueStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlDoStmt(it) => &it.syntax,
@@ -68983,6 +69083,12 @@ impl From<PlpgsqlCaseStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlCaseStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlCaseStmt(node)
+    }
+}
+impl From<PlpgsqlCloseStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlCloseStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlCloseStmt(node)
     }
 }
 impl From<PlpgsqlCommitStmt> for PlpgsqlStmt {

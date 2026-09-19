@@ -333,8 +333,10 @@ fn stmt(p: &mut Parser) {
         assert_stmt(p);
     } else if p.nth_at_contextual_kw(0, RAISE_KW) {
         raise_stmt(p);
-    } else if at_get_diag_stmt(p) {
+    } else if at_stmt_kw(p, GET_KW) {
         get_diag_stmt(p);
+    } else if at_stmt_kw(p, CLOSE_KW) {
+        close_stmt(p);
     } else if at_transaction_stmt(p) {
         transaction_stmt(p);
     } else if p.at(CASE_KW) {
@@ -574,7 +576,7 @@ const DIAG_ITEM_KINDS: [SyntaxKind; 13] = [
 ];
 
 fn get_diag_stmt(p: &mut Parser) {
-    assert!(at_get_diag_stmt(p));
+    assert!(at_stmt_kw(p, GET_KW));
     let m = p.start();
     p.bump_remap(GET_KW);
     opt_diag_area(p);
@@ -652,6 +654,29 @@ fn diag_kind(p: &mut Parser) {
         }
     }
     m.complete(p, PLPGSQL_DIAG_KIND);
+}
+
+fn close_stmt(p: &mut Parser) {
+    assert!(at_stmt_kw(p, CLOSE_KW));
+    let m = p.start();
+    p.bump(CLOSE_KW);
+    cursor_variable_ref(p);
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_CLOSE_STMT);
+}
+
+fn cursor_variable_ref(p: &mut Parser) {
+    if !at_name(p, 0) {
+        p.error(format!("expected a cursor variable, got {:?}", p.current()));
+        return;
+    }
+    name(p, PLPGSQL_CURSOR_VARIABLE_REF);
+    if p.at(DOT) || p.at(L_BRACK) {
+        let m = p.start();
+        p.error("a cursor variable must be a simple variable");
+        grammar::accessors(p);
+        m.complete(p, ERROR);
+    }
 }
 
 fn assign_stmt(p: &mut Parser) {
@@ -903,8 +928,8 @@ fn at_assign_target(p: &Parser) -> bool {
     at_name(p, 0) && (p.at_ts(grammar::NAME_FIRST) || p.at(POSITIONAL_PARAM))
 }
 
-fn at_get_diag_stmt(p: &Parser) -> bool {
-    p.nth_at_contextual_kw(0, GET_KW) && !p.nth_at(1, DOT)
+fn at_stmt_kw(p: &Parser, kw: SyntaxKind) -> bool {
+    at_maybe_contextual_kw(p, 0, kw) && !p.nth_at(1, DOT)
 }
 
 fn at_transaction_stmt(p: &Parser) -> bool {
