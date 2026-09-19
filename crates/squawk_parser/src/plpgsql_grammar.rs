@@ -343,6 +343,8 @@ fn stmt(p: &mut Parser) {
         move_stmt(p);
     } else if at_stmt_kw(p, CLOSE_KW) {
         close_stmt(p);
+    } else if at_stmt_kw(p, EXECUTE_KW) {
+        dyn_execute_stmt(p);
     } else if at_transaction_stmt(p) {
         transaction_stmt(p);
     } else if p.at(CASE_KW) {
@@ -701,6 +703,28 @@ fn fetch_stmt(p: &mut Parser) {
     m.complete(p, PLPGSQL_FETCH_STMT);
 }
 
+fn dyn_execute_stmt(p: &mut Parser) {
+    assert!(at_stmt_kw(p, EXECUTE_KW));
+    let m = p.start();
+    p.bump(EXECUTE_KW);
+    expr_until_into_or_using(p);
+    let mut into = false;
+    let mut using = false;
+    while !p.at(EOF) {
+        if !into && p.at(INTO_KW) {
+            into = true;
+            into_clause(p);
+        } else if !using && p.at(USING_KW) {
+            using = true;
+            opt_using_clause(p, expr);
+        } else {
+            break;
+        }
+    }
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_DYN_EXECUTE_STMT);
+}
+
 fn move_stmt(p: &mut Parser) {
     assert!(at_stmt_kw(p, MOVE_KW));
     let m = p.start();
@@ -726,6 +750,7 @@ fn into_clause(p: &mut Parser) {
     }
     let m = p.start();
     p.bump(INTO_KW);
+    p.eat(STRICT_KW);
     into_target_list(p);
     m.complete(p, PLPGSQL_INTO_CLAUSE);
 }
@@ -963,6 +988,14 @@ fn for_range(p: &mut Parser) {
 
 fn range_bound(p: &mut Parser) {
     if p.nth_at_contextual_kw(0, LOOP_KW) || p.at(BY_KW) {
+        p.error("expected an expression");
+        return;
+    }
+    expr(p);
+}
+
+fn expr_until_into_or_using(p: &mut Parser) {
+    if p.at(INTO_KW) || p.at(USING_KW) || p.at(SEMICOLON) {
         p.error("expected an expression");
         return;
     }

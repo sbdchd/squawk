@@ -2170,6 +2170,7 @@ PlpgsqlStmt =
 | PlpgsqlCloseStmt
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
+| PlpgsqlDynExecuteStmt
 | PlpgsqlExitStmt
 | PlpgsqlForCursorStmt
 | PlpgsqlForDynStmt
@@ -2521,8 +2522,16 @@ PlpgsqlFetchStmt =
   into_clause:PlpgsqlIntoClause
   ';'
 
+PlpgsqlDynExecuteStmt =
+  'execute'
+  query:Expr
+  into_clause:PlpgsqlIntoClause?
+  using_clause:PlpgsqlUsingClause?
+  ';'
+
 PlpgsqlIntoClause =
   'into'
+  'strict'?
   targets:PlpgsqlIntoTargetList
 
 PlpgsqlIntoTargetList =

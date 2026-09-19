@@ -96,22 +96,21 @@ PLPGSQL@0..350
                   R_BRACK@117..118 "]"
         SEMICOLON@118..119 ";"
       WHITESPACE@119..122 "\n  "
-      PLPGSQL_FETCH_STMT@122..141
+      PLPGSQL_FETCH_STMT@122..144
         FETCH_KW@122..127 "fetch"
         WHITESPACE@127..128 " "
         PLPGSQL_CURSOR_VARIABLE_REF@128..129
           IDENT@128..129 "c"
         WHITESPACE@129..130 " "
-        PLPGSQL_INTO_CLAUSE@130..141
+        PLPGSQL_INTO_CLAUSE@130..143
           INTO_KW@130..134 "into"
           WHITESPACE@134..135 " "
-          PLPGSQL_INTO_TARGET_LIST@135..141
-            PLPGSQL_INTO_TARGET@135..141
-              PLPGSQL_VAR_NAME_REF@135..141
-                STRICT_KW@135..141 "strict"
-      WHITESPACE@141..142 " "
-      ERROR@142..144
-        IDENT@142..143 "x"
+          STRICT_KW@135..141 "strict"
+          WHITESPACE@141..142 " "
+          PLPGSQL_INTO_TARGET_LIST@142..143
+            PLPGSQL_INTO_TARGET@142..143
+              PLPGSQL_VAR_NAME_REF@142..143
+                IDENT@142..143 "x"
         SEMICOLON@143..144 ";"
       WHITESPACE@144..147 "\n  "
       COMMENT@147..224 "-- FETCH can only ret ..."
@@ -220,14 +219,10 @@ error[syntax-error]: subscript not allowed
   ╭▸ 
 9 │   fetch c into x[1];
   ╰╴                ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: FETCH does not support STRICT
    ╭▸ 
 10 │   fetch c into strict x;
-   ╰╴                     ━
-error[syntax-error]: expected a statement, got IDENT
-   ╭▸ 
-10 │   fetch c into strict x;
-   ╰╴                      ━
+   ╰╴               ━━━━━━
 error[syntax-error]: FETCH statement cannot return multiple rows
    ╭▸ 
 12 │   fetch all from c into x;

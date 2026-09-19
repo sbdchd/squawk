@@ -55,7 +55,10 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 },
                 ast::PlpgsqlCaseWhen(it) => validate_no_bare_case_in_conds(it, errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
-                ast::PlpgsqlFetchStmt(it) => validate_fetch_single_row(it, errors),
+                ast::PlpgsqlFetchStmt(it) => {
+                    validate_fetch_no_strict(it.into_clause(), errors);
+                    validate_fetch_single_row(it, errors)
+                },
                 ast::PlpgsqlForCursorStmt(it) => validate_for_cursor_single_var(it, errors),
                 ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(it, errors),
                 ast::PlpgsqlForQueryStmt(it) => validate_for_query_no_reverse(it, errors),
@@ -391,6 +394,20 @@ fn validate_fetch_single_row(it: ast::PlpgsqlFetchStmt, acc: &mut Vec<SyntaxErro
             direction.syntax().text_range(),
         ));
     }
+}
+
+// -- err
+// fetch c into strict x;
+// -- ok
+// execute q into strict x;
+fn validate_fetch_no_strict(it: Option<ast::PlpgsqlIntoClause>, acc: &mut Vec<SyntaxError>) {
+    let Some(strict) = it.and_then(|it| it.strict_token()) else {
+        return;
+    };
+    acc.push(SyntaxError::new(
+        "FETCH does not support STRICT",
+        strict.text_range(),
+    ));
 }
 
 // -- err
