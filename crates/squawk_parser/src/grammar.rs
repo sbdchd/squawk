@@ -166,7 +166,7 @@ fn is_select_marker(cm: &CompletedMarker) -> bool {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum ExprKind {
+pub(crate) enum ExprKind {
     Other,
     Select,
 }
@@ -2323,7 +2323,7 @@ fn path_for_qualifier(
     }
 }
 
-fn opt_percent_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+pub(crate) fn opt_percent_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(PERCENT) && p.nth_at(1, TYPE_KW) {
         let m = p.start();
         p.bump(PERCENT);
@@ -2334,7 +2334,7 @@ fn opt_percent_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn opt_array_bound(p: &mut Parser<'_>) -> bool {
+pub(crate) fn opt_array_bound(p: &mut Parser<'_>) -> bool {
     if !p.at(L_BRACK) {
         return false;
     }
@@ -2547,7 +2547,7 @@ fn type_name(p: &mut Parser<'_>) {
     }
 }
 
-fn func_type(p: &mut Parser<'_>) {
+pub(crate) fn func_type(p: &mut Parser<'_>) {
     if opt_type_name_with(p, true, true).is_none() {
         p.error("expected type name");
     }
@@ -2997,7 +2997,7 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     m.complete(p, FIELD_EXPR)
 }
 
-fn expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
+pub(crate) fn expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     expr_bp(p, 1, &Restrictions::default())
 }
 
@@ -3539,6 +3539,29 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
             select_clause(p);
         }
     }
+    Some(select_tail(p, m, r, out_kind))
+}
+
+pub(crate) fn perform_select(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.nth_at_contextual_kw(0, PERFORM_KW));
+    let m = p.start();
+    let clause = p.start();
+    // Postgres rewrites this to `select` before passing to the sql parser, but
+    // we can't do that
+    p.bump_remap(PERFORM_KW);
+    opt_select_all_or_distinct(p);
+    opt_target_list(p);
+    clause.complete(p, SELECT_CLAUSE);
+    select_tail(p, m, &SelectRestrictions::default(), SELECT)
+}
+
+fn select_tail(
+    p: &mut Parser,
+    m: Marker,
+    r: &SelectRestrictions,
+    out_kind: SyntaxKind,
+) -> CompletedMarker {
+    let mut out_kind = out_kind;
     if opt_into_clause(p).is_some() {
         out_kind = SELECT_INTO;
     }
@@ -3550,20 +3573,20 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
     opt_window_clause(p);
     if p.at_ts(COMPOUND_SELECT_FIRST) && r.compound_allowed {
         let cm = m.complete(p, out_kind);
-        return Some(compound_select(p, cm, r));
+        return compound_select(p, cm, r);
     }
     if r.trailing_clauses {
         opt_select_trailing_clauses(p);
         // error recovery
         if p.at_ts(COMPOUND_SELECT_FIRST) && r.compound_allowed {
             let cm = m.complete(p, out_kind);
-            return Some(compound_select(p, cm, r));
+            return compound_select(p, cm, r);
         }
     }
     if r.semi_allowed {
         p.eat(SEMICOLON);
     }
-    Some(m.complete(p, out_kind))
+    m.complete(p, out_kind)
 }
 
 const SELECT_TRAILING_CLAUSES_FIRST: TokenSet =
@@ -4786,7 +4809,7 @@ fn at_period_column(p: &Parser<'_>) -> bool {
     p.at(PERIOD_KW) && p.nth_at_ts(1, NAME_REF_FIRST)
 }
 
-fn accessors(p: &mut Parser<'_>) {
+pub(crate) fn accessors(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         match p.current() {
             DOT => field_accessor(p),
@@ -4796,7 +4819,7 @@ fn accessors(p: &mut Parser<'_>) {
     }
 }
 
-fn field_accessor(p: &mut Parser<'_>) {
+pub(crate) fn field_accessor(p: &mut Parser<'_>) {
     assert!(p.at(DOT));
     let m = p.start();
     p.bump(DOT);
@@ -6266,7 +6289,7 @@ const COL_LABEL_FIRST: TokenSet = TokenSet::new(&[IDENT])
     .union(TYPE_FUNC_NAME_KEYWORDS)
     .union(RESERVED_KEYWORDS);
 
-const NAME_FIRST: TokenSet = TokenSet::new(&[IDENT])
+pub(crate) const NAME_FIRST: TokenSet = TokenSet::new(&[IDENT])
     .union(UNRESERVED_KEYWORDS)
     .union(COL_NAME_KEYWORD_FIRST);
 
@@ -7735,7 +7758,7 @@ fn commit(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, kind)
 }
 
-fn opt_chain_clause(p: &mut Parser<'_>) {
+pub(crate) fn opt_chain_clause(p: &mut Parser<'_>) {
     if !p.at(AND_KW) {
         return;
     }
@@ -7833,7 +7856,7 @@ fn begin(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // Sconst
-fn opt_string_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+pub(crate) fn opt_string_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at_ts(STRING_FIRST) {
         literal(p)
     } else {
@@ -7960,14 +7983,15 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 #[derive(Default)]
-struct StmtRestrictions {
+pub(crate) struct StmtRestrictions {
     begin_end_allowed: bool,
     semi_allowed: bool,
 }
 
-fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
+pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
     match (p.current(), p.nth(1)) {
-        (SEMICOLON, _) => Some(empty_stmt(p)),
+        (SEMICOLON, _) if r.semi_allowed => Some(empty_stmt(p)),
+        (SEMICOLON, _) => None,
         (ABORT_KW, _) => Some(rollback(p)),
         (ALTER_KW, AGGREGATE_KW) => Some(alter_aggregate(p)),
         (ALTER_KW, COLLATION_KW) => Some(alter_collation(p)),
@@ -8020,7 +8044,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (ALTER_KW, VIEW_KW) => Some(alter_view(p)),
         (ANALYZE_KW | ANALYSE_KW, _) => Some(analyze(p)),
         (BEGIN_KW, _) if r.begin_end_allowed => Some(begin(p)),
-        (CALL_KW, _) => Some(call(p)),
+        (CALL_KW, _) => Some(call(p, r.semi_allowed)),
         (CHECKPOINT_KW, _) => Some(checkpoint(p)),
         (CLOSE_KW, _) => Some(close(p)),
         (CLUSTER_KW, _) => Some(cluster(p)),
@@ -8120,7 +8144,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (DECLARE_KW, _) => Some(declare(p)),
         (DELETE_KW, _) => Some(delete(p, None, r.semi_allowed)),
         (DISCARD_KW, _) => Some(discard(p)),
-        (DO_KW, _) => Some(do_(p)),
+        (DO_KW, _) => Some(do_(p, r.semi_allowed)),
         (DROP_KW, ACCESS_KW) => Some(drop_access_method(p)),
         (DROP_KW, AGGREGATE_KW) => Some(drop_aggregate(p)),
         (DROP_KW, CAST_KW) => Some(drop_cast(p)),
@@ -15987,15 +16011,34 @@ fn opt_do_language(p: &mut Parser<'_>) {
 }
 
 // DO [ LANGUAGE lang_name ] code
-fn do_(p: &mut Parser<'_>) -> CompletedMarker {
+fn do_(p: &mut Parser<'_>, semi_allowed: bool) -> CompletedMarker {
     assert!(p.at(DO_KW));
     let m = p.start();
     p.bump(DO_KW);
     opt_do_language(p);
     string_literal(p);
     opt_do_language(p);
-    p.eat(SEMICOLON);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, DO)
+}
+
+pub(crate) fn opt_cursor_scroll(p: &mut Parser<'_>) {
+    match p.current() {
+        NO_KW => {
+            let m = p.start();
+            p.bump(NO_KW);
+            p.expect(SCROLL_KW);
+            m.complete(p, NO_SCROLL);
+        }
+        SCROLL_KW => {
+            let m = p.start();
+            p.bump(SCROLL_KW);
+            m.complete(p, SCROLL);
+        }
+        _ => (),
+    }
 }
 
 // DECLARE name [ BINARY ] [ ASENSITIVE | INSENSITIVE ] [ [ NO ] SCROLL ]
@@ -16022,20 +16065,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
         _ => (),
     }
     // [ [ NO ] SCROLL ]
-    match p.current() {
-        NO_KW => {
-            let m = p.start();
-            p.bump(NO_KW);
-            p.expect(SCROLL_KW);
-            m.complete(p, NO_SCROLL);
-        }
-        SCROLL_KW => {
-            let m = p.start();
-            p.bump(SCROLL_KW);
-            m.complete(p, SCROLL);
-        }
-        _ => (),
-    }
+    opt_cursor_scroll(p);
     p.expect(CURSOR_KW);
     // [ { WITH | WITHOUT } HOLD ]
     match p.current() {
@@ -16716,7 +16746,7 @@ fn preparable_stmt(p: &mut Parser<'_>) {
 
 // https://www.postgresql.org/docs/17/sql-call.html
 // CALL name ( [ argument ] [, ...] )
-fn call(p: &mut Parser<'_>) -> CompletedMarker {
+fn call(p: &mut Parser<'_>, semi_allowed: bool) -> CompletedMarker {
     assert!(p.at(CALL_KW));
     let m = p.start();
     p.bump(CALL_KW);
@@ -16726,7 +16756,9 @@ fn call(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected L_PAREN");
     }
-    p.eat(SEMICOLON);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, CALL)
 }
 
@@ -19522,7 +19554,7 @@ fn attribute_list(p: &mut Parser<'_>) {
     m.complete(p, ATTRIBUTE_LIST);
 }
 
-fn opt_collate(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+pub(crate) fn opt_collate(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if p.eat(COLLATE_KW) {
         collation_ref(p);

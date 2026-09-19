@@ -587,7 +587,6 @@ impl<'t> Parser<'t> {
     /// Advances the parser by one token, remapping its kind.
     /// This is useful to create contextual keywords from
     /// identifiers.
-    #[expect(dead_code, reason = "used by the PL/pgSQL grammar")]
     pub(crate) fn bump_remap(&mut self, kind: SyntaxKind) {
         if self.nth(0) == SyntaxKind::EOF {
             // FIXME: panic!?
@@ -597,7 +596,6 @@ impl<'t> Parser<'t> {
     }
 
     /// Checks if the nth token is contextual keyword `kw`.
-    #[expect(dead_code, reason = "used by the PL/pgSQL grammar")]
     pub(crate) fn nth_at_contextual_kw(&self, n: usize, kw: SyntaxKind) -> bool {
         self.inp.contextual_kind(self.pos + n) == kw
     }
@@ -669,6 +667,12 @@ impl<'t> Parser<'t> {
     #[must_use]
     pub(crate) fn nth_at_ts(&self, n: usize, kinds: TokenSet) -> bool {
         kinds.contains(self.nth(n))
+    }
+
+    /// Checks if the nth token is a contextual keyword in `kinds`.
+    #[must_use]
+    pub(crate) fn nth_at_contextual_ts(&self, n: usize, kinds: TokenSet) -> bool {
+        kinds.contains(self.inp.contextual_kind(self.pos + n))
     }
 
     #[must_use]

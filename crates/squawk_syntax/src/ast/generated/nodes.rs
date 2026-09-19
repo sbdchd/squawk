@@ -19320,6 +19320,10 @@ pub struct PathSegmentRef {
 }
 impl PathSegmentRef {
     #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
     }
@@ -19350,12 +19354,20 @@ pub struct PercentType {
 }
 impl PercentType {
     #[inline]
+    pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn percent_type_clause(&self) -> Option<PercentTypeClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
     }
     #[inline]
     pub fn setof_token(&self) -> Option<SyntaxToken> {
@@ -19399,8 +19411,841 @@ pub struct Plpgsql {
 }
 impl Plpgsql {
     #[inline]
-    pub fn stmts(&self) -> AstChildren<PlpgsqlNullStmt> {
+    pub fn block(&self) -> Option<PlpgsqlBlock> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn comp_options(&self) -> AstChildren<PlpgsqlCompOption> {
         support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlAliasDecl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlAliasDecl {
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn alias_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALIAS_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlAliasTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlAliasTarget {
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlAssertStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlAssertStmt {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn assert_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ASSERT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlAssignStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlAssignStmt {
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlAssignTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlAssignTarget {
+    #[inline]
+    pub fn accessors(&self) -> AstChildren<Accessor> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarNameRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlBlock {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlBlock {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn declare_section(&self) -> Option<PlpgsqlDeclareSection> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn exception(&self) -> Option<PlpgsqlExceptionSection> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn begin_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BEGIN_KW)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlBody {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlBody {
+    #[inline]
+    pub fn stmts(&self) -> AstChildren<PlpgsqlStmt> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCallStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCallStmt {
+    #[inline]
+    pub fn call(&self) -> Option<Call> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCaseStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCaseStmt {
+    #[inline]
+    pub fn else_clause(&self) -> Option<PlpgsqlElseClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn subject(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn whens(&self) -> AstChildren<PlpgsqlCaseWhen> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn case_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASE_KW)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCaseWhen {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCaseWhen {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn conds(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCommitStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCommitStmt {
+    #[inline]
+    pub fn chain_clause(&self) -> Option<ChainClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn commit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMIT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCompOptionDump {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCompOptionDump {
+    #[inline]
+    pub fn pound_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POUND)
+    }
+    #[inline]
+    pub fn dump_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DUMP_KW)
+    }
+    #[inline]
+    pub fn option_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPTION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCompOptionPrintStrictParams {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCompOptionPrintStrictParams {
+    #[inline]
+    pub fn option_value(&self) -> Option<PlpgsqlOptionValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn pound_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POUND)
+    }
+    #[inline]
+    pub fn print_strict_params_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PRINT_STRICT_PARAMS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCompOptionVariableConflict {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCompOptionVariableConflict {
+    #[inline]
+    pub fn pound_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POUND)
+    }
+    #[inline]
+    pub fn error_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ERROR_KW)
+    }
+    #[inline]
+    pub fn use_column_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USE_COLUMN_KW)
+    }
+    #[inline]
+    pub fn use_variable_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USE_VARIABLE_KW)
+    }
+    #[inline]
+    pub fn variable_conflict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VARIABLE_CONFLICT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCondition {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCondition {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
+    pub fn string_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STRING)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlContinueStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlContinueStmt {
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_clause(&self) -> Option<PlpgsqlExitWhen> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn continue_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONTINUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCursorArg {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCursorArg {
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<PlpgsqlDeclType> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCursorArgList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCursorArgList {
+    #[inline]
+    pub fn plpgsql_cursor_args(&self) -> AstChildren<PlpgsqlCursorArg> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlCursorDecl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlCursorDecl {
+    #[inline]
+    pub fn args(&self) -> Option<PlpgsqlCursorArgList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn query(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn scroll(&self) -> Option<CursorScroll> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn cursor_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURSOR_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDeclareSection {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDeclareSection {
+    #[inline]
+    pub fn decls(&self) -> AstChildren<PlpgsqlDecl> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn declare_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DECLARE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagArea {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagArea {
+    #[inline]
+    pub fn current_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_KW)
+    }
+    #[inline]
+    pub fn stacked_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STACKED_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagItem {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagItem {
+    #[inline]
+    pub fn kind(&self) -> Option<PlpgsqlDiagKind> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagItemList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagItemList {
+    #[inline]
+    pub fn plpgsql_diag_items(&self) -> AstChildren<PlpgsqlDiagItem> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagKind {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagKind {
+    #[inline]
+    pub fn column_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMN_NAME_KW)
+    }
+    #[inline]
+    pub fn constraint_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_NAME_KW)
+    }
+    #[inline]
+    pub fn message_text_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MESSAGE_TEXT_KW)
+    }
+    #[inline]
+    pub fn pg_context_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_CONTEXT_KW)
+    }
+    #[inline]
+    pub fn pg_datatype_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_DATATYPE_NAME_KW)
+    }
+    #[inline]
+    pub fn pg_exception_context_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_EXCEPTION_CONTEXT_KW)
+    }
+    #[inline]
+    pub fn pg_exception_detail_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_EXCEPTION_DETAIL_KW)
+    }
+    #[inline]
+    pub fn pg_exception_hint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_EXCEPTION_HINT_KW)
+    }
+    #[inline]
+    pub fn pg_routine_oid_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PG_ROUTINE_OID_KW)
+    }
+    #[inline]
+    pub fn returned_sqlstate_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RETURNED_SQLSTATE_KW)
+    }
+    #[inline]
+    pub fn row_count_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROW_COUNT_KW)
+    }
+    #[inline]
+    pub fn schema_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCHEMA_NAME_KW)
+    }
+    #[inline]
+    pub fn table_name_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_NAME_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDiagTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDiagTarget {
+    #[inline]
+    pub fn field_accessors(&self) -> AstChildren<FieldAccessor> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarNameRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlDoStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlDoStmt {
+    #[inline]
+    pub fn do_(&self) -> Option<Do> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlElseClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlElseClause {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn else_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ELSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlElsifClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlElsifClause {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn elseif_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ELSEIF_KW)
+    }
+    #[inline]
+    pub fn elsif_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ELSIF_KW)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExceptionHandler {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExceptionHandler {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn conditions(&self) -> AstChildren<PlpgsqlCondition> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExceptionSection {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExceptionSection {
+    #[inline]
+    pub fn handlers(&self) -> AstChildren<PlpgsqlExceptionHandler> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn exception_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXCEPTION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExitStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExitStmt {
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_clause(&self) -> Option<PlpgsqlExitWhen> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn exit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXIT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExitWhen {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExitWhen {
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlGetDiagStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlGetDiagStmt {
+    #[inline]
+    pub fn area(&self) -> Option<PlpgsqlDiagArea> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn items(&self) -> Option<PlpgsqlDiagItemList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn diagnostics_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DIAGNOSTICS_KW)
+    }
+    #[inline]
+    pub fn get_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlIfStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlIfStmt {
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn else_clause(&self) -> Option<PlpgsqlElseClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn elsifs(&self) -> AstChildren<PlpgsqlElsifClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn then_body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn if_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IF_KW)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLabel {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLabel {
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlLabelName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn less_less_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LESS_LESS)
+    }
+    #[inline]
+    pub fn greater_greater_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GREATER_GREATER)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLabelName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLabelName {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLabelNameRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLabelNameRef {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlLoopStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlLoopStmt {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOOP_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlNotNull {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlNotNull {
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn null_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULL_KW)
     }
 }
 
@@ -19416,6 +20261,627 @@ impl PlpgsqlNullStmt {
     #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NULL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlOptionValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlOptionValue {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlPercentRowtype {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlPercentRowtype {
+    #[inline]
+    pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn percent_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PERCENT)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
+    }
+    #[inline]
+    pub fn rowtype_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROWTYPE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlPerformStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlPerformStmt {
+    #[inline]
+    pub fn compound_select(&self) -> Option<CompoundSelect> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn select(&self) -> Option<Select> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn select_into(&self) -> Option<SelectInto> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseLevel {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseLevel {
+    #[inline]
+    pub fn debug_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEBUG_KW)
+    }
+    #[inline]
+    pub fn exception_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXCEPTION_KW)
+    }
+    #[inline]
+    pub fn info_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INFO_KW)
+    }
+    #[inline]
+    pub fn log_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOG_KW)
+    }
+    #[inline]
+    pub fn notice_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOTICE_KW)
+    }
+    #[inline]
+    pub fn warning_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WARNING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseMessage {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseMessage {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionColumn {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn column_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionConstraint {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionConstraint {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn constraint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionDatatype {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionDatatype {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn datatype_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DATATYPE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionDetail {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionDetail {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn detail_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DETAIL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionErrcode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionErrcode {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn errcode_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ERRCODE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionHint {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionHint {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn hint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::HINT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionMessage {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionMessage {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn message_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MESSAGE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionSchema {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionSchema {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn schema_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseOptionTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseOptionTable {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseStmt {
+    #[inline]
+    pub fn condition_name(&self) -> Option<PlpgsqlCondition> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn level(&self) -> Option<PlpgsqlRaiseLevel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn message(&self) -> Option<PlpgsqlRaiseMessage> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn params(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn using_clause(&self) -> Option<PlpgsqlRaiseUsingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn raise_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RAISE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRaiseUsingClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRaiseUsingClause {
+    #[inline]
+    pub fn plpgsql_raise_options(&self) -> AstChildren<PlpgsqlRaiseOption> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn using_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlReturnNextStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlReturnNextStmt {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn next_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NEXT_KW)
+    }
+    #[inline]
+    pub fn return_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RETURN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlReturnQueryExecuteStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlReturnQueryExecuteStmt {
+    #[inline]
+    pub fn query(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_clause(&self) -> Option<PlpgsqlUsingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn execute_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXECUTE_KW)
+    }
+    #[inline]
+    pub fn query_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::QUERY_KW)
+    }
+    #[inline]
+    pub fn return_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RETURN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlReturnQueryStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlReturnQueryStmt {
+    #[inline]
+    pub fn query(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn query_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::QUERY_KW)
+    }
+    #[inline]
+    pub fn return_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RETURN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlReturnStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlReturnStmt {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn return_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RETURN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlRollbackStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlRollbackStmt {
+    #[inline]
+    pub fn chain_clause(&self) -> Option<ChainClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn rollback_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROLLBACK_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlUsingClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlUsingClause {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn using_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlVarDecl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlVarDecl {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn init(&self) -> Option<PlpgsqlVarInit> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_null(&self) -> Option<PlpgsqlNotNull> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<PlpgsqlDeclType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn constant_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTANT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlVarInit {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlVarInit {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON_EQ)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlVarName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlVarName {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlVarNameRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlVarNameRef {
+    #[inline]
+    pub fn positional_param_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POSITIONAL_PARAM)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlWhileStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlWhileStmt {
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cond(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOOP_KW)
+    }
+    #[inline]
+    pub fn while_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHILE_KW)
     }
 }
 
@@ -23151,6 +24617,10 @@ impl SelectClause {
     #[inline]
     pub fn target_list(&self) -> Option<TargetList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn perform_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PERFORM_KW)
     }
     #[inline]
     pub fn select_token(&self) -> Option<SyntaxToken> {
@@ -28527,6 +29997,12 @@ pub enum AnyName {
     ParamNameRef(ParamNameRef),
     PathSegment(PathSegment),
     PathSegmentRef(PathSegmentRef),
+    PlpgsqlCondition(PlpgsqlCondition),
+    PlpgsqlLabelName(PlpgsqlLabelName),
+    PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
+    PlpgsqlOptionValue(PlpgsqlOptionValue),
+    PlpgsqlVarName(PlpgsqlVarName),
+    PlpgsqlVarNameRef(PlpgsqlVarNameRef),
     Policy(Policy),
     PolicyRef(PolicyRef),
     PreparedStatement(PreparedStatement),
@@ -28583,6 +30059,8 @@ pub enum AnyNameRef {
     NameRef(NameRef),
     ParamNameRef(ParamNameRef),
     PathSegmentRef(PathSegmentRef),
+    PlpgsqlLabelNameRef(PlpgsqlLabelNameRef),
+    PlpgsqlVarNameRef(PlpgsqlVarNameRef),
     PolicyRef(PolicyRef),
     PreparedStatementRef(PreparedStatementRef),
     PropertyNameRef(PropertyNameRef),
@@ -29424,6 +30902,64 @@ pub enum PathPrimary {
 pub enum Persistence {
     Temp(Temp),
     Unlogged(Unlogged),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlCompOption {
+    PlpgsqlCompOptionDump(PlpgsqlCompOptionDump),
+    PlpgsqlCompOptionPrintStrictParams(PlpgsqlCompOptionPrintStrictParams),
+    PlpgsqlCompOptionVariableConflict(PlpgsqlCompOptionVariableConflict),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlDecl {
+    PlpgsqlAliasDecl(PlpgsqlAliasDecl),
+    PlpgsqlCursorDecl(PlpgsqlCursorDecl),
+    PlpgsqlVarDecl(PlpgsqlVarDecl),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlDeclType {
+    PlpgsqlPercentRowtype(PlpgsqlPercentRowtype),
+    FuncType(FuncType),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlRaiseOption {
+    PlpgsqlRaiseOptionColumn(PlpgsqlRaiseOptionColumn),
+    PlpgsqlRaiseOptionConstraint(PlpgsqlRaiseOptionConstraint),
+    PlpgsqlRaiseOptionDatatype(PlpgsqlRaiseOptionDatatype),
+    PlpgsqlRaiseOptionDetail(PlpgsqlRaiseOptionDetail),
+    PlpgsqlRaiseOptionErrcode(PlpgsqlRaiseOptionErrcode),
+    PlpgsqlRaiseOptionHint(PlpgsqlRaiseOptionHint),
+    PlpgsqlRaiseOptionMessage(PlpgsqlRaiseOptionMessage),
+    PlpgsqlRaiseOptionSchema(PlpgsqlRaiseOptionSchema),
+    PlpgsqlRaiseOptionTable(PlpgsqlRaiseOptionTable),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlStmt {
+    PlpgsqlAssertStmt(PlpgsqlAssertStmt),
+    PlpgsqlAssignStmt(PlpgsqlAssignStmt),
+    PlpgsqlBlock(PlpgsqlBlock),
+    PlpgsqlCallStmt(PlpgsqlCallStmt),
+    PlpgsqlCaseStmt(PlpgsqlCaseStmt),
+    PlpgsqlCommitStmt(PlpgsqlCommitStmt),
+    PlpgsqlContinueStmt(PlpgsqlContinueStmt),
+    PlpgsqlDoStmt(PlpgsqlDoStmt),
+    PlpgsqlExitStmt(PlpgsqlExitStmt),
+    PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt),
+    PlpgsqlIfStmt(PlpgsqlIfStmt),
+    PlpgsqlLoopStmt(PlpgsqlLoopStmt),
+    PlpgsqlNullStmt(PlpgsqlNullStmt),
+    PlpgsqlPerformStmt(PlpgsqlPerformStmt),
+    PlpgsqlRaiseStmt(PlpgsqlRaiseStmt),
+    PlpgsqlReturnNextStmt(PlpgsqlReturnNextStmt),
+    PlpgsqlReturnQueryExecuteStmt(PlpgsqlReturnQueryExecuteStmt),
+    PlpgsqlReturnQueryStmt(PlpgsqlReturnQueryStmt),
+    PlpgsqlReturnStmt(PlpgsqlReturnStmt),
+    PlpgsqlRollbackStmt(PlpgsqlRollbackStmt),
+    PlpgsqlWhileStmt(PlpgsqlWhileStmt),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -46054,10 +47590,1198 @@ impl AstNode for Plpgsql {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlAliasDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ALIAS_DECL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlAliasTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ALIAS_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlAssertStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ASSERT_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlAssignStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ASSIGN_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlAssignTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ASSIGN_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlBlock {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_BLOCK
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlBody {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_BODY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCallStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CALL_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCaseStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CASE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCaseWhen {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CASE_WHEN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCommitStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_COMMIT_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCompOptionDump {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_COMP_OPTION_DUMP
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCompOptionPrintStrictParams {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCompOptionVariableConflict {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCondition {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CONDITION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlContinueStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CONTINUE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCursorArg {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CURSOR_ARG
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCursorArgList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CURSOR_ARG_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlCursorDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_CURSOR_DECL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDeclareSection {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DECLARE_SECTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagArea {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_AREA
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagItem {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_ITEM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagItemList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_ITEM_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagKind {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_KIND
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDiagTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DIAG_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlDoStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_DO_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlElseClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ELSE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlElsifClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ELSIF_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExceptionHandler {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXCEPTION_HANDLER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExceptionSection {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXCEPTION_SECTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExitStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXIT_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExitWhen {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXIT_WHEN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlGetDiagStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_GET_DIAG_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlIfStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_IF_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlLabel {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LABEL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlLabelName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LABEL_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlLabelNameRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LABEL_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlLoopStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_LOOP_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlNotNull {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_NOT_NULL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlNullStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_NULL_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlOptionValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_OPTION_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlPercentRowtype {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_PERCENT_ROWTYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlPerformStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_PERFORM_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseLevel {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_LEVEL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseMessage {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_MESSAGE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionConstraint {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_CONSTRAINT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionDatatype {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_DATATYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionDetail {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_DETAIL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionErrcode {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_ERRCODE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionHint {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_HINT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionMessage {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_MESSAGE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionSchema {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_SCHEMA
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseOptionTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_OPTION_TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRaiseUsingClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RAISE_USING_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlReturnNextStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RETURN_NEXT_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlReturnQueryExecuteStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RETURN_QUERY_EXECUTE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlReturnQueryStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RETURN_QUERY_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlReturnStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_RETURN_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlRollbackStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_ROLLBACK_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlUsingClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_USING_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlVarDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_VAR_DECL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlVarInit {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_VAR_INIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlVarName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_VAR_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlVarNameRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_VAR_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlWhileStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_WHILE_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -58447,6 +61171,12 @@ impl AstNode for AnyName {
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT
                 | SyntaxKind::PATH_SEGMENT_REF
+                | SyntaxKind::PLPGSQL_CONDITION
+                | SyntaxKind::PLPGSQL_LABEL_NAME
+                | SyntaxKind::PLPGSQL_LABEL_NAME_REF
+                | SyntaxKind::PLPGSQL_OPTION_VALUE
+                | SyntaxKind::PLPGSQL_VAR_NAME
+                | SyntaxKind::PLPGSQL_VAR_NAME_REF
                 | SyntaxKind::POLICY
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT
@@ -58558,6 +61288,20 @@ impl AstNode for AnyName {
             SyntaxKind::PARAM_NAME_REF => AnyName::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::PATH_SEGMENT => AnyName::PathSegment(PathSegment { syntax }),
             SyntaxKind::PATH_SEGMENT_REF => AnyName::PathSegmentRef(PathSegmentRef { syntax }),
+            SyntaxKind::PLPGSQL_CONDITION => AnyName::PlpgsqlCondition(PlpgsqlCondition { syntax }),
+            SyntaxKind::PLPGSQL_LABEL_NAME => {
+                AnyName::PlpgsqlLabelName(PlpgsqlLabelName { syntax })
+            }
+            SyntaxKind::PLPGSQL_LABEL_NAME_REF => {
+                AnyName::PlpgsqlLabelNameRef(PlpgsqlLabelNameRef { syntax })
+            }
+            SyntaxKind::PLPGSQL_OPTION_VALUE => {
+                AnyName::PlpgsqlOptionValue(PlpgsqlOptionValue { syntax })
+            }
+            SyntaxKind::PLPGSQL_VAR_NAME => AnyName::PlpgsqlVarName(PlpgsqlVarName { syntax }),
+            SyntaxKind::PLPGSQL_VAR_NAME_REF => {
+                AnyName::PlpgsqlVarNameRef(PlpgsqlVarNameRef { syntax })
+            }
             SyntaxKind::POLICY => AnyName::Policy(Policy { syntax }),
             SyntaxKind::POLICY_REF => AnyName::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT => {
@@ -58663,6 +61407,12 @@ impl AstNode for AnyName {
             AnyName::ParamNameRef(it) => &it.syntax,
             AnyName::PathSegment(it) => &it.syntax,
             AnyName::PathSegmentRef(it) => &it.syntax,
+            AnyName::PlpgsqlCondition(it) => &it.syntax,
+            AnyName::PlpgsqlLabelName(it) => &it.syntax,
+            AnyName::PlpgsqlLabelNameRef(it) => &it.syntax,
+            AnyName::PlpgsqlOptionValue(it) => &it.syntax,
+            AnyName::PlpgsqlVarName(it) => &it.syntax,
+            AnyName::PlpgsqlVarNameRef(it) => &it.syntax,
             AnyName::Policy(it) => &it.syntax,
             AnyName::PolicyRef(it) => &it.syntax,
             AnyName::PreparedStatement(it) => &it.syntax,
@@ -58983,6 +61733,42 @@ impl From<PathSegmentRef> for AnyName {
         AnyName::PathSegmentRef(node)
     }
 }
+impl From<PlpgsqlCondition> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlCondition) -> AnyName {
+        AnyName::PlpgsqlCondition(node)
+    }
+}
+impl From<PlpgsqlLabelName> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlLabelName) -> AnyName {
+        AnyName::PlpgsqlLabelName(node)
+    }
+}
+impl From<PlpgsqlLabelNameRef> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlLabelNameRef) -> AnyName {
+        AnyName::PlpgsqlLabelNameRef(node)
+    }
+}
+impl From<PlpgsqlOptionValue> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlOptionValue) -> AnyName {
+        AnyName::PlpgsqlOptionValue(node)
+    }
+}
+impl From<PlpgsqlVarName> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlVarName) -> AnyName {
+        AnyName::PlpgsqlVarName(node)
+    }
+}
+impl From<PlpgsqlVarNameRef> for AnyName {
+    #[inline]
+    fn from(node: PlpgsqlVarNameRef) -> AnyName {
+        AnyName::PlpgsqlVarNameRef(node)
+    }
+}
 impl From<Policy> for AnyName {
     #[inline]
     fn from(node: Policy) -> AnyName {
@@ -59215,6 +62001,8 @@ impl AstNode for AnyNameRef {
                 | SyntaxKind::NAME_REF
                 | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::PATH_SEGMENT_REF
+                | SyntaxKind::PLPGSQL_LABEL_NAME_REF
+                | SyntaxKind::PLPGSQL_VAR_NAME_REF
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT_REF
                 | SyntaxKind::PROPERTY_NAME_REF
@@ -59266,6 +62054,12 @@ impl AstNode for AnyNameRef {
             SyntaxKind::NAME_REF => AnyNameRef::NameRef(NameRef { syntax }),
             SyntaxKind::PARAM_NAME_REF => AnyNameRef::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::PATH_SEGMENT_REF => AnyNameRef::PathSegmentRef(PathSegmentRef { syntax }),
+            SyntaxKind::PLPGSQL_LABEL_NAME_REF => {
+                AnyNameRef::PlpgsqlLabelNameRef(PlpgsqlLabelNameRef { syntax })
+            }
+            SyntaxKind::PLPGSQL_VAR_NAME_REF => {
+                AnyNameRef::PlpgsqlVarNameRef(PlpgsqlVarNameRef { syntax })
+            }
             SyntaxKind::POLICY_REF => AnyNameRef::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT_REF => {
                 AnyNameRef::PreparedStatementRef(PreparedStatementRef { syntax })
@@ -59313,6 +62107,8 @@ impl AstNode for AnyNameRef {
             AnyNameRef::NameRef(it) => &it.syntax,
             AnyNameRef::ParamNameRef(it) => &it.syntax,
             AnyNameRef::PathSegmentRef(it) => &it.syntax,
+            AnyNameRef::PlpgsqlLabelNameRef(it) => &it.syntax,
+            AnyNameRef::PlpgsqlVarNameRef(it) => &it.syntax,
             AnyNameRef::PolicyRef(it) => &it.syntax,
             AnyNameRef::PreparedStatementRef(it) => &it.syntax,
             AnyNameRef::PropertyNameRef(it) => &it.syntax,
@@ -59431,6 +62227,18 @@ impl From<PathSegmentRef> for AnyNameRef {
     #[inline]
     fn from(node: PathSegmentRef) -> AnyNameRef {
         AnyNameRef::PathSegmentRef(node)
+    }
+}
+impl From<PlpgsqlLabelNameRef> for AnyNameRef {
+    #[inline]
+    fn from(node: PlpgsqlLabelNameRef) -> AnyNameRef {
+        AnyNameRef::PlpgsqlLabelNameRef(node)
+    }
+}
+impl From<PlpgsqlVarNameRef> for AnyNameRef {
+    #[inline]
+    fn from(node: PlpgsqlVarNameRef) -> AnyNameRef {
+        AnyNameRef::PlpgsqlVarNameRef(node)
     }
 }
 impl From<PolicyRef> for AnyNameRef {
@@ -65753,6 +68561,524 @@ impl From<Unlogged> for Persistence {
     #[inline]
     fn from(node: Unlogged) -> Persistence {
         Persistence::Unlogged(node)
+    }
+}
+impl AstNode for PlpgsqlCompOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PLPGSQL_COMP_OPTION_DUMP
+                | SyntaxKind::PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS
+                | SyntaxKind::PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_COMP_OPTION_DUMP => {
+                PlpgsqlCompOption::PlpgsqlCompOptionDump(PlpgsqlCompOptionDump { syntax })
+            }
+            SyntaxKind::PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS => {
+                PlpgsqlCompOption::PlpgsqlCompOptionPrintStrictParams(
+                    PlpgsqlCompOptionPrintStrictParams { syntax },
+                )
+            }
+            SyntaxKind::PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT => {
+                PlpgsqlCompOption::PlpgsqlCompOptionVariableConflict(
+                    PlpgsqlCompOptionVariableConflict { syntax },
+                )
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlCompOption::PlpgsqlCompOptionDump(it) => &it.syntax,
+            PlpgsqlCompOption::PlpgsqlCompOptionPrintStrictParams(it) => &it.syntax,
+            PlpgsqlCompOption::PlpgsqlCompOptionVariableConflict(it) => &it.syntax,
+        }
+    }
+}
+impl From<PlpgsqlCompOptionDump> for PlpgsqlCompOption {
+    #[inline]
+    fn from(node: PlpgsqlCompOptionDump) -> PlpgsqlCompOption {
+        PlpgsqlCompOption::PlpgsqlCompOptionDump(node)
+    }
+}
+impl From<PlpgsqlCompOptionPrintStrictParams> for PlpgsqlCompOption {
+    #[inline]
+    fn from(node: PlpgsqlCompOptionPrintStrictParams) -> PlpgsqlCompOption {
+        PlpgsqlCompOption::PlpgsqlCompOptionPrintStrictParams(node)
+    }
+}
+impl From<PlpgsqlCompOptionVariableConflict> for PlpgsqlCompOption {
+    #[inline]
+    fn from(node: PlpgsqlCompOptionVariableConflict) -> PlpgsqlCompOption {
+        PlpgsqlCompOption::PlpgsqlCompOptionVariableConflict(node)
+    }
+}
+impl AstNode for PlpgsqlDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PLPGSQL_ALIAS_DECL
+                | SyntaxKind::PLPGSQL_CURSOR_DECL
+                | SyntaxKind::PLPGSQL_VAR_DECL
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_ALIAS_DECL => {
+                PlpgsqlDecl::PlpgsqlAliasDecl(PlpgsqlAliasDecl { syntax })
+            }
+            SyntaxKind::PLPGSQL_CURSOR_DECL => {
+                PlpgsqlDecl::PlpgsqlCursorDecl(PlpgsqlCursorDecl { syntax })
+            }
+            SyntaxKind::PLPGSQL_VAR_DECL => PlpgsqlDecl::PlpgsqlVarDecl(PlpgsqlVarDecl { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlDecl::PlpgsqlAliasDecl(it) => &it.syntax,
+            PlpgsqlDecl::PlpgsqlCursorDecl(it) => &it.syntax,
+            PlpgsqlDecl::PlpgsqlVarDecl(it) => &it.syntax,
+        }
+    }
+}
+impl From<PlpgsqlAliasDecl> for PlpgsqlDecl {
+    #[inline]
+    fn from(node: PlpgsqlAliasDecl) -> PlpgsqlDecl {
+        PlpgsqlDecl::PlpgsqlAliasDecl(node)
+    }
+}
+impl From<PlpgsqlCursorDecl> for PlpgsqlDecl {
+    #[inline]
+    fn from(node: PlpgsqlCursorDecl) -> PlpgsqlDecl {
+        PlpgsqlDecl::PlpgsqlCursorDecl(node)
+    }
+}
+impl From<PlpgsqlVarDecl> for PlpgsqlDecl {
+    #[inline]
+    fn from(node: PlpgsqlVarDecl) -> PlpgsqlDecl {
+        PlpgsqlDecl::PlpgsqlVarDecl(node)
+    }
+}
+impl AstNode for PlpgsqlDeclType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::PLPGSQL_PERCENT_ROWTYPE) || FuncType::can_cast(kind)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_PERCENT_ROWTYPE => {
+                PlpgsqlDeclType::PlpgsqlPercentRowtype(PlpgsqlPercentRowtype { syntax })
+            }
+            _ => {
+                if let Some(result) = FuncType::cast(syntax.clone()) {
+                    return Some(PlpgsqlDeclType::FuncType(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlDeclType::PlpgsqlPercentRowtype(it) => &it.syntax,
+            PlpgsqlDeclType::FuncType(it) => it.syntax(),
+        }
+    }
+}
+impl From<PlpgsqlPercentRowtype> for PlpgsqlDeclType {
+    #[inline]
+    fn from(node: PlpgsqlPercentRowtype) -> PlpgsqlDeclType {
+        PlpgsqlDeclType::PlpgsqlPercentRowtype(node)
+    }
+}
+impl AstNode for PlpgsqlRaiseOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PLPGSQL_RAISE_OPTION_COLUMN
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_CONSTRAINT
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_DATATYPE
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_DETAIL
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_ERRCODE
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_HINT
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_MESSAGE
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_SCHEMA
+                | SyntaxKind::PLPGSQL_RAISE_OPTION_TABLE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_RAISE_OPTION_COLUMN => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionColumn(PlpgsqlRaiseOptionColumn { syntax })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_CONSTRAINT => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionConstraint(PlpgsqlRaiseOptionConstraint {
+                    syntax,
+                })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_DATATYPE => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionDatatype(PlpgsqlRaiseOptionDatatype {
+                    syntax,
+                })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_DETAIL => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionDetail(PlpgsqlRaiseOptionDetail { syntax })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_ERRCODE => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionErrcode(PlpgsqlRaiseOptionErrcode { syntax })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_HINT => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionHint(PlpgsqlRaiseOptionHint { syntax })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_MESSAGE => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionMessage(PlpgsqlRaiseOptionMessage { syntax })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_SCHEMA => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionSchema(PlpgsqlRaiseOptionSchema { syntax })
+            }
+            SyntaxKind::PLPGSQL_RAISE_OPTION_TABLE => {
+                PlpgsqlRaiseOption::PlpgsqlRaiseOptionTable(PlpgsqlRaiseOptionTable { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionColumn(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionConstraint(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionDatatype(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionDetail(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionErrcode(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionHint(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionMessage(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionSchema(it) => &it.syntax,
+            PlpgsqlRaiseOption::PlpgsqlRaiseOptionTable(it) => &it.syntax,
+        }
+    }
+}
+impl From<PlpgsqlRaiseOptionColumn> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionColumn) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionColumn(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionConstraint> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionConstraint) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionConstraint(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionDatatype> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionDatatype) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionDatatype(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionDetail> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionDetail) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionDetail(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionErrcode> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionErrcode) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionErrcode(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionHint> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionHint) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionHint(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionMessage> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionMessage) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionMessage(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionSchema> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionSchema) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionSchema(node)
+    }
+}
+impl From<PlpgsqlRaiseOptionTable> for PlpgsqlRaiseOption {
+    #[inline]
+    fn from(node: PlpgsqlRaiseOptionTable) -> PlpgsqlRaiseOption {
+        PlpgsqlRaiseOption::PlpgsqlRaiseOptionTable(node)
+    }
+}
+impl AstNode for PlpgsqlStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PLPGSQL_ASSERT_STMT
+                | SyntaxKind::PLPGSQL_ASSIGN_STMT
+                | SyntaxKind::PLPGSQL_BLOCK
+                | SyntaxKind::PLPGSQL_CALL_STMT
+                | SyntaxKind::PLPGSQL_CASE_STMT
+                | SyntaxKind::PLPGSQL_COMMIT_STMT
+                | SyntaxKind::PLPGSQL_CONTINUE_STMT
+                | SyntaxKind::PLPGSQL_DO_STMT
+                | SyntaxKind::PLPGSQL_EXIT_STMT
+                | SyntaxKind::PLPGSQL_GET_DIAG_STMT
+                | SyntaxKind::PLPGSQL_IF_STMT
+                | SyntaxKind::PLPGSQL_LOOP_STMT
+                | SyntaxKind::PLPGSQL_NULL_STMT
+                | SyntaxKind::PLPGSQL_PERFORM_STMT
+                | SyntaxKind::PLPGSQL_RAISE_STMT
+                | SyntaxKind::PLPGSQL_RETURN_NEXT_STMT
+                | SyntaxKind::PLPGSQL_RETURN_QUERY_EXECUTE_STMT
+                | SyntaxKind::PLPGSQL_RETURN_QUERY_STMT
+                | SyntaxKind::PLPGSQL_RETURN_STMT
+                | SyntaxKind::PLPGSQL_ROLLBACK_STMT
+                | SyntaxKind::PLPGSQL_WHILE_STMT
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_ASSERT_STMT => {
+                PlpgsqlStmt::PlpgsqlAssertStmt(PlpgsqlAssertStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_ASSIGN_STMT => {
+                PlpgsqlStmt::PlpgsqlAssignStmt(PlpgsqlAssignStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_BLOCK => PlpgsqlStmt::PlpgsqlBlock(PlpgsqlBlock { syntax }),
+            SyntaxKind::PLPGSQL_CALL_STMT => {
+                PlpgsqlStmt::PlpgsqlCallStmt(PlpgsqlCallStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_CASE_STMT => {
+                PlpgsqlStmt::PlpgsqlCaseStmt(PlpgsqlCaseStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_COMMIT_STMT => {
+                PlpgsqlStmt::PlpgsqlCommitStmt(PlpgsqlCommitStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_CONTINUE_STMT => {
+                PlpgsqlStmt::PlpgsqlContinueStmt(PlpgsqlContinueStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_DO_STMT => PlpgsqlStmt::PlpgsqlDoStmt(PlpgsqlDoStmt { syntax }),
+            SyntaxKind::PLPGSQL_EXIT_STMT => {
+                PlpgsqlStmt::PlpgsqlExitStmt(PlpgsqlExitStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_GET_DIAG_STMT => {
+                PlpgsqlStmt::PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_IF_STMT => PlpgsqlStmt::PlpgsqlIfStmt(PlpgsqlIfStmt { syntax }),
+            SyntaxKind::PLPGSQL_LOOP_STMT => {
+                PlpgsqlStmt::PlpgsqlLoopStmt(PlpgsqlLoopStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_NULL_STMT => {
+                PlpgsqlStmt::PlpgsqlNullStmt(PlpgsqlNullStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_PERFORM_STMT => {
+                PlpgsqlStmt::PlpgsqlPerformStmt(PlpgsqlPerformStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_RAISE_STMT => {
+                PlpgsqlStmt::PlpgsqlRaiseStmt(PlpgsqlRaiseStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_RETURN_NEXT_STMT => {
+                PlpgsqlStmt::PlpgsqlReturnNextStmt(PlpgsqlReturnNextStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_RETURN_QUERY_EXECUTE_STMT => {
+                PlpgsqlStmt::PlpgsqlReturnQueryExecuteStmt(PlpgsqlReturnQueryExecuteStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_RETURN_QUERY_STMT => {
+                PlpgsqlStmt::PlpgsqlReturnQueryStmt(PlpgsqlReturnQueryStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_RETURN_STMT => {
+                PlpgsqlStmt::PlpgsqlReturnStmt(PlpgsqlReturnStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_ROLLBACK_STMT => {
+                PlpgsqlStmt::PlpgsqlRollbackStmt(PlpgsqlRollbackStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_WHILE_STMT => {
+                PlpgsqlStmt::PlpgsqlWhileStmt(PlpgsqlWhileStmt { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlStmt::PlpgsqlAssertStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlAssignStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlBlock(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlCallStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlCaseStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlCommitStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlContinueStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlDoStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlExitStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlGetDiagStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlIfStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlLoopStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlNullStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlPerformStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlRaiseStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlReturnNextStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlReturnQueryExecuteStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlReturnQueryStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlReturnStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlRollbackStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlWhileStmt(it) => &it.syntax,
+        }
+    }
+}
+impl From<PlpgsqlAssertStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlAssertStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlAssertStmt(node)
+    }
+}
+impl From<PlpgsqlAssignStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlAssignStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlAssignStmt(node)
+    }
+}
+impl From<PlpgsqlBlock> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlBlock) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlBlock(node)
+    }
+}
+impl From<PlpgsqlCallStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlCallStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlCallStmt(node)
+    }
+}
+impl From<PlpgsqlCaseStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlCaseStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlCaseStmt(node)
+    }
+}
+impl From<PlpgsqlCommitStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlCommitStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlCommitStmt(node)
+    }
+}
+impl From<PlpgsqlContinueStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlContinueStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlContinueStmt(node)
+    }
+}
+impl From<PlpgsqlDoStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlDoStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlDoStmt(node)
+    }
+}
+impl From<PlpgsqlExitStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlExitStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlExitStmt(node)
+    }
+}
+impl From<PlpgsqlGetDiagStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlGetDiagStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlGetDiagStmt(node)
+    }
+}
+impl From<PlpgsqlIfStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlIfStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlIfStmt(node)
+    }
+}
+impl From<PlpgsqlLoopStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlLoopStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlLoopStmt(node)
+    }
+}
+impl From<PlpgsqlNullStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlNullStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlNullStmt(node)
+    }
+}
+impl From<PlpgsqlPerformStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlPerformStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlPerformStmt(node)
+    }
+}
+impl From<PlpgsqlRaiseStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlRaiseStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlRaiseStmt(node)
+    }
+}
+impl From<PlpgsqlReturnNextStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlReturnNextStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlReturnNextStmt(node)
+    }
+}
+impl From<PlpgsqlReturnQueryExecuteStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlReturnQueryExecuteStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlReturnQueryExecuteStmt(node)
+    }
+}
+impl From<PlpgsqlReturnQueryStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlReturnQueryStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlReturnQueryStmt(node)
+    }
+}
+impl From<PlpgsqlReturnStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlReturnStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlReturnStmt(node)
+    }
+}
+impl From<PlpgsqlRollbackStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlRollbackStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlRollbackStmt(node)
+    }
+}
+impl From<PlpgsqlWhileStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlWhileStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlWhileStmt(node)
     }
 }
 impl AstNode for PolicyCommandKind {

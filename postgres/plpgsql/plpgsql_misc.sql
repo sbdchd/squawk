@@ -18,8 +18,8 @@ $$
   end
 $$;
 
-\sf test1
-\sf test2
+-- \sf test1
+-- \sf test2
 
 -- Test %TYPE and %ROWTYPE error cases
 create table misc_table(f1 int);

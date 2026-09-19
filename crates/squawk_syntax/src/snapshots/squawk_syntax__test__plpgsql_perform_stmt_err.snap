@@ -1,0 +1,170 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/perform_stmt.sql
+---
+PLPGSQL@0..168
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..167
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..163
+      PLPGSQL_PERFORM_STMT@9..22
+        SELECT@9..21
+          SELECT_CLAUSE@9..16
+            PERFORM_KW@9..16 "perform"
+          WHITESPACE@16..17 " "
+          FROM_CLAUSE@17..21
+            FROM_KW@17..21 "from"
+        SEMICOLON@21..22 ";"
+      WHITESPACE@22..25 "\n  "
+      PLPGSQL_PERFORM_STMT@25..42
+        SELECT_INTO@25..41
+          SELECT_CLAUSE@25..34
+            PERFORM_KW@25..32 "perform"
+            WHITESPACE@32..33 " "
+            TARGET_LIST@33..34
+              TARGET@33..34
+                LITERAL@33..34
+                  INT_NUMBER@33..34 "1"
+          WHITESPACE@34..35 " "
+          INTO_CLAUSE@35..41
+            INTO_KW@35..39 "into"
+            WHITESPACE@39..40 " "
+            TABLE_NAME@40..41
+              PATH@40..41
+                PATH_SEGMENT@40..41
+                  IDENT@40..41 "x"
+        SEMICOLON@41..42 ";"
+      WHITESPACE@42..45 "\n  "
+      PLPGSQL_PERFORM_STMT@45..66
+        SELECT_INTO@45..66
+          SELECT_CLAUSE@45..54
+            PERFORM_KW@45..52 "perform"
+            WHITESPACE@52..53 " "
+            TARGET_LIST@53..54
+              TARGET@53..54
+                LITERAL@53..54
+                  INT_NUMBER@53..54 "1"
+          WHITESPACE@54..55 " "
+          INTO_CLAUSE@55..66
+            INTO_KW@55..59 "into"
+            WHITESPACE@59..60 " "
+            TABLE_NAME@60..66
+              PATH@60..66
+                PATH_SEGMENT@60..66
+                  STRICT_KW@60..66 "strict"
+      WHITESPACE@66..67 " "
+      ERROR@67..69
+        IDENT@67..68 "x"
+        SEMICOLON@68..69 ";"
+      WHITESPACE@69..72 "\n  "
+      PLPGSQL_PERFORM_STMT@72..79
+        SELECT@72..79
+          SELECT_CLAUSE@72..79
+            PERFORM_KW@72..79 "perform"
+      WHITESPACE@79..80 " "
+      ERROR@80..117
+        WITH_KW@80..84 "with"
+        WHITESPACE@84..85 " "
+        IDENT@85..86 "x"
+        WHITESPACE@86..87 " "
+        AS_KW@87..89 "as"
+        WHITESPACE@89..90 " "
+        L_PAREN@90..91 "("
+        SELECT_KW@91..97 "select"
+        WHITESPACE@97..98 " "
+        INT_NUMBER@98..99 "1"
+        R_PAREN@99..100 ")"
+        WHITESPACE@100..101 " "
+        SELECT_KW@101..107 "select"
+        WHITESPACE@107..108 " "
+        STAR@108..109 "*"
+        WHITESPACE@109..110 " "
+        FROM_KW@110..114 "from"
+        WHITESPACE@114..115 " "
+        IDENT@115..116 "x"
+        SEMICOLON@116..117 ";"
+      WHITESPACE@117..120 "\n  "
+      PLPGSQL_PERFORM_STMT@120..133
+        SELECT@120..133
+          SELECT_CLAUSE@120..133
+            PERFORM_KW@120..127 "perform"
+            WHITESPACE@127..128 " "
+            TARGET_LIST@128..133
+              ERROR@128..133
+                TABLE_KW@128..133 "table"
+      WHITESPACE@133..134 " "
+      ERROR@134..141
+        IDENT@134..140 "onecol"
+        SEMICOLON@140..141 ";"
+      WHITESPACE@141..144 "\n  "
+      PLPGSQL_PERFORM_STMT@144..163
+        SELECT@144..162
+          SELECT_CLAUSE@144..162
+            PERFORM_KW@144..151 "perform"
+            WHITESPACE@151..152 " "
+            TARGET_LIST@152..162
+              TARGET@152..162
+                CALL_EXPR@152..162
+                  NAME_REF@152..158
+                    VALUES_KW@152..158 "values"
+                  WHITESPACE@158..159 " "
+                  ARG_LIST@159..162
+                    L_PAREN@159..160 "("
+                    ARG@160..161
+                      LITERAL@160..161
+                        INT_NUMBER@160..161 "1"
+                    R_PAREN@161..162 ")"
+        SEMICOLON@162..163 ";"
+    WHITESPACE@163..164 "\n"
+    END_KW@164..167 "end"
+  WHITESPACE@167..168 "\n"
+
+error[syntax-error]: expected from item, got SEMICOLON
+  ╭▸ 
+3 │   perform from;
+  ╰╴              ━
+error[syntax-error]: SELECT ... INTO is not allowed here
+  ╭▸ 
+4 │   perform 1 into x;
+  ╰╴  ━━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+  ╭▸ 
+5 │   perform 1 into strict x;
+  ╰╴  ━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+5 │   perform 1 into strict x;
+  ╰╴                       ━
+error[syntax-error]: expected a statement, got IDENT
+  ╭▸ 
+5 │   perform 1 into strict x;
+  ╰╴                        ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+6 │   perform with x as (select 1) select * from x;
+  ╰╴         ━
+error[syntax-error]: expected a statement, got WITH_KW
+  ╭▸ 
+6 │   perform with x as (select 1) select * from x;
+  ╰╴          ━
+error[syntax-error]: expected an expression, found TABLE_KW
+  ╭▸ 
+7 │   perform table onecol;
+  ╰╴          ━
+error[syntax-error]: expected an expression in target_el, found IDENT
+  ╭▸ 
+7 │   perform table onecol;
+  ╰╴               ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+7 │   perform table onecol;
+  ╰╴               ━
+error[syntax-error]: expected a statement, got IDENT
+  ╭▸ 
+7 │   perform table onecol;
+  ╰╴                ━
+error[syntax-error]: `values` is not a valid function name
+  ╭▸ 
+8 │   perform values (1);
+  ╰╴          ━━━━━━

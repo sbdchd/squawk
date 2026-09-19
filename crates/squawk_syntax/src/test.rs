@@ -11,7 +11,7 @@ use crate::{
     syntax_error::SyntaxError,
 };
 
-fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
+pub(crate) fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
     let mut rendered = String::new();
     let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
 
@@ -116,6 +116,89 @@ fn plpgsql_bodies(parse: &Parse<SourceFile>) -> Vec<Plpgsql> {
         .collect()
 }
 
+fn plpgsql_fixture(sql: &str) -> (String, Vec<SyntaxError>) {
+    let parse = SourceFile::parse(sql);
+    assert!(
+        parse.errors().is_empty(),
+        "plpgsql fixtures must be valid sql:\n{}",
+        render_errors(sql, &parse.errors())
+    );
+
+    let bodies = plpgsql_bodies(&parse);
+    assert!(!bodies.is_empty(), "no plpgsql bodies found");
+
+    let mut buffer = String::new();
+    let mut errors = vec![];
+    for body in bodies {
+        if !buffer.is_empty() {
+            buffer.push_str("---\n");
+        }
+        buffer.push_str(&format!("{:#?}", body.syntax()));
+        errors.extend(body.errors());
+    }
+
+    if !errors.is_empty() {
+        buffer.push('\n');
+        buffer.push_str(&render_errors(sql, &errors));
+    }
+
+    (buffer, errors)
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/../squawk_parser/tests/data/plpgsql/ok",
+    glob: "*.sql",
+)]
+fn plpgsql_ok(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let input_file = Utf8Path::new(fixture.path());
+    let test_name = input_file
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let (buffer, errors) = plpgsql_fixture(content);
+
+    with_settings!({
+      omit_expression => true,
+      input_file => input_file,
+    }, {
+      assert_snapshot!(format!("plpgsql_{test_name}_ok"), buffer);
+    });
+
+    assert!(
+        errors.is_empty(),
+        "tests defined in `plpgsql/ok` can't have parser errors."
+    );
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/../squawk_parser/tests/data/plpgsql/err",
+    glob: "*.sql",
+)]
+fn plpgsql_err(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let input_file = Utf8Path::new(fixture.path());
+    let test_name = input_file
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let (buffer, errors) = plpgsql_fixture(content);
+
+    with_settings!({
+      omit_expression => true,
+      input_file => input_file,
+    }, {
+      assert_snapshot!(format!("plpgsql_{test_name}_err"), buffer);
+    });
+
+    assert!(
+        !errors.is_empty(),
+        "tests defined in `plpgsql/err` must have parser errors."
+    );
+}
+
 fn token_counts(node: &SyntaxNode) -> (usize, usize) {
     let mut total = 0;
     let mut unparsed = 0;
@@ -137,39 +220,48 @@ fn token_counts(node: &SyntaxNode) -> (usize, usize) {
 
 #[test]
 fn plpgsql_suite_score() {
-    let dir = Utf8Path::new(env!("CARGO_MANIFEST_DIR")).join("../../postgres/plpgsql");
-    let mut files = std::fs::read_dir(&dir)
+    let root = Utf8Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let mut files = std::fs::read_dir(root.join("postgres/plpgsql"))
         .unwrap()
         .map(|entry| Utf8PathBuf::try_from(entry.unwrap().path()).unwrap())
         .filter(|path| path.extension() == Some("sql"))
         .collect::<Vec<_>>();
-    files.sort();
+    files.push(root.join("postgres/regression_suite/plpgsql.sql"));
+    files.sort_by(|a, b| a.file_name().cmp(&b.file_name()));
 
-    let row = |label: &str, counts: [usize; 5]| {
-        let [sql, bodies, tokens, unparsed, err] = counts;
-        format!("{label:<25}{sql:>6}{bodies:>8}{tokens:>8}{unparsed:>10}{err:>6}\n")
+    let row = |label: &str, counts: [usize; 4]| {
+        let [bodies, tokens, unparsed, err] = counts;
+        format!("{label:<25}{bodies:>8}{tokens:>8}{unparsed:>10}{err:>6}\n")
     };
 
     let mut table = format!(
-        "{:<25}{:>6}{:>8}{:>8}{:>10}{:>6}\n",
-        "file", "sql", "bodies", "tokens", "unparsed", "err"
+        "{:<25}{:>8}{:>8}{:>10}{:>6}\n",
+        "file", "bodies", "tokens", "unparsed", "err"
     );
-    let mut totals = [0; 5];
+    let mut totals = [0; 4];
 
     for path in &files {
         let content = std::fs::read_to_string(path).unwrap();
         let parse = SourceFile::parse(&content);
+        let file_name = path.file_name().unwrap();
+
+        assert!(
+            parse.errors().is_empty(),
+            "`{file_name}` must parse as sql, otherwise the tree can hide bodies:\n{}",
+            render_errors(&content, &parse.errors())
+        );
+
         let bodies = plpgsql_bodies(&parse);
 
-        let mut counts = [parse.errors().len(), bodies.len(), 0, 0, 0];
-        for body in &bodies {
+        let mut counts = [bodies.len(), 0, 0, 0];
+        for body in bodies {
             let (tokens, unparsed) = token_counts(&body.syntax());
-            counts[2] += tokens;
-            counts[3] += unparsed;
-            counts[4] += body.errors().len();
+            counts[1] += tokens;
+            counts[2] += unparsed;
+            counts[3] += body.errors().len();
         }
 
-        table.push_str(&row(path.file_name().unwrap(), counts));
+        table.push_str(&row(file_name, counts));
         for (total, count) in totals.iter_mut().zip(counts) {
             *total += count;
         }
@@ -178,21 +270,22 @@ fn plpgsql_suite_score() {
     table.push_str(&row("total", totals));
 
     assert_snapshot!(table, @"
-    file                        sql  bodies  tokens  unparsed   err
-    plpgsql_array.sql             0      26     949       949   949
-    plpgsql_cache.sql             0       2      60        60    60
-    plpgsql_call.sql              0      45    1698      1696  1696
-    plpgsql_control.sql           0      27    1424      1422  1422
-    plpgsql_copy.sql             79       4      28        28    28
-    plpgsql_domain.sql            0      23     307       307   307
-    plpgsql_misc.sql              6      16     261       261   261
-    plpgsql_record.sql           27      65    2008      2000  2000
-    plpgsql_simple.sql            3       9     217       217   217
-    plpgsql_transaction.sql       0      37    1203      1199  1199
-    plpgsql_trap.sql              0       7     354       354   354
-    plpgsql_trigger.sql           0       1      55        55    55
-    plpgsql_varprops.sql          0      33     736       706   706
-    total                       115     295    9300      9254  9254
+    file                       bodies  tokens  unparsed   err
+    plpgsql.sql                   254    9764      2753   264
+    plpgsql_array.sql              26     913        44    18
+    plpgsql_cache.sql               2      59        15     2
+    plpgsql_call.sql               45    1591        96    11
+    plpgsql_control.sql            27    1374       618    58
+    plpgsql_copy.sql                4      28        16     4
+    plpgsql_domain.sql             23     293         0     0
+    plpgsql_misc.sql               16     260        63     5
+    plpgsql_record.sql             65    1931       155    14
+    plpgsql_simple.sql              9     212        96    11
+    plpgsql_transaction.sql        37    1194       632    54
+    plpgsql_trap.sql                7     340        58     6
+    plpgsql_trigger.sql             1      55         0     0
+    plpgsql_varprops.sql           33     700        70     8
+    total                         549   18714      4616   455
     ");
 }
 

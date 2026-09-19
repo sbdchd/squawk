@@ -1,0 +1,271 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/raise_stmt.sql
+---
+PLPGSQL@0..519
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..518
+    PLPGSQL_DECLARE_SECTION@1..26
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..26
+        PLPGSQL_VAR_NAME@11..16
+          IDENT@11..16 "raise"
+        WHITESPACE@16..17 " "
+        PATH_TYPE@17..20
+          PATH_REF@17..20
+            PATH_SEGMENT_REF@17..20
+              INT_KW@17..20 "int"
+        WHITESPACE@20..21 " "
+        PLPGSQL_VAR_INIT@21..25
+          COLON_EQ@21..23 ":="
+          WHITESPACE@23..24 " "
+          LITERAL@24..25
+            INT_NUMBER@24..25 "1"
+        SEMICOLON@25..26 ";"
+    WHITESPACE@26..27 "\n"
+    BEGIN_KW@27..32 "begin"
+    WHITESPACE@32..35 "\n  "
+    PLPGSQL_BODY@35..514
+      PLPGSQL_RAISE_STMT@35..41
+        RAISE_KW@35..40 "raise"
+        SEMICOLON@40..41 ";"
+      WHITESPACE@41..44 "\n  "
+      PLPGSQL_RAISE_STMT@44..65
+        RAISE_KW@44..49 "raise"
+        WHITESPACE@49..50 " "
+        PLPGSQL_RAISE_LEVEL@50..56
+          NOTICE_KW@50..56 "notice"
+        WHITESPACE@56..57 " "
+        PLPGSQL_RAISE_MESSAGE@57..64
+          LITERAL@57..64
+            STRING@57..64 "'plain'"
+        SEMICOLON@64..65 ";"
+      WHITESPACE@65..68 "\n  "
+      PLPGSQL_RAISE_STMT@68..97
+        RAISE_KW@68..73 "raise"
+        WHITESPACE@73..74 " "
+        PLPGSQL_RAISE_LEVEL@74..80
+          NOTICE_KW@74..80 "notice"
+        WHITESPACE@80..81 " "
+        PLPGSQL_RAISE_MESSAGE@81..90
+          LITERAL@81..90
+            STRING@81..90 "'fmt % %'"
+        COMMA@90..91 ","
+        WHITESPACE@91..92 " "
+        LITERAL@92..93
+          INT_NUMBER@92..93 "1"
+        COMMA@93..94 ","
+        WHITESPACE@94..95 " "
+        LITERAL@95..96
+          INT_NUMBER@95..96 "2"
+        SEMICOLON@96..97 ";"
+      WHITESPACE@97..100 "\n  "
+      PLPGSQL_RAISE_STMT@100..117
+        RAISE_KW@100..105 "raise"
+        WHITESPACE@105..106 " "
+        PLPGSQL_RAISE_MESSAGE@106..116
+          LITERAL@106..116
+            STRING@106..116 "'no level'"
+        SEMICOLON@116..117 ";"
+      WHITESPACE@117..120 "\n  "
+      PLPGSQL_RAISE_STMT@120..168
+        RAISE_KW@120..125 "raise"
+        WHITESPACE@125..126 " "
+        PLPGSQL_RAISE_LEVEL@126..135
+          EXCEPTION_KW@126..135 "exception"
+        WHITESPACE@135..136 " "
+        PLPGSQL_RAISE_MESSAGE@136..142
+          LITERAL@136..142
+            STRING@136..142 "'boom'"
+        WHITESPACE@142..143 " "
+        PLPGSQL_RAISE_USING_CLAUSE@143..167
+          USING_KW@143..148 "using"
+          WHITESPACE@148..149 " "
+          PLPGSQL_RAISE_OPTION_ERRCODE@149..167
+            ERRCODE_KW@149..156 "errcode"
+            WHITESPACE@156..157 " "
+            COLON_EQ@157..159 ":="
+            WHITESPACE@159..160 " "
+            LITERAL@160..167
+              STRING@160..167 "'22012'"
+        SEMICOLON@167..168 ";"
+      WHITESPACE@168..171 "\n  "
+      PLPGSQL_RAISE_STMT@171..231
+        RAISE_KW@171..176 "raise"
+        WHITESPACE@176..177 " "
+        PLPGSQL_RAISE_LEVEL@177..184
+          WARNING_KW@177..184 "warning"
+        WHITESPACE@184..185 " "
+        PLPGSQL_RAISE_USING_CLAUSE@185..230
+          USING_KW@185..190 "using"
+          WHITESPACE@190..191 " "
+          PLPGSQL_RAISE_OPTION_MESSAGE@191..204
+            MESSAGE_KW@191..198 "message"
+            WHITESPACE@198..199 " "
+            EQ@199..200 "="
+            WHITESPACE@200..201 " "
+            LITERAL@201..204
+              STRING@201..204 "'m'"
+          COMMA@204..205 ","
+          WHITESPACE@205..206 " "
+          PLPGSQL_RAISE_OPTION_DETAIL@206..218
+            DETAIL_KW@206..212 "detail"
+            WHITESPACE@212..213 " "
+            EQ@213..214 "="
+            WHITESPACE@214..215 " "
+            LITERAL@215..218
+              STRING@215..218 "'d'"
+          COMMA@218..219 ","
+          WHITESPACE@219..220 " "
+          PLPGSQL_RAISE_OPTION_HINT@220..230
+            HINT_KW@220..224 "hint"
+            WHITESPACE@224..225 " "
+            EQ@225..226 "="
+            WHITESPACE@226..227 " "
+            LITERAL@227..230
+              STRING@227..230 "'h'"
+        SEMICOLON@230..231 ";"
+      WHITESPACE@231..234 "\n  "
+      PLPGSQL_RAISE_STMT@234..334
+        RAISE_KW@234..239 "raise"
+        WHITESPACE@239..240 " "
+        PLPGSQL_RAISE_LEVEL@240..249
+          EXCEPTION_KW@240..249 "exception"
+        WHITESPACE@249..250 " "
+        PLPGSQL_RAISE_USING_CLAUSE@250..333
+          USING_KW@250..255 "using"
+          WHITESPACE@255..256 " "
+          PLPGSQL_RAISE_OPTION_COLUMN@256..268
+            COLUMN_KW@256..262 "column"
+            WHITESPACE@262..263 " "
+            EQ@263..264 "="
+            WHITESPACE@264..265 " "
+            LITERAL@265..268
+              STRING@265..268 "'c'"
+          COMMA@268..269 ","
+          WHITESPACE@269..270 " "
+          PLPGSQL_RAISE_OPTION_CONSTRAINT@270..286
+            CONSTRAINT_KW@270..280 "constraint"
+            WHITESPACE@280..281 " "
+            EQ@281..282 "="
+            WHITESPACE@282..283 " "
+            LITERAL@283..286
+              STRING@283..286 "'k'"
+          COMMA@286..287 ","
+          WHITESPACE@287..288 " "
+          PLPGSQL_RAISE_OPTION_DATATYPE@288..302
+            DATATYPE_KW@288..296 "datatype"
+            WHITESPACE@296..297 " "
+            EQ@297..298 "="
+            WHITESPACE@298..299 " "
+            LITERAL@299..302
+              STRING@299..302 "'d'"
+          COMMA@302..303 ","
+          WHITESPACE@303..308 "\n    "
+          PLPGSQL_RAISE_OPTION_TABLE@308..319
+            TABLE_KW@308..313 "table"
+            WHITESPACE@313..314 " "
+            EQ@314..315 "="
+            WHITESPACE@315..316 " "
+            LITERAL@316..319
+              STRING@316..319 "'t'"
+          COMMA@319..320 ","
+          WHITESPACE@320..321 " "
+          PLPGSQL_RAISE_OPTION_SCHEMA@321..333
+            SCHEMA_KW@321..327 "schema"
+            WHITESPACE@327..328 " "
+            EQ@328..329 "="
+            WHITESPACE@329..330 " "
+            LITERAL@330..333
+              STRING@330..333 "'s'"
+        SEMICOLON@333..334 ";"
+      WHITESPACE@334..337 "\n  "
+      PLPGSQL_RAISE_STMT@337..360
+        RAISE_KW@337..342 "raise"
+        WHITESPACE@342..343 " "
+        PLPGSQL_CONDITION@343..359
+          IDENT@343..359 "division_by_zero"
+        SEMICOLON@359..360 ";"
+      WHITESPACE@360..363 "\n  "
+      PLPGSQL_RAISE_STMT@363..386
+        RAISE_KW@363..368 "raise"
+        WHITESPACE@368..369 " "
+        PLPGSQL_CONDITION@369..385
+          IDENT@369..377 "sqlstate"
+          WHITESPACE@377..378 " "
+          STRING@378..385 "'22012'"
+        SEMICOLON@385..386 ";"
+      WHITESPACE@386..389 "\n  "
+      PLPGSQL_RAISE_STMT@389..407
+        RAISE_KW@389..394 "raise"
+        WHITESPACE@394..395 " "
+        PLPGSQL_RAISE_LEVEL@395..400
+          DEBUG_KW@395..400 "debug"
+        WHITESPACE@400..401 " "
+        PLPGSQL_RAISE_MESSAGE@401..406
+          LITERAL@401..406
+            STRING@401..406 "'dbg'"
+        SEMICOLON@406..407 ";"
+      WHITESPACE@407..410 "\n  "
+      PLPGSQL_RAISE_STMT@410..425
+        RAISE_KW@410..415 "raise"
+        WHITESPACE@415..416 " "
+        PLPGSQL_RAISE_LEVEL@416..419
+          LOG_KW@416..419 "log"
+        WHITESPACE@419..420 " "
+        PLPGSQL_RAISE_MESSAGE@420..424
+          LITERAL@420..424
+            STRING@420..424 "'lg'"
+        SEMICOLON@424..425 ";"
+      WHITESPACE@425..428 "\n  "
+      PLPGSQL_RAISE_STMT@428..444
+        RAISE_KW@428..433 "raise"
+        WHITESPACE@433..434 " "
+        PLPGSQL_RAISE_LEVEL@434..438
+          INFO_KW@434..438 "info"
+        WHITESPACE@438..439 " "
+        PLPGSQL_RAISE_MESSAGE@439..443
+          LITERAL@439..443
+            STRING@439..443 "'nf'"
+        SEMICOLON@443..444 ";"
+      WHITESPACE@444..447 "\n  "
+      PLPGSQL_RAISE_STMT@447..467
+        RAISE_KW@447..452 "raise"
+        WHITESPACE@452..453 " "
+        PLPGSQL_RAISE_LEVEL@453..459
+          NOTICE_KW@453..459 "notice"
+        WHITESPACE@459..460 " "
+        PLPGSQL_RAISE_MESSAGE@460..466
+          LITERAL@460..466
+            ESC_STRING@460..466 "E'esc'"
+        SEMICOLON@466..467 ";"
+      WHITESPACE@467..470 "\n  "
+      PLPGSQL_RAISE_STMT@470..500
+        RAISE_KW@470..475 "raise"
+        WHITESPACE@475..476 " "
+        PLPGSQL_RAISE_USING_CLAUSE@476..499
+          USING_KW@476..481 "using"
+          WHITESPACE@481..482 " "
+          PLPGSQL_RAISE_OPTION_ERRCODE@482..499
+            ERRCODE_KW@482..489 "errcode"
+            WHITESPACE@489..490 " "
+            EQ@490..491 "="
+            WHITESPACE@491..492 " "
+            LITERAL@492..499
+              STRING@492..499 "'22012'"
+        SEMICOLON@499..500 ";"
+      WHITESPACE@500..503 "\n  "
+      PLPGSQL_ASSIGN_STMT@503..514
+        PLPGSQL_ASSIGN_TARGET@503..508
+          PLPGSQL_VAR_NAME_REF@503..508
+            IDENT@503..508 "raise"
+        WHITESPACE@508..509 " "
+        COLON_EQ@509..511 ":="
+        WHITESPACE@511..512 " "
+        LITERAL@512..513
+          INT_NUMBER@512..513 "2"
+        SEMICOLON@513..514 ";"
+    WHITESPACE@514..515 "\n"
+    END_KW@515..518 "end"
+  WHITESPACE@518..519 "\n"

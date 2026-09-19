@@ -1,0 +1,468 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/get_diag_stmt.sql
+---
+PLPGSQL@0..709
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..708
+    PLPGSQL_DECLARE_SECTION@1..65
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..19
+        PLPGSQL_VAR_NAME@11..14
+          IDENT@11..14 "get"
+        WHITESPACE@14..15 " "
+        PATH_TYPE@15..18
+          PATH_REF@15..18
+            PATH_SEGMENT_REF@15..18
+              INT_KW@15..18 "int"
+        SEMICOLON@18..19 ";"
+      WHITESPACE@19..22 "\n  "
+      PLPGSQL_VAR_DECL@22..28
+        PLPGSQL_VAR_NAME@22..23
+          IDENT@22..23 "x"
+        WHITESPACE@23..24 " "
+        PATH_TYPE@24..27
+          PATH_REF@24..27
+            PATH_SEGMENT_REF@24..27
+              INT_KW@24..27 "int"
+        SEMICOLON@27..28 ";"
+      WHITESPACE@28..31 "\n  "
+      PLPGSQL_VAR_DECL@31..38
+        PLPGSQL_VAR_NAME@31..32
+          IDENT@31..32 "y"
+        WHITESPACE@32..33 " "
+        PATH_TYPE@33..37
+          PATH_REF@33..37
+            PATH_SEGMENT_REF@33..37
+              TEXT_KW@33..37 "text"
+        SEMICOLON@37..38 ";"
+      WHITESPACE@38..41 "\n  "
+      PLPGSQL_VAR_DECL@41..53
+        PLPGSQL_VAR_NAME@41..48
+          IDENT@41..48 "\"table\""
+        WHITESPACE@48..49 " "
+        PATH_TYPE@49..52
+          PATH_REF@49..52
+            PATH_SEGMENT_REF@49..52
+              INT_KW@49..52 "int"
+        SEMICOLON@52..53 ";"
+      WHITESPACE@53..56 "\n  "
+      PLPGSQL_VAR_DECL@56..65
+        PLPGSQL_VAR_NAME@56..57
+          IDENT@56..57 "r"
+        WHITESPACE@57..58 " "
+        PATH_TYPE@58..64
+          PATH_REF@58..64
+            PATH_SEGMENT_REF@58..64
+              IDENT@58..64 "record"
+        SEMICOLON@64..65 ";"
+    WHITESPACE@65..66 "\n"
+    BEGIN_KW@66..71 "begin"
+    WHITESPACE@71..74 "\n  "
+    PLPGSQL_BODY@74..403
+      PLPGSQL_GET_DIAG_STMT@74..104
+        GET_KW@74..77 "get"
+        WHITESPACE@77..78 " "
+        DIAGNOSTICS_KW@78..89 "diagnostics"
+        WHITESPACE@89..90 " "
+        PLPGSQL_DIAG_ITEM_LIST@90..103
+          PLPGSQL_DIAG_ITEM@90..103
+            PLPGSQL_DIAG_TARGET@90..91
+              PLPGSQL_VAR_NAME_REF@90..91
+                IDENT@90..91 "x"
+            WHITESPACE@91..92 " "
+            EQ@92..93 "="
+            WHITESPACE@93..94 " "
+            PLPGSQL_DIAG_KIND@94..103
+              ROW_COUNT_KW@94..103 "row_count"
+        SEMICOLON@103..104 ";"
+      WHITESPACE@104..107 "\n  "
+      PLPGSQL_GET_DIAG_STMT@107..145
+        GET_KW@107..110 "get"
+        WHITESPACE@110..111 " "
+        PLPGSQL_DIAG_AREA@111..118
+          CURRENT_KW@111..118 "current"
+        WHITESPACE@118..119 " "
+        DIAGNOSTICS_KW@119..130 "diagnostics"
+        WHITESPACE@130..131 " "
+        PLPGSQL_DIAG_ITEM_LIST@131..144
+          PLPGSQL_DIAG_ITEM@131..144
+            PLPGSQL_DIAG_TARGET@131..132
+              PLPGSQL_VAR_NAME_REF@131..132
+                IDENT@131..132 "x"
+            WHITESPACE@132..133 " "
+            EQ@133..134 "="
+            WHITESPACE@134..135 " "
+            PLPGSQL_DIAG_KIND@135..144
+              ROW_COUNT_KW@135..144 "row_count"
+        SEMICOLON@144..145 ";"
+      WHITESPACE@145..148 "\n  "
+      PLPGSQL_GET_DIAG_STMT@148..179
+        GET_KW@148..151 "get"
+        WHITESPACE@151..152 " "
+        DIAGNOSTICS_KW@152..163 "diagnostics"
+        WHITESPACE@163..164 " "
+        PLPGSQL_DIAG_ITEM_LIST@164..178
+          PLPGSQL_DIAG_ITEM@164..178
+            PLPGSQL_DIAG_TARGET@164..165
+              PLPGSQL_VAR_NAME_REF@164..165
+                IDENT@164..165 "x"
+            WHITESPACE@165..166 " "
+            COLON_EQ@166..168 ":="
+            WHITESPACE@168..169 " "
+            PLPGSQL_DIAG_KIND@169..178
+              ROW_COUNT_KW@169..178 "row_count"
+        SEMICOLON@178..179 ";"
+      WHITESPACE@179..182 "\n  "
+      PLPGSQL_GET_DIAG_STMT@182..212
+        GET_KW@182..185 "get"
+        WHITESPACE@185..186 " "
+        DIAGNOSTICS_KW@186..197 "diagnostics"
+        WHITESPACE@197..198 " "
+        PLPGSQL_DIAG_ITEM_LIST@198..211
+          PLPGSQL_DIAG_ITEM@198..211
+            PLPGSQL_DIAG_TARGET@198..199
+              PLPGSQL_VAR_NAME_REF@198..199
+                IDENT@198..199 "X"
+            WHITESPACE@199..200 " "
+            EQ@200..201 "="
+            WHITESPACE@201..202 " "
+            PLPGSQL_DIAG_KIND@202..211
+              ROW_COUNT_KW@202..211 "ROW_COUNT"
+        SEMICOLON@211..212 ";"
+      WHITESPACE@212..215 "\n  "
+      PLPGSQL_GET_DIAG_STMT@215..267
+        GET_KW@215..218 "get"
+        WHITESPACE@218..219 " "
+        DIAGNOSTICS_KW@219..230 "diagnostics"
+        WHITESPACE@230..231 " "
+        PLPGSQL_DIAG_ITEM_LIST@231..266
+          PLPGSQL_DIAG_ITEM@231..246
+            PLPGSQL_DIAG_TARGET@231..234
+              PLPGSQL_VAR_NAME_REF@231..234
+                IDENT@231..234 "get"
+            WHITESPACE@234..235 " "
+            EQ@235..236 "="
+            WHITESPACE@236..237 " "
+            PLPGSQL_DIAG_KIND@237..246
+              ROW_COUNT_KW@237..246 "row_count"
+          COMMA@246..247 ","
+          WHITESPACE@247..248 " "
+          PLPGSQL_DIAG_ITEM@248..266
+            PLPGSQL_DIAG_TARGET@248..249
+              PLPGSQL_VAR_NAME_REF@248..249
+                IDENT@248..249 "x"
+            WHITESPACE@249..250 " "
+            EQ@250..251 "="
+            WHITESPACE@251..252 " "
+            PLPGSQL_DIAG_KIND@252..266
+              PG_ROUTINE_OID_KW@252..266 "pg_routine_oid"
+        SEMICOLON@266..267 ";"
+      WHITESPACE@267..270 "\n  "
+      PLPGSQL_GET_DIAG_STMT@270..306
+        GET_KW@270..273 "get"
+        WHITESPACE@273..274 " "
+        DIAGNOSTICS_KW@274..285 "diagnostics"
+        WHITESPACE@285..286 " "
+        PLPGSQL_DIAG_ITEM_LIST@286..305
+          PLPGSQL_DIAG_ITEM@286..305
+            PLPGSQL_DIAG_TARGET@286..293
+              PLPGSQL_VAR_NAME_REF@286..293
+                IDENT@286..293 "\"table\""
+            WHITESPACE@293..294 " "
+            EQ@294..295 "="
+            WHITESPACE@295..296 " "
+            PLPGSQL_DIAG_KIND@296..305
+              ROW_COUNT_KW@296..305 "row_count"
+        SEMICOLON@305..306 ";"
+      WHITESPACE@306..309 "\n  "
+      PLPGSQL_GET_DIAG_STMT@309..340
+        GET_KW@309..312 "get"
+        WHITESPACE@312..313 " "
+        DIAGNOSTICS_KW@313..324 "diagnostics"
+        WHITESPACE@324..325 " "
+        PLPGSQL_DIAG_ITEM_LIST@325..339
+          PLPGSQL_DIAG_ITEM@325..339
+            PLPGSQL_DIAG_TARGET@325..326
+              PLPGSQL_VAR_NAME_REF@325..326
+                IDENT@325..326 "y"
+            WHITESPACE@326..327 " "
+            EQ@327..328 "="
+            WHITESPACE@328..329 " "
+            PLPGSQL_DIAG_KIND@329..339
+              PG_CONTEXT_KW@329..339 "pg_context"
+        SEMICOLON@339..340 ";"
+      WHITESPACE@340..343 "\n  "
+      PLPGSQL_ASSIGN_STMT@343..355
+        PLPGSQL_ASSIGN_TARGET@343..344
+          PLPGSQL_VAR_NAME_REF@343..344
+            IDENT@343..344 "r"
+        WHITESPACE@344..345 " "
+        COLON_EQ@345..347 ":="
+        WHITESPACE@347..348 " "
+        TUPLE_EXPR@348..354
+          ROW_KW@348..351 "row"
+          L_PAREN@351..352 "("
+          LITERAL@352..353
+            INT_NUMBER@352..353 "1"
+          R_PAREN@353..354 ")"
+        SEMICOLON@354..355 ";"
+      WHITESPACE@355..358 "\n  "
+      PLPGSQL_GET_DIAG_STMT@358..391
+        GET_KW@358..361 "get"
+        WHITESPACE@361..362 " "
+        DIAGNOSTICS_KW@362..373 "diagnostics"
+        WHITESPACE@373..374 " "
+        PLPGSQL_DIAG_ITEM_LIST@374..390
+          PLPGSQL_DIAG_ITEM@374..390
+            PLPGSQL_DIAG_TARGET@374..378
+              PLPGSQL_VAR_NAME_REF@374..375
+                IDENT@374..375 "r"
+              FIELD_ACCESSOR@375..378
+                DOT@375..376 "."
+                COMPOSITE_FIELD_REF@376..378
+                  IDENT@376..378 "f1"
+            WHITESPACE@378..379 " "
+            EQ@379..380 "="
+            WHITESPACE@380..381 " "
+            PLPGSQL_DIAG_KIND@381..390
+              ROW_COUNT_KW@381..390 "row_count"
+        SEMICOLON@390..391 ";"
+      WHITESPACE@391..394 "\n  "
+      PLPGSQL_ASSIGN_STMT@394..403
+        PLPGSQL_ASSIGN_TARGET@394..397
+          PLPGSQL_VAR_NAME_REF@394..397
+            IDENT@394..397 "get"
+        WHITESPACE@397..398 " "
+        COLON_EQ@398..400 ":="
+        WHITESPACE@400..401 " "
+        LITERAL@401..402
+          INT_NUMBER@401..402 "1"
+        SEMICOLON@402..403 ";"
+    WHITESPACE@403..404 "\n"
+    PLPGSQL_EXCEPTION_SECTION@404..704
+      EXCEPTION_KW@404..413 "exception"
+      WHITESPACE@413..414 " "
+      PLPGSQL_EXCEPTION_HANDLER@414..704
+        WHEN_KW@414..418 "when"
+        WHITESPACE@418..419 " "
+        PLPGSQL_CONDITION@419..425
+          OTHERS_KW@419..425 "others"
+        WHITESPACE@425..426 " "
+        THEN_KW@426..430 "then"
+        WHITESPACE@430..433 "\n  "
+        PLPGSQL_BODY@433..704
+          PLPGSQL_GET_DIAG_STMT@433..704
+            GET_KW@433..436 "get"
+            WHITESPACE@436..437 " "
+            PLPGSQL_DIAG_AREA@437..444
+              STACKED_KW@437..444 "stacked"
+            WHITESPACE@444..445 " "
+            DIAGNOSTICS_KW@445..456 "diagnostics"
+            WHITESPACE@456..461 "\n    "
+            PLPGSQL_DIAG_ITEM_LIST@461..703
+              PLPGSQL_DIAG_ITEM@461..482
+                PLPGSQL_DIAG_TARGET@461..462
+                  PLPGSQL_VAR_NAME_REF@461..462
+                    IDENT@461..462 "y"
+                WHITESPACE@462..463 " "
+                EQ@463..464 "="
+                WHITESPACE@464..465 " "
+                PLPGSQL_DIAG_KIND@465..482
+                  RETURNED_SQLSTATE_KW@465..482 "returned_sqlstate"
+              COMMA@482..483 ","
+              WHITESPACE@483..488 "\n    "
+              PLPGSQL_DIAG_ITEM@488..504
+                PLPGSQL_DIAG_TARGET@488..489
+                  PLPGSQL_VAR_NAME_REF@488..489
+                    IDENT@488..489 "y"
+                WHITESPACE@489..490 " "
+                EQ@490..491 "="
+                WHITESPACE@491..492 " "
+                PLPGSQL_DIAG_KIND@492..504
+                  MESSAGE_TEXT_KW@492..504 "message_text"
+              COMMA@504..505 ","
+              WHITESPACE@505..510 "\n    "
+              PLPGSQL_DIAG_ITEM@510..533
+                PLPGSQL_DIAG_TARGET@510..511
+                  PLPGSQL_VAR_NAME_REF@510..511
+                    IDENT@510..511 "y"
+                WHITESPACE@511..512 " "
+                EQ@512..513 "="
+                WHITESPACE@513..514 " "
+                PLPGSQL_DIAG_KIND@514..533
+                  PG_EXCEPTION_DETAIL_KW@514..533 "pg_exception_detail"
+              COMMA@533..534 ","
+              WHITESPACE@534..539 "\n    "
+              PLPGSQL_DIAG_ITEM@539..560
+                PLPGSQL_DIAG_TARGET@539..540
+                  PLPGSQL_VAR_NAME_REF@539..540
+                    IDENT@539..540 "y"
+                WHITESPACE@540..541 " "
+                EQ@541..542 "="
+                WHITESPACE@542..543 " "
+                PLPGSQL_DIAG_KIND@543..560
+                  PG_EXCEPTION_HINT_KW@543..560 "pg_exception_hint"
+              COMMA@560..561 ","
+              WHITESPACE@561..566 "\n    "
+              PLPGSQL_DIAG_ITEM@566..590
+                PLPGSQL_DIAG_TARGET@566..567
+                  PLPGSQL_VAR_NAME_REF@566..567
+                    IDENT@566..567 "y"
+                WHITESPACE@567..568 " "
+                EQ@568..569 "="
+                WHITESPACE@569..570 " "
+                PLPGSQL_DIAG_KIND@570..590
+                  PG_EXCEPTION_CONTEXT_KW@570..590 "pg_exception_context"
+              COMMA@590..591 ","
+              WHITESPACE@591..596 "\n    "
+              PLPGSQL_DIAG_ITEM@596..611
+                PLPGSQL_DIAG_TARGET@596..597
+                  PLPGSQL_VAR_NAME_REF@596..597
+                    IDENT@596..597 "y"
+                WHITESPACE@597..598 " "
+                EQ@598..599 "="
+                WHITESPACE@599..600 " "
+                PLPGSQL_DIAG_KIND@600..611
+                  COLUMN_NAME_KW@600..611 "column_name"
+              COMMA@611..612 ","
+              WHITESPACE@612..617 "\n    "
+              PLPGSQL_DIAG_ITEM@617..636
+                PLPGSQL_DIAG_TARGET@617..618
+                  PLPGSQL_VAR_NAME_REF@617..618
+                    IDENT@617..618 "y"
+                WHITESPACE@618..619 " "
+                EQ@619..620 "="
+                WHITESPACE@620..621 " "
+                PLPGSQL_DIAG_KIND@621..636
+                  CONSTRAINT_NAME_KW@621..636 "constraint_name"
+              COMMA@636..637 ","
+              WHITESPACE@637..642 "\n    "
+              PLPGSQL_DIAG_ITEM@642..662
+                PLPGSQL_DIAG_TARGET@642..643
+                  PLPGSQL_VAR_NAME_REF@642..643
+                    IDENT@642..643 "y"
+                WHITESPACE@643..644 " "
+                EQ@644..645 "="
+                WHITESPACE@645..646 " "
+                PLPGSQL_DIAG_KIND@646..662
+                  PG_DATATYPE_NAME_KW@646..662 "pg_datatype_name"
+              COMMA@662..663 ","
+              WHITESPACE@663..668 "\n    "
+              PLPGSQL_DIAG_ITEM@668..682
+                PLPGSQL_DIAG_TARGET@668..669
+                  PLPGSQL_VAR_NAME_REF@668..669
+                    IDENT@668..669 "y"
+                WHITESPACE@669..670 " "
+                EQ@670..671 "="
+                WHITESPACE@671..672 " "
+                PLPGSQL_DIAG_KIND@672..682
+                  TABLE_NAME_KW@672..682 "table_name"
+              COMMA@682..683 ","
+              WHITESPACE@683..688 "\n    "
+              PLPGSQL_DIAG_ITEM@688..703
+                PLPGSQL_DIAG_TARGET@688..689
+                  PLPGSQL_VAR_NAME_REF@688..689
+                    IDENT@688..689 "y"
+                WHITESPACE@689..690 " "
+                EQ@690..691 "="
+                WHITESPACE@691..692 " "
+                PLPGSQL_DIAG_KIND@692..703
+                  SCHEMA_NAME_KW@692..703 "schema_name"
+            SEMICOLON@703..704 ";"
+    WHITESPACE@704..705 "\n"
+    END_KW@705..708 "end"
+  WHITESPACE@708..709 "\n"
+---
+PLPGSQL@0..127
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..126
+    PLPGSQL_DECLARE_SECTION@1..38
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..23
+        PLPGSQL_VAR_NAME@11..18
+          CURRENT_KW@11..18 "current"
+        WHITESPACE@18..19 " "
+        PATH_TYPE@19..22
+          PATH_REF@19..22
+            PATH_SEGMENT_REF@19..22
+              INT_KW@19..22 "int"
+        SEMICOLON@22..23 ";"
+      WHITESPACE@23..26 "\n  "
+      PLPGSQL_VAR_DECL@26..38
+        PLPGSQL_VAR_NAME@26..33
+          IDENT@26..33 "stacked"
+        WHITESPACE@33..34 " "
+        PATH_TYPE@34..37
+          PATH_REF@34..37
+            PATH_SEGMENT_REF@34..37
+              INT_KW@34..37 "int"
+        SEMICOLON@37..38 ";"
+    WHITESPACE@38..39 "\n"
+    BEGIN_KW@39..44 "begin"
+    WHITESPACE@44..47 "\n  "
+    PLPGSQL_BODY@47..122
+      PLPGSQL_GET_DIAG_STMT@47..83
+        GET_KW@47..50 "get"
+        WHITESPACE@50..51 " "
+        DIAGNOSTICS_KW@51..62 "diagnostics"
+        WHITESPACE@62..63 " "
+        PLPGSQL_DIAG_ITEM_LIST@63..82
+          PLPGSQL_DIAG_ITEM@63..82
+            PLPGSQL_DIAG_TARGET@63..70
+              PLPGSQL_VAR_NAME_REF@63..70
+                CURRENT_KW@63..70 "current"
+            WHITESPACE@70..71 " "
+            EQ@71..72 "="
+            WHITESPACE@72..73 " "
+            PLPGSQL_DIAG_KIND@73..82
+              ROW_COUNT_KW@73..82 "row_count"
+        SEMICOLON@82..83 ";"
+      WHITESPACE@83..86 "\n  "
+      PLPGSQL_GET_DIAG_STMT@86..122
+        GET_KW@86..89 "get"
+        WHITESPACE@89..90 " "
+        DIAGNOSTICS_KW@90..101 "diagnostics"
+        WHITESPACE@101..102 " "
+        PLPGSQL_DIAG_ITEM_LIST@102..121
+          PLPGSQL_DIAG_ITEM@102..121
+            PLPGSQL_DIAG_TARGET@102..109
+              PLPGSQL_VAR_NAME_REF@102..109
+                IDENT@102..109 "stacked"
+            WHITESPACE@109..110 " "
+            EQ@110..111 "="
+            WHITESPACE@111..112 " "
+            PLPGSQL_DIAG_KIND@112..121
+              ROW_COUNT_KW@112..121 "row_count"
+        SEMICOLON@121..122 ";"
+    WHITESPACE@122..123 "\n"
+    END_KW@123..126 "end"
+  WHITESPACE@126..127 "\n"
+---
+PLPGSQL@0..45
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..44
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..40
+      PLPGSQL_GET_DIAG_STMT@9..40
+        GET_KW@9..12 "get"
+        WHITESPACE@12..13 " "
+        DIAGNOSTICS_KW@13..24 "diagnostics"
+        WHITESPACE@24..25 " "
+        PLPGSQL_DIAG_ITEM_LIST@25..39
+          PLPGSQL_DIAG_ITEM@25..39
+            PLPGSQL_DIAG_TARGET@25..27
+              PLPGSQL_VAR_NAME_REF@25..27
+                POSITIONAL_PARAM@25..27 "$1"
+            WHITESPACE@27..28 " "
+            EQ@28..29 "="
+            WHITESPACE@29..30 " "
+            PLPGSQL_DIAG_KIND@30..39
+              ROW_COUNT_KW@30..39 "row_count"
+        SEMICOLON@39..40 ";"
+    WHITESPACE@40..41 "\n"
+    END_KW@41..44 "end"
+  WHITESPACE@44..45 "\n"

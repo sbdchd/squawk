@@ -1,0 +1,65 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/label.sql
+---
+PLPGSQL@0..81
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..80
+    PLPGSQL_LABEL@1..10
+      LESS_LESS@1..3 "<<"
+      PLPGSQL_LABEL_NAME@3..8
+        OUTER_KW@3..8 "outer"
+      GREATER_GREATER@8..10 ">>"
+    WHITESPACE@10..11 "\n"
+    BEGIN_KW@11..16 "begin"
+    WHITESPACE@16..19 "\n  "
+    PLPGSQL_BODY@19..69
+      PLPGSQL_BLOCK@19..69
+        PLPGSQL_LABEL@19..28
+          LESS_LESS@19..21 "<<"
+          PLPGSQL_LABEL_NAME@21..26
+            INNER_KW@21..26 "inner"
+          GREATER_GREATER@26..28 ">>"
+        WHITESPACE@28..31 "\n  "
+        PLPGSQL_DECLARE_SECTION@31..38
+          DECLARE_KW@31..38 "declare"
+        WHITESPACE@38..41 "\n  "
+        BEGIN_KW@41..46 "begin"
+        WHITESPACE@46..51 "\n    "
+        PLPGSQL_BODY@51..56
+          PLPGSQL_NULL_STMT@51..56
+            NULL_KW@51..55 "null"
+            SEMICOLON@55..56 ";"
+        WHITESPACE@56..59 "\n  "
+        END_KW@59..62 "end"
+        WHITESPACE@62..63 " "
+        PLPGSQL_LABEL_NAME_REF@63..68
+          INNER_KW@63..68 "inner"
+        SEMICOLON@68..69 ";"
+    WHITESPACE@69..70 "\n"
+    END_KW@70..73 "end"
+    WHITESPACE@73..74 " "
+    PLPGSQL_LABEL_NAME_REF@74..79
+      OUTER_KW@74..79 "outer"
+    SEMICOLON@79..80 ";"
+  WHITESPACE@80..81 "\n"
+---
+PLPGSQL@0..31
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..30
+    PLPGSQL_LABEL@1..11
+      LESS_LESS@1..3 "<<"
+      PLPGSQL_LABEL_NAME@3..9
+        UPDATE_KW@3..9 "update"
+      GREATER_GREATER@9..11 ">>"
+    WHITESPACE@11..12 "\n"
+    BEGIN_KW@12..17 "begin"
+    WHITESPACE@17..20 "\n  "
+    PLPGSQL_BODY@20..25
+      PLPGSQL_NULL_STMT@20..25
+        NULL_KW@20..24 "null"
+        SEMICOLON@24..25 ";"
+    WHITESPACE@25..26 "\n"
+    END_KW@26..29 "end"
+    SEMICOLON@29..30 ";"
+  WHITESPACE@30..31 "\n"

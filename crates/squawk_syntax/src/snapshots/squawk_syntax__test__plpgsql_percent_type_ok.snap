@@ -1,0 +1,217 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/percent_type.sql
+---
+PLPGSQL@0..265
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..264
+    PLPGSQL_DECLARE_SECTION@1..246
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..17
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "v"
+        WHITESPACE@12..13 " "
+        PATH_TYPE@13..16
+          PATH_REF@13..16
+            PATH_SEGMENT_REF@13..16
+              INT_KW@13..16 "int"
+        SEMICOLON@16..17 ";"
+      WHITESPACE@17..20 "\n  "
+      PLPGSQL_VAR_DECL@20..29
+        PLPGSQL_VAR_NAME@20..21
+          IDENT@20..21 "a"
+        WHITESPACE@21..22 " "
+        PERCENT_TYPE@22..28
+          PATH_REF@22..23
+            PATH_SEGMENT_REF@22..23
+              IDENT@22..23 "v"
+          PERCENT_TYPE_CLAUSE@23..28
+            PERCENT@23..24 "%"
+            TYPE_KW@24..28 "type"
+        SEMICOLON@28..29 ";"
+      WHITESPACE@29..32 "\n  "
+      PLPGSQL_VAR_DECL@32..43
+        PLPGSQL_VAR_NAME@32..33
+          IDENT@32..33 "b"
+        WHITESPACE@33..34 " "
+        PERCENT_TYPE@34..42
+          PATH_REF@34..35
+            PATH_SEGMENT_REF@34..35
+              IDENT@34..35 "v"
+          PERCENT_TYPE_CLAUSE@35..40
+            PERCENT@35..36 "%"
+            TYPE_KW@36..40 "type"
+          ARRAY_BOUND@40..42
+            L_BRACK@40..41 "["
+            R_BRACK@41..42 "]"
+        SEMICOLON@42..43 ";"
+      WHITESPACE@43..46 "\n  "
+      PLPGSQL_VAR_DECL@46..61
+        PLPGSQL_VAR_NAME@46..47
+          IDENT@46..47 "c"
+        WHITESPACE@47..48 " "
+        PERCENT_TYPE@48..60
+          PATH_REF@48..49
+            PATH_SEGMENT_REF@48..49
+              IDENT@48..49 "v"
+          PERCENT_TYPE_CLAUSE@49..54
+            PERCENT@49..50 "%"
+            TYPE_KW@50..54 "type"
+          ARRAY_BOUND@54..57
+            L_BRACK@54..55 "["
+            LITERAL@55..56
+              INT_NUMBER@55..56 "1"
+            R_BRACK@56..57 "]"
+          ARRAY_BOUND@57..60
+            L_BRACK@57..58 "["
+            LITERAL@58..59
+              INT_NUMBER@58..59 "3"
+            R_BRACK@59..60 "]"
+        SEMICOLON@60..61 ";"
+      WHITESPACE@61..64 "\n  "
+      PLPGSQL_VAR_DECL@64..79
+        PLPGSQL_VAR_NAME@64..65
+          IDENT@64..65 "d"
+        WHITESPACE@65..66 " "
+        PERCENT_TYPE@66..78
+          PATH_REF@66..67
+            PATH_SEGMENT_REF@66..67
+              IDENT@66..67 "v"
+          PERCENT_TYPE_CLAUSE@67..72
+            PERCENT@67..68 "%"
+            TYPE_KW@68..72 "type"
+          WHITESPACE@72..73 " "
+          ARRAY_KW@73..78 "array"
+        SEMICOLON@78..79 ";"
+      WHITESPACE@79..82 "\n  "
+      PLPGSQL_VAR_DECL@82..100
+        PLPGSQL_VAR_NAME@82..83
+          IDENT@82..83 "e"
+        WHITESPACE@83..84 " "
+        PERCENT_TYPE@84..99
+          PATH_REF@84..85
+            PATH_SEGMENT_REF@84..85
+              IDENT@84..85 "v"
+          PERCENT_TYPE_CLAUSE@85..90
+            PERCENT@85..86 "%"
+            TYPE_KW@86..90 "type"
+          WHITESPACE@90..91 " "
+          ARRAY_KW@91..96 "array"
+          ARRAY_BOUND@96..99
+            L_BRACK@96..97 "["
+            LITERAL@97..98
+              INT_NUMBER@97..98 "1"
+            R_BRACK@98..99 "]"
+        SEMICOLON@99..100 ";"
+      WHITESPACE@100..103 "\n  "
+      PLPGSQL_VAR_DECL@103..117
+        PLPGSQL_VAR_NAME@103..104
+          IDENT@103..104 "f"
+        WHITESPACE@104..105 " "
+        PLPGSQL_PERCENT_ROWTYPE@105..116
+          PATH_REF@105..108
+            PATH_SEGMENT_REF@105..108
+              IDENT@105..108 "foo"
+          PERCENT@108..109 "%"
+          ROWTYPE_KW@109..116 "rowtype"
+        SEMICOLON@116..117 ";"
+      WHITESPACE@117..120 "\n  "
+      PLPGSQL_VAR_DECL@120..137
+        PLPGSQL_VAR_NAME@120..121
+          IDENT@120..121 "g"
+        WHITESPACE@121..122 " "
+        PLPGSQL_PERCENT_ROWTYPE@122..136
+          PATH_REF@122..128
+            PATH_SEGMENT_REF@122..128
+              IDENT@122..128 "notice"
+          PERCENT@128..129 "%"
+          ROWTYPE_KW@129..136 "rowtype"
+        SEMICOLON@136..137 ";"
+      WHITESPACE@137..140 "\n  "
+      PLPGSQL_VAR_DECL@140..162
+        PLPGSQL_VAR_NAME@140..141
+          IDENT@140..141 "h"
+        WHITESPACE@141..142 " "
+        PLPGSQL_PERCENT_ROWTYPE@142..161
+          PATH_REF@142..153
+            PATH_REF@142..149
+              PATH_REF@142..145
+                PATH_SEGMENT_REF@142..145
+                  IDENT@142..145 "foo"
+              DOT@145..146 "."
+              PATH_SEGMENT_REF@146..149
+                IDENT@146..149 "bar"
+            DOT@149..150 "."
+            PATH_SEGMENT_REF@150..153
+              IDENT@150..153 "baz"
+          PERCENT@153..154 "%"
+          ROWTYPE_KW@154..161 "rowtype"
+        SEMICOLON@161..162 ";"
+      WHITESPACE@162..165 "\n  "
+      PLPGSQL_VAR_DECL@165..197
+        PLPGSQL_VAR_NAME@165..166
+          IDENT@165..166 "i"
+        WHITESPACE@166..167 " "
+        PLPGSQL_PERCENT_ROWTYPE@167..196
+          PATH_REF@167..186
+            PATH_REF@167..177
+              PATH_SEGMENT_REF@167..177
+                IDENT@167..177 "pg_catalog"
+            DOT@177..178 "."
+            PATH_SEGMENT_REF@178..186
+              IDENT@178..186 "pg_class"
+          PERCENT@186..187 "%"
+          ROWTYPE_KW@187..194 "rowtype"
+          ARRAY_BOUND@194..196
+            L_BRACK@194..195 "["
+            R_BRACK@195..196 "]"
+        SEMICOLON@196..197 ";"
+      WHITESPACE@197..200 "\n  "
+      PLPGSQL_VAR_DECL@200..216
+        PLPGSQL_VAR_NAME@200..201
+          IDENT@200..201 "j"
+        WHITESPACE@201..202 " "
+        PLPGSQL_PERCENT_ROWTYPE@202..215
+          PATH_REF@202..207
+            PATH_SEGMENT_REF@202..207
+              TABLE_KW@202..207 "table"
+          PERCENT@207..208 "%"
+          ROWTYPE_KW@208..215 "rowtype"
+        SEMICOLON@215..216 ";"
+      WHITESPACE@216..219 "\n  "
+      PLPGSQL_VAR_DECL@219..233
+        PLPGSQL_VAR_NAME@219..220
+          IDENT@219..220 "k"
+        WHITESPACE@220..221 " "
+        PERCENT_TYPE@221..232
+          PATH_REF@221..227
+            PATH_SEGMENT_REF@221..227
+              SELECT_KW@221..227 "select"
+          PERCENT_TYPE_CLAUSE@227..232
+            PERCENT@227..228 "%"
+            TYPE_KW@228..232 "type"
+        SEMICOLON@232..233 ";"
+      WHITESPACE@233..236 "\n  "
+      PLPGSQL_VAR_DECL@236..246
+        PLPGSQL_VAR_NAME@236..237
+          IDENT@236..237 "l"
+        WHITESPACE@237..238 " "
+        PERCENT_TYPE@238..245
+          PATH_REF@238..240
+            PATH_SEGMENT_REF@238..240
+              POSITIONAL_PARAM@238..240 "$1"
+          PERCENT_TYPE_CLAUSE@240..245
+            PERCENT@240..241 "%"
+            TYPE_KW@241..245 "type"
+        SEMICOLON@245..246 ";"
+    WHITESPACE@246..247 "\n"
+    BEGIN_KW@247..252 "begin"
+    WHITESPACE@252..255 "\n  "
+    PLPGSQL_BODY@255..260
+      PLPGSQL_NULL_STMT@255..260
+        NULL_KW@255..259 "null"
+        SEMICOLON@259..260 ";"
+    WHITESPACE@260..261 "\n"
+    END_KW@261..264 "end"
+  WHITESPACE@264..265 "\n"

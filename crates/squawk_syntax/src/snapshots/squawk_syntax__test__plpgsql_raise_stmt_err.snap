@@ -1,0 +1,125 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/raise_stmt.sql
+---
+PLPGSQL@0..155
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..154
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..150
+      PLPGSQL_RAISE_STMT@9..42
+        RAISE_KW@9..14 "raise"
+        WHITESPACE@14..15 " "
+        PLPGSQL_RAISE_LEVEL@15..21
+          NOTICE_KW@15..21 "notice"
+        WHITESPACE@21..22 " "
+        PLPGSQL_RAISE_MESSAGE@22..25
+          LITERAL@22..25
+            STRING@22..25 "'x'"
+        WHITESPACE@25..26 " "
+        PLPGSQL_RAISE_USING_CLAUSE@26..41
+          USING_KW@26..31 "using"
+          WHITESPACE@31..32 " "
+          ERROR@32..41
+            BIN_EXPR@32..41
+              NAME_REF@32..37
+                IDENT@32..37 "bogus"
+              WHITESPACE@37..38 " "
+              EQ@38..39 "="
+              WHITESPACE@39..40 " "
+              LITERAL@40..41
+                INT_NUMBER@40..41 "1"
+        SEMICOLON@41..42 ";"
+      WHITESPACE@42..45 "\n  "
+      PLPGSQL_RAISE_STMT@45..76
+        RAISE_KW@45..50 "raise"
+        WHITESPACE@50..51 " "
+        PLPGSQL_RAISE_LEVEL@51..57
+          NOTICE_KW@51..57 "notice"
+        WHITESPACE@57..58 " "
+        PLPGSQL_RAISE_MESSAGE@58..61
+          LITERAL@58..61
+            STRING@58..61 "'x'"
+        WHITESPACE@61..62 " "
+        PLPGSQL_RAISE_USING_CLAUSE@62..75
+          USING_KW@62..67 "using"
+          WHITESPACE@67..68 " "
+          PLPGSQL_RAISE_OPTION_ERRCODE@68..75
+            ERRCODE_KW@68..75 "errcode"
+        SEMICOLON@75..76 ";"
+      WHITESPACE@76..79 "\n  "
+      PLPGSQL_RAISE_STMT@79..113
+        RAISE_KW@79..84 "raise"
+        WHITESPACE@84..85 " "
+        PLPGSQL_RAISE_LEVEL@85..91
+          NOTICE_KW@85..91 "notice"
+        WHITESPACE@91..92 " "
+        PLPGSQL_RAISE_MESSAGE@92..95
+          LITERAL@92..95
+            STRING@92..95 "'x'"
+        WHITESPACE@95..96 " "
+        PLPGSQL_RAISE_USING_CLAUSE@96..111
+          USING_KW@96..101 "using"
+          WHITESPACE@101..102 " "
+          PLPGSQL_RAISE_OPTION_ERRCODE@102..111
+            ERRCODE_KW@102..109 "errcode"
+            WHITESPACE@109..110 " "
+            EQ@110..111 "="
+        WHITESPACE@111..112 " "
+        SEMICOLON@112..113 ";"
+      WHITESPACE@113..116 "\n  "
+      PLPGSQL_RAISE_STMT@116..131
+        RAISE_KW@116..121 "raise"
+        WHITESPACE@121..122 " "
+        PLPGSQL_CONDITION@122..130
+          IDENT@122..130 "sqlstate"
+        SEMICOLON@130..131 ";"
+      WHITESPACE@131..134 "\n  "
+      PLPGSQL_RAISE_STMT@134..150
+        RAISE_KW@134..139 "raise"
+        WHITESPACE@139..140 " "
+        PLPGSQL_RAISE_LEVEL@140..149
+          EXCEPTION_KW@140..149 "exception"
+        PLPGSQL_CONDITION@149..149
+        SEMICOLON@149..150 ";"
+    WHITESPACE@150..151 "\n"
+    END_KW@151..154 "end"
+  WHITESPACE@154..155 "\n"
+
+error[syntax-error]: unrecognized RAISE statement option
+  ╭▸ 
+3 │   raise notice 'x' using bogus = 1;
+  ╰╴                         ━
+error[syntax-error]: expected EQ
+  ╭▸ 
+3 │   raise notice 'x' using bogus = 1;
+  ╰╴                         ━
+error[syntax-error]: expected EQ
+  ╭▸ 
+4 │   raise notice 'x' using errcode;
+  ╰╴                                ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+4 │   raise notice 'x' using errcode;
+  ╰╴                                ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+4 │   raise notice 'x' using errcode;
+  ╰╴                                ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+5 │   raise notice 'x' using errcode = ;
+  ╰╴                                  ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+5 │   raise notice 'x' using errcode = ;
+  ╰╴                                  ━
+error[syntax-error]: expected STRING
+  ╭▸ 
+6 │   raise sqlstate;
+  ╰╴                ━
+error[syntax-error]: expected a condition name, got SEMICOLON
+  ╭▸ 
+7 │   raise exception;
+  ╰╴                 ━

@@ -232,6 +232,7 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
                     resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
                 })
             }
+            ast::AnyNameRef::PlpgsqlLabelNameRef(_) | ast::AnyNameRef::PlpgsqlVarNameRef(_) => None,
             ast::AnyNameRef::PolicyRef(name_ref) => resolve_in_files(db, file, |definition_file| {
                 resolve::resolve_policy_ref(db, InFile::new(definition_file, &name_ref))
             }),

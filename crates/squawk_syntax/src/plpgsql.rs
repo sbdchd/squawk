@@ -2,6 +2,7 @@ use rowan::{GreenNode, TextRange};
 
 use crate::{
     SyntaxNode, ast, ast::AstNode, decoded_text::DecodedText, parsing, syntax_error::SyntaxError,
+    validation,
 };
 
 pub struct Plpgsql {
@@ -44,8 +45,17 @@ impl Plpgsql {
         self.decoded.source_range(range)
     }
 
-    pub fn errors(&self) -> &[SyntaxError] {
-        &self.errors
+    pub fn errors(self) -> Vec<SyntaxError> {
+        let mut validation_errors = vec![];
+        validation::validate(&self.syntax(), &mut validation_errors);
+
+        let mut errors = self.errors;
+        errors.extend(validation_errors.into_iter().map(|error| {
+            let range = self.decoded.source_range(error.range());
+            error.with_range(range)
+        }));
+        errors.sort_by_key(|error| error.range().start());
+        errors
     }
 }
 
@@ -107,6 +117,7 @@ impl ast::Do {
 mod tests {
     use super::*;
     use crate::SourceFile;
+    use crate::test::render_errors;
     use insta::assert_snapshot;
     use rowan::{TextRange, TextSize};
 
@@ -131,25 +142,29 @@ mod tests {
 
         let mut out = format!("{:#?}", body.syntax());
         out.push_str(&format!("---\nsource {range:?} {:?}\n", &sql[start..end]));
-        for error in body.errors() {
-            out.push_str(&format!("error {:?} {}\n", error.range(), error.message()));
-        }
+        out.push_str(&render_errors(sql, &body.errors()));
         out
     }
 
     #[test]
     fn language_after_as() {
         assert_snapshot!(
-            body("create function f() returns int as $$ null; $$ language plpgsql;"),
+            body("create function f() returns int as $$ begin null; end $$ language plpgsql;"),
             @r#"
-        PLPGSQL@0..7
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 37..44 " null; "
+        source 37..54 " begin null; end "
         "#
         );
     }
@@ -157,16 +172,22 @@ mod tests {
     #[test]
     fn language_before_as() {
         assert_snapshot!(
-            body("create function f() returns int language plpgsql as $$ null; $$;"),
+            body("create function f() returns int language plpgsql as $$ begin null; end $$;"),
             @r#"
-        PLPGSQL@0..7
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 54..61 " null; "
+        source 54..71 " begin null; end "
         "#
         );
     }
@@ -179,31 +200,43 @@ mod tests {
     #[test]
     fn procedure() {
         assert_snapshot!(
-            body("create procedure p() as $$ null; $$ language plpgsql;"),
+            body("create procedure p() as $$ begin null; end $$ language plpgsql;"),
             @r#"
-        PLPGSQL@0..7
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 26..33 " null; "
+        source 26..43 " begin null; end "
         "#
         );
     }
 
     #[test]
     fn do_defaults_to_plpgsql() {
-        assert_snapshot!(body("do $$ null; $$;"), @r#"
-        PLPGSQL@0..7
+        assert_snapshot!(body("do $$ begin null; end $$;"), @r#"
+        PLPGSQL@0..17
           WHITESPACE@0..1 " "
-          PLPGSQL_NULL_STMT@1..6
-            NULL_KW@1..5 "null"
-            SEMICOLON@5..6 ";"
-          WHITESPACE@6..7 " "
+          PLPGSQL_BLOCK@1..16
+            BEGIN_KW@1..6 "begin"
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..12
+              PLPGSQL_NULL_STMT@7..12
+                NULL_KW@7..11 "null"
+                SEMICOLON@11..12 ";"
+            WHITESPACE@12..13 " "
+            END_KW@13..16 "end"
+          WHITESPACE@16..17 " "
         ---
-        source 5..12 " null; "
+        source 5..22 " begin null; end "
         "#
         );
     }
@@ -216,58 +249,72 @@ mod tests {
     #[test]
     fn escaped_body_maps_back_through_the_escapes() {
         assert_snapshot!(
-            body(r"create function f() returns int as E'null;\n' language plpgsql;"),
+            body(r"create function f() returns int as E'begin null; end\n' language plpgsql;"),
             @r#"
-        PLPGSQL@0..6
-          PLPGSQL_NULL_STMT@0..5
-            NULL_KW@0..4 "null"
-            SEMICOLON@4..5 ";"
-          WHITESPACE@5..6 "\n"
+        PLPGSQL@0..16
+          PLPGSQL_BLOCK@0..15
+            BEGIN_KW@0..5 "begin"
+            WHITESPACE@5..6 " "
+            PLPGSQL_BODY@6..11
+              PLPGSQL_NULL_STMT@6..11
+                NULL_KW@6..10 "null"
+                SEMICOLON@10..11 ";"
+            WHITESPACE@11..12 " "
+            END_KW@12..15 "end"
+          WHITESPACE@15..16 "\n"
         ---
-        source 37..44 "null;\\n"
+        source 37..54 "begin null; end\\n"
         "#
         );
     }
 
     #[test]
     fn unparsed_tokens_are_errors() {
-        assert_snapshot!(body("do $$ begin null; end $$;"), @r#"
-        PLPGSQL@0..17
+        assert_snapshot!(body("do $$ begin open c; end $$;"), @r#"
+        PLPGSQL@0..19
           WHITESPACE@0..1 " "
-          ERROR@1..6
+          PLPGSQL_BLOCK@1..18
             BEGIN_KW@1..6 "begin"
-          WHITESPACE@6..7 " "
-          PLPGSQL_NULL_STMT@7..12
-            NULL_KW@7..11 "null"
-            SEMICOLON@11..12 ";"
-          WHITESPACE@12..13 " "
-          ERROR@13..16
-            END_KW@13..16 "end"
-          WHITESPACE@16..17 " "
+            WHITESPACE@6..7 " "
+            PLPGSQL_BODY@7..14
+              ERROR@7..14
+                IDENT@7..11 "open"
+                WHITESPACE@11..12 " "
+                IDENT@12..13 "c"
+                SEMICOLON@13..14 ";"
+            WHITESPACE@14..15 " "
+            END_KW@15..18 "end"
+          WHITESPACE@18..19 " "
         ---
-        source 5..22 " begin null; end "
-        error 6..6 expected a statement, found BEGIN_KW
-        error 18..18 expected a statement, found END_KW
+        source 5..24 " begin open c; end "
+        error[syntax-error]: expected a statement, got IDENT
+          ╭▸ 
+        1 │ do $$ begin open c; end $$;
+          ╰╴            ━
         "#);
     }
 
     #[test]
     fn errors_in_an_escaped_body_map_into_the_file() {
-        assert_snapshot!(body(r"do E'begin\n null;\n end';"), @r#"
-        PLPGSQL@0..17
-          ERROR@0..5
+        assert_snapshot!(body(r"do E'begin\n open c;\n end';"), @r#"
+        PLPGSQL@0..19
+          PLPGSQL_BLOCK@0..19
             BEGIN_KW@0..5 "begin"
-          WHITESPACE@5..7 "\n "
-          PLPGSQL_NULL_STMT@7..12
-            NULL_KW@7..11 "null"
-            SEMICOLON@11..12 ";"
-          WHITESPACE@12..14 "\n "
-          ERROR@14..17
-            END_KW@14..17 "end"
+            WHITESPACE@5..7 "\n "
+            PLPGSQL_BODY@7..14
+              ERROR@7..14
+                IDENT@7..11 "open"
+                WHITESPACE@11..12 " "
+                IDENT@12..13 "c"
+                SEMICOLON@13..14 ";"
+            WHITESPACE@14..16 "\n "
+            END_KW@16..19 "end"
         ---
-        source 5..24 "begin\\n null;\\n end"
-        error 5..5 expected a statement, found BEGIN_KW
-        error 21..21 expected a statement, found END_KW
+        source 5..26 "begin\\n open c;\\n end"
+        error[syntax-error]: expected a statement, got IDENT
+          ╭▸ 
+        1 │ do E'begin\n open c;\n end';
+          ╰╴             ━
         "#);
     }
 }

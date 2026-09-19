@@ -1,0 +1,242 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/return_stmt.sql
+---
+PLPGSQL@0..415
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..414
+    PLPGSQL_DECLARE_SECTION@1..39
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..27
+        PLPGSQL_VAR_NAME@11..17
+          RETURN_KW@11..17 "return"
+        WHITESPACE@17..18 " "
+        PATH_TYPE@18..21
+          PATH_REF@18..21
+            PATH_SEGMENT_REF@18..21
+              INT_KW@18..21 "int"
+        WHITESPACE@21..22 " "
+        PLPGSQL_VAR_INIT@22..26
+          COLON_EQ@22..24 ":="
+          WHITESPACE@24..25 " "
+          LITERAL@25..26
+            INT_NUMBER@25..26 "1"
+        SEMICOLON@26..27 ";"
+      WHITESPACE@27..30 "\n  "
+      PLPGSQL_VAR_DECL@30..39
+        PLPGSQL_VAR_NAME@30..34
+          NEXT_KW@30..34 "next"
+        WHITESPACE@34..35 " "
+        PATH_TYPE@35..38
+          PATH_REF@35..38
+            PATH_SEGMENT_REF@35..38
+              IDENT@35..38 "rec"
+        SEMICOLON@38..39 ";"
+    WHITESPACE@39..40 "\n"
+    BEGIN_KW@40..45 "begin"
+    WHITESPACE@45..48 "\n  "
+    PLPGSQL_BODY@48..410
+      PLPGSQL_RETURN_STMT@48..55
+        RETURN_KW@48..54 "return"
+        SEMICOLON@54..55 ";"
+      WHITESPACE@55..58 "\n  "
+      PLPGSQL_RETURN_STMT@58..67
+        RETURN_KW@58..64 "return"
+        WHITESPACE@64..65 " "
+        LITERAL@65..66
+          INT_NUMBER@65..66 "1"
+        SEMICOLON@66..67 ";"
+      WHITESPACE@67..70 "\n  "
+      PLPGSQL_RETURN_STMT@70..106
+        RETURN_KW@70..76 "return"
+        WHITESPACE@76..77 " "
+        PAREN_EXPR@77..105
+          L_PAREN@77..78 "("
+          SELECT@78..104
+            SELECT_CLAUSE@78..92
+              SELECT_KW@78..84 "select"
+              WHITESPACE@84..85 " "
+              TARGET_LIST@85..92
+                TARGET@85..92
+                  CALL_EXPR@85..92
+                    NAME_REF@85..88
+                      IDENT@85..88 "max"
+                    ARG_LIST@88..92
+                      L_PAREN@88..89 "("
+                      ARG@89..91
+                        NAME_REF@89..91
+                          IDENT@89..91 "f1"
+                      R_PAREN@91..92 ")"
+            WHITESPACE@92..93 " "
+            FROM_CLAUSE@93..104
+              FROM_KW@93..97 "from"
+              WHITESPACE@97..98 " "
+              RELATION_FROM_ITEM@98..104
+                RELATION_NAME_REF@98..104
+                  PATH_REF@98..104
+                    PATH_SEGMENT_REF@98..104
+                      IDENT@98..104 "onecol"
+          R_PAREN@104..105 ")"
+        SEMICOLON@105..106 ";"
+      WHITESPACE@106..109 "\n  "
+      PLPGSQL_RETURN_NEXT_STMT@109..121
+        RETURN_KW@109..115 "return"
+        WHITESPACE@115..116 " "
+        NEXT_KW@116..120 "next"
+        SEMICOLON@120..121 ";"
+      WHITESPACE@121..124 "\n  "
+      PLPGSQL_RETURN_NEXT_STMT@124..138
+        RETURN_KW@124..130 "return"
+        WHITESPACE@130..131 " "
+        NEXT_KW@131..135 "next"
+        WHITESPACE@135..136 " "
+        LITERAL@136..137
+          INT_NUMBER@136..137 "1"
+        SEMICOLON@137..138 ";"
+      WHITESPACE@138..141 "\n  "
+      PLPGSQL_RETURN_STMT@141..155
+        RETURN_KW@141..147 "return"
+        WHITESPACE@147..148 " "
+        FIELD_EXPR@148..154
+          NAME_REF@148..152
+            NEXT_KW@148..152 "next"
+          DOT@152..153 "."
+          NAME_REF@153..154
+            IDENT@153..154 "x"
+        SEMICOLON@154..155 ";"
+      WHITESPACE@155..158 "\n  "
+      PLPGSQL_RETURN_QUERY_STMT@158..180
+        RETURN_KW@158..164 "return"
+        WHITESPACE@164..165 " "
+        QUERY_KW@165..170 "query"
+        WHITESPACE@170..171 " "
+        SELECT@171..179
+          SELECT_CLAUSE@171..179
+            SELECT_KW@171..177 "select"
+            WHITESPACE@177..178 " "
+            TARGET_LIST@178..179
+              TARGET@178..179
+                LITERAL@178..179
+                  INT_NUMBER@178..179 "1"
+        SEMICOLON@179..180 ";"
+      WHITESPACE@180..183 "\n  "
+      PLPGSQL_RETURN_QUERY_STMT@183..212
+        RETURN_KW@183..189 "return"
+        WHITESPACE@189..190 " "
+        QUERY_KW@190..195 "query"
+        WHITESPACE@195..196 " "
+        VALUES@196..211
+          VALUES_KW@196..202 "values"
+          WHITESPACE@202..203 " "
+          ROW_LIST@203..211
+            ROW@203..206
+              L_PAREN@203..204 "("
+              LITERAL@204..205
+                INT_NUMBER@204..205 "1"
+              R_PAREN@205..206 ")"
+            COMMA@206..207 ","
+            WHITESPACE@207..208 " "
+            ROW@208..211
+              L_PAREN@208..209 "("
+              LITERAL@209..210
+                INT_NUMBER@209..210 "2"
+              R_PAREN@210..211 ")"
+        SEMICOLON@211..212 ";"
+      WHITESPACE@212..215 "\n  "
+      PLPGSQL_RETURN_QUERY_STMT@215..265
+        RETURN_KW@215..221 "return"
+        WHITESPACE@221..222 " "
+        QUERY_KW@222..227 "query"
+        WHITESPACE@227..228 " "
+        INSERT@228..264
+          INSERT_KW@228..234 "insert"
+          WHITESPACE@234..235 " "
+          INTO_KW@235..239 "into"
+          WHITESPACE@239..240 " "
+          RELATION_NAME_REF@240..241
+            PATH_REF@240..241
+              PATH_SEGMENT_REF@240..241
+                IDENT@240..241 "t"
+          WHITESPACE@241..242 " "
+          VALUES@242..252
+            VALUES_KW@242..248 "values"
+            WHITESPACE@248..249 " "
+            ROW_LIST@249..252
+              ROW@249..252
+                L_PAREN@249..250 "("
+                LITERAL@250..251
+                  INT_NUMBER@250..251 "1"
+                R_PAREN@251..252 ")"
+          WHITESPACE@252..253 " "
+          RETURNING_CLAUSE@253..264
+            RETURNING_KW@253..262 "returning"
+            WHITESPACE@262..263 " "
+            TARGET_LIST@263..264
+              TARGET@263..264
+                NAME_REF@263..264
+                  IDENT@263..264 "a"
+        SEMICOLON@264..265 ";"
+      WHITESPACE@265..268 "\n  "
+      PLPGSQL_RETURN_QUERY_EXECUTE_STMT@268..300
+        RETURN_KW@268..274 "return"
+        WHITESPACE@274..275 " "
+        QUERY_KW@275..280 "query"
+        WHITESPACE@280..281 " "
+        EXECUTE_KW@281..288 "execute"
+        WHITESPACE@288..289 " "
+        LITERAL@289..299
+          STRING@289..299 "'select 1'"
+        SEMICOLON@299..300 ";"
+      WHITESPACE@300..303 "\n  "
+      PLPGSQL_RETURN_QUERY_EXECUTE_STMT@303..344
+        RETURN_KW@303..309 "return"
+        WHITESPACE@309..310 " "
+        QUERY_KW@310..315 "query"
+        WHITESPACE@315..316 " "
+        EXECUTE_KW@316..323 "execute"
+        WHITESPACE@323..324 " "
+        LITERAL@324..335
+          STRING@324..335 "'select $1'"
+        WHITESPACE@335..336 " "
+        PLPGSQL_USING_CLAUSE@336..343
+          USING_KW@336..341 "using"
+          WHITESPACE@341..342 " "
+          LITERAL@342..343
+            INT_NUMBER@342..343 "7"
+        SEMICOLON@343..344 ";"
+      WHITESPACE@344..347 "\n  "
+      PLPGSQL_RETURN_QUERY_EXECUTE_STMT@347..395
+        RETURN_KW@347..353 "return"
+        WHITESPACE@353..354 " "
+        QUERY_KW@354..359 "query"
+        WHITESPACE@359..360 " "
+        EXECUTE_KW@360..367 "execute"
+        WHITESPACE@367..368 " "
+        LITERAL@368..383
+          STRING@368..383 "'select $1, $2'"
+        WHITESPACE@383..384 " "
+        PLPGSQL_USING_CLAUSE@384..394
+          USING_KW@384..389 "using"
+          WHITESPACE@389..390 " "
+          LITERAL@390..391
+            INT_NUMBER@390..391 "7"
+          COMMA@391..392 ","
+          WHITESPACE@392..393 " "
+          LITERAL@393..394
+            INT_NUMBER@393..394 "8"
+        SEMICOLON@394..395 ";"
+      WHITESPACE@395..398 "\n  "
+      PLPGSQL_ASSIGN_STMT@398..410
+        PLPGSQL_ASSIGN_TARGET@398..404
+          PLPGSQL_VAR_NAME_REF@398..404
+            RETURN_KW@398..404 "return"
+        WHITESPACE@404..405 " "
+        COLON_EQ@405..407 ":="
+        WHITESPACE@407..408 " "
+        LITERAL@408..409
+          INT_NUMBER@408..409 "2"
+        SEMICOLON@409..410 ";"
+    WHITESPACE@410..411 "\n"
+    END_KW@411..414 "end"
+  WHITESPACE@414..415 "\n"

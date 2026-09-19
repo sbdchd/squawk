@@ -1,0 +1,121 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/alias_decl.sql
+---
+PLPGSQL@0..181
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..180
+    PLPGSQL_LABEL@1..8
+      LESS_LESS@1..3 "<<"
+      PLPGSQL_LABEL_NAME@3..6
+        IDENT@3..6 "blk"
+      GREATER_GREATER@6..8 ">>"
+    WHITESPACE@8..9 "\n"
+    PLPGSQL_DECLARE_SECTION@9..162
+      DECLARE_KW@9..16 "declare"
+      WHITESPACE@16..19 "\n  "
+      PLPGSQL_ALIAS_DECL@19..35
+        PLPGSQL_VAR_NAME@19..20
+          IDENT@19..20 "a"
+        WHITESPACE@20..21 " "
+        ALIAS_KW@21..26 "alias"
+        WHITESPACE@26..27 " "
+        FOR_KW@27..30 "for"
+        WHITESPACE@30..31 " "
+        PLPGSQL_ALIAS_TARGET@31..34
+          PATH_REF@31..34
+            PATH_SEGMENT_REF@31..34
+              NEW_KW@31..34 "new"
+        SEMICOLON@34..35 ";"
+      WHITESPACE@35..38 "\n  "
+      PLPGSQL_ALIAS_DECL@38..53
+        PLPGSQL_VAR_NAME@38..39
+          IDENT@38..39 "b"
+        WHITESPACE@39..40 " "
+        ALIAS_KW@40..45 "alias"
+        WHITESPACE@45..46 " "
+        FOR_KW@46..49 "for"
+        WHITESPACE@49..50 " "
+        PLPGSQL_ALIAS_TARGET@50..52
+          PATH_REF@50..52
+            PATH_SEGMENT_REF@50..52
+              POSITIONAL_PARAM@50..52 "$1"
+        SEMICOLON@52..53 ";"
+      WHITESPACE@53..56 "\n  "
+      PLPGSQL_ALIAS_DECL@56..74
+        PLPGSQL_VAR_NAME@56..57
+          IDENT@56..57 "c"
+        WHITESPACE@57..58 " "
+        ALIAS_KW@58..63 "alias"
+        WHITESPACE@63..64 " "
+        FOR_KW@64..67 "for"
+        WHITESPACE@67..68 " "
+        PLPGSQL_ALIAS_TARGET@68..73
+          PATH_REF@68..73
+            PATH_REF@68..71
+              PATH_SEGMENT_REF@68..71
+                IDENT@68..71 "blk"
+            DOT@71..72 "."
+            PATH_SEGMENT_REF@72..73
+              IDENT@72..73 "x"
+        SEMICOLON@73..74 ";"
+      WHITESPACE@74..77 "\n  "
+      PLPGSQL_ALIAS_DECL@77..117
+        PLPGSQL_VAR_NAME@77..78
+          IDENT@77..78 "d"
+        WHITESPACE@78..79 " "
+        ALIAS_KW@79..84 "alias"
+        WHITESPACE@84..85 " "
+        FOR_KW@85..88 "for"
+        WHITESPACE@88..89 " "
+        PLPGSQL_ALIAS_TARGET@89..116
+          PATH_REF@89..116
+            PATH_REF@89..108
+              PATH_REF@89..99
+                PATH_SEGMENT_REF@89..99
+                  IDENT@89..99 "pg_catalog"
+              DOT@99..100 "."
+              PATH_SEGMENT_REF@100..108
+                IDENT@100..108 "pg_class"
+            DOT@108..109 "."
+            PATH_SEGMENT_REF@109..116
+              IDENT@109..116 "relname"
+        SEMICOLON@116..117 ";"
+      WHITESPACE@117..120 "\n  "
+      PLPGSQL_ALIAS_DECL@120..141
+        PLPGSQL_VAR_NAME@120..121
+          IDENT@120..121 "e"
+        WHITESPACE@121..122 " "
+        ALIAS_KW@122..127 "alias"
+        WHITESPACE@127..128 " "
+        FOR_KW@128..131 "for"
+        WHITESPACE@131..132 " "
+        PLPGSQL_ALIAS_TARGET@132..140
+          PATH_REF@132..140
+            PATH_SEGMENT_REF@132..140
+              IDENT@132..140 "\"my var\""
+        SEMICOLON@140..141 ";"
+      WHITESPACE@141..144 "\n  "
+      PLPGSQL_ALIAS_DECL@144..162
+        PLPGSQL_VAR_NAME@144..145
+          IDENT@144..145 "f"
+        WHITESPACE@145..146 " "
+        ALIAS_KW@146..151 "alias"
+        WHITESPACE@151..152 " "
+        FOR_KW@152..155 "for"
+        WHITESPACE@155..156 " "
+        PLPGSQL_ALIAS_TARGET@156..161
+          PATH_REF@156..161
+            PATH_SEGMENT_REF@156..161
+              VALUE_KW@156..161 "value"
+        SEMICOLON@161..162 ";"
+    WHITESPACE@162..163 "\n"
+    BEGIN_KW@163..168 "begin"
+    WHITESPACE@168..171 "\n  "
+    PLPGSQL_BODY@171..176
+      PLPGSQL_NULL_STMT@171..176
+        NULL_KW@171..175 "null"
+        SEMICOLON@175..176 ";"
+    WHITESPACE@176..177 "\n"
+    END_KW@177..180 "end"
+  WHITESPACE@180..181 "\n"

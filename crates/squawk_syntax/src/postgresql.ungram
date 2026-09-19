@@ -35,6 +35,8 @@ PathSegment =
 
 PathSegmentRef =
   '#name'?
+   // '@positional_param' is only used in pl/pgsql, in an alias target
+  '@positional_param'?
 
 Path =
   qualifier:PathRef?
@@ -767,7 +769,8 @@ ArrayBound =
   '[' Expr? ']'
 
 PercentType =
-  'setof'? PathRef PercentTypeClause
+   // 'array' and ArrayBound are only used in pl/pgsql
+  'setof'? PathRef PercentTypeClause 'array'? ArrayBound*
 
 PathType =
   'setof'? PathRef ArgList?
@@ -2037,10 +2040,378 @@ RoutineBody =
 | AtomicBody
 
 Plpgsql =
-  stmts:(PlpgsqlNullStmt*)
+  comp_options:(PlpgsqlCompOption*)
+  block:PlpgsqlBlock?
+
+PlpgsqlCompOption =
+  PlpgsqlCompOptionDump
+| PlpgsqlCompOptionVariableConflict
+| PlpgsqlCompOptionPrintStrictParams
+
+PlpgsqlCompOptionDump =
+  '#' 'option' 'dump'
+
+PlpgsqlCompOptionVariableConflict =
+  '#' 'variable_conflict' ('error' | 'use_variable' | 'use_column')
+
+PlpgsqlCompOptionPrintStrictParams =
+  '#' 'print_strict_params' option_value:PlpgsqlOptionValue
+
+PlpgsqlOptionValue =
+  '#name'?
+  '@positional_param'?
+
+PlpgsqlBlock =
+  label:PlpgsqlLabel?
+  declare_section:PlpgsqlDeclareSection?
+  'begin'
+  body:PlpgsqlBody
+  exception:PlpgsqlExceptionSection?
+  'end'
+  end_label:PlpgsqlLabelNameRef?
+  ';'?
+
+PlpgsqlExceptionSection =
+  'exception'
+  handlers:(PlpgsqlExceptionHandler*)
+
+PlpgsqlExceptionHandler =
+  'when'
+  conditions:(PlpgsqlCondition*)
+  'then'
+  body:PlpgsqlBody
+
+PlpgsqlCondition =
+  '#name'?
+  '@positional_param'?
+  '@string'?
+
+PlpgsqlLabel =
+  '<<' name:PlpgsqlLabelName '>>'
+
+PlpgsqlLabelName =
+  '#name'?
+  '@positional_param'?
+
+PlpgsqlLabelNameRef =
+  '#name'?
+  '@positional_param'?
+
+PlpgsqlDeclareSection =
+  'declare'
+  decls:(PlpgsqlDecl*)
+
+PlpgsqlDecl =
+  PlpgsqlVarDecl
+| PlpgsqlAliasDecl
+| PlpgsqlCursorDecl
+
+PlpgsqlVarDecl =
+  name:PlpgsqlVarName
+  'constant'?
+  ty:PlpgsqlDeclType
+  Collate?
+  not_null:PlpgsqlNotNull?
+  init:PlpgsqlVarInit?
+  ';'
+
+PlpgsqlDeclType =
+  FuncType
+| PlpgsqlPercentRowtype
+
+PlpgsqlPercentRowtype =
+  PathRef '%' 'rowtype' 'array'? ArrayBound*
+
+PlpgsqlNotNull =
+  'not' 'null'
+
+PlpgsqlVarName =
+  '#name'?
+  '@positional_param'?
+
+PlpgsqlVarInit =
+  (':=' | '=' | 'default')
+  Expr
+
+PlpgsqlAliasDecl =
+  name:PlpgsqlVarName
+  'alias'
+  'for'
+  target:PlpgsqlAliasTarget
+  ';'
+
+PlpgsqlAliasTarget =
+  PathRef
+
+PlpgsqlCursorDecl =
+  name:PlpgsqlVarName
+  scroll:CursorScroll?
+  'cursor'
+  args:PlpgsqlCursorArgList?
+  ('is' | 'for')
+  query:Stmt
+  ';'
+
+PlpgsqlCursorArgList =
+  '(' (PlpgsqlCursorArg (',' PlpgsqlCursorArg)*) ')'
+
+PlpgsqlCursorArg =
+  name:PlpgsqlVarName
+  ty:PlpgsqlDeclType
+
+PlpgsqlBody =
+  stmts:(PlpgsqlStmt*)
+
+PlpgsqlStmt =
+  PlpgsqlAssignStmt
+| PlpgsqlBlock
+| PlpgsqlCallStmt
+| PlpgsqlCaseStmt
+| PlpgsqlContinueStmt
+| PlpgsqlDoStmt
+| PlpgsqlExitStmt
+| PlpgsqlGetDiagStmt
+| PlpgsqlIfStmt
+| PlpgsqlLoopStmt
+| PlpgsqlAssertStmt
+| PlpgsqlCommitStmt
+| PlpgsqlNullStmt
+| PlpgsqlPerformStmt
+| PlpgsqlRaiseStmt
+| PlpgsqlReturnNextStmt
+| PlpgsqlReturnQueryExecuteStmt
+| PlpgsqlReturnQueryStmt
+| PlpgsqlReturnStmt
+| PlpgsqlRollbackStmt
+| PlpgsqlWhileStmt
 
 PlpgsqlNullStmt =
   'null' ';'
+
+PlpgsqlCallStmt =
+  Call
+  ';'
+
+PlpgsqlDoStmt =
+  Do
+  ';'
+
+PlpgsqlPerformStmt =
+  (Select | SelectInto | CompoundSelect)
+  ';'
+
+PlpgsqlReturnStmt =
+  'return'
+  Expr?
+  ';'
+
+PlpgsqlReturnNextStmt =
+  'return' 'next'
+  Expr?
+  ';'
+
+PlpgsqlReturnQueryStmt =
+  'return' 'query'
+  query:Stmt
+  ';'
+
+PlpgsqlReturnQueryExecuteStmt =
+  'return' 'query' 'execute'
+  query:Expr
+  using_clause:PlpgsqlUsingClause?
+  ';'
+
+PlpgsqlUsingClause =
+  'using' (Expr (',' Expr)*)
+
+PlpgsqlRaiseStmt =
+  'raise'
+  level:PlpgsqlRaiseLevel?
+  condition_name:PlpgsqlCondition?
+  message:PlpgsqlRaiseMessage?
+  params:(Expr (',' Expr)*)
+  using_clause:PlpgsqlRaiseUsingClause?
+  ';'
+
+PlpgsqlRaiseLevel =
+  'exception' | 'warning' | 'notice' | 'info' | 'log' | 'debug'
+
+PlpgsqlRaiseMessage =
+  Literal
+
+PlpgsqlRaiseUsingClause =
+  'using' (PlpgsqlRaiseOption (',' PlpgsqlRaiseOption)*)
+
+PlpgsqlRaiseOption =
+  PlpgsqlRaiseOptionErrcode
+| PlpgsqlRaiseOptionMessage
+| PlpgsqlRaiseOptionDetail
+| PlpgsqlRaiseOptionHint
+| PlpgsqlRaiseOptionColumn
+| PlpgsqlRaiseOptionConstraint
+| PlpgsqlRaiseOptionDatatype
+| PlpgsqlRaiseOptionTable
+| PlpgsqlRaiseOptionSchema
+
+PlpgsqlRaiseOptionErrcode =
+  'errcode' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionMessage =
+  'message' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionDetail =
+  'detail' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionHint =
+  'hint' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionColumn =
+  'column' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionConstraint =
+  'constraint' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionDatatype =
+  'datatype' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionTable =
+  'table' (':=' | '=') Expr
+
+PlpgsqlRaiseOptionSchema =
+  'schema' (':=' | '=') Expr
+
+PlpgsqlAssertStmt =
+  'assert'
+  cond:Expr
+  message:Expr?
+  ';'
+
+PlpgsqlCommitStmt =
+  'commit'
+  ChainClause?
+  ';'
+
+PlpgsqlRollbackStmt =
+  'rollback'
+  ChainClause?
+  ';'
+
+PlpgsqlIfStmt =
+  'if'
+  cond:Expr
+  'then'
+  then_body:PlpgsqlBody
+  elsifs:(PlpgsqlElsifClause*)
+  else_clause:PlpgsqlElseClause?
+  'end' 'if' ';'
+
+PlpgsqlElsifClause =
+  ('elsif' | 'elseif')
+  cond:Expr
+  'then'
+  body:PlpgsqlBody
+
+PlpgsqlElseClause =
+  'else'
+  body:PlpgsqlBody
+
+PlpgsqlCaseStmt =
+  'case'
+  subject:Expr?
+  whens:(PlpgsqlCaseWhen*)
+  else_clause:PlpgsqlElseClause?
+  'end' 'case' ';'
+
+PlpgsqlCaseWhen =
+  'when'
+  conds:(Expr (',' Expr)*)
+  'then'
+  body:PlpgsqlBody
+
+PlpgsqlLoopStmt =
+  label:PlpgsqlLabel?
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlWhileStmt =
+  label:PlpgsqlLabel?
+  'while'
+  cond:Expr
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlExitStmt =
+  'exit'
+  label:PlpgsqlLabelNameRef?
+  when_clause:PlpgsqlExitWhen?
+  ';'
+
+PlpgsqlContinueStmt =
+  'continue'
+  label:PlpgsqlLabelNameRef?
+  when_clause:PlpgsqlExitWhen?
+  ';'
+
+PlpgsqlExitWhen =
+  'when'
+  cond:Expr
+
+PlpgsqlAssignStmt =
+  target:PlpgsqlAssignTarget
+  (':=' | '=')
+  value:Expr
+  ';'
+
+PlpgsqlAssignTarget =
+  name:PlpgsqlVarNameRef
+  Accessor*
+
+PlpgsqlVarNameRef =
+  '#name'?
+  '@positional_param'?
+
+PlpgsqlGetDiagStmt =
+  'get'
+  area:PlpgsqlDiagArea?
+  'diagnostics'
+  items:PlpgsqlDiagItemList
+  ';'
+
+PlpgsqlDiagArea =
+  'current' | 'stacked'
+
+PlpgsqlDiagItemList =
+  PlpgsqlDiagItem (',' PlpgsqlDiagItem)*
+
+PlpgsqlDiagItem =
+  target:PlpgsqlDiagTarget
+  (':=' | '=')
+  kind:PlpgsqlDiagKind
+
+PlpgsqlDiagTarget =
+  name:PlpgsqlVarNameRef
+  FieldAccessor*
+
+PlpgsqlDiagKind =
+  'row_count'
+| 'pg_routine_oid'
+| 'pg_context'
+| 'pg_exception_detail'
+| 'pg_exception_hint'
+| 'pg_exception_context'
+| 'column_name'
+| 'constraint_name'
+| 'pg_datatype_name'
+| 'message_text'
+| 'table_name'
+| 'schema_name'
+| 'returned_sqlstate'
 
 FuncOptionList =
   options:(FuncOption*)
@@ -2880,7 +3251,9 @@ WithClause =
   'with' 'recursive'? (WithTable (',' WithTable)*)
 
 SelectClause =
-  'select'
+  // 'perform' is only used in pl/pgsql, postgres rewrites it to select before
+  // parsing
+  ('select' | 'perform')
   SelectQuantifier?
   TargetList?
 

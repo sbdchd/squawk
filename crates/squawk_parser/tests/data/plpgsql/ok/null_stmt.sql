@@ -1,1 +1,6 @@
-null;
+do $$
+begin
+  null;
+  null;
+end
+$$;

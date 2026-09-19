@@ -1,0 +1,48 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/assert_stmt.sql
+---
+PLPGSQL@0..39
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..38
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..34
+      PLPGSQL_ASSERT_STMT@9..16
+        ASSERT_KW@9..15 "assert"
+        SEMICOLON@15..16 ";"
+      WHITESPACE@16..19 "\n  "
+      PLPGSQL_ASSERT_STMT@19..34
+        ASSERT_KW@19..25 "assert"
+        WHITESPACE@25..26 " "
+        BIN_EXPR@26..31
+          LITERAL@26..27
+            INT_NUMBER@26..27 "1"
+          WHITESPACE@27..28 " "
+          EQ@28..29 "="
+          WHITESPACE@29..30 " "
+          LITERAL@30..31
+            INT_NUMBER@30..31 "1"
+        COMMA@31..32 ","
+        WHITESPACE@32..33 " "
+        SEMICOLON@33..34 ";"
+    WHITESPACE@34..35 "\n"
+    END_KW@35..38 "end"
+  WHITESPACE@38..39 "\n"
+
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+3 │   assert;
+  ╰╴        ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+3 │   assert;
+  ╰╴        ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+4 │   assert 1 = 1, ;
+  ╰╴               ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+4 │   assert 1 = 1, ;
+  ╰╴               ━

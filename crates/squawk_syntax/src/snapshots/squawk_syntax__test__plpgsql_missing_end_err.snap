@@ -1,0 +1,19 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/missing_end.sql
+---
+PLPGSQL@0..15
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..14
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..14
+      PLPGSQL_NULL_STMT@9..14
+        NULL_KW@9..13 "null"
+        SEMICOLON@13..14 ";"
+  WHITESPACE@14..15 "\n"
+
+error[syntax-error]: expected END_KW
+  ╭▸ 
+3 │   null;
+  ╰╴       ━

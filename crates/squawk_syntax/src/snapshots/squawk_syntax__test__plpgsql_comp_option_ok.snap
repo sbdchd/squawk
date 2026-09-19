@@ -1,0 +1,177 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/comp_option.sql
+---
+PLPGSQL@0..24
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_DUMP@1..13
+    POUND@1..2 "#"
+    OPTION_KW@2..8 "option"
+    WHITESPACE@8..9 " "
+    DUMP_KW@9..13 "dump"
+  WHITESPACE@13..14 "\n"
+  PLPGSQL_BLOCK@14..23
+    BEGIN_KW@14..19 "begin"
+    WHITESPACE@19..20 " "
+    PLPGSQL_BODY@20..20
+    END_KW@20..23 "end"
+  WHITESPACE@23..24 " "
+---
+PLPGSQL@0..36
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT@1..25
+    POUND@1..2 "#"
+    VARIABLE_CONFLICT_KW@2..19 "variable_conflict"
+    WHITESPACE@19..20 " "
+    ERROR_KW@20..25 "error"
+  WHITESPACE@25..26 "\n"
+  PLPGSQL_BLOCK@26..35
+    BEGIN_KW@26..31 "begin"
+    WHITESPACE@31..32 " "
+    PLPGSQL_BODY@32..32
+    END_KW@32..35 "end"
+  WHITESPACE@35..36 " "
+---
+PLPGSQL@0..43
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT@1..32
+    POUND@1..2 "#"
+    VARIABLE_CONFLICT_KW@2..19 "variable_conflict"
+    WHITESPACE@19..20 " "
+    USE_VARIABLE_KW@20..32 "use_variable"
+  WHITESPACE@32..33 "\n"
+  PLPGSQL_BLOCK@33..42
+    BEGIN_KW@33..38 "begin"
+    WHITESPACE@38..39 " "
+    PLPGSQL_BODY@39..39
+    END_KW@39..42 "end"
+  WHITESPACE@42..43 " "
+---
+PLPGSQL@0..41
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT@1..30
+    POUND@1..2 "#"
+    VARIABLE_CONFLICT_KW@2..19 "variable_conflict"
+    WHITESPACE@19..20 " "
+    USE_COLUMN_KW@20..30 "use_column"
+  WHITESPACE@30..31 "\n"
+  PLPGSQL_BLOCK@31..40
+    BEGIN_KW@31..36 "begin"
+    WHITESPACE@36..37 " "
+    PLPGSQL_BODY@37..37
+    END_KW@37..40 "end"
+  WHITESPACE@40..41 " "
+---
+PLPGSQL@0..35
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..24
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+    WHITESPACE@21..22 " "
+    PLPGSQL_OPTION_VALUE@22..24
+      ON_KW@22..24 "on"
+  WHITESPACE@24..25 "\n"
+  PLPGSQL_BLOCK@25..34
+    BEGIN_KW@25..30 "begin"
+    WHITESPACE@30..31 " "
+    PLPGSQL_BODY@31..31
+    END_KW@31..34 "end"
+  WHITESPACE@34..35 " "
+---
+PLPGSQL@0..36
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..25
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+    WHITESPACE@21..22 " "
+    PLPGSQL_OPTION_VALUE@22..25
+      OFF_KW@22..25 "off"
+  WHITESPACE@25..26 "\n"
+  PLPGSQL_BLOCK@26..35
+    BEGIN_KW@26..31 "begin"
+    WHITESPACE@31..32 " "
+    PLPGSQL_BODY@32..32
+    END_KW@32..35 "end"
+  WHITESPACE@35..36 " "
+---
+PLPGSQL@0..35
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..24
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+    WHITESPACE@21..22 " "
+    PLPGSQL_OPTION_VALUE@22..24
+      ON_KW@22..24 "ON"
+  WHITESPACE@24..25 "\n"
+  PLPGSQL_BLOCK@25..34
+    BEGIN_KW@25..30 "begin"
+    WHITESPACE@30..31 " "
+    PLPGSQL_BODY@31..31
+    END_KW@31..34 "end"
+  WHITESPACE@34..35 " "
+---
+PLPGSQL@0..37
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@1..26
+    POUND@1..2 "#"
+    PRINT_STRICT_PARAMS_KW@2..21 "print_strict_params"
+    WHITESPACE@21..22 " "
+    PLPGSQL_OPTION_VALUE@22..26
+      IDENT@22..26 "\"on\""
+  WHITESPACE@26..27 "\n"
+  PLPGSQL_BLOCK@27..36
+    BEGIN_KW@27..32 "begin"
+    WHITESPACE@32..33 " "
+    PLPGSQL_BODY@33..33
+    END_KW@33..36 "end"
+  WHITESPACE@36..37 " "
+---
+PLPGSQL@0..111
+  WHITESPACE@0..1 " "
+  PLPGSQL_COMP_OPTION_DUMP@1..14
+    POUND@1..2 "#"
+    WHITESPACE@2..3 " "
+    OPTION_KW@3..9 "option"
+    WHITESPACE@9..10 " "
+    DUMP_KW@10..14 "dump"
+  WHITESPACE@14..15 "\n"
+  PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT@15..46
+    POUND@15..16 "#"
+    VARIABLE_CONFLICT_KW@16..33 "variable_conflict"
+    WHITESPACE@33..34 " "
+    USE_VARIABLE_KW@34..46 "use_variable"
+  WHITESPACE@46..47 "\n"
+  PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS@47..70
+    POUND@47..48 "#"
+    PRINT_STRICT_PARAMS_KW@48..67 "print_strict_params"
+    WHITESPACE@67..68 " "
+    PLPGSQL_OPTION_VALUE@68..70
+      ON_KW@68..70 "on"
+  WHITESPACE@70..71 "\n"
+  PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT@71..100
+    POUND@71..72 "#"
+    VARIABLE_CONFLICT_KW@72..89 "variable_conflict"
+    WHITESPACE@89..90 " "
+    USE_COLUMN_KW@90..100 "use_column"
+  WHITESPACE@100..101 "\n"
+  PLPGSQL_BLOCK@101..110
+    BEGIN_KW@101..106 "begin"
+    WHITESPACE@106..107 " "
+    PLPGSQL_BODY@107..107
+    END_KW@107..110 "end"
+  WHITESPACE@110..111 " "
+---
+PLPGSQL@0..24
+  WHITESPACE@0..1 " "
+  PLPGSQL_COMP_OPTION_DUMP@1..13
+    POUND@1..2 "#"
+    OPTION_KW@2..8 "option"
+    WHITESPACE@8..9 " "
+    DUMP_KW@9..13 "dump"
+  WHITESPACE@13..14 " "
+  PLPGSQL_BLOCK@14..23
+    BEGIN_KW@14..19 "begin"
+    WHITESPACE@19..20 " "
+    PLPGSQL_BODY@20..20
+    END_KW@20..23 "end"
+  WHITESPACE@23..24 " "
