@@ -1,0 +1,7 @@
+---
+source: crates/squawk/src/github.rs
+expression: body
+---
+# Squawk Report
+
+✅ 0 violations across 8 file(s)
