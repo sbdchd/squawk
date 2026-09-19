@@ -2621,7 +2621,7 @@ fn arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn arg_list(p: &mut Parser<'_>) {
+pub(crate) fn arg_list(p: &mut Parser<'_>) {
     assert!(p.at(L_PAREN));
     let m = p.start();
     // sum(*), count(*), max(*)

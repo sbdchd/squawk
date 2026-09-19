@@ -335,6 +335,10 @@ fn stmt(p: &mut Parser) {
         raise_stmt(p);
     } else if at_stmt_kw(p, GET_KW) {
         get_diag_stmt(p);
+    } else if at_stmt_kw(p, FETCH_KW) {
+        fetch_stmt(p);
+    } else if at_stmt_kw(p, OPEN_KW) {
+        open_stmt(p);
     } else if at_stmt_kw(p, MOVE_KW) {
         move_stmt(p);
     } else if at_stmt_kw(p, CLOSE_KW) {
@@ -611,7 +615,7 @@ fn diag_item_list(p: &mut Parser) {
 fn diag_item(p: &mut Parser) {
     let m = p.start();
     if at_name(p, 0) {
-        diag_target(p);
+        scalar_target(p, PLPGSQL_DIAG_TARGET);
         if !p.eat(COLON_EQ) {
             p.expect(EQ);
         }
@@ -625,7 +629,7 @@ fn diag_item(p: &mut Parser) {
     m.complete(p, PLPGSQL_DIAG_ITEM);
 }
 
-fn diag_target(p: &mut Parser) {
+fn scalar_target(p: &mut Parser, kind: SyntaxKind) {
     assert!(at_name(p, 0));
     let m = p.start();
     name(p, PLPGSQL_VAR_NAME_REF);
@@ -634,11 +638,11 @@ fn diag_target(p: &mut Parser) {
     }
     if p.at(L_BRACK) {
         let m = p.start();
-        p.error("a GET DIAGNOSTICS target can't be subscripted");
+        p.error("subscript not allowed");
         grammar::accessors(p);
         m.complete(p, ERROR);
     }
-    m.complete(p, PLPGSQL_DIAG_TARGET);
+    m.complete(p, kind);
 }
 
 fn diag_kind(p: &mut Parser) {
@@ -658,18 +662,89 @@ fn diag_kind(p: &mut Parser) {
     m.complete(p, PLPGSQL_DIAG_KIND);
 }
 
+fn open_stmt(p: &mut Parser) {
+    assert!(at_stmt_kw(p, OPEN_KW));
+    let m = p.start();
+    p.bump_remap(OPEN_KW);
+    cursor_variable_ref(p);
+    if p.at(L_PAREN) {
+        grammar::arg_list(p);
+    }
+    grammar::opt_cursor_scroll(p);
+    if p.at(FOR_KW) {
+        let m = p.start();
+        p.bump(FOR_KW);
+        let kind = if p.eat(EXECUTE_KW) {
+            expr(p);
+            opt_using_clause(p);
+            PLPGSQL_OPEN_EXECUTE
+        } else {
+            if grammar::stmt(p, &grammar::StmtRestrictions::default()).is_none() {
+                p.error("expected a query");
+            }
+            PLPGSQL_OPEN_QUERY
+        };
+        m.complete(p, kind);
+    }
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_OPEN_STMT);
+}
+
+fn fetch_stmt(p: &mut Parser) {
+    assert!(at_stmt_kw(p, FETCH_KW));
+    let m = p.start();
+    p.bump(FETCH_KW);
+    fetch_direction(p);
+    cursor_variable_ref(p);
+    into_clause(p);
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_FETCH_STMT);
+}
+
 fn move_stmt(p: &mut Parser) {
     assert!(at_stmt_kw(p, MOVE_KW));
     let m = p.start();
     p.bump(MOVE_KW);
+    fetch_direction(p);
+    cursor_variable_ref(p);
+    p.expect(SEMICOLON);
+    m.complete(p, PLPGSQL_MOVE_STMT);
+}
+
+fn fetch_direction(p: &mut Parser) {
     let direction = grammar::opt_direction(p);
     let from_or_in = p.eat(FROM_KW) || p.eat(IN_KW);
     if direction && !from_or_in {
         p.error("expected FROM or IN");
     }
-    cursor_variable_ref(p);
-    p.expect(SEMICOLON);
-    m.complete(p, PLPGSQL_MOVE_STMT);
+}
+
+fn into_clause(p: &mut Parser) {
+    if !p.at(INTO_KW) {
+        p.error(format!("expected INTO, got {:?}", p.current()));
+        return;
+    }
+    let m = p.start();
+    p.bump(INTO_KW);
+    into_target_list(p);
+    m.complete(p, PLPGSQL_INTO_CLAUSE);
+}
+
+fn into_target_list(p: &mut Parser) {
+    let m = p.start();
+    into_target(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        into_target(p);
+    }
+    m.complete(p, PLPGSQL_INTO_TARGET_LIST);
+}
+
+fn into_target(p: &mut Parser) {
+    if !at_name(p, 0) {
+        p.error(format!("expected an INTO target, got {:?}", p.current()));
+        return;
+    }
+    scalar_target(p, PLPGSQL_INTO_TARGET);
 }
 
 fn close_stmt(p: &mut Parser) {

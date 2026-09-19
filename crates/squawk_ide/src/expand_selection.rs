@@ -73,6 +73,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::PARTITION_LIST,
     SyntaxKind::PLPGSQL_CURSOR_ARG_LIST,
     SyntaxKind::PLPGSQL_DIAG_ITEM_LIST,
+    SyntaxKind::PLPGSQL_INTO_TARGET_LIST,
     SyntaxKind::TABLE_NAME_REF_LIST,
     SyntaxKind::REINDEX_OPTION_LIST,
     SyntaxKind::RELATION_LIST,

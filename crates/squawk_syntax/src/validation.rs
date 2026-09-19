@@ -55,6 +55,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 },
                 ast::PlpgsqlCaseWhen(it) => validate_no_bare_case_in_conds(it, errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
+                ast::PlpgsqlFetchStmt(it) => validate_fetch_single_row(it, errors),
                 ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
                 ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
@@ -362,6 +363,29 @@ fn validate_print_strict_params(
         acc.push(SyntaxError::new(
             format!("unrecognized print_strict_params option {text}"),
             value.syntax().text_range(),
+        ));
+    }
+}
+
+// -- err
+// fetch all from c into x;
+// fetch forward 2 from c into x;
+// -- ok
+// fetch forward from c into x;
+fn validate_fetch_single_row(it: ast::PlpgsqlFetchStmt, acc: &mut Vec<SyntaxError>) {
+    let Some(direction) = it.direction() else {
+        return;
+    };
+    let multiple_rows = match &direction {
+        ast::CursorAction::All(_) | ast::CursorAction::Expr(_) => true,
+        ast::CursorAction::Forward(it) => it.all_token().is_some() || it.expr().is_some(),
+        ast::CursorAction::Backward(it) => it.all_token().is_some() || it.expr().is_some(),
+        _ => false,
+    };
+    if multiple_rows {
+        acc.push(SyntaxError::new(
+            "FETCH statement cannot return multiple rows",
+            direction.syntax().text_range(),
         ));
     }
 }

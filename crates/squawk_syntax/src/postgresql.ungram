@@ -2171,6 +2171,7 @@ PlpgsqlStmt =
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
 | PlpgsqlExitStmt
+| PlpgsqlFetchStmt
 | PlpgsqlGetDiagStmt
 | PlpgsqlIfStmt
 | PlpgsqlLoopStmt
@@ -2178,6 +2179,7 @@ PlpgsqlStmt =
 | PlpgsqlAssertStmt
 | PlpgsqlCommitStmt
 | PlpgsqlNullStmt
+| PlpgsqlOpenStmt
 | PlpgsqlPerformStmt
 | PlpgsqlRaiseStmt
 | PlpgsqlReturnNextStmt
@@ -2426,6 +2428,46 @@ PlpgsqlMoveStmt =
   ('from' | 'in')?
   cursor:PlpgsqlCursorVariableRef
   ';'
+
+PlpgsqlFetchStmt =
+  'fetch'
+  direction:CursorAction?
+  ('from' | 'in')?
+  cursor:PlpgsqlCursorVariableRef
+  into_clause:PlpgsqlIntoClause
+  ';'
+
+PlpgsqlIntoClause =
+  'into'
+  targets:PlpgsqlIntoTargetList
+
+PlpgsqlIntoTargetList =
+  PlpgsqlIntoTarget (',' PlpgsqlIntoTarget)*
+
+PlpgsqlIntoTarget =
+  name:PlpgsqlVarNameRef
+  FieldAccessor*
+
+PlpgsqlOpenStmt =
+  'open'
+  cursor:PlpgsqlCursorVariableRef
+  args:ArgList?
+  scroll:CursorScroll?
+  source:PlpgsqlOpenSource?
+  ';'
+
+PlpgsqlOpenSource =
+  PlpgsqlOpenQuery
+| PlpgsqlOpenExecute
+
+PlpgsqlOpenQuery =
+  'for'
+  query:Stmt
+
+PlpgsqlOpenExecute =
+  'for' 'execute'
+  query:Expr
+  using_clause:PlpgsqlUsingClause?
 
 PlpgsqlCursorVariableRef =
   '#name'?

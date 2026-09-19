@@ -20123,6 +20123,41 @@ impl PlpgsqlExitWhen {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlFetchStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlFetchStmt {
+    #[inline]
+    pub fn cursor(&self) -> Option<PlpgsqlCursorVariableRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn direction(&self) -> Option<CursorAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn into_clause(&self) -> Option<PlpgsqlIntoClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn fetch_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FETCH_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn in_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlGetDiagStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -20185,6 +20220,47 @@ impl PlpgsqlIfStmt {
     #[inline]
     pub fn then_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlIntoClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlIntoClause {
+    #[inline]
+    pub fn targets(&self) -> Option<PlpgsqlIntoTargetList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn into_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INTO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlIntoTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlIntoTarget {
+    #[inline]
+    pub fn field_accessors(&self) -> AstChildren<FieldAccessor> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<PlpgsqlVarNameRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlIntoTargetList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlIntoTargetList {
+    #[inline]
+    pub fn plpgsql_into_targets(&self) -> AstChildren<PlpgsqlIntoTarget> {
+        support::children(&self.syntax)
     }
 }
 
@@ -20326,6 +20402,75 @@ impl PlpgsqlNullStmt {
     #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NULL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlOpenExecute {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlOpenExecute {
+    #[inline]
+    pub fn query(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_clause(&self) -> Option<PlpgsqlUsingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn execute_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXECUTE_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlOpenQuery {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlOpenQuery {
+    #[inline]
+    pub fn query(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlOpenStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlOpenStmt {
+    #[inline]
+    pub fn args(&self) -> Option<ArgList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cursor(&self) -> Option<PlpgsqlCursorVariableRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn scroll(&self) -> Option<CursorScroll> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn source(&self) -> Option<PlpgsqlOpenSource> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn open_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPEN_KW)
     }
 }
 
@@ -30992,6 +31137,12 @@ pub enum PlpgsqlDeclType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlpgsqlOpenSource {
+    PlpgsqlOpenExecute(PlpgsqlOpenExecute),
+    PlpgsqlOpenQuery(PlpgsqlOpenQuery),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlpgsqlRaiseOption {
     PlpgsqlRaiseOptionColumn(PlpgsqlRaiseOptionColumn),
     PlpgsqlRaiseOptionConstraint(PlpgsqlRaiseOptionConstraint),
@@ -31016,11 +31167,13 @@ pub enum PlpgsqlStmt {
     PlpgsqlContinueStmt(PlpgsqlContinueStmt),
     PlpgsqlDoStmt(PlpgsqlDoStmt),
     PlpgsqlExitStmt(PlpgsqlExitStmt),
+    PlpgsqlFetchStmt(PlpgsqlFetchStmt),
     PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt),
     PlpgsqlIfStmt(PlpgsqlIfStmt),
     PlpgsqlLoopStmt(PlpgsqlLoopStmt),
     PlpgsqlMoveStmt(PlpgsqlMoveStmt),
     PlpgsqlNullStmt(PlpgsqlNullStmt),
+    PlpgsqlOpenStmt(PlpgsqlOpenStmt),
     PlpgsqlPerformStmt(PlpgsqlPerformStmt),
     PlpgsqlRaiseStmt(PlpgsqlRaiseStmt),
     PlpgsqlReturnNextStmt(PlpgsqlReturnNextStmt),
@@ -48271,6 +48424,24 @@ impl AstNode for PlpgsqlExitWhen {
         &self.syntax
     }
 }
+impl AstNode for PlpgsqlFetchStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_FETCH_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PlpgsqlGetDiagStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -48293,6 +48464,60 @@ impl AstNode for PlpgsqlIfStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_IF_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlIntoClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_INTO_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlIntoTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_INTO_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlIntoTargetList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_INTO_TARGET_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -48419,6 +48644,60 @@ impl AstNode for PlpgsqlNullStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_NULL_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlOpenExecute {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_OPEN_EXECUTE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlOpenQuery {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_OPEN_QUERY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlOpenStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_OPEN_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -68854,6 +69133,49 @@ impl From<PlpgsqlPercentRowtype> for PlpgsqlDeclType {
         PlpgsqlDeclType::PlpgsqlPercentRowtype(node)
     }
 }
+impl AstNode for PlpgsqlOpenSource {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PLPGSQL_OPEN_EXECUTE | SyntaxKind::PLPGSQL_OPEN_QUERY
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PLPGSQL_OPEN_EXECUTE => {
+                PlpgsqlOpenSource::PlpgsqlOpenExecute(PlpgsqlOpenExecute { syntax })
+            }
+            SyntaxKind::PLPGSQL_OPEN_QUERY => {
+                PlpgsqlOpenSource::PlpgsqlOpenQuery(PlpgsqlOpenQuery { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PlpgsqlOpenSource::PlpgsqlOpenExecute(it) => &it.syntax,
+            PlpgsqlOpenSource::PlpgsqlOpenQuery(it) => &it.syntax,
+        }
+    }
+}
+impl From<PlpgsqlOpenExecute> for PlpgsqlOpenSource {
+    #[inline]
+    fn from(node: PlpgsqlOpenExecute) -> PlpgsqlOpenSource {
+        PlpgsqlOpenSource::PlpgsqlOpenExecute(node)
+    }
+}
+impl From<PlpgsqlOpenQuery> for PlpgsqlOpenSource {
+    #[inline]
+    fn from(node: PlpgsqlOpenQuery) -> PlpgsqlOpenSource {
+        PlpgsqlOpenSource::PlpgsqlOpenQuery(node)
+    }
+}
 impl AstNode for PlpgsqlRaiseOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -68994,11 +69316,13 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_CONTINUE_STMT
                 | SyntaxKind::PLPGSQL_DO_STMT
                 | SyntaxKind::PLPGSQL_EXIT_STMT
+                | SyntaxKind::PLPGSQL_FETCH_STMT
                 | SyntaxKind::PLPGSQL_GET_DIAG_STMT
                 | SyntaxKind::PLPGSQL_IF_STMT
                 | SyntaxKind::PLPGSQL_LOOP_STMT
                 | SyntaxKind::PLPGSQL_MOVE_STMT
                 | SyntaxKind::PLPGSQL_NULL_STMT
+                | SyntaxKind::PLPGSQL_OPEN_STMT
                 | SyntaxKind::PLPGSQL_PERFORM_STMT
                 | SyntaxKind::PLPGSQL_RAISE_STMT
                 | SyntaxKind::PLPGSQL_RETURN_NEXT_STMT
@@ -69038,6 +69362,9 @@ impl AstNode for PlpgsqlStmt {
             SyntaxKind::PLPGSQL_EXIT_STMT => {
                 PlpgsqlStmt::PlpgsqlExitStmt(PlpgsqlExitStmt { syntax })
             }
+            SyntaxKind::PLPGSQL_FETCH_STMT => {
+                PlpgsqlStmt::PlpgsqlFetchStmt(PlpgsqlFetchStmt { syntax })
+            }
             SyntaxKind::PLPGSQL_GET_DIAG_STMT => {
                 PlpgsqlStmt::PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt { syntax })
             }
@@ -69050,6 +69377,9 @@ impl AstNode for PlpgsqlStmt {
             }
             SyntaxKind::PLPGSQL_NULL_STMT => {
                 PlpgsqlStmt::PlpgsqlNullStmt(PlpgsqlNullStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_OPEN_STMT => {
+                PlpgsqlStmt::PlpgsqlOpenStmt(PlpgsqlOpenStmt { syntax })
             }
             SyntaxKind::PLPGSQL_PERFORM_STMT => {
                 PlpgsqlStmt::PlpgsqlPerformStmt(PlpgsqlPerformStmt { syntax })
@@ -69094,11 +69424,13 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlContinueStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlDoStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlExitStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlFetchStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlGetDiagStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlIfStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlLoopStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlMoveStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlNullStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlOpenStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlPerformStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlRaiseStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlReturnNextStmt(it) => &it.syntax,
@@ -69170,6 +69502,12 @@ impl From<PlpgsqlExitStmt> for PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlExitStmt(node)
     }
 }
+impl From<PlpgsqlFetchStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlFetchStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlFetchStmt(node)
+    }
+}
 impl From<PlpgsqlGetDiagStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlGetDiagStmt) -> PlpgsqlStmt {
@@ -69198,6 +69536,12 @@ impl From<PlpgsqlNullStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlNullStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlNullStmt(node)
+    }
+}
+impl From<PlpgsqlOpenStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlOpenStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlOpenStmt(node)
     }
 }
 impl From<PlpgsqlPerformStmt> for PlpgsqlStmt {

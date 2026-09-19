@@ -171,6 +171,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::PARTITION_ITEM_LIST
         | SyntaxKind::PARTITION_LIST
         | SyntaxKind::PLPGSQL_DIAG_ITEM_LIST
+        | SyntaxKind::PLPGSQL_INTO_TARGET_LIST
         | SyntaxKind::TABLE_NAME_REF_LIST
         | SyntaxKind::REINDEX_OPTION_LIST
         | SyntaxKind::RELATION_LIST

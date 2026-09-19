@@ -270,50 +270,50 @@ mod tests {
 
     #[test]
     fn unparsed_tokens_are_errors() {
-        assert_snapshot!(body("do $$ begin open c; end $$;"), @r#"
-        PLPGSQL@0..19
+        assert_snapshot!(body("do $$ begin null null; end $$;"), @r#"
+        PLPGSQL@0..22
           WHITESPACE@0..1 " "
-          PLPGSQL_BLOCK@1..18
+          PLPGSQL_BLOCK@1..21
             BEGIN_KW@1..6 "begin"
             WHITESPACE@6..7 " "
-            PLPGSQL_BODY@7..14
-              ERROR@7..14
-                IDENT@7..11 "open"
+            PLPGSQL_BODY@7..17
+              ERROR@7..17
+                NULL_KW@7..11 "null"
                 WHITESPACE@11..12 " "
-                IDENT@12..13 "c"
-                SEMICOLON@13..14 ";"
-            WHITESPACE@14..15 " "
-            END_KW@15..18 "end"
-          WHITESPACE@18..19 " "
+                NULL_KW@12..16 "null"
+                SEMICOLON@16..17 ";"
+            WHITESPACE@17..18 " "
+            END_KW@18..21 "end"
+          WHITESPACE@21..22 " "
         ---
-        source 5..24 " begin open c; end "
-        error[syntax-error]: expected a statement, got IDENT
+        source 5..27 " begin null null; end "
+        error[syntax-error]: expected a statement, got NULL_KW
           ╭▸ 
-        1 │ do $$ begin open c; end $$;
+        1 │ do $$ begin null null; end $$;
           ╰╴            ━
         "#);
     }
 
     #[test]
     fn errors_in_an_escaped_body_map_into_the_file() {
-        assert_snapshot!(body(r"do E'begin\n open c;\n end';"), @r#"
-        PLPGSQL@0..19
-          PLPGSQL_BLOCK@0..19
+        assert_snapshot!(body(r"do E'begin\n null null;\n end';"), @r#"
+        PLPGSQL@0..22
+          PLPGSQL_BLOCK@0..22
             BEGIN_KW@0..5 "begin"
             WHITESPACE@5..7 "\n "
-            PLPGSQL_BODY@7..14
-              ERROR@7..14
-                IDENT@7..11 "open"
+            PLPGSQL_BODY@7..17
+              ERROR@7..17
+                NULL_KW@7..11 "null"
                 WHITESPACE@11..12 " "
-                IDENT@12..13 "c"
-                SEMICOLON@13..14 ";"
-            WHITESPACE@14..16 "\n "
-            END_KW@16..19 "end"
+                NULL_KW@12..16 "null"
+                SEMICOLON@16..17 ";"
+            WHITESPACE@17..19 "\n "
+            END_KW@19..22 "end"
         ---
-        source 5..26 "begin\\n open c;\\n end"
-        error[syntax-error]: expected a statement, got IDENT
+        source 5..29 "begin\\n null null;\\n end"
+        error[syntax-error]: expected a statement, got NULL_KW
           ╭▸ 
-        1 │ do E'begin\n open c;\n end';
+        1 │ do E'begin\n null null;\n end';
           ╰╴             ━
         "#);
     }
