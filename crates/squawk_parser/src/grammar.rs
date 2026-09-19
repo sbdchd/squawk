@@ -4481,10 +4481,12 @@ fn int_literal(p: &mut Parser<'_>) {
     }
 }
 
+pub(crate) fn opt_uint_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if p.at(INT_NUMBER) { literal(p) } else { None }
+}
+
 fn uint_literal(p: &mut Parser<'_>) {
-    if p.at(INT_NUMBER) {
-        literal(p);
-    } else {
+    if opt_uint_literal(p).is_none() {
         let m = p.start();
         p.error("expected unsigned integer literal");
         expr(p);

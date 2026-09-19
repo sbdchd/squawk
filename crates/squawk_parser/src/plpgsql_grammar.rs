@@ -847,6 +847,8 @@ fn loop_stmt(p: &mut Parser) {
         PLPGSQL_WHILE_STMT
     } else if p.at(FOR_KW) {
         for_head(p)
+    } else if p.nth_at_contextual_kw(0, FOREACH_KW) {
+        foreach_head(p)
     } else {
         PLPGSQL_LOOP_STMT
     };
@@ -889,6 +891,34 @@ fn for_head(p: &mut Parser) -> SyntaxKind {
             PLPGSQL_FOR_QUERY_STMT
         }
     }
+}
+
+fn foreach_head(p: &mut Parser) -> SyntaxKind {
+    assert!(p.nth_at_contextual_kw(0, FOREACH_KW));
+    p.bump_remap(FOREACH_KW);
+    for_variable_list(p);
+    opt_foreach_slice(p);
+    p.expect(IN_KW);
+    p.expect(ARRAY_KW);
+    expr_until_loop(p);
+    PLPGSQL_FOR_EACH_STMT
+}
+
+fn opt_foreach_slice(p: &mut Parser) {
+    if !p.nth_at_contextual_kw(0, SLICE_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump_remap(SLICE_KW);
+    if grammar::opt_uint_literal(p).is_none() {
+        let m = p.start();
+        p.error("expected unsigned integer literal");
+        if !p.at(IN_KW) {
+            p.bump_any();
+        }
+        m.complete(p, ERROR);
+    }
+    m.complete(p, PLPGSQL_FOR_EACH_SLICE);
 }
 
 fn for_query(p: &mut Parser, loop_at: Option<usize>) {
@@ -1097,7 +1127,10 @@ fn at_loop_start(p: &Parser) -> bool {
 }
 
 fn at_loop_kw(p: &Parser, n: usize) -> bool {
-    p.nth_at_contextual_kw(n, LOOP_KW) || p.nth_at_contextual_kw(n, WHILE_KW) || p.nth_at(n, FOR_KW)
+    p.nth_at_contextual_kw(n, LOOP_KW)
+        || p.nth_at_contextual_kw(n, WHILE_KW)
+        || p.nth_at_contextual_kw(n, FOREACH_KW)
+        || p.nth_at(n, FOR_KW)
 }
 
 const NOT_A_CURSOR_NAME: TokenSet = TokenSet::new(&[SELECT_KW, VALUES_KW]);

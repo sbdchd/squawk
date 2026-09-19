@@ -20264,6 +20264,76 @@ impl PlpgsqlForDynStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlForEachSlice {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlForEachSlice {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn slice_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SLICE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlForEachStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlForEachStmt {
+    #[inline]
+    pub fn array(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn slice(&self) -> Option<PlpgsqlForEachSlice> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn vars(&self) -> AstChildren<PlpgsqlForVariable> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn foreach_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOREACH_KW)
+    }
+    #[inline]
+    pub fn in_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IN_KW)
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOOP_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlForIStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -31408,6 +31478,7 @@ pub enum PlpgsqlStmt {
     PlpgsqlFetchStmt(PlpgsqlFetchStmt),
     PlpgsqlForCursorStmt(PlpgsqlForCursorStmt),
     PlpgsqlForDynStmt(PlpgsqlForDynStmt),
+    PlpgsqlForEachStmt(PlpgsqlForEachStmt),
     PlpgsqlForIStmt(PlpgsqlForIStmt),
     PlpgsqlForQueryStmt(PlpgsqlForQueryStmt),
     PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt),
@@ -48706,6 +48777,42 @@ impl AstNode for PlpgsqlForDynStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_FOR_DYN_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlForEachSlice {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_FOR_EACH_SLICE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlForEachStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_FOR_EACH_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -69669,6 +69776,7 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_FETCH_STMT
                 | SyntaxKind::PLPGSQL_FOR_CURSOR_STMT
                 | SyntaxKind::PLPGSQL_FOR_DYN_STMT
+                | SyntaxKind::PLPGSQL_FOR_EACH_STMT
                 | SyntaxKind::PLPGSQL_FOR_I_STMT
                 | SyntaxKind::PLPGSQL_FOR_QUERY_STMT
                 | SyntaxKind::PLPGSQL_GET_DIAG_STMT
@@ -69724,6 +69832,9 @@ impl AstNode for PlpgsqlStmt {
             }
             SyntaxKind::PLPGSQL_FOR_DYN_STMT => {
                 PlpgsqlStmt::PlpgsqlForDynStmt(PlpgsqlForDynStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_FOR_EACH_STMT => {
+                PlpgsqlStmt::PlpgsqlForEachStmt(PlpgsqlForEachStmt { syntax })
             }
             SyntaxKind::PLPGSQL_FOR_I_STMT => {
                 PlpgsqlStmt::PlpgsqlForIStmt(PlpgsqlForIStmt { syntax })
@@ -69793,6 +69904,7 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlFetchStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForCursorStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForDynStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlForEachStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForIStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForQueryStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlGetDiagStmt(it) => &it.syntax,
@@ -69888,6 +70000,12 @@ impl From<PlpgsqlForDynStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlForDynStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlForDynStmt(node)
+    }
+}
+impl From<PlpgsqlForEachStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlForEachStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlForEachStmt(node)
     }
 }
 impl From<PlpgsqlForIStmt> for PlpgsqlStmt {

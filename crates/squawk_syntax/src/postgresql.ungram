@@ -2173,6 +2173,7 @@ PlpgsqlStmt =
 | PlpgsqlExitStmt
 | PlpgsqlForCursorStmt
 | PlpgsqlForDynStmt
+| PlpgsqlForEachStmt
 | PlpgsqlForIStmt
 | PlpgsqlForQueryStmt
 | PlpgsqlFetchStmt
@@ -2494,6 +2495,23 @@ PlpgsqlForQueryStmt =
   'end' 'loop'
   end_label:PlpgsqlLabelNameRef?
   ';'
+
+PlpgsqlForEachStmt =
+  label:PlpgsqlLabel?
+  'foreach'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  slice:PlpgsqlForEachSlice?
+  'in' 'array'
+  array:Expr
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForEachSlice =
+  'slice'
+  Literal
 
 PlpgsqlFetchStmt =
   'fetch'
