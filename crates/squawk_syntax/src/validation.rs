@@ -56,6 +56,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PlpgsqlCaseWhen(it) => validate_no_bare_case_in_conds(it, errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlFetchStmt(it) => validate_fetch_single_row(it, errors),
+                ast::PlpgsqlForCursorStmt(it) => validate_for_cursor_single_var(it, errors),
                 ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(it, errors),
                 ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
                 ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
@@ -399,6 +400,19 @@ fn validate_for_i_single_var(it: ast::PlpgsqlForIStmt, acc: &mut Vec<SyntaxError
     for var in it.vars().skip(1) {
         acc.push(SyntaxError::new(
             "integer FOR loop takes one variable",
+            var.syntax().text_range(),
+        ));
+    }
+}
+
+// -- err
+// for a, b in c loop null; end loop;
+// -- ok
+// for a in c loop null; end loop;
+fn validate_for_cursor_single_var(it: ast::PlpgsqlForCursorStmt, acc: &mut Vec<SyntaxError>) {
+    for var in it.vars().skip(1) {
+        acc.push(SyntaxError::new(
+            "cursor FOR loop takes one variable",
             var.syntax().text_range(),
         ));
     }

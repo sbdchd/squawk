@@ -20158,6 +20158,57 @@ impl PlpgsqlFetchStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlForCursorStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlForCursorStmt {
+    #[inline]
+    pub fn args(&self) -> Option<ArgList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn body(&self) -> Option<PlpgsqlBody> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cursor(&self) -> Option<PlpgsqlCursorVariableRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn end_label(&self) -> Option<PlpgsqlLabelNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn label(&self) -> Option<PlpgsqlLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn vars(&self) -> AstChildren<PlpgsqlForVariable> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::END_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn in_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IN_KW)
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOOP_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlpgsqlForDynStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -31304,6 +31355,7 @@ pub enum PlpgsqlStmt {
     PlpgsqlDoStmt(PlpgsqlDoStmt),
     PlpgsqlExitStmt(PlpgsqlExitStmt),
     PlpgsqlFetchStmt(PlpgsqlFetchStmt),
+    PlpgsqlForCursorStmt(PlpgsqlForCursorStmt),
     PlpgsqlForDynStmt(PlpgsqlForDynStmt),
     PlpgsqlForIStmt(PlpgsqlForIStmt),
     PlpgsqlGetDiagStmt(PlpgsqlGetDiagStmt),
@@ -48566,6 +48618,24 @@ impl AstNode for PlpgsqlFetchStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_FETCH_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlForCursorStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_FOR_CURSOR_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -69527,6 +69597,7 @@ impl AstNode for PlpgsqlStmt {
                 | SyntaxKind::PLPGSQL_DO_STMT
                 | SyntaxKind::PLPGSQL_EXIT_STMT
                 | SyntaxKind::PLPGSQL_FETCH_STMT
+                | SyntaxKind::PLPGSQL_FOR_CURSOR_STMT
                 | SyntaxKind::PLPGSQL_FOR_DYN_STMT
                 | SyntaxKind::PLPGSQL_FOR_I_STMT
                 | SyntaxKind::PLPGSQL_GET_DIAG_STMT
@@ -69576,6 +69647,9 @@ impl AstNode for PlpgsqlStmt {
             }
             SyntaxKind::PLPGSQL_FETCH_STMT => {
                 PlpgsqlStmt::PlpgsqlFetchStmt(PlpgsqlFetchStmt { syntax })
+            }
+            SyntaxKind::PLPGSQL_FOR_CURSOR_STMT => {
+                PlpgsqlStmt::PlpgsqlForCursorStmt(PlpgsqlForCursorStmt { syntax })
             }
             SyntaxKind::PLPGSQL_FOR_DYN_STMT => {
                 PlpgsqlStmt::PlpgsqlForDynStmt(PlpgsqlForDynStmt { syntax })
@@ -69643,6 +69717,7 @@ impl AstNode for PlpgsqlStmt {
             PlpgsqlStmt::PlpgsqlDoStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlExitStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlFetchStmt(it) => &it.syntax,
+            PlpgsqlStmt::PlpgsqlForCursorStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForDynStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlForIStmt(it) => &it.syntax,
             PlpgsqlStmt::PlpgsqlGetDiagStmt(it) => &it.syntax,
@@ -69726,6 +69801,12 @@ impl From<PlpgsqlFetchStmt> for PlpgsqlStmt {
     #[inline]
     fn from(node: PlpgsqlFetchStmt) -> PlpgsqlStmt {
         PlpgsqlStmt::PlpgsqlFetchStmt(node)
+    }
+}
+impl From<PlpgsqlForCursorStmt> for PlpgsqlStmt {
+    #[inline]
+    fn from(node: PlpgsqlForCursorStmt) -> PlpgsqlStmt {
+        PlpgsqlStmt::PlpgsqlForCursorStmt(node)
     }
 }
 impl From<PlpgsqlForDynStmt> for PlpgsqlStmt {

@@ -1,0 +1,365 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/for_cursor_stmt.sql
+---
+PLPGSQL@0..443
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..442
+    PLPGSQL_DECLARE_SECTION@1..138
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..38
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "c"
+        WHITESPACE@12..13 " "
+        CURSOR_KW@13..19 "cursor"
+        WHITESPACE@19..20 " "
+        FOR_KW@20..23 "for"
+        WHITESPACE@23..24 " "
+        SELECT@24..37
+          SELECT_CLAUSE@24..37
+            SELECT_KW@24..30 "select"
+            WHITESPACE@30..31 " "
+            TARGET_LIST@31..37
+              TARGET@31..37
+                LITERAL@31..32
+                  INT_NUMBER@31..32 "1"
+                WHITESPACE@32..33 " "
+                AS_NAME@33..37
+                  AS_KW@33..35 "as"
+                  WHITESPACE@35..36 " "
+                  COLUMN_NAME@36..37
+                    IDENT@36..37 "x"
+        SEMICOLON@37..38 ";"
+      WHITESPACE@38..41 "\n  "
+      PLPGSQL_CURSOR_DECL@41..92
+        PLPGSQL_VAR_NAME@41..43
+          IDENT@41..43 "c2"
+        WHITESPACE@43..44 " "
+        CURSOR_KW@44..50 "cursor"
+        WHITESPACE@50..51 " "
+        PLPGSQL_CURSOR_ARG_LIST@51..67
+          L_PAREN@51..52 "("
+          PLPGSQL_CURSOR_ARG@52..58
+            PLPGSQL_VAR_NAME@52..54
+              IDENT@52..54 "lo"
+            WHITESPACE@54..55 " "
+            PATH_TYPE@55..58
+              PATH_REF@55..58
+                PATH_SEGMENT_REF@55..58
+                  INT_KW@55..58 "int"
+          COMMA@58..59 ","
+          WHITESPACE@59..60 " "
+          PLPGSQL_CURSOR_ARG@60..66
+            PLPGSQL_VAR_NAME@60..62
+              IDENT@60..62 "hi"
+            WHITESPACE@62..63 " "
+            PATH_TYPE@63..66
+              PATH_REF@63..66
+                PATH_SEGMENT_REF@63..66
+                  INT_KW@63..66 "int"
+          R_PAREN@66..67 ")"
+        WHITESPACE@67..68 " "
+        FOR_KW@68..71 "for"
+        WHITESPACE@71..72 " "
+        SELECT@72..91
+          SELECT_CLAUSE@72..91
+            SELECT_KW@72..78 "select"
+            WHITESPACE@78..79 " "
+            TARGET_LIST@79..91
+              TARGET@79..91
+                BIN_EXPR@79..86
+                  NAME_REF@79..81
+                    IDENT@79..81 "lo"
+                  WHITESPACE@81..82 " "
+                  PLUS@82..83 "+"
+                  WHITESPACE@83..84 " "
+                  NAME_REF@84..86
+                    IDENT@84..86 "hi"
+                WHITESPACE@86..87 " "
+                AS_NAME@87..91
+                  AS_KW@87..89 "as"
+                  WHITESPACE@89..90 " "
+                  COLUMN_NAME@90..91
+                    IDENT@90..91 "x"
+        SEMICOLON@91..92 ";"
+      WHITESPACE@92..95 "\n  "
+      PLPGSQL_CURSOR_DECL@95..126
+        PLPGSQL_VAR_NAME@95..100
+          VALUE_KW@95..100 "value"
+        WHITESPACE@100..101 " "
+        CURSOR_KW@101..107 "cursor"
+        WHITESPACE@107..108 " "
+        FOR_KW@108..111 "for"
+        WHITESPACE@111..112 " "
+        SELECT@112..125
+          SELECT_CLAUSE@112..125
+            SELECT_KW@112..118 "select"
+            WHITESPACE@118..119 " "
+            TARGET_LIST@119..125
+              TARGET@119..125
+                LITERAL@119..120
+                  INT_NUMBER@119..120 "1"
+                WHITESPACE@120..121 " "
+                AS_NAME@121..125
+                  AS_KW@121..123 "as"
+                  WHITESPACE@123..124 " "
+                  COLUMN_NAME@124..125
+                    IDENT@124..125 "x"
+        SEMICOLON@125..126 ";"
+      WHITESPACE@126..129 "\n  "
+      PLPGSQL_VAR_DECL@129..138
+        PLPGSQL_VAR_NAME@129..130
+          IDENT@129..130 "r"
+        WHITESPACE@130..131 " "
+        PATH_TYPE@131..137
+          PATH_REF@131..137
+            PATH_SEGMENT_REF@131..137
+              IDENT@131..137 "record"
+        SEMICOLON@137..138 ";"
+    WHITESPACE@138..139 "\n"
+    BEGIN_KW@139..144 "begin"
+    WHITESPACE@144..147 "\n  "
+    PLPGSQL_BODY@147..438
+      PLPGSQL_FOR_CURSOR_STMT@147..184
+        FOR_KW@147..150 "for"
+        WHITESPACE@150..151 " "
+        PLPGSQL_FOR_VARIABLE@151..152
+          PLPGSQL_VAR_NAME_REF@151..152
+            IDENT@151..152 "r"
+        WHITESPACE@152..153 " "
+        IN_KW@153..155 "in"
+        WHITESPACE@155..156 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@156..157
+          IDENT@156..157 "c"
+        WHITESPACE@157..158 " "
+        LOOP_KW@158..162 "loop"
+        WHITESPACE@162..167 "\n    "
+        PLPGSQL_BODY@167..172
+          PLPGSQL_NULL_STMT@167..172
+            NULL_KW@167..171 "null"
+            SEMICOLON@171..172 ";"
+        WHITESPACE@172..175 "\n  "
+        END_KW@175..178 "end"
+        WHITESPACE@178..179 " "
+        LOOP_KW@179..183 "loop"
+        SEMICOLON@183..184 ";"
+      WHITESPACE@184..187 "\n  "
+      PLPGSQL_FOR_CURSOR_STMT@187..231
+        FOR_KW@187..190 "for"
+        WHITESPACE@190..191 " "
+        PLPGSQL_FOR_VARIABLE@191..192
+          PLPGSQL_VAR_NAME_REF@191..192
+            IDENT@191..192 "r"
+        WHITESPACE@192..193 " "
+        IN_KW@193..195 "in"
+        WHITESPACE@195..196 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@196..198
+          IDENT@196..198 "c2"
+        ARG_LIST@198..204
+          L_PAREN@198..199 "("
+          ARG@199..200
+            LITERAL@199..200
+              INT_NUMBER@199..200 "1"
+          COMMA@200..201 ","
+          WHITESPACE@201..202 " "
+          ARG@202..203
+            LITERAL@202..203
+              INT_NUMBER@202..203 "2"
+          R_PAREN@203..204 ")"
+        WHITESPACE@204..205 " "
+        LOOP_KW@205..209 "loop"
+        WHITESPACE@209..214 "\n    "
+        PLPGSQL_BODY@214..219
+          PLPGSQL_NULL_STMT@214..219
+            NULL_KW@214..218 "null"
+            SEMICOLON@218..219 ";"
+        WHITESPACE@219..222 "\n  "
+        END_KW@222..225 "end"
+        WHITESPACE@225..226 " "
+        LOOP_KW@226..230 "loop"
+        SEMICOLON@230..231 ";"
+      WHITESPACE@231..234 "\n  "
+      PLPGSQL_FOR_CURSOR_STMT@234..290
+        FOR_KW@234..237 "for"
+        WHITESPACE@237..238 " "
+        PLPGSQL_FOR_VARIABLE@238..239
+          PLPGSQL_VAR_NAME_REF@238..239
+            IDENT@238..239 "r"
+        WHITESPACE@239..240 " "
+        IN_KW@240..242 "in"
+        WHITESPACE@242..243 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@243..245
+          IDENT@243..245 "c2"
+        ARG_LIST@245..263
+          L_PAREN@245..246 "("
+          ARG@246..253
+            NAMED_ARG@246..253
+              PARAM_NAME_REF@246..248
+                IDENT@246..248 "hi"
+              WHITESPACE@248..249 " "
+              COLON_EQ@249..251 ":="
+              WHITESPACE@251..252 " "
+              LITERAL@252..253
+                INT_NUMBER@252..253 "2"
+          COMMA@253..254 ","
+          WHITESPACE@254..255 " "
+          ARG@255..262
+            NAMED_ARG@255..262
+              PARAM_NAME_REF@255..257
+                IDENT@255..257 "lo"
+              WHITESPACE@257..258 " "
+              FAT_ARROW@258..260 "=>"
+              WHITESPACE@260..261 " "
+              LITERAL@261..262
+                INT_NUMBER@261..262 "1"
+          R_PAREN@262..263 ")"
+        WHITESPACE@263..264 " "
+        LOOP_KW@264..268 "loop"
+        WHITESPACE@268..273 "\n    "
+        PLPGSQL_BODY@273..278
+          PLPGSQL_NULL_STMT@273..278
+            NULL_KW@273..277 "null"
+            SEMICOLON@277..278 ";"
+        WHITESPACE@278..281 "\n  "
+        END_KW@281..284 "end"
+        WHITESPACE@284..285 " "
+        LOOP_KW@285..289 "loop"
+        SEMICOLON@289..290 ";"
+      WHITESPACE@290..293 "\n  "
+      PLPGSQL_FOR_CURSOR_STMT@293..332
+        FOR_KW@293..296 "for"
+        WHITESPACE@296..297 " "
+        PLPGSQL_FOR_VARIABLE@297..300
+          PLPGSQL_VAR_NAME_REF@297..298
+            IDENT@297..298 "r"
+          FIELD_ACCESSOR@298..300
+            DOT@298..299 "."
+            COMPOSITE_FIELD_REF@299..300
+              IDENT@299..300 "x"
+        WHITESPACE@300..301 " "
+        IN_KW@301..303 "in"
+        WHITESPACE@303..304 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@304..305
+          IDENT@304..305 "c"
+        WHITESPACE@305..306 " "
+        LOOP_KW@306..310 "loop"
+        WHITESPACE@310..315 "\n    "
+        PLPGSQL_BODY@315..320
+          PLPGSQL_NULL_STMT@315..320
+            NULL_KW@315..319 "null"
+            SEMICOLON@319..320 ";"
+        WHITESPACE@320..323 "\n  "
+        END_KW@323..326 "end"
+        WHITESPACE@326..327 " "
+        LOOP_KW@327..331 "loop"
+        SEMICOLON@331..332 ";"
+      WHITESPACE@332..335 "\n  "
+      PLPGSQL_FOR_CURSOR_STMT@335..376
+        FOR_KW@335..338 "for"
+        WHITESPACE@338..339 " "
+        PLPGSQL_FOR_VARIABLE@339..340
+          PLPGSQL_VAR_NAME_REF@339..340
+            IDENT@339..340 "r"
+        WHITESPACE@340..341 " "
+        IN_KW@341..343 "in"
+        WHITESPACE@343..344 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@344..349
+          VALUE_KW@344..349 "value"
+        WHITESPACE@349..350 " "
+        LOOP_KW@350..354 "loop"
+        WHITESPACE@354..359 "\n    "
+        PLPGSQL_BODY@359..364
+          PLPGSQL_NULL_STMT@359..364
+            NULL_KW@359..363 "null"
+            SEMICOLON@363..364 ";"
+        WHITESPACE@364..367 "\n  "
+        END_KW@367..370 "end"
+        WHITESPACE@370..371 " "
+        LOOP_KW@371..375 "loop"
+        SEMICOLON@375..376 ";"
+      WHITESPACE@376..379 "\n  "
+      PLPGSQL_FOR_CURSOR_STMT@379..438
+        PLPGSQL_LABEL@379..388
+          LESS_LESS@379..381 "<<"
+          PLPGSQL_LABEL_NAME@381..386
+            OUTER_KW@381..386 "outer"
+          GREATER_GREATER@386..388 ">>"
+        WHITESPACE@388..389 " "
+        FOR_KW@389..392 "for"
+        WHITESPACE@392..393 " "
+        PLPGSQL_FOR_VARIABLE@393..394
+          PLPGSQL_VAR_NAME_REF@393..394
+            IDENT@393..394 "r"
+        WHITESPACE@394..395 " "
+        IN_KW@395..397 "in"
+        WHITESPACE@397..398 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@398..399
+          IDENT@398..399 "c"
+        WHITESPACE@399..400 " "
+        LOOP_KW@400..404 "loop"
+        WHITESPACE@404..409 "\n    "
+        PLPGSQL_BODY@409..420
+          PLPGSQL_EXIT_STMT@409..420
+            EXIT_KW@409..413 "exit"
+            WHITESPACE@413..414 " "
+            PLPGSQL_LABEL_NAME_REF@414..419
+              OUTER_KW@414..419 "outer"
+            SEMICOLON@419..420 ";"
+        WHITESPACE@420..423 "\n  "
+        END_KW@423..426 "end"
+        WHITESPACE@426..427 " "
+        LOOP_KW@427..431 "loop"
+        WHITESPACE@431..432 " "
+        PLPGSQL_LABEL_NAME_REF@432..437
+          OUTER_KW@432..437 "outer"
+        SEMICOLON@437..438 ";"
+    WHITESPACE@438..439 "\n"
+    END_KW@439..442 "end"
+  WHITESPACE@442..443 "\n"
+---
+PLPGSQL@0..70
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..69
+    PLPGSQL_DECLARE_SECTION@1..18
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..9 " "
+      PLPGSQL_VAR_DECL@9..18
+        PLPGSQL_VAR_NAME@9..10
+          IDENT@9..10 "r"
+        WHITESPACE@10..11 " "
+        PATH_TYPE@11..17
+          PATH_REF@11..17
+            PATH_SEGMENT_REF@11..17
+              IDENT@11..17 "record"
+        SEMICOLON@17..18 ";"
+    WHITESPACE@18..19 "\n"
+    BEGIN_KW@19..24 "begin"
+    WHITESPACE@24..27 "\n  "
+    PLPGSQL_BODY@27..65
+      PLPGSQL_FOR_CURSOR_STMT@27..65
+        FOR_KW@27..30 "for"
+        WHITESPACE@30..31 " "
+        PLPGSQL_FOR_VARIABLE@31..32
+          PLPGSQL_VAR_NAME_REF@31..32
+            IDENT@31..32 "r"
+        WHITESPACE@32..33 " "
+        IN_KW@33..35 "in"
+        WHITESPACE@35..36 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@36..38
+          POSITIONAL_PARAM@36..38 "$1"
+        WHITESPACE@38..39 " "
+        LOOP_KW@39..43 "loop"
+        WHITESPACE@43..48 "\n    "
+        PLPGSQL_BODY@48..53
+          PLPGSQL_NULL_STMT@48..53
+            NULL_KW@48..52 "null"
+            SEMICOLON@52..53 ";"
+        WHITESPACE@53..56 "\n  "
+        END_KW@56..59 "end"
+        WHITESPACE@59..60 " "
+        LOOP_KW@60..64 "loop"
+        SEMICOLON@64..65 ";"
+    WHITESPACE@65..66 "\n"
+    END_KW@66..69 "end"
+  WHITESPACE@69..70 "\n"

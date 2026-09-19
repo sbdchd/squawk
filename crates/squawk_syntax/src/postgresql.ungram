@@ -2171,6 +2171,7 @@ PlpgsqlStmt =
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
 | PlpgsqlExitStmt
+| PlpgsqlForCursorStmt
 | PlpgsqlForDynStmt
 | PlpgsqlForIStmt
 | PlpgsqlFetchStmt
@@ -2461,6 +2462,19 @@ PlpgsqlForDynStmt =
   'in' 'execute'
   query:Expr
   using_clause:PlpgsqlUsingClause?
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForCursorStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in'
+  cursor:PlpgsqlCursorVariableRef
+  args:ArgList?
   'loop'
   body:PlpgsqlBody
   'end' 'loop'

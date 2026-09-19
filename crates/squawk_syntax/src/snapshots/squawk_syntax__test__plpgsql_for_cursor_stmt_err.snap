@@ -1,0 +1,180 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/for_cursor_stmt.sql
+---
+PLPGSQL@0..108
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..107
+    PLPGSQL_DECLARE_SECTION@1..54
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..36
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "c"
+        WHITESPACE@12..13 " "
+        CURSOR_KW@13..19 "cursor"
+        WHITESPACE@19..20 " "
+        FOR_KW@20..23 "for"
+        WHITESPACE@23..24 " "
+        SELECT@24..35
+          SELECT_CLAUSE@24..35
+            SELECT_KW@24..30 "select"
+            WHITESPACE@30..31 " "
+            TARGET_LIST@31..35
+              TARGET@31..32
+                LITERAL@31..32
+                  INT_NUMBER@31..32 "1"
+              COMMA@32..33 ","
+              WHITESPACE@33..34 " "
+              TARGET@34..35
+                LITERAL@34..35
+                  INT_NUMBER@34..35 "2"
+        SEMICOLON@35..36 ";"
+      WHITESPACE@36..39 "\n  "
+      PLPGSQL_VAR_DECL@39..45
+        PLPGSQL_VAR_NAME@39..40
+          IDENT@39..40 "a"
+        WHITESPACE@40..41 " "
+        PATH_TYPE@41..44
+          PATH_REF@41..44
+            PATH_SEGMENT_REF@41..44
+              INT_KW@41..44 "int"
+        SEMICOLON@44..45 ";"
+      WHITESPACE@45..48 "\n  "
+      PLPGSQL_VAR_DECL@48..54
+        PLPGSQL_VAR_NAME@48..49
+          IDENT@48..49 "b"
+        WHITESPACE@49..50 " "
+        PATH_TYPE@50..53
+          PATH_REF@50..53
+            PATH_SEGMENT_REF@50..53
+              INT_KW@50..53 "int"
+        SEMICOLON@53..54 ";"
+    WHITESPACE@54..55 "\n"
+    BEGIN_KW@55..60 "begin"
+    WHITESPACE@60..63 "\n  "
+    PLPGSQL_BODY@63..103
+      PLPGSQL_FOR_CURSOR_STMT@63..103
+        FOR_KW@63..66 "for"
+        WHITESPACE@66..67 " "
+        PLPGSQL_FOR_VARIABLE@67..68
+          PLPGSQL_VAR_NAME_REF@67..68
+            IDENT@67..68 "a"
+        COMMA@68..69 ","
+        WHITESPACE@69..70 " "
+        PLPGSQL_FOR_VARIABLE@70..71
+          PLPGSQL_VAR_NAME_REF@70..71
+            IDENT@70..71 "b"
+        WHITESPACE@71..72 " "
+        IN_KW@72..74 "in"
+        WHITESPACE@74..75 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@75..76
+          IDENT@75..76 "c"
+        WHITESPACE@76..77 " "
+        LOOP_KW@77..81 "loop"
+        WHITESPACE@81..86 "\n    "
+        PLPGSQL_BODY@86..91
+          PLPGSQL_NULL_STMT@86..91
+            NULL_KW@86..90 "null"
+            SEMICOLON@90..91 ";"
+        WHITESPACE@91..94 "\n  "
+        END_KW@94..97 "end"
+        WHITESPACE@97..98 " "
+        LOOP_KW@98..102 "loop"
+        SEMICOLON@102..103 ";"
+    WHITESPACE@103..104 "\n"
+    END_KW@104..107 "end"
+  WHITESPACE@107..108 "\n"
+---
+PLPGSQL@0..112
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..111
+    PLPGSQL_DECLARE_SECTION@1..56
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..44
+        PLPGSQL_VAR_NAME@11..13
+          IDENT@11..13 "c2"
+        WHITESPACE@13..14 " "
+        CURSOR_KW@14..20 "cursor"
+        WHITESPACE@20..21 " "
+        PLPGSQL_CURSOR_ARG_LIST@21..29
+          L_PAREN@21..22 "("
+          PLPGSQL_CURSOR_ARG@22..28
+            PLPGSQL_VAR_NAME@22..24
+              IDENT@22..24 "lo"
+            WHITESPACE@24..25 " "
+            PATH_TYPE@25..28
+              PATH_REF@25..28
+                PATH_SEGMENT_REF@25..28
+                  INT_KW@25..28 "int"
+          R_PAREN@28..29 ")"
+        WHITESPACE@29..30 " "
+        FOR_KW@30..33 "for"
+        WHITESPACE@33..34 " "
+        SELECT@34..43
+          SELECT_CLAUSE@34..43
+            SELECT_KW@34..40 "select"
+            WHITESPACE@40..41 " "
+            TARGET_LIST@41..43
+              TARGET@41..43
+                NAME_REF@41..43
+                  IDENT@41..43 "lo"
+        SEMICOLON@43..44 ";"
+      WHITESPACE@44..47 "\n  "
+      PLPGSQL_VAR_DECL@47..56
+        PLPGSQL_VAR_NAME@47..48
+          IDENT@47..48 "r"
+        WHITESPACE@48..49 " "
+        PATH_TYPE@49..55
+          PATH_REF@49..55
+            PATH_SEGMENT_REF@49..55
+              IDENT@49..55 "record"
+        SEMICOLON@55..56 ";"
+    WHITESPACE@56..57 "\n"
+    BEGIN_KW@57..62 "begin"
+    WHITESPACE@62..65 "\n  "
+    PLPGSQL_BODY@65..107
+      PLPGSQL_FOR_CURSOR_STMT@65..107
+        FOR_KW@65..68 "for"
+        WHITESPACE@68..69 " "
+        PLPGSQL_FOR_VARIABLE@69..70
+          PLPGSQL_VAR_NAME_REF@69..70
+            IDENT@69..70 "r"
+        WHITESPACE@70..71 " "
+        IN_KW@71..73 "in"
+        WHITESPACE@73..74 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@74..76
+          IDENT@74..76 "c2"
+        ARG_LIST@76..80
+          L_PAREN@76..77 "("
+          ARG@77..78
+            LITERAL@77..78
+              INT_NUMBER@77..78 "1"
+          ERROR@78..79
+            COMMA@78..79 ","
+          R_PAREN@79..80 ")"
+        WHITESPACE@80..81 " "
+        LOOP_KW@81..85 "loop"
+        WHITESPACE@85..90 "\n    "
+        PLPGSQL_BODY@90..95
+          PLPGSQL_NULL_STMT@90..95
+            NULL_KW@90..94 "null"
+            SEMICOLON@94..95 ";"
+        WHITESPACE@95..98 "\n  "
+        END_KW@98..101 "end"
+        WHITESPACE@101..102 " "
+        LOOP_KW@102..106 "loop"
+        SEMICOLON@106..107 ";"
+    WHITESPACE@107..108 "\n"
+    END_KW@108..111 "end"
+  WHITESPACE@111..112 "\n"
+
+error[syntax-error]: cursor FOR loop takes one variable
+  ╭▸ 
+8 │   for a, b in c loop
+  ╰╴         ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+20 │   for r in c2(1,) loop
+   ╰╴               ━

@@ -869,6 +869,13 @@ fn for_head(p: &mut Parser) -> SyntaxKind {
         opt_using_clause(p, expr_until_loop);
         return PLPGSQL_FOR_DYN_STMT;
     }
+    if at_for_cursor(p, 0) {
+        cursor_variable_ref(p);
+        if p.at(L_PAREN) {
+            grammar::arg_list(p);
+        }
+        return PLPGSQL_FOR_CURSOR_STMT;
+    }
     if at_for_reverse(p, 0) {
         p.bump_remap(REVERSE_KW);
     }
@@ -1071,7 +1078,8 @@ fn at_loop_kw(p: &Parser, n: usize) -> bool {
     p.nth_at_contextual_kw(n, LOOP_KW)
         || p.nth_at_contextual_kw(n, WHILE_KW)
         // TODO: drop when the other FOR forms are parsed
-        || (p.nth_at(n, FOR_KW) && (at_for_i_header(p, n) || at_for_dyn_header(p, n)))
+        || (p.nth_at(n, FOR_KW)
+            && (at_for_i_header(p, n) || at_for_dyn_header(p, n) || at_for_cursor_header(p, n)))
 }
 
 fn at_for_i_header(p: &Parser, n: usize) -> bool {
@@ -1090,6 +1098,44 @@ fn at_for_i_header(p: &Parser, n: usize) -> bool {
 fn at_for_dyn_header(p: &Parser, n: usize) -> bool {
     let n = for_vars_end(p, n + 1).unwrap_or(n + 1);
     p.nth_at(n, IN_KW) && p.nth_at(n + 1, EXECUTE_KW)
+}
+
+fn at_for_cursor_header(p: &Parser, n: usize) -> bool {
+    let n = for_vars_end(p, n + 1).unwrap_or(n + 1);
+    p.nth_at(n, IN_KW) && at_for_cursor(p, n + 1)
+}
+
+const NOT_A_CURSOR_NAME: TokenSet = TokenSet::new(&[SELECT_KW, VALUES_KW]);
+
+fn at_for_cursor(p: &Parser, n: usize) -> bool {
+    if !at_name(p, n) || p.nth_at_ts(n, NOT_A_CURSOR_NAME) {
+        return false;
+    }
+    let Some(n) = cursor_args_end(p, n + 1) else {
+        return false;
+    };
+    p.nth_at_contextual_kw(n, LOOP_KW)
+}
+
+fn cursor_args_end(p: &Parser, mut n: usize) -> Option<usize> {
+    if !p.nth_at(n, L_PAREN) {
+        return Some(n);
+    }
+    let mut depth = 0i32;
+    while !p.nth_at(n, EOF) && !p.nth_at(n, SEMICOLON) {
+        match p.nth(n) {
+            L_PAREN => depth += 1,
+            R_PAREN => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(n + 1);
+                }
+            }
+            _ => (),
+        }
+        n += 1;
+    }
+    None
 }
 
 fn at_for_reverse(p: &Parser, n: usize) -> bool {
