@@ -404,7 +404,8 @@ fn validate_plpgsql_block(it: ast::PlpgsqlBlock, acc: &mut Vec<SyntaxError>) {
     if it.semicolon_token().is_some()
         || it
             .syntax()
-            .parent().is_none_or(|parent| parent.kind() != PLPGSQL_BODY)
+            .parent()
+            .is_none_or(|parent| parent.kind() != PLPGSQL_BODY)
     {
         return;
     }
