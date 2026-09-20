@@ -1,0 +1,61 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/percent_type.sql
+---
+PLPGSQL@0..90
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..89
+    PLPGSQL_DECLARE_SECTION@1..71
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..38
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "a"
+        WHITESPACE@12..13 " "
+        PERCENT_TYPE@13..37
+          PATH_REF@13..32
+            PATH_SEGMENT_REF@13..32
+              IDENT@13..20 "U&\"tbl\""
+              WHITESPACE@20..21 " "
+              UESCAPE_KW@21..28 "UESCAPE"
+              WHITESPACE@28..29 " "
+              STRING@29..32 "'!'"
+          PERCENT_TYPE_CLAUSE@32..37
+            PERCENT@32..33 "%"
+            TYPE_KW@33..37 "type"
+        SEMICOLON@37..38 ";"
+      WHITESPACE@38..41 "\n  "
+      PLPGSQL_VAR_DECL@41..71
+        PLPGSQL_VAR_NAME@41..42
+          IDENT@41..42 "b"
+        WHITESPACE@42..43 " "
+        PLPGSQL_PERCENT_ROWTYPE@43..70
+          PATH_REF@43..62
+            PATH_SEGMENT_REF@43..62
+              IDENT@43..50 "U&\"tbl\""
+              WHITESPACE@50..51 " "
+              UESCAPE_KW@51..58 "UESCAPE"
+              WHITESPACE@58..59 " "
+              STRING@59..62 "'!'"
+          PERCENT@62..63 "%"
+          ROWTYPE_KW@63..70 "rowtype"
+        SEMICOLON@70..71 ";"
+    WHITESPACE@71..72 "\n"
+    BEGIN_KW@72..77 "begin"
+    WHITESPACE@77..80 "\n  "
+    PLPGSQL_BODY@80..85
+      PLPGSQL_NULL_STMT@80..85
+        NULL_KW@80..84 "null"
+        SEMICOLON@84..85 ";"
+    WHITESPACE@85..86 "\n"
+    END_KW@86..89 "end"
+  WHITESPACE@89..90 "\n"
+
+error[syntax-error]: UESCAPE is not allowed before %TYPE
+  ╭▸ 
+3 │   a U&"tbl" UESCAPE '!'%type;
+  ╰╴                       ━
+error[syntax-error]: UESCAPE is not allowed before %ROWTYPE
+  ╭▸ 
+4 │   b U&"tbl" UESCAPE '!'%rowtype;
+  ╰╴                       ━

@@ -49,6 +49,13 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 ast::ParenFromItem(it) => validate_paren_from_item(it, errors),
                 ast::PartitionForValuesWith(it) => validate_hash_partition_bounds(it, errors),
+                ast::PercentType(it) => validate_plpgsql_percent_type(
+                    it.syntax(),
+                    it.percent_type_clause().and_then(|it| it.percent_token()),
+                    "%TYPE",
+                    errors,
+                ),
+                ast::PlpgsqlBlock(it) => validate_plpgsql_block(it, errors),
                 ast::PlpgsqlCaseStmt(it) => validate_no_bare_case(it.subject(), errors),
                 ast::PlpgsqlCompOptionPrintStrictParams(it) => {
                     validate_print_strict_params(it, errors)
@@ -63,6 +70,12 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(it, errors),
                 ast::PlpgsqlForQueryStmt(it) => validate_for_query_no_reverse(it, errors),
                 ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
+                ast::PlpgsqlPercentRowtype(it) => validate_plpgsql_percent_type(
+                    it.syntax(),
+                    it.percent_token(),
+                    "%ROWTYPE",
+                    errors,
+                ),
                 ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
                 ast::Select(it) => validate_select(it, errors),
@@ -355,6 +368,50 @@ fn validate_atomic_body(it: ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
             TextRange::empty(end),
         ));
     }
+}
+
+// -- err
+// declare x U&"tbl" UESCAPE '!'%type;
+// declare x U&"tbl" UESCAPE '!'%rowtype;
+fn validate_plpgsql_percent_type(
+    syntax: &SyntaxNode,
+    percent: Option<SyntaxToken>,
+    percent_type: &str,
+    acc: &mut Vec<SyntaxError>,
+) {
+    if !syntax
+        .parent()
+        .is_some_and(|parent| matches!(parent.kind(), PLPGSQL_VAR_DECL | PLPGSQL_CURSOR_ARG))
+    {
+        return;
+    }
+    let has_uescape = syntax
+        .descendants_with_tokens()
+        .any(|element| element.kind() == UESCAPE_KW);
+    if !has_uescape {
+        return;
+    }
+    let Some(percent) = percent else {
+        return;
+    };
+    acc.push(SyntaxError::new(
+        format!("UESCAPE is not allowed before {percent_type}"),
+        percent.text_range(),
+    ));
+}
+
+fn validate_plpgsql_block(it: ast::PlpgsqlBlock, acc: &mut Vec<SyntaxError>) {
+    if it.semicolon_token().is_some()
+        || it
+            .syntax()
+            .parent().is_none_or(|parent| parent.kind() != PLPGSQL_BODY)
+    {
+        return;
+    }
+    acc.push(SyntaxError::new(
+        "Missing semicolon after block",
+        TextRange::empty(it.syntax().text_range().end()),
+    ));
 }
 
 fn validate_print_strict_params(

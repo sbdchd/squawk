@@ -80,7 +80,6 @@ fn opt_block(p: &mut Parser) {
     opt_exception_section(p);
     p.expect(END_KW);
     opt_label_name_ref(p);
-    // TODO: add validation, sometimes this is required
     p.eat(SEMICOLON);
     m.complete(p, PLPGSQL_BLOCK);
 }
@@ -236,14 +235,24 @@ fn decl_datatype(p: &mut Parser) {
 fn path_name_ref(p: &mut Parser) {
     assert!(at_path(p).is_some());
     let m = p.start();
-    name(p, PATH_SEGMENT_REF);
+    path_segment_ref(p);
     let mut path = m.complete(p, PATH_REF);
     while !p.at(EOF) && p.at(DOT) {
         let m = path.precede(p);
         p.bump(DOT);
-        name(p, PATH_SEGMENT_REF);
+        path_segment_ref(p);
         path = m.complete(p, PATH_REF);
     }
+}
+
+fn path_segment_ref(p: &mut Parser) {
+    let m = p.start();
+    let unicode_ident = p.at(IDENT);
+    p.bump_any();
+    if unicode_ident && p.eat(UESCAPE_KW) {
+        p.expect(STRING);
+    }
+    m.complete(p, PATH_SEGMENT_REF);
 }
 
 fn at_percent_datatype(p: &Parser) -> bool {
@@ -256,7 +265,11 @@ fn at_percent_datatype(p: &Parser) -> bool {
 fn at_path(p: &Parser) -> Option<usize> {
     let mut n = 0;
     while !p.nth_at(n, EOF) && at_name(p, n) {
+        let unicode_ident = p.nth_at(n, IDENT);
         n += 1;
+        if unicode_ident && p.nth_at(n, UESCAPE_KW) && p.nth_at(n + 1, STRING) {
+            n += 2;
+        }
         if !p.nth_at(n, DOT) {
             return Some(n);
         }
