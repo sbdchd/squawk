@@ -201,12 +201,15 @@ PLPGSQL@0..709
         WHITESPACE@344..345 " "
         COLON_EQ@345..347 ":="
         WHITESPACE@347..348 " "
-        TUPLE_EXPR@348..354
-          ROW_KW@348..351 "row"
-          L_PAREN@351..352 "("
-          LITERAL@352..353
-            INT_NUMBER@352..353 "1"
-          R_PAREN@353..354 ")"
+        PLPGSQL_EXPR@348..354
+          TARGET_LIST@348..354
+            TARGET@348..354
+              TUPLE_EXPR@348..354
+                ROW_KW@348..351 "row"
+                L_PAREN@351..352 "("
+                LITERAL@352..353
+                  INT_NUMBER@352..353 "1"
+                R_PAREN@353..354 ")"
         SEMICOLON@354..355 ";"
       WHITESPACE@355..358 "\n  "
       PLPGSQL_GET_DIAG_STMT@358..391
@@ -237,8 +240,11 @@ PLPGSQL@0..709
         WHITESPACE@397..398 " "
         COLON_EQ@398..400 ":="
         WHITESPACE@400..401 " "
-        LITERAL@401..402
-          INT_NUMBER@401..402 "1"
+        PLPGSQL_EXPR@401..402
+          TARGET_LIST@401..402
+            TARGET@401..402
+              LITERAL@401..402
+                INT_NUMBER@401..402 "1"
         SEMICOLON@402..403 ";"
     WHITESPACE@403..404 "\n"
     PLPGSQL_EXCEPTION_SECTION@404..704

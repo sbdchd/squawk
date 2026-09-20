@@ -2043,6 +2043,16 @@ Plpgsql =
   comp_options:(PlpgsqlCompOption*)
   block:PlpgsqlBlock?
 
+PlpgsqlExpr =
+  SelectQuantifier?
+  TargetList?
+  FromClause?
+  WhereClause?
+  GroupByClause?
+  HavingClause?
+  WindowClause?
+  tail_clauses:SelectTailClause*
+
 PlpgsqlCompOption =
   PlpgsqlCompOptionDump
 | PlpgsqlCompOptionVariableConflict
@@ -2131,7 +2141,7 @@ PlpgsqlVarName =
 
 PlpgsqlVarInit =
   (':=' | '=' | 'default')
-  Expr
+  expr:PlpgsqlExpr
 
 PlpgsqlAliasDecl =
   name:PlpgsqlVarName
@@ -2213,12 +2223,12 @@ PlpgsqlPerformStmt =
 
 PlpgsqlReturnStmt =
   'return'
-  Expr?
+  expr:PlpgsqlExpr?
   ';'
 
 PlpgsqlReturnNextStmt =
   'return' 'next'
-  Expr?
+  expr:PlpgsqlExpr?
   ';'
 
 PlpgsqlReturnQueryStmt =
@@ -2228,19 +2238,19 @@ PlpgsqlReturnQueryStmt =
 
 PlpgsqlReturnQueryExecuteStmt =
   'return' 'query' 'execute'
-  query:Expr
+  query:PlpgsqlExpr
   using_clause:PlpgsqlUsingClause?
   ';'
 
 PlpgsqlUsingClause =
-  'using' (Expr (',' Expr)*)
+  'using' exprs:(PlpgsqlExpr (',' PlpgsqlExpr)*)
 
 PlpgsqlRaiseStmt =
   'raise'
   level:PlpgsqlRaiseLevel?
   condition_name:PlpgsqlCondition?
   message:PlpgsqlRaiseMessage?
-  params:(Expr (',' Expr)*)
+  params:(PlpgsqlExpr (',' PlpgsqlExpr)*)
   using_clause:PlpgsqlRaiseUsingClause?
   ';'
 
@@ -2265,36 +2275,36 @@ PlpgsqlRaiseOption =
 | PlpgsqlRaiseOptionSchema
 
 PlpgsqlRaiseOptionErrcode =
-  'errcode' (':=' | '=') Expr
+  'errcode' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionMessage =
-  'message' (':=' | '=') Expr
+  'message' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionDetail =
-  'detail' (':=' | '=') Expr
+  'detail' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionHint =
-  'hint' (':=' | '=') Expr
+  'hint' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionColumn =
-  'column' (':=' | '=') Expr
+  'column' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionConstraint =
-  'constraint' (':=' | '=') Expr
+  'constraint' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionDatatype =
-  'datatype' (':=' | '=') Expr
+  'datatype' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionTable =
-  'table' (':=' | '=') Expr
+  'table' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlRaiseOptionSchema =
-  'schema' (':=' | '=') Expr
+  'schema' (':=' | '=') expr:PlpgsqlExpr
 
 PlpgsqlAssertStmt =
   'assert'
-  cond:Expr
-  message:Expr?
+  cond:PlpgsqlExpr
+  message:PlpgsqlExpr?
   ';'
 
 PlpgsqlCommitStmt =
@@ -2309,7 +2319,7 @@ PlpgsqlRollbackStmt =
 
 PlpgsqlIfStmt =
   'if'
-  cond:Expr
+  cond:PlpgsqlExpr
   'then'
   then_body:PlpgsqlBody
   elsifs:(PlpgsqlElsifClause*)
@@ -2318,7 +2328,7 @@ PlpgsqlIfStmt =
 
 PlpgsqlElsifClause =
   ('elsif' | 'elseif')
-  cond:Expr
+  cond:PlpgsqlExpr
   'then'
   body:PlpgsqlBody
 
@@ -2328,14 +2338,14 @@ PlpgsqlElseClause =
 
 PlpgsqlCaseStmt =
   'case'
-  subject:Expr?
+  subject:PlpgsqlExpr?
   whens:(PlpgsqlCaseWhen*)
   else_clause:PlpgsqlElseClause?
   'end' 'case' ';'
 
 PlpgsqlCaseWhen =
   'when'
-  conds:(Expr (',' Expr)*)
+  cond:PlpgsqlExpr
   'then'
   body:PlpgsqlBody
 
@@ -2350,7 +2360,7 @@ PlpgsqlLoopStmt =
 PlpgsqlWhileStmt =
   label:PlpgsqlLabel?
   'while'
-  cond:Expr
+  cond:PlpgsqlExpr
   'loop'
   body:PlpgsqlBody
   'end' 'loop'
@@ -2371,12 +2381,12 @@ PlpgsqlContinueStmt =
 
 PlpgsqlExitWhen =
   'when'
-  cond:Expr
+  cond:PlpgsqlExpr
 
 PlpgsqlAssignStmt =
   target:PlpgsqlAssignTarget
   (':=' | '=')
-  value:Expr
+  value:PlpgsqlExpr
   ';'
 
 PlpgsqlAssignTarget =
@@ -2454,17 +2464,17 @@ PlpgsqlForVariable =
   FieldAccessor*
 
 PlpgsqlForRange =
-  lower:Expr
+  lower:PlpgsqlExpr
   '..'
-  upper:Expr
-  ('by' step:Expr)?
+  upper:PlpgsqlExpr
+  ('by' step:PlpgsqlExpr)?
 
 PlpgsqlForDynStmt =
   label:PlpgsqlLabel?
   'for'
   vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
   'in' 'execute'
-  query:Expr
+  query:PlpgsqlExpr
   using_clause:PlpgsqlUsingClause?
   'loop'
   body:PlpgsqlBody
@@ -2504,7 +2514,7 @@ PlpgsqlForEachStmt =
   vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
   slice:PlpgsqlForEachSlice?
   'in' 'array'
-  array:Expr
+  array:PlpgsqlExpr
   'loop'
   body:PlpgsqlBody
   'end' 'loop'
@@ -2529,7 +2539,7 @@ PlpgsqlExecSqlStmt =
 
 PlpgsqlDynExecuteStmt =
   'execute'
-  query:Expr
+  query:PlpgsqlExpr
   into_clause:PlpgsqlIntoClause?
   using_clause:PlpgsqlUsingClause?
   ';'
@@ -2564,7 +2574,7 @@ PlpgsqlOpenQuery =
 
 PlpgsqlOpenExecute =
   'for' 'execute'
-  query:Expr
+  query:PlpgsqlExpr
   using_clause:PlpgsqlUsingClause?
 
 PlpgsqlCursorVariableRef =

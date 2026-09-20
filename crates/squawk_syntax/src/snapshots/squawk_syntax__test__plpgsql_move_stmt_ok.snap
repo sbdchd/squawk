@@ -48,8 +48,11 @@ PLPGSQL@0..456
         PLPGSQL_VAR_INIT@58..62
           COLON_EQ@58..60 ":="
           WHITESPACE@60..61 " "
-          LITERAL@61..62
-            INT_NUMBER@61..62 "2"
+          PLPGSQL_EXPR@61..62
+            TARGET_LIST@61..62
+              TARGET@61..62
+                LITERAL@61..62
+                  INT_NUMBER@61..62 "2"
         SEMICOLON@62..63 ";"
     WHITESPACE@63..64 "\n"
     BEGIN_KW@64..69 "begin"
@@ -347,8 +350,11 @@ PLPGSQL@0..49
         WHITESPACE@38..39 " "
         COLON_EQ@39..41 ":="
         WHITESPACE@41..42 " "
-        LITERAL@42..43
-          INT_NUMBER@42..43 "1"
+        PLPGSQL_EXPR@42..43
+          TARGET_LIST@42..43
+            TARGET@42..43
+              LITERAL@42..43
+                INT_NUMBER@42..43 "1"
         SEMICOLON@43..44 ";"
     WHITESPACE@44..45 "\n"
     END_KW@45..48 "end"

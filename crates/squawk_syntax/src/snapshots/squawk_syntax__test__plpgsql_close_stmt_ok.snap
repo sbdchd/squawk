@@ -156,8 +156,11 @@ PLPGSQL@0..51
         WHITESPACE@40..41 " "
         COLON_EQ@41..43 ":="
         WHITESPACE@43..44 " "
-        LITERAL@44..45
-          INT_NUMBER@44..45 "1"
+        PLPGSQL_EXPR@44..45
+          TARGET_LIST@44..45
+            TARGET@44..45
+              LITERAL@44..45
+                INT_NUMBER@44..45 "1"
         SEMICOLON@45..46 ";"
     WHITESPACE@46..47 "\n"
     END_KW@47..50 "end"

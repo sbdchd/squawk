@@ -22,14 +22,17 @@ PLPGSQL@0..155
           USING_KW@26..31 "using"
           WHITESPACE@31..32 " "
           ERROR@32..41
-            BIN_EXPR@32..41
-              NAME_REF@32..37
-                IDENT@32..37 "bogus"
-              WHITESPACE@37..38 " "
-              EQ@38..39 "="
-              WHITESPACE@39..40 " "
-              LITERAL@40..41
-                INT_NUMBER@40..41 "1"
+            PLPGSQL_EXPR@32..41
+              TARGET_LIST@32..41
+                TARGET@32..41
+                  BIN_EXPR@32..41
+                    NAME_REF@32..37
+                      IDENT@32..37 "bogus"
+                    WHITESPACE@37..38 " "
+                    EQ@38..39 "="
+                    WHITESPACE@39..40 " "
+                    LITERAL@40..41
+                      INT_NUMBER@40..41 "1"
         SEMICOLON@41..42 ";"
       WHITESPACE@42..45 "\n  "
       PLPGSQL_RAISE_STMT@45..76
@@ -99,18 +102,10 @@ error[syntax-error]: expected EQ
   ╭▸ 
 4 │   raise notice 'x' using errcode;
   ╰╴                                ━
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-4 │   raise notice 'x' using errcode;
-  ╰╴                                ━
 error[syntax-error]: expected an expression
   ╭▸ 
 4 │   raise notice 'x' using errcode;
   ╰╴                                ━
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-5 │   raise notice 'x' using errcode = ;
-  ╰╴                                  ━
 error[syntax-error]: expected an expression
   ╭▸ 
 5 │   raise notice 'x' using errcode = ;

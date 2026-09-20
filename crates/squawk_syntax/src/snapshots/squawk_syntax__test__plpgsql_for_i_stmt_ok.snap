@@ -24,20 +24,23 @@ PLPGSQL@0..560
         PLPGSQL_VAR_INIT@21..38
           COLON_EQ@21..23 ":="
           WHITESPACE@23..24 " "
-          ARRAY_EXPR@24..38
-            ARRAY_KW@24..29 "array"
-            L_BRACK@29..30 "["
-            LITERAL@30..31
-              INT_NUMBER@30..31 "1"
-            COMMA@31..32 ","
-            WHITESPACE@32..33 " "
-            LITERAL@33..34
-              INT_NUMBER@33..34 "2"
-            COMMA@34..35 ","
-            WHITESPACE@35..36 " "
-            LITERAL@36..37
-              INT_NUMBER@36..37 "3"
-            R_BRACK@37..38 "]"
+          PLPGSQL_EXPR@24..38
+            TARGET_LIST@24..38
+              TARGET@24..38
+                ARRAY_EXPR@24..38
+                  ARRAY_KW@24..29 "array"
+                  L_BRACK@29..30 "["
+                  LITERAL@30..31
+                    INT_NUMBER@30..31 "1"
+                  COMMA@31..32 ","
+                  WHITESPACE@32..33 " "
+                  LITERAL@33..34
+                    INT_NUMBER@33..34 "2"
+                  COMMA@34..35 ","
+                  WHITESPACE@35..36 " "
+                  LITERAL@36..37
+                    INT_NUMBER@36..37 "3"
+                  R_BRACK@37..38 "]"
         SEMICOLON@38..39 ";"
       WHITESPACE@39..42 "\n  "
       PLPGSQL_VAR_DECL@42..53
@@ -52,8 +55,11 @@ PLPGSQL@0..560
         PLPGSQL_VAR_INIT@48..52
           COLON_EQ@48..50 ":="
           WHITESPACE@50..51 " "
-          LITERAL@51..52
-            INT_NUMBER@51..52 "3"
+          PLPGSQL_EXPR@51..52
+            TARGET_LIST@51..52
+              TARGET@51..52
+                LITERAL@51..52
+                  INT_NUMBER@51..52 "3"
         SEMICOLON@52..53 ";"
       WHITESPACE@53..56 "\n  "
       PLPGSQL_VAR_DECL@56..65
@@ -79,11 +85,17 @@ PLPGSQL@0..560
         IN_KW@80..82 "in"
         WHITESPACE@82..83 " "
         PLPGSQL_FOR_RANGE@83..88
-          LITERAL@83..84
-            INT_NUMBER@83..84 "1"
+          PLPGSQL_EXPR@83..84
+            TARGET_LIST@83..84
+              TARGET@83..84
+                LITERAL@83..84
+                  INT_NUMBER@83..84 "1"
           DOT_DOT@84..86 ".."
-          LITERAL@86..88
-            INT_NUMBER@86..88 "10"
+          PLPGSQL_EXPR@86..88
+            TARGET_LIST@86..88
+              TARGET@86..88
+                LITERAL@86..88
+                  INT_NUMBER@86..88 "10"
         WHITESPACE@88..89 " "
         LOOP_KW@89..93 "loop"
         WHITESPACE@93..98 "\n    "
@@ -109,11 +121,17 @@ PLPGSQL@0..560
         REVERSE_KW@127..134 "reverse"
         WHITESPACE@134..135 " "
         PLPGSQL_FOR_RANGE@135..140
-          LITERAL@135..137
-            INT_NUMBER@135..137 "10"
+          PLPGSQL_EXPR@135..137
+            TARGET_LIST@135..137
+              TARGET@135..137
+                LITERAL@135..137
+                  INT_NUMBER@135..137 "10"
           DOT_DOT@137..139 ".."
-          LITERAL@139..140
-            INT_NUMBER@139..140 "1"
+          PLPGSQL_EXPR@139..140
+            TARGET_LIST@139..140
+              TARGET@139..140
+                LITERAL@139..140
+                  INT_NUMBER@139..140 "1"
         WHITESPACE@140..141 " "
         LOOP_KW@141..145 "loop"
         WHITESPACE@145..150 "\n    "
@@ -139,16 +157,25 @@ PLPGSQL@0..560
         REVERSE_KW@179..186 "reverse"
         WHITESPACE@186..187 " "
         PLPGSQL_FOR_RANGE@187..197
-          LITERAL@187..189
-            INT_NUMBER@187..189 "10"
+          PLPGSQL_EXPR@187..189
+            TARGET_LIST@187..189
+              TARGET@187..189
+                LITERAL@187..189
+                  INT_NUMBER@187..189 "10"
           DOT_DOT@189..191 ".."
-          LITERAL@191..192
-            INT_NUMBER@191..192 "1"
+          PLPGSQL_EXPR@191..192
+            TARGET_LIST@191..192
+              TARGET@191..192
+                LITERAL@191..192
+                  INT_NUMBER@191..192 "1"
           WHITESPACE@192..193 " "
           BY_KW@193..195 "by"
           WHITESPACE@195..196 " "
-          LITERAL@196..197
-            INT_NUMBER@196..197 "2"
+          PLPGSQL_EXPR@196..197
+            TARGET_LIST@196..197
+              TARGET@196..197
+                LITERAL@196..197
+                  INT_NUMBER@196..197 "2"
         WHITESPACE@197..198 " "
         LOOP_KW@198..202 "loop"
         WHITESPACE@202..207 "\n    "
@@ -172,31 +199,37 @@ PLPGSQL@0..560
         IN_KW@233..235 "in"
         WHITESPACE@235..236 " "
         PLPGSQL_FOR_RANGE@236..264
-          BIN_EXPR@236..241
-            LITERAL@236..237
-              INT_NUMBER@236..237 "1"
-            WHITESPACE@237..238 " "
-            PLUS@238..239 "+"
-            WHITESPACE@239..240 " "
-            LITERAL@240..241
-              INT_NUMBER@240..241 "1"
+          PLPGSQL_EXPR@236..241
+            TARGET_LIST@236..241
+              TARGET@236..241
+                BIN_EXPR@236..241
+                  LITERAL@236..237
+                    INT_NUMBER@236..237 "1"
+                  WHITESPACE@237..238 " "
+                  PLUS@238..239 "+"
+                  WHITESPACE@239..240 " "
+                  LITERAL@240..241
+                    INT_NUMBER@240..241 "1"
           WHITESPACE@241..242 " "
           DOT_DOT@242..244 ".."
           WHITESPACE@244..245 " "
-          CALL_EXPR@245..264
-            NAME_REF@245..256
-              IDENT@245..256 "array_upper"
-            ARG_LIST@256..264
-              L_PAREN@256..257 "("
-              ARG@257..260
-                NAME_REF@257..260
-                  IDENT@257..260 "arr"
-              COMMA@260..261 ","
-              WHITESPACE@261..262 " "
-              ARG@262..263
-                LITERAL@262..263
-                  INT_NUMBER@262..263 "1"
-              R_PAREN@263..264 ")"
+          PLPGSQL_EXPR@245..264
+            TARGET_LIST@245..264
+              TARGET@245..264
+                CALL_EXPR@245..264
+                  NAME_REF@245..256
+                    IDENT@245..256 "array_upper"
+                  ARG_LIST@256..264
+                    L_PAREN@256..257 "("
+                    ARG@257..260
+                      NAME_REF@257..260
+                        IDENT@257..260 "arr"
+                    COMMA@260..261 ","
+                    WHITESPACE@261..262 " "
+                    ARG@262..263
+                      LITERAL@262..263
+                        INT_NUMBER@262..263 "1"
+                    R_PAREN@263..264 ")"
         WHITESPACE@264..265 " "
         LOOP_KW@265..269 "loop"
         WHITESPACE@269..274 "\n    "
@@ -220,11 +253,17 @@ PLPGSQL@0..560
         IN_KW@300..302 "in"
         WHITESPACE@302..303 " "
         PLPGSQL_FOR_RANGE@303..307
-          LITERAL@303..304
-            INT_NUMBER@303..304 "1"
+          PLPGSQL_EXPR@303..304
+            TARGET_LIST@303..304
+              TARGET@303..304
+                LITERAL@303..304
+                  INT_NUMBER@303..304 "1"
           DOT_DOT@304..306 ".."
-          NAME_REF@306..307
-            IDENT@306..307 "n"
+          PLPGSQL_EXPR@306..307
+            TARGET_LIST@306..307
+              TARGET@306..307
+                NAME_REF@306..307
+                  IDENT@306..307 "n"
         WHITESPACE@307..308 " "
         LOOP_KW@308..312 "loop"
         WHITESPACE@312..317 "\n    "
@@ -248,29 +287,35 @@ PLPGSQL@0..560
         IN_KW@343..345 "in"
         WHITESPACE@345..346 " "
         PLPGSQL_FOR_RANGE@346..368
-          PAREN_EXPR@346..356
-            L_PAREN@346..347 "("
-            SELECT@347..355
-              SELECT_CLAUSE@347..355
-                SELECT_KW@347..353 "select"
-                WHITESPACE@353..354 " "
-                TARGET_LIST@354..355
-                  TARGET@354..355
-                    LITERAL@354..355
-                      INT_NUMBER@354..355 "1"
-            R_PAREN@355..356 ")"
+          PLPGSQL_EXPR@346..356
+            TARGET_LIST@346..356
+              TARGET@346..356
+                PAREN_EXPR@346..356
+                  L_PAREN@346..347 "("
+                  SELECT@347..355
+                    SELECT_CLAUSE@347..355
+                      SELECT_KW@347..353 "select"
+                      WHITESPACE@353..354 " "
+                      TARGET_LIST@354..355
+                        TARGET@354..355
+                          LITERAL@354..355
+                            INT_NUMBER@354..355 "1"
+                  R_PAREN@355..356 ")"
           DOT_DOT@356..358 ".."
-          PAREN_EXPR@358..368
-            L_PAREN@358..359 "("
-            SELECT@359..367
-              SELECT_CLAUSE@359..367
-                SELECT_KW@359..365 "select"
-                WHITESPACE@365..366 " "
-                TARGET_LIST@366..367
-                  TARGET@366..367
-                    LITERAL@366..367
-                      INT_NUMBER@366..367 "2"
-            R_PAREN@367..368 ")"
+          PLPGSQL_EXPR@358..368
+            TARGET_LIST@358..368
+              TARGET@358..368
+                PAREN_EXPR@358..368
+                  L_PAREN@358..359 "("
+                  SELECT@359..367
+                    SELECT_CLAUSE@359..367
+                      SELECT_KW@359..365 "select"
+                      WHITESPACE@365..366 " "
+                      TARGET_LIST@366..367
+                        TARGET@366..367
+                          LITERAL@366..367
+                            INT_NUMBER@366..367 "2"
+                  R_PAREN@367..368 ")"
         WHITESPACE@368..369 " "
         LOOP_KW@369..373 "loop"
         WHITESPACE@373..378 "\n    "
@@ -298,11 +343,17 @@ PLPGSQL@0..560
         IN_KW@406..408 "in"
         WHITESPACE@408..409 " "
         PLPGSQL_FOR_RANGE@409..413
-          LITERAL@409..410
-            INT_NUMBER@409..410 "1"
+          PLPGSQL_EXPR@409..410
+            TARGET_LIST@409..410
+              TARGET@409..410
+                LITERAL@409..410
+                  INT_NUMBER@409..410 "1"
           DOT_DOT@410..412 ".."
-          LITERAL@412..413
-            INT_NUMBER@412..413 "2"
+          PLPGSQL_EXPR@412..413
+            TARGET_LIST@412..413
+              TARGET@412..413
+                LITERAL@412..413
+                  INT_NUMBER@412..413 "2"
         WHITESPACE@413..414 " "
         LOOP_KW@414..418 "loop"
         WHITESPACE@418..423 "\n    "
@@ -332,11 +383,17 @@ PLPGSQL@0..560
         IN_KW@459..461 "in"
         WHITESPACE@461..462 " "
         PLPGSQL_FOR_RANGE@462..466
-          LITERAL@462..463
-            INT_NUMBER@462..463 "1"
+          PLPGSQL_EXPR@462..463
+            TARGET_LIST@462..463
+              TARGET@462..463
+                LITERAL@462..463
+                  INT_NUMBER@462..463 "1"
           DOT_DOT@463..465 ".."
-          LITERAL@465..466
-            INT_NUMBER@465..466 "3"
+          PLPGSQL_EXPR@465..466
+            TARGET_LIST@465..466
+              TARGET@465..466
+                LITERAL@465..466
+                  INT_NUMBER@465..466 "3"
         WHITESPACE@466..467 " "
         LOOP_KW@467..471 "loop"
         WHITESPACE@471..476 "\n    "
@@ -351,11 +408,17 @@ PLPGSQL@0..560
             IN_KW@482..484 "in"
             WHITESPACE@484..485 " "
             PLPGSQL_FOR_RANGE@485..489
-              LITERAL@485..486
-                INT_NUMBER@485..486 "1"
+              PLPGSQL_EXPR@485..486
+                TARGET_LIST@485..486
+                  TARGET@485..486
+                    LITERAL@485..486
+                      INT_NUMBER@485..486 "1"
               DOT_DOT@486..488 ".."
-              LITERAL@488..489
-                INT_NUMBER@488..489 "3"
+              PLPGSQL_EXPR@488..489
+                TARGET_LIST@488..489
+                  TARGET@488..489
+                    LITERAL@488..489
+                      INT_NUMBER@488..489 "3"
             WHITESPACE@489..490 " "
             LOOP_KW@490..494 "loop"
             WHITESPACE@494..501 "\n      "
@@ -369,14 +432,17 @@ PLPGSQL@0..560
                 PLPGSQL_EXIT_WHEN@512..522
                   WHEN_KW@512..516 "when"
                   WHITESPACE@516..517 " "
-                  BIN_EXPR@517..522
-                    NAME_REF@517..518
-                      IDENT@517..518 "j"
-                    WHITESPACE@518..519 " "
-                    EQ@519..520 "="
-                    WHITESPACE@520..521 " "
-                    LITERAL@521..522
-                      INT_NUMBER@521..522 "2"
+                  PLPGSQL_EXPR@517..522
+                    TARGET_LIST@517..522
+                      TARGET@517..522
+                        BIN_EXPR@517..522
+                          NAME_REF@517..518
+                            IDENT@517..518 "j"
+                          WHITESPACE@518..519 " "
+                          EQ@519..520 "="
+                          WHITESPACE@520..521 " "
+                          LITERAL@521..522
+                            INT_NUMBER@521..522 "2"
                 SEMICOLON@522..523 ";"
             WHITESPACE@523..528 "\n    "
             END_KW@528..531 "end"
@@ -424,17 +490,23 @@ PLPGSQL@0..90
         IN_KW@41..43 "in"
         WHITESPACE@43..44 " "
         PLPGSQL_FOR_RANGE@44..58
-          FIELD_EXPR@44..53
-            NAME_REF@44..51
-              IDENT@44..51 "reverse"
-            DOT@51..52 "."
-            NAME_REF@52..53
-              IDENT@52..53 "x"
+          PLPGSQL_EXPR@44..53
+            TARGET_LIST@44..53
+              TARGET@44..53
+                FIELD_EXPR@44..53
+                  NAME_REF@44..51
+                    IDENT@44..51 "reverse"
+                  DOT@51..52 "."
+                  NAME_REF@52..53
+                    IDENT@52..53 "x"
           WHITESPACE@53..54 " "
           DOT_DOT@54..56 ".."
           WHITESPACE@56..57 " "
-          LITERAL@57..58
-            INT_NUMBER@57..58 "3"
+          PLPGSQL_EXPR@57..58
+            TARGET_LIST@57..58
+              TARGET@57..58
+                LITERAL@57..58
+                  INT_NUMBER@57..58 "3"
         WHITESPACE@58..59 " "
         LOOP_KW@59..63 "loop"
         WHITESPACE@63..68 "\n    "

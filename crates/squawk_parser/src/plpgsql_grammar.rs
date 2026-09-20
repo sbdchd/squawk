@@ -283,14 +283,69 @@ fn opt_var_init(p: &mut Parser) {
     if !p.eat(COLON_EQ) && !p.eat(EQ) {
         p.bump(DEFAULT_KW);
     }
-    expr(p);
+    expr_until_semi(p);
     m.complete(p, PLPGSQL_VAR_INIT);
 }
 
 fn expr(p: &mut Parser) {
-    if grammar::expr(p).is_none() {
+    if grammar::plpgsql_expr(p).is_none() {
         p.error("expected an expression");
     }
+}
+
+fn expr_until(p: &mut Parser, terminator: Option<(SyntaxKind, usize)>) {
+    match terminator {
+        None => expr(p),
+        Some((_, 0)) => p.error("expected an expression"),
+        Some((_, n)) => p.with_limit(n, expr),
+    }
+}
+
+const SEMICOLON_TERMINATOR: TokenSet = TokenSet::new(&[SEMICOLON]);
+const COMMA_TERMINATOR: TokenSet = TokenSet::new(&[COMMA, SEMICOLON]);
+const COMMA_OR_USING_TERMINATOR: TokenSet = TokenSet::new(&[COMMA, SEMICOLON, USING_KW]);
+const LOOP_TERMINATOR: TokenSet = TokenSet::new(&[LOOP_KW]);
+const DOT_DOT_TERMINATOR: TokenSet = TokenSet::new(&[DOT_DOT, SEMICOLON]);
+const BY_TERMINATOR: TokenSet = TokenSet::new(&[BY_KW, SEMICOLON]);
+const THEN_TERMINATOR: TokenSet = TokenSet::new(&[THEN_KW]);
+const WHEN_TERMINATOR: TokenSet = TokenSet::new(&[WHEN_KW]);
+const USING_TERMINATOR: TokenSet = TokenSet::new(&[USING_KW, SEMICOLON]);
+const INTO_OR_USING_TERMINATOR: TokenSet = TokenSet::new(&[INTO_KW, USING_KW, SEMICOLON]);
+const RECOVERY_TERMINATORS: TokenSet =
+    TokenSet::new(&[THEN_KW, WHEN_KW, USING_KW, ELSE_KW, END_KW, SEMICOLON]);
+
+fn expr_until_ts(p: &mut Parser, stop: TokenSet, contextual_stop: TokenSet) {
+    let terminator = top_level_terminator(p, stop, contextual_stop)
+        .or_else(|| top_level_terminator(p, RECOVERY_TERMINATORS, contextual_stop));
+    expr_until(p, terminator);
+}
+
+fn expr_until_semi(p: &mut Parser) {
+    expr_until_ts(p, SEMICOLON_TERMINATOR, TokenSet::EMPTY);
+}
+
+fn expr_until_then(p: &mut Parser) {
+    expr_until_ts(p, THEN_TERMINATOR, TokenSet::EMPTY);
+}
+
+fn expr_until_when(p: &mut Parser) {
+    expr_until_ts(p, WHEN_TERMINATOR, TokenSet::EMPTY);
+}
+
+fn expr_until_using(p: &mut Parser) {
+    expr_until_ts(p, USING_TERMINATOR, TokenSet::EMPTY);
+}
+
+fn comma_expr(p: &mut Parser) {
+    expr_until_ts(p, COMMA_TERMINATOR, TokenSet::EMPTY);
+}
+
+fn comma_expr_until_loop(p: &mut Parser) {
+    expr_until_ts(p, COMMA_TERMINATOR, LOOP_TERMINATOR);
+}
+
+fn comma_expr_until_using(p: &mut Parser) {
+    expr_until_ts(p, COMMA_OR_USING_TERMINATOR, TokenSet::EMPTY);
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -434,14 +489,14 @@ fn return_stmt(p: &mut Parser) {
     let kind = if p.at(NEXT_KW) && !composite {
         p.bump(NEXT_KW);
         if !p.at(SEMICOLON) {
-            expr(p);
+            expr_until_semi(p);
         }
         PLPGSQL_RETURN_NEXT_STMT
     } else if p.nth_at_contextual_kw(0, QUERY_KW) && !composite && p.nth_at(1, EXECUTE_KW) {
         p.bump_remap(QUERY_KW);
         p.bump(EXECUTE_KW);
-        expr(p);
-        opt_using_clause(p, expr);
+        expr_until_using(p);
+        opt_using_clause(p, comma_expr);
         PLPGSQL_RETURN_QUERY_EXECUTE_STMT
     } else if p.nth_at_contextual_kw(0, QUERY_KW) && !composite {
         p.bump_remap(QUERY_KW);
@@ -451,7 +506,7 @@ fn return_stmt(p: &mut Parser) {
         PLPGSQL_RETURN_QUERY_STMT
     } else {
         if !p.at(SEMICOLON) {
-            expr(p);
+            expr_until_semi(p);
         }
         PLPGSQL_RETURN_STMT
     };
@@ -463,9 +518,9 @@ fn assert_stmt(p: &mut Parser) {
     assert!(p.nth_at_contextual_kw(0, ASSERT_KW));
     let m = p.start();
     p.bump_remap(ASSERT_KW);
-    expr(p);
+    comma_expr(p);
     if p.eat(COMMA) {
-        expr(p);
+        expr_until_semi(p);
     }
     p.expect(SEMICOLON);
     m.complete(p, PLPGSQL_ASSERT_STMT);
@@ -513,7 +568,7 @@ fn raise_stmt(p: &mut Parser) {
         opt_raise_level(p);
         if opt_raise_message(p) {
             while !p.at(EOF) && p.eat(COMMA) {
-                expr(p);
+                comma_expr_until_using(p);
             }
         } else if !p.at(USING_KW) {
             condition(p);
@@ -575,7 +630,7 @@ fn raise_option(p: &mut Parser) {
     if !p.eat(COLON_EQ) {
         p.expect(EQ);
     }
-    expr(p);
+    comma_expr(p);
     m.complete(p, kind);
 }
 
@@ -703,8 +758,8 @@ fn open_stmt(p: &mut Parser) {
         let m = p.start();
         p.bump(FOR_KW);
         let kind = if p.eat(EXECUTE_KW) {
-            expr(p);
-            opt_using_clause(p, expr);
+            expr_until_using(p);
+            opt_using_clause(p, comma_expr);
             PLPGSQL_OPEN_EXECUTE
         } else {
             if grammar::stmt(p, &grammar::StmtRestrictions::default()).is_none() {
@@ -742,7 +797,7 @@ fn dyn_execute_stmt(p: &mut Parser) {
             into_clause(p);
         } else if !using && p.at(USING_KW) {
             using = true;
-            opt_using_clause(p, expr);
+            opt_using_clause(p, comma_expr);
         } else {
             break;
         }
@@ -828,7 +883,7 @@ fn assign_stmt(p: &mut Parser) {
     if !p.eat(COLON_EQ) {
         p.expect(EQ);
     }
-    expr(p);
+    expr_until_semi(p);
     p.expect(SEMICOLON);
     m.complete(p, PLPGSQL_ASSIGN_STMT);
 }
@@ -844,7 +899,7 @@ fn if_stmt(p: &mut Parser) {
     assert!(p.at(IF_KW));
     let m = p.start();
     p.bump(IF_KW);
-    expr(p);
+    expr_until_then(p);
     p.expect(THEN_KW);
     body(p, BodyKind::IfThen);
     while !p.at(EOF) && opt_elsif_clause(p) {}
@@ -860,7 +915,7 @@ fn case_stmt(p: &mut Parser) {
     let m = p.start();
     p.bump(CASE_KW);
     if !p.at(WHEN_KW) {
-        expr(p);
+        expr_until_when(p);
         if !p.at(WHEN_KW) {
             p.error("expected `when`");
         }
@@ -879,10 +934,7 @@ fn case_when(p: &mut Parser) {
     assert!(p.at(WHEN_KW));
     let m = p.start();
     p.bump(WHEN_KW);
-    expr(p);
-    while !p.at(EOF) && p.eat(COMMA) {
-        expr(p);
-    }
+    expr_until_then(p);
     p.expect(THEN_KW);
     body(p, BodyKind::CaseWhen);
     m.complete(p, PLPGSQL_CASE_WHEN);
@@ -894,7 +946,7 @@ fn loop_stmt(p: &mut Parser) {
     opt_label(p);
     let kind = if p.nth_at_contextual_kw(0, WHILE_KW) {
         p.bump_remap(WHILE_KW);
-        expr(p);
+        expr_until_loop(p, TokenSet::EMPTY);
         PLPGSQL_WHILE_STMT
     } else if p.at(FOR_KW) {
         for_head(p)
@@ -918,8 +970,8 @@ fn for_head(p: &mut Parser) -> SyntaxKind {
     for_variable_list(p);
     p.expect(IN_KW);
     if p.eat(EXECUTE_KW) {
-        expr_until_loop(p);
-        opt_using_clause(p, expr_until_loop);
+        expr_until_loop_or_using(p);
+        opt_using_clause(p, comma_expr_until_loop);
         return PLPGSQL_FOR_DYN_STMT;
     }
     if at_for_cursor(p, 0) {
@@ -932,13 +984,13 @@ fn for_head(p: &mut Parser) -> SyntaxKind {
     if at_for_reverse(p, 0) {
         p.bump_remap(REVERSE_KW);
     }
-    match for_header_terminator(p, 0) {
+    match top_level_terminator(p, DOT_DOT_TERMINATOR, LOOP_TERMINATOR) {
         Some((DOT_DOT, _)) => {
             for_range(p);
             PLPGSQL_FOR_I_STMT
         }
         terminator => {
-            for_query(p, terminator.map(|(_, n)| n));
+            for_query(p, terminator);
             PLPGSQL_FOR_QUERY_STMT
         }
     }
@@ -951,7 +1003,7 @@ fn foreach_head(p: &mut Parser) -> SyntaxKind {
     opt_foreach_slice(p);
     p.expect(IN_KW);
     p.expect(ARRAY_KW);
-    expr_until_loop(p);
+    expr_until_loop(p, TokenSet::EMPTY);
     PLPGSQL_FOR_EACH_STMT
 }
 
@@ -972,16 +1024,16 @@ fn opt_foreach_slice(p: &mut Parser) {
     m.complete(p, PLPGSQL_FOR_EACH_SLICE);
 }
 
-fn for_query(p: &mut Parser, loop_at: Option<usize>) {
-    match loop_at {
-        Some(0) => p.error("expected a query"),
-        Some(n) => {
+fn for_query(p: &mut Parser, terminator: Option<(SyntaxKind, usize)>) {
+    match terminator {
+        Some((SEMICOLON, _)) | None => {
+            grammar::stmt(p, &grammar::StmtRestrictions::default());
+        }
+        Some((_, 0)) => p.error("expected a query"),
+        Some((_, n)) => {
             p.with_limit(n, |p| {
                 grammar::stmt(p, &grammar::StmtRestrictions::default());
             });
-        }
-        None => {
-            grammar::stmt(p, &grammar::StmtRestrictions::default());
         }
     }
 }
@@ -1003,37 +1055,25 @@ fn for_variable(p: &mut Parser) {
 
 fn for_range(p: &mut Parser) {
     let m = p.start();
-    range_bound(p);
+    expr_until_loop(p, DOT_DOT_TERMINATOR);
     p.expect(DOT_DOT);
-    range_bound(p);
+    expr_until_loop(p, BY_TERMINATOR);
     if p.eat(BY_KW) {
-        range_bound(p);
+        expr_until_loop(p, TokenSet::EMPTY);
     }
     m.complete(p, PLPGSQL_FOR_RANGE);
 }
 
-fn range_bound(p: &mut Parser) {
-    if p.nth_at_contextual_kw(0, LOOP_KW) || p.at(BY_KW) {
-        p.error("expected an expression");
-        return;
-    }
-    expr(p);
-}
-
 fn expr_until_into_or_using(p: &mut Parser) {
-    if p.at(INTO_KW) || p.at(USING_KW) || p.at(SEMICOLON) {
-        p.error("expected an expression");
-        return;
-    }
-    expr(p);
+    expr_until_ts(p, INTO_OR_USING_TERMINATOR, TokenSet::EMPTY);
 }
 
-fn expr_until_loop(p: &mut Parser) {
-    if p.nth_at_contextual_kw(0, LOOP_KW) || p.at(USING_KW) {
-        p.error("expected an expression");
-        return;
-    }
-    expr(p);
+fn expr_until_loop(p: &mut Parser, extra_follow: TokenSet) {
+    expr_until_ts(p, SEMICOLON_TERMINATOR.union(extra_follow), LOOP_TERMINATOR);
+}
+
+fn expr_until_loop_or_using(p: &mut Parser) {
+    expr_until_ts(p, USING_TERMINATOR, LOOP_TERMINATOR);
 }
 
 fn exit_stmt(p: &mut Parser) {
@@ -1057,7 +1097,7 @@ fn opt_exit_when(p: &mut Parser) {
     }
     let m = p.start();
     p.bump(WHEN_KW);
-    expr(p);
+    expr_until_semi(p);
     m.complete(p, PLPGSQL_EXIT_WHEN);
 }
 
@@ -1079,7 +1119,7 @@ fn opt_elsif_clause(p: &mut Parser) -> bool {
     } else {
         p.bump_remap(ELSIF_KW);
     }
-    expr(p);
+    expr_until_then(p);
     p.expect(THEN_KW);
     body(p, BodyKind::IfThen);
     m.complete(p, PLPGSQL_ELSIF_CLAUSE);
@@ -1233,15 +1273,26 @@ fn at_for_reverse(p: &Parser, n: usize) -> bool {
 }
 
 // postgres does a similar thing to look ahead until it sees a loop token
-fn for_header_terminator(p: &Parser, mut n: usize) -> Option<(SyntaxKind, usize)> {
+fn top_level_terminator(
+    p: &Parser,
+    stop: TokenSet,
+    contextual_stop: TokenSet,
+) -> Option<(SyntaxKind, usize)> {
     let mut depth = 0i32;
+    let mut case_depth = 0i32;
+    let mut n = 0;
     while !p.nth_at(n, EOF) {
         match p.nth(n) {
             L_PAREN | L_BRACK => depth += 1,
-            R_PAREN | R_BRACK => depth -= 1,
-            SEMICOLON if depth == 0 => return None,
-            DOT_DOT if depth == 0 => return Some((DOT_DOT, n)),
-            _ if depth == 0 && p.nth_at_contextual_kw(n, LOOP_KW) => return Some((LOOP_KW, n)),
+            R_PAREN | R_BRACK if depth > 0 => depth -= 1,
+            CASE_KW => case_depth += 1,
+            END_KW if case_depth > 0 => case_depth -= 1,
+            kind if depth == 0 && case_depth == 0 && stop.contains(kind) => {
+                return Some((kind, n));
+            }
+            _ if depth == 0 && case_depth == 0 && p.nth_at_contextual_ts(n, contextual_stop) => {
+                return Some((p.nth_contextual_kind(n), n));
+            }
             _ => (),
         }
         n += 1;

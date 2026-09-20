@@ -20,8 +20,11 @@ PLPGSQL@0..559
         PLPGSQL_VAR_INIT@18..31
           COLON_EQ@18..20 ":="
           WHITESPACE@20..21 " "
-          LITERAL@21..31
-            STRING@21..31 "'select 1'"
+          PLPGSQL_EXPR@21..31
+            TARGET_LIST@21..31
+              TARGET@21..31
+                LITERAL@21..31
+                  STRING@21..31 "'select 1'"
         SEMICOLON@31..32 ";"
       WHITESPACE@32..35 "\n  "
       PLPGSQL_VAR_DECL@35..57
@@ -36,8 +39,11 @@ PLPGSQL@0..559
         PLPGSQL_VAR_INIT@42..56
           COLON_EQ@42..44 ":="
           WHITESPACE@44..45 " "
-          LITERAL@45..56
-            STRING@45..56 "'dynexec_t'"
+          PLPGSQL_EXPR@45..56
+            TARGET_LIST@45..56
+              TARGET@45..56
+                LITERAL@45..56
+                  STRING@45..56 "'dynexec_t'"
         SEMICOLON@56..57 ";"
       WHITESPACE@57..60 "\n  "
       PLPGSQL_VAR_DECL@60..66
@@ -76,44 +82,56 @@ PLPGSQL@0..559
       PLPGSQL_DYN_EXECUTE_STMT@96..115
         EXECUTE_KW@96..103 "execute"
         WHITESPACE@103..104 " "
-        LITERAL@104..114
-          STRING@104..114 "'select 1'"
+        PLPGSQL_EXPR@104..114
+          TARGET_LIST@104..114
+            TARGET@104..114
+              LITERAL@104..114
+                STRING@104..114 "'select 1'"
         SEMICOLON@114..115 ";"
       WHITESPACE@115..118 "\n  "
       PLPGSQL_DYN_EXECUTE_STMT@118..128
         EXECUTE_KW@118..125 "execute"
         WHITESPACE@125..126 " "
-        NAME_REF@126..127
-          IDENT@126..127 "q"
+        PLPGSQL_EXPR@126..127
+          TARGET_LIST@126..127
+            TARGET@126..127
+              NAME_REF@126..127
+                IDENT@126..127 "q"
         SEMICOLON@127..128 ";"
       WHITESPACE@128..131 "\n  "
       PLPGSQL_DYN_EXECUTE_STMT@131..174
         EXECUTE_KW@131..138 "execute"
         WHITESPACE@138..139 " "
-        BIN_EXPR@139..173
-          LITERAL@139..155
-            STRING@139..155 "'select a from '"
-          WHITESPACE@155..156 " "
-          CUSTOM_OP@156..158
-            PIPE@156..157 "|"
-            PIPE@157..158 "|"
-          WHITESPACE@158..159 " "
-          CALL_EXPR@159..173
-            NAME_REF@159..170
-              IDENT@159..170 "quote_ident"
-            ARG_LIST@170..173
-              L_PAREN@170..171 "("
-              ARG@171..172
-                NAME_REF@171..172
-                  IDENT@171..172 "t"
-              R_PAREN@172..173 ")"
+        PLPGSQL_EXPR@139..173
+          TARGET_LIST@139..173
+            TARGET@139..173
+              BIN_EXPR@139..173
+                LITERAL@139..155
+                  STRING@139..155 "'select a from '"
+                WHITESPACE@155..156 " "
+                CUSTOM_OP@156..158
+                  PIPE@156..157 "|"
+                  PIPE@157..158 "|"
+                WHITESPACE@158..159 " "
+                CALL_EXPR@159..173
+                  NAME_REF@159..170
+                    IDENT@159..170 "quote_ident"
+                  ARG_LIST@170..173
+                    L_PAREN@170..171 "("
+                    ARG@171..172
+                      NAME_REF@171..172
+                        IDENT@171..172 "t"
+                    R_PAREN@172..173 ")"
         SEMICOLON@173..174 ";"
       WHITESPACE@174..177 "\n  "
       PLPGSQL_DYN_EXECUTE_STMT@177..194
         EXECUTE_KW@177..184 "execute"
         WHITESPACE@184..185 " "
-        NAME_REF@185..186
-          IDENT@185..186 "q"
+        PLPGSQL_EXPR@185..186
+          TARGET_LIST@185..186
+            TARGET@185..186
+              NAME_REF@185..186
+                IDENT@185..186 "q"
         WHITESPACE@186..187 " "
         PLPGSQL_INTO_CLAUSE@187..193
           INTO_KW@187..191 "into"
@@ -127,8 +145,11 @@ PLPGSQL@0..559
       PLPGSQL_DYN_EXECUTE_STMT@197..221
         EXECUTE_KW@197..204 "execute"
         WHITESPACE@204..205 " "
-        NAME_REF@205..206
-          IDENT@205..206 "q"
+        PLPGSQL_EXPR@205..206
+          TARGET_LIST@205..206
+            TARGET@205..206
+              NAME_REF@205..206
+                IDENT@205..206 "q"
         WHITESPACE@206..207 " "
         PLPGSQL_INTO_CLAUSE@207..220
           INTO_KW@207..211 "into"
@@ -144,8 +165,11 @@ PLPGSQL@0..559
       PLPGSQL_DYN_EXECUTE_STMT@224..241
         EXECUTE_KW@224..231 "execute"
         WHITESPACE@231..232 " "
-        NAME_REF@232..233
-          IDENT@232..233 "q"
+        PLPGSQL_EXPR@232..233
+          TARGET_LIST@232..233
+            TARGET@232..233
+              NAME_REF@232..233
+                IDENT@232..233 "q"
         WHITESPACE@233..234 " "
         PLPGSQL_INTO_CLAUSE@234..240
           INTO_KW@234..238 "into"
@@ -159,8 +183,11 @@ PLPGSQL@0..559
       PLPGSQL_DYN_EXECUTE_STMT@244..263
         EXECUTE_KW@244..251 "execute"
         WHITESPACE@251..252 " "
-        NAME_REF@252..253
-          IDENT@252..253 "q"
+        PLPGSQL_EXPR@252..253
+          TARGET_LIST@252..253
+            TARGET@252..253
+              NAME_REF@252..253
+                IDENT@252..253 "q"
         WHITESPACE@253..254 " "
         PLPGSQL_INTO_CLAUSE@254..262
           INTO_KW@254..258 "into"
@@ -178,38 +205,56 @@ PLPGSQL@0..559
       PLPGSQL_DYN_EXECUTE_STMT@266..294
         EXECUTE_KW@266..273 "execute"
         WHITESPACE@273..274 " "
-        LITERAL@274..285
-          STRING@274..285 "'select $1'"
+        PLPGSQL_EXPR@274..285
+          TARGET_LIST@274..285
+            TARGET@274..285
+              LITERAL@274..285
+                STRING@274..285 "'select $1'"
         WHITESPACE@285..286 " "
         PLPGSQL_USING_CLAUSE@286..293
           USING_KW@286..291 "using"
           WHITESPACE@291..292 " "
-          LITERAL@292..293
-            INT_NUMBER@292..293 "1"
+          PLPGSQL_EXPR@292..293
+            TARGET_LIST@292..293
+              TARGET@292..293
+                LITERAL@292..293
+                  INT_NUMBER@292..293 "1"
         SEMICOLON@293..294 ";"
       WHITESPACE@294..297 "\n  "
       PLPGSQL_DYN_EXECUTE_STMT@297..332
         EXECUTE_KW@297..304 "execute"
         WHITESPACE@304..305 " "
-        LITERAL@305..320
-          STRING@305..320 "'select $1, $2'"
+        PLPGSQL_EXPR@305..320
+          TARGET_LIST@305..320
+            TARGET@305..320
+              LITERAL@305..320
+                STRING@305..320 "'select $1, $2'"
         WHITESPACE@320..321 " "
         PLPGSQL_USING_CLAUSE@321..331
           USING_KW@321..326 "using"
           WHITESPACE@326..327 " "
-          LITERAL@327..328
-            INT_NUMBER@327..328 "1"
+          PLPGSQL_EXPR@327..328
+            TARGET_LIST@327..328
+              TARGET@327..328
+                LITERAL@327..328
+                  INT_NUMBER@327..328 "1"
           COMMA@328..329 ","
           WHITESPACE@329..330 " "
-          LITERAL@330..331
-            INT_NUMBER@330..331 "2"
+          PLPGSQL_EXPR@330..331
+            TARGET_LIST@330..331
+              TARGET@330..331
+                LITERAL@330..331
+                  INT_NUMBER@330..331 "2"
         SEMICOLON@331..332 ";"
       WHITESPACE@332..335 "\n  "
       PLPGSQL_DYN_EXECUTE_STMT@335..370
         EXECUTE_KW@335..342 "execute"
         WHITESPACE@342..343 " "
-        LITERAL@343..354
-          STRING@343..354 "'select $1'"
+        PLPGSQL_EXPR@343..354
+          TARGET_LIST@343..354
+            TARGET@343..354
+              LITERAL@343..354
+                STRING@343..354 "'select $1'"
         WHITESPACE@354..355 " "
         PLPGSQL_INTO_CLAUSE@355..361
           INTO_KW@355..359 "into"
@@ -222,8 +267,11 @@ PLPGSQL@0..559
         PLPGSQL_USING_CLAUSE@362..369
           USING_KW@362..367 "using"
           WHITESPACE@367..368 " "
-          LITERAL@368..369
-            INT_NUMBER@368..369 "1"
+          PLPGSQL_EXPR@368..369
+            TARGET_LIST@368..369
+              TARGET@368..369
+                LITERAL@368..369
+                  INT_NUMBER@368..369 "1"
         SEMICOLON@369..370 ";"
       WHITESPACE@370..373 "\n  "
       COMMENT@373..422 "-- postgres takes the ..."
@@ -231,14 +279,20 @@ PLPGSQL@0..559
       PLPGSQL_DYN_EXECUTE_STMT@425..460
         EXECUTE_KW@425..432 "execute"
         WHITESPACE@432..433 " "
-        LITERAL@433..444
-          STRING@433..444 "'select $1'"
+        PLPGSQL_EXPR@433..444
+          TARGET_LIST@433..444
+            TARGET@433..444
+              LITERAL@433..444
+                STRING@433..444 "'select $1'"
         WHITESPACE@444..445 " "
         PLPGSQL_USING_CLAUSE@445..452
           USING_KW@445..450 "using"
           WHITESPACE@450..451 " "
-          LITERAL@451..452
-            INT_NUMBER@451..452 "1"
+          PLPGSQL_EXPR@451..452
+            TARGET_LIST@451..452
+              TARGET@451..452
+                LITERAL@451..452
+                  INT_NUMBER@451..452 "1"
         WHITESPACE@452..453 " "
         PLPGSQL_INTO_CLAUSE@453..459
           INTO_KW@453..457 "into"
@@ -252,8 +306,11 @@ PLPGSQL@0..559
       PLPGSQL_DYN_EXECUTE_STMT@463..512
         EXECUTE_KW@463..470 "execute"
         WHITESPACE@470..471 " "
-        LITERAL@471..486
-          STRING@471..486 "'select $1, $2'"
+        PLPGSQL_EXPR@471..486
+          TARGET_LIST@471..486
+            TARGET@471..486
+              LITERAL@471..486
+                STRING@471..486 "'select $1, $2'"
         WHITESPACE@486..487 " "
         PLPGSQL_INTO_CLAUSE@487..500
           INTO_KW@487..491 "into"
@@ -268,19 +325,28 @@ PLPGSQL@0..559
         PLPGSQL_USING_CLAUSE@501..511
           USING_KW@501..506 "using"
           WHITESPACE@506..507 " "
-          LITERAL@507..508
-            INT_NUMBER@507..508 "1"
+          PLPGSQL_EXPR@507..508
+            TARGET_LIST@507..508
+              TARGET@507..508
+                LITERAL@507..508
+                  INT_NUMBER@507..508 "1"
           COMMA@508..509 ","
           WHITESPACE@509..510 " "
-          LITERAL@510..511
-            INT_NUMBER@510..511 "2"
+          PLPGSQL_EXPR@510..511
+            TARGET_LIST@510..511
+              TARGET@510..511
+                LITERAL@510..511
+                  INT_NUMBER@510..511 "2"
         SEMICOLON@511..512 ";"
       WHITESPACE@512..515 "\n  "
       PLPGSQL_DYN_EXECUTE_STMT@515..554
         EXECUTE_KW@515..522 "execute"
         WHITESPACE@522..523 " "
-        LITERAL@523..536
-          STRING@523..536 "'select 1, 2'"
+        PLPGSQL_EXPR@523..536
+          TARGET_LIST@523..536
+            TARGET@523..536
+              LITERAL@523..536
+                STRING@523..536 "'select 1, 2'"
         WHITESPACE@536..537 " "
         PLPGSQL_INTO_CLAUSE@537..553
           INTO_KW@537..541 "into"
@@ -323,8 +389,11 @@ PLPGSQL@0..70
       PLPGSQL_DYN_EXECUTE_STMT@26..53
         EXECUTE_KW@26..33 "execute"
         WHITESPACE@33..34 " "
-        LITERAL@34..36
-          POSITIONAL_PARAM@34..36 "$1"
+        PLPGSQL_EXPR@34..36
+          TARGET_LIST@34..36
+            TARGET@34..36
+              LITERAL@34..36
+                POSITIONAL_PARAM@34..36 "$1"
         WHITESPACE@36..37 " "
         PLPGSQL_INTO_CLAUSE@37..43
           INTO_KW@37..41 "into"
@@ -337,15 +406,21 @@ PLPGSQL@0..70
         PLPGSQL_USING_CLAUSE@44..52
           USING_KW@44..49 "using"
           WHITESPACE@49..50 " "
-          LITERAL@50..52
-            POSITIONAL_PARAM@50..52 "$1"
+          PLPGSQL_EXPR@50..52
+            TARGET_LIST@50..52
+              TARGET@50..52
+                LITERAL@50..52
+                  POSITIONAL_PARAM@50..52 "$1"
         SEMICOLON@52..53 ";"
       WHITESPACE@53..56 "\n  "
       PLPGSQL_RETURN_STMT@56..65
         RETURN_KW@56..62 "return"
         WHITESPACE@62..63 " "
-        NAME_REF@63..64
-          IDENT@63..64 "x"
+        PLPGSQL_EXPR@63..64
+          TARGET_LIST@63..64
+            TARGET@63..64
+              NAME_REF@63..64
+                IDENT@63..64 "x"
         SEMICOLON@64..65 ";"
     WHITESPACE@65..66 "\n"
     END_KW@66..69 "end"

@@ -11,7 +11,7 @@ use either::Either;
 use crate::ast::{AstNode, LitKind, PrefixOp};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
-use rowan::{TextRange, TextSize};
+use rowan::{TextRange, TextSize, WalkEvent};
 use squawk_parser::{
     SyntaxKind::*, is_col_name_keyword, is_reserved_keyword, is_type_func_name_keyword,
 };
@@ -53,7 +53,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PlpgsqlCompOptionPrintStrictParams(it) => {
                     validate_print_strict_params(it, errors)
                 },
-                ast::PlpgsqlCaseWhen(it) => validate_no_bare_case_in_conds(it, errors),
+                ast::PlpgsqlCaseWhen(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlFetchStmt(it) => {
                     validate_fetch_no_strict(it.into_clause(), errors);
@@ -450,22 +450,20 @@ fn validate_for_query_no_reverse(it: ast::PlpgsqlForQueryStmt, acc: &mut Vec<Syn
     ));
 }
 
-fn validate_no_bare_case_in_conds(it: ast::PlpgsqlCaseWhen, acc: &mut Vec<SyntaxError>) {
-    for cond in it.conds() {
-        validate_no_bare_case(Some(cond), acc);
-    }
-}
-
 // -- err
 // if case when a then 1 end then
 // -- ok
 // if (case when a then 1 end) then
-fn validate_no_bare_case(cond: Option<ast::Expr>, acc: &mut Vec<SyntaxError>) {
+fn validate_no_bare_case(cond: Option<ast::PlpgsqlExpr>, acc: &mut Vec<SyntaxError>) {
     let Some(cond) = cond else {
         return;
     };
     let mut depth = 0i32;
-    for element in cond.syntax().descendants_with_tokens() {
+    let mut preorder = cond.syntax().preorder_with_tokens();
+    while let Some(event) = preorder.next() {
+        let WalkEvent::Enter(element) = event else {
+            continue;
+        };
         match element.kind() {
             L_PAREN | L_BRACK => depth += 1,
             R_PAREN | R_BRACK => depth -= 1,
@@ -474,7 +472,7 @@ fn validate_no_bare_case(cond: Option<ast::Expr>, acc: &mut Vec<SyntaxError>) {
                     "CASE expression must be parenthesized",
                     element.text_range(),
                 ));
-                return;
+                preorder.skip_subtree();
             }
             _ => (),
         }

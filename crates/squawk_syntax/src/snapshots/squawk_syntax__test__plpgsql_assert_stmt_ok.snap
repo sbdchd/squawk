@@ -20,8 +20,11 @@ PLPGSQL@0..154
         PLPGSQL_VAR_INIT@22..26
           COLON_EQ@22..24 ":="
           WHITESPACE@24..25 " "
-          LITERAL@25..26
-            INT_NUMBER@25..26 "1"
+          PLPGSQL_EXPR@25..26
+            TARGET_LIST@25..26
+              TARGET@25..26
+                LITERAL@25..26
+                  INT_NUMBER@25..26 "1"
         SEMICOLON@26..27 ";"
     WHITESPACE@27..28 "\n"
     BEGIN_KW@28..33 "begin"
@@ -30,73 +33,88 @@ PLPGSQL@0..154
       PLPGSQL_ASSERT_STMT@36..48
         ASSERT_KW@36..42 "assert"
         WHITESPACE@42..43 " "
-        LITERAL@43..47
-          TRUE_KW@43..47 "true"
+        PLPGSQL_EXPR@43..47
+          TARGET_LIST@43..47
+            TARGET@43..47
+              LITERAL@43..47
+                TRUE_KW@43..47 "true"
         SEMICOLON@47..48 ";"
       WHITESPACE@48..51 "\n  "
       PLPGSQL_ASSERT_STMT@51..72
         ASSERT_KW@51..57 "assert"
         WHITESPACE@57..58 " "
-        BIN_EXPR@58..63
-          LITERAL@58..59
-            INT_NUMBER@58..59 "1"
-          WHITESPACE@59..60 " "
-          EQ@60..61 "="
-          WHITESPACE@61..62 " "
-          LITERAL@62..63
-            INT_NUMBER@62..63 "1"
+        PLPGSQL_EXPR@58..63
+          TARGET_LIST@58..63
+            TARGET@58..63
+              BIN_EXPR@58..63
+                LITERAL@58..59
+                  INT_NUMBER@58..59 "1"
+                WHITESPACE@59..60 " "
+                EQ@60..61 "="
+                WHITESPACE@61..62 " "
+                LITERAL@62..63
+                  INT_NUMBER@62..63 "1"
         COMMA@63..64 ","
         WHITESPACE@64..65 " "
-        LITERAL@65..71
-          STRING@65..71 "'boom'"
+        PLPGSQL_EXPR@65..71
+          TARGET_LIST@65..71
+            TARGET@65..71
+              LITERAL@65..71
+                STRING@65..71 "'boom'"
         SEMICOLON@71..72 ";"
       WHITESPACE@72..75 "\n  "
       PLPGSQL_ASSERT_STMT@75..134
         ASSERT_KW@75..81 "assert"
         WHITESPACE@81..82 " "
-        BIN_EXPR@82..115
-          PAREN_EXPR@82..111
-            L_PAREN@82..83 "("
-            SELECT@83..110
-              SELECT_CLAUSE@83..98
-                SELECT_KW@83..89 "select"
-                WHITESPACE@89..90 " "
-                TARGET_LIST@90..98
-                  TARGET@90..98
-                    CALL_EXPR@90..98
-                      NAME_REF@90..95
-                        IDENT@90..95 "count"
-                      ARG_LIST@95..98
-                        L_PAREN@95..96 "("
-                        STAR@96..97 "*"
-                        R_PAREN@97..98 ")"
-              WHITESPACE@98..99 " "
-              FROM_CLAUSE@99..110
-                FROM_KW@99..103 "from"
-                WHITESPACE@103..104 " "
-                RELATION_FROM_ITEM@104..110
-                  RELATION_NAME_REF@104..110
-                    PATH_REF@104..110
-                      PATH_SEGMENT_REF@104..110
-                        IDENT@104..110 "onecol"
-            R_PAREN@110..111 ")"
-          WHITESPACE@111..112 " "
-          R_ANGLE@112..113 ">"
-          WHITESPACE@113..114 " "
-          LITERAL@114..115
-            INT_NUMBER@114..115 "0"
+        PLPGSQL_EXPR@82..115
+          TARGET_LIST@82..115
+            TARGET@82..115
+              BIN_EXPR@82..115
+                PAREN_EXPR@82..111
+                  L_PAREN@82..83 "("
+                  SELECT@83..110
+                    SELECT_CLAUSE@83..98
+                      SELECT_KW@83..89 "select"
+                      WHITESPACE@89..90 " "
+                      TARGET_LIST@90..98
+                        TARGET@90..98
+                          CALL_EXPR@90..98
+                            NAME_REF@90..95
+                              IDENT@90..95 "count"
+                            ARG_LIST@95..98
+                              L_PAREN@95..96 "("
+                              STAR@96..97 "*"
+                              R_PAREN@97..98 ")"
+                    WHITESPACE@98..99 " "
+                    FROM_CLAUSE@99..110
+                      FROM_KW@99..103 "from"
+                      WHITESPACE@103..104 " "
+                      RELATION_FROM_ITEM@104..110
+                        RELATION_NAME_REF@104..110
+                          PATH_REF@104..110
+                            PATH_SEGMENT_REF@104..110
+                              IDENT@104..110 "onecol"
+                  R_PAREN@110..111 ")"
+                WHITESPACE@111..112 " "
+                R_ANGLE@112..113 ">"
+                WHITESPACE@113..114 " "
+                LITERAL@114..115
+                  INT_NUMBER@114..115 "0"
         COMMA@115..116 ","
         WHITESPACE@116..117 " "
-        BIN_EXPR@117..133
-          LITERAL@117..126
-            STRING@117..126 "'empty: '"
-          WHITESPACE@126..127 " "
-          CUSTOM_OP@127..129
-            PIPE@127..128 "|"
-            PIPE@128..129 "|"
-          WHITESPACE@129..130 " "
-          LITERAL@130..133
-            STRING@130..133 "'x'"
+        PLPGSQL_EXPR@117..133
+          TARGET_LIST@117..133
+            TARGET@117..133
+              BIN_EXPR@117..133
+                LITERAL@117..126
+                  STRING@117..126 "'empty: '"
+                WHITESPACE@126..127 " "
+                CUSTOM_OP@127..129
+                  PIPE@127..128 "|"
+                  PIPE@128..129 "|"
+                WHITESPACE@129..130 " "
+                LITERAL@130..133
+                  STRING@130..133 "'x'"
         SEMICOLON@133..134 ";"
       WHITESPACE@134..137 "\n  "
       PLPGSQL_ASSIGN_STMT@137..149
@@ -106,8 +124,11 @@ PLPGSQL@0..154
         WHITESPACE@143..144 " "
         COLON_EQ@144..146 ":="
         WHITESPACE@146..147 " "
-        LITERAL@147..148
-          INT_NUMBER@147..148 "2"
+        PLPGSQL_EXPR@147..148
+          TARGET_LIST@147..148
+            TARGET@147..148
+              LITERAL@147..148
+                INT_NUMBER@147..148 "2"
         SEMICOLON@148..149 ";"
     WHITESPACE@149..150 "\n"
     END_KW@150..153 "end"

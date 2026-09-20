@@ -2,9 +2,9 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_parser/tests/data/plpgsql/ok/if_stmt.sql
 ---
-PLPGSQL@0..514
+PLPGSQL@0..1177
   WHITESPACE@0..1 "\n"
-  PLPGSQL_BLOCK@1..513
+  PLPGSQL_BLOCK@1..1176
     PLPGSQL_DECLARE_SECTION@1..22
       DECLARE_KW@1..8 "declare"
       WHITESPACE@8..11 "\n  "
@@ -20,24 +20,30 @@ PLPGSQL@0..514
         PLPGSQL_VAR_INIT@17..21
           COLON_EQ@17..19 ":="
           WHITESPACE@19..20 " "
-          LITERAL@20..21
-            INT_NUMBER@20..21 "1"
+          PLPGSQL_EXPR@20..21
+            TARGET_LIST@20..21
+              TARGET@20..21
+                LITERAL@20..21
+                  INT_NUMBER@20..21 "1"
         SEMICOLON@21..22 ";"
     WHITESPACE@22..23 "\n"
     BEGIN_KW@23..28 "begin"
     WHITESPACE@28..31 "\n  "
-    PLPGSQL_BODY@31..509
+    PLPGSQL_BODY@31..1172
       PLPGSQL_IF_STMT@31..64
         IF_KW@31..33 "if"
         WHITESPACE@33..34 " "
-        BIN_EXPR@34..39
-          NAME_REF@34..35
-            IDENT@34..35 "x"
-          WHITESPACE@35..36 " "
-          R_ANGLE@36..37 ">"
-          WHITESPACE@37..38 " "
-          LITERAL@38..39
-            INT_NUMBER@38..39 "0"
+        PLPGSQL_EXPR@34..39
+          TARGET_LIST@34..39
+            TARGET@34..39
+              BIN_EXPR@34..39
+                NAME_REF@34..35
+                  IDENT@34..35 "x"
+                WHITESPACE@35..36 " "
+                R_ANGLE@36..37 ">"
+                WHITESPACE@37..38 " "
+                LITERAL@38..39
+                  INT_NUMBER@38..39 "0"
         WHITESPACE@39..40 " "
         THEN_KW@40..44 "then"
         WHITESPACE@44..49 "\n    "
@@ -54,14 +60,17 @@ PLPGSQL@0..514
       PLPGSQL_IF_STMT@68..118
         IF_KW@68..70 "if"
         WHITESPACE@70..71 " "
-        BIN_EXPR@71..76
-          NAME_REF@71..72
-            IDENT@71..72 "x"
-          WHITESPACE@72..73 " "
-          EQ@73..74 "="
-          WHITESPACE@74..75 " "
-          LITERAL@75..76
-            INT_NUMBER@75..76 "1"
+        PLPGSQL_EXPR@71..76
+          TARGET_LIST@71..76
+            TARGET@71..76
+              BIN_EXPR@71..76
+                NAME_REF@71..72
+                  IDENT@71..72 "x"
+                WHITESPACE@72..73 " "
+                EQ@73..74 "="
+                WHITESPACE@74..75 " "
+                LITERAL@75..76
+                  INT_NUMBER@75..76 "1"
         WHITESPACE@76..77 " "
         THEN_KW@77..81 "then"
         WHITESPACE@81..86 "\n    "
@@ -86,14 +95,17 @@ PLPGSQL@0..514
       PLPGSQL_IF_STMT@122..329
         IF_KW@122..124 "if"
         WHITESPACE@124..125 " "
-        BIN_EXPR@125..130
-          NAME_REF@125..126
-            IDENT@125..126 "x"
-          WHITESPACE@126..127 " "
-          EQ@127..128 "="
-          WHITESPACE@128..129 " "
-          LITERAL@129..130
-            INT_NUMBER@129..130 "1"
+        PLPGSQL_EXPR@125..130
+          TARGET_LIST@125..130
+            TARGET@125..130
+              BIN_EXPR@125..130
+                NAME_REF@125..126
+                  IDENT@125..126 "x"
+                WHITESPACE@126..127 " "
+                EQ@127..128 "="
+                WHITESPACE@128..129 " "
+                LITERAL@129..130
+                  INT_NUMBER@129..130 "1"
         WHITESPACE@130..131 " "
         THEN_KW@131..135 "then"
         WHITESPACE@135..140 "\n    "
@@ -101,14 +113,17 @@ PLPGSQL@0..514
           PLPGSQL_IF_STMT@140..177
             IF_KW@140..142 "if"
             WHITESPACE@142..143 " "
-            BIN_EXPR@143..148
-              NAME_REF@143..144
-                IDENT@143..144 "x"
-              WHITESPACE@144..145 " "
-              EQ@145..146 "="
-              WHITESPACE@146..147 " "
-              LITERAL@147..148
-                INT_NUMBER@147..148 "2"
+            PLPGSQL_EXPR@143..148
+              TARGET_LIST@143..148
+                TARGET@143..148
+                  BIN_EXPR@143..148
+                    NAME_REF@143..144
+                      IDENT@143..144 "x"
+                    WHITESPACE@144..145 " "
+                    EQ@145..146 "="
+                    WHITESPACE@146..147 " "
+                    LITERAL@147..148
+                      INT_NUMBER@147..148 "2"
             WHITESPACE@148..149 " "
             THEN_KW@149..153 "then"
             WHITESPACE@153..160 "\n      "
@@ -125,14 +140,17 @@ PLPGSQL@0..514
         PLPGSQL_ELSIF_CLAUSE@180..206
           ELSIF_KW@180..185 "elsif"
           WHITESPACE@185..186 " "
-          BIN_EXPR@186..191
-            NAME_REF@186..187
-              IDENT@186..187 "x"
-            WHITESPACE@187..188 " "
-            EQ@188..189 "="
-            WHITESPACE@189..190 " "
-            LITERAL@190..191
-              INT_NUMBER@190..191 "2"
+          PLPGSQL_EXPR@186..191
+            TARGET_LIST@186..191
+              TARGET@186..191
+                BIN_EXPR@186..191
+                  NAME_REF@186..187
+                    IDENT@186..187 "x"
+                  WHITESPACE@187..188 " "
+                  EQ@188..189 "="
+                  WHITESPACE@189..190 " "
+                  LITERAL@190..191
+                    INT_NUMBER@190..191 "2"
           WHITESPACE@191..192 " "
           THEN_KW@192..196 "then"
           WHITESPACE@196..201 "\n    "
@@ -144,14 +162,17 @@ PLPGSQL@0..514
         PLPGSQL_ELSIF_CLAUSE@209..236
           ELSEIF_KW@209..215 "elseif"
           WHITESPACE@215..216 " "
-          BIN_EXPR@216..221
-            NAME_REF@216..217
-              IDENT@216..217 "x"
-            WHITESPACE@217..218 " "
-            EQ@218..219 "="
-            WHITESPACE@219..220 " "
-            LITERAL@220..221
-              INT_NUMBER@220..221 "3"
+          PLPGSQL_EXPR@216..221
+            TARGET_LIST@216..221
+              TARGET@216..221
+                BIN_EXPR@216..221
+                  NAME_REF@216..217
+                    IDENT@216..217 "x"
+                  WHITESPACE@217..218 " "
+                  EQ@218..219 "="
+                  WHITESPACE@219..220 " "
+                  LITERAL@220..221
+                    INT_NUMBER@220..221 "3"
           WHITESPACE@221..222 " "
           THEN_KW@222..226 "then"
           WHITESPACE@226..231 "\n    "
@@ -163,37 +184,40 @@ PLPGSQL@0..514
         PLPGSQL_ELSIF_CLAUSE@239..302
           ELSIF_KW@239..244 "elsif"
           WHITESPACE@244..245 " "
-          PAREN_EXPR@245..287
-            L_PAREN@245..246 "("
-            CASE_EXPR@246..286
-              CASE_KW@246..250 "case"
-              WHITESPACE@250..251 " "
-              WHEN_CLAUSE_LIST@251..271
-                WHEN_CLAUSE@251..271
-                  WHEN_KW@251..255 "when"
-                  WHITESPACE@255..256 " "
-                  BIN_EXPR@256..261
-                    NAME_REF@256..257
-                      IDENT@256..257 "x"
-                    WHITESPACE@257..258 " "
-                    EQ@258..259 "="
-                    WHITESPACE@259..260 " "
-                    LITERAL@260..261
-                      INT_NUMBER@260..261 "4"
-                  WHITESPACE@261..262 " "
-                  THEN_KW@262..266 "then"
-                  WHITESPACE@266..267 " "
-                  LITERAL@267..271
-                    TRUE_KW@267..271 "true"
-              WHITESPACE@271..272 " "
-              ELSE_CLAUSE@272..282
-                ELSE_KW@272..276 "else"
-                WHITESPACE@276..277 " "
-                LITERAL@277..282
-                  FALSE_KW@277..282 "false"
-              WHITESPACE@282..283 " "
-              END_KW@283..286 "end"
-            R_PAREN@286..287 ")"
+          PLPGSQL_EXPR@245..287
+            TARGET_LIST@245..287
+              TARGET@245..287
+                PAREN_EXPR@245..287
+                  L_PAREN@245..246 "("
+                  CASE_EXPR@246..286
+                    CASE_KW@246..250 "case"
+                    WHITESPACE@250..251 " "
+                    WHEN_CLAUSE_LIST@251..271
+                      WHEN_CLAUSE@251..271
+                        WHEN_KW@251..255 "when"
+                        WHITESPACE@255..256 " "
+                        BIN_EXPR@256..261
+                          NAME_REF@256..257
+                            IDENT@256..257 "x"
+                          WHITESPACE@257..258 " "
+                          EQ@258..259 "="
+                          WHITESPACE@259..260 " "
+                          LITERAL@260..261
+                            INT_NUMBER@260..261 "4"
+                        WHITESPACE@261..262 " "
+                        THEN_KW@262..266 "then"
+                        WHITESPACE@266..267 " "
+                        LITERAL@267..271
+                          TRUE_KW@267..271 "true"
+                    WHITESPACE@271..272 " "
+                    ELSE_CLAUSE@272..282
+                      ELSE_KW@272..276 "else"
+                      WHITESPACE@276..277 " "
+                      LITERAL@277..282
+                        FALSE_KW@277..282 "false"
+                    WHITESPACE@282..283 " "
+                    END_KW@283..286 "end"
+                  R_PAREN@286..287 ")"
           WHITESPACE@287..288 " "
           THEN_KW@288..292 "then"
           WHITESPACE@292..297 "\n    "
@@ -218,14 +242,17 @@ PLPGSQL@0..514
       PLPGSQL_IF_STMT@333..360
         IF_KW@333..335 "if"
         WHITESPACE@335..336 " "
-        BIN_EXPR@336..345
-          NAME_REF@336..337
-            IDENT@336..337 "x"
-          WHITESPACE@337..338 " "
-          IS_KW@338..340 "is"
-          WHITESPACE@340..341 " "
-          LITERAL@341..345
-            NULL_KW@341..345 "null"
+        PLPGSQL_EXPR@336..345
+          TARGET_LIST@336..345
+            TARGET@336..345
+              BIN_EXPR@336..345
+                NAME_REF@336..337
+                  IDENT@336..337 "x"
+                WHITESPACE@337..338 " "
+                IS_KW@338..340 "is"
+                WHITESPACE@340..341 " "
+                LITERAL@341..345
+                  NULL_KW@341..345 "null"
         WHITESPACE@345..346 " "
         THEN_KW@346..350 "then"
         WHITESPACE@350..353 "\n  "
@@ -238,46 +265,49 @@ PLPGSQL@0..514
       PLPGSQL_IF_STMT@364..435
         IF_KW@364..366 "if"
         WHITESPACE@366..367 " "
-        BIN_EXPR@367..410
-          CALL_EXPR@367..406
-            NAME_REF@367..375
-              COALESCE_KW@367..375 "coalesce"
-            ARG_LIST@375..406
-              L_PAREN@375..376 "("
-              ARG@376..402
-                CASE_EXPR@376..402
-                  CASE_KW@376..380 "case"
-                  WHITESPACE@380..381 " "
-                  WHEN_CLAUSE_LIST@381..398
-                    WHEN_CLAUSE@381..398
-                      WHEN_KW@381..385 "when"
-                      WHITESPACE@385..386 " "
-                      BIN_EXPR@386..391
-                        NAME_REF@386..387
-                          IDENT@386..387 "x"
-                        WHITESPACE@387..388 " "
-                        EQ@388..389 "="
-                        WHITESPACE@389..390 " "
-                        LITERAL@390..391
-                          INT_NUMBER@390..391 "1"
-                      WHITESPACE@391..392 " "
-                      THEN_KW@392..396 "then"
-                      WHITESPACE@396..397 " "
-                      LITERAL@397..398
-                        INT_NUMBER@397..398 "1"
-                  WHITESPACE@398..399 " "
-                  END_KW@399..402 "end"
-              COMMA@402..403 ","
-              WHITESPACE@403..404 " "
-              ARG@404..405
-                LITERAL@404..405
-                  INT_NUMBER@404..405 "0"
-              R_PAREN@405..406 ")"
-          WHITESPACE@406..407 " "
-          EQ@407..408 "="
-          WHITESPACE@408..409 " "
-          LITERAL@409..410
-            INT_NUMBER@409..410 "1"
+        PLPGSQL_EXPR@367..410
+          TARGET_LIST@367..410
+            TARGET@367..410
+              BIN_EXPR@367..410
+                CALL_EXPR@367..406
+                  NAME_REF@367..375
+                    COALESCE_KW@367..375 "coalesce"
+                  ARG_LIST@375..406
+                    L_PAREN@375..376 "("
+                    ARG@376..402
+                      CASE_EXPR@376..402
+                        CASE_KW@376..380 "case"
+                        WHITESPACE@380..381 " "
+                        WHEN_CLAUSE_LIST@381..398
+                          WHEN_CLAUSE@381..398
+                            WHEN_KW@381..385 "when"
+                            WHITESPACE@385..386 " "
+                            BIN_EXPR@386..391
+                              NAME_REF@386..387
+                                IDENT@386..387 "x"
+                              WHITESPACE@387..388 " "
+                              EQ@388..389 "="
+                              WHITESPACE@389..390 " "
+                              LITERAL@390..391
+                                INT_NUMBER@390..391 "1"
+                            WHITESPACE@391..392 " "
+                            THEN_KW@392..396 "then"
+                            WHITESPACE@396..397 " "
+                            LITERAL@397..398
+                              INT_NUMBER@397..398 "1"
+                        WHITESPACE@398..399 " "
+                        END_KW@399..402 "end"
+                    COMMA@402..403 ","
+                    WHITESPACE@403..404 " "
+                    ARG@404..405
+                      LITERAL@404..405
+                        INT_NUMBER@404..405 "0"
+                    R_PAREN@405..406 ")"
+                WHITESPACE@406..407 " "
+                EQ@407..408 "="
+                WHITESPACE@408..409 " "
+                LITERAL@409..410
+                  INT_NUMBER@409..410 "1"
         WHITESPACE@410..411 " "
         THEN_KW@411..415 "then"
         WHITESPACE@415..420 "\n    "
@@ -294,46 +324,49 @@ PLPGSQL@0..514
       PLPGSQL_IF_STMT@439..509
         IF_KW@439..441 "if"
         WHITESPACE@441..442 " "
-        BIN_EXPR@442..484
-          INDEX_EXPR@442..480
-            PAREN_EXPR@442..477
-              L_PAREN@442..443 "("
-              ARRAY_EXPR@443..476
-                ARRAY_KW@443..448 "array"
-                L_BRACK@448..449 "["
-                CASE_EXPR@449..475
-                  CASE_KW@449..453 "case"
-                  WHITESPACE@453..454 " "
-                  WHEN_CLAUSE_LIST@454..471
-                    WHEN_CLAUSE@454..471
-                      WHEN_KW@454..458 "when"
-                      WHITESPACE@458..459 " "
-                      BIN_EXPR@459..464
-                        NAME_REF@459..460
-                          IDENT@459..460 "x"
-                        WHITESPACE@460..461 " "
-                        EQ@461..462 "="
-                        WHITESPACE@462..463 " "
-                        LITERAL@463..464
-                          INT_NUMBER@463..464 "1"
-                      WHITESPACE@464..465 " "
-                      THEN_KW@465..469 "then"
-                      WHITESPACE@469..470 " "
-                      LITERAL@470..471
-                        INT_NUMBER@470..471 "1"
-                  WHITESPACE@471..472 " "
-                  END_KW@472..475 "end"
-                R_BRACK@475..476 "]"
-              R_PAREN@476..477 ")"
-            L_BRACK@477..478 "["
-            LITERAL@478..479
-              INT_NUMBER@478..479 "1"
-            R_BRACK@479..480 "]"
-          WHITESPACE@480..481 " "
-          EQ@481..482 "="
-          WHITESPACE@482..483 " "
-          LITERAL@483..484
-            INT_NUMBER@483..484 "1"
+        PLPGSQL_EXPR@442..484
+          TARGET_LIST@442..484
+            TARGET@442..484
+              BIN_EXPR@442..484
+                INDEX_EXPR@442..480
+                  PAREN_EXPR@442..477
+                    L_PAREN@442..443 "("
+                    ARRAY_EXPR@443..476
+                      ARRAY_KW@443..448 "array"
+                      L_BRACK@448..449 "["
+                      CASE_EXPR@449..475
+                        CASE_KW@449..453 "case"
+                        WHITESPACE@453..454 " "
+                        WHEN_CLAUSE_LIST@454..471
+                          WHEN_CLAUSE@454..471
+                            WHEN_KW@454..458 "when"
+                            WHITESPACE@458..459 " "
+                            BIN_EXPR@459..464
+                              NAME_REF@459..460
+                                IDENT@459..460 "x"
+                              WHITESPACE@460..461 " "
+                              EQ@461..462 "="
+                              WHITESPACE@462..463 " "
+                              LITERAL@463..464
+                                INT_NUMBER@463..464 "1"
+                            WHITESPACE@464..465 " "
+                            THEN_KW@465..469 "then"
+                            WHITESPACE@469..470 " "
+                            LITERAL@470..471
+                              INT_NUMBER@470..471 "1"
+                        WHITESPACE@471..472 " "
+                        END_KW@472..475 "end"
+                      R_BRACK@475..476 "]"
+                    R_PAREN@476..477 ")"
+                  L_BRACK@477..478 "["
+                  LITERAL@478..479
+                    INT_NUMBER@478..479 "1"
+                  R_BRACK@479..480 "]"
+                WHITESPACE@480..481 " "
+                EQ@481..482 "="
+                WHITESPACE@482..483 " "
+                LITERAL@483..484
+                  INT_NUMBER@483..484 "1"
         WHITESPACE@484..485 " "
         THEN_KW@485..489 "then"
         WHITESPACE@489..494 "\n    "
@@ -346,6 +379,406 @@ PLPGSQL@0..514
         WHITESPACE@505..506 " "
         IF_KW@506..508 "if"
         SEMICOLON@508..509 ";"
-    WHITESPACE@509..510 "\n"
-    END_KW@510..513 "end"
-  WHITESPACE@513..514 "\n"
+      WHITESPACE@509..513 "\n\n  "
+      COMMENT@513..585 "-- PL/pgSQL expressio ..."
+      WHITESPACE@585..588 "\n  "
+      PLPGSQL_IF_STMT@588..633
+        IF_KW@588..590 "if"
+        WHITESPACE@590..591 " "
+        PLPGSQL_EXPR@591..608
+          TARGET_LIST@591..608
+            TARGET@591..608
+              LITERAL@591..595
+                TRUE_KW@591..595 "true"
+              WHITESPACE@595..596 " "
+              AS_NAME@596..608
+                AS_KW@596..598 "as"
+                WHITESPACE@598..599 " "
+                COLUMN_NAME@599..608
+                  IDENT@599..608 "condition"
+        WHITESPACE@608..609 " "
+        THEN_KW@609..613 "then"
+        WHITESPACE@613..618 "\n    "
+        PLPGSQL_BODY@618..623
+          PLPGSQL_NULL_STMT@618..623
+            NULL_KW@618..622 "null"
+            SEMICOLON@622..623 ";"
+        WHITESPACE@623..626 "\n  "
+        END_KW@626..629 "end"
+        WHITESPACE@629..630 " "
+        IF_KW@630..632 "if"
+        SEMICOLON@632..633 ";"
+      WHITESPACE@633..637 "\n\n  "
+      PLPGSQL_IF_STMT@637..692
+        IF_KW@637..639 "if"
+        WHITESPACE@639..640 " "
+        PLPGSQL_EXPR@640..667
+          TARGET_LIST@640..667
+            TARGET@640..654
+              LITERAL@640..644
+                TRUE_KW@640..644 "true"
+              WHITESPACE@644..645 " "
+              AS_NAME@645..654
+                COLUMN_NAME@645..654
+                  IDENT@645..654 "condition"
+            COMMA@654..655 ","
+            WHITESPACE@655..656 " "
+            TARGET@656..667
+              LITERAL@656..661
+                FALSE_KW@656..661 "false"
+              WHITESPACE@661..662 " "
+              AS_NAME@662..667
+                COLUMN_NAME@662..667
+                  IDENT@662..667 "other"
+        WHITESPACE@667..668 " "
+        THEN_KW@668..672 "then"
+        WHITESPACE@672..677 "\n    "
+        PLPGSQL_BODY@677..682
+          PLPGSQL_NULL_STMT@677..682
+            NULL_KW@677..681 "null"
+            SEMICOLON@681..682 ";"
+        WHITESPACE@682..685 "\n  "
+        END_KW@685..688 "end"
+        WHITESPACE@688..689 " "
+        IF_KW@689..691 "if"
+        SEMICOLON@691..692 ";"
+      WHITESPACE@692..696 "\n\n  "
+      PLPGSQL_IF_STMT@696..771
+        IF_KW@696..698 "if"
+        WHITESPACE@698..699 " "
+        PLPGSQL_EXPR@699..746
+          TARGET_LIST@699..703
+            TARGET@699..703
+              NAME_REF@699..703
+                IDENT@699..703 "flag"
+          WHITESPACE@703..704 " "
+          FROM_CLAUSE@704..735
+            FROM_KW@704..708 "from"
+            WHITESPACE@708..709 " "
+            PAREN_FROM_ITEM@709..735
+              PAREN_SELECT@709..724
+                L_PAREN@709..710 "("
+                VALUES@710..723
+                  VALUES_KW@710..716 "values"
+                  WHITESPACE@716..717 " "
+                  ROW_LIST@717..723
+                    ROW@717..723
+                      L_PAREN@717..718 "("
+                      LITERAL@718..722
+                        TRUE_KW@718..722 "true"
+                      R_PAREN@722..723 ")"
+                R_PAREN@723..724 ")"
+              WHITESPACE@724..725 " "
+              FROM_ALIAS@725..735
+                AS_KW@725..727 "as"
+                WHITESPACE@727..728 " "
+                TABLE_ALIAS@728..729
+                  IDENT@728..729 "v"
+                COLUMN_LIST@729..735
+                  L_PAREN@729..730 "("
+                  COLUMN_NAME@730..734
+                    IDENT@730..734 "flag"
+                  R_PAREN@734..735 ")"
+          WHITESPACE@735..736 " "
+          WHERE_CLAUSE@736..746
+            WHERE_KW@736..741 "where"
+            WHITESPACE@741..742 " "
+            NAME_REF@742..746
+              IDENT@742..746 "flag"
+        WHITESPACE@746..747 " "
+        THEN_KW@747..751 "then"
+        WHITESPACE@751..756 "\n    "
+        PLPGSQL_BODY@756..761
+          PLPGSQL_NULL_STMT@756..761
+            NULL_KW@756..760 "null"
+            SEMICOLON@760..761 ";"
+        WHITESPACE@761..764 "\n  "
+        END_KW@764..767 "end"
+        WHITESPACE@767..768 " "
+        IF_KW@768..770 "if"
+        SEMICOLON@770..771 ";"
+      WHITESPACE@771..775 "\n\n  "
+      PLPGSQL_IF_STMT@775..885
+        IF_KW@775..777 "if"
+        WHITESPACE@777..778 " "
+        PLPGSQL_EXPR@778..860
+          TARGET_LIST@778..792
+            TARGET@778..792
+              CALL_EXPR@778..792
+                NAME_REF@778..786
+                  IDENT@778..786 "bool_and"
+                ARG_LIST@786..792
+                  L_PAREN@786..787 "("
+                  ARG@787..791
+                    NAME_REF@787..791
+                      IDENT@787..791 "flag"
+                  R_PAREN@791..792 ")"
+          WHITESPACE@792..793 " "
+          FROM_CLAUSE@793..824
+            FROM_KW@793..797 "from"
+            WHITESPACE@797..798 " "
+            PAREN_FROM_ITEM@798..824
+              PAREN_SELECT@798..813
+                L_PAREN@798..799 "("
+                VALUES@799..812
+                  VALUES_KW@799..805 "values"
+                  WHITESPACE@805..806 " "
+                  ROW_LIST@806..812
+                    ROW@806..812
+                      L_PAREN@806..807 "("
+                      LITERAL@807..811
+                        TRUE_KW@807..811 "true"
+                      R_PAREN@811..812 ")"
+                R_PAREN@812..813 ")"
+              WHITESPACE@813..814 " "
+              FROM_ALIAS@814..824
+                AS_KW@814..816 "as"
+                WHITESPACE@816..817 " "
+                TABLE_ALIAS@817..818
+                  IDENT@817..818 "v"
+                COLUMN_LIST@818..824
+                  L_PAREN@818..819 "("
+                  COLUMN_NAME@819..823
+                    IDENT@819..823 "flag"
+                  R_PAREN@823..824 ")"
+          WHITESPACE@824..825 " "
+          GROUP_BY_CLAUSE@825..838
+            GROUP_KW@825..830 "group"
+            WHITESPACE@830..831 " "
+            BY_KW@831..833 "by"
+            WHITESPACE@833..834 " "
+            GROUP_BY_LIST@834..838
+              GROUPING_EXPR@834..838
+                NAME_REF@834..838
+                  IDENT@834..838 "flag"
+          WHITESPACE@838..839 " "
+          HAVING_CLAUSE@839..860
+            HAVING_KW@839..845 "having"
+            WHITESPACE@845..846 " "
+            CALL_EXPR@846..860
+              NAME_REF@846..854
+                IDENT@846..854 "bool_and"
+              ARG_LIST@854..860
+                L_PAREN@854..855 "("
+                ARG@855..859
+                  NAME_REF@855..859
+                    IDENT@855..859 "flag"
+                R_PAREN@859..860 ")"
+        WHITESPACE@860..861 " "
+        THEN_KW@861..865 "then"
+        WHITESPACE@865..870 "\n    "
+        PLPGSQL_BODY@870..875
+          PLPGSQL_NULL_STMT@870..875
+            NULL_KW@870..874 "null"
+            SEMICOLON@874..875 ";"
+        WHITESPACE@875..878 "\n  "
+        END_KW@878..881 "end"
+        WHITESPACE@881..882 " "
+        IF_KW@882..884 "if"
+        SEMICOLON@884..885 ";"
+      WHITESPACE@885..889 "\n\n  "
+      PLPGSQL_IF_STMT@889..985
+        IF_KW@889..891 "if"
+        WHITESPACE@891..892 " "
+        PLPGSQL_EXPR@892..960
+          TARGET_LIST@892..913
+            TARGET@892..913
+              CALL_EXPR@892..913
+                NAME_REF@892..900
+                  IDENT@892..900 "bool_and"
+                ARG_LIST@900..906
+                  L_PAREN@900..901 "("
+                  ARG@901..905
+                    NAME_REF@901..905
+                      IDENT@901..905 "flag"
+                  R_PAREN@905..906 ")"
+                WHITESPACE@906..907 " "
+                OVER_CLAUSE@907..913
+                  OVER_KW@907..911 "over"
+                  WHITESPACE@911..912 " "
+                  WINDOW_REF@912..913
+                    IDENT@912..913 "w"
+          WHITESPACE@913..914 " "
+          FROM_CLAUSE@914..945
+            FROM_KW@914..918 "from"
+            WHITESPACE@918..919 " "
+            PAREN_FROM_ITEM@919..945
+              PAREN_SELECT@919..934
+                L_PAREN@919..920 "("
+                VALUES@920..933
+                  VALUES_KW@920..926 "values"
+                  WHITESPACE@926..927 " "
+                  ROW_LIST@927..933
+                    ROW@927..933
+                      L_PAREN@927..928 "("
+                      LITERAL@928..932
+                        TRUE_KW@928..932 "true"
+                      R_PAREN@932..933 ")"
+                R_PAREN@933..934 ")"
+              WHITESPACE@934..935 " "
+              FROM_ALIAS@935..945
+                AS_KW@935..937 "as"
+                WHITESPACE@937..938 " "
+                TABLE_ALIAS@938..939
+                  IDENT@938..939 "v"
+                COLUMN_LIST@939..945
+                  L_PAREN@939..940 "("
+                  COLUMN_NAME@940..944
+                    IDENT@940..944 "flag"
+                  R_PAREN@944..945 ")"
+          WHITESPACE@945..946 " "
+          WINDOW_CLAUSE@946..960
+            WINDOW_KW@946..952 "window"
+            WHITESPACE@952..953 " "
+            WINDOW_DEF@953..960
+              WINDOW@953..954
+                IDENT@953..954 "w"
+              WHITESPACE@954..955 " "
+              AS_KW@955..957 "as"
+              WHITESPACE@957..958 " "
+              L_PAREN@958..959 "("
+              R_PAREN@959..960 ")"
+        WHITESPACE@960..961 " "
+        THEN_KW@961..965 "then"
+        WHITESPACE@965..970 "\n    "
+        PLPGSQL_BODY@970..975
+          PLPGSQL_NULL_STMT@970..975
+            NULL_KW@970..974 "null"
+            SEMICOLON@974..975 ";"
+        WHITESPACE@975..978 "\n  "
+        END_KW@978..981 "end"
+        WHITESPACE@981..982 " "
+        IF_KW@982..984 "if"
+        SEMICOLON@984..985 ";"
+      WHITESPACE@985..989 "\n\n  "
+      PLPGSQL_IF_STMT@989..1093
+        IF_KW@989..991 "if"
+        WHITESPACE@991..992 " "
+        PLPGSQL_EXPR@992..1068
+          DISTINCT_CLAUSE@992..1000
+            DISTINCT_KW@992..1000 "distinct"
+          WHITESPACE@1000..1001 " "
+          TARGET_LIST@1001..1005
+            TARGET@1001..1005
+              NAME_REF@1001..1005
+                IDENT@1001..1005 "flag"
+          WHITESPACE@1005..1006 " "
+          FROM_CLAUSE@1006..1037
+            FROM_KW@1006..1010 "from"
+            WHITESPACE@1010..1011 " "
+            PAREN_FROM_ITEM@1011..1037
+              PAREN_SELECT@1011..1026
+                L_PAREN@1011..1012 "("
+                VALUES@1012..1025
+                  VALUES_KW@1012..1018 "values"
+                  WHITESPACE@1018..1019 " "
+                  ROW_LIST@1019..1025
+                    ROW@1019..1025
+                      L_PAREN@1019..1020 "("
+                      LITERAL@1020..1024
+                        TRUE_KW@1020..1024 "true"
+                      R_PAREN@1024..1025 ")"
+                R_PAREN@1025..1026 ")"
+              WHITESPACE@1026..1027 " "
+              FROM_ALIAS@1027..1037
+                AS_KW@1027..1029 "as"
+                WHITESPACE@1029..1030 " "
+                TABLE_ALIAS@1030..1031
+                  IDENT@1030..1031 "v"
+                COLUMN_LIST@1031..1037
+                  L_PAREN@1031..1032 "("
+                  COLUMN_NAME@1032..1036
+                    IDENT@1032..1036 "flag"
+                  R_PAREN@1036..1037 ")"
+          WHITESPACE@1037..1038 " "
+          ORDER_BY_CLAUSE@1038..1051
+            ORDER_KW@1038..1043 "order"
+            WHITESPACE@1043..1044 " "
+            BY_KW@1044..1046 "by"
+            WHITESPACE@1046..1047 " "
+            SORT_BY_LIST@1047..1051
+              SORT_BY@1047..1051
+                NAME_REF@1047..1051
+                  IDENT@1047..1051 "flag"
+          WHITESPACE@1051..1052 " "
+          LIMIT_CLAUSE@1052..1059
+            LIMIT_KW@1052..1057 "limit"
+            WHITESPACE@1057..1058 " "
+            LITERAL@1058..1059
+              INT_NUMBER@1058..1059 "1"
+          WHITESPACE@1059..1060 " "
+          OFFSET_CLAUSE@1060..1068
+            OFFSET_KW@1060..1066 "offset"
+            WHITESPACE@1066..1067 " "
+            LITERAL@1067..1068
+              INT_NUMBER@1067..1068 "0"
+        WHITESPACE@1068..1069 " "
+        THEN_KW@1069..1073 "then"
+        WHITESPACE@1073..1078 "\n    "
+        PLPGSQL_BODY@1078..1083
+          PLPGSQL_NULL_STMT@1078..1083
+            NULL_KW@1078..1082 "null"
+            SEMICOLON@1082..1083 ";"
+        WHITESPACE@1083..1086 "\n  "
+        END_KW@1086..1089 "end"
+        WHITESPACE@1089..1090 " "
+        IF_KW@1090..1092 "if"
+        SEMICOLON@1092..1093 ";"
+      WHITESPACE@1093..1097 "\n\n  "
+      PLPGSQL_IF_STMT@1097..1172
+        IF_KW@1097..1099 "if"
+        WHITESPACE@1099..1100 " "
+        PLPGSQL_EXPR@1100..1147
+          TARGET_LIST@1100..1104
+            TARGET@1100..1104
+              NAME_REF@1100..1104
+                IDENT@1100..1104 "flag"
+          WHITESPACE@1104..1105 " "
+          FROM_CLAUSE@1105..1136
+            FROM_KW@1105..1109 "from"
+            WHITESPACE@1109..1110 " "
+            PAREN_FROM_ITEM@1110..1136
+              PAREN_SELECT@1110..1125
+                L_PAREN@1110..1111 "("
+                VALUES@1111..1124
+                  VALUES_KW@1111..1117 "values"
+                  WHITESPACE@1117..1118 " "
+                  ROW_LIST@1118..1124
+                    ROW@1118..1124
+                      L_PAREN@1118..1119 "("
+                      LITERAL@1119..1123
+                        TRUE_KW@1119..1123 "true"
+                      R_PAREN@1123..1124 ")"
+                R_PAREN@1124..1125 ")"
+              WHITESPACE@1125..1126 " "
+              FROM_ALIAS@1126..1136
+                AS_KW@1126..1128 "as"
+                WHITESPACE@1128..1129 " "
+                TABLE_ALIAS@1129..1130
+                  IDENT@1129..1130 "v"
+                COLUMN_LIST@1130..1136
+                  L_PAREN@1130..1131 "("
+                  COLUMN_NAME@1131..1135
+                    IDENT@1131..1135 "flag"
+                  R_PAREN@1135..1136 ")"
+          WHITESPACE@1136..1137 " "
+          LOCKING_CLAUSE@1137..1147
+            FOR_KW@1137..1140 "for"
+            WHITESPACE@1140..1141 " "
+            FOR_UPDATE@1141..1147
+              UPDATE_KW@1141..1147 "update"
+        WHITESPACE@1147..1148 " "
+        THEN_KW@1148..1152 "then"
+        WHITESPACE@1152..1157 "\n    "
+        PLPGSQL_BODY@1157..1162
+          PLPGSQL_NULL_STMT@1157..1162
+            NULL_KW@1157..1161 "null"
+            SEMICOLON@1161..1162 ";"
+        WHITESPACE@1162..1165 "\n  "
+        END_KW@1165..1168 "end"
+        WHITESPACE@1168..1169 " "
+        IF_KW@1169..1171 "if"
+        SEMICOLON@1171..1172 ";"
+    WHITESPACE@1172..1173 "\n"
+    END_KW@1173..1176 "end"
+  WHITESPACE@1176..1177 "\n"

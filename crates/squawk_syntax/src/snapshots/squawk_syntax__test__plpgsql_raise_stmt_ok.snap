@@ -20,8 +20,11 @@ PLPGSQL@0..519
         PLPGSQL_VAR_INIT@21..25
           COLON_EQ@21..23 ":="
           WHITESPACE@23..24 " "
-          LITERAL@24..25
-            INT_NUMBER@24..25 "1"
+          PLPGSQL_EXPR@24..25
+            TARGET_LIST@24..25
+              TARGET@24..25
+                LITERAL@24..25
+                  INT_NUMBER@24..25 "1"
         SEMICOLON@25..26 ";"
     WHITESPACE@26..27 "\n"
     BEGIN_KW@27..32 "begin"
@@ -53,12 +56,18 @@ PLPGSQL@0..519
             STRING@81..90 "'fmt % %'"
         COMMA@90..91 ","
         WHITESPACE@91..92 " "
-        LITERAL@92..93
-          INT_NUMBER@92..93 "1"
+        PLPGSQL_EXPR@92..93
+          TARGET_LIST@92..93
+            TARGET@92..93
+              LITERAL@92..93
+                INT_NUMBER@92..93 "1"
         COMMA@93..94 ","
         WHITESPACE@94..95 " "
-        LITERAL@95..96
-          INT_NUMBER@95..96 "2"
+        PLPGSQL_EXPR@95..96
+          TARGET_LIST@95..96
+            TARGET@95..96
+              LITERAL@95..96
+                INT_NUMBER@95..96 "2"
         SEMICOLON@96..97 ";"
       WHITESPACE@97..100 "\n  "
       PLPGSQL_RAISE_STMT@100..117
@@ -87,8 +96,11 @@ PLPGSQL@0..519
             WHITESPACE@156..157 " "
             COLON_EQ@157..159 ":="
             WHITESPACE@159..160 " "
-            LITERAL@160..167
-              STRING@160..167 "'22012'"
+            PLPGSQL_EXPR@160..167
+              TARGET_LIST@160..167
+                TARGET@160..167
+                  LITERAL@160..167
+                    STRING@160..167 "'22012'"
         SEMICOLON@167..168 ";"
       WHITESPACE@168..171 "\n  "
       PLPGSQL_RAISE_STMT@171..231
@@ -105,8 +117,11 @@ PLPGSQL@0..519
             WHITESPACE@198..199 " "
             EQ@199..200 "="
             WHITESPACE@200..201 " "
-            LITERAL@201..204
-              STRING@201..204 "'m'"
+            PLPGSQL_EXPR@201..204
+              TARGET_LIST@201..204
+                TARGET@201..204
+                  LITERAL@201..204
+                    STRING@201..204 "'m'"
           COMMA@204..205 ","
           WHITESPACE@205..206 " "
           PLPGSQL_RAISE_OPTION_DETAIL@206..218
@@ -114,8 +129,11 @@ PLPGSQL@0..519
             WHITESPACE@212..213 " "
             EQ@213..214 "="
             WHITESPACE@214..215 " "
-            LITERAL@215..218
-              STRING@215..218 "'d'"
+            PLPGSQL_EXPR@215..218
+              TARGET_LIST@215..218
+                TARGET@215..218
+                  LITERAL@215..218
+                    STRING@215..218 "'d'"
           COMMA@218..219 ","
           WHITESPACE@219..220 " "
           PLPGSQL_RAISE_OPTION_HINT@220..230
@@ -123,8 +141,11 @@ PLPGSQL@0..519
             WHITESPACE@224..225 " "
             EQ@225..226 "="
             WHITESPACE@226..227 " "
-            LITERAL@227..230
-              STRING@227..230 "'h'"
+            PLPGSQL_EXPR@227..230
+              TARGET_LIST@227..230
+                TARGET@227..230
+                  LITERAL@227..230
+                    STRING@227..230 "'h'"
         SEMICOLON@230..231 ";"
       WHITESPACE@231..234 "\n  "
       PLPGSQL_RAISE_STMT@234..334
@@ -141,8 +162,11 @@ PLPGSQL@0..519
             WHITESPACE@262..263 " "
             EQ@263..264 "="
             WHITESPACE@264..265 " "
-            LITERAL@265..268
-              STRING@265..268 "'c'"
+            PLPGSQL_EXPR@265..268
+              TARGET_LIST@265..268
+                TARGET@265..268
+                  LITERAL@265..268
+                    STRING@265..268 "'c'"
           COMMA@268..269 ","
           WHITESPACE@269..270 " "
           PLPGSQL_RAISE_OPTION_CONSTRAINT@270..286
@@ -150,8 +174,11 @@ PLPGSQL@0..519
             WHITESPACE@280..281 " "
             EQ@281..282 "="
             WHITESPACE@282..283 " "
-            LITERAL@283..286
-              STRING@283..286 "'k'"
+            PLPGSQL_EXPR@283..286
+              TARGET_LIST@283..286
+                TARGET@283..286
+                  LITERAL@283..286
+                    STRING@283..286 "'k'"
           COMMA@286..287 ","
           WHITESPACE@287..288 " "
           PLPGSQL_RAISE_OPTION_DATATYPE@288..302
@@ -159,8 +186,11 @@ PLPGSQL@0..519
             WHITESPACE@296..297 " "
             EQ@297..298 "="
             WHITESPACE@298..299 " "
-            LITERAL@299..302
-              STRING@299..302 "'d'"
+            PLPGSQL_EXPR@299..302
+              TARGET_LIST@299..302
+                TARGET@299..302
+                  LITERAL@299..302
+                    STRING@299..302 "'d'"
           COMMA@302..303 ","
           WHITESPACE@303..308 "\n    "
           PLPGSQL_RAISE_OPTION_TABLE@308..319
@@ -168,8 +198,11 @@ PLPGSQL@0..519
             WHITESPACE@313..314 " "
             EQ@314..315 "="
             WHITESPACE@315..316 " "
-            LITERAL@316..319
-              STRING@316..319 "'t'"
+            PLPGSQL_EXPR@316..319
+              TARGET_LIST@316..319
+                TARGET@316..319
+                  LITERAL@316..319
+                    STRING@316..319 "'t'"
           COMMA@319..320 ","
           WHITESPACE@320..321 " "
           PLPGSQL_RAISE_OPTION_SCHEMA@321..333
@@ -177,8 +210,11 @@ PLPGSQL@0..519
             WHITESPACE@327..328 " "
             EQ@328..329 "="
             WHITESPACE@329..330 " "
-            LITERAL@330..333
-              STRING@330..333 "'s'"
+            PLPGSQL_EXPR@330..333
+              TARGET_LIST@330..333
+                TARGET@330..333
+                  LITERAL@330..333
+                    STRING@330..333 "'s'"
         SEMICOLON@333..334 ";"
       WHITESPACE@334..337 "\n  "
       PLPGSQL_RAISE_STMT@337..360
@@ -252,8 +288,11 @@ PLPGSQL@0..519
             WHITESPACE@489..490 " "
             EQ@490..491 "="
             WHITESPACE@491..492 " "
-            LITERAL@492..499
-              STRING@492..499 "'22012'"
+            PLPGSQL_EXPR@492..499
+              TARGET_LIST@492..499
+                TARGET@492..499
+                  LITERAL@492..499
+                    STRING@492..499 "'22012'"
         SEMICOLON@499..500 ";"
       WHITESPACE@500..503 "\n  "
       PLPGSQL_ASSIGN_STMT@503..514
@@ -263,8 +302,11 @@ PLPGSQL@0..519
         WHITESPACE@508..509 " "
         COLON_EQ@509..511 ":="
         WHITESPACE@511..512 " "
-        LITERAL@512..513
-          INT_NUMBER@512..513 "2"
+        PLPGSQL_EXPR@512..513
+          TARGET_LIST@512..513
+            TARGET@512..513
+              LITERAL@512..513
+                INT_NUMBER@512..513 "2"
         SEMICOLON@513..514 ";"
     WHITESPACE@514..515 "\n"
     END_KW@515..518 "end"
