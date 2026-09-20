@@ -13,6 +13,7 @@ declare
   j table%rowtype;
   k select%type;
   l $1%type;
+  m U&"int4" UESCAPE '!';
 begin
   null;
 end

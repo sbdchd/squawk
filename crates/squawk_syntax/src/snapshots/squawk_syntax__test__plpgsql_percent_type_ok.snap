@@ -2,10 +2,10 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_parser/tests/data/plpgsql/ok/percent_type.sql
 ---
-PLPGSQL@0..265
+PLPGSQL@0..291
   WHITESPACE@0..1 "\n"
-  PLPGSQL_BLOCK@1..264
-    PLPGSQL_DECLARE_SECTION@1..246
+  PLPGSQL_BLOCK@1..290
+    PLPGSQL_DECLARE_SECTION@1..272
       DECLARE_KW@1..8 "declare"
       WHITESPACE@8..11 "\n  "
       PLPGSQL_VAR_DECL@11..17
@@ -205,13 +205,27 @@ PLPGSQL@0..265
             PERCENT@240..241 "%"
             TYPE_KW@241..245 "type"
         SEMICOLON@245..246 ";"
-    WHITESPACE@246..247 "\n"
-    BEGIN_KW@247..252 "begin"
-    WHITESPACE@252..255 "\n  "
-    PLPGSQL_BODY@255..260
-      PLPGSQL_NULL_STMT@255..260
-        NULL_KW@255..259 "null"
-        SEMICOLON@259..260 ";"
-    WHITESPACE@260..261 "\n"
-    END_KW@261..264 "end"
-  WHITESPACE@264..265 "\n"
+      WHITESPACE@246..249 "\n  "
+      PLPGSQL_VAR_DECL@249..272
+        PLPGSQL_VAR_NAME@249..250
+          IDENT@249..250 "m"
+        WHITESPACE@250..251 " "
+        PATH_TYPE@251..271
+          PATH_REF@251..271
+            PATH_SEGMENT_REF@251..271
+              IDENT@251..259 "U&\"int4\""
+              WHITESPACE@259..260 " "
+              UESCAPE_KW@260..267 "UESCAPE"
+              WHITESPACE@267..268 " "
+              STRING@268..271 "'!'"
+        SEMICOLON@271..272 ";"
+    WHITESPACE@272..273 "\n"
+    BEGIN_KW@273..278 "begin"
+    WHITESPACE@278..281 "\n  "
+    PLPGSQL_BODY@281..286
+      PLPGSQL_NULL_STMT@281..286
+        NULL_KW@281..285 "null"
+        SEMICOLON@285..286 ";"
+    WHITESPACE@286..287 "\n"
+    END_KW@287..290 "end"
+  WHITESPACE@290..291 "\n"
