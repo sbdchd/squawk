@@ -1,0 +1,180 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/close_stmt.sql
+---
+PLPGSQL@0..94
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..93
+    PLPGSQL_DECLARE_SECTION@1..49
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..33
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "c"
+        WHITESPACE@12..13 " "
+        CURSOR_KW@13..19 "cursor"
+        WHITESPACE@19..20 " "
+        FOR_KW@20..23 "for"
+        WHITESPACE@23..24 " "
+        SELECT@24..32
+          SELECT_CLAUSE@24..32
+            SELECT_KW@24..30 "select"
+            WHITESPACE@30..31 " "
+            TARGET_LIST@31..32
+              TARGET@31..32
+                LITERAL@31..32
+                  INT_NUMBER@31..32 "1"
+        SEMICOLON@32..33 ";"
+      WHITESPACE@33..36 "\n  "
+      PLPGSQL_VAR_DECL@36..49
+        PLPGSQL_VAR_NAME@36..38
+          IDENT@36..38 "rc"
+        WHITESPACE@38..39 " "
+        PATH_TYPE@39..48
+          PATH_REF@39..48
+            PATH_SEGMENT_REF@39..48
+              IDENT@39..48 "refcursor"
+        SEMICOLON@48..49 ";"
+    WHITESPACE@49..50 "\n"
+    BEGIN_KW@50..55 "begin"
+    WHITESPACE@55..58 "\n  "
+    PLPGSQL_BODY@58..89
+      PLPGSQL_CLOSE_STMT@58..66
+        CLOSE_KW@58..63 "close"
+        WHITESPACE@63..64 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@64..65
+          IDENT@64..65 "c"
+        SEMICOLON@65..66 ";"
+      WHITESPACE@66..69 "\n  "
+      PLPGSQL_CLOSE_STMT@69..78
+        CLOSE_KW@69..74 "close"
+        WHITESPACE@74..75 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@75..77
+          IDENT@75..77 "rc"
+        SEMICOLON@77..78 ";"
+      WHITESPACE@78..81 "\n  "
+      PLPGSQL_CLOSE_STMT@81..89
+        CLOSE_KW@81..86 "CLOSE"
+        WHITESPACE@86..87 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@87..88
+          IDENT@87..88 "C"
+        SEMICOLON@88..89 ";"
+    WHITESPACE@89..90 "\n"
+    END_KW@90..93 "end"
+  WHITESPACE@93..94 "\n"
+---
+PLPGSQL@0..125
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..124
+    PLPGSQL_DECLARE_SECTION@1..67
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..27
+        PLPGSQL_VAR_NAME@11..16
+          CLOSE_KW@11..16 "close"
+        WHITESPACE@16..17 " "
+        PATH_TYPE@17..26
+          PATH_REF@17..26
+            PATH_SEGMENT_REF@17..26
+              IDENT@17..26 "refcursor"
+        SEMICOLON@26..27 ";"
+      WHITESPACE@27..30 "\n  "
+      PLPGSQL_VAR_DECL@30..46
+        PLPGSQL_VAR_NAME@30..35
+          FETCH_KW@30..35 "fetch"
+        WHITESPACE@35..36 " "
+        PATH_TYPE@36..45
+          PATH_REF@36..45
+            PATH_SEGMENT_REF@36..45
+              IDENT@36..45 "refcursor"
+        SEMICOLON@45..46 ";"
+      WHITESPACE@46..49 "\n  "
+      PLPGSQL_VAR_DECL@49..67
+        PLPGSQL_VAR_NAME@49..56
+          IDENT@49..56 "\"table\""
+        WHITESPACE@56..57 " "
+        PATH_TYPE@57..66
+          PATH_REF@57..66
+            PATH_SEGMENT_REF@57..66
+              IDENT@57..66 "refcursor"
+        SEMICOLON@66..67 ";"
+    WHITESPACE@67..68 "\n"
+    BEGIN_KW@68..73 "begin"
+    WHITESPACE@73..76 "\n  "
+    PLPGSQL_BODY@76..120
+      PLPGSQL_CLOSE_STMT@76..88
+        CLOSE_KW@76..81 "close"
+        WHITESPACE@81..82 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@82..87
+          CLOSE_KW@82..87 "close"
+        SEMICOLON@87..88 ";"
+      WHITESPACE@88..91 "\n  "
+      PLPGSQL_CLOSE_STMT@91..103
+        CLOSE_KW@91..96 "close"
+        WHITESPACE@96..97 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@97..102
+          FETCH_KW@97..102 "fetch"
+        SEMICOLON@102..103 ";"
+      WHITESPACE@103..106 "\n  "
+      PLPGSQL_CLOSE_STMT@106..120
+        CLOSE_KW@106..111 "close"
+        WHITESPACE@111..112 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@112..119
+          IDENT@112..119 "\"table\""
+        SEMICOLON@119..120 ";"
+    WHITESPACE@120..121 "\n"
+    END_KW@121..124 "end"
+  WHITESPACE@124..125 "\n"
+---
+PLPGSQL@0..51
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..50
+    PLPGSQL_DECLARE_SECTION@1..24
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..24
+        PLPGSQL_VAR_NAME@11..16
+          CLOSE_KW@11..16 "close"
+        WHITESPACE@16..17 " "
+        PATH_TYPE@17..23
+          PATH_REF@17..23
+            PATH_SEGMENT_REF@17..23
+              IDENT@17..23 "record"
+        SEMICOLON@23..24 ";"
+    WHITESPACE@24..25 "\n"
+    BEGIN_KW@25..30 "begin"
+    WHITESPACE@30..33 "\n  "
+    PLPGSQL_BODY@33..46
+      PLPGSQL_ASSIGN_STMT@33..46
+        PLPGSQL_ASSIGN_TARGET@33..40
+          PLPGSQL_VAR_NAME_REF@33..38
+            CLOSE_KW@33..38 "close"
+          FIELD_ACCESSOR@38..40
+            DOT@38..39 "."
+            COMPOSITE_FIELD_REF@39..40
+              IDENT@39..40 "x"
+        WHITESPACE@40..41 " "
+        COLON_EQ@41..43 ":="
+        WHITESPACE@43..44 " "
+        LITERAL@44..45
+          INT_NUMBER@44..45 "1"
+        SEMICOLON@45..46 ";"
+    WHITESPACE@46..47 "\n"
+    END_KW@47..50 "end"
+  WHITESPACE@50..51 "\n"
+---
+PLPGSQL@0..23
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..22
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..18
+      PLPGSQL_CLOSE_STMT@9..18
+        CLOSE_KW@9..14 "close"
+        WHITESPACE@14..15 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@15..17
+          POSITIONAL_PARAM@15..17 "$1"
+        SEMICOLON@17..18 ";"
+    WHITESPACE@18..19 "\n"
+    END_KW@19..22 "end"
+  WHITESPACE@22..23 "\n"

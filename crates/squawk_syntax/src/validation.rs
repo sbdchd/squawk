@@ -55,6 +55,13 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 },
                 ast::PlpgsqlCaseWhen(it) => validate_no_bare_case_in_conds(it, errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
+                ast::PlpgsqlFetchStmt(it) => {
+                    validate_fetch_no_strict(it.into_clause(), errors);
+                    validate_fetch_single_row(it, errors)
+                },
+                ast::PlpgsqlForCursorStmt(it) => validate_for_cursor_single_var(it, errors),
+                ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(it, errors),
+                ast::PlpgsqlForQueryStmt(it) => validate_for_query_no_reverse(it, errors),
                 ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
                 ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
@@ -364,6 +371,83 @@ fn validate_print_strict_params(
             value.syntax().text_range(),
         ));
     }
+}
+
+// -- err
+// fetch all from c into x;
+// fetch forward 2 from c into x;
+// -- ok
+// fetch forward from c into x;
+fn validate_fetch_single_row(it: ast::PlpgsqlFetchStmt, acc: &mut Vec<SyntaxError>) {
+    let Some(direction) = it.direction() else {
+        return;
+    };
+    let multiple_rows = match &direction {
+        ast::CursorAction::All(_) | ast::CursorAction::Expr(_) => true,
+        ast::CursorAction::Forward(it) => it.all_token().is_some() || it.expr().is_some(),
+        ast::CursorAction::Backward(it) => it.all_token().is_some() || it.expr().is_some(),
+        _ => false,
+    };
+    if multiple_rows {
+        acc.push(SyntaxError::new(
+            "FETCH statement cannot return multiple rows",
+            direction.syntax().text_range(),
+        ));
+    }
+}
+
+// -- err
+// fetch c into strict x;
+// -- ok
+// execute q into strict x;
+fn validate_fetch_no_strict(it: Option<ast::PlpgsqlIntoClause>, acc: &mut Vec<SyntaxError>) {
+    let Some(strict) = it.and_then(|it| it.strict_token()) else {
+        return;
+    };
+    acc.push(SyntaxError::new(
+        "FETCH does not support STRICT",
+        strict.text_range(),
+    ));
+}
+
+// -- err
+// for i, j in 1..2 loop null; end loop;
+// -- ok
+// for i in 1..2 loop null; end loop;
+fn validate_for_i_single_var(it: ast::PlpgsqlForIStmt, acc: &mut Vec<SyntaxError>) {
+    for var in it.vars().skip(1) {
+        acc.push(SyntaxError::new(
+            "integer FOR loop takes one variable",
+            var.syntax().text_range(),
+        ));
+    }
+}
+
+// -- err
+// for a, b in c loop null; end loop;
+// -- ok
+// for a in c loop null; end loop;
+fn validate_for_cursor_single_var(it: ast::PlpgsqlForCursorStmt, acc: &mut Vec<SyntaxError>) {
+    for var in it.vars().skip(1) {
+        acc.push(SyntaxError::new(
+            "cursor FOR loop takes one variable",
+            var.syntax().text_range(),
+        ));
+    }
+}
+
+// -- err
+// for r in reverse select 1 loop null; end loop;
+// -- ok
+// for r in select 1 loop null; end loop;
+fn validate_for_query_no_reverse(it: ast::PlpgsqlForQueryStmt, acc: &mut Vec<SyntaxError>) {
+    let Some(reverse) = it.reverse_token() else {
+        return;
+    };
+    acc.push(SyntaxError::new(
+        "cannot specify REVERSE in query FOR loop",
+        reverse.text_range(),
+    ));
 }
 
 fn validate_no_bare_case_in_conds(it: ast::PlpgsqlCaseWhen, acc: &mut Vec<SyntaxError>) {

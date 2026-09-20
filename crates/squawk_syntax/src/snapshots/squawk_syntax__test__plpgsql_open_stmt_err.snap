@@ -1,0 +1,123 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/open_stmt.sql
+---
+PLPGSQL@0..138
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..137
+    PLPGSQL_DECLARE_SECTION@1..49
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..33
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "c"
+        WHITESPACE@12..13 " "
+        CURSOR_KW@13..19 "cursor"
+        WHITESPACE@19..20 " "
+        FOR_KW@20..23 "for"
+        WHITESPACE@23..24 " "
+        SELECT@24..32
+          SELECT_CLAUSE@24..32
+            SELECT_KW@24..30 "select"
+            WHITESPACE@30..31 " "
+            TARGET_LIST@31..32
+              TARGET@31..32
+                LITERAL@31..32
+                  INT_NUMBER@31..32 "1"
+        SEMICOLON@32..33 ";"
+      WHITESPACE@33..36 "\n  "
+      PLPGSQL_VAR_DECL@36..49
+        PLPGSQL_VAR_NAME@36..38
+          IDENT@36..38 "rc"
+        WHITESPACE@38..39 " "
+        PATH_TYPE@39..48
+          PATH_REF@39..48
+            PATH_SEGMENT_REF@39..48
+              IDENT@39..48 "refcursor"
+        SEMICOLON@48..49 ";"
+    WHITESPACE@49..50 "\n"
+    BEGIN_KW@50..55 "begin"
+    WHITESPACE@55..58 "\n  "
+    PLPGSQL_BODY@58..133
+      PLPGSQL_OPEN_STMT@58..63
+        OPEN_KW@58..62 "open"
+        SEMICOLON@62..63 ";"
+      WHITESPACE@63..66 "\n  "
+      PLPGSQL_OPEN_STMT@66..78
+        OPEN_KW@66..70 "open"
+        WHITESPACE@70..71 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@71..73
+          IDENT@71..73 "rc"
+        WHITESPACE@73..74 " "
+        PLPGSQL_OPEN_QUERY@74..77
+          FOR_KW@74..77 "for"
+        SEMICOLON@77..78 ";"
+      WHITESPACE@78..81 "\n  "
+      PLPGSQL_OPEN_STMT@81..101
+        OPEN_KW@81..85 "open"
+        WHITESPACE@85..86 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@86..88
+          IDENT@86..88 "rc"
+        WHITESPACE@88..89 " "
+        PLPGSQL_OPEN_EXECUTE@89..100
+          FOR_KW@89..92 "for"
+          WHITESPACE@92..93 " "
+          EXECUTE_KW@93..100 "execute"
+        SEMICOLON@100..101 ";"
+      WHITESPACE@101..104 "\n  "
+      PLPGSQL_OPEN_STMT@104..111
+        OPEN_KW@104..108 "open"
+        WHITESPACE@108..109 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@109..111
+          IDENT@109..111 "rc"
+      WHITESPACE@111..112 " "
+      PLPGSQL_EXEC_SQL_STMT@112..121
+        SELECT@112..120
+          SELECT_CLAUSE@112..120
+            SELECT_KW@112..118 "select"
+            WHITESPACE@118..119 " "
+            TARGET_LIST@119..120
+              TARGET@119..120
+                LITERAL@119..120
+                  INT_NUMBER@119..120 "1"
+        SEMICOLON@120..121 ";"
+      WHITESPACE@121..124 "\n  "
+      PLPGSQL_OPEN_STMT@124..133
+        OPEN_KW@124..128 "open"
+        WHITESPACE@128..129 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@129..130
+          IDENT@129..130 "c"
+        ERROR@130..132
+          FIELD_ACCESSOR@130..132
+            DOT@130..131 "."
+            COMPOSITE_FIELD_REF@131..132
+              IDENT@131..132 "x"
+        SEMICOLON@132..133 ";"
+    WHITESPACE@133..134 "\n"
+    END_KW@134..137 "end"
+  WHITESPACE@137..138 "\n"
+
+error[syntax-error]: expected a cursor variable, got SEMICOLON
+  ╭▸ 
+6 │   open;
+  ╰╴      ━
+error[syntax-error]: expected a query
+  ╭▸ 
+7 │   open rc for;
+  ╰╴             ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+8 │   open rc for execute;
+  ╰╴                     ━
+error[syntax-error]: expected an expression
+  ╭▸ 
+8 │   open rc for execute;
+  ╰╴                     ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+9 │   open rc select 1;
+  ╰╴         ━
+error[syntax-error]: a cursor variable must be a simple variable
+   ╭▸ 
+10 │   open c.x;
+   ╰╴        ━

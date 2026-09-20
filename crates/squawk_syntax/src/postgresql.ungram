@@ -2167,15 +2167,26 @@ PlpgsqlStmt =
 | PlpgsqlBlock
 | PlpgsqlCallStmt
 | PlpgsqlCaseStmt
+| PlpgsqlCloseStmt
 | PlpgsqlContinueStmt
 | PlpgsqlDoStmt
+| PlpgsqlDynExecuteStmt
+| PlpgsqlExecSqlStmt
 | PlpgsqlExitStmt
+| PlpgsqlForCursorStmt
+| PlpgsqlForDynStmt
+| PlpgsqlForEachStmt
+| PlpgsqlForIStmt
+| PlpgsqlForQueryStmt
+| PlpgsqlFetchStmt
 | PlpgsqlGetDiagStmt
 | PlpgsqlIfStmt
 | PlpgsqlLoopStmt
+| PlpgsqlMoveStmt
 | PlpgsqlAssertStmt
 | PlpgsqlCommitStmt
 | PlpgsqlNullStmt
+| PlpgsqlOpenStmt
 | PlpgsqlPerformStmt
 | PlpgsqlRaiseStmt
 | PlpgsqlReturnNextStmt
@@ -2412,6 +2423,153 @@ PlpgsqlDiagKind =
 | 'table_name'
 | 'schema_name'
 | 'returned_sqlstate'
+
+PlpgsqlCloseStmt =
+  'close'
+  cursor:PlpgsqlCursorVariableRef
+  ';'
+
+PlpgsqlMoveStmt =
+  'move'
+  direction:CursorAction?
+  ('from' | 'in')?
+  cursor:PlpgsqlCursorVariableRef
+  ';'
+
+PlpgsqlForIStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in'
+  'reverse'?
+  range:PlpgsqlForRange
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForVariable =
+  name:PlpgsqlVarNameRef
+  FieldAccessor*
+
+PlpgsqlForRange =
+  lower:Expr
+  '..'
+  upper:Expr
+  ('by' step:Expr)?
+
+PlpgsqlForDynStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in' 'execute'
+  query:Expr
+  using_clause:PlpgsqlUsingClause?
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForCursorStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in'
+  cursor:PlpgsqlCursorVariableRef
+  args:ArgList?
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForQueryStmt =
+  label:PlpgsqlLabel?
+  'for'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  'in'
+  'reverse'?
+  query:Stmt
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForEachStmt =
+  label:PlpgsqlLabel?
+  'foreach'
+  vars:(PlpgsqlForVariable (',' PlpgsqlForVariable)*)
+  slice:PlpgsqlForEachSlice?
+  'in' 'array'
+  array:Expr
+  'loop'
+  body:PlpgsqlBody
+  'end' 'loop'
+  end_label:PlpgsqlLabelNameRef?
+  ';'
+
+PlpgsqlForEachSlice =
+  'slice'
+  Literal
+
+PlpgsqlFetchStmt =
+  'fetch'
+  direction:CursorAction?
+  ('from' | 'in')?
+  cursor:PlpgsqlCursorVariableRef
+  into_clause:PlpgsqlIntoClause
+  ';'
+
+PlpgsqlExecSqlStmt =
+  stmt:Stmt
+  ';'
+
+PlpgsqlDynExecuteStmt =
+  'execute'
+  query:Expr
+  into_clause:PlpgsqlIntoClause?
+  using_clause:PlpgsqlUsingClause?
+  ';'
+
+PlpgsqlIntoClause =
+  'into'
+  'strict'?
+  targets:PlpgsqlIntoTargetList
+
+PlpgsqlIntoTargetList =
+  PlpgsqlIntoTarget (',' PlpgsqlIntoTarget)*
+
+PlpgsqlIntoTarget =
+  name:PlpgsqlVarNameRef
+  FieldAccessor*
+
+PlpgsqlOpenStmt =
+  'open'
+  cursor:PlpgsqlCursorVariableRef
+  args:ArgList?
+  scroll:CursorScroll?
+  source:PlpgsqlOpenSource?
+  ';'
+
+PlpgsqlOpenSource =
+  PlpgsqlOpenQuery
+| PlpgsqlOpenExecute
+
+PlpgsqlOpenQuery =
+  'for'
+  query:Stmt
+
+PlpgsqlOpenExecute =
+  'for' 'execute'
+  query:Expr
+  using_clause:PlpgsqlUsingClause?
+
+PlpgsqlCursorVariableRef =
+  '#name'?
+  '@positional_param'?
 
 FuncOptionList =
   options:(FuncOption*)

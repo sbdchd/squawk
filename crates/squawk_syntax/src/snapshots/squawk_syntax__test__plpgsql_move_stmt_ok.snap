@@ -1,0 +1,376 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/move_stmt.sql
+---
+PLPGSQL@0..456
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..455
+    PLPGSQL_DECLARE_SECTION@1..63
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..33
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "c"
+        WHITESPACE@12..13 " "
+        CURSOR_KW@13..19 "cursor"
+        WHITESPACE@19..20 " "
+        FOR_KW@20..23 "for"
+        WHITESPACE@23..24 " "
+        SELECT@24..32
+          SELECT_CLAUSE@24..32
+            SELECT_KW@24..30 "select"
+            WHITESPACE@30..31 " "
+            TARGET_LIST@31..32
+              TARGET@31..32
+                LITERAL@31..32
+                  INT_NUMBER@31..32 "1"
+        SEMICOLON@32..33 ";"
+      WHITESPACE@33..36 "\n  "
+      PLPGSQL_VAR_DECL@36..49
+        PLPGSQL_VAR_NAME@36..38
+          IDENT@36..38 "rc"
+        WHITESPACE@38..39 " "
+        PATH_TYPE@39..48
+          PATH_REF@39..48
+            PATH_SEGMENT_REF@39..48
+              IDENT@39..48 "refcursor"
+        SEMICOLON@48..49 ";"
+      WHITESPACE@49..52 "\n  "
+      PLPGSQL_VAR_DECL@52..63
+        PLPGSQL_VAR_NAME@52..53
+          IDENT@52..53 "n"
+        WHITESPACE@53..54 " "
+        PATH_TYPE@54..57
+          PATH_REF@54..57
+            PATH_SEGMENT_REF@54..57
+              INT_KW@54..57 "int"
+        WHITESPACE@57..58 " "
+        PLPGSQL_VAR_INIT@58..62
+          COLON_EQ@58..60 ":="
+          WHITESPACE@60..61 " "
+          LITERAL@61..62
+            INT_NUMBER@61..62 "2"
+        SEMICOLON@62..63 ";"
+    WHITESPACE@63..64 "\n"
+    BEGIN_KW@64..69 "begin"
+    WHITESPACE@69..72 "\n  "
+    PLPGSQL_BODY@72..451
+      PLPGSQL_MOVE_STMT@72..79
+        MOVE_KW@72..76 "move"
+        WHITESPACE@76..77 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@77..78
+          IDENT@77..78 "c"
+        SEMICOLON@78..79 ";"
+      WHITESPACE@79..82 "\n  "
+      PLPGSQL_MOVE_STMT@82..94
+        MOVE_KW@82..86 "move"
+        WHITESPACE@86..87 " "
+        FROM_KW@87..91 "from"
+        WHITESPACE@91..92 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@92..93
+          IDENT@92..93 "c"
+        SEMICOLON@93..94 ";"
+      WHITESPACE@94..97 "\n  "
+      PLPGSQL_MOVE_STMT@97..107
+        MOVE_KW@97..101 "move"
+        WHITESPACE@101..102 " "
+        IN_KW@102..104 "in"
+        WHITESPACE@104..105 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@105..106
+          IDENT@105..106 "c"
+        SEMICOLON@106..107 ";"
+      WHITESPACE@107..110 "\n  "
+      PLPGSQL_MOVE_STMT@110..118
+        MOVE_KW@110..114 "move"
+        WHITESPACE@114..115 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@115..117
+          IDENT@115..117 "rc"
+        SEMICOLON@117..118 ";"
+      WHITESPACE@118..121 "\n  "
+      PLPGSQL_MOVE_STMT@121..135
+        MOVE_KW@121..125 "move"
+        WHITESPACE@125..126 " "
+        LITERAL@126..127
+          INT_NUMBER@126..127 "3"
+        WHITESPACE@127..128 " "
+        FROM_KW@128..132 "from"
+        WHITESPACE@132..133 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@133..134
+          IDENT@133..134 "c"
+        SEMICOLON@134..135 ";"
+      WHITESPACE@135..138 "\n  "
+      PLPGSQL_MOVE_STMT@138..153
+        MOVE_KW@138..142 "move"
+        WHITESPACE@142..143 " "
+        PREFIX_EXPR@143..145
+          MINUS@143..144 "-"
+          LITERAL@144..145
+            INT_NUMBER@144..145 "1"
+        WHITESPACE@145..146 " "
+        FROM_KW@146..150 "from"
+        WHITESPACE@150..151 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@151..152
+          IDENT@151..152 "c"
+        SEMICOLON@152..153 ";"
+      WHITESPACE@153..156 "\n  "
+      PLPGSQL_MOVE_STMT@156..170
+        MOVE_KW@156..160 "move"
+        WHITESPACE@160..161 " "
+        ALL@161..164
+          ALL_KW@161..164 "all"
+        WHITESPACE@164..165 " "
+        IN_KW@165..167 "in"
+        WHITESPACE@167..168 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@168..169
+          IDENT@168..169 "c"
+        SEMICOLON@169..170 ";"
+      WHITESPACE@170..173 "\n  "
+      PLPGSQL_MOVE_STMT@173..190
+        MOVE_KW@173..177 "move"
+        WHITESPACE@177..178 " "
+        NEXT@178..182
+          NEXT_KW@178..182 "next"
+        WHITESPACE@182..183 " "
+        FROM_KW@183..187 "from"
+        WHITESPACE@187..188 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@188..189
+          IDENT@188..189 "c"
+        SEMICOLON@189..190 ";"
+      WHITESPACE@190..193 "\n  "
+      PLPGSQL_MOVE_STMT@193..211
+        MOVE_KW@193..197 "move"
+        WHITESPACE@197..198 " "
+        PRIOR@198..203
+          PRIOR_KW@198..203 "prior"
+        WHITESPACE@203..204 " "
+        FROM_KW@204..208 "from"
+        WHITESPACE@208..209 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@209..210
+          IDENT@209..210 "c"
+        SEMICOLON@210..211 ";"
+      WHITESPACE@211..214 "\n  "
+      PLPGSQL_MOVE_STMT@214..232
+        MOVE_KW@214..218 "move"
+        WHITESPACE@218..219 " "
+        FIRST@219..224
+          FIRST_KW@219..224 "first"
+        WHITESPACE@224..225 " "
+        FROM_KW@225..229 "from"
+        WHITESPACE@229..230 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@230..231
+          IDENT@230..231 "c"
+        SEMICOLON@231..232 ";"
+      WHITESPACE@232..235 "\n  "
+      PLPGSQL_MOVE_STMT@235..252
+        MOVE_KW@235..239 "move"
+        WHITESPACE@239..240 " "
+        LAST@240..244
+          LAST_KW@240..244 "last"
+        WHITESPACE@244..245 " "
+        FROM_KW@245..249 "from"
+        WHITESPACE@249..250 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@250..251
+          IDENT@250..251 "c"
+        SEMICOLON@251..252 ";"
+      WHITESPACE@252..255 "\n  "
+      PLPGSQL_MOVE_STMT@255..275
+        MOVE_KW@255..259 "move"
+        WHITESPACE@259..260 " "
+        FORWARD@260..267
+          FORWARD_KW@260..267 "forward"
+        WHITESPACE@267..268 " "
+        FROM_KW@268..272 "from"
+        WHITESPACE@272..273 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@273..274
+          IDENT@273..274 "c"
+        SEMICOLON@274..275 ";"
+      WHITESPACE@275..278 "\n  "
+      PLPGSQL_MOVE_STMT@278..300
+        MOVE_KW@278..282 "move"
+        WHITESPACE@282..283 " "
+        FORWARD@283..294
+          FORWARD_KW@283..290 "forward"
+          WHITESPACE@290..291 " "
+          ALL_KW@291..294 "all"
+        WHITESPACE@294..295 " "
+        IN_KW@295..297 "in"
+        WHITESPACE@297..298 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@298..299
+          IDENT@298..299 "c"
+        SEMICOLON@299..300 ";"
+      WHITESPACE@300..303 "\n  "
+      PLPGSQL_MOVE_STMT@303..325
+        MOVE_KW@303..307 "move"
+        WHITESPACE@307..308 " "
+        FORWARD@308..317
+          FORWARD_KW@308..315 "forward"
+          WHITESPACE@315..316 " "
+          LITERAL@316..317
+            INT_NUMBER@316..317 "2"
+        WHITESPACE@317..318 " "
+        FROM_KW@318..322 "from"
+        WHITESPACE@322..323 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@323..324
+          IDENT@323..324 "c"
+        SEMICOLON@324..325 ";"
+      WHITESPACE@325..328 "\n  "
+      PLPGSQL_MOVE_STMT@328..349
+        MOVE_KW@328..332 "move"
+        WHITESPACE@332..333 " "
+        BACKWARD@333..341
+          BACKWARD_KW@333..341 "backward"
+        WHITESPACE@341..342 " "
+        FROM_KW@342..346 "from"
+        WHITESPACE@346..347 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@347..348
+          IDENT@347..348 "c"
+        SEMICOLON@348..349 ";"
+      WHITESPACE@349..352 "\n  "
+      PLPGSQL_MOVE_STMT@352..375
+        MOVE_KW@352..356 "move"
+        WHITESPACE@356..357 " "
+        BACKWARD@357..369
+          BACKWARD_KW@357..365 "backward"
+          WHITESPACE@365..366 " "
+          ALL_KW@366..369 "all"
+        WHITESPACE@369..370 " "
+        IN_KW@370..372 "in"
+        WHITESPACE@372..373 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@373..374
+          IDENT@373..374 "c"
+        SEMICOLON@374..375 ";"
+      WHITESPACE@375..378 "\n  "
+      PLPGSQL_MOVE_STMT@378..401
+        MOVE_KW@378..382 "move"
+        WHITESPACE@382..383 " "
+        BACKWARD@383..393
+          BACKWARD_KW@383..391 "backward"
+          WHITESPACE@391..392 " "
+          LITERAL@392..393
+            INT_NUMBER@392..393 "2"
+        WHITESPACE@393..394 " "
+        FROM_KW@394..398 "from"
+        WHITESPACE@398..399 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@399..400
+          IDENT@399..400 "c"
+        SEMICOLON@400..401 ";"
+      WHITESPACE@401..404 "\n  "
+      PLPGSQL_MOVE_STMT@404..425
+        MOVE_KW@404..408 "move"
+        WHITESPACE@408..409 " "
+        RELATIVE@409..419
+          RELATIVE_KW@409..417 "relative"
+          WHITESPACE@417..418 " "
+          NAME_REF@418..419
+            IDENT@418..419 "n"
+        WHITESPACE@419..420 " "
+        IN_KW@420..422 "in"
+        WHITESPACE@422..423 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@423..424
+          IDENT@423..424 "c"
+        SEMICOLON@424..425 ";"
+      WHITESPACE@425..428 "\n  "
+      PLPGSQL_MOVE_STMT@428..451
+        MOVE_KW@428..432 "move"
+        WHITESPACE@432..433 " "
+        ABSOLUTE@433..443
+          ABSOLUTE_KW@433..441 "absolute"
+          WHITESPACE@441..442 " "
+          LITERAL@442..443
+            INT_NUMBER@442..443 "0"
+        WHITESPACE@443..444 " "
+        FROM_KW@444..448 "from"
+        WHITESPACE@448..449 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@449..450
+          IDENT@449..450 "c"
+        SEMICOLON@450..451 ";"
+    WHITESPACE@451..452 "\n"
+    END_KW@452..455 "end"
+  WHITESPACE@455..456 "\n"
+---
+PLPGSQL@0..50
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..49
+    PLPGSQL_DECLARE_SECTION@1..26
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..26
+        PLPGSQL_VAR_NAME@11..15
+          MOVE_KW@11..15 "move"
+        WHITESPACE@15..16 " "
+        PATH_TYPE@16..25
+          PATH_REF@16..25
+            PATH_SEGMENT_REF@16..25
+              IDENT@16..25 "refcursor"
+        SEMICOLON@25..26 ";"
+    WHITESPACE@26..27 "\n"
+    BEGIN_KW@27..32 "begin"
+    WHITESPACE@32..35 "\n  "
+    PLPGSQL_BODY@35..45
+      PLPGSQL_MOVE_STMT@35..45
+        MOVE_KW@35..39 "move"
+        WHITESPACE@39..40 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@40..44
+          MOVE_KW@40..44 "move"
+        SEMICOLON@44..45 ";"
+    WHITESPACE@45..46 "\n"
+    END_KW@46..49 "end"
+  WHITESPACE@49..50 "\n"
+---
+PLPGSQL@0..49
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..48
+    PLPGSQL_DECLARE_SECTION@1..23
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..23
+        PLPGSQL_VAR_NAME@11..15
+          MOVE_KW@11..15 "move"
+        WHITESPACE@15..16 " "
+        PATH_TYPE@16..22
+          PATH_REF@16..22
+            PATH_SEGMENT_REF@16..22
+              IDENT@16..22 "record"
+        SEMICOLON@22..23 ";"
+    WHITESPACE@23..24 "\n"
+    BEGIN_KW@24..29 "begin"
+    WHITESPACE@29..32 "\n  "
+    PLPGSQL_BODY@32..44
+      PLPGSQL_ASSIGN_STMT@32..44
+        PLPGSQL_ASSIGN_TARGET@32..38
+          PLPGSQL_VAR_NAME_REF@32..36
+            MOVE_KW@32..36 "move"
+          FIELD_ACCESSOR@36..38
+            DOT@36..37 "."
+            COMPOSITE_FIELD_REF@37..38
+              IDENT@37..38 "x"
+        WHITESPACE@38..39 " "
+        COLON_EQ@39..41 ":="
+        WHITESPACE@41..42 " "
+        LITERAL@42..43
+          INT_NUMBER@42..43 "1"
+        SEMICOLON@43..44 ";"
+    WHITESPACE@44..45 "\n"
+    END_KW@45..48 "end"
+  WHITESPACE@48..49 "\n"
+---
+PLPGSQL@0..32
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..31
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..27
+      PLPGSQL_MOVE_STMT@9..27
+        MOVE_KW@9..13 "move"
+        WHITESPACE@13..14 " "
+        NEXT@14..18
+          NEXT_KW@14..18 "next"
+        WHITESPACE@18..19 " "
+        FROM_KW@19..23 "from"
+        WHITESPACE@23..24 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@24..26
+          POSITIONAL_PARAM@24..26 "$1"
+        SEMICOLON@26..27 ";"
+    WHITESPACE@27..28 "\n"
+    END_KW@28..31 "end"
+  WHITESPACE@31..32 "\n"

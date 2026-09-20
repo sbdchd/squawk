@@ -35,10 +35,12 @@ PLPGSQL@0..66
                 INT_NUMBER@25..26 "2"
         SEMICOLON@26..27 ";"
       WHITESPACE@27..30 "\n  "
-      ERROR@30..34
-        IDENT@30..31 "x"
+      PLPGSQL_EXEC_SQL_STMT@30..34
+        ERROR@30..31
+          IDENT@30..31 "x"
         WHITESPACE@31..32 " "
-        INT_NUMBER@32..33 "1"
+        ERROR@32..33
+          INT_NUMBER@32..33 "1"
         SEMICOLON@33..34 ";"
       WHITESPACE@34..37 "\n  "
       ERROR@37..46
@@ -90,10 +92,14 @@ error[syntax-error]: expected an expression
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴          ━
-error[syntax-error]: expected a statement, got IDENT
+error[syntax-error]: expected command, found IDENT
   ╭▸ 
 5 │   x 1;
   ╰╴  ━
+error[syntax-error]: expected SEMICOLON, got INT_NUMBER
+  ╭▸ 
+5 │   x 1;
+  ╰╴    ━
 error[syntax-error]: expected a statement, got ALL_KW
   ╭▸ 
 6 │   all := 1;

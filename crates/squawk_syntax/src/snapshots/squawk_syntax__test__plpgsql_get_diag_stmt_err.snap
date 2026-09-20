@@ -116,7 +116,7 @@ error[syntax-error]: expected EQ
   ╭▸ 
 7 │   get diagnostics x row_count;
   ╰╴                   ━
-error[syntax-error]: a GET DIAGNOSTICS target can't be subscripted
+error[syntax-error]: subscript not allowed
   ╭▸ 
 8 │   get diagnostics x[1] = row_count;
   ╰╴                   ━

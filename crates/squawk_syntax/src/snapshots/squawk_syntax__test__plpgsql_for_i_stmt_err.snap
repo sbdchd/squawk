@@ -1,0 +1,274 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/for_i_stmt.sql
+---
+PLPGSQL@0..59
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..58
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..54
+      PLPGSQL_FOR_QUERY_STMT@9..54
+        FOR_KW@9..12 "for"
+        WHITESPACE@12..13 " "
+        PLPGSQL_FOR_VARIABLE@13..14
+          PLPGSQL_VAR_NAME_REF@13..14
+            IDENT@13..14 "i"
+        WHITESPACE@14..15 " "
+        IN_KW@15..17 "in"
+        WHITESPACE@17..18 " "
+        REVERSE_KW@18..25 "reverse"
+        WHITESPACE@25..26 " "
+        ERROR@26..27
+          INT_NUMBER@26..27 "1"
+        WHITESPACE@27..28 " "
+        LOOP_KW@28..32 "loop"
+        WHITESPACE@32..37 "\n    "
+        PLPGSQL_BODY@37..42
+          PLPGSQL_NULL_STMT@37..42
+            NULL_KW@37..41 "null"
+            SEMICOLON@41..42 ";"
+        WHITESPACE@42..45 "\n  "
+        END_KW@45..48 "end"
+        WHITESPACE@48..49 " "
+        LOOP_KW@49..53 "loop"
+        SEMICOLON@53..54 ";"
+    WHITESPACE@54..55 "\n"
+    END_KW@55..58 "end"
+  WHITESPACE@58..59 "\n"
+---
+PLPGSQL@0..52
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..51
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..47
+      PLPGSQL_FOR_I_STMT@9..47
+        FOR_KW@9..12 "for"
+        WHITESPACE@12..13 " "
+        IN_KW@13..15 "in"
+        WHITESPACE@15..16 " "
+        PLPGSQL_FOR_RANGE@16..20
+          LITERAL@16..17
+            INT_NUMBER@16..17 "1"
+          DOT_DOT@17..19 ".."
+          LITERAL@19..20
+            INT_NUMBER@19..20 "2"
+        WHITESPACE@20..21 " "
+        LOOP_KW@21..25 "loop"
+        WHITESPACE@25..30 "\n    "
+        PLPGSQL_BODY@30..35
+          PLPGSQL_NULL_STMT@30..35
+            NULL_KW@30..34 "null"
+            SEMICOLON@34..35 ";"
+        WHITESPACE@35..38 "\n  "
+        END_KW@38..41 "end"
+        WHITESPACE@41..42 " "
+        LOOP_KW@42..46 "loop"
+        SEMICOLON@46..47 ";"
+    WHITESPACE@47..48 "\n"
+    END_KW@48..51 "end"
+  WHITESPACE@51..52 "\n"
+---
+PLPGSQL@0..53
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..52
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..48
+      PLPGSQL_FOR_I_STMT@9..48
+        FOR_KW@9..12 "for"
+        WHITESPACE@12..13 " "
+        PLPGSQL_FOR_VARIABLE@13..14
+          PLPGSQL_VAR_NAME_REF@13..14
+            IDENT@13..14 "i"
+        WHITESPACE@14..15 " "
+        IN_KW@15..17 "in"
+        WHITESPACE@17..18 " "
+        PLPGSQL_FOR_RANGE@18..21
+          LITERAL@18..19
+            INT_NUMBER@18..19 "1"
+          DOT_DOT@19..21 ".."
+        WHITESPACE@21..22 " "
+        LOOP_KW@22..26 "loop"
+        WHITESPACE@26..31 "\n    "
+        PLPGSQL_BODY@31..36
+          PLPGSQL_NULL_STMT@31..36
+            NULL_KW@31..35 "null"
+            SEMICOLON@35..36 ";"
+        WHITESPACE@36..39 "\n  "
+        END_KW@39..42 "end"
+        WHITESPACE@42..43 " "
+        LOOP_KW@43..47 "loop"
+        SEMICOLON@47..48 ";"
+    WHITESPACE@48..49 "\n"
+    END_KW@49..52 "end"
+  WHITESPACE@52..53 "\n"
+---
+PLPGSQL@0..49
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..48
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..44
+      PLPGSQL_FOR_I_STMT@9..44
+        FOR_KW@9..12 "for"
+        WHITESPACE@12..13 " "
+        PLPGSQL_FOR_VARIABLE@13..14
+          PLPGSQL_VAR_NAME_REF@13..14
+            IDENT@13..14 "i"
+        WHITESPACE@14..15 " "
+        IN_KW@15..17 "in"
+        WHITESPACE@17..18 " "
+        PLPGSQL_FOR_RANGE@18..22
+          LITERAL@18..19
+            INT_NUMBER@18..19 "1"
+          DOT_DOT@19..21 ".."
+          LITERAL@21..22
+            INT_NUMBER@21..22 "2"
+        WHITESPACE@22..27 "\n    "
+        PLPGSQL_BODY@27..32
+          PLPGSQL_NULL_STMT@27..32
+            NULL_KW@27..31 "null"
+            SEMICOLON@31..32 ";"
+        WHITESPACE@32..35 "\n  "
+        END_KW@35..38 "end"
+        WHITESPACE@38..39 " "
+        LOOP_KW@39..43 "loop"
+        SEMICOLON@43..44 ";"
+    WHITESPACE@44..45 "\n"
+    END_KW@45..48 "end"
+  WHITESPACE@48..49 "\n"
+---
+PLPGSQL@0..57
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..56
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..52
+      PLPGSQL_FOR_I_STMT@9..52
+        FOR_KW@9..12 "for"
+        WHITESPACE@12..13 " "
+        PLPGSQL_FOR_VARIABLE@13..14
+          PLPGSQL_VAR_NAME_REF@13..14
+            IDENT@13..14 "i"
+        WHITESPACE@14..15 " "
+        IN_KW@15..17 "in"
+        WHITESPACE@17..18 " "
+        PLPGSQL_FOR_RANGE@18..25
+          LITERAL@18..19
+            INT_NUMBER@18..19 "1"
+          DOT_DOT@19..21 ".."
+          LITERAL@21..22
+            INT_NUMBER@21..22 "2"
+          WHITESPACE@22..23 " "
+          BY_KW@23..25 "by"
+        WHITESPACE@25..26 " "
+        LOOP_KW@26..30 "loop"
+        WHITESPACE@30..35 "\n    "
+        PLPGSQL_BODY@35..40
+          PLPGSQL_NULL_STMT@35..40
+            NULL_KW@35..39 "null"
+            SEMICOLON@39..40 ";"
+        WHITESPACE@40..43 "\n  "
+        END_KW@43..46 "end"
+        WHITESPACE@46..47 " "
+        LOOP_KW@47..51 "loop"
+        SEMICOLON@51..52 ";"
+    WHITESPACE@52..53 "\n"
+    END_KW@53..56 "end"
+  WHITESPACE@56..57 "\n"
+---
+PLPGSQL@0..83
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..82
+    PLPGSQL_DECLARE_SECTION@1..26
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_VAR_DECL@11..17
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "i"
+        WHITESPACE@12..13 " "
+        PATH_TYPE@13..16
+          PATH_REF@13..16
+            PATH_SEGMENT_REF@13..16
+              INT_KW@13..16 "int"
+        SEMICOLON@16..17 ";"
+      WHITESPACE@17..20 "\n  "
+      PLPGSQL_VAR_DECL@20..26
+        PLPGSQL_VAR_NAME@20..21
+          IDENT@20..21 "j"
+        WHITESPACE@21..22 " "
+        PATH_TYPE@22..25
+          PATH_REF@22..25
+            PATH_SEGMENT_REF@22..25
+              INT_KW@22..25 "int"
+        SEMICOLON@25..26 ";"
+    WHITESPACE@26..27 "\n"
+    BEGIN_KW@27..32 "begin"
+    WHITESPACE@32..35 "\n  "
+    PLPGSQL_BODY@35..78
+      PLPGSQL_FOR_I_STMT@35..78
+        FOR_KW@35..38 "for"
+        WHITESPACE@38..39 " "
+        PLPGSQL_FOR_VARIABLE@39..40
+          PLPGSQL_VAR_NAME_REF@39..40
+            IDENT@39..40 "i"
+        COMMA@40..41 ","
+        WHITESPACE@41..42 " "
+        PLPGSQL_FOR_VARIABLE@42..43
+          PLPGSQL_VAR_NAME_REF@42..43
+            IDENT@42..43 "j"
+        WHITESPACE@43..44 " "
+        IN_KW@44..46 "in"
+        WHITESPACE@46..47 " "
+        PLPGSQL_FOR_RANGE@47..51
+          LITERAL@47..48
+            INT_NUMBER@47..48 "1"
+          DOT_DOT@48..50 ".."
+          LITERAL@50..51
+            INT_NUMBER@50..51 "2"
+        WHITESPACE@51..52 " "
+        LOOP_KW@52..56 "loop"
+        WHITESPACE@56..61 "\n    "
+        PLPGSQL_BODY@61..66
+          PLPGSQL_NULL_STMT@61..66
+            NULL_KW@61..65 "null"
+            SEMICOLON@65..66 ";"
+        WHITESPACE@66..69 "\n  "
+        END_KW@69..72 "end"
+        WHITESPACE@72..73 " "
+        LOOP_KW@73..77 "loop"
+        SEMICOLON@77..78 ";"
+    WHITESPACE@78..79 "\n"
+    END_KW@79..82 "end"
+  WHITESPACE@82..83 "\n"
+
+error[syntax-error]: cannot specify REVERSE in query FOR loop
+  ╭▸ 
+4 │   for i in reverse 1 loop
+  ╰╴           ━━━━━━━
+error[syntax-error]: expected command, found INT_NUMBER
+  ╭▸ 
+4 │   for i in reverse 1 loop
+  ╰╴                   ━
+error[syntax-error]: expected a loop variable, got IN_KW
+   ╭▸ 
+13 │   for in 1..2 loop
+   ╰╴     ━
+error[syntax-error]: expected an expression
+   ╭▸ 
+22 │   for i in 1.. loop
+   ╰╴              ━
+error[syntax-error]: expected LOOP_KW
+   ╭▸ 
+31 │   for i in 1..2
+   ╰╴               ━
+error[syntax-error]: expected an expression
+   ╭▸ 
+40 │   for i in 1..2 by loop
+   ╰╴                  ━
+error[syntax-error]: integer FOR loop takes one variable
+   ╭▸ 
+52 │   for i, j in 1..2 loop
+   ╰╴         ━

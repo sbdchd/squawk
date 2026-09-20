@@ -11,17 +11,20 @@ PLPGSQL@0..106
       PLPGSQL_COMMIT_STMT@9..15
         COMMIT_KW@9..15 "commit"
       WHITESPACE@15..16 " "
-      ERROR@16..21
-        WORK_KW@16..20 "work"
+      PLPGSQL_EXEC_SQL_STMT@16..21
+        ERROR@16..20
+          WORK_KW@16..20 "work"
         SEMICOLON@20..21 ";"
       WHITESPACE@21..24 "\n  "
       PLPGSQL_COMMIT_STMT@24..30
         COMMIT_KW@24..30 "commit"
       WHITESPACE@30..31 " "
-      ERROR@31..44
-        PREPARED_KW@31..39 "prepared"
+      PLPGSQL_EXEC_SQL_STMT@31..44
+        ERROR@31..39
+          PREPARED_KW@31..39 "prepared"
         WHITESPACE@39..40 " "
-        STRING@40..43 "'x'"
+        ERROR@40..43
+          STRING@40..43 "'x'"
         SEMICOLON@43..44 ";"
       WHITESPACE@44..47 "\n  "
       PLPGSQL_ROLLBACK_STMT@47..55
@@ -45,8 +48,9 @@ PLPGSQL@0..106
       PLPGSQL_COMMIT_STMT@88..94
         COMMIT_KW@88..94 "commit"
       WHITESPACE@94..95 " "
-      ERROR@95..101
-        CHAIN_KW@95..100 "chain"
+      PLPGSQL_EXEC_SQL_STMT@95..101
+        ERROR@95..100
+          CHAIN_KW@95..100 "chain"
         SEMICOLON@100..101 ";"
     WHITESPACE@101..102 "\n"
     END_KW@102..105 "end"
@@ -56,7 +60,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 3 │   commit work;
   ╰╴        ━
-error[syntax-error]: expected a statement, got WORK_KW
+error[syntax-error]: expected command, found WORK_KW
   ╭▸ 
 3 │   commit work;
   ╰╴         ━
@@ -64,10 +68,14 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 4 │   commit prepared 'x';
   ╰╴        ━
-error[syntax-error]: expected a statement, got PREPARED_KW
+error[syntax-error]: expected command, found PREPARED_KW
   ╭▸ 
 4 │   commit prepared 'x';
   ╰╴         ━
+error[syntax-error]: expected SEMICOLON, got STRING
+  ╭▸ 
+4 │   commit prepared 'x';
+  ╰╴                  ━
 error[syntax-error]: expected SEMICOLON
   ╭▸ 
 5 │   rollback to savepoint s;
@@ -84,7 +92,7 @@ error[syntax-error]: expected SEMICOLON
   ╭▸ 
 7 │   commit chain;
   ╰╴        ━
-error[syntax-error]: expected a statement, got CHAIN_KW
+error[syntax-error]: expected command, found CHAIN_KW
   ╭▸ 
 7 │   commit chain;
   ╰╴         ━

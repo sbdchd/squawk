@@ -1,0 +1,124 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/err/move_stmt.sql
+---
+PLPGSQL@0..201
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..200
+    PLPGSQL_DECLARE_SECTION@1..56
+      DECLARE_KW@1..8 "declare"
+      WHITESPACE@8..11 "\n  "
+      PLPGSQL_CURSOR_DECL@11..33
+        PLPGSQL_VAR_NAME@11..12
+          IDENT@11..12 "c"
+        WHITESPACE@12..13 " "
+        CURSOR_KW@13..19 "cursor"
+        WHITESPACE@19..20 " "
+        FOR_KW@20..23 "for"
+        WHITESPACE@23..24 " "
+        SELECT@24..32
+          SELECT_CLAUSE@24..32
+            SELECT_KW@24..30 "select"
+            WHITESPACE@30..31 " "
+            TARGET_LIST@31..32
+              TARGET@31..32
+                LITERAL@31..32
+                  INT_NUMBER@31..32 "1"
+        SEMICOLON@32..33 ";"
+      WHITESPACE@33..36 "\n  "
+      PLPGSQL_VAR_DECL@36..47
+        PLPGSQL_VAR_NAME@36..37
+          IDENT@36..37 "n"
+        WHITESPACE@37..38 " "
+        PATH_TYPE@38..41
+          PATH_REF@38..41
+            PATH_SEGMENT_REF@38..41
+              INT_KW@38..41 "int"
+        WHITESPACE@41..42 " "
+        PLPGSQL_VAR_INIT@42..46
+          COLON_EQ@42..44 ":="
+          WHITESPACE@44..45 " "
+          LITERAL@45..46
+            INT_NUMBER@45..46 "2"
+        SEMICOLON@46..47 ";"
+      WHITESPACE@47..50 "\n  "
+      PLPGSQL_VAR_DECL@50..56
+        PLPGSQL_VAR_NAME@50..51
+          IDENT@50..51 "x"
+        WHITESPACE@51..52 " "
+        PATH_TYPE@52..55
+          PATH_REF@52..55
+            PATH_SEGMENT_REF@52..55
+              INT_KW@52..55 "int"
+        SEMICOLON@55..56 ";"
+    WHITESPACE@56..57 "\n"
+    BEGIN_KW@57..62 "begin"
+    WHITESPACE@62..65 "\n  "
+    PLPGSQL_BODY@65..196
+      PLPGSQL_MOVE_STMT@65..70
+        MOVE_KW@65..69 "move"
+        SEMICOLON@69..70 ";"
+      WHITESPACE@70..73 "\n  "
+      PLPGSQL_MOVE_STMT@73..85
+        MOVE_KW@73..77 "move"
+        WHITESPACE@77..78 " "
+        NEXT@78..82
+          NEXT_KW@78..82 "next"
+        WHITESPACE@82..83 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@83..84
+          IDENT@83..84 "c"
+        SEMICOLON@84..85 ";"
+      WHITESPACE@85..88 "\n  "
+      PLPGSQL_MOVE_STMT@88..94
+        MOVE_KW@88..92 "move"
+        WHITESPACE@92..93 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@93..94
+          IDENT@93..94 "c"
+      WHITESPACE@94..95 " "
+      ERROR@95..102
+        INTO_KW@95..99 "into"
+        WHITESPACE@99..100 " "
+        IDENT@100..101 "x"
+        SEMICOLON@101..102 ";"
+      WHITESPACE@102..105 "\n  "
+      COMMENT@105..179 "-- a word in the coun ..."
+      WHITESPACE@179..182 "\n  "
+      PLPGSQL_MOVE_STMT@182..188
+        MOVE_KW@182..186 "move"
+        WHITESPACE@186..187 " "
+        PLPGSQL_CURSOR_VARIABLE_REF@187..188
+          IDENT@187..188 "n"
+      WHITESPACE@188..189 " "
+      ERROR@189..196
+        FROM_KW@189..193 "from"
+        WHITESPACE@193..194 " "
+        IDENT@194..195 "c"
+        SEMICOLON@195..196 ";"
+    WHITESPACE@196..197 "\n"
+    END_KW@197..200 "end"
+  WHITESPACE@200..201 "\n"
+
+error[syntax-error]: expected a cursor variable, got SEMICOLON
+  ╭▸ 
+7 │   move;
+  ╰╴      ━
+error[syntax-error]: expected FROM or IN
+  ╭▸ 
+8 │   move next c;
+  ╰╴           ━
+error[syntax-error]: expected SEMICOLON
+  ╭▸ 
+9 │   move c into x;
+  ╰╴        ━
+error[syntax-error]: expected a statement, got INTO_KW
+  ╭▸ 
+9 │   move c into x;
+  ╰╴         ━
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+11 │   move n from c;
+   ╰╴        ━
+error[syntax-error]: expected a statement, got FROM_KW
+   ╭▸ 
+11 │   move n from c;
+   ╰╴         ━

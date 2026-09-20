@@ -57,18 +57,20 @@ PLPGSQL@0..315
               NULL_KW@76..80 "null"
               SEMICOLON@80..81 ";"
             WHITESPACE@81..84 "\n  "
-            ERROR@84..110
-              IDENT@84..89 "elsif"
+            PLPGSQL_EXEC_SQL_STMT@84..110
+              ERROR@84..89
+                IDENT@84..89 "elsif"
               WHITESPACE@89..90 " "
-              INT_NUMBER@90..91 "1"
-              WHITESPACE@91..92 " "
-              EQ@92..93 "="
-              WHITESPACE@93..94 " "
-              INT_NUMBER@94..95 "2"
-              WHITESPACE@95..96 " "
-              THEN_KW@96..100 "then"
-              WHITESPACE@100..105 "\n    "
-              NULL_KW@105..109 "null"
+              ERROR@90..109
+                INT_NUMBER@90..91 "1"
+                WHITESPACE@91..92 " "
+                EQ@92..93 "="
+                WHITESPACE@93..94 " "
+                INT_NUMBER@94..95 "2"
+                WHITESPACE@95..96 " "
+                THEN_KW@96..100 "then"
+                WHITESPACE@100..105 "\n    "
+                NULL_KW@105..109 "null"
               SEMICOLON@109..110 ";"
         WHITESPACE@110..113 "\n  "
         END_KW@113..116 "end"
@@ -160,10 +162,14 @@ error[syntax-error]: expected THEN_KW
   ╭▸ 
 3 │   if 1 = 1
   ╰╴          ━
-error[syntax-error]: expected a statement, got IDENT
+error[syntax-error]: expected command, found IDENT
    ╭▸ 
 11 │   elsif 1 = 2 then
    ╰╴  ━
+error[syntax-error]: expected SEMICOLON, got INT_NUMBER
+   ╭▸ 
+11 │   elsif 1 = 2 then
+   ╰╴        ━
 error[syntax-error]: CASE expression must be parenthesized
    ╭▸ 
 16 │   if case when true then 1 end = 1 then

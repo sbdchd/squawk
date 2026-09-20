@@ -1,0 +1,402 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_parser/tests/data/plpgsql/ok/exec_sql_stmt.sql
+---
+PLPGSQL@0..864
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..863
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..859
+      PLPGSQL_EXEC_SQL_STMT@9..41
+        INSERT@9..40
+          INSERT_KW@9..15 "insert"
+          WHITESPACE@15..16 " "
+          INTO_KW@16..20 "into"
+          WHITESPACE@20..21 " "
+          RELATION_NAME_REF@21..26
+            PATH_REF@21..26
+              PATH_SEGMENT_REF@21..26
+                IDENT@21..26 "exs_t"
+          WHITESPACE@26..27 " "
+          VALUES@27..40
+            VALUES_KW@27..33 "values"
+            WHITESPACE@33..34 " "
+            ROW_LIST@34..40
+              ROW@34..40
+                L_PAREN@34..35 "("
+                LITERAL@35..36
+                  INT_NUMBER@35..36 "1"
+                COMMA@36..37 ","
+                WHITESPACE@37..38 " "
+                LITERAL@38..39
+                  INT_NUMBER@38..39 "2"
+                R_PAREN@39..40 ")"
+        SEMICOLON@40..41 ";"
+      WHITESPACE@41..44 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@44..79
+        UPDATE@44..78
+          UPDATE_KW@44..50 "update"
+          WHITESPACE@50..51 " "
+          RELATION_NAME@51..56
+            RELATION_NAME_REF@51..56
+              PATH_REF@51..56
+                PATH_SEGMENT_REF@51..56
+                  IDENT@51..56 "exs_t"
+          WHITESPACE@56..57 " "
+          SET_CLAUSE@57..66
+            SET_KW@57..60 "set"
+            WHITESPACE@60..61 " "
+            SET_COLUMN_LIST@61..66
+              SET_SINGLE_COLUMN@61..66
+                COLUMN_TARGET@61..62
+                  COLUMN_NAME_REF@61..62
+                    IDENT@61..62 "a"
+                WHITESPACE@62..63 " "
+                EQ@63..64 "="
+                WHITESPACE@64..65 " "
+                SET_EXPR@65..66
+                  LITERAL@65..66
+                    INT_NUMBER@65..66 "2"
+          WHITESPACE@66..67 " "
+          WHERE_CLAUSE@67..78
+            WHERE_KW@67..72 "where"
+            WHITESPACE@72..73 " "
+            BIN_EXPR@73..78
+              NAME_REF@73..74
+                IDENT@73..74 "b"
+              WHITESPACE@74..75 " "
+              EQ@75..76 "="
+              WHITESPACE@76..77 " "
+              LITERAL@77..78
+                INT_NUMBER@77..78 "2"
+        SEMICOLON@78..79 ";"
+      WHITESPACE@79..82 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@82..112
+        DELETE@82..111
+          DELETE_KW@82..88 "delete"
+          WHITESPACE@88..89 " "
+          FROM_KW@89..93 "from"
+          WHITESPACE@93..94 " "
+          RELATION_NAME@94..99
+            RELATION_NAME_REF@94..99
+              PATH_REF@94..99
+                PATH_SEGMENT_REF@94..99
+                  IDENT@94..99 "exs_t"
+          WHITESPACE@99..100 " "
+          WHERE_CLAUSE@100..111
+            WHERE_KW@100..105 "where"
+            WHITESPACE@105..106 " "
+            BIN_EXPR@106..111
+              NAME_REF@106..107
+                IDENT@106..107 "a"
+              WHITESPACE@107..108 " "
+              EQ@108..109 "="
+              WHITESPACE@109..110 " "
+              LITERAL@110..111
+                INT_NUMBER@110..111 "2"
+        SEMICOLON@111..112 ";"
+      WHITESPACE@112..115 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@115..130
+        TRUNCATE@115..129
+          TRUNCATE_KW@115..123 "truncate"
+          WHITESPACE@123..124 " "
+          TABLE_LIST@124..129
+            TABLE_RELATION_NAME@124..129
+              TABLE_NAME_REF@124..129
+                PATH_REF@124..129
+                  PATH_SEGMENT_REF@124..129
+                    IDENT@124..129 "exs_t"
+        SEMICOLON@129..130 ";"
+      WHITESPACE@130..133 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@133..160
+        CREATE_TABLE@133..159
+          CREATE_KW@133..139 "create"
+          WHITESPACE@139..140 " "
+          TABLE_KW@140..145 "table"
+          WHITESPACE@145..146 " "
+          TABLE_NAME@146..151
+            PATH@146..151
+              PATH_SEGMENT@146..151
+                IDENT@146..151 "exs_u"
+          WHITESPACE@151..152 " "
+          TABLE_ARG_LIST@152..159
+            L_PAREN@152..153 "("
+            COLUMN@153..158
+              COLUMN_NAME@153..154
+                IDENT@153..154 "a"
+              WHITESPACE@154..155 " "
+              PATH_TYPE@155..158
+                PATH_REF@155..158
+                  PATH_SEGMENT_REF@155..158
+                    INT_KW@155..158 "int"
+            R_PAREN@158..159 ")"
+        SEMICOLON@159..160 ";"
+      WHITESPACE@160..163 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@163..180
+        DROP_TABLE@163..179
+          DROP_KW@163..167 "drop"
+          WHITESPACE@167..168 " "
+          TABLE_KW@168..173 "table"
+          WHITESPACE@173..174 " "
+          TABLE_NAME_REF@174..179
+            PATH_REF@174..179
+              PATH_SEGMENT_REF@174..179
+                IDENT@174..179 "exs_u"
+        SEMICOLON@179..180 ";"
+      WHITESPACE@180..183 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@183..194
+        VALUES@183..193
+          VALUES_KW@183..189 "values"
+          WHITESPACE@189..190 " "
+          ROW_LIST@190..193
+            ROW@190..193
+              L_PAREN@190..191 "("
+              LITERAL@191..192
+                INT_NUMBER@191..192 "1"
+              R_PAREN@192..193 ")"
+        SEMICOLON@193..194 ";"
+      WHITESPACE@194..197 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@197..239
+        SELECT@197..238
+          WITH_CLAUSE@197..222
+            WITH_KW@197..201 "with"
+            WHITESPACE@201..202 " "
+            WITH_TABLE@202..222
+              CTE_NAME@202..203
+                IDENT@202..203 "x"
+              WHITESPACE@203..204 " "
+              AS_KW@204..206 "as"
+              WHITESPACE@206..207 " "
+              L_PAREN@207..208 "("
+              SELECT@208..221
+                SELECT_CLAUSE@208..221
+                  SELECT_KW@208..214 "select"
+                  WHITESPACE@214..215 " "
+                  TARGET_LIST@215..221
+                    TARGET@215..221
+                      LITERAL@215..216
+                        INT_NUMBER@215..216 "1"
+                      WHITESPACE@216..217 " "
+                      AS_NAME@217..221
+                        AS_KW@217..219 "as"
+                        WHITESPACE@219..220 " "
+                        COLUMN_NAME@220..221
+                          IDENT@220..221 "a"
+              R_PAREN@221..222 ")"
+          WHITESPACE@222..223 " "
+          SELECT_CLAUSE@223..231
+            SELECT_KW@223..229 "select"
+            WHITESPACE@229..230 " "
+            TARGET_LIST@230..231
+              TARGET@230..231
+                STAR@230..231 "*"
+          WHITESPACE@231..232 " "
+          FROM_CLAUSE@232..238
+            FROM_KW@232..236 "from"
+            WHITESPACE@236..237 " "
+            RELATION_FROM_ITEM@237..238
+              RELATION_NAME_REF@237..238
+                PATH_REF@237..238
+                  PATH_SEGMENT_REF@237..238
+                    IDENT@237..238 "x"
+        SEMICOLON@238..239 ";"
+      WHITESPACE@239..242 "\n  "
+      COMMENT@242..317 "-- the trailing `;` b ..."
+      WHITESPACE@317..320 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@320..402
+        CREATE_FUNCTION@320..401
+          CREATE_KW@320..326 "create"
+          WHITESPACE@326..327 " "
+          OR_REPLACE@327..337
+            OR_KW@327..329 "or"
+            WHITESPACE@329..330 " "
+            REPLACE_KW@330..337 "replace"
+          WHITESPACE@337..338 " "
+          FUNCTION_KW@338..346 "function"
+          WHITESPACE@346..347 " "
+          FUNCTION_NAME@347..352
+            PATH@347..352
+              PATH_SEGMENT@347..352
+                IDENT@347..352 "exs_f"
+          PARAM_LIST@352..357
+            L_PAREN@352..353 "("
+            PARAM@353..356
+              PATH_TYPE@353..356
+                PATH_REF@353..356
+                  PATH_SEGMENT_REF@353..356
+                    INT_KW@353..356 "int"
+            R_PAREN@356..357 ")"
+          WHITESPACE@357..358 " "
+          RET_TYPE@358..369
+            RETURNS_KW@358..365 "returns"
+            WHITESPACE@365..366 " "
+            PATH_TYPE@366..369
+              PATH_REF@366..369
+                PATH_SEGMENT_REF@366..369
+                  INT_KW@366..369 "int"
+          WHITESPACE@369..370 " "
+          FUNC_OPTION_LIST@370..401
+            LANGUAGE_FUNC_OPTION@370..382
+              LANGUAGE_KW@370..378 "language"
+              WHITESPACE@378..379 " "
+              LANGUAGE_REF@379..382
+                SQL_KW@379..382 "sql"
+            WHITESPACE@382..383 " "
+            AS_FUNC_OPTION@383..401
+              AS_KW@383..385 "as"
+              WHITESPACE@385..386 " "
+              AS_DEFINITION@386..401
+                LITERAL@386..401
+                  STRING@386..401 "'select $1 + 1'"
+        SEMICOLON@401..402 ";"
+      WHITESPACE@402..405 "\n  "
+      COMMENT@405..459 "-- a `;` inside BEGIN ..."
+      WHITESPACE@459..462 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@462..549
+        CREATE_FUNCTION@462..548
+          CREATE_KW@462..468 "create"
+          WHITESPACE@468..469 " "
+          OR_REPLACE@469..479
+            OR_KW@469..471 "or"
+            WHITESPACE@471..472 " "
+            REPLACE_KW@472..479 "replace"
+          WHITESPACE@479..480 " "
+          FUNCTION_KW@480..488 "function"
+          WHITESPACE@488..489 " "
+          FUNCTION_NAME@489..494
+            PATH@489..494
+              PATH_SEGMENT@489..494
+                IDENT@489..494 "exs_g"
+          PARAM_LIST@494..496
+            L_PAREN@494..495 "("
+            R_PAREN@495..496 ")"
+          WHITESPACE@496..497 " "
+          RET_TYPE@497..508
+            RETURNS_KW@497..504 "returns"
+            WHITESPACE@504..505 " "
+            PATH_TYPE@505..508
+              PATH_REF@505..508
+                PATH_SEGMENT_REF@505..508
+                  INT_KW@505..508 "int"
+          WHITESPACE@508..509 " "
+          FUNC_OPTION_LIST@509..521
+            LANGUAGE_FUNC_OPTION@509..521
+              LANGUAGE_KW@509..517 "language"
+              WHITESPACE@517..518 " "
+              LANGUAGE_REF@518..521
+                SQL_KW@518..521 "sql"
+          WHITESPACE@521..522 " "
+          ATOMIC_BODY@522..548
+            BEGIN_KW@522..527 "begin"
+            WHITESPACE@527..528 " "
+            ATOMIC_KW@528..534 "atomic"
+            WHITESPACE@534..535 " "
+            SELECT@535..544
+              SELECT_CLAUSE@535..543
+                SELECT_KW@535..541 "select"
+                WHITESPACE@541..542 " "
+                TARGET_LIST@542..543
+                  TARGET@542..543
+                    LITERAL@542..543
+                      INT_NUMBER@542..543 "1"
+              SEMICOLON@543..544 ";"
+            WHITESPACE@544..545 " "
+            END_KW@545..548 "end"
+        SEMICOLON@548..549 ";"
+      WHITESPACE@549..552 "\n  "
+      COMMENT@552..581 "-- nor does one insid ..."
+      WHITESPACE@581..584 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@584..703
+        CREATE_RULE@584..702
+          CREATE_KW@584..590 "create"
+          WHITESPACE@590..591 " "
+          RULE_KW@591..595 "rule"
+          WHITESPACE@595..596 " "
+          RULE@596..601
+            IDENT@596..601 "exs_r"
+          WHITESPACE@601..602 " "
+          AS_KW@602..604 "as"
+          WHITESPACE@604..605 " "
+          RULE_ON@605..623
+            ON_KW@605..607 "on"
+            WHITESPACE@607..608 " "
+            RULE_EVENT@608..614
+              INSERT_KW@608..614 "insert"
+            WHITESPACE@614..615 " "
+            TO_KW@615..617 "to"
+            WHITESPACE@617..618 " "
+            RELATION_NAME_REF@618..623
+              PATH_REF@618..623
+                PATH_SEGMENT_REF@618..623
+                  IDENT@618..623 "exs_t"
+          WHITESPACE@623..628 "\n    "
+          RULE_DO@628..702
+            DO_KW@628..630 "do"
+            WHITESPACE@630..631 " "
+            ALSO_KW@631..635 "also"
+            WHITESPACE@635..636 " "
+            RULE_STMT_LIST@636..702
+              L_PAREN@636..637 "("
+              INSERT@637..669
+                INSERT_KW@637..643 "insert"
+                WHITESPACE@643..644 " "
+                INTO_KW@644..648 "into"
+                WHITESPACE@648..649 " "
+                RELATION_NAME_REF@649..654
+                  PATH_REF@649..654
+                    PATH_SEGMENT_REF@649..654
+                      IDENT@649..654 "exs_t"
+                WHITESPACE@654..655 " "
+                VALUES@655..668
+                  VALUES_KW@655..661 "values"
+                  WHITESPACE@661..662 " "
+                  ROW_LIST@662..668
+                    ROW@662..668
+                      L_PAREN@662..663 "("
+                      LITERAL@663..664
+                        INT_NUMBER@663..664 "3"
+                      COMMA@664..665 ","
+                      WHITESPACE@665..666 " "
+                      LITERAL@666..667
+                        INT_NUMBER@666..667 "3"
+                      R_PAREN@667..668 ")"
+                SEMICOLON@668..669 ";"
+              WHITESPACE@669..670 " "
+              INSERT@670..701
+                INSERT_KW@670..676 "insert"
+                WHITESPACE@676..677 " "
+                INTO_KW@677..681 "into"
+                WHITESPACE@681..682 " "
+                RELATION_NAME_REF@682..687
+                  PATH_REF@682..687
+                    PATH_SEGMENT_REF@682..687
+                      IDENT@682..687 "exs_t"
+                WHITESPACE@687..688 " "
+                VALUES@688..701
+                  VALUES_KW@688..694 "values"
+                  WHITESPACE@694..695 " "
+                  ROW_LIST@695..701
+                    ROW@695..701
+                      L_PAREN@695..696 "("
+                      LITERAL@696..697
+                        INT_NUMBER@696..697 "4"
+                      COMMA@697..698 ","
+                      WHITESPACE@698..699 " "
+                      LITERAL@699..700
+                        INT_NUMBER@699..700 "4"
+                      R_PAREN@700..701 ")"
+              R_PAREN@701..702 ")"
+        SEMICOLON@702..703 ";"
+      WHITESPACE@703..706 "\n  "
+      COMMENT@706..784 "-- `abort` is not a P ..."
+      WHITESPACE@784..787 "\n  "
+      COMMENT@787..850 "-- when it compiles t ..."
+      WHITESPACE@850..853 "\n  "
+      PLPGSQL_EXEC_SQL_STMT@853..859
+        ROLLBACK_TRANSACTION@853..858
+          ABORT_KW@853..858 "abort"
+        SEMICOLON@858..859 ";"
+    WHITESPACE@859..860 "\n"
+    END_KW@860..863 "end"
+  WHITESPACE@863..864 "\n"
