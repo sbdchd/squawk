@@ -77,12 +77,17 @@ PLPGSQL@0..81
         WHITESPACE@35..36 " "
         EXECUTE_KW@36..43 "execute"
         WHITESPACE@43..44 " "
-        LITERAL@44..54
-          STRING@44..54 "'select 1'"
-        WHITESPACE@54..59 "\n    "
-        PLPGSQL_BODY@59..64
-          PLPGSQL_NULL_STMT@59..64
-            NULL_KW@59..63 "null"
+        PLPGSQL_EXPR@44..63
+          TARGET_LIST@44..63
+            TARGET@44..63
+              LITERAL@44..54
+                STRING@44..54 "'select 1'"
+              WHITESPACE@54..59 "\n    "
+              AS_NAME@59..63
+                COLUMN_NAME@59..63
+                  NULL_KW@59..63 "null"
+        PLPGSQL_BODY@63..64
+          ERROR@63..64
             SEMICOLON@63..64 ";"
         WHITESPACE@64..67 "\n  "
         END_KW@67..70 "end"
@@ -123,8 +128,11 @@ PLPGSQL@0..92
         WHITESPACE@35..36 " "
         EXECUTE_KW@36..43 "execute"
         WHITESPACE@43..44 " "
-        LITERAL@44..54
-          STRING@44..54 "'select 1'"
+        PLPGSQL_EXPR@44..54
+          TARGET_LIST@44..54
+            TARGET@44..54
+              LITERAL@44..54
+                STRING@44..54 "'select 1'"
         WHITESPACE@54..55 " "
         PLPGSQL_USING_CLAUSE@55..60
           USING_KW@55..60 "using"
@@ -174,14 +182,20 @@ PLPGSQL@0..96
         WHITESPACE@35..36 " "
         EXECUTE_KW@36..43 "execute"
         WHITESPACE@43..44 " "
-        LITERAL@44..55
-          STRING@44..55 "'select $1'"
+        PLPGSQL_EXPR@44..55
+          TARGET_LIST@44..55
+            TARGET@44..55
+              LITERAL@44..55
+                STRING@44..55 "'select $1'"
         WHITESPACE@55..56 " "
         PLPGSQL_USING_CLAUSE@56..64
           USING_KW@56..61 "using"
           WHITESPACE@61..62 " "
-          LITERAL@62..63
-            INT_NUMBER@62..63 "1"
+          PLPGSQL_EXPR@62..63
+            TARGET_LIST@62..63
+              TARGET@62..63
+                LITERAL@62..63
+                  INT_NUMBER@62..63 "1"
           COMMA@63..64 ","
         WHITESPACE@64..65 " "
         LOOP_KW@65..69 "loop"
@@ -205,8 +219,12 @@ error[syntax-error]: expected an expression
   ╰╴                  ━
 error[syntax-error]: expected LOOP_KW
    ╭▸ 
-15 │   for r in execute 'select 1'
-   ╰╴                             ━
+16 │     null;
+   ╰╴        ━
+error[syntax-error]: expected a statement, got SEMICOLON
+   ╭▸ 
+16 │     null;
+   ╰╴        ━
 error[syntax-error]: expected an expression
    ╭▸ 
 25 │   for r in execute 'select 1' using loop

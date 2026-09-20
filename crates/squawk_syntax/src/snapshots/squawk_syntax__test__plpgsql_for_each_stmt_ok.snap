@@ -24,20 +24,23 @@ PLPGSQL@0..620
         PLPGSQL_VAR_INIT@21..38
           COLON_EQ@21..23 ":="
           WHITESPACE@23..24 " "
-          ARRAY_EXPR@24..38
-            ARRAY_KW@24..29 "array"
-            L_BRACK@29..30 "["
-            LITERAL@30..31
-              INT_NUMBER@30..31 "1"
-            COMMA@31..32 ","
-            WHITESPACE@32..33 " "
-            LITERAL@33..34
-              INT_NUMBER@33..34 "2"
-            COMMA@34..35 ","
-            WHITESPACE@35..36 " "
-            LITERAL@36..37
-              INT_NUMBER@36..37 "3"
-            R_BRACK@37..38 "]"
+          PLPGSQL_EXPR@24..38
+            TARGET_LIST@24..38
+              TARGET@24..38
+                ARRAY_EXPR@24..38
+                  ARRAY_KW@24..29 "array"
+                  L_BRACK@29..30 "["
+                  LITERAL@30..31
+                    INT_NUMBER@30..31 "1"
+                  COMMA@31..32 ","
+                  WHITESPACE@32..33 " "
+                  LITERAL@33..34
+                    INT_NUMBER@33..34 "2"
+                  COMMA@34..35 ","
+                  WHITESPACE@35..36 " "
+                  LITERAL@36..37
+                    INT_NUMBER@36..37 "3"
+                  R_BRACK@37..38 "]"
         SEMICOLON@38..39 ";"
       WHITESPACE@39..42 "\n  "
       PLPGSQL_VAR_DECL@42..81
@@ -59,30 +62,33 @@ PLPGSQL@0..620
         PLPGSQL_VAR_INIT@56..80
           COLON_EQ@56..58 ":="
           WHITESPACE@58..59 " "
-          ARRAY_EXPR@59..80
-            ARRAY_KW@59..64 "array"
-            L_BRACK@64..65 "["
-            ARRAY_EXPR@65..71
-              L_BRACK@65..66 "["
-              LITERAL@66..67
-                INT_NUMBER@66..67 "1"
-              COMMA@67..68 ","
-              WHITESPACE@68..69 " "
-              LITERAL@69..70
-                INT_NUMBER@69..70 "2"
-              R_BRACK@70..71 "]"
-            COMMA@71..72 ","
-            WHITESPACE@72..73 " "
-            ARRAY_EXPR@73..79
-              L_BRACK@73..74 "["
-              LITERAL@74..75
-                INT_NUMBER@74..75 "3"
-              COMMA@75..76 ","
-              WHITESPACE@76..77 " "
-              LITERAL@77..78
-                INT_NUMBER@77..78 "4"
-              R_BRACK@78..79 "]"
-            R_BRACK@79..80 "]"
+          PLPGSQL_EXPR@59..80
+            TARGET_LIST@59..80
+              TARGET@59..80
+                ARRAY_EXPR@59..80
+                  ARRAY_KW@59..64 "array"
+                  L_BRACK@64..65 "["
+                  ARRAY_EXPR@65..71
+                    L_BRACK@65..66 "["
+                    LITERAL@66..67
+                      INT_NUMBER@66..67 "1"
+                    COMMA@67..68 ","
+                    WHITESPACE@68..69 " "
+                    LITERAL@69..70
+                      INT_NUMBER@69..70 "2"
+                    R_BRACK@70..71 "]"
+                  COMMA@71..72 ","
+                  WHITESPACE@72..73 " "
+                  ARRAY_EXPR@73..79
+                    L_BRACK@73..74 "["
+                    LITERAL@74..75
+                      INT_NUMBER@74..75 "3"
+                    COMMA@75..76 ","
+                    WHITESPACE@76..77 " "
+                    LITERAL@77..78
+                      INT_NUMBER@77..78 "4"
+                    R_BRACK@78..79 "]"
+                  R_BRACK@79..80 "]"
         SEMICOLON@80..81 ";"
       WHITESPACE@81..84 "\n  "
       PLPGSQL_VAR_DECL@84..90
@@ -153,8 +159,11 @@ PLPGSQL@0..620
         WHITESPACE@156..157 " "
         ARRAY_KW@157..162 "array"
         WHITESPACE@162..163 " "
-        NAME_REF@163..166
-          IDENT@163..166 "arr"
+        PLPGSQL_EXPR@163..166
+          TARGET_LIST@163..166
+            TARGET@163..166
+              NAME_REF@163..166
+                IDENT@163..166 "arr"
         WHITESPACE@166..167 " "
         LOOP_KW@167..171 "loop"
         WHITESPACE@171..176 "\n    "
@@ -185,8 +194,11 @@ PLPGSQL@0..620
         WHITESPACE@216..217 " "
         ARRAY_KW@217..222 "array"
         WHITESPACE@222..223 " "
-        NAME_REF@223..228
-          IDENT@223..228 "pairs"
+        PLPGSQL_EXPR@223..228
+          TARGET_LIST@223..228
+            TARGET@223..228
+              NAME_REF@223..228
+                IDENT@223..228 "pairs"
         WHITESPACE@228..229 " "
         LOOP_KW@229..233 "loop"
         WHITESPACE@233..238 "\n    "
@@ -217,8 +229,11 @@ PLPGSQL@0..620
         WHITESPACE@278..279 " "
         ARRAY_KW@279..284 "array"
         WHITESPACE@284..285 " "
-        NAME_REF@285..288
-          IDENT@285..288 "arr"
+        PLPGSQL_EXPR@285..288
+          TARGET_LIST@285..288
+            TARGET@285..288
+              NAME_REF@285..288
+                IDENT@285..288 "arr"
         WHITESPACE@288..289 " "
         LOOP_KW@289..293 "loop"
         WHITESPACE@293..298 "\n    "
@@ -248,8 +263,11 @@ PLPGSQL@0..620
         WHITESPACE@333..334 " "
         ARRAY_KW@334..339 "array"
         WHITESPACE@339..340 " "
-        NAME_REF@340..343
-          IDENT@340..343 "arr"
+        PLPGSQL_EXPR@340..343
+          TARGET_LIST@340..343
+            TARGET@340..343
+              NAME_REF@340..343
+                IDENT@340..343 "arr"
         WHITESPACE@343..344 " "
         LOOP_KW@344..348 "loop"
         WHITESPACE@348..353 "\n    "
@@ -278,8 +296,11 @@ PLPGSQL@0..620
         WHITESPACE@387..388 " "
         ARRAY_KW@388..393 "array"
         WHITESPACE@393..394 " "
-        NAME_REF@394..397
-          IDENT@394..397 "arr"
+        PLPGSQL_EXPR@394..397
+          TARGET_LIST@394..397
+            TARGET@394..397
+              NAME_REF@394..397
+                IDENT@394..397 "arr"
         WHITESPACE@397..398 " "
         LOOP_KW@398..402 "loop"
         WHITESPACE@402..407 "\n    "
@@ -306,8 +327,11 @@ PLPGSQL@0..620
         WHITESPACE@504..505 " "
         ARRAY_KW@505..510 "array"
         WHITESPACE@510..511 " "
-        NAME_REF@511..514
-          IDENT@511..514 "arr"
+        PLPGSQL_EXPR@511..514
+          TARGET_LIST@511..514
+            TARGET@511..514
+              NAME_REF@511..514
+                IDENT@511..514 "arr"
         WHITESPACE@514..515 " "
         LOOP_KW@515..519 "loop"
         WHITESPACE@519..524 "\n    "
@@ -338,8 +362,11 @@ PLPGSQL@0..620
         WHITESPACE@566..567 " "
         ARRAY_KW@567..572 "array"
         WHITESPACE@572..573 " "
-        NAME_REF@573..576
-          IDENT@573..576 "arr"
+        PLPGSQL_EXPR@573..576
+          TARGET_LIST@573..576
+            TARGET@573..576
+              NAME_REF@573..576
+                IDENT@573..576 "arr"
         WHITESPACE@576..577 " "
         LOOP_KW@577..581 "loop"
         WHITESPACE@581..586 "\n    "
@@ -392,8 +419,11 @@ PLPGSQL@0..79
         WHITESPACE@38..39 " "
         ARRAY_KW@39..44 "array"
         WHITESPACE@44..45 " "
-        LITERAL@45..47
-          POSITIONAL_PARAM@45..47 "$1"
+        PLPGSQL_EXPR@45..47
+          TARGET_LIST@45..47
+            TARGET@45..47
+              LITERAL@45..47
+                POSITIONAL_PARAM@45..47 "$1"
         WHITESPACE@47..48 " "
         LOOP_KW@48..52 "loop"
         WHITESPACE@52..57 "\n    "

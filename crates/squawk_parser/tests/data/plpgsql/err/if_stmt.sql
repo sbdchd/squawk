@@ -12,7 +12,6 @@ begin
     null;
   end if;
 
-  -- `expr_until_then` ends the condition at the case's own `then`
   if case when true then 1 end = 1 then
     null;
   elsif 1 = case when true then 1 end then

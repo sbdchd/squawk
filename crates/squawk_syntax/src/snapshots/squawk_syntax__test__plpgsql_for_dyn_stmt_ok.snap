@@ -30,8 +30,11 @@ PLPGSQL@0..469
         PLPGSQL_VAR_INIT@29..33
           COLON_EQ@29..31 ":="
           WHITESPACE@31..32 " "
-          LITERAL@32..33
-            INT_NUMBER@32..33 "1"
+          PLPGSQL_EXPR@32..33
+            TARGET_LIST@32..33
+              TARGET@32..33
+                LITERAL@32..33
+                  INT_NUMBER@32..33 "1"
         SEMICOLON@33..34 ";"
     WHITESPACE@34..35 "\n"
     BEGIN_KW@35..40 "begin"
@@ -48,8 +51,11 @@ PLPGSQL@0..469
         WHITESPACE@51..52 " "
         EXECUTE_KW@52..59 "execute"
         WHITESPACE@59..60 " "
-        LITERAL@60..75
-          STRING@60..75 "'select 1 as x'"
+        PLPGSQL_EXPR@60..75
+          TARGET_LIST@60..75
+            TARGET@60..75
+              LITERAL@60..75
+                STRING@60..75 "'select 1 as x'"
         WHITESPACE@75..76 " "
         LOOP_KW@76..80 "loop"
         WHITESPACE@80..85 "\n    "
@@ -74,14 +80,20 @@ PLPGSQL@0..469
         WHITESPACE@113..114 " "
         EXECUTE_KW@114..121 "execute"
         WHITESPACE@121..122 " "
-        LITERAL@122..138
-          STRING@122..138 "'select $1 as x'"
+        PLPGSQL_EXPR@122..138
+          TARGET_LIST@122..138
+            TARGET@122..138
+              LITERAL@122..138
+                STRING@122..138 "'select $1 as x'"
         WHITESPACE@138..139 " "
         PLPGSQL_USING_CLAUSE@139..146
           USING_KW@139..144 "using"
           WHITESPACE@144..145 " "
-          LITERAL@145..146
-            INT_NUMBER@145..146 "1"
+          PLPGSQL_EXPR@145..146
+            TARGET_LIST@145..146
+              TARGET@145..146
+                LITERAL@145..146
+                  INT_NUMBER@145..146 "1"
         WHITESPACE@146..147 " "
         LOOP_KW@147..151 "loop"
         WHITESPACE@151..156 "\n    "
@@ -106,24 +118,33 @@ PLPGSQL@0..469
         WHITESPACE@184..185 " "
         EXECUTE_KW@185..192 "execute"
         WHITESPACE@192..193 " "
-        LITERAL@193..208
-          STRING@193..208 "'select $1, $2'"
+        PLPGSQL_EXPR@193..208
+          TARGET_LIST@193..208
+            TARGET@193..208
+              LITERAL@193..208
+                STRING@193..208 "'select $1, $2'"
         WHITESPACE@208..209 " "
         PLPGSQL_USING_CLAUSE@209..223
           USING_KW@209..214 "using"
           WHITESPACE@214..215 " "
-          NAME_REF@215..216
-            IDENT@215..216 "n"
+          PLPGSQL_EXPR@215..216
+            TARGET_LIST@215..216
+              TARGET@215..216
+                NAME_REF@215..216
+                  IDENT@215..216 "n"
           COMMA@216..217 ","
           WHITESPACE@217..218 " "
-          BIN_EXPR@218..223
-            NAME_REF@218..219
-              IDENT@218..219 "n"
-            WHITESPACE@219..220 " "
-            STAR@220..221 "*"
-            WHITESPACE@221..222 " "
-            LITERAL@222..223
-              INT_NUMBER@222..223 "2"
+          PLPGSQL_EXPR@218..223
+            TARGET_LIST@218..223
+              TARGET@218..223
+                BIN_EXPR@218..223
+                  NAME_REF@218..219
+                    IDENT@218..219 "n"
+                  WHITESPACE@219..220 " "
+                  STAR@220..221 "*"
+                  WHITESPACE@221..222 " "
+                  LITERAL@222..223
+                    INT_NUMBER@222..223 "2"
         WHITESPACE@223..224 " "
         LOOP_KW@224..228 "loop"
         WHITESPACE@228..233 "\n    "
@@ -161,8 +182,11 @@ PLPGSQL@0..469
         WHITESPACE@268..269 " "
         EXECUTE_KW@269..276 "execute"
         WHITESPACE@276..277 " "
-        LITERAL@277..290
-          STRING@277..290 "'select 1, 2'"
+        PLPGSQL_EXPR@277..290
+          TARGET_LIST@277..290
+            TARGET@277..290
+              LITERAL@277..290
+                STRING@277..290 "'select 1, 2'"
         WHITESPACE@290..291 " "
         LOOP_KW@291..295 "loop"
         WHITESPACE@295..300 "\n    "
@@ -187,8 +211,11 @@ PLPGSQL@0..469
         WHITESPACE@328..329 " "
         EXECUTE_KW@329..336 "execute"
         WHITESPACE@336..337 " "
-        LITERAL@337..358
-          DOLLAR_QUOTED_STRING@337..358 "$q$ select 1 as x $q$"
+        PLPGSQL_EXPR@337..358
+          TARGET_LIST@337..358
+            TARGET@337..358
+              LITERAL@337..358
+                DOLLAR_QUOTED_STRING@337..358 "$q$ select 1 as x $q$"
         WHITESPACE@358..359 " "
         LOOP_KW@359..363 "loop"
         WHITESPACE@363..368 "\n    "
@@ -219,8 +246,11 @@ PLPGSQL@0..469
         WHITESPACE@406..407 " "
         EXECUTE_KW@407..414 "execute"
         WHITESPACE@414..415 " "
-        LITERAL@415..425
-          STRING@415..425 "'select 1'"
+        PLPGSQL_EXPR@415..425
+          TARGET_LIST@415..425
+            TARGET@415..425
+              LITERAL@415..425
+                STRING@415..425 "'select 1'"
         WHITESPACE@425..426 " "
         LOOP_KW@426..430 "loop"
         WHITESPACE@430..435 "\n    "

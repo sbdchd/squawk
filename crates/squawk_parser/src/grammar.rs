@@ -3555,6 +3555,27 @@ pub(crate) fn perform_select(p: &mut Parser<'_>) -> CompletedMarker {
     select_tail(p, m, &SelectRestrictions::default(), SELECT)
 }
 
+// PLpgSQL_Expr: opt_distinct_clause opt_target_list
+//     from_clause where_clause
+//     group_clause having_clause window_clause
+//     opt_sort_clause opt_select_limit opt_for_locking_clause
+pub(crate) fn plpgsql_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    let mut found = opt_select_all_or_distinct(p).is_some();
+    found |= opt_target_list(p).is_some();
+    found |= opt_from_clause(p).is_some();
+    found |= opt_where_clause(p).is_some();
+    found |= opt_group_by_clause(p).is_some();
+    found |= opt_having_clause(p).is_some();
+    found |= opt_window_clause(p).is_some();
+    found |= opt_select_trailing_clauses(p);
+    if !found {
+        m.abandon(p);
+        return None;
+    }
+    Some(m.complete(p, PLPGSQL_EXPR))
+}
+
 fn select_tail(
     p: &mut Parser,
     m: Marker,
@@ -6222,14 +6243,13 @@ fn opt_offset_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 /// all is the default, distinct removes duplicate rows
-fn opt_select_all_or_distinct(p: &mut Parser) {
+fn opt_select_all_or_distinct(p: &mut Parser) -> Option<CompletedMarker> {
     // TODO: we probably don't want to be so specific here, we can be more
     // generous with parsing and handle error reporting later on.
     if p.at(ALL_KW) {
         let m = p.start();
         p.bump(ALL_KW);
-        m.complete(p, ALL);
-        return;
+        return Some(m.complete(p, ALL));
     }
     // ```
     // select DISTINCT [ ON ( expression [, ...] ) ]
@@ -6265,9 +6285,10 @@ fn opt_select_all_or_distinct(p: &mut Parser) {
             paren_expr_list(p);
             m.complete(p, DISTINCT_ON);
         }
-        m.complete(p, DISTINCT_CLAUSE);
+        Some(m.complete(p, DISTINCT_CLAUSE))
     } else {
         m.abandon(p);
+        None
     }
 }
 
@@ -6473,10 +6494,10 @@ fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
                 break;
             }
             if !p.eat(COMMA) {
-                if p.at(FORMAT_KW) && p.nth_at(1, JSON_KW) {
+                if p.at_ts(TARGET_FOLLOW) {
                     break;
                 }
-                if p.at(RETURNING_KW) && p.nth_at(1, TEXT_KW) {
+                if p.at(FORMAT_KW) && p.nth_at(1, JSON_KW) {
                     break;
                 }
                 if p.at_ts(TARGET_FIRST) {

@@ -22,6 +22,8 @@ begin
       null;
     when x = 2, case when x = 3 then true end then
       null;
+    when case when x = 4 then true end, case when x = 5 then true end then
+      null;
   end case;
 end
 $$;

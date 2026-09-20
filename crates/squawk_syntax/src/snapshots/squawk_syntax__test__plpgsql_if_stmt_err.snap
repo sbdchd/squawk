@@ -2,27 +2,32 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_parser/tests/data/plpgsql/err/if_stmt.sql
 ---
-PLPGSQL@0..315
+PLPGSQL@0..248
   WHITESPACE@0..1 "\n"
-  PLPGSQL_BLOCK@1..314
+  PLPGSQL_BLOCK@1..247
     BEGIN_KW@1..6 "begin"
     WHITESPACE@6..9 "\n  "
-    PLPGSQL_BODY@9..310
+    PLPGSQL_BODY@9..243
       PLPGSQL_IF_STMT@9..37
         IF_KW@9..11 "if"
         WHITESPACE@11..12 " "
-        BIN_EXPR@12..17
-          LITERAL@12..13
-            INT_NUMBER@12..13 "1"
-          WHITESPACE@13..14 " "
-          EQ@14..15 "="
-          WHITESPACE@15..16 " "
-          LITERAL@16..17
-            INT_NUMBER@16..17 "1"
-        WHITESPACE@17..22 "\n    "
-        PLPGSQL_BODY@22..27
-          PLPGSQL_NULL_STMT@22..27
-            NULL_KW@22..26 "null"
+        PLPGSQL_EXPR@12..26
+          TARGET_LIST@12..26
+            TARGET@12..26
+              BIN_EXPR@12..17
+                LITERAL@12..13
+                  INT_NUMBER@12..13 "1"
+                WHITESPACE@13..14 " "
+                EQ@14..15 "="
+                WHITESPACE@15..16 " "
+                LITERAL@16..17
+                  INT_NUMBER@16..17 "1"
+              WHITESPACE@17..22 "\n    "
+              AS_NAME@22..26
+                COLUMN_NAME@22..26
+                  NULL_KW@22..26 "null"
+        PLPGSQL_BODY@26..27
+          ERROR@26..27
             SEMICOLON@26..27 ";"
         WHITESPACE@27..30 "\n  "
         END_KW@30..33 "end"
@@ -33,14 +38,17 @@ PLPGSQL@0..315
       PLPGSQL_IF_STMT@41..120
         IF_KW@41..43 "if"
         WHITESPACE@43..44 " "
-        BIN_EXPR@44..49
-          LITERAL@44..45
-            INT_NUMBER@44..45 "1"
-          WHITESPACE@45..46 " "
-          EQ@46..47 "="
-          WHITESPACE@47..48 " "
-          LITERAL@48..49
-            INT_NUMBER@48..49 "1"
+        PLPGSQL_EXPR@44..49
+          TARGET_LIST@44..49
+            TARGET@44..49
+              BIN_EXPR@44..49
+                LITERAL@44..45
+                  INT_NUMBER@44..45 "1"
+                WHITESPACE@45..46 " "
+                EQ@46..47 "="
+                WHITESPACE@47..48 " "
+                LITERAL@48..49
+                  INT_NUMBER@48..49 "1"
         WHITESPACE@49..50 " "
         THEN_KW@50..54 "then"
         WHITESPACE@54..59 "\n    "
@@ -78,90 +86,98 @@ PLPGSQL@0..315
         IF_KW@117..119 "if"
         SEMICOLON@119..120 ";"
       WHITESPACE@120..124 "\n\n  "
-      COMMENT@124..188 "-- `expr_until_then`  ..."
-      WHITESPACE@188..191 "\n  "
-      PLPGSQL_IF_STMT@191..301
-        IF_KW@191..193 "if"
-        WHITESPACE@193..194 " "
-        BIN_EXPR@194..223
-          CASE_EXPR@194..219
-            CASE_KW@194..198 "case"
-            WHITESPACE@198..199 " "
-            WHEN_CLAUSE_LIST@199..215
-              WHEN_CLAUSE@199..215
-                WHEN_KW@199..203 "when"
-                WHITESPACE@203..204 " "
-                LITERAL@204..208
-                  TRUE_KW@204..208 "true"
-                WHITESPACE@208..209 " "
-                THEN_KW@209..213 "then"
-                WHITESPACE@213..214 " "
-                LITERAL@214..215
-                  INT_NUMBER@214..215 "1"
-            WHITESPACE@215..216 " "
-            END_KW@216..219 "end"
-          WHITESPACE@219..220 " "
-          EQ@220..221 "="
-          WHITESPACE@221..222 " "
-          LITERAL@222..223
-            INT_NUMBER@222..223 "1"
-        WHITESPACE@223..224 " "
-        THEN_KW@224..228 "then"
-        WHITESPACE@228..233 "\n    "
-        PLPGSQL_BODY@233..238
-          PLPGSQL_NULL_STMT@233..238
-            NULL_KW@233..237 "null"
-            SEMICOLON@237..238 ";"
-        WHITESPACE@238..241 "\n  "
-        PLPGSQL_ELSIF_CLAUSE@241..291
-          ELSIF_KW@241..246 "elsif"
-          WHITESPACE@246..247 " "
-          BIN_EXPR@247..276
-            LITERAL@247..248
-              INT_NUMBER@247..248 "1"
-            WHITESPACE@248..249 " "
-            EQ@249..250 "="
-            WHITESPACE@250..251 " "
-            CASE_EXPR@251..276
-              CASE_KW@251..255 "case"
-              WHITESPACE@255..256 " "
-              WHEN_CLAUSE_LIST@256..272
-                WHEN_CLAUSE@256..272
-                  WHEN_KW@256..260 "when"
-                  WHITESPACE@260..261 " "
-                  LITERAL@261..265
-                    TRUE_KW@261..265 "true"
-                  WHITESPACE@265..266 " "
-                  THEN_KW@266..270 "then"
-                  WHITESPACE@270..271 " "
-                  LITERAL@271..272
-                    INT_NUMBER@271..272 "1"
-              WHITESPACE@272..273 " "
-              END_KW@273..276 "end"
-          WHITESPACE@276..277 " "
-          THEN_KW@277..281 "then"
-          WHITESPACE@281..286 "\n    "
-          PLPGSQL_BODY@286..291
-            PLPGSQL_NULL_STMT@286..291
-              NULL_KW@286..290 "null"
-              SEMICOLON@290..291 ";"
-        WHITESPACE@291..294 "\n  "
-        END_KW@294..297 "end"
-        WHITESPACE@297..298 " "
-        IF_KW@298..300 "if"
-        SEMICOLON@300..301 ";"
-      WHITESPACE@301..305 "\n\n  "
-      PLPGSQL_NULL_STMT@305..310
-        NULL_KW@305..309 "null"
-        SEMICOLON@309..310 ";"
-    WHITESPACE@310..311 "\n"
-    END_KW@311..314 "end"
-  WHITESPACE@314..315 "\n"
+      PLPGSQL_IF_STMT@124..234
+        IF_KW@124..126 "if"
+        WHITESPACE@126..127 " "
+        PLPGSQL_EXPR@127..156
+          TARGET_LIST@127..156
+            TARGET@127..156
+              BIN_EXPR@127..156
+                CASE_EXPR@127..152
+                  CASE_KW@127..131 "case"
+                  WHITESPACE@131..132 " "
+                  WHEN_CLAUSE_LIST@132..148
+                    WHEN_CLAUSE@132..148
+                      WHEN_KW@132..136 "when"
+                      WHITESPACE@136..137 " "
+                      LITERAL@137..141
+                        TRUE_KW@137..141 "true"
+                      WHITESPACE@141..142 " "
+                      THEN_KW@142..146 "then"
+                      WHITESPACE@146..147 " "
+                      LITERAL@147..148
+                        INT_NUMBER@147..148 "1"
+                  WHITESPACE@148..149 " "
+                  END_KW@149..152 "end"
+                WHITESPACE@152..153 " "
+                EQ@153..154 "="
+                WHITESPACE@154..155 " "
+                LITERAL@155..156
+                  INT_NUMBER@155..156 "1"
+        WHITESPACE@156..157 " "
+        THEN_KW@157..161 "then"
+        WHITESPACE@161..166 "\n    "
+        PLPGSQL_BODY@166..171
+          PLPGSQL_NULL_STMT@166..171
+            NULL_KW@166..170 "null"
+            SEMICOLON@170..171 ";"
+        WHITESPACE@171..174 "\n  "
+        PLPGSQL_ELSIF_CLAUSE@174..224
+          ELSIF_KW@174..179 "elsif"
+          WHITESPACE@179..180 " "
+          PLPGSQL_EXPR@180..209
+            TARGET_LIST@180..209
+              TARGET@180..209
+                BIN_EXPR@180..209
+                  LITERAL@180..181
+                    INT_NUMBER@180..181 "1"
+                  WHITESPACE@181..182 " "
+                  EQ@182..183 "="
+                  WHITESPACE@183..184 " "
+                  CASE_EXPR@184..209
+                    CASE_KW@184..188 "case"
+                    WHITESPACE@188..189 " "
+                    WHEN_CLAUSE_LIST@189..205
+                      WHEN_CLAUSE@189..205
+                        WHEN_KW@189..193 "when"
+                        WHITESPACE@193..194 " "
+                        LITERAL@194..198
+                          TRUE_KW@194..198 "true"
+                        WHITESPACE@198..199 " "
+                        THEN_KW@199..203 "then"
+                        WHITESPACE@203..204 " "
+                        LITERAL@204..205
+                          INT_NUMBER@204..205 "1"
+                    WHITESPACE@205..206 " "
+                    END_KW@206..209 "end"
+          WHITESPACE@209..210 " "
+          THEN_KW@210..214 "then"
+          WHITESPACE@214..219 "\n    "
+          PLPGSQL_BODY@219..224
+            PLPGSQL_NULL_STMT@219..224
+              NULL_KW@219..223 "null"
+              SEMICOLON@223..224 ";"
+        WHITESPACE@224..227 "\n  "
+        END_KW@227..230 "end"
+        WHITESPACE@230..231 " "
+        IF_KW@231..233 "if"
+        SEMICOLON@233..234 ";"
+      WHITESPACE@234..238 "\n\n  "
+      PLPGSQL_NULL_STMT@238..243
+        NULL_KW@238..242 "null"
+        SEMICOLON@242..243 ";"
+    WHITESPACE@243..244 "\n"
+    END_KW@244..247 "end"
+  WHITESPACE@247..248 "\n"
 
 error[syntax-error]: expected THEN_KW
   ╭▸ 
-3 │   if 1 = 1
-  ╰╴          ━
+4 │     null;
+  ╰╴        ━
+error[syntax-error]: expected a statement, got SEMICOLON
+  ╭▸ 
+4 │     null;
+  ╰╴        ━
 error[syntax-error]: expected command, found IDENT
    ╭▸ 
 11 │   elsif 1 = 2 then
@@ -172,9 +188,9 @@ error[syntax-error]: expected SEMICOLON, got INT_NUMBER
    ╰╴        ━
 error[syntax-error]: CASE expression must be parenthesized
    ╭▸ 
-16 │   if case when true then 1 end = 1 then
+15 │   if case when true then 1 end = 1 then
    ╰╴     ━━━━━━━━━━━━━━━━━━━━━━━━━
 error[syntax-error]: CASE expression must be parenthesized
    ╭▸ 
-18 │   elsif 1 = case when true then 1 end then
+17 │   elsif 1 = case when true then 1 end then
    ╰╴            ━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -64,10 +64,6 @@ PLPGSQL@0..66
     END_KW@62..65 "end"
   WHITESPACE@65..66 "\n"
 
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-3 │   x := ;
-  ╰╴      ━
 error[syntax-error]: expected an expression
   ╭▸ 
 3 │   x := ;
@@ -81,10 +77,6 @@ error[syntax-error]: expected R_BRACK
 4 │   a[1 := 2;
   ╰╴          ━
 error[syntax-error]: expected EQ
-  ╭▸ 
-4 │   a[1 := 2;
-  ╰╴          ━
-error[syntax-error]: expected an expression, found SEMICOLON
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴          ━

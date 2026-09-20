@@ -15,14 +15,17 @@ PLPGSQL@0..39
       PLPGSQL_ASSERT_STMT@19..34
         ASSERT_KW@19..25 "assert"
         WHITESPACE@25..26 " "
-        BIN_EXPR@26..31
-          LITERAL@26..27
-            INT_NUMBER@26..27 "1"
-          WHITESPACE@27..28 " "
-          EQ@28..29 "="
-          WHITESPACE@29..30 " "
-          LITERAL@30..31
-            INT_NUMBER@30..31 "1"
+        PLPGSQL_EXPR@26..31
+          TARGET_LIST@26..31
+            TARGET@26..31
+              BIN_EXPR@26..31
+                LITERAL@26..27
+                  INT_NUMBER@26..27 "1"
+                WHITESPACE@27..28 " "
+                EQ@28..29 "="
+                WHITESPACE@29..30 " "
+                LITERAL@30..31
+                  INT_NUMBER@30..31 "1"
         COMMA@31..32 ","
         WHITESPACE@32..33 " "
         SEMICOLON@33..34 ";"
@@ -30,18 +33,10 @@ PLPGSQL@0..39
     END_KW@35..38 "end"
   WHITESPACE@38..39 "\n"
 
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-3 │   assert;
-  ╰╴        ━
 error[syntax-error]: expected an expression
   ╭▸ 
 3 │   assert;
   ╰╴        ━
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-4 │   assert 1 = 1, ;
-  ╰╴               ━
 error[syntax-error]: expected an expression
   ╭▸ 
 4 │   assert 1 = 1, ;

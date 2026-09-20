@@ -38,8 +38,11 @@ PLPGSQL@0..201
         PLPGSQL_VAR_INIT@42..46
           COLON_EQ@42..44 ":="
           WHITESPACE@44..45 " "
-          LITERAL@45..46
-            INT_NUMBER@45..46 "2"
+          PLPGSQL_EXPR@45..46
+            TARGET_LIST@45..46
+              TARGET@45..46
+                LITERAL@45..46
+                  INT_NUMBER@45..46 "2"
         SEMICOLON@46..47 ";"
       WHITESPACE@47..50 "\n  "
       PLPGSQL_VAR_DECL@50..56

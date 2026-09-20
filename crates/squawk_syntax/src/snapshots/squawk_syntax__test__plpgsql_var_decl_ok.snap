@@ -32,8 +32,11 @@ PLPGSQL@0..159
         PLPGSQL_VAR_INIT@36..42
           COLON_EQ@36..38 ":="
           WHITESPACE@38..39 " "
-          LITERAL@39..42
-            STRING@39..42 "'x'"
+          PLPGSQL_EXPR@39..42
+            TARGET_LIST@39..42
+              TARGET@39..42
+                LITERAL@39..42
+                  STRING@39..42 "'x'"
         SEMICOLON@42..43 ";"
       WHITESPACE@43..46 "\n  "
       PLPGSQL_VAR_DECL@46..73
@@ -59,8 +62,11 @@ PLPGSQL@0..159
         PLPGSQL_VAR_INIT@63..72
           DEFAULT_KW@63..70 "default"
           WHITESPACE@70..71 " "
-          LITERAL@71..72
-            INT_NUMBER@71..72 "0"
+          PLPGSQL_EXPR@71..72
+            TARGET_LIST@71..72
+              TARGET@71..72
+                LITERAL@71..72
+                  INT_NUMBER@71..72 "0"
         SEMICOLON@72..73 ";"
       WHITESPACE@73..76 "\n  "
       PLPGSQL_VAR_DECL@76..110
@@ -88,8 +94,11 @@ PLPGSQL@0..159
         PLPGSQL_VAR_INIT@104..109
           EQ@104..105 "="
           WHITESPACE@105..106 " "
-          LITERAL@106..109
-            STRING@106..109 "'y'"
+          PLPGSQL_EXPR@106..109
+            TARGET_LIST@106..109
+              TARGET@106..109
+                LITERAL@106..109
+                  STRING@106..109 "'y'"
         SEMICOLON@109..110 ";"
       WHITESPACE@110..113 "\n  "
       PLPGSQL_VAR_DECL@113..140

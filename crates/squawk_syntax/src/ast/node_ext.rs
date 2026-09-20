@@ -864,29 +864,29 @@ impl ast::PlpgsqlDiagItem {
 
 impl ast::PlpgsqlAssertStmt {
     #[inline]
-    pub fn cond(&self) -> Option<ast::Expr> {
+    pub fn cond(&self) -> Option<ast::PlpgsqlExpr> {
         support::children(&self.syntax).next()
     }
 
     #[inline]
-    pub fn message(&self) -> Option<ast::Expr> {
+    pub fn message(&self) -> Option<ast::PlpgsqlExpr> {
         support::children(&self.syntax).nth(1)
     }
 }
 
 impl ast::PlpgsqlForRange {
     #[inline]
-    pub fn lower(&self) -> Option<ast::Expr> {
+    pub fn lower(&self) -> Option<ast::PlpgsqlExpr> {
         support::children(&self.syntax).next()
     }
 
     #[inline]
-    pub fn upper(&self) -> Option<ast::Expr> {
+    pub fn upper(&self) -> Option<ast::PlpgsqlExpr> {
         support::children(&self.syntax).nth(1)
     }
 
     #[inline]
-    pub fn step(&self) -> Option<ast::Expr> {
+    pub fn step(&self) -> Option<ast::PlpgsqlExpr> {
         support::children(&self.syntax).nth(2)
     }
 }

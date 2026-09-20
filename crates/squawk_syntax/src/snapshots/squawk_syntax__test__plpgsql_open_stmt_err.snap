@@ -105,10 +105,6 @@ error[syntax-error]: expected a query
   ╭▸ 
 7 │   open rc for;
   ╰╴             ━
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-8 │   open rc for execute;
-  ╰╴                     ━
 error[syntax-error]: expected an expression
   ╭▸ 
 8 │   open rc for execute;

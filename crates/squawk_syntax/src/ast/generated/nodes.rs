@@ -19578,7 +19578,7 @@ impl PlpgsqlCaseStmt {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn subject(&self) -> Option<Expr> {
+    pub fn subject(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19609,8 +19609,8 @@ impl PlpgsqlCaseWhen {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn conds(&self) -> AstChildren<Expr> {
-        support::children(&self.syntax)
+    pub fn cond(&self) -> Option<PlpgsqlExpr> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn then_token(&self) -> Option<SyntaxToken> {
@@ -20014,7 +20014,7 @@ impl PlpgsqlDynExecuteStmt {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn query(&self) -> Option<Expr> {
+    pub fn query(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20056,7 +20056,7 @@ impl PlpgsqlElsifClause {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn cond(&self) -> Option<Expr> {
+    pub fn cond(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20155,12 +20155,51 @@ pub struct PlpgsqlExitWhen {
 }
 impl PlpgsqlExitWhen {
     #[inline]
-    pub fn cond(&self) -> Option<Expr> {
+    pub fn cond(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn when_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PlpgsqlExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PlpgsqlExpr {
+    #[inline]
+    pub fn from_clause(&self) -> Option<FromClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn group_by_clause(&self) -> Option<GroupByClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn having_clause(&self) -> Option<HavingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn select_quantifier(&self) -> Option<SelectQuantifier> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn tail_clauses(&self) -> AstChildren<SelectTailClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn target_list(&self) -> Option<TargetList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn window_clause(&self) -> Option<WindowClause> {
+        support::child(&self.syntax)
     }
 }
 
@@ -20268,7 +20307,7 @@ impl PlpgsqlForDynStmt {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn query(&self) -> Option<Expr> {
+    pub fn query(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20326,7 +20365,7 @@ pub struct PlpgsqlForEachStmt {
 }
 impl PlpgsqlForEachStmt {
     #[inline]
-    pub fn array(&self) -> Option<Expr> {
+    pub fn array(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20540,7 +20579,7 @@ pub struct PlpgsqlIfStmt {
 }
 impl PlpgsqlIfStmt {
     #[inline]
-    pub fn cond(&self) -> Option<Expr> {
+    pub fn cond(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20765,7 +20804,7 @@ pub struct PlpgsqlOpenExecute {
 }
 impl PlpgsqlOpenExecute {
     #[inline]
-    pub fn query(&self) -> Option<Expr> {
+    pub fn query(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20941,7 +20980,7 @@ pub struct PlpgsqlRaiseOptionColumn {
 }
 impl PlpgsqlRaiseOptionColumn {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20964,7 +21003,7 @@ pub struct PlpgsqlRaiseOptionConstraint {
 }
 impl PlpgsqlRaiseOptionConstraint {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20987,7 +21026,7 @@ pub struct PlpgsqlRaiseOptionDatatype {
 }
 impl PlpgsqlRaiseOptionDatatype {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21010,7 +21049,7 @@ pub struct PlpgsqlRaiseOptionDetail {
 }
 impl PlpgsqlRaiseOptionDetail {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21033,7 +21072,7 @@ pub struct PlpgsqlRaiseOptionErrcode {
 }
 impl PlpgsqlRaiseOptionErrcode {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21056,7 +21095,7 @@ pub struct PlpgsqlRaiseOptionHint {
 }
 impl PlpgsqlRaiseOptionHint {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21079,7 +21118,7 @@ pub struct PlpgsqlRaiseOptionMessage {
 }
 impl PlpgsqlRaiseOptionMessage {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21102,7 +21141,7 @@ pub struct PlpgsqlRaiseOptionSchema {
 }
 impl PlpgsqlRaiseOptionSchema {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21125,7 +21164,7 @@ pub struct PlpgsqlRaiseOptionTable {
 }
 impl PlpgsqlRaiseOptionTable {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21160,7 +21199,7 @@ impl PlpgsqlRaiseStmt {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn params(&self) -> AstChildren<Expr> {
+    pub fn params(&self) -> AstChildren<PlpgsqlExpr> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -21198,7 +21237,7 @@ pub struct PlpgsqlReturnNextStmt {
 }
 impl PlpgsqlReturnNextStmt {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21221,7 +21260,7 @@ pub struct PlpgsqlReturnQueryExecuteStmt {
 }
 impl PlpgsqlReturnQueryExecuteStmt {
     #[inline]
-    pub fn query(&self) -> Option<Expr> {
+    pub fn query(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21275,7 +21314,7 @@ pub struct PlpgsqlReturnStmt {
 }
 impl PlpgsqlReturnStmt {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21313,7 +21352,7 @@ pub struct PlpgsqlUsingClause {
 }
 impl PlpgsqlUsingClause {
     #[inline]
-    pub fn exprs(&self) -> AstChildren<Expr> {
+    pub fn exprs(&self) -> AstChildren<PlpgsqlExpr> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -21363,7 +21402,7 @@ pub struct PlpgsqlVarInit {
 }
 impl PlpgsqlVarInit {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21420,7 +21459,7 @@ impl PlpgsqlWhileStmt {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn cond(&self) -> Option<Expr> {
+    pub fn cond(&self) -> Option<PlpgsqlExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -48807,6 +48846,24 @@ impl AstNode for PlpgsqlExitWhen {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PLPGSQL_EXIT_WHEN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PlpgsqlExpr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PLPGSQL_EXPR
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

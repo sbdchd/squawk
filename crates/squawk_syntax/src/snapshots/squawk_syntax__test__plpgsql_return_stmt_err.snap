@@ -12,11 +12,14 @@ PLPGSQL@0..121
         RETURN_KW@9..15 "return"
         WHITESPACE@15..16 " "
         NEXT_KW@16..20 "next"
-        ARRAY_EXPR@20..23
-          L_BRACK@20..21 "["
-          LITERAL@21..22
-            INT_NUMBER@21..22 "1"
-          R_BRACK@22..23 "]"
+        PLPGSQL_EXPR@20..23
+          TARGET_LIST@20..23
+            TARGET@20..23
+              ARRAY_EXPR@20..23
+                L_BRACK@20..21 "["
+                LITERAL@21..22
+                  INT_NUMBER@21..22 "1"
+                R_BRACK@22..23 "]"
         SEMICOLON@23..24 ";"
       WHITESPACE@24..27 "\n  "
       PLPGSQL_RETURN_QUERY_STMT@27..40
@@ -40,8 +43,11 @@ PLPGSQL@0..121
         WHITESPACE@79..80 " "
         EXECUTE_KW@80..87 "execute"
         WHITESPACE@87..88 " "
-        LITERAL@88..98
-          STRING@88..98 "'select 1'"
+        PLPGSQL_EXPR@88..98
+          TARGET_LIST@88..98
+            TARGET@88..98
+              LITERAL@88..98
+                STRING@88..98 "'select 1'"
         WHITESPACE@98..99 " "
         PLPGSQL_USING_CLAUSE@99..104
           USING_KW@99..104 "using"
@@ -50,8 +56,11 @@ PLPGSQL@0..121
       PLPGSQL_RETURN_STMT@108..116
         RETURN_KW@108..114 "return"
         WHITESPACE@114..115 " "
-        LITERAL@115..116
-          INT_NUMBER@115..116 "1"
+        PLPGSQL_EXPR@115..116
+          TARGET_LIST@115..116
+            TARGET@115..116
+              LITERAL@115..116
+                INT_NUMBER@115..116 "1"
     WHITESPACE@116..117 "\n"
     END_KW@117..120 "end"
   WHITESPACE@120..121 "\n"
@@ -64,18 +73,10 @@ error[syntax-error]: expected a query
   ╭▸ 
 4 │   return query;
   ╰╴              ━
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-5 │   return query execute;
-  ╰╴                      ━
 error[syntax-error]: expected an expression
   ╭▸ 
 5 │   return query execute;
   ╰╴                      ━
-error[syntax-error]: expected an expression, found SEMICOLON
-  ╭▸ 
-6 │   return query execute 'select 1' using;
-  ╰╴                                       ━
 error[syntax-error]: expected an expression
   ╭▸ 
 6 │   return query execute 'select 1' using;
