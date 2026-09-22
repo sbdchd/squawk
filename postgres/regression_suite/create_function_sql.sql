@@ -461,12 +461,12 @@ INSERT INTO pt VALUES (1);
 INSERT INTO pt VALUES (1);
 
 -- Things that shouldn't work:
-
-CREATE FUNCTION test1 (int) RETURNS int LANGUAGE SQL
-    AS 'SELECT ''not an integer'';';
-
-CREATE FUNCTION test1 (int) RETURNS int LANGUAGE SQL
-    AS 'not even SQL';
+-- 
+-- CREATE FUNCTION test1 (int) RETURNS int LANGUAGE SQL
+--     AS 'SELECT ''not an integer'';';
+-- 
+-- CREATE FUNCTION test1 (int) RETURNS int LANGUAGE SQL
+--     AS 'not even SQL';
 
 CREATE FUNCTION test1 (int) RETURNS int LANGUAGE SQL
     AS 'SELECT 1, 2, 3;';

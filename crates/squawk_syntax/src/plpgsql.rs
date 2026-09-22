@@ -1,111 +1,38 @@
-use rowan::{GreenNode, TextRange};
+use rowan::GreenNode;
 
 use crate::{
-    SyntaxNode, ast, ast::AstNode, decoded_text::DecodedText, parsing, syntax_error::SyntaxError,
-    validation,
+    ast,
+    body::{Body, BodyLanguage},
+    parsing,
+    syntax_error::SyntaxError,
 };
 
-pub struct Plpgsql {
-    green: GreenNode,
-    errors: Vec<SyntaxError>,
-    decoded: DecodedText,
-}
+pub type Plpgsql = Body<ast::Plpgsql>;
 
-impl Plpgsql {
-    pub(crate) fn parse(decoded: DecodedText) -> Self {
-        let (green, errors) = parsing::parse_plpgsql_text(decoded.text());
-        let errors = errors
-            .into_iter()
-            .map(|error| {
-                let range = decoded.source_range(error.range());
-                error.with_range(range)
-            })
-            .collect();
+impl BodyLanguage for ast::Plpgsql {
+    const LANGUAGE: &'static str = "plpgsql";
 
-        Self {
-            green,
-            errors,
-            decoded,
-        }
+    fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
+        parsing::parse_plpgsql_text(text)
     }
-
-    pub fn syntax(&self) -> SyntaxNode {
-        SyntaxNode::new_root(self.green.clone())
-    }
-
-    pub fn tree(&self) -> ast::Plpgsql {
-        ast::Plpgsql::cast(self.syntax()).expect("root is always a Plpgsql")
-    }
-
-    pub fn text(&self) -> &str {
-        self.decoded.text()
-    }
-
-    pub fn source_range(&self, range: TextRange) -> TextRange {
-        self.decoded.source_range(range)
-    }
-
-    pub fn errors(self) -> Vec<SyntaxError> {
-        let mut validation_errors = vec![];
-        validation::validate(&self.syntax(), &mut validation_errors);
-
-        let mut errors = self.errors;
-        errors.extend(validation_errors.into_iter().map(|error| {
-            let range = self.decoded.source_range(error.range());
-            error.with_range(range)
-        }));
-        errors.sort_by_key(|error| error.range().start());
-        errors
-    }
-}
-
-fn is_plpgsql(language_ref: Option<ast::LanguageRef>, literal: Option<ast::Literal>) -> bool {
-    let name = match (language_ref, literal) {
-        (Some(language_ref), _) => language_ref.syntax().text().to_string(),
-        (_, Some(literal)) => literal.string_value().unwrap_or_default(),
-        _ => return false,
-    };
-    name.eq_ignore_ascii_case("plpgsql")
-}
-
-fn from_options(options: ast::FuncOptionList) -> Option<Plpgsql> {
-    let mut plpgsql = false;
-    let mut body = None;
-
-    for option in options.options() {
-        match option {
-            ast::FuncOption::LanguageFuncOption(option) => {
-                plpgsql = is_plpgsql(option.language_ref(), option.literal());
-            }
-            ast::FuncOption::AsFuncOption(option) => {
-                if let Some(ast::AsFuncTarget::AsDefinition(definition)) = option.as_func_target() {
-                    body = definition.literal();
-                }
-            }
-            _ => (),
-        }
-    }
-
-    plpgsql.then_some(())?;
-    Some(Plpgsql::parse(body?.decoded_value()?))
 }
 
 impl ast::CreateFunction {
     pub fn plpgsql(&self) -> Option<Plpgsql> {
-        from_options(self.option_list()?)
+        Plpgsql::from_options(self.option_list()?)
     }
 }
 
 impl ast::CreateProcedure {
     pub fn plpgsql(&self) -> Option<Plpgsql> {
-        from_options(self.option_list()?)
+        Plpgsql::from_options(self.option_list()?)
     }
 }
 
 impl ast::Do {
     pub fn plpgsql(&self) -> Option<Plpgsql> {
         if let Some(language) = self.do_language()
-            && !is_plpgsql(language.language_ref(), language.literal())
+            && !ast::Plpgsql::is_language(language.language_name())
         {
             return None;
         }
@@ -117,6 +44,7 @@ impl ast::Do {
 mod tests {
     use super::*;
     use crate::SourceFile;
+    use crate::ast::AstNode;
     use crate::test::render_errors;
     use insta::assert_snapshot;
     use rowan::{TextRange, TextSize};
@@ -243,7 +171,7 @@ mod tests {
 
     #[test]
     fn do_with_other_language_is_not_a_body() {
-        assert!(find("do language sql $$ select 1 $$;").is_none());
+        assert!(find("do language plpython3u $$ return 1 $$;").is_none());
     }
 
     #[test]

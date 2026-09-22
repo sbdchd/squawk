@@ -1,0 +1,27 @@
+---
+source: crates/squawk_syntax/src/sql_body.rs
+expression: "body(\"create procedure p()\n  language sql\n  as $$ select 1; select 2 $$;\")"
+---
+SOURCE_FILE@0..20
+  WHITESPACE@0..1 " "
+  SELECT@1..10
+    SELECT_CLAUSE@1..9
+      SELECT_KW@1..7 "select"
+      WHITESPACE@7..8 " "
+      TARGET_LIST@8..9
+        TARGET@8..9
+          LITERAL@8..9
+            INT_NUMBER@8..9 "1"
+    SEMICOLON@9..10 ";"
+  WHITESPACE@10..11 " "
+  SELECT@11..19
+    SELECT_CLAUSE@11..19
+      SELECT_KW@11..17 "select"
+      WHITESPACE@17..18 " "
+      TARGET_LIST@18..19
+        TARGET@18..19
+          LITERAL@18..19
+            INT_NUMBER@18..19 "2"
+  WHITESPACE@19..20 " "
+---
+source 43..63 " select 1; select 2 "

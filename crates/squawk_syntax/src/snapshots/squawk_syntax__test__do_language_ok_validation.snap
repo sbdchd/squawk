@@ -1,0 +1,64 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/do_language_ok.sql
+---
+SOURCE_FILE@0..181
+  DO@0..25
+    DO_KW@0..2 "do"
+    WHITESPACE@2..3 " "
+    LITERAL@3..24
+      DOLLAR_QUOTED_STRING@3..24 "$$ begin null; end $$"
+    SEMICOLON@24..25 ";"
+  WHITESPACE@25..26 "\n"
+  DO@26..68
+    DO_KW@26..28 "do"
+    WHITESPACE@28..29 " "
+    DO_LANGUAGE@29..45
+      LANGUAGE_KW@29..37 "language"
+      WHITESPACE@37..38 " "
+      LANGUAGE_REF@38..45
+        IDENT@38..45 "plpgsql"
+    WHITESPACE@45..46 " "
+    LITERAL@46..67
+      DOLLAR_QUOTED_STRING@46..67 "$$ begin null; end $$"
+    SEMICOLON@67..68 ";"
+  WHITESPACE@68..69 "\n"
+  DO@69..112
+    DO_KW@69..71 "do"
+    WHITESPACE@71..72 " "
+    LITERAL@72..86
+      DOLLAR_QUOTED_STRING@72..86 "$$ anything $$"
+    WHITESPACE@86..87 " "
+    DO_LANGUAGE@87..111
+      LANGUAGE_KW@87..95 "language"
+      WHITESPACE@95..96 " "
+      LANGUAGE_REF@96..111
+        IDENT@96..111 "custom_language"
+    SEMICOLON@111..112 ";"
+  WHITESPACE@112..113 "\n"
+  DO@113..146
+    DO_KW@113..115 "do"
+    WHITESPACE@115..116 " "
+    DO_LANGUAGE@116..130
+      LANGUAGE_KW@116..124 "language"
+      WHITESPACE@124..125 " "
+      LANGUAGE_REF@125..130
+        IDENT@125..130 "\"SQL\""
+    WHITESPACE@130..131 " "
+    LITERAL@131..145
+      DOLLAR_QUOTED_STRING@131..145 "$$ anything $$"
+    SEMICOLON@145..146 ";"
+  WHITESPACE@146..147 "\n"
+  DO@147..180
+    DO_KW@147..149 "do"
+    WHITESPACE@149..150 " "
+    DO_LANGUAGE@150..164
+      LANGUAGE_KW@150..158 "language"
+      WHITESPACE@158..159 " "
+      LITERAL@159..164
+        STRING@159..164 "'SQL'"
+    WHITESPACE@164..165 " "
+    LITERAL@165..179
+      DOLLAR_QUOTED_STRING@165..179 "$$ anything $$"
+    SEMICOLON@179..180 ";"
+  WHITESPACE@180..181 "\n"

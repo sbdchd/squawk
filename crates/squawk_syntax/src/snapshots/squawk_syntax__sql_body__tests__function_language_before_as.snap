@@ -1,0 +1,23 @@
+---
+source: crates/squawk_syntax/src/sql_body.rs
+expression: "body(\"create function f(int) returns int\n  language sql\n  as $$ select $1 + 1 $$;\")"
+---
+SOURCE_FILE@0..15
+  WHITESPACE@0..1 " "
+  SELECT@1..14
+    SELECT_CLAUSE@1..14
+      SELECT_KW@1..7 "select"
+      WHITESPACE@7..8 " "
+      TARGET_LIST@8..14
+        TARGET@8..14
+          BIN_EXPR@8..14
+            LITERAL@8..10
+              POSITIONAL_PARAM@8..10 "$1"
+            WHITESPACE@10..11 " "
+            PLUS@11..12 "+"
+            WHITESPACE@12..13 " "
+            LITERAL@13..14
+              INT_NUMBER@13..14 "1"
+  WHITESPACE@14..15 " "
+---
+source 57..72 " select $1 + 1 "

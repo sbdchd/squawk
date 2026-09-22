@@ -10,7 +10,9 @@ use either::Either;
 
 use crate::ast::{AstNode, LitKind, PrefixOp};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
-use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
+use crate::{
+    SyntaxNode, SyntaxToken, ast, match_ast, sql_body::SqlBody, syntax_error::SyntaxError,
+};
 use rowan::{TextRange, TextSize, WalkEvent};
 use squawk_parser::{
     SyntaxKind::*, is_col_name_keyword, is_reserved_keyword, is_type_func_name_keyword,
@@ -1497,7 +1499,17 @@ fn validate_do(do_: ast::Do, acc: &mut Vec<SyntaxError>) {
     let mut seen_body = false;
     for part in do_.language_and_body() {
         let (seen, range) = match part {
-            Either::Left(language) => (&mut seen_language, language.syntax().text_range()),
+            Either::Left(language) => {
+                if let Some(language_name) = language.language_name()
+                    && language_name.name == SqlBody::LANGUAGE
+                {
+                    acc.push(SyntaxError::new(
+                        "SQL is not a valid language for DO statements.",
+                        language_name.range,
+                    ));
+                }
+                (&mut seen_language, language.syntax().text_range())
+            }
             Either::Right(body) => (&mut seen_body, body.syntax().text_range()),
         };
         if *seen {

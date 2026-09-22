@@ -292,7 +292,7 @@ mod test {
     #[test]
     fn single_param() {
         assert_snapshot!(check_inlay_hints("
-create function foo(a int) returns int as 'select $$1' language sql;
+create function foo(a int) returns int as 'select $1' language sql;
 select foo(1);
 "), @"
         labels:
@@ -303,7 +303,7 @@ select foo(1);
         targets:
           ╭▸ current.sql:2:21
           │
-        2 │ create function foo(a int) returns int as 'select $$1' language sql;
+        2 │ create function foo(a int) returns int as 'select $1' language sql;
           ╰╴                    ─ 1. target
         ");
     }
@@ -311,7 +311,7 @@ select foo(1);
     #[test]
     fn multiple_params() {
         assert_snapshot!(check_inlay_hints("
-create function add(a int, b int) returns int as 'select $$1 + $$2' language sql;
+create function add(a int, b int) returns int as 'select $1 + $2' language sql;
 select add(1, 2);
 "), @"
         labels:
@@ -324,7 +324,7 @@ select add(1, 2);
         targets:
           ╭▸ current.sql:2:21
           │
-        2 │ create function add(a int, b int) returns int as 'select $$1 + $$2' language sql;
+        2 │ create function add(a int, b int) returns int as 'select $1 + $2' language sql;
           │                     ┬      ─ 2. target
           │                     │
           ╰╴                    1. target
@@ -342,7 +342,7 @@ select foo();
     #[test]
     fn with_schema() {
         assert_snapshot!(check_inlay_hints("
-create function public.foo(x int) returns int as 'select $$1' language sql;
+create function public.foo(x int) returns int as 'select $1' language sql;
 select public.foo(42);
 "), @"
         labels:
@@ -353,7 +353,7 @@ select public.foo(42);
         targets:
           ╭▸ current.sql:2:28
           │
-        2 │ create function public.foo(x int) returns int as 'select $$1' language sql;
+        2 │ create function public.foo(x int) returns int as 'select $1' language sql;
           ╰╴                           ─ 1. target
         ");
     }
@@ -362,7 +362,7 @@ select public.foo(42);
     fn with_search_path() {
         assert_snapshot!(check_inlay_hints(r#"
 set search_path to myschema;
-create function foo(val int) returns int as 'select $$1' language sql;
+create function foo(val int) returns int as 'select $1' language sql;
 select foo(100);
 "#), @"
         labels:
@@ -373,7 +373,7 @@ select foo(100);
         targets:
           ╭▸ current.sql:3:21
           │
-        3 │ create function foo(val int) returns int as 'select $$1' language sql;
+        3 │ create function foo(val int) returns int as 'select $1' language sql;
           ╰╴                    ─── 1. target
         ");
     }
@@ -381,7 +381,7 @@ select foo(100);
     #[test]
     fn multiple_calls() {
         assert_snapshot!(check_inlay_hints("
-create function inc(n int) returns int as 'select $$1 + 1' language sql;
+create function inc(n int) returns int as 'select $1 + 1' language sql;
 select inc(1), inc(2);
 "), @"
         labels:
@@ -394,7 +394,7 @@ select inc(1), inc(2);
         targets:
           ╭▸ current.sql:2:21
           │
-        2 │ create function inc(n int) returns int as 'select $$1 + 1' language sql;
+        2 │ create function inc(n int) returns int as 'select $1 + 1' language sql;
           │                     ┬
           │                     │
           │                     1. target
@@ -405,7 +405,7 @@ select inc(1), inc(2);
     #[test]
     fn more_args_than_params() {
         assert_snapshot!(check_inlay_hints("
-create function foo(a int) returns int as 'select $$1' language sql;
+create function foo(a int) returns int as 'select $1' language sql;
 select foo(1, 2);
 "), @"
         labels:
@@ -416,7 +416,7 @@ select foo(1, 2);
         targets:
           ╭▸ current.sql:2:21
           │
-        2 │ create function foo(a int) returns int as 'select $$1' language sql;
+        2 │ create function foo(a int) returns int as 'select $1' language sql;
           ╰╴                    ─ 1. target
         ");
     }

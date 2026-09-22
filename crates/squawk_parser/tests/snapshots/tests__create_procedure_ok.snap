@@ -228,7 +228,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_DEFINITION
           LITERAL
-            STRING "'foo'"
+            STRING "'select 1'"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROCEDURE
@@ -263,7 +263,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_DEFINITION
           LITERAL
-            STRING "'foo'"
+            STRING "'select 1'"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROCEDURE
@@ -296,7 +296,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_DEFINITION
           LITERAL
-            STRING "'foo'"
+            STRING "'select 1'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- as_with_two_strings"

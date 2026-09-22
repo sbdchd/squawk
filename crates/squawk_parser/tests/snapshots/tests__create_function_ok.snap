@@ -2272,7 +2272,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_DEFINITION
           LITERAL
-            STRING "'0'"
+            STRING "'select 0'"
       WHITESPACE "\n"
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"

@@ -29,7 +29,7 @@ use std::borrow::Cow;
 use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
-use rowan::{GreenNodeData, GreenTokenData, NodeOrToken, TextSize};
+use rowan::{GreenNodeData, GreenTokenData, NodeOrToken, TextRange, TextSize};
 use squawk_line_index::{LineEnding, find_newline};
 
 #[cfg(test)]
@@ -995,6 +995,41 @@ pub fn is_quoted_name_node(node: &SyntaxNode) -> bool {
         (first, second),
         (Some('u' | 'U'), Some('"')) | (Some('"'), Some(_))
     )
+}
+
+pub struct LanguageName {
+    pub name: String,
+    pub range: TextRange,
+}
+
+fn language_name(
+    language_ref: Option<ast::LanguageRef>,
+    literal: Option<ast::Literal>,
+) -> Option<LanguageName> {
+    if let Some(language_ref) = language_ref {
+        return Some(LanguageName {
+            name: normalize_name_node(language_ref.syntax()),
+            range: language_ref.syntax().text_range(),
+        });
+    }
+
+    let literal = literal?;
+    Some(LanguageName {
+        name: literal.string_value()?,
+        range: literal.syntax().text_range(),
+    })
+}
+
+impl ast::LanguageFuncOption {
+    pub fn language_name(&self) -> Option<LanguageName> {
+        language_name(self.language_ref(), self.literal())
+    }
+}
+
+impl ast::DoLanguage {
+    pub fn language_name(&self) -> Option<LanguageName> {
+        language_name(self.language_ref(), self.literal())
+    }
 }
 
 // TODO: return a NewType wrapper around String?
