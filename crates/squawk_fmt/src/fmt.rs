@@ -12042,14 +12042,13 @@ fn build_op_sig<'a>(sig: ast::OpSig) -> Doc<'a> {
         doc = doc.append(comments_before(&l_paren));
     }
     let has_none = sig.none_token().is_some();
-    let lhs = if let Some(none) = sig.none_token() {
+    let mut body = if let Some(none) = sig.none_token() {
         leading_comments(&none).append(Doc::text("none"))
     } else if let Some(lhs) = sig.lhs() {
         leading_comments(lhs.syntax()).append(build_type(lhs))
     } else {
         Doc::nil()
     };
-    let mut body = lhs;
     if let Some(comma) = sig.comma_token() {
         body = body
             .append(comments_before(&comma))

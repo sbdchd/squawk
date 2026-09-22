@@ -17,9 +17,9 @@ set buzz from current
 return 10 + 1;
 
 -- security_variants
-create procedure p() language sql security invoker as 'foo';
-create procedure p() language sql external security definer as 'foo';
-create procedure p() language sql security definer as 'foo';
+create procedure p() language sql security invoker as 'select 1';
+create procedure p() language sql external security definer as 'select 1';
+create procedure p() language sql security definer as 'select 1';
 
 -- as_with_two_strings
 create procedure p() language c as 'foo', 'bar';

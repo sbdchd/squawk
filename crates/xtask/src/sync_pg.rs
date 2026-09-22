@@ -12,24 +12,49 @@ const KWLIST_PATH: &str = "postgres/kwlist.h";
 const PL_RESERVED_KWLIST_PATH: &str = "postgres/pl_reserved_kwlist.h";
 const PL_UNRESERVED_KWLIST_PATH: &str = "postgres/pl_unreserved_kwlist.h";
 
-const START_END_MARKERS: &[(&str, &str)] = &[
+const START_END_MARKERS: &[(&str, &str, &str)] = &[
     (
+        "merge.sql",
         "MERGE INTO target t RANDOMWORD",
         "\tUPDATE SET balance = 0;",
     ),
     (
+        "merge.sql",
         "-- incorrectly specifying INTO target",
         "\tINSERT INTO target DEFAULT VALUES;",
     ),
-    ("-- Multiple VALUES clause", "\tINSERT VALUES (1,1), (2,2);"),
-    ("-- SELECT query for INSERT", "\tINSERT SELECT (1, 1);"),
-    ("-- UPDATE tablename", "\tUPDATE target SET balance = 0;"),
     (
+        "merge.sql",
+        "-- Multiple VALUES clause",
+        "\tINSERT VALUES (1,1), (2,2);",
+    ),
+    (
+        "merge.sql",
+        "-- SELECT query for INSERT",
+        "\tINSERT SELECT (1, 1);",
+    ),
+    (
+        "merge.sql",
+        "-- UPDATE tablename",
+        "\tUPDATE target SET balance = 0;",
+    ),
+    (
+        "for_portion_of.sql",
         "-- TO is used for the bound but not the INTERVAL:",
         "  WHERE id = '[1,2)';",
     ),
-    ("-- => is disallowed as an operator name now", ");"),
+    (
+        "create_operator.sql",
+        "-- => is disallowed as an operator name now",
+        ");",
+    ),
 ];
+
+const AFTER_START_END_MARKERS: &[(&str, &str, &str)] = &[(
+    "create_function_sql.sql",
+    "-- Things that shouldn't work:",
+    "    AS 'not even SQL';",
+)];
 
 const IGNORED_LINES: &[&str] = &[
     r#"SELECT JSON_TABLE('[]', '$');"#,
@@ -321,7 +346,7 @@ fn preprocess_files(files: &[Utf8PathBuf], output_dir: &Utf8Path) -> Result<()> 
         let reader = std::io::BufReader::new(input_file);
         let mut processed_content = vec![];
 
-        if let Err(e) = preprocess_sql(reader, &mut processed_content) {
+        if let Err(e) = preprocess_sql(reader, &mut processed_content, filename) {
             eprintln!("Error: Failed to process file: {e}");
             continue;
         }
@@ -359,7 +384,11 @@ fn sync_plpgsql_suite(clone_dir: &Utf8Path) -> Result<()> {
 // The regression suite from postgres has a mix of valid and invalid sql. We
 // don't have a good way to determine what is what, so we munge the data to
 // comment out any problematic code.
-pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Result<()> {
+pub(crate) fn preprocess_sql<R: BufRead, W: Write>(
+    source: R,
+    mut dest: W,
+    filename: &str,
+) -> Result<()> {
     let template_vars_regex = Regex::new(r"^:'([^']+)'|^:([a-zA-Z_][a-zA-Z0-9_]*)").unwrap();
     let mut in_copy_stdin = false;
     let mut in_bogus_cases = false;
@@ -382,8 +411,8 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
             in_copy_select_input = false;
         }
 
-        for &(start, end) in START_END_MARKERS {
-            if line.contains(start) {
+        for &(marker_filename, start, end) in START_END_MARKERS {
+            if filename == marker_filename && line.contains(start) {
                 looking_for_end = Some(end);
             }
         }
@@ -392,6 +421,12 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
             should_comment = true;
             if line.contains(end) {
                 looking_for_end = None;
+            }
+        }
+
+        for &(marker_filename, start, end) in AFTER_START_END_MARKERS {
+            if filename == marker_filename && line.contains(start) {
+                looking_for_end = Some(end);
             }
         }
 
@@ -553,7 +588,7 @@ mod tests {
         let input = sql.as_bytes();
         let mut output = Vec::new();
         let cursor = Cursor::new(input);
-        preprocess_sql(cursor, &mut output)?;
+        preprocess_sql(cursor, &mut output, "")?;
         String::from_utf8(output).map_err(Into::into)
     }
 

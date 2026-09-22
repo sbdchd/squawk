@@ -1,0 +1,19 @@
+---
+source: crates/squawk_syntax/src/sql_body.rs
+expression: "body(\"create function f() returns int\n  language sql\n  as $$ select from $$;\")"
+---
+SOURCE_FILE@0..13
+  WHITESPACE@0..1 " "
+  SELECT@1..12
+    SELECT_CLAUSE@1..7
+      SELECT_KW@1..7 "select"
+    WHITESPACE@7..8 " "
+    FROM_CLAUSE@8..12
+      FROM_KW@8..12 "from"
+  WHITESPACE@12..13 " "
+---
+source 54..67 " select from "
+error[syntax-error]: expected from item, got EOF
+  ╭▸ 
+3 │   as $$ select from $$;
+  ╰╴                   ━

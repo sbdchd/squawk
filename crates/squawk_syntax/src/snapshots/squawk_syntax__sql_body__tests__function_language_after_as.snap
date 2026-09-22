@@ -1,0 +1,15 @@
+---
+source: crates/squawk_syntax/src/sql_body.rs
+expression: "body(\"create function f(int) returns int\n  as 'select $1'\n  language sql;\")"
+---
+SOURCE_FILE@0..9
+  SELECT@0..9
+    SELECT_CLAUSE@0..9
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..9
+        TARGET@7..9
+          LITERAL@7..9
+            POSITIONAL_PARAM@7..9 "$1"
+---
+source 41..50 "select $1"

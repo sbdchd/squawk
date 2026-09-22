@@ -3470,11 +3470,10 @@ fn compound_select_operand(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 fn compound_select_bp(
     p: &mut Parser<'_>,
-    lhs: CompletedMarker,
+    mut lhs: CompletedMarker,
     min_bp: u8,
     r: &SelectRestrictions,
 ) -> CompletedMarker {
-    let mut lhs = lhs;
     while let Some(bp) = compound_op_bp(p) {
         if bp < min_bp {
             break;
@@ -3580,9 +3579,8 @@ fn select_tail(
     p: &mut Parser,
     m: Marker,
     r: &SelectRestrictions,
-    out_kind: SyntaxKind,
+    mut out_kind: SyntaxKind,
 ) -> CompletedMarker {
-    let mut out_kind = out_kind;
     if opt_into_clause(p).is_some() {
         out_kind = SELECT_INTO;
     }
@@ -4694,7 +4692,7 @@ enum ColumnDefKind {
 // select * from f() as t(a int, b text, c text collate foo.bar.buzz);
 //                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // [ ( column_name [, ... ] ) ]
-fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
+fn opt_column_list_with(p: &mut Parser<'_>, mut kind: ColumnDefKind) -> bool {
     if !p.at(L_PAREN) ||
         // we're probably at (select)
         !p.nth_at_ts(1, COLUMN_FIRST) && !p.nth_at(1, R_PAREN) && !p.nth_at(1, COMMA)
@@ -4717,7 +4715,6 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     if matches!(items, ListItems::Required) && p.at(R_PAREN) {
         p.error("Expected at least one item");
     }
-    let mut kind = kind;
     let mut seen_period = false;
     while !p.at(EOF) && !p.at(R_PAREN) {
         if p.at(COMMA) {

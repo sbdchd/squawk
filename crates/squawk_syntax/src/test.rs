@@ -78,9 +78,7 @@ fn regression_suite_validation(fixture: Fixture<&str>) {
     }
 
     let parse = SourceFile::parse(content);
-    let errors = parse.errors();
-
-    let mut errors = errors;
+    let mut errors = parse.errors();
 
     if test_name == "errors" {
         assert!(

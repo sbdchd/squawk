@@ -25,6 +25,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 pub mod ast;
+pub mod body;
 pub mod column_name;
 pub mod decoded_text;
 mod generated;
@@ -32,6 +33,7 @@ mod parsing;
 pub mod plpgsql;
 mod ptr;
 pub mod quote;
+pub mod sql_body;
 pub mod syntax_error;
 mod syntax_node;
 mod token_text;
@@ -98,6 +100,8 @@ impl<T> Parse<T> {
             vec![]
         };
         validation::validate(&self.syntax_node(), &mut errors);
+        let file = SourceFile::cast(self.syntax_node()).expect("parse root is always a SourceFile");
+        errors.extend(file.sql_body_errors());
         errors.sort_by_key(|error| error.range().start());
         errors
     }

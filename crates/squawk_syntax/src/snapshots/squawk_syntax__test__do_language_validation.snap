@@ -1,0 +1,74 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/do_language.sql
+---
+SOURCE_FILE@0..132
+  DO@0..31
+    DO_KW@0..2 "do"
+    WHITESPACE@2..3 " "
+    LITERAL@3..17
+      DOLLAR_QUOTED_STRING@3..17 "$$ select 1 $$"
+    WHITESPACE@17..18 " "
+    DO_LANGUAGE@18..30
+      LANGUAGE_KW@18..26 "language"
+      WHITESPACE@26..27 " "
+      LANGUAGE_REF@27..30
+        SQL_KW@27..30 "sql"
+    SEMICOLON@30..31 ";"
+  WHITESPACE@31..32 "\n"
+  DO@32..63
+    DO_KW@32..34 "do"
+    WHITESPACE@34..35 " "
+    DO_LANGUAGE@35..47
+      LANGUAGE_KW@35..43 "language"
+      WHITESPACE@43..44 " "
+      LANGUAGE_REF@44..47
+        SQL_KW@44..47 "SQL"
+    WHITESPACE@47..48 " "
+    LITERAL@48..62
+      DOLLAR_QUOTED_STRING@48..62 "$$ select 1 $$"
+    SEMICOLON@62..63 ";"
+  WHITESPACE@63..64 "\n"
+  DO@64..97
+    DO_KW@64..66 "do"
+    WHITESPACE@66..67 " "
+    DO_LANGUAGE@67..81
+      LANGUAGE_KW@67..75 "language"
+      WHITESPACE@75..76 " "
+      LANGUAGE_REF@76..81
+        IDENT@76..81 "\"sql\""
+    WHITESPACE@81..82 " "
+    LITERAL@82..96
+      DOLLAR_QUOTED_STRING@82..96 "$$ select 1 $$"
+    SEMICOLON@96..97 ";"
+  WHITESPACE@97..98 "\n"
+  DO@98..131
+    DO_KW@98..100 "do"
+    WHITESPACE@100..101 " "
+    DO_LANGUAGE@101..115
+      LANGUAGE_KW@101..109 "language"
+      WHITESPACE@109..110 " "
+      LITERAL@110..115
+        STRING@110..115 "'sql'"
+    WHITESPACE@115..116 " "
+    LITERAL@116..130
+      DOLLAR_QUOTED_STRING@116..130 "$$ select 1 $$"
+    SEMICOLON@130..131 ";"
+  WHITESPACE@131..132 "\n"
+
+error[syntax-error]: SQL is not a valid language for DO statements.
+  ╭▸ 
+1 │ do $$ select 1 $$ language sql;
+  ╰╴                           ━━━
+error[syntax-error]: SQL is not a valid language for DO statements.
+  ╭▸ 
+2 │ do language SQL $$ select 1 $$;
+  ╰╴            ━━━
+error[syntax-error]: SQL is not a valid language for DO statements.
+  ╭▸ 
+3 │ do language "sql" $$ select 1 $$;
+  ╰╴            ━━━━━
+error[syntax-error]: SQL is not a valid language for DO statements.
+  ╭▸ 
+4 │ do language 'sql' $$ select 1 $$;
+  ╰╴            ━━━━━

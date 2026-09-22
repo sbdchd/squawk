@@ -474,6 +474,10 @@ error[syntax-error]: Conflicting or redundant options.
   ╭▸ 
 2 │ do language plpgsql $$ x $$ language sql;
   ╰╴                            ━━━━━━━━━━━━
+error[syntax-error]: SQL is not a valid language for DO statements.
+  ╭▸ 
+2 │ do language plpgsql $$ x $$ language sql;
+  ╰╴                                     ━━━
 error[syntax-error]: Conflicting or redundant options.
   ╭▸ 
 7 │   language sql

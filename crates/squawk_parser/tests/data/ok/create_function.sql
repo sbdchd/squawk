@@ -307,7 +307,7 @@ language sql;
 
 create function f(bitmask bit(8))
 returns boolean
-as '0'
+as 'select 0'
 language sql;
 
 -- argmode
