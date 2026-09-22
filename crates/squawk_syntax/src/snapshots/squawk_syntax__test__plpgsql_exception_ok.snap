@@ -37,7 +37,7 @@ PLPGSQL@0..117
         OR_KW@78..80 "or"
         WHITESPACE@80..81 " "
         PLPGSQL_CONDITION@81..97
-          IDENT@81..89 "sqlstate"
+          SQLSTATE_KW@81..89 "sqlstate"
           WHITESPACE@89..90 " "
           STRING@90..97 "'22012'"
         WHITESPACE@97..98 " "

@@ -33,11 +33,11 @@ fn comp_option(p: &mut Parser) {
         p.bump(OPTION_KW);
         expect_contextual_kw(p, DUMP_KW);
         PLPGSQL_COMP_OPTION_DUMP
-    } else if p.nth_at_contextual_kw(0, VARIABLE_CONFLICT_KW) {
+    } else if p.at_contextual_kw(VARIABLE_CONFLICT_KW) {
         p.bump_remap(VARIABLE_CONFLICT_KW);
         variable_conflict_value(p);
         PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT
-    } else if p.nth_at_contextual_kw(0, PRINT_STRICT_PARAMS_KW) {
+    } else if p.at_contextual_kw(PRINT_STRICT_PARAMS_KW) {
         p.bump_remap(PRINT_STRICT_PARAMS_KW);
         option_value(p);
         PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS
@@ -59,7 +59,7 @@ fn variable_conflict_value(p: &mut Parser) {
 }
 
 fn option_value(p: &mut Parser) {
-    if !at_name(p, 0) {
+    if !at_name(p) {
         p.error(format!("expected an option value, got {:?}", p.current()));
         return;
     }
@@ -97,7 +97,7 @@ fn opt_label(p: &mut Parser) {
 }
 
 fn opt_label_name_ref(p: &mut Parser) {
-    if !at_name(p, 0) {
+    if !at_name(p) {
         return;
     }
     name(p, PLPGSQL_LABEL_NAME_REF);
@@ -132,7 +132,7 @@ fn opt_declare_section(p: &mut Parser) {
 fn var_decl(p: &mut Parser) {
     let m = p.start();
     name(p, PLPGSQL_VAR_NAME);
-    if p.nth_at_contextual_kw(0, CONSTANT_KW) {
+    if p.at_contextual_kw(CONSTANT_KW) {
         p.bump_remap(CONSTANT_KW);
     }
     decl_datatype(p);
@@ -201,7 +201,7 @@ fn cursor_arg_list(p: &mut Parser) {
 
 fn cursor_arg(p: &mut Parser) {
     let m = p.start();
-    if at_name(p, 0) {
+    if at_name(p) {
         name(p, PLPGSQL_VAR_NAME);
         decl_datatype(p);
     } else {
@@ -264,7 +264,7 @@ fn at_percent_datatype(p: &Parser) -> bool {
 
 fn at_path(p: &Parser) -> Option<usize> {
     let mut n = 0;
-    while !p.nth_at(n, EOF) && at_name(p, n) {
+    while !p.nth_at(n, EOF) && nth_at_name(p, n) {
         let unicode_ident = p.nth_at(n, IDENT);
         n += 1;
         if unicode_ident && p.nth_at(n, UESCAPE_KW) && p.nth_at(n + 1, STRING) {
@@ -393,13 +393,13 @@ fn stmt(p: &mut Parser) {
         call_stmt(p);
     } else if p.at(DO_KW) {
         do_stmt(p);
-    } else if p.nth_at_contextual_kw(0, PERFORM_KW) {
+    } else if p.at_contextual_kw(PERFORM_KW) {
         perform_stmt(p);
     } else if p.at(RETURN_KW) {
         return_stmt(p);
-    } else if p.nth_at_contextual_kw(0, ASSERT_KW) {
+    } else if p.at_contextual_kw(ASSERT_KW) {
         assert_stmt(p);
-    } else if p.nth_at_contextual_kw(0, RAISE_KW) {
+    } else if p.at_contextual_kw(RAISE_KW) {
         raise_stmt(p);
     } else if at_stmt_kw(p, GET_KW) {
         get_diag_stmt(p);
@@ -482,7 +482,7 @@ fn do_stmt(p: &mut Parser) {
 }
 
 fn perform_stmt(p: &mut Parser) {
-    assert!(p.nth_at_contextual_kw(0, PERFORM_KW));
+    assert!(p.at_contextual_kw(PERFORM_KW));
     let m = p.start();
     match grammar::perform_select(p).kind() {
         SELECT | SELECT_INTO | COMPOUND_SELECT => (),
@@ -505,13 +505,13 @@ fn return_stmt(p: &mut Parser) {
             expr_until_semi(p);
         }
         PLPGSQL_RETURN_NEXT_STMT
-    } else if p.nth_at_contextual_kw(0, QUERY_KW) && !composite && p.nth_at(1, EXECUTE_KW) {
+    } else if p.at_contextual_kw(QUERY_KW) && !composite && p.nth_at(1, EXECUTE_KW) {
         p.bump_remap(QUERY_KW);
         p.bump(EXECUTE_KW);
         expr_until_using(p);
         opt_using_clause(p, comma_expr);
         PLPGSQL_RETURN_QUERY_EXECUTE_STMT
-    } else if p.nth_at_contextual_kw(0, QUERY_KW) && !composite {
+    } else if p.at_contextual_kw(QUERY_KW) && !composite {
         p.bump_remap(QUERY_KW);
         if grammar::stmt(p, &grammar::StmtRestrictions::default()).is_none() {
             p.error("expected a query");
@@ -528,7 +528,7 @@ fn return_stmt(p: &mut Parser) {
 }
 
 fn assert_stmt(p: &mut Parser) {
-    assert!(p.nth_at_contextual_kw(0, ASSERT_KW));
+    assert!(p.at_contextual_kw(ASSERT_KW));
     let m = p.start();
     p.bump_remap(ASSERT_KW);
     comma_expr(p);
@@ -574,7 +574,7 @@ const RAISE_OPTIONS: [(SyntaxKind, SyntaxKind); 9] = [
 ];
 
 fn raise_stmt(p: &mut Parser) {
-    assert!(p.nth_at_contextual_kw(0, RAISE_KW));
+    assert!(p.at_contextual_kw(RAISE_KW));
     let m = p.start();
     p.bump_remap(RAISE_KW);
     if !p.at(SEMICOLON) {
@@ -689,7 +689,7 @@ fn get_diag_stmt(p: &mut Parser) {
 }
 
 fn opt_diag_area(p: &mut Parser) {
-    if !p.at(CURRENT_KW) && !p.nth_at_contextual_kw(0, STACKED_KW) {
+    if !p.at(CURRENT_KW) && !p.at_contextual_kw(STACKED_KW) {
         return;
     }
     let m = p.start();
@@ -710,7 +710,7 @@ fn diag_item_list(p: &mut Parser) {
 
 fn diag_item(p: &mut Parser) {
     let m = p.start();
-    if at_name(p, 0) {
+    if at_name(p) {
         scalar_target(p, PLPGSQL_DIAG_TARGET);
         if !p.eat(COLON_EQ) {
             p.expect(EQ);
@@ -726,7 +726,7 @@ fn diag_item(p: &mut Parser) {
 }
 
 fn scalar_target(p: &mut Parser, kind: SyntaxKind) {
-    assert!(at_name(p, 0));
+    assert!(at_name(p));
     let m = p.start();
     name(p, PLPGSQL_VAR_NAME_REF);
     while !p.at(EOF) && p.at(DOT) {
@@ -745,12 +745,12 @@ fn diag_kind(p: &mut Parser) {
     let m = p.start();
     match DIAG_ITEM_KINDS
         .into_iter()
-        .find(|&kw| p.nth_at_contextual_kw(0, kw))
+        .find(|&kw| p.at_contextual_kw(kw))
     {
         Some(kw) => p.bump_remap(kw),
         None => {
             p.error("unrecognized GET DIAGNOSTICS item");
-            if at_name(p, 0) {
+            if at_name(p) {
                 p.bump_any();
             }
         }
@@ -859,7 +859,7 @@ fn into_target_list(p: &mut Parser) {
 }
 
 fn into_target(p: &mut Parser) {
-    if !at_name(p, 0) {
+    if !at_name(p) {
         p.error(format!("expected an INTO target, got {:?}", p.current()));
         return;
     }
@@ -876,7 +876,7 @@ fn close_stmt(p: &mut Parser) {
 }
 
 fn cursor_variable_ref(p: &mut Parser) {
-    if !at_name(p, 0) {
+    if !at_name(p) {
         p.error(format!("expected a cursor variable, got {:?}", p.current()));
         return;
     }
@@ -957,13 +957,13 @@ fn loop_stmt(p: &mut Parser) {
     assert!(at_loop_start(p));
     let m = p.start();
     opt_label(p);
-    let kind = if p.nth_at_contextual_kw(0, WHILE_KW) {
+    let kind = if p.at_contextual_kw(WHILE_KW) {
         p.bump_remap(WHILE_KW);
         expr_until_loop(p, TokenSet::EMPTY);
         PLPGSQL_WHILE_STMT
     } else if p.at(FOR_KW) {
         for_head(p)
-    } else if p.nth_at_contextual_kw(0, FOREACH_KW) {
+    } else if p.at_contextual_kw(FOREACH_KW) {
         foreach_head(p)
     } else {
         PLPGSQL_LOOP_STMT
@@ -1010,7 +1010,7 @@ fn for_head(p: &mut Parser) -> SyntaxKind {
 }
 
 fn foreach_head(p: &mut Parser) -> SyntaxKind {
-    assert!(p.nth_at_contextual_kw(0, FOREACH_KW));
+    assert!(p.at_contextual_kw(FOREACH_KW));
     p.bump_remap(FOREACH_KW);
     for_variable_list(p);
     opt_foreach_slice(p);
@@ -1021,7 +1021,7 @@ fn foreach_head(p: &mut Parser) -> SyntaxKind {
 }
 
 fn opt_foreach_slice(p: &mut Parser) {
-    if !p.nth_at_contextual_kw(0, SLICE_KW) {
+    if !p.at_contextual_kw(SLICE_KW) {
         return;
     }
     let m = p.start();
@@ -1059,7 +1059,7 @@ fn for_variable_list(p: &mut Parser) {
 }
 
 fn for_variable(p: &mut Parser) {
-    if !at_name(p, 0) {
+    if !at_name(p) {
         p.error(format!("expected a loop variable, got {:?}", p.current()));
         return;
     }
@@ -1115,7 +1115,7 @@ fn opt_exit_when(p: &mut Parser) {
 }
 
 fn expect_contextual_kw(p: &mut Parser, kw: SyntaxKind) {
-    if p.nth_at_contextual_kw(0, kw) {
+    if p.at_contextual_kw(kw) {
         p.bump_remap(kw);
     } else {
         p.error(format!("expected {kw:?}"));
@@ -1127,7 +1127,7 @@ fn opt_elsif_clause(p: &mut Parser) -> bool {
         return false;
     }
     let m = p.start();
-    if p.nth_at_contextual_kw(0, ELSEIF_KW) {
+    if p.at_contextual_kw(ELSEIF_KW) {
         p.bump_remap(ELSEIF_KW);
     } else {
         p.bump_remap(ELSIF_KW);
@@ -1174,7 +1174,7 @@ fn skip_to_stmt_end(p: &mut Parser) {
 }
 
 fn opt_exception_section(p: &mut Parser) {
-    if !p.nth_at_contextual_kw(0, EXCEPTION_KW) {
+    if !p.at_contextual_kw(EXCEPTION_KW) {
         return;
     }
     let m = p.start();
@@ -1201,12 +1201,11 @@ fn exception_handler(p: &mut Parser) {
 
 fn condition(p: &mut Parser) {
     let m = p.start();
-    if at_name(p, 0) {
-        let sqlstate = p.nth_at_contextual_kw(0, SQLSTATE_KW);
+    if p.at_contextual_kw(SQLSTATE_KW) {
+        p.bump_remap(SQLSTATE_KW);
+        p.expect(STRING);
+    } else if at_name(p) {
         p.bump_any();
-        if sqlstate {
-            p.expect(STRING);
-        }
     } else {
         p.error(format!("expected a condition name, got {:?}", p.current()));
     }
@@ -1214,15 +1213,15 @@ fn condition(p: &mut Parser) {
 }
 
 fn at_alias_decl(p: &Parser) -> bool {
-    at_name(p, 0) && p.nth_at_contextual_kw(1, ALIAS_KW)
+    at_name(p) && p.nth_at_contextual_kw(1, ALIAS_KW)
 }
 
 fn at_cursor_decl(p: &Parser) -> bool {
-    at_name(p, 0) && (p.nth_at(1, CURSOR_KW) || p.nth_at(1, SCROLL_KW) || p.nth_at(1, NO_KW))
+    at_name(p) && (p.nth_at(1, CURSOR_KW) || p.nth_at(1, SCROLL_KW) || p.nth_at(1, NO_KW))
 }
 
 fn at_var_decl(p: &Parser) -> bool {
-    at_name(p, 0)
+    at_name(p)
 }
 
 fn at_block_start(p: &Parser) -> bool {
@@ -1234,7 +1233,7 @@ fn at_block_label(p: &Parser) -> bool {
 }
 
 fn at_label(p: &Parser) -> bool {
-    p.at(LESS_LESS) && at_name(p, 2) && p.nth_at(3, GREATER_GREATER)
+    p.at(LESS_LESS) && nth_at_name(p, 2) && p.nth_at(3, GREATER_GREATER)
 }
 
 fn at_loop_start(p: &Parser) -> bool {
@@ -1251,7 +1250,7 @@ fn at_loop_kw(p: &Parser, n: usize) -> bool {
 const NOT_A_CURSOR_NAME: TokenSet = TokenSet::new(&[SELECT_KW, VALUES_KW]);
 
 fn at_for_cursor(p: &Parser, n: usize) -> bool {
-    if !at_name(p, n) || p.nth_at_ts(n, NOT_A_CURSOR_NAME) {
+    if !nth_at_name(p, n) || p.nth_at_ts(n, NOT_A_CURSOR_NAME) {
         return false;
     }
     let Some(n) = cursor_args_end(p, n + 1) else {
@@ -1314,7 +1313,7 @@ fn top_level_terminator(
 }
 
 fn at_exec_sql_stmt(p: &Parser) -> bool {
-    if !at_name(p, 0) || at_assign_op(p) {
+    if !at_name(p) || at_assign_op(p) {
         return false;
     }
     if p.at(IMPORT_KW) {
@@ -1365,7 +1364,7 @@ fn at_assign_op(p: &Parser) -> bool {
 }
 
 fn at_assign_target(p: &Parser) -> bool {
-    at_name(p, 0) && (p.at_ts(grammar::NAME_FIRST) || p.at(POSITIONAL_PARAM))
+    at_name(p) && (p.at_ts(grammar::NAME_FIRST) || p.at(POSITIONAL_PARAM))
 }
 
 fn at_stmt_kw(p: &Parser, kw: SyntaxKind) -> bool {
@@ -1377,10 +1376,14 @@ fn at_transaction_stmt(p: &Parser) -> bool {
 }
 
 fn at_exit_stmt(p: &Parser) -> bool {
-    p.at(CONTINUE_KW) || p.nth_at_contextual_kw(0, EXIT_KW)
+    p.at(CONTINUE_KW) || p.at_contextual_kw(EXIT_KW)
 }
 
-fn at_name(p: &Parser, n: usize) -> bool {
+fn at_name(p: &Parser) -> bool {
+    nth_at_name(p, 0)
+}
+
+fn nth_at_name(p: &Parser, n: usize) -> bool {
     if p.nth_at(n, IDENT) {
         return !p.nth_at_contextual_ts(n, PLPGSQL_RESERVED_CONTEXTUAL_KEYWORDS);
     }
@@ -1403,7 +1406,7 @@ fn bump_maybe_contextual_kw(p: &mut Parser, kw: SyntaxKind) {
 }
 
 fn at_elsif(p: &Parser) -> bool {
-    p.nth_at_contextual_kw(0, ELSIF_KW) || p.nth_at_contextual_kw(0, ELSEIF_KW)
+    p.at_contextual_kw(ELSIF_KW) || p.at_contextual_kw(ELSEIF_KW)
 }
 
 fn at_body_end(p: &Parser, kind: BodyKind) -> bool {
@@ -1411,8 +1414,8 @@ fn at_body_end(p: &Parser, kind: BodyKind) -> bool {
         return true;
     }
     match kind {
-        BodyKind::Block => p.nth_at_contextual_kw(0, EXCEPTION_KW),
-        BodyKind::ExceptionHandler => p.nth_at_contextual_kw(0, EXCEPTION_KW) || p.at(WHEN_KW),
+        BodyKind::Block => p.at_contextual_kw(EXCEPTION_KW),
+        BodyKind::ExceptionHandler => p.at_contextual_kw(EXCEPTION_KW) || p.at(WHEN_KW),
         BodyKind::IfThen => at_end_if(p) || p.at(ELSE_KW) || at_elsif(p),
         BodyKind::IfElse => at_end_if(p),
         BodyKind::CaseWhen => at_end_case(p) || p.at(WHEN_KW) || p.at(ELSE_KW),

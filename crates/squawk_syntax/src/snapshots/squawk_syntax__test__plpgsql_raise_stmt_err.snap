@@ -76,7 +76,7 @@ PLPGSQL@0..155
         RAISE_KW@116..121 "raise"
         WHITESPACE@121..122 " "
         PLPGSQL_CONDITION@122..130
-          IDENT@122..130 "sqlstate"
+          SQLSTATE_KW@122..130 "sqlstate"
         SEMICOLON@130..131 ";"
       WHITESPACE@131..134 "\n  "
       PLPGSQL_RAISE_STMT@134..150

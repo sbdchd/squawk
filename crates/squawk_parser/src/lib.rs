@@ -623,6 +623,11 @@ impl<'t> Parser<'t> {
         self.do_bump(kind, 1);
     }
 
+    /// Checks if the current token is contextual keyword `kw`.
+    pub(crate) fn at_contextual_kw(&self, kw: SyntaxKind) -> bool {
+        self.contextual_kind_at(self.pos) == kw
+    }
+
     /// Checks if the nth token is contextual keyword `kw`.
     pub(crate) fn nth_at_contextual_kw(&self, n: usize, kw: SyntaxKind) -> bool {
         self.contextual_kind_at(self.pos + n) == kw

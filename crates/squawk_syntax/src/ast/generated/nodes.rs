@@ -19742,6 +19742,10 @@ impl PlpgsqlCondition {
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
     }
+    #[inline]
+    pub fn sqlstate_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SQLSTATE_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
