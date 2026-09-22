@@ -15,3 +15,9 @@ $body$;
 /* before */ DO /* after do */ LANGUAGE /* after language */ plpgsql /* before body */ $body$BEGIN NULL; END$body$ /* before semicolon */;
 
 DO /* before trailing body */ $body$BEGIN NULL; END$body$ /* before trailing language */ LANGUAGE /* before language literal */ 'plpgsql' /* before trailing semicolon */;
+
+DO $body$
+BEGIN
+    PERFORM refresh_materialized_view_with_an_intentionally_long_name_and_arguments();
+END;
+$body$ LANGUAGE 'plpgsql';

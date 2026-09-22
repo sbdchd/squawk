@@ -113,7 +113,7 @@ create table column_features (
     cycle
   ) primary key,
   computed bigint generated always as (id + 1) stored,
-  parent_id bigint references public.parents(id)
+  parent_id bigint references public.parents (id)
     match full
     on delete cascade
     on update restrict

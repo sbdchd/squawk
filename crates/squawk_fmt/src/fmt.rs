@@ -18,8 +18,7 @@ use crate::comment::{
 use tiny_pretty::Doc;
 use tiny_pretty::{LineBreak, PrintOptions, print};
 
-// TODO: anytime we have `syntax().to_string()`, it means we have to do more to
-// actually convert the data into the IR. to_string() is a temp hack
+const INDENT: usize = 2;
 
 fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
     let mut doc = Doc::nil();
@@ -82,7 +81,7 @@ fn build_begin<'a>(begin: &ast::Begin) -> Doc<'a> {
         doc = doc.append(
             line_before(modes.syntax())
                 .append(build_transaction_mode_list(modes))
-                .nest(2),
+                .nest(INDENT),
         );
     }
 
@@ -219,14 +218,14 @@ fn build_prepare<'a>(prepare: &ast::Prepare) -> Doc<'a> {
 
     let mut header = Doc::text("prepare");
     if let Some(header_body) = header_body {
-        header = header.append(Doc::line_or_space().append(header_body).nest(2));
+        header = header.append(Doc::line_or_space().append(header_body).nest(INDENT));
     }
     let mut doc = header.group();
     if let Some(stmt) = prepare.stmt() {
         doc = doc.append(
             hard_line_before(stmt.syntax())
                 .append(build_preparable_stmt(stmt))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.append(build_semicolon(prepare.semicolon_token()))
@@ -561,7 +560,7 @@ fn build_delete<'a>(delete: &ast::Delete) -> Doc<'a> {
         doc = doc.append(if using_has_join {
             hard_line_before(using_clause.syntax())
                 .append(build_using_clause(using_clause))
-                .nest(2)
+                .nest(INDENT)
         } else {
             line_before(using_clause.syntax()).append(build_using_clause(using_clause))
         });
@@ -570,7 +569,7 @@ fn build_delete<'a>(delete: &ast::Delete) -> Doc<'a> {
         doc = doc.append(if using_has_join {
             hard_line_before(where_clause.syntax())
                 .append(build_where_clause_or_current_of(where_clause))
-                .nest(2)
+                .nest(INDENT)
         } else {
             line_before(where_clause.syntax())
                 .append(build_where_clause_or_current_of(where_clause))
@@ -615,7 +614,7 @@ fn build_using_clause<'a>(using_clause: ast::UsingClause) -> Doc<'a> {
         )
     });
     if let Some(items) = build_comma_separated_docs(items) {
-        doc = doc.append(Doc::space()).append(items.nest(2));
+        doc = doc.append(Doc::space()).append(items.nest(INDENT));
     }
     doc
 }
@@ -915,7 +914,7 @@ fn build_merge_when_clause<'a>(clause: ast::MergeWhenClause) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(action.syntax())
                 .append(build_merge_action(action))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc
@@ -1088,29 +1087,27 @@ fn set_column_has_bracketed_expr(column: &ast::SetSingleColumn) -> bool {
 fn build_set_column<'a>(column: ast::SetColumn, bracketed_expr: bool) -> Doc<'a> {
     match column {
         ast::SetColumn::SetSingleColumn(column) => {
-            let doc = column
+            let mut doc = column
                 .column_target()
                 .map(build_column_target)
                 .unwrap_or_else(Doc::nil);
-            let mut value = Doc::nil();
             if let Some(eq_token) = column.eq_token() {
                 let separator = if bracketed_expr {
                     space_before(&eq_token)
                 } else {
                     line_before(&eq_token)
                 };
-                value = value.append(separator).append(Doc::text("="));
+                doc = doc
+                    .append(separator.append(Doc::text("=")).nest(INDENT))
+                    .group();
             }
+            let mut value = Doc::nil();
             if let Some(expr) = column.set_expr() {
                 value = value
                     .append(space_before(expr.syntax()))
                     .append(build_set_expr(expr));
             }
-            if bracketed_expr {
-                doc.append(value)
-            } else {
-                doc.append(value.nest(2)).group()
-            }
+            doc.append(value).group()
         }
         ast::SetColumn::SetMultipleColumns(columns) => {
             let mut doc = columns
@@ -1363,7 +1360,7 @@ fn build_create_trigger<'a>(stmt: &ast::CreateTrigger) -> Doc<'a> {
                 .append(line_before(events.syntax()))
                 .append(build_trigger_event_list(events));
         }
-        doc = doc.append(Doc::hard_line().append(clause.group()).nest(2));
+        doc = doc.append(Doc::hard_line().append(clause.group()).nest(INDENT));
     }
     if let Some(on_relation) = stmt.on_relation() {
         let mut clause = Doc::text("on");
@@ -1376,7 +1373,7 @@ fn build_create_trigger<'a>(stmt: &ast::CreateTrigger) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(on_relation.syntax())
                 .append(clause.group())
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(from_table) = stmt.from_table() {
@@ -1390,14 +1387,14 @@ fn build_create_trigger<'a>(stmt: &ast::CreateTrigger) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(from_table.syntax())
                 .append(clause.group())
-                .nest(2),
+                .nest(INDENT),
         );
     }
     for option in stmt.constraint_options() {
         doc = doc.append(
             hard_line_before(option.syntax())
                 .append(build_constraint_option(option))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(referencing) = stmt.referencing() {
@@ -1408,21 +1405,21 @@ fn build_create_trigger<'a>(stmt: &ast::CreateTrigger) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(referencing.syntax())
                 .append(clause.group())
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(level) = stmt.trigger_level() {
         doc = doc.append(
             hard_line_before(level.syntax())
                 .append(build_keyword_node(level.syntax()))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(condition) = stmt.when_condition() {
         doc = doc.append(
             hard_line_before(condition.syntax())
                 .append(build_trigger_when_condition(condition))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(call) = stmt.call_expr() {
@@ -1442,9 +1439,9 @@ fn build_create_trigger<'a>(stmt: &ast::CreateTrigger) -> Doc<'a> {
         clause = clause
             .append(line_before(call.syntax()))
             .append(build_call_expr(call))
-            .nest(2)
+            .nest(INDENT)
             .group();
-        doc = doc.append(Doc::hard_line().append(clause).nest(2));
+        doc = doc.append(Doc::hard_line().append(clause).nest(INDENT));
     }
 
     doc.append(build_semicolon(stmt.semicolon_token()))
@@ -1487,7 +1484,7 @@ fn build_trigger_event<'a>(event: ast::TriggerEvent) -> Doc<'a> {
                 )
             });
             if let Some(columns) = build_comma_separated_docs(columns) {
-                doc = doc.append(Doc::line_or_space().append(columns).nest(2));
+                doc = doc.append(Doc::line_or_space().append(columns).nest(INDENT));
             }
             doc.group()
         }
@@ -1562,7 +1559,11 @@ fn build_create_transform<'a>(stmt: &ast::CreateTransform) -> Doc<'a> {
         doc = append_nested_node(doc, ty, build_type);
     }
     if let Some(language) = stmt.language_token() {
-        doc = doc.append(line_before(&language).append(Doc::text("language")).nest(2));
+        doc = doc.append(
+            line_before(&language)
+                .append(Doc::text("language"))
+                .nest(INDENT),
+        );
     }
     if let Some(language) = stmt.language_ref() {
         doc = doc
@@ -1615,7 +1616,7 @@ fn build_transform_func<'a>(func: ast::TransformFunc) -> Doc<'a> {
         prefix
             .append(line_before(sig.syntax()))
             .append(build_function_sig(sig))
-            .nest(2)
+            .nest(INDENT)
             .group()
     } else {
         prefix
@@ -1661,7 +1662,7 @@ fn build_create_function<'a>(create_function: &ast::CreateFunction) -> Doc<'a> {
                     .append(option_leading)
                     .append(leading_comments(option.syntax()))
                     .append(build_function_option(option))
-                    .nest(2),
+                    .nest(INDENT),
             );
             option_leading = Doc::nil();
         }
@@ -1670,7 +1671,7 @@ fn build_create_function<'a>(create_function: &ast::CreateFunction) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(body.syntax())
                 .append(build_routine_body(body))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.append(build_semicolon(create_function.semicolon_token()))
@@ -1887,7 +1888,7 @@ fn build_atomic_body<'a>(options: ast::AtomicBody) -> Doc<'a> {
             ast::RoutineBodyStmt::ReturnStmt(option) => build_return_stmt(option),
             ast::RoutineBodyStmt::Stmt(stmt) => build_stmt(stmt),
         };
-        doc = doc.append(before_option.append(option_doc).nest(2));
+        doc = doc.append(before_option.append(option_doc).nest(INDENT));
     }
 
     let end_doc = options
@@ -1955,7 +1956,11 @@ fn build_deallocate<'a>(deallocate: &ast::Deallocate) -> Doc<'a> {
     let mut doc = Doc::text("deallocate");
 
     if let Some(prepare) = deallocate.prepare_token() {
-        doc = doc.append(line_before(&prepare).append(Doc::text("prepare")).nest(2));
+        doc = doc.append(
+            line_before(&prepare)
+                .append(Doc::text("prepare"))
+                .nest(INDENT),
+        );
     }
 
     let target = if let Some(statement) = deallocate.prepared_statement_ref() {
@@ -1966,7 +1971,7 @@ fn build_deallocate<'a>(deallocate: &ast::Deallocate) -> Doc<'a> {
             .map(|all| leading_comments(&all).append(Doc::text("all")))
     };
     if let Some(target) = target {
-        doc = doc.append(Doc::line_or_space().append(target).nest(2));
+        doc = doc.append(Doc::line_or_space().append(target).nest(INDENT));
     }
 
     doc.group()
@@ -1980,7 +1985,11 @@ fn build_declare<'a>(declare: &ast::Declare) -> Doc<'a> {
         doc = append_nested_clause(doc, cursor.syntax(), build_name(cursor.syntax()));
     }
     if let Some(binary) = declare.binary_token() {
-        doc = doc.append(line_before(&binary).append(Doc::text("binary")).nest(2));
+        doc = doc.append(
+            line_before(&binary)
+                .append(Doc::text("binary"))
+                .nest(INDENT),
+        );
     }
     if let Some(sensitivity) = declare.cursor_sensitivity() {
         doc = append_nested_clause(
@@ -1993,7 +2002,11 @@ fn build_declare<'a>(declare: &ast::Declare) -> Doc<'a> {
         doc = append_nested_clause(doc, scroll.syntax(), build_keyword_node(scroll.syntax()));
     }
     if let Some(cursor) = declare.cursor_token() {
-        doc = doc.append(line_before(&cursor).append(Doc::text("cursor")).nest(2));
+        doc = doc.append(
+            line_before(&cursor)
+                .append(Doc::text("cursor"))
+                .nest(INDENT),
+        );
     }
     if let Some(hold) = declare.cursor_hold() {
         doc = append_nested_clause(doc, hold.syntax(), build_keyword_node(hold.syntax()));
@@ -2234,7 +2247,7 @@ fn build_reset<'a>(reset: &ast::Reset) -> Doc<'a> {
                 build_keyword_node(target.syntax())
             }
         });
-        doc = doc.append(Doc::line_or_space().append(target_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(target_doc).nest(INDENT));
     }
     doc.group().append(build_semicolon(reset.semicolon_token()))
 }
@@ -2267,7 +2280,7 @@ fn build_fetch<'a>(fetch: &ast::Fetch) -> Doc<'a> {
         } else {
             "in"
         };
-        doc = doc.append(line_before(&token).append(Doc::text(keyword)).nest(2));
+        doc = doc.append(line_before(&token).append(Doc::text(keyword)).nest(INDENT));
     }
     if let Some(cursor) = fetch.cursor_ref() {
         doc = append_nested_clause(doc, cursor.syntax(), build_name(cursor.syntax()));
@@ -2331,7 +2344,7 @@ fn build_close<'a>(close: &ast::Close) -> Doc<'a> {
 
     let mut doc = Doc::text("close");
     if let Some(target) = target {
-        doc = doc.append(Doc::line_or_space().append(target).nest(2));
+        doc = doc.append(Doc::line_or_space().append(target).nest(INDENT));
     }
     doc.group().append(build_semicolon(close.semicolon_token()))
 }
@@ -2352,7 +2365,7 @@ fn build_cluster<'a>(cluster: &ast::Cluster) -> Doc<'a> {
         if let Some(path) = table.path_ref() {
             table_doc = table_doc.append(build_path_ref(&path));
         }
-        doc = doc.append(Doc::line_or_space().append(table_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(table_doc).nest(INDENT));
         if let Some(using_index) = cluster.cluster_using_index() {
             doc = doc
                 .append(line_before(using_index.syntax()))
@@ -2566,14 +2579,24 @@ fn build_table_and_columns<'a>(table: ast::TableAndColumns) -> Doc<'a> {
 
 fn build_do<'a>(do_stmt: &ast::Do) -> Doc<'a> {
     let mut doc = Doc::text("do");
+    let mut is_first_part = true;
+    let mut previous_was_body = false;
     for part in do_stmt.language_and_body() {
+        let part_is_body = matches!(&part, Either::Right(_));
+        let separator = if is_first_part || previous_was_body {
+            Doc::space()
+        } else {
+            Doc::line_or_space()
+        };
         let part_doc = match part {
             Either::Left(language) => {
                 leading_comments(language.syntax()).append(build_do_language(language))
             }
             Either::Right(body) => leading_comments(body.syntax()).append(build_literal(body)),
         };
-        doc = doc.append(Doc::line_or_space().append(part_doc).nest(2));
+        doc = doc.append(separator.append(part_doc).nest(INDENT));
+        is_first_part = false;
+        previous_was_body = part_is_body;
     }
 
     doc.group()
@@ -3173,7 +3196,7 @@ fn build_create_access_method<'a>(stmt: &ast::CreateAccessMethod) -> Doc<'a> {
                 .append(space_before(kind.syntax()))
                 .append(build_keyword_node(kind.syntax()));
         }
-        doc = doc.append(Doc::hard_line().append(clause).nest(2));
+        doc = doc.append(Doc::hard_line().append(clause).nest(INDENT));
     }
     if let Some(handler) = stmt.handler_clause() {
         let mut clause = build_keyword_tokens([(handler.handler_token(), "handler")]);
@@ -3182,7 +3205,11 @@ fn build_create_access_method<'a>(stmt: &ast::CreateAccessMethod) -> Doc<'a> {
                 .append(Doc::space())
                 .append(build_extension_path_value(&function));
         }
-        doc = doc.append(hard_line_before(handler.syntax()).append(clause).nest(2));
+        doc = doc.append(
+            hard_line_before(handler.syntax())
+                .append(clause)
+                .nest(INDENT),
+        );
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -3276,7 +3303,7 @@ fn build_create_cast<'a>(stmt: &ast::CreateCast) -> Doc<'a> {
                     doc = doc
                         .append(line_before(function.syntax()))
                         .append(build_function_sig(function))
-                        .nest(2);
+                        .nest(INDENT);
                 }
                 doc.group()
             }
@@ -3374,7 +3401,7 @@ fn build_create_conversion<'a>(stmt: &ast::CreateConversion) -> Doc<'a> {
                 .append(space_before(encoding.syntax()))
                 .append(build_literal(encoding));
         }
-        doc = doc.append(Doc::line_or_space().append(clause).nest(2));
+        doc = doc.append(Doc::line_or_space().append(clause).nest(INDENT));
     }
     if let Some(token) = stmt.to_token() {
         let mut clause = leading_comments(&token).append(Doc::text("to"));
@@ -3383,7 +3410,7 @@ fn build_create_conversion<'a>(stmt: &ast::CreateConversion) -> Doc<'a> {
                 .append(space_before(encoding.syntax()))
                 .append(build_literal(encoding));
         }
-        doc = doc.append(Doc::line_or_space().append(clause).nest(2));
+        doc = doc.append(Doc::line_or_space().append(clause).nest(INDENT));
     }
     if let Some(token) = stmt.from_token() {
         let mut clause = leading_comments(&token).append(Doc::text("from"));
@@ -3391,10 +3418,10 @@ fn build_create_conversion<'a>(stmt: &ast::CreateConversion) -> Doc<'a> {
             clause = clause.append(
                 Doc::line_or_space()
                     .append(build_extension_path_value(&function))
-                    .nest(2),
+                    .nest(INDENT),
             );
         }
-        doc = doc.append(Doc::line_or_space().append(clause.group()).nest(2));
+        doc = doc.append(Doc::line_or_space().append(clause.group()).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -3433,7 +3460,7 @@ fn build_create_domain<'a>(stmt: &ast::CreateDomain) -> Doc<'a> {
         doc = doc.append(Doc::space()).append(name);
     }
     if let Some(as_token) = stmt.as_token() {
-        doc = doc.append(line_before(&as_token).append(Doc::text("as")).nest(2));
+        doc = doc.append(line_before(&as_token).append(Doc::text("as")).nest(INDENT));
     }
     if let Some(ty) = stmt.ty() {
         let separator = if stmt.as_token().is_some() {
@@ -3445,7 +3472,7 @@ fn build_create_domain<'a>(stmt: &ast::CreateDomain) -> Doc<'a> {
             separator
                 .append(leading_comments(ty.syntax()))
                 .append(build_type(ty))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     for qualifier in stmt.domain_qualifiers() {
@@ -3473,7 +3500,7 @@ fn build_create_event_trigger<'a>(stmt: &ast::CreateEventTrigger) -> Doc<'a> {
             .append(build_name(name.syntax()));
     }
     if let Some(on_token) = stmt.on_token() {
-        doc = doc.append(line_before(&on_token).append(Doc::text("on")).nest(2));
+        doc = doc.append(line_before(&on_token).append(Doc::text("on")).nest(INDENT));
     }
     if let Some(event) = stmt.event() {
         doc = doc
@@ -3505,12 +3532,12 @@ fn build_create_event_trigger<'a>(stmt: &ast::CreateEventTrigger) -> Doc<'a> {
                 .unwrap_or_else(Doc::nil)
                 .append(line_before(call.syntax()))
                 .append(build_call_expr(call))
-                .nest(2)
+                .nest(INDENT)
                 .group(),
         );
     }
     if let Some(execute_clause) = execute_clause {
-        doc = doc.append(Doc::line_or_space().append(execute_clause).nest(2));
+        doc = doc.append(Doc::line_or_space().append(execute_clause).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -3577,7 +3604,11 @@ fn build_create_extension<'a>(stmt: &ast::CreateExtension) -> Doc<'a> {
             .append(build_name(extension.syntax()));
     }
     if let Some(with_token) = stmt.with_token() {
-        doc = doc.append(line_before(&with_token).append(Doc::text("with")).nest(2));
+        doc = doc.append(
+            line_before(&with_token)
+                .append(Doc::text("with"))
+                .nest(INDENT),
+        );
     }
     if let Some(schema) = stmt.extension_schema() {
         let mut clause = schema
@@ -3611,7 +3642,7 @@ fn build_create_extension<'a>(stmt: &ast::CreateExtension) -> Doc<'a> {
         doc = doc.append(
             line_before(&cascade_token)
                 .append(Doc::text("cascade"))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -3651,10 +3682,10 @@ fn build_comment_on<'a>(stmt: &ast::CommentOn) -> Doc<'a> {
     if let Some(object) = stmt.comment_object() {
         doc = doc
             .append(space_before(object.syntax()))
-            .append(build_comment_object(object).nest(2));
+            .append(build_comment_object(object).nest(INDENT));
     }
     if let Some(token) = stmt.is_token() {
-        doc = doc.append(line_before(&token).append(Doc::text("is")).nest(2));
+        doc = doc.append(line_before(&token).append(Doc::text("is")).nest(INDENT));
     }
     if let Some(literal) = stmt.literal() {
         doc = doc
@@ -3947,14 +3978,14 @@ fn build_explain<'a>(explain: &ast::Explain) -> Doc<'a> {
         doc = if parenthesized {
             doc.append(Doc::space()).append(mode_doc)
         } else {
-            doc.append(Doc::line_or_space().append(mode_doc).nest(2))
+            doc.append(Doc::line_or_space().append(mode_doc).nest(INDENT))
         };
     }
     if let Some(stmt) = explain.explain_stmt() {
         doc = doc.append(
             hard_line_before(stmt.syntax())
                 .append(build_explain_stmt(stmt))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group()
@@ -4251,15 +4282,15 @@ fn build_create_rule<'a>(stmt: &ast::CreateRule) -> Doc<'a> {
     doc = doc.append(
         Doc::line_or_space()
             .append(as_clause.group())
-            .nest(2)
+            .nest(INDENT)
             .group(),
     );
-    doc = doc.append(rule_on_tail.nest(2));
+    doc = doc.append(rule_on_tail.nest(INDENT));
     if let Some(rule_do) = stmt.rule_do() {
         doc = doc.append(
             hard_line_before(rule_do.syntax())
                 .append(build_rule_do(rule_do))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -4365,7 +4396,7 @@ fn build_create_schema<'a>(stmt: &ast::CreateSchema) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(&syntax)
                 .append(build_schema_element(element))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -4509,7 +4540,7 @@ fn build_create_server<'a>(stmt: &ast::CreateServer) -> Doc<'a> {
         });
     }
     if let Some(wrapper) = wrapper {
-        doc = doc.append(Doc::line_or_space().append(wrapper).nest(2));
+        doc = doc.append(Doc::line_or_space().append(wrapper).nest(INDENT));
     }
     if let Some(options) = stmt.alter_option_list() {
         doc = append_nested_clause(doc, options.syntax(), build_alter_option_list(&options));
@@ -4539,7 +4570,7 @@ fn build_create_statistics<'a>(stmt: &ast::CreateStatistics) -> Doc<'a> {
     }
     if let Some(statistics_doc) = statistics_doc {
         doc = doc
-            .append(Doc::line_or_space().append(statistics_doc).nest(2))
+            .append(Doc::line_or_space().append(statistics_doc).nest(INDENT))
             .group();
     }
     if let Some(on) = stmt.statistics_on_clause() {
@@ -4577,7 +4608,7 @@ fn build_statistics_on_clause<'a>(on: ast::StatisticsOnClause) -> Doc<'a> {
         (leading_comments(&syntax).append(build_expr(expr)), syntax)
     });
     if let Some(exprs) = build_comma_separated_docs(exprs) {
-        doc = doc.append(Doc::line_or_space().append(exprs).nest(2));
+        doc = doc.append(Doc::line_or_space().append(exprs).nest(INDENT));
     }
     doc.group()
 }
@@ -4618,7 +4649,7 @@ fn build_create_tablespace<'a>(stmt: &ast::CreateTablespace) -> Doc<'a> {
                 .append(space_before(literal.syntax()))
                 .append(build_literal(literal));
         }
-        doc = doc.append(Doc::hard_line().append(clause).nest(2));
+        doc = doc.append(Doc::hard_line().append(clause).nest(INDENT));
     }
     if let Some(params) = stmt.with_params() {
         doc = append_nested_node(doc, params, build_with_params);
@@ -4849,13 +4880,13 @@ fn build_create_operator_class<'a>(stmt: &ast::CreateOperatorClass) -> Doc<'a> {
                 .append(space_before(ty.syntax()))
                 .append(build_type(ty));
         }
-        doc = doc.append(Doc::hard_line().append(clause).nest(2));
+        doc = doc.append(Doc::hard_line().append(clause).nest(INDENT));
     }
     if let Some(using) = stmt.using_method() {
         doc = doc.append(
             hard_line_before(using.syntax())
                 .append(build_using_method(using))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(family) = stmt.operator_family_clause() {
@@ -4865,7 +4896,11 @@ fn build_create_operator_class<'a>(stmt: &ast::CreateOperatorClass) -> Doc<'a> {
                 .append(Doc::space())
                 .append(build_extension_path_value(&name));
         }
-        doc = doc.append(hard_line_before(family.syntax()).append(family_doc).nest(2));
+        doc = doc.append(
+            hard_line_before(family.syntax())
+                .append(family_doc)
+                .nest(INDENT),
+        );
     }
     if let Some(as_token) = stmt.as_token() {
         doc = doc.append(space_before(&as_token)).append(Doc::text("as"));
@@ -4882,7 +4917,7 @@ fn build_create_operator_class<'a>(stmt: &ast::CreateOperatorClass) -> Doc<'a> {
             doc = doc.append(
                 hard_line_before(options.syntax())
                     .append(options_doc)
-                    .nest(2),
+                    .nest(INDENT),
             );
         }
     }
@@ -4906,7 +4941,7 @@ fn build_create_operator_family<'a>(stmt: &ast::CreateOperatorFamily) -> Doc<'a>
         doc = doc.append(
             hard_line_before(using.syntax())
                 .append(build_using_method(using))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -5022,7 +5057,7 @@ fn build_create_procedure<'a>(stmt: &ast::CreateProcedure) -> Doc<'a> {
                     .append(option_leading)
                     .append(leading_comments(option.syntax()))
                     .append(build_function_option(option))
-                    .nest(2),
+                    .nest(INDENT),
             );
             option_leading = Doc::nil();
         }
@@ -5031,7 +5066,7 @@ fn build_create_procedure<'a>(stmt: &ast::CreateProcedure) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(body.syntax())
                 .append(build_routine_body(body))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.append(build_semicolon(stmt.semicolon_token()))
@@ -5061,7 +5096,7 @@ fn build_create_materialized_view<'a>(view: &ast::CreateMaterializedView) -> Doc
     }
     if let Some(view_doc) = view_doc {
         doc = doc
-            .append(Doc::line_or_space().append(view_doc).nest(2))
+            .append(Doc::line_or_space().append(view_doc).nest(INDENT))
             .group();
     }
     let has_options = view.using_method().is_some()
@@ -5085,7 +5120,7 @@ fn build_create_materialized_view<'a>(view: &ast::CreateMaterializedView) -> Doc
     if let Some(as_token) = view.as_token() {
         let as_doc = leading_comments(&as_token).append(Doc::text("as"));
         doc = if has_options {
-            doc.append(Doc::hard_line().append(as_doc).nest(2))
+            doc.append(Doc::hard_line().append(as_doc).nest(INDENT))
         } else {
             doc.append(Doc::space()).append(as_doc)
         };
@@ -5094,14 +5129,14 @@ fn build_create_materialized_view<'a>(view: &ast::CreateMaterializedView) -> Doc
         doc = doc.append(
             hard_line_before(query.syntax())
                 .append(build_select_variant(query))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(data) = view.data_option() {
         doc = doc.append(
             hard_line_before(data.syntax())
                 .append(build_keyword_node(data.syntax()))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group().append(build_semicolon(view.semicolon_token()))
@@ -5235,7 +5270,7 @@ fn build_name_items<'a>(items: impl Iterator<Item = SyntaxNode>) -> Doc<'a> {
 
 fn append_privilege_items<'a>(prefix: Doc<'a>, items: Doc<'a>) -> Doc<'a> {
     prefix
-        .append(Doc::line_or_space().append(items).nest(2))
+        .append(Doc::line_or_space().append(items).nest(INDENT))
         .group()
 }
 
@@ -5581,7 +5616,7 @@ fn build_grant_with_clause<'a>(with: ast::GrantWithClause) -> Doc<'a> {
         }))
         .unwrap_or_else(Doc::nil);
         let options_doc = leading_comments(options.syntax()).append(options_doc);
-        doc = doc.append(Doc::line_or_space().append(options_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(options_doc).nest(INDENT));
     }
     doc.group()
 }
@@ -5612,7 +5647,7 @@ fn build_grant<'a>(grant: &ast::Grant) -> Doc<'a> {
         doc = append_nested_clause(doc, on.syntax(), on_doc);
     }
     if let Some(to) = grant.to_token() {
-        doc = doc.append(line_before(&to).append(Doc::text("to")).nest(2));
+        doc = doc.append(line_before(&to).append(Doc::text("to")).nest(INDENT));
     }
     if let Some(roles) = grant.role_ref_list() {
         doc = append_nested_node(doc, roles, build_role_ref_list);
@@ -5651,7 +5686,7 @@ fn build_revoke<'a>(revoke: &ast::Revoke) -> Doc<'a> {
         doc = append_nested_clause(doc, on.syntax(), on_doc);
     }
     if let Some(from) = revoke.from_token() {
-        doc = doc.append(line_before(&from).append(Doc::text("from")).nest(2));
+        doc = doc.append(line_before(&from).append(Doc::text("from")).nest(INDENT));
     }
     if let Some(roles) = revoke.role_ref_list() {
         doc = append_nested_node(doc, roles, build_role_ref_list);
@@ -5734,7 +5769,7 @@ fn build_import_foreign_schema<'a>(import: &ast::ImportForeignSchema) -> Doc<'a>
                 .append(space_before(server.syntax()))
                 .append(build_server_clause(server));
         }
-        doc = doc.append(Doc::line_or_space().append(from_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(from_doc).nest(INDENT));
     } else if let Some(server) = import.server_clause() {
         doc = append_nested_node(doc, server, build_server_clause);
     }
@@ -5774,7 +5809,7 @@ fn build_move<'a>(move_stmt: &ast::Move) -> Doc<'a> {
         } else {
             "in"
         };
-        doc = doc.append(line_before(&token).append(Doc::text(keyword)).nest(2));
+        doc = doc.append(line_before(&token).append(Doc::text(keyword)).nest(INDENT));
     }
     if let Some(cursor) = move_stmt.cursor_ref() {
         doc = append_nested_clause(doc, cursor.syntax(), build_name(cursor.syntax()));
@@ -5816,7 +5851,7 @@ fn build_reassign<'a>(reassign: &ast::Reassign) -> Doc<'a> {
                 .append(space_before(roles.syntax()))
                 .append(build_role_ref_list(roles));
         }
-        doc = doc.append(Doc::line_or_space().append(to_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(to_doc).nest(INDENT));
     } else if let Some(roles) = reassign.after() {
         doc = append_nested_node(doc, roles, build_role_ref_list);
     }
@@ -5835,7 +5870,7 @@ fn build_refresh<'a>(refresh: &ast::Refresh) -> Doc<'a> {
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&view))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(data) = refresh.data_option() {
@@ -5894,7 +5929,7 @@ fn build_reset_session_auth<'a>(reset: &ast::ResetSessionAuth) -> Doc<'a> {
 
 fn append_security_object_value<'a>(prefix: Doc<'a>, value: Doc<'a>) -> Doc<'a> {
     prefix
-        .append(Doc::line_or_space().append(value).nest(2))
+        .append(Doc::line_or_space().append(value).nest(INDENT))
         .group()
 }
 
@@ -6113,7 +6148,7 @@ fn build_security_label<'a>(label: &ast::SecurityLabel) -> Doc<'a> {
                 .append(space_before(object.syntax()))
                 .append(build_security_label_object(object));
         }
-        doc = doc.append(Doc::line_or_space().append(on_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(on_doc).nest(INDENT));
     } else if let Some(object) = object {
         doc = append_nested_node(doc, object, build_security_label_object);
     }
@@ -6130,9 +6165,9 @@ fn build_security_label<'a>(label: &ast::SecurityLabel) -> Doc<'a> {
         if let Some(value) = value {
             is_doc = is_doc.append(Doc::space()).append(value);
         }
-        doc = doc.append(Doc::line_or_space().append(is_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(is_doc).nest(INDENT));
     } else if let Some(value) = value {
-        doc = doc.append(Doc::line_or_space().append(value).nest(2));
+        doc = doc.append(Doc::line_or_space().append(value).nest(INDENT));
     }
     doc.group().append(build_semicolon(label.semicolon_token()))
 }
@@ -6143,7 +6178,7 @@ fn build_set_constraints<'a>(set: &ast::SetConstraints) -> Doc<'a> {
         doc = doc.append(
             line_before(&constraints)
                 .append(Doc::text("constraints"))
-                .nest(2),
+                .nest(INDENT),
         );
     }
 
@@ -6158,7 +6193,7 @@ fn build_set_constraints<'a>(set: &ast::SetConstraints) -> Doc<'a> {
             .map(|all| leading_comments(&all).append(Doc::text("all")))
     };
     if let Some(target) = target {
-        doc = doc.append(Doc::line_or_space().append(target).nest(2));
+        doc = doc.append(Doc::line_or_space().append(target).nest(INDENT));
     }
     if let Some(timing) = set.constraint_timing() {
         doc = append_nested_clause(doc, timing.syntax(), build_keyword_node(timing.syntax()));
@@ -6222,13 +6257,13 @@ fn build_set_role<'a>(set: &ast::SetRole) -> Doc<'a> {
         doc = append_nested_clause(doc, scope.syntax(), build_keyword_node(scope.syntax()));
     }
     if let Some(role) = set.role_token() {
-        doc = doc.append(line_before(&role).append(Doc::text("role")).nest(2));
+        doc = doc.append(line_before(&role).append(Doc::text("role")).nest(INDENT));
     }
     if let Some(target) = set.set_role_target() {
         doc = doc.append(
             line_before(target.syntax())
                 .append(build_set_role_target(target))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group().append(build_semicolon(set.semicolon_token()))
@@ -6250,20 +6285,24 @@ fn build_set_session_auth<'a>(set: &ast::SetSessionAuth) -> Doc<'a> {
         doc = append_nested_clause(doc, scope.syntax(), build_keyword_node(scope.syntax()));
     }
     if let Some(session) = set.session_token() {
-        doc = doc.append(line_before(&session).append(Doc::text("session")).nest(2));
+        doc = doc.append(
+            line_before(&session)
+                .append(Doc::text("session"))
+                .nest(INDENT),
+        );
     }
     if let Some(authorization) = set.authorization_token() {
         doc = doc.append(
             line_before(&authorization)
                 .append(Doc::text("authorization"))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(target) = set.set_session_auth_target() {
         doc = doc.append(
             line_before(target.syntax())
                 .append(build_set_session_auth_target(target))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group().append(build_semicolon(set.semicolon_token()))
@@ -6328,7 +6367,12 @@ fn build_set_transaction<'a>(set: &ast::SetTransaction) -> Doc<'a> {
         })
     };
     if let Some((comments, body)) = body {
-        doc = doc.append(Doc::line_or_space().append(comments).append(body).nest(2));
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(comments)
+                .append(body)
+                .nest(INDENT),
+        );
     }
     doc.group().append(build_semicolon(set.semicolon_token()))
 }
@@ -6349,7 +6393,7 @@ fn build_show<'a>(show: &ast::Show) -> Doc<'a> {
                 build_keyword_node(action.syntax())
             }
         };
-        doc = doc.append(before_action.append(action_doc).nest(2));
+        doc = doc.append(before_action.append(action_doc).nest(INDENT));
     }
     doc.group().append(build_semicolon(show.semicolon_token()))
 }
@@ -6364,7 +6408,7 @@ fn build_unlisten<'a>(unlisten: &ast::Unlisten) -> Doc<'a> {
             .map(|star| leading_comments(&star).append(Doc::text("*")))
     };
     if let Some(target) = target {
-        doc = doc.append(Doc::line_or_space().append(target).nest(2));
+        doc = doc.append(Doc::line_or_space().append(target).nest(INDENT));
     }
     doc.group()
         .append(build_semicolon(unlisten.semicolon_token()))
@@ -6550,10 +6594,10 @@ fn build_create_index<'a>(create_index: &ast::CreateIndex) -> Doc<'a> {
                 .append(build_create_table_partition_items(items));
         }
         on_doc = on_doc.append(Doc::line_or_space()).append(using_doc);
-        doc = doc.append(Doc::hard_line().append(on_doc.group()).nest(2));
+        doc = doc.append(Doc::hard_line().append(on_doc.group()).nest(INDENT));
     } else {
         doc = doc
-            .append(Doc::line_or_space().append(on_doc).nest(2))
+            .append(Doc::line_or_space().append(on_doc).nest(INDENT))
             .group();
         if let Some(items) = create_index.partition_item_list() {
             doc = doc
@@ -6568,7 +6612,7 @@ fn build_create_index<'a>(create_index: &ast::CreateIndex) -> Doc<'a> {
                 .append(space_before(items.syntax()))
                 .append(build_create_table_partition_items(items));
         }
-        doc = doc.append(Doc::line_or_space().append(include_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(include_doc).nest(INDENT));
     }
     if let Some(nulls) = create_index.nulls_distinct_option() {
         doc = append_nested_clause(doc, nulls.syntax(), build_keyword_node(nulls.syntax()));
@@ -6584,7 +6628,7 @@ fn build_create_index<'a>(create_index: &ast::CreateIndex) -> Doc<'a> {
                 .append(space_before(tablespace_ref.syntax()))
                 .append(build_name(tablespace_ref.syntax()));
         }
-        doc = doc.append(Doc::line_or_space().append(tablespace_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(tablespace_doc).nest(INDENT));
     }
     if let Some(where_clause) = create_index.where_clause() {
         doc = append_nested_node(doc, where_clause, build_where_clause);
@@ -6634,7 +6678,7 @@ fn build_create_view<'a>(create_view: &ast::CreateView) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(with_params.syntax())
                 .append(build_with_params(with_params))
-                .nest(2),
+                .nest(INDENT),
         );
         true
     } else {
@@ -6643,7 +6687,7 @@ fn build_create_view<'a>(create_view: &ast::CreateView) -> Doc<'a> {
     if let Some(as_token) = create_view.as_token() {
         let as_doc = leading_comments(&as_token).append(Doc::text("as"));
         doc = if has_with_params {
-            doc.append(Doc::hard_line().append(as_doc).nest(2))
+            doc.append(Doc::hard_line().append(as_doc).nest(INDENT))
         } else {
             doc.append(Doc::space()).append(as_doc)
         };
@@ -6652,14 +6696,14 @@ fn build_create_view<'a>(create_view: &ast::CreateView) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(query.syntax())
                 .append(build_select_variant(query))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(check_option) = create_view.with_check_option() {
         doc = doc.append(
             hard_line_before(check_option.syntax())
                 .append(build_with_check_option(check_option))
-                .nest(2),
+                .nest(INDENT),
         );
     }
 
@@ -6700,7 +6744,7 @@ fn build_create_table_as<'a>(create_table_as: &ast::CreateTableAs) -> Doc<'a> {
     if let Some(using_method) = create_table_as.using_method() {
         let option =
             leading_comments(using_method.syntax()).append(build_using_method(using_method));
-        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+        doc = doc.append(Doc::line_or_space().append(option).nest(INDENT));
     }
     if let Some(params) = create_table_as.table_params() {
         let option = match params {
@@ -6710,7 +6754,7 @@ fn build_create_table_as<'a>(create_table_as: &ast::CreateTableAs) -> Doc<'a> {
             ast::TableParams::WithoutOids(without_oids) => leading_comments(without_oids.syntax())
                 .append(build_keyword_node(without_oids.syntax())),
         };
-        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+        doc = doc.append(Doc::line_or_space().append(option).nest(INDENT));
     }
     if let Some(on_commit) = create_table_as.on_commit() {
         let mut option = leading_comments(on_commit.syntax()).append(Doc::text("on"));
@@ -6725,7 +6769,7 @@ fn build_create_table_as<'a>(create_table_as: &ast::CreateTableAs) -> Doc<'a> {
                 .append(space_before(action.syntax()))
                 .append(build_keyword_node(action.syntax()));
         }
-        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+        doc = doc.append(Doc::line_or_space().append(option).nest(INDENT));
     }
     if let Some(tablespace) = create_table_as.tablespace_clause() {
         let mut option = leading_comments(tablespace.syntax()).append(Doc::text("tablespace"));
@@ -6734,13 +6778,13 @@ fn build_create_table_as<'a>(create_table_as: &ast::CreateTableAs) -> Doc<'a> {
                 .append(space_before(name.syntax()))
                 .append(build_name(name.syntax()));
         }
-        doc = doc.append(Doc::line_or_space().append(option).nest(2));
+        doc = doc.append(Doc::line_or_space().append(option).nest(INDENT));
     }
 
     if let Some(as_token) = create_table_as.as_token() {
         let as_doc = leading_comments(&as_token).append(Doc::text("as"));
         doc = if has_table_option {
-            doc.append(Doc::hard_line().append(as_doc).nest(2))
+            doc.append(Doc::hard_line().append(as_doc).nest(INDENT))
         } else {
             doc.append(Doc::space()).append(as_doc)
         };
@@ -6751,13 +6795,13 @@ fn build_create_table_as<'a>(create_table_as: &ast::CreateTableAs) -> Doc<'a> {
             ast::CreateTableAsQuery::SelectVariant(select) => build_select_variant(select),
             ast::CreateTableAsQuery::Execute(execute) => build_execute(execute),
         };
-        doc = doc.append(before_query.append(query_doc).nest(2));
+        doc = doc.append(before_query.append(query_doc).nest(INDENT));
     }
     if let Some(data_option) = create_table_as.data_option() {
         doc = doc.append(
             hard_line_before(data_option.syntax())
                 .append(build_keyword_node(data_option.syntax()))
-                .nest(2),
+                .nest(INDENT),
         );
     }
 
@@ -6841,7 +6885,7 @@ fn build_create_foreign_table<'a>(create_table: &ast::CreateForeignTable) -> Doc
                 .append(leading_comments(partition_type.syntax()))
                 .append(build_create_table_partition_type(partition_type));
         }
-        doc = doc.append(Doc::hard_line().append(partition_doc).nest(2));
+        doc = doc.append(Doc::hard_line().append(partition_doc).nest(INDENT));
     } else {
         if let Some(arg_list) = create_table.table_arg_list() {
             doc = append_table_arg_list(doc, arg_list);
@@ -6927,7 +6971,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
         doc = doc.append(
             hard_line_before(partition_of.syntax())
                 .append(build_create_table_partition_of(partition_of))
-                .nest(2),
+                .nest(INDENT),
         );
     }
 
@@ -6938,7 +6982,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
                 .append(space_before(ty.syntax()))
                 .append(build_type(ty));
         }
-        doc = doc.append(Doc::hard_line().append(of_type_doc).nest(2));
+        doc = doc.append(Doc::hard_line().append(of_type_doc).nest(INDENT));
     }
 
     if let Some(arg_list) = create_table.table_arg_list() {
@@ -6955,7 +6999,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
             separator
                 .append(leading_comments(partition_type.syntax()))
                 .append(build_create_table_partition_type(partition_type))
-                .nest(2),
+                .nest(INDENT),
         );
     }
 
@@ -6970,7 +7014,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
     if let Some(using_method) = create_table.using_method() {
         let using_doc =
             leading_comments(using_method.syntax()).append(build_using_method(using_method));
-        doc = doc.append(Doc::line_or_space().append(using_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(using_doc).nest(INDENT));
     }
 
     if let Some(params) = create_table.table_params() {
@@ -6985,7 +7029,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
                     .append(build_keyword_node(without_oids.syntax())),
             ),
         };
-        doc = doc.append(separator.append(params_doc).nest(2));
+        doc = doc.append(separator.append(params_doc).nest(INDENT));
     }
 
     if let Some(on_commit) = create_table.on_commit() {
@@ -7001,7 +7045,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
                 .append(space_before(action.syntax()))
                 .append(build_keyword_node(action.syntax()));
         }
-        doc = doc.append(Doc::hard_line().append(on_commit_doc).nest(2));
+        doc = doc.append(Doc::hard_line().append(on_commit_doc).nest(INDENT));
     }
 
     if let Some(tablespace) = create_table.tablespace_clause() {
@@ -7012,7 +7056,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
                 .append(space_before(tablespace_ref.syntax()))
                 .append(build_name(tablespace_ref.syntax()));
         }
-        doc = doc.append(Doc::line_or_space().append(tablespace_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(tablespace_doc).nest(INDENT));
     }
 
     doc.group()
@@ -7372,7 +7416,7 @@ fn build_column<'a>(column: &ast::Column) -> Doc<'a> {
         doc = doc.append(
             Doc::space()
                 .append(clause.clone())
-                .union(Doc::hard_line().append(clause).nest(2)),
+                .union(Doc::hard_line().append(clause).nest(INDENT)),
         );
     }
     doc
@@ -7383,18 +7427,18 @@ fn append_nested_node<'a, T: AstNode>(
     node: T,
     build: impl FnOnce(T) -> Doc<'a>,
 ) -> Doc<'a> {
-    doc.append(line_before(node.syntax()).append(build(node)).nest(2))
+    doc.append(line_before(node.syntax()).append(build(node)).nest(INDENT))
 }
 
 fn append_nested_clause<'a>(doc: Doc<'a>, syntax: &SyntaxNode, clause: Doc<'a>) -> Doc<'a> {
-    doc.append(line_before(syntax).append(clause).nest(2))
+    doc.append(line_before(syntax).append(clause).nest(INDENT))
 }
 
 fn append_clause_body<'a>(doc: Doc<'a>, syntax: &SyntaxNode, body: Doc<'a>, hug: bool) -> Doc<'a> {
     if hug {
-        doc.append(space_before(syntax).nest(2)).append(body)
+        doc.append(space_before(syntax).nest(INDENT)).append(body)
     } else {
-        doc.append(line_before(syntax).append(body).nest(2).group())
+        doc.append(line_before(syntax).append(body).nest(INDENT).group())
     }
 }
 
@@ -7480,7 +7524,7 @@ fn build_default_constraint<'a>(constraint: ast::DefaultConstraint) -> Doc<'a> {
         doc = doc.append(
             line_before(option.syntax())
                 .append(build_constraint_option(option))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc.group()
@@ -7498,7 +7542,7 @@ fn build_not_null_constraint<'a>(constraint: ast::NotNullConstraint) -> Doc<'a> 
             .append(build_name(column.syntax()));
     }
     append_constraint_options(doc, constraint.constraint_options())
-        .nest(2)
+        .nest(INDENT)
         .group()
 }
 
@@ -7510,7 +7554,7 @@ fn build_null_constraint<'a>(constraint: ast::NullConstraint) -> Doc<'a> {
             .append(Doc::text("null"));
     }
     append_constraint_options(doc, constraint.constraint_options())
-        .nest(2)
+        .nest(INDENT)
         .group()
 }
 
@@ -7550,7 +7594,7 @@ fn build_references_constraint<'a>(constraint: ast::ReferencesConstraint) -> Doc
     doc = append_commented_path_ref(doc, constraint.table());
     if let Some(column) = constraint.column() {
         if let Some(l_paren) = constraint.l_paren_token() {
-            doc = doc.append(comments_before(&l_paren));
+            doc = doc.append(space_before(&l_paren));
         }
         doc = doc
             .append(Doc::text("("))
@@ -7572,7 +7616,7 @@ fn build_references_constraint<'a>(constraint: ast::ReferencesConstraint) -> Doc
             .append(build_referential_action(action));
     }
     append_constraint_options(doc, constraint.constraint_options())
-        .nest(2)
+        .nest(INDENT)
         .group()
 }
 
@@ -7862,7 +7906,8 @@ fn build_primary_key_constraint<'a>(constraint: ast::PrimaryKeyConstraint) -> Do
             doc = doc.append(comments_before(parameters.syntax()));
         }
     }
-    let options = append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(2);
+    let options =
+        append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(INDENT);
     doc.append(options).group()
 }
 
@@ -7886,7 +7931,8 @@ fn build_unique_constraint<'a>(constraint: ast::UniqueConstraint) -> Doc<'a> {
             doc = doc.append(comments_before(parameters.syntax()));
         }
     }
-    let options = append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(2);
+    let options =
+        append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(INDENT);
     doc.append(options).group()
 }
 
@@ -8190,7 +8236,7 @@ fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Do
         body = body.append(if has_constraint_name {
             clause
         } else {
-            clause.nest(2)
+            clause.nest(INDENT)
         });
     }
     if let Some(match_type) = constraint.match_type() {
@@ -8199,7 +8245,7 @@ fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Do
         body = body.append(if has_constraint_name {
             clause
         } else {
-            clause.nest(2)
+            clause.nest(INDENT)
         });
     }
     for action in constraint.referential_actions() {
@@ -8207,19 +8253,19 @@ fn build_foreign_key_constraint<'a>(constraint: ast::ForeignKeyConstraint) -> Do
         body = body.append(if has_constraint_name {
             clause
         } else {
-            clause.nest(2)
+            clause.nest(INDENT)
         });
     }
     let options = append_constraint_options(Doc::nil(), constraint.constraint_options());
     body = body.append(if has_constraint_name {
         options
     } else {
-        options.nest(2)
+        options.nest(INDENT)
     });
 
     if let Some(constraint_name) = constraint_name {
         build_constraint_name(&constraint_name)
-            .append(Doc::line_or_space().append(body.group()).nest(2))
+            .append(Doc::line_or_space().append(body.group()).nest(INDENT))
             .group()
     } else {
         body.group()
@@ -8361,7 +8407,8 @@ fn build_exclude_constraint<'a>(constraint: ast::ExcludeConstraint) -> Doc<'a> {
     if let Some(where_clause) = constraint.where_condition_clause() {
         doc = append_nested_node(doc, where_clause, build_where_condition_clause);
     }
-    let options = append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(2);
+    let options =
+        append_constraint_options(Doc::nil(), constraint.constraint_options()).nest(INDENT);
     doc.append(options).group()
 }
 
@@ -8386,7 +8433,7 @@ fn build_constraint_exclusion_list<'a>(list: ast::ConstraintExclusionList) -> Do
                 .append(build_operator_call(&op));
         }
         (
-            leading_comments(exclusion.syntax()).append(item.nest(2).group()),
+            leading_comments(exclusion.syntax()).append(item.nest(INDENT).group()),
             exclusion.syntax().clone(),
         )
     });
@@ -8424,7 +8471,7 @@ fn build_like_clause<'a>(like_clause: &ast::LikeClause) -> Doc<'a> {
         .map(|option| line_before(option.syntax()).append(build_like_option(&option)))
         .collect();
     if !options.is_empty() {
-        doc = doc.append(Doc::list(options).nest(2).group());
+        doc = doc.append(Doc::list(options).nest(INDENT).group());
     }
 
     doc
@@ -8491,7 +8538,7 @@ fn build_values_rows<'a>(values: &ast::Values, nest_rows: bool) -> Doc<'a> {
             }
             .append(rows);
             doc = doc.append(if nest_rows && multiple_rows {
-                rows.nest(2).group()
+                rows.nest(INDENT).group()
             } else {
                 rows
             });
@@ -8621,7 +8668,7 @@ fn build_select_into<'a>(select_into: &ast::SelectInto) -> Doc<'a> {
     }
     doc = doc.append(match select_body {
         Some(select_body) => Doc::text("select")
-            .append(Doc::line_or_space().append(select_body).nest(2))
+            .append(Doc::line_or_space().append(select_body).nest(INDENT))
             .group(),
         None => Doc::text("select"),
     });
@@ -8935,7 +8982,7 @@ fn build_window_clause<'a>(window: ast::WindowClause) -> Doc<'a> {
         doc = if single_def {
             doc.append(Doc::space()).append(defs)
         } else {
-            doc.append(Doc::line_or_space().append(defs).nest(2))
+            doc.append(Doc::line_or_space().append(defs).nest(INDENT))
         };
     }
     doc.group()
@@ -9028,7 +9075,7 @@ fn build_publication_for_clause<'a>(clause: ast::PublicationForClause) -> Doc<'a
         ast::PublicationForClause::ForAllPublicationObjects(clause) => {
             let mut doc = Doc::text("for");
             if let Some(objects) = build_all_publication_objects(clause.all_publication_objects()) {
-                doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+                doc = doc.append(Doc::line_or_space().append(objects).nest(INDENT));
             }
             if let Some(except) = clause.except_table_clause() {
                 doc = doc
@@ -9040,7 +9087,7 @@ fn build_publication_for_clause<'a>(clause: ast::PublicationForClause) -> Doc<'a
         ast::PublicationForClause::ForPublicationObjects(clause) => {
             let mut doc = Doc::text("for");
             if let Some(objects) = build_publication_objects(clause.publication_objects()) {
-                doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+                doc = doc.append(Doc::line_or_space().append(objects).nest(INDENT));
             }
             doc.group()
         }
@@ -9222,7 +9269,7 @@ fn build_alter_foreign_table<'a>(stmt: &ast::AlterForeignTable) -> Doc<'a> {
         )
     });
     if let Some(actions) = build_comma_separated_docs(actions) {
-        doc = doc.append(Doc::line_or_space().append(actions).nest(2));
+        doc = doc.append(Doc::line_or_space().append(actions).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -9272,15 +9319,9 @@ fn build_alter_foreign_table_action<'a>(action: ast::AlterTableAction) -> Doc<'a
         ast::AlterTableAction::AddConstraint(node) => {
             let mut doc = Doc::text("add");
             if let Some(constraint) = node.constraint() {
-                let is_foreign_key =
-                    matches!(&constraint, ast::Constraint::ForeignKeyConstraint(_));
                 let constraint_doc = leading_comments(constraint.syntax())
                     .append(build_domain_constraint(constraint));
-                doc = if is_foreign_key {
-                    doc.append(Doc::space()).append(constraint_doc)
-                } else {
-                    doc.append(Doc::line_or_space().append(constraint_doc).nest(2))
-                };
+                doc = doc.append(Doc::space()).append(constraint_doc);
             }
             doc.group()
         }
@@ -9731,7 +9772,7 @@ fn build_alter_column_option<'a>(option: ast::AlterColumnOption) -> Doc<'a> {
             }
             doc = doc.append(Doc::space()).append(
                 build_keyword_tokens([(n.as_token(), "as"), (n.identity_token(), "identity")])
-                    .nest(2),
+                    .nest(INDENT),
             );
             if let Some(list) = n.sequence_option_list() {
                 doc = doc
@@ -9937,7 +9978,7 @@ fn build_fdw_option_list<'a>(list: ast::FdwOptionList) -> Doc<'a> {
         doc = if index == 0 {
             option_doc
         } else {
-            doc.append(Doc::line_or_space().append(option_doc).nest(2))
+            doc.append(Doc::line_or_space().append(option_doc).nest(INDENT))
         };
     }
     doc.group()
@@ -10032,7 +10073,11 @@ fn build_alter_function<'a>(stmt: &ast::AlterFunction) -> Doc<'a> {
         doc = append_nested_clause(doc, &action_syntax, action_doc);
     }
     if let Some(token) = stmt.restrict_token() {
-        doc = doc.append(line_before(&token).append(Doc::text("restrict")).nest(2));
+        doc = doc.append(
+            line_before(&token)
+                .append(Doc::text("restrict"))
+                .nest(INDENT),
+        );
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -10131,7 +10176,11 @@ fn build_alter_routine<'a>(stmt: &ast::AlterRoutine) -> Doc<'a> {
 
 fn append_restrict<'a>(mut doc: Doc<'a>, token: Option<SyntaxToken>) -> Doc<'a> {
     if let Some(token) = token {
-        doc = doc.append(line_before(&token).append(Doc::text("restrict")).nest(2));
+        doc = doc.append(
+            line_before(&token)
+                .append(Doc::text("restrict"))
+                .nest(INDENT),
+        );
     }
     doc
 }
@@ -10224,7 +10273,7 @@ fn build_alter_sequence<'a>(stmt: &ast::AlterSequence) -> Doc<'a> {
             ]),
             ast::AlterSequenceAction::SequenceOption(option) => build_sequence_option(option),
         });
-        doc = doc.append(Doc::line_or_space().append(part).nest(2));
+        doc = doc.append(Doc::line_or_space().append(part).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -10342,7 +10391,7 @@ fn build_alter_table<'a>(stmt: &ast::AlterTable) -> Doc<'a> {
             )
         });
         if let Some(actions) = build_comma_separated_docs(actions) {
-            doc = doc.append(Doc::line_or_space().append(actions).nest(2));
+            doc = doc.append(Doc::line_or_space().append(actions).nest(INDENT));
         }
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -10456,7 +10505,7 @@ fn build_alter_text_search_dictionary<'a>(stmt: &ast::AlterTextSearchDictionary)
         doc = doc.append(if is_attribute_list {
             Doc::space().append(action_doc)
         } else {
-            Doc::line_or_space().append(action_doc).nest(2)
+            Doc::line_or_space().append(action_doc).nest(INDENT)
         });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -10871,14 +10920,14 @@ fn build_add_mapping<'a>(action: &ast::AddMapping) -> Doc<'a> {
         }
     }
     if let Some(kinds) = build_text_search_token_kinds(action.text_search_token_kinds()) {
-        doc = doc.append(Doc::line_or_space().append(kinds).nest(2));
+        doc = doc.append(Doc::line_or_space().append(kinds).nest(INDENT));
     }
     if let Some(with) = action.with_token() {
         doc = doc.append(line_before(&with)).append(Doc::text("with"));
     }
     if let Some(dictionaries) = build_text_search_dictionaries(action.text_search_dictionary_refs())
     {
-        doc = doc.append(Doc::line_or_space().append(dictionaries).nest(2));
+        doc = doc.append(Doc::line_or_space().append(dictionaries).nest(INDENT));
     }
     doc.group()
 }
@@ -10894,14 +10943,14 @@ fn build_alter_mapping<'a>(action: &ast::AlterMapping) -> Doc<'a> {
         doc = doc.append(line_before(&for_token)).append(Doc::text("for"));
     }
     if let Some(kinds) = build_text_search_token_kinds(action.text_search_token_kinds()) {
-        doc = doc.append(Doc::line_or_space().append(kinds).nest(2));
+        doc = doc.append(Doc::line_or_space().append(kinds).nest(INDENT));
     }
     if let Some(with) = action.with_token() {
         doc = doc.append(line_before(&with)).append(Doc::text("with"));
         if let Some(dictionaries) =
             build_text_search_dictionaries(action.text_search_dictionary_refs())
         {
-            doc = doc.append(Doc::line_or_space().append(dictionaries).nest(2));
+            doc = doc.append(Doc::line_or_space().append(dictionaries).nest(INDENT));
         }
     } else if let Some(replace) = action.replace_dictionary() {
         doc = doc
@@ -10938,7 +10987,7 @@ fn build_drop_mapping<'a>(action: &ast::DropMapping) -> Doc<'a> {
         doc = doc.append(line_before(&for_token)).append(Doc::text("for"));
     }
     if let Some(kinds) = build_text_search_token_kinds(action.text_search_token_kinds()) {
-        doc = doc.append(Doc::line_or_space().append(kinds).nest(2));
+        doc = doc.append(Doc::line_or_space().append(kinds).nest(INDENT));
     }
     doc.group()
 }
@@ -11084,7 +11133,7 @@ fn append_role_list<'a>(mut doc: Doc<'a>, roles: Option<ast::RoleRefList>) -> Do
         doc = doc.append(
             space_before(x.syntax())
                 .append(build_role_ref_list(x))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc
@@ -11370,7 +11419,7 @@ fn build_drop_element_properties<'a>(n: ast::DropVertexEdgeLabelProperties) -> D
             .append(space_before(x.syntax()))
             .append(build_drop_behavior(x));
     }
-    doc.append(Doc::line_or_space().append(detail).nest(2))
+    doc.append(Doc::line_or_space().append(detail).nest(INDENT))
         .group()
 }
 fn build_drop_element_tables<'a>(
@@ -11738,7 +11787,7 @@ fn build_alter_function_options<'a>(list: &ast::FuncOptionList) -> Doc<'a> {
         doc = if index == 0 {
             option_doc
         } else {
-            doc.append(Doc::line_or_space().append(option_doc).nest(2))
+            doc.append(Doc::line_or_space().append(option_doc).nest(INDENT))
         };
     }
     doc.group()
@@ -11792,7 +11841,7 @@ fn build_group_users<'a>(
         )
     }))
     .unwrap_or_else(Doc::nil);
-    doc.append(Doc::line_or_space().append(roles).nest(2))
+    doc.append(Doc::line_or_space().append(roles).nest(INDENT))
         .group()
 }
 
@@ -11992,7 +12041,7 @@ fn build_alter_large_object<'a>(stmt: &ast::AlterLargeObject) -> Doc<'a> {
         });
     }
     if let Some(owner) = owner {
-        doc = doc.append(Doc::line_or_space().append(owner).nest(2));
+        doc = doc.append(Doc::line_or_space().append(owner).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -12027,7 +12076,7 @@ fn build_alter_operator<'a>(stmt: &ast::AlterOperator) -> Doc<'a> {
         doc = doc.append(if is_set_options {
             action_doc
         } else {
-            action_doc.nest(2)
+            action_doc.nest(INDENT)
         });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -12450,7 +12499,7 @@ fn build_alter_materialized_view<'a>(stmt: &ast::AlterMaterializedView) -> Doc<'
             )
         });
         if let Some(actions) = build_comma_separated_docs(actions) {
-            doc = doc.append(Doc::line_or_space().append(actions).nest(2));
+            doc = doc.append(Doc::line_or_space().append(actions).nest(INDENT));
         }
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -12530,7 +12579,7 @@ fn build_alter_aggregate<'a>(stmt: &ast::AlterAggregate) -> Doc<'a> {
             ast::AlterAggregateAction::OwnerTo(action) => build_owner_to(&action),
             ast::AlterAggregateAction::SetSchema(action) => build_set_schema(&action),
         };
-        doc = doc.append(before_action.append(action_doc).nest(2));
+        doc = doc.append(before_action.append(action_doc).nest(INDENT));
     }
     doc.append(build_semicolon(stmt.semicolon_token())).group()
 }
@@ -12560,7 +12609,7 @@ fn build_alter_collation<'a>(stmt: &ast::AlterCollation) -> Doc<'a> {
             ast::AlterCollationAction::RefreshVersion(action) => build_refresh_version(action),
             ast::AlterCollationAction::SetSchema(action) => build_set_schema(&action),
         };
-        doc = doc.append(before_action.append(action_doc).nest(2));
+        doc = doc.append(before_action.append(action_doc).nest(INDENT));
     }
     doc.append(build_semicolon(stmt.semicolon_token())).group()
 }
@@ -12589,7 +12638,7 @@ fn build_alter_conversion<'a>(stmt: &ast::AlterConversion) -> Doc<'a> {
             ast::AlterConversionAction::OwnerTo(action) => build_owner_to(&action),
             ast::AlterConversionAction::SetSchema(action) => build_set_schema(&action),
         };
-        doc = doc.append(before_action.append(action_doc).nest(2));
+        doc = doc.append(before_action.append(action_doc).nest(INDENT));
     }
     doc.append(build_semicolon(stmt.semicolon_token())).group()
 }
@@ -12844,7 +12893,7 @@ fn build_alter_default_privileges<'a>(stmt: &ast::AlterDefaultPrivileges) -> Doc
             )
         }))
         .unwrap_or_else(Doc::nil);
-        clause = clause.append(Doc::line_or_space().append(schemas).nest(2));
+        clause = clause.append(Doc::line_or_space().append(schemas).nest(INDENT));
         doc = append_nested_clause(doc, in_schemas.syntax(), clause);
     }
     if let Some(action) = stmt.action() {
@@ -12887,7 +12936,7 @@ fn build_alter_default_privileges_action<'a>(action: ast::AlterDefaultPrivileges
             if let Some(privileges) = grant.privileges() {
                 doc = doc
                     .append(space_before(privileges.syntax()))
-                    .append(build_privileges(privileges).nest(2));
+                    .append(build_privileges(privileges).nest(INDENT));
             }
             let mut on_clause = grant
                 .on_token()
@@ -12931,9 +12980,9 @@ fn build_alter_default_privileges_action<'a>(action: ast::AlterDefaultPrivileges
                 let privileges_doc =
                     leading_comments(privileges.syntax()).append(build_privileges(privileges));
                 doc = if has_grant_option {
-                    doc.append(Doc::line_or_space().append(privileges_doc).nest(2))
+                    doc.append(Doc::line_or_space().append(privileges_doc).nest(INDENT))
                 } else {
-                    doc.append(Doc::space()).append(privileges_doc.nest(2))
+                    doc.append(Doc::space()).append(privileges_doc.nest(INDENT))
                 };
             }
             let mut on_clause = revoke
@@ -13118,7 +13167,7 @@ fn build_alter_event_trigger<'a>(stmt: &ast::AlterEventTrigger) -> Doc<'a> {
             }
             ast::AlterEventTriggerAction::OwnerTo(node) => build_owner_to(&node),
         };
-        doc = doc.append(before_action.append(action_doc).nest(2));
+        doc = doc.append(before_action.append(action_doc).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -13184,7 +13233,7 @@ fn build_alter_extension_member_action<'a>(
 fn build_extension_member_value<'a>(prefix: Doc<'a>, value: Option<Doc<'a>>) -> Doc<'a> {
     if let Some(value) = value {
         prefix
-            .append(Doc::line_or_space().append(value).nest(2))
+            .append(Doc::line_or_space().append(value).nest(INDENT))
             .group()
     } else {
         prefix
@@ -13249,7 +13298,7 @@ fn build_extension_operator<'a>(node: ast::ObjectOperator) -> Doc<'a> {
     let mut doc = build_keyword_tokens([(node.operator_token(), "operator")]);
     if let Some(op) = node.op() {
         let op_doc = leading_comments(op.syntax()).append(build_operator(&op));
-        doc = doc.append(Doc::line_or_space().append(op_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(op_doc).nest(INDENT));
     }
     let body =
         build_comma_separated_docs([node.lhs(), node.rhs()].into_iter().flatten().map(|ty| {
@@ -13267,7 +13316,7 @@ fn build_extension_operator<'a>(node: ast::ObjectOperator) -> Doc<'a> {
             .append(Doc::text("("))
             .append(wrap_body(body, node.r_paren_token()))
             .append(Doc::text(")"))
-            .nest(2),
+            .nest(INDENT),
     )
     .group()
 }
@@ -13553,7 +13602,7 @@ fn build_alter_publication_action<'a>(action: ast::AlterPublicationAction) -> Do
         ast::AlterPublicationAction::SetAllPublicationObjectList(action) => {
             let mut doc = Doc::text("set");
             if let Some(objects) = build_all_publication_objects(action.all_publication_objects()) {
-                doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+                doc = doc.append(Doc::line_or_space().append(objects).nest(INDENT));
             }
             if let Some(except) = action.except_table_clause() {
                 doc = doc
@@ -13585,7 +13634,7 @@ fn build_publication_object_action<'a>(
 ) -> Doc<'a> {
     let mut doc = Doc::text(keyword);
     if let Some(objects) = build_publication_objects(objects) {
-        doc = doc.append(Doc::line_or_space().append(objects).nest(2));
+        doc = doc.append(Doc::line_or_space().append(objects).nest(INDENT));
     }
     doc.group()
 }
@@ -13633,9 +13682,9 @@ fn build_create_subscription<'a>(stmt: &ast::CreateSubscription) -> Doc<'a> {
         if let Some(publications) = build_publication_refs(stmt.publication_refs()) {
             publication_doc = publication_doc
                 .append(Doc::space())
-                .append(publications.nest(2));
+                .append(publications.nest(INDENT));
         }
-        doc = doc.append(Doc::line_or_space().append(publication_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(publication_doc).nest(INDENT));
     }
     if let Some(params) = stmt.with_params() {
         doc = append_nested_node(doc, params, build_with_params);
@@ -13782,7 +13831,7 @@ fn build_subscription_publication_action<'a>(
             .append(Doc::text("publication"));
     }
     if let Some(publications) = build_publication_refs(publications) {
-        doc = doc.append(Doc::space()).append(publications.nest(2));
+        doc = doc.append(Doc::space()).append(publications.nest(INDENT));
     }
     if let Some(params) = params {
         doc = doc
@@ -13819,7 +13868,7 @@ fn build_drop_aggregate<'a>(stmt: &ast::DropAggregate) -> Doc<'a> {
             syntax,
         )
     })) {
-        doc = doc.append(Doc::line_or_space().append(aggregates).nest(2));
+        doc = doc.append(Doc::line_or_space().append(aggregates).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -13851,7 +13900,7 @@ fn build_drop_collation<'a>(stmt: &ast::DropCollation) -> Doc<'a> {
         let syntax = collation.syntax().clone();
         (build_extension_path_value(&collation), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(collations).nest(2));
+        doc = doc.append(Doc::line_or_space().append(collations).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -13867,7 +13916,7 @@ fn build_drop_conversion<'a>(stmt: &ast::DropConversion) -> Doc<'a> {
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&conversion))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
@@ -13933,7 +13982,7 @@ fn build_drop_domain<'a>(stmt: &ast::DropDomain) -> Doc<'a> {
         let syntax = domain.syntax().clone();
         (build_extension_path_value(&domain), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(domains).nest(2));
+        doc = doc.append(Doc::line_or_space().append(domains).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -13966,7 +14015,7 @@ fn build_drop_extension<'a>(stmt: &ast::DropExtension) -> Doc<'a> {
             syntax,
         )
     })) {
-        doc = doc.append(Doc::line_or_space().append(extensions).nest(2));
+        doc = doc.append(Doc::line_or_space().append(extensions).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -13989,7 +14038,7 @@ fn build_drop_foreign_data_wrapper<'a>(stmt: &ast::DropForeignDataWrapper) -> Do
             )
         }))
     {
-        doc = doc.append(Doc::line_or_space().append(wrappers).nest(2));
+        doc = doc.append(Doc::line_or_space().append(wrappers).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14006,7 +14055,7 @@ fn build_drop_foreign_table<'a>(stmt: &ast::DropForeignTable) -> Doc<'a> {
         let syntax = table.syntax().clone();
         (build_extension_path_value(&table), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(tables).nest(2));
+        doc = doc.append(Doc::line_or_space().append(tables).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14044,7 +14093,7 @@ fn build_drop_group<'a>(stmt: &ast::DropGroup) -> Doc<'a> {
             syntax,
         )
     })) {
-        doc = doc.append(Doc::line_or_space().append(groups).nest(2));
+        doc = doc.append(Doc::line_or_space().append(groups).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -14060,7 +14109,7 @@ fn build_drop_index<'a>(stmt: &ast::DropIndex) -> Doc<'a> {
         let syntax = index.syntax().clone();
         (build_extension_path_value(&index), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(indexes).nest(2));
+        doc = doc.append(Doc::line_or_space().append(indexes).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14091,7 +14140,7 @@ fn build_drop_materialized_view<'a>(stmt: &ast::DropMaterializedView) -> Doc<'a>
         let syntax = view.syntax().clone();
         (build_extension_path_value(&view), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(views).nest(2));
+        doc = doc.append(Doc::line_or_space().append(views).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14129,7 +14178,7 @@ fn build_drop_operator_class<'a>(stmt: &ast::DropOperatorClass) -> Doc<'a> {
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&class))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(using) = stmt.using_method() {
@@ -14150,7 +14199,7 @@ fn build_drop_operator_family<'a>(stmt: &ast::DropOperatorFamily) -> Doc<'a> {
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&family))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(using) = stmt.using_method() {
@@ -14227,7 +14276,7 @@ fn build_drop_property_graph<'a>(stmt: &ast::DropPropertyGraph) -> Doc<'a> {
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&graph))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
@@ -14244,7 +14293,7 @@ fn build_drop_role<'a>(stmt: &ast::DropRole) -> Doc<'a> {
             syntax,
         )
     })) {
-        doc = doc.append(Doc::line_or_space().append(roles).nest(2));
+        doc = doc.append(Doc::line_or_space().append(roles).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -14300,7 +14349,7 @@ fn build_drop_schema<'a>(stmt: &ast::DropSchema) -> Doc<'a> {
             syntax,
         )
     })) {
-        doc = doc.append(Doc::line_or_space().append(schemas).nest(2));
+        doc = doc.append(Doc::line_or_space().append(schemas).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14316,7 +14365,7 @@ fn build_drop_sequence<'a>(stmt: &ast::DropSequence) -> Doc<'a> {
         let syntax = sequence.syntax().clone();
         (build_extension_path_value(&sequence), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(sequences).nest(2));
+        doc = doc.append(Doc::line_or_space().append(sequences).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14333,7 +14382,7 @@ fn build_drop_server<'a>(stmt: &ast::DropServer) -> Doc<'a> {
             syntax,
         )
     })) {
-        doc = doc.append(Doc::line_or_space().append(servers).nest(2));
+        doc = doc.append(Doc::line_or_space().append(servers).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14349,7 +14398,7 @@ fn build_drop_statistics<'a>(stmt: &ast::DropStatistics) -> Doc<'a> {
         let syntax = statistics.syntax().clone();
         (build_extension_path_value(&statistics), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(statistics).nest(2));
+        doc = doc.append(Doc::line_or_space().append(statistics).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14363,7 +14412,7 @@ fn build_drop_table<'a>(stmt: &ast::DropTable) -> Doc<'a> {
         let syntax = table.syntax().clone();
         (build_extension_path_value(&table), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(tables).nest(2));
+        doc = doc.append(Doc::line_or_space().append(tables).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14376,7 +14425,7 @@ fn build_drop_view<'a>(stmt: &ast::DropView) -> Doc<'a> {
         let syntax = view.syntax().clone();
         (build_extension_path_value(&view), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(views).nest(2));
+        doc = doc.append(Doc::line_or_space().append(views).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14406,7 +14455,7 @@ fn build_drop_text_search_config<'a>(stmt: &ast::DropTextSearchConfig) -> Doc<'a
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&configuration))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
@@ -14425,7 +14474,7 @@ fn build_drop_text_search_dict<'a>(stmt: &ast::DropTextSearchDict) -> Doc<'a> {
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&dictionary))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
@@ -14444,7 +14493,7 @@ fn build_drop_text_search_parser<'a>(stmt: &ast::DropTextSearchParser) -> Doc<'a
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&parser))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
@@ -14463,7 +14512,7 @@ fn build_drop_text_search_template<'a>(stmt: &ast::DropTextSearchTemplate) -> Do
         doc = doc.append(
             Doc::line_or_space()
                 .append(build_extension_path_value(&template))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
@@ -14488,7 +14537,7 @@ fn build_drop_transform<'a>(stmt: &ast::DropTransform) -> Doc<'a> {
         doc = doc.append(
             line_before(&language_token)
                 .append(Doc::text("language"))
-                .nest(2),
+                .nest(INDENT),
         );
     }
     if let Some(language) = stmt.language_ref() {
@@ -14529,7 +14578,7 @@ fn build_drop_type<'a>(stmt: &ast::DropType) -> Doc<'a> {
         let syntax = ty.syntax().clone();
         (build_extension_path_value(&ty), syntax)
     })) {
-        doc = doc.append(Doc::line_or_space().append(types).nest(2));
+        doc = doc.append(Doc::line_or_space().append(types).nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -14545,7 +14594,7 @@ fn build_drop_user<'a>(stmt: &ast::DropUser) -> Doc<'a> {
             syntax,
         )
     })) {
-        doc = doc.append(Doc::line_or_space().append(users).nest(2));
+        doc = doc.append(Doc::line_or_space().append(users).nest(INDENT));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -14582,7 +14631,7 @@ fn build_drop_publication<'a>(stmt: &ast::DropPublication) -> Doc<'a> {
     if let Some(publications) = build_publication_refs(stmt.publication_refs()) {
         doc = doc
             .append(Doc::line_or_space())
-            .append(publications.nest(2));
+            .append(publications.nest(INDENT));
     }
     doc = append_drop_behavior(doc, stmt.drop_behavior());
     doc.append(build_semicolon(stmt.semicolon_token())).group()
@@ -14717,10 +14766,12 @@ fn build_select_doc_ungrouped<'a>(select: &ast::Select) -> Doc<'a> {
         Some(select_body) if has_single_inline_target(select) => {
             select_doc.append(Doc::space()).append(select_body)
         }
-        Some(select_body) if has_distinct_on => {
-            select_doc.append(Doc::space()).append(select_body.nest(2))
+        Some(select_body) if has_distinct_on => select_doc
+            .append(Doc::space())
+            .append(select_body.nest(INDENT)),
+        Some(select_body) => {
+            select_doc.append(Doc::line_or_space().append(select_body).nest(INDENT))
         }
-        Some(select_body) => select_doc.append(Doc::line_or_space().append(select_body).nest(2)),
     };
     doc = if select.with_clause().is_some() {
         doc.append(select_doc.group())
@@ -14787,7 +14838,7 @@ fn build_from_clause<'a>(from: ast::FromClause) -> Doc<'a> {
         )
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
-    let body = if nest_items { body.nest(2) } else { body };
+    let body = if nest_items { body.nest(INDENT) } else { body };
 
     Doc::text("from").append(Doc::space()).append(body)
 }
@@ -14842,7 +14893,7 @@ fn build_join<'a>(join: ast::Join) -> Doc<'a> {
             ast::JoinCondition::JoinUsingClause(using) => {
                 let condition_doc =
                     leading_comments(using.syntax()).append(build_join_using_clause(using));
-                doc = doc.append(Doc::line_or_space().append(condition_doc).nest(2));
+                doc = doc.append(Doc::line_or_space().append(condition_doc).nest(INDENT));
             }
         }
     }
@@ -15613,7 +15664,7 @@ fn build_xml_row_passing_clause<'a>(clause: ast::XmlRowPassingClause) -> Doc<'a>
                 .append(space_before(mech.syntax()))
                 .append(build_xml_passing_mech(mech));
         }
-        doc = doc.append(Doc::line_or_space().append(passing_doc_doc).nest(2));
+        doc = doc.append(Doc::line_or_space().append(passing_doc_doc).nest(INDENT));
     }
     doc.group()
 }
@@ -15627,7 +15678,7 @@ fn build_xml_table_column_list<'a>(list: ast::XmlTableColumnList) -> Doc<'a> {
         )
     });
     if let Some(columns) = build_comma_separated_docs(columns) {
-        doc = doc.append(Doc::hard_line().append(columns).nest(2));
+        doc = doc.append(Doc::hard_line().append(columns).nest(INDENT));
     }
     doc
 }
@@ -15860,7 +15911,7 @@ fn build_group_by_list<'a>(list: ast::GroupByList) -> Doc<'a> {
     if single_group_by {
         Doc::space().append(body)
     } else {
-        Doc::line_or_space().append(body).nest(2)
+        Doc::line_or_space().append(body).nest(INDENT)
     }
 }
 
@@ -15988,7 +16039,7 @@ fn wrap_delimited_body<'a>(
         } else {
             Doc::space().append(comment_doc)
         })
-        .nest(2)
+        .nest(INDENT)
         .append(closing_separator)
 }
 
@@ -16004,7 +16055,7 @@ fn wrap_empty_body<'a>(r_delimiter: Option<SyntaxToken>) -> Doc<'a> {
     let (comment_doc, closing_separator) = comments.before_closing_delimiter(Doc::line_or_space());
     Doc::line_or_space()
         .append(comment_doc)
-        .nest(2)
+        .nest(INDENT)
         .append(closing_separator)
 }
 
@@ -16207,8 +16258,9 @@ fn build_tuple_expr<'a>(tuple_expr: ast::TupleExpr) -> Doc<'a> {
 
 fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
     let target = between_expr.target().unwrap();
+    let target_is_inline_bracketed = is_inline_bracketed_expr(&target);
     let mut doc = build_expr(target.clone())
-        .append(comment_run_after(target.syntax()).after_node(Doc::line_or_space()));
+        .append(comment_run_after(target.syntax()).between_nodes(Doc::line_or_space()));
     if between_expr.not_token().is_some() {
         doc = doc.append(Doc::text("not")).append(Doc::space());
         if let Some(between_token) = between_expr.between_token() {
@@ -16231,14 +16283,18 @@ fn build_between_expr<'a>(between_expr: ast::BetweenExpr) -> Doc<'a> {
     }
     let start = between_expr.start().unwrap();
     let end = between_expr.end().unwrap();
-    doc.append(space_before(start.syntax()))
+    let doc = doc
+        .append(space_before(start.syntax()))
         .append(build_expr(start.clone()))
-        .append(comment_run_after(start.syntax()).after_node(Doc::line_or_space()))
+        .append(comment_run_after(start.syntax()).between_nodes(Doc::line_or_space()))
         .append(Doc::text("and"))
         .append(space_before(end.syntax()))
-        .append(build_expr(end))
-        .nest(2)
-        .group()
+        .append(build_expr(end));
+    if target_is_inline_bracketed {
+        doc.group()
+    } else {
+        doc.nest(INDENT).group()
+    }
 }
 
 fn build_call_expr<'a>(call_expr: ast::CallExpr) -> Doc<'a> {
@@ -16444,7 +16500,7 @@ fn build_path_pattern<'a>(pattern: ast::PathPattern) -> Doc<'a> {
             .append(leading_comments(factor.syntax()))
             .append(build_path_factor(factor));
     }
-    doc.nest(2).group()
+    doc.nest(INDENT).group()
 }
 
 fn build_path_factor<'a>(factor: ast::PathFactor) -> Doc<'a> {
@@ -16589,7 +16645,7 @@ fn build_graph_pattern_inner<'a>(
             .append(line_before(where_clause.syntax()))
             .append(build_where_clause(where_clause));
     }
-    doc.nest(2).group()
+    doc.nest(INDENT).group()
 }
 
 fn build_is_label<'a>(label: ast::IsLabel) -> Doc<'a> {
@@ -17512,7 +17568,7 @@ fn build_json_passing_clause<'a>(passing: ast::JsonPassingClause) -> Doc<'a> {
             previous_syntax = arg.syntax().clone();
         }
     }
-    doc.nest(2).group()
+    doc.nest(INDENT).group()
 }
 
 fn build_json_passing_arg<'a>(arg: ast::JsonPassingArg) -> Doc<'a> {
@@ -17844,7 +17900,7 @@ fn build_json_returning_clause<'a>(returning: ast::JsonReturningClause) -> Doc<'
             .append(line_before(format.syntax()))
             .append(build_json_format_clause(format));
     }
-    doc.nest(2).group()
+    doc.nest(INDENT).group()
 }
 
 fn build_overlay_fn<'a>(overlay_fn: ast::OverlayFn) -> Doc<'a> {
@@ -18350,7 +18406,7 @@ fn build_case_expr<'a>(case_expr: ast::CaseExpr) -> Doc<'a> {
                     .append(list_comments)
                     .append(leading_comments(when_clause.syntax()))
                     .append(build_when_clause(when_clause))
-                    .nest(2),
+                    .nest(INDENT),
             );
         }
     }
@@ -18391,7 +18447,7 @@ fn build_else_clause<'a>(else_clause: ast::ElseClause) -> Doc<'a> {
     if let Some(expr) = else_clause.expr() {
         doc = append_nested_node(doc, expr, build_expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_cast_expr<'a>(cast_expr: ast::CastExpr) -> Doc<'a> {
@@ -18711,7 +18767,7 @@ fn build_logical_expr<'a>(bin_expr: ast::BinExpr, logical: LogicalOp) -> Doc<'a>
     };
 
     lhs_doc
-        .append(comment_run_after(lhs.syntax()).after_node(Doc::line_or_space()))
+        .append(comment_run_after(lhs.syntax()).between_nodes(Doc::line_or_space()))
         .append(build_op(bin_expr.op().unwrap()))
         .append(space_before(rhs.syntax()))
         .append(rhs_doc)
@@ -18719,11 +18775,22 @@ fn build_logical_expr<'a>(bin_expr: ast::BinExpr, logical: LogicalOp) -> Doc<'a>
 
 fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
     if let Some(logical) = bin_expr.op().as_ref().and_then(logical_op) {
-        return build_logical_expr(bin_expr, logical).nest(2).group();
+        let lhs_is_inline_bracketed = bin_expr
+            .lhs()
+            .as_ref()
+            .is_some_and(is_inline_bracketed_expr);
+        let doc = build_logical_expr(bin_expr, logical);
+        return if lhs_is_inline_bracketed {
+            doc.group()
+        } else {
+            doc.nest(INDENT).group()
+        };
     }
 
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
+    let lhs_is_inline_bracketed = is_inline_bracketed_expr(&lhs);
+    let lhs_requires_inline_separator = matches!(&lhs, ast::Expr::CaseExpr(_));
     let comments = comment_run_before(rhs.syntax());
     let after_op = comments.before_node(Doc::space());
     let rhs_requires_inline_separator = comments.is_empty() && is_inline_bracketed_expr(&rhs);
@@ -18732,17 +18799,22 @@ fn build_bin_expr<'a>(bin_expr: ast::BinExpr) -> Doc<'a> {
     } else {
         Doc::line_or_space()
     };
-    let before_op = comment_run_after(lhs.syntax()).after_node(separator);
-
-    let doc = build_expr(lhs)
-        .append(before_op)
+    let before_op = comment_run_after(lhs.syntax()).between_nodes(separator);
+    let tail = before_op
         .append(build_op(bin_expr.op().unwrap()))
         .append(after_op)
         .append(build_expr(rhs));
-    if rhs_requires_inline_separator {
-        doc
+    let tail = if lhs_requires_inline_separator {
+        tail.group()
     } else {
-        doc.nest(2).group()
+        tail
+    };
+
+    let doc = build_expr(lhs).append(tail);
+    if lhs_is_inline_bracketed || rhs_requires_inline_separator {
+        doc.group()
+    } else {
+        doc.nest(INDENT).group()
     }
 }
 
@@ -18842,7 +18914,7 @@ fn build_frame_clause<'a>(frame: ast::FrameClause) -> Doc<'a> {
             .append(line_before(exclude.syntax()))
             .append(build_frame_exclude(exclude));
     }
-    doc.nest(2).group()
+    doc.nest(INDENT).group()
 }
 
 fn build_frame_extent<'a>(extent: ast::FrameExtent) -> Doc<'a> {
@@ -18862,7 +18934,7 @@ fn build_frame_extent<'a>(extent: ast::FrameExtent) -> Doc<'a> {
                     .append(space_before(end.syntax()))
                     .append(build_frame_bound(end));
             }
-            doc.nest(2).group()
+            doc.nest(INDENT).group()
         }
         ast::FrameExtent::FrameBound(bound) => build_frame_bound(bound),
     }
@@ -19112,7 +19184,16 @@ fn build_prefix_expr<'a>(prefix_expr: ast::PrefixExpr) -> Doc<'a> {
         ast::Expr::PrefixExpr(expr) if matches!(expr.op(), Some(ast::PrefixOp::Minus(_)))
     );
     let (op, space_before_expr) = match prefix_expr.op().unwrap() {
-        ast::PrefixOp::CustomOp(custom_op) => (build_operator_part(custom_op.syntax()), true),
+        ast::PrefixOp::CustomOp(custom_op) => {
+            // Valid operator but people use this for templating so just special
+            // case it
+            let is_at = custom_op.at_token().is_some()
+                && custom_op.syntax().first_token() == custom_op.syntax().last_token();
+            (
+                build_operator_part(custom_op.syntax()),
+                has_comments || !is_at,
+            )
+        }
         ast::PrefixOp::Minus(_) => (Doc::text("-"), has_comments || expr_starts_with_minus),
         ast::PrefixOp::Not(_) => (Doc::text("not"), true),
         ast::PrefixOp::OperatorCall(operator_call) => (build_operator_call(&operator_call), true),
