@@ -228,7 +228,7 @@ PLPGSQL@0..519
         RAISE_KW@363..368 "raise"
         WHITESPACE@368..369 " "
         PLPGSQL_CONDITION@369..385
-          IDENT@369..377 "sqlstate"
+          SQLSTATE_KW@369..377 "sqlstate"
           WHITESPACE@377..378 " "
           STRING@378..385 "'22012'"
         SEMICOLON@385..386 ";"

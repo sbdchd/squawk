@@ -3542,7 +3542,7 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
 }
 
 pub(crate) fn perform_select(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.nth_at_contextual_kw(0, PERFORM_KW));
+    assert!(p.at_contextual_kw(PERFORM_KW));
     let m = p.start();
     let clause = p.start();
     // Postgres rewrites this to `select` before passing to the sql parser, but
