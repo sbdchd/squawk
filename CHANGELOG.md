@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.66.0 - 2026-09-23
+
+### Added
+
+- parser: validation for sql embedded in strings (#1350)
+- parser: validation for uescape (#1349)
+- parser: plpgsql support (#1348, #1347, #1346, #1345)
+
+- playground: semantic syntax highlighting for formatted output (#1344)
+
+### Changed
+
+- fmt: improve alter table, fk, do, case when else, @ op (#1354)
+- fmt: support nicer single expression clauses (#1343)
+
 ## v2.65.0 - 2026-09-09
 
 ### Added
