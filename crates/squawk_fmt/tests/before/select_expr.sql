@@ -404,3 +404,29 @@ select * from /* TEMPLATE: schema */ river_job where id <> @id and unique_key = 
 
 -- multiline case followed by a long binary right operand
 select case state when 'available' then unique_states & (1 << 0) when 'cancelled' then unique_states & (1 << 1) else 0 end >= an_extraordinarily_long_expression_that_will_not_fit_after_the_end_keyword;
+
+-- before comment placement expression
+select
+  -- above case
+  case
+    -- above when
+    when true
+    -- above then
+    then 1 -- trailing then result
+    -- above else
+    else 0 -- trailing else result
+    -- end case
+  end, -- trailing case
+  -- above call
+  coalesce(
+    -- above call argument
+    1 -- trailing call argument
+    -- end call
+  ), -- trailing call
+  -- above array
+  array[
+    -- above array item
+    1 -- trailing array item
+    -- end array
+  ]; -- trailing statement
+-- after comment placement expression

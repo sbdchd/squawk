@@ -18416,9 +18416,7 @@ fn build_case_expr<'a>(case_expr: ast::CaseExpr) -> Doc<'a> {
     }
 
     if let Some(end) = case_expr.end_token() {
-        doc = doc
-            .append(comments_before(&end))
-            .append(Doc::line_or_space());
+        doc = doc.append(comment_run_before(&end).between_nodes(Doc::line_or_space()));
     }
     doc.append(Doc::text("end")).group()
 }
@@ -18432,8 +18430,7 @@ fn build_when_clause<'a>(when_clause: ast::WhenClause) -> Doc<'a> {
     }
     if let Some(then) = when_clause.then_token() {
         doc = doc
-            .append(comments_before(&then))
-            .append(Doc::space())
+            .append(comment_run_before(&then).before_keyword(Doc::line_or_space()))
             .append(Doc::text("then"));
     }
     if let Some(result) = when_clause.then() {

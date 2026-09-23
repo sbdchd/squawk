@@ -134,6 +134,20 @@ impl CommentRun {
             .append(self.separator_after(separator))
     }
 
+    pub(crate) fn before_keyword<'a>(&self, separator: Doc<'a>) -> Doc<'a> {
+        if self.is_empty() {
+            return Doc::space();
+        }
+        let before = if self.tokens.first().is_some_and(is_trailing_comment) {
+            Doc::space()
+        } else {
+            separator
+        };
+        before
+            .append(self.doc())
+            .append(self.separator_after(Doc::space()))
+    }
+
     pub(crate) fn before_closing_delimiter<'a>(&self, separator: Doc<'a>) -> (Doc<'a>, Doc<'a>) {
         (self.doc(), self.separator_after(separator))
     }
