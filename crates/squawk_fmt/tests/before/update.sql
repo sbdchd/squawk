@@ -46,3 +46,20 @@ update foo set a = 1 returning -- before target
 a, b;
 
 update foo set a = 1 returning a_very_long_returning_target_name_that_definitely_does_not_fit_here_okay;
+
+update /* TEMPLATE: schema */ river_job set
+  -- If the job is actively running, we want to let its current client and
+  -- producer handle the cancellation. Otherwise, immediately cancel it.
+  state = case when state = 'running' then state else 'cancelled' end,
+  finalized_at = case
+    when state = 'running' then finalized_at
+    else coalesce(sqlc.narg('now')::timestamptz, now())
+  end,
+  -- Mark the job as cancelled by query so that the rescuer knows not to
+  -- rescue it, even if it gets stuck in the running state:
+  metadata = jsonb_set(
+    metadata,
+    '{cancel_attempted_at}'::text[],
+    @cancel_attempted_at::jsonb,
+    true
+  );

@@ -35,3 +35,13 @@ where -- trailing where
   -- above archived_at check
   and archived_at is not null; -- trailing archived at check
 -- bottom
+
+WITH deleted_job AS (
+    DELETE FROM /* TEMPLATE: schema */river_job
+    USING job_to_delete
+    WHERE river_job.id = job_to_delete.id
+        -- Do not touch running jobs:
+        AND river_job.state != 'running'
+    RETURNING river_job.*
+)
+SELECT * FROM deleted_job;

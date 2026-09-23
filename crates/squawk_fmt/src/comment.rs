@@ -44,10 +44,7 @@ fn comment_tokens(
     tokens
 }
 
-fn is_trailing_line_comment(token: &SyntaxToken) -> bool {
-    if !is_line_comment(token) {
-        return false;
-    }
+fn is_trailing_comment(token: &SyntaxToken) -> bool {
     match token.prev_token() {
         Some(prev) if prev.kind() == SyntaxKind::WHITESPACE => {
             find_newline(prev.text()).is_none() && prev.prev_token().is_some()
@@ -86,7 +83,11 @@ impl CommentRun {
     }
 
     fn separator_before<'a>(&self, separator: Doc<'a>) -> Doc<'a> {
-        if self.tokens.first().is_some_and(is_trailing_line_comment) {
+        if self
+            .tokens
+            .first()
+            .is_some_and(|token| is_line_comment(token) && is_trailing_comment(token))
+        {
             Doc::space()
         } else {
             separator
@@ -117,6 +118,34 @@ impl CommentRun {
         Doc::space()
             .append(self.doc())
             .append(self.separator_after(separator))
+    }
+
+    pub(crate) fn between_nodes<'a>(&self, separator: Doc<'a>) -> Doc<'a> {
+        if self.is_empty() {
+            return separator;
+        }
+        let before = if self.tokens.first().is_some_and(is_trailing_comment) {
+            Doc::space()
+        } else {
+            separator.clone()
+        };
+        before
+            .append(self.doc())
+            .append(self.separator_after(separator))
+    }
+
+    pub(crate) fn before_keyword<'a>(&self, separator: Doc<'a>) -> Doc<'a> {
+        if self.is_empty() {
+            return Doc::space();
+        }
+        let before = if self.tokens.first().is_some_and(is_trailing_comment) {
+            Doc::space()
+        } else {
+            separator
+        };
+        before
+            .append(self.doc())
+            .append(self.separator_after(Doc::space()))
     }
 
     pub(crate) fn before_closing_delimiter<'a>(&self, separator: Doc<'a>) -> (Doc<'a>, Doc<'a>) {

@@ -72,3 +72,14 @@ ALTER /* table */ TABLE /* relation */ options_test /* alter */ ALTER /* column 
 
 -- parenthesized default expressions are only indented once
 alter table t add column a int default (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16);
+
+ALTER TABLE /* TEMPLATE: schema */river_job DROP CONSTRAINT finalized_or_finalized_at_null;
+ALTER TABLE /* TEMPLATE: schema */river_job ADD CONSTRAINT finalized_or_finalized_at_null CHECK (
+  (state IN ('cancelled', 'completed', 'discarded') AND finalized_at IS NOT NULL) OR finalized_at IS NULL
+);
+
+ALTER TABLE room_reservations ADD CONSTRAINT room_reservations_no_overlapping_reservations EXCLUDE USING gist (room_id WITH =, reserved_during WITH &&);
+
+ALTER TABLE warehouse_inventory ADD CONSTRAINT warehouse_inventory_location_product_primary_key PRIMARY KEY (warehouse_location_id, product_catalog_entry_id);
+
+ALTER TABLE customer_accounts ADD CONSTRAINT customer_accounts_tenant_email_unique UNIQUE (tenant_id, normalized_email_address);

@@ -89,9 +89,8 @@ alter table child_table
   add not null a_very_long_inherited_column_name no inherit;
 
 alter /* table */ table /* relation */ child_table
-  /* add */ add
-    /* not */ not /* null */ null /* column */ inherited_column
-      /* no */ no /* inherit */ inherit /* semicolon */;
+  /* add */ add /* not */ not /* null */ null /* column */ inherited_column
+    /* no */ no /* inherit */ inherit /* semicolon */;
 
 alter table parent_table
   alter constraint source_ordered_constraint /* enforced */ enforced /* not */ not /* deferrable */ deferrable;
@@ -169,3 +168,32 @@ alter table t
     default (
       1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16
     );
+
+alter table /* TEMPLATE: schema */ river_job
+  drop constraint finalized_or_finalized_at_null;
+alter table /* TEMPLATE: schema */ river_job
+  add constraint finalized_or_finalized_at_null check (
+    (
+      state in ('cancelled', 'completed', 'discarded')
+        and finalized_at is not null
+    )
+    or finalized_at is null
+  );
+
+alter table room_reservations
+  add constraint room_reservations_no_overlapping_reservations exclude using gist (
+    room_id with =,
+    reserved_during with &&
+  );
+
+alter table warehouse_inventory
+  add constraint warehouse_inventory_location_product_primary_key primary key (
+    warehouse_location_id,
+    product_catalog_entry_id
+  );
+
+alter table customer_accounts
+  add constraint customer_accounts_tenant_email_unique unique (
+    tenant_id,
+    normalized_email_address
+  );
