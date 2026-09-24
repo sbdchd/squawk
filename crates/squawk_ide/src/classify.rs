@@ -1004,6 +1004,9 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             // (anything in SELECT except FROM clause)
             return Some(NameRefClass::SelectColumn);
         }
+        if ast::Values::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::SelectColumn);
+        }
         if ast::CompoundSelect::can_cast(ancestor.kind())
             && in_order_by_clause
             && let Some(parent) = node.parent()
