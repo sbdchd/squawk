@@ -879,34 +879,42 @@ pub(crate) fn resolve_name_ref(
             resolve_select_qualified_column_ptr(db, InFile::new(file, name_ref))
         }
         NameRefClass::InsertColumn => {
+            if column_qualifier_name(name_ref).is_some() {
+                return resolve_dml_column_ptr(
+                    db,
+                    InFile::new(file, name_ref),
+                    DmlScope::enclosing(name_ref.syntax())?,
+                );
+            }
             let column_name = Name::from_node(name_ref);
             let insert = name_ref.syntax().ancestors().find_map(ast::Insert::cast)?;
             let path = insert.relation_name_ref()?.path_ref()?;
-            resolve_column_for_path(db, InFile::new(file, &path), column_name)
+            if let Some(column) = resolve_column_for_path(db, InFile::new(file, &path), column_name)
+            {
+                return Some(column);
+            }
+            if is_target_definition(name_ref.syntax()) {
+                return None;
+            }
+            let scope = DmlScope::new(insert.syntax(), name_ref.syntax())?;
+            resolve_dml_table_name_ptr(db, InFile::new(file, name_ref), scope)
+                .or_else(|| resolve_enclosing_function_param(InFile::new(file, name_ref)))
         }
-        NameRefClass::InsertQualifiedColumnTable => {
-            let insert = name_ref.syntax().ancestors().find_map(ast::Insert::cast)?;
-            let path = insert.relation_name_ref()?.path_ref()?;
-            resolve_table_in_returning_clause(
+        NameRefClass::DeleteColumn | NameRefClass::UpdateColumn | NameRefClass::MergeColumn => {
+            resolve_dml_column_ptr(
                 db,
                 InFile::new(file, name_ref),
-                insert.alias().and_then(|alias| alias.name()),
-                &path,
-                insert.returning_clause(),
+                DmlScope::enclosing(name_ref.syntax())?,
             )
         }
-        NameRefClass::DeleteColumn => resolve_delete_column_ptr(db, InFile::new(file, name_ref)),
-        NameRefClass::DeleteQualifiedColumnTable => {
-            resolve_delete_table_name_ptr(db, InFile::new(file, name_ref))
-        }
-        NameRefClass::UpdateColumn => resolve_update_column_ptr(db, InFile::new(file, name_ref)),
-        NameRefClass::UpdateQualifiedColumnTable => {
-            resolve_update_table_name_ptr(db, InFile::new(file, name_ref))
-        }
-        NameRefClass::MergeColumn => resolve_merge_column_ptr(db, InFile::new(file, name_ref)),
-        NameRefClass::MergeQualifiedColumnTable => {
-            resolve_merge_table_name_ptr(db, InFile::new(file, name_ref))
-        }
+        NameRefClass::InsertQualifiedColumnTable
+        | NameRefClass::DeleteQualifiedColumnTable
+        | NameRefClass::UpdateQualifiedColumnTable
+        | NameRefClass::MergeQualifiedColumnTable => resolve_dml_table_name_ptr(
+            db,
+            InFile::new(file, name_ref),
+            DmlScope::enclosing(name_ref.syntax())?,
+        ),
         NameRefClass::JoinUsingColumn => {
             let join_expr = name_ref
                 .syntax()
@@ -1940,7 +1948,14 @@ fn resolve_select_qualified_column_table_name_ptr(
         return Some(locations);
     }
 
-    let from_item = find_from_item_for_select_qualified_name_ref(table_name_ref, &table_name)?;
+    let Some(from_item) = find_from_item_for_select_qualified_name_ref(table_name_ref, &table_name)
+    else {
+        return DmlScope::enclosing(table_name_ref.syntax())
+            .and_then(|scope| {
+                resolve_dml_table_name_ptr(db, InFile::new(file, table_name_ref), scope)
+            })
+            .or_else(|| resolve_enclosing_routine_name_ptr(InFile::new(file, table_name_ref)));
+    };
 
     if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name())
         && Name::from_node(&alias_name) == table_name
@@ -1981,20 +1996,38 @@ enum ReturningClauseMatch {
     TableAlias(ast::TableAlias),
 }
 
+// `old`, `new` and their `returning with` aliases are only visible from inside
+// the returning clause
 fn match_table_in_returning_clause(
+    node: &SyntaxNode,
     table_name: &Name,
     stmt_table_name: &Name,
     alias: Option<&ast::TableAlias>,
     returning_clause: Option<&ast::ReturningClause>,
 ) -> Option<ReturningClauseMatch> {
-    // Check `returning with (old as alias, new as alias)`
+    let returning_clause = returning_clause.filter(|returning_clause| {
+        returning_clause
+            .syntax()
+            .text_range()
+            .contains_range(node.text_range())
+    });
+
+    // Check `returning with (old as alias, new as alias)`. An alias hides the
+    // corresponding built-in name.
+    let mut pseudo_table_is_aliased = false;
     if let Some(option_list) = returning_clause.and_then(|x| x.returning_option_list()) {
         for option in option_list.returning_options() {
-            if let Some(alias) = option.name()
-                && Name::from_node(&alias) == *table_name
-            {
+            let (pseudo_table_name, alias) = match option {
+                ast::ReturningOption::ReturningOld(option) => ("old", option.name()),
+                ast::ReturningOption::ReturningNew(option) => ("new", option.name()),
+            };
+            let Some(alias) = alias else {
+                continue;
+            };
+            if Name::from_node(&alias) == *table_name {
                 return Some(ReturningClauseMatch::ReturningAlias(alias));
             }
+            pseudo_table_is_aliased |= *table_name == pseudo_table_name;
         }
     }
 
@@ -2004,7 +2037,10 @@ fn match_table_in_returning_clause(
         return Some(ReturningClauseMatch::TableAlias(alias.clone()));
     }
 
-    if *table_name == "old" || *table_name == "new" {
+    if returning_clause.is_some()
+        && (*table_name == "old" || *table_name == "new")
+        && !pseudo_table_is_aliased
+    {
         return Some(ReturningClauseMatch::PseudoTable);
     }
 
@@ -2032,7 +2068,15 @@ fn resolve_select_qualified_column_ptr(
 
     let position = column_name_ref.syntax().text_range().start();
 
-    let (schema, mut table_name) = if let Some(schema) = explicit_schema {
+    let resolve_dml = |stmt: &SyntaxNode| {
+        resolve_dml_column_ptr(
+            db,
+            InFile::new(file, column_name_ref),
+            DmlScope::new(stmt, column_name_ref.syntax())?,
+        )
+    };
+
+    let (schema, table_name) = if let Some(schema) = explicit_schema {
         (Some(schema), column_table_name)
     } else {
         match ast_nav::node_parent_query(column_name_ref.syntax())? {
@@ -2045,10 +2089,18 @@ fn resolve_select_qualified_column_ptr(
                     return Some(locations);
                 }
 
-                let from_item = find_from_item_for_select_qualified_name_ref(
+                let Some(from_item) = find_from_item_for_select_qualified_name_ref(
                     column_name_ref,
                     &column_table_name,
-                )?;
+                ) else {
+                    return DmlScope::enclosing(column_name_ref.syntax())
+                        .and_then(|scope| {
+                            resolve_dml_column_ptr(db, InFile::new(file, column_name_ref), scope)
+                        })
+                        .or_else(|| {
+                            resolve_enclosing_function_param(InFile::new(file, column_name_ref))
+                        });
+                };
 
                 if let ast::FromItem::FunctionFromItem(func) = &from_item
                     && let Some(call_expr) = func.call_expr()
@@ -2152,48 +2204,10 @@ fn resolve_select_qualified_column_ptr(
                 }
                 name::schema_and_table_from_from_item(&from_item)?
             }
-            ast_nav::ParentQuery::Update(update) => {
-                let path = update.relation_name()?.relation_name_ref()?.path_ref()?;
-                name::schema_and_name_path(&path)?
-            }
-            ast_nav::ParentQuery::Delete(delete) => {
-                let path = delete.relation_name()?.relation_name_ref()?.path_ref()?;
-                name::schema_and_name_path(&path)?
-            }
-            ast_nav::ParentQuery::Insert(insert) => {
-                let path = insert.relation_name_ref()?.path_ref()?;
-                name::schema_and_name_path(&path)?
-            }
-            ast_nav::ParentQuery::Merge(merge) => {
-                // When the qualifier refers to the USING source (by alias or by
-                // relation name), resolve the column against that source. This
-                // handles subquery and VALUES sources, where the qualifier is not
-                // a real table name.
-                if let Some(from_item) = ast_nav::merge_using_from_item(&merge) {
-                    let matches_source = if let Some(alias_name) =
-                        from_item.alias().and_then(|alias| alias.name())
-                    {
-                        Name::from_node(&alias_name) == column_table_name
-                    } else if let Some((_, item_name)) =
-                        name::schema_and_table_from_from_item(&from_item)
-                    {
-                        item_name == column_table_name
-                    } else {
-                        false
-                    };
-
-                    if matches_source {
-                        return resolve_from_item_column_ptr(
-                            db,
-                            InFile::new(file, &from_item),
-                            column_name_ref,
-                        );
-                    }
-                }
-
-                let path = merge.table_relation_name()?.table_name_ref()?.path_ref()?;
-                name::schema_and_name_path(&path)?
-            }
+            ast_nav::ParentQuery::Update(update) => return resolve_dml(update.syntax()),
+            ast_nav::ParentQuery::Delete(delete) => return resolve_dml(delete.syntax()),
+            ast_nav::ParentQuery::Insert(insert) => return resolve_dml(insert.syntax()),
+            ast_nav::ParentQuery::Merge(merge) => return resolve_dml(merge.syntax()),
         }
     };
 
@@ -2208,9 +2222,6 @@ fn resolve_select_qualified_column_ptr(
                 return Some(cte_column_ptr);
             }
             return None;
-        }
-        if let Some(alias_table_name) = resolve_merge_alias(column_name_ref, &table_name) {
-            table_name = alias_table_name;
         }
     }
 
@@ -2311,21 +2322,6 @@ pub(crate) fn resolve_table_name(
                 _ => (),
             }
         }
-    }
-    None
-}
-
-fn resolve_merge_alias(name_ref: &impl ast::NameLike, table_name: &Name) -> Option<Name> {
-    let from_item = name_ref
-        .syntax()
-        .ancestors()
-        .find_map(|x| ast_nav::merge_using_from_item(&ast::Merge::cast(x)?))?;
-    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name())
-        && Name::from_node(&alias_name) == *table_name
-        && let ast::FromItem::RelationFromItem(relation) = &from_item
-    {
-        let table_name = Name::from_node(&relation.name_ref()?);
-        return Some(table_name);
     }
     None
 }
@@ -2820,7 +2816,10 @@ fn resolve_select_column_ptr(
         // In the case of ambiguous columns, we'll have multiple matches.
         // They're an error, but we'll report that elsewhere.
         let mut results: SmallVec<[Location; 1]> = SmallVec::new();
-        for from_item in ast_nav::iter_from_clause(&from_clause) {
+        for from_item in ast_nav::visible_from_items(
+            ast_nav::iter_from_clause(&from_clause),
+            column_name_ref.syntax(),
+        ) {
             if let Some(column_ptr) =
                 resolve_from_item_column_ptr(db, InFile::new(file, &from_item), column_name_ref)
             {
@@ -2835,16 +2834,9 @@ fn resolve_select_column_ptr(
     // A correlated subquery can reference the target relation of an enclosing
     // DML statement, e.g. `update foo set a = (select b)` where `b` is `foo.b`
     let in_file = InFile::new(file, column_name_ref);
-    for ancestor in ast_nav::ancestors_outside_own_with_clause(column_name_ref.syntax()) {
-        match ancestor.kind() {
-            SyntaxKind::UPDATE => return resolve_update_column_ptr(db, in_file),
-            SyntaxKind::DELETE => return resolve_delete_column_ptr(db, in_file),
-            SyntaxKind::MERGE => return resolve_merge_column_ptr(db, in_file),
-            _ => (),
-        }
-    }
-
-    resolve_enclosing_function_param(in_file)
+    DmlScope::enclosing(column_name_ref.syntax())
+        .and_then(|scope| resolve_dml_column_ptr(db, in_file, scope))
+        .or_else(|| resolve_enclosing_function_param(in_file))
 }
 
 fn resolve_enclosing_function_param(
@@ -2853,6 +2845,13 @@ fn resolve_enclosing_function_param(
     let file = name_ref.file_id;
     let name_ref = name_ref.value;
     let param_name = Name::from_node(name_ref);
+
+    if let Some(qualifier) = column_qualifier_name(name_ref)
+        && ast_nav::enclosing_routine_name(name_ref.syntax())
+            .is_none_or(|(routine_name, _, _)| routine_name != qualifier)
+    {
+        return None;
+    }
 
     for ancestor in name_ref.syntax().ancestors() {
         let Some(has_param_list) = ast::HasParamList::cast(ancestor) else {
@@ -2875,6 +2874,24 @@ fn resolve_enclosing_function_param(
     }
 
     None
+}
+
+fn resolve_enclosing_routine_name_ptr(
+    name_ref: InFile<&impl ast::NameLike>,
+) -> Option<SmallVec<[Location; 1]>> {
+    let (routine_name, segment, kind) = ast_nav::enclosing_routine_name(name_ref.value.syntax())?;
+    if Name::from_node(name_ref.value) != routine_name {
+        return None;
+    }
+    let kind = match kind {
+        ast_nav::RoutineKind::Function => LocationKind::Function,
+        ast_nav::RoutineKind::Procedure => LocationKind::Procedure,
+    };
+    Some(smallvec![Location::new(
+        name_ref.file_id,
+        segment.syntax().text_range(),
+        kind
+    )])
 }
 
 fn resolve_select_group_by_alias_or_column_ptr(
@@ -3127,6 +3144,16 @@ pub(crate) fn find_from_item_in_from_clause(
         .find_map(|from_item| find_from_item_matching_qualifier(&from_item, qualifier))
 }
 
+fn find_visible_from_item(
+    from_items: impl Iterator<Item = ast::FromItem>,
+    name_ref: &impl ast::NameLike,
+    qualifier: &Name,
+) -> Option<ast::FromItem> {
+    ast_nav::visible_from_items(from_items, name_ref.syntax())
+        .iter()
+        .find_map(|from_item| find_from_item_matching_qualifier(from_item, qualifier))
+}
+
 // `t join u using (a) as j`
 fn find_join_expr_by_using_alias(
     join_expr: &ast::JoinExpr,
@@ -3145,22 +3172,47 @@ fn find_join_expr_by_using_alias(
     find_join_expr_by_using_alias(&lhs, qualifier)
 }
 
+fn source_from_list_items(node: &SyntaxNode) -> Option<Vec<ast::FromListItem>> {
+    if let Some(from_clause) = select_like_from_clause(node) {
+        return Some(from_clause.items().collect());
+    }
+    dml_source_from_list_items(node)
+}
+
+fn dml_source_from_list_items(stmt: &SyntaxNode) -> Option<Vec<ast::FromListItem>> {
+    if let Some(update) = ast::Update::cast(stmt.clone()) {
+        return Some(update.from_clause()?.items().collect());
+    }
+    if let Some(delete) = ast::Delete::cast(stmt.clone()) {
+        return Some(delete.using_clause()?.items().collect());
+    }
+    if let Some(merge) = ast::Merge::cast(stmt.clone()) {
+        return Some(vec![merge.using_on_clause()?.from_list_item()?]);
+    }
+    None
+}
+
 fn find_using_alias_join_expr_for_name_ref(
     name_ref: &impl ast::NameLike,
     qualifier: &Name,
 ) -> Option<ast::JoinExpr> {
-    let select = name_ref
-        .syntax()
-        .ancestors()
-        .find(|a| ast::Select::can_cast(a.kind()) || ast::SelectInto::can_cast(a.kind()))?;
-    let from_clause = select_like_from_clause(&select)?;
-    from_clause
-        .items()
-        .filter_map(|item| match item {
-            ast::FromListItem::JoinExpr(join_expr) => Some(join_expr),
-            ast::FromListItem::FromItem(_) => None,
-        })
-        .find_map(|join_expr| find_join_expr_by_using_alias(&join_expr, qualifier))
+    ast_nav::ancestors_outside_own_with_clause(name_ref.syntax()).find_map(|ancestor| {
+        let items = source_from_list_items(&ancestor)?;
+        let visible = ast_nav::visible_from_items(
+            ast_nav::iter_from_items(items.iter().cloned()),
+            name_ref.syntax(),
+        );
+        items
+            .into_iter()
+            .filter_map(|item| match item {
+                ast::FromListItem::JoinExpr(join_expr) => Some(join_expr),
+                ast::FromListItem::FromItem(_) => None,
+            })
+            .filter_map(|join_expr| find_join_expr_by_using_alias(&join_expr, qualifier))
+            .find(|join_expr| {
+                ast_nav::iter_join_expr(join_expr).all(|from_item| visible.contains(&from_item))
+            })
+    })
 }
 
 fn resolve_join_using_alias_table_ptr(
@@ -3220,54 +3272,15 @@ fn find_from_item_for_select_qualified_name_ref(
     name_ref: &impl ast::NameLike,
     table_name: &Name,
 ) -> Option<ast::FromItem> {
-    let select = name_ref.syntax().ancestors().find(|ancestor| {
-        ast::Select::can_cast(ancestor.kind()) || ast::SelectInto::can_cast(ancestor.kind())
-    })?;
-
-    if let Some(from_clause) = select_like_from_clause(&select)
-        && let Some(from_item) = find_from_item_in_from_clause(&from_clause, table_name)
-    {
-        return Some(from_item);
-    }
-
-    if let Some(lateral_from_item) = name_ref.syntax().ancestors().find_map(|ancestor| {
-        ast::FromItem::cast(ancestor).filter(|from_item| {
-            from_item
-                .syntax()
-                .children_with_tokens()
-                .any(|it| it.kind() == SyntaxKind::LATERAL_KW)
+    ast_nav::ancestors_outside_own_with_clause(name_ref.syntax())
+        .filter_map(|ancestor| select_like_from_clause(&ancestor))
+        .find_map(|from_clause| {
+            find_visible_from_item(
+                ast_nav::iter_from_clause(&from_clause),
+                name_ref,
+                table_name,
+            )
         })
-    }) {
-        let lateral_start = lateral_from_item.syntax().text_range().start();
-
-        for ancestor in lateral_from_item.syntax().ancestors() {
-            if let Some(from_clause) = ast::Select::cast(ancestor).and_then(|x| x.from_clause())
-                && let Some(outer_from_item) = ast_nav::iter_from_clause(&from_clause)
-                    .filter(|item| item.syntax().text_range().start() < lateral_start)
-                    .find_map(|item| find_from_item_matching_qualifier(&item, table_name))
-            {
-                return Some(outer_from_item);
-            }
-        }
-    }
-
-    let inner_select_start = select.text_range().start();
-    for ancestor in select.ancestors().skip(1) {
-        if let Some(outer_from_clause) = ast::Select::cast(ancestor).and_then(|x| x.from_clause()) {
-            if outer_from_clause
-                .syntax()
-                .text_range()
-                .contains(inner_select_start)
-            {
-                continue;
-            }
-            if let Some(from_item) = find_from_item_in_from_clause(&outer_from_clause, table_name) {
-                return Some(from_item);
-            }
-        }
-    }
-
-    None
 }
 
 pub(crate) fn find_column_in_create_table(
@@ -4390,6 +4403,7 @@ fn returning_target_kind(
     if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr()
         && let Some(table_name) = qualified_star_table_name(&field_expr)
         && match_table_in_returning_clause(
+            target.syntax(),
             &table_name,
             stmt_table_name,
             alias,
@@ -5353,39 +5367,26 @@ fn resolve_composite_type_from_cast_node(
     name::schema_and_type_name(&ty)
 }
 
-fn resolve_update_table_name_ptr(
+fn contains_node(container: Option<impl AstNode>, node: &SyntaxNode) -> bool {
+    container.is_some_and(|container| {
+        container
+            .syntax()
+            .text_range()
+            .contains_range(node.text_range())
+    })
+}
+
+fn resolve_dml_source_table_name_ptr(
     db: &dyn Db,
     table_name_ref: InFile<&impl ast::NameLike>,
+    from_items: impl Iterator<Item = ast::FromItem>,
+    table_name: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let file = table_name_ref.file_id;
-    let table_name_ref = table_name_ref.value;
-    let table_name = Name::from_node(table_name_ref);
-    let update = table_name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::Update::cast)?;
-
-    if let Some(from_clause) = update.from_clause() {
-        for from_item in ast_nav::iter_from_clause(&from_clause) {
-            if let Some(result) = resolve_from_item_table_name_ptr(
-                db,
-                InFile::new(file, table_name_ref),
-                &from_item,
-                &table_name,
-            ) {
-                return Some(result);
-            }
-        }
+    if let Some(locations) = resolve_join_using_alias_table_ptr(table_name_ref, table_name) {
+        return Some(locations);
     }
-
-    let path = update.relation_name()?.relation_name_ref()?.path_ref()?;
-    resolve_table_in_returning_clause(
-        db,
-        InFile::new(file, table_name_ref),
-        update.alias().and_then(|alias| alias.name()),
-        &path,
-        update.returning_clause(),
-    )
+    let from_item = find_visible_from_item(from_items, table_name_ref.value, table_name)?;
+    resolve_from_item_table_name_ptr(db, table_name_ref, &from_item, table_name)
 }
 
 fn resolve_from_item_table_name_ptr(
@@ -5447,164 +5448,148 @@ fn column_qualifier_name(column_name_ref: &impl ast::NameLike) -> Option<Name> {
     }
 }
 
-fn resolve_update_column_ptr(
+fn resolve_dml_source_column_ptr(
     db: &dyn Db,
-    column_name_ref: InFile<&impl ast::NameLike>,
+    file: File,
+    from_items: impl Iterator<Item = ast::FromItem>,
+    column_name_ref: &impl ast::NameLike,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let file = column_name_ref.file_id;
-    let column_name_ref = column_name_ref.value;
-    let column_name = Name::from_node(column_name_ref);
-    let update = column_name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::Update::cast)?;
-
-    // The left-hand side of `set` is always a target-table column, so `from`
-    // tables are only considered for right-hand side expressions and predicates.
-    let mut in_set_clause = false;
-    let mut in_set_expr = false;
-    for ancestor in column_name_ref.syntax().ancestors() {
-        if ast::SetClause::can_cast(ancestor.kind()) {
-            in_set_clause = true;
-        }
-        if ast::SetExpr::can_cast(ancestor.kind()) {
-            in_set_expr = true;
-        }
-    }
-    let is_set_target = in_set_clause && !in_set_expr;
-
-    // `update t set a = b from u`
-    if !is_set_target && let Some(from_clause) = update.from_clause() {
-        for from_item in ast_nav::iter_from_clause(&from_clause) {
-            if let Some(result) =
-                resolve_from_item_column_ptr(db, InFile::new(file, &from_item), column_name_ref)
-            {
-                return Some(result);
-            }
-        }
-    }
-
-    // `update t set a = b`
-    let path = update.relation_name()?.relation_name_ref()?.path_ref()?;
-
     if let Some(qualifier) = column_qualifier_name(column_name_ref) {
-        let (_, stmt_table_name) = name::schema_and_name_path(&path)?;
-        match_table_in_returning_clause(
-            &qualifier,
-            &stmt_table_name,
-            update.alias().and_then(|alias| alias.name()).as_ref(),
-            update.returning_clause().as_ref(),
-        )?;
+        if let Some(locations) =
+            resolve_join_using_alias_column_ptr(db, InFile::new(file, column_name_ref), &qualifier)
+        {
+            return Some(locations);
+        }
+        let from_item = find_visible_from_item(from_items, column_name_ref, &qualifier)?;
+        return resolve_from_item_column_ptr(db, InFile::new(file, &from_item), column_name_ref);
     }
-
-    resolve_column_for_path(db, InFile::new(file, &path), column_name).or_else(|| {
-        (!is_set_target)
-            .then(|| resolve_enclosing_function_param(InFile::new(file, column_name_ref)))
+    let results: SmallVec<[Location; 1]> =
+        ast_nav::visible_from_items(from_items, column_name_ref.syntax())
+            .into_iter()
+            .filter_map(|from_item| {
+                resolve_from_item_column_ptr(db, InFile::new(file, &from_item), column_name_ref)
+            })
             .flatten()
-    })
+            .collect();
+    (!results.is_empty()).then_some(results)
 }
 
-fn resolve_delete_column_ptr(
-    db: &dyn Db,
-    column_name_ref: InFile<&impl ast::NameLike>,
-) -> Option<SmallVec<[Location; 1]>> {
-    let file = column_name_ref.file_id;
-    let column_name_ref = column_name_ref.value;
-    let column_name = Name::from_node(column_name_ref);
-    let delete = column_name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::Delete::cast)?;
+fn is_visible_excluded(qualifier: &Name, node: &SyntaxNode) -> bool {
+    *qualifier == "excluded"
+        && node.ancestors().any(|ancestor| {
+            ast::ConflictDoUpdateSet::can_cast(ancestor.kind())
+                || ast::ConflictDoSelect::can_cast(ancestor.kind())
+        })
+}
 
-    if let Some(using_clause) = delete.using_clause() {
-        for from_item in ast_nav::iter_from_items(using_clause.items()) {
-            if let Some(ptr) =
-                resolve_from_item_column_ptr(db, InFile::new(file, &from_item), column_name_ref)
-            {
-                return Some(ptr);
+struct DmlScope {
+    source_items: Vec<ast::FromItem>,
+    in_source: bool,
+    source_visible: bool,
+    target_visible: bool,
+    path: Option<ast::PathRef>,
+    alias: Option<ast::TableAlias>,
+    returning_clause: Option<ast::ReturningClause>,
+}
+
+impl DmlScope {
+    fn new(stmt: &SyntaxNode, node: &SyntaxNode) -> Option<DmlScope> {
+        let mut scope = if let Some(update) = ast::Update::cast(stmt.clone()) {
+            DmlScope {
+                source_items: vec![],
+                in_source: false,
+                source_visible: true,
+                target_visible: true,
+                path: update
+                    .relation_name()
+                    .and_then(|it| it.relation_name_ref())
+                    .and_then(|it| it.path_ref()),
+                alias: update.alias().and_then(|alias| alias.name()),
+                returning_clause: update.returning_clause(),
             }
-        }
-    }
-
-    let path = delete.relation_name()?.relation_name_ref()?.path_ref()?;
-
-    if let Some(qualifier) = column_qualifier_name(column_name_ref) {
-        let (_, stmt_table_name) = name::schema_and_name_path(&path)?;
-        match_table_in_returning_clause(
-            &qualifier,
-            &stmt_table_name,
-            delete.alias().and_then(|alias| alias.name()).as_ref(),
-            delete.returning_clause().as_ref(),
-        )?;
-    }
-
-    resolve_column_for_path(db, InFile::new(file, &path), column_name)
-        .or_else(|| resolve_enclosing_function_param(InFile::new(file, column_name_ref)))
-}
-
-fn resolve_delete_table_name_ptr(
-    db: &dyn Db,
-    table_name_ref: InFile<&impl ast::NameLike>,
-) -> Option<SmallVec<[Location; 1]>> {
-    let file = table_name_ref.file_id;
-    let table_name_ref = table_name_ref.value;
-    let table_name = Name::from_node(table_name_ref);
-    let delete = table_name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::Delete::cast)?;
-
-    if let Some(using_clause) = delete.using_clause() {
-        for from_item in ast_nav::iter_from_items(using_clause.items()) {
-            if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name()) {
-                if Name::from_node(&alias_name) == table_name {
-                    return Some(smallvec![Location::new(
-                        file,
-                        alias_name.syntax().text_range(),
-                        LocationKind::Table
-                    )]);
-                }
-            } else if let ast::FromItem::RelationFromItem(relation) = &from_item
-                && let Some(item_name_ref) = relation.name_ref()
-            {
-                let item_name = Name::from_node(&item_name_ref);
-                if item_name == table_name {
-                    let position = table_name_ref.syntax().text_range().start();
-                    let schemas = bind(db, file).resolved_schemas(position, None);
-                    let (ptr, kind) =
-                        resolve_table_like(db, Some(table_name_ref), &item_name, &schemas, file)?;
-                    return Some(smallvec![Location::new(file, ptr.text_range(), kind)]);
-                }
+        } else if let Some(delete) = ast::Delete::cast(stmt.clone()) {
+            DmlScope {
+                source_items: vec![],
+                in_source: false,
+                source_visible: true,
+                target_visible: true,
+                path: delete
+                    .relation_name()
+                    .and_then(|it| it.relation_name_ref())
+                    .and_then(|it| it.path_ref()),
+                alias: delete.alias().and_then(|alias| alias.name()),
+                returning_clause: delete.returning_clause(),
             }
-        }
+        } else if let Some(merge) = ast::Merge::cast(stmt.clone()) {
+            let (source_visible, target_visible) =
+                match node.ancestors().find_map(ast::MergeWhenClause::cast) {
+                    Some(ast::MergeWhenClause::MergeWhenNotMatchedSource(_)) => (false, true),
+                    Some(ast::MergeWhenClause::MergeWhenNotMatchedTarget(_)) => (true, false),
+                    Some(ast::MergeWhenClause::MergeWhenMatched(_)) | None => (true, true),
+                };
+            DmlScope {
+                source_items: vec![],
+                in_source: false,
+                source_visible,
+                target_visible,
+                path: merge
+                    .table_relation_name()
+                    .and_then(|it| it.table_name_ref())
+                    .and_then(|it| it.path_ref()),
+                alias: merge.alias().and_then(|alias| alias.name()),
+                returning_clause: merge.returning_clause(),
+            }
+        } else if let Some(insert) = ast::Insert::cast(stmt.clone()) {
+            // The insert target is only visible from `on conflict` and
+            // `returning`, not from the rows being inserted
+            DmlScope {
+                source_items: vec![],
+                in_source: false,
+                source_visible: false,
+                target_visible: contains_node(insert.on_conflict_clause(), node)
+                    || contains_node(insert.returning_clause(), node),
+                path: insert.relation_name_ref().and_then(|it| it.path_ref()),
+                alias: insert.alias().and_then(|alias| alias.name()),
+                returning_clause: insert.returning_clause(),
+            }
+        } else {
+            return None;
+        };
+        let source_list_items = dml_source_from_list_items(stmt).unwrap_or_default();
+        scope.in_source = source_list_items
+            .iter()
+            .any(|item| item.syntax().text_range().contains_range(node.text_range()));
+        scope.source_items = ast_nav::iter_from_items(source_list_items.into_iter()).collect();
+        Some(scope)
     }
 
-    let path = delete.relation_name()?.relation_name_ref()?.path_ref()?;
-    resolve_table_in_returning_clause(
-        db,
-        InFile::new(file, table_name_ref),
-        delete.alias().and_then(|alias| alias.name()),
-        &path,
-        delete.returning_clause(),
-    )
+    fn enclosing(node: &SyntaxNode) -> Option<DmlScope> {
+        ast_nav::ancestors_outside_own_with_clause(node)
+            .find_map(|ancestor| DmlScope::new(&ancestor, node))
+    }
+
+    fn qualifier_matches_target(&self, node: &SyntaxNode, qualifier: &Name) -> Option<bool> {
+        let (_, stmt_table_name) = name::schema_and_name_path(self.path.as_ref()?)?;
+        Some(
+            match_table_in_returning_clause(
+                node,
+                qualifier,
+                &stmt_table_name,
+                self.alias.as_ref(),
+                self.returning_clause.as_ref(),
+            )
+            .is_some(),
+        )
+    }
 }
 
-fn resolve_merge_column_ptr(
-    db: &dyn Db,
-    column_name_ref: InFile<&impl ast::NameLike>,
-) -> Option<SmallVec<[Location; 1]>> {
-    let file = column_name_ref.file_id;
-    let column_name_ref = column_name_ref.value;
-    let column_name = Name::from_node(column_name_ref);
-    let merge = column_name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::Merge::cast)?;
-
+// The left-hand side of `set` and an insert column list always name
+// target-table columns
+fn is_target_definition(node: &SyntaxNode) -> bool {
     let mut in_set_clause = false;
     let mut in_set_expr = false;
-    let mut in_insert_column_list = false;
-    for ancestor in column_name_ref.syntax().ancestors() {
+    let mut in_column_target_list = false;
+    for ancestor in node.ancestors() {
         if ast::SetClause::can_cast(ancestor.kind()) {
             in_set_clause = true;
         }
@@ -5612,26 +5597,122 @@ fn resolve_merge_column_ptr(
             in_set_expr = true;
         }
         if ast::ColumnTargetList::can_cast(ancestor.kind()) {
-            in_insert_column_list = true;
+            in_column_target_list = true;
         }
     }
-    let is_set_target = in_set_clause && !in_set_expr;
+    (in_set_clause && !in_set_expr) || in_column_target_list
+}
 
-    if !is_set_target
-        && !in_insert_column_list
-        && let Some(from_item) = ast_nav::merge_using_from_item(&merge)
-        && let Some(ptr) =
-            resolve_from_item_column_ptr(db, InFile::new(file, &from_item), column_name_ref)
-    {
-        return Some(ptr);
+fn resolve_dml_column_ptr(
+    db: &dyn Db,
+    column_name_ref: InFile<&impl ast::NameLike>,
+    scope: DmlScope,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = column_name_ref.file_id;
+    let column_name_ref = column_name_ref.value;
+    let param = || resolve_enclosing_function_param(InFile::new(file, column_name_ref));
+    let qualifier = column_qualifier_name(column_name_ref);
+    let is_target_definition = is_target_definition(column_name_ref.syntax());
+
+    let source_column = if scope.source_visible && !is_target_definition {
+        resolve_dml_source_column_ptr(
+            db,
+            file,
+            scope.source_items.iter().cloned(),
+            column_name_ref,
+        )
+    } else {
+        None
+    };
+    if source_column.is_some() && (scope.in_source || qualifier.is_some()) {
+        return source_column;
     }
 
-    let path = merge.table_relation_name()?.table_name_ref()?.path_ref()?;
-    resolve_column_for_path(db, InFile::new(file, &path), column_name).or_else(|| {
-        (!is_set_target && !in_insert_column_list)
-            .then(|| resolve_enclosing_function_param(InFile::new(file, column_name_ref)))
-            .flatten()
-    })
+    let path = scope.path.as_ref()?;
+
+    if !scope.target_visible && !is_target_definition {
+        return source_column.or_else(param);
+    }
+
+    if let Some(qualifier) = &qualifier
+        && !is_visible_excluded(qualifier, column_name_ref.syntax())
+        && !scope.qualifier_matches_target(column_name_ref.syntax(), qualifier)?
+    {
+        return param();
+    }
+
+    let target_column = resolve_column_for_path(
+        db,
+        InFile::new(file, path),
+        Name::from_node(column_name_ref),
+    );
+    // `invalid reference to FROM-clause entry for table "t"`
+    if target_column.is_some() && scope.in_source {
+        return None;
+    }
+    if let Some(mut target) = target_column {
+        // An unqualified column present in both the target and a source is
+        // ambiguous, so return both.
+        if let Some(source) = source_column {
+            target.extend(source);
+        }
+        return Some(target);
+    }
+    if let Some(source) = source_column {
+        return Some(source);
+    }
+
+    if is_target_definition {
+        return None;
+    }
+    if qualifier.is_none() {
+        return resolve_dml_table_name_ptr(db, InFile::new(file, column_name_ref), scope)
+            .or_else(param);
+    }
+    param()
+}
+
+fn resolve_dml_table_name_ptr(
+    db: &dyn Db,
+    table_name_ref: InFile<&impl ast::NameLike>,
+    scope: DmlScope,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = table_name_ref.file_id;
+    let table_name = Name::from_node(table_name_ref.value);
+
+    if scope.source_visible
+        && !scope.source_items.is_empty()
+        && let Some(result) = resolve_dml_source_table_name_ptr(
+            db,
+            table_name_ref,
+            scope.source_items.into_iter(),
+            &table_name,
+        )
+    {
+        return Some(result);
+    }
+
+    if scope.in_source || !scope.target_visible {
+        return resolve_enclosing_routine_name_ptr(table_name_ref);
+    }
+
+    let path = scope.path?;
+
+    if is_visible_excluded(&table_name, table_name_ref.value.syntax()) {
+        let (schema, stmt_table_name) = name::schema_and_name_path(&path)?;
+        let position = table_name_ref.value.syntax().text_range().start();
+        let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+        let (ptr, kind) = resolve_view_or_table(db, &stmt_table_name, &schemas, file)?;
+        return Some(smallvec![Location::new(file, ptr.text_range(), kind)]);
+    }
+
+    resolve_table_in_returning_clause(
+        db,
+        table_name_ref,
+        scope.alias,
+        &path,
+        scope.returning_clause,
+    )
 }
 
 // TODO: I think we could use trait(s) here to simplify this and have the
@@ -5648,12 +5729,15 @@ fn resolve_table_in_returning_clause(
     let table_name = Name::from_node(table_name_ref);
     let (schema, stmt_table_name) = name::schema_and_name_path(path)?;
 
-    let matched = match_table_in_returning_clause(
+    let Some(matched) = match_table_in_returning_clause(
+        table_name_ref.syntax(),
         &table_name,
         &stmt_table_name,
         alias.as_ref(),
         returning_clause.as_ref(),
-    )?;
+    ) else {
+        return resolve_enclosing_routine_name_ptr(InFile::new(file, table_name_ref));
+    };
 
     let position = table_name_ref.syntax().text_range().start();
     let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
@@ -5686,54 +5770,6 @@ fn resolve_table_in_returning_clause(
             )])
         }
     }
-}
-
-fn resolve_merge_table_name_ptr(
-    db: &dyn Db,
-    table_name_ref: InFile<&impl ast::NameLike>,
-) -> Option<SmallVec<[Location; 1]>> {
-    let file = table_name_ref.file_id;
-    let table_name_ref = table_name_ref.value;
-    let table_name = Name::from_node(table_name_ref);
-    let merge = table_name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::Merge::cast)?;
-
-    let path = merge.table_relation_name()?.table_name_ref()?.path_ref()?;
-
-    // Check USING clause for the source table - MERGE-specific.
-    // A source alias hides the underlying table name.
-    if let Some(from_item) = ast_nav::merge_using_from_item(&merge) {
-        if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name()) {
-            if Name::from_node(&alias_name) == table_name {
-                return Some(smallvec![Location::new(
-                    file,
-                    alias_name.syntax().text_range(),
-                    LocationKind::Table
-                )]);
-            }
-        } else if let ast::FromItem::RelationFromItem(relation) = &from_item
-            && let Some(item_name_ref) = relation.name_ref()
-        {
-            let item_name = Name::from_node(&item_name_ref);
-            if item_name == table_name {
-                let position = table_name_ref.syntax().text_range().start();
-                let schemas = bind(db, file).resolved_schemas(position, None);
-                let (ptr, kind) =
-                    resolve_table_like(db, Some(table_name_ref), &item_name, &schemas, file)?;
-                return Some(smallvec![Location::new(file, ptr.text_range(), kind)]);
-            }
-        }
-    }
-
-    resolve_table_in_returning_clause(
-        db,
-        InFile::new(file, table_name_ref),
-        merge.alias().and_then(|alias| alias.name()),
-        &path,
-        merge.returning_clause(),
-    )
 }
 
 fn find_param_in_func_def(

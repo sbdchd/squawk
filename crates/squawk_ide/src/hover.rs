@@ -4379,6 +4379,18 @@ create procedure foo$0() language sql as $$ select 1 $$;
     }
 
     #[test]
+    fn hover_on_procedure_qualified_parameter_qualifier() {
+        assert_snapshot!(check_hover("
+create procedure p(x int) language sql begin atomic select p$0.x; end;
+"), @r"
+        hover: procedure public.p(x int)
+          ╭▸ 
+        2 │ create procedure p(x int) language sql begin atomic select p.x; end;
+          ╰╴                                                           ─ hover
+        ");
+    }
+
+    #[test]
     fn hover_on_create_procedure_with_explicit_schema() {
         assert_snapshot!(check_hover("
 create procedure myschema.foo$0() language sql as $$ select 1 $$;
