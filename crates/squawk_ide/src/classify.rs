@@ -1,4 +1,4 @@
-use crate::{location::LocationKind, name, symbols::Name};
+use crate::{ast_nav, location::LocationKind, symbols::Name};
 use squawk_syntax::{
     SyntaxKind, SyntaxNode,
     ast::{self, AstNode, LitKind},
@@ -508,12 +508,18 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         let mut in_returning_clause = false;
         let mut in_set_clause = false;
         let mut in_set_expr = false;
+        let mut in_using_clause = false;
         let mut in_where_clause = false;
         let mut in_when_clause = false;
         let mut in_when_condition = false;
         for ancestor in parent.ancestors() {
             if ast::ArgList::can_cast(ancestor.kind()) {
                 in_arg_list = true;
+            }
+            if ast::UsingClause::can_cast(ancestor.kind())
+                || ast::UsingOnClause::can_cast(ancestor.kind())
+            {
+                in_using_clause = true;
             }
             if ast::WhenCondition::can_cast(ancestor.kind()) {
                 in_when_condition = true;
@@ -575,7 +581,11 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
                 }
             }
             if ast::Merge::can_cast(ancestor.kind()) {
-                if in_returning_clause || in_on_clause || in_when_clause {
+                if in_returning_clause
+                    || in_on_clause
+                    || in_when_clause
+                    || (in_using_clause && in_arg_list)
+                {
                     if is_function_call || is_schema_table_col {
                         return Some(NameRefClass::Schema);
                     } else {
@@ -600,6 +610,17 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
                     return Some(NameRefClass::Schema);
                 } else {
                     return Some(NameRefClass::PolicyQualifiedColumnTable);
+                }
+            }
+            if ast::ReturnStmt::can_cast(ancestor.kind())
+                && ast_nav::enclosing_routine_name(&ancestor).is_some_and(|(routine_name, _, _)| {
+                    Name::from_node(&base_name_ref) == routine_name
+                })
+            {
+                if is_function_call || is_schema_table_col {
+                    return Some(NameRefClass::Schema);
+                } else {
+                    return Some(NameRefClass::SelectQualifiedColumnTable);
                 }
             }
         }
@@ -716,8 +737,8 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             }
             if ast::ReturnStmt::can_cast(ancestor.kind()) {
                 if let Some(ast::Expr::NameRef(base)) = field_expr.base()
-                    && enclosing_routine_name(&ancestor)
-                        .is_some_and(|routine_name| Name::from_node(&base) == routine_name)
+                    && ast_nav::enclosing_routine_name(&ancestor)
+                        .is_some_and(|(routine_name, _, _)| Name::from_node(&base) == routine_name)
                 {
                     return Some(NameRefClass::SelectColumn);
                 }
@@ -1065,7 +1086,10 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             in_returning_clause = true;
         }
         if ast::Delete::can_cast(ancestor.kind()) {
-            if in_returning_clause || in_where_clause {
+            if in_returning_clause
+                || in_where_clause
+                || (in_using_clause && (in_on_clause || in_arg_list))
+            {
                 return Some(NameRefClass::DeleteColumn);
             }
             if in_using_clause {
@@ -1074,7 +1098,11 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             break;
         }
         if ast::Update::can_cast(ancestor.kind()) {
-            if in_returning_clause || in_where_clause || in_set_clause {
+            if in_returning_clause
+                || in_where_clause
+                || in_set_clause
+                || (in_from_clause && (in_on_clause || in_arg_list))
+            {
                 return Some(NameRefClass::UpdateColumn);
             }
             if in_from_clause {
@@ -1086,7 +1114,11 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             in_when_clause = true;
         }
         if ast::Merge::can_cast(ancestor.kind()) {
-            if in_when_clause || in_returning_clause || in_on_clause {
+            if in_when_clause
+                || in_returning_clause
+                || in_on_clause
+                || (in_using_clause && in_arg_list)
+            {
                 return Some(NameRefClass::MergeColumn);
             }
             if in_using_clause {
@@ -1101,22 +1133,6 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
     }
 
     has_table_name_ref.then_some(NameRefClass::Table)
-}
-
-fn enclosing_routine_name(node: &SyntaxNode) -> Option<Name> {
-    for ancestor in node.ancestors() {
-        if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
-            let (_, routine_name) =
-                name::schema_and_name_definition(&create_function.name()?.path()?)?;
-            return Some(routine_name);
-        }
-        if let Some(create_procedure) = ast::CreateProcedure::cast(ancestor) {
-            let (_, routine_name) =
-                name::schema_and_name_definition(&create_procedure.name()?.path()?)?;
-            return Some(routine_name);
-        }
-    }
-    None
 }
 
 fn is_grouping_or_distinct_el(node: &SyntaxNode) -> bool {

@@ -2,11 +2,12 @@
 ///
 /// There shouldn't be any dependency on Salsa.
 use squawk_syntax::{
-    SyntaxNode, SyntaxToken,
+    SyntaxKind, SyntaxNode, SyntaxToken,
     ast::{self, AstNode},
 };
 use std::iter;
 
+use crate::name;
 use crate::symbols::Name;
 
 pub(crate) fn find_cte_with_table(
@@ -319,17 +320,117 @@ pub(crate) fn unwrap_paren_expr(expr: ast::Expr) -> impl Iterator<Item = ast::Ex
     }
 }
 
-pub(crate) fn merge_using_from_item(merge: &ast::Merge) -> Option<ast::FromItem> {
-    match merge.using_on_clause()?.from_list_item()? {
-        ast::FromListItem::FromItem(from_item) => Some(from_item),
-        ast::FromListItem::JoinExpr(_) => None,
-    }
-}
-
 pub(crate) fn iter_from_clause(
     from_clause: &ast::FromClause,
 ) -> impl Iterator<Item = ast::FromItem> {
     iter_from_items(from_clause.items())
+}
+
+// A FROM item can't see its siblings, unless it's lateral, then it can see
+// the items before it. An `on` clause can only see the items in its own join.
+pub(crate) fn visible_from_items(
+    from_items: impl Iterator<Item = ast::FromItem>,
+    node: &SyntaxNode,
+) -> Vec<ast::FromItem> {
+    let mut from_items = from_items.peekable();
+    if let Some(from_item) = from_items.peek()
+        && let Some(join_expr) = enclosing_on_clause_join_expr(node, from_item)
+    {
+        return iter_join_expr(&join_expr).collect();
+    }
+    let mut visible = vec![];
+    collect_visible_from_items(from_items, node, &mut visible);
+    visible
+}
+
+fn enclosing_on_clause_join_expr(
+    node: &SyntaxNode,
+    from_item: &ast::FromItem,
+) -> Option<ast::JoinExpr> {
+    let from_list = enclosing_from_list(from_item.syntax())?;
+    node.ancestors()
+        .filter_map(ast::OnClause::cast)
+        .filter_map(|on_clause| {
+            let join = on_clause.syntax().parent().and_then(ast::Join::cast)?;
+            join.syntax().parent().and_then(ast::JoinExpr::cast)
+        })
+        .find(|join_expr| enclosing_from_list(join_expr.syntax()).as_ref() == Some(&from_list))
+}
+
+fn enclosing_from_list(node: &SyntaxNode) -> Option<SyntaxNode> {
+    node.ancestors().find(|ancestor| {
+        ast::FromClause::can_cast(ancestor.kind())
+            || ast::UsingClause::can_cast(ancestor.kind())
+            || ast::UsingOnClause::can_cast(ancestor.kind())
+    })
+}
+
+fn collect_visible_from_items(
+    from_items: impl Iterator<Item = ast::FromItem>,
+    node: &SyntaxNode,
+    visible: &mut Vec<ast::FromItem>,
+) {
+    for from_item in from_items {
+        if !from_item
+            .syntax()
+            .text_range()
+            .contains_range(node.text_range())
+        {
+            visible.push(from_item);
+            continue;
+        }
+        hide_disallowed_lateral_items(&from_item, visible);
+        if let ast::FromItem::ParenFromItem(paren) = &from_item
+            && let Some(paren_expr) = paren.paren_expr()
+        {
+            collect_visible_from_items(
+                iter_from_items(paren_expr.from_list_item().into_iter()),
+                node,
+                visible,
+            );
+        } else if !is_lateral_from_item(&from_item) {
+            visible.clear();
+        }
+        return;
+    }
+}
+
+fn hide_disallowed_lateral_items(from_item: &ast::FromItem, visible: &mut Vec<ast::FromItem>) {
+    let Some(join) = from_item.syntax().parent().and_then(ast::Join::cast) else {
+        return;
+    };
+    if !matches!(
+        join.join_type(),
+        Some(ast::JoinType::JoinRight(_) | ast::JoinType::JoinFull(_))
+    ) {
+        return;
+    }
+    let Some(lhs) = join
+        .syntax()
+        .parent()
+        .and_then(ast::JoinExpr::cast)
+        .and_then(|join_expr| join_expr.from_list_item())
+    else {
+        return;
+    };
+    let hidden: Vec<_> = iter_from_items(std::iter::once(lhs)).collect();
+    visible.retain(|from_item| !hidden.contains(from_item));
+}
+
+fn is_lateral_from_item(from_item: &ast::FromItem) -> bool {
+    match from_item {
+        ast::FromItem::ExprFromItem(_)
+        | ast::FromItem::FunctionFromItem(_)
+        | ast::FromItem::JsonTableFromItem(_)
+        | ast::FromItem::RowsFromItem(_)
+        | ast::FromItem::XmlTableFromItem(_) => true,
+        ast::FromItem::GraphTableFromItem(_)
+        | ast::FromItem::ParenFromItem(_)
+        | ast::FromItem::RelationFromItem(_) => from_item
+            .syntax()
+            .children_with_tokens()
+            .any(|it| it.kind() == SyntaxKind::LATERAL_KW),
+    }
 }
 
 pub(crate) fn iter_join_expr(join_expr: &ast::JoinExpr) -> impl Iterator<Item = ast::FromItem> {
@@ -370,4 +471,27 @@ impl Iterator for FromItemIter {
 
         None
     }
+}
+
+pub(crate) enum RoutineKind {
+    Function,
+    Procedure,
+}
+
+pub(crate) fn enclosing_routine_name(
+    node: &SyntaxNode,
+) -> Option<(Name, ast::PathSegment, RoutineKind)> {
+    node.ancestors().find_map(|ancestor| {
+        let (path, kind) =
+            if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
+                (create_function.name()?.path()?, RoutineKind::Function)
+            } else {
+                (
+                    ast::CreateProcedure::cast(ancestor)?.name()?.path()?,
+                    RoutineKind::Procedure,
+                )
+            };
+        let (_, routine_name) = name::schema_and_name_definition(&path)?;
+        Some((routine_name, path.segment()?, kind))
+    })
 }

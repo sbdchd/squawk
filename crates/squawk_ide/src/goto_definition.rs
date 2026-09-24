@@ -1941,6 +1941,33 @@ create function f(x int) returns int language sql return f.x$0 + 1;
     }
 
     #[test]
+    fn goto_function_name_qualifier_in_sql_body_return_expr() {
+        assert_snapshot!(goto("
+create function f(x int) returns int language sql return f$0.x + 1;
+"), @"
+          ╭▸ 
+        2 │ create function f(x int) returns int language sql return f.x + 1;
+          ╰╴                ─ 2. destination                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_schema_matching_function_name_in_sql_body_return_expr() {
+        assert_snapshot!(goto("
+create schema f;
+create function f.g() returns int language sql return 1;
+create function f() returns int language sql return f$0.g();
+"), @"
+          ╭▸ 
+        2 │ create schema f;
+          │               ─ 2. destination
+        3 │ create function f.g() returns int language sql return 1;
+        4 │ create function f() returns int language sql return f.g();
+          ╰╴                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_function_param_bogus_qualified_in_sql_body_return_expr() {
         goto_not_found(
             "
@@ -9771,6 +9798,2927 @@ delete from target using src s where s.y$0 = target.id;
     }
 
     #[test]
+    fn goto_update_qualified_target_column_shadowed_by_from() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 from u where t.b$0 = u.b;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = 1 from u where t.b = u.b;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_qualified_target_column_shadowed_by_using() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+delete from t using u where t.b$0 = u.b;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ delete from t using u where t.b = u.b;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_qualified_source_column_in_set_expr() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = u.b$0 from u where t.b = u.b;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ update t set a = u.b from u where t.b = u.b;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_qualified_column_in_paren_join_source() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+create table w(b int);
+update t set a = 1 from (u join w on true) where w.b$0 = t.b;
+"), @"
+          ╭▸ 
+        4 │ create table w(b int);
+          │                ─ 2. destination
+        5 │ update t set a = 1 from (u join w on true) where w.b = t.b;
+          ╰╴                                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_qualified_column_in_subquery_source() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+delete from t using u, (select 1 as b) s where s.b$0 = t.b;
+"), @"
+          ╭▸ 
+        4 │ delete from t using u, (select 1 as b) s where s.b = t.b;
+          │                                     ┬            ─ 1. source
+          │                                     │
+          ╰╴                                    2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_merge_qualified_target_column_shadowed_by_using() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on t.b$0 = u.b when matched then delete;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ merge into t using u on t.b = u.b when matched then delete;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_aliased_qualified_target_column_shadowed_by_from() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t as x set a = 1 from u where x.b$0 = u.b;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t as x set a = 1 from u where x.b = u.b;
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_qualified_column_shadowed_by_other_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+select * from t, u where t.b$0 = u.b;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ select * from t, u where t.b = u.b;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_ambiguous_column_with_target() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+update t set a = 1 from u where a$0 = 1;"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create table u(a int);
+          │                ─ 3. destination
+        4 │ update t set a = 1 from u where a = 1;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_ambiguous_column_between_sources() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(x int);
+create table w(x int);
+update t set a = x$0 from u, w;"
+        ), @"
+          ╭▸ 
+        3 │ create table u(x int);
+          │                ─ 2. destination
+        4 │ create table w(x int);
+          │                ─ 3. destination
+        5 │ update t set a = x from u, w;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_ambiguous_column_with_target() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+delete from t using u where a$0 = 1;"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create table u(a int);
+          │                ─ 3. destination
+        4 │ delete from t using u where a = 1;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_ambiguous_column_with_target() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+merge into t using u on a$0 = 1 when matched then do nothing;"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create table u(a int);
+          │                ─ 3. destination
+        4 │ merge into t using u on a = 1 when matched then do nothing;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_not_matched_by_source_column_not_ambiguous() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+merge into t using u on t.a = u.a
+  when not matched by source then update set a = a$0 + 1;"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+          ‡
+        5 │   when not matched by source then update set a = a + 1;
+          ╰╴                                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_lateral_column_not_ambiguous_with_target() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+update t set a = 1 from u, lateral (select a$0) v;"
+        ), @"
+          ╭▸ 
+        3 │ create table u(a int);
+          │                ─ 2. destination
+        4 │ update t set a = 1 from u, lateral (select a) v;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_join_on_unqualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+update t set a = 1 from w join z on y$0 = 1;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ update t set a = 1 from w join z on y = 1;
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_join_on_qualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+update t set a = 1 from w join z on w.y$0 = z.q;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ update t set a = 1 from w join z on w.y = z.q;
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_join_on_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+update t set a = 1 from w join z on w$0.y = z.q;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │              ─ 2. destination
+        4 │ create table z(q int);
+        5 │ update t set a = 1 from w join z on w.y = z.q;
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_lateral_function_arg() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+create function f(int) returns int as 'select 1' language sql;
+update t set a = 1 from u, lateral f(b$0) q;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ create function f(int) returns int as 'select 1' language sql;
+        5 │ update t set a = 1 from u, lateral f(b) q;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_lateral_subquery_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+update t set a = 1 from u, lateral (select b$0) q;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ update t set a = 1 from u, lateral (select b) q;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+update t set a = 1 from u, generate_series(1, b$0) g;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ update t set a = 1 from u, generate_series(1, b) g;
+          ╰╴                                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_join_on_unqualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+delete from t using w join z on y$0 = 1;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ delete from t using w join z on y = 1;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_join_on_qualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+delete from t using w join z on w.y$0 = z.q;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ delete from t using w join z on w.y = z.q;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_join_on_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+delete from t using w join z on w$0.y = z.q;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │              ─ 2. destination
+        4 │ create table z(q int);
+        5 │ delete from t using w join z on w.y = z.q;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_function_arg_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+delete from t using u, generate_series(1, u$0.b) g;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │              ─ 2. destination
+        4 │ delete from t using u, generate_series(1, u.b) g;
+          ╰╴                                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+update t set a = 1 from u, generate_series(1, u$0.b) g;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │              ─ 2. destination
+        4 │ update t set a = 1 from u, generate_series(1, u.b) g;
+          ╰╴                                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_join_on_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+merge into t using w join z on w$0.y = z.q on true when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │              ─ 2. destination
+        4 │ create table z(q int);
+        5 │ merge into t using w join z on w.y = z.q on true when matched then delete;
+          ╰╴                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_lateral_subquery_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+delete from t using u, lateral (select b$0) q;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ delete from t using u, lateral (select b) q;
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_paren_join_on_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+merge into t using (w join z on w$0.y = 1) v on true when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │              ─ 2. destination
+        4 │ create table z(q int);
+        5 │ merge into t using (w join z on w.y = 1) v on true when matched then delete;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_paren_join_on_qualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+merge into t using (w join z on w.y$0 = 1) v on true when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ merge into t using (w join z on w.y = 1) v on true when matched then delete;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_paren_join_on_unqualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+merge into t using (w join z on y$0 = 1) v on true when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ merge into t using (w join z on y = 1) v on true when matched then delete;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_join_on_unqualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+merge into t using w join z on y$0 = 1 on true when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ merge into t using w join z on y = 1 on true when matched then delete;
+          ╰╴                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_qualified_column_in_join_source() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table w(y int);
+create table z(q int);
+merge into t using w join z on true on t.a = w.y$0 when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table w(y int);
+          │                ─ 2. destination
+        4 │ create table z(q int);
+        5 │ merge into t using w join z on true on t.a = w.y when matched then delete;
+          ╰╴                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_join_using_alias_qualifier() {
+        assert_snapshot!(goto("
+create table target(a int, b int);
+create table u(b int);
+create table w(b int);
+update target
+set a = 1
+from u join w using (b) as j
+where j$0.b = target.b;
+"), @"
+          ╭▸ 
+        7 │ from u join w using (b) as j
+          │                            ─ 2. destination
+        8 │ where j.b = target.b;
+          ╰╴      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_join_using_alias_column() {
+        assert_snapshot!(goto("
+create table target(a int, b int);
+create table u(b int);
+create table w(b int);
+update target
+set a = 1
+from u join w using (b) as j
+where j.b$0 = target.b;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ create table w(b int);
+          │                ─ 3. destination
+          ‡
+        8 │ where j.b = target.b;
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_join_using_alias_column() {
+        assert_snapshot!(goto("
+create table target(a int, b int);
+create table u(b int);
+create table w(b int);
+delete from target using u join w using (b) as j where j.b$0 = target.b;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ create table w(b int);
+          │                ─ 3. destination
+        5 │ delete from target using u join w using (b) as j where j.b = target.b;
+          ╰╴                                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_join_using_alias_qualifier() {
+        assert_snapshot!(goto("
+create table target(a int, b int);
+create table u(b int);
+create table w(b int);
+merge into target using u join w using (b) as j on j$0.b = target.b when matched then delete;
+"), @"
+          ╭▸ 
+        5 │ merge into target using u join w using (b) as j on j.b = target.b when matched then delete;
+          │                                               ┬    ─ 1. source
+          │                                               │
+          ╰╴                                              2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_join_using_alias_column() {
+        assert_snapshot!(goto("
+create table target(a int, b int);
+create table u(b int);
+create table w(b int);
+merge into target using u join w using (b) as j on j.b$0 = target.b when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ create table w(b int);
+          │                ─ 3. destination
+        5 │ merge into target using u join w using (b) as j on j.b = target.b when matched then delete;
+          ╰╴                                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_paren_join_alias_on_qualifier() {
+        assert_snapshot!(goto("
+create table w(y int);
+create table z(q int);
+select * from (w join z on w$0.y = 1) v;
+"), @"
+          ╭▸ 
+        2 │ create table w(y int);
+          │              ─ 2. destination
+        3 │ create table z(q int);
+        4 │ select * from (w join z on w.y = 1) v;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_paren_join_alias_on_qualified_column() {
+        assert_snapshot!(goto("
+create table w(y int);
+create table z(q int);
+select * from (w join z on w.y$0 = 1) v;
+"), @"
+          ╭▸ 
+        2 │ create table w(y int);
+          │                ─ 2. destination
+        3 │ create table z(q int);
+        4 │ select * from (w join z on w.y = 1) v;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_lateral_function_arg() {
+        assert_snapshot!(goto("
+create table u(b int);
+create function f(int) returns int as 'select 1' language sql;
+select * from u, lateral f(b$0) q;
+"), @"
+          ╭▸ 
+        2 │ create table u(b int);
+          │                ─ 2. destination
+        3 │ create function f(int) returns int as 'select 1' language sql;
+        4 │ select * from u, lateral f(b) q;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where exists (select 1 from u where u.b = t.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = 1 where exists (select 1 from u where u.b = t.b);
+          ╰╴                                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_subquery_target_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where exists (select 1 from u where u.b = t$0.b);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = 1 where exists (select 1 from u where u.b = t.b);
+          ╰╴                                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_subquery_target_alias_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t as x set a = 1 where exists (select 1 from u where u.b = x.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t as x set a = 1 where exists (select 1 from u where u.b = x.b);
+          ╰╴                                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_subquery_target_alias_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t as x set a = 1 where exists (select 1 from u where u.b = x$0.b);
+"), @"
+          ╭▸ 
+        4 │ update t as x set a = 1 where exists (select 1 from u where u.b = x.b);
+          ╰╴            ─ 2. destination                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = (select u.b from u where u.b = t.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = (select u.b from u where u.b = t.b);
+          ╰╴                                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_subquery_target_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = (select u.b from u where u.b = t$0.b);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = (select u.b from u where u.b = t.b);
+          ╰╴                                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_subquery_target_alias_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t x set a = (select u.b from u where u.b = x.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t x set a = (select u.b from u where u.b = x.b);
+          ╰╴                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_nested_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where exists (select 1 from u where exists (select 1 where u.b = t.b$0));
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = 1 where exists (select 1 from u where exists (select 1 where u.b = t.b));
+          ╰╴                                                                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+delete from t where exists (select 1 from u where u.b = t.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ delete from t where exists (select 1 from u where u.b = t.b);
+          ╰╴                                                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_subquery_target_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+delete from t where exists (select 1 from u where u.b = t$0.b);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create table u(b int);
+        4 │ delete from t where exists (select 1 from u where u.b = t.b);
+          ╰╴                                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_subquery_target_alias_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+delete from t as x where exists (select 1 from u where u.b = x.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ delete from t as x where exists (select 1 from u where u.b = x.b);
+          ╰╴                                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_subquery_target_alias_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+delete from t as x where exists (select 1 from u where u.b = x$0.b);
+"), @"
+          ╭▸ 
+        4 │ delete from t as x where exists (select 1 from u where u.b = x.b);
+          ╰╴                 ─ 2. destination                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on exists (select 1 where u.b = t.b$0) when matched then delete;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ merge into t using u on exists (select 1 where u.b = t.b) when matched then delete;
+          ╰╴                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_subquery_target_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on exists (select 1 where u.b = t$0.b) when matched then delete;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create table u(b int);
+        4 │ merge into t using u on exists (select 1 where u.b = t.b) when matched then delete;
+          ╰╴                                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_subquery_target_alias_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t as x using u on exists (select 1 where u.b = x.b$0) when matched then delete;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ merge into t as x using u on exists (select 1 where u.b = x.b) when matched then delete;
+          ╰╴                                                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_subquery_target_alias_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t as x using u on exists (select 1 where u.b = x$0.b) when matched then delete;
+"), @"
+          ╭▸ 
+        4 │ merge into t as x using u on exists (select 1 where u.b = x.b) when matched then delete;
+          ╰╴                ─ 2. destination                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_subquery_source_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on exists (select 1 where u.b$0 = t.b) when matched then delete;
+"), @"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ merge into t using u on exists (select 1 where u.b = t.b) when matched then delete;
+          ╰╴                                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_when_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on true when matched and exists (select 1 where t.b$0 = 1) then delete;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ merge into t using u on true when matched and exists (select 1 where t.b = 1) then delete;
+          ╰╴                                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_update_set_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on true when matched then update set a = (select t.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ merge into t using u on true when matched then update set a = (select t.b);
+          ╰╴                                                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_subquery_target_hidden_by_alias() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+update t as x set a = 1 where exists (select 1 from u where u.b = t.b$0);
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_where_subquery_target_hidden_by_alias() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+delete from t as x where exists (select 1 from u where u.b = t$0.b);
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_update_set_unknown_qualifier() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on true when matched then update set a = z.b$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_lateral_subquery_sees_earlier_sibling() {
+        assert_snapshot!(goto("
+create table u(x int, j jsonb);
+select * from u, lateral (select x$0) v;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, j jsonb);
+          │                ─ 2. destination
+        3 │ select * from u, lateral (select x) v;
+          ╰╴                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_lateral_subquery_sees_earlier_sibling_qualified() {
+        assert_snapshot!(goto("
+create table u(x int, j jsonb);
+select * from u, lateral (select u.x$0) v;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, j jsonb);
+          │                ─ 2. destination
+        3 │ select * from u, lateral (select u.x) v;
+          ╰╴                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_function_arg_sees_earlier_sibling() {
+        assert_snapshot!(goto("
+create table u(x int, j jsonb);
+select * from u, generate_series(1, x$0) g;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, j jsonb);
+          │                ─ 2. destination
+        3 │ select * from u, generate_series(1, x) g;
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_rows_from_arg_sees_earlier_sibling() {
+        assert_snapshot!(goto("
+create table u(x int, j jsonb);
+select * from u, rows from (generate_series(1, x$0)) g;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, j jsonb);
+          │                ─ 2. destination
+        3 │ select * from u, rows from (generate_series(1, x)) g;
+          ╰╴                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_json_table_arg_sees_earlier_sibling() {
+        assert_snapshot!(goto("
+create table u(x int, j jsonb);
+select * from u, json_table(j$0, '$' columns (a int)) jt;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, j jsonb);
+          │                       ─ 2. destination
+        3 │ select * from u, json_table(j, '$' columns (a int)) jt;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_join_lateral_subquery_sees_earlier_sibling() {
+        assert_snapshot!(goto("
+create table u(x int, j jsonb);
+select * from u join lateral (select x$0) v on true;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, j jsonb);
+          │                ─ 2. destination
+        3 │ select * from u join lateral (select x) v on true;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_non_lateral_subquery_sees_own_from() {
+        assert_snapshot!(goto("
+create table u(x int, j jsonb);
+select * from u, (select x$0 from u) v;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, j jsonb);
+          │                ─ 2. destination
+        3 │ select * from u, (select x from u) v;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_non_lateral_subquery_hides_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from u, (select x$0) v;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_non_lateral_subquery_hides_sibling_qualified() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from u, (select u$0.x) v;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_lateral_subquery_hides_later_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from lateral (select x$0) v, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_lateral_subquery_hides_later_sibling_qualified() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from lateral (select u.x$0) v, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_function_arg_hides_later_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from generate_series(1, x$0) g, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_function_arg_hides_later_sibling_qualified() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from generate_series(1, u$0.x) g, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_rows_from_arg_hides_later_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from rows from (generate_series(1, x$0)) g, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_json_table_arg_hides_later_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from json_table(j$0, '$' columns (a int)) jt, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_join_non_lateral_subquery_hides_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from u join (select x$0) v on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_join_lateral_subquery_hides_later_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+select * from lateral (select x$0) v join u on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_hides_later_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+create table t(a int);
+update t set a = 1 from generate_series(1, x$0) g, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_using_function_arg_hides_later_sibling() {
+        goto_not_found(
+            "
+create table u(x int, j jsonb);
+create table t(a int);
+delete from t using generate_series(1, x$0) g, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_function_arg_sees_earlier_join_using_alias() {
+        assert_snapshot!(goto("
+create table u(b int);
+create table w(b int);
+select * from u join w using (b) as j, generate_series(1, j$0.b) g;
+"), @"
+          ╭▸ 
+        4 │ select * from u join w using (b) as j, generate_series(1, j.b) g;
+          ╰╴                                    ─ 2. destination      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_function_arg_sees_earlier_join_using_alias_column() {
+        assert_snapshot!(goto("
+create table u(b int);
+create table w(b int);
+select * from u join w using (b) as j, generate_series(1, j.b$0) g;
+"), @"
+          ╭▸ 
+        2 │ create table u(b int);
+          │                ─ 2. destination
+        3 │ create table w(b int);
+          │                ─ 3. destination
+        4 │ select * from u join w using (b) as j, generate_series(1, j.b) g;
+          ╰╴                                                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_lateral_subquery_sees_earlier_join_using_alias() {
+        assert_snapshot!(goto("
+create table u(b int);
+create table w(b int);
+select * from u join w using (b) as j, lateral (select j$0.b) q;
+"), @"
+          ╭▸ 
+        4 │ select * from u join w using (b) as j, lateral (select j.b) q;
+          ╰╴                                    ─ 2. destination   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_lateral_subquery_sees_earlier_join_using_alias_column() {
+        assert_snapshot!(goto("
+create table u(b int);
+create table w(b int);
+select * from u join w using (b) as j, lateral (select j.b$0) q;
+"), @"
+          ╭▸ 
+        2 │ create table u(b int);
+          │                ─ 2. destination
+        3 │ create table w(b int);
+          │                ─ 3. destination
+        4 │ select * from u join w using (b) as j, lateral (select j.b) q;
+          ╰╴                                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_from_function_arg_hides_later_join_using_alias() {
+        goto_not_found(
+            "
+create table u(b int);
+create table w(b int);
+select * from generate_series(1, j$0.b) g, u join w using (b) as j;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_function_arg_hides_later_join_using_alias_column() {
+        goto_not_found(
+            "
+create table u(b int);
+create table w(b int);
+select * from generate_series(1, j.b$0) g, u join w using (b) as j;
+",
+        );
+    }
+
+    #[test]
+    fn goto_from_non_lateral_subquery_hides_join_using_alias() {
+        goto_not_found(
+            "
+create table u(b int);
+create table w(b int);
+select * from u join w using (b) as j, (select j$0.b) q;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_hides_later_join_using_alias() {
+        goto_not_found(
+            "
+create table u(b int);
+create table w(b int);
+create table t(a int);
+update t set a = 1 from generate_series(1, j$0.b) g, u join w using (b) as j;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_hides_later_join_using_alias_column() {
+        goto_not_found(
+            "
+create table u(b int);
+create table w(b int);
+create table t(a int);
+update t set a = 1 from generate_series(1, j.b$0) g, u join w using (b) as j;
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_using_function_arg_hides_later_join_using_alias() {
+        goto_not_found(
+            "
+create table u(b int);
+create table w(b int);
+create table t(a int);
+delete from t using generate_series(1, j$0.b) g, u join w using (b) as j;
+",
+        );
+    }
+
+    #[test]
+    fn goto_outer_level_from_subquery_in_from() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from (select x$0) v) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from (select x) v) from u;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_subquery_in_from_qualified() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from (select u.x$0) v) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from (select u.x) v) from u;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_subquery_in_from_qualifier() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from (select u$0.x) v) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │              ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from (select u.x) v) from u;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_subquery_in_from_alias() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from (select o.x$0) v) from u o;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from (select o.x) v) from u o;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_subquery_in_from_where() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select * from u where exists (select 1 from (select x$0) v);
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select * from u where exists (select 1 from (select x) v);
+          ╰╴                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_subquery_in_from_with_sibling() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from w, (select x$0) v) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from w, (select x) v) from u;
+          ╰╴                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_skips_middle_level() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select (select 1 from (select x$0) v) from w) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select (select 1 from (select x) v) from w) from u;
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_function_arg() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from generate_series(1, x$0) g) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from generate_series(1, x) g) from u;
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_function_arg_qualified() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from generate_series(1, u.x$0) g) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from generate_series(1, u.x) g) from u;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_from_nested_subqueries_in_from() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+select (select 1 from (select 1 from (select x$0) a) b) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+        3 │ create table w(y int);
+        4 │ select (select 1 from (select 1 from (select x) a) b) from u;
+          ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_nearest_level_wins() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select (select 1 from (select x$0 from z) v) from u;
+"), @"
+          ╭▸ 
+        4 │ create table z(x int);
+          │                ─ 2. destination
+        5 │ select (select 1 from (select x from z) v) from u;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_target_from_subquery_in_from() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int, x int);
+update t set a = (select 1 from (select x$0) v);
+"), @"
+          ╭▸ 
+        4 │ create table t(a int, x int);
+          │                       ─ 2. destination
+        5 │ update t set a = (select 1 from (select x) v);
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_target_from_subquery_in_from_qualified() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int, x int);
+update t set a = (select 1 from (select t.x$0) v);
+"), @"
+          ╭▸ 
+        4 │ create table t(a int, x int);
+          │                       ─ 2. destination
+        5 │ update t set a = (select 1 from (select t.x) v);
+          ╰╴                                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_target_from_subquery_in_from() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int, x int);
+delete from t where exists (select 1 from (select x$0) v);
+"), @"
+          ╭▸ 
+        4 │ create table t(a int, x int);
+          │                       ─ 2. destination
+        5 │ delete from t where exists (select 1 from (select x) v);
+          ╰╴                                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_level_not_subquery_output_column() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+select (select 1 from (select x$0) v) from w;
+",
+        );
+    }
+
+    #[test]
+    fn goto_outer_level_from_subquery_hides_outer_sibling() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+select * from u, (select (select 1 from (select x$0) v)) q;
+",
+        );
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_not_hidden_by_non_lateral_sibling() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from u, (values (x$0)) v;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select 1 from u, (values (x)) v;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_not_hidden_by_non_lateral_subquery_sibling() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from u, (select x$0) v;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select 1 from u, (select x) v;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_not_hidden_by_later_sibling_function_arg() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from generate_series(1, x$0) g, u;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select 1 from generate_series(1, x) g, u;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_not_hidden_by_later_sibling_lateral() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from lateral (select x$0) v, u;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select 1 from lateral (select x) v, u;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_from_nested_subquery_in_from() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select (select 1 from (select x$0) v) from w;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select (select 1 from (select x) v) from w;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_in_select_without_column() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select x$0 from w;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select x from w;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_function_qualified() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from u, (select f.x$0) v;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select 1 from u, (select f.x) v;
+          ╰╴                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_column_shadows_param_in_select() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select x$0 from u;
+  end;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+          ‡
+        7 │     select x from u;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_column_shadows_param_in_lateral() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from u, lateral (select x$0) v;
+  end;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+          ‡
+        7 │     select 1 from u, lateral (select x) v;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_column_shadows_param_in_function_arg() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from u, generate_series(1, x$0) g;
+  end;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+          ‡
+        7 │     select 1 from u, generate_series(1, x) g;
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_in_update_from_non_lateral_sibling() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    update t set a = 1 from u, (select x$0) v;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     update t set a = 1 from u, (select x) v;
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_in_update_from_later_sibling_function_arg() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    update t set a = 1 from generate_series(1, x$0) g, u;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     update t set a = 1 from generate_series(1, x) g, u;
+          ╰╴                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_in_delete_using_non_lateral_sibling() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    delete from t using u, (select x$0) v;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     delete from t using u, (select x) v;
+          ╰╴                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_function_qualified_in_select() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select f.x$0 from w;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     select f.x from w;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_function_qualifier_in_select() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select f$0.x from w;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                 ─ 2. destination
+        6 │   begin atomic
+        7 │     select f.x from w;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_function_qualifier() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    select 1 from u, (select f$0.x) v;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                 ─ 2. destination
+        6 │   begin atomic
+        7 │     select 1 from u, (select f.x) v;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_function_qualified_in_update() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    update t set a = f.x$0;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(x int) returns setof int
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     update t set a = f.x;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_wrong_qualifier() {
+        goto_not_found(
+            "
+create table w(y int);
+create function f(x int) returns setof int
+  begin atomic
+    select g.x$0 from w;
+  end;
+",
+        );
+    }
+
+    #[test]
+    fn goto_begin_atomic_param_not_reached_through_target_qualifier() {
+        goto_not_found(
+            "
+create table t(a int);
+create function f(x int) returns setof int
+  begin atomic
+    update t set a = t.x$0;
+  end;
+",
+        );
+    }
+
+    #[test]
+    fn goto_begin_atomic_table_named_like_function_shadows_param() {
+        assert_snapshot!(goto("
+create table f(x text);
+create function f(x int) returns setof text
+  begin atomic
+    select f.x$0 from f;
+  end;
+"), @"
+          ╭▸ 
+        2 │ create table f(x text);
+          │                ─ 2. destination
+          ‡
+        5 │     select f.x from f;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_right_join_lateral_hides_left_column() {
+        goto_not_found(
+            "
+create table a(x int);
+select * from a right join lateral (select a.x$0) v on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_right_join_lateral_hides_left_qualifier() {
+        goto_not_found(
+            "
+create table a(x int);
+select * from a right join lateral (select a$0.x) v on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_full_join_function_hides_left_column() {
+        goto_not_found(
+            "
+create table a(x int);
+select * from a full join generate_series(1, a.x$0) g on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_right_join_lateral_keeps_comma_sibling_visible() {
+        assert_snapshot!(goto("
+create table x(q int);
+create table a(y int);
+select * from x, a right join lateral (select x.q$0) v on true;
+"), @"
+          ╭▸ 
+        2 │ create table x(q int);
+          │                ─ 2. destination
+        3 │ create table a(y int);
+        4 │ select * from x, a right join lateral (select x.q) v on true;
+          ╰╴                                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_right_join_lateral_sees_own_rhs_sibling() {
+        assert_snapshot!(goto("
+create table a(y int);
+create table b(x int);
+select * from a right join (b cross join lateral (select b.x$0) v) on true;
+"), @"
+          ╭▸ 
+        3 │ create table b(x int);
+          │                ─ 2. destination
+        4 │ select * from a right join (b cross join lateral (select b.x) v) on true;
+          ╰╴                                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_left_join_lateral_sees_left_column() {
+        assert_snapshot!(goto("
+create table a(x int);
+select * from a left join lateral (select a.x$0) v on true;
+"), @"
+          ╭▸ 
+        2 │ create table a(x int);
+          │                ─ 2. destination
+        3 │ select * from a left join lateral (select a.x) v on true;
+          ╰╴                                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_join_lateral_sees_earlier_paren_join() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from (u cross join w) join lateral (select x$0) v on true;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+          ‡
+        5 │ select * from (u cross join w) join lateral (select x) v on true;
+          ╰╴                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_join_lateral_in_paren_sees_outer_earlier() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from u join (w cross join lateral (select x$0) v) on true;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+          ‡
+        5 │ select * from u join (w cross join lateral (select x) v) on true;
+          ╰╴                                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_join_lateral_in_paren_sees_paren_earlier() {
+        assert_snapshot!(goto("
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from w join (u cross join lateral (select x$0) v) on true;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int);
+          │                ─ 2. destination
+          ‡
+        5 │ select * from w join (u cross join lateral (select x) v) on true;
+          ╰╴                                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_join_non_lateral_in_paren_hides_siblings() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from w join (u cross join (select x$0) v) on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_nested_join_non_lateral_in_paren_hides_outer() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from z join (w cross join (select x$0) v) on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_nested_join_lateral_hides_self_qualified() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from u, lateral (select v$0.x) v;
+",
+        );
+    }
+
+    #[test]
+    fn goto_nested_join_lateral_in_paren_hides_later() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from (w cross join lateral (select x$0) v cross join u);
+",
+        );
+    }
+
+    #[test]
+    fn goto_nested_join_lateral_hides_later_paren_join() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from lateral (select x$0) v join (u cross join w) on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_nested_join_aliased_paren_join_hides_inner_name() {
+        goto_not_found(
+            "
+create table u(x int);
+create table w(y int);
+create table z(x int);
+select * from (u cross join w) p, lateral (select u$0.x) q;
+",
+        );
+    }
+
+    #[test]
+    fn goto_on_clause_subquery_sees_own_join() {
+        assert_snapshot!(goto("
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select * from u join w on exists (select x$0);
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, b int);
+          │                ─ 2. destination
+          ‡
+        8 │ select * from u join w on exists (select x);
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_on_clause_falls_through_to_outer_level() {
+        assert_snapshot!(goto("
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select (select 1 from w join z on x$0 = 1) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, b int);
+          │                ─ 2. destination
+          ‡
+        8 │ select (select 1 from w join z on x = 1) from u;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_on_clause_hides_comma_sibling() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select * from u, w join z on x$0 = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_on_clause_hides_comma_sibling_qualified() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select * from u, w join z on u$0.x = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_on_clause_hides_later_comma_sibling() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select * from w join z on x$0 = 1, u;
+",
+        );
+    }
+
+    #[test]
+    fn goto_on_clause_hides_table_outside_paren_join() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select * from y join (a join b on a.c = y$0.f) on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_on_clause_hides_column_outside_paren_join() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select * from y join (a join b on a.c = f$0) on true;
+",
+        );
+    }
+
+    #[test]
+    fn goto_on_clause_hides_comma_sibling_join_using_alias() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+select * from u join w using (b) as j, a join z on j$0.b = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_on_clause_hides_comma_sibling() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+create table t(a int);
+update t set a = 1 from u, w join z on x$0 = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_using_on_clause_hides_comma_sibling() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(y int, b int);
+create table z(q int);
+create table y(f int);
+create table a(c int);
+create table b(d int);
+create table t(a int);
+delete from t using u, w join z on u$0.x = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_returning_subquery_old_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 returning (select old.b$0);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = 1 returning (select old.b);
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_subquery_old_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 returning (select old$0.b);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create table u(b int);
+        4 │ update t set a = 1 returning (select old.b);
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_old_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where old.a$0 = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_where_old_table_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where old$0.a = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_set_new_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+update t set a = new.a$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_where_subquery_old_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where exists (select old.a$0);
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_where_returning_alias_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where o$0.a = 1 returning with (old as o) o.a;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_where_returning_alias_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+update t set a = 1 where o.a$0 = 1 returning with (old as o) o.a;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_returning_old_alias_hides_old_qualifier() {
+        goto_not_found(
+            "
+create table t(a int);
+update t set a = 1 returning with (old as before) old$0.a;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_returning_old_alias_hides_old_column() {
+        goto_not_found(
+            "
+create table t(a int);
+update t set a = 1 returning with (old as before) old.a$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_returning_new_alias_hides_new_column() {
+        goto_not_found(
+            "
+create table t(a int);
+update t set a = 1 returning with (new as after) new.a$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_returning_old_alias_keeps_new_visible() {
+        assert_snapshot!(goto("
+create table t(a int);
+update t set a = 1 returning with (old as before) new.a$0;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ update t set a = 1 returning with (old as before) new.a;
+          ╰╴                                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_new_alias_keeps_old_visible() {
+        assert_snapshot!(goto("
+create table t(a int);
+update t set a = 1 returning with (new as after) old.a$0;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ update t set a = 1 returning with (new as after) old.a;
+          ╰╴                                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_new_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+delete from t where new.a$0 = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_on_old_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on old.a$0 = u.b when matched then delete;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_on_old_table_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on old$0.a = u.b when matched then delete;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_when_old_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on true when matched and old.a$0 = 1 then delete;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_update_set_old_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+create table u(b int);
+merge into t using u on true when matched then update set a = old.a$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_using_function_arg_sees_earlier_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(x int);
+merge into t
+using (u cross join generate_series(1, u$0.x) g) s
+on true
+when matched then do nothing;
+"), @"
+          ╭▸ 
+        3 │ create table u(x int);
+          │              ─ 2. destination
+        4 │ merge into t
+        5 │ using (u cross join generate_series(1, u.x) g) s
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_function_arg_sees_earlier_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(x int);
+merge into t
+using (u cross join generate_series(1, u.x$0) g) s
+on true
+when matched then do nothing;
+"), @"
+          ╭▸ 
+        3 │ create table u(x int);
+          │                ─ 2. destination
+        4 │ merge into t
+        5 │ using (u cross join generate_series(1, u.x) g) s
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_function_arg_hides_later_qualifier() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(x int);
+merge into t
+using (generate_series(1, u$0.x) g cross join u) s
+on true
+when matched then do nothing;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_not_matched_target_condition_hides_target_column() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(b int);
+merge into t using u on true
+when not matched and t.a$0 = 1 then do nothing;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_not_matched_target_action_hides_target_qualifier() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(b int);
+merge into t using u on true
+when not matched then insert values (t$0.a);
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_not_matched_target_action_hides_unqualified_target_column() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(b int);
+merge into t using u on true
+when not matched then insert values (a$0);
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_not_matched_source_condition_hides_source_column() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(b int);
+merge into t using u on true
+when not matched by source and u.b$0 = 1 then do nothing;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_not_matched_source_action_hides_source_qualifier() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(b int);
+merge into t using u on true
+when not matched by source then update set a = u$0.b;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_not_matched_source_action_hides_unqualified_source_column() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(b int);
+merge into t using u on true
+when not matched by source then update set a = b$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_not_matched_source_action_sees_target_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+merge into t using u on true
+when not matched by source then update set a = t.a$0 + 1;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+          ‡
+        5 │ when not matched by source then update set a = t.a + 1;
+          ╰╴                                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_in_subquery_sees_outer_query() {
+        assert_snapshot!(goto("
+create table u(x int, b int);
+create table w(b int);
+select (with c as (select u.x$0) select * from c) from u;
+"), @"
+          ╭▸ 
+        2 │ create table u(x int, b int);
+          │                ─ 2. destination
+        3 │ create table w(b int);
+        4 │ select (with c as (select u.x) select * from c) from u;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_body_hides_main_from_qualifier() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(b int);
+with c as (select u$0.x) select * from u, c;
+",
+        );
+    }
+
+    #[test]
+    fn goto_cte_body_hides_main_from_qualified_column() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(b int);
+with c as (select u.x$0) select * from u, c;
+",
+        );
+    }
+
+    #[test]
+    fn goto_cte_body_hides_main_from_column() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(b int);
+with c as (select x$0) select * from u, c;
+",
+        );
+    }
+
+    #[test]
+    fn goto_cte_body_hides_main_join_using_alias() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(b int);
+with c as (select j$0.b) select * from u join w using (b) as j, c;
+",
+        );
+    }
+
+    #[test]
+    fn goto_cte_body_hides_update_target_qualifier() {
+        goto_not_found(
+            "
+create table u(x int, b int);
+create table w(b int);
+create table t(a int);
+with c as (select t$0.a) update t set a = 1 from c;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_param_when_target_lacks_column() {
+        assert_snapshot!(goto("
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+create function f(p int) returns void
+  begin atomic
+    update t set a = 1 from generate_series(1, p$0) g;
+  end;
+"), @"
+          ╭▸ 
+        5 │ create function f(p int) returns void
+          │                   ─ 2. destination
+        6 │   begin atomic
+        7 │     update t set a = 1 from generate_series(1, p) g;
+          ╰╴                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_lateral_subquery_hides_target_column() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+update t set a = 1 from u, lateral (select z$0) v;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_hides_target_qualifier() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+update t set a = 1 from generate_series(1, t$0.a) g;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_hides_target_qualified_column() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+update t set a = 1 from generate_series(1, t.a$0) g;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_hides_target_column() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+update t set a = 1 from generate_series(1, a$0) g;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_on_clause_hides_target_qualifier() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+update t set a = 1 from u join w on t$0.a = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_on_clause_hides_target_column() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+update t set a = 1 from u join w on a$0 = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_hides_target_alias() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+update t as x set a = 1 from generate_series(1, x$0.a) g;
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_using_lateral_subquery_hides_target_qualified_column() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+delete from t using u, lateral (select t.a$0) v;
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_using_function_arg_hides_target_column() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+delete from t using generate_series(1, a$0) g;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_using_subquery_hides_target_qualifier() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+merge into t using (select t$0.a) s on true when matched then delete;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_using_subquery_hides_target_column() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+merge into t using (select a$0) s on true when matched then delete;
+",
+        );
+    }
+
+    #[test]
+    fn goto_update_from_function_arg_target_column_shadows_param() {
+        goto_not_found(
+            "
+create table t(a int, z int);
+create table u(b int);
+create table w(y int);
+create function f(a int) returns void
+  begin atomic
+    update t set a = 1 from generate_series(1, a$0) g;
+  end;
+",
+        );
+    }
+
+    #[test]
     fn goto_select_from_table() {
         assert_snapshot!(goto("
 create table users(id int, email text);
@@ -13633,6 +16581,195 @@ insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c$0;"
           │                ─ 2. destination
         3 │ insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c;
           ╰╴                                                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_excluded_table() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = excluded$0.b;"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int primary key, b int);
+          │              ─ 2. destination
+        3 │ insert into t values (1, 2) on conflict (a) do update set b = excluded.b;
+          ╰╴                                                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_excluded_whole_row() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b jsonb);
+insert into t values (1, '{}') on conflict (a) do update set b = to_jsonb(excluded$0);"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int primary key, b jsonb);
+          │              ─ 2. destination
+        3 │ insert into t values (1, '{}') on conflict (a) do update set b = to_jsonb(excluded);
+          ╰╴                                                                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_excluded_view() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+create view v as select a, b from t;
+insert into v values (1, 2) on conflict (a) do update set b = excluded$0.b;"
+        ), @"
+          ╭▸ 
+        3 │ create view v as select a, b from t;
+          │             ─ 2. destination
+        4 │ insert into v values (1, 2) on conflict (a) do update set b = excluded.b;
+          ╰╴                                                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_set_subquery_target_column() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = (select t.b$0);"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int primary key, b int);
+          │                                   ─ 2. destination
+        3 │ insert into t values (1, 2) on conflict (a) do update set b = (select t.b);
+          ╰╴                                                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_set_subquery_target_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = (select t$0.b);"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int primary key, b int);
+          │              ─ 2. destination
+        3 │ insert into t values (1, 2) on conflict (a) do update set b = (select t.b);
+          ╰╴                                                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_set_subquery_unqualified_column() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = (select b$0);"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int primary key, b int);
+          │                                   ─ 2. destination
+        3 │ insert into t values (1, 2) on conflict (a) do update set b = (select b);
+          ╰╴                                                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_set_subquery_excluded_column() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = (select excluded.b$0);"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int primary key, b int);
+          │                                   ─ 2. destination
+        3 │ insert into t values (1, 2) on conflict (a) do update set b = (select excluded.b);
+          ╰╴                                                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_where_subquery_excluded_column() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = 1 where exists (select 1 where excluded.b$0 > 1);"
+        ), @"
+          ╭▸ 
+        2 │ create table t(a int primary key, b int);
+          │                                   ─ 2. destination
+        3 │ insert into t values (1, 2) on conflict (a) do update set b = 1 where exists (select 1 where excluded.b > 1);
+          ╰╴                                                                                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_where_old_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = 1 where old.b$0 > 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_insert_returning_excluded_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do update set b = 1 returning excluded.b$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_nothing_excluded_column_not_found() {
+        goto_not_found(
+            "
+create table t(a int primary key, b int);
+insert into t values (1, 2) on conflict (a) do nothing returning excluded.b$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_insert_alias_hides_table_in_on_conflict_set() {
+        goto_not_found(
+            "
+create table t(a int primary key, b int);
+insert into t as z values (1, 2) on conflict (a) do update set b = t.b$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_set_function_param() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+create function f(y int) returns void
+  begin atomic
+    insert into t values (1, 2) on conflict (a) do update set b = y$0;
+  end;
+"), @"
+          ╭▸ 
+        3 │ create function f(y int) returns void
+          │                   ─ 2. destination
+        4 │   begin atomic
+        5 │     insert into t values (1, 2) on conflict (a) do update set b = y;
+          ╰╴                                                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_where_function_param() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+create function f(y int) returns void
+  begin atomic
+    insert into t values (1, 2) on conflict (a) do update set b = 1 where y$0 > 1;
+  end;
+"), @"
+          ╭▸ 
+        3 │ create function f(y int) returns void
+          │                   ─ 2. destination
+        4 │   begin atomic
+        5 │     insert into t values (1, 2) on conflict (a) do update set b = 1 where y > 1;
+          ╰╴                                                                          ─ 1. source
         ");
     }
 
