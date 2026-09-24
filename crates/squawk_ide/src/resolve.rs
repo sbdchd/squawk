@@ -2813,7 +2813,7 @@ fn resolve_select_column_ptr(
     // Walk up through enclosing selects so a column in a correlated subquery
     // resolves against an outer query's from clause:
     // `select (select (select a)) from foo`
-    for ancestor in column_name_ref.syntax().ancestors() {
+    for ancestor in ast_nav::ancestors_outside_own_with_clause(column_name_ref.syntax()) {
         let Some(from_clause) = select_like_from_clause(&ancestor) else {
             continue;
         };
@@ -2835,7 +2835,7 @@ fn resolve_select_column_ptr(
     // A correlated subquery can reference the target relation of an enclosing
     // DML statement, e.g. `update foo set a = (select b)` where `b` is `foo.b`
     let in_file = InFile::new(file, column_name_ref);
-    for ancestor in column_name_ref.syntax().ancestors() {
+    for ancestor in ast_nav::ancestors_outside_own_with_clause(column_name_ref.syntax()) {
         match ancestor.kind() {
             SyntaxKind::UPDATE => return resolve_update_column_ptr(db, in_file),
             SyntaxKind::DELETE => return resolve_delete_column_ptr(db, in_file),
@@ -5497,7 +5497,11 @@ fn resolve_update_column_ptr(
         )?;
     }
 
-    resolve_column_for_path(db, InFile::new(file, &path), column_name)
+    resolve_column_for_path(db, InFile::new(file, &path), column_name).or_else(|| {
+        (!is_set_target)
+            .then(|| resolve_enclosing_function_param(InFile::new(file, column_name_ref)))
+            .flatten()
+    })
 }
 
 fn resolve_delete_column_ptr(
@@ -5535,6 +5539,7 @@ fn resolve_delete_column_ptr(
     }
 
     resolve_column_for_path(db, InFile::new(file, &path), column_name)
+        .or_else(|| resolve_enclosing_function_param(InFile::new(file, column_name_ref)))
 }
 
 fn resolve_delete_table_name_ptr(
@@ -5622,7 +5627,11 @@ fn resolve_merge_column_ptr(
     }
 
     let path = merge.table_relation_name()?.table_name_ref()?.path_ref()?;
-    resolve_column_for_path(db, InFile::new(file, &path), column_name)
+    resolve_column_for_path(db, InFile::new(file, &path), column_name).or_else(|| {
+        (!is_set_target && !in_insert_column_list)
+            .then(|| resolve_enclosing_function_param(InFile::new(file, column_name_ref)))
+            .flatten()
+    })
 }
 
 // TODO: I think we could use trait(s) here to simplify this and have the

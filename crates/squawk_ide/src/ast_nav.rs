@@ -40,6 +40,17 @@ pub(crate) fn find_cte_with_table(
     None
 }
 
+pub(crate) fn ancestors_outside_own_with_clause(
+    node: &SyntaxNode,
+) -> impl Iterator<Item = SyntaxNode> {
+    let mut prev_was_with_clause = false;
+    node.ancestors().filter(move |ancestor| {
+        let skip = prev_was_with_clause;
+        prev_was_with_clause = ast::WithClause::can_cast(ancestor.kind());
+        !skip
+    })
+}
+
 pub(crate) fn iter_values_columns(values: &ast::Values) -> impl Iterator<Item = (Name, ast::Expr)> {
     values
         .row_list()

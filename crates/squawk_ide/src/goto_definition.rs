@@ -1976,6 +1976,162 @@ end;
     }
 
     #[test]
+    fn goto_function_param_in_begin_atomic_insert_values() {
+        assert_snapshot!(goto("
+create table t (a int);
+create function f(x int) returns void
+  begin atomic
+    insert into t values (x$0);
+  end;
+"), @"
+          ╭▸ 
+        3 │ create function f(x int) returns void
+          │                   ─ 2. destination
+        4 │   begin atomic
+        5 │     insert into t values (x);
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_begin_atomic_update() {
+        assert_snapshot!(goto("
+create table t (a int);
+create function f(x int) returns void
+  begin atomic
+    update t set a = x$0;
+  end;
+"), @"
+          ╭▸ 
+        3 │ create function f(x int) returns void
+          │                   ─ 2. destination
+        4 │   begin atomic
+        5 │     update t set a = x;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_begin_atomic_delete_where() {
+        assert_snapshot!(goto("
+create table t (a int);
+create function f(x int) returns void
+  begin atomic
+    delete from t where a = x$0;
+  end;
+"), @"
+          ╭▸ 
+        3 │ create function f(x int) returns void
+          │                   ─ 2. destination
+        4 │   begin atomic
+        5 │     delete from t where a = x;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_begin_atomic_merge() {
+        assert_snapshot!(goto("
+create table t (a int);
+create function f(x int) returns void
+  begin atomic
+    merge into t
+    using t u on t.a = x$0
+    when matched then
+      do nothing;
+  end;
+"), @"
+          ╭▸ 
+        3 │ create function f(x int) returns void
+          │                   ─ 2. destination
+          ‡
+        6 │     using t u on t.a = x
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_begin_atomic_values() {
+        assert_snapshot!(goto("
+create function f(x int) returns int
+  begin atomic
+    values (x$0);
+  end;
+"), @"
+          ╭▸ 
+        2 │ create function f(x int) returns int
+          │                   ─ 2. destination
+        3 │   begin atomic
+        4 │     values (x);
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_begin_atomic_column_shadows_function_param() {
+        assert_snapshot!(goto("
+create table t (x int);
+create function f(x int) returns void
+  begin atomic
+    delete from t where x$0 = 1;
+  end;
+"), @"
+          ╭▸ 
+        2 │ create table t (x int);
+          │                 ─ 2. destination
+          ‡
+        5 │     delete from t where x = 1;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_cte_insert_values_not_outer_select_column() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (x int);
+create function f(x int) returns int
+  begin atomic
+    with c as (
+      insert into t values (x$0) returning 1
+    )
+    select 1
+    from u;
+  end;
+"), @"
+          ╭▸ 
+        4 │ create function f(x int) returns int
+          │                   ─ 2. destination
+          ‡
+        7 │       insert into t values (x) returning 1
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_cte_insert_values_not_outer_update_column() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (x int);
+create function f(x int) returns void
+  begin atomic
+    with c as (
+      insert into t values (x$0)
+    )
+    update u
+    set x = 1;
+  end;
+"), @"
+          ╭▸ 
+        4 │ create function f(x int) returns void
+          │                   ─ 2. destination
+          ‡
+        7 │       insert into t values (x)
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_positional_param_unnamed_param() {
         assert_snapshot!(goto("
 create function f(int) returns int language sql return $1$0;
