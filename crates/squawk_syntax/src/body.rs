@@ -84,6 +84,10 @@ impl<T: BodyLanguage> Body<T> {
         self.decoded.source_range(range)
     }
 
+    pub fn body_position(&self, source: rowan::TextSize) -> Option<rowan::TextSize> {
+        self.decoded.decoded_pos(source)
+    }
+
     pub fn errors(&self) -> Vec<SyntaxError> {
         let mut validation_errors = vec![];
         validation::validate(&self.syntax(), &mut validation_errors);

@@ -1930,6 +1930,227 @@ create function f(x int) returns int language sql return x$0 + 1;
     }
 
     #[test]
+    fn goto_table_in_sql_string_function_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function all_users() returns setof users language sql
+  as $$ select * from users$0 $$;
+"#), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │              ───── 2. destination
+        3 │ create function all_users() returns setof users language sql
+        4 │   as $$ select * from users $$;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_in_sql_string_function_body_uses_outer_search_path_position() {
+        assert_snapshot!(goto(r#"
+create schema a;
+create schema b;
+create table a.users(id int);
+create table b.users(id int);
+set search_path to a;
+select 1;
+select 2;
+select 3;
+set search_path to b;
+create function all_users() returns setof int language sql
+  as $$ select * from users$0 $$;
+"#), @r"
+          ╭▸ 
+        5 │ create table b.users(id int);
+          │                ───── 2. destination
+          ‡
+       12 │   as $$ select * from users $$;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_in_sql_string_function_body_uses_routine_search_path() {
+        assert_snapshot!(goto(r#"
+create schema a;
+create schema b;
+create table a.users(id int);
+create table b.users(id int);
+set search_path to a;
+create function all_users() returns setof int language sql
+  set search_path to b
+  as $$ select * from users$0 $$;
+"#), @r"
+          ╭▸ 
+        5 │ create table b.users(id int);
+          │                ───── 2. destination
+          ‡
+        9 │   as $$ select * from users $$;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_in_sql_string_function_body_uses_body_search_path() {
+        assert_snapshot!(goto(r#"
+create schema a;
+create schema b;
+create table a.users(id int);
+create table b.users(id int);
+set search_path to a;
+create function all_users() returns setof int language sql as $$
+  set search_path to b;
+  select * from users$0;
+$$;
+"#), @r"
+          ╭▸ 
+        5 │ create table b.users(id int);
+          │                ───── 2. destination
+          ‡
+        9 │   select * from users;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_sql_string_body_does_not_remap_outer_definition_with_matching_body_range() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof users language sql as $$
+with         users as (select 1) select * from users;
+select * from users$0;
+$$;
+"#), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │              ───── 2. destination
+          ‡
+        5 │ select * from users;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function outer_function() returns int language sql as $outer$
+  create function inner_function() returns int language sql as $inner$
+    with result as (select 42 as value)
+    select value$0 from result
+  $inner$;
+  select 1;
+$outer$;
+"#), @r"
+          ╭▸ 
+        4 │     with result as (select 42 as value)
+          │                                  ───── 2. destination
+        5 │     select value from result
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_case_in_sql_string_body_maps_to_source() {
+        assert_snapshot!(goto(r#"
+create function f() returns int language sql as $$
+  select case when true then 1 else$0 2 end;
+$$;
+"#), @r"
+          ╭▸ 
+        3 │   select case when true then 1 else 2 end;
+          ╰╴         ──── 2. destination      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_self_qualified_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function f(value int) returns int language sql as $$
+  select f.value$0 + 1;
+$$;
+"#), @r"
+          ╭▸ 
+        2 │ create function f(value int) returns int language sql as $$
+          │                   ───── 2. destination
+        3 │   select f.value + 1;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_bogus_qualified_in_sql_string_body() {
+        goto_not_found(
+            r#"
+create function f(value int) returns int language sql as $$
+  select bogus.value$0 + 1;
+$$;
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_commit_to_begin_in_sql_string_function_body() {
+        assert_snapshot!(goto(r#"
+create function f() returns int language sql as $$
+begin;
+commit$0;
+$$;
+"#), @r"
+          ╭▸ 
+        3 │ begin;
+          │ ────── 2. destination
+        4 │ commit;
+          ╰╴     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function increment(value int) returns int language sql
+  as $$ select value$0 + 1 $$;
+"#), @r"
+          ╭▸ 
+        2 │ create function increment(value int) returns int language sql
+          │                           ───── 2. destination
+        3 │   as $$ select value + 1 $$;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_column_in_sql_string_procedure_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create procedure find_user() language sql
+  as 'select id from users where id$0 = 1';
+"#), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │                    ── 2. destination
+        3 │ create procedure find_user() language sql
+        4 │   as 'select id from users where id = 1';
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_column_in_sql_string_body_maps_to_source() {
+        assert_snapshot!(goto(r#"
+create function answer() returns int language sql as $$
+  with result as (select 42 as value)
+  select value$0 from result
+$$;
+"#), @r"
+          ╭▸ 
+        3 │   with result as (select 42 as value)
+          │                                ───── 2. destination
+        4 │   select value from result
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_function_param_self_qualified_in_sql_body_return_expr() {
         assert_snapshot!(goto("
 create function f(x int) returns int language sql return f.x$0 + 1;

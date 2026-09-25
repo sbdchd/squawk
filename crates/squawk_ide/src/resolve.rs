@@ -965,8 +965,8 @@ pub(crate) fn resolve_literal(
     let file = literal.file_id;
     let literal = literal.value;
 
-    if let Some(ast::LitKind::PositionalParam(token)) = literal.kind() {
-        return resolve_positional_param(file, literal, &token);
+    if let Some(index) = literal.positional_param_index() {
+        return resolve_positional_param(file, literal, index);
     }
 
     let context = classify_literal(literal.syntax())?;
@@ -1028,11 +1028,8 @@ pub(crate) fn resolve_custom_op(
 fn resolve_positional_param(
     file: File,
     literal: &ast::Literal,
-    token: &SyntaxToken,
+    index: usize,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let index = token.text().strip_prefix('$')?.parse::<usize>().ok()?;
-    let index = index.checked_sub(1)?;
-
     for ancestor in literal.syntax().ancestors() {
         let Some(has_param_list) = ast::HasParamList::cast(ancestor) else {
             continue;
