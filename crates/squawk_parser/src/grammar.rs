@@ -2125,14 +2125,14 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
     lhs
 }
 
-enum ListItems {
+pub(crate) enum ListItems {
     Required,
     Optional,
 }
 
 /// The `parser` passed this is required to at least consume one token if it returns `true`.
 /// If the `parser` returns false, parsing will stop.
-fn delimited(
+pub(crate) fn delimited(
     p: &mut Parser<'_>,
     bra: SyntaxKind,
     ket: SyntaxKind,
@@ -2182,7 +2182,7 @@ fn delimited(
 
 /// This is essentially the same as [delimited] but without the wrapping
 /// tokens, i.e., `(` `)`
-fn separated(
+pub(crate) fn separated(
     p: &mut Parser<'_>,
     delim: SyntaxKind,
     unexpected_delim_message: impl Fn() -> String,
@@ -2209,7 +2209,7 @@ fn separated(
         }
         if p.at(delim) && (p.nth_at(1, EOF) || p.nth_at(1, SEMICOLON) || p.nth_at_ts(1, follow_set))
         {
-            p.err_and_bump("unexpected trailing comma");
+            p.err_and_bump(&unexpected_delim_message());
             break;
         }
         if !p.eat(delim) {
@@ -6391,7 +6391,7 @@ const FUNC_KEYWORDS: TokenSet = TokenSet::new(&[
 
 const NAME_REF_FIRST: TokenSet = TYPE_KEYWORDS.union(IDENTS);
 
-const EXPR_FIRST: TokenSet = LHS_FIRST;
+pub(crate) const EXPR_FIRST: TokenSet = LHS_FIRST;
 
 const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     SELECT_KW,

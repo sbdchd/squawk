@@ -40,3 +40,10 @@ begin
   execute q into x into y;
 end
 $$;
+
+do $$
+begin
+  execute q into x, ;
+  execute q using 1, , 2;
+end
+$$;

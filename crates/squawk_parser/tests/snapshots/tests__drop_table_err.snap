@@ -107,15 +107,15 @@ error[syntax-error]: unexpected comma, expected a name
   ╭▸ 
 5 │ drop table foo,   , buzz cascade;
   ╰╴                  ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected comma, expected a name
   ╭▸ 
 8 │ drop table p,;
   ╰╴            ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected comma, expected a name
   ╭▸ 
 9 │ drop table p, cascade;
   ╰╴            ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected comma, expected a name
    ╭▸ 
 10 │ drop table p,
    ╰╴            ━

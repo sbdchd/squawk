@@ -84,7 +84,6 @@ PLPGSQL@0..155
         WHITESPACE@139..140 " "
         PLPGSQL_RAISE_LEVEL@140..149
           EXCEPTION_KW@140..149 "exception"
-        PLPGSQL_CONDITION@149..149
         SEMICOLON@149..150 ";"
     WHITESPACE@150..151 "\n"
     END_KW@151..154 "end"
