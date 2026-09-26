@@ -272,14 +272,22 @@ impl TryFrom<LocationKind> for SemanticTokenType {
 }
 
 fn embedded_token_type(kind: SyntaxKind) -> Option<SemanticTokenType> {
-    if kind.is_keyword() {
-        Some(SemanticTokenType::Keyword)
-    } else if kind.is_punctuation() {
-        Some(SemanticTokenType::Punctuation)
-    } else if kind.is_operator() {
-        Some(SemanticTokenType::Operator)
-    } else {
-        None
+    match kind {
+        SyntaxKind::TRUE_KW | SyntaxKind::FALSE_KW => Some(SemanticTokenType::Bool),
+        SyntaxKind::BIT_STRING
+        | SyntaxKind::BYTE_STRING
+        | SyntaxKind::DOLLAR_QUOTED_STRING
+        | SyntaxKind::ESC_STRING
+        | SyntaxKind::NATIONAL_STRING
+        | SyntaxKind::STRING
+        | SyntaxKind::UNICODE_ESC_STRING => Some(SemanticTokenType::String),
+        SyntaxKind::INT_NUMBER | SyntaxKind::NUMERIC_NUMBER => Some(SemanticTokenType::Number),
+        SyntaxKind::COMMENT => Some(SemanticTokenType::Comment),
+        SyntaxKind::IDENT => Some(SemanticTokenType::NameRef),
+        _ if kind.is_keyword() => Some(SemanticTokenType::Keyword),
+        _ if kind.is_punctuation() => Some(SemanticTokenType::Punctuation),
+        _ if kind.is_operator() => Some(SemanticTokenType::Operator),
+        _ => None,
     }
 }
 
@@ -399,7 +407,7 @@ fn highlight(
                 }
 
                 if let Some(literal) = ast::Literal::cast(node.clone()) {
-                    highlight_embedded(db, file, literal, out);
+                    highlight_embedded(db, file, literal, range_to_highlight, out);
                 }
 
                 // Cleanup various operators that the textmate grammar
@@ -443,6 +451,7 @@ fn highlight_embedded(
     db: &dyn Db,
     file: FileId,
     literal: ast::Literal,
+    range_to_highlight: TextRange,
     out: &mut SemanticTokenBuilder,
 ) {
     let Some(parent) = literal.syntax().parent() else {
@@ -465,10 +474,10 @@ fn highlight_embedded(
         &mut embedded_out,
     );
     for token in embedded_out.tokens {
-        out.push(SemanticToken {
-            range: body.source_range(token.range),
-            ..token
-        });
+        let range = body.source_range(token.range);
+        if range_to_highlight.intersect(range).is_some() {
+            out.push(SemanticToken { range, ..token });
+        }
     }
 }
 
@@ -760,6 +769,7 @@ language sql;
         "setof" @ 29..34: Type
         "int" @ 35..38: Type
         "select" @ 43..49: Keyword
+        "1" @ 50..51: Number
         "#);
     }
 
@@ -887,6 +897,7 @@ select f();
         "f" @ 17..18: Function
         "int" @ 29..32: Type
         "select" @ 37..43: Keyword
+        "1" @ 44..45: Number
         "f" @ 68..69: Function
         "#);
     }
@@ -907,6 +918,7 @@ select b(t), t.b from t;
         "t" @ 42..43: Type
         "int" @ 53..56: Type
         "select" @ 61..67: Keyword
+        "1" @ 68..69: Number
         "b" @ 92..93: Function
         "t" @ 94..95: Table
         "t" @ 98..99: Table
@@ -932,6 +944,7 @@ create policy p on t
         "t" @ 42..43: Type
         "int" @ 53..56: Type
         "select" @ 61..67: Keyword
+        "1" @ 68..69: Number
         "t" @ 104..105: Table
         "t" @ 120..121: Table
         "x" @ 122..123: Function
@@ -1042,6 +1055,7 @@ as 'insert into t(a) select ''x'' from t';
         "a" @ 77..78: Column
         ")" @ 78..79: Punctuation
         "select" @ 80..86: Keyword
+        "''x''" @ 87..92: String
         "from" @ 93..97: Keyword
         "t" @ 98..99: Table
         "#);
@@ -1062,6 +1076,43 @@ language plpgsql;
         "int" @ 18..21: Type
         "f" @ 40..41: Function
         "int" @ 52..55: Type
+        "#);
+    }
+
+    #[test]
+    fn embedded_sql_lexical_tokens() {
+        assert_snapshot!(semantic_tokens(
+            "
+create function f() returns int language sql as $body$
+-- embedded
+select unknown_name, 42, 1.5, true, false, null, 'text', E'escape', B'01', X'ff';
+$body$;
+",
+        ), @r#"
+        "f" @ 17..18: Function
+        "int" @ 29..32: Type
+        "-- embedded" @ 56..67: Comment
+        "select" @ 68..74: Keyword
+        "unknown_name" @ 75..87: NameRef
+        "," @ 87..88: Punctuation
+        "42" @ 89..91: Number
+        "," @ 91..92: Punctuation
+        "1.5" @ 93..96: Number
+        "," @ 96..97: Punctuation
+        "true" @ 98..102: Bool
+        "," @ 102..103: Punctuation
+        "false" @ 104..109: Bool
+        "," @ 109..110: Punctuation
+        "null" @ 111..115: Keyword
+        "," @ 115..116: Punctuation
+        "'text'" @ 117..123: String
+        "," @ 123..124: Punctuation
+        "E'escape'" @ 125..134: String
+        "," @ 134..135: Punctuation
+        "B'01'" @ 136..141: String
+        "," @ 141..142: Punctuation
+        "X'ff'" @ 143..148: String
+        ";" @ 148..149: Punctuation
         "#);
     }
 }
