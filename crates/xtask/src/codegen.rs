@@ -76,8 +76,9 @@ pub(crate) fn codegen() -> Result<()> {
     std::fs::write(ast_nodes_file, ast_nodes).context("problem writing generated nodes")?;
 
     let keyword_kinds = keyword_kinds()?;
+    let contextual_keywords = contextual_keywords()?;
 
-    let token_sets = generate_token_sets(&keyword_kinds)?;
+    let token_sets = generate_token_sets(&keyword_kinds, &contextual_keywords)?;
     let token_sets_file = project_root().join("crates/squawk_parser/src/generated/token_sets.rs");
     std::fs::write(token_sets_file, token_sets).context("problem writing generated token sets")?;
 
@@ -96,7 +97,7 @@ pub(crate) fn codegen() -> Result<()> {
         &ast_src.nodes,
         &grammar,
         keyword_kinds.all_keywords,
-        contextual_keywords()?,
+        contextual_keywords,
     );
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
@@ -123,7 +124,8 @@ const EOF: &str = "EOF";
 const NAME_TOKEN: &str = "#name";
 const LITERAL_TOKEN: &str = "@";
 
-/// The punctuations of the language.
+const PUNCTUATION: &[&str] = &[";", ",", "(", ")", "[", "]", "{", "}", ".", ".."];
+
 const PUNCT: &[(&str, &str)] = &[
     // KEEP THE DOLLAR AT THE TOP ITS SPECIAL
     ("$", "DOLLAR"),
@@ -415,7 +417,26 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
     Ok(format!("{PRELUDE}{output}"))
 }
 
-fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
+fn generate_token_sets(
+    keyword_kinds: &KeywordKinds,
+    contextual_keywords: &[String],
+) -> Result<String> {
+    let punctuation = PUNCT
+        .iter()
+        .filter(|(token, _)| PUNCTUATION.contains(token))
+        .map(|(_, name)| format_ident!("{name}"))
+        .collect::<Vec<_>>();
+    let operators = PUNCT
+        .iter()
+        .filter(|(token, _)| !PUNCTUATION.contains(token))
+        .map(|(_, name)| format_ident!("{name}"))
+        .collect::<Vec<_>>();
+
+    let contextual_keywords = contextual_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
+
     let column_or_table_keywords = keyword_kinds
         .col_table_keywords
         .iter()
@@ -475,6 +496,18 @@ fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
         quote! {
             use crate::syntax_kind::SyntaxKind;
             use crate::token_set::TokenSet;
+
+            pub(crate) const PUNCTUATION: TokenSet = TokenSet::new(&[
+                #(SyntaxKind::#punctuation),*
+            ]);
+
+            pub(crate) const OPERATORS: TokenSet = TokenSet::new(&[
+                #(SyntaxKind::#operators),*
+            ]);
+
+            pub(crate) const CONTEXTUAL_KEYWORDS: TokenSet = TokenSet::new(&[
+                #(SyntaxKind::#contextual_keywords),*
+            ]);
 
             pub(crate) const COLUMN_OR_TABLE_KEYWORDS: TokenSet = TokenSet::new(&[
                 #(SyntaxKind::#column_or_table_keywords),*

@@ -22,6 +22,23 @@ impl SyntaxKind {
     pub fn is_trivia(self) -> bool {
         matches!(self, SyntaxKind::WHITESPACE | SyntaxKind::COMMENT)
     }
+
+    #[inline]
+    pub fn is_keyword(self) -> bool {
+        self <= SyntaxKind::WHITESPACE
+            && (crate::generated::token_sets::ALL_KEYWORDS.contains(self)
+                || crate::generated::token_sets::CONTEXTUAL_KEYWORDS.contains(self))
+    }
+
+    #[inline]
+    pub fn is_operator(self) -> bool {
+        self <= SyntaxKind::WHITESPACE && crate::generated::token_sets::OPERATORS.contains(self)
+    }
+
+    #[inline]
+    pub fn is_punctuation(self) -> bool {
+        self <= SyntaxKind::WHITESPACE && crate::generated::token_sets::PUNCTUATION.contains(self)
+    }
 }
 
 #[inline]
@@ -53,5 +70,18 @@ mod tests {
 
         assert!(!is_reserved_keyword(SyntaxKind::IDENT));
         assert!(!is_reserved_keyword(SyntaxKind::SELECT));
+    }
+
+    #[test]
+    fn semantic_categories() {
+        assert!(SyntaxKind::SELECT_KW.is_keyword());
+        assert!(SyntaxKind::PERFORM_KW.is_keyword());
+        assert!(SyntaxKind::PLUS.is_operator());
+        assert!(SyntaxKind::L_PAREN.is_punctuation());
+
+        assert!(!SyntaxKind::IDENT.is_keyword());
+        assert!(!SyntaxKind::L_PAREN.is_operator());
+        assert!(!SyntaxKind::PLUS.is_punctuation());
+        assert!(!SyntaxKind::SELECT.is_keyword());
     }
 }
