@@ -161,3 +161,23 @@ To use Squawk as a GitHub App, Squawk needs a corresponding GitHub App so it can
 
    <https://github.com/sbdchd/squawk/pull/14#issuecomment-647009446>
 
+## Only comment on violations
+
+By default, Squawk posts a PR comment on every run. To suppress the full report
+when there are no violations, pass `--only-comment-on-violations` to the
+`upload-to-github` subcommand:
+
+```bash
+squawk upload-to-github --only-comment-on-violations example.sql
+```
+
+Or set it in `.squawk.toml`:
+
+```toml
+[upload_to_github]
+only_comment_on_violations = true
+```
+
+When no violations are found, Squawk will post a brief ✅ summary instead of
+the full report.
+
