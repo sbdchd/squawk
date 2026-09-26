@@ -481,17 +481,19 @@ pub(crate) enum RoutineKind {
 pub(crate) fn enclosing_routine_name(
     node: &SyntaxNode,
 ) -> Option<(Name, ast::PathSegment, RoutineKind)> {
-    node.ancestors().find_map(|ancestor| {
-        let (path, kind) =
-            if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
-                (create_function.name()?.path()?, RoutineKind::Function)
-            } else {
-                (
-                    ast::CreateProcedure::cast(ancestor)?.name()?.path()?,
-                    RoutineKind::Procedure,
-                )
-            };
-        let (_, routine_name) = name::schema_and_name_definition(&path)?;
-        Some((routine_name, path.segment()?, kind))
-    })
+    node.ancestors()
+        .find_map(|ancestor| routine_name(&ancestor))
+}
+
+pub(crate) fn routine_name(node: &SyntaxNode) -> Option<(Name, ast::PathSegment, RoutineKind)> {
+    let (path, kind) = if let Some(create_function) = ast::CreateFunction::cast(node.clone()) {
+        (create_function.name()?.path()?, RoutineKind::Function)
+    } else {
+        (
+            ast::CreateProcedure::cast(node.clone())?.name()?.path()?,
+            RoutineKind::Procedure,
+        )
+    };
+    let (_, routine_name) = name::schema_and_name_definition(&path)?;
+    Some((routine_name, path.segment()?, kind))
 }

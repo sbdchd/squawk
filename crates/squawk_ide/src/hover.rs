@@ -1,7 +1,7 @@
 use crate::ast_nav;
 use crate::collect;
 use crate::comments::preceding_comment;
-use crate::db::{File, bind, list_files, parse};
+use crate::db::{FileId, bind};
 use crate::file::InFile;
 use crate::infer::{infer_type_from_expr, infer_type_from_literal};
 use crate::literals::binary_digits_to_hex;
@@ -831,7 +831,7 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> 
         && let Some(table_ptr) =
             resolve::table_ptr_from_from_item(db, InFile::new(file, &from_item))
     {
-        let base_columns = collect::star_column_names(db, file, &table_ptr);
+        let base_columns = collect::star_column_names(db, table_ptr);
         for column in base_columns.iter().skip(columns.len()) {
             columns.push(column.clone());
         }
@@ -846,59 +846,22 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> 
 }
 
 fn hover_qualified_star(db: &dyn Db, field_expr: InFile<ast::FieldExpr>) -> Option<Hover> {
-    let file = field_expr.file_id;
     let table_ptr = qualified_star_table_ptr(db, field_expr)?;
-    hover_qualified_star_columns(db, InFile::new(file, &table_ptr))
+    hover_qualified_star_columns(db, table_ptr)
 }
 
 fn hover_unqualified_star(db: &dyn Db, target: InFile<ast::Target>) -> Option<Hover> {
     let mut results = vec![];
-    for file in list_files(db, target.file_id) {
-        results = hover_unqualified_star_with_binder(db, InFile::new(file, &target.value));
-        if results.is_empty() && target_has_schema_qualified_from_item(&target.value) {
-            continue;
-        } else {
-            break;
-        }
-    }
-    merge_hovers(results)
-}
-
-fn hover_unqualified_star_with_binder(db: &dyn Db, target: InFile<&ast::Target>) -> Vec<Hover> {
-    let file = target.file_id;
-    let mut results = vec![];
-
-    if let Some(table_ptrs) = unqualified_star_table_ptrs(db, target) {
+    if let Some(table_ptrs) =
+        unqualified_star_table_ptrs(db, InFile::new(target.file_id, &target.value))
+    {
         for table_ptr in table_ptrs {
-            if let Some(columns) = hover_qualified_star_columns(db, InFile::new(file, &table_ptr)) {
+            if let Some(columns) = hover_qualified_star_columns(db, table_ptr) {
                 results.push(columns);
             }
         }
     }
-
-    results
-}
-
-fn target_has_schema_qualified_from_item(target: &ast::Target) -> bool {
-    let Some(select) = target.syntax().ancestors().find_map(ast::Select::cast) else {
-        return false;
-    };
-    let Some(from_clause) = select.from_clause() else {
-        return false;
-    };
-
-    for from_item in ast_nav::iter_from_clause(&from_clause) {
-        if let ast::FromItem::RelationFromItem(relation) = from_item
-            && relation
-                .path_ref()
-                .and_then(|path| path.qualifier())
-                .is_some()
-        {
-            return true;
-        }
-    }
-
-    false
+    merge_hovers(results)
 }
 
 fn hover_unqualified_star_in_arg_list(
@@ -909,7 +872,7 @@ fn hover_unqualified_star_in_arg_list(
     let table_ptrs = unqualified_star_in_arg_list_ptrs(db, InFile::new(file, &arg_list.value))?;
     let mut results = vec![];
     for table_ptr in table_ptrs {
-        if let Some(columns) = hover_qualified_star_columns(db, InFile::new(file, &table_ptr)) {
+        if let Some(columns) = hover_qualified_star_columns(db, table_ptr) {
             results.push(columns);
         }
     }
@@ -923,14 +886,9 @@ fn format_subquery_table(name: Name, paren_select: ast::ParenSelect) -> Option<H
     Some(Hover::snippet(format!("subquery {name} as {query}")))
 }
 
-fn hover_qualified_star_columns(
-    db: &dyn Db,
-    table_ptr: InFile<&squawk_syntax::SyntaxNodePtr>,
-) -> Option<Hover> {
+fn hover_qualified_star_columns(db: &dyn Db, table_ptr: InFile<SyntaxNodePtr>) -> Option<Hover> {
     let file = table_ptr.file_id;
-    let source_file = parse(db, file).tree();
-    let root = source_file.syntax();
-    let table_name_node = table_ptr.value.to_node(root);
+    let table_name_node = table_ptr.to_node(db);
 
     match ast_nav::parent_source(&table_name_node)? {
         ast_nav::ParentSouce::Alias(alias) => {
@@ -1162,9 +1120,7 @@ fn hover_qualified_star_columns_from_subquery(
             if target.star_token().is_some() {
                 let table_ptrs = unqualified_star_table_ptrs(db, InFile::new(file, &target))?;
                 for table_ptr in table_ptrs {
-                    if let Some(columns) =
-                        hover_qualified_star_columns(db, InFile::new(file, &table_ptr))
-                    {
+                    if let Some(columns) = hover_qualified_star_columns(db, table_ptr) {
                         results.push(columns)
                     }
                 }
@@ -2038,17 +1994,17 @@ fn hover_routine(db: &dyn Db, def: Location) -> Option<Hover> {
 
 fn qualified_star_from_clause_table_ptr(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     position: TextSize,
     from_clause: ast::FromClause,
     table_name: &Name,
-) -> Option<SyntaxNodePtr> {
+) -> Option<InFile<SyntaxNodePtr>> {
     let from_item = resolve::find_from_item_in_from_clause(&from_clause, table_name)?;
 
     if let Some(alias) = from_item.alias()
         && alias.columns().is_some()
     {
-        return Some(SyntaxNodePtr::new(alias.syntax()));
+        return Some(InFile::new(file, SyntaxNodePtr::new(alias.syntax())));
     }
 
     let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
@@ -2065,7 +2021,7 @@ fn qualified_star_from_clause_table_ptr(
 fn qualified_star_table_ptr(
     db: &dyn Db,
     field_expr: InFile<ast::FieldExpr>,
-) -> Option<SyntaxNodePtr> {
+) -> Option<InFile<SyntaxNodePtr>> {
     let file = field_expr.file_id;
     let field_expr = field_expr.value;
     let table_name = resolve::qualified_star_table_name(&field_expr)?;
@@ -2115,7 +2071,7 @@ fn table_or_view_or_cte_ptrs(
     db: &dyn Db,
     path: InFile<&ast::PathRef>,
     position: TextSize,
-) -> Option<Vec<SyntaxNodePtr>> {
+) -> Option<Vec<InFile<SyntaxNodePtr>>> {
     let file = path.file_id;
     let path = path.value;
     let (schema, table_name) = name::schema_and_name_path(path)?;
@@ -2138,7 +2094,7 @@ fn table_or_view_or_cte_ptrs(
 fn unqualified_star_table_ptrs(
     db: &dyn Db,
     target: InFile<&ast::Target>,
-) -> Option<Vec<SyntaxNodePtr>> {
+) -> Option<Vec<InFile<SyntaxNodePtr>>> {
     let file = target.file_id;
     let target = target.value;
     target.star_token()?;
@@ -2179,7 +2135,7 @@ fn unqualified_star_table_ptrs(
 fn unqualified_star_in_arg_list_ptrs(
     db: &dyn Db,
     arg_list: InFile<&ast::ArgList>,
-) -> Option<Vec<SyntaxNodePtr>> {
+) -> Option<Vec<InFile<SyntaxNodePtr>>> {
     let file = arg_list.file_id;
     let arg_list = arg_list.value;
     let from_clause = arg_list
@@ -2219,7 +2175,7 @@ mod test {
         if let Some(type_info) = hover(db, offset) {
             let title = format!("hover: {}", type_info.snippet);
             let group = Level::INFO.primary_title(&title).element(
-                Snippet::source(offset.file_id.content(db).as_ref())
+                Snippet::source(offset.file_id.original_file(db).content(db).as_ref())
                     .fold(true)
                     .annotation(AnnotationKind::Context.span(marker.range()).label("hover")),
             );

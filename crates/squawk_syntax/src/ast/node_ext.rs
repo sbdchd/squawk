@@ -199,6 +199,18 @@ impl ast::Literal {
         };
         Some(kind)
     }
+
+    pub fn positional_param_index(&self) -> Option<usize> {
+        let LitKind::PositionalParam(token) = self.kind()? else {
+            return None;
+        };
+        token
+            .text()
+            .strip_prefix('$')?
+            .parse::<usize>()
+            .ok()?
+            .checked_sub(1)
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

@@ -1,5 +1,5 @@
 use crate::ast_nav;
-use crate::db::{File, bind, list_files, parse};
+use crate::db::{FileId, bind};
 use crate::file::InFile;
 use crate::goto_definition::goto_definition;
 use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
@@ -18,7 +18,7 @@ use squawk_syntax::{
 
 pub(crate) fn columns_from_create_table(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     create_table: &ast::CreateTableLike,
 ) -> Vec<(Name, Option<InFile<SyntaxNodePtr>>)> {
     let mut columns = vec![];
@@ -28,7 +28,7 @@ pub(crate) fn columns_from_create_table(
 
 fn columns_from_create_table_impl(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     create_table: &ast::CreateTableLike,
     columns: &mut Vec<(Name, Option<InFile<SyntaxNodePtr>>)>,
     depth: usize,
@@ -88,7 +88,7 @@ fn columns_from_create_table_impl(
 
 fn resolved_to_column_ptrs(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     resolved: ResolvedTableName,
     depth: usize,
 ) -> Vec<(Name, Option<InFile<SyntaxNodePtr>>)> {
@@ -125,7 +125,7 @@ fn resolved_to_column_ptrs(
 
 pub(crate) fn table_columns(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     create_table: &impl ast::HasCreateTable,
 ) -> Vec<(Name, Option<Type>)> {
     table_columns_impl(db, file, create_table, 0)
@@ -134,7 +134,7 @@ pub(crate) fn table_columns(
 // TODO: combine with find_column_in_create_table_impl
 fn table_columns_impl(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     create_table: &impl ast::HasCreateTable,
     depth: usize,
 ) -> Vec<(Name, Option<Type>)> {
@@ -194,7 +194,7 @@ fn table_columns_impl(
 
 fn resolved_to_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     resolved: ResolvedTableName,
     depth: usize,
 ) -> Vec<(Name, Option<Type>)> {
@@ -220,49 +220,33 @@ fn resolved_to_columns_with_types(
 
 pub(crate) fn create_table_as_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     create_table_as: &ast::CreateTableAs,
 ) -> Vec<(Name, Option<Type>)> {
-    for file in list_files(db, file) {
-        let columns = select_columns_with_types(
-            db,
-            file,
-            &create_table_as
-                .query()
-                .and_then(|query| query.select_variant()),
-        );
-        if !columns.is_empty() {
-            return columns;
-        }
-    }
-
-    vec![]
+    select_columns_with_types(
+        db,
+        file,
+        &create_table_as
+            .query()
+            .and_then(|query| query.select_variant()),
+    )
 }
 
 pub(crate) fn select_into_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     select_into: &ast::SelectInto,
 ) -> Vec<(Name, Option<Type>)> {
     let Some(target_list) = select_into.select_clause().and_then(|c| c.target_list()) else {
         return vec![];
     };
     let from_clause = select_into.from_clause();
-
-    for file in list_files(db, file) {
-        let columns =
-            target_list_columns_with_types_in_file(db, file, &target_list, from_clause.as_ref());
-        if !columns.is_empty() {
-            return columns;
-        }
-    }
-
-    vec![]
+    target_list_columns_with_types_in_file(db, file, &target_list, from_clause.as_ref())
 }
 
 fn target_list_columns_with_types_in_file(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     target_list: &ast::TargetList,
     from_clause: Option<&ast::FromClause>,
 ) -> Vec<(Name, Option<Type>)> {
@@ -300,7 +284,7 @@ fn target_list_columns_with_types_in_file(
 // TODO: merge with select_variant_columns_with_types
 fn select_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     query: &Option<ast::SelectVariant>,
 ) -> Vec<(Name, Option<Type>)> {
     let Some(query) = query else {
@@ -335,7 +319,7 @@ fn select_columns_with_types(
 
 fn table_query_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     table: &ast::Table,
 ) -> Vec<(Name, Option<Type>)> {
     let Some(path) = table
@@ -356,8 +340,8 @@ fn table_query_columns_with_types(
     // Try CTE resolution first since resolve_table_name doesn't handle CTEs
     if let Some((ptr, kind)) = resolve_table_like(db, Some(&name_ref), &table_name, &schemas, file)
     {
-        let tree = parse(db, file).tree();
-        let node = ptr.to_node(tree.syntax());
+        let file = ptr.file_id;
+        let node = ptr.to_node(db);
         match kind {
             LocationKind::Table => {
                 if let Some(with_table) = node.ancestors().find_map(ast::WithTable::cast) {
@@ -384,7 +368,7 @@ fn table_query_columns_with_types(
 
 fn columns_from_returning_clause_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     query: &ast::WithQuery,
 ) -> Option<Vec<(Name, Option<Type>)>> {
     let (returning_clause, path) = match query {
@@ -428,7 +412,7 @@ fn columns_from_returning_clause_with_types(
 
 fn returning_target_list_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     path: &ast::PathRef,
     target_list: &ast::TargetList,
 ) -> Vec<(Name, Option<Type>)> {
@@ -464,7 +448,7 @@ fn returning_target_list_columns_with_types(
 
 pub(crate) fn view_like_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     create_view: &ast::CreateViewLike,
 ) -> Vec<(Name, Option<Type>)> {
     let alias_columns: Vec<Name> = create_view
@@ -474,13 +458,7 @@ pub(crate) fn view_like_columns_with_types(
         .map(|name| Name::from_node(&name))
         .collect();
 
-    let mut base_columns = vec![];
-    for file in list_files(db, file) {
-        base_columns = select_columns_with_types(db, file, &create_view.query());
-        if !base_columns.is_empty() {
-            break;
-        }
-    }
+    let base_columns = select_columns_with_types(db, file, &create_view.query());
 
     if alias_columns.is_empty() {
         return base_columns;
@@ -502,7 +480,7 @@ pub(crate) fn view_like_columns_with_types(
 
 pub(crate) fn with_table_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     with_table: ast::WithTable,
 ) -> Vec<(Name, Option<Type>)> {
     let alias_columns: Vec<Name> = with_table
@@ -512,13 +490,7 @@ pub(crate) fn with_table_columns_with_types(
         .map(|name| Name::from_node(&name))
         .collect();
 
-    let mut base_columns = vec![];
-    for file in list_files(db, file) {
-        base_columns = with_table_query_columns_with_types(db, file, with_table.clone());
-        if !base_columns.is_empty() {
-            break;
-        }
-    }
+    let base_columns = with_table_query_columns_with_types(db, file, with_table.clone());
 
     if alias_columns.is_empty() {
         return base_columns;
@@ -540,7 +512,7 @@ pub(crate) fn with_table_columns_with_types(
 
 fn with_table_query_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     with_table: ast::WithTable,
 ) -> Vec<(Name, Option<Type>)> {
     let Some(query) = with_table.query() else {
@@ -570,7 +542,7 @@ fn with_table_query_columns_with_types(
     target_list_columns_with_types_in_file(db, file, &target_list, from_clause.as_ref())
 }
 
-fn target_expr_type(db: &dyn Db, file: File, target: &ast::Target) -> Option<Type> {
+fn target_expr_type(db: &dyn Db, file: FileId, target: &ast::Target) -> Option<Type> {
     let expr = target.expr()?;
     if let Some(ty) = infer_type_from_expr(&expr) {
         return Some(ty);
@@ -578,7 +550,7 @@ fn target_expr_type(db: &dyn Db, file: File, target: &ast::Target) -> Option<Typ
     column_ref_type(db, file, &expr)
 }
 
-fn column_ref_type(db: &dyn Db, file: File, expr: &ast::Expr) -> Option<Type> {
+fn column_ref_type(db: &dyn Db, file: FileId, expr: &ast::Expr) -> Option<Type> {
     let position = match expr {
         ast::Expr::NameRef(name_ref) => name_ref.syntax().text_range().start(),
         ast::Expr::Collate(collate) => return column_ref_type(db, file, &collate.expr()?),
@@ -669,7 +641,7 @@ fn columns_from_values(values: &ast::Values) -> Vec<(Name, Option<Type>)> {
 
 fn columns_for_star_from_clause(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     from_clause: &ast::FromClause,
 ) -> Vec<(Name, Option<Type>)> {
     let mut columns = vec![];
@@ -683,7 +655,7 @@ fn columns_for_star_from_clause(
 
 fn columns_for_star_from_from_item(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     from_item: &ast::FromItem,
 ) -> Vec<(Name, Option<Type>)> {
     if let Some(alias) = from_item.alias()
@@ -696,12 +668,12 @@ fn columns_for_star_from_from_item(
         return vec![];
     };
 
-    columns_for_star_from_table_ptr(db, file, &table_ptr)
+    columns_for_star_from_table_ptr(db, table_ptr)
 }
 
 pub(crate) fn columns_for_star_from_alias(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     from_item: &ast::FromItem,
     alias: &ast::FromAlias,
 ) -> Vec<(Name, Option<Type>)> {
@@ -716,7 +688,7 @@ pub(crate) fn columns_for_star_from_alias(
         return vec![];
     };
 
-    let base_columns = columns_for_star_from_table_ptr(db, file, &table_ptr);
+    let base_columns = columns_for_star_from_table_ptr(db, table_ptr);
     let mut results = vec![];
 
     for (idx, alias_name) in alias_columns.iter().enumerate() {
@@ -733,12 +705,10 @@ pub(crate) fn columns_for_star_from_alias(
 
 fn columns_for_star_from_table_ptr(
     db: &dyn Db,
-    file: File,
-    table_ptr: &SyntaxNodePtr,
+    table_ptr: InFile<SyntaxNodePtr>,
 ) -> Vec<(Name, Option<Type>)> {
-    let tree = parse(db, file).tree();
-    let root = tree.syntax();
-    let table_node = table_ptr.to_node(root);
+    let file = table_ptr.file_id;
+    let table_node = table_ptr.to_node(db);
 
     match ast_nav::parent_source(&table_node) {
         Some(ast_nav::ParentSouce::Alias(alias)) => {
@@ -748,13 +718,7 @@ fn columns_for_star_from_table_ptr(
             columns_for_star_from_alias(db, file, &from_item, &alias)
         }
         Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            for f in list_files(db, file) {
-                let columns = with_table_columns_with_types(db, f, with_table.clone());
-                if !columns.is_empty() {
-                    return columns;
-                }
-            }
-            vec![]
+            with_table_columns_with_types(db, file, with_table)
         }
         Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
             table_columns(db, file, &create_table)
@@ -777,7 +741,7 @@ fn columns_for_star_from_table_ptr(
 
 pub(crate) fn paren_select_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     paren_select: &ast::ParenSelect,
 ) -> Vec<(Name, Option<Type>)> {
     let Some(select_variant) = paren_select.select() else {
@@ -788,7 +752,7 @@ pub(crate) fn paren_select_columns_with_types(
 
 fn select_variant_columns_with_types(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     select_variant: &ast::SelectVariant,
 ) -> Vec<(Name, Option<Type>)> {
     match select_variant {
@@ -826,10 +790,9 @@ fn select_variant_columns_with_types(
     }
 }
 
-pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodePtr) -> Vec<Name> {
-    let source_file = parse(db, file).tree();
-    let root = source_file.syntax();
-    let table_name_node = table_ptr.to_node(root);
+pub(crate) fn star_column_names(db: &dyn Db, table_ptr: InFile<SyntaxNodePtr>) -> Vec<Name> {
+    let file = table_ptr.file_id;
+    let table_name_node = table_ptr.to_node(db);
 
     match ast_nav::parent_source(&table_name_node) {
         Some(ast_nav::ParentSouce::Alias(alias)) => alias
@@ -839,16 +802,10 @@ pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodeP
             .map(|name| Name::from_node(&name))
             .collect(),
         Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            for file in list_files(db, file) {
-                let columns: Vec<_> = with_table_columns_with_types(db, file, with_table.clone())
-                    .into_iter()
-                    .map(|(name, _)| name)
-                    .collect();
-                if !columns.is_empty() {
-                    return columns;
-                }
-            }
-            vec![]
+            with_table_columns_with_types(db, file, with_table)
+                .into_iter()
+                .map(|(name, _)| name)
+                .collect()
         }
         Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
             table_columns(db, file, &create_table)
@@ -890,7 +847,7 @@ pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodeP
 
 fn star_column_names_from_paren_select(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     paren_select: &ast::ParenSelect,
 ) -> Vec<Name> {
     let Some(ast::SelectVariant::Select(select)) = paren_select.select() else {
@@ -902,7 +859,7 @@ fn star_column_names_from_paren_select(
     let mut columns = vec![];
     for from_item in ast_nav::iter_from_clause(&from_clause) {
         if let Some(table_ptr) = table_ptr_from_from_item(db, InFile::new(file, &from_item)) {
-            columns.extend(star_column_names(db, file, &table_ptr));
+            columns.extend(star_column_names(db, table_ptr));
         }
     }
     columns

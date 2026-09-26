@@ -3,9 +3,11 @@ use std::marker::PhantomData;
 use rowan::{GreenNode, TextRange};
 
 use crate::{
-    SyntaxNode, ast, ast::AstNode, decoded_text::DecodedText, syntax_error::SyntaxError, validation,
+    Parse, SyntaxNode, ast, ast::AstNode, decoded_text::DecodedText, syntax_error::SyntaxError,
+    validation,
 };
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Body<T> {
     green: GreenNode,
     errors: Vec<SyntaxError>,
@@ -68,6 +70,10 @@ impl<T: BodyLanguage> Body<T> {
         Some(Self::parse(body?.decoded_value()?))
     }
 
+    pub fn to_parse(&self) -> Parse<T> {
+        Parse::new(self.green.clone(), vec![])
+    }
+
     pub fn syntax(&self) -> SyntaxNode {
         SyntaxNode::new_root(self.green.clone())
     }
@@ -82,6 +88,10 @@ impl<T: BodyLanguage> Body<T> {
 
     pub fn source_range(&self, range: TextRange) -> TextRange {
         self.decoded.source_range(range)
+    }
+
+    pub fn body_position(&self, source: rowan::TextSize) -> Option<rowan::TextSize> {
+        self.decoded.decoded_pos(source)
     }
 
     pub fn errors(&self) -> Vec<SyntaxError> {

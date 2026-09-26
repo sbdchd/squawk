@@ -1,7 +1,7 @@
-use crate::db::{File, list_files, parse};
+use crate::db::parse;
 use crate::file::InFile;
 use crate::location::{Location, LocationKind};
-use crate::offsets::token_from_offset;
+use crate::offsets::{embedded_position, token_from_offset};
 use crate::resolve;
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
@@ -48,20 +48,15 @@ fn special_syntax_function_name(token: &SyntaxToken) -> Option<&'static str> {
     }
 }
 
-fn resolve_in_files(
-    db: &dyn Db,
-    origin_file: File,
-    mut resolve: impl FnMut(File) -> Option<SmallVec<[Location; 1]>>,
-) -> Option<SmallVec<[Location; 1]>> {
-    for definition_file in list_files(db, origin_file) {
-        if let Some(locations) = resolve(definition_file) {
-            return Some(locations);
-        }
-    }
-    None
+pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Location; 1]> {
+    let position = embedded_position(db, position);
+    goto_definition_in_file(db, position)
+        .into_iter()
+        .map(|location| location.upmap(db))
+        .collect()
 }
 
-pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Location; 1]> {
+fn goto_definition_in_file(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Location; 1]> {
     let file = position.file_id;
     let Some(token) = token_from_offset(db, position) else {
         return smallvec![];
@@ -89,13 +84,11 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
     }
 
     if let Some(function_name) = special_syntax_function_name(&token) {
-        return resolve_in_files(db, file, |definition_file| {
-            resolve::resolve_function_name(
-                db,
-                InFile::new(definition_file, token.text_range().start()),
-                function_name,
-            )
-        })
+        return resolve::resolve_function_name(
+            db,
+            InFile::new(file, token.text_range().start()),
+            function_name,
+        )
         .unwrap_or_default();
     }
 
@@ -159,138 +152,92 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
     }
 
     if let Some(name_ref) = ast::AnyNameRef::cast(parent.clone()) {
-        // TODO: these nodes come from the origin file, but we wrap them in each
-        // definition file below. Probably a bug.
         let locations = match name_ref {
             ast::AnyNameRef::AccessMethodRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_access_method_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_access_method_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::BindParamNameRef(_) => None,
             ast::AnyNameRef::ChannelRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_channel_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_channel_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::ColumnNameRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_name_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::CompositeFieldRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_name_ref(db, InFile::new(file, &name_ref))
             }
-            ast::AnyNameRef::CursorRef(name_ref) => resolve_in_files(db, file, |definition_file| {
-                resolve::resolve_cursor_ref(db, InFile::new(definition_file, &name_ref))
-            }),
+            ast::AnyNameRef::CursorRef(name_ref) => {
+                resolve::resolve_cursor_ref(db, InFile::new(file, &name_ref))
+            }
             ast::AnyNameRef::DatabaseRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_database_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_database_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::ElementTableRef(_) => None,
             ast::AnyNameRef::EventTriggerRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_event_trigger_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_event_trigger_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::ExtensionRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_extension_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_extension_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::ForeignDataWrapperRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_foreign_data_wrapper_ref(
-                        db,
-                        InFile::new(definition_file, &name_ref),
-                    )
-                })
+                resolve::resolve_foreign_data_wrapper_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::JsonPathNameRef(name_ref) => {
                 return resolve::resolve_json_path_name_ref(file, &name_ref).unwrap_or_default();
             }
             ast::AnyNameRef::LabelRef(_) => None,
             ast::AnyNameRef::LanguageRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_language_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_language_ref(db, InFile::new(file, &name_ref))
             }
-            ast::AnyNameRef::NameRef(name_ref) => resolve_in_files(db, file, |definition_file| {
-                resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
-            }),
+            ast::AnyNameRef::NameRef(name_ref) => {
+                resolve::resolve_name_ref(db, InFile::new(file, &name_ref))
+            }
             ast::AnyNameRef::ParamNameRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_param_name_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_param_name_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::PathSegmentRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_name_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::PlpgsqlCursorVariableRef(_)
             | ast::AnyNameRef::PlpgsqlLabelNameRef(_)
             | ast::AnyNameRef::PlpgsqlVarNameRef(_) => None,
-            ast::AnyNameRef::PolicyRef(name_ref) => resolve_in_files(db, file, |definition_file| {
-                resolve::resolve_policy_ref(db, InFile::new(definition_file, &name_ref))
-            }),
+            ast::AnyNameRef::PolicyRef(name_ref) => {
+                resolve::resolve_policy_ref(db, InFile::new(file, &name_ref))
+            }
             ast::AnyNameRef::PreparedStatementRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_prepared_statement_ref(
-                        db,
-                        InFile::new(definition_file, &name_ref),
-                    )
-                })
+                resolve::resolve_prepared_statement_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::PropertyNameRef(_) => None,
             ast::AnyNameRef::PublicationRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_publication_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_publication_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::RemoteTableNameRef(_) => None,
             ast::AnyNameRef::RoleNameRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_role_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_role_ref(db, InFile::new(file, &name_ref))
             }
-            ast::AnyNameRef::RuleRef(name_ref) => resolve_in_files(db, file, |definition_file| {
-                resolve::resolve_rule_ref(db, InFile::new(definition_file, &name_ref))
-            }),
+            ast::AnyNameRef::RuleRef(name_ref) => {
+                resolve::resolve_rule_ref(db, InFile::new(file, &name_ref))
+            }
             ast::AnyNameRef::SavepointRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_savepoint_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_savepoint_ref(db, InFile::new(file, &name_ref))
             }
-            ast::AnyNameRef::SchemaRef(name_ref) => resolve_in_files(db, file, |definition_file| {
-                resolve::resolve_schema_ref(db, InFile::new(definition_file, &name_ref))
-            }),
-            ast::AnyNameRef::ServerRef(name_ref) => resolve_in_files(db, file, |definition_file| {
-                resolve::resolve_server_ref(db, InFile::new(definition_file, &name_ref))
-            }),
+            ast::AnyNameRef::SchemaRef(name_ref) => {
+                resolve::resolve_schema_ref(db, InFile::new(file, &name_ref))
+            }
+            ast::AnyNameRef::ServerRef(name_ref) => {
+                resolve::resolve_server_ref(db, InFile::new(file, &name_ref))
+            }
             ast::AnyNameRef::SubscriptionRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_subscription_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_subscription_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::TablespaceRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_tablespace_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_tablespace_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::TriggerRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_trigger_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_trigger_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::VertexTableRef(name_ref) => {
-                resolve_in_files(db, file, |definition_file| {
-                    resolve::resolve_vertex_table_ref(db, InFile::new(definition_file, &name_ref))
-                })
+                resolve::resolve_vertex_table_ref(db, InFile::new(file, &name_ref))
             }
             ast::AnyNameRef::WindowRef(name_ref) => {
                 return resolve::resolve_window_ref(file, &name_ref).unwrap_or_default();
@@ -301,35 +248,23 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
         }
     }
 
-    if let Some(config_value_name) = ast::ConfigValueName::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) = resolve::resolve_config_value_name(
-                db,
-                InFile::new(definition_file, &config_value_name),
-            ) {
-                return locations;
-            }
-        }
+    if let Some(config_value_name) = ast::ConfigValueName::cast(parent.clone())
+        && let Some(locations) =
+            resolve::resolve_config_value_name(db, InFile::new(file, &config_value_name))
+    {
+        return locations;
     }
 
-    if let Some(literal) = ast::Literal::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_literal(db, InFile::new(definition_file, &literal))
-            {
-                return locations;
-            }
-        }
+    if let Some(literal) = ast::Literal::cast(parent.clone())
+        && let Some(locations) = resolve::resolve_literal(db, InFile::new(file, &literal))
+    {
+        return locations;
     }
 
-    if let Some(custom_op) = ast::CustomOp::cast(parent.clone()) {
-        for definition_file in list_files(db, file) {
-            if let Some(locations) =
-                resolve::resolve_custom_op(db, InFile::new(definition_file, &custom_op))
-            {
-                return locations;
-            }
-        }
+    if let Some(custom_op) = ast::CustomOp::cast(parent.clone())
+        && let Some(locations) = resolve::resolve_custom_op(db, InFile::new(file, &custom_op))
+    {
+        return locations;
     }
 
     let type_node = ast::Type::cast(parent.clone()).or_else(|| {
@@ -340,20 +275,14 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
             None
         }
     });
-    if let Some(ty) = type_node {
-        for definition_file in list_files(db, file) {
-            if let Some(ptr) =
-                // TODO: we shouldn't be wrapping name_ref like this since it's
-                // a different file. Probably a bug.
-                resolve::resolve_type_ptr_from_type(db, InFile::new(definition_file, &ty))
-            {
-                return smallvec![Location {
-                    file: definition_file,
-                    range: ptr.text_range(),
-                    kind: LocationKind::Type,
-                }];
-            }
-        }
+    if let Some(ty) = type_node
+        && let Some(ptr) = resolve::resolve_type_ptr_from_type(db, InFile::new(file, &ty))
+    {
+        return smallvec![Location::new(
+            ptr.file_id,
+            ptr.value.text_range(),
+            LocationKind::Type
+        )];
     }
 
     smallvec![]
@@ -413,7 +342,7 @@ mod test {
         let offset = marker.offset_before();
         let source_span = marker.range();
         let db = fixture.db();
-        let current_file = offset.file_id;
+        let current_file = offset.file_id.original_file(db);
 
         let results = goto_definition(db, offset);
         if results.is_empty() {
@@ -427,7 +356,7 @@ mod test {
         let mut dests_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in results.iter().enumerate() {
             dests_by_file
-                .entry(location.file)
+                .entry(location.file.original_file(db))
                 .or_default()
                 .push((i + 2, location.range));
         }
@@ -1926,6 +1855,480 @@ create function f(x int) returns int language sql return x$0 + 1;
           ╭▸ 
         2 │ create function f(x int) returns int language sql return x + 1;
           ╰╴                  ─ 2. destination                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_in_sql_string_function_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function all_users() returns setof users language sql
+  as $$ select * from users$0 $$;
+"#), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │              ───── 2. destination
+        3 │ create function all_users() returns setof users language sql
+        4 │   as $$ select * from users $$;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_in_sql_string_function_body_uses_outer_search_path_position() {
+        assert_snapshot!(goto(r#"
+create schema a;
+create schema b;
+create table a.users(id int);
+create table b.users(id int);
+set search_path to a;
+select 1;
+select 2;
+select 3;
+set search_path to b;
+create function all_users() returns setof int language sql
+  as $$ select * from users$0 $$;
+"#), @r"
+          ╭▸ 
+        5 │ create table b.users(id int);
+          │                ───── 2. destination
+          ‡
+       12 │   as $$ select * from users $$;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_in_sql_string_function_body_uses_routine_search_path() {
+        assert_snapshot!(goto(r#"
+create schema a;
+create schema b;
+create table a.users(id int);
+create table b.users(id int);
+set search_path to a;
+create function all_users() returns setof int language sql
+  set search_path to b
+  as $$ select * from users$0 $$;
+"#), @r"
+          ╭▸ 
+        5 │ create table b.users(id int);
+          │                ───── 2. destination
+          ‡
+        9 │   as $$ select * from users $$;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_in_sql_string_function_body_uses_body_search_path() {
+        assert_snapshot!(goto(r#"
+create schema a;
+create schema b;
+create table a.users(id int);
+create table b.users(id int);
+set search_path to a;
+create function all_users() returns setof int language sql as $$
+  set search_path to b;
+  select * from users$0;
+$$;
+"#), @r"
+          ╭▸ 
+        5 │ create table b.users(id int);
+          │                ───── 2. destination
+          ‡
+        9 │   select * from users;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_sql_string_body_does_not_remap_outer_definition_with_matching_body_range() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof users language sql as $$
+with         users as (select 1) select * from users;
+select * from users$0;
+$$;
+"#), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │              ───── 2. destination
+          ‡
+        5 │ select * from users;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function outer_function() returns int language sql as $outer$
+  create function inner_function() returns int language sql as $inner$
+    with result as (select 42 as value)
+    select value$0 from result
+  $inner$;
+  select 1;
+$outer$;
+"#), @r"
+          ╭▸ 
+        4 │     with result as (select 42 as value)
+          │                                  ───── 2. destination
+        5 │     select value from result
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_nested_sql_string_body_outer_param_not_visible() {
+        goto_not_found(
+            r#"
+create function f(a int) returns void language sql as $$
+  create function g() returns int language sql as 'select a$0';
+$$;
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_nested_sql_string_body_outer_positional_param_not_visible() {
+        goto_not_found(
+            r#"
+create function f(a int) returns void language sql as $$
+  create function g() returns int language sql as 'select $1$0';
+$$;
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_case_in_sql_string_body_maps_to_source() {
+        assert_snapshot!(goto(r#"
+create function f() returns int language sql as $$
+  select case when true then 1 else$0 2 end;
+$$;
+"#), @r"
+          ╭▸ 
+        3 │   select case when true then 1 else 2 end;
+          ╰╴         ──── 2. destination      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_self_qualified_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function f(value int) returns int language sql as $$
+  select f.value$0 + 1;
+$$;
+"#), @r"
+          ╭▸ 
+        2 │ create function f(value int) returns int language sql as $$
+          │                   ───── 2. destination
+        3 │   select f.value + 1;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_bogus_qualified_in_sql_string_body() {
+        goto_not_found(
+            r#"
+create function f(value int) returns int language sql as $$
+  select bogus.value$0 + 1;
+$$;
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_commit_to_begin_in_sql_string_function_body() {
+        assert_snapshot!(goto(r#"
+create function f() returns int language sql as $$
+begin;
+commit$0;
+$$;
+"#), @r"
+          ╭▸ 
+        3 │ begin;
+          │ ────── 2. destination
+        4 │ commit;
+          ╰╴     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function increment(value int) returns int language sql
+  as $$ select value$0 + 1 $$;
+"#), @r"
+          ╭▸ 
+        2 │ create function increment(value int) returns int language sql
+          │                           ───── 2. destination
+        3 │   as $$ select value + 1 $$;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_column_in_sql_string_procedure_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create procedure find_user() language sql
+  as 'select id from users where id$0 = 1';
+"#), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │                    ── 2. destination
+        3 │ create procedure find_user() language sql
+        4 │   as 'select id from users where id = 1';
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_positional_param_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function f(value int) returns int language sql as $$
+  select $1$0 + 1;
+$$;
+"#), @r"
+          ╭▸ 
+        2 │ create function f(value int) returns int language sql as $$
+          │                   ───── 2. destination
+        3 │   select $1 + 1;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_column_after_escaped_quote_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int, name text);
+create function f() returns setof int language sql
+  as 'select id from users where name = ''bob'' and id$0 = 1';
+"#), @r"
+          ╭▸ 
+        2 │ create table users(id int, name text);
+          │                    ── 2. destination
+        3 │ create function f() returns setof int language sql
+        4 │   as 'select id from users where name = ''bob'' and id = 1';
+          ╰╴                                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_column_in_sql_string_body_maps_to_source() {
+        assert_snapshot!(goto(r#"
+create function answer() returns int language sql as $$
+  with result as (select 42 as value)
+  select value$0 from result
+$$;
+"#), @r"
+          ╭▸ 
+        3 │   with result as (select 42 as value)
+          │                                ───── 2. destination
+        4 │   select value from result
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alias_column_list_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof int language sql as $$
+  select u.a$0 from users u(a);
+$$;
+"#), @"
+          ╭▸ 
+        4 │   select u.a from users u(a);
+          ╰╴           ─ 1. source    ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_alias_column_list_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int, name text);
+create function f() returns setof int language sql as $$
+  select b$0 from (select * from users) s(a, b);
+$$;
+"#), @"
+          ╭▸ 
+        4 │   select b from (select * from users) s(a, b);
+          ╰╴         ─ 1. source                       ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_star_and_column_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof int language sql as $$
+  select x$0 from (select *, 1 as x from users) s;
+$$;
+"#), @"
+          ╭▸ 
+        4 │   select x from (select *, 1 as x from users) s;
+          ╰╴         ─ 1. source            ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_lateral_column_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof int language sql as $$
+  select x$0 from users cross join lateral (select id as x) t;
+$$;
+"#), @"
+          ╭▸ 
+        4 │   select x from users cross join lateral (select id as x) t;
+          ╰╴         ─ 1. source                                   ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_table_column_with_lateral_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof int language sql as $$
+  select id$0 from users, lateral (select 1 as x) t;
+$$;
+"#), @"
+          ╭▸ 
+        2 │ create table users(id int);
+          │                    ── 2. destination
+        3 │ create function f() returns setof int language sql as $$
+        4 │   select id from users, lateral (select 1 as x) t;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_star_column_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof int language sql as $$
+  with c as (select * from users) select id$0 from c;
+$$;
+"#), @"
+          ╭▸ 
+        2 │ create table users(id int);
+          │                    ── 2. destination
+        3 │ create function f() returns setof int language sql as $$
+        4 │   with c as (select * from users) select id from c;
+          ╰╴                                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_alias_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns void language sql as $$
+  delete from users u where u$0.id = 1;
+$$;
+"#), @"
+          ╭▸ 
+        4 │   delete from users u where u.id = 1;
+          │                     ┬       ─ 1. source
+          │                     │
+          ╰╴                    2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_body_view_over_outer_table_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof int language sql as $$
+  create view v as select * from users;
+  select id$0 from v;
+$$;
+"#), @"
+          ╭▸ 
+        2 │ create table users(id int);
+          │                    ── 2. destination
+          ‡
+        5 │   select id from v;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_outer_function_return_table_column_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create function g() returns table(a int, b int) language sql as 'select 1, 2';
+create function f() returns setof int language sql as $$
+  select b$0 from g();
+$$;
+"#), @"
+          ╭▸ 
+        2 │ create function g() returns table(a int, b int) language sql as 'select 1, 2';
+          │                                          ─ 2. destination
+        3 │ create function f() returns setof int language sql as $$
+        4 │   select b from g();
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_table_column_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+-- include-builtins
+create function f() returns setof name language sql as $$
+  select relname$0 from pg_catalog.pg_class;
+$$;
+"#), @"
+            ╭▸ current.sql:4:16
+            │
+          4 │   select relname from pg_catalog.pg_class;
+            │                ─ 1. source
+            ╰╴
+
+            ╭▸ builtins.sql:592:3
+            │
+        592 │   relname name,
+            ╰╴  ─────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_body_table_shadows_outer_table_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+create table users(id int);
+create function f() returns setof int language sql as $$
+  create table users(id int);
+  select id$0 from users;
+$$;
+"#), @"
+          ╭▸ 
+        4 │   create table users(id int);
+          │                      ── 2. destination
+        5 │   select id from users;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_function_in_sql_string_body() {
+        assert_snapshot!(goto(r#"
+-- include-builtins
+create function f() returns int language sql as $$
+  select now$0();
+$$;
+"#), @"
+              ╭▸ current.sql:4:12
+              │
+            4 │   select now();
+              │            ─ 1. source
+              ╰╴
+
+              ╭▸ builtins.sql:11089:28
+              │
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
+              ╰╴                           ─── 2. destination
         ");
     }
 

@@ -1,5 +1,5 @@
 use crate::collect;
-use crate::db::{File, parse};
+use crate::db::{File, FileId, parse};
 use crate::file::InFile;
 use crate::goto_definition;
 use crate::resolve;
@@ -30,9 +30,9 @@ pub fn inlay_hints(db: &dyn Db, file: File) -> Vec<InlayHint> {
     let mut hints = vec![];
     for node in parse(db, file).tree().syntax().descendants() {
         if let Some(call_expr) = ast::CallExpr::cast(node.clone()) {
-            inlay_hint_call_expr(db, &mut hints, file, call_expr);
+            inlay_hint_call_expr(db, &mut hints, file.into(), call_expr);
         } else if let Some(insert) = ast::Insert::cast(node) {
-            inlay_hint_insert(db, &mut hints, file, insert);
+            inlay_hint_insert(db, &mut hints, file.into(), insert);
         }
     }
     hints
@@ -41,7 +41,7 @@ pub fn inlay_hints(db: &dyn Db, file: File) -> Vec<InlayHint> {
 fn inlay_hint_call_expr(
     db: &dyn Db,
     hints: &mut Vec<InlayHint>,
-    file_id: File,
+    file_id: FileId,
     call_expr: ast::CallExpr,
 ) -> Option<()> {
     let arg_list = call_expr.arg_list()?;
@@ -89,7 +89,7 @@ fn inlay_hint_call_expr(
 fn inlay_hint_insert(
     db: &dyn Db,
     hints: &mut Vec<InlayHint>,
-    file_id: File,
+    file_id: FileId,
     insert: ast::Insert,
 ) -> Option<()> {
     let name_start = insert
@@ -235,7 +235,7 @@ mod test {
                 let start: usize = target.value.start().into();
                 let end: usize = target.value.end().into();
                 targets_by_file
-                    .entry(target.file_id)
+                    .entry(target.file_id.original_file(&db))
                     .or_default()
                     .push((i + 1, start..end));
             }

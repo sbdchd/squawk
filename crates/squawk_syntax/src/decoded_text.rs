@@ -1,12 +1,12 @@
 use rowan::{TextRange, TextSize};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DecodedText {
     text: String,
     marks: Vec<Mark>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Mark {
     decoded: u32,
     pos: u32,
@@ -64,5 +64,24 @@ impl DecodedText {
 
     pub fn source_range(&self, range: TextRange) -> TextRange {
         TextRange::new(self.source_pos(range.start()), self.source_pos(range.end()))
+    }
+
+    pub fn decoded_pos(&self, position: TextSize) -> Option<TextSize> {
+        let position = u32::from(position);
+        let decoded_end = self.text.len() as u32;
+        let source_start = self.marks.first()?.pos;
+        let source_end = u32::from(self.source_pos(TextSize::new(decoded_end)));
+        if !(source_start..=source_end).contains(&position) {
+            return None;
+        }
+
+        let idx = self.marks.partition_point(|mark| mark.pos <= position);
+        let mark = &self.marks[idx - 1];
+        let decoded = mark.decoded + position - mark.pos;
+        let decoded = self
+            .marks
+            .get(idx)
+            .map_or(decoded, |next| decoded.min(next.decoded - 1));
+        Some(TextSize::new(decoded))
     }
 }
