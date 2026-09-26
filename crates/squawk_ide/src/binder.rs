@@ -300,6 +300,15 @@ pub(crate) fn bind(file: &ast::SourceFile) -> Binder {
     binder
 }
 
+pub(crate) fn bind_with_search_path(file: &ast::SourceFile, search_path: Vec<Schema>) -> Binder {
+    let mut binder = Binder::new();
+    binder.search_path_changes[0].search_path = search_path;
+
+    bind_file(&mut binder, file);
+
+    binder
+}
+
 fn bind_file(b: &mut Binder, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         bind_stmt(b, stmt);
@@ -1863,20 +1872,34 @@ fn bind_routine_body_search_path(
     let Some(option_list) = option_list else {
         return;
     };
-    let Some(ast::RoutineBody::AtomicBody(atomic_body)) = body else {
-        return;
-    };
 
     let mut search_path = None;
+    let mut body_range = match body {
+        Some(ast::RoutineBody::AtomicBody(atomic_body)) => Some(atomic_body.syntax().text_range()),
+        _ => None,
+    };
     for option in option_list.options() {
-        if let ast::FuncOption::SetFuncOption(set_func_option) = option {
-            if let Some(set_config_param) = set_func_option.set_config_param() {
-                search_path = search_path_from_set_config_param(&set_config_param);
+        match option {
+            ast::FuncOption::SetFuncOption(set_func_option) => {
+                if let Some(set_config_param) = set_func_option.set_config_param() {
+                    search_path = search_path_from_set_config_param(&set_config_param);
+                }
             }
+            ast::FuncOption::AsFuncOption(as_func_option) => {
+                if let Some(ast::AsFuncTarget::AsDefinition(definition)) =
+                    as_func_option.as_func_target()
+                    && let Some(literal) = definition.literal()
+                {
+                    body_range = Some(literal.syntax().text_range());
+                }
+            }
+            _ => (),
         }
     }
 
-    let body_range = atomic_body.syntax().text_range();
+    let Some(body_range) = body_range else {
+        return;
+    };
     let Some(search_path) = search_path else {
         return;
     };

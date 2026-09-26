@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use crate::db::File;
+use crate::db::FileId;
 
 /// `InFile<T>` stores a value of `T` inside a particular file/syntax tree.
 ///
@@ -40,9 +40,12 @@ pub struct InFileWrapper<FileKind, T> {
 }
 
 impl<FileKind, T> InFileWrapper<FileKind, T> {
-    pub fn new(file_id: FileKind, value: T) -> Self {
-        Self { file_id, value }
+    pub fn new(file_id: impl Into<FileKind>, value: T) -> Self {
+        Self {
+            file_id: file_id.into(),
+            value,
+        }
     }
 }
 
-pub type InFile<T> = InFileWrapper<File, T>;
+pub type InFile<T> = InFileWrapper<FileId, T>;

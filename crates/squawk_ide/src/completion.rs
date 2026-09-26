@@ -1,28 +1,35 @@
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode, HasSelectTail};
-use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
+use squawk_syntax::{SyntaxKind, SyntaxToken};
 
 use crate::ast_nav;
 use crate::binder;
 use crate::collect;
-use crate::db::{File, bind, parse};
+use crate::db::{CompletionFile, FileId, bind, parse};
 use crate::file::InFile;
 use crate::name::{self, Name, Schema};
 use crate::resolve;
 use crate::symbols::SymbolKind;
 use crate::tokens::is_string_or_comment;
 
-const COMPLETION_MARKER: &str = "squawkCompletionMarker";
+// In order to make completions, we do something similar to rust analyzer by
+// inserting an ident to make the parse tree parse in more cases.
+// Rust analyzer does fancier things for this, which we can investigate later.
+//
+// This helps us support `select t. from t`, which parses as `select t.from t`.
+// If we insert the ident we get, `select t.c from t`.
+pub(crate) const COMPLETION_MARKER: &str = "squawkCompletionMarker";
 
 pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem> {
-    let file = position.file_id;
     let offset = position.value;
-    let parse = parse(db, file);
-    let source_file = parse.tree();
-
-    let marker_file = file_with_completion_marker(&source_file, offset);
-    let Some(token) = token_at_offset(&marker_file, offset) else {
+    let file = FileId::Completion(CompletionFile::new(
+        db,
+        position.file_id.original_file(db),
+        offset,
+    ));
+    let source_file = parse(db, file).tree();
+    let Some(token) = token_at_offset(&source_file, offset) else {
         // empty file
         return default_completions();
     };
@@ -35,7 +42,7 @@ pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem
     }
 
     match completion_context(&token) {
-        CompletionContext::TableOnly => table_completions(&marker_file, &token),
+        CompletionContext::TableOnly => table_completions(&source_file, &token),
         CompletionContext::Default => default_completions(),
         CompletionContext::SelectClause(select_clause) => {
             select_completions(db, file, select_clause, &token)
@@ -45,17 +52,17 @@ pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem
         CompletionContext::LimitClause => limit_completions(db, file, &token),
         CompletionContext::OffsetClause => offset_completions(db, file, &token),
         CompletionContext::DeleteClauses(delete) => {
-            delete_clauses_completions(&marker_file, &delete, &token)
+            delete_clauses_completions(&source_file, &delete, &token)
         }
         CompletionContext::DeleteExpr(delete) => {
-            delete_expr_completions(db, file, &marker_file, &delete, &token)
+            delete_expr_completions(db, file, &source_file, &delete, &token)
         }
     }
 }
 
 fn select_completions(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     select_clause: ast::SelectClause,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
@@ -259,7 +266,7 @@ fn select_clauses_completions(select: &ast::Select) -> Vec<CompletionItem> {
     completions
 }
 
-fn limit_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<CompletionItem> {
+fn limit_completions(db: &dyn Db, file: FileId, token: &SyntaxToken) -> Vec<CompletionItem> {
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
@@ -277,7 +284,7 @@ fn limit_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<Comple
     completions
 }
 
-fn offset_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<CompletionItem> {
+fn offset_completions(db: &dyn Db, file: FileId, token: &SyntaxToken) -> Vec<CompletionItem> {
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
@@ -286,7 +293,7 @@ fn offset_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<Compl
 
 fn select_expr_completions(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     select: &ast::Select,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
@@ -319,7 +326,7 @@ fn select_expr_completions(
 
 fn function_completions(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     schema: Option<&Schema>,
     position: TextSize,
 ) -> Vec<CompletionItem> {
@@ -341,13 +348,13 @@ fn function_completions(
 
 fn column_completions_from_clause(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     from_clause: &ast::FromClause,
 ) -> Vec<CompletionItem> {
     let mut completions = vec![];
-    let syntax_root = from_clause.syntax().ancestors().last().unwrap();
     for table_ptr in resolve::table_ptrs_from_clause(db, InFile::new(file, from_clause)) {
-        let table_node = table_ptr.to_node(&syntax_root);
+        let table_node = table_ptr.to_node(db);
+        let file = table_ptr.file_id;
         match ast_nav::parent_source(&table_node) {
             Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
                 let columns = collect::table_columns(db, file, &create_table);
@@ -406,7 +413,7 @@ fn column_completions_from_clause(
                     .map(|name| Name::from_node(&name))
                     .collect();
 
-                let base_columns = alias_base_columns_with_types(db, file, &syntax_root, &alias);
+                let base_columns = alias_base_columns_with_types(db, file, &alias);
 
                 for (idx, alias_column) in alias_columns.iter().enumerate() {
                     completions.push(CompletionItem {
@@ -468,8 +475,7 @@ fn column_completions_from_clause(
 
 fn alias_base_columns_with_types(
     db: &dyn Db,
-    file: File,
-    syntax_root: &SyntaxNode,
+    file: FileId,
     alias: &ast::FromAlias,
 ) -> Vec<(Name, Option<String>)> {
     let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
@@ -480,7 +486,8 @@ fn alias_base_columns_with_types(
         return vec![];
     };
 
-    let table_node = table_ptr.to_node(syntax_root);
+    let table_node = table_ptr.to_node(db);
+    let file = table_ptr.file_id;
 
     match ast_nav::parent_source(&table_node) {
         Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
@@ -637,7 +644,7 @@ fn delete_clauses_completions(
 
 fn delete_expr_completions(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     source_file: &ast::SourceFile,
     delete: &ast::Delete,
     token: &SyntaxToken,
@@ -841,27 +848,13 @@ fn token_at_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxTok
     Some(token)
 }
 
-// In order to make completions, we do something similar to rust analyzer by
-// inserting an ident to make the parse tree parse in more cases.
-// Rust analyzer does fancier things for this, which we can investigate later.
-//
-// This helps us support `select t. from t`, which parses as `select t.from t`.
-// If we insert the ident we get, `select t.c from t`.
-fn file_with_completion_marker(file: &ast::SourceFile, offset: TextSize) -> ast::SourceFile {
-    let mut sql = file.syntax().text().to_string();
-    let offset = u32::from(offset) as usize;
-    let offset = offset.min(sql.len());
-    sql.insert_str(offset, COMPLETION_MARKER);
-    ast::SourceFile::parse(&sql).tree()
-}
-
 fn schema_qualifier_at_token(token: &SyntaxToken) -> Option<Schema> {
     qualifier_at_token(token).map(Schema)
 }
 
 fn function_detail(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     function_name: &Name,
     schema: Option<&Schema>,
     position: TextSize,

@@ -5,7 +5,7 @@ use squawk_syntax::ast::AstNode;
 
 use crate::{
     classify::classify_def_node,
-    db::{File, parse},
+    db::{FileId, embedded_body, parse},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,19 +64,42 @@ pub enum LocationKind {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Location {
-    pub file: File,
+    pub file: FileId,
     pub range: TextRange,
     pub kind: LocationKind,
 }
 
 impl Location {
-    pub(crate) fn new(file: File, range: TextRange, kind: LocationKind) -> Location {
-        Location { file, range, kind }
+    pub(crate) fn new(file: impl Into<FileId>, range: TextRange, kind: LocationKind) -> Location {
+        Location {
+            file: file.into(),
+            range,
+            kind,
+        }
     }
 
-    pub(crate) fn from_node(file: File, node: &SyntaxNode) -> Option<Location> {
+    pub(crate) fn from_node(file: impl Into<FileId>, node: &SyntaxNode) -> Option<Location> {
         let kind = classify_def_node(node)?;
         Some(Location::new(file, node.text_range(), kind))
+    }
+
+    pub(crate) fn upmap(self, db: &dyn Db) -> Location {
+        let mut location = self;
+        loop {
+            match location.file {
+                FileId::File(_) | FileId::Completion(_) => return location,
+                FileId::Embedded(embedded) => {
+                    let Some(body) = embedded_body(db, embedded) else {
+                        return location;
+                    };
+                    location = Location::new(
+                        embedded.parent(db),
+                        body.source_range(location.range),
+                        location.kind,
+                    );
+                }
+            }
+        }
     }
 
     pub(crate) fn to_node(self, db: &dyn Db) -> Option<SyntaxNode> {

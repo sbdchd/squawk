@@ -243,9 +243,10 @@ pub(crate) fn to_location(
     loc: squawk_ide::location::Location,
 ) -> Option<Location> {
     let db = snapshot.db();
-    let uri = snapshot.uri(loc.file)?;
+    let file = loc.file.original_file(db);
+    let uri = snapshot.uri(file)?;
 
-    let line_index = line_index(db, loc.file);
+    let line_index = line_index(db, file);
     let range = range(&line_index, loc.range);
     Some(Location { uri, range })
 }

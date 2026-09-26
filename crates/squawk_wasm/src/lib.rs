@@ -334,8 +334,9 @@ impl SquawkDatabase {
             .into_iter()
             .map(|loc| {
                 let range = loc.range;
-                let file = file_string(&self.db, loc.file);
-                let line_index = db::line_index(&self.db, loc.file);
+                let file = loc.file.original_file(&self.db);
+                let line_index = db::line_index(&self.db, file);
+                let file = file_string(&self.db, file);
                 let start = line_index.line_col(range.start());
                 let end = line_index.line_col(range.end());
                 let start_wide = line_index
@@ -378,8 +379,9 @@ impl SquawkDatabase {
         let locations: Vec<LocationRange> = references
             .iter()
             .map(|loc| {
-                let file = file_string(&self.db, loc.file);
-                let line_index = db::line_index(&self.db, loc.file);
+                let file = loc.file.original_file(&self.db);
+                let line_index = db::line_index(&self.db, file);
+                let file = file_string(&self.db, file);
                 let start = line_index.line_col(loc.range.start());
                 let end = line_index.line_col(loc.range.end());
                 let start_wide = line_index

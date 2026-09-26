@@ -32,8 +32,9 @@ pub(crate) fn handle_inlay_hints(
             };
 
             let label = if let Some(target) = hint.target {
-                let target_uri = snapshot.uri(target.file_id)?;
-                let target_line_index = line_index(db, target.file_id);
+                let target_file = target.file_id.original_file(db);
+                let target_uri = snapshot.uri(target_file)?;
+                let target_line_index = line_index(db, target_file);
                 Label::InlayHintLabelPartList(vec![InlayHintLabelPart {
                     value: hint.label,
                     location: Some(Location {

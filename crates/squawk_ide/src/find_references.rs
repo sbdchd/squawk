@@ -88,7 +88,7 @@ mod test {
         let offset = marker.offset_before();
         let query_span = marker.range();
         let db = fixture.db();
-        let current_file = offset.file_id;
+        let current_file = offset.file_id.original_file(db);
 
         let references = find_references(db, offset);
 
@@ -99,7 +99,7 @@ mod test {
         let mut refs_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in references.iter().enumerate() {
             refs_by_file
-                .entry(location.file)
+                .entry(location.file.original_file(db))
                 .or_default()
                 .push((i + 1, location.range));
         }

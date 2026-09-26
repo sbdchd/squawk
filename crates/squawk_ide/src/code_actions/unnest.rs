@@ -3,7 +3,7 @@ use salsa::Database as Db;
 use squawk_syntax::ast;
 
 use crate::{
-    db::{File, bind},
+    db::{FileId, bind},
     name::Name,
     symbols::SymbolKind,
 };
@@ -55,7 +55,7 @@ pub(super) fn unnest_call(call_expr: &ast::CallExpr) -> Option<UnnestCall> {
     })
 }
 
-pub(super) fn unnest_shadowed(db: &dyn Db, file: File, position: TextSize) -> bool {
+pub(super) fn unnest_shadowed(db: &dyn Db, file: FileId, position: TextSize) -> bool {
     let binder = bind(db, file);
     let schemas = binder.resolved_schemas(position, None);
     binder

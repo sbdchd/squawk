@@ -34,6 +34,20 @@ impl ast::SourceFile {
     }
 }
 
+impl ast::Literal {
+    pub fn sql_body(&self) -> Option<SqlBody> {
+        let definition = ast::AsDefinition::cast(self.syntax().parent()?)?;
+        if definition.literal()? != *self {
+            return None;
+        }
+        let options = definition
+            .syntax()
+            .ancestors()
+            .find_map(ast::FuncOptionList::cast)?;
+        SqlBody::from_options(options)
+    }
+}
+
 impl ast::CreateFunction {
     pub fn sql_body(&self) -> Option<SqlBody> {
         SqlBody::from_options(self.option_list()?)

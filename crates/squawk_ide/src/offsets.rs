@@ -1,8 +1,41 @@
-use crate::db::parse;
+use crate::db::{EmbeddedFile, FileId, embedded_body, parse};
 use crate::file::InFile;
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken, ast::AstNode};
+use squawk_syntax::{
+    SyntaxKind, SyntaxNode, SyntaxToken,
+    ast::{self, AstNode},
+};
+
+pub(crate) fn embedded_position(db: &dyn Db, position: InFile<TextSize>) -> InFile<TextSize> {
+    let mut position = position;
+    loop {
+        let Some(literal) = parse(db, position.file_id)
+            .tree()
+            .syntax()
+            .token_at_offset(position.value)
+            .right_biased()
+            .and_then(|token| token.parent())
+            .and_then(ast::Literal::cast)
+            .filter(|literal| {
+                literal
+                    .syntax()
+                    .parent()
+                    .is_some_and(|parent| ast::AsDefinition::can_cast(parent.kind()))
+            })
+        else {
+            return position;
+        };
+        let embedded = EmbeddedFile::new(db, position.file_id, literal.syntax().text_range());
+        let Some(offset) = embedded_body(db, embedded)
+            .as_ref()
+            .and_then(|body| body.body_position(position.value))
+        else {
+            return position;
+        };
+        position = InFile::new(FileId::Embedded(embedded), offset);
+    }
+}
 
 pub(crate) fn token_from_offset(db: &dyn Db, position: InFile<TextSize>) -> Option<SyntaxToken> {
     token_from_syntax_offset(parse(db, position.file_id).tree().syntax(), position.value)

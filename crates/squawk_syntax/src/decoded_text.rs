@@ -1,12 +1,12 @@
 use rowan::{TextRange, TextSize};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DecodedText {
     text: String,
     marks: Vec<Mark>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Mark {
     decoded: u32,
     pos: u32,

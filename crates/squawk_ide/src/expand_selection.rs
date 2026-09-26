@@ -347,7 +347,11 @@ mod tests {
     fn expand(sql: &str) -> Vec<String> {
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset();
-        let sql = offset.file_id.content(fixture.db()).clone();
+        let sql = offset
+            .file_id
+            .original_file(fixture.db())
+            .content(fixture.db())
+            .clone();
         let tree = crate::db::parse(fixture.db(), offset.file_id).tree();
         let root = tree.syntax();
 
