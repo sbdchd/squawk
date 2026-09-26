@@ -98,7 +98,6 @@ PLPGSQL@0..178
         WHITESPACE@160..161 " "
         DIAGNOSTICS_KW@161..172 "diagnostics"
         PLPGSQL_DIAG_ITEM_LIST@172..172
-          PLPGSQL_DIAG_ITEM@172..172
         SEMICOLON@172..173 ";"
     WHITESPACE@173..174 "\n"
     END_KW@174..177 "end"

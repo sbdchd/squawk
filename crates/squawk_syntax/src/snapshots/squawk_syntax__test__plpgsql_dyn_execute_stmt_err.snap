@@ -189,6 +189,65 @@ PLPGSQL@0..88
     WHITESPACE@83..84 "\n"
     END_KW@84..87 "end"
   WHITESPACE@87..88 "\n"
+---
+PLPGSQL@0..59
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..58
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..54
+      PLPGSQL_DYN_EXECUTE_STMT@9..28
+        EXECUTE_KW@9..16 "execute"
+        WHITESPACE@16..17 " "
+        PLPGSQL_EXPR@17..18
+          TARGET_LIST@17..18
+            TARGET@17..18
+              NAME_REF@17..18
+                IDENT@17..18 "q"
+        WHITESPACE@18..19 " "
+        PLPGSQL_INTO_CLAUSE@19..26
+          INTO_KW@19..23 "into"
+          WHITESPACE@23..24 " "
+          PLPGSQL_INTO_TARGET_LIST@24..26
+            PLPGSQL_INTO_TARGET@24..25
+              PLPGSQL_VAR_NAME_REF@24..25
+                IDENT@24..25 "x"
+            ERROR@25..26
+              COMMA@25..26 ","
+        WHITESPACE@26..27 " "
+        SEMICOLON@27..28 ";"
+      WHITESPACE@28..31 "\n  "
+      PLPGSQL_DYN_EXECUTE_STMT@31..54
+        EXECUTE_KW@31..38 "execute"
+        WHITESPACE@38..39 " "
+        PLPGSQL_EXPR@39..40
+          TARGET_LIST@39..40
+            TARGET@39..40
+              NAME_REF@39..40
+                IDENT@39..40 "q"
+        WHITESPACE@40..41 " "
+        PLPGSQL_USING_CLAUSE@41..53
+          USING_KW@41..46 "using"
+          WHITESPACE@46..47 " "
+          PLPGSQL_EXPR@47..48
+            TARGET_LIST@47..48
+              TARGET@47..48
+                LITERAL@47..48
+                  INT_NUMBER@47..48 "1"
+          COMMA@48..49 ","
+          WHITESPACE@49..50 " "
+          ERROR@50..51
+            COMMA@50..51 ","
+          WHITESPACE@51..52 " "
+          PLPGSQL_EXPR@52..53
+            TARGET_LIST@52..53
+              TARGET@52..53
+                LITERAL@52..53
+                  INT_NUMBER@52..53 "2"
+        SEMICOLON@53..54 ";"
+    WHITESPACE@54..55 "\n"
+    END_KW@55..58 "end"
+  WHITESPACE@58..59 "\n"
 
 error[syntax-error]: expected an expression
   ╭▸ 
@@ -214,3 +273,11 @@ error[syntax-error]: expected a statement, got INTO_KW
    ╭▸ 
 40 │   execute q into x into y;
    ╰╴                   ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+46 │   execute q into x, ;
+   ╰╴                  ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+47 │   execute q using 1, , 2;
+   ╰╴                     ━

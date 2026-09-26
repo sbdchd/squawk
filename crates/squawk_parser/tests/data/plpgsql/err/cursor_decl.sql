@@ -8,3 +8,12 @@ begin
   null;
 end
 $$;
+
+do $$
+declare
+  a cursor (x int, , y int) for select 1;
+  b cursor (x int,) for select 1;
+begin
+  null;
+end
+$$;

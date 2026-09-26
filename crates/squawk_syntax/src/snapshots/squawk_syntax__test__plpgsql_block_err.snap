@@ -48,6 +48,38 @@ PLPGSQL@0..53
     WHITESPACE@48..49 "\n"
     END_KW@49..52 "end"
   WHITESPACE@52..53 "\n"
+---
+PLPGSQL@0..71
+  WHITESPACE@0..1 "\n"
+  PLPGSQL_BLOCK@1..70
+    BEGIN_KW@1..6 "begin"
+    WHITESPACE@6..9 "\n  "
+    PLPGSQL_BODY@9..14
+      PLPGSQL_NULL_STMT@9..14
+        NULL_KW@9..13 "null"
+        SEMICOLON@13..14 ";"
+    WHITESPACE@14..15 "\n"
+    PLPGSQL_EXCEPTION_SECTION@15..66
+      EXCEPTION_KW@15..24 "exception"
+      WHITESPACE@24..27 "\n  "
+      PLPGSQL_EXCEPTION_HANDLER@27..66
+        WHEN_KW@27..31 "when"
+        WHITESPACE@31..32 " "
+        PLPGSQL_CONDITION@32..48
+          IDENT@32..48 "division_by_zero"
+        WHITESPACE@48..49 " "
+        ERROR@49..51
+          OR_KW@49..51 "or"
+        WHITESPACE@51..52 " "
+        THEN_KW@52..56 "then"
+        WHITESPACE@56..61 "\n    "
+        PLPGSQL_BODY@61..66
+          PLPGSQL_NULL_STMT@61..66
+            NULL_KW@61..65 "null"
+            SEMICOLON@65..66 ";"
+    WHITESPACE@66..67 "\n"
+    END_KW@67..70 "end"
+  WHITESPACE@70..71 "\n"
 
 error[syntax-error]: Missing semicolon after block
   ╭▸ 
@@ -57,3 +89,7 @@ error[syntax-error]: Missing semicolon after block
    ╭▸ 
 14 │   end inner
    ╰╴           ━
+error[syntax-error]: unexpected OR
+   ╭▸ 
+22 │   when division_by_zero or then
+   ╰╴                        ━

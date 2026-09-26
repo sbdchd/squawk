@@ -14,3 +14,12 @@ begin
   end inner
 end
 $$;
+
+do $$
+begin
+  null;
+exception
+  when division_by_zero or then
+    null;
+end
+$$;
