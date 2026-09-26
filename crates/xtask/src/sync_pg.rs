@@ -48,6 +48,16 @@ const START_END_MARKERS: &[(&str, &str, &str)] = &[
         "-- => is disallowed as an operator name now",
         ");",
     ),
+    (
+        "plpgsql.sql",
+        "    for r in select I fought the law, the law won LOOP",
+        "    end loop;",
+    ),
+    (
+        "plpgsql_varprops.sql",
+        "  for x[1], y in select 1, 2 loop  -- fail (currently, unsupported syntax)",
+        "  end loop;",
+    ),
 ];
 
 const AFTER_START_END_MARKERS: &[(&str, &str, &str)] = &[(
@@ -179,6 +189,8 @@ const IGNORED_LINES: &[&str] = &[
     // the psql variable this reads is set by a \set we comment out, so the body
     // would otherwise parse as the literal string `dobody`
     "DO LANGUAGE plpgsql :'dobody';",
+    "    Johnny Yuma;",
+    "  return query select 10 into no_such_table;",
 ];
 
 const VARIABLE_REPLACEMENTS: &[(&str, &str)] = &[

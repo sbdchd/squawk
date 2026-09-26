@@ -37,8 +37,8 @@ end$$;
 do $$
 declare x constant int[]; y int;
 begin
-  for x[1], y in select 1, 2 loop  -- fail (currently, unsupported syntax)
-  end loop;
+--   for x[1], y in select 1, 2 loop  -- fail (currently, unsupported syntax)
+--   end loop;
 end$$;
 
 do $$
