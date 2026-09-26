@@ -7,7 +7,7 @@ PLPGSQL@0..114
   PLPGSQL_BLOCK@1..113
     BEGIN_KW@1..6 "begin"
     WHITESPACE@6..9 "\n  "
-    PLPGSQL_BODY@9..113
+    PLPGSQL_BODY@9..109
       PLPGSQL_LOOP_STMT@9..30
         LOOP_KW@9..13 "loop"
         WHITESPACE@13..18 "\n    "
@@ -61,10 +61,10 @@ PLPGSQL@0..114
         PLPGSQL_LABEL_NAME_REF@100..104
           IDENT@100..104 "exit"
       WHITESPACE@104..105 " "
-      ERROR@105..113
+      ERROR@105..109
         WHEN_KW@105..109 "when"
-        WHITESPACE@109..110 "\n"
-        END_KW@110..113 "end"
+    WHITESPACE@109..110 "\n"
+    END_KW@110..113 "end"
   WHITESPACE@113..114 "\n"
 
 error[syntax-error]: expected LOOP_KW
@@ -87,7 +87,3 @@ error[syntax-error]: expected a statement, got WHEN_KW
    ╭▸ 
 15 │   exit when
    ╰╴       ━
-error[syntax-error]: expected END_KW
-   ╭▸ 
-16 │ end
-   ╰╴   ━
