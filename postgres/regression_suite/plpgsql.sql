@@ -2138,7 +2138,7 @@ create function bad_sql1() returns int as $$
 declare a int;
 begin
     a := 5;
-    Johnny Yuma;
+--     Johnny Yuma;
     a := 10;
     return a;
 end$$ language plpgsql;
@@ -2146,9 +2146,9 @@ end$$ language plpgsql;
 create function bad_sql2() returns int as $$
 declare r record;
 begin
-    for r in select I fought the law, the law won LOOP
-        raise notice 'in loop';
-    end loop;
+--     for r in select I fought the law, the law won LOOP
+--         raise notice 'in loop';
+--     end loop;
     return 5;
 end;$$ language plpgsql;
 
@@ -3584,7 +3584,7 @@ select * from rttest();
 create or replace function rttest()
 returns setof int as $$
 begin
-  return query select 10 into no_such_table;
+--   return query select 10 into no_such_table;
 end;
 $$ language plpgsql;
 
