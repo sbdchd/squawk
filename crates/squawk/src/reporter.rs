@@ -103,8 +103,14 @@ fn render_lint_error<W: std::io::Write>(
     err: &ReportViolation,
     filename: &str,
     sql: &str,
+    styled: bool,
 ) -> Result<()> {
-    let renderer = Renderer::styled().decor_style(DecorStyle::Unicode);
+    let renderer = if styled {
+        Renderer::styled()
+    } else {
+        Renderer::plain()
+    }
+    .decor_style(DecorStyle::Unicode);
     let level = match err.level {
         ViolationLevel::Warning => Level::WARNING,
         ViolationLevel::Error => Level::ERROR,
@@ -115,12 +121,12 @@ fn render_lint_error<W: std::io::Write>(
         .fold(true)
         .annotation(AnnotationKind::Primary.span(err.range.into()));
 
-    let rule_url = format!("https://squawkhq.com/docs/{}", err.rule_name);
-    let mut group = level
-        .primary_title(&err.message)
-        .id(&err.rule_name)
-        .id_url(&rule_url)
-        .element(snippet);
+    let mut title = level.primary_title(&err.message).id(&err.rule_name);
+    // annotate-snippets emits OSC 8 hyperlinks even with the plain renderer
+    if styled {
+        title = title.id_url(format!("https://squawkhq.com/docs/{}", err.rule_name));
+    }
+    let mut group = title.element(snippet);
 
     if let Some(help) = &err.help {
         group = group.element(Level::HELP.message(help));
@@ -340,8 +346,9 @@ pub fn fmt_tty_violation<W: io::Write>(
     violation: &ReportViolation,
     filename: &str,
     sql: &str,
+    styled: bool,
 ) -> Result<()> {
-    render_lint_error(f, violation, filename, sql)?;
+    render_lint_error(f, violation, filename, sql, styled)?;
     Ok(())
 }
 
@@ -349,7 +356,7 @@ pub fn fmt_tty<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
     let summary = Summary::from(reports);
     for report in reports {
         for violation in &report.violations {
-            fmt_tty_violation(f, violation, &report.path, &report.sql)?;
+            fmt_tty_violation(f, violation, &report.path, &report.sql, true)?;
         }
     }
     print_summary(f, &summary)?;
