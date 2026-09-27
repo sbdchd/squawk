@@ -82,7 +82,7 @@ impl CommentRun {
         Doc::list(docs)
     }
 
-    fn separator_before<'a>(&self, separator: Doc<'a>) -> Doc<'a> {
+    pub(crate) fn separator_before<'a>(&self, separator: Doc<'a>) -> Doc<'a> {
         if self
             .tokens
             .first()
@@ -148,6 +148,32 @@ impl CommentRun {
             .append(self.separator_after(Doc::space()))
     }
 
+    pub(crate) fn split_trailing(self) -> (CommentRun, CommentRun) {
+        let count = self
+            .tokens
+            .iter()
+            .take_while(|token| is_trailing_comment(token))
+            .position(is_line_comment)
+            .map_or(0, |index| index + 1);
+        let mut trailing = self.tokens;
+        let rest = trailing.split_off(count);
+        (Self { tokens: trailing }, Self { tokens: rest })
+    }
+
+    pub(crate) fn trailing<'a>(&self) -> Doc<'a> {
+        if self.is_empty() {
+            return Doc::nil();
+        }
+        Doc::space().append(self.doc())
+    }
+
+    pub(crate) fn leading<'a>(&self) -> Doc<'a> {
+        if self.is_empty() {
+            return Doc::nil();
+        }
+        self.doc().append(self.separator_after(Doc::space()))
+    }
+
     pub(crate) fn before_closing_delimiter<'a>(&self, separator: Doc<'a>) -> (Doc<'a>, Doc<'a>) {
         (self.doc(), self.separator_after(separator))
     }
@@ -166,13 +192,7 @@ pub(crate) fn comment_run_after(el: &(impl Into<SyntaxElement> + Clone)) -> Comm
 }
 
 pub(crate) fn leading_comments<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> Doc<'a> {
-    let comments = comment_run_before(el);
-    if comments.is_empty() {
-        return Doc::nil();
-    }
-    comments
-        .doc()
-        .append(comments.separator_after(Doc::space()))
+    comment_run_before(el).leading()
 }
 
 pub(crate) fn comments_before<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> Doc<'a> {
@@ -203,18 +223,11 @@ pub(crate) fn hard_line_before<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> D
     comment_run_before(el).before_node(Doc::hard_line())
 }
 
-pub(crate) fn separator_before<'a>(
-    sep: Doc<'a>,
-    el: &(impl Into<SyntaxElement> + Clone),
-) -> Doc<'a> {
-    comment_run_before(el).separator_before(sep)
-}
-
-pub(crate) fn separator_after<'a>(
-    sep: Doc<'a>,
-    el: &(impl Into<SyntaxElement> + Clone),
-) -> Doc<'a> {
-    comment_run_after(el).separator_before(sep)
+pub(crate) fn has_own_line_comments_before(el: &(impl Into<SyntaxElement> + Clone)) -> bool {
+    comment_run_before(el)
+        .tokens
+        .first()
+        .is_some_and(|token| !is_trailing_comment(token))
 }
 
 pub(crate) fn has_comments_before(el: &(impl Into<SyntaxElement> + Clone)) -> bool {
