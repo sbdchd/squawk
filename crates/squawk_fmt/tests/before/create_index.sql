@@ -6,6 +6,10 @@ create index reservations_during_idx on reservations using gist (during);
 
 create index documents_search_idx on documents using gin (search_vector);
 
+create unique index on /* TEMPLATE: schema */ river_migration using btree (version);
+
+create index river_job_metadata_index on /* TEMPLATE: schema */ river_job using gin (metadata);
+
 create index long_index_name_for_testing_line_wrapping on long_schema_name.a_very_long_table_name using btree (a_very_long_column_name, another_very_long_column_name, a_third_very_long_column_name) include (a_very_long_included_column_name) nulls distinct where a_very_long_column_name is not null;
 
 -- comments in every position
