@@ -5,12 +5,15 @@ use std::process::ExitCode;
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
 use clap::Parser;
-use squawk_fmt::token_compare::assert_no_dropped_tokens;
+use squawk_fmt::{FormatOptions, token_compare::assert_no_dropped_tokens};
 use squawk_syntax::SourceFile;
 
 #[derive(Parser)]
 #[command(name = "squawk-fmt")]
 struct Cli {
+    /// Number of spaces to indent
+    #[arg(long, default_value_t = FormatOptions::default().indent)]
+    indent: usize,
     /// File to format; reads from stdin if omitted
     file: Option<PathBuf>,
 }
@@ -52,7 +55,7 @@ fn main() -> Result<ExitCode> {
         return Ok(ExitCode::FAILURE);
     }
 
-    let formatted = squawk_fmt::fmt_str(&input)?;
+    let formatted = squawk_fmt::fmt_str(&input, FormatOptions { indent: cli.indent })?;
     assert_no_dropped_tokens(&input, &formatted);
 
     let reparse = SourceFile::parse(&formatted);

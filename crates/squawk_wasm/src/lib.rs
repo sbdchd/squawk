@@ -223,7 +223,7 @@ impl SquawkDatabase {
         if !parse.errors().is_empty() {
             return Err(Error::new("Cannot format SQL with syntax errors."));
         }
-        squawk_fmt::fmt(&parse.tree(), line_ending).map_err(into_error)
+        squawk_fmt::fmt(&parse.tree(), line_ending, Default::default()).map_err(into_error)
     }
 
     pub fn lint(&self) -> Result<JsValue, Error> {

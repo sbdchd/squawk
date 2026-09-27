@@ -15,7 +15,7 @@ fn fmt(fixture: Fixture<&str>) {
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let formatted = squawk_fmt::fmt_str(content).unwrap();
+    let formatted = squawk_fmt::fmt_str(content, Default::default()).unwrap();
 
     assert_no_dropped_tokens(content, &formatted);
     assert_parses(&formatted);
@@ -43,7 +43,7 @@ fn fmt_with_line_ending(line_ending: &str) -> String {
     ]
     .join(line_ending);
 
-    match squawk_fmt::fmt_str(&sql) {
+    match squawk_fmt::fmt_str(&sql, Default::default()) {
         Ok(formatted) => {
             assert_no_dropped_tokens(&sql, &formatted);
             assert_parses(&formatted);
@@ -89,13 +89,29 @@ fn fmt_cr_line_endings() {
 }
 
 #[test]
+fn configurable_indent() {
+    let sql =
+        "select 'a', 'really long string                                                    ';\n";
+    let options = squawk_fmt::FormatOptions { indent: 4 };
+
+    assert_snapshot!(squawk_fmt::fmt_str(sql, options).unwrap(), @"
+    select
+        'a',
+        'really long string                                                    ';
+    ");
+}
+
+#[test]
 fn normalizes_line_endings_inside_block_comments() {
     let sql = "select 1;\r\n/* a\n * comment\n */\nselect 2;\n";
     let expected = "select 1;\r\n/* a\r\n * comment\r\n */\r\nselect 2;\r\n";
 
-    let formatted = squawk_fmt::fmt_str(sql).unwrap();
+    let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
     assert_eq!(formatted, expected);
-    assert_eq!(squawk_fmt::fmt_str(&formatted).unwrap(), expected);
+    assert_eq!(
+        squawk_fmt::fmt_str(&formatted, Default::default()).unwrap(),
+        expected
+    );
 }
 
 #[test]
@@ -103,7 +119,10 @@ fn removes_trailing_whitespace_from_comments() {
     let sql = "select 1; -- ok   \n/* a  \n * comment\t\n */\nselect 2;\n";
     let expected = "select 1; -- ok\n/* a\n * comment\n */\nselect 2;\n";
 
-    assert_eq!(squawk_fmt::fmt_str(sql).unwrap(), expected);
+    assert_eq!(
+        squawk_fmt::fmt_str(sql, Default::default()).unwrap(),
+        expected
+    );
 }
 
 #[test]
@@ -111,11 +130,14 @@ fn preserves_a_leading_bom() {
     let sql = "\u{feff}select   1;\n";
     let expected = "\u{feff}select 1;\n";
 
-    let formatted = squawk_fmt::fmt_str(sql).unwrap();
+    let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
     assert_no_dropped_tokens(sql, &formatted);
     assert_parses(&formatted);
     assert_eq!(formatted, expected);
-    assert_eq!(squawk_fmt::fmt_str(&formatted).unwrap(), expected);
+    assert_eq!(
+        squawk_fmt::fmt_str(&formatted, Default::default()).unwrap(),
+        expected
+    );
 }
 
 fn assert_parses(formatted: &str) {
