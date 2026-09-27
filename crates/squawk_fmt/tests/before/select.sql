@@ -23,3 +23,36 @@ select from onek;
 select where 1 = 1;
 select except select;
 select all from onek;
+
+with t(ch,val) AS (
+  VALUES
+    ('0',0),('1',1),('2',2),('3',3),('4',4),('5',5),('6',6),('7',7),('8',8),('9',9),
+    ('A',10),('B',11),('C',12),('D',13),('E',14),('F',15),('G',16),('H',17),('I',18),('J',19)
+)
+select * from t;
+
+with t as (
+  select
+    case
+      when (select flag from use_numeric) then (select t from numeric_bitstream)
+      when (select flag from use_alnum) then (select t from alnum_bitstream)
+      else (select t from data_bits_byte)
+    end as t
+)
+select *
+from t;
+
+-- above with
+with 
+-- above first
+t as ( -- after open paren
+  -- above select
+  select 1
+), -- after comma
+-- above second
+x as ( -- after open paren
+  -- above select
+  select 2
+) -- after close paren
+-- above final
+select * from t; -- after statement

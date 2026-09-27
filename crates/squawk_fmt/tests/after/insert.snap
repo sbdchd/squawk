@@ -7,8 +7,7 @@ insert into foo (id, name) values (1, 'one') returning id;
 with inserted as (
   insert into foo default values returning id
 )
-select *
-from inserted;
+select * from inserted;
 
 with inserted as (
   insert into foo as f (id, name)
@@ -17,8 +16,7 @@ with inserted as (
   on conflict on constraint foo_pkey do nothing
   returning id
 )
-select *
-from inserted;
+select * from inserted;
 
 insert into products (product_no, name, price) values
   (1, 'Cheese', 9.99),
@@ -69,8 +67,7 @@ with /*a*/ inserted/*b*/ (
     /*bc*/ new /*bd*/ as /*be*/ new_row /*bf*/
   ) /*bg*/ new_row.id /*bh*/
 )
-/*bi*/ select /*bj*/ result_id
-/*bk*/ from /*bl*/ inserted /*bm*/;
+/*bi*/ select /*bj*/ result_id /*bk*/ from /*bl*/ inserted /*bm*/;
 
 -- top
 insert into products (product_no, name, price) values -- after insert

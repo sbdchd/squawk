@@ -26,8 +26,7 @@ returning id, a_very_long_first_column_name;
 with changed as (
   update foo set a = 1 where id = 2 returning id
 )
-select *
-from changed;
+select * from changed;
 
 with source as (
   select id, value from incoming
@@ -53,8 +52,7 @@ update /*a*/ only /*b*/(/*c*/ public /*d*/./*e*/ foo /*f*/)
 /*as*/ returning /*at*/ f.id /*au*/, /*av*/ f.payload /*aw*/;
 
 -- top
-with source as (
-  -- trailing with
+with source as ( -- trailing with
   select id, value from incoming -- trailing select
 ) -- trailing paren
 update foo -- trailing update

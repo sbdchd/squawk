@@ -47,7 +47,7 @@ use crate::unescape::{
     decode_esc_string, decode_plain_string, decode_unicode_esc_string, escape_unicode_esc_str,
     uescape_char,
 };
-use crate::{SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
+use crate::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
 
 use super::support;
 
@@ -510,6 +510,28 @@ pub enum PostfixOp {
     IsNotNormalized(ast::IsNotNormalized),
     IsNull(SyntaxToken),
     NotNull(SyntaxToken),
+}
+
+impl PostfixOp {
+    pub fn syntax_element(&self) -> SyntaxElement {
+        match self {
+            PostfixOp::AtLocal(node) => node.syntax().clone().into(),
+            PostfixOp::IsJson(node) => node.syntax().clone().into(),
+            PostfixOp::IsJsonArray(node) => node.syntax().clone().into(),
+            PostfixOp::IsJsonObject(node) => node.syntax().clone().into(),
+            PostfixOp::IsJsonScalar(node) => node.syntax().clone().into(),
+            PostfixOp::IsJsonValue(node) => node.syntax().clone().into(),
+            PostfixOp::IsNormalized(node) => node.syntax().clone().into(),
+            PostfixOp::IsNotJson(node) => node.syntax().clone().into(),
+            PostfixOp::IsNotJsonArray(node) => node.syntax().clone().into(),
+            PostfixOp::IsNotJsonObject(node) => node.syntax().clone().into(),
+            PostfixOp::IsNotJsonScalar(node) => node.syntax().clone().into(),
+            PostfixOp::IsNotJsonValue(node) => node.syntax().clone().into(),
+            PostfixOp::IsNotNormalized(node) => node.syntax().clone().into(),
+            PostfixOp::IsNull(token) => token.clone().into(),
+            PostfixOp::NotNull(token) => token.clone().into(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

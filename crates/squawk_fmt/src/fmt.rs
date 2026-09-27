@@ -12,8 +12,8 @@ use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 
 use crate::comment::{
     CommentRun, build_comment, comment_run_after, comment_run_before, comments_before,
-    hard_line_before, has_comments_before, is_line_comment, leading_comments, line_before,
-    separator_after, separator_before, space_before, space_or_comments_before, trailing_comments,
+    hard_line_before, has_comments_before, has_own_line_comments_before, is_line_comment,
+    leading_comments, line_before, space_before, space_or_comments_before, trailing_comments,
 };
 use tiny_pretty::Doc;
 use tiny_pretty::{LineBreak, PrintOptions, print};
@@ -67,7 +67,7 @@ fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a>
                     } else {
                         Doc::empty_line()
                     };
-                    doc = doc.append(separator_after(gap, &token));
+                    doc = doc.append(comment_run_after(&token).separator_before(gap));
                 }
             }
         }
@@ -342,7 +342,7 @@ fn build_insert<'a>(ctx: &Ctx, insert: &ast::Insert) -> Doc<'a> {
                     .append(before_source)
                     .append(Doc::text("values"))
                     .group()
-                    .append(build_values_rows(ctx, &values, true));
+                    .append(build_values_rows(ctx, &values));
                 for clause in values.tail_clauses() {
                     doc = doc
                         .append(Doc::line_or_space())
@@ -8853,7 +8853,7 @@ fn build_values<'a>(ctx: &Ctx, values: &ast::Values) -> Doc<'a> {
 
     doc = doc.append(
         Doc::text("values")
-            .append(build_values_rows(ctx, values, false))
+            .append(build_values_rows(ctx, values))
             .group(),
     );
 
@@ -8867,7 +8867,7 @@ fn build_values<'a>(ctx: &Ctx, values: &ast::Values) -> Doc<'a> {
         .group()
 }
 
-fn build_values_rows<'a>(ctx: &Ctx, values: &ast::Values, nest_rows: bool) -> Doc<'a> {
+fn build_values_rows<'a>(ctx: &Ctx, values: &ast::Values) -> Doc<'a> {
     let mut doc = Doc::nil();
     if let Some(row_list) = values.row_list() {
         let rows = row_list.rows().map(|row| {
@@ -8878,13 +8878,13 @@ fn build_values_rows<'a>(ctx: &Ctx, values: &ast::Values, nest_rows: bool) -> Do
         });
         if let Some(rows) = build_comma_separated_docs(rows) {
             let multiple_rows = row_list.rows().count() > 1;
-            let rows = if nest_rows && multiple_rows {
+            let rows = if multiple_rows {
                 line_before(row_list.syntax())
             } else {
                 space_before(row_list.syntax())
             }
             .append(rows);
-            doc = doc.append(if nest_rows && multiple_rows {
+            doc = doc.append(if multiple_rows {
                 rows.nest(ctx.indent).group()
             } else {
                 rows
@@ -9078,8 +9078,12 @@ fn build_with_clause<'a>(ctx: &Ctx, with_clause: ast::WithClause) -> Doc<'a> {
             table.syntax().clone(),
         )
     });
+    let separator = match with_clause.with_tables().next() {
+        Some(first) if has_own_line_comments_before(first.syntax()) => Doc::hard_line(),
+        _ => Doc::space(),
+    };
     if let Some(tables) = build_comma_separated_docs(tables) {
-        doc = doc.append(Doc::space()).append(tables);
+        doc = doc.append(separator).append(tables);
     }
     doc
 }
@@ -9116,10 +9120,16 @@ fn build_with_table<'a>(ctx: &Ctx, table: ast::WithTable) -> Doc<'a> {
     if let Some(l_paren) = table.l_paren_token() {
         doc = doc.append(space_before(&l_paren)).append(Doc::text("("));
     }
-    let body = table
-        .query()
-        .map(|query| leading_comments(query.syntax()).append(build_with_query(ctx, query)))
-        .unwrap_or_else(Doc::nil);
+    let body = match table.query() {
+        Some(query) => {
+            let (trailing, leading) = comment_run_before(query.syntax()).split_trailing();
+            doc = doc.append(trailing.trailing());
+            leading
+                .before_node(Doc::nil())
+                .append(build_with_query(ctx, query))
+        }
+        None => Doc::nil(),
+    };
     doc = doc
         .append(wrap_hard_body(ctx, body, table.r_paren_token()))
         .append(Doc::text(")"));
@@ -12527,7 +12537,7 @@ fn build_op_sig<'a>(ctx: &Ctx, sig: ast::OpSig) -> Doc<'a> {
         .map(|op| leading_comments(op.syntax()).append(build_ddl_operator(&op)))
         .unwrap_or_else(Doc::nil);
     if let Some(l_paren) = sig.l_paren_token() {
-        doc = doc.append(comments_before(&l_paren));
+        doc = doc.append(space_before(&l_paren));
     }
     let has_none = sig.none_token().is_some();
     let mut body = if let Some(none) = sig.none_token() {
@@ -15261,7 +15271,9 @@ fn ends_with_inline_bracketed_expr(expr: &ast::Expr) -> bool {
 
 fn is_single_inline_target_list(target_list: &ast::TargetList) -> bool {
     match target_list.targets().exactly_one() {
-        Ok(target) => target.expr().as_ref().is_some_and(is_inline_bracketed_expr),
+        Ok(target) => target.expr().as_ref().is_some_and(|expr| {
+            is_inline_bracketed_expr(expr) || matches!(expr, ast::Expr::CaseExpr(_))
+        }),
         Err(_) => false,
     }
 }
@@ -15280,14 +15292,14 @@ fn has_single_inline_target(select: &ast::Select) -> bool {
 }
 
 fn build_select_doc_ungrouped<'a>(ctx: &Ctx, select: &ast::Select) -> Doc<'a> {
-    let mut doc = Doc::nil();
+    let mut prefix = Doc::nil();
     if let Some(with_clause) = select.with_clause() {
-        doc = doc
+        prefix = prefix
             .append(leading_comments(with_clause.syntax()))
             .append(build_with_clause(ctx, with_clause));
-        doc = match select.select_clause() {
-            Some(select_clause) => doc.append(hard_line_before(select_clause.syntax())),
-            None => doc.append(Doc::hard_line()),
+        prefix = match select.select_clause() {
+            Some(select_clause) => prefix.append(hard_line_before(select_clause.syntax())),
+            None => prefix.append(Doc::hard_line()),
         };
     }
     let mut select_doc = Doc::text("select");
@@ -15311,11 +15323,7 @@ fn build_select_doc_ungrouped<'a>(ctx: &Ctx, select: &ast::Select) -> Doc<'a> {
             select_doc.append(Doc::line_or_space().append(select_body).nest(ctx.indent))
         }
     };
-    doc = if select.with_clause().is_some() {
-        doc.append(select_doc.group())
-    } else {
-        doc.append(select_doc)
-    };
+    let mut doc = select_doc;
     if select.from_clause().is_some() {
         doc = doc.group();
     }
@@ -15357,7 +15365,11 @@ fn build_select_doc_ungrouped<'a>(ctx: &Ctx, select: &ast::Select) -> Doc<'a> {
 
     doc = doc.append(build_semicolon(select.semicolon_token()));
 
-    doc
+    if select.with_clause().is_some() {
+        prefix.append(doc.group())
+    } else {
+        doc
+    }
 }
 
 fn build_from_clause<'a>(ctx: &Ctx, from: ast::FromClause) -> Doc<'a> {
@@ -18386,7 +18398,7 @@ fn join_comma_separated<'a>(
         docs.push(
             trailing_comments(&previous_syntax)
                 .append(Doc::text(","))
-                .append(separator_before(Doc::line_or_space(), &syntax))
+                .append(comment_run_before(&syntax).separator_before(Doc::line_or_space()))
                 .append(item),
         );
         previous_syntax = syntax;
@@ -19244,28 +19256,8 @@ fn build_postfix_expr<'a>(ctx: &Ctx, postfix_expr: ast::PostfixExpr) -> Doc<'a> 
     let expr = build_expr(ctx, postfix_expr.expr().unwrap());
     let op = postfix_expr.op().unwrap();
     expr.append(Doc::space())
-        .append(leading_comments_postfix_op(&op))
+        .append(leading_comments(&op.syntax_element()))
         .append(build_postfix_op(op))
-}
-
-fn leading_comments_postfix_op<'a>(op: &ast::PostfixOp) -> Doc<'a> {
-    match op {
-        ast::PostfixOp::AtLocal(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsJson(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsJsonArray(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsJsonObject(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsJsonScalar(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsJsonValue(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNormalized(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNotJson(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNotJsonArray(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNotJsonObject(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNotJsonScalar(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNotJsonValue(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNotNormalized(node) => leading_comments(node.syntax()),
-        ast::PostfixOp::IsNull(token) => leading_comments(token),
-        ast::PostfixOp::NotNull(token) => leading_comments(token),
-    }
 }
 
 fn build_postfix_op<'a>(op: ast::PostfixOp) -> Doc<'a> {

@@ -737,14 +737,15 @@ select
   ),
   (values (1, 2), (3, 4)),
   (
-    values (
-      a_very_long_first_parenthesized_value_expression,
-      a_very_long_second_parenthesized_value_expression
-    ),
-    (
-      a_very_long_third_parenthesized_value_expression,
-      a_very_long_fourth_parenthesized_value_expression
-    )
+    values
+      (
+        a_very_long_first_parenthesized_value_expression,
+        a_very_long_second_parenthesized_value_expression
+      ),
+      (
+        a_very_long_third_parenthesized_value_expression,
+        a_very_long_fourth_parenthesized_value_expression
+      )
   ),
   (
     a_very_long_parenthesized_expression
