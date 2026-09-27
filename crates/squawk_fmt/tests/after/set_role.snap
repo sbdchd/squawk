@@ -12,6 +12,8 @@ set role group legacy_user;
 
 set role 'literal role';
 
+set role to 'api';
+
 set
   session
   role

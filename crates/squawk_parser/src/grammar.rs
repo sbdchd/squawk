@@ -15462,8 +15462,8 @@ fn opt_set_scope(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
-// SET [ SESSION | LOCAL ] ROLE role_name
-// SET [ SESSION | LOCAL ] ROLE NONE
+// SET [ SESSION | LOCAL ] ROLE [ TO ] role_name
+// SET [ SESSION | LOCAL ] ROLE [ TO ] NONE
 // RESET ROLE
 fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SET_KW));
@@ -15471,6 +15471,7 @@ fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SET_KW);
     opt_set_scope(p);
     p.expect(ROLE_KW);
+    p.eat(TO_KW);
     if p.at(NONE_KW) {
         let target = p.start();
         p.bump(NONE_KW);

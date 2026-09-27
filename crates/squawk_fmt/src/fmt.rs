@@ -6518,6 +6518,9 @@ fn build_set_role<'a>(ctx: &Ctx, set: &ast::SetRole) -> Doc<'a> {
                 .nest(ctx.indent),
         );
     }
+    if let Some(to) = set.to_token() {
+        doc = doc.append(line_before(&to).append(Doc::text("to")).nest(ctx.indent));
+    }
     if let Some(target) = set.set_role_target() {
         doc = doc.append(
             line_before(target.syntax())

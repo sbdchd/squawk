@@ -9,5 +9,7 @@ SET SESSION ROLE foo;
 
 set role 'fooo';
 
+set role to 'api';
+
 RESET ROLE;
 
