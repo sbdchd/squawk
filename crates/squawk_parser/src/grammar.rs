@@ -3400,6 +3400,10 @@ fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     p.expect(WITH_KW);
     p.eat(RECURSIVE_KW);
+    if p.at_ts(WITH_FOLLOW) {
+        p.error("expected common table expression");
+        return Some(m.complete(p, WITH_CLAUSE));
+    }
     while !p.at(EOF) {
         with_query(p);
         if p.at(COMMA) && p.nth_at_ts(1, WITH_FOLLOW) {
@@ -3409,8 +3413,11 @@ fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         if !p.eat(COMMA) {
             if p.at_ts(WITH_FOLLOW) || (p.at(L_PAREN) && p.nth_at_ts(1, PAREN_SELECT_FIRST)) {
                 break;
-            } else {
+            } else if p.at_ts(NAME_REF_FIRST) {
                 p.error("missing comma");
+            } else {
+                p.err_and_bump("missing comma");
+                break;
             }
         }
     }

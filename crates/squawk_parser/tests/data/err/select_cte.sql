@@ -45,3 +45,6 @@ values (2);
 
 -- WITHOUT OVERLAPS is only valid w/ PRIMARY KEY or UNIQUE constraint
 with t (a without overlaps) as (select 1) select * from t;
+
+-- missing common table expression
+with select 1;
