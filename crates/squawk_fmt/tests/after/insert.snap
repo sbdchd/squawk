@@ -37,12 +37,12 @@ with inserted as (
   )
   on conflict (organization_identifier)
     do update
-    set
-      extremely_long_descriptive_column_name
-        = excluded.extremely_long_descriptive_column_name
-    where
-      a_very_long_table_name.organization_identifier
-        = excluded.organization_identifier
+      set
+        extremely_long_descriptive_column_name
+          = excluded.extremely_long_descriptive_column_name
+      where
+        a_very_long_table_name.organization_identifier
+          = excluded.organization_identifier
   returning organization_identifier, extremely_long_descriptive_column_name
 )
 select organization_identifier, extremely_long_descriptive_column_name
@@ -61,10 +61,10 @@ with /*a*/ inserted/*b*/ (
   /*ad*/ on /*ae*/ conflict /*af*/ (
     /*ag*/ id /*ah*/ collate /*ai*/ "C" /*aj*/ text_ops /*ak*/
   )
-  /*al*/ where /*am*/ id > 0
+    /*al*/ where /*am*/ id > 0
     /*an*/ do /*ao*/ update
-    /*ap*/ set /*aq*/ payload /*ar*/ = /*as*/ excluded.payload
-    /*at*/ where /*au*/ foo.id = excluded.id
+      /*ap*/ set /*aq*/ payload /*ar*/ = /*as*/ excluded.payload
+      /*at*/ where /*au*/ foo.id = excluded.id
   /*av*/ returning /*aw*/ with /*ax*/ (
     /*ay*/ old /*az*/ as /*ba*/ old_row /*bb*/,
     /*bc*/ new /*bd*/ as /*be*/ new_row /*bf*/
@@ -93,3 +93,23 @@ values (
 returning
   a, -- returning
   b;
+
+insert into t (id)
+select id from raw_job_data
+on conflict (unique_key)
+  where
+    unique_key is not null
+    and unique_states is not null
+    and /* TEMPLATE: schema */ river_job_state_in_bitmask(unique_states, state)
+  -- Something needs to be updated for a row to be returned on a conflict.
+  do update
+    set kind = excluded.kind;
+
+insert into t (a)
+values (1)
+on conflict (a)
+  do select
+    for update of this_is_a_very_long_table_name_that_forces_the_conflict_action_to_wrap
+    where
+      this_is_a_very_long_column_name_that_forces_the_where_clause_to_wrap > 0
+returning *;
