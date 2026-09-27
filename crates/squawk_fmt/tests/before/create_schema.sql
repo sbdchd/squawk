@@ -1,5 +1,7 @@
 create schema app;
 
+create schema تست;
+
 create schema if not exists extraordinarily_long_application_reporting_and_data_warehouse_schema authorization extraordinarily_long_application_reporting_and_data_warehouse_owner_role;
 
 create schema authorization current_user;

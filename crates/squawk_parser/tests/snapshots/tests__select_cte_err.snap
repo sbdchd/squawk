@@ -457,6 +457,21 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "t"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing common table expression"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+    WHITESPACE " "
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected comma
@@ -491,3 +506,7 @@ error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE 
    ╭▸ 
 47 │ with t (a without overlaps) as (select 1) select * from t;
    ╰╴          ━
+error[syntax-error]: expected common table expression
+   ╭▸ 
+50 │ with select 1;
+   ╰╴    ━

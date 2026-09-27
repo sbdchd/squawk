@@ -64,12 +64,12 @@ pub fn unquote_ident(node: &SyntaxNode) -> Option<String> {
 
     // see: https://www.postgresql.org/docs/18/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
     match chars.next() {
-        Some(c) if c.is_lowercase() || c == '_' => {}
+        Some(c) if c.is_ascii_lowercase() || !c.is_ascii() || c == '_' => {}
         _ => return None,
     }
 
     for c in chars {
-        if c.is_lowercase() || c.is_ascii_digit() || c == '_' || c == '$' {
+        if c.is_ascii_lowercase() || !c.is_ascii() || c.is_ascii_digit() || c == '_' || c == '$' {
             continue;
         }
         return None;
@@ -90,12 +90,12 @@ pub fn needs_quoting(text: &str) -> bool {
     let mut chars = text.chars();
 
     match chars.next() {
-        Some(c) if c.is_lowercase() || c == '_' => {}
+        Some(c) if c.is_ascii_lowercase() || !c.is_ascii() || c == '_' => {}
         _ => return true,
     }
 
     for c in chars {
-        if c.is_lowercase() || c.is_ascii_digit() || c == '_' || c == '$' {
+        if c.is_ascii_lowercase() || !c.is_ascii() || c.is_ascii_digit() || c == '_' || c == '$' {
             continue;
         }
         return true;
@@ -205,6 +205,7 @@ mod tests {
         assert_snapshot!(quote_ident("col_name"), @"col_name");
         assert_snapshot!(quote_ident("users"), @"users");
         assert_snapshot!(quote_ident("t2$"), @"t2$");
+        assert_snapshot!(quote_ident("تست"), @"تست");
     }
 
     #[test]

@@ -1000,9 +1000,21 @@ impl ast::PathSegmentRef {
 }
 
 pub fn is_quoted_name_node(node: &SyntaxNode) -> bool {
-    let text = node.text();
-    let first = text.char_at(0.into());
-    let second = text.char_at(1.into());
+    let mut first = None;
+    let mut second = None;
+    node.text().for_each_chunk(|chunk| {
+        if second.is_some() {
+            return;
+        }
+        for ch in chunk.chars() {
+            if first.is_none() {
+                first = Some(ch);
+            } else {
+                second = Some(ch);
+                break;
+            }
+        }
+    });
     matches!(
         (first, second),
         (Some('u' | 'U'), Some('"')) | (Some('"'), Some(_))
