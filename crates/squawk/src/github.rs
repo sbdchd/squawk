@@ -4,7 +4,6 @@ use crate::reporter::{CheckReport, fmt_github_annotations, fmt_tty_violation};
 use crate::{LintArgs, UploadToGithubArgs};
 use crate::{file_finding::find_paths, reporter::lint_files};
 use anyhow::{Context, Result, anyhow, bail};
-use console::strip_ansi_codes;
 use log::info;
 use squawk_github::{GitHubApi, actions, app, comment_on_pr};
 use squawk_line_index::UniversalNewlines;
@@ -307,10 +306,9 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
     let mut buff = Vec::new();
     let violation_count = violation.violations.len();
     for v in &violation.violations {
-        fmt_tty_violation(&mut buff, v, &violation.path, sql)?;
+        fmt_tty_violation(&mut buff, v, &violation.path, sql, false)?;
     }
-    let violations_text_raw = &String::from_utf8_lossy(&buff);
-    let violations_text = strip_ansi_codes(violations_text_raw);
+    let violations_text = String::from_utf8_lossy(&buff);
 
     let violation_content = if violation_count > 0 {
         format!(
