@@ -19,16 +19,19 @@ use tiny_pretty::Doc;
 use tiny_pretty::{LineBreak, PrintOptions, print};
 
 const DEFAULT_INDENT: usize = 2;
+const DEFAULT_WIDTH: usize = 80;
 
 #[derive(Debug, Clone, Copy)]
 pub struct FormatOptions {
     pub indent: usize,
+    pub width: usize,
 }
 
 impl Default for FormatOptions {
     fn default() -> Self {
         Self {
             indent: DEFAULT_INDENT,
+            width: DEFAULT_WIDTH,
         }
     }
 }
@@ -20302,6 +20305,7 @@ pub fn fmt(
         &doc,
         &PrintOptions {
             line_break,
+            width: options.width,
             ..Default::default()
         },
     ))

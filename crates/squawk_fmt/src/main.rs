@@ -14,6 +14,9 @@ struct Cli {
     /// Number of spaces to indent
     #[arg(long, default_value_t = FormatOptions::default().indent)]
     indent: usize,
+    /// The line length where Squawk tries wrapping
+    #[arg(long, default_value_t = FormatOptions::default().width)]
+    width: usize,
     /// File to format; reads from stdin if omitted
     file: Option<PathBuf>,
 }
@@ -55,7 +58,13 @@ fn main() -> Result<ExitCode> {
         return Ok(ExitCode::FAILURE);
     }
 
-    let formatted = squawk_fmt::fmt_str(&input, FormatOptions { indent: cli.indent })?;
+    let formatted = squawk_fmt::fmt_str(
+        &input,
+        FormatOptions {
+            indent: cli.indent,
+            width: cli.width,
+        },
+    )?;
     assert_no_dropped_tokens(&input, &formatted);
 
     let reparse = SourceFile::parse(&formatted);

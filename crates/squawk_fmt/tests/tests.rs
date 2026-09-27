@@ -19,7 +19,11 @@ fn fmt(fixture: Fixture<&str>) {
 
     assert_no_dropped_tokens(content, &formatted);
     assert_parses(&formatted);
-
+    assert_eq!(
+        squawk_fmt::fmt_str(&formatted, Default::default()).unwrap(),
+        formatted,
+        "formatting isn't idempotent"
+    );
     with_settings!({
         omit_expression => true,
         input_file => absolute_fixture_path,
@@ -92,12 +96,30 @@ fn fmt_cr_line_endings() {
 fn configurable_indent() {
     let sql =
         "select 'a', 'really long string                                                    ';\n";
-    let options = squawk_fmt::FormatOptions { indent: 4 };
+    let options = squawk_fmt::FormatOptions {
+        indent: 4,
+        ..Default::default()
+    };
 
     assert_snapshot!(squawk_fmt::fmt_str(sql, options).unwrap(), @"
     select
         'a',
         'really long string                                                    ';
+    ");
+}
+
+#[test]
+fn configurable_width() {
+    let sql = "select first_column, second_column;\n";
+    let options = squawk_fmt::FormatOptions {
+        width: 20,
+        ..Default::default()
+    };
+
+    assert_snapshot!(squawk_fmt::fmt_str(sql, options).unwrap(), @"
+    select
+      first_column,
+      second_column;
     ");
 }
 
