@@ -41,8 +41,7 @@ where foo.id = doomed.id;
 with deleted as (
   delete from foo where id = 1 returning id
 )
-select *
-from deleted;
+select * from deleted;
 
 delete from t3
   using t1 join t2 using (a)
@@ -90,5 +89,4 @@ with deleted_job as (
     and river_job.state != 'running'
   returning river_job.*
 )
-select *
-from deleted_job;
+select * from deleted_job;

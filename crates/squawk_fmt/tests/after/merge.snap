@@ -21,8 +21,7 @@ with merged as (
     insert default values
   returning target.id
 )
-select *
-from merged;
+select * from merged;
 
 merge into a_very_long_schema_name.a_very_long_target_table_name as an_extremely_long_target_alias
 using a_very_long_schema_name.a_very_long_source_table_name as an_extremely_long_source_alias
