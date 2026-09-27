@@ -41,3 +41,32 @@ ON CONFLICT (unique_key)
     DO UPDATE SET kind = EXCLUDED.kind;
 
 insert into t(a) values(1) on conflict(a) do select for update of this_is_a_very_long_table_name_that_forces_the_conflict_action_to_wrap where this_is_a_very_long_column_name_that_forces_the_where_clause_to_wrap > 0 returning *;
+
+insert into river_job (
+  args,
+  created_at,
+  kind,
+  max_attempts,
+  metadata,
+  priority,
+  queue,
+  scheduled_at,
+  state,
+  tags,
+  unique_key,
+  unique_states
+)
+values (
+  @args,
+  @created_at,
+  @kind,
+  @max_attempts,
+  @metadata,
+  @priority,
+  @queue,
+  @scheduled_at,
+  @state,
+  @tags,
+  @unique_key,
+  @unique_states
+);

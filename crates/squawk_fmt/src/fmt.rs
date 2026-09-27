@@ -312,6 +312,7 @@ fn build_insert<'a>(ctx: &Ctx, insert: &ast::Insert) -> Doc<'a> {
             .append(space_before(alias.syntax()))
             .append(build_required_as_alias(alias));
     }
+    let has_columns = insert.column_target_list().is_some();
     if let Some(columns) = insert.column_target_list() {
         doc = doc
             .append(space_before(columns.syntax()))
@@ -323,7 +324,14 @@ fn build_insert<'a>(ctx: &Ctx, insert: &ast::Insert) -> Doc<'a> {
             .append(build_overriding_clause(overriding));
     }
     if let Some(source) = insert.insert_source() {
-        let before_source = line_before(source.syntax());
+        let before_source = match &source {
+            ast::InsertSource::SelectVariant(ast::SelectVariant::Values(_))
+                if has_columns && insert.overriding_clause().is_none() =>
+            {
+                space_before(source.syntax())
+            }
+            _ => line_before(source.syntax()),
+        };
         match source {
             ast::InsertSource::SelectVariant(ast::SelectVariant::Values(values))
                 if values
