@@ -26057,6 +26057,10 @@ impl SetRole {
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
     }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

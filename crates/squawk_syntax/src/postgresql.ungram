@@ -5818,7 +5818,7 @@ Immediate =
   'immediate'
 
 SetRole =
-  'set' SetScope? 'role' SetRoleTarget ';'?
+  'set' SetScope? 'role' 'to'? SetRoleTarget ';'?
 
 SetRoleTarget =
   RoleRef

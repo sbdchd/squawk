@@ -57,6 +57,17 @@ SOURCE_FILE
       STRING "'fooo'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  SET_ROLE
+    SET_KW "set"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      STRING "'api'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   RESET_ROLE
     RESET_KW "RESET"
     WHITESPACE " "
