@@ -445,9 +445,11 @@ fn build_conflict_target<'a>(ctx: &Ctx, target: ast::ConflictTarget) -> Doc<'a> 
                 .map(|value| build_conflict_index_item_list(ctx, value))
                 .unwrap_or_else(Doc::nil);
             if let Some(where_clause) = index.where_clause() {
-                doc = doc
-                    .append(line_before(where_clause.syntax()))
-                    .append(build_where_clause(ctx, where_clause));
+                doc = doc.append(
+                    line_before(where_clause.syntax())
+                        .append(build_where_clause(ctx, where_clause))
+                        .nest(ctx.indent),
+                );
             }
             doc
         }
@@ -504,14 +506,18 @@ fn build_conflict_action<'a>(ctx: &Ctx, action: ast::ConflictAction) -> Doc<'a> 
                     .append(Doc::text("update"));
             }
             if let Some(set_clause) = action.set_clause() {
-                doc = doc
-                    .append(line_before(set_clause.syntax()))
-                    .append(build_set_clause(ctx, set_clause));
+                doc = doc.append(
+                    line_before(set_clause.syntax())
+                        .append(build_set_clause(ctx, set_clause))
+                        .nest(ctx.indent),
+                );
             }
             if let Some(where_clause) = action.where_clause() {
-                doc = doc
-                    .append(line_before(where_clause.syntax()))
-                    .append(build_where_clause(ctx, where_clause));
+                doc = doc.append(
+                    line_before(where_clause.syntax())
+                        .append(build_where_clause(ctx, where_clause))
+                        .nest(ctx.indent),
+                );
             }
             doc
         }
@@ -523,14 +529,18 @@ fn build_conflict_action<'a>(ctx: &Ctx, action: ast::ConflictAction) -> Doc<'a> 
                     .append(Doc::text("select"));
             }
             if let Some(locking) = action.locking_clause() {
-                doc = doc
-                    .append(line_before(locking.syntax()))
-                    .append(build_locking_clause(ctx, locking));
+                doc = doc.append(
+                    line_before(locking.syntax())
+                        .append(build_locking_clause(ctx, locking))
+                        .nest(ctx.indent),
+                );
             }
             if let Some(where_clause) = action.where_clause() {
-                doc = doc
-                    .append(line_before(where_clause.syntax()))
-                    .append(build_where_clause(ctx, where_clause));
+                doc = doc.append(
+                    line_before(where_clause.syntax())
+                        .append(build_where_clause(ctx, where_clause))
+                        .nest(ctx.indent),
+                );
             }
             doc
         }

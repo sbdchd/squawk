@@ -29,3 +29,15 @@ insert into products (product_no, name, price) values -- after insert
 insert into t values (1, -- values
 2) returning a, -- returning
 b;
+
+insert into t (id)
+select id
+from raw_job_data
+ON CONFLICT (unique_key)
+    WHERE unique_key IS NOT NULL
+        AND unique_states IS NOT NULL
+        AND /* TEMPLATE: schema */river_job_state_in_bitmask(unique_states, state)
+    -- Something needs to be updated for a row to be returned on a conflict.
+    DO UPDATE SET kind = EXCLUDED.kind;
+
+insert into t(a) values(1) on conflict(a) do select for update of this_is_a_very_long_table_name_that_forces_the_conflict_action_to_wrap where this_is_a_very_long_column_name_that_forces_the_where_clause_to_wrap > 0 returning *;
