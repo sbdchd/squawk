@@ -1,7 +1,7 @@
 {
-  "name": "@squawk-cli/linux-arm64",
+  "name": "@squawk-cli/linux-arm64-musl",
   "version": "2.66.0",
-  "description": "squawk-cli binary for linux-arm64",
+  "description": "squawk-cli binary for linux-arm64-musl",
   "repository": "git@github.com:sbdchd/squawk.git",
   "license": "(Apache-2.0 OR MIT)",
   "os": [
@@ -11,7 +11,7 @@
     "arm64"
   ],
   "libc": [
-    "glibc"
+    "musl"
   ],
   "files": [
     "bin/squawk"

@@ -10,6 +10,9 @@
   "cpu": [
     "x64"
   ],
+  "libc": [
+    "glibc"
+  ],
   "files": [
     "bin/squawk"
   ]

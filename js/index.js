@@ -1,6 +1,7 @@
 "use strict"
 
 const childProcess = require("child_process")
+const fs = require("fs")
 
 /** @type {Record<string, string>} */
 const PLATFORM_PACKAGES = {
@@ -8,11 +9,27 @@ const PLATFORM_PACKAGES = {
   "darwin-arm64": "@squawk-cli/darwin-arm64",
   "linux-x64": "@squawk-cli/linux-x64",
   "linux-arm64": "@squawk-cli/linux-arm64",
+  "linux-x64-musl": "@squawk-cli/linux-x64-musl",
+  "linux-arm64-musl": "@squawk-cli/linux-arm64-musl",
   "win32-x64": "@squawk-cli/win32-x64",
 }
 
+function isMusl() {
+  // same order as detect-libc, process.report can be slow
+  try {
+    return fs.readFileSync("/usr/bin/ldd", "utf8").includes("musl")
+  } catch {
+    /** @type {any} */
+    const report = process.report?.getReport()
+    return !report?.header.glibcVersionRuntime
+  }
+}
+
 function getBinaryPath() {
-  const key = `${process.platform}-${process.arch}`
+  let key = `${process.platform}-${process.arch}`
+  if (process.platform === "linux" && isMusl()) {
+    key += "-musl"
+  }
   const pkg = PLATFORM_PACKAGES[key]
   if (!pkg) {
     throw new Error(
