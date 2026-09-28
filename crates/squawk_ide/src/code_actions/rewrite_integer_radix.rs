@@ -2,40 +2,42 @@ use num_bigint::BigUint;
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_linter::Edit;
-use squawk_syntax::SyntaxKind;
-
-use crate::{
-    file::InFile,
-    literals::{IntegerRadix, normalize_integer_literal},
-    offsets::token_from_offset,
+use squawk_syntax::{
+    SyntaxKind,
+    ast::{self, AstNode},
 };
+
+use crate::{file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
-impl IntegerRadix {
-    const ALL: [Self; 4] = [Self::Binary, Self::Octal, Self::Decimal, Self::Hexadecimal];
+const INTEGER_RADIXES: [ast::IntegerRadix; 4] = [
+    ast::IntegerRadix::Binary,
+    ast::IntegerRadix::Octal,
+    ast::IntegerRadix::Decimal,
+    ast::IntegerRadix::Hexadecimal,
+];
 
-    fn format(self, value: &BigUint) -> String {
-        let mut digits = value.to_str_radix(self.base());
-        if self == Self::Hexadecimal {
-            digits.make_ascii_uppercase();
-        }
-        let prefix = match self {
-            Self::Binary => "0b",
-            Self::Decimal => "",
-            Self::Hexadecimal => "0x",
-            Self::Octal => "0o",
-        };
-        format!("{prefix}{digits}")
+fn format_integer(radix: ast::IntegerRadix, value: &BigUint) -> String {
+    let mut digits = value.to_str_radix(radix.base());
+    if radix == ast::IntegerRadix::Hexadecimal {
+        digits.make_ascii_uppercase();
     }
+    let prefix = match radix {
+        ast::IntegerRadix::Binary => "0b",
+        ast::IntegerRadix::Decimal => "",
+        ast::IntegerRadix::Hexadecimal => "0x",
+        ast::IntegerRadix::Octal => "0o",
+    };
+    format!("{prefix}{digits}")
+}
 
-    fn name(self) -> &'static str {
-        match self {
-            Self::Binary => "binary",
-            Self::Decimal => "decimal",
-            Self::Hexadecimal => "hexadecimal",
-            Self::Octal => "octal",
-        }
+fn integer_radix_name(radix: ast::IntegerRadix) -> &'static str {
+    match radix {
+        ast::IntegerRadix::Binary => "binary",
+        ast::IntegerRadix::Decimal => "decimal",
+        ast::IntegerRadix::Hexadecimal => "hexadecimal",
+        ast::IntegerRadix::Octal => "octal",
     }
 }
 
@@ -49,27 +51,23 @@ pub(super) fn rewrite_integer_radix(
         return None;
     }
 
-    let (source_radix, value) = parse_integer_literal(token.text())?;
-    for target_radix in IntegerRadix::ALL {
+    let literal = token.parent().and_then(ast::Literal::cast)?;
+    let source_radix = literal.integer_radix()?;
+    let value = literal.integer_value()?;
+    for target_radix in INTEGER_RADIXES {
         if target_radix == source_radix {
             continue;
         }
 
-        let replacement = target_radix.format(&value);
+        let replacement = format_integer(target_radix, &value);
         actions.push(CodeAction {
-            title: format!("Rewrite integer as {}", target_radix.name()),
+            title: format!("Rewrite integer as {}", integer_radix_name(target_radix)),
             edits: vec![Edit::replace(token.text_range(), replacement)],
             kind: ActionKind::RefactorRewrite,
         });
     }
 
     Some(())
-}
-
-fn parse_integer_literal(text: &str) -> Option<(IntegerRadix, BigUint)> {
-    let (radix, digits) = normalize_integer_literal(text);
-    let value = BigUint::parse_bytes(digits.as_bytes(), radix.base())?;
-    Some((radix, value))
 }
 
 #[cfg(test)]

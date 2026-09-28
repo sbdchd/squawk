@@ -10,6 +10,7 @@ use squawk_syntax::{
 };
 
 use crate::binder::ResolvedSchemas;
+use crate::collect::columns_for_star_from_from_item;
 use crate::db::FileId;
 use crate::file::InFile;
 use crate::location::{Location, LocationKind};
@@ -988,6 +989,10 @@ pub(crate) fn resolve_literal(
         return resolve_positional_param(db, InFile::new(file, literal), index);
     }
 
+    if let Some(locations) = resolve_select_target_ordinal(db, file, literal) {
+        return Some(locations);
+    }
+
     let context = classify_literal(literal.syntax())?;
 
     match context {
@@ -1014,6 +1019,123 @@ pub(crate) fn resolve_literal(
             )])
         }
         _ => None,
+    }
+}
+
+fn resolve_select_target_ordinal(
+    db: &dyn Db,
+    file: FileId,
+    literal: &ast::Literal,
+) -> Option<SmallVec<[Location; 1]>> {
+    let ordinal = usize::try_from(literal.integer_value()?)
+        .ok()?
+        .checked_sub(1)?;
+    let owner = select_target_ordinal_owner(literal)?;
+    let (target_list, from_clause) = targets_for_select_variant(ast::SelectVariant::cast(owner)?)?;
+
+    let mut remaining = ordinal;
+    for target in target_list.targets() {
+        if !target_is_star(&target) {
+            if remaining == 0 {
+                return Some(smallvec![Location::new(
+                    file,
+                    target.syntax().text_range(),
+                    LocationKind::Column,
+                )]);
+            }
+            remaining -= 1;
+            continue;
+        }
+
+        for from_item in star_target_from_items(&target, from_clause.as_ref()?)? {
+            let columns = columns_for_star_from_from_item(db, file, &from_item);
+            if columns.is_empty() {
+                return None;
+            }
+            if let Some((column_name, _)) = columns.get(remaining) {
+                let scope_name_ref = relation_name_ref_from_from_item(&from_item)?;
+                return resolve_from_item_column_by_name_after_index(
+                    db,
+                    InFile::new(file, &from_item),
+                    &scope_name_ref,
+                    column_name,
+                    remaining,
+                );
+            }
+            remaining -= columns.len();
+        }
+    }
+    None
+}
+
+fn star_target_from_items(
+    target: &ast::Target,
+    from_clause: &ast::FromClause,
+) -> Option<Vec<ast::FromItem>> {
+    if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr() {
+        let table_name = qualified_star_table_name(&field_expr)?;
+        return Some(vec![find_from_item_in_from_clause(
+            from_clause,
+            &table_name,
+        )?]);
+    }
+    Some(ast_nav::iter_from_clause(from_clause).collect())
+}
+
+fn select_target_ordinal_owner(literal: &ast::Literal) -> Option<SyntaxNode> {
+    let parent = literal
+        .syntax()
+        .ancestors()
+        .skip(1)
+        .find(|node| !ast::ParenExpr::can_cast(node.kind()))?;
+    if ast::SortBy::can_cast(parent.kind()) {
+        return parent
+            .ancestors()
+            .find_map(ast::OrderByClause::cast)?
+            .syntax()
+            .parent();
+    }
+    if ast::GroupingExpr::can_cast(parent.kind())
+        || ast::GroupingCube::can_cast(parent.kind())
+        || ast::GroupingRollup::can_cast(parent.kind())
+    {
+        return parent
+            .ancestors()
+            .find_map(ast::GroupByClause::cast)?
+            .syntax()
+            .parent();
+    }
+    if ast::DistinctOn::can_cast(parent.kind()) {
+        return parent
+            .ancestors()
+            .find_map(ast::SelectClause::cast)?
+            .syntax()
+            .parent();
+    }
+    None
+}
+
+fn target_is_star(target: &ast::Target) -> bool {
+    target.star_token().is_some()
+        || matches!(
+            target.expr(),
+            Some(ast::Expr::FieldExpr(field_expr)) if field_expr.star_token().is_some()
+        )
+}
+
+fn targets_for_select_variant(
+    select: ast::SelectVariant,
+) -> Option<(ast::TargetList, Option<ast::FromClause>)> {
+    match select {
+        ast::SelectVariant::CompoundSelect(select) => targets_for_select_variant(select.lhs()?),
+        ast::SelectVariant::ParenSelect(select) => targets_for_select_variant(select.select()?),
+        ast::SelectVariant::Select(select) => {
+            Some((select.select_clause()?.target_list()?, select.from_clause()))
+        }
+        ast::SelectVariant::SelectInto(select) => {
+            Some((select.select_clause()?.target_list()?, select.from_clause()))
+        }
+        ast::SelectVariant::Table(_) | ast::SelectVariant::Values(_) => None,
     }
 }
 
