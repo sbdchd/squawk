@@ -29,6 +29,7 @@ use std::borrow::Cow;
 use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
+use num_bigint::BigUint;
 use rowan::{GreenNodeData, GreenTokenData, NodeOrToken, TextRange, TextSize};
 use squawk_line_index::{LineEnding, find_newline};
 
@@ -87,6 +88,25 @@ pub enum CastKind {
     DoubleColon,
     Treat,
     TypeLiteral,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntegerRadix {
+    Binary,
+    Decimal,
+    Hexadecimal,
+    Octal,
+}
+
+impl IntegerRadix {
+    pub fn base(self) -> u32 {
+        match self {
+            Self::Binary => 2,
+            Self::Decimal => 10,
+            Self::Hexadecimal => 16,
+            Self::Octal => 8,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -210,6 +230,31 @@ impl ast::Literal {
             .parse::<usize>()
             .ok()?
             .checked_sub(1)
+    }
+
+    pub fn integer_radix(&self) -> Option<IntegerRadix> {
+        let LitKind::IntNumber(token) = self.kind()? else {
+            return None;
+        };
+        Some(match token.text().as_bytes() {
+            [b'0', b'b' | b'B', ..] => IntegerRadix::Binary,
+            [b'0', b'o' | b'O', ..] => IntegerRadix::Octal,
+            [b'0', b'x' | b'X', ..] => IntegerRadix::Hexadecimal,
+            _ => IntegerRadix::Decimal,
+        })
+    }
+
+    pub fn integer_value(&self) -> Option<BigUint> {
+        let LitKind::IntNumber(token) = self.kind()? else {
+            return None;
+        };
+        let radix = self.integer_radix()?;
+        let text = token.text();
+        let digits = match radix {
+            IntegerRadix::Decimal => text,
+            IntegerRadix::Binary | IntegerRadix::Hexadecimal | IntegerRadix::Octal => &text[2..],
+        };
+        BigUint::parse_bytes(digits.replace('_', "").as_bytes(), radix.base())
     }
 }
 
@@ -2183,6 +2228,43 @@ fn vacuum_full_dollar_quoted_off_is_not_full() {
 #[test]
 fn vacuum_full_0_is_not_full() {
     assert!(!extract_vacuum("VACUUM (FULL 0) foo;").is_full());
+}
+
+#[cfg(test)]
+fn extract_literal(sql: &str) -> ast::Literal {
+    let parse = SourceFile::parse(sql);
+    assert!(parse.errors().is_empty(), "{:?}", parse.errors());
+    parse
+        .tree()
+        .syntax()
+        .descendants()
+        .find_map(ast::Literal::cast)
+        .unwrap()
+}
+
+#[test]
+fn integer_value() {
+    assert_eq!(
+        extract_literal("select 42").integer_value(),
+        Some(42u8.into())
+    );
+    assert_eq!(
+        extract_literal("select 1_000").integer_value(),
+        Some(1_000u16.into())
+    );
+    assert_eq!(
+        extract_literal("select 0b1010").integer_value(),
+        Some(10u8.into())
+    );
+    assert_eq!(
+        extract_literal("select 0o12").integer_value(),
+        Some(10u8.into())
+    );
+    assert_eq!(
+        extract_literal("select 0xA").integer_value(),
+        Some(10u8.into())
+    );
+    assert_eq!(extract_literal("select 1.0").integer_value(), None);
 }
 
 #[cfg(test)]

@@ -2578,6 +2578,7 @@ dependencies = [
  "dir-test",
  "either",
  "insta",
+ "num-bigint",
  "rowan",
  "smol_str",
  "squawk-line-index",

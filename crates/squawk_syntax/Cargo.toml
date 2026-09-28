@@ -19,6 +19,7 @@ squawk-parser.workspace = true
 rowan.workspace = true
 smol_str.workspace = true
 either.workspace = true
+num-bigint.workspace = true
 
 [dev-dependencies]
 annotate-snippets.workspace = true

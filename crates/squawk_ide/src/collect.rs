@@ -542,7 +542,7 @@ fn with_table_query_columns_with_types(
     target_list_columns_with_types_in_file(db, file, &target_list, from_clause.as_ref())
 }
 
-fn target_expr_type(db: &dyn Db, file: FileId, target: &ast::Target) -> Option<Type> {
+pub(crate) fn target_expr_type(db: &dyn Db, file: FileId, target: &ast::Target) -> Option<Type> {
     let expr = target.expr()?;
     if let Some(ty) = infer_type_from_expr(&expr) {
         return Some(ty);
@@ -653,7 +653,7 @@ fn columns_for_star_from_clause(
     columns
 }
 
-fn columns_for_star_from_from_item(
+pub(crate) fn columns_for_star_from_from_item(
     db: &dyn Db,
     file: FileId,
     from_item: &ast::FromItem,

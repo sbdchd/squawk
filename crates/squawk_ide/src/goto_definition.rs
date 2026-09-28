@@ -8593,6 +8593,217 @@ select * from t group by t.b$0;
     }
 
     #[test]
+    fn goto_select_target_ordinal_in_group_by() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select a, max(b) from t group by 1$0
+"), @"
+          ╭▸ 
+        3 │ select a, max(b) from t group by 1
+          ╰╴       ─ 2. destination          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_order_by() {
+        assert_snapshot!(goto("
+select a, max(b) as maximum from t order by 2$0
+"), @"
+          ╭▸ 
+        2 │ select a, max(b) as maximum from t order by 2
+          ╰╴          ───────────────── 2. destination  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_parenthesized() {
+        assert_snapshot!(goto("
+select a from t order by ((1$0))
+"), @"
+          ╭▸ 
+        2 │ select a from t order by ((1))
+          ╰╴       ─ 2. destination    ─ 1. source
+        ");
+        assert_snapshot!(goto("
+select a from t group by ((1$0))
+"), @"
+          ╭▸ 
+        2 │ select a from t group by ((1))
+          ╰╴       ─ 2. destination    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_distinct_on() {
+        assert_snapshot!(goto("
+select distinct on (1$0) a from t
+"), @"
+          ╭▸ 
+        2 │ select distinct on (1) a from t
+          │                     ┬  ─ 2. destination
+          │                     │
+          ╰╴                    1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_group_by_set() {
+        assert_snapshot!(goto("
+select a from t group by cube (1$0)
+"), @"
+          ╭▸ 
+        2 │ select a from t group by cube (1)
+          ╰╴       ─ 2. destination        ─ 1. source
+        ");
+        assert_snapshot!(goto("
+select a from t group by rollup (1$0)
+"), @"
+          ╭▸ 
+        2 │ select a from t group by rollup (1)
+          ╰╴       ─ 2. destination          ─ 1. source
+        ");
+        assert_snapshot!(goto("
+select a from t group by grouping sets (1$0)
+"), @"
+          ╭▸ 
+        2 │ select a from t group by grouping sets (1)
+          ╰╴       ─ 2. destination                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_out_of_range() {
+        goto_not_found("select a from t order by 2$0");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_star() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select *, a from t order by 2$0
+"), @"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b)
+          │                          ─ 2. destination
+        3 │ select *, a from t order by 2
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_after_star() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select *, a from t order by 3$0
+"), @"
+          ╭▸ 
+        3 │ select *, a from t order by 3
+          ╰╴          ─ 2. destination  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_qualified_star() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b),
+     u as (select 3 c, 4 d)
+select u.*, t.* from t, u group by 3$0
+"), @"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b),
+          │                     ─ 2. destination
+        3 │      u as (select 3 c, 4 d)
+        4 │ select u.*, t.* from t, u group by 3
+          ╰╴                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_star_across_from_items() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b),
+     u as (select 3 c, 4 d)
+select * from t, u order by 4$0
+"), @"
+          ╭▸ 
+        3 │      u as (select 3 c, 4 d)
+          │                          ─ 2. destination
+        4 │ select * from t, u order by 4
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_star_through_cte_star() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b),
+     u as (select * from t)
+select * from u order by 2$0
+"), @"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b),
+          │                          ─ 2. destination
+        3 │      u as (select * from t)
+        4 │ select * from u order by 2
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_star_with_duplicate_names() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 a)
+select * from t order by 2$0
+"), @"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 a)
+          │                          ─ 2. destination
+        3 │ select * from t order by 2
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_star_with_alias_columns() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select * from t as x(y) order by 1$0
+"), @"
+          ╭▸ 
+        3 │ select * from t as x(y) order by 1
+          │                      ┬           ─ 1. source
+          │                      │
+          ╰╴                     2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_star_out_of_range() {
+        goto_not_found(
+            "
+with t as (select 1 a, 2 b)
+select *, a from t order by 4$0
+",
+        );
+    }
+
+    #[test]
+    fn goto_select_target_ordinal_in_paren_select() {
+        assert_snapshot!(goto("
+(select a, b from t) order by 2$0
+"), @"
+          ╭▸ 
+        2 │ (select a, b from t) order by 2
+          ╰╴           ─ 2. destination   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_window_order_by_integer_is_not_a_target_ordinal() {
+        goto_not_found("select a, row_number() over (order by 1$0) from t");
+    }
+
+    #[test]
     fn goto_select_alias_order_by_column_name_conflict() {
         // If an ORDER BY expression is a simple name that matches both an
         // output column name and an input column name, ORDER BY will interpret
