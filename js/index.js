@@ -50,6 +50,7 @@ function run() {
   child.on("error", (err) => {
     console.error("error: failed to invoke squawk")
     console.error(err.stack)
+    process.exit(1)
   })
 
   child.on("exit", (code) => {
