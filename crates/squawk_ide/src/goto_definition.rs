@@ -1407,6 +1407,16 @@ select * from (
     }
 
     #[test]
+    fn goto_recursive_cte_star_column_count_cycle_not_found() {
+        goto_not_found(
+            "
+with recursive t as (select * from t)
+select x$0 from t as t(a);
+",
+        );
+    }
+
+    #[test]
     fn goto_cte_forward_ref_ignored_for_qualified_star() {
         assert_snapshot!(goto("
 create table b(c int);
@@ -9565,6 +9575,42 @@ create table t(a int, b int);
 select a$0 from (select * from t) u(x);
 ",
         );
+    }
+
+    #[test]
+    fn goto_cte_star_column_count_through_nested_ctes() {
+        assert_snapshot!(goto("
+with s as (select 1 a, 2 b),
+     u as (select * from s),
+     t as (select 3 c),
+     v as (select * from u, t)
+select c$0 from v as x(p, q);
+"), @"
+          ╭▸ 
+        4 │      t as (select 3 c),
+          │                     ─ 2. destination
+        5 │      v as (select * from u, t)
+        6 │ select c from v as x(p, q);
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_star_column_count_through_nested_views() {
+        assert_snapshot!(goto("
+create table s (a int, b int);
+create view u as select * from s;
+create table t (c int);
+create view v as select * from u, t;
+select c$0 from v as x(p, q);
+"), @"
+          ╭▸ 
+        4 │ create table t (c int);
+          │                 ─ 2. destination
+        5 │ create view v as select * from u, t;
+        6 │ select c from v as x(p, q);
+          ╰╴       ─ 1. source
+        ");
     }
 
     #[test]
