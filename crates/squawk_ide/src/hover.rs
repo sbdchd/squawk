@@ -259,10 +259,35 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
     }
 
     if let Some(literal) = ast::Literal::cast(parent) {
+        if literal.integer_value().is_some() {
+            return hover_select_target_ordinal(db, position);
+        }
         return hover_literal(&literal);
     }
 
     None
+}
+
+fn hover_select_target_ordinal(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
+    let def = *goto_definition::goto_definition(db, position).first()?;
+    if let Some(target) = def.to_node(db)?.ancestors().find_map(ast::Target::cast)
+        && let Some((_, node)) = ColumnName::from_target(target)
+    {
+        return hover(db, InFile::new(def.file, node.text_range().start()));
+    }
+    hover_position(db, position)
+}
+
+fn hover_select_target(db: &dyn Db, def: Location) -> Option<Hover> {
+    let target = def.to_node(db)?.ancestors().find_map(ast::Target::cast)?;
+    let (column_name, _) = ColumnName::from_target(target.clone())?;
+    let column_name = column_name.to_string()?;
+    Some(Hover::snippet(
+        match collect::target_expr_type(db, def.file, &target) {
+            Some(ty) => ColumnHover::anon_column_type(&column_name, &ty.to_string()),
+            None => ColumnHover::anon_column(&column_name),
+        },
+    ))
 }
 
 fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
@@ -469,7 +494,10 @@ fn hover_position(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
                 return Some(result);
             }
             // Finally try as table (handles case like `select t from t;` where t is the table)
-            hover_table(db, def)
+            if let Some(result) = hover_table(db, def) {
+                return Some(result);
+            }
+            hover_select_target(db, def)
         }
         LocationKind::Collation => hover_collation(db, def),
         LocationKind::Constraint => hover_constraint(db, def),
@@ -2191,6 +2219,13 @@ mod test {
         None
     }
 
+    #[track_caller]
+    fn hover_not_found(sql: &str) {
+        if let Some(hover) = check_hover_(sql) {
+            panic!("expected no hover, found:\n{hover}");
+        }
+    }
+
     #[must_use]
     #[track_caller]
     fn check_hover_info(sql: &str) -> super::Hover {
@@ -2198,6 +2233,116 @@ mod test {
         let offset = fixture.marker().offset_before();
 
         hover(fixture.db(), offset).expect("should find hover information")
+    }
+
+    #[test]
+    fn hover_select_target_ordinal_in_order_by() {
+        assert_snapshot!(check_hover("
+create table t(a int, b text);
+select a, b from t order by 2$0;
+"), @"
+        hover: column public.t.b text
+          ╭▸ 
+        3 │ select a, b from t order by 2;
+          ╰╴                            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_target_ordinal_in_group_by() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b)
+select a, max(b) from t group by 1$0;
+"), @"
+        hover: column t.a integer
+          ╭▸ 
+        3 │ select a, max(b) from t group by 1;
+          ╰╴                                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_target_ordinal_aliased_expr() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+select a, max(b) as maximum from t order by 2$0;
+"), @"
+        hover: column maximum
+          ╭▸ 
+        3 │ select a, max(b) as maximum from t order by 2;
+          ╰╴                                            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_target_ordinal_aliased_cast() {
+        assert_snapshot!(check_hover("
+create table t(a int);
+select a::text as label from t order by 1$0;
+"), @"
+        hover: column label text
+          ╭▸ 
+        3 │ select a::text as label from t order by 1;
+          ╰╴                                        ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_window_order_by_integer_is_not_a_target_ordinal() {
+        hover_not_found("select a, row_number() over (order by 1$0) from t");
+    }
+
+    #[test]
+    fn hover_select_target_alias() {
+        assert_snapshot!(check_hover("
+create table t(a int);
+select a::text as label$0 from t;
+"), @"
+        hover: column label text
+          ╭▸ 
+        3 │ select a::text as label from t;
+          ╰╴                      ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_target_ordinal_in_star() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b)
+select *, a from t order by 2$0;
+"), @"
+        hover: column t.b integer
+          ╭▸ 
+        3 │ select *, a from t order by 2;
+          ╰╴                            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_target_ordinal_in_qualified_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b text);
+create table u(c bigint);
+select u.*, t.* from t, u order by 3$0;
+"), @"
+        hover: column public.t.b text
+          ╭▸ 
+        4 │ select u.*, t.* from t, u order by 3;
+          ╰╴                                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_target_ordinal_in_paren_select() {
+        assert_snapshot!(check_hover("
+create table t(a int, b text);
+(select a, b from t) order by 2$0;
+"), @"
+        hover: column public.t.b text
+          ╭▸ 
+        3 │ (select a, b from t) order by 2;
+          ╰╴                              ─ hover
+        ");
     }
 
     #[test]
@@ -4076,14 +4221,11 @@ select u.*$0 from t u(x, y);
 
     #[test]
     fn hover_on_star_from_cte_empty_select() {
-        assert!(
-            check_hover_(
-                "
+        hover_not_found(
+            "
 with t as (select)
 select *$0 from t;
 ",
-            )
-            .is_none()
         );
     }
 
