@@ -14,18 +14,46 @@ fn meaningful_tokens(text: &str) -> Vec<(TokenKind, &str)> {
     tokens
 }
 
+fn line_comments_equivalent(before: &str, after: &str) -> bool {
+    let before = before.trim_end_matches([' ', '\t']);
+    let after = after.trim_end_matches([' ', '\t']);
+    if before == after {
+        return true;
+    }
+
+    let Some(content) = before.strip_prefix("--") else {
+        return false;
+    };
+    if content.is_empty() || content.starts_with(' ') || content.starts_with('\t') {
+        return false;
+    }
+
+    after.strip_prefix("-- ") == Some(content)
+}
+
 fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> bool {
     let (before_kind, before_text) = before;
     let (after_kind, after_text) = after;
 
     if before_kind == after_kind {
-        if matches!(
-            before_kind,
-            TokenKind::LineComment | TokenKind::BlockComment { .. }
-        ) {
+        if before_kind == TokenKind::LineComment {
+            return line_comments_equivalent(before_text, after_text);
+        }
+        if matches!(before_kind, TokenKind::BlockComment { .. }) {
             let normalize = |text: &str| {
+                let align_stars = text
+                    .universal_newlines()
+                    .skip(1)
+                    .all(|line| line.as_str().trim_start().starts_with('*'));
                 text.universal_newlines()
-                    .map(|line| line.as_str().trim_end_matches([' ', '\t']))
+                    .map(|line| {
+                        let line = line.as_str().trim_end_matches([' ', '\t']);
+                        if align_stars && line.trim_start().starts_with('*') {
+                            format!(" {}", line.trim())
+                        } else {
+                            line.to_string()
+                        }
+                    })
                     .collect::<Vec<_>>()
                     .join("\n")
             };
