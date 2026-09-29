@@ -32,7 +32,9 @@
     "@squawk-cli/darwin-arm64": "2.66.0",
     "@squawk-cli/darwin-x64": "2.66.0",
     "@squawk-cli/linux-arm64": "2.66.0",
+    "@squawk-cli/linux-arm64-musl": "2.66.0",
     "@squawk-cli/linux-x64": "2.66.0",
+    "@squawk-cli/linux-x64-musl": "2.66.0",
     "@squawk-cli/win32-x64": "2.66.0"
   },
   "volta": {
@@ -45,7 +47,9 @@
       "@squawk-cli/darwin-arm64",
       "@squawk-cli/darwin-x64",
       "@squawk-cli/linux-arm64",
+      "@squawk-cli/linux-arm64-musl",
       "@squawk-cli/linux-x64",
+      "@squawk-cli/linux-x64-musl",
       "@squawk-cli/win32-x64"
     ]
   }

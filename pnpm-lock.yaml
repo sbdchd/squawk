@@ -1138,7 +1138,9 @@ ignoredOptionalDependencies:
   - '@squawk-cli/darwin-arm64'
   - '@squawk-cli/darwin-x64'
   - '@squawk-cli/linux-arm64'
+  - '@squawk-cli/linux-arm64-musl'
   - '@squawk-cli/linux-x64'
+  - '@squawk-cli/linux-x64-musl'
   - '@squawk-cli/win32-x64'
 
 snapshots:

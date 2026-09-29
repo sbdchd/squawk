@@ -229,18 +229,20 @@ jobs:
       - name: Stage platform binaries
         run: |
           set -euo pipefail
-          mkdir -p npm/darwin-x64/bin npm/darwin-arm64/bin npm/linux-x64/bin npm/linux-arm64/bin npm/win32-x64/bin
+          mkdir -p npm/darwin-x64/bin npm/darwin-arm64/bin npm/linux-x64/bin npm/linux-arm64/bin npm/linux-x64-musl/bin npm/linux-arm64-musl/bin npm/win32-x64/bin
           cp artifacts/release-squawk-darwin-x64/squawk-darwin-x64 npm/darwin-x64/bin/squawk
           cp artifacts/release-squawk-darwin-arm64/squawk-darwin-arm64 npm/darwin-arm64/bin/squawk
           cp artifacts/release-squawk-linux-x64/squawk-linux-x64 npm/linux-x64/bin/squawk
           cp artifacts/release-squawk-linux-arm64/squawk-linux-arm64 npm/linux-arm64/bin/squawk
+          cp artifacts/release-squawk-linux-musl-x64/squawk-linux-musl-x64 npm/linux-x64-musl/bin/squawk
+          cp artifacts/release-squawk-linux-musl-arm64/squawk-linux-musl-arm64 npm/linux-arm64-musl/bin/squawk
           cp artifacts/release-squawk-windows-x64.exe/squawk-windows-x64.exe npm/win32-x64/bin/squawk.exe
-          chmod +x npm/darwin-x64/bin/squawk npm/darwin-arm64/bin/squawk npm/linux-x64/bin/squawk npm/linux-arm64/bin/squawk
+          chmod +x npm/darwin-x64/bin/squawk npm/darwin-arm64/bin/squawk npm/linux-x64/bin/squawk npm/linux-arm64/bin/squawk npm/linux-x64-musl/bin/squawk npm/linux-arm64-musl/bin/squawk
 
       - name: Publish packages
         run: |
           set -euo pipefail
-          for pkg in darwin-x64 darwin-arm64 linux-x64 linux-arm64 win32-x64; do
+          for pkg in darwin-x64 darwin-arm64 linux-x64 linux-arm64 linux-x64-musl linux-arm64-musl win32-x64; do
             (cd "npm/$pkg" && npm publish --access public --provenance)
           done
           npm publish --access public --provenance
