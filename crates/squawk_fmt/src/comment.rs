@@ -1,5 +1,5 @@
 use rowan::Direction;
-use squawk_line_index::find_newline;
+use squawk_line_index::{UniversalNewlines, find_newline};
 use squawk_syntax::{SyntaxElement, SyntaxKind, SyntaxToken};
 use tiny_pretty::Doc;
 
@@ -8,7 +8,26 @@ pub(crate) fn is_line_comment(token: &SyntaxToken) -> bool {
 }
 
 pub(crate) fn build_comment<'a>(token: &SyntaxToken) -> Doc<'a> {
-    let line = |text: &str| Doc::text(text.trim_end_matches([' ', '\t']).to_string());
+    let align_stars = !is_line_comment(token)
+        && find_newline(token.text()).is_some()
+        && token
+            .text()
+            .universal_newlines()
+            .skip(1)
+            .all(|line| line.as_str().trim_start().starts_with('*'));
+    let line = |text: &str| {
+        let text = text.trim_end_matches([' ', '\t']);
+        if is_line_comment(token) {
+            if let Some(content) = text.strip_prefix("--") {
+                if !content.is_empty() && !content.starts_with(' ') && !content.starts_with('\t') {
+                    return Doc::text(format!("-- {content}"));
+                }
+            }
+        } else if align_stars && text.trim_start().starts_with('*') {
+            return Doc::text(format!(" {}", text.trim()));
+        }
+        Doc::text(text.to_string())
+    };
     let mut docs = vec![];
     let mut text = token.text();
     while let Some((position, line_ending)) = find_newline(text) {

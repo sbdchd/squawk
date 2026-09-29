@@ -4,7 +4,7 @@
  * 
  */
 
--- intentional new line follows, we should keep that
+--intentional new line follows, we should keep that
 
 /* bar */
 /* followed by another comment */
@@ -25,3 +25,25 @@
 
 
 /* end */
+
+/*
+*
+*
+*
+*/
+select 1;
+
+/*
+*
+
+*
+*/
+select 1;
+
+/*
+          * text
+          */
+select 1;
+
+/*foo*/
+select 1;
