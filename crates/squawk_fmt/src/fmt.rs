@@ -5950,12 +5950,10 @@ fn build_import_table_filter<'a>(ctx: &Ctx, filter: ast::ImportTableFilter) -> D
     )
     .unwrap_or_else(Doc::nil);
     doc = doc
-        .append(Doc::space())
         .append(
             l_paren
-                .clone()
-                .map(|el| comments_before(&el))
-                .unwrap_or_else(Doc::nil),
+                .map(|el| space_or_comments_before(&el))
+                .unwrap_or_else(Doc::space),
         )
         .append(Doc::text("("))
         .append(wrap_body(ctx, body, r_paren))
@@ -9520,9 +9518,11 @@ fn build_publication_object<'a>(ctx: &Ctx, object: ast::PublicationObject) -> Do
             let parenthesized = object.l_paren_token().is_some();
             if let Some(l_paren) = object.l_paren_token() {
                 if has_prefix {
-                    doc = doc.append(Doc::space());
+                    doc = doc.append(space_or_comments_before(&l_paren));
+                } else {
+                    doc = doc.append(comments_before(&l_paren));
                 }
-                doc = doc.append(comments_before(&l_paren)).append(Doc::text("("));
+                doc = doc.append(Doc::text("("));
             }
             if let Some(table) = object.table_name_ref() {
                 if !parenthesized && has_prefix {
@@ -9582,8 +9582,7 @@ fn build_except_table_clause<'a>(ctx: &Ctx, clause: ast::ExceptTableClause) -> D
     let mut doc = Doc::text("except");
     if let Some(l_paren) = clause.l_paren_token() {
         doc = doc
-            .append(Doc::space())
-            .append(comments_before(&l_paren))
+            .append(space_or_comments_before(&l_paren))
             .append(Doc::text("("));
     }
     let items = clause.except_table_names().map(|name| {
@@ -11831,11 +11830,10 @@ fn build_drop_element_properties<'a>(ctx: &Ctx, n: ast::DropVertexEdgeLabelPrope
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
     detail = detail
-        .append(Doc::space())
         .append(
             n.l_paren_token()
-                .map(|el| comments_before(&el))
-                .unwrap_or_else(Doc::nil),
+                .map(|el| space_or_comments_before(&el))
+                .unwrap_or_else(Doc::space),
         )
         .append(Doc::text("("))
         .append(wrap_body(ctx, body, n.r_paren_token()))
@@ -11864,11 +11862,10 @@ fn build_drop_element_tables<'a>(
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
     doc = doc
-        .append(Doc::space())
         .append(
             l.clone()
-                .map(|el| comments_before(&el))
-                .unwrap_or_else(Doc::nil),
+                .map(|el| space_or_comments_before(&el))
+                .unwrap_or_else(Doc::space),
         )
         .append(Doc::text("("))
         .append(wrap_body(ctx, body, r))
@@ -11894,11 +11891,10 @@ fn build_vertex_tables<'a>(ctx: &Ctx, n: ast::VertexTables) -> Doc<'a> {
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
     doc = doc
-        .append(Doc::space())
         .append(
             n.l_paren_token()
-                .map(|el| comments_before(&el))
-                .unwrap_or_else(Doc::nil),
+                .map(|el| space_or_comments_before(&el))
+                .unwrap_or_else(Doc::space),
         )
         .append(Doc::text("("))
         .append(wrap_body(ctx, body, n.r_paren_token()))
@@ -11943,11 +11939,10 @@ fn build_edge_tables<'a>(ctx: &Ctx, n: ast::EdgeTables) -> Doc<'a> {
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
     doc = doc
-        .append(Doc::space())
         .append(
             n.l_paren_token()
-                .map(|el| comments_before(&el))
-                .unwrap_or_else(Doc::nil),
+                .map(|el| space_or_comments_before(&el))
+                .unwrap_or_else(Doc::space),
         )
         .append(Doc::text("("))
         .append(wrap_body(ctx, body, n.r_paren_token()))

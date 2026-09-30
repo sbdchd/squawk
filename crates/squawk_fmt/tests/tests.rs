@@ -1,7 +1,9 @@
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet};
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
 use squawk_fmt::token_compare::assert_no_dropped_tokens;
+use squawk_lexer::{Token, TokenKind, tokenize};
 
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/before",
@@ -19,6 +21,7 @@ fn fmt(fixture: Fixture<&str>) {
 
     assert_no_dropped_tokens(content, &formatted);
     assert_parses(&formatted);
+    assert_no_extra_spaces(&formatted);
     assert_eq!(
         squawk_fmt::fmt_str(&formatted, Default::default()).unwrap(),
         formatted,
@@ -174,4 +177,30 @@ fn assert_parses(formatted: &str) {
             .collect::<Vec<_>>()
             .join("\n")
     );
+}
+
+fn assert_no_extra_spaces(formatted: &str) {
+    let mut offset = 0;
+    for Token { kind, len } in tokenize(formatted) {
+        let start = offset;
+        offset += len as usize;
+        if kind != TokenKind::Whitespace {
+            continue;
+        }
+        let text = &formatted[start..offset];
+        let at_line_start = start == 0 || formatted[..start].ends_with(['\n', '\r']);
+        let at_eof = offset == formatted.len();
+        if at_line_start || at_eof || text.contains(['\n', '\r']) || text == " " {
+            continue;
+        }
+        let snippet = Snippet::source(formatted)
+            .fold(true)
+            .annotation(AnnotationKind::Primary.span(start..offset));
+        let group = Level::ERROR
+            .primary_title(format!(
+                "expected a single space between tokens, found {text:?}"
+            ))
+            .element(snippet);
+        panic!("{}", Renderer::plain().render(&[group]));
+    }
 }
