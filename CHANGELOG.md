@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
+- linter: opt-in ban-drop-trigger rule
+
 ## v2.67.0 - 2026-10-04
 
 ### Added
