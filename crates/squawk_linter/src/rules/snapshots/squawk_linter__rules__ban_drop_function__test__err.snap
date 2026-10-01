@@ -1,0 +1,20 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_function.rs
+expression: "lint_errors(sql, Rule::BanDropFunction)"
+---
+warning[ban-drop-function]: Dropping a function may break existing clients.
+  ╭▸ 
+2 │ DROP FUNCTION f(int);
+  ╰╴━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-function]: Dropping a function may break existing clients.
+  ╭▸ 
+3 │ DROP FUNCTION IF EXISTS f(int) CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-function]: Dropping a function may break existing clients.
+  ╭▸ 
+4 │ DROP PROCEDURE p(int);
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-function]: Dropping a function may break existing clients.
+  ╭▸ 
+5 │ DROP PROCEDURE IF EXISTS p(int) CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
