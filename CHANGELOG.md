@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
 - linter: opt-in ban-drop-trigger rule
+- linter: compatibility rules for dropped schemas, sequences, and domains, object renames, and schema moves
+- linter: opt-in compatibility rules for dropped constraints and indexes, identity and generated columns, defaults, triggers, replica identity, policies, privileges, and replacements
 
 ## v2.67.0 - 2026-10-04
 

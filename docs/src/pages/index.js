@@ -267,6 +267,21 @@ const rules = [
     tags: ["backwards compatibility"],
     description: "Prevent silent changes when a trigger is dropped (opt-in).",
   },
+  { name: "ban-drop-schema", tags: ["backwards compatibility"], description: "Prevent breaking clients that use a dropped schema." },
+  { name: "ban-drop-sequence", tags: ["backwards compatibility"], description: "Prevent breaking clients that use a dropped sequence." },
+  { name: "ban-drop-domain", tags: ["backwards compatibility"], description: "Prevent breaking clients that use a dropped domain." },
+  { name: "ban-drop-constraint", tags: ["backwards compatibility"], description: "Prevent removing a constraint guarantee (opt-in)." },
+  { name: "renaming-object", tags: ["backwards compatibility"], description: "Prevent renaming objects used by clients." },
+  { name: "ban-set-schema", tags: ["backwards compatibility"], description: "Prevent moving objects used by clients to another schema." },
+  { name: "ban-alter-identity", tags: ["backwards compatibility"], description: "Prevent changing identity columns used by clients." },
+  { name: "ban-alter-generated-expression", tags: ["backwards compatibility"], description: "Prevent breaking inserts with generated columns (opt-in)." },
+  { name: "ban-drop-index", tags: ["backwards compatibility"], description: "Prevent dropping indexes used by clients (opt-in)." },
+  { name: "ban-set-default", tags: ["backwards compatibility"], description: "Prevent silent changes to column defaults (opt-in)." },
+  { name: "ban-disable-trigger", tags: ["backwards compatibility"], description: "Prevent changes to triggers, rules, and row level security (opt-in)." },
+  { name: "ban-replica-identity", tags: ["backwards compatibility"], description: "Prevent changes to replica identity (opt-in)." },
+  { name: "ban-drop-policy", tags: ["backwards compatibility"], description: "Prevent dropping policies and rules (opt-in)." },
+  { name: "ban-revoke", tags: ["backwards compatibility"], description: "Prevent revoking client privileges (opt-in)." },
+  { name: "ban-replace-view-function", tags: ["backwards compatibility"], description: "Prevent replacing views and routines (opt-in)." },
   // xtask:new-rule:rule-doc-meta
 ]
 
