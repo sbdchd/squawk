@@ -1,0 +1,52 @@
+use crate::{Linter, Rule, Violation};
+use squawk_syntax::{
+    Parse, SourceFile,
+    ast::{self, AstNode},
+};
+
+pub(crate) fn ban_revoke(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+    for stmt in parse.tree().stmts() {
+        match stmt {
+            ast::Stmt::Revoke(node) => {
+                ctx.report(Violation::for_node(
+                    Rule::BanRevoke,
+                    "Revoking privileges may break existing clients.".into(),
+                    node.syntax(),
+                ));
+            }
+            ast::Stmt::AlterDefaultPrivileges(node) => {
+                if matches!(
+                    node.action(),
+                    Some(ast::AlterDefaultPrivilegesAction::RevokeDefaultPrivileges(
+                        _
+                    ))
+                ) {
+                    ctx.report(Violation::for_node(
+                        Rule::BanRevoke,
+                        "Revoking privileges may break existing clients.".into(),
+                        node.syntax(),
+                    ));
+                }
+            }
+            _ => (),
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        Rule,
+        test_utils::{lint_errors, lint_ok},
+    };
+    use insta::assert_snapshot;
+    #[test]
+    fn err() {
+        let sql = "REVOKE SELECT ON t FROM app; ALTER DEFAULT PRIVILEGES REVOKE SELECT ON TABLES FROM app;";
+        assert_snapshot!(lint_errors(sql, Rule::BanRevoke));
+    }
+    #[test]
+    fn ok() {
+        lint_ok("GRANT SELECT ON t TO app;", Rule::BanRevoke);
+    }
+}

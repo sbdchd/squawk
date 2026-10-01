@@ -68,6 +68,12 @@ use rules::require_enum_value_ordering;
 use rules::require_table_schema;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
+use rules::{
+    ban_alter_generated_expression, ban_alter_identity, ban_disable_trigger, ban_drop_constraint,
+    ban_drop_domain, ban_drop_index, ban_drop_policy, ban_drop_schema, ban_drop_sequence,
+    ban_replace_view_function, ban_replica_identity, ban_revoke, ban_set_default, ban_set_schema,
+    renaming_object,
+};
 // xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, Sequence)]
@@ -117,6 +123,21 @@ pub enum Rule {
     BanDropType,
     BanDropDefault,
     BanDropTrigger,
+    BanDropSchema,
+    BanDropSequence,
+    BanDropDomain,
+    BanDropConstraint,
+    RenamingObject,
+    BanSetSchema,
+    BanAlterIdentity,
+    BanAlterGeneratedExpression,
+    BanDropIndex,
+    BanSetDefault,
+    BanDisableTrigger,
+    BanReplicaIdentity,
+    BanDropPolicy,
+    BanRevoke,
+    BanReplaceViewFunction,
     // xtask:new-rule:error-name
 }
 
@@ -127,7 +148,19 @@ impl Rule {
         // require-timeout-settings is an alias, see `Rule::expands_to`
         matches!(
             self,
-            Rule::RequireTableSchema | Rule::RequireTimeoutSettings | Rule::BanDropTrigger
+            Rule::RequireTableSchema
+                | Rule::RequireTimeoutSettings
+                | Rule::BanDropTrigger
+                | Rule::BanDropConstraint
+                | Rule::BanAlterIdentity
+                | Rule::BanAlterGeneratedExpression
+                | Rule::BanDropIndex
+                | Rule::BanSetDefault
+                | Rule::BanDisableTrigger
+                | Rule::BanReplicaIdentity
+                | Rule::BanDropPolicy
+                | Rule::BanRevoke
+                | Rule::BanReplaceViewFunction
         )
     }
 
@@ -195,6 +228,21 @@ impl TryFrom<&str> for Rule {
             "ban-drop-type" => Ok(Rule::BanDropType),
             "ban-drop-default" => Ok(Rule::BanDropDefault),
             "ban-drop-trigger" => Ok(Rule::BanDropTrigger),
+            "ban-drop-schema" => Ok(Rule::BanDropSchema),
+            "ban-drop-sequence" => Ok(Rule::BanDropSequence),
+            "ban-drop-domain" => Ok(Rule::BanDropDomain),
+            "ban-drop-constraint" => Ok(Rule::BanDropConstraint),
+            "renaming-object" => Ok(Rule::RenamingObject),
+            "ban-set-schema" => Ok(Rule::BanSetSchema),
+            "ban-alter-identity" => Ok(Rule::BanAlterIdentity),
+            "ban-alter-generated-expression" => Ok(Rule::BanAlterGeneratedExpression),
+            "ban-drop-index" => Ok(Rule::BanDropIndex),
+            "ban-set-default" => Ok(Rule::BanSetDefault),
+            "ban-disable-trigger" => Ok(Rule::BanDisableTrigger),
+            "ban-replica-identity" => Ok(Rule::BanReplicaIdentity),
+            "ban-drop-policy" => Ok(Rule::BanDropPolicy),
+            "ban-revoke" => Ok(Rule::BanRevoke),
+            "ban-replace-view-function" => Ok(Rule::BanReplaceViewFunction),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -271,6 +319,21 @@ impl fmt::Display for Rule {
             Rule::BanDropType => "ban-drop-type",
             Rule::BanDropDefault => "ban-drop-default",
             Rule::BanDropTrigger => "ban-drop-trigger",
+            Rule::BanDropSchema => "ban-drop-schema",
+            Rule::BanDropSequence => "ban-drop-sequence",
+            Rule::BanDropDomain => "ban-drop-domain",
+            Rule::BanDropConstraint => "ban-drop-constraint",
+            Rule::RenamingObject => "renaming-object",
+            Rule::BanSetSchema => "ban-set-schema",
+            Rule::BanAlterIdentity => "ban-alter-identity",
+            Rule::BanAlterGeneratedExpression => "ban-alter-generated-expression",
+            Rule::BanDropIndex => "ban-drop-index",
+            Rule::BanSetDefault => "ban-set-default",
+            Rule::BanDisableTrigger => "ban-disable-trigger",
+            Rule::BanReplicaIdentity => "ban-replica-identity",
+            Rule::BanDropPolicy => "ban-drop-policy",
+            Rule::BanRevoke => "ban-revoke",
+            Rule::BanReplaceViewFunction => "ban-replace-view-function",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -540,6 +603,34 @@ impl Linter {
         if self.rules.contains(&Rule::BanDropTrigger) {
             ban_drop_trigger(self, file);
         }
+        for (rule, check) in [
+            (
+                Rule::BanDropSchema,
+                ban_drop_schema
+                    as fn(&mut Linter, &squawk_syntax::Parse<squawk_syntax::SourceFile>),
+            ),
+            (Rule::BanDropSequence, ban_drop_sequence),
+            (Rule::BanDropDomain, ban_drop_domain),
+            (Rule::BanDropConstraint, ban_drop_constraint),
+            (Rule::RenamingObject, renaming_object),
+            (Rule::BanSetSchema, ban_set_schema),
+            (Rule::BanAlterIdentity, ban_alter_identity),
+            (
+                Rule::BanAlterGeneratedExpression,
+                ban_alter_generated_expression,
+            ),
+            (Rule::BanDropIndex, ban_drop_index),
+            (Rule::BanSetDefault, ban_set_default),
+            (Rule::BanDisableTrigger, ban_disable_trigger),
+            (Rule::BanReplicaIdentity, ban_replica_identity),
+            (Rule::BanDropPolicy, ban_drop_policy),
+            (Rule::BanRevoke, ban_revoke),
+            (Rule::BanReplaceViewFunction, ban_replace_view_function),
+        ] {
+            if self.rules.contains(&rule) {
+                check(self, file);
+            }
+        }
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file
@@ -635,11 +726,68 @@ mod tests {
         let linter = Linter::with_rules(&[], &[]);
         assert!(!linter.rules.contains(&Rule::RequireTableSchema));
         assert!(!linter.rules.contains(&Rule::BanDropTrigger));
+        for rule in [
+            Rule::BanDropConstraint,
+            Rule::BanAlterIdentity,
+            Rule::BanAlterGeneratedExpression,
+            Rule::BanDropIndex,
+            Rule::BanSetDefault,
+            Rule::BanDisableTrigger,
+            Rule::BanReplicaIdentity,
+            Rule::BanDropPolicy,
+            Rule::BanRevoke,
+            Rule::BanReplaceViewFunction,
+        ] {
+            assert!(!linter.rules.contains(&rule));
+        }
+    }
+
+    #[test]
+    fn new_opt_in_rules_only_report_when_included() {
+        for (rule, sql) in [
+            (Rule::BanDropConstraint, "ALTER TABLE t DROP CONSTRAINT c;"),
+            (
+                Rule::BanAlterIdentity,
+                "ALTER TABLE t ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY;",
+            ),
+            (
+                Rule::BanAlterGeneratedExpression,
+                "ALTER TABLE t ALTER COLUMN c DROP EXPRESSION;",
+            ),
+        ] {
+            let parse = SourceFile::parse(sql);
+            assert!(parse.errors().is_empty());
+            assert!(
+                !Linter::with_default_rules()
+                    .lint(&parse, sql)
+                    .iter()
+                    .any(|violation| violation.code == rule)
+            );
+            assert!(
+                Linter::with_rules(&[rule], &[])
+                    .lint(&parse, sql)
+                    .iter()
+                    .any(|violation| violation.code == rule)
+            );
+        }
     }
 
     #[test]
     fn with_rules_opt_in_enabled_via_include() {
-        for rule in [Rule::RequireTableSchema, Rule::BanDropTrigger] {
+        for rule in [
+            Rule::RequireTableSchema,
+            Rule::BanDropTrigger,
+            Rule::BanDropConstraint,
+            Rule::BanAlterIdentity,
+            Rule::BanAlterGeneratedExpression,
+            Rule::BanDropIndex,
+            Rule::BanSetDefault,
+            Rule::BanDisableTrigger,
+            Rule::BanReplicaIdentity,
+            Rule::BanDropPolicy,
+            Rule::BanRevoke,
+            Rule::BanReplaceViewFunction,
+        ] {
             let linter = Linter::with_rules(&[rule], &[]);
             assert!(linter.rules.contains(&rule));
         }

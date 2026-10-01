@@ -1,0 +1,8 @@
+---
+source: crates/squawk_linter/src/rules/ban_set_default.rs
+expression: "lint_errors(sql, Rule::BanSetDefault)"
+---
+warning[ban-set-default]: Setting a column default may silently change values written by existing clients.
+  ╭▸ 
+1 │ ALTER TABLE t ALTER COLUMN c SET DEFAULT 1;
+  ╰╴                             ━━━━━━━━━━━━━

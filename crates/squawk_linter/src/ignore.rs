@@ -278,7 +278,7 @@ alter table t drop column c cascade;
 alter table t add column c char;
 
 ALTER TABLE foo
--- squawk-ignore adding-field-with-default,prefer-robust-stmts
+-- squawk-ignore adding-field-with-default,prefer-robust-stmts,ban-alter-generated-expression
 ADD COLUMN bar numeric GENERATED 
   ALWAYS AS (bar + baz) STORED;
 

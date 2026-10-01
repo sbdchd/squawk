@@ -1,0 +1,8 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_constraint.rs
+expression: "lint_errors(sql, Rule::BanDropConstraint)"
+---
+warning[ban-drop-constraint]: Dropping a constraint may remove a guarantee that existing clients assume.
+  ╭▸ 
+1 │ ALTER TABLE t DROP CONSTRAINT IF EXISTS c;
+  ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━
