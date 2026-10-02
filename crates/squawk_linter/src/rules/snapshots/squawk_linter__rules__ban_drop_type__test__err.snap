@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_type.rs
+expression: "lint_errors(sql, Rule::BanDropType)"
+---
+warning[ban-drop-type]: Dropping a type may break existing clients.
+  ╭▸ 
+2 │ DROP TYPE t;
+  ╰╴━━━━━━━━━━━━
+warning[ban-drop-type]: Dropping a type may break existing clients.
+  ╭▸ 
+3 │ DROP TYPE IF EXISTS t CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

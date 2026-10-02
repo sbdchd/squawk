@@ -37,8 +37,13 @@ use rules::ban_concurrent_index_creation_in_transaction;
 use rules::ban_create_domain_with_constraint;
 use rules::ban_drop_column;
 use rules::ban_drop_database;
+use rules::ban_drop_default;
+use rules::ban_drop_function;
 use rules::ban_drop_not_null;
 use rules::ban_drop_table;
+use rules::ban_drop_trigger;
+use rules::ban_drop_type;
+use rules::ban_drop_view;
 use rules::ban_duplicate_column_assignments;
 use rules::ban_truncate_cascade;
 use rules::ban_uncommitted_transaction;
@@ -107,6 +112,11 @@ pub enum Rule {
     RequireLockTimeout,
     RequireStatementTimeout,
     BanDuplicateColumnAssignments,
+    BanDropView,
+    BanDropFunction,
+    BanDropType,
+    BanDropDefault,
+    BanDropTrigger,
     // xtask:new-rule:error-name
 }
 
@@ -117,7 +127,7 @@ impl Rule {
         // require-timeout-settings is an alias, see `Rule::expands_to`
         matches!(
             self,
-            Rule::RequireTableSchema | Rule::RequireTimeoutSettings
+            Rule::RequireTableSchema | Rule::RequireTimeoutSettings | Rule::BanDropTrigger
         )
     }
 
@@ -180,6 +190,11 @@ impl TryFrom<&str> for Rule {
             "require-lock-timeout" => Ok(Rule::RequireLockTimeout),
             "require-statement-timeout" => Ok(Rule::RequireStatementTimeout),
             "ban-duplicate-column-assignments" => Ok(Rule::BanDuplicateColumnAssignments),
+            "ban-drop-view" => Ok(Rule::BanDropView),
+            "ban-drop-function" => Ok(Rule::BanDropFunction),
+            "ban-drop-type" => Ok(Rule::BanDropType),
+            "ban-drop-default" => Ok(Rule::BanDropDefault),
+            "ban-drop-trigger" => Ok(Rule::BanDropTrigger),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -251,6 +266,11 @@ impl fmt::Display for Rule {
             Rule::RequireLockTimeout => "require-lock-timeout",
             Rule::RequireStatementTimeout => "require-statement-timeout",
             Rule::BanDuplicateColumnAssignments => "ban-duplicate-column-assignments",
+            Rule::BanDropView => "ban-drop-view",
+            Rule::BanDropFunction => "ban-drop-function",
+            Rule::BanDropType => "ban-drop-type",
+            Rule::BanDropDefault => "ban-drop-default",
+            Rule::BanDropTrigger => "ban-drop-trigger",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -505,6 +525,21 @@ impl Linter {
         if self.rules.contains(&Rule::BanDuplicateColumnAssignments) {
             ban_duplicate_column_assignments(self, file);
         }
+        if self.rules.contains(&Rule::BanDropView) {
+            ban_drop_view(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropFunction) {
+            ban_drop_function(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropType) {
+            ban_drop_type(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropDefault) {
+            ban_drop_default(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropTrigger) {
+            ban_drop_trigger(self, file);
+        }
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file
@@ -599,12 +634,15 @@ mod tests {
     fn with_rules_opt_in_disabled_by_default() {
         let linter = Linter::with_rules(&[], &[]);
         assert!(!linter.rules.contains(&Rule::RequireTableSchema));
+        assert!(!linter.rules.contains(&Rule::BanDropTrigger));
     }
 
     #[test]
     fn with_rules_opt_in_enabled_via_include() {
-        let linter = Linter::with_rules(&[Rule::RequireTableSchema], &[]);
-        assert!(linter.rules.contains(&Rule::RequireTableSchema));
+        for rule in [Rule::RequireTableSchema, Rule::BanDropTrigger] {
+            let linter = Linter::with_rules(&[rule], &[]);
+            assert!(linter.rules.contains(&rule));
+        }
     }
 
     #[test]

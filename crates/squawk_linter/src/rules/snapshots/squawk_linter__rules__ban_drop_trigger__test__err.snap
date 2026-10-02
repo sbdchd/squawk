@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_trigger.rs
+expression: "lint_errors(sql, Rule::BanDropTrigger)"
+---
+warning[ban-drop-trigger]: Dropping a trigger may silently change behaviour for existing clients.
+  ╭▸ 
+2 │ DROP TRIGGER trg ON tbl;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-trigger]: Dropping a trigger may silently change behaviour for existing clients.
+  ╭▸ 
+3 │ DROP TRIGGER IF EXISTS trg ON tbl CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
