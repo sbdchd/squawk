@@ -16,3 +16,5 @@ create publication omitted_schema_keywords for tables in schema first_schema, /*
 create /* after create */ publication /* after publication */ commented_pub
 for /* after for */ table /* after table */ only /* after only */ (/* before table name */ public.commented /* before close */) /* before star */ * /* before columns */ (/* before column */ id /* before comma */, /* after comma */ payload /* before columns close */) /* before where */ where /* before where open */ (/* before expression */ id > 0 /* before where close */), /* after object comma */ tables /* after tables */ in /* after in */ schema /* after schema */ current_schema
 with /* after with */ (/* before option */ publish /* before equals */ = /* before value */ 'insert' /* before options close */) /* before semicolon */;
+
+create publication except_paren_comment for all tables except /* before paren */ (table audit.secret_events);

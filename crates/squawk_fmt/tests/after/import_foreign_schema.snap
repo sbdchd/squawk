@@ -19,7 +19,7 @@ import foreign schema remote
 
 /* before import */
 import /* before foreign */ foreign /* before schema */ schema /* before remote */ remote
-  /* before limit */ limit /* before to */ to  /* before open */(
+  /* before limit */ limit /* before to */ to /* before open */(
     /* before table */ records /* before comma */,
     /* before second */ users /* before close */
   )

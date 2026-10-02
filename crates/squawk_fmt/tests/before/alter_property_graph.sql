@@ -28,3 +28,7 @@ alter property graph social_graph owner /* to */ to /* role */ graph_administrat
 
 alter property graph social_graph drop vertex tables (people, organizations -- trailing
 ) cascade;
+
+alter property graph social_graph alter relationship table follows alter label connection drop properties /* before paren */ (created_at);
+
+alter property graph social_graph drop vertex tables /* before paren */ (people);
