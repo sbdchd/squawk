@@ -1,0 +1,20 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_view.rs
+expression: "lint_errors(sql, Rule::BanDropView)"
+---
+warning[ban-drop-view]: Dropping a view may break existing clients.
+  ╭▸ 
+2 │ DROP VIEW v;
+  ╰╴━━━━━━━━━━━━
+warning[ban-drop-view]: Dropping a view may break existing clients.
+  ╭▸ 
+3 │ DROP VIEW IF EXISTS v CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-view]: Dropping a view may break existing clients.
+  ╭▸ 
+4 │ DROP MATERIALIZED VIEW mv;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-view]: Dropping a view may break existing clients.
+  ╭▸ 
+5 │ DROP MATERIALIZED VIEW IF EXISTS mv CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

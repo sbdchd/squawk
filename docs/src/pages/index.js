@@ -242,6 +242,31 @@ const rules = [
     tags: ["queries"],
     description: "Prevent invalid assignments to the same column more than once.",
   },
+  {
+    name: "ban-drop-view",
+    tags: ["backwards compatibility"],
+    description: "Prevent breaking clients that depend on views or materialized views.",
+  },
+  {
+    name: "ban-drop-function",
+    tags: ["backwards compatibility"],
+    description: "Prevent breaking clients that call functions or procedures.",
+  },
+  {
+    name: "ban-drop-type",
+    tags: ["backwards compatibility"],
+    description: "Prevent breaking clients that use dropped types.",
+  },
+  {
+    name: "ban-drop-default",
+    tags: ["backwards compatibility"],
+    description: "Prevent inserts from failing or writing NULL after dropping a column default.",
+  },
+  {
+    name: "ban-drop-trigger",
+    tags: ["backwards compatibility"],
+    description: "Prevent silent changes when a trigger is dropped (opt-in).",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 

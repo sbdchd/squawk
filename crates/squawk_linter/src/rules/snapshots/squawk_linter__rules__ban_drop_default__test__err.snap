@@ -1,0 +1,20 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_default.rs
+expression: "lint_errors(sql, Rule::BanDropDefault)"
+---
+warning[ban-drop-default]: Dropping a column default may break existing clients.
+  ╭▸ 
+2 │ ALTER TABLE tbl ALTER COLUMN c DROP DEFAULT;
+  ╰╴                               ━━━━━━━━━━━━
+warning[ban-drop-default]: Dropping a column default may break existing clients.
+  ╭▸ 
+3 │ ALTER TABLE IF EXISTS tbl ALTER COLUMN c DROP DEFAULT;
+  ╰╴                                         ━━━━━━━━━━━━
+warning[ban-drop-default]: Dropping a column default may break existing clients.
+  ╭▸ 
+4 │ ALTER TABLE tbl ALTER COLUMN c DROP DEFAULT, ALTER COLUMN d DROP DEFAULT;
+  ╰╴                               ━━━━━━━━━━━━
+warning[ban-drop-default]: Dropping a column default may break existing clients.
+  ╭▸ 
+4 │ ALTER TABLE tbl ALTER COLUMN c DROP DEFAULT, ALTER COLUMN d DROP DEFAULT;
+  ╰╴                                                            ━━━━━━━━━━━━
