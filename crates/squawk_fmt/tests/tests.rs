@@ -166,6 +166,27 @@ fn preserves_a_leading_bom() {
     );
 }
 
+#[test]
+fn removes_leading_and_trailing_whitespace() {
+    for (sql, expected) in [
+        ("\n\n\n\n    select 1;\n\n\n", "select 1;\n"),
+        ("select 1;  ", "select 1;"),
+        ("select 1; -- c\n\n\n", "select 1; -- c\n"),
+        ("select 1;\n\n/* c */\n\n", "select 1;\n\n/* c */\n"),
+        ("  /* c */ select 1;", "/* c */ select 1;"),
+        ("  -- c\nselect 1;", "-- c\nselect 1;"),
+        ("\n\n  select 1;", "select 1;"),
+        ("\u{feff}  /* c */ select 1;", "\u{feff}/* c */ select 1;"),
+    ] {
+        let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
+        assert_eq!(formatted, expected);
+        assert_eq!(
+            squawk_fmt::fmt_str(&formatted, Default::default()).unwrap(),
+            expected
+        );
+    }
+}
+
 fn assert_parses(formatted: &str) {
     let parse = squawk_syntax::ast::SourceFile::parse(formatted);
     assert!(
@@ -202,12 +223,26 @@ fn comment_spacing_error(formatted: &str) -> Option<(std::ops::Range<usize>, &'s
         }
         if let Some((previous, previous_end)) = left {
             let touching = previous_end == span.start;
-            let must_touch = matches!(kind, TokenKind::BlockComment { .. })
-                && matches!(
-                    previous,
-                    TokenKind::OpenParen | TokenKind::OpenBracket | TokenKind::OpenCurly
-                );
-            if must_touch && !touching {
+            let own_line = formatted[previous_end..span.start].contains(['\n', '\r']);
+            let after_opening_delimiter = matches!(
+                previous,
+                TokenKind::OpenParen | TokenKind::OpenBracket | TokenKind::OpenCurly
+            );
+            if after_opening_delimiter && !own_line {
+                let wraps = kind == TokenKind::LineComment
+                    || tokens.peek().is_some_and(|(_, next_span)| {
+                        formatted[span.end..next_span.start].contains(['\n', '\r'])
+                    });
+                if wraps {
+                    return Some((
+                        span,
+                        "comment after an opening delimiter must be on its own line when the contents wrap",
+                    ));
+                }
+            }
+            let must_touch =
+                matches!(kind, TokenKind::BlockComment { .. }) && after_opening_delimiter;
+            if must_touch && !touching && !own_line {
                 return Some((
                     span,
                     "block comment must touch the opening delimiter on its left",
@@ -221,6 +256,7 @@ fn comment_spacing_error(formatted: &str) -> Option<(std::ops::Range<usize>, &'s
             && let Some((next, next_span)) = tokens.peek()
         {
             let touching = span.end == next_span.start;
+            let own_line = formatted[span.end..next_span.start].contains(['\n', '\r']);
             let must_touch = matches!(
                 next,
                 TokenKind::CloseParen
@@ -228,11 +264,8 @@ fn comment_spacing_error(formatted: &str) -> Option<(std::ops::Range<usize>, &'s
                     | TokenKind::CloseCurly
                     | TokenKind::Comma
                     | TokenKind::Semi
-                    | TokenKind::OpenParen
-                    | TokenKind::OpenBracket
-                    | TokenKind::OpenCurly
             );
-            if must_touch && !touching {
+            if must_touch && !touching && !own_line {
                 return Some((span, "block comment must touch the delimiter on its right"));
             }
             if !must_touch && touching {
@@ -293,14 +326,38 @@ mod comment_spacing_test {
     /// Block & line comments do not need whitespace at file boundaries.
     #[test]
     fn file_boundaries() {
-        for sql in [
-            "/* foo */",
-            "-- foo",
-            "/* foo */\nselect 1;\n/* bar */",
-            "-- foo\nselect 1;\n-- bar",
-        ] {
-            assert_comment_spacing(sql);
-        }
+        assert_comment_spacing(
+            r"/* foo */
+select 1;
+/* bar */",
+        );
+        assert_comment_spacing(
+            r"-- foo
+select 1;
+-- bar",
+        );
+    }
+
+    /// Block and line comments are fine by themselves.
+    #[test]
+    fn own_line() {
+        assert_comment_spacing(
+            r"
+-- foo
+select 1;
+/* foo */
+select 1;",
+        );
+    }
+
+    #[test]
+    fn delimiters_across_line_breaks() {
+        assert_comment_spacing(
+            r"create table t (
+  /* a */ a int,
+  b int /* b */
+);",
+        );
     }
 
     /// Trailing line comments must have whitespace on their left.
@@ -318,16 +375,19 @@ mod comment_spacing_test {
     /// Block comments must be surrounded with whitespace.
     #[test]
     fn block_comments_surrounded_by_whitespace() {
-        for sql in [
-            "select 1 /*c*/ + 1;",
-            "create function f(v accounts.id /* c */ % /* c */ type) returns int language sql return 1;",
-            "table foo /* c */ *;",
-            "select * from graph_table(g match (a)-[e] /* c */ - /* c */ > (b) columns (a.id));",
-            "select 1 /* c */ ::int;",
-            "select (array[1, 2, 3])[1 /* c */ : /* c */ 2];",
-        ] {
-            assert_comment_spacing(sql);
-        }
+        assert_comment_spacing(
+            r"
+select 1 /*c*/ + 1;
+create function f(v accounts.id /* c */ % /* c */ type) returns int language sql return 1;
+table foo /* c */ *;
+select * from graph_table(g match (a)-[e] /* c */ - /* c */ > (b) columns (a.id));
+select 1 /* c */ ::int;
+select (array[1, 2, 3])[1 /* c */ : /* c */ 2];
+create function f /* c */ (a int) returns int language sql return 1;
+select (array[1, 2, 3]) /* c */ [1];
+select * from graph_table(g match (a)-> /* c */ {1, 3}(b) columns (a.id));
+",
+        );
         assert_snapshot!(comment_spacing_diagnostic("select 1/*c*/ + 1;").unwrap(), @"
     error: comment must have whitespace on its left
       |
@@ -352,6 +412,24 @@ mod comment_spacing_test {
     1 | select foo(x,/* c */ y);
       |              ^^^^^^^
     ");
+        assert_snapshot!(comment_spacing_diagnostic("create function f /* c */(a int) returns int language sql return 1;").unwrap(), @"
+    error: block comment must have whitespace on its right
+      |
+    1 | create function f /* c */(a int) returns int language sql return 1;
+      |                   ^^^^^^^
+    ");
+        assert_snapshot!(comment_spacing_diagnostic("select (array[1, 2, 3]) /* c */[1];").unwrap(), @"
+    error: block comment must have whitespace on its right
+      |
+    1 | select (array[1, 2, 3]) /* c */[1];
+      |                         ^^^^^^^
+    ");
+        assert_snapshot!(comment_spacing_diagnostic("select * from graph_table(g match (a)-> /* c */{1, 3}(b) columns (a.id));").unwrap(), @"
+    error: block comment must have whitespace on its right
+      |
+    1 | select * from graph_table(g match (a)-> /* c */{1, 3}(b) columns (a.id));
+      |                                         ^^^^^^^
+    ");
     }
 
     /// Block comments must have whitespace between them.
@@ -369,13 +447,13 @@ mod comment_spacing_test {
     /// Block comments must touch `(`, `[`, `{` on their left.
     #[test]
     fn block_comments_touch_left_delimiters() {
-        for sql in [
-            "select foo(/* c */ x);",
-            "select (array[1, 2, 3])[/* c */ 1];",
-            "select * from graph_table(g match (a)->{/* c */ 1, 3}(b) columns (a.id));",
-        ] {
-            assert_comment_spacing(sql);
-        }
+        assert_comment_spacing(
+            r"
+select foo(/* c */ x);
+select (array[1, 2, 3])[/* c */ 1];
+select * from graph_table(g match (a)->{/* c */ 1, 3}(b) columns (a.id));
+",
+        );
         assert_snapshot!(comment_spacing_diagnostic("select foo( /* c */ x);").unwrap(), @"
     error: block comment must touch the opening delimiter on its left
       |
@@ -396,19 +474,56 @@ mod comment_spacing_test {
     ");
     }
 
-    /// Block comments must touch `)`, `]`, `}`, `,`, `;`, `(`, `[`, `{` on their right.
+    /// Comments only share a line with `(`, `[`, `{` when the contents don't wrap.
+    #[test]
+    fn opening_delimiter_comments_when_wrapping() {
+        assert_comment_spacing(
+            r"
+select foo(/* c */ x);
+select foo(
+  -- c
+  x
+);
+select foo(
+  /* c */
+  x
+);
+select foo(
+  /* c */ x,
+  y
+);
+",
+        );
+        assert_snapshot!(comment_spacing_diagnostic("select foo(-- c\n  x);").unwrap(), @"
+        error: comment after an opening delimiter must be on its own line when the contents wrap
+          |
+        1 | select foo(-- c
+          |            ^^^^
+        ");
+        assert_snapshot!(comment_spacing_diagnostic("select foo( -- c\n  x\n);").unwrap(), @"
+        error: comment after an opening delimiter must be on its own line when the contents wrap
+          |
+        1 | select foo( -- c
+          |             ^^^^
+        ");
+        assert_snapshot!(comment_spacing_diagnostic("select foo(/* c */\n  x\n);").unwrap(), @"
+        error: comment after an opening delimiter must be on its own line when the contents wrap
+          |
+        1 | select foo(/* c */
+          |            ^^^^^^^
+        ");
+    }
+
+    /// Block comments must touch `)`, `]`, `}`, `,`, `;` on their right.
     #[test]
     fn block_comments_touch_right_delimiters() {
-        for sql in [
-            "select foo(x /* c */);",
-            "select foo(x /* c */, y);",
-            "select 1 /* c */;",
-            "create function f /* c */(a int) returns int language sql return 1;",
-            "select (array[1, 2, 3]) /* c */[1];",
-            "select * from graph_table(g match (a)-> /* c */{1, 3}(b) columns (a.id));",
-        ] {
-            assert_comment_spacing(sql);
-        }
+        assert_comment_spacing(
+            r"
+select foo(x /* c */);
+select foo(x /* c */, y);
+select 1 /* c */;
+",
+        );
         assert_snapshot!(comment_spacing_diagnostic("select foo(x /* c */ );").unwrap(), @"
     error: block comment must touch the delimiter on its right
       |
@@ -438,24 +553,6 @@ mod comment_spacing_test {
       |
     1 | select * from graph_table(g match (a)->{1, 3 /* c */ }(b) columns (a.id));
       |                                              ^^^^^^^
-    ");
-        assert_snapshot!(comment_spacing_diagnostic("create function f /* c */ (a int) returns int language sql return 1;").unwrap(), @"
-    error: block comment must touch the delimiter on its right
-      |
-    1 | create function f /* c */ (a int) returns int language sql return 1;
-      |                   ^^^^^^^
-    ");
-        assert_snapshot!(comment_spacing_diagnostic("select (array[1, 2, 3]) /* c */ [1];").unwrap(), @"
-    error: block comment must touch the delimiter on its right
-      |
-    1 | select (array[1, 2, 3]) /* c */ [1];
-      |                         ^^^^^^^
-    ");
-        assert_snapshot!(comment_spacing_diagnostic("select * from graph_table(g match (a)-> /* c */ {1, 3}(b) columns (a.id));").unwrap(), @"
-    error: block comment must touch the delimiter on its right
-      |
-    1 | select * from graph_table(g match (a)-> /* c */ {1, 3}(b) columns (a.id));
-      |                                         ^^^^^^^
     ");
     }
 }
