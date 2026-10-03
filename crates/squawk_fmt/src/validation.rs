@@ -245,24 +245,25 @@ fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> boo
             };
             return normalize(before_text) == normalize(after_text);
         }
-        return before_text.eq_ignore_ascii_case(after_text);
+        return if before_kind == TokenKind::Ident {
+            before_text.eq_ignore_ascii_case(after_text)
+        } else {
+            before_text == after_text
+        };
     }
 
-    fn unquote<'a>(kind: &TokenKind, text: &'a str) -> Option<&'a str> {
-        match kind {
-            TokenKind::QuotedIdent { .. } => text
-                .strip_prefix('"')
-                .and_then(|text| text.strip_suffix('"')),
-            TokenKind::Ident => Some(text),
-            _ => None,
+    fn unquote(text: &str) -> Option<&str> {
+        text.strip_prefix('"')
+            .and_then(|text| text.strip_suffix('"'))
+    }
+
+    match (before_kind, after_kind) {
+        (TokenKind::QuotedIdent { .. }, TokenKind::Ident) => {
+            unquote(before_text) == Some(after_text.to_ascii_lowercase().as_str())
         }
-    }
-
-    match (
-        unquote(&before_kind, before_text),
-        unquote(&after_kind, after_text),
-    ) {
-        (Some(before), Some(after)) => before.eq_ignore_ascii_case(after),
+        (TokenKind::Ident, TokenKind::QuotedIdent { .. }) => {
+            unquote(after_text) == Some(before_text.to_ascii_lowercase().as_str())
+        }
         _ => false,
     }
 }
