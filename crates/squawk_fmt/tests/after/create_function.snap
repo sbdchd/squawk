@@ -68,7 +68,7 @@ create function percent_type_param(
 
 create function percent_type_table(
   unused integer
-) returns table (value accounts /*pct1*/.id /*pct2*/% /*pct3*/type)
+) returns table (value accounts /*pct1*/ .id /*pct2*/ % /*pct3*/ type)
   language sql
   as $$ select 1 $$;
 
@@ -82,7 +82,7 @@ END;
 $$
   language plpgsql;
 
-create function foo( /* no params */ ) returns t
+create function foo(/* no params */) returns t
   as $$select 1$$
   language sql;
 
@@ -103,7 +103,7 @@ create function comment_before_language(
   as $$select 1$$;
 
 -- comments in every position
-create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/./*f*/ commented(
+create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/ . /*f*/ commented(
   /*g*/ in /*h*/ value /*i*/ integer /*j*/ default /*k*/ 1 /*l*/,
   /*m*/ in /*n*/ result /*o*/ text /*p*/
 ) /*q*/ returns /*r*/ table /*s*/ (
@@ -119,7 +119,7 @@ create /*a*/ or /*b*/ replace /*c*/ function /*d*/ app /*e*/./*f*/ commented(
   /*aj*/ security /*ak*/ definer
   /*al*/ set /*am*/ search_path /*an*/ to /*ao*/ public /*ap*/, /*aq*/ pg_temp
   /*ar*/ /*as*/ reset /*at*/ all
-  /*au*/ support /*av*/ public /*aw*/./*ax*/ support_fn
+  /*au*/ support /*av*/ public /*aw*/ . /*ax*/ support_fn
   /*ay*/ as /*az*/ $$ select value::text $$ /*ba*/;
 
 create function increment(value integer) returns integer

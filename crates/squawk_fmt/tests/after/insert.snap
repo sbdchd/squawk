@@ -45,11 +45,10 @@ with inserted as (
 select organization_identifier, extremely_long_descriptive_column_name
 from inserted;
 
-/*before*/
-with /*a*/ inserted/*b*/ (
+/*before*/ with /*a*/ inserted /*b*/ (
   /*c*/ result_id /*d*/
 ) /*e*/ as /*f*/ not /*g*/ materialized /*h*/ (
-  /*i*/ insert /*j*/ into /*k*/ public /*l*/./*m*/ foo /*n*/ as /*o*/ f /*p*/ (
+  /*i*/ insert /*j*/ into /*k*/ public /*l*/ . /*m*/ foo /*n*/ as /*o*/ f /*p*/ (
     /*q*/ id /*r*/,
     /*s*/ payload /*t*/
   )

@@ -11,6 +11,6 @@ drop index concurrently if exists
 
 -- comments in every position
 drop /* index */ index /* concurrently */ concurrently /* if */ if /* exists */ exists
-  /* first index */ public /* dot */.events_idx /* before comma */,
+  /* first index */ public /* dot */ .events_idx /* before comma */,
   /* second index */ reporting.archive_idx
   /* behavior */ restrict /* end */;

@@ -14,7 +14,7 @@ drop operator if exists
 
 -- comments in every position
 drop /* operator */ operator /* if */ if /* exists */ exists
-  /* first operator */ public /* path dot */.=== /* open */ (
+  /* first operator */ public /* path dot */ .=== /* open */ (
     /* left type */ integer /* type comma */,
     /* right type */ integer /* close */
   ) /* signature comma */,

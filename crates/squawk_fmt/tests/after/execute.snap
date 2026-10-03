@@ -14,8 +14,7 @@ execute statement_name(
   a_third_intentionally_long_argument_name
 );
 
-/* before execute */
-execute /* before statement */ statement_name /* before left paren */(
+/* before execute */ execute /* before statement */ statement_name /* before left paren */ (
   /* after left paren */ 1 /* before comma */,
   /* after comma */ true /* before right paren */
 ) /* before semicolon */;

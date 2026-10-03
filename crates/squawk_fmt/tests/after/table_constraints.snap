@@ -139,7 +139,7 @@ create table commented_constraints (
     /* before foreign */ foreign /* before key */ key /* before from opening paren */ (
       /* before from column */ parent_id /* before from closing paren */
     )
-    /* before references */ references /* before table */ public /* before dot */./* before table name */ parents /* before to opening paren */ (
+    /* before references */ references /* before table */ public /* before dot */ . /* before table name */ parents /* before to opening paren */ (
       /* before to column */ id /* before to closing paren */
     )
     /* before match */ match /* before simple */ simple
@@ -152,7 +152,7 @@ create table commented_constraints (
     /* before exclusion expression */ id
       /* before exclusion with */ with /* before exclusion op */ = /* before exclusion comma */,
     /* before second exclusion */ valid_at
-      with /* before operator */ operator /* before operator opening paren */(/* before operator name */ public /* before operator dot */./* before operator op */ && /* before operator closing paren */) /* before exclusion closing paren */
+      with /* before operator */ operator /* before operator opening paren */ (/* before operator name */ public /* before operator dot */ . /* before operator op */ && /* before operator closing paren */) /* before exclusion closing paren */
   )
     /* before include */ include /* before include opening paren */ (
       id /* before include closing paren */

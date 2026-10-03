@@ -76,21 +76,23 @@ select 1::setof int;
 
 -- comments inside types
 create table t (
-  a national /*a*/ char /*b*/ varying /*c*/(2),
-  b int /*d*/[],
-  c interval /*e*/ day to /*f*/ second /*g*/(3),
-  d numeric /*h*/(/*i*/ 10 /*j*/, /*k*/ 2 /*l*/),
-  e time /*m*/(/*n*/ 3 /*o*/) /*p*/ with /*q*/ time /*r*/ zone,
-  f int[ /*s*/][/*t*/ 3 /*u*/],
+  a national /*a*/ char /*b*/ varying /*c*/ (2),
+  b int /*d*/ [],
+  c interval /*e*/ day to /*f*/ second /*g*/ (3),
+  d numeric /*h*/ (/*i*/ 10 /*j*/, /*k*/ 2 /*l*/),
+  e time /*m*/ (/*n*/ 3 /*o*/) /*p*/ with /*q*/ time /*r*/ zone,
+  f int[/*s*/][/*t*/ 3 /*u*/],
   g timestamp /*v*/ without /*w*/ time /*x*/ zone,
   h timestamp with /*y*/ time /*z*/ zone,
   i double /*aa*/ precision,
   j character /*bb*/ varying,
   k national /*cc*/ character,
-  l bit /*dd*/ varying /*ee*/(/*ff*/ 3 /*gg*/),
-  m interval year /*hh*/ to /*ii*/ month
+  l bit /*dd*/ varying /*ee*/ (/*ff*/ 3 /*gg*/),
+  m bit /*hh*/ (3),
+  n character /*ii*/ (4),
+  o interval year /*jj*/ to /*kk*/ month
 );
-select 1::setof /*a*/ int, 2::pg_catalog /*b*/./*c*/ int4;
+select 1::setof /*a*/ int, 2::pg_catalog /*b*/ . /*c*/ int4;
 
 -- line comments inside types
 create table t (
@@ -113,14 +115,14 @@ select
   interval(4) '3';
 
 -- comments around casts
-select 1 /*a*/::/*b*/ int8;
-select cast /*c*/(/*d*/ 1 /*e*/ as /*f*/ int8 /*g*/);
+select 1 /*a*/ :: /*b*/ int8;
+select cast /*c*/ (/*d*/ 1 /*e*/ as /*f*/ int8 /*g*/);
 select
   a_very_long_expression_name_that_forces_the_select_to_wrap,
-  cast /*c*/(
+  cast /*c*/ (
     /*d*/ 1 /*e*/ as /*f*/ int8 /*g*/
   );
-select treat /*h*/(2 as /*i*/ bigint);
+select treat /*h*/ (2 as /*i*/ bigint);
 select pg_catalog.varchar(10) /*j*/ 'foo';
 select interval '4' /*k*/ year to month;
 

@@ -16,7 +16,7 @@ drop procedure if exists
 
 -- comments in every position
 drop /* procedure */ procedure /* if */ if /* exists */ exists
-  /* first procedure */ public /* dot */.refresh_accounts /* open */(
+  /* first procedure */ public /* dot */ .refresh_accounts /* open */ (
     /* first argument */ integer /* argument comma */,
     /* second argument */ text /* close */
   ) /* procedure comma */,

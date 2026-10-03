@@ -11,6 +11,6 @@ drop statistics if exists
 
 -- comments in every position
 drop /* statistics */ statistics /* if */ if /* exists */ exists
-  /* first statistics */ public /* dot */.user_stats /* before comma */,
+  /* first statistics */ public /* dot */ .user_stats /* before comma */,
   /* second statistics */ reporting.activity_stats
   /* behavior */ restrict /* end */;

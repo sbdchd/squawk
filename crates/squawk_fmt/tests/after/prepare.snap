@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 29
 input_file: crates/squawk_fmt/tests/before/prepare.sql
 ---
 prepare statement_name as
@@ -29,9 +28,8 @@ prepare
   select an_intentionally_long_column_name
   from an_intentionally_long_table_name;
 
-/* before prepare */
-prepare
-  /* before name */ statement_name/* before left paren */ (
+/* before prepare */ prepare
+  /* before name */ statement_name /* before left paren */ (
     /* after left paren */ int /* before comma */,
     /* after comma */ text /* before right paren */
   )

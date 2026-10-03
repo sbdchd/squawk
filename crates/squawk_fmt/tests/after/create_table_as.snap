@@ -33,7 +33,7 @@ create table cached_result as
   with data;
 
 -- comments in every position
-create /*a*/ temp /*b*/ table /*c*/ if /*d*/ not /*e*/ exists /*f*/ app /*g*/./*h*/ report /*i*/ (
+create /*a*/ temp /*b*/ table /*c*/ if /*d*/ not /*e*/ exists /*f*/ app /*g*/ . /*h*/ report /*i*/ (
   /*j*/ id /*k*/,
   /*l*/ total /*m*/
 )
@@ -46,5 +46,5 @@ create /*a*/ temp /*b*/ table /*c*/ if /*d*/ not /*e*/ exists /*f*/ app /*g*/./*
   /*ad*/ with /*ae*/ no /*af*/ data /*ag*/;
 
 create table executed /*a*/ as
-  /*b*/ execute /*c*/ refresh_report /*d*/(/*e*/ 1 /*f*/, /*g*/ 'full' /*h*/)
+  /*b*/ execute /*c*/ refresh_report /*d*/ (/*e*/ 1 /*f*/, /*g*/ 'full' /*h*/)
   /*i*/ with /*j*/ data /*k*/;

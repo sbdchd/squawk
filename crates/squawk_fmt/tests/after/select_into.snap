@@ -5,11 +5,10 @@ input_file: crates/squawk_fmt/tests/before/select_into.sql
 select 1 into foo;
 select a, b into temporary table public.foo from bar;
 select 1 into unlogged foo;
-/* before select */
-select
+/* before select */ select
   /* before distinct */ distinct /* before first target */ a /* before target comma */,
   /* before second target */ b
-/* before into */ into /* before local */ local /* before temporary */ temporary /* before table */ table /* before schema */ public /* before dot */./* before table name */ foo
+/* before into */ into /* before local */ local /* before temporary */ temporary /* before table */ table /* before schema */ public /* before dot */ . /* before table name */ foo
 /* before from */ from /* before relation */ bar
 /* before group */ group /* before by */ by /* before group expression */ a
 /* before order */ order /* before order by */ by
@@ -44,7 +43,7 @@ for no key update of source skip locked
 limit 10
 offset 2 rows;
 
-with /* before recursive */ recursive /* before cte */ cte/* before columns */ (
+with /* before recursive */ recursive /* before cte */ cte /* before columns */ (
   /* before column */ a /* before column comma */,
   /* before second column */ b /* before columns close */
 ) /* before as */ as /* before not */ not /* before materialized */ materialized /* before query open */ (

@@ -17,7 +17,7 @@ create text search parser extraordinarily_long_schema_name.extraordinarily_long_
   headline = public.extraordinarily_long_parser_headline_function_name
 );
 
-create /* text keyword */ text /* search keyword */ search /* parser keyword */ parser /* name */ public /* dot */./* name segment */ commented_parser /* left parenthesis */ (
+create /* text keyword */ text /* search keyword */ search /* parser keyword */ parser /* name */ public /* dot */ . /* name segment */ commented_parser /* left parenthesis */ (
   /* first option */ start /* equals */ = /* value */ public.parser_start /* comma */,
   /* second option */ gettoken = /* second value */ public.parser_gettoken /* comma two */,
   /* third option */ end = public.parser_end,

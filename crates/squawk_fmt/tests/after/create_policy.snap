@@ -17,7 +17,7 @@ create policy extraordinarily_long_account_access_policy_name
 
 -- comments in every position
 create /* policy */ policy /* name */ account_access
-  /* on */ on /* schema */ public /* dot */./* table */ accounts
+  /* on */ on /* schema */ public /* dot */ . /* table */ accounts
   /* as */ as /* policy type */ restrictive
   /* for */ for /* command */ select
   /* to */ to /* first role */ account_admin /* comma */,

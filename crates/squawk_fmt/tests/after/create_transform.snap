@@ -24,14 +24,14 @@ create transform for
 
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ transform /*d*/ for
-  /*e*/ app /*f*/./*g*/ custom_type
+  /*e*/ app /*f*/ . /*g*/ custom_type
   /*h*/ language /*i*/ plpgsql /*j*/ (
   /*k*/ from /*l*/ sql /*m*/ with /*n*/ function
-    /*o*/ app /*p*/./*q*/ from_sql(
+    /*o*/ app /*p*/ . /*q*/ from_sql(
       /*r*/ integer /*s*/
     ) /*t*/,
   /*u*/ to /*v*/ sql /*w*/ with /*x*/ function
-    /*y*/ app /*z*/./*aa*/ to_sql(
+    /*y*/ app /*z*/ . /*aa*/ to_sql(
       /*ab*/ integer /*ac*/
     ) /*ad*/
 ) /*ae*/;

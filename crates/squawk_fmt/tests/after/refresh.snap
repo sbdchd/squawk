@@ -8,7 +8,6 @@ refresh materialized view concurrently
   public.an_intentionally_long_materialized_view_name_that_makes_this_statement_longer_than_eighty_characters
   with no data;
 
-/* before refresh */
-refresh /* before materialized */ materialized /* before view */ view /* before concurrently */ concurrently
-  /* before name */ public /* before dot */./* after dot */ summary
+/* before refresh */ refresh /* before materialized */ materialized /* before view */ view /* before concurrently */ concurrently
+  /* before name */ public /* before dot */ . /* after dot */ summary
   /* before with */ with /* before no */ no /* before data */ data /* before semicolon */;

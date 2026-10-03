@@ -30,10 +30,9 @@ reindex (
 )
   table concurrently an_intentionally_long_schema_name.an_intentionally_long_table_name;
 
-/* before reindex */
-reindex /* before left paren */ (
+/* before reindex */ reindex /* before left paren */ (
   /* after left paren */ concurrently /* before option value */ true /* before comma */,
   /* after comma */ tablespace /* before tablespace */ new_tablespace /* before second comma */,
   /* after second comma */ verbose /* before verbose value */ no /* before right paren */
 )
-  /* before target */ table /* before concurrently */ concurrently /* before table name */ public /* before dot */./* after dot */ records /* before semicolon */;
+  /* before target */ table /* before concurrently */ concurrently /* before table name */ public /* before dot */ . /* after dot */ records /* before semicolon */;

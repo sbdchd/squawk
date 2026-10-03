@@ -6,9 +6,8 @@ truncate foo;
 truncate table only foo continue identity restrict;
 truncate foo *, bar restart identity cascade;
 
-/*before*/
-truncate /*a*/ table
-  /*b*/ public /*c*/./*d*/ foo /*e*/ * /*f*/,
+/*before*/ truncate /*a*/ table
+  /*b*/ public /*c*/ . /*d*/ foo /*e*/ * /*f*/,
   /*g*/ bar
 /*h*/ continue /*i*/ identity
 /*j*/ restrict /*k*/;

@@ -37,8 +37,7 @@ fetch
   from
   cursor_with_an_intentionally_long_name_that_makes_this_fetch_statement_longer_than_eighty_characters;
 
-/* before fetch */
-fetch
+/* before fetch */ fetch
   /* before action */ forward /* before all */ all
   /* before from */ from
   /* before cursor */ cursor_name /* before semicolon */;

@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_fmt/tests/tests.rs
-assertion_line: 29
 input_file: crates/squawk_fmt/tests/before/copy.sql
 ---
 copy foo from '/tmp/foo.csv';
@@ -35,8 +34,7 @@ force quote *
 force null description
 where id > 0;
 
-/* before */
-copy /* after copy */ binary /* after binary */ public /* before dot */./* after dot */ records /* before columns */ (
+/* before */ copy /* after copy */ binary /* after binary */ public /* before dot */ . /* after dot */ records /* before columns */ (
   /* after left paren */ id /* before comma */,
   /* after comma */ description /* before right paren */
 )

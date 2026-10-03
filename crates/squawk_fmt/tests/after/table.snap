@@ -6,9 +6,8 @@ table foo;
 table public.foo *;
 table only (public.foo);
 table foo order by a desc, b asc;
-/* before table */
-table
-  /* before only */ only /* before relation opening paren */(/* before relation */ public /* before dot */./* before name */ foo /* before relation closing paren */)
+/* before table */ table
+  /* before only */ only /* before relation opening paren */ (/* before relation */ public /* before dot */ . /* before name */ foo /* before relation closing paren */)
 /* before order */ order /* before by */ by
   /* before first expression */ a /* before desc */ desc /* before comma */,
   /* before second expression */ b /* before asc */ asc /* before semicolon */;

@@ -5,7 +5,7 @@ input_file: crates/squawk_fmt/tests/before/alter_operator_family.sql
 alter /* operator */ operator /* family */ family /* name */ public.integer_family
   /* using */ using /* method */ btree
   /* add */ add
-    /* operator option */ operator /* strategy */ 1 /* op */ < /* left paren */(
+    /* operator option */ operator /* strategy */ 1 /* op */ < /* left paren */ (
       /* lhs */ integer /* comma */,
       /* rhs */ integer /* right paren */
     )

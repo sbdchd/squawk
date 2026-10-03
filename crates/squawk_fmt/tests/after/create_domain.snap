@@ -16,8 +16,7 @@ create domain extraordinarily_long_schema_name.extraordinarily_long_domain_name
   check (length(value) > 3)
   not null;
 
-/* before create */
-create /* before domain */ domain /* before name */ public.commented_domain
+/* before create */ create /* before domain */ domain /* before name */ public.commented_domain
   /* before as */ as /* before type */ text
   /* before collate */ collate /* before collation */ "C"
   /* before constraint */ constraint /* before constraint name */ valid_value /* before check */ check /* before left paren */ (

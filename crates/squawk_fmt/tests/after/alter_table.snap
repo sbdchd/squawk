@@ -50,7 +50,7 @@ alter table all in tablespace old_reporting_tablespace
   set tablespace new_reporting_tablespace
   nowait;
 
-alter /* table */ table /* if */ if /* exists */ exists /* only */ only /* left paren */(/* relation */ reporting.commented_customer_activity /* right paren */)
+alter /* table */ table /* if */ if /* exists */ exists /* only */ only /* left paren */ (/* relation */ reporting.commented_customer_activity /* right paren */)
   /* action */ alter /* column */ column /* column name */ activity_description
     /* set */ set /* default */ default
       /* expression */ 'A very long default activity description used to verify formatter wrapping behavior',
@@ -126,7 +126,7 @@ alter /* table */ table /* relation */ partitions_merge_schema.sales_range
     /* second partition */ sales_feb2022,
     /* third partition */ sales_mar2022 /* right paren */
   )
-  /* into */ into /* target partition */ partitions_merge_schema./* target name */ sales_jan_feb_mar2022 /* semicolon */;
+  /* into */ into /* target partition */ partitions_merge_schema. /* target name */ sales_jan_feb_mar2022 /* semicolon */;
 
 alter table sales_range
   split partition sales_feb_mar_apr2022 into (
@@ -137,8 +137,8 @@ alter table sales_range
   );
 
 alter /* table */ table /* relation */ sales_range
-  /* split */ split /* partition */ partition /* source */ partition_split_schema./* source name */ sales_all /* into */ into /* list left */ (
-    /* first partition */ partition /* first name */ partition_split_schema./* name */ sales_first
+  /* split */ split /* partition */ partition /* source */ partition_split_schema. /* source name */ sales_all /* into */ into /* list left */ (
+    /* first partition */ partition /* first name */ partition_split_schema. /* name */ sales_first
       /* for */ for /* values */ values /* from */ from /* lower left */ (
         /* lower */ '2022-01-01' /* lower right */
       )
@@ -146,7 +146,7 @@ alter /* table */ table /* relation */ sales_range
         /* upper */ '2022-02-01' /* upper right */
       ) /* comma */,
     /* second partition */ partition /* second name */ sales_second
-      /* for */ for /* values */ values /* in */ in /* in left */(
+      /* for */ for /* values */ values /* in */ in /* in left */ (
         /* first value */ 'one' /* value comma */,
         /* second value */ 'two' /* in right */
       ),

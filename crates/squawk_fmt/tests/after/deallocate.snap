@@ -16,8 +16,7 @@ deallocate
   prepare
   prepared_statement_with_an_intentionally_long_name_that_makes_the_statement_longer_than_eighty_characters;
 
-/* before deallocate */
-deallocate
+/* before deallocate */ deallocate
   /* before prepare */ prepare
   /* before target */ statement_name /* before semicolon */;
 

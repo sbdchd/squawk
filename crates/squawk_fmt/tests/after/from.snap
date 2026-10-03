@@ -14,13 +14,13 @@ from foo /* before alias */ as /* before alias name */ f /* before open paren */
 select * from users tablesample bernoulli (10) repeatable (42);
 select t.id from test_tablesample as t tablesample system (50) repeatable (0);
 select *
-from users /* before alias */ as /* before alias name */ u /* before tablesample */ tablesample /* before method */ bernoulli /* before sample opening paren */(
+from users /* before alias */ as /* before alias name */ u /* before tablesample */ tablesample /* before method */ bernoulli /* before sample opening paren */ (
   /* before percentage */ 10 /* before sample closing paren */
-) /* before repeatable */ repeatable /* before seed opening paren */(/* before seed */ 42 /* before seed closing paren */);
+) /* before repeatable */ repeatable /* before seed opening paren */ (/* before seed */ 42 /* before seed closing paren */);
 select * from generate_series(1, 3);
 select * from lateral generate_series(1, 3) with ordinality as g (n, ord);
 select *
-from /* before lateral */ lateral /* before call */ generate_series /* before opening paren */(
+from /* before lateral */ lateral /* before call */ generate_series /* before opening paren */ (
     /* before first argument */ 1 /* before comma */,
     /* before second argument */ 3 /* before closing paren */
   ) /* before with */ with /* before ordinality */ ordinality /* before alias */ as /* before alias name */ g /* before alias opening paren */ (
@@ -34,7 +34,7 @@ from lateral cast(
 ) as converted;
 select * from collation for (foo) as collation_name;
 select *
-from /* before lateral */ lateral /* before cast */ cast /* before opening paren */(
+from /* before lateral */ lateral /* before cast */ cast /* before opening paren */ (
   /* before expression */ value
   /* before as */ as /* before type */ int8 /* before closing paren */
 ) /* before alias */ as /* before alias name */ converted;
@@ -55,7 +55,7 @@ from rows from (
   unnest(array[1, 2]) as (value int8)
 ) with ordinality as generated (first_value, second_value, ordinality);
 select *
-from /* before lateral */ lateral /* before rows */ rows /* before from */ from /* before opening paren */(
+from /* before lateral */ lateral /* before rows */ rows /* before from */ from /* before opening paren */ (
   /* before first argument */ generate_series(1, 3) /* before argument comma */,
   /* before second argument */ unnest(
     array[1, 2]
@@ -85,8 +85,8 @@ from lateral xmltable(
     a_very_long_ordinality_column_name for ordinality
 ) as a_very_long_xml_table_alias;
 select *
-from /* before lateral */ lateral /* before xmltable */ xmltable /* before opening paren */(
-  /* before namespaces */ xmlnamespaces /* before namespace opening paren */(
+from /* before lateral */ lateral /* before xmltable */ xmltable /* before opening paren */ (
+  /* before namespaces */ xmlnamespaces /* before namespace opening paren */ (
     /* before namespace expression */ 'urn:a' /* before as */ as /* before prefix */ a /* before namespace comma */,
     /* before default */ default /* before default expression */ 'urn:default' /* before namespace closing paren */
   ) /* before outer comma */,
@@ -148,12 +148,12 @@ from lateral json_table(
   error on error
 ) as a_very_long_json_table_alias;
 select *
-from /* before lateral */ lateral /* before json table */ json_table /* before opening paren */(
+from /* before lateral */ lateral /* before json table */ json_table /* before opening paren */ (
   /* before document */ doc
   /* before format */ format /* before json */ json /* before comma */,
   /* before path */ '$[*]' /* before path as */ as /* before path name */ root
   /* before passing */ passing /* before argument */ x /* before argument as */ as /* before variable */ foo
-  /* before columns */ columns /* before columns opening paren */(
+  /* before columns */ columns /* before columns opening paren */ (
     /* before ordinality column */ ord /* before for */ for /* before ordinality */ ordinality /* before column comma */,
     /* before value column */ value /* before type */ text
     /* before path keyword */ path /* before column path */ '$.value' /* before second column comma */,
@@ -161,17 +161,17 @@ from /* before lateral */ lateral /* before json table */ json_table /* before o
     /* before exists */ exists
     /* before exists path */ path /* before exists path expression */ '$.value' /* before nested comma */,
     /* before nested */ nested /* before nested path */ path /* before nested expression */ '$.items[*]' /* before nested as */ as /* before nested name */ items
-    /* before nested columns */ columns /* before nested opening paren */(
+    /* before nested columns */ columns /* before nested opening paren */ (
       /* before nested column */ item /* before nested type */ text /* before nested closing paren */
     ) /* before columns closing paren */
   )
-  /* before plan */ plan /* before plan opening paren */(
+  /* before plan */ plan /* before plan opening paren */ (
     /* before plan name */ items /* before plan closing paren */
   )
   /* before on error */ error /* before on */ on /* before error */ error /* before closing paren */
 ) /* before alias */ as /* before alias name */ jt;
 select *
-/* before from */ from /* before item */ only /* before relation */ public /* before dot */./* before table */ foo /* before star */ * /* before alias */ as /* before alias name */ f /* before item comma */,
+/* before from */ from /* before item */ only /* before relation */ public /* before dot */ . /* before table */ foo /* before star */ * /* before alias */ as /* before alias name */ f /* before item comma */,
   /* before second item */ other /* before second alias */ o;
 
 select *
@@ -215,7 +215,7 @@ from /* before joined relation */ pg_class
   /* before join */ left /* before outer */ outer /* before join keyword */ join /* before joined table */ pg_inherits /* before on */ on
     /* before left operand */ inhrelid /* before equals */
       = /* before right operand */ oid /* before comma */,
-  /* before lateral item */ lateral /* before function */ pg_get_indexdef /* before opening paren */(
+  /* before lateral item */ lateral /* before function */ pg_get_indexdef /* before opening paren */ (
     /* before argument */ pg_class.oid /* before closing paren */
   );
 
@@ -237,7 +237,7 @@ select * from (a join b on a.id = b.id) as joined_tables;
 select *
 from a
   /*ja*/ left /*jb*/ outer /*jc*/ join /*jd*/ b /*je*/ on
-    /*jf*/ a /*jg*/./*jh*/ id /*ji*/ = /*jj*/ b /*jk*/./*jl*/ id,
+    /*jf*/ a /*jg*/ . /*jh*/ id /*ji*/ = /*jj*/ b /*jk*/ . /*jl*/ id,
   /*jm*/ c
   /*jn*/ join /*jo*/ d
     /*jp*/ using /*jq*/ (
@@ -263,8 +263,8 @@ from pg_statistic_ext s
 
 select *
 from statistics /* before base alias */ s
-  /* before cross */ cross /* before cross join */ join /* before lateral */ lateral /* before function */ unnest /* before function opening paren */(
-    /* before argument */ s.keys /* before cast */::int2[] /* before function closing paren */
+  /* before cross */ cross /* before cross join */ join /* before lateral */ lateral /* before function */ unnest /* before function opening paren */ (
+    /* before argument */ s.keys /* before cast */ ::int2[] /* before function closing paren */
   ) /* before with */ with /* before ordinality */ ordinality /* before function alias */ as /* before function alias name */ u /* before alias opening paren */ (
     /* before first alias column */ attnum /* before alias comma */,
     /* before second alias column */ ord /* before alias closing paren */

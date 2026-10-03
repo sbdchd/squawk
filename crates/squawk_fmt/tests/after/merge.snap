@@ -55,8 +55,7 @@ using /* before left source */ source1 /* before left alias */ s1
 when matched then
   delete;
 
-/* before merge */
-merge /* before into */ into /* before target */ only /* before target open */(/* before schema */ public /* before dot */./* before table */ target /* before target close */) /* before as */ as /* before target alias */ t
+/* before merge */ merge /* before into */ into /* before target */ only /* before target open */ (/* before schema */ public /* before dot */ . /* before table */ target /* before target close */) /* before as */ as /* before target alias */ t
 /* before using */ using /* before source */ source /* before source as */ as /* before source alias */ s
 /* before on */ on /* before condition */ t.id = s.id
 /* before first when */ when /* before matched */ matched /* before and */ and

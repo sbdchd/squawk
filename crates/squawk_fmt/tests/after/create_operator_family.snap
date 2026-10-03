@@ -11,5 +11,5 @@ create operator family
 
 -- comments in every position
 create /* operator */ operator /* family */ family
-  /* schema */ app /* dot */./* name */ integer_family
+  /* schema */ app /* dot */ . /* name */ integer_family
   /* using */ using /* method */ btree /* end */;

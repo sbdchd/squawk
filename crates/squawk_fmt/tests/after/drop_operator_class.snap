@@ -11,6 +11,6 @@ drop operator class if exists
 
 -- comments in every position
 drop /* operator */ operator /* class */ class /* if */ if /* exists */ exists
-  /* class name */ public /* dot */.text_pattern_ops
+  /* class name */ public /* dot */ .text_pattern_ops
   /* using */ using /* method */ btree
   /* behavior */ restrict /* end */;

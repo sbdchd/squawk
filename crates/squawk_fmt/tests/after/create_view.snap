@@ -27,7 +27,7 @@ create view a_very_long_schema_name.a_very_long_view_name (
   with cascaded check option;
 
 -- comments in every position
-create /*a*/ or /*b*/ replace /*c*/ temp /*d*/ recursive /*e*/ view /*f*/ app /*g*/./*h*/ dashboard /*i*/ (
+create /*a*/ or /*b*/ replace /*c*/ temp /*d*/ recursive /*e*/ view /*f*/ app /*g*/ . /*h*/ dashboard /*i*/ (
   /*j*/ account_id /*k*/,
   /*l*/ total /*m*/
 )

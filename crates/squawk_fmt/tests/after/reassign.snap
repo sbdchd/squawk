@@ -10,8 +10,7 @@ reassign owned by
   current_user
   to an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters;
 
-/* before reassign */
-reassign /* before owned */ owned /* before by */ by
+/* before reassign */ reassign /* before owned */ owned /* before by */ by
   /* before first */ alice /* before comma */,
   /* before second */ bob
   /* before to */ to /* before new owner */ carol /* before semicolon */;

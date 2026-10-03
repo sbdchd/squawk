@@ -26,8 +26,7 @@ set
     read write,
     not deferrable;
 
-/* before set */
-set
+/* before set */ set
   /* before transaction */ transaction
     /* before first mode */ isolation /* before level */ level /* before serializable */ serializable /* before comma */,
     /* before read */ read /* before only */ only /* before second comma */,

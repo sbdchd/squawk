@@ -47,3 +47,5 @@ select 1;
 
 /*foo*/
 select 1;
+
+/* first *//* second */select 1;-- directly trailing

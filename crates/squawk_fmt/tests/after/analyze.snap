@@ -18,12 +18,11 @@ analyze
     an_intentionally_long_column_name
   );
 
-/* before analyze */
-analyze /* before options */ (
+/* before analyze */ analyze /* before options */ (
   /* before verbose */ verbose /* before true */ true /* before comma */,
   /* before skip locked */ skip_locked /* before false */ false /* before close */
 )
-  /* before table */ public /* before dot */./* after dot */ records /* before columns */ (
+  /* before table */ public /* before dot */ . /* after dot */ records /* before columns */ (
     /* before id */ id /* before column comma */,
     /* before payload */ payload /* before columns close */
   ) /* before table comma */,

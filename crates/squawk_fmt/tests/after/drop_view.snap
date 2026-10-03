@@ -11,6 +11,6 @@ drop view if exists
 
 -- comments in every position
 drop /* view */ view /* if */ if /* exists */ exists
-  /* first view */ public /* dot */.active_accounts /* before comma */,
+  /* first view */ public /* dot */ .active_accounts /* before comma */,
   /* second view */ reporting.archived_accounts
   /* behavior */ restrict /* end */;

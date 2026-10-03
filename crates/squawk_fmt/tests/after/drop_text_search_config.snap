@@ -10,5 +10,5 @@ drop text search configuration if exists
 
 -- comments in every position
 drop /* text */ text /* search */ search /* configuration */ configuration /* if */ if /* exists */ exists
-  /* configuration */ public /* dot */.english
+  /* configuration */ public /* dot */ .english
   /* behavior */ restrict /* end */;

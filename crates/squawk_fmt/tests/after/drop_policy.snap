@@ -12,5 +12,5 @@ drop policy if exists
 -- comments in every position
 drop /* policy */ policy /* if */ if /* exists */ exists
   /* policy name */ account_policy
-  /* on */ on /* table schema */ public /* dot */.accounts
+  /* on */ on /* table schema */ public /* dot */ .accounts
   /* behavior */ restrict /* end */;

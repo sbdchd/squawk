@@ -15,9 +15,8 @@ reset transaction isolation level;
 reset
   an_intentionally_long_config_namespace.an_intentionally_long_config_group.an_intentionally_long_config_parameter_name;
 
-/* before reset */
-reset
-  /* before parameter */ custom /* before first dot */./* after first dot */ group_name /* before second dot */./* after second dot */ parameter_name /* before semicolon */;
+/* before reset */ reset
+  /* before parameter */ custom /* before first dot */ . /* after first dot */ group_name /* before second dot */ . /* after second dot */ parameter_name /* before semicolon */;
 
 reset
   /* before transaction */ transaction /* before isolation */ isolation /* before level */ level /* before transaction semicolon */;

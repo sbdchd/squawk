@@ -16,7 +16,7 @@ drop routine if exists
 
 -- comments in every position
 drop /* routine */ routine /* if */ if /* exists */ exists
-  /* first routine */ public /* dot */.calculate_total /* open */(
+  /* first routine */ public /* dot */ .calculate_total /* open */ (
     /* first argument */ integer /* argument comma */,
     /* second argument */ numeric /* close */
   ) /* routine comma */,

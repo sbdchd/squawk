@@ -11,6 +11,6 @@ drop type if exists
 
 -- comments in every position
 drop /* type */ type /* if */ if /* exists */ exists
-  /* first */ public /* dot */.customer_kind /* comma */,
+  /* first */ public /* dot */ .customer_kind /* comma */,
   /* second */ reporting.event_kind
   /* behavior */ restrict /* end */;

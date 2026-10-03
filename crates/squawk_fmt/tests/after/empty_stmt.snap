@@ -6,9 +6,6 @@ input_file: crates/squawk_fmt/tests/before/empty_stmt.sql
 
 ;;
 
-/* before empty statement */
-;
+/* before empty statement */;
 
-;
-/* between empty statements */
-;
+; /* between empty statements */;

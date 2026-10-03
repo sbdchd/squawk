@@ -12,11 +12,10 @@ set
   another_intentionally_long_constraint_name
   deferred;
 
-/* before set */
-set
+/* before set */ set
   /* before constraints */ constraints
   /* before first name */ first_constraint /* before comma */,
-  /* before second name */ public /* before dot */./* after dot */ second_constraint
+  /* before second name */ public /* before dot */ . /* after dot */ second_constraint
   /* before timing */ immediate /* before semicolon */;
 
 set

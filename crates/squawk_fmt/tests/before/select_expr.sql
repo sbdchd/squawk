@@ -430,3 +430,10 @@ select
     -- end array
   ]; -- trailing statement
 -- after comment placement expression
+
+select an_extraordinarily_long_left_operand_name in (select an_extraordinarily_long_column_name from an_extraordinarily_long_table_name);
+select an_extraordinarily_long_left_operand_name not in (select an_extraordinarily_long_column_name from an_extraordinarily_long_table_name);
+
+select treat(an_extraordinarily_long_expression_name as an_extraordinarily_long_type_name);
+
+select an_extraordinarily_long_expression_name::an_extraordinarily_long_type_name;

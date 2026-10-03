@@ -16,7 +16,7 @@ drop function if exists
 
 -- comments in every position
 drop /* function */ function /* if */ if /* exists */ exists
-  /* first function */ public /* dot */.calculate_total /* open */(
+  /* first function */ public /* dot */ .calculate_total /* open */ (
     /* first argument */ integer /* argument comma */,
     /* second argument */ numeric /* close */
   ) /* function comma */,

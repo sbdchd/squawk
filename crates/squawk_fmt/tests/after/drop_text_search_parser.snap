@@ -10,5 +10,5 @@ drop text search parser if exists
 
 -- comments in every position
 drop /* text */ text /* search */ search /* parser */ parser /* if */ if /* exists */ exists
-  /* parser name */ public /* dot */.default_parser
+  /* parser name */ public /* dot */ .default_parser
   /* behavior */ restrict /* end */;

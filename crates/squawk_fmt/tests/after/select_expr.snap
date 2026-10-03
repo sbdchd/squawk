@@ -7,7 +7,7 @@ select
   array[1, 2],
   array(select 1),
   array(select '1 4'::int2vector union all select '1 2'::int2vector),
-  /* before array query */ array /* before opening paren */(
+  /* before array query */ array /* before opening paren */ (
     /* before left select */ select /* before left target */ 1
     /* before union */ union /* before all */ all
     /* before right select */ select
@@ -21,7 +21,7 @@ select
     from a_very_long_second_array_select_relation
   ),
   array[[1, 2], [3, 4]],
-  /* before array */ array /* before opening bracket */[
+  /* before array */ array /* before opening bracket */ [
     /* before first */ 1 /* before comma */,
     /* before second */ 2 /* before closing bracket */
   ] /* after array */,
@@ -57,7 +57,7 @@ select
       )
     )
   ),
-  /* before nested array */ array /* before outer opening paren */(
+  /* before nested array */ array /* before outer opening paren */ (
     /* after outer opening paren */ (
       /* after middle opening paren */ (
         /* before select */ select
@@ -97,7 +97,7 @@ select
   ts at time zone 'UTC',
   2 ^ 3,
   name collate "C",
-  name /* before collate */ collate /* before collation */ public /* before dot */./* before name */ "C",
+  name /* before collate */ collate /* before collation */ public /* before dot */ . /* before name */ "C",
   1 = 1,
   1 >= 1,
   'foo' ilike 'F%',
@@ -120,7 +120,7 @@ select
   1 operator(+) 1,
   1 operator(public.+) 1,
   1
-    operator /* before paren */(/* before path */ public /* before dot */./* before op */ + /* after op */) /* after paren */ 1,
+    operator /* before paren */ (/* before path */ public /* before dot */ . /* before op */ + /* after op */) /* after paren */ 1,
   true or false,
   (1, 2) overlaps (3, 4),
   10 % 3,
@@ -136,7 +136,7 @@ select
   2 = all(select x from things),
   3 = some(array[3]),
   4 /* before op */
-    = /* before any */ any /* before opening paren */(
+    = /* before any */ any /* before opening paren */ (
       /* before expr */ array[4] /* before closing paren */
     ) /* after any */,
   exists(select 1 from things),
@@ -160,14 +160,14 @@ select
     select a_very_long_exists_select_expression
     from a_very_long_exists_relation_name
   ),
-  /* before exists */ exists /* before opening paren */(
+  /* before exists */ exists /* before opening paren */ (
     /* before select */ select 1 /* before closing paren */
   ) /* after exists */,
   collation for (b + c),
   collation for (
     a_very_long_collation_input_expression_that_forces_the_builtin_to_wrap
   ),
-  /* before collation */ collation /* before for */ for /* before opening paren */(
+  /* before collation */ collation /* before for */ for /* before opening paren */ (
     /* before expr */ foo /* before closing paren */
   ) /* after collation */,
   extract(year from timestamp '2001-02-16 20:38:40'),
@@ -177,7 +177,7 @@ select
     a_very_long_field_name
     from a_very_long_timestamp_expression_that_forces_the_builtin_to_wrap
   ),
-  /* before extract */ extract /* before opening paren */(
+  /* before extract */ extract /* before opening paren */ (
     /* before field */ day
     /* before from */ from /* before expr */ ts /* before closing paren */
   ) /* after extract */,
@@ -187,7 +187,7 @@ select
     in
     a_very_long_string_expression_that_forces_wrapping
   ),
-  /* before position */ position /* before opening paren */(
+  /* before position */ position /* before opening paren */ (
     /* before substring */ 'om'
     /* before in */ in
     /* before string */ 'Thomas' /* before closing paren */
@@ -208,13 +208,13 @@ select
     a_very_long_start_expression,
     a_very_long_count_name => a_very_long_count_expression
   ),
-  /* before overlay */ overlay /* before opening paren */(
+  /* before overlay */ overlay /* before opening paren */ (
     /* before string */ 'Txxxxas'
     /* before placing */ placing /* before replacement */ 'hom'
     /* before from */ from /* before start */ 2
     /* before for */ for /* before count */ 4 /* before closing paren */
   ) /* after overlay */,
-  overlay /* before opening paren */(
+  overlay /* before opening paren */ (
     /* before string */ 'Txxxxas' /* before comma */,
     /* before replacement */ 'hom' /* before comma */,
     /* before start */ 2 /* before comma */,
@@ -249,7 +249,7 @@ select
   substring(
     'Thomas' /* before comma */, /* before start */ 2, /* before count */ 3
   ),
-  /* before substring */ substring /* before opening paren */(
+  /* before substring */ substring /* before opening paren */ (
     /* before string */ 'Thomas'
     /* before from */ from /* before start */ 2
     /* before for */ for /* before count */ 3 /* before closing paren */
@@ -278,7 +278,7 @@ select
     a_second_very_long_trim_expression,
     a_third_very_long_trim_expression
   ),
-  /* before trim */ trim /* before opening paren */(
+  /* before trim */ trim /* before opening paren */ (
     /* before side */ both /* before trim char */ 'x'
     /* before from */ from /* before string */ 'xfoox' /* before closing paren */
   ) /* after trim */,
@@ -289,7 +289,7 @@ select
     third_very_long_argument_name
   ),
   foo(),
-  foo( /* inside empty args */ ),
+  foo(/* inside empty args */),
   foo(
     -- inside empty args
   ),
@@ -356,7 +356,7 @@ select
     absent on null
     returning a_very_long_json_arrayagg_return_type format json
   ),
-  json_arrayagg /* before opening paren */(
+  json_arrayagg /* before opening paren */ (
     /* before value */ v
     /* before value format */ format /* before value json */ json
     /* before encoding */ encoding /* before encoding name */ utf8
@@ -395,7 +395,7 @@ select
   json_array((select 1)),
   json_array(table things),
   json_array(values (1), (2)),
-  json_array /* before opening paren */(
+  json_array /* before opening paren */ (
     /* before first */ 1 /* before comma */,
     /* before second */ 2
     /* before format */ format /* before json */ json
@@ -418,7 +418,7 @@ select
     passing a_very_long_json_exists_argument as a_very_long_json_exists_name
     false on error
   ),
-  json_exists /* before opening paren */(
+  json_exists /* before opening paren */ (
     /* before document */ doc
     /* before format */ format /* before json */ json
     /* before encoding */ encoding /* before encoding name */ utf8 /* before comma */,
@@ -438,7 +438,7 @@ select
     a_very_long_json_scalar_input_expression_that_forces_the_builtin_to_wrap
   ),
   json_scalar(),
-  json_scalar /* before opening paren */(
+  json_scalar /* before opening paren */ (
     /* before expression */ 1 /* before closing paren */
   ),
   json_serialize(doc),
@@ -450,7 +450,7 @@ select
     returning a_very_long_json_serialize_return_type_name_that_forces_returning_to_wrap
       format json
   ),
-  json_serialize /* before opening paren */(
+  json_serialize /* before opening paren */ (
     /* before document */ doc
     /* before format */ format /* before json */ json
     /* before returning */ returning /* before type */ text
@@ -471,7 +471,7 @@ select
     default a_very_long_json_query_empty_value on empty
     error on error
   ),
-  json_query /* before opening paren */(
+  json_query /* before opening paren */ (
     /* before document */ doc
     /* before format */ format /* before json */ json
     /* before encoding */ encoding /* before encoding name */ utf8 /* before comma */,
@@ -494,7 +494,7 @@ select
     default a_very_long_json_value_empty_value on empty
     error on error
   ),
-  json_value /* before opening paren */(
+  json_value /* before opening paren */ (
     /* before document */ doc
     /* before format */ format /* before json */ json /* before comma */,
     /* before path */ '$.a'
@@ -511,7 +511,7 @@ select
     format json encoding utf8
     with unique keys
   ),
-  json /* before opening paren */(
+  json /* before opening paren */ (
     /* before expression */ doc
     /* before format */ format /* before json */ json
     /* before encoding */ encoding /* before encoding name */ utf8
@@ -531,7 +531,7 @@ select
     with unique keys
     returning a_very_long_json_objectagg_return_type format json
   ),
-  json_objectagg /* before opening paren */(
+  json_objectagg /* before opening paren */ (
     /* before key */ k /* before value keyword */ value /* before value */ v
     /* before value format */ format /* before value json */ json
     /* before null */ null /* before on */ on /* before second null */ null
@@ -557,8 +557,8 @@ select
     returning a_very_long_json_object_return_type format json
   ),
   json_object(returning jsonb),
-  json_object /* before opening paren */(
-    /* before key */ 'a' /* before colon */: /* before value */ 1 /* before comma */,
+  json_object /* before opening paren */ (
+    /* before key */ 'a' /* before colon */ : /* before value */ 1 /* before comma */,
     /* before second key */ 'b' /* before value keyword */ value /* before second value */ 2
     /* before format */ format /* before json */ json
     /* before absent */ absent /* before on */ on /* before null */ null
@@ -567,7 +567,7 @@ select
       /* before returning format */ format /* before returning json */ json /* before closing paren */
   ),
   public.foo(1),
-  foo /* before opening paren */(
+  foo /* before opening paren */ (
     /* before first arg */ 1 /* before comma */,
     /* before second arg */ 2 /* before closing paren */
   ),
@@ -677,7 +677,7 @@ select
   foo.*,
   (foo).bar,
   (/* after opening paren */ foo /* before closing paren */).bar,
-  foo /* before dot */./* before field */ bar,
+  foo /* before dot */ . /* before field */ bar,
   a_very_long_field_base_expression.a_very_long_first_field_name.a_very_long_second_field_name,
   (
     a_very_long_parenthesized_field_base_expression_that_forces_wrapping
@@ -686,7 +686,7 @@ select
   a[1],
   a[1][2],
   a[1 + 2],
-  a /* before bracket */[/* before index */ 1 /* before closing bracket */],
+  a /* before bracket */ [/* before index */ 1 /* before closing bracket */],
   a_very_long_indexed_expression[a_very_long_first_index_expression][
     a_very_long_second_index_expression + a_very_long_index_offset_expression
   ],
@@ -729,7 +729,7 @@ select
   (table foo order by a desc, b asc),
   (
     /* before table */ table
-      /* before only */ only /* before relation opening paren */(/* before relation */ public /* before dot */./* before name */ foo /* before relation closing paren */) /* before outer closing paren */
+      /* before only */ only /* before relation opening paren */ (/* before relation */ public /* before dot */ . /* before name */ foo /* before relation closing paren */) /* before outer closing paren */
   ),
   (
     table
@@ -798,7 +798,7 @@ select
   c[2:],
   c[:3],
   c[:],
-  c /* before bracket */[/* before start */ 1 /* before colon */:/* before end */ 2 /* before closing bracket */],
+  c /* before bracket */ [/* before start */ 1 /* before colon */ : /* before end */ 2 /* before closing bracket */],
   a_very_long_sliced_expression[a_very_long_slice_start_expression:a_very_long_slice_end_expression][a_second_very_long_slice_start_expression:a_second_very_long_slice_end_expression],
   -- tuple expr
   (1, 2, 3),
@@ -808,12 +808,12 @@ select
     third_very_long_tuple_expression
   ),
   row(),
-  row( /* inside empty row */ ),
+  row(/* inside empty row */),
   row(
     -- inside empty row
   ),
   row(1),
-  row /* before opening paren */(1),
+  row /* before opening paren */ (1),
   row(1, 2),
   row(
     a_very_long_first_row_expression,
@@ -978,3 +978,21 @@ select
     -- end array
   ]; -- trailing statement
 -- after comment placement expression
+
+select
+  an_extraordinarily_long_left_operand_name in (
+    select an_extraordinarily_long_column_name
+    from an_extraordinarily_long_table_name
+  );
+select
+  an_extraordinarily_long_left_operand_name not in (
+    select an_extraordinarily_long_column_name
+    from an_extraordinarily_long_table_name
+  );
+
+select treat(
+  an_extraordinarily_long_expression_name as an_extraordinarily_long_type_name
+);
+
+select
+  an_extraordinarily_long_expression_name::an_extraordinarily_long_type_name;
