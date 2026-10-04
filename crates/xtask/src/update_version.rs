@@ -166,7 +166,25 @@ fn update_changelog(sh: &Shell, version: &str, date: &str, commits: &str) -> Res
     if !content.contains(needle) {
         bail!("CHANGELOG.md is missing the '## [Unreleased]' header");
     }
-    let replacement = format!("## [Unreleased]\n\n## v{version} - {date}\n\n{commits}\n");
+    let replacement = format!(
+        "\
+## [Unreleased]
+
+## v{version} - {date}
+
+### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+### Internal
+
+{commits}
+"
+    );
     let updated = content.replacen(needle, &replacement, 1);
     sh.write_file(&path, updated)?;
     Ok(())

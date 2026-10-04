@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - linter: adds linting for migration operations that break backwards compatibility (#1375). Thanks @t-monaghan!
+  - ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
+  - opt-in ban-drop-trigger rule
 
 - ide: goto def for embedded sql strings (#1358)
 - ide: goto def for begin atomic function defs (#1356)
@@ -22,26 +24,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fmt: add validation for comments + whitespace (#1377)
 - fmt: add validation for dupe spaces (#1376)
 
+### Changed
+
+- fmt: adjust insert, alter/drop operator, cte queries, values (#1368, #1364, #1363)
+
 ### Fixed
 
 - parser: fix set role (#1365)
 - parser: fix non-unicode ident parsing + cte error recovery (#1366)
 - parser: improve plpgsql error recovery (#1361)
 
-- npm: publish musl packages and fix exit code on spawn failure (#1371)
+- npm: publish musl packages and fix exit code on spawn failure (#1371). Thanks @TiagoGranelli!
 - github: fix escape codes in github comments (#1367). Thanks @chdsbd!
 
 - ide: fix goto def visibility issues (#1357)
 - ide: fix goto def bug with `*` expansion (#1373)
-
-### Changed
-
-- fmt: adjust insert, alter/drop operator, cte queries, values (#1368, #1364, #1363)
-
-### Added
-
-- linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
-- linter: opt-in ban-drop-trigger rule
 
 ## v2.66.0 - 2026-09-23
 
@@ -1018,14 +1015,14 @@ Attempt to fix npm install method
 - ide: goto def window defs & over clauses (#994)
 - ide: goto def subquery compound selects (#988)
 
+### Changed
+
+- server: pull based diagnostics (#1006)
+
 ### Fixed
 
 - server: handle errors from handlers by converting to a lsp err response (#1005)
 - parser: we weren't handling compound selects with extra parens (#989)
-
-### Changed
-
-- server: pull based diagnostics (#1006)
 
 ### Internal
 
@@ -1063,13 +1060,6 @@ Attempt to fix npm install method
 
 ## v2.42.0 - 2026-02-25
 
-### Changed
-
-- linter: undo foreign key constraint check in create table (#962)
-
-  This was an incorrect change to add and isn't necessary since the new table
-  doesn't have any rows.
-
 ### Added
 
 - ci: build for alpine arm (#960)
@@ -1077,6 +1067,13 @@ Attempt to fix npm install method
 - ide: goto def & hover for now() + current_timestamp (#950)
 - ide: goto def for column names in table function returns (#949)
 - ide: goto def with function in from item & cross join (#961)
+
+### Changed
+
+- linter: undo foreign key constraint check in create table (#962)
+
+  This was an incorrect change to add and isn't necessary since the new table
+  doesn't have any rows.
 
 ### Fixed
 
@@ -1094,19 +1091,15 @@ Attempt to fix npm install method
 - ide: add quick fixes for leading `from` (#933)
 - ide: goto def for builtins (#932)
 
-### Fixed
-
-- linter: fix adding-not-nullable-field for pg >= 12 with validated CHECK (#910). Thanks @reteps!
-
 ### Changed
 
 - linter: don't report lint errors when syntax error found (#943)
 
-## v2.40.1 - 2026-02-12
-
 ### Fixed
 
-- github: fix commenting via rust_crypto features in jsonwebtoken (#929). Thanks @lokiwins!
+- linter: fix adding-not-nullable-field for pg >= 12 with validated CHECK (#910). Thanks @reteps!
+
+## v2.40.1 - 2026-02-12
 
 ### Added
 
@@ -1161,6 +1154,10 @@ Attempt to fix npm install method
   Before it parsed `all` as a name reference.
 
 - ide: goto def func call in on conflict (#925)
+
+### Fixed
+
+- github: fix commenting via rust_crypto features in jsonwebtoken (#929). Thanks @lokiwins!
 
 ## v2.40.0 - 2026-02-06
 
@@ -1382,13 +1379,13 @@ Attempt to fix npm install method
 
 ## v2.32.0 - 2025-12-04
 
-### Fixed
-
-- parser: fixed issue parsing some `insert`'s with `select`s and `conflict` clauses (#720, #721, #722).
-
 ### Added
 
 - parser: special case functions like `extract` are now properly typed in the ast (#719).
+
+### Fixed
+
+- parser: fixed issue parsing some `insert`'s with `select`s and `conflict` clauses (#720, #721, #722).
 
 ## v2.31.0 - 2025-11-24
 
@@ -1544,6 +1541,11 @@ Attempt to fix npm install method
      ╰╴             ++++++++++++
   ```
 
+### Changed
+
+- internal: bump rust to 1.90.0 (#659)
+- syntax: fill out more of the ast (#658)
+
 ### Fixed
 
 - parser: parsing some `set` related commands. (#657)
@@ -1555,11 +1557,6 @@ Attempt to fix npm install method
   set foo.bar from current;
   set bar from current;
   ```
-
-### Changed
-
-- internal: bump rust to 1.90.0 (#659)
-- syntax: fill out more of the ast (#658)
 
 ## v2.26.0 - 2025-09-15
 
@@ -1575,6 +1572,10 @@ Attempt to fix npm install method
   alter table t add column c timestamptz default now() - interval '100 years';
   ```
 
+### Changed
+
+- cli now uses unicode for snippet annotations (#654).
+
 ### Fixed
 
 - parser: parse materialized views using a paren select (#651).
@@ -1585,10 +1586,6 @@ Attempt to fix npm install method
   create materialized view v
   as (select * from t);
   ```
-
-### Changed
-
-- cli now uses unicode for snippet annotations (#654).
 
 ## v2.25.1 - 2025-09-03
 
@@ -1941,6 +1938,11 @@ github: fix api calls failing with 403. (#643)
 
 ## v2.8.0 - 2025-05-25
 
+### Changed
+
+- Renamed `ast::Item` to `ast::Stmt`. (#483)
+- Split `select` into `select`, `tables`, and `values` statements. (#484)
+
 ### Fixed
 
 - Fix parsing `select select`. (#499)
@@ -1981,11 +1983,6 @@ github: fix api calls failing with 403. (#643)
   ```sql
   explain (costs off) select;
   ```
-
-### Changed
-
-- Renamed `ast::Item` to `ast::Stmt`. (#483)
-- Split `select` into `select`, `tables`, and `values` statements. (#484)
 
 ## v2.7.0 - 2025-05-14
 
@@ -2250,15 +2247,15 @@ github: fix api calls failing with 403. (#643)
 - added `ban-drop-table` rule. Thanks @borisrozumnuk! (#286)
 - added `not-null-constraint` rule. Thanks @andrewsmith! (#288)
 
+### Changed
+
+- Upgrade libpg_query from 13 to 15. Thanks @andrewsmith! (#291)
+
 ### Fixed
 
 - Fixed building Squawk on platforms where `c_char` is unsigned. Thanks @ods! (#285)
 - Fixed Squawk compatiblity with Nix. Thanks @andrewsmith! (#287)
 - Fixed regression in parsing union queries. Fixed parsing call statement. (#293)
-
-### Changed
-
-- Upgrade libpg_query from 13 to 15. Thanks @andrewsmith! (#291)
 
 ## v0.21.0 - 2023-02-14
 
@@ -2422,14 +2419,14 @@ github: fix api calls failing with 403. (#643)
 
 ## v0.7.1 - 2021-05-30
 
+### Changed
+
+- allowing adding not null column with default for `adding-not-null-field`. (#144)
+
 ### Fixed
 
 - incorrect internal schema for "create partition" statements. (#146)
 - `upload-to-github` command not obeying top level `--exclude`s. (#142)
-
-### Changed
-
-- allowing adding not null column with default for `adding-not-null-field`. (#144)
 
 ## v0.7.0 - 2021-05-19
 
