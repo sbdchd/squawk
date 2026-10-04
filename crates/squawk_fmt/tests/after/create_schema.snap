@@ -38,7 +38,7 @@ create schema
 
 create /* schema keyword */ schema
   /* authorization keyword */ authorization /* role */ schema_owner
-  /* schema element */ create /* function keyword */ function /* function name */ app /* separator */./* local name */ calculate(
+  /* schema element */ create /* function keyword */ function /* function name */ app /* separator */ . /* local name */ calculate(
     /* parameter */ value integer
   ) /* return type */ returns integer
     /* language option */ language /* language */ sql

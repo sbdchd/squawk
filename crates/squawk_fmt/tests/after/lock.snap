@@ -30,9 +30,8 @@ lock table
   in access exclusive mode
   nowait;
 
-/* before lock */
-lock /* before table */ table
-  /* before first relation */ only /* before first name */ public /* before dot */./* after dot */ records /* before comma */,
+/* before lock */ lock /* before table */ table
+  /* before first relation */ only /* before first name */ public /* before dot */ . /* after dot */ records /* before comma */,
   /* after comma */ archived_records
   /* before in */ in /* before access */ access /* before exclusive */ exclusive /* before mode */ mode
   /* before nowait */ nowait /* before semicolon */;

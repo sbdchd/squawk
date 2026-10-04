@@ -13,8 +13,7 @@ create event trigger extraordinarily_long_event_trigger_name
   execute procedure
     extraordinarily_long_schema_name.extraordinarily_long_event_trigger_procedure();
 
-/* before create */
-create /* before event */ event /* before trigger */ trigger /* before name */ commented_trigger
+/* before create */ create /* before event */ event /* before trigger */ trigger /* before name */ commented_trigger
   /* before on */ on /* before event name */ ddl_command_end
   /* before when */ when /* before variable */ tag /* before in */ in /* before left paren */ (
     /* before first literal */ 'CREATE TABLE' /* before comma */,
@@ -24,6 +23,6 @@ create /* before event */ event /* before trigger */ trigger /* before name */ c
     /* before second literal */ 'postgis' /* before second right paren */
   )
   /* before execute */ execute /* before function */ function
-    /* before call */ audit.log_ddl /* before call left paren */(
+    /* before call */ audit.log_ddl /* before call left paren */ (
       /* before call right paren */
     ) /* before semicolon */;

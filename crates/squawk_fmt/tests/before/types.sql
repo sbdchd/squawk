@@ -56,7 +56,9 @@ create table t (
   j CHARACTER /*bb*/ VARYING,
   k NATIONAL /*cc*/ CHARACTER,
   l BIT /*dd*/ VARYING /*ee*/ ( /*ff*/ 3 /*gg*/ ),
-  m INTERVAL YEAR /*hh*/ TO /*ii*/ MONTH
+  m BIT /*hh*/ (3),
+  n CHARACTER /*ii*/ (4),
+  o INTERVAL YEAR /*jj*/ TO /*kk*/ MONTH
 );
 select 1::SETOF /*a*/ INT, 2::pg_catalog /*b*/ . /*c*/ int4;
 

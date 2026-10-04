@@ -11,6 +11,6 @@ drop sequence if exists
 
 -- comments in every position
 drop /* sequence */ sequence /* if */ if /* exists */ exists
-  /* first schema */ public /* first dot */.order_number_seq /* comma */,
-  /* second schema */ accounting /* second dot */.invoice_number_seq
+  /* first schema */ public /* first dot */ .order_number_seq /* comma */,
+  /* second schema */ accounting /* second dot */ .invoice_number_seq
   /* behavior */ restrict /* end */;

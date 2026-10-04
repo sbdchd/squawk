@@ -12,7 +12,7 @@ create text search configuration
 );
 
 create /* text keyword */ text /* search keyword */ search /* configuration keyword */ configuration
-  /* name */ public /* dot */./* name segment */ commented_configuration /* left parenthesis */ (
+  /* name */ public /* dot */ . /* name segment */ commented_configuration /* left parenthesis */ (
   /* first option */ parser /* equals */ = /* value */ public.default_parser /* comma */,
   /* second option */ copy = /* second value */ public.english /* right parenthesis */
 ) /* semicolon */;

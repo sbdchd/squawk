@@ -10,5 +10,5 @@ drop text search template if exists
 
 -- comments in every position
 drop /* text */ text /* search */ search /* template */ template /* if */ if /* exists */ exists
-  /* template name */ public /* dot */.simple_template
+  /* template name */ public /* dot */ .simple_template
   /* behavior */ restrict /* end */;

@@ -52,8 +52,8 @@ create property graph social
   );
 
 -- comments in every position
-create /* persistence */ local /* temporary */ temporary /* property */ property /* graph */ graph /* graph name */ public /* dot */./* name */ social
-  /* vertex */ vertex /* tables */ tables /* left paren */(
+create /* persistence */ local /* temporary */ temporary /* property */ property /* graph */ graph /* graph name */ public /* dot */ . /* name */ social
+  /* vertex */ vertex /* tables */ tables /* left paren */ (
     /* table */ people /* key */ key /* key left */ (
       /* key column */ id /* key right */
     )
@@ -63,7 +63,7 @@ create /* persistence */ local /* temporary */ temporary /* property */ property
     /* second table */ organizations
       /* no */ no /* properties */ properties /* vertex right */
   )
-  /* edge */ edge /* edge tables */ tables /* edge left */(
+  /* edge */ edge /* edge tables */ tables /* edge left */ (
     /* edge table */ follows
       /* source */ source /* source key */ key /* source left */ (
         /* source column */ follower_id /* source right */

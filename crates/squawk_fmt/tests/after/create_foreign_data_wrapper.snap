@@ -16,8 +16,7 @@ create foreign data wrapper extraordinarily_long_foreign_data_wrapper_name
     extraordinarily_long_option_name 'extraordinarily long foreign data wrapper option value'
   );
 
-/* before create */
-create /* before foreign */ foreign /* before data */ data /* before wrapper */ wrapper /* before name */ commented_fdw
+/* before create */ create /* before foreign */ foreign /* before data */ data /* before wrapper */ wrapper /* before name */ commented_fdw
   /* before handler */ handler /* before handler name */ public.handler_fn
   /* before validator */ validator /* before validator name */ public.validator_fn
   /* before options */ options /* before left paren */ (

@@ -17,9 +17,9 @@ select
     second_very_long_content_expression,
     third_very_long_content_expression
   ),
-  /* before element */ xmlelement /* before outer opening paren */(
+  /* before element */ xmlelement /* before outer opening paren */ (
     /* before name */ name /* before tag */ tag /* before attributes comma */,
-    /* before xmlattributes */ xmlattributes /* before attributes opening paren */(
+    /* before xmlattributes */ xmlattributes /* before attributes opening paren */ (
       /* before first attribute */ a /* before as */ as /* before attribute name */ attr /* before attribute comma */,
       /* before second attribute */ b /* before attributes closing paren */
     ) /* before content comma */,
@@ -35,7 +35,7 @@ select
     a_very_long_xml_exists_document_expression
     by value
   ),
-  /* before exists */ xmlexists /* before opening paren */(
+  /* before exists */ xmlexists /* before opening paren */ (
     /* before row */ '/foo'
     /* before passing */ passing
     /* before first by */ by /* before ref */ ref
@@ -47,7 +47,7 @@ select
     first_very_long_expression as first_very_long_element_name,
     second_very_long_expression as second_very_long_element_name
   ),
-  /* before forest */ xmlforest /* before opening paren */(
+  /* before forest */ xmlforest /* before opening paren */ (
     /* before first expression */ a /* before as */ as /* before tag */ first /* before comma */,
     /* before second expression */ b /* before closing paren */
   ) /* after forest */,
@@ -58,7 +58,7 @@ select
     a_very_long_xml_parse_document_expression_that_forces_the_xml_parse_node_to_wrap
     preserve whitespace
   ),
-  /* before parse */ xmlparse /* before opening paren */(
+  /* before parse */ xmlparse /* before opening paren */ (
     /* before kind */ document
     /* before expression */ value
     /* before preserve */ preserve /* before whitespace */ whitespace /* before closing paren */
@@ -69,7 +69,7 @@ select
     name a_very_long_xml_processing_instruction_target,
     a_very_long_xml_processing_instruction_expression_that_forces_the_xml_pi_node_to_wrap
   ),
-  /* before pi */ xmlpi /* before opening paren */(
+  /* before pi */ xmlpi /* before opening paren */ (
     /* before name */ name /* before target */ php /* before comma */,
     /* before expression */ 'echo' /* before closing paren */
   ) /* after pi */,
@@ -82,9 +82,9 @@ select
     version a_very_long_xml_root_version_expression,
     standalone no value
   ),
-  /* before root */ xmlroot /* before opening paren */(
+  /* before root */ xmlroot /* before opening paren */ (
     /* before expression */ doc /* before version comma */,
-    /* before version */ version /* before no */ no /* before version value */ value/* before standalone comma */ ,
+    /* before version */ version /* before no */ no /* before version value */ value /* before standalone comma */,
     /* before standalone */ standalone /* before standalone no */ no /* before standalone value */ value /* before closing paren */
   ) /* after root */,
   xmlserialize(document doc as text),
@@ -95,7 +95,7 @@ select
     as a_very_long_xml_serialize_return_type
     no indent
   ),
-  /* before serialize */ xmlserialize /* before opening paren */(
+  /* before serialize */ xmlserialize /* before opening paren */ (
     /* before kind */ content /* before expression */ doc
     /* before as */ as /* before type */ text
     /* before no */ no /* before indent */ indent /* before closing paren */

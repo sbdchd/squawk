@@ -4,8 +4,7 @@ input_file: crates/squawk_fmt/tests/before/values.sql
 ---
 values (1, 2), (3, 4);
 values (1), (2) order by column1 desc, column2 asc;
-/* before values */
-values
+/* before values */ values
   /* before first row */ (
     /* before first expression */ 1 /* before expression comma */,
     /* before second expression */ 2 /* before first row closing paren */

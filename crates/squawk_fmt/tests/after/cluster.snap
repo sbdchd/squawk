@@ -17,15 +17,14 @@ cluster
   a_very_long_schema_name.an_intentionally_long_table_name
 using a_very_long_schema_name.an_intentionally_long_index_name;
 
-/* before */
-cluster
+/* before */ cluster
   /* after cluster */ (
     /* after left paren */ verbose /* before comma */,
     /* after comma */ analyze /* before value */ true /* before right paren */
   )
-  /* before table */ public /* before table dot */./* after table dot */ records
-/* before using */ using /* after using */ public /* before index dot */./* after index dot */ records_idx /* before semicolon */;
+  /* before table */ public /* before table dot */ . /* after table dot */ records
+/* before using */ using /* after using */ public /* before index dot */ . /* after index dot */ records_idx /* before semicolon */;
 
 cluster
-  /* before legacy index */ public /* before legacy index dot */./* after legacy index dot */ records_idx
-  /* before on */ on /* after on */ public /* before legacy table dot */./* after legacy table dot */ records /* before legacy semicolon */;
+  /* before legacy index */ public /* before legacy index dot */ . /* after legacy index dot */ records_idx
+  /* before on */ on /* after on */ public /* before legacy table dot */ . /* after legacy table dot */ records /* before legacy semicolon */;

@@ -4,7 +4,7 @@ input_file: crates/squawk_fmt/tests/before/create_table.sql
 ---
 create table u ();
 
-create table empty_table_arg_comment ( /* inside empty args */ );
+create table empty_table_arg_comment (/* inside empty args */);
 
 create table empty_table_arg_line_comment (
   -- inside empty args
@@ -39,7 +39,7 @@ create table "left" (id int);
 create table "table" (id int);
 create table U&"d\0061t\+000061" (id int);
 create table U&"d!0061tum" uescape '!' (id int);
-create table /* foo */ foo /* bar  */./* buzz */ bar (id int);
+create table /* foo */ foo /* bar  */ . /* buzz */ bar (id int);
 
 -- comments inside a name node
 create table U&"d!0061tum" /* mid */ uescape '!' (id int);
@@ -47,7 +47,7 @@ create table t (U&"c!006fl" /* c */ uescape '!' int);
 create table t (U&"c!006fl" uescape /* c */ '!' int);
 
 -- comments inside a path
-create table foo /*a*/ /*b*/.bar (id int);
+create table foo /*a*/ /*b*/ .bar (id int);
 create table foo -- a line comment
 .bar (id int);
 
@@ -126,7 +126,7 @@ create table column_option_comments (
     /*k*/ add /*l*/ formatter /*m*/ 'x' /*n*/,
     /*o*/ set /*p*/ formatter /*q*/ 'y' /*r*/,
     /*s*/ drop /*t*/ formatter /*u*/
-  ) /*v*/ collate /*w*/ public /*x*/./*y*/ "C"
+  ) /*v*/ collate /*w*/ public /*x*/ . /*y*/ "C"
     /*z*/ constraint /*aa*/ payload_required /*ab*/ not /*ac*/ null
       /*ad*/ deferrable,
   /*ae*/ id /*af*/ bigint
@@ -196,4 +196,11 @@ create table default_expression_comments (
     ) /* before default close */
   ) /* before comma */,
   b int
+);
+
+create table default_subquery (
+  a int default (
+    select count(*)
+    from an_extraordinarily_long_table_name_that_forces_the_subquery_to_wrap
+  )
 );

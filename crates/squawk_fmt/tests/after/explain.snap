@@ -16,8 +16,7 @@ explain (
   from an_intentionally_long_table_name
   where an_intentionally_long_column_name > 0;
 
-/* before explain */
-explain /* before options */ (
+/* before explain */ explain /* before options */ (
   /* before analyze */ analyze /* before value */ true /* before comma */,
   /* before format */ format /* before json */ json /* before close */
 )

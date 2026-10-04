@@ -29,11 +29,11 @@ create operator class extraordinarily_long_schema_name.extraordinarily_long_inte
   storage extraordinarily_long_schema_name.extraordinarily_long_storage_type;
 
 -- comments in every position
-create /* operator */ operator /* class */ class /* schema */ app /* dot */./* name */ integer_ops
+create /* operator */ operator /* class */ class /* schema */ app /* dot */ . /* name */ integer_ops
   /* default */ default /* for */ for /* type keyword */ type /* data type */ integer
   /* using */ using /* method */ btree
-  /* family */ family /* family schema */ app /* family dot */./* family name */ integer_family /* as */ as
-  /* option */ operator /* number */ 1 /* operator name */ < /* left paren */(
+  /* family */ family /* family schema */ app /* family dot */ . /* family name */ integer_family /* as */ as
+  /* option */ operator /* number */ 1 /* operator name */ < /* left paren */ (
     /* left type */ integer /* type comma */,
     /* right type */ integer /* right paren */
   )

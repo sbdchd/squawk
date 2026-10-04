@@ -60,7 +60,7 @@ create table partitioned (
 create /*a*/ local /*b*/ temporary /*c*/ table /*d*/ if /*e*/ not /*f*/ exists /*g*/ commented (
   /*h*/ id int /*i*/
 )
-  /*j*/ inherits /*k*/(/*l*/ parent /*m*/, /*n*/ archive.parent /*o*/)
+  /*j*/ inherits /*k*/ (/*l*/ parent /*m*/, /*n*/ archive.parent /*o*/)
   /*p*/ partition /*q*/ by /*r*/ hash /*s*/ (/*t*/ id /*u*/)
   /*v*/ using /*w*/ heap
   /*x*/ with /*y*/ (fillfactor /*z*/ = /*aa*/ 70 /*ab*/)
@@ -73,10 +73,10 @@ create table child
   /*l*/ to /*m*/ (/*n*/ maxvalue /*o*/, /*p*/ 100 /*q*/);
 create table child_in
   partition of parent
-  for /*a*/ values /*b*/ in /*c*/(/*d*/ 1 /*e*/, /*f*/ 2 /*g*/);
+  for /*a*/ values /*b*/ in /*c*/ (/*d*/ 1 /*e*/, /*f*/ 2 /*g*/);
 create table child_hash
   partition of parent
-  for /*a*/ values /*b*/ with /*c*/(
+  for /*a*/ values /*b*/ with /*c*/ (
     /*d*/ modulus /*e*/ 4 /*f*/,
     /*g*/ remainder /*h*/ 0 /*i*/
   );

@@ -12,5 +12,5 @@ drop trigger if exists
 -- comments in every position
 drop /* trigger */ trigger /* if */ if /* exists */ exists
   /* name */ audit_trigger
-  /* on */ on /* relation */ public /* dot */.accounts
+  /* on */ on /* relation */ public /* dot */ .accounts
   /* behavior */ restrict /* end */;

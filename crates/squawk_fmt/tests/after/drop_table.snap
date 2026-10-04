@@ -11,6 +11,6 @@ drop table if exists
 
 -- comments in every position
 drop /* table */ table /* if */ if /* exists */ exists
-  /* first table */ public /* dot */.accounts /* before comma */,
+  /* first table */ public /* dot */ .accounts /* before comma */,
   /* second table */ archive.old_accounts
   /* behavior */ restrict /* end */;

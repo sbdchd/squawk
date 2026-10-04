@@ -72,14 +72,13 @@ grant execute on procedure /* before procedure */ p(integer) to app_user;
 
 grant execute on routine /* before routine */ r(integer) to app_user;
 
-/* before grant */
-grant
+/* before grant */ grant
   /* before select */ select /* before columns */ (
     /* before column */ payload /* before close */
   )
   /* before on */ on
     /* before table */ table
-      /* before object */ public /* before dot */./* after dot */ records
+      /* before object */ public /* before dot */ . /* after dot */ records
   /* before to */ to
   /* before role */ app_user
   /* before with */ with /* before grant option */ grant /* before option */ option

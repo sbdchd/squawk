@@ -76,3 +76,19 @@ and b;
 
 select 1 between a -- lower bound
 and b;
+
+select foo( /* first */ /* second */ );
+
+select array[ /* empty */ ];
+
+select 1/* first *//* second */+/* third */2;
+
+select ( /* outer */ foo( /* inner */ 1 /* close inner */ ) /* close outer */ );
+
+select foo.
+-- own-line comment after dot
+bar;
+
+select foo.
+/* own-line block comment after dot */
+bar;

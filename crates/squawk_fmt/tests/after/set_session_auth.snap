@@ -15,8 +15,7 @@ set
   authorization
   an_intentionally_long_role_name_that_makes_this_statement_longer_than_eighty_characters;
 
-/* before set */
-set
+/* before set */ set
   /* before scope */ local
   /* before session */ session
   /* before authorization */ authorization

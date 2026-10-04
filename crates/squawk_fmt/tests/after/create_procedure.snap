@@ -17,7 +17,7 @@ create or replace procedure extraordinarily_long_schema_name.extraordinarily_lon
   as $$ begin null; end $$;
 
 -- comments in every position
-create /* or */ or /* replace */ replace /* procedure */ procedure /* schema */ app /* dot */./* name */ recalculate/* params */ (
+create /* or */ or /* replace */ replace /* procedure */ procedure /* schema */ app /* dot */ . /* name */ recalculate /* params */ (
   /* mode */ in /* parameter */ account_id /* type */ integer /* comma */,
   /* out mode */ out /* output */ result /* output type */ text /* close */
 )

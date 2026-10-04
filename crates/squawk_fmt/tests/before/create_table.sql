@@ -97,3 +97,5 @@ create table t (a int default (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 
 
 -- comments in parenthesized default expressions
 create table default_expression_comments (a int /* before default */ default /* before open */ (/* before expression */ greatest(/* before first */ 1 /* before comma */, /* before second */ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 /* before call close */) /* before default close */) /* before comma */, b int);
+
+create table default_subquery (a int default (select count(*) from an_extraordinarily_long_table_name_that_forces_the_subquery_to_wrap));

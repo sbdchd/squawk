@@ -43,6 +43,8 @@ struct Ctx {
 fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a> {
     let mut doc = Doc::nil();
     let mut previous_was_stmt = false;
+    let mut needs_space = false;
+    let mut at_start = true;
     for el in source_file.syntax().children_with_tokens() {
         match el {
             rowan::NodeOrToken::Node(node) => {
@@ -50,27 +52,42 @@ fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a>
                     let is_empty_stmt = matches!(&stmt, ast::Stmt::EmptyStmt(_));
                     if previous_was_stmt && !is_empty_stmt {
                         doc = doc.append(Doc::empty_line());
+                    } else if needs_space && !is_empty_stmt {
+                        doc = doc.append(Doc::space());
                     }
                     doc = doc.append(build_stmt(ctx, stmt));
                     previous_was_stmt = !is_empty_stmt;
                 } else {
                     previous_was_stmt = false;
                 }
+                needs_space = true;
+                at_start = false;
             }
             rowan::NodeOrToken::Token(token) => {
                 previous_was_stmt = false;
                 if token.kind() == SyntaxKind::COMMENT {
+                    if needs_space {
+                        doc = doc.append(Doc::space());
+                    }
                     doc = doc.append(build_comment(&token));
+                    needs_space = true;
+                    at_start = false;
                 } else if token.text() == BOM {
                     doc = doc.append(Doc::text(BOM));
-                } else if token.kind() == SyntaxKind::WHITESPACE {
-                    // TODO: I think we can improve this
-                    let gap = if token.text().universal_newlines().count() >= 2 {
-                        Doc::empty_line().append(Doc::empty_line())
-                    } else {
-                        Doc::empty_line()
-                    };
-                    doc = doc.append(comment_run_after(&token).separator_before(gap));
+                } else if token.kind() == SyntaxKind::WHITESPACE && !at_start {
+                    let newlines = token
+                        .text()
+                        .universal_newlines()
+                        .filter(|line| line.line_ending().is_some())
+                        .count();
+                    if newlines == 0 {
+                        continue;
+                    }
+                    needs_space = false;
+                    doc = doc.append(Doc::empty_line());
+                    if newlines >= 2 && token.next_sibling_or_token().is_some() {
+                        doc = doc.append(Doc::empty_line());
+                    }
                 }
             }
         }
@@ -223,7 +240,7 @@ fn build_prepare<'a>(ctx: &Ctx, prepare: &ast::Prepare) -> Doc<'a> {
         .map(|name| leading_comments(name.syntax()).append(build_name(name.syntax())));
     if let Some(params) = prepare.param_list() {
         let params =
-            leading_comments(params.syntax()).append(build_function_param_list(ctx, params));
+            comments_before(params.syntax()).append(build_function_param_list(ctx, params));
         header_body = Some(match header_body {
             Some(header_body) => header_body.append(params),
             None => params,
@@ -1204,7 +1221,7 @@ fn build_column_target<'a>(ctx: &Ctx, target: ast::ColumnTarget) -> Doc<'a> {
         .unwrap_or_else(Doc::nil);
     for accessor in target.accessors() {
         doc = doc
-            .append(leading_comments(accessor.syntax()))
+            .append(comments_before(accessor.syntax()))
             .append(build_accessor(ctx, accessor));
     }
     doc
@@ -1570,15 +1587,17 @@ fn build_referencing_table<'a>(table: ast::ReferencingTable) -> Doc<'a> {
 
 fn build_trigger_when_condition<'a>(ctx: &Ctx, condition: ast::WhenCondition) -> Doc<'a> {
     let mut doc = Doc::text("when");
-    if let Some(l_paren) = condition.l_paren_token() {
-        doc = doc.append(comments_before(&l_paren));
-    }
+    doc = doc.append(
+        condition
+            .l_paren_token()
+            .map(|l_paren| space_or_comments_before(&l_paren))
+            .unwrap_or_else(Doc::space),
+    );
     let body = condition
         .expr()
         .map(|expr| leading_comments(expr.syntax()).append(build_expr(ctx, expr)))
         .unwrap_or_else(Doc::nil);
-    doc.append(Doc::space())
-        .append(Doc::text("("))
+    doc.append(Doc::text("("))
         .append(wrap_body(ctx, body, condition.r_paren_token()))
         .append(Doc::text(")"))
         .group()
@@ -1618,9 +1637,11 @@ fn build_create_transform<'a>(ctx: &Ctx, stmt: &ast::CreateTransform) -> Doc<'a>
     }
     doc = doc.group();
 
-    if let Some(l_paren) = stmt.l_paren_token() {
-        doc = doc.append(comments_before(&l_paren));
-    }
+    doc = doc.append(
+        stmt.l_paren_token()
+            .map(|l_paren| space_or_comments_before(&l_paren))
+            .unwrap_or_else(Doc::space),
+    );
     let funcs = stmt.transform_funcs().map(|func| {
         let syntax = func.syntax().clone();
         (
@@ -1629,8 +1650,7 @@ fn build_create_transform<'a>(ctx: &Ctx, stmt: &ast::CreateTransform) -> Doc<'a>
         )
     });
     let body = build_comma_separated_docs(funcs).unwrap_or_else(Doc::nil);
-    doc.append(Doc::space())
-        .append(Doc::text("("))
+    doc.append(Doc::text("("))
         .append(wrap_body(ctx, body, stmt.r_paren_token()))
         .append(Doc::text(")"))
         .group()
@@ -1690,7 +1710,7 @@ fn build_create_function<'a>(ctx: &Ctx, create_function: &ast::CreateFunction) -
     }
     if let Some(params) = create_function.param_list() {
         doc = doc
-            .append(leading_comments(params.syntax()))
+            .append(comments_before(params.syntax()))
             .append(build_function_param_list(ctx, params));
     }
     if let Some(ret_type) = create_function.ret_type() {
@@ -3364,7 +3384,7 @@ fn build_create_aggregate<'a>(ctx: &Ctx, stmt: &ast::CreateAggregate) -> Doc<'a>
     }
     if let Some(params) = stmt.param_list() {
         doc = doc
-            .append(leading_comments(params.syntax()))
+            .append(comments_before(params.syntax()))
             .append(build_aggregate_param_list(ctx, params));
     }
     if let Some(attributes) = stmt.attribute_list() {
@@ -3678,9 +3698,12 @@ fn build_event_trigger_when<'a>(ctx: &Ctx, filter: ast::EventTriggerWhen) -> Doc
     if let Some(in_token) = filter.in_token() {
         doc = doc.append(space_before(&in_token)).append(Doc::text("in"));
     }
-    if let Some(l_paren) = filter.l_paren_token() {
-        doc = doc.append(comments_before(&l_paren));
-    }
+    doc = doc.append(
+        filter
+            .l_paren_token()
+            .map(|l_paren| space_or_comments_before(&l_paren))
+            .unwrap_or_else(Doc::space),
+    );
     let items = filter.literals().map(|literal| {
         let syntax = literal.syntax().clone();
         (
@@ -3689,8 +3712,7 @@ fn build_event_trigger_when<'a>(ctx: &Ctx, filter: ast::EventTriggerWhen) -> Doc
         )
     });
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
-    doc.append(Doc::space())
-        .append(Doc::text("("))
+    doc.append(Doc::text("("))
         .append(wrap_body(ctx, body, filter.r_paren_token()))
         .append(Doc::text(")"))
         .group()
@@ -5222,7 +5244,7 @@ fn build_create_procedure<'a>(ctx: &Ctx, stmt: &ast::CreateProcedure) -> Doc<'a>
     }
     if let Some(params) = stmt.param_list() {
         doc = doc
-            .append(leading_comments(params.syntax()))
+            .append(comments_before(params.syntax()))
             .append(build_function_param_list(ctx, params));
     }
     doc = doc.group();
@@ -6172,7 +6194,7 @@ fn build_aggregate_sig<'a>(ctx: &Ctx, aggregate: ast::Aggregate) -> Doc<'a> {
         .unwrap_or_else(Doc::nil);
     if let Some(params) = aggregate.param_list() {
         doc = doc
-            .append(leading_comments(params.syntax()))
+            .append(comments_before(params.syntax()))
             .append(build_aggregate_param_list(ctx, params));
     }
     doc
@@ -7570,9 +7592,10 @@ fn build_path_parts<'a>(
 ) -> Doc<'a> {
     let mut doc = Doc::nil();
     if let Some(qualifier) = qualifier {
-        doc = doc
-            .append(build_path_ref(&qualifier))
-            .append(trailing_comments(qualifier.syntax()));
+        doc = doc.append(build_path_ref(&qualifier));
+        if let Some(dot) = &dot {
+            doc = doc.append(comments_before(dot));
+        }
     }
     let is_qualified = dot.is_some();
     if is_qualified {
@@ -9096,7 +9119,7 @@ fn build_with_table<'a>(ctx: &Ctx, table: ast::WithTable) -> Doc<'a> {
         .unwrap_or_else(Doc::nil);
     if let Some(columns) = table.column_list() {
         doc = doc
-            .append(leading_comments(columns.syntax()))
+            .append(comments_before(columns.syntax()))
             .append(build_cte_column_list(ctx, columns));
     }
     if let Some(as_token) = table.as_token() {
@@ -9122,13 +9145,7 @@ fn build_with_table<'a>(ctx: &Ctx, table: ast::WithTable) -> Doc<'a> {
         doc = doc.append(space_before(&l_paren)).append(Doc::text("("));
     }
     let body = match table.query() {
-        Some(query) => {
-            let (trailing, leading) = comment_run_before(query.syntax()).split_trailing();
-            doc = doc.append(trailing.trailing());
-            leading
-                .before_node(Doc::nil())
-                .append(build_with_query(ctx, query))
-        }
+        Some(query) => leading_comments(query.syntax()).append(build_with_query(ctx, query)),
         None => Doc::nil(),
     };
     doc = doc
@@ -9537,7 +9554,7 @@ fn build_publication_object<'a>(ctx: &Ctx, object: ast::PublicationObject) -> Do
                 doc = doc.append(comments_before(&r_paren)).append(Doc::text(")"));
             }
             if let Some(star) = object.star_token() {
-                doc = doc.append(leading_comments(&star)).append(Doc::text("*"));
+                doc = doc.append(comments_before(&star)).append(Doc::text("*"));
             }
             if let Some(columns) = object.column_ref_list() {
                 doc = doc
@@ -13797,7 +13814,7 @@ fn build_extension_operator<'a>(ctx: &Ctx, node: ast::ObjectOperator) -> Doc<'a>
         Doc::line_or_space()
             .append(
                 node.l_paren_token()
-                    .map(|el| comments_before(&el))
+                    .map(|el| leading_comments(&el))
                     .unwrap_or_else(Doc::nil),
             )
             .append(Doc::text("("))
@@ -16427,9 +16444,8 @@ fn build_from_alias_columns<'a>(ctx: &Ctx, columns: ast::FromAliasColumns) -> Do
                     syntax,
                 )
             });
-            comments_before(list.syntax()).append(build_from_alias_column_list(
+            space_or_comments_before(list.syntax()).append(build_from_alias_column_list(
                 ctx,
-                list.l_paren_token(),
                 items,
                 list.r_paren_token(),
             ))
@@ -16453,9 +16469,8 @@ fn build_from_alias_columns<'a>(ctx: &Ctx, columns: ast::FromAliasColumns) -> Do
                 }
                 (doc, syntax)
             });
-            comments_before(list.syntax()).append(build_from_alias_column_list(
+            space_or_comments_before(list.syntax()).append(build_from_alias_column_list(
                 ctx,
-                list.l_paren_token(),
                 items,
                 list.r_paren_token(),
             ))
@@ -16465,18 +16480,12 @@ fn build_from_alias_columns<'a>(ctx: &Ctx, columns: ast::FromAliasColumns) -> Do
 
 fn build_from_alias_column_list<'a>(
     ctx: &Ctx,
-    l_paren: Option<SyntaxToken>,
     items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
     r_paren: Option<SyntaxToken>,
 ) -> Doc<'a> {
-    let mut doc = Doc::nil();
-    if let Some(l_paren) = &l_paren {
-        doc = doc.append(space_or_comments_before(l_paren));
-    }
-    doc = doc.append(Doc::text("("));
-
     let body = build_comma_separated_docs(items).unwrap_or_else(Doc::nil);
-    doc.append(wrap_body(ctx, body, r_paren))
+    Doc::text("(")
+        .append(wrap_body(ctx, body, r_paren))
         .append(Doc::text(")"))
         .group()
 }
@@ -16646,8 +16655,8 @@ fn wrap_empty_body<'a>(ctx: &Ctx, r_delimiter: Option<SyntaxToken>) -> Doc<'a> {
     if comments.is_empty() {
         return Doc::nil();
     }
-    let (comment_doc, closing_separator) = comments.before_closing_delimiter(Doc::line_or_space());
-    Doc::line_or_space()
+    let (comment_doc, closing_separator) = comments.before_closing_delimiter(Doc::line_or_nil());
+    Doc::line_or_nil()
         .append(comment_doc)
         .nest(ctx.indent)
         .append(closing_separator)
@@ -17659,7 +17668,7 @@ fn build_xml_root_fn<'a>(ctx: &Ctx, xml_root_fn: ast::XmlRootFn) -> Doc<'a> {
     }
     if let Some(standalone) = xml_root_fn.xml_standalone() {
         body = body
-            .append(leading_comments(standalone.syntax()))
+            .append(comments_before(standalone.syntax()))
             .append(build_xml_standalone(standalone));
     }
 
@@ -19192,9 +19201,12 @@ fn build_collate_expr<'a>(ctx: &Ctx, collate: ast::Collate) -> Doc<'a> {
         .unwrap_or_else(Doc::nil);
 
     if let Some(collate_token) = collate.collate_token() {
-        doc = doc.append(comments_before(&collate_token));
-    }
-    if has_expr {
+        doc = doc.append(if has_expr {
+            space_or_comments_before(&collate_token)
+        } else {
+            comments_before(&collate_token)
+        });
+    } else if has_expr {
         doc = doc.append(Doc::space());
     }
     doc = doc.append(Doc::text("collate"));
@@ -20040,16 +20052,17 @@ fn build_type<'a>(ctx: &Ctx, ty: ast::Type) -> Doc<'a> {
             doc
         }
         ast::Type::BitType(bit_type) => {
-            build_keyword_node(bit_type.syntax()).append(build_type_args(ctx, bit_type.arg_list()))
+            build_keyword_type(ctx, bit_type.syntax(), bit_type.arg_list())
         }
         ast::Type::BitVaryingType(bit_varying_type) => {
-            build_keyword_node(bit_varying_type.syntax())
-                .append(build_type_args(ctx, bit_varying_type.arg_list()))
+            build_keyword_type(ctx, bit_varying_type.syntax(), bit_varying_type.arg_list())
         }
-        ast::Type::CharacterType(character_type) => build_keyword_node(character_type.syntax())
-            .append(build_type_args(ctx, character_type.arg_list())),
-        ast::Type::VarcharType(varchar_type) => build_keyword_node(varchar_type.syntax())
-            .append(build_type_args(ctx, varchar_type.arg_list())),
+        ast::Type::CharacterType(character_type) => {
+            build_keyword_type(ctx, character_type.syntax(), character_type.arg_list())
+        }
+        ast::Type::VarcharType(varchar_type) => {
+            build_keyword_type(ctx, varchar_type.syntax(), varchar_type.arg_list())
+        }
         ast::Type::DoubleType(double_type) => build_keyword_node(double_type.syntax()),
         ast::Type::IntervalType(interval_type) => {
             let mut doc = build_setof(interval_type.setof_token());
@@ -20132,6 +20145,18 @@ fn build_array_bound<'a>(ctx: &Ctx, bound: &ast::ArrayBound) -> Doc<'a> {
         doc = doc.append(comments_before(&r_brack));
     }
     doc.append(Doc::text("]"))
+}
+
+fn build_keyword_type<'a>(ctx: &Ctx, node: &SyntaxNode, arg_list: Option<ast::ArgList>) -> Doc<'a> {
+    let mut doc = build_keyword_node(node);
+    if arg_list.as_ref().is_some_and(|arg_list| {
+        comment_run_before(arg_list.syntax())
+            .last()
+            .is_some_and(|token| !is_line_comment(token))
+    }) {
+        doc = doc.append(Doc::space());
+    }
+    doc.append(build_type_args(ctx, arg_list))
 }
 
 fn build_type_args<'a>(ctx: &Ctx, arg_list: Option<ast::ArgList>) -> Doc<'a> {

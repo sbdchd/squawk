@@ -11,6 +11,6 @@ drop transform if exists for
 
 -- comments in every position
 drop /* transform */ transform /* if */ if /* exists */ exists /* for */ for
-  /* type */ public /* dot */.customer_document
+  /* type */ public /* dot */ .customer_document
   /* language */ language /* language name */ plpgsql
   /* behavior */ restrict /* end */;

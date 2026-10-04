@@ -14,9 +14,8 @@ security label
 
 security label on function public.process_record(bigint, text) is 'trusted';
 
-/* before security */
-security /* before label */ label
+/* before security */ security /* before label */ label
   /* before for */ for /* before provider */ selinux
   /* before on */ on /* before foreign */ foreign /* before table */ table
-    /* before name */ public /* before dot */./* after dot */ records
+    /* before name */ public /* before dot */ . /* after dot */ records
   /* before is */ is /* before value */ 'trusted' /* before semicolon */;

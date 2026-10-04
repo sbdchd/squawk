@@ -24,7 +24,7 @@ create or replace rule extraordinarily_long_rule_name_for_recording_all_account_
 -- comments in every position
 create /* or */ or /* replace */ replace /* rule */ rule /* name */ audit_change
   /* as */ as /* on */ on /* event */ update
-  /* to */ to /* schema */ public /* dot */./* relation */ accounts
+  /* to */ to /* schema */ public /* dot */ . /* relation */ accounts
     /* where */ where /* left paren */ (
       /* condition */ old.owner_id
         is distinct from new.owner_id /* right paren */

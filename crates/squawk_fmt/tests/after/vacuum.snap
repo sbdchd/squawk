@@ -32,13 +32,12 @@ vacuum (analyze, verbose, index_cleanup auto, parallel 4)
   ),
   another_very_long_schema_name.another_intentionally_long_table_name;
 
-/* before */
-vacuum /* after vacuum */ (
+/* before */ vacuum /* after vacuum */ (
   /* after left paren */ full /* before comma */,
   /* after comma */ analyze /* before value */ true /* before second comma */,
   /* after second comma */ index_cleanup /* before name value */ auto /* before right paren */
 )
-  /* before tables */ public /* before table dot */./* after table dot */ records /* before columns */ (
+  /* before tables */ public /* before table dot */ . /* after table dot */ records /* before columns */ (
     /* after columns left paren */ id /* before column comma */,
     /* after column comma */ name /* before columns right paren */
   ) /* before table comma */,

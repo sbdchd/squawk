@@ -11,8 +11,7 @@ move
   from
   an_intentionally_long_cursor_name;
 
-/* before move */
-move
+/* before move */ move
   /* before backward */ backward /* before all */ all
   /* before from */ from
   /* before cursor */ cursor_name /* before semicolon */;

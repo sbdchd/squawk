@@ -57,10 +57,9 @@ set
   an_intentionally_long_config_namespace.an_intentionally_long_config_group.an_intentionally_long_parameter_name
   to an_intentionally_long_value_name, another_intentionally_long_value_name;
 
-/* before set */
-set
+/* before set */ set
   /* before scope */ local
-  /* before parameter */ custom /* before dot */./* after dot */ parameter
+  /* before parameter */ custom /* before dot */ . /* after dot */ parameter
   /* before equals */ = /* before first value */ first_value /* before comma */,
   /* after comma */ 'second value' /* before semicolon */;
 

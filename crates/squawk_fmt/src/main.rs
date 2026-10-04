@@ -5,7 +5,7 @@ use std::process::ExitCode;
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
 use clap::Parser;
-use squawk_fmt::{FormatOptions, token_compare::assert_no_dropped_tokens};
+use squawk_fmt::{FormatOptions, validation::validate_format};
 use squawk_syntax::SourceFile;
 
 #[derive(Parser)]
@@ -58,26 +58,12 @@ fn main() -> Result<ExitCode> {
         return Ok(ExitCode::FAILURE);
     }
 
-    let formatted = squawk_fmt::fmt_str(
-        &input,
-        FormatOptions {
-            indent: cli.indent,
-            width: cli.width,
-        },
-    )?;
-    assert_no_dropped_tokens(&input, &formatted);
-
-    let reparse = SourceFile::parse(&formatted);
-    assert!(
-        reparse.errors().is_empty(),
-        "formatted output has syntax errors:\n{}\n\nformatted output:\n{formatted}",
-        reparse
-            .errors()
-            .iter()
-            .map(ToString::to_string)
-            .collect::<Vec<_>>()
-            .join("\n")
-    );
+    let options = FormatOptions {
+        indent: cli.indent,
+        width: cli.width,
+    };
+    let formatted = squawk_fmt::fmt_str(&input, options)?;
+    validate_format(&input, &formatted, options)?;
 
     write!(io::stdout().lock(), "{formatted}")?;
     Ok(ExitCode::SUCCESS)

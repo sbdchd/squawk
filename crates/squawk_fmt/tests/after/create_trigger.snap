@@ -67,8 +67,8 @@ create /*a*/ or /*b*/ replace /*c*/ constraint /*d*/ trigger /*e*/ commented_tri
   /*h*/ update /*i*/ of /*j*/ first_column /*k*/, /*l*/ second_column /*m*/
   or
   /*n*/ delete
-  /*o*/ on /*p*/ app /*q*/./*r*/ records
-  /*s*/ from /*t*/ app /*u*/./*v*/ source_records
+  /*o*/ on /*p*/ app /*q*/ . /*r*/ records
+  /*s*/ from /*t*/ app /*u*/ . /*v*/ source_records
   /*w*/ deferrable
   /*x*/ initially /*y*/ deferred
   /*z*/ referencing
@@ -77,7 +77,7 @@ create /*a*/ or /*b*/ replace /*c*/ constraint /*d*/ trigger /*e*/ commented_tri
   /*ah*/ for /*ai*/ each /*aj*/ row
   /*ak*/ when /*al*/ (/*am*/ old_rows.first_column /*an*/ > /*ao*/ 1 /*ap*/)
   /*aq*/ execute /*ar*/ function
-    /*as*/ app /*at*/./*au*/ handle_records(
+    /*as*/ app /*at*/ . /*au*/ handle_records(
       /*av*/ 1 /*aw*/,
       /*ax*/ 'two' /*ay*/
     ) /*az*/;

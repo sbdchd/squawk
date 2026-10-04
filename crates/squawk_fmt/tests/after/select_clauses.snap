@@ -35,7 +35,7 @@ for no key update of a_very_long_common_table_expression_name skip locked
 limit a_very_long_limit_expression
 offset a_very_long_offset_expression rows;
 
-with /* before recursive */ recursive /* before cte */ cte/* before columns */ (
+with /* before recursive */ recursive /* before cte */ cte /* before columns */ (
   /* before column */ x /* before columns close */
 ) /* before as */ as /* before materialized */ materialized /* before query open */ (
   /* before query */ select 1 /* before query close */

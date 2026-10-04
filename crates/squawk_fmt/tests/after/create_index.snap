@@ -41,7 +41,7 @@ create index long_index_name_for_testing_line_wrapping
 
 -- comments in every position
 create /*a*/ unique /*b*/ index /*c*/ concurrently /*d*/ if /*e*/ not /*f*/ exists /*g*/ idx
-  /*h*/ on /*i*/ only /*j*/ app /*k*/./*l*/ users
+  /*h*/ on /*i*/ only /*j*/ app /*k*/ . /*l*/ users
   /*m*/ using /*n*/ btree /*o*/ (
     /*p*/ email /*q*/ collate /*r*/ "C" /*s*/ text_pattern_ops /*t*/ desc /*u*/ nulls /*v*/ last /*w*/,
     /*x*/ (lower(name)) /*y*/ asc /*z*/

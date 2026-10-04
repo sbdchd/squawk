@@ -77,12 +77,14 @@ select * from t;
 -- above with
 with
 -- above first
-t as ( -- after open paren
+t as (
+  -- after open paren
   -- above select
   select 1
 ), -- after comma
 -- above second
-x as ( -- after open paren
+x as (
+  -- after open paren
   -- above select
   select 2
 ) -- after close paren

@@ -37,13 +37,12 @@ revoke
   from
   public;
 
-/* before revoke */
-revoke
+/* before revoke */ revoke
   /* before grant */ grant /* before option */ option /* before for */ for
   /* before select */ select
   /* before on */ on
     /* before table */ table
-      /* before object */ public /* before dot */./* after dot */ records
+      /* before object */ public /* before dot */ . /* after dot */ records
   /* before from */ from
   /* before role */ app_user
   /* before granted */ granted /* before by */ by /* before grantor */ current_user

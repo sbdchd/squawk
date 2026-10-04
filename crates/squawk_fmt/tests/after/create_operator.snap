@@ -43,7 +43,7 @@ create operator extraordinarily_long_schema_name.## (
 );
 
 -- comments in every position
-create /* operator */ operator /* schema */ app /* dot */./* symbol */ # /* attributes */ (
+create /* operator */ operator /* schema */ app /* dot */ . /* symbol */ # /* attributes */ (
   /* function name */ function /* equals */ = /* function value */ app.compare_values /* comma */,
   /* left argument */ leftarg /* second equals */ = /* type */ integer /* comma */,
   /* marker */ hashes /* closing parenthesis */
@@ -68,5 +68,5 @@ create operator + (
 );
 
 create operator + (
-  commutator /* before qualified operator */ = /* before operator keyword */ operator /* before open paren */(/* before operator */ pg_catalog.+ /* before close paren */) /* before semicolon */
+  commutator /* before qualified operator */ = /* before operator keyword */ operator /* before open paren */ (/* before operator */ pg_catalog.+ /* before close paren */) /* before semicolon */
 );

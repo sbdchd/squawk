@@ -26,8 +26,7 @@ for select
   another_intentionally_long_column_name
 from an_intentionally_long_table_name;
 
-/* before declare */
-declare
+/* before declare */ declare
   /* before cursor name */ c
   /* before binary */ binary
   /* before sensitivity */ insensitive
