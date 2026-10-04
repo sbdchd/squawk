@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - linter: adds linting for migration operations that break backwards compatibility (#1375). Thanks @t-monaghan!
+  - ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
+  - opt-in ban-drop-trigger rule
 
 - ide: goto def for embedded sql strings (#1358)
 - ide: goto def for begin atomic function defs (#1356)
@@ -28,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - parser: fix non-unicode ident parsing + cte error recovery (#1366)
 - parser: improve plpgsql error recovery (#1361)
 
-- npm: publish musl packages and fix exit code on spawn failure (#1371)
+- npm: publish musl packages and fix exit code on spawn failure (#1371). Thanks @TiagoGranelli!
 - github: fix escape codes in github comments (#1367). Thanks @chdsbd!
 
 - ide: fix goto def visibility issues (#1357)
@@ -37,11 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - fmt: adjust insert, alter/drop operator, cte queries, values (#1368, #1364, #1363)
-
-### Added
-
-- linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
-- linter: opt-in ban-drop-trigger rule
 
 ## v2.66.0 - 2026-09-23
 
