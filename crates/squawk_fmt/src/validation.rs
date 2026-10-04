@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet};
 use anyhow::{Result, bail, ensure};
-use squawk_lexer::{BOM, Token, TokenKind, tokenize};
+use squawk_lexer::{BOM, LiteralKind, Token, TokenKind, tokenize};
 use squawk_line_index::UniversalNewlines;
 
 use crate::fmt::{FormatOptions, fmt_str};
@@ -244,6 +244,19 @@ fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> boo
                     .join("\n")
             };
             return normalize(before_text) == normalize(after_text);
+        }
+        if let TokenKind::Literal {
+            kind:
+                LiteralKind::NationalStr { .. }
+                | LiteralKind::ByteStr { .. }
+                | LiteralKind::BitStr { .. }
+                | LiteralKind::UnicodeEscStr { .. }
+                | LiteralKind::EscStr { .. },
+        } = before_kind
+            && let Some((before_prefix, before_rest)) = before_text.split_once('\'')
+            && let Some((after_prefix, after_rest)) = after_text.split_once('\'')
+        {
+            return before_prefix.eq_ignore_ascii_case(after_prefix) && before_rest == after_rest;
         }
         return if before_kind == TokenKind::Ident {
             before_text.eq_ignore_ascii_case(after_text)
