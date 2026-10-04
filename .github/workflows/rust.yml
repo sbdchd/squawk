@@ -240,12 +240,7 @@ jobs:
           chmod +x npm/darwin-x64/bin/squawk npm/darwin-arm64/bin/squawk npm/linux-x64/bin/squawk npm/linux-arm64/bin/squawk npm/linux-x64-musl/bin/squawk npm/linux-arm64-musl/bin/squawk
 
       - name: Publish packages
-        run: |
-          set -euo pipefail
-          for pkg in darwin-x64 darwin-arm64 linux-x64 linux-arm64 linux-x64-musl linux-arm64-musl win32-x64; do
-            (cd "npm/$pkg" && npm publish --access public --provenance)
-          done
-          npm publish --access public --provenance
+        run: ./s/publish-npm.js
 
   publish-docker:
     if: startsWith(github.ref, 'refs/tags/')
