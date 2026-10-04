@@ -86,6 +86,10 @@ impl CommentRun {
         self.tokens.is_empty()
     }
 
+    pub(crate) fn last(&self) -> Option<&SyntaxToken> {
+        self.tokens.last()
+    }
+
     fn doc<'a>(&self) -> Doc<'a> {
         let mut docs = vec![];
         for (index, token) in self.tokens.iter().enumerate() {
@@ -167,25 +171,6 @@ impl CommentRun {
             .append(self.separator_after(Doc::space()))
     }
 
-    pub(crate) fn split_trailing(self) -> (CommentRun, CommentRun) {
-        let count = self
-            .tokens
-            .iter()
-            .take_while(|token| is_trailing_comment(token))
-            .position(is_line_comment)
-            .map_or(0, |index| index + 1);
-        let mut trailing = self.tokens;
-        let rest = trailing.split_off(count);
-        (Self { tokens: trailing }, Self { tokens: rest })
-    }
-
-    pub(crate) fn trailing<'a>(&self) -> Doc<'a> {
-        if self.is_empty() {
-            return Doc::nil();
-        }
-        Doc::space().append(self.doc())
-    }
-
     pub(crate) fn leading<'a>(&self) -> Doc<'a> {
         if self.is_empty() {
             return Doc::nil();
@@ -210,12 +195,65 @@ pub(crate) fn comment_run_after(el: &(impl Into<SyntaxElement> + Clone)) -> Comm
     }
 }
 
+fn kind_before(comments: &CommentRun) -> Option<SyntaxKind> {
+    let mut token = comments.tokens.first().and_then(|token| token.prev_token());
+    while let Some(curr) = token {
+        match curr.kind() {
+            SyntaxKind::COMMENT | SyntaxKind::WHITESPACE => token = curr.prev_token(),
+            kind => return Some(kind),
+        }
+    }
+    None
+}
+
+fn starts_with_closing_token(el: SyntaxElement) -> bool {
+    let first = match el {
+        rowan::NodeOrToken::Node(node) => node.first_token(),
+        rowan::NodeOrToken::Token(token) => Some(token),
+    };
+    first.is_none_or(|token| {
+        matches!(
+            token.kind(),
+            SyntaxKind::R_PAREN
+                | SyntaxKind::R_BRACK
+                | SyntaxKind::R_CURLY
+                | SyntaxKind::COMMA
+                | SyntaxKind::SEMICOLON
+        )
+    })
+}
+
 pub(crate) fn leading_comments<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> Doc<'a> {
-    comment_run_before(el).leading()
+    let comments = comment_run_before(el);
+    match kind_before(&comments) {
+        Some(SyntaxKind::DOT | SyntaxKind::COLON) => {
+            comments.between_nodes(if has_own_line_comments_before(el) {
+                Doc::hard_line()
+            } else {
+                Doc::space()
+            })
+        }
+        _ => comments.leading(),
+    }
 }
 
 pub(crate) fn comments_before<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> Doc<'a> {
-    comment_run_before(el).after_node(Doc::nil())
+    let comments = comment_run_before(el);
+    if comments.is_empty() {
+        return Doc::nil();
+    }
+    let before = match kind_before(&comments) {
+        Some(SyntaxKind::L_PAREN | SyntaxKind::L_BRACK | SyntaxKind::L_CURLY) => Doc::nil(),
+        _ => Doc::space(),
+    };
+    let after = if starts_with_closing_token(el.clone().into()) {
+        Doc::nil()
+    } else {
+        Doc::space()
+    };
+    before
+        .append(comments.doc())
+        .append(comments.separator_after(after))
 }
 
 pub(crate) fn trailing_comments<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> Doc<'a> {
@@ -223,11 +261,11 @@ pub(crate) fn trailing_comments<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> 
 }
 
 pub(crate) fn space_or_comments_before<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> Doc<'a> {
-    let comments = comment_run_before(el);
-    if comments.is_empty() {
-        return Doc::space();
+    if has_comments_before(el) {
+        comments_before(el)
+    } else {
+        Doc::space()
     }
-    comments.after_node(Doc::nil())
 }
 
 pub(crate) fn space_before<'a>(el: &(impl Into<SyntaxElement> + Clone)) -> Doc<'a> {
