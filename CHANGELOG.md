@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.67.0 - 2026-10-04
+
+### Added
+
+- linter: adds linting for migration operations that break backwards compatibility (#1375). Thanks @t-monaghan!
+
+- ide: goto def for embedded sql strings (#1358)
+- ide: goto def for begin atomic function defs (#1356)
+- ide: semantic syntax highlighting for embedded strings (#1359)
+- ide: goto def & hover for ordinals (#1372)
+
+- fmt: format comments block & line comments (#1374)
+- fmt: add validation for comments + whitespace (#1377)
+- fmt: add validation for dupe spaces (#1376)
+
+### Fixed
+
+- parser: fix set role (#1365)
+- parser: fix non-unicode ident parsing + cte error recovery (#1366)
+- parser: improve plpgsql error recovery (#1361)
+
+- npm: publish musl packages and fix exit code on spawn failure (#1371)
+- github: fix escape codes in github comments (#1367). Thanks @chdsbd!
+
+- ide: fix goto def visibility issues (#1357)
+- ide: fix goto def bug with `*` expansion (#1373)
+
+### Changed
+
+- fmt: adjust insert, alter/drop operator, cte queries, values (#1368, #1364, #1363)
+
 ### Added
 
 - linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
