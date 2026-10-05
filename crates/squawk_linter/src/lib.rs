@@ -70,7 +70,7 @@ use rules::require_timeout_settings;
 use rules::transaction_nesting;
 use rules::{
     ban_alter_generated_expression, ban_alter_identity, ban_disable_trigger, ban_drop_constraint,
-    ban_drop_domain, ban_drop_index, ban_drop_policy, ban_drop_schema, ban_drop_sequence,
+    ban_drop_domain, ban_drop_generated_expression, ban_drop_index, ban_drop_policy, ban_drop_schema, ban_drop_sequence,
     ban_replace_view_function, ban_replica_identity, ban_revoke, ban_set_default, ban_set_schema,
     renaming_object, security_compatibility,
 };
@@ -791,7 +791,7 @@ mod tests {
         for (rule, sql) in [
             (
                 Rule::BanAlterGeneratedExpression,
-                "ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 1);",
+                "ALTER TABLE t ADD COLUMN c int GENERATED ALWAYS AS (id + 1) STORED;",
             ),
         ] {
             let parse = SourceFile::parse(sql);
