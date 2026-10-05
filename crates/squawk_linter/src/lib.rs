@@ -72,7 +72,7 @@ use rules::{
     ban_alter_generated_expression, ban_alter_identity, ban_disable_trigger, ban_drop_constraint,
     ban_drop_domain, ban_drop_generated_expression, ban_drop_index, ban_drop_policy, ban_drop_schema, ban_drop_sequence,
     ban_replace_view_function, ban_replica_identity, ban_revoke, ban_set_default, ban_set_schema,
-    renaming_object, security_compatibility,
+    compatibility_additions, renaming_object, security_compatibility,
 };
 // xtask:new-rule:rule-import
 
@@ -148,6 +148,11 @@ pub enum Rule {
     BanAlterRoleOptions,
     BanAlterDatabaseOptions,
     BanAlterRowLevelSecurity,
+    BanNewWriteRestriction,
+    BanAddEnumValue,
+    BanAddCompositeAttribute,
+    BanDetachInheritance,
+    BanAlterSequenceValues,
     // xtask:new-rule:error-name
 }
 
@@ -177,6 +182,11 @@ impl Rule {
                 | Rule::BanAlterRoleOptions
                 | Rule::BanAlterDatabaseOptions
                 | Rule::BanAlterRowLevelSecurity
+                | Rule::BanNewWriteRestriction
+                | Rule::BanAddEnumValue
+                | Rule::BanAddCompositeAttribute
+                | Rule::BanDetachInheritance
+                | Rule::BanAlterSequenceValues
         )
     }
 
@@ -269,6 +279,11 @@ impl TryFrom<&str> for Rule {
             "ban-alter-role-options" => Ok(Rule::BanAlterRoleOptions),
             "ban-alter-database-options" => Ok(Rule::BanAlterDatabaseOptions),
             "ban-alter-row-level-security" => Ok(Rule::BanAlterRowLevelSecurity),
+            "ban-new-write-restriction" => Ok(Rule::BanNewWriteRestriction),
+            "ban-add-enum-value" => Ok(Rule::BanAddEnumValue),
+            "ban-add-composite-attribute" => Ok(Rule::BanAddCompositeAttribute),
+            "ban-detach-inheritance" => Ok(Rule::BanDetachInheritance),
+            "ban-alter-sequence-values" => Ok(Rule::BanAlterSequenceValues),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -370,6 +385,11 @@ impl fmt::Display for Rule {
             Rule::BanAlterRoleOptions => "ban-alter-role-options",
             Rule::BanAlterDatabaseOptions => "ban-alter-database-options",
             Rule::BanAlterRowLevelSecurity => "ban-alter-row-level-security",
+            Rule::BanNewWriteRestriction => "ban-new-write-restriction",
+            Rule::BanAddEnumValue => "ban-add-enum-value",
+            Rule::BanAddCompositeAttribute => "ban-add-composite-attribute",
+            Rule::BanDetachInheritance => "ban-detach-inheritance",
+            Rule::BanAlterSequenceValues => "ban-alter-sequence-values",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -669,6 +689,18 @@ impl Linter {
             }
         }
         security_compatibility(self, file);
+        if [
+            Rule::BanNewWriteRestriction,
+            Rule::BanAddEnumValue,
+            Rule::BanAddCompositeAttribute,
+            Rule::BanDetachInheritance,
+            Rule::BanAlterSequenceValues,
+        ]
+        .iter()
+        .any(|rule| self.rules.contains(rule))
+        {
+            compatibility_additions(self, file);
+        }
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file

@@ -73,6 +73,11 @@ module.exports = {
       "ban-alter-role-options",
       "ban-alter-database-options",
       "ban-alter-row-level-security",
+      "ban-new-write-restriction",
+      "ban-add-enum-value",
+      "ban-add-composite-attribute",
+      "ban-detach-inheritance",
+      "ban-alter-sequence-values",
       // xtask:new-rule:error-name
     ],
   },

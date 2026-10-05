@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- linter: opt-in compatibility rules for new write restrictions, enum values, composite attributes, partition detachment, inheritance removal, and sequence changes
 - linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
 - linter: opt-in ban-drop-trigger rule
 - linter: compatibility rules for dropped schemas, sequences, and domains, object renames, and schema moves

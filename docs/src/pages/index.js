@@ -292,6 +292,11 @@ const rules = [
   { name: "ban-alter-role-options", tags: ["backwards compatibility"], description: "Review role option and configuration changes (opt-in)." },
   { name: "ban-alter-database-options", tags: ["backwards compatibility"], description: "Review database option and configuration changes (opt-in)." },
   { name: "ban-alter-row-level-security", tags: ["backwards compatibility"], description: "Review row level security changes (opt-in)." },
+  { name: "ban-new-write-restriction", tags: ["backwards compatibility"], description: "Detect new write restrictions on existing tables (opt-in)." },
+  { name: "ban-add-enum-value", tags: ["backwards compatibility"], description: "Detect new enum values (opt-in)." },
+  { name: "ban-add-composite-attribute", tags: ["backwards compatibility"], description: "Detect new composite attributes (opt-in)." },
+  { name: "ban-detach-inheritance", tags: ["backwards compatibility"], description: "Detect partition detach and NO INHERIT (opt-in)." },
+  { name: "ban-alter-sequence-values", tags: ["backwards compatibility"], description: "Detect changes to sequence values (opt-in)." },
   // xtask:new-rule:rule-doc-meta
 ]
 
