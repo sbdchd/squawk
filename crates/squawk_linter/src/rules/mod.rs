@@ -12,11 +12,11 @@ pub(crate) mod ban_create_domain_with_constraint;
 pub(crate) mod ban_disable_trigger;
 pub(crate) mod ban_drop_column;
 pub(crate) mod ban_drop_constraint;
-pub(crate) mod ban_drop_generated_expression;
 pub(crate) mod ban_drop_database;
 pub(crate) mod ban_drop_default;
 pub(crate) mod ban_drop_domain;
 pub(crate) mod ban_drop_function;
+pub(crate) mod ban_drop_generated_expression;
 pub(crate) mod ban_drop_index;
 pub(crate) mod ban_drop_not_null;
 pub(crate) mod ban_drop_policy;
@@ -56,8 +56,8 @@ pub(crate) mod require_concurrent_reindex;
 pub(crate) mod require_enum_value_ordering;
 pub(crate) mod require_table_schema;
 pub(crate) mod require_timeout_settings;
-pub(crate) mod transaction_nesting;
 pub(crate) mod security_compatibility;
+pub(crate) mod transaction_nesting;
 #[cfg(test)]
 mod variant_tests;
 // xtask:new-rule:mod-decl
@@ -76,11 +76,11 @@ pub(crate) use ban_create_domain_with_constraint::ban_create_domain_with_constra
 pub(crate) use ban_disable_trigger::ban_disable_trigger;
 pub(crate) use ban_drop_column::ban_drop_column;
 pub(crate) use ban_drop_constraint::ban_drop_constraint;
-pub(crate) use ban_drop_generated_expression::ban_drop_generated_expression;
 pub(crate) use ban_drop_database::ban_drop_database;
 pub(crate) use ban_drop_default::ban_drop_default;
 pub(crate) use ban_drop_domain::ban_drop_domain;
 pub(crate) use ban_drop_function::ban_drop_function;
+pub(crate) use ban_drop_generated_expression::ban_drop_generated_expression;
 pub(crate) use ban_drop_index::ban_drop_index;
 pub(crate) use ban_drop_not_null::ban_drop_not_null;
 pub(crate) use ban_drop_policy::ban_drop_policy;
@@ -120,6 +120,6 @@ pub(crate) use require_concurrent_reindex::require_concurrent_reindex;
 pub(crate) use require_enum_value_ordering::require_enum_value_ordering;
 pub(crate) use require_table_schema::require_table_schema;
 pub(crate) use require_timeout_settings::require_timeout_settings;
-pub(crate) use transaction_nesting::transaction_nesting;
 pub(crate) use security_compatibility::security_compatibility;
+pub(crate) use transaction_nesting::transaction_nesting;
 // xtask:new-rule:export

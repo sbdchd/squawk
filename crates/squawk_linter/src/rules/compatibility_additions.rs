@@ -71,6 +71,33 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                                     ));
                                 }
                             }
+                            ast::AlterTableAction::AddColumn(column) => {
+                                for constraint in column.constraints() {
+                                    if matches!(
+                                        constraint,
+                                        ast::Constraint::NotNullConstraint(_)
+                                            | ast::Constraint::ReferencesConstraint(_)
+                                            | ast::Constraint::CheckConstraint(_)
+                                            | ast::Constraint::UniqueConstraint(_)
+                                    ) {
+                                        ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
+                                            "A new column constraint can reject writes from existing clients.".into(), constraint.syntax()));
+                                    }
+                                }
+                            }
+                            ast::AlterTableAction::AlterConstraint(node) => {
+                                if node.constraint_options().any(|option| {
+                                    matches!(option,
+                                    ast::ConstraintOption::Enforced(_)
+                                    | ast::ConstraintOption::DeferrableConstraintOption(_)
+                                    | ast::ConstraintOption::NotDeferrableConstraintOption(_)
+                                    | ast::ConstraintOption::InitiallyImmediateConstraintOption(_)
+                                    | ast::ConstraintOption::InitiallyDeferredConstraintOption(_))
+                                }) {
+                                    ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
+                                        "Changing constraint enforcement or timing can reject existing client writes.".into(), node.syntax()));
+                                }
+                            }
                             _ => (),
                         }
                     }
@@ -105,6 +132,19 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                                 "NO INHERIT changes which rows existing clients can read and write through the parent table.".into(), node.syntax())),
                             _ => (),
                         }
+                    }
+                }
+            }
+            ast::Stmt::AlterDomain(domain) if ctx.rules.contains(&Rule::BanNewWriteRestriction) => {
+                if let Some(action) = domain.action() {
+                    match action {
+                        ast::AlterDomainAction::SetNotNull(node) => ctx.report(Violation::for_node(
+                            Rule::BanNewWriteRestriction,
+                            "A domain NOT NULL requirement can reject writes from existing clients.".into(), node.syntax())),
+                        ast::AlterDomainAction::AddConstraint(node) => ctx.report(Violation::for_node(
+                            Rule::BanNewWriteRestriction,
+                            "A domain constraint can reject writes from existing clients, even when it is NOT VALID.".into(), node.syntax())),
+                        _ => (),
                     }
                 }
             }
@@ -188,6 +228,33 @@ mod test {
         );
         lint_ok(
             "CREATE INDEX CONCURRENTLY idx ON t(id);",
+            Rule::BanNewWriteRestriction,
+        );
+    }
+
+    #[test]
+    fn more_write_restrictions() {
+        assert_eq!(lint_errors("ALTER DOMAIN d SET NOT NULL; ALTER DOMAIN d ADD CONSTRAINT c CHECK (VALUE > 0) NOT VALID;", Rule::BanNewWriteRestriction).matches("warning[ban-new-write-restriction]").count(), 2);
+        assert_eq!(
+            lint_errors(
+                "ALTER TABLE t ADD COLUMN c int NOT NULL;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            1
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER TABLE t ALTER CONSTRAINT fk NOT DEFERRABLE;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            1
+        );
+        lint_ok(
+            "ALTER TABLE t ALTER CONSTRAINT fk NOT ENFORCED;",
             Rule::BanNewWriteRestriction,
         );
     }
