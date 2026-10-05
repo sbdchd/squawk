@@ -6,12 +6,37 @@ use squawk_syntax::{
 
 pub(crate) fn ban_replica_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
-        if let ast::Stmt::AlterTable(table) = stmt {
-            for action in table.actions() {
-                if let ast::AlterTableAction::ReplicaIdentity(node) = action {
-                    ctx.report(Violation::for_node(Rule::BanReplicaIdentity, "Changing replica identity may silently change replication for existing clients.".into(), node.syntax()));
+        match stmt {
+            ast::Stmt::AlterTable(table) => {
+                for action in table.actions() {
+                    if let ast::AlterTableAction::ReplicaIdentity(node) = action {
+                        ctx.report(Violation::for_node(Rule::BanReplicaIdentity, "Changing replica identity may silently change replication for existing clients.".into(), node.syntax()));
+                    }
                 }
             }
+            ast::Stmt::DropPublication(node) => ctx.report(Violation::for_node(
+                Rule::BanReplicaIdentity,
+                "Dropping a publication stops replication for existing consumers.".into(),
+                node.syntax(),
+            )),
+            ast::Stmt::AlterPublication(publication) => {
+                if let Some(action) = publication.action() {
+                    if matches!(
+                        action,
+                        ast::AlterPublicationAction::DropPublicationObjects(_)
+                            | ast::AlterPublicationAction::SetPublicationObjects(_)
+                            | ast::AlterPublicationAction::SetAllPublicationObjectList(_)
+                            | ast::AlterPublicationAction::SetOptions(_)
+                    ) {
+                        ctx.report(Violation::for_node(
+                            Rule::BanReplicaIdentity,
+                            "Changing publication tables or options can stop or change replication for existing consumers.".into(),
+                            action.syntax(),
+                        ));
+                    }
+                }
+            }
+            _ => (),
         }
     }
 }
@@ -31,8 +56,19 @@ mod test {
     #[test]
     fn ok() {
         lint_ok(
-            "ALTER TABLE t ENABLE ROW LEVEL SECURITY;",
+            "ALTER TABLE t ENABLE ROW LEVEL SECURITY; ALTER PUBLICATION p ADD TABLE t; CREATE PUBLICATION p FOR TABLE t;",
             Rule::BanReplicaIdentity,
+        );
+    }
+
+    #[test]
+    fn publication_changes() {
+        let sql = "DROP PUBLICATION p; ALTER PUBLICATION p DROP TABLE t; ALTER PUBLICATION p SET TABLE t; ALTER PUBLICATION p SET (publish = 'insert'); ALTER PUBLICATION p SET TABLES IN SCHEMA public;";
+        assert_eq!(
+            lint_errors(sql, Rule::BanReplicaIdentity)
+                .matches("warning[ban-replica-identity]")
+                .count(),
+            5
         );
     }
 }

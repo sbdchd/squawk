@@ -152,6 +152,7 @@ pub enum Rule {
     BanNewWriteRestriction,
     BanAddEnumValue,
     BanAddCompositeAttribute,
+    BanAddColumn,
     BanDetachInheritance,
     BanAlterSequenceValues,
     BanAlterSystemOptions,
@@ -188,6 +189,7 @@ impl Rule {
                 | Rule::BanNewWriteRestriction
                 | Rule::BanAddEnumValue
                 | Rule::BanAddCompositeAttribute
+                | Rule::BanAddColumn
                 | Rule::BanDetachInheritance
                 | Rule::BanAlterSequenceValues
                 | Rule::BanAlterSystemOptions
@@ -287,6 +289,7 @@ impl TryFrom<&str> for Rule {
             "ban-new-write-restriction" => Ok(Rule::BanNewWriteRestriction),
             "ban-add-enum-value" => Ok(Rule::BanAddEnumValue),
             "ban-add-composite-attribute" => Ok(Rule::BanAddCompositeAttribute),
+            "ban-add-column" => Ok(Rule::BanAddColumn),
             "ban-detach-inheritance" => Ok(Rule::BanDetachInheritance),
             "ban-alter-sequence-values" => Ok(Rule::BanAlterSequenceValues),
             "ban-alter-system-options" => Ok(Rule::BanAlterSystemOptions),
@@ -395,6 +398,7 @@ impl fmt::Display for Rule {
             Rule::BanNewWriteRestriction => "ban-new-write-restriction",
             Rule::BanAddEnumValue => "ban-add-enum-value",
             Rule::BanAddCompositeAttribute => "ban-add-composite-attribute",
+            Rule::BanAddColumn => "ban-add-column",
             Rule::BanDetachInheritance => "ban-detach-inheritance",
             Rule::BanAlterSequenceValues => "ban-alter-sequence-values",
             Rule::BanAlterSystemOptions => "ban-alter-system-options",
@@ -705,6 +709,7 @@ impl Linter {
             Rule::BanNewWriteRestriction,
             Rule::BanAddEnumValue,
             Rule::BanAddCompositeAttribute,
+            Rule::BanAddColumn,
             Rule::BanDetachInheritance,
             Rule::BanAlterSequenceValues,
         ]
@@ -827,6 +832,7 @@ mod tests {
             Rule::BanAlterRowLevelSecurity,
             Rule::BanAlterSystemOptions,
             Rule::BanAlterExtension,
+            Rule::BanAddColumn,
         ] {
             assert!(!linter.rules.contains(&rule));
         }
@@ -843,6 +849,8 @@ mod tests {
                 Rule::BanAlterGeneratedExpression,
                 "ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 1);",
             ),
+            (Rule::BanAddColumn, "ALTER TABLE t ADD COLUMN c int;"),
+            (Rule::BanReplicaIdentity, "DROP PUBLICATION p;"),
         ] {
             let parse = SourceFile::parse(sql);
             assert!(parse.errors().is_empty());
@@ -884,6 +892,7 @@ mod tests {
             Rule::BanAlterRowLevelSecurity,
             Rule::BanAlterSystemOptions,
             Rule::BanAlterExtension,
+            Rule::BanAddColumn,
         ] {
             let linter = Linter::with_rules(&[rule], &[]);
             assert!(linter.rules.contains(&rule));

@@ -41,6 +41,15 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                     .and_then(|n| n.path_ref())
                     .is_some_and(|n| tables.contains(&n.syntax().to_string()));
                 for action in table.actions() {
+                    if ctx.rules.contains(&Rule::BanAddColumn) && !new_table {
+                        if let ast::AlterTableAction::AddColumn(column) = &action {
+                            ctx.report(Violation::for_node(
+                                Rule::BanAddColumn,
+                                "Adding a column changes the shape of rows existing clients receive and can break positional inserts.".into(),
+                                column.syntax(),
+                            ));
+                        }
+                    }
                     if ctx.rules.contains(&Rule::BanNewWriteRestriction) && !new_table {
                         match &action {
                             ast::AlterTableAction::AddConstraint(add) => {
@@ -125,10 +134,20 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                     }
                 }
             }
-            ast::Stmt::AlterForeignTable(table)
-                if ctx.rules.contains(&Rule::BanNewWriteRestriction) =>
-            {
+            ast::Stmt::AlterForeignTable(table) => {
                 for action in table.actions() {
+                    if ctx.rules.contains(&Rule::BanAddColumn) {
+                        if let ast::AlterTableAction::AddColumn(column) = &action {
+                            ctx.report(Violation::for_node(
+                                Rule::BanAddColumn,
+                                "Adding a column changes the shape of rows existing clients receive and can break positional inserts.".into(),
+                                column.syntax(),
+                            ));
+                        }
+                    }
+                    if !ctx.rules.contains(&Rule::BanNewWriteRestriction) {
+                        continue;
+                    }
                     match action {
                         ast::AlterTableAction::AddColumn(column) => {
                             check_column_constraints(ctx, &column);
@@ -215,6 +234,15 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                 if !new_sequence {
                     for action in seq.actions() {
                         if let ast::AlterSequenceAction::SequenceOption(option) = action {
+                            if matches!(
+                                option,
+                                ast::SequenceOption::OptionOwnedBy(_)
+                                    | ast::SequenceOption::OptionLogged(_)
+                                    | ast::SequenceOption::OptionUnlogged(_)
+                                    | ast::SequenceOption::OptionSequenceName(_)
+                            ) {
+                                continue;
+                            }
                             ctx.report(Violation::for_node(Rule::BanAlterSequenceValues,
                                 "Changing a sequence option can change values generated for existing clients.".into(), option.syntax()));
                         }
@@ -334,6 +362,38 @@ mod test {
     }
 
     #[test]
+    fn add_column() {
+        assert_eq!(
+            lint_errors("ALTER TABLE t ADD COLUMN c int;", Rule::BanAddColumn)
+                .matches("warning[ban-add-column]")
+                .count(),
+            1
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER FOREIGN TABLE ft ADD COLUMN c int;",
+                Rule::BanAddColumn
+            )
+            .matches("warning[ban-add-column]")
+            .count(),
+            1
+        );
+        lint_ok(
+            "CREATE TABLE t (id int); ALTER TABLE t ADD COLUMN c int;",
+            Rule::BanAddColumn,
+        );
+        assert_eq!(
+            lint_errors(
+                "CREATE TABLE IF NOT EXISTS t (id int); ALTER TABLE t ADD COLUMN c int;",
+                Rule::BanAddColumn
+            )
+            .matches("warning[ban-add-column]")
+            .count(),
+            1
+        );
+    }
+
+    #[test]
     fn composite_attribute() {
         assert_eq!(
             lint_errors(
@@ -379,7 +439,7 @@ mod test {
             Rule::BanAlterSequenceValues,
         );
         lint_ok(
-            "ALTER SEQUENCE ids OWNER TO app;",
+            "ALTER SEQUENCE ids OWNER TO app; ALTER SEQUENCE ids OWNED BY t.id; ALTER SEQUENCE ids SET LOGGED; ALTER SEQUENCE ids SET UNLOGGED;",
             Rule::BanAlterSequenceValues,
         );
         assert_eq!(

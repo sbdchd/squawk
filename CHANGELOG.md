@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- linter: opt-in ban-add-column check for existing tables and foreign tables; detect publication changes with ban-replica-identity
 - linter: opt-in compatibility rules for new write restrictions, enum values, composite attributes, partition detachment, inheritance removal, and sequence changes
 - linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
 - linter: opt-in ban-drop-trigger rule
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- linter: detect plain trigger and rule enabling; exclude non-value sequence options from ban-alter-sequence-values
 - linter: extend existing compatibility checks to more PostgreSQL statement variants, including domain and foreign-table changes, replica-only trigger and rule firing, generated expression replacement, routine schema moves and options, aggregate renames and schema moves, extension schema moves, `ALTER USER` options, group membership removal, named `NOT NULL` constraints, and inline primary keys
 
 ## v2.67.0 - 2026-10-04

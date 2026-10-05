@@ -76,6 +76,7 @@ module.exports = {
       "ban-new-write-restriction",
       "ban-add-enum-value",
       "ban-add-composite-attribute",
+      "ban-add-column",
       "ban-detach-inheritance",
       "ban-alter-sequence-values",
       "ban-alter-system-options",

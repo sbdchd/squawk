@@ -14,6 +14,8 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         "Replica-only triggers and rules do not fire for normal application writes."
                     }
                     ast::AlterTableAction::DisableTrigger(_)
+                    | ast::AlterTableAction::EnableTrigger(_)
+                    | ast::AlterTableAction::EnableRule(_)
                     | ast::AlterTableAction::DisableRule(_)
                     | ast::AlterTableAction::EnableAlwaysTrigger(_)
                     | ast::AlterTableAction::EnableAlwaysRule(_) => {
@@ -51,7 +53,21 @@ mod test {
         assert_snapshot!(errors);
     }
     #[test]
+    fn enable() {
+        let sql = "ALTER TABLE t ENABLE TRIGGER trg; ALTER TABLE t ENABLE RULE r;";
+        assert_eq!(
+            lint_errors(sql, Rule::BanDisableTrigger)
+                .matches("warning[ban-disable-trigger]")
+                .count(),
+            2
+        );
+    }
+
+    #[test]
     fn ok() {
-        lint_ok("ALTER TABLE t ENABLE TRIGGER trg;", Rule::BanDisableTrigger);
+        lint_ok(
+            "ALTER TABLE t ENABLE ROW LEVEL SECURITY;",
+            Rule::BanDisableTrigger,
+        );
     }
 }

@@ -207,7 +207,11 @@ fn enforcement_and_policy() {
         5,
     );
     lint_ok("ALTER POLICY p ON t USING (true);", Rule::BanDropPolicy);
-    lint_ok("ALTER TABLE t ENABLE TRIGGER tr;", Rule::BanDisableTrigger);
+    check(
+        "ALTER TABLE t ENABLE TRIGGER tr;",
+        Rule::BanDisableTrigger,
+        1,
+    );
 }
 
 #[test]
