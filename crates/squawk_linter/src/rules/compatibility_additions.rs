@@ -52,6 +52,7 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                                             | ast::Constraint::UniqueConstraint(_)
                                             | ast::Constraint::PrimaryKeyConstraint(_)
                                             | ast::Constraint::ExcludeConstraint(_)
+                                            | ast::Constraint::NotNullConstraint(_)
                                     );
                                     if restriction {
                                         ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
@@ -72,18 +73,7 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                                 }
                             }
                             ast::AlterTableAction::AddColumn(column) => {
-                                for constraint in column.constraints() {
-                                    if matches!(
-                                        constraint,
-                                        ast::Constraint::NotNullConstraint(_)
-                                            | ast::Constraint::ReferencesConstraint(_)
-                                            | ast::Constraint::CheckConstraint(_)
-                                            | ast::Constraint::UniqueConstraint(_)
-                                    ) {
-                                        ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
-                                            "A new column constraint can reject writes from existing clients.".into(), constraint.syntax()));
-                                    }
-                                }
+                                check_column_constraints(ctx, column);
                             }
                             ast::AlterTableAction::AlterConstraint(node) => {
                                 if node.constraint_options().any(|option| {
@@ -140,6 +130,9 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
             {
                 for action in table.actions() {
                     match action {
+                        ast::AlterTableAction::AddColumn(column) => {
+                            check_column_constraints(ctx, &column);
+                        }
                         ast::AlterTableAction::AddConstraint(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::BanNewWriteRestriction,
@@ -233,6 +226,25 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
     }
 }
 
+fn check_column_constraints(ctx: &mut Linter, column: &ast::AddColumn) {
+    for constraint in column.constraints() {
+        if matches!(
+            constraint,
+            ast::Constraint::NotNullConstraint(_)
+                | ast::Constraint::ReferencesConstraint(_)
+                | ast::Constraint::CheckConstraint(_)
+                | ast::Constraint::UniqueConstraint(_)
+                | ast::Constraint::PrimaryKeyConstraint(_)
+        ) {
+            ctx.report(Violation::for_node(
+                Rule::BanNewWriteRestriction,
+                "A new column constraint can reject writes from existing clients.".into(),
+                constraint.syntax(),
+            ));
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::{
@@ -270,6 +282,15 @@ mod test {
             .matches("warning[ban-new-write-restriction]")
             .count(),
             1
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER TABLE t ADD CONSTRAINT nn NOT NULL c; ALTER TABLE t ADD NOT NULL c NOT VALID;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            2
         );
         assert_eq!(
             lint_errors(

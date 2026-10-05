@@ -41,6 +41,15 @@ pub(crate) fn ban_revoke(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 "Dropping a role may break existing clients.".into(),
                 node.syntax(),
             )),
+            ast::Stmt::AlterGroup(node) => {
+                if let Some(ast::AlterGroupAction::DropUsers(users)) = node.action() {
+                    ctx.report(Violation::for_node(
+                        Rule::BanRevoke,
+                        "Removing role membership may break existing clients.".into(),
+                        users.syntax(),
+                    ));
+                }
+            }
             ast::Stmt::AlterDefaultPrivileges(node) => {
                 if matches!(
                     node.action(),

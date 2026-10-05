@@ -57,6 +57,26 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                     );
                 }
             }
+            ast::Stmt::AlterProcedure(node) => {
+                if let Some(ast::AlterProcedureAction::FuncOptionList(options)) = node.action() {
+                    report(
+                        ctx,
+                        Rule::BanAlterFunctionOptions,
+                        "Changing procedure options may change behaviour for existing clients.",
+                        options.syntax(),
+                    );
+                }
+            }
+            ast::Stmt::AlterRoutine(node) => {
+                if let Some(ast::AlterRoutineAction::FuncOptionList(options)) = node.action() {
+                    report(
+                        ctx,
+                        Rule::BanAlterFunctionOptions,
+                        "Changing routine options may change behaviour for existing clients.",
+                        options.syntax(),
+                    );
+                }
+            }
             ast::Stmt::AlterView(node) => {
                 if let Some(action) = node.action() {
                     match action {
@@ -92,6 +112,31 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                             config.syntax(),
                         ),
                         ast::AlterRoleAction::ResetConfigParam(config) => report(
+                            ctx,
+                            Rule::BanAlterRoleOptions,
+                            "Changing role configuration may change behaviour for existing clients.",
+                            config.syntax(),
+                        ),
+                        _ => {}
+                    }
+                }
+            }
+            ast::Stmt::AlterUser(node) => {
+                if let Some(action) = node.action() {
+                    match action {
+                        ast::AlterUserAction::RoleOptionList(options) => report(
+                            ctx,
+                            Rule::BanAlterRoleOptions,
+                            "Changing role options may change access for existing clients.",
+                            options.syntax(),
+                        ),
+                        ast::AlterUserAction::SetConfigParam(config) => report(
+                            ctx,
+                            Rule::BanAlterRoleOptions,
+                            "Changing role configuration may change behaviour for existing clients.",
+                            config.syntax(),
+                        ),
+                        ast::AlterUserAction::ResetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterRoleOptions,
                             "Changing role configuration may change behaviour for existing clients.",
@@ -199,6 +244,21 @@ mod tests {
                 Rule::BanAlterFunctionOptions,
                 "ALTER FUNCTION f() SECURITY DEFINER;",
                 "ALTER FUNCTION f() RENAME TO g;",
+            ),
+            (
+                Rule::BanAlterFunctionOptions,
+                "ALTER PROCEDURE p() SECURITY DEFINER;",
+                "ALTER PROCEDURE p() RENAME TO q;",
+            ),
+            (
+                Rule::BanAlterFunctionOptions,
+                "ALTER ROUTINE f() SET search_path TO private;",
+                "ALTER ROUTINE f() SET SCHEMA private;",
+            ),
+            (
+                Rule::BanAlterRoleOptions,
+                "ALTER USER app NOLOGIN;",
+                "ALTER USER app RENAME TO app2;",
             ),
             (
                 Rule::BanAlterViewOptions,

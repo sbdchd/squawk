@@ -5,10 +5,11 @@ title: ban-revoke
 
 ## problem
 
-Revoking privileges, dropping a role or user, changing object ownership with `OWNER TO` or `REASSIGN OWNED`, or running `DROP OWNED` can make client queries fail. `DROP OWNED` can also remove objects owned by the role. This rule is opt-in.
+Revoking privileges, removing role membership with `ALTER GROUP ... DROP USER`, dropping a role or user, changing object ownership with `OWNER TO` or `REASSIGN OWNED`, or running `DROP OWNED` can make client queries fail. `DROP OWNED` can also remove objects owned by the role. This rule is opt-in.
 
 ```sql
 REVOKE SELECT ON t FROM app;
+ALTER GROUP writers DROP USER app;
 ```
 
 ## solution
