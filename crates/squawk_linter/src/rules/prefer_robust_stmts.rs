@@ -22,18 +22,28 @@ fn is_alembic_version_update(stmt: &ast::Stmt) -> bool {
         .is_some_and(|name| name.text().eq_ignore_ascii_case("alembic_version")))
 }
 
-fn alembic_version_commit_tx_indices(stmts: &[ast::Stmt]) -> Option<FxHashSet<usize>> {
+fn alembic_version_commit_tx_indices(
+    stmts: impl Iterator<Item = ast::Stmt>,
+) -> Option<FxHashSet<usize>> {
     let mut indices = FxHashSet::default();
     let mut tx_start = None;
-    for (i, stmt) in stmts.iter().enumerate() {
-        match stmt {
-            ast::Stmt::Begin(_) => tx_start = Some(i),
+    let mut has_alembic_version_update = false;
+    for (i, stmt) in stmts.enumerate() {
+        match &stmt {
+            ast::Stmt::Begin(_) => {
+                tx_start = Some(i);
+                has_alembic_version_update = false;
+            }
             ast::Stmt::Commit(_) | ast::Stmt::Rollback(_) => {
                 if let Some(start) = tx_start.take()
-                    && stmts[start..=i].iter().any(is_alembic_version_update)
+                    && has_alembic_version_update
                 {
                     indices.extend(start..=i);
                 }
+                has_alembic_version_update = false;
+            }
+            _ if tx_start.is_some() && is_alembic_version_update(&stmt) => {
+                has_alembic_version_update = true;
             }
             _ => {}
         }
@@ -43,11 +53,10 @@ fn alembic_version_commit_tx_indices(stmts: &[ast::Stmt]) -> Option<FxHashSet<us
 
 pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
-    let stmts: Vec<ast::Stmt> = file.stmts().collect();
     let mut inside_transaction = ctx.settings.assume_in_transaction;
     let mut constraint_names: FxHashMap<String, Constraint> = FxHashMap::default();
 
-    let version_tx_indices = alembic_version_commit_tx_indices(&stmts);
+    let version_tx_indices = alembic_version_commit_tx_indices(file.stmts());
 
     enum ActionErrorMessage {
         IfExists,
@@ -55,13 +64,13 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         None,
     }
 
-    for (i, stmt) in stmts.iter().enumerate() {
+    for (i, stmt) in file.stmts().enumerate() {
         let in_robust_tx = match &version_tx_indices {
             Some(set) => ctx.settings.assume_in_transaction || set.contains(&i),
             None => inside_transaction,
         };
 
-        match stmt {
+        match &stmt {
             ast::Stmt::Begin(_) => {
                 inside_transaction = true;
             }

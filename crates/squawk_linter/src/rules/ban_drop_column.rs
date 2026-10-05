@@ -8,9 +8,9 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for stmt in file.stmts() {
-        let actions: Vec<_> = match stmt {
-            ast::Stmt::AlterTable(table) => table.actions().collect(),
-            ast::Stmt::AlterForeignTable(table) => table.actions().collect(),
+        let actions = match stmt {
+            ast::Stmt::AlterTable(table) => table.actions(),
+            ast::Stmt::AlterForeignTable(table) => table.actions(),
             ast::Stmt::AlterType(ty) => {
                 if let Some(ast::AlterTypeAction::AlterTypeAttributeActionList(list)) = ty.action()
                 {
@@ -24,9 +24,9 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         }
                     }
                 }
-                Vec::new()
+                continue;
             }
-            _ => Vec::new(),
+            _ => continue,
         };
         for action in actions {
             if let ast::AlterTableAction::DropColumn(drop_column) = action {

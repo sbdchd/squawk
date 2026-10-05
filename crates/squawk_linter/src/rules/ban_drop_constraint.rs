@@ -6,12 +6,12 @@ use squawk_syntax::{
 
 pub(crate) fn ban_drop_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
-        let actions: Vec<_> = match &stmt {
-            ast::Stmt::AlterTable(table) => table.actions().collect(),
-            ast::Stmt::AlterForeignTable(table) => table.actions().collect(),
-            _ => Vec::new(),
+        let actions = match &stmt {
+            ast::Stmt::AlterTable(table) => Some(table.actions()),
+            ast::Stmt::AlterForeignTable(table) => Some(table.actions()),
+            _ => None,
         };
-        for action in actions {
+        for action in actions.into_iter().flatten() {
             match action {
                 ast::AlterTableAction::DropConstraint(node) => ctx.report(Violation::for_node(
                     Rule::BanDropConstraint,
