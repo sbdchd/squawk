@@ -885,6 +885,51 @@ mod tests {
     }
 
     #[test]
+    fn compatibility_defaults_and_explicit_configuration() {
+        for (rule, sql) in [
+            (Rule::BanDropConstraint, "ALTER TABLE t DROP CONSTRAINT c;"),
+            (
+                Rule::BanAlterIdentity,
+                "ALTER TABLE t ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY;",
+            ),
+            (
+                Rule::BanDropGeneratedExpression,
+                "ALTER TABLE t ALTER COLUMN c DROP EXPRESSION;",
+            ),
+            (Rule::BanDropExtension, "DROP EXTENSION hstore;"),
+        ] {
+            let parse = SourceFile::parse(sql);
+            assert!(parse.errors().is_empty());
+            assert!(
+                Linter::with_default_rules()
+                    .lint(&parse, sql)
+                    .iter()
+                    .any(|v| v.code == rule)
+            );
+            assert!(
+                !Linter::with_rules(&[], &[rule])
+                    .lint(&parse, sql)
+                    .iter()
+                    .any(|v| v.code == rule)
+            );
+        }
+        let sql = "ALTER TYPE mood ADD VALUE 'new';";
+        let parse = SourceFile::parse(sql);
+        assert!(
+            Linter::with_rules(&[Rule::BanAddEnumValue], &[])
+                .lint(&parse, sql)
+                .iter()
+                .any(|v| v.code == Rule::BanAddEnumValue)
+        );
+        assert!(
+            !Linter::with_rules(&[Rule::BanAddEnumValue], &[Rule::BanAddEnumValue])
+                .lint(&parse, sql)
+                .iter()
+                .any(|v| v.code == Rule::BanAddEnumValue)
+        );
+    }
+
+    #[test]
     fn require_timeout_settings_expands_to_granular_rules() {
         let linter = Linter::from([Rule::RequireTimeoutSettings]);
         assert!(linter.rules.contains(&Rule::RequireLockTimeout));
