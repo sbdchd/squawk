@@ -171,6 +171,43 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                     }
                 }
             }
+            ast::Stmt::AlterSystem(node) => {
+                if let Some(action) = node.action() {
+                    match action {
+                        ast::AlterSystemAction::SetConfigParam(config) => report(
+                            ctx,
+                            Rule::BanAlterSystemOptions,
+                            "Changing server configuration may change behaviour for existing clients.",
+                            config.syntax(),
+                        ),
+                        ast::AlterSystemAction::ResetConfigParam(config) => report(
+                            ctx,
+                            Rule::BanAlterSystemOptions,
+                            "Changing server configuration may change behaviour for existing clients.",
+                            config.syntax(),
+                        ),
+                    }
+                }
+            }
+            ast::Stmt::AlterExtension(node) => {
+                if let Some(action) = node.action() {
+                    match action {
+                        ast::AlterExtensionAction::AlterExtensionUpdate(update) => report(
+                            ctx,
+                            Rule::BanAlterExtension,
+                            "Updating an extension can change or remove objects used by existing clients.",
+                            update.syntax(),
+                        ),
+                        ast::AlterExtensionAction::AlterExtensionDrop(drop) => report(
+                            ctx,
+                            Rule::BanAlterExtension,
+                            "Removing an object from an extension changes how the object is managed for existing clients.",
+                            drop.syntax(),
+                        ),
+                        _ => {}
+                    }
+                }
+            }
             ast::Stmt::AlterTable(node) => {
                 for action in node.actions() {
                     match action {
@@ -279,6 +316,26 @@ mod tests {
                 Rule::BanAlterRowLevelSecurity,
                 "ALTER TABLE t ENABLE ROW LEVEL SECURITY;",
                 "ALTER TABLE t ADD COLUMN c int;",
+            ),
+            (
+                Rule::BanAlterSystemOptions,
+                "ALTER SYSTEM SET timezone = 'UTC';",
+                "ALTER DATABASE d SET timezone = 'UTC';",
+            ),
+            (
+                Rule::BanAlterSystemOptions,
+                "ALTER SYSTEM RESET ALL;",
+                "ALTER ROLE r RESET ALL;",
+            ),
+            (
+                Rule::BanAlterExtension,
+                "ALTER EXTENSION postgis UPDATE TO '3.4.0';",
+                "ALTER EXTENSION postgis ADD FUNCTION f();",
+            ),
+            (
+                Rule::BanAlterExtension,
+                "ALTER EXTENSION postgis DROP FUNCTION f();",
+                "ALTER EXTENSION postgis SET SCHEMA gis;",
             ),
         ];
         for (rule, bad, good) in cases {

@@ -125,6 +125,15 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     }
                 }
             }
+            ast::Stmt::AlterAggregate(node) => {
+                if let Some(ast::AlterAggregateAction::AggregateRenameTo(action)) = node.action() {
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming an aggregate may break existing clients.".into(),
+                        action.syntax(),
+                    ));
+                }
+            }
             ast::Stmt::AlterProcedure(node) => {
                 for action in node.action().into_iter() {
                     if let ast::AlterProcedureAction::ProcedureRenameTo(node) = action {
@@ -229,9 +238,25 @@ mod test {
         assert_snapshot!(errors);
     }
     #[test]
+    fn aggregate() {
+        assert_eq!(
+            lint_errors(
+                "ALTER AGGREGATE agg(int) RENAME TO agg2;",
+                Rule::RenamingObject
+            )
+            .matches("warning[renaming-object]")
+            .count(),
+            1
+        );
+    }
+    #[test]
     fn ok() {
         lint_ok(
             "ALTER TABLE t RENAME TO t2; ALTER TABLE t RENAME COLUMN c TO d;",
+            Rule::RenamingObject,
+        );
+        lint_ok(
+            "ALTER AGGREGATE agg(int) OWNER TO app;",
             Rule::RenamingObject,
         );
     }

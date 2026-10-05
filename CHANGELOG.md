@@ -15,10 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - linter: compatibility rules for dropped schemas, sequences, and domains, object renames, and schema moves
 - linter: default checks for dropped constraints, identity changes, and dropped generated expressions; opt-in checks for dropped indexes, generated expression replacement and addition, defaults, triggers, replica identity, policies, privileges, and replacements
 - linter: default ban-drop-extension and opt-in rules for policy creation, policy conditions and roles, function and view options, role and database options, and row level security
+- linter: opt-in ban-alter-system-options and ban-alter-extension rules
 
 ### Changed
 
-- linter: extend existing compatibility checks to more PostgreSQL statement variants, including domain and foreign-table changes, replica-only trigger and rule firing, generated expression replacement, and routine schema moves
+- linter: extend existing compatibility checks to more PostgreSQL statement variants, including domain and foreign-table changes, replica-only trigger and rule firing, generated expression replacement, routine schema moves and options, aggregate renames and schema moves, extension schema moves, `ALTER USER` options, group membership removal, named `NOT NULL` constraints, and inline primary keys
 
 ## v2.67.0 - 2026-10-04
 

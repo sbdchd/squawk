@@ -297,6 +297,8 @@ const rules = [
   { name: "ban-add-composite-attribute", tags: ["backwards compatibility"], description: "Detect new composite attributes (opt-in)." },
   { name: "ban-detach-inheritance", tags: ["backwards compatibility"], description: "Detect partition detach and NO INHERIT (opt-in)." },
   { name: "ban-alter-sequence-values", tags: ["backwards compatibility"], description: "Detect changes to sequence values (opt-in)." },
+  { name: "ban-alter-system-options", tags: ["backwards compatibility"], description: "Review server configuration changes (opt-in)." },
+  { name: "ban-alter-extension", tags: ["backwards compatibility"], description: "Review extension updates and member removals (opt-in)." },
   // xtask:new-rule:rule-doc-meta
 ]
 

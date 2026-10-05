@@ -51,6 +51,24 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     }
                 }
             }
+            ast::Stmt::AlterAggregate(node) => {
+                if let Some(ast::AlterAggregateAction::SetSchema(action)) = node.action() {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        action.syntax(),
+                    ));
+                }
+            }
+            ast::Stmt::AlterExtension(node) => {
+                if let Some(ast::AlterExtensionAction::SetSchema(action)) = node.action() {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        action.syntax(),
+                    ));
+                }
+            }
             ast::Stmt::AlterProcedure(node) => {
                 if let Some(ast::AlterProcedureAction::SetSchema(action)) = node.action() {
                     ctx.report(Violation::for_node(
@@ -133,7 +151,18 @@ mod test {
         assert_snapshot!(errors);
     }
     #[test]
+    fn aggregate_and_extension() {
+        let sql = "ALTER AGGREGATE agg(int) SET SCHEMA s; ALTER EXTENSION hstore SET SCHEMA s;";
+        assert_eq!(
+            lint_errors(sql, Rule::BanSetSchema)
+                .matches("warning[ban-set-schema]")
+                .count(),
+            2
+        );
+    }
+    #[test]
     fn ok() {
         lint_ok("ALTER TABLE t OWNER TO app;", Rule::BanSetSchema);
+        lint_ok("ALTER AGGREGATE agg(int) OWNER TO app;", Rule::BanSetSchema);
     }
 }

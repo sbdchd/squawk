@@ -154,6 +154,8 @@ pub enum Rule {
     BanAddCompositeAttribute,
     BanDetachInheritance,
     BanAlterSequenceValues,
+    BanAlterSystemOptions,
+    BanAlterExtension,
     // xtask:new-rule:error-name
 }
 
@@ -188,6 +190,8 @@ impl Rule {
                 | Rule::BanAddCompositeAttribute
                 | Rule::BanDetachInheritance
                 | Rule::BanAlterSequenceValues
+                | Rule::BanAlterSystemOptions
+                | Rule::BanAlterExtension
         )
     }
 
@@ -285,6 +289,8 @@ impl TryFrom<&str> for Rule {
             "ban-add-composite-attribute" => Ok(Rule::BanAddCompositeAttribute),
             "ban-detach-inheritance" => Ok(Rule::BanDetachInheritance),
             "ban-alter-sequence-values" => Ok(Rule::BanAlterSequenceValues),
+            "ban-alter-system-options" => Ok(Rule::BanAlterSystemOptions),
+            "ban-alter-extension" => Ok(Rule::BanAlterExtension),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -391,6 +397,8 @@ impl fmt::Display for Rule {
             Rule::BanAddCompositeAttribute => "ban-add-composite-attribute",
             Rule::BanDetachInheritance => "ban-detach-inheritance",
             Rule::BanAlterSequenceValues => "ban-alter-sequence-values",
+            Rule::BanAlterSystemOptions => "ban-alter-system-options",
+            Rule::BanAlterExtension => "ban-alter-extension",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -817,6 +825,8 @@ mod tests {
             Rule::BanAlterRoleOptions,
             Rule::BanAlterDatabaseOptions,
             Rule::BanAlterRowLevelSecurity,
+            Rule::BanAlterSystemOptions,
+            Rule::BanAlterExtension,
         ] {
             assert!(!linter.rules.contains(&rule));
         }
@@ -872,6 +882,8 @@ mod tests {
             Rule::BanAlterRoleOptions,
             Rule::BanAlterDatabaseOptions,
             Rule::BanAlterRowLevelSecurity,
+            Rule::BanAlterSystemOptions,
+            Rule::BanAlterExtension,
         ] {
             let linter = Linter::with_rules(&[rule], &[]);
             assert!(linter.rules.contains(&rule));

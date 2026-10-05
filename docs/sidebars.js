@@ -78,6 +78,8 @@ module.exports = {
       "ban-add-composite-attribute",
       "ban-detach-inheritance",
       "ban-alter-sequence-values",
+      "ban-alter-system-options",
+      "ban-alter-extension",
       // xtask:new-rule:error-name
     ],
   },
