@@ -1,9 +1,8 @@
 ---
 source: crates/squawk_linter/src/rules/ban_alter_generated_expression.rs
-assertion_line: 41
 expression: "lint_errors(sql, Rule::BanAlterGeneratedExpression)"
 ---
-warning[ban-alter-generated-expression]: Changing a generated column may break inserts from existing clients.
+warning[ban-alter-generated-expression]: Changing a generated column expression may change values read by existing clients.
   ╭▸ 
 1 │ ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 2); ALTER TABLE t ADD COLUMN c int GENERATED ALWAYS AS (id + 1) STORED;
   ╰╴                             ━━━━━━━━━━━━━━━━━━━━━━━━━━
