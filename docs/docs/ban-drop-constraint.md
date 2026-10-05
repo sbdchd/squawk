@@ -5,7 +5,7 @@ title: ban-drop-constraint
 
 ## problem
 
-Dropping a constraint removes a foreign key, check, or uniqueness guarantee that clients can depend on. This rule is opt-in because compatibility depends on whether clients rely on the constraint.
+Dropping a constraint removes a foreign key, check, or uniqueness guarantee that clients can depend on. If an old application uses `INSERT ... ON CONFLICT ON CONSTRAINT c` or infers a dropped unique constraint as its conflict arbiter, its inserts fail immediately. This rule is enabled by default.
 
 ```sql
 ALTER TABLE t DROP CONSTRAINT IF EXISTS c;
@@ -15,4 +15,4 @@ ALTER TABLE t DROP CONSTRAINT IF EXISTS c;
 
 Update clients to not depend on the constraint before dropping it.
 
-Enable this rule with `--include ban-drop-constraint` (or add `ban-drop-constraint` to your configured include list).
+Exclude this rule with `--exclude ban-drop-constraint` after checking application compatibility.

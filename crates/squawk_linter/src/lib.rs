@@ -127,6 +127,7 @@ pub enum Rule {
     BanDropSequence,
     BanDropDomain,
     BanDropConstraint,
+    BanDropGeneratedExpression,
     RenamingObject,
     BanSetSchema,
     BanAlterIdentity,
@@ -151,8 +152,6 @@ impl Rule {
             Rule::RequireTableSchema
                 | Rule::RequireTimeoutSettings
                 | Rule::BanDropTrigger
-                | Rule::BanDropConstraint
-                | Rule::BanAlterIdentity
                 | Rule::BanAlterGeneratedExpression
                 | Rule::BanDropIndex
                 | Rule::BanSetDefault
@@ -232,6 +231,7 @@ impl TryFrom<&str> for Rule {
             "ban-drop-sequence" => Ok(Rule::BanDropSequence),
             "ban-drop-domain" => Ok(Rule::BanDropDomain),
             "ban-drop-constraint" => Ok(Rule::BanDropConstraint),
+            "ban-drop-generated-expression" => Ok(Rule::BanDropGeneratedExpression),
             "renaming-object" => Ok(Rule::RenamingObject),
             "ban-set-schema" => Ok(Rule::BanSetSchema),
             "ban-alter-identity" => Ok(Rule::BanAlterIdentity),
@@ -323,6 +323,7 @@ impl fmt::Display for Rule {
             Rule::BanDropSequence => "ban-drop-sequence",
             Rule::BanDropDomain => "ban-drop-domain",
             Rule::BanDropConstraint => "ban-drop-constraint",
+            Rule::BanDropGeneratedExpression => "ban-drop-generated-expression",
             Rule::RenamingObject => "renaming-object",
             Rule::BanSetSchema => "ban-set-schema",
             Rule::BanAlterIdentity => "ban-alter-identity",
@@ -612,6 +613,7 @@ impl Linter {
             (Rule::BanDropSequence, ban_drop_sequence),
             (Rule::BanDropDomain, ban_drop_domain),
             (Rule::BanDropConstraint, ban_drop_constraint),
+            (Rule::BanDropGeneratedExpression, ban_drop_generated_expression),
             (Rule::RenamingObject, renaming_object),
             (Rule::BanSetSchema, ban_set_schema),
             (Rule::BanAlterIdentity, ban_alter_identity),
@@ -727,8 +729,6 @@ mod tests {
         assert!(!linter.rules.contains(&Rule::RequireTableSchema));
         assert!(!linter.rules.contains(&Rule::BanDropTrigger));
         for rule in [
-            Rule::BanDropConstraint,
-            Rule::BanAlterIdentity,
             Rule::BanAlterGeneratedExpression,
             Rule::BanDropIndex,
             Rule::BanSetDefault,
@@ -745,14 +745,9 @@ mod tests {
     #[test]
     fn new_opt_in_rules_only_report_when_included() {
         for (rule, sql) in [
-            (Rule::BanDropConstraint, "ALTER TABLE t DROP CONSTRAINT c;"),
-            (
-                Rule::BanAlterIdentity,
-                "ALTER TABLE t ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY;",
-            ),
             (
                 Rule::BanAlterGeneratedExpression,
-                "ALTER TABLE t ALTER COLUMN c DROP EXPRESSION;",
+                "ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 1);",
             ),
         ] {
             let parse = SourceFile::parse(sql);
@@ -777,8 +772,6 @@ mod tests {
         for rule in [
             Rule::RequireTableSchema,
             Rule::BanDropTrigger,
-            Rule::BanDropConstraint,
-            Rule::BanAlterIdentity,
             Rule::BanAlterGeneratedExpression,
             Rule::BanDropIndex,
             Rule::BanSetDefault,

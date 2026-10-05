@@ -12,6 +12,7 @@ pub(crate) mod ban_create_domain_with_constraint;
 pub(crate) mod ban_disable_trigger;
 pub(crate) mod ban_drop_column;
 pub(crate) mod ban_drop_constraint;
+pub(crate) mod ban_drop_generated_expression;
 pub(crate) mod ban_drop_database;
 pub(crate) mod ban_drop_default;
 pub(crate) mod ban_drop_domain;
@@ -71,6 +72,7 @@ pub(crate) use ban_create_domain_with_constraint::ban_create_domain_with_constra
 pub(crate) use ban_disable_trigger::ban_disable_trigger;
 pub(crate) use ban_drop_column::ban_drop_column;
 pub(crate) use ban_drop_constraint::ban_drop_constraint;
+pub(crate) use ban_drop_generated_expression::ban_drop_generated_expression;
 pub(crate) use ban_drop_database::ban_drop_database;
 pub(crate) use ban_drop_default::ban_drop_default;
 pub(crate) use ban_drop_domain::ban_drop_domain;

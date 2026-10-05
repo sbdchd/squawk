@@ -52,6 +52,7 @@ module.exports = {
       "ban-drop-sequence",
       "ban-drop-domain",
       "ban-drop-constraint",
+      "ban-drop-generated-expression",
       "renaming-object",
       "ban-set-schema",
       "ban-alter-identity",
