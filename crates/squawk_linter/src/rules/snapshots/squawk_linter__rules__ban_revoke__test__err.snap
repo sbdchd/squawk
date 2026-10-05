@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_revoke.rs
+expression: "lint_errors(sql, Rule::BanRevoke)"
+---
+warning[ban-revoke]: Revoking privileges may break existing clients.
+  ╭▸ 
+1 │ REVOKE SELECT ON t FROM app; ALTER DEFAULT PRIVILEGES REVOKE SELECT ON TABLES FROM app;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-revoke]: Revoking privileges may break existing clients.
+  ╭▸ 
+1 │ REVOKE SELECT ON t FROM app; ALTER DEFAULT PRIVILEGES REVOKE SELECT ON TABLES FROM app;
+  ╰╴                             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

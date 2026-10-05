@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - linter: default rollback compatibility rules: ban-drop-schema, ban-drop-sequence, ban-drop-domain, ban-drop-constraint, ban-drop-generated-expression, ban-drop-extension, ban-alter-identity, renaming-object, ban-set-schema
+- linter: opt-in rollback compatibility rules: ban-alter-generated-expression, ban-drop-index, ban-set-default, ban-disable-trigger, ban-replica-identity, ban-drop-policy, ban-revoke, ban-replace-view-function, ban-create-policy, ban-alter-policy-condition, ban-alter-policy-roles, ban-alter-row-level-security, ban-alter-function-options, ban-alter-view-options, ban-alter-role-options, ban-alter-database-options, ban-alter-system-options, ban-alter-extension, ban-new-write-restriction, ban-add-column, ban-add-enum-value, ban-add-composite-attribute, ban-detach-inheritance, ban-alter-sequence-values
 
 ### Changed
 

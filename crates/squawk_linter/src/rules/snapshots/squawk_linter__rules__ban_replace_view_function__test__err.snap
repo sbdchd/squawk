@@ -1,0 +1,16 @@
+---
+source: crates/squawk_linter/src/rules/ban_replace_view_function.rs
+expression: "lint_errors(sql, Rule::BanReplaceViewFunction)"
+---
+warning[ban-replace-view-function]: Replacing a view, function, or procedure may silently change behaviour for existing clients.
+  ╭▸ 
+1 │ CREATE OR REPLACE VIEW v AS SELECT 1 AS id; CREATE OR REPLACE FUNCTION f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$; CREATE OR REPLAC…
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-replace-view-function]: Replacing a view, function, or procedure may silently change behaviour for existing clients.
+  ╭▸ 
+1 │ CREATE OR REPLACE VIEW v AS SELECT 1 AS id; CREATE OR REPLACE FUNCTION f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$; CREATE OR REPLAC…
+  ╰╴                                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-replace-view-function]: Replacing a view, function, or procedure may silently change behaviour for existing clients.
+  ╭▸ 
+1 │ …nt LANGUAGE sql AS $$ SELECT 1 $$; CREATE OR REPLACE PROCEDURE p() LANGUAGE sql AS $$ SELECT 1 $$;
+  ╰╴                                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_index.rs
+expression: errors
+---
+warning[ban-drop-index]: Dropping an index may remove a guarantee or change query plans for existing clients.
+  ╭▸ 
+1 │ DROP INDEX CONCURRENTLY IF EXISTS i; DROP INDEX i;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-index]: Dropping an index may remove a guarantee or change query plans for existing clients.
+  ╭▸ 
+1 │ DROP INDEX CONCURRENTLY IF EXISTS i; DROP INDEX i;
+  ╰╴                                     ━━━━━━━━━━━━━

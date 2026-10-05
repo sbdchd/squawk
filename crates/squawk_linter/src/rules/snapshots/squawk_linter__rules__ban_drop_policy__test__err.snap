@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_policy.rs
+expression: "lint_errors(sql, Rule::BanDropPolicy)"
+---
+warning[ban-drop-policy]: Dropping a policy or rule may silently change behaviour for existing clients.
+  ╭▸ 
+1 │ DROP POLICY IF EXISTS p ON t; DROP RULE IF EXISTS r ON t;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning[ban-drop-policy]: Dropping a policy or rule may silently change behaviour for existing clients.
+  ╭▸ 
+1 │ DROP POLICY IF EXISTS p ON t; DROP RULE IF EXISTS r ON t;
+  ╰╴                              ━━━━━━━━━━━━━━━━━━━━━━━━━━━
