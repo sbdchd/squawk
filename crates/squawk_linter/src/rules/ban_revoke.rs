@@ -6,6 +6,9 @@ use squawk_syntax::{
 
 pub(crate) fn ban_revoke(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
+        for owner in stmt.syntax().descendants().filter_map(ast::OwnerTo::cast) {
+            ctx.report(Violation::for_node(Rule::BanRevoke, "Changing object ownership may break existing clients.".into(), owner.syntax()));
+        }
         match stmt {
             ast::Stmt::Revoke(node) => {
                 ctx.report(Violation::for_node(
@@ -17,6 +20,16 @@ pub(crate) fn ban_revoke(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropOwned(node) => ctx.report(Violation::for_node(
                 Rule::BanRevoke,
                 "Dropping owned objects or privileges may break existing clients.".into(),
+                node.syntax(),
+            )),
+            ast::Stmt::Reassign(node) => ctx.report(Violation::for_node(
+                Rule::BanRevoke,
+                "Reassigning owned objects may break existing clients.".into(),
+                node.syntax(),
+            )),
+            ast::Stmt::DropUser(node) => ctx.report(Violation::for_node(
+                Rule::BanRevoke,
+                "Dropping a user may break existing clients.".into(),
                 node.syntax(),
             )),
             ast::Stmt::DropRole(node) => ctx.report(Violation::for_node(

@@ -7,6 +7,17 @@ use squawk_syntax::{
 pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         match stmt {
+            ast::Stmt::AlterForeignTable(node) => {
+                for action in node.actions() {
+                    if let ast::AlterTableAction::SetSchema(node) = action {
+                        ctx.report(Violation::for_node(
+                            Rule::BanSetSchema,
+                            "Moving an object to another schema may break existing clients.".into(),
+                            node.syntax(),
+                        ));
+                    }
+                }
+            }
             ast::Stmt::AlterTable(node) => {
                 for action in node.actions() {
                     if let ast::AlterTableAction::SetSchema(node) = action {

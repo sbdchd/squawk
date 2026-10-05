@@ -5,7 +5,7 @@ title: ban-drop-function
 
 ## problem
 
-Dropping a function, procedure, or routine may break existing clients. Calls can fail with `42883 undefined_function`.
+Dropping a function, procedure, routine, or aggregate may break existing clients. Calls can fail with `42883 undefined_function`.
 
 ## solution
 

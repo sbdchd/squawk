@@ -5,7 +5,7 @@ title: ban-drop-column
 
 ## problem
 
-Dropping a column may break existing clients.
+Dropping a table or foreign table column or a composite type attribute may break existing clients.
 
 ## solution
 

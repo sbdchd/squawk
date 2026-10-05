@@ -7,8 +7,7 @@ title: changing-column-type
 
 Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten.
 
-Changing the type of the column may also break other clients reading from the
-table.
+Changing the type of a table or foreign table column or a composite type attribute may also break clients that read its values.
 
 <https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES>
 
