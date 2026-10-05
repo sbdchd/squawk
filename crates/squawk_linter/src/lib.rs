@@ -824,10 +824,16 @@ mod tests {
 
     #[test]
     fn new_opt_in_rules_only_report_when_included() {
-        for (rule, sql) in [(
-            Rule::BanAlterGeneratedExpression,
-            "ALTER TABLE t ADD COLUMN c int GENERATED ALWAYS AS (id + 1) STORED;",
-        )] {
+        for (rule, sql) in [
+            (
+                Rule::BanAlterGeneratedExpression,
+                "ALTER TABLE t ADD COLUMN c int GENERATED ALWAYS AS (id + 1) STORED;",
+            ),
+            (
+                Rule::BanAlterGeneratedExpression,
+                "ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 1);",
+            ),
+        ] {
             let parse = SourceFile::parse(sql);
             assert!(parse.errors().is_empty());
             assert!(

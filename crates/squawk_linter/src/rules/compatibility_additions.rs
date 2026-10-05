@@ -45,14 +45,14 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                         match &action {
                             ast::AlterTableAction::AddConstraint(add) => {
                                 if let Some(constraint) = add.constraint() {
-                                    let restriction = match &constraint {
+                                    let restriction = matches!(
+                                        constraint,
                                         ast::Constraint::CheckConstraint(_)
-                                        | ast::Constraint::ForeignKeyConstraint(_)
-                                        | ast::Constraint::UniqueConstraint(_)
-                                        | ast::Constraint::PrimaryKeyConstraint(_)
-                                        | ast::Constraint::ExcludeConstraint(_) => true,
-                                        _ => false,
-                                    };
+                                            | ast::Constraint::ForeignKeyConstraint(_)
+                                            | ast::Constraint::UniqueConstraint(_)
+                                            | ast::Constraint::PrimaryKeyConstraint(_)
+                                            | ast::Constraint::ExcludeConstraint(_)
+                                    );
                                     if restriction {
                                         ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
                                             "A new constraint can reject writes from existing clients, even when it is NOT VALID.".into(), add.syntax()));
