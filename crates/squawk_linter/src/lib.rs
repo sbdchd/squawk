@@ -930,6 +930,19 @@ mod tests {
     }
 
     #[test]
+    fn compatibility_rule_respects_ignore_comment() {
+        let sql = "-- squawk-ignore ban-add-enum-value\nALTER TYPE mood ADD VALUE 'new';";
+        let parse = SourceFile::parse(sql);
+        assert!(parse.errors().is_empty());
+        assert!(
+            !Linter::with_rules(&[Rule::BanAddEnumValue], &[])
+                .lint(&parse, sql)
+                .iter()
+                .any(|v| v.code == Rule::BanAddEnumValue)
+        );
+    }
+
+    #[test]
     fn require_timeout_settings_expands_to_granular_rules() {
         let linter = Linter::from([Rule::RequireTimeoutSettings]);
         assert!(linter.rules.contains(&Rule::RequireLockTimeout));

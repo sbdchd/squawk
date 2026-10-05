@@ -8,20 +8,29 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         if let ast::Stmt::AlterTable(table) = stmt {
             for action in table.actions() {
-                if matches!(
-                    action,
+                let message = match action {
+                    ast::AlterTableAction::EnableReplicaTrigger(_)
+                    | ast::AlterTableAction::EnableReplicaRule(_) => {
+                        "Replica-only triggers and rules do not fire for normal application writes."
+                    }
                     ast::AlterTableAction::DisableTrigger(_)
-                        | ast::AlterTableAction::DisableRule(_)
-                        | ast::AlterTableAction::DisableRls(_)
-                        | ast::AlterTableAction::ForceRls(_)
-                        | ast::AlterTableAction::NoForceRls(_)
-                        | ast::AlterTableAction::EnableReplicaTrigger(_)
-                        | ast::AlterTableAction::EnableReplicaRule(_)
-                        | ast::AlterTableAction::EnableAlwaysTrigger(_)
-                        | ast::AlterTableAction::EnableAlwaysRule(_)
-                ) {
-                    ctx.report(Violation::for_node(Rule::BanDisableTrigger, "Disabling a trigger, rule, or row level security may silently change behaviour for existing clients.".into(), action.syntax()));
-                }
+                    | ast::AlterTableAction::DisableRule(_)
+                    | ast::AlterTableAction::EnableAlwaysTrigger(_)
+                    | ast::AlterTableAction::EnableAlwaysRule(_) => {
+                        "Changing trigger or rule firing may change database side effects for existing clients."
+                    }
+                    ast::AlterTableAction::DisableRls(_)
+                    | ast::AlterTableAction::ForceRls(_)
+                    | ast::AlterTableAction::NoForceRls(_) => {
+                        "Changing row level security can change visible rows or reject access for existing clients."
+                    }
+                    _ => continue,
+                };
+                ctx.report(Violation::for_node(
+                    Rule::BanDisableTrigger,
+                    message.into(),
+                    action.syntax(),
+                ));
             }
         }
     }

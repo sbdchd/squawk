@@ -1,20 +1,20 @@
 ---
 source: crates/squawk_linter/src/rules/ban_disable_trigger.rs
-expression: "lint_errors(sql, Rule::BanDisableTrigger)"
+expression: errors
 ---
-warning[ban-disable-trigger]: Disabling a trigger, rule, or row level security may silently change behaviour for existing clients.
+warning[ban-disable-trigger]: Changing trigger or rule firing may change database side effects for existing clients.
   ╭▸ 
 1 │ ALTER TABLE t DISABLE TRIGGER trg; ALTER TABLE t DISABLE RULE r; ALTER TABLE t DISABLE ROW LEVEL SECURITY; ALTER TABLE t FORCE ROW LEVE…
   ╰╴              ━━━━━━━━━━━━━━━━━━━
-warning[ban-disable-trigger]: Disabling a trigger, rule, or row level security may silently change behaviour for existing clients.
+warning[ban-disable-trigger]: Changing trigger or rule firing may change database side effects for existing clients.
   ╭▸ 
 1 │ ALTER TABLE t DISABLE TRIGGER trg; ALTER TABLE t DISABLE RULE r; ALTER TABLE t DISABLE ROW LEVEL SECURITY; ALTER TABLE t FORCE ROW LEVE…
   ╰╴                                                 ━━━━━━━━━━━━━━
-warning[ban-disable-trigger]: Disabling a trigger, rule, or row level security may silently change behaviour for existing clients.
+warning[ban-disable-trigger]: Changing row level security can change visible rows or reject access for existing clients.
   ╭▸ 
 1 │ ALTER TABLE t DISABLE TRIGGER trg; ALTER TABLE t DISABLE RULE r; ALTER TABLE t DISABLE ROW LEVEL SECURITY; ALTER TABLE t FORCE ROW LEVE…
   ╰╴                                                                               ━━━━━━━━━━━━━━━━━━━━━━━━━━
-warning[ban-disable-trigger]: Disabling a trigger, rule, or row level security may silently change behaviour for existing clients.
+warning[ban-disable-trigger]: Changing row level security can change visible rows or reject access for existing clients.
   ╭▸ 
 1 │ …LTER TABLE t DISABLE ROW LEVEL SECURITY; ALTER TABLE t FORCE ROW LEVEL SECURITY;
   ╰╴                                                        ━━━━━━━━━━━━━━━━━━━━━━━━
