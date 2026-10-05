@@ -72,7 +72,7 @@ use rules::{
     ban_alter_generated_expression, ban_alter_identity, ban_disable_trigger, ban_drop_constraint,
     ban_drop_domain, ban_drop_index, ban_drop_policy, ban_drop_schema, ban_drop_sequence,
     ban_replace_view_function, ban_replica_identity, ban_revoke, ban_set_default, ban_set_schema,
-    renaming_object,
+    renaming_object, security_compatibility,
 };
 // xtask:new-rule:rule-import
 
@@ -139,6 +139,15 @@ pub enum Rule {
     BanDropPolicy,
     BanRevoke,
     BanReplaceViewFunction,
+    BanDropExtension,
+    BanAlterPolicyCondition,
+    BanAlterPolicyRoles,
+    BanCreatePolicy,
+    BanAlterFunctionOptions,
+    BanAlterViewOptions,
+    BanAlterRoleOptions,
+    BanAlterDatabaseOptions,
+    BanAlterRowLevelSecurity,
     // xtask:new-rule:error-name
 }
 
@@ -160,6 +169,14 @@ impl Rule {
                 | Rule::BanDropPolicy
                 | Rule::BanRevoke
                 | Rule::BanReplaceViewFunction
+                | Rule::BanAlterPolicyCondition
+                | Rule::BanAlterPolicyRoles
+                | Rule::BanCreatePolicy
+                | Rule::BanAlterFunctionOptions
+                | Rule::BanAlterViewOptions
+                | Rule::BanAlterRoleOptions
+                | Rule::BanAlterDatabaseOptions
+                | Rule::BanAlterRowLevelSecurity
         )
     }
 
@@ -243,6 +260,15 @@ impl TryFrom<&str> for Rule {
             "ban-drop-policy" => Ok(Rule::BanDropPolicy),
             "ban-revoke" => Ok(Rule::BanRevoke),
             "ban-replace-view-function" => Ok(Rule::BanReplaceViewFunction),
+            "ban-drop-extension" => Ok(Rule::BanDropExtension),
+            "ban-alter-policy-condition" => Ok(Rule::BanAlterPolicyCondition),
+            "ban-alter-policy-roles" => Ok(Rule::BanAlterPolicyRoles),
+            "ban-create-policy" => Ok(Rule::BanCreatePolicy),
+            "ban-alter-function-options" => Ok(Rule::BanAlterFunctionOptions),
+            "ban-alter-view-options" => Ok(Rule::BanAlterViewOptions),
+            "ban-alter-role-options" => Ok(Rule::BanAlterRoleOptions),
+            "ban-alter-database-options" => Ok(Rule::BanAlterDatabaseOptions),
+            "ban-alter-row-level-security" => Ok(Rule::BanAlterRowLevelSecurity),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -335,6 +361,15 @@ impl fmt::Display for Rule {
             Rule::BanDropPolicy => "ban-drop-policy",
             Rule::BanRevoke => "ban-revoke",
             Rule::BanReplaceViewFunction => "ban-replace-view-function",
+            Rule::BanDropExtension => "ban-drop-extension",
+            Rule::BanAlterPolicyCondition => "ban-alter-policy-condition",
+            Rule::BanAlterPolicyRoles => "ban-alter-policy-roles",
+            Rule::BanCreatePolicy => "ban-create-policy",
+            Rule::BanAlterFunctionOptions => "ban-alter-function-options",
+            Rule::BanAlterViewOptions => "ban-alter-view-options",
+            Rule::BanAlterRoleOptions => "ban-alter-role-options",
+            Rule::BanAlterDatabaseOptions => "ban-alter-database-options",
+            Rule::BanAlterRowLevelSecurity => "ban-alter-row-level-security",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -633,6 +668,7 @@ impl Linter {
                 check(self, file);
             }
         }
+        security_compatibility(self, file);
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file
@@ -737,6 +773,14 @@ mod tests {
             Rule::BanDropPolicy,
             Rule::BanRevoke,
             Rule::BanReplaceViewFunction,
+            Rule::BanAlterPolicyCondition,
+            Rule::BanAlterPolicyRoles,
+            Rule::BanCreatePolicy,
+            Rule::BanAlterFunctionOptions,
+            Rule::BanAlterViewOptions,
+            Rule::BanAlterRoleOptions,
+            Rule::BanAlterDatabaseOptions,
+            Rule::BanAlterRowLevelSecurity,
         ] {
             assert!(!linter.rules.contains(&rule));
         }
@@ -780,6 +824,14 @@ mod tests {
             Rule::BanDropPolicy,
             Rule::BanRevoke,
             Rule::BanReplaceViewFunction,
+            Rule::BanAlterPolicyCondition,
+            Rule::BanAlterPolicyRoles,
+            Rule::BanCreatePolicy,
+            Rule::BanAlterFunctionOptions,
+            Rule::BanAlterViewOptions,
+            Rule::BanAlterRoleOptions,
+            Rule::BanAlterDatabaseOptions,
+            Rule::BanAlterRowLevelSecurity,
         ] {
             let linter = Linter::with_rules(&[rule], &[]);
             assert!(linter.rules.contains(&rule));

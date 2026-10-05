@@ -283,6 +283,15 @@ const rules = [
   { name: "ban-drop-policy", tags: ["backwards compatibility"], description: "Prevent dropping policies and rules (opt-in)." },
   { name: "ban-revoke", tags: ["backwards compatibility"], description: "Prevent revoking client privileges (opt-in)." },
   { name: "ban-replace-view-function", tags: ["backwards compatibility"], description: "Prevent replacing views and routines (opt-in)." },
+  { name: "ban-drop-extension", tags: ["backwards compatibility"], description: "Prevent dropping extensions used by clients." },
+  { name: "ban-create-policy", tags: ["backwards compatibility"], description: "Review new policy access rules (opt-in)." },
+  { name: "ban-alter-policy-condition", tags: ["backwards compatibility"], description: "Review policy condition changes (opt-in)." },
+  { name: "ban-alter-policy-roles", tags: ["backwards compatibility"], description: "Review policy role changes (opt-in)." },
+  { name: "ban-alter-function-options", tags: ["backwards compatibility"], description: "Review function option changes (opt-in)." },
+  { name: "ban-alter-view-options", tags: ["backwards compatibility"], description: "Review view option changes (opt-in)." },
+  { name: "ban-alter-role-options", tags: ["backwards compatibility"], description: "Review role option and configuration changes (opt-in)." },
+  { name: "ban-alter-database-options", tags: ["backwards compatibility"], description: "Review database option and configuration changes (opt-in)." },
+  { name: "ban-alter-row-level-security", tags: ["backwards compatibility"], description: "Review row level security changes (opt-in)." },
   // xtask:new-rule:rule-doc-meta
 ]
 
