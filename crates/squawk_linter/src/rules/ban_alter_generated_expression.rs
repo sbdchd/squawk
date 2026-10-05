@@ -10,15 +10,14 @@ pub(crate) fn ban_alter_generated_expression(ctx: &mut Linter, parse: &Parse<Sou
             for action in table.actions() {
                 match action {
                     ast::AlterTableAction::AlterColumn(column) => {
-                        if let Some(ast::AlterColumnOption::DropExpression(node)) = column.option()
-                        {
+                        if let Some(ast::AlterColumnOption::SetExpression(node)) = column.option() {
                             ctx.report(Violation::for_node(Rule::BanAlterGeneratedExpression, "Changing a generated column may break inserts from existing clients.".into(), node.syntax()));
                         }
                     }
                     ast::AlterTableAction::AddColumn(column) => {
                         for constraint in column.constraints() {
                             if let ast::Constraint::GeneratedConstraint(node) = constraint {
-                                ctx.report(Violation::for_node(Rule::BanAlterGeneratedExpression, "Changing a generated column may break inserts from existing clients.".into(), node.syntax()));
+                                ctx.report(Violation::for_node(Rule::BanAlterGeneratedExpression, "Adding a generated column may break inserts from existing clients.".into(), node.syntax()));
                             }
                         }
                     }
@@ -38,13 +37,13 @@ mod test {
     use insta::assert_snapshot;
     #[test]
     fn err() {
-        let sql = "ALTER TABLE t ALTER COLUMN c DROP EXPRESSION; ALTER TABLE t ADD COLUMN c int GENERATED ALWAYS AS (id + 1) STORED;";
+        let sql = "ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 2); ALTER TABLE t ADD COLUMN c int GENERATED ALWAYS AS (id + 1) STORED;";
         assert_snapshot!(lint_errors(sql, Rule::BanAlterGeneratedExpression));
     }
     #[test]
     fn ok() {
         lint_ok(
-            "ALTER TABLE t ADD COLUMN c int;",
+            "ALTER TABLE t ADD COLUMN c int; ALTER TABLE t ALTER COLUMN c DROP EXPRESSION;",
             Rule::BanAlterGeneratedExpression,
         );
     }

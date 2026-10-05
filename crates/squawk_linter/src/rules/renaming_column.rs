@@ -8,16 +8,50 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for stmt in file.stmts() {
-        if let ast::Stmt::AlterTable(alter_table) = stmt {
-            for action in alter_table.actions() {
-                if let ast::AlterTableAction::RenameColumn(rename_column) = action {
+        match stmt {
+            ast::Stmt::AlterTable(table) => {
+                for action in table.actions() {
+                    if let ast::AlterTableAction::RenameColumn(node) = action {
+                        ctx.report(Violation::for_node(
+                            Rule::RenamingColumn,
+                            "Renaming a column may break existing clients.".into(),
+                            node.syntax(),
+                        ));
+                    }
+                }
+            }
+            ast::Stmt::AlterForeignTable(table) => {
+                for action in table.actions() {
+                    if let ast::AlterTableAction::RenameColumn(node) = action {
+                        ctx.report(Violation::for_node(
+                            Rule::RenamingColumn,
+                            "Renaming a column may break existing clients.".into(),
+                            node.syntax(),
+                        ));
+                    }
+                }
+            }
+            ast::Stmt::AlterView(view) => {
+                if let Some(ast::AlterViewAction::RenameColumn(node)) = view.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingColumn,
                         "Renaming a column may break existing clients.".into(),
-                        rename_column.syntax(),
+                        node.syntax(),
                     ));
                 }
             }
+            ast::Stmt::AlterMaterializedView(view) => {
+                for action in view.action() {
+                    if let ast::AlterMaterializedViewAction::RenameColumn(node) = action {
+                        ctx.report(Violation::for_node(
+                            Rule::RenamingColumn,
+                            "Renaming a column may break existing clients.".into(),
+                            node.syntax(),
+                        ));
+                    }
+                }
+            }
+            _ => (),
         }
     }
 }

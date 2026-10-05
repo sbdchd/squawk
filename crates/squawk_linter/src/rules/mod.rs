@@ -57,6 +57,8 @@ pub(crate) mod require_table_schema;
 pub(crate) mod require_timeout_settings;
 pub(crate) mod transaction_nesting;
 pub(crate) mod security_compatibility;
+#[cfg(test)]
+mod variant_tests;
 // xtask:new-rule:mod-decl
 
 pub(crate) use adding_field_with_default::adding_field_with_default;

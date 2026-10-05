@@ -5,7 +5,7 @@ title: renaming-object
 
 ## problem
 
-Clients that use an old object name or enum value can fail after a rename.
+Clients that use an old object name or enum value can fail after a rename. This includes foreign tables and routines.
 
 ```sql
 ALTER VIEW v RENAME TO v2;

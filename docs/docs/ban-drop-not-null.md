@@ -5,7 +5,7 @@ title: ban-drop-not-null
 
 ## problem
 
-Dropping a NOT NULL constraint may break existing clients.
+Dropping a `NOT NULL` constraint on a table column, foreign table column, or domain may break existing clients.
 
 Application code or code written in procedural languages like PL/SQL or PL/pgSQL may not expect NULL values for the column that was previously guaranteed to be NOT NULL and therefore may fail to process them correctly.
 

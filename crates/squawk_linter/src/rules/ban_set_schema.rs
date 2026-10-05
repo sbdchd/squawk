@@ -40,6 +40,24 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     }
                 }
             }
+            ast::Stmt::AlterProcedure(node) => {
+                if let Some(ast::AlterProcedureAction::SetSchema(action)) = node.action() {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        action.syntax(),
+                    ));
+                }
+            }
+            ast::Stmt::AlterRoutine(node) => {
+                if let Some(ast::AlterRoutineAction::SetSchema(action)) = node.action() {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        action.syntax(),
+                    ));
+                }
+            }
             ast::Stmt::AlterFunction(node) => {
                 for action in node.action().into_iter() {
                     if let ast::AlterFunctionAction::SetSchema(node) = action {

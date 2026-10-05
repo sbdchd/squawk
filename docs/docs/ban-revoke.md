@@ -5,7 +5,7 @@ title: ban-revoke
 
 ## problem
 
-Revoking privileges can make client queries fail with a permission error. This rule is opt-in.
+Revoking privileges, dropping a role, or running `DROP OWNED` can make client queries fail. `DROP OWNED` can also remove objects owned by the role. This rule is opt-in.
 
 ```sql
 REVOKE SELECT ON t FROM app;

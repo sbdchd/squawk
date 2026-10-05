@@ -5,7 +5,7 @@ title: ban-drop-table
 
 ## problem
 
-Dropping a table may break existing clients.
+Dropping a table or foreign table may break existing clients.
 
 ## solution
 

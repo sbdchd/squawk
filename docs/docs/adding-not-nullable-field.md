@@ -10,7 +10,7 @@ Use a check constraint instead of setting a column as `NOT NULL`.
 Adding a column as `NOT NULL` is no longer covered by this rule. See ["adding-required-field (set a non-volatile default)"](adding-required-field.md#set-a-non-volatile-default) for more information on how to add new columns with `NOT NULL`.
 
 
-Modifying a column to be `NOT NULL` may fail if the column contains records with a `NULL` value, requiring a full table scan to check before executing. Old application code may also try to write `NULL` values to the table.
+Modifying a table or foreign table column, or a domain, to be `NOT NULL` may fail if existing values contain `NULL`. Validation can require a scan. Old application code may also try to write `NULL` values to the table.
 
 `ALTER TABLE` also requires an `ACCESS EXCLUSIVE` lock which will disable reads and writes while this statement is running.
 

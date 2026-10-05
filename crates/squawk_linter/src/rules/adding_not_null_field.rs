@@ -57,6 +57,28 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
     let mut tables_with_external_validated_constraints: FxHashSet<String> = FxHashSet::default();
 
     for stmt in file.stmts() {
+        if let ast::Stmt::AlterDomain(domain) = &stmt {
+            if let Some(ast::AlterDomainAction::SetNotNull(node)) = domain.action() {
+                ctx.report(Violation::for_node(
+                    Rule::AddingNotNullableField,
+                    "Setting a domain `NOT NULL` validates existing values.".into(),
+                    node.syntax(),
+                ));
+            }
+        }
+        if let ast::Stmt::AlterForeignTable(table) = &stmt {
+            for action in table.actions() {
+                if let ast::AlterTableAction::AlterColumn(column) = action {
+                    if let Some(ast::AlterColumnOption::SetNotNull(node)) = column.option() {
+                        ctx.report(Violation::for_node(
+                            Rule::AddingNotNullableField,
+                            "Setting a column `NOT NULL` may block reads during validation.".into(),
+                            node.syntax(),
+                        ));
+                    }
+                }
+            }
+        }
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             let Some(table) = get_table_name(&alter_table) else {
                 continue;

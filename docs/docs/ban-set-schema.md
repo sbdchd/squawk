@@ -5,7 +5,7 @@ title: ban-set-schema
 
 ## problem
 
-Clients that use schema-qualified names cannot find objects after `SET SCHEMA`.
+Clients that use schema-qualified names cannot find objects after `SET SCHEMA`. This includes procedures and routines.
 
 ```sql
 ALTER TABLE t SET SCHEMA s;

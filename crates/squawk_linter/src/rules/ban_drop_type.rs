@@ -7,7 +7,13 @@ use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_drop_type(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
-        if let ast::Stmt::DropType(node) = stmt {
+        if let ast::Stmt::DropCast(node) = stmt {
+            ctx.report(Violation::for_node(
+                Rule::BanDropType,
+                "Dropping a cast may break existing clients.".into(),
+                node.syntax(),
+            ));
+        } else if let ast::Stmt::DropType(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropType,
                 "Dropping a type may break existing clients.".into(),

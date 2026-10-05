@@ -14,6 +14,16 @@ pub(crate) fn ban_revoke(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     node.syntax(),
                 ));
             }
+            ast::Stmt::DropOwned(node) => ctx.report(Violation::for_node(
+                Rule::BanRevoke,
+                "Dropping owned objects or privileges may break existing clients.".into(),
+                node.syntax(),
+            )),
+            ast::Stmt::DropRole(node) => ctx.report(Violation::for_node(
+                Rule::BanRevoke,
+                "Dropping a role may break existing clients.".into(),
+                node.syntax(),
+            )),
             ast::Stmt::AlterDefaultPrivileges(node) => {
                 if matches!(
                     node.action(),

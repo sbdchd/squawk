@@ -14,6 +14,11 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         | ast::AlterTableAction::DisableRule(_)
                         | ast::AlterTableAction::DisableRls(_)
                         | ast::AlterTableAction::ForceRls(_)
+                        | ast::AlterTableAction::NoForceRls(_)
+                        | ast::AlterTableAction::EnableReplicaTrigger(_)
+                        | ast::AlterTableAction::EnableReplicaRule(_)
+                        | ast::AlterTableAction::EnableAlwaysTrigger(_)
+                        | ast::AlterTableAction::EnableAlwaysRule(_)
                 ) {
                     ctx.report(Violation::for_node(Rule::BanDisableTrigger, "Disabling a trigger, rule, or row level security may silently change behaviour for existing clients.".into(), action.syntax()));
                 }

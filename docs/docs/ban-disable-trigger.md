@@ -5,7 +5,7 @@ title: ban-disable-trigger
 
 ## problem
 
-Disabling a trigger or rule, or changing row level security enforcement, changes behaviour without a client error. This rule is opt-in.
+Disabling a trigger or rule, enabling a replica or always trigger or rule, or changing row level security enforcement (including `NO FORCE ROW LEVEL SECURITY`) can change behaviour without a client error. This rule is opt-in.
 
 ```sql
 ALTER TABLE t DISABLE TRIGGER trg;

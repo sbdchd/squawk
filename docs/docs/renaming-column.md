@@ -5,7 +5,7 @@ title: renaming-column
 
 ## problem
 
-Renaming a column may break existing clients.
+Renaming a table, foreign table, view, or materialized view column may break existing clients.
 
 ## solution
 

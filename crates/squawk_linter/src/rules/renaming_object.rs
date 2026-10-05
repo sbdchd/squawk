@@ -7,6 +7,26 @@ use squawk_syntax::{
 pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         match stmt {
+            ast::Stmt::AlterForeignTable(node) => {
+                for action in node.actions() {
+                    if let ast::AlterTableAction::TableRenameTo(node) = action {
+                        ctx.report(Violation::for_node(
+                            Rule::RenamingObject,
+                            "Renaming a foreign table may break existing clients.".into(),
+                            node.syntax(),
+                        ));
+                    }
+                }
+            }
+            ast::Stmt::AlterRoutine(node) => {
+                if let Some(ast::AlterRoutineAction::RoutineRenameTo(action)) = node.action() {
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a routine may break existing clients.".into(),
+                        action.syntax(),
+                    ));
+                }
+            }
             ast::Stmt::AlterView(node) => {
                 for action in node.action().into_iter() {
                     if let ast::AlterViewAction::ViewRenameTo(node) = action {

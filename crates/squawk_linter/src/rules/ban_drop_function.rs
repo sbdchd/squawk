@@ -18,6 +18,11 @@ pub(crate) fn ban_drop_function(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 "Dropping a function may break existing clients.".into(),
                 node.syntax(),
             )),
+            ast::Stmt::DropRoutine(node) => ctx.report(Violation::for_node(
+                Rule::BanDropFunction,
+                "Dropping a routine may break existing clients.".into(),
+                node.syntax(),
+            )),
             _ => (),
         }
     }
