@@ -1,0 +1,8 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_domain.rs
+expression: "lint_errors(sql, Rule::BanDropDomain)"
+---
+warning[ban-drop-domain]: Dropping a domain may break existing clients.
+  ╭▸ 
+1 │ DROP DOMAIN IF EXISTS d CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

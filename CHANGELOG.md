@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- linter: default rollback compatibility rules: ban-drop-schema, ban-drop-sequence, ban-drop-domain, ban-drop-constraint, ban-drop-generated-expression, ban-drop-extension, ban-alter-identity, renaming-object, ban-set-schema
+
+### Changed
+
+- linter: extend adding-not-nullable-field and ban-drop-not-null to domains and foreign tables; ban-drop-default to domains, foreign tables, and views; ban-drop-column and changing-column-type to foreign tables and composite attributes; renaming-column to foreign tables, composite attributes, views, and materialized views
+- linter: extend ban-drop-function to aggregates and routines, ban-drop-table to foreign tables, and ban-drop-type to operators, operator classes, operator families, and casts
+
 ## v2.67.0 - 2026-10-04
 
 ### Added

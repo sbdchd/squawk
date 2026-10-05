@@ -1,0 +1,8 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_schema.rs
+expression: "lint_errors(sql, Rule::BanDropSchema)"
+---
+warning[ban-drop-schema]: Dropping a schema may break existing clients.
+  ╭▸ 
+1 │ DROP SCHEMA IF EXISTS s CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

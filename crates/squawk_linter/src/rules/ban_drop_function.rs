@@ -8,6 +8,11 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn ban_drop_function(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         match stmt {
+            ast::Stmt::DropAggregate(node) => ctx.report(Violation::for_node(
+                Rule::BanDropFunction,
+                "Dropping an aggregate may break existing clients.".into(),
+                node.syntax(),
+            )),
             ast::Stmt::DropFunction(node) => ctx.report(Violation::for_node(
                 Rule::BanDropFunction,
                 "Dropping a function may break existing clients.".into(),
@@ -16,6 +21,11 @@ pub(crate) fn ban_drop_function(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropProcedure(node) => ctx.report(Violation::for_node(
                 Rule::BanDropFunction,
                 "Dropping a function may break existing clients.".into(),
+                node.syntax(),
+            )),
+            ast::Stmt::DropRoutine(node) => ctx.report(Violation::for_node(
+                Rule::BanDropFunction,
+                "Dropping a routine may break existing clients.".into(),
                 node.syntax(),
             )),
             _ => (),
