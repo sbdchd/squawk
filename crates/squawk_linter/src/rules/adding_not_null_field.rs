@@ -169,6 +169,14 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
     }
 
     #[test]
+    fn domain_and_foreign_table_set_not_null_are_not_locking_warnings() {
+        lint_ok(
+            "ALTER DOMAIN d SET NOT NULL; ALTER FOREIGN TABLE ft ALTER COLUMN c SET NOT NULL;",
+            Rule::AddingNotNullableField,
+        );
+    }
+
+    #[test]
     fn adding_field_that_is_not_nullable() {
         let sql = r#"
 BEGIN;

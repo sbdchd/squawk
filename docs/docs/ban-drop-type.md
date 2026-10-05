@@ -5,7 +5,7 @@ title: ban-drop-type
 
 ## problem
 
-Dropping a type may break existing clients. Casts and parameters that name the type can fail with `42704 undefined_object`. `CASCADE` can also drop columns of that type.
+Dropping a type, cast, operator, operator class, or operator family may break existing clients. Casts and parameters that name the type can fail with `42704 undefined_object`. `CASCADE` can also drop columns of that type.
 
 ## solution
 

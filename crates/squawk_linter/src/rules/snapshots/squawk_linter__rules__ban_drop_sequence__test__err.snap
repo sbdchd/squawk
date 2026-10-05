@@ -1,0 +1,8 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_sequence.rs
+expression: "lint_errors(sql, Rule::BanDropSequence)"
+---
+warning[ban-drop-sequence]: Dropping a sequence may break existing clients.
+  ╭▸ 
+1 │ DROP SEQUENCE IF EXISTS s CASCADE;
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

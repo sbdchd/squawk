@@ -1,0 +1,44 @@
+---
+source: crates/squawk_linter/src/rules/renaming_object.rs
+expression: "lint_errors(sql, Rule::RenamingObject)"
+---
+warning[renaming-object]: Renaming a view may break existing clients.
+  ╭▸ 
+1 │ ALTER VIEW v RENAME TO v2; ALTER MATERIALIZED VIEW mv RENAME TO mv2; ALTER FUNCTION f() RENAME TO f2; ALTER PROCEDURE p() RENAME TO p2;…
+  ╰╴             ━━━━━━━━━━━━
+warning[renaming-object]: Renaming a materialized view may break existing clients.
+  ╭▸ 
+1 │ ALTER VIEW v RENAME TO v2; ALTER MATERIALIZED VIEW mv RENAME TO mv2; ALTER FUNCTION f() RENAME TO f2; ALTER PROCEDURE p() RENAME TO p2;…
+  ╰╴                                                      ━━━━━━━━━━━━━
+warning[renaming-object]: Renaming a function may break existing clients.
+  ╭▸ 
+1 │ ALTER VIEW v RENAME TO v2; ALTER MATERIALIZED VIEW mv RENAME TO mv2; ALTER FUNCTION f() RENAME TO f2; ALTER PROCEDURE p() RENAME TO p2;…
+  ╰╴                                                                                        ━━━━━━━━━━━━
+warning[renaming-object]: Renaming a procedure may break existing clients.
+  ╭▸ 
+1 │ …TO mv2; ALTER FUNCTION f() RENAME TO f2; ALTER PROCEDURE p() RENAME TO p2; ALTER TYPE typ RENAME TO typ2; ALTER SEQUENCE seq RENAME TO…
+  ╰╴                                                              ━━━━━━━━━━━━
+warning[renaming-object]: Renaming a type may break existing clients.
+  ╭▸ 
+1 │ …AME TO f2; ALTER PROCEDURE p() RENAME TO p2; ALTER TYPE typ RENAME TO typ2; ALTER SEQUENCE seq RENAME TO seq2; ALTER SCHEMA s RENAME T…
+  ╰╴                                                             ━━━━━━━━━━━━━━
+warning[renaming-object]: Renaming a sequence may break existing clients.
+  ╭▸ 
+1 │ …ME TO p2; ALTER TYPE typ RENAME TO typ2; ALTER SEQUENCE seq RENAME TO seq2; ALTER SCHEMA s RENAME TO s2; ALTER DOMAIN d RENAME TO d2; …
+  ╰╴                                                             ━━━━━━━━━━━━━━
+warning[renaming-object]: Renaming a schema may break existing clients.
+  ╭▸ 
+1 │ …E TO typ2; ALTER SEQUENCE seq RENAME TO seq2; ALTER SCHEMA s RENAME TO s2; ALTER DOMAIN d RENAME TO d2; ALTER INDEX i RENAME TO i2; AL…
+  ╰╴                                                              ━━━━━━━━━━━━
+warning[renaming-object]: Renaming a domain may break existing clients.
+  ╭▸ 
+1 │ … RENAME TO seq2; ALTER SCHEMA s RENAME TO s2; ALTER DOMAIN d RENAME TO d2; ALTER INDEX i RENAME TO i2; ALTER TYPE typ RENAME VALUE 'a'…
+  ╰╴                                                              ━━━━━━━━━━━━
+warning[renaming-object]: Renaming an index may break existing clients.
+  ╭▸ 
+1 │ …A s RENAME TO s2; ALTER DOMAIN d RENAME TO d2; ALTER INDEX i RENAME TO i2; ALTER TYPE typ RENAME VALUE 'a' TO 'b';
+  ╰╴                                                              ━━━━━━━━━━━━
+warning[renaming-object]: Renaming a type value may break existing clients.
+  ╭▸ 
+1 │ …NAME TO d2; ALTER INDEX i RENAME TO i2; ALTER TYPE typ RENAME VALUE 'a' TO 'b';
+  ╰╴                                                        ━━━━━━━━━━━━━━━━━━━━━━━

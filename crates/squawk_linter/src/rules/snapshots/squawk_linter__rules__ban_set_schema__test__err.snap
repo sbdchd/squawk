@@ -1,0 +1,32 @@
+---
+source: crates/squawk_linter/src/rules/ban_set_schema.rs
+expression: "lint_errors(sql, Rule::BanSetSchema)"
+---
+warning[ban-set-schema]: Moving an object to another schema may break existing clients.
+  ╭▸ 
+1 │ ALTER TABLE t SET SCHEMA s; ALTER VIEW v SET SCHEMA s; ALTER MATERIALIZED VIEW mv SET SCHEMA s; ALTER FUNCTION f() SET SCHEMA s; ALTER …
+  ╰╴              ━━━━━━━━━━━━
+warning[ban-set-schema]: Moving an object to another schema may break existing clients.
+  ╭▸ 
+1 │ ALTER TABLE t SET SCHEMA s; ALTER VIEW v SET SCHEMA s; ALTER MATERIALIZED VIEW mv SET SCHEMA s; ALTER FUNCTION f() SET SCHEMA s; ALTER …
+  ╰╴                                         ━━━━━━━━━━━━
+warning[ban-set-schema]: Moving an object to another schema may break existing clients.
+  ╭▸ 
+1 │ ALTER TABLE t SET SCHEMA s; ALTER VIEW v SET SCHEMA s; ALTER MATERIALIZED VIEW mv SET SCHEMA s; ALTER FUNCTION f() SET SCHEMA s; ALTER …
+  ╰╴                                                                                  ━━━━━━━━━━━━
+warning[ban-set-schema]: Moving an object to another schema may break existing clients.
+  ╭▸ 
+1 │ ALTER TABLE t SET SCHEMA s; ALTER VIEW v SET SCHEMA s; ALTER MATERIALIZED VIEW mv SET SCHEMA s; ALTER FUNCTION f() SET SCHEMA s; ALTER …
+  ╰╴                                                                                                                   ━━━━━━━━━━━━
+warning[ban-set-schema]: Moving an object to another schema may break existing clients.
+  ╭▸ 
+1 │ …ET SCHEMA s; ALTER FUNCTION f() SET SCHEMA s; ALTER TYPE typ SET SCHEMA s; ALTER SEQUENCE seq SET SCHEMA s; ALTER DOMAIN d SET SCHEMA …
+  ╰╴                                                              ━━━━━━━━━━━━
+warning[ban-set-schema]: Moving an object to another schema may break existing clients.
+  ╭▸ 
+1 │ …ET SCHEMA s; ALTER TYPE typ SET SCHEMA s; ALTER SEQUENCE seq SET SCHEMA s; ALTER DOMAIN d SET SCHEMA s;
+  ╰╴                                                              ━━━━━━━━━━━━
+warning[ban-set-schema]: Moving an object to another schema may break existing clients.
+  ╭▸ 
+1 │ …ET SCHEMA s; ALTER SEQUENCE seq SET SCHEMA s; ALTER DOMAIN d SET SCHEMA s;
+  ╰╴                                                              ━━━━━━━━━━━━

@@ -14,6 +14,12 @@ pub(crate) fn ban_drop_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 "Dropping a table may break existing clients.".into(),
                 drop_table.syntax(),
             ));
+        } else if let ast::Stmt::DropForeignTable(drop_table) = stmt {
+            ctx.report(Violation::for_node(
+                Rule::BanDropTable,
+                "Dropping a table may break existing clients.".into(),
+                drop_table.syntax(),
+            ));
         }
     }
 }

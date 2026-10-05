@@ -68,6 +68,11 @@ use rules::require_enum_value_ordering;
 use rules::require_table_schema;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
+use rules::{
+    ban_alter_identity, ban_drop_constraint, ban_drop_domain, ban_drop_extension,
+    ban_drop_generated_expression, ban_drop_schema, ban_drop_sequence, ban_set_schema,
+    renaming_object,
+};
 // xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, Sequence)]
@@ -117,6 +122,15 @@ pub enum Rule {
     BanDropType,
     BanDropDefault,
     BanDropTrigger,
+    BanDropSchema,
+    BanDropSequence,
+    BanDropDomain,
+    BanDropConstraint,
+    BanDropGeneratedExpression,
+    RenamingObject,
+    BanSetSchema,
+    BanAlterIdentity,
+    BanDropExtension,
     // xtask:new-rule:error-name
 }
 
@@ -195,6 +209,15 @@ impl TryFrom<&str> for Rule {
             "ban-drop-type" => Ok(Rule::BanDropType),
             "ban-drop-default" => Ok(Rule::BanDropDefault),
             "ban-drop-trigger" => Ok(Rule::BanDropTrigger),
+            "ban-drop-schema" => Ok(Rule::BanDropSchema),
+            "ban-drop-sequence" => Ok(Rule::BanDropSequence),
+            "ban-drop-domain" => Ok(Rule::BanDropDomain),
+            "ban-drop-constraint" => Ok(Rule::BanDropConstraint),
+            "ban-drop-generated-expression" => Ok(Rule::BanDropGeneratedExpression),
+            "renaming-object" => Ok(Rule::RenamingObject),
+            "ban-set-schema" => Ok(Rule::BanSetSchema),
+            "ban-alter-identity" => Ok(Rule::BanAlterIdentity),
+            "ban-drop-extension" => Ok(Rule::BanDropExtension),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -271,6 +294,15 @@ impl fmt::Display for Rule {
             Rule::BanDropType => "ban-drop-type",
             Rule::BanDropDefault => "ban-drop-default",
             Rule::BanDropTrigger => "ban-drop-trigger",
+            Rule::BanDropSchema => "ban-drop-schema",
+            Rule::BanDropSequence => "ban-drop-sequence",
+            Rule::BanDropDomain => "ban-drop-domain",
+            Rule::BanDropConstraint => "ban-drop-constraint",
+            Rule::BanDropGeneratedExpression => "ban-drop-generated-expression",
+            Rule::RenamingObject => "renaming-object",
+            Rule::BanSetSchema => "ban-set-schema",
+            Rule::BanAlterIdentity => "ban-alter-identity",
+            Rule::BanDropExtension => "ban-drop-extension",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -540,6 +572,33 @@ impl Linter {
         if self.rules.contains(&Rule::BanDropTrigger) {
             ban_drop_trigger(self, file);
         }
+        if self.rules.contains(&Rule::BanDropSchema) {
+            ban_drop_schema(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropSequence) {
+            ban_drop_sequence(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropDomain) {
+            ban_drop_domain(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropConstraint) {
+            ban_drop_constraint(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropGeneratedExpression) {
+            ban_drop_generated_expression(self, file);
+        }
+        if self.rules.contains(&Rule::RenamingObject) {
+            renaming_object(self, file);
+        }
+        if self.rules.contains(&Rule::BanSetSchema) {
+            ban_set_schema(self, file);
+        }
+        if self.rules.contains(&Rule::BanAlterIdentity) {
+            ban_alter_identity(self, file);
+        }
+        if self.rules.contains(&Rule::BanDropExtension) {
+            ban_drop_extension(self, file);
+        }
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file
@@ -686,5 +745,36 @@ mod tests {
         );
         assert!(linter.rules.contains(&Rule::RequireLockTimeout));
         assert!(!linter.rules.contains(&Rule::RequireStatementTimeout));
+    }
+
+    #[test]
+    fn compatibility_rules_are_enabled_by_default_and_can_be_excluded() {
+        for (rule, sql) in [
+            (Rule::BanDropConstraint, "ALTER TABLE t DROP CONSTRAINT c;"),
+            (
+                Rule::BanAlterIdentity,
+                "ALTER TABLE t ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY;",
+            ),
+            (
+                Rule::BanDropGeneratedExpression,
+                "ALTER TABLE t ALTER COLUMN c DROP EXPRESSION;",
+            ),
+            (Rule::BanDropExtension, "DROP EXTENSION hstore;"),
+        ] {
+            let parse = SourceFile::parse(sql);
+            assert!(parse.errors().is_empty());
+            assert!(
+                Linter::with_default_rules()
+                    .lint(&parse, sql)
+                    .iter()
+                    .any(|v| v.code == rule)
+            );
+            assert!(
+                !Linter::with_rules(&[], &[rule])
+                    .lint(&parse, sql)
+                    .iter()
+                    .any(|v| v.code == rule)
+            );
+        }
     }
 }

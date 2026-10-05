@@ -267,6 +267,15 @@ const rules = [
     tags: ["backwards compatibility"],
     description: "Prevent silent changes when a trigger is dropped (opt-in).",
   },
+  { name: "ban-drop-schema", tags: ["backwards compatibility"], description: "Prevent breaking clients that use a dropped schema." },
+  { name: "ban-drop-sequence", tags: ["backwards compatibility"], description: "Prevent breaking clients that use a dropped sequence." },
+  { name: "ban-drop-domain", tags: ["backwards compatibility"], description: "Prevent breaking clients that use a dropped domain." },
+  { name: "ban-drop-constraint", tags: ["backwards compatibility"], description: "Prevent removing a constraint guarantee." },
+  { name: "ban-drop-generated-expression", tags: ["backwards compatibility"], description: "Prevent dropping a generated expression." },
+  { name: "renaming-object", tags: ["backwards compatibility"], description: "Prevent renaming objects used by clients." },
+  { name: "ban-set-schema", tags: ["backwards compatibility"], description: "Prevent moving objects used by clients to another schema." },
+  { name: "ban-alter-identity", tags: ["backwards compatibility"], description: "Prevent changing identity columns used by clients." },
+  { name: "ban-drop-extension", tags: ["backwards compatibility"], description: "Prevent dropping extensions used by clients." },
   // xtask:new-rule:rule-doc-meta
 ]
 
