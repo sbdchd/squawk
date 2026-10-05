@@ -9,19 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- linter: opt-in ban-add-column check for existing tables and foreign tables; detect publication changes with ban-replica-identity
-- linter: opt-in compatibility rules for new write restrictions, enum values, composite attributes, partition detachment, inheritance removal, and sequence changes
-- linter: ban-drop-view, ban-drop-function, ban-drop-type, ban-drop-default rules
-- linter: opt-in ban-drop-trigger rule
-- linter: compatibility rules for dropped schemas, sequences, and domains, object renames, and schema moves
-- linter: default checks for dropped constraints, identity changes, and dropped generated expressions; opt-in checks for dropped indexes, generated expression replacement and addition, defaults, triggers, replica identity, policies, privileges, and replacements
-- linter: default ban-drop-extension and opt-in rules for policy creation, policy conditions and roles, function and view options, role and database options, and row level security
-- linter: opt-in ban-alter-system-options and ban-alter-extension rules
+- linter: default rollback compatibility rules: ban-drop-schema, ban-drop-sequence, ban-drop-domain, ban-drop-constraint, ban-drop-generated-expression, ban-drop-extension, ban-alter-identity, renaming-object, ban-set-schema
+- linter: opt-in rollback compatibility rules: ban-alter-generated-expression, ban-drop-index, ban-set-default, ban-disable-trigger, ban-replica-identity, ban-drop-policy, ban-revoke, ban-replace-view-function, ban-create-policy, ban-alter-policy-condition, ban-alter-policy-roles, ban-alter-row-level-security, ban-alter-function-options, ban-alter-view-options, ban-alter-role-options, ban-alter-database-options, ban-alter-system-options, ban-alter-extension, ban-new-write-restriction, ban-add-column, ban-add-enum-value, ban-add-composite-attribute, ban-detach-inheritance, ban-alter-sequence-values
 
 ### Changed
 
-- linter: detect plain trigger and rule enabling; exclude non-value sequence options from ban-alter-sequence-values
-- linter: extend existing compatibility checks to more PostgreSQL statement variants, including domain and foreign-table changes, replica-only trigger and rule firing, generated expression replacement, routine schema moves and options, aggregate renames and schema moves, extension schema moves, `ALTER USER` options, group membership removal, named `NOT NULL` constraints, and inline primary keys
+- linter: extend adding-not-nullable-field and ban-drop-not-null to domains and foreign tables; ban-drop-default to domains, foreign tables, and views; ban-drop-column and changing-column-type to foreign tables and composite attributes; renaming-column to foreign tables, composite attributes, views, and materialized views
+- linter: extend ban-drop-function to aggregates and routines, ban-drop-table to foreign tables, and ban-drop-type to operators, operator classes, operator families, and casts
 
 ## v2.67.0 - 2026-10-04
 
