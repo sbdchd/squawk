@@ -62,18 +62,17 @@ impl LockImpact {
         Self(blocks)
     }
 
-    fn blocked(self) -> Vec<&'static str> {
-        let mut items = vec![];
-        for (bit, label) in [
-            (Self::READS, "reads"),
-            (Self::WRITES, "writes"),
-            (Self::SCHEMA_CHANGES, "schema changes"),
-        ] {
-            if self.0 & bit != 0 {
-                items.push(label);
-            }
+    fn blocked(self) -> &'static str {
+        match self.0 {
+            0b001 => "reads",
+            0b010 => "writes",
+            0b011 => "reads, writes",
+            0b100 => "schema changes",
+            0b101 => "reads, schema changes",
+            0b110 => "writes, schema changes",
+            0b111 => "reads, writes, schema changes",
+            _ => "",
         }
-        items
     }
 }
 
@@ -274,11 +273,10 @@ impl LockKind {
     }
 
     fn violation_message(self) -> String {
-        let name = self.to_string();
-        if name.is_empty() {
+        if self == LockKind::Unknown {
             "Missing `set lock_timeout` before potentially slow operations".to_string()
         } else {
-            format!("Missing `set lock_timeout` before potentially slow {name} lock operations")
+            format!("Missing `set lock_timeout` before potentially slow {self} lock operations")
         }
     }
 
@@ -300,19 +298,15 @@ impl LockKind {
 
     fn help(self) -> String {
         let help = "Configure a `lock_timeout` before this statement.";
-        let name = self.to_string();
         let Some(impact) = self.impact() else {
             return help.to_string();
         };
 
         let blocked = impact.blocked();
         if blocked.is_empty() {
-            format!("{help} Statement requires: {name} lock.")
+            format!("{help} Statement requires: {self} lock.")
         } else {
-            format!(
-                "{help} Statement requires: {name} lock; blocking: {}.",
-                blocked.join(", ")
-            )
+            format!("{help} Statement requires: {self} lock; blocking: {blocked}.")
         }
     }
 }
