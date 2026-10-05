@@ -21,38 +21,66 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::AlterTable(node) => {
                 for action in node.actions() {
                     if let ast::AlterTableAction::RenameConstraint(node) = action {
-                        ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a constraint may break existing clients.".into(), node.syntax()));
+                        ctx.report(Violation::for_node(
+                            Rule::RenamingObject,
+                            "Renaming a constraint may break existing clients.".into(),
+                            node.syntax(),
+                        ));
                     }
                 }
             }
             ast::Stmt::AlterRole(node) => {
                 if let Some(ast::AlterRoleAction::RoleRenameTo(action)) = node.action() {
-                    ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a role may break existing clients.".into(), action.syntax()));
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a role may break existing clients.".into(),
+                        action.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterUser(node) => {
                 if let Some(ast::AlterUserAction::RoleRenameTo(action)) = node.action() {
-                    ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a user may break existing clients.".into(), action.syntax()));
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a user may break existing clients.".into(),
+                        action.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterGroup(node) => {
                 if let Some(ast::AlterGroupAction::RoleRenameTo(action)) = node.action() {
-                    ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a group may break existing clients.".into(), action.syntax()));
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a group may break existing clients.".into(),
+                        action.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterDatabase(node) => {
                 if let Some(ast::AlterDatabaseAction::DatabaseRenameTo(action)) = node.action() {
-                    ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a database may break existing clients.".into(), action.syntax()));
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a database may break existing clients.".into(),
+                        action.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterTrigger(node) => {
                 if let Some(ast::AlterTriggerAction::TriggerRenameTo(action)) = node.action() {
-                    ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a trigger may break existing clients.".into(), action.syntax()));
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a trigger may break existing clients.".into(),
+                        action.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterPolicy(node) => {
                 if let Some(ast::AlterPolicyAction::PolicyRenameTo(action)) = node.action() {
-                    ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a policy may break existing clients.".into(), action.syntax()));
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a policy may break existing clients.".into(),
+                        action.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterRoutine(node) => {
@@ -152,8 +180,20 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::AlterDomain(node) => {
                 for action in node.action().into_iter() {
                     match action {
-                        ast::AlterDomainAction::DomainRenameTo(node) => ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a domain may break existing clients.".into(), node.syntax())),
-                        ast::AlterDomainAction::RenameConstraint(node) => ctx.report(Violation::for_node(Rule::RenamingObject, "Renaming a constraint may break existing clients.".into(), node.syntax())),
+                        ast::AlterDomainAction::DomainRenameTo(node) => {
+                            ctx.report(Violation::for_node(
+                                Rule::RenamingObject,
+                                "Renaming a domain may break existing clients.".into(),
+                                node.syntax(),
+                            ))
+                        }
+                        ast::AlterDomainAction::RenameConstraint(node) => {
+                            ctx.report(Violation::for_node(
+                                Rule::RenamingObject,
+                                "Renaming a constraint may break existing clients.".into(),
+                                node.syntax(),
+                            ))
+                        }
                         _ => (),
                     }
                 }

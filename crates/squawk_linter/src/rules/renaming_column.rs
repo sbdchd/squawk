@@ -11,7 +11,11 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         match stmt {
             ast::Stmt::AlterType(ty) => {
                 if let Some(ast::AlterTypeAction::RenameAttribute(node)) = ty.action() {
-                    ctx.report(Violation::for_node(Rule::RenamingColumn, "Renaming an attribute may break existing clients.".into(), node.syntax()));
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingColumn,
+                        "Renaming an attribute may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterTable(table) => {

@@ -7,6 +7,11 @@ fn example_sql_svg() {
     Command::new(bin_path)
         .env("CLICOLOR_FORCE", "1")
         .env("SQUAWK_DISABLE_GITHUB_ANNOTATIONS", "1")
+        .arg("--config")
+        .arg(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty.squawk.toml"
+        ))
         .arg("../../example.sql")
         .assert()
         .code(1) // squawk returns 1 when it finds violations

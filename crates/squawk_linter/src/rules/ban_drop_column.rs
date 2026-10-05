@@ -12,10 +12,15 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::AlterTable(table) => table.actions().collect(),
             ast::Stmt::AlterForeignTable(table) => table.actions().collect(),
             ast::Stmt::AlterType(ty) => {
-                if let Some(ast::AlterTypeAction::AlterTypeAttributeActionList(list)) = ty.action() {
+                if let Some(ast::AlterTypeAction::AlterTypeAttributeActionList(list)) = ty.action()
+                {
                     for action in list.actions() {
                         if let ast::AlterTypeAttributeAction::DropAttribute(node) = action {
-                            ctx.report(Violation::for_node(Rule::BanDropColumn, "Dropping an attribute may break existing clients.".into(), node.syntax()));
+                            ctx.report(Violation::for_node(
+                                Rule::BanDropColumn,
+                                "Dropping an attribute may break existing clients.".into(),
+                                node.syntax(),
+                            ));
                         }
                     }
                 }

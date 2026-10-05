@@ -135,6 +135,33 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                     }
                 }
             }
+            ast::Stmt::AlterForeignTable(table)
+                if ctx.rules.contains(&Rule::BanNewWriteRestriction) =>
+            {
+                for action in table.actions() {
+                    match action {
+                        ast::AlterTableAction::AddConstraint(node) => {
+                            ctx.report(Violation::for_node(
+                                Rule::BanNewWriteRestriction,
+                                "A foreign table constraint can reject existing client writes."
+                                    .into(),
+                                node.syntax(),
+                            ))
+                        }
+                        ast::AlterTableAction::AlterColumn(column) => {
+                            if let Some(ast::AlterColumnOption::SetNotNull(node)) = column.option()
+                            {
+                                ctx.report(Violation::for_node(
+                                    Rule::BanNewWriteRestriction,
+                                    "SET NOT NULL can reject existing client writes.".into(),
+                                    node.syntax(),
+                                ));
+                            }
+                        }
+                        _ => (),
+                    }
+                }
+            }
             ast::Stmt::AlterDomain(domain) if ctx.rules.contains(&Rule::BanNewWriteRestriction) => {
                 if let Some(action) = domain.action() {
                     match action {
@@ -256,6 +283,15 @@ mod test {
         lint_ok(
             "ALTER TABLE t ALTER CONSTRAINT fk NOT ENFORCED;",
             Rule::BanNewWriteRestriction,
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER FOREIGN TABLE ft ALTER COLUMN c SET NOT NULL;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            1
         );
     }
 

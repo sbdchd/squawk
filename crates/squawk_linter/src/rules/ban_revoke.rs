@@ -7,7 +7,11 @@ use squawk_syntax::{
 pub(crate) fn ban_revoke(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         for owner in stmt.syntax().descendants().filter_map(ast::OwnerTo::cast) {
-            ctx.report(Violation::for_node(Rule::BanRevoke, "Changing object ownership may break existing clients.".into(), owner.syntax()));
+            ctx.report(Violation::for_node(
+                Rule::BanRevoke,
+                "Changing object ownership may break existing clients.".into(),
+                owner.syntax(),
+            ));
         }
         match stmt {
             ast::Stmt::Revoke(node) => {
