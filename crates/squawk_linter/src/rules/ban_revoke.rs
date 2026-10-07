@@ -85,4 +85,19 @@ mod test {
     fn ok() {
         lint_ok("GRANT SELECT ON t TO app;", Rule::BanRevoke);
     }
+
+    #[test]
+    fn group_membership_removal() {
+        let sql = "ALTER GROUP writers DROP USER app, worker;";
+        assert_eq!(
+            lint_errors(sql, Rule::BanRevoke)
+                .matches("warning[ban-revoke]")
+                .count(),
+            1
+        );
+        lint_ok(
+            "ALTER GROUP writers ADD USER app; ALTER GROUP writers RENAME TO editors;",
+            Rule::BanRevoke,
+        );
+    }
 }

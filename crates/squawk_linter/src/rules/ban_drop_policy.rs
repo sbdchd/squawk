@@ -43,5 +43,6 @@ mod test {
     #[test]
     fn ok() {
         lint_ok("CREATE POLICY p ON t USING (true);", Rule::BanDropPolicy);
+        lint_ok("ALTER POLICY p ON t USING (true);", Rule::BanDropPolicy);
     }
 }

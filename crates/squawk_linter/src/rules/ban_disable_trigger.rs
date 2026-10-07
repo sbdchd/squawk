@@ -70,4 +70,21 @@ mod test {
             Rule::BanDisableTrigger,
         );
     }
+
+    #[test]
+    fn enforcement_variants() {
+        let sql = "ALTER TABLE t ENABLE REPLICA TRIGGER tr; ALTER TABLE t ENABLE REPLICA RULE r; ALTER TABLE t ENABLE ALWAYS TRIGGER tr; ALTER TABLE t ENABLE ALWAYS RULE r; ALTER TABLE t NO FORCE ROW LEVEL SECURITY;";
+        assert_eq!(
+            lint_errors(sql, Rule::BanDisableTrigger)
+                .matches("warning[ban-disable-trigger]")
+                .count(),
+            5
+        );
+        assert_eq!(
+            lint_errors("ALTER TABLE t ENABLE TRIGGER tr;", Rule::BanDisableTrigger)
+                .matches("warning[ban-disable-trigger]")
+                .count(),
+            1
+        );
+    }
 }

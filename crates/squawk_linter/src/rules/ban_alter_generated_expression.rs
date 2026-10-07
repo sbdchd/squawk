@@ -47,4 +47,19 @@ mod test {
             Rule::BanAlterGeneratedExpression,
         );
     }
+
+    #[test]
+    fn generated_expression_variant() {
+        let sql = "ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 1);";
+        assert_eq!(
+            lint_errors(sql, Rule::BanAlterGeneratedExpression)
+                .matches("warning[ban-alter-generated-expression]")
+                .count(),
+            1
+        );
+        lint_ok(
+            "ALTER TABLE t ALTER COLUMN c DROP EXPRESSION;",
+            Rule::BanAlterGeneratedExpression,
+        );
+    }
 }

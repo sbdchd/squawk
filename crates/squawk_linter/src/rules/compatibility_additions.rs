@@ -345,6 +345,21 @@ mod test {
     }
 
     #[test]
+    fn additional_write_constraint_forms() {
+        let sql = "ALTER TABLE t ADD CONSTRAINT id_required NOT NULL id; ALTER TABLE t ADD COLUMN c bigint PRIMARY KEY; ALTER FOREIGN TABLE ft ADD COLUMN c int NOT NULL;";
+        assert_eq!(
+            lint_errors(sql, Rule::BanNewWriteRestriction)
+                .matches("warning[ban-new-write-restriction]")
+                .count(),
+            3
+        );
+        lint_ok(
+            "CREATE TABLE t (id bigint); ALTER TABLE t ADD CONSTRAINT id_required NOT NULL id; ALTER TABLE t ADD COLUMN c bigint PRIMARY KEY; ALTER FOREIGN TABLE ft ADD COLUMN c int;",
+            Rule::BanNewWriteRestriction,
+        );
+    }
+
+    #[test]
     fn enum_value() {
         assert_eq!(
             lint_errors(

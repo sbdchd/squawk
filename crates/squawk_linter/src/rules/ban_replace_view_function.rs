@@ -60,4 +60,19 @@ mod test {
     fn ok() {
         lint_ok("CREATE VIEW v AS SELECT 1;", Rule::BanReplaceViewFunction);
     }
+
+    #[test]
+    fn replacement_variants() {
+        let sql = "CREATE OR REPLACE RULE r AS ON INSERT TO t DO INSTEAD NOTHING; CREATE OR REPLACE AGGREGATE a (int) (SFUNC = int4pl, STYPE = int); CREATE OR REPLACE TRIGGER tr BEFORE INSERT ON t FOR EACH ROW EXECUTE FUNCTION f();";
+        assert_eq!(
+            lint_errors(sql, Rule::BanReplaceViewFunction)
+                .matches("warning[ban-replace-view-function]")
+                .count(),
+            3
+        );
+        lint_ok(
+            "CREATE RULE r AS ON INSERT TO t DO INSTEAD NOTHING;",
+            Rule::BanReplaceViewFunction,
+        );
+    }
 }
