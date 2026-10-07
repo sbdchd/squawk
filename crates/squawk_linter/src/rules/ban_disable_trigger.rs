@@ -11,7 +11,7 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 let message = match action {
                     ast::AlterTableAction::EnableReplicaTrigger(_)
                     | ast::AlterTableAction::EnableReplicaRule(_) => {
-                        "Replica-only triggers and rules do not fire for normal application writes."
+                        "Making a trigger or rule replica-only stops it firing for normal application writes. Earlier application revisions may depend on its side effects."
                     }
                     ast::AlterTableAction::DisableTrigger(_)
                     | ast::AlterTableAction::EnableTrigger(_)
@@ -74,11 +74,13 @@ mod test {
     #[test]
     fn enforcement_variants() {
         let sql = "ALTER TABLE t ENABLE REPLICA TRIGGER tr; ALTER TABLE t ENABLE REPLICA RULE r; ALTER TABLE t ENABLE ALWAYS TRIGGER tr; ALTER TABLE t ENABLE ALWAYS RULE r; ALTER TABLE t NO FORCE ROW LEVEL SECURITY;";
+        let errors = lint_errors(sql, Rule::BanDisableTrigger);
+        assert_eq!(errors.matches("warning[ban-disable-trigger]").count(), 5);
         assert_eq!(
-            lint_errors(sql, Rule::BanDisableTrigger)
-                .matches("warning[ban-disable-trigger]")
+            errors
+                .matches("Earlier application revisions may depend on its side effects.")
                 .count(),
-            5
+            2
         );
     }
 }
