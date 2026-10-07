@@ -1,13 +1,19 @@
+mod ban_add_column;
+mod ban_add_composite_attribute;
+mod ban_add_enum_value;
+mod ban_alter_sequence_values;
+mod ban_detach_inheritance;
+mod ban_new_write_restriction;
+
 use rustc_hash::FxHashSet;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation};
+use crate::{Linter, Rule};
 
-// Track only unconditional CREATE statements earlier in the file. An IF NOT EXISTS
-// statement does not establish that the object was newly created.
+// Only unconditional CREATE statements establish that an object is new to this file.
 pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let mut tables = FxHashSet::default();
     let mut types = FxHashSet::default();
@@ -41,95 +47,18 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                     .and_then(|n| n.path_ref())
                     .is_some_and(|n| tables.contains(&n.syntax().to_string()));
                 for action in table.actions() {
-                    if ctx.rules.contains(&Rule::BanAddColumn) && !new_table {
-                        if let ast::AlterTableAction::AddColumn(column) = &action {
-                            ctx.report(Violation::for_node(
-                                Rule::BanAddColumn,
-                                "Adding a column changes the shape of rows existing clients receive and can break positional inserts.".into(),
-                                column.syntax(),
-                            ));
+                    if !new_table {
+                        if ctx.rules.contains(&Rule::BanAddColumn) {
+                            ban_add_column::check(ctx, &action);
                         }
-                    }
-                    if ctx.rules.contains(&Rule::BanNewWriteRestriction) && !new_table {
-                        match &action {
-                            ast::AlterTableAction::AddConstraint(add) => {
-                                if let Some(constraint) = add.constraint() {
-                                    let restriction = matches!(
-                                        constraint,
-                                        ast::Constraint::CheckConstraint(_)
-                                            | ast::Constraint::ForeignKeyConstraint(_)
-                                            | ast::Constraint::UniqueConstraint(_)
-                                            | ast::Constraint::PrimaryKeyConstraint(_)
-                                            | ast::Constraint::ExcludeConstraint(_)
-                                            | ast::Constraint::NotNullConstraint(_)
-                                    );
-                                    if restriction {
-                                        ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
-                                            "A new constraint can reject writes from existing clients, even when it is NOT VALID.".into(), add.syntax()));
-                                    }
-                                }
-                            }
-                            ast::AlterTableAction::AlterColumn(column) => {
-                                if let Some(ast::AlterColumnOption::SetNotNull(node)) =
-                                    column.option()
-                                {
-                                    ctx.report(Violation::for_node(
-                                        Rule::BanNewWriteRestriction,
-                                        "SET NOT NULL can reject writes from existing clients."
-                                            .into(),
-                                        node.syntax(),
-                                    ));
-                                }
-                            }
-                            ast::AlterTableAction::AddColumn(column) => {
-                                check_column_constraints(ctx, column);
-                            }
-                            ast::AlterTableAction::AlterConstraint(node) => {
-                                if node.constraint_options().any(|option| {
-                                    matches!(option,
-                                    ast::ConstraintOption::Enforced(_)
-                                    | ast::ConstraintOption::DeferrableConstraintOption(_)
-                                    | ast::ConstraintOption::NotDeferrableConstraintOption(_)
-                                    | ast::ConstraintOption::InitiallyImmediateConstraintOption(_)
-                                    | ast::ConstraintOption::InitiallyDeferredConstraintOption(_))
-                                }) {
-                                    ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
-                                        "Changing constraint enforcement or timing can reject existing client writes.".into(), node.syntax()));
-                                }
-                            }
-                            _ => (),
+                        if ctx.rules.contains(&Rule::BanNewWriteRestriction) {
+                            ban_new_write_restriction::check_table_action(ctx, &action);
                         }
-                    }
-                    if ctx.rules.contains(&Rule::BanAlterSequenceValues) && !new_table {
-                        if let ast::AlterTableAction::AlterColumn(column) = &action {
-                            if let Some(option) = column.option() {
-                                match option {
-                                    ast::AlterColumnOption::Restart(node) => ctx.report(Violation::for_node(
-                                        Rule::BanAlterSequenceValues, "Restarting an identity sequence can change values generated for existing clients.".into(), node.syntax())),
-                                    ast::AlterColumnOption::SetSequenceOption(node) => ctx.report(Violation::for_node(
-                                        Rule::BanAlterSequenceValues, "Changing an identity sequence option can change values generated for existing clients.".into(), node.syntax())),
-                                    ast::AlterColumnOption::SetGeneratedOptions(options) => {
-                                        for option in options.set_generated_options() {
-                                            if matches!(option, ast::SetGeneratedOption::Restart(_) | ast::SetGeneratedOption::SetSequenceOption(_)) {
-                                                ctx.report(Violation::for_node(Rule::BanAlterSequenceValues,
-                                                    "Changing an identity sequence can change values generated for existing clients.".into(), option.syntax()));
-                                            }
-                                        }
-                                    }
-                                    _ => (),
-                                }
-                            }
+                        if ctx.rules.contains(&Rule::BanAlterSequenceValues) {
+                            ban_alter_sequence_values::check_table_action(ctx, &action);
                         }
-                    }
-                    if ctx.rules.contains(&Rule::BanDetachInheritance) && !new_table {
-                        match action {
-                            ast::AlterTableAction::DetachPartition(node) => ctx.report(Violation::for_node(
-                                Rule::BanDetachInheritance,
-                                "Detaching a partition changes which rows existing clients can read and write through the parent table.".into(), node.syntax())),
-                            ast::AlterTableAction::NoInheritTable(node) => ctx.report(Violation::for_node(
-                                Rule::BanDetachInheritance,
-                                "NO INHERIT changes which rows existing clients can read and write through the parent table.".into(), node.syntax())),
-                            _ => (),
+                        if ctx.rules.contains(&Rule::BanDetachInheritance) {
+                            ban_detach_inheritance::check(ctx, &action);
                         }
                     }
                 }
@@ -137,66 +66,24 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
             ast::Stmt::AlterForeignTable(table) => {
                 for action in table.actions() {
                     if ctx.rules.contains(&Rule::BanAddColumn) {
-                        if let ast::AlterTableAction::AddColumn(column) = &action {
-                            ctx.report(Violation::for_node(
-                                Rule::BanAddColumn,
-                                "Adding a column changes the shape of rows existing clients receive and can break positional inserts.".into(),
-                                column.syntax(),
-                            ));
-                        }
+                        ban_add_column::check(ctx, &action);
                     }
-                    if !ctx.rules.contains(&Rule::BanNewWriteRestriction) {
-                        continue;
-                    }
-                    match action {
-                        ast::AlterTableAction::AddColumn(column) => {
-                            check_column_constraints(ctx, &column);
-                        }
-                        ast::AlterTableAction::AddConstraint(node) => {
-                            ctx.report(Violation::for_node(
-                                Rule::BanNewWriteRestriction,
-                                "A foreign table constraint can reject existing client writes."
-                                    .into(),
-                                node.syntax(),
-                            ))
-                        }
-                        ast::AlterTableAction::AlterColumn(column) => {
-                            if let Some(ast::AlterColumnOption::SetNotNull(node)) = column.option()
-                            {
-                                ctx.report(Violation::for_node(
-                                    Rule::BanNewWriteRestriction,
-                                    "SET NOT NULL can reject existing client writes.".into(),
-                                    node.syntax(),
-                                ));
-                            }
-                        }
-                        _ => (),
+                    if ctx.rules.contains(&Rule::BanNewWriteRestriction) {
+                        ban_new_write_restriction::check_foreign_table_action(ctx, &action);
                     }
                 }
             }
             ast::Stmt::AlterDomain(domain) if ctx.rules.contains(&Rule::BanNewWriteRestriction) => {
-                if let Some(action) = domain.action() {
-                    match action {
-                        ast::AlterDomainAction::SetNotNull(node) => ctx.report(Violation::for_node(
-                            Rule::BanNewWriteRestriction,
-                            "A domain NOT NULL requirement can reject writes from existing clients.".into(), node.syntax())),
-                        ast::AlterDomainAction::AddConstraint(node) => ctx.report(Violation::for_node(
-                            Rule::BanNewWriteRestriction,
-                            "A domain constraint can reject writes from existing clients, even when it is NOT VALID.".into(), node.syntax())),
-                        _ => (),
-                    }
-                }
+                ban_new_write_restriction::check_domain(ctx, &domain);
             }
             ast::Stmt::CreateIndex(index) if ctx.rules.contains(&Rule::BanNewWriteRestriction) => {
-                if index.unique_token().is_some()
-                    && index
-                        .table_relation_name()
-                        .and_then(|n| n.table_name_ref())
-                        .and_then(|n| n.path_ref())
-                        .is_none_or(|n| !tables.contains(&n.syntax().to_string()))
+                if index
+                    .table_relation_name()
+                    .and_then(|n| n.table_name_ref())
+                    .and_then(|n| n.path_ref())
+                    .is_none_or(|n| !tables.contains(&n.syntax().to_string()))
                 {
-                    ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
-                        "A unique index can reject writes from existing clients, even when created CONCURRENTLY.".into(), index.syntax()));
+                    ban_new_write_restriction::check_index(ctx, &index);
                 }
             }
             ast::Stmt::AlterType(ty) => {
@@ -205,24 +92,11 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                     .and_then(|n| n.path_ref())
                     .is_some_and(|n| types.contains(&n.syntax().to_string()));
                 if !new_type {
-                    match ty.action() {
-                        Some(ast::AlterTypeAction::AddValue(node))
-                            if ctx.rules.contains(&Rule::BanAddEnumValue) =>
-                        {
-                            ctx.report(Violation::for_node(Rule::BanAddEnumValue,
-                                "Adding an enum value changes the set of values existing clients can receive.".into(), node.syntax()));
-                        }
-                        Some(ast::AlterTypeAction::AlterTypeAttributeActionList(list))
-                            if ctx.rules.contains(&Rule::BanAddCompositeAttribute) =>
-                        {
-                            for action in list.actions() {
-                                if let ast::AlterTypeAttributeAction::AddAttribute(node) = action {
-                                    ctx.report(Violation::for_node(Rule::BanAddCompositeAttribute,
-                                        "Adding a composite attribute changes the shape of values existing clients receive.".into(), node.syntax()));
-                                }
-                            }
-                        }
-                        _ => (),
+                    if ctx.rules.contains(&Rule::BanAddEnumValue) {
+                        ban_add_enum_value::check(ctx, &ty);
+                    }
+                    if ctx.rules.contains(&Rule::BanAddCompositeAttribute) {
+                        ban_add_composite_attribute::check(ctx, &ty);
                     }
                 }
             }
@@ -232,43 +106,10 @@ pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile
                     .and_then(|n| n.path_ref())
                     .is_some_and(|n| sequences.contains(&n.syntax().to_string()));
                 if !new_sequence {
-                    for action in seq.actions() {
-                        if let ast::AlterSequenceAction::SequenceOption(option) = action {
-                            if matches!(
-                                option,
-                                ast::SequenceOption::OptionOwnedBy(_)
-                                    | ast::SequenceOption::OptionLogged(_)
-                                    | ast::SequenceOption::OptionUnlogged(_)
-                                    | ast::SequenceOption::OptionSequenceName(_)
-                            ) {
-                                continue;
-                            }
-                            ctx.report(Violation::for_node(Rule::BanAlterSequenceValues,
-                                "Changing a sequence option can change values generated for existing clients.".into(), option.syntax()));
-                        }
-                    }
+                    ban_alter_sequence_values::check_sequence(ctx, &seq);
                 }
             }
             _ => (),
-        }
-    }
-}
-
-fn check_column_constraints(ctx: &mut Linter, column: &ast::AddColumn) {
-    for constraint in column.constraints() {
-        if matches!(
-            constraint,
-            ast::Constraint::NotNullConstraint(_)
-                | ast::Constraint::ReferencesConstraint(_)
-                | ast::Constraint::CheckConstraint(_)
-                | ast::Constraint::UniqueConstraint(_)
-                | ast::Constraint::PrimaryKeyConstraint(_)
-        ) {
-            ctx.report(Violation::for_node(
-                Rule::BanNewWriteRestriction,
-                "A new column constraint can reject writes from existing clients.".into(),
-                constraint.syntax(),
-            ));
         }
     }
 }
