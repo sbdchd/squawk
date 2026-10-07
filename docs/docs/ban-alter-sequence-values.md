@@ -5,7 +5,7 @@ title: ban-alter-sequence-values
 
 ## problem
 
-Changes to standalone and identity sequence options can change generated values. This rule is opt-in. An unconditional CREATE earlier in the file suppresses a warning for that new object.
+Changes to standalone and identity sequence options can reissue identifiers or change the range of values that existing clients receive. This rule is opt-in. An unconditional CREATE earlier in the file suppresses a warning for that new object.
 
 ```sql
 ALTER SEQUENCE ids RESTART WITH 1;

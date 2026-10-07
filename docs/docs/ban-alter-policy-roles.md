@@ -3,7 +3,7 @@ id: ban-alter-policy-roles
 title: ban-alter-policy-roles
 ---
 
-`ALTER POLICY ... TO` changes which roles the policy applies to. This can change client access. This rule is opt-in. It does not report policy renames or condition-only changes.
+`ALTER POLICY ... TO` changes which roles the policy applies to. This can change access for existing clients that use those roles. This rule is opt-in. It does not report policy renames or condition-only changes.
 
 ```sql
 ALTER POLICY p ON accounts TO app_user;

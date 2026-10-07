@@ -5,7 +5,7 @@ title: ban-detach-inheritance
 
 ## problem
 
-DETACH PARTITION and NO INHERIT change which rows clients access through a parent table. This rule is opt-in. An unconditional CREATE earlier in the file suppresses a warning for that new object.
+`DETACH PARTITION` and `NO INHERIT` change which rows existing clients access through a parent table. This rule is opt-in. An unconditional CREATE earlier in the file suppresses a warning for that new object.
 
 ```sql
 ALTER TABLE parent DETACH PARTITION child CONCURRENTLY;

@@ -5,7 +5,7 @@ title: ban-add-composite-attribute
 
 ## problem
 
-A new composite attribute changes the structure of values that clients receive. This rule is opt-in. An unconditional CREATE earlier in the file suppresses a warning for that new object.
+A new composite attribute changes the structure of values that existing clients receive and can break positional composite input. This rule is opt-in. An unconditional CREATE earlier in the file suppresses a warning for that new object.
 
 ```sql
 ALTER TYPE address ADD ATTRIBUTE street text;

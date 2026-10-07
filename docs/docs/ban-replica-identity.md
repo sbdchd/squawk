@@ -5,7 +5,7 @@ title: ban-replica-identity
 
 ## problem
 
-Changing replica identity changes the row data available to logical replication consumers. Dropping a publication or changing its published tables or options can stop or change replication for those consumers. This rule is opt-in.
+Changing replica identity changes the row data available to logical replication consumers. Dropping a publication or changing its published tables or options can stop or change replication for those consumers. Existing clients that depend on the replicated data may then see stale, missing, or changed data. This rule is opt-in.
 
 ```sql
 ALTER TABLE t REPLICA IDENTITY FULL;

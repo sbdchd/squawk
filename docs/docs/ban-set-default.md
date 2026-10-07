@@ -5,7 +5,7 @@ title: ban-set-default
 
 ## problem
 
-Inserts that omit a table, foreign table, view column, or domain value can write different values after its default changes. This rule is opt-in.
+A changed default can make existing clients write different values when they omit a column of a table, foreign table, or view, or a domain value. This rule is opt-in.
 
 ```sql
 ALTER TABLE t ALTER COLUMN c SET DEFAULT 1;

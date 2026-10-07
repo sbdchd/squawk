@@ -5,7 +5,7 @@ title: ban-drop-index
 
 ## problem
 
-Dropping an index can remove a unique or exclusion guarantee or change query plans. This rule is opt-in.
+Dropping an index can remove a unique or exclusion guarantee or change query plans for existing clients. This rule is opt-in.
 
 ```sql
 DROP INDEX CONCURRENTLY IF EXISTS i;
