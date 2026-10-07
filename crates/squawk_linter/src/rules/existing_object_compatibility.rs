@@ -14,7 +14,7 @@ use squawk_syntax::{
 use crate::{Linter, Rule};
 
 // Only unconditional CREATE statements establish that an object is new to this file.
-pub(crate) fn compatibility_additions(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let mut tables = FxHashSet::default();
     let mut types = FxHashSet::default();
     let mut sequences = FxHashSet::default();
