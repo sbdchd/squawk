@@ -45,3 +45,41 @@ pub(super) fn check_sequence(ctx: &mut Linter, seq: &ast::AlterSequence) {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        Rule,
+        test_utils::{lint_errors, lint_ok},
+    };
+
+    #[test]
+    fn sequence_values() {
+        assert_eq!(
+            lint_errors(
+                "ALTER SEQUENCE ids RESTART WITH 1 INCREMENT BY 2;",
+                Rule::BanAlterSequenceValues
+            )
+            .matches("warning[ban-alter-sequence-values]")
+            .count(),
+            2
+        );
+        lint_ok(
+            "CREATE SEQUENCE ids; ALTER SEQUENCE ids RESTART WITH 1;",
+            Rule::BanAlterSequenceValues,
+        );
+        lint_ok(
+            "ALTER SEQUENCE ids OWNER TO app; ALTER SEQUENCE ids OWNED BY t.id; ALTER SEQUENCE ids SET LOGGED; ALTER SEQUENCE ids SET UNLOGGED;",
+            Rule::BanAlterSequenceValues,
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER TABLE t ALTER COLUMN id RESTART WITH 5;",
+                Rule::BanAlterSequenceValues
+            )
+            .matches("warning[ban-alter-sequence-values]")
+            .count(),
+            1
+        );
+    }
+}

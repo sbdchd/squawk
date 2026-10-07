@@ -116,3 +116,90 @@ fn check_column_constraints(ctx: &mut Linter, column: &ast::AddColumn) {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        Rule,
+        test_utils::{lint_errors, lint_ok},
+    };
+
+    #[test]
+    fn write_restrictions() {
+        let sql = "ALTER TABLE t ADD CONSTRAINT ck CHECK (id > 0) NOT VALID; ALTER TABLE t ADD CONSTRAINT fk FOREIGN KEY (id) REFERENCES p(id) NOT VALID; ALTER TABLE t ALTER COLUMN id SET NOT NULL; CREATE UNIQUE INDEX CONCURRENTLY idx ON t(id);";
+        assert_eq!(
+            lint_errors(sql, Rule::BanNewWriteRestriction)
+                .matches("warning[ban-new-write-restriction]")
+                .count(),
+            4
+        );
+        lint_ok(
+            "CREATE TABLE t (id int); ALTER TABLE t ADD CONSTRAINT ck CHECK (id > 0) NOT VALID; CREATE UNIQUE INDEX idx ON t(id);",
+            Rule::BanNewWriteRestriction,
+        );
+        lint_ok(
+            "CREATE INDEX CONCURRENTLY idx ON t(id);",
+            Rule::BanNewWriteRestriction,
+        );
+    }
+
+    #[test]
+    fn more_write_restrictions() {
+        assert_eq!(lint_errors("ALTER DOMAIN d SET NOT NULL; ALTER DOMAIN d ADD CONSTRAINT c CHECK (VALUE > 0) NOT VALID;", Rule::BanNewWriteRestriction).matches("warning[ban-new-write-restriction]").count(), 2);
+        assert_eq!(
+            lint_errors(
+                "ALTER TABLE t ADD COLUMN c int NOT NULL;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            1
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER TABLE t ADD CONSTRAINT nn NOT NULL c; ALTER TABLE t ADD NOT NULL c NOT VALID;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            2
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER TABLE t ALTER CONSTRAINT fk NOT DEFERRABLE;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            1
+        );
+        lint_ok(
+            "ALTER TABLE t ALTER CONSTRAINT fk NOT ENFORCED;",
+            Rule::BanNewWriteRestriction,
+        );
+        assert_eq!(
+            lint_errors(
+                "ALTER FOREIGN TABLE ft ALTER COLUMN c SET NOT NULL;",
+                Rule::BanNewWriteRestriction
+            )
+            .matches("warning[ban-new-write-restriction]")
+            .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn additional_write_constraint_forms() {
+        let sql = "ALTER TABLE t ADD COLUMN c bigint PRIMARY KEY; ALTER FOREIGN TABLE ft ADD COLUMN c int NOT NULL;";
+        assert_eq!(
+            lint_errors(sql, Rule::BanNewWriteRestriction)
+                .matches("warning[ban-new-write-restriction]")
+                .count(),
+            2
+        );
+        lint_ok(
+            "CREATE TABLE t (id bigint); ALTER TABLE t ADD COLUMN c bigint PRIMARY KEY; ALTER FOREIGN TABLE ft ADD COLUMN c int;",
+            Rule::BanNewWriteRestriction,
+        );
+    }
+}
