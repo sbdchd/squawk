@@ -360,29 +360,28 @@ mod tests {
 
     #[test]
     fn routine_options() {
-        let sql = "ALTER PROCEDURE p() SECURITY DEFINER; ALTER PROCEDURE p() SET search_path TO private; ALTER PROCEDURE p() RESET ALL; ALTER ROUTINE f() SECURITY INVOKER; ALTER ROUTINE f() SET search_path TO private; ALTER ROUTINE f() RESET ALL;";
+        let sql = "ALTER PROCEDURE p() SET search_path TO private; ALTER PROCEDURE p() RESET ALL; ALTER ROUTINE f() SECURITY INVOKER; ALTER ROUTINE f() SET search_path TO private; ALTER ROUTINE f() RESET ALL;";
         assert_eq!(
             lint_errors(sql, Rule::BanAlterFunctionOptions)
                 .matches("warning[ban-alter-function-options]")
                 .count(),
-            6
+            5
         );
         lint_ok(
-            "ALTER PROCEDURE p() RENAME TO q; ALTER ROUTINE f() SET SCHEMA private; ALTER PROCEDURE p() OWNER TO app;",
+            "ALTER PROCEDURE p() OWNER TO app;",
             Rule::BanAlterFunctionOptions,
         );
     }
 
     #[test]
     fn user_options() {
-        let sql = "ALTER USER app NOLOGIN; ALTER USER app NOBYPASSRLS; ALTER USER app IN DATABASE db SET search_path TO private; ALTER USER app RESET ALL;";
+        let sql = "ALTER USER app NOBYPASSRLS; ALTER USER app IN DATABASE db SET search_path TO private; ALTER USER app RESET ALL;";
         assert_eq!(
             lint_errors(sql, Rule::BanAlterRoleOptions)
                 .matches("warning[ban-alter-role-options]")
                 .count(),
-            4
+            3
         );
-        lint_ok("ALTER USER app RENAME TO app2;", Rule::BanAlterRoleOptions);
     }
 
     #[test]

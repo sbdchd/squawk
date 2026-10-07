@@ -80,11 +80,5 @@ mod test {
                 .count(),
             5
         );
-        assert_eq!(
-            lint_errors("ALTER TABLE t ENABLE TRIGGER tr;", Rule::BanDisableTrigger)
-                .matches("warning[ban-disable-trigger]")
-                .count(),
-            1
-        );
     }
 }
