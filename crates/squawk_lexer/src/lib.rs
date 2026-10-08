@@ -417,7 +417,7 @@ impl Cursor<'_> {
         } else {
             // No base prefix, parse number in the usual way.
             self.eat_decimal_digits();
-        };
+        }
 
         match self.first() {
             // `1..10` lexes as 1, .., 10 rather than `1.` followed by `.10`
@@ -684,7 +684,10 @@ impl Cursor<'_> {
 pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
     let (bom, input) = match input.strip_prefix(BOM) {
         Some(input) => (
-            Some(Token::new(TokenKind::Whitespace, BOM.len() as u32)),
+            Some(Token::new(
+                TokenKind::Whitespace,
+                u32::try_from(BOM.len()).unwrap(),
+            )),
             input,
         ),
         None => (None, input),
@@ -852,7 +855,7 @@ select 2 \r"));
     fn line_comment_whitespace() {
         assert_debug_snapshot!(lex(r#"
 select 'Hello' -- This is a comment
-' World';"#))
+' World';"#));
     }
 
     #[test]
@@ -863,7 +866,7 @@ $SomeTag$Dianne's horse$SomeTag$
 
 -- with dollar inside and matching tags
 $foo$hello$world$bar$
-"#))
+"#));
     }
 
     #[test]
@@ -871,7 +874,7 @@ $foo$hello$world$bar$
         assert_debug_snapshot!(lex(r#"
 DO $doblock$
 end
-$doblock$;"#))
+$doblock$;"#));
     }
 
     #[test]
@@ -904,7 +907,7 @@ $foo$hello$world$bar$
 1e+10
 1e10
 4664.E+5
-"#))
+"#));
     }
 
     #[test]
@@ -916,7 +919,7 @@ $foo$hello$world$bar$
 0O755
 0x42f
 0XFFFF
-"#))
+"#));
     }
 
     #[test]
@@ -955,7 +958,7 @@ $foo$hello$world$bar$
 0o_1_755
 0xFFFF_FFFF
 1.618_034
-"#))
+"#));
     }
 
     #[test]
@@ -968,7 +971,7 @@ $foo$hello$world$bar$
             " " @ Whitespace,
             ".1_2e3" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 6 } },
         ]
-        "#)
+        "#);
     }
 
     #[test]
@@ -1048,14 +1051,14 @@ $foo$hello$world$bar$
             "+" @ Plus,
             "_2" @ Ident,
         ]
-        "#)
+        "#);
     }
 
     #[test]
     fn select_with_period() {
         assert_debug_snapshot!(lex(r#"
 select public.users;
-"#))
+"#));
     }
 
     #[test]
@@ -1065,7 +1068,7 @@ B'1001'
 b'1001'
 X'1FF'
 x'1FF'
-"#))
+"#));
     }
 
     #[test]
@@ -1124,7 +1127,7 @@ select 'foooo'
 'foo \\ \n \tbar'
 
 'forgot to close the string
-"#))
+"#));
     }
 
     #[test]
@@ -1135,7 +1138,7 @@ select $1 + $2;
 select $1123123123123;
 
 select $;
-"#))
+"#));
     }
 
     #[test]
@@ -1155,7 +1158,7 @@ e'\x0\x11\xFF'
 
 e'\uAAAA \UFFFFFFFF'
 
-"#))
+"#));
     }
 
     #[test]
@@ -1197,7 +1200,7 @@ U&"\0441\043B\043E\043D"
 u&'\0441\043B'
 
 U&"d!0061t!+000061" UESCAPE '!'
-"#))
+"#));
     }
 
     #[test]
@@ -1207,14 +1210,14 @@ U&"d!0061t!+000061" UESCAPE '!'
 
 
 "hello-world
-"#))
+"#));
     }
 
     #[test]
     fn quoted_ident_with_escape_quote() {
         assert_debug_snapshot!(lex(r#"
 "foo "" bar"
-"#))
+"#));
     }
 
     #[test]

@@ -61,10 +61,10 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
             .is_some_and(|expr| is_non_volatile_or_const(&expr)),
         // current_timestamp is the same as calling now()
         ast::Expr::NameRef(name_ref) => {
-            if let Some(child) = name_ref.syntax().first_child_or_token() {
-                if child.kind() == SyntaxKind::CURRENT_TIMESTAMP_KW {
-                    return true;
-                }
+            if let Some(child) = name_ref.syntax().first_child_or_token()
+                && child.kind() == SyntaxKind::CURRENT_TIMESTAMP_KW
+            {
+                return true;
             }
             false
         }
@@ -103,7 +103,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                         expr.syntax(),
                                     )
                                     .help(help),
-                                )
+                                );
                             }
                             ast::Constraint::GeneratedConstraint(generated) => {
                                 ctx.report(

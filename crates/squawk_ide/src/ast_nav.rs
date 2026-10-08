@@ -111,7 +111,7 @@ pub(crate) enum SelectContext {
 }
 
 impl SelectContext {
-    pub(crate) fn iter(&self) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
+    pub(crate) fn selects(&self) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
         fn variant_iter(
             variant: ast::SelectVariant,
         ) -> Option<Box<dyn Iterator<Item = ast::Select>>> {

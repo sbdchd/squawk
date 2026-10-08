@@ -14,13 +14,13 @@ use crate::{Command, DebugOption, Opts, Reporter, UploadToGithubArgs};
 const FILE_NAME: &str = ".squawk.toml";
 
 #[derive(Debug, Default, Deserialize)]
-pub struct UploadToGitHubConfig {
+pub(crate) struct UploadToGitHubConfig {
     #[serde(default)]
     pub fail_on_violations: Option<bool>,
 }
 
 #[derive(Debug, Default, Deserialize)]
-pub struct ConfigFile {
+pub(crate) struct ConfigFile {
     #[serde(default)]
     pub excluded_paths: Vec<String>,
     #[serde(default)]
@@ -36,7 +36,7 @@ pub struct ConfigFile {
 }
 
 impl ConfigFile {
-    pub fn parse(custom_path: Option<PathBuf>) -> Result<Option<Self>> {
+    pub(crate) fn parse(custom_path: Option<PathBuf>) -> Result<Option<Self>> {
         let path = if let Some(path) = custom_path {
             Some(path)
         } else {
@@ -55,7 +55,8 @@ impl ConfigFile {
     }
 }
 
-pub struct Config {
+#[allow(clippy::struct_excessive_bools)]
+pub(crate) struct Config {
     pub excluded_paths: Vec<String>,
     pub excluded_rules: Vec<Rule>,
     pub included_rules: Vec<Rule>,
@@ -74,7 +75,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn from(opts: Opts) -> Config {
+    pub(crate) fn from(opts: Opts) -> Config {
         let conf = ConfigFile::parse(opts.config_path)
             .unwrap_or_else(|e| {
                 eprintln!("Configuration error: {e}");

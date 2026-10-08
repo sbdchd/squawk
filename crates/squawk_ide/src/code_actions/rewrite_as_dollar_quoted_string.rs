@@ -47,7 +47,7 @@ fn dollar_delimiter(content: &str) -> Option<String> {
     // We can't safely transform a trailing `$` i.e., `select 'foo $'` with an
     // empty delim, because we'll  `select $$foo $$$` which isn't valid.
     if !content.contains("$$") && !content.ends_with('$') {
-        return Some("".to_owned());
+        return Some(String::new());
     }
 
     let mut delim = "q".to_owned();

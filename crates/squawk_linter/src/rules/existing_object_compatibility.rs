@@ -36,10 +36,10 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<Sour
     for stmt in parse.tree().stmts() {
         match stmt {
             ast::Stmt::CreateTable(table) => {
-                if table.if_not_exists().is_none() {
-                    if let Some(name) = table.table_name().and_then(|n| n.path()) {
-                        tables.insert(object_name(name));
-                    }
+                if table.if_not_exists().is_none()
+                    && let Some(name) = table.table_name().and_then(|n| n.path())
+                {
+                    tables.insert(object_name(name));
                 }
             }
             ast::Stmt::CreateType(ty) => {
@@ -48,10 +48,10 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<Sour
                 }
             }
             ast::Stmt::CreateSequence(seq) => {
-                if seq.if_not_exists().is_none() {
-                    if let Some(name) = seq.sequence().and_then(|n| n.path()) {
-                        sequences.insert(object_name(name));
-                    }
+                if seq.if_not_exists().is_none()
+                    && let Some(name) = seq.sequence().and_then(|n| n.path())
+                {
+                    sequences.insert(object_name(name));
                 }
             }
             ast::Stmt::AlterTable(table) => {

@@ -81,7 +81,7 @@ fn inlay_hint_call_expr(
                 });
             }
         }
-    };
+    }
 
     Some(())
 }
@@ -264,7 +264,7 @@ mod test {
         let target_contents = target_entries
             .into_iter()
             .map(|(f, targets)| {
-                let path = *file_paths.get(&f).unwrap();
+                let path = file_paths[&f];
                 (f.content(&db).clone(), path, targets)
             })
             .collect::<Vec<_>>();
@@ -284,7 +284,6 @@ mod test {
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
         renderer
             .render(&groups)
-            .to_string()
             .replace("info: labels", "labels:")
             .replace("info: targets", "targets:")
     }

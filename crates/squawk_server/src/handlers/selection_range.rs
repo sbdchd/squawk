@@ -35,7 +35,7 @@ pub(crate) fn handle_selection_range(
                 if next == range {
                     break;
                 } else {
-                    range = next
+                    range = next;
                 }
             }
         }

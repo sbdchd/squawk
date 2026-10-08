@@ -975,7 +975,7 @@ mod tests {
             items,
             vec![],
             "Completions found. If this was unintended, use `completions` instead."
-        )
+        );
     }
 
     fn format_items(mut items: Vec<super::CompletionItem>) -> String {
@@ -1418,7 +1418,7 @@ delete from t where $0;
          name        | Column   | text                            
          t           | Table    |                                 
          is_active() | Function | public.is_active() returns bool
-        ")
+        ");
     }
 
     #[test]

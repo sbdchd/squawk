@@ -235,6 +235,7 @@ fn contiguous_range_for_comment(
 #[cfg(test)]
 mod tests {
     use insta::assert_snapshot;
+    use std::fmt::Write as _;
 
     use crate::db::{Database, File};
 
@@ -300,7 +301,7 @@ mod tests {
             if event.is_end {
                 output.push_str("</fold>");
             } else {
-                output.push_str(&format!("<fold {}>", event.kind));
+                write!(output, "<fold {}>", event.kind).unwrap();
             }
         }
         if pos < sql.len() {

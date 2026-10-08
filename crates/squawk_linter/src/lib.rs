@@ -819,7 +819,7 @@ impl Linter {
             errors: vec![],
             ignores: vec![],
             rules,
-            settings: Default::default(),
+            settings: LinterSettings::default(),
         }
     }
 }

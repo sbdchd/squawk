@@ -101,9 +101,10 @@ fn resolved_to_column_ptrs(
         ResolvedTableName::TableAs(create_table_as) => select_columns_with_types(
             db,
             file,
-            &create_table_as
+            create_table_as
                 .query()
-                .and_then(|query| query.select_variant()),
+                .and_then(|query| query.select_variant())
+                .as_ref(),
         )
         .into_iter()
         .map(|(name, _ty)| (name, None))
@@ -205,9 +206,10 @@ fn resolved_to_columns_with_types(
         ResolvedTableName::TableAs(create_table_as) => select_columns_with_types(
             db,
             file,
-            &create_table_as
+            create_table_as
                 .query()
-                .and_then(|query| query.select_variant()),
+                .and_then(|query| query.select_variant())
+                .as_ref(),
         ),
         ResolvedTableName::SelectInto(select_into) => {
             select_into_columns_with_types(db, file, &select_into)
@@ -226,9 +228,10 @@ pub(crate) fn create_table_as_columns_with_types(
     select_columns_with_types(
         db,
         file,
-        &create_table_as
+        create_table_as
             .query()
-            .and_then(|query| query.select_variant()),
+            .and_then(|query| query.select_variant())
+            .as_ref(),
     )
 }
 
@@ -285,7 +288,7 @@ fn target_list_columns_with_types_in_file(
 fn select_columns_with_types(
     db: &dyn Db,
     file: FileId,
-    query: &Option<ast::SelectVariant>,
+    query: Option<&ast::SelectVariant>,
 ) -> Vec<(Name, Option<Type>)> {
     let Some(query) = query else {
         return vec![];
@@ -312,7 +315,7 @@ fn select_columns_with_types(
             paren_select_columns_with_types(db, file, nested)
         }
         ast::SelectVariant::CompoundSelect(compound) => {
-            select_columns_with_types(db, file, &compound.lhs())
+            select_columns_with_types(db, file, compound.lhs().as_ref())
         }
     }
 }
@@ -458,7 +461,7 @@ pub(crate) fn view_like_columns_with_types(
         .map(|name| Name::from_node(&name))
         .collect();
 
-    let base_columns = select_columns_with_types(db, file, &create_view.query());
+    let base_columns = select_columns_with_types(db, file, create_view.query().as_ref());
 
     if alias_columns.is_empty() {
         return base_columns;
@@ -490,7 +493,7 @@ pub(crate) fn with_table_columns_with_types(
         .map(|name| Name::from_node(&name))
         .collect();
 
-    let base_columns = with_table_query_columns_with_types(db, file, with_table.clone());
+    let base_columns = with_table_query_columns_with_types(db, file, with_table);
 
     if alias_columns.is_empty() {
         return base_columns;

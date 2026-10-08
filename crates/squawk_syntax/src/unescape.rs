@@ -57,7 +57,7 @@ where
 {
     const HIGH_SURROGATE: RangeInclusive<u32> = 0xD800..=0xDBFF;
     const LOW_SURROGATE: RangeInclusive<u32> = 0xDC00..=0xDFFF;
-    const MAX_CODEPOINT: u32 = 0x10FFFF;
+    const MAX_CODEPOINT: u32 = 0x0010_FFFF;
 
     let mut chars = text.char_indices().peekable();
     let mut high_surrogate: Option<(Range<usize>, u32)> = None;
@@ -179,7 +179,7 @@ pub fn uescape_char(text: &str) -> Option<char> {
 pub fn decode_plain_string(inner: &str, start_pos: TextSize, out: &mut DecodedText) {
     let mut chars = inner.char_indices().peekable();
     while let Some((i, c)) = chars.next() {
-        let pos = start_pos + TextSize::new(i as u32);
+        let pos = start_pos + TextSize::try_from(i).unwrap();
         if c == '\'' && chars.peek().is_some_and(|&(_, next)| next == '\'') {
             chars.next();
         }
@@ -241,7 +241,7 @@ pub fn decode_esc_string(inner: &str, start_pos: TextSize, out: &mut DecodedText
     let mut esc = EscBuffer::new(start_pos);
 
     while let Some((i, c)) = chars.next() {
-        let pos = start_pos + TextSize::new(i as u32);
+        let pos = start_pos + TextSize::try_from(i).unwrap();
 
         if c == '\'' && chars.peek().is_some_and(|&(_, next)| next == '\'') {
             chars.next();
@@ -292,7 +292,7 @@ pub fn decode_esc_string(inner: &str, start_pos: TextSize, out: &mut DecodedText
                     }
                 }
                 if value != 0 {
-                    esc.push(value as u8, pos);
+                    esc.push(value.to_le_bytes()[0], pos);
                 }
             }
             'x' => {
@@ -303,7 +303,7 @@ pub fn decode_esc_string(inner: &str, start_pos: TextSize, out: &mut DecodedText
                     match chars.peek() {
                         Some(&(_, d)) if d.is_ascii_hexdigit() => {
                             chars.next();
-                            value = value * 16 + d.to_digit(16).unwrap() as u8;
+                            value = value * 16 + u8::try_from(d.to_digit(16).unwrap()).unwrap();
                             got_any = true;
                         }
                         _ => break,
@@ -363,7 +363,10 @@ pub fn decode_unicode_esc_string(
 
     escape_unicode_esc_str(dequoted.text(), escape_char, |range, result| {
         if let Ok(ch) = result {
-            out.push_char(ch, dequoted.source_pos(TextSize::new(range.start as u32)));
+            out.push_char(
+                ch,
+                dequoted.source_pos(TextSize::try_from(range.start).unwrap()),
+            );
         }
     });
 }

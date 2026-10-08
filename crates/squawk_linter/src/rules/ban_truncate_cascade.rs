@@ -6,17 +6,17 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn ban_truncate_cascade(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for stmt in file.stmts() {
-        if let ast::Stmt::Truncate(truncate) = stmt {
-            if let Some(ast::DropBehavior::Cascade(cascade)) = truncate.drop_behavior() {
-                // TODO: if we had knowledge about the entire schema, we
-                // could be more precise here and actually navigate the
-                // foreign keys.
-                ctx.report(Violation::for_range(
+        if let ast::Stmt::Truncate(truncate) = stmt
+            && let Some(ast::DropBehavior::Cascade(cascade)) = truncate.drop_behavior()
+        {
+            // TODO: if we had knowledge about the entire schema, we
+            // could be more precise here and actually navigate the
+            // foreign keys.
+            ctx.report(Violation::for_range(
                     Rule::BanTruncateCascade,
                     "Using `CASCADE` will recursively truncate any tables that foreign key to the referenced tables! So if you had foreign keys setup as `a <- b <- c` and truncated `a`, then `b` & `c` would also be truncated!".to_string(),
                     cascade.syntax().text_range(),
                 ).help("Remove the `CASCADE` and specify exactly which tables you want to truncate."));
-            }
         }
     }
 }

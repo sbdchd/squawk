@@ -426,10 +426,9 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             if let Some(else_clause) = case.else_clause()
                 && let Some(expr) = else_clause.expr()
                 && let Some((column, node)) = name_from_expr(expr, in_type)
+                && !matches!(column, ColumnName::UnknownColumn(_))
             {
-                if !matches!(column, ColumnName::UnknownColumn(_)) {
-                    return Some((column, node));
-                }
+                return Some((column, node));
             }
             return Some((ColumnName::column("case"), node));
         }

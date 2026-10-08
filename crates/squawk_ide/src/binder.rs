@@ -190,7 +190,7 @@ impl Binder {
         name: &N,
         kind: SymbolKind,
         schemas: &ResolvedSchemas,
-        table: &Option<Name>,
+        table: Option<&Name>,
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
         for search_schema in schemas.list() {
@@ -198,7 +198,7 @@ impl Binder {
                 let symbol = &self.symbols[*id];
                 symbol.kind == kind
                     && symbol.schema.as_ref() == Some(search_schema)
-                    && &symbol.table == table
+                    && symbol.table.as_ref() == table
             }) {
                 return Some(self.symbols[symbol_id].ptr);
             }
@@ -323,7 +323,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateTableAs(create_table_as) => bind_create_table_as(b, create_table_as),
         ast::Stmt::SelectInto(select_into) => bind_select_into(b, select_into),
         ast::Stmt::CreateForeignTable(create_foreign_table) => {
-            bind_create_table(b, create_foreign_table)
+            bind_create_table(b, create_foreign_table);
         }
         ast::Stmt::CreateIndex(create_index) => bind_create_index(b, create_index),
         ast::Stmt::CreateFunction(create_function) => bind_create_function(b, create_function),
@@ -334,57 +334,57 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateDomain(create_domain) => bind_create_domain(b, create_domain),
         ast::Stmt::CreateView(create_view) => bind_create_view(b, create_view),
         ast::Stmt::CreateMaterializedView(create_view) => {
-            bind_create_materialized_view(b, create_view)
+            bind_create_materialized_view(b, create_view);
         }
         ast::Stmt::CreateSequence(create_sequence) => bind_create_sequence(b, create_sequence),
         ast::Stmt::CreateStatistics(create_statistics) => {
-            bind_create_statistics(b, create_statistics)
+            bind_create_statistics(b, create_statistics);
         }
         ast::Stmt::CreateTrigger(create_trigger) => bind_create_trigger(b, create_trigger),
         ast::Stmt::CreateEventTrigger(create_event_trigger) => {
-            bind_create_event_trigger(b, create_event_trigger)
+            bind_create_event_trigger(b, create_event_trigger);
         }
         ast::Stmt::CreateTablespace(create_tablespace) => {
-            bind_create_tablespace(b, create_tablespace)
+            bind_create_tablespace(b, create_tablespace);
         }
         ast::Stmt::CreateDatabase(create_database) => bind_create_database(b, create_database),
         ast::Stmt::CreateServer(create_server) => bind_create_server(b, create_server),
         ast::Stmt::CreateForeignDataWrapper(create_fdw) => {
-            bind_create_foreign_data_wrapper(b, create_fdw)
+            bind_create_foreign_data_wrapper(b, create_fdw);
         }
         ast::Stmt::CreatePublication(create_publication) => {
-            bind_create_publication(b, create_publication)
+            bind_create_publication(b, create_publication);
         }
         ast::Stmt::CreateSubscription(create_subscription) => {
-            bind_create_subscription(b, create_subscription)
+            bind_create_subscription(b, create_subscription);
         }
         ast::Stmt::CreateLanguage(create_language) => bind_create_language(b, create_language),
         ast::Stmt::CreateCollation(create_collation) => bind_create_collation(b, create_collation),
         ast::Stmt::CreateConversion(create_conversion) => {
-            bind_create_conversion(b, create_conversion)
+            bind_create_conversion(b, create_conversion);
         }
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
         ast::Stmt::CreateAccessMethod(create_access_method) => {
-            bind_create_access_method(b, create_access_method)
+            bind_create_access_method(b, create_access_method);
         }
         ast::Stmt::CreateOperator(create_operator) => bind_create_operator(b, create_operator),
         ast::Stmt::CreateOperatorFamily(create_operator_family) => {
-            bind_create_operator_family(b, create_operator_family)
+            bind_create_operator_family(b, create_operator_family);
         }
         ast::Stmt::CreateOperatorClass(create_operator_class) => {
-            bind_create_operator_class(b, create_operator_class)
+            bind_create_operator_class(b, create_operator_class);
         }
         ast::Stmt::CreateTextSearchDictionary(create_text_search_dictionary) => {
-            bind_create_text_search_dictionary(b, create_text_search_dictionary)
+            bind_create_text_search_dictionary(b, create_text_search_dictionary);
         }
         ast::Stmt::CreateTextSearchConfiguration(create_text_search_configuration) => {
-            bind_create_text_search_configuration(b, create_text_search_configuration)
+            bind_create_text_search_configuration(b, create_text_search_configuration);
         }
         ast::Stmt::CreateTextSearchParser(create_text_search_parser) => {
-            bind_create_text_search_parser(b, create_text_search_parser)
+            bind_create_text_search_parser(b, create_text_search_parser);
         }
         ast::Stmt::CreateTextSearchTemplate(create_text_search_template) => {
-            bind_create_text_search_template(b, create_text_search_template)
+            bind_create_text_search_template(b, create_text_search_template);
         }
         ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role.role()),
         ast::Stmt::CreateUser(create_user) => bind_create_role(b, create_user.role()),
@@ -403,7 +403,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
         ast::Stmt::CreateRule(create_rule) => bind_create_rule(b, create_rule),
         ast::Stmt::CreatePropertyGraph(create_property_graph) => {
-            bind_create_property_graph(b, create_property_graph)
+            bind_create_property_graph(b, create_property_graph);
         }
         _ => (),
     }
@@ -714,14 +714,14 @@ fn bind_schema_element(b: &mut Binder, element: ast::SchemaElement) {
         ast::SchemaElement::CreateSequence(stmt) => bind_create_sequence(b, stmt),
         ast::SchemaElement::CreateTable(stmt) => bind_create_table(b, stmt),
         ast::SchemaElement::CreateTextSearchConfiguration(stmt) => {
-            bind_create_text_search_configuration(b, stmt)
+            bind_create_text_search_configuration(b, stmt);
         }
         ast::SchemaElement::CreateTextSearchDictionary(stmt) => {
-            bind_create_text_search_dictionary(b, stmt)
+            bind_create_text_search_dictionary(b, stmt);
         }
         ast::SchemaElement::CreateTextSearchParser(stmt) => bind_create_text_search_parser(b, stmt),
         ast::SchemaElement::CreateTextSearchTemplate(stmt) => {
-            bind_create_text_search_template(b, stmt)
+            bind_create_text_search_template(b, stmt);
         }
         ast::SchemaElement::CreateTrigger(stmt) => bind_create_trigger(b, stmt),
         ast::SchemaElement::CreateType(stmt) => bind_create_type(b, stmt),
@@ -758,19 +758,18 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
 
     b.scope.insert(type_name.clone(), type_id);
 
-    if let Some(ast::CreateTypeKind::RangeType(range_type)) = create_type.kind() {
-        if let Some((multirange_name, multirange_ptr, multirange_schema)) =
+    if let Some(ast::CreateTypeKind::RangeType(range_type)) = create_type.kind()
+        && let Some((multirange_name, multirange_ptr, multirange_schema)) =
             multirange_type_from_range(b, &range_type, type_name, schema, name_ptr)
-        {
-            let multirange_id = b.symbols.alloc(Symbol {
-                kind: SymbolKind::Type,
-                ptr: multirange_ptr,
-                schema: Some(multirange_schema),
-                params: None,
-                table: None,
-            });
-            b.scope.insert(multirange_name, multirange_id);
-        }
+    {
+        let multirange_id = b.symbols.alloc(Symbol {
+            kind: SymbolKind::Type,
+            ptr: multirange_ptr,
+            schema: Some(multirange_schema),
+            params: None,
+            table: None,
+        });
+        b.scope.insert(multirange_name, multirange_id);
     }
 }
 

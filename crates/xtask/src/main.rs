@@ -1,3 +1,5 @@
+#![allow(clippy::print_stdout, clippy::print_stderr)]
+
 use anyhow::Result;
 // see: https://github.com/matklad/cargo-xtask
 use clap::{Args, Parser, Subcommand};

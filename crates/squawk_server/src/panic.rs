@@ -238,7 +238,7 @@ mod tests {
         });
 
         match result {
-            Ok(_) => panic!("Expected query to panic"),
+            Ok(()) => panic!("Expected query to panic"),
             Err(err) => {
                 // Panics triggered with `resume_unwind` have no backtrace.
                 assert!(err.backtrace.is_none());

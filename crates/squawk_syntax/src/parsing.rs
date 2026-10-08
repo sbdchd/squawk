@@ -55,14 +55,14 @@ pub(crate) fn build_tree(
         squawk_parser::StrStep::Enter { kind } => builder.start_node(kind),
         squawk_parser::StrStep::Exit => builder.finish_node(),
         squawk_parser::StrStep::Error { msg, pos } => {
-            builder.error(msg.to_owned(), pos.try_into().unwrap())
+            builder.error(msg.to_owned(), pos.try_into().unwrap());
         }
     });
 
     let (node, mut errors) = builder.finish_raw();
     for (text_range, err) in lexed.errors() {
         let text_range = TextRange::new(text_range.start.into(), text_range.end.into());
-        errors.push(SyntaxError::new(err, text_range))
+        errors.push(SyntaxError::new(err, text_range));
     }
 
     (node, errors, is_eof)

@@ -60,13 +60,13 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PlpgsqlBlock(it) => validate_plpgsql_block(it, errors),
                 ast::PlpgsqlCaseStmt(it) => validate_no_bare_case(it.subject(), errors),
                 ast::PlpgsqlCompOptionPrintStrictParams(it) => {
-                    validate_print_strict_params(it, errors)
+                    validate_print_strict_params(it, errors);
                 },
                 ast::PlpgsqlCaseWhen(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlFetchStmt(it) => {
                     validate_fetch_no_strict(it.into_clause(), errors);
-                    validate_fetch_single_row(it, errors)
+                    validate_fetch_single_row(it, errors);
                 },
                 ast::PlpgsqlForCursorStmt(it) => validate_for_cursor_single_var(it, errors),
                 ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(it, errors),
@@ -1074,8 +1074,8 @@ fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
 }
 
 fn offset_range(start: TextSize, range: Range<usize>) -> TextRange {
-    let begin = start + TextSize::new(range.start as u32);
-    let end = start + TextSize::new(range.end as u32);
+    let begin = start + TextSize::try_from(range.start).unwrap();
+    let end = start + TextSize::try_from(range.end).unwrap();
     TextRange::new(begin, end)
 }
 
@@ -1303,9 +1303,7 @@ fn validate_create_function(function: ast::CreateFunction, acc: &mut Vec<SyntaxE
         let invalid_mode = match param.mode() {
             Some(ast::ParamMode::ParamOut(mode)) => Some(mode.syntax().text_range()),
             Some(ast::ParamMode::ParamInOut(mode)) => Some(mode.syntax().text_range()),
-            Some(ast::ParamMode::ParamIn(_)) | Some(ast::ParamMode::ParamVariadic(_)) | None => {
-                None
-            }
+            Some(ast::ParamMode::ParamIn(_) | ast::ParamMode::ParamVariadic(_)) | None => None,
         };
         if let Some(range) = invalid_mode {
             acc.push(SyntaxError::new(
@@ -1416,7 +1414,7 @@ fn validate_non_standard_param(param: ast::NonStandardParam, acc: &mut Vec<Synta
     acc.push(SyntaxError::new(
         "Invalid parameter type. Use positional params like $1 instead.",
         param.syntax().text_range(),
-    ))
+    ));
 }
 
 const CONFLICTING_OPTIONS: &str = "Conflicting or redundant options.";

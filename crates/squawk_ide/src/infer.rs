@@ -72,8 +72,8 @@ fn infer_int_type(literal: &ast::Literal) -> Type {
         .integer_value()
         .and_then(|value| u64::try_from(value).ok())
     {
-        Some(n) if n <= i32::MAX as u64 => Type::Integer,
-        Some(n) if n <= i64::MAX as u64 => Type::Bigint,
+        Some(n) if i32::try_from(n).is_ok() => Type::Integer,
+        Some(n) if i64::try_from(n).is_ok() => Type::Bigint,
         _ => Type::Numeric,
     }
 }

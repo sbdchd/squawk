@@ -2,7 +2,7 @@ pub(crate) fn binary_digits_to_hex(digits: &str) -> Option<String> {
     const HEX_DIGITS: &[u8; 16] = b"0123456789ABCDEF";
 
     if digits.is_empty() {
-        return Some("".to_string());
+        return Some(String::new());
     }
 
     let mut out = String::with_capacity(digits.len().div_ceil(4));
@@ -33,7 +33,7 @@ pub(crate) fn hex_digits_to_binary(digits: &str) -> Option<String> {
     ];
 
     if digits.is_empty() {
-        return Some("".to_string());
+        return Some(String::new());
     }
 
     let mut out = String::with_capacity(digits.len() * 4);

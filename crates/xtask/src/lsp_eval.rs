@@ -1,3 +1,4 @@
+use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::ops::Range;
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
@@ -69,19 +70,18 @@ fn render(content: &str, source_span: Range<usize>, locations: &[Location]) -> S
     let groups = vec![Level::INFO.primary_title("definition").element(snippet)];
 
     let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
-    let mut out = renderer
-        .render(&groups)
-        .to_string()
-        .replace("info: definition", "");
+    let mut out = renderer.render(&groups).replace("info: definition", "");
 
     if locations.is_empty() {
         out.push_str("\nno definition found\n");
     }
     for location in other_files {
-        out.push_str(&format!(
-            "\ndestination in {} at {:?}..{:?}\n",
+        writeln!(
+            out,
+            "\ndestination in {} at {:?}..{:?}",
             location.uri, location.start, location.end
-        ));
+        )
+        .unwrap();
     }
 
     out
@@ -226,8 +226,9 @@ fn parse_locations(result: &Value) -> Vec<Location> {
 }
 
 fn position(value: &Value) -> (u32, u32) {
-    let line = value.get("line").and_then(Value::as_u64).unwrap_or(0) as u32;
-    let character = value.get("character").and_then(Value::as_u64).unwrap_or(0) as u32;
+    let line = u32::try_from(value.get("line").and_then(Value::as_u64).unwrap_or(0)).unwrap();
+    let character =
+        u32::try_from(value.get("character").and_then(Value::as_u64).unwrap_or(0)).unwrap();
     (line, character)
 }
 
@@ -243,7 +244,7 @@ fn position_to_byte(text: &str, position: (u32, u32)) -> usize {
 }
 
 fn byte_to_position(text: &str, byte: usize) -> (u32, u32) {
-    let line_col = LineIndex::new(text).line_col(TextSize::from(byte as u32));
+    let line_col = LineIndex::new(text).line_col(TextSize::try_from(byte).unwrap());
     (line_col.line, line_col.col)
 }
 

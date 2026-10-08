@@ -30,14 +30,14 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
             }
             ast::Stmt::AlterView(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterViewAction::SetSchema(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterViewAction::SetSchema(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterMaterializedView(node) => {
@@ -88,25 +88,25 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
             }
             ast::Stmt::AlterFunction(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterFunctionAction::SetSchema(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterFunctionAction::SetSchema(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterType(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterTypeAction::SetSchema(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterTypeAction::SetSchema(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterSequence(node) => {
@@ -121,14 +121,14 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
             }
             ast::Stmt::AlterDomain(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterDomainAction::SetSchema(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterDomainAction::SetSchema(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::BanSetSchema,
+                        "Moving an object to another schema may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             _ => (),

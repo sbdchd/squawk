@@ -22,7 +22,7 @@ pub(crate) fn handle_inlay_hints(
 
     let lsp_hints: Vec<InlayHint> = hints
         .into_iter()
-        .flat_map(|hint| {
+        .filter_map(|hint| {
             let line_col = current_line_index.line_col(hint.position);
             let position = gen_lsp_types::Position::new(line_col.line, line_col.col);
 

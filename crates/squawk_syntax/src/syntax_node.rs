@@ -45,12 +45,12 @@ impl Language for Sql {
 pub type SyntaxNode = rowan::SyntaxNode<Sql>;
 pub type SyntaxToken = rowan::SyntaxToken<Sql>;
 pub type SyntaxElement = rowan::SyntaxElement<Sql>;
-pub type SyntaxNodeChildren = rowan::SyntaxNodeChildren<Sql>;
+pub(crate) type SyntaxNodeChildren = rowan::SyntaxNodeChildren<Sql>;
 // pub type SyntaxElementChildren = rowan::SyntaxElementChildren<Sql>;
 // pub type PreorderWithTokens = rowan::api::PreorderWithTokens<Sql>;
 
 #[derive(Default)]
-pub struct SyntaxTreeBuilder {
+pub(crate) struct SyntaxTreeBuilder {
     errors: Vec<SyntaxError>,
     inner: GreenNodeBuilder<'static>,
 }
@@ -72,21 +72,21 @@ impl SyntaxTreeBuilder {
     //     Parse::new(green, errors)
     // }
 
-    pub fn token(&mut self, kind: SyntaxKind, text: &str) {
+    pub(crate) fn token(&mut self, kind: SyntaxKind, text: &str) {
         let kind = Sql::kind_to_raw(kind);
         self.inner.token(kind, text);
     }
 
-    pub fn start_node(&mut self, kind: SyntaxKind) {
+    pub(crate) fn start_node(&mut self, kind: SyntaxKind) {
         let kind = Sql::kind_to_raw(kind);
         self.inner.start_node(kind);
     }
 
-    pub fn finish_node(&mut self) {
+    pub(crate) fn finish_node(&mut self) {
         self.inner.finish_node();
     }
 
-    pub fn error(&mut self, error: String, text_pos: TextSize) {
+    pub(crate) fn error(&mut self, error: String, text_pos: TextSize) {
         self.errors
             .push(SyntaxError::new_at_offset(error, text_pos));
     }

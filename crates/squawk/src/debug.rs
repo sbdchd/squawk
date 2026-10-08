@@ -1,3 +1,4 @@
+use std::fmt::Write as _;
 use std::io;
 
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -50,9 +51,9 @@ pub(crate) fn debug<W: io::Write>(f: &mut W, args: DebugArgs) -> Result<()> {
                         snap += "\n";
                         snap += "ERROR";
                         if range.start() == range.end() {
-                            snap += &format!("@{:?} {:?}", range.start(), text);
+                            write!(snap, "@{:?} {:?}", range.start(), text)?;
                         } else {
-                            snap += &format!("@{:?}:{:?} {:?}", range.start(), range.end(), text);
+                            write!(snap, "@{:?}:{:?} {:?}", range.start(), range.end(), text)?;
                         }
                     }
                     writeln!(f, "{snap}")?;
@@ -78,7 +79,7 @@ pub(crate) fn debug<W: io::Write>(f: &mut W, args: DebugArgs) -> Result<()> {
                 process_dump_ast(&sql, &path.to_string_lossy(), f)?;
             }
         }
-    };
+    }
 
     Ok(())
 }

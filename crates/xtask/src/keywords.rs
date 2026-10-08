@@ -123,17 +123,17 @@ fn parse_header() -> Result<FxHashMap<String, KeywordMeta>> {
 }
 
 pub(crate) struct KeywordKinds {
-    pub(crate) all_keywords: Vec<String>,
-    pub(crate) bare_label_keywords: Vec<String>,
-    pub(crate) as_label_keywords: Vec<String>,
-    pub(crate) unreserved_keywords: Vec<String>,
-    pub(crate) reserved_keywords: Vec<String>,
-    pub(crate) col_name_keywords: Vec<String>,
-    pub(crate) type_func_name_keywords: Vec<String>,
-    pub(crate) col_table_keywords: Vec<String>,
-    pub(crate) type_keywords: Vec<String>,
-    pub(crate) plpgsql_reserved_keywords: Vec<String>,
-    pub(crate) plpgsql_reserved_contextual_keywords: Vec<String>,
+    pub(crate) all: Vec<String>,
+    pub(crate) bare_label: Vec<String>,
+    pub(crate) as_label: Vec<String>,
+    pub(crate) unreserved: Vec<String>,
+    pub(crate) reserved: Vec<String>,
+    pub(crate) col_name: Vec<String>,
+    pub(crate) type_func_name: Vec<String>,
+    pub(crate) col_table: Vec<String>,
+    pub(crate) types: Vec<String>,
+    pub(crate) plpgsql_reserved: Vec<String>,
+    pub(crate) plpgsql_reserved_contextual: Vec<String>,
 }
 
 pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
@@ -213,12 +213,12 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
 
     let mut col_table_keywords = col_table_tokens
         .iter()
-        .map(|x| x.to_string())
+        .map(|x| (*x).clone())
         .collect::<Vec<String>>();
     col_table_keywords.sort();
     let mut type_keywords = type_tokens
         .iter()
-        .map(|x| x.to_string())
+        .map(|x| (*x).clone())
         .collect::<Vec<String>>();
     type_keywords.sort();
 
@@ -237,17 +237,17 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
     plpgsql_reserved_contextual_keywords.sort();
 
     Ok(KeywordKinds {
-        all_keywords,
-        bare_label_keywords,
-        as_label_keywords,
-        unreserved_keywords,
-        reserved_keywords,
-        col_name_keywords,
-        type_func_name_keywords,
-        col_table_keywords,
-        type_keywords,
-        plpgsql_reserved_keywords,
-        plpgsql_reserved_contextual_keywords,
+        all: all_keywords,
+        bare_label: bare_label_keywords,
+        as_label: as_label_keywords,
+        unreserved: unreserved_keywords,
+        reserved: reserved_keywords,
+        col_name: col_name_keywords,
+        type_func_name: type_func_name_keywords,
+        col_table: col_table_keywords,
+        types: type_keywords,
+        plpgsql_reserved: plpgsql_reserved_keywords,
+        plpgsql_reserved_contextual: plpgsql_reserved_contextual_keywords,
     })
 }
 

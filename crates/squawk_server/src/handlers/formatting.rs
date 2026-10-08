@@ -21,7 +21,11 @@ pub(crate) fn handle_formatting(
     if !parse.errors().is_empty() {
         return Ok(Some(Vec::new()));
     }
-    let formatted = squawk_fmt::fmt(&parse.tree(), line_ending, Default::default())?;
+    let formatted = squawk_fmt::fmt(
+        &parse.tree(),
+        line_ending,
+        squawk_fmt::FormatOptions::default(),
+    )?;
 
     if formatted == content.as_ref() {
         return Ok(Some(Vec::new()));

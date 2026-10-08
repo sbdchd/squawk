@@ -584,7 +584,7 @@ select 1 and, 2 select;
 "), @r#"
         "and" @ 10..13: Column
         "select" @ 17..23: Column
-        "#)
+        "#);
     }
 
     #[test]
@@ -594,7 +594,7 @@ select $1, $2;
 "), @r#"
         "$1" @ 8..10: PositionalParam
         "$2" @ 12..14: PositionalParam
-        "#)
+        "#);
     }
 
     #[test]
@@ -619,7 +619,7 @@ insert into products (product_no, name, price) values
         "product_no" @ 89..99: Column
         "name" @ 101..105: Column
         "price" @ 107..112: Column
-        "#)
+        "#);
     }
 
     #[test]
@@ -818,7 +818,7 @@ create table test (
         "test" @ 45..49: Table
         "like" @ 54..58: Keyword
         "products" @ 59..67: Table
-        "#)
+        "#);
     }
 
     #[test]
@@ -835,7 +835,7 @@ create table t_1 partition of t for values in (1);
         "t_1" @ 37..40: Table
         "t" @ 54..55: Table
         "in" @ 67..69: Keyword
-        "#)
+        "#);
     }
 
     #[test]

@@ -64,7 +64,7 @@ fn validate_no_extra_spaces(formatted: &str) -> Result<()> {
                 "expected a single space between tokens, found {text:?}"
             ))
             .element(snippet);
-        bail!(Renderer::plain().render(&[group]).to_string());
+        bail!(Renderer::plain().render(&[group]));
     }
     Ok(())
 }
@@ -177,7 +177,7 @@ fn comment_spacing_diagnostic(formatted: &str) -> Option<String> {
         .fold(true)
         .annotation(AnnotationKind::Primary.span(span));
     let group = Level::ERROR.primary_title(message).element(snippet);
-    Some(Renderer::plain().render(&[group]).to_string())
+    Some(Renderer::plain().render(&[group]))
 }
 
 fn validate_comment_spacing(formatted: &str) -> Result<()> {

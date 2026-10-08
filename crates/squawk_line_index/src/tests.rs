@@ -161,7 +161,7 @@ fn test_every_chars() {
             &std::collections::hash_map::RandomState::new(),
         ));
         let mut rng = oorandom::Rand32::new(seed);
-        let mut rand_index = |i| rng.rand_range(0..i as u32) as usize;
+        let mut rand_index = |i| rng.rand_range(0..u32::try_from(i).unwrap()) as usize;
         let mut remaining = chars.len() - 1;
         while remaining > 0 {
             let index = rand_index(remaining);
@@ -194,7 +194,7 @@ fn test_every_chars() {
             let wide_lin_col = line_index.to_wide(enc, lin_col).unwrap();
             let got_lin_col = line_index.to_utf8(enc, wide_lin_col).unwrap();
             assert_eq!(got_lin_col, lin_col);
-            assert_eq!(wide_lin_col.col, col)
+            assert_eq!(wide_lin_col.col, col);
         }
 
         // SQUAWK: `\r` ends a line too, unless it's the first half of a `\r\n`
@@ -206,8 +206,8 @@ fn test_every_chars() {
             col_utf16 = 0;
             col_utf32 = 0;
         } else {
-            lin_col.col += c.len_utf8() as u32;
-            col_utf16 += c.len_utf16() as u32;
+            lin_col.col += u32::try_from(c.len_utf8()).unwrap();
+            col_utf16 += u32::try_from(c.len_utf16()).unwrap();
             col_utf32 += 1;
         }
     }

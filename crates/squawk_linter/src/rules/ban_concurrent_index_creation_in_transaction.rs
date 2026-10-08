@@ -20,14 +20,12 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
                 in_transaction = false;
             }
             ast::Stmt::CreateIndex(create_index) => {
-                if in_transaction {
-                    if let Some(concurrently) = create_index.concurrently_token() {
-                        errors.push(Violation::for_range(
+                if in_transaction && let Some(concurrently) = create_index.concurrently_token() {
+                    errors.push(Violation::for_range(
                             Rule::BanConcurrentIndexCreationInTransaction,
                             "While regular index creation can happen inside a transaction, this is not allowed when the `CONCURRENTLY` option is used.".into(),
                             concurrently.text_range(),
                         ).help("Build the index outside any transactions."));
-                    }
                 }
             }
             _ => (),

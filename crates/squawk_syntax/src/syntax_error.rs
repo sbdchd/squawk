@@ -58,6 +58,7 @@ impl SyntaxError {
     pub fn message(&self) -> &str {
         &self.0
     }
+    #[must_use]
     pub fn with_range(mut self, range: TextRange) -> Self {
         self.1 = range;
         self

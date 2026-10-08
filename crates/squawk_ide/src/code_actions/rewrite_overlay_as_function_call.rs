@@ -1,3 +1,5 @@
+use std::fmt::Write as _;
+
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_linter::Edit;
@@ -29,7 +31,7 @@ pub(super) fn rewrite_overlay_as_function_call(
         from.syntax().text()
     );
     if let Some(for_) = args.for_() {
-        arguments.push_str(&format!(", {}", for_.syntax().text()));
+        write!(arguments, ", {}", for_.syntax().text()).unwrap();
     }
 
     actions.push(CodeAction {

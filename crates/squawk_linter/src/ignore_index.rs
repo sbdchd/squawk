@@ -65,10 +65,10 @@ impl IgnoreIndex {
         // TODO: hmmm basically we want to ensure that either it's on the line before or it's inside the start of the node. we parse stuff so that the comment ends up inside the node :/
         let line = self.line_index.line_col(range.start()).line;
         for line in [line, if line == 0 { 0 } else { line - 1 }] {
-            if let Some(set) = self.line_to_ignored.get(&line) {
-                if set.contains(&item) {
-                    return true;
-                }
+            if let Some(set) = self.line_to_ignored.get(&line)
+                && set.contains(&item)
+            {
+                return true;
             }
         }
         false

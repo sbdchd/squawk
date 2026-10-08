@@ -593,7 +593,7 @@ impl<'t> Parser<'t> {
     /// consumed between the `start` and the corresponding `Marker::complete`
     /// belong to the same node.
     pub(crate) fn start(&mut self) -> Marker {
-        let pos = self.events.len() as u32;
+        let pos = u32::try_from(self.events.len()).unwrap();
         self.push_event(Event::tombstone());
         Marker::new(pos)
     }

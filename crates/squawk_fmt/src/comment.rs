@@ -18,10 +18,12 @@ pub(crate) fn build_comment<'a>(token: &SyntaxToken) -> Doc<'a> {
     let line = |text: &str| {
         let text = text.trim_end_matches([' ', '\t']);
         if is_line_comment(token) {
-            if let Some(content) = text.strip_prefix("--") {
-                if !content.is_empty() && !content.starts_with(' ') && !content.starts_with('\t') {
-                    return Doc::text(format!("-- {content}"));
-                }
+            if let Some(content) = text.strip_prefix("--")
+                && !content.is_empty()
+                && !content.starts_with(' ')
+                && !content.starts_with('\t')
+            {
+                return Doc::text(format!("-- {content}"));
             }
         } else if align_stars && text.trim_start().starts_with('*') {
             return Doc::text(format!(" {}", text.trim()));

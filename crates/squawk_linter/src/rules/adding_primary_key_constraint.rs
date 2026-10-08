@@ -16,8 +16,24 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                     ast::AlterTableAction::AddConstraint(add_constraint) => {
                         if let Some(ast::Constraint::PrimaryKeyConstraint(primary_key_constraint)) =
                             add_constraint.constraint()
+                            && primary_key_constraint.using_index().is_none()
                         {
-                            if primary_key_constraint.using_index().is_none() {
+                            ctx.report(
+                                Violation::for_node(
+                                    Rule::AddingSerialPrimaryKeyField,
+                                    message.to_string(),
+                                    primary_key_constraint.syntax(),
+                                )
+                                .help(help),
+                            );
+                        }
+                    }
+                    ast::AlterTableAction::AddColumn(add_column) => {
+                        for constraint in add_column.constraints() {
+                            if let ast::Constraint::PrimaryKeyConstraint(primary_key_constraint) =
+                                constraint
+                                && primary_key_constraint.using_index().is_none()
+                            {
                                 ctx.report(
                                     Violation::for_node(
                                         Rule::AddingSerialPrimaryKeyField,
@@ -26,24 +42,6 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                     )
                                     .help(help),
                                 );
-                            }
-                        }
-                    }
-                    ast::AlterTableAction::AddColumn(add_column) => {
-                        for constraint in add_column.constraints() {
-                            if let ast::Constraint::PrimaryKeyConstraint(primary_key_constraint) =
-                                constraint
-                            {
-                                if primary_key_constraint.using_index().is_none() {
-                                    ctx.report(
-                                        Violation::for_node(
-                                            Rule::AddingSerialPrimaryKeyField,
-                                            message.to_string(),
-                                            primary_key_constraint.syntax(),
-                                        )
-                                        .help(help),
-                                    );
-                                }
                             }
                         }
                     }

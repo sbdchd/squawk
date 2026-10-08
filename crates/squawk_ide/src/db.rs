@@ -205,7 +205,7 @@ impl Binders<'_> {
         name: &N,
         kind: SymbolKind,
         schemas: &ResolvedSchemas,
-        table: &Option<Name>,
+        table: Option<&Name>,
     ) -> Option<InFile<SyntaxNodePtr>> {
         self.find(|binder| binder.lookup_with_table(name, kind, schemas, table))
     }

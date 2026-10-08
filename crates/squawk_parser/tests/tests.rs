@@ -197,7 +197,7 @@ fn parse_text(text: &str) -> (String, Option<String>) {
                     .fold(true)
                     .annotation(AnnotationKind::Primary.span(range.clone())),
             );
-            let rendered = renderer.render(&[group]).to_string();
+            let rendered = renderer.render(&[group]).clone();
 
             out.push_str(&rendered);
             out.push('\n');

@@ -1324,7 +1324,7 @@ fn resolve_constraint(
             &constraint_name,
             SymbolKind::Constraint,
             &schemas,
-            &Some(owner_name),
+            Some(&owner_name),
         ),
         None => binder.lookup_with(&constraint_name, SymbolKind::Constraint, &schemas),
     }?;
@@ -1814,7 +1814,7 @@ pub(crate) fn resolve_policy_ref(
         &Name::from_node(policy_ref),
         SymbolKind::Policy,
         &schemas,
-        &Some(table_name),
+        Some(&table_name),
     )?;
     Some(smallvec![Location::new(
         ptr.file_id,
@@ -1858,7 +1858,7 @@ pub(crate) fn resolve_rule_ref(
         &Name::from_node(rule_ref),
         SymbolKind::Rule,
         &schemas,
-        &Some(table_name),
+        Some(&table_name),
     )?;
     Some(smallvec![Location::new(
         ptr.file_id,
@@ -1934,7 +1934,7 @@ pub(crate) fn resolve_trigger_ref(
         &Name::from_node(trigger_ref),
         SymbolKind::Trigger,
         &schemas,
-        &Some(table_name),
+        Some(&table_name),
     )?;
     Some(smallvec![Location::new(
         ptr.file_id,
@@ -2356,18 +2356,16 @@ fn resolve_select_qualified_column_ptr(
         }
     };
 
-    if schema.is_none() {
-        if resolve_cte_table(column_name_ref, &table_name).is_some() {
-            if let Some(cte_column_ptr) = resolve_cte_column(
-                db,
-                InFile::new(file, column_name_ref),
-                &table_name,
-                &column_name,
-            ) {
-                return Some(cte_column_ptr);
-            }
-            return None;
+    if schema.is_none() && resolve_cte_table(column_name_ref, &table_name).is_some() {
+        if let Some(cte_column_ptr) = resolve_cte_column(
+            db,
+            InFile::new(file, column_name_ref),
+            &table_name,
+            &column_name,
+        ) {
+            return Some(cte_column_ptr);
         }
+        return None;
     }
 
     let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
@@ -3882,11 +3880,11 @@ fn find_column_in_from_clause_with_skip(
     let mut column_index = 0usize;
     for from_item in ast_nav::iter_from_clause(from_clause) {
         let item_skip = skip_column_count.saturating_sub(column_index);
-        if let Some(count) = count_columns_for_from_item(db, InFile::new(file, &from_item)) {
-            if item_skip >= count {
-                column_index = column_index.saturating_add(count);
-                continue;
-            }
+        if let Some(count) = count_columns_for_from_item(db, InFile::new(file, &from_item))
+            && item_skip >= count
+        {
+            column_index = column_index.saturating_add(count);
+            continue;
         }
 
         let Some((schema, table_name)) = name::schema_and_table_from_from_item(&from_item) else {
@@ -4906,11 +4904,11 @@ fn resolve_from_clause_column_after_index(
     let mut column_index = 0usize;
     for from_item in ast_nav::iter_from_clause(from_clause.value) {
         let item_skip = skip_column_count.saturating_sub(column_index);
-        if let Some(count) = count_columns_for_from_item(db, InFile::new(file, &from_item)) {
-            if item_skip >= count {
-                column_index = column_index.saturating_add(count);
-                continue;
-            }
+        if let Some(count) = count_columns_for_from_item(db, InFile::new(file, &from_item))
+            && item_skip >= count
+        {
+            column_index = column_index.saturating_add(count);
+            continue;
         }
 
         if let Some(result) = resolve_from_item_column_by_name_after_index(
@@ -4939,11 +4937,11 @@ fn resolve_from_clause_for_cte_star(
     let mut column_index = 0usize;
     for from_item in ast_nav::iter_from_clause(from_clause.value) {
         let item_skip = skip_column_count.saturating_sub(column_index);
-        if let Some(count) = count_columns_for_from_item(db, InFile::new(file, &from_item)) {
-            if item_skip >= count {
-                column_index = column_index.saturating_add(count);
-                continue;
-            }
+        if let Some(count) = count_columns_for_from_item(db, InFile::new(file, &from_item))
+            && item_skip >= count
+        {
+            column_index = column_index.saturating_add(count);
+            continue;
         }
 
         if let Some(result) = resolve_from_item_for_cte_star(
@@ -5484,7 +5482,7 @@ fn resolve_composite_type_field_ptr(
             return Some(result);
         }
 
-        let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
+        let base_name_ref = ast_nav::unwrap_paren_expr(base).find_map(|e| match e {
             ast::Expr::NameRef(nr) => Some(nr),
             ast::Expr::FieldExpr(field_expr) => field_expr.field(),
             _ => None,

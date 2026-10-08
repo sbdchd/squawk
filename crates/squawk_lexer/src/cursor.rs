@@ -50,7 +50,7 @@ impl<'a> Cursor<'a> {
 
     /// Returns amount of already consumed symbols.
     pub(crate) fn pos_within_token(&self) -> u32 {
-        (self.len_remaining - self.chars.as_str().len()) as u32
+        u32::try_from(self.len_remaining - self.chars.as_str().len()).unwrap()
     }
 
     /// Resets the number of bytes consumed to 0.

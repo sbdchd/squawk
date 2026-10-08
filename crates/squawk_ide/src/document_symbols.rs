@@ -999,9 +999,10 @@ mod tests {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());
         let symbols = document_symbols(&db, file);
-        if !symbols.is_empty() {
-            panic!("Symbols found. If this is expected, use `symbols` instead.")
-        }
+        assert!(
+            symbols.is_empty(),
+            "Symbols found. If this is expected, use `symbols` instead."
+        );
     }
 
     #[must_use]
@@ -1009,9 +1010,10 @@ mod tests {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());
         let symbols = document_symbols(&db, file);
-        if symbols.is_empty() {
-            panic!("No symbols found. If this is expected, use `symbols_not_found` instead.")
-        }
+        assert!(
+            !symbols.is_empty(),
+            "No symbols found. If this is expected, use `symbols_not_found` instead."
+        );
 
         let mut output = vec![];
         for symbol in symbols {
@@ -1021,7 +1023,6 @@ mod tests {
         Renderer::plain()
             .decor_style(DecorStyle::Unicode)
             .render(&output)
-            .to_string()
     }
 
     fn symbol_to_group<'a>(symbol: &DocumentSymbol, sql: &'a str) -> Group<'a> {
@@ -1076,7 +1077,7 @@ mod tests {
                     .label("full range"),
             );
 
-        let mut group = Level::INFO.primary_title(title.clone()).element(snippet);
+        let mut group = Level::INFO.primary_title(title).element(snippet);
 
         if !symbol.children.is_empty() {
             let child_labels: Vec<String> = symbol
@@ -1753,12 +1754,12 @@ prepare stmt as select 1;
 
     #[test]
     fn empty_file() {
-        symbols_not_found("")
+        symbols_not_found("");
     }
 
     #[test]
     fn non_create_statements() {
-        symbols_not_found("select * from users;")
+        symbols_not_found("select * from users;");
     }
 
     #[test]

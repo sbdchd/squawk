@@ -308,7 +308,7 @@ impl ast::Literal {
                 SyntaxKind::DOLLAR_QUOTED_STRING => {
                     let tag = dollar_quote_tag(token.text())?;
                     let inner = strip_dollar_quotes(token.text())?;
-                    out.push_str(inner, start + TextSize::new(tag.len() as u32 + 2));
+                    out.push_str(inner, start + TextSize::try_from(tag.len() + 2).unwrap());
                     return Some(out);
                 }
                 SyntaxKind::NATIONAL_STRING => {
@@ -1812,7 +1812,7 @@ fn name() {
             .unwrap()
             .name()
             .unwrap();
-        name.text().to_string()
+        name.text()
     }
 }
 
@@ -1843,7 +1843,7 @@ fn name_ref() {
         let ast::Expr::NameRef(name_ref) = target.expr().unwrap() else {
             unreachable!()
         };
-        name_ref.text().to_string()
+        name_ref.text()
     }
 }
 
@@ -1868,7 +1868,7 @@ fn unicode_quoted_name_keeps_doubled_single_quotes() {
         .name()
         .unwrap();
 
-    assert_snapshot!(name.text().to_string(), @"a''b");
+    assert_snapshot!(name.text(), @"a''b");
 }
 
 #[test]
@@ -2094,8 +2094,7 @@ fn cast_expr() {
                     .next()
                     .unwrap()
                     .expr()
-                    .unwrap()
-                    .clone(),
+                    .unwrap(),
                 _ => unreachable!(),
             })
             .next()
@@ -2285,11 +2284,13 @@ fn decode_literal(sql: &str) -> String {
         .map(|(i, _)| i)
         .chain(std::iter::once(text.len()));
 
+    use std::fmt::Write as _;
+
     let mut out = format!("{text:?}\n");
     for offset in offsets {
-        let pos = usize::from(decoded.source_pos(TextSize::new(offset as u32)));
+        let pos = usize::from(decoded.source_pos(TextSize::try_from(offset).unwrap()));
         let at = sql[pos..].chars().next();
-        out.push_str(&format!("  {offset} -> {pos} {at:?}\n"));
+        writeln!(out, "  {offset} -> {pos} {at:?}").unwrap();
     }
     out
 }

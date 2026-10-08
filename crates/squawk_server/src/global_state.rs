@@ -54,7 +54,7 @@ impl GlobalState {
         let threads = std::thread::available_parallelism().unwrap_or(NonZeroUsize::MIN);
         let task_pool = {
             let (sender, receiver) = unbounded();
-            let handle = TaskPool::new_with_threads(sender.clone(), threads);
+            let handle = TaskPool::new_with_threads(sender, threads);
             Handle { handle, receiver }
         };
         let db = Database::default();
@@ -153,7 +153,7 @@ impl GlobalState {
 
     pub(crate) fn run(&mut self, inbox: Receiver<Message>) -> anyhow::Result<()> {
         let outbox = &self.task_pool.receiver.clone();
-        while let Ok(event) = self.next_event(&inbox, outbox) {
+        while let Ok(event) = Self::next_event(&inbox, outbox) {
             let loop_start = Instant::now();
             match event {
                 Event::Inbox(msg) => match msg {
@@ -182,10 +182,10 @@ impl GlobalState {
                             // Instead of having the tasks send directly via the sender
                             // channel, we handle them on the main thread so we can check
                             // for cancellation first.
-                            self.respond(resp)
+                            self.respond(resp);
                         }
                         TaskResult::Retry(req) if !self.is_completed(&req) => {
-                            self.handle_request(req, loop_start)
+                            self.handle_request(req, loop_start);
                         }
                         TaskResult::Retry(_) => (),
                     }
@@ -197,7 +197,6 @@ impl GlobalState {
     }
 
     fn next_event(
-        &self,
         inbox: &Receiver<Message>,
         outbox: &Receiver<TaskResult>,
     ) -> Result<Event, crossbeam_channel::RecvError> {

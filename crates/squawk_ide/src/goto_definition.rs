@@ -365,7 +365,7 @@ mod test {
 
         let mut snippet = Snippet::source(current_file.content(db).as_ref()).fold(true);
         if multi_file {
-            snippet = snippet.path(*file_paths.get(&current_file).unwrap());
+            snippet = snippet.path(file_paths[&current_file]);
         }
         if let Some(current_dests) = dests_by_file.remove(&current_file) {
             snippet = annotate_destinations(snippet, current_dests);
@@ -375,7 +375,7 @@ mod test {
         let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
 
         for (dest_file, dests) in dests_by_file {
-            let path = file_paths.get(&dest_file).unwrap();
+            let path = &file_paths[&dest_file];
             let other_snippet = Snippet::source(dest_file.content(db).as_ref())
                 .path(*path)
                 .fold(true);
@@ -391,7 +391,6 @@ mod test {
         Some(
             renderer
                 .render(&groups)
-                .to_string()
                 // hacky cleanup to make the text shorter
                 .replace("info: definition", ""),
         )
@@ -468,7 +467,7 @@ select case when x > 1 then 1 else 2 end;$0
             "
 select case when x > 1 then$0 1 else 2 end;
 ",
-        )
+        );
     }
 
     #[test]
@@ -6969,7 +6968,7 @@ set bar.search_path to foo, public;
 create table foo.t();
 drop table t$0;
 ",
-        )
+        );
     }
 
     #[test]
@@ -7296,7 +7295,7 @@ set search_path to '';
 create table public.t();
 drop table t$0;
 ",
-        )
+        );
     }
 
     #[test]

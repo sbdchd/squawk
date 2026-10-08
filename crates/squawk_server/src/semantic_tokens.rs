@@ -22,5 +22,5 @@ pub(crate) const SUPPORTED_MODIFIERS: &[SemanticTokenModifiers] = &[
 ];
 
 pub(crate) fn type_index(ty: SemanticTokenTypes) -> u32 {
-    SUPPORTED_TYPES.iter().position(|it| *it == ty).unwrap() as u32
+    u32::try_from(SUPPORTED_TYPES.iter().position(|it| *it == ty).unwrap()).unwrap()
 }

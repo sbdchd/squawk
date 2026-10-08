@@ -1,3 +1,5 @@
+use std::fmt::Write as _;
+
 use crate::ast_nav;
 use crate::collect;
 use crate::comments::preceding_comment;
@@ -55,11 +57,7 @@ impl Hover {
         );
 
         if let Some(comment) = &self.comment {
-            out.push_str(&format!(
-                "---
-{comment}
-"
-            ))
+            writeln!(out, "---\n{comment}").unwrap();
         }
 
         out
@@ -94,10 +92,7 @@ fn hover_with_preceding_comment(snippet: impl Into<String>, node: &SyntaxNode) -
 
 fn hover_column_with_preceding_comment(snippet: impl Into<String>, def_node: &SyntaxNode) -> Hover {
     let snippet = snippet.into();
-    if let Some(definition_node) = def_node
-        .ancestors()
-        .find_map(|node| ast::Column::cast(node.clone()))
-    {
+    if let Some(definition_node) = def_node.ancestors().find_map(ast::Column::cast) {
         return hover_with_preceding_comment(snippet, definition_node.syntax());
     }
     Hover::snippet(snippet)
@@ -123,7 +118,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             return Some(result);
         }
 
-        if let Some(target) = ast::Target::cast(parent.clone())
+        if let Some(target) = ast::Target::cast(parent)
             && target.star_token().is_some()
             && let Some(result) = hover_unqualified_star(db, InFile::new(file, target))
         {
@@ -1149,7 +1144,7 @@ fn hover_qualified_star_columns_from_subquery(
                 let table_ptrs = unqualified_star_table_ptrs(db, InFile::new(file, &target))?;
                 for table_ptr in table_ptrs {
                     if let Some(columns) = hover_qualified_star_columns(db, table_ptr) {
-                        results.push(columns)
+                        results.push(columns);
                     }
                 }
                 continue;
@@ -2211,7 +2206,6 @@ mod test {
             return Some(
                 renderer
                     .render(&[group])
-                    .to_string()
                     // neater
                     .replace("info: hover:", "hover:"),
             );
@@ -6182,7 +6176,7 @@ select U&'\0061\0308b$0c';
         text
         ```
         ---
-        value of literal: ` äbc `
+        value of literal: ` a\u{0308}bc `
         ");
     }
 

@@ -1,4 +1,6 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/tests.rs
+use std::fmt::Write as _;
+
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use camino::{Utf8Path, Utf8PathBuf};
 use dir_test::{Fixture, dir_test};
@@ -30,7 +32,7 @@ pub(crate) fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
                 .primary_title(syntax_error.message())
                 .id(label)
                 .element(snippet)])
-            .to_string();
+            .clone();
 
         rendered.push_str(&rendered_error);
         rendered.push('\n');
@@ -131,7 +133,7 @@ fn plpgsql_fixture(sql: &str) -> (String, Vec<SyntaxError>) {
         if !buffer.is_empty() {
             buffer.push_str("---\n");
         }
-        buffer.push_str(&format!("{:#?}", body.syntax()));
+        write!(buffer, "{:#?}", body.syntax()).unwrap();
         errors.extend(body.errors());
     }
 

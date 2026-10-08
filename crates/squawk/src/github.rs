@@ -38,23 +38,23 @@ fn get_github_private_key(
 }
 
 fn create_gh_app(
-    github_api_url: &Option<String>,
-    github_install_id: &Option<i64>,
-    github_app_id: &Option<i64>,
-    github_token: &Option<String>,
-    github_private_key: &Option<String>,
-    github_private_key_base64: &Option<String>,
+    github_api_url: Option<&str>,
+    github_install_id: Option<i64>,
+    github_app_id: Option<i64>,
+    github_token: Option<&str>,
+    github_private_key: Option<&str>,
+    github_private_key_base64: Option<&str>,
 ) -> Result<Box<dyn GitHubApi>> {
-    if let Some(github_install_id) = github_install_id {
-        if let Some(github_app_id) = github_app_id {
-            info!("using github app client");
-            let gh_private_key = get_github_private_key(
-                github_private_key.clone(),
-                github_private_key_base64.clone(),
-            )?;
-            let app = app::GitHub::new(&gh_private_key, *github_app_id, *github_install_id)?;
-            return Ok(Box::new(app));
-        }
+    if let Some(github_install_id) = github_install_id
+        && let Some(github_app_id) = github_app_id
+    {
+        info!("using github app client");
+        let gh_private_key = get_github_private_key(
+            github_private_key.map(str::to_owned),
+            github_private_key_base64.map(str::to_owned),
+        )?;
+        let app = app::GitHub::new(&gh_private_key, github_app_id, github_install_id)?;
+        return Ok(Box::new(app));
     }
 
     if let Some(github_token) = github_token {
@@ -64,7 +64,7 @@ fn create_gh_app(
             None => actions::GitHub::new(github_token),
         };
         return Ok(Box::new(client));
-    };
+    }
     bail!(
         "Missing GitHub credentials:
 
@@ -81,7 +81,7 @@ fn create_gh_app(
 
 const COMMENT_HEADER: &str = "# Squawk Report";
 
-pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
+pub(crate) fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
     let args = cfg
         .upload_to_github_args
         .context("Should always have args for the github command")?;
@@ -107,12 +107,12 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
         };
 
     let github_app = create_gh_app(
-        &github_api_url,
-        &github_install_id,
-        &github_app_id,
-        &github_token,
-        &github_private_key,
-        &github_private_key_base64,
+        github_api_url.as_deref(),
+        github_install_id,
+        github_app_id,
+        github_token.as_deref(),
+        github_private_key.as_deref(),
+        github_private_key_base64.as_deref(),
     )?;
 
     let found_paths = find_paths(&paths, &cfg.excluded_paths)?;

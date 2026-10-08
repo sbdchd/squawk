@@ -111,7 +111,7 @@ impl<'a> LexedStr<'a> {
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
         self.kind.push(kind);
-        self.start.push(offset as u32);
+        self.start.push(u32::try_from(offset).unwrap());
     }
 }
 
@@ -159,7 +159,7 @@ impl<'a> Converter<'a> {
     }
 
     fn push(&mut self, kind: SyntaxKind, len: usize, err: Option<(&str, ops::Range<u32>)>) {
-        let token_start = self.offset as u32;
+        let token_start = u32::try_from(self.offset).unwrap();
         self.res.push(kind, self.offset);
         self.offset += len;
 
@@ -258,7 +258,8 @@ impl<'a> Converter<'a> {
                         err_range = Some(0..*trailing_junk_start);
                     } else if (*trailing_junk_start as usize) < token_text.len() {
                         err = "trailing junk after positional parameter";
-                        err_range = Some(*trailing_junk_start..token_text.len() as u32);
+                        err_range =
+                            Some(*trailing_junk_start..u32::try_from(token_text.len()).unwrap());
                     }
                     SyntaxKind::POSITIONAL_PARAM
                 }
@@ -267,7 +268,7 @@ impl<'a> Converter<'a> {
                     uescape,
                 } => {
                     if !terminated {
-                        err = "Missing trailing \" to terminate the quoted identifier"
+                        err = "Missing trailing \" to terminate the quoted identifier";
                     } else if is_empty_quoted_ident(token_text, *uescape) {
                         err = "empty delimited identifier";
                     }
@@ -277,7 +278,12 @@ impl<'a> Converter<'a> {
         };
 
         let err = if err.is_empty() { None } else { Some(err) };
-        let err = err.map(|msg| (msg, err_range.unwrap_or(0..token_text.len() as u32)));
+        let err = err.map(|msg| {
+            (
+                msg,
+                err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
+            )
+        });
         self.push(syntax_kind, token_text.len(), err);
     }
 
@@ -299,11 +305,11 @@ impl<'a> Converter<'a> {
                         let prefix_len = 2u32;
                         let digits = &token_text[prefix_len as usize..trailing_junk_start as usize];
                         let base = base as u32;
-                        let token_start = self.offset as u32;
+                        let token_start = u32::try_from(self.offset).unwrap();
                         for (i, c) in digits.char_indices() {
                             if c != '_' && c.to_digit(base).is_none() {
-                                let start = token_start + prefix_len + i as u32;
-                                let end = start + c.len_utf8() as u32;
+                                let start = token_start + prefix_len + u32::try_from(i).unwrap();
+                                let end = start + u32::try_from(c.len_utf8()).unwrap();
                                 self.res.error.push(LexError {
                                     msg: format!("invalid digit for a base {base} literal"),
                                     range: start..end,
@@ -313,7 +319,8 @@ impl<'a> Converter<'a> {
                     }
                     if (trailing_junk_start as usize) < token_text.len() {
                         err = Some("trailing junk after numeric literal".into());
-                        err_range = Some(trailing_junk_start..token_text.len() as u32);
+                        err_range =
+                            Some(trailing_junk_start..u32::try_from(token_text.len()).unwrap());
                     }
                 }
                 SyntaxKind::INT_NUMBER
@@ -327,7 +334,7 @@ impl<'a> Converter<'a> {
                     err_range = Some(exponent_start..exponent_start + 1);
                 } else if (trailing_junk_start as usize) < token_text.len() {
                     err = Some("trailing junk after numeric literal".into());
-                    err_range = Some(trailing_junk_start..token_text.len() as u32);
+                    err_range = Some(trailing_junk_start..u32::try_from(token_text.len()).unwrap());
                 }
                 SyntaxKind::NUMERIC_NUMBER
             }
@@ -407,9 +414,12 @@ impl<'a> Converter<'a> {
             }
         };
 
-        let err = err
-            .as_deref()
-            .map(|msg| (msg, err_range.unwrap_or(0..token_text.len() as u32)));
+        let err = err.as_deref().map(|msg| {
+            (
+                msg,
+                err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
+            )
+        });
         self.push(syntax_kind, token_text.len(), err);
     }
 
@@ -484,11 +494,11 @@ impl<'a> Converter<'a> {
     }
 
     fn push_content_error(&mut self, msg: String, start: usize, len: usize) {
-        let token_start = self.offset as u32;
-        let start = token_start + start as u32;
+        let token_start = u32::try_from(self.offset).unwrap();
+        let start = token_start + u32::try_from(start).unwrap();
         self.res.error.push(LexError {
             msg,
-            range: start..start + len as u32,
+            range: start..start + u32::try_from(len).unwrap(),
         });
     }
 }
@@ -512,7 +522,7 @@ mod tests {
                     .fold(true)
                     .annotation(AnnotationKind::Primary.span(span)),
             );
-            res.push_str(&renderer.render(&[group]).to_string());
+            res.push_str(&renderer.render(&[group]).clone());
             res.push('\n');
         }
 

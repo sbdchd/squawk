@@ -8,37 +8,52 @@ pub(crate) fn ban_alter_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         if let ast::Stmt::AlterTable(table) = stmt {
             for action in table.actions() {
-                if let ast::AlterTableAction::AlterColumn(column) = action {
-                    if let Some(option) = column.option() {
-                        match option {
-                            ast::AlterColumnOption::AddGenerated(node) => {
-                                ctx.report(Violation::for_node(Rule::BanAlterIdentity, "Changing column identity may break inserts from existing clients.".into(), node.syntax()));
-                            }
-                            ast::AlterColumnOption::DropIdentity(node) => {
-                                ctx.report(Violation::for_node(Rule::BanAlterIdentity, "Changing column identity may break inserts from existing clients.".into(), node.syntax()));
-                            }
-                            ast::AlterColumnOption::SetGenerated(node)
-                                if matches!(
-                                    node.generated_when(),
-                                    Some(ast::GeneratedWhen::GeneratedAlways(_))
-                                ) =>
-                            {
-                                ctx.report(Violation::for_node(Rule::BanAlterIdentity, "Changing column identity may break inserts from existing clients.".into(), node.syntax()));
-                            }
-                            ast::AlterColumnOption::SetGeneratedOptions(options) => {
-                                for option in options.set_generated_options() {
-                                    if let ast::SetGeneratedOption::SetGenerated(node) = option {
-                                        if matches!(
-                                            node.generated_when(),
-                                            Some(ast::GeneratedWhen::GeneratedAlways(_))
-                                        ) {
-                                            ctx.report(Violation::for_node(Rule::BanAlterIdentity, "Changing column identity may break inserts from existing clients.".into(), node.syntax()));
-                                        }
-                                    }
+                if let ast::AlterTableAction::AlterColumn(column) = action
+                    && let Some(option) = column.option()
+                {
+                    match option {
+                        ast::AlterColumnOption::AddGenerated(node) => {
+                            ctx.report(Violation::for_node(
+                                Rule::BanAlterIdentity,
+                                "Changing column identity may break inserts from existing clients."
+                                    .into(),
+                                node.syntax(),
+                            ));
+                        }
+                        ast::AlterColumnOption::DropIdentity(node) => {
+                            ctx.report(Violation::for_node(
+                                Rule::BanAlterIdentity,
+                                "Changing column identity may break inserts from existing clients."
+                                    .into(),
+                                node.syntax(),
+                            ));
+                        }
+                        ast::AlterColumnOption::SetGenerated(node)
+                            if matches!(
+                                node.generated_when(),
+                                Some(ast::GeneratedWhen::GeneratedAlways(_))
+                            ) =>
+                        {
+                            ctx.report(Violation::for_node(
+                                Rule::BanAlterIdentity,
+                                "Changing column identity may break inserts from existing clients."
+                                    .into(),
+                                node.syntax(),
+                            ));
+                        }
+                        ast::AlterColumnOption::SetGeneratedOptions(options) => {
+                            for option in options.set_generated_options() {
+                                if let ast::SetGeneratedOption::SetGenerated(node) = option
+                                    && matches!(
+                                        node.generated_when(),
+                                        Some(ast::GeneratedWhen::GeneratedAlways(_))
+                                    )
+                                {
+                                    ctx.report(Violation::for_node(Rule::BanAlterIdentity, "Changing column identity may break inserts from existing clients.".into(), node.syntax()));
                                 }
                             }
-                            _ => (),
                         }
+                        _ => (),
                     }
                 }
             }
