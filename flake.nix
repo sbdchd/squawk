@@ -34,10 +34,7 @@
               buildInputs = with final; [
                 libiconv
                 openssl
-              ] ++ lib.optionals final.stdenv.isDarwin (with final.darwin.apple_sdk.frameworks; [
-                CoreFoundation
-                Security
-              ]);
+              ];
 
               meta = with lib; {
                 description = "Linter for PostgreSQL, focused on migrations";
@@ -50,22 +47,24 @@
       in
       {
         packages = {
+          default = pkgs.squawk;
           squawk = pkgs.squawk;
         };
-        defaultPackage = self.packages.${system}.squawk;
-        checks = self.packages;
+        checks.squawk = pkgs.squawk;
 
-        # for debugging
-        inherit pkgs;
-
-        devShell = pkgs.squawk.overrideAttrs (old: {
+        devShells.default = pkgs.mkShell {
           RUST_SRC_PATH = pkgs.rustPlatform.rustLibSrc;
-
-          nativeBuildInputs = old.nativeBuildInputs ++ (with pkgs; [
-            cargo-insta
-            clippy
+          packages = with pkgs; [
+            cargo
+            rustc
             rustfmt
-          ]);
-        });
+            clippy
+            cargo-insta
+            pkg-config
+            rustPlatform.bindgenHook
+            libiconv
+            openssl
+          ];
+        };
       });
 }
