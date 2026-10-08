@@ -733,7 +733,7 @@ alter type textrange1 owner to regress_multirange_owner;
 set role regress_multirange_owner;
 revoke usage on type multitextrange1 from public;  -- fail
 revoke usage on type textrange1 from public;
--- \dT+ *textrange1*
+\dT+ *textrange1*
 create temp table test1(f1 multitextrange1[]);
 revoke usage on type textrange1 from regress_multirange_owner;
 create temp table test2(f1 multitextrange1[]);  -- fail

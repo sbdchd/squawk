@@ -1123,11 +1123,11 @@ ORDER BY c.relname;
 
 SELECT relname, (stats).*
 FROM stats_import.pg_statistic_get_difference('test', 'test_clone')
-/* \gx */;
+\gx
 
 SELECT relname, (stats).*
 FROM stats_import.pg_statistic_get_difference('is_odd', 'is_odd_clone')
-/* \gx */;
+\gx
 
 -- attribute stats exist before a clear, but not after
 SELECT COUNT(*)
@@ -1529,7 +1529,7 @@ SELECT e.most_common_vals, e.most_common_val_nulls,
 FROM pg_stats_ext AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_mcv_exprs' AND
-    e.inherited = false /* \gx */;
+    e.inherited = false \gx
 
 -- Incorrect extended stats kind, mcv not supported
 SELECT pg_catalog.pg_restore_extended_stats(
@@ -1665,7 +1665,7 @@ FROM pg_stats_ext AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_mcv' AND
     e.inherited = false
-/* \gx */;
+\gx
 
 -- Check import of all kinds for multirange.
 CREATE STATISTICS stats_import.test_mr_stat
@@ -1769,7 +1769,7 @@ FROM pg_stats_ext AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_mr_stat' AND
     e.inherited = false
-/* \gx */;
+\gx
 
 SELECT e.expr, e.null_frac, e.avg_width, e.n_distinct, e.most_common_vals,
        e.most_common_freqs, e.histogram_bounds, e.correlation,
@@ -1779,7 +1779,7 @@ FROM pg_stats_ext_exprs AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_mr_stat' AND
     e.inherited = false
-/* \gx */;
+\gx
 
 -- Incorrect extended stats kind, exprs not supported
 SELECT pg_catalog.pg_restore_extended_stats(
@@ -2070,7 +2070,7 @@ FROM pg_stats_ext_exprs AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_clone' AND
     e.inherited = false
-/* \gx */;
+\gx
 -- ok: exprs last null
 SELECT pg_catalog.pg_restore_extended_stats(
   'schemaname', 'stats_import',
@@ -2101,7 +2101,7 @@ FROM pg_stats_ext_exprs AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_clone' AND
     e.inherited = false
-/* \gx */;
+\gx
 -- ok: both exprs
 SELECT pg_catalog.pg_restore_extended_stats(
   'schemaname', 'stats_import',
@@ -2142,7 +2142,7 @@ FROM pg_stats_ext_exprs AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_clone' AND
     e.inherited = false
-/* \gx */;
+\gx
 
 -- A statistics object for testing MCELEM values in expressions
 CREATE STATISTICS stats_import.test_stat_mcelem
@@ -2266,7 +2266,7 @@ FROM pg_stats_ext_exprs AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_mcelem' AND
     e.inherited = false
-/* \gx */;
+\gx
 
 -- ok, with warning: extra exprs param
 SELECT pg_catalog.pg_restore_extended_stats(
@@ -2298,7 +2298,7 @@ FROM pg_stats_ext_exprs AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_mcelem' AND
     e.inherited = false
-/* \gx */;
+\gx
 
 -- bad: exprs param which is a prefix of a valid key name
 SELECT pg_catalog.pg_restore_extended_stats(
@@ -2328,7 +2328,7 @@ FROM pg_stats_ext_exprs AS e
 WHERE e.statistics_schemaname = 'stats_import' AND
     e.statistics_name = 'test_stat_tsvec' AND
     e.inherited = false
-/* \gx */;
+\gx
 
 -- Test the ability of pg_restore_extended_stats() to import all of the
 -- statistic values from an extended statistic object that has been
@@ -2379,11 +2379,11 @@ AND e.statistics_name = 'test_stat';
 
 SELECT statname, (stats).*
 FROM stats_import.pg_stats_ext_get_difference('test_stat', 'test_stat_clone')
-/* \gx */;
+\gx
 
 SELECT statname, (stats).*
 FROM stats_import.pg_stats_ext_exprs_get_difference('test_stat', 'test_stat_clone')
-/* \gx */;
+\gx
 
 
 ANALYZE stats_import.test_mr;
@@ -2428,11 +2428,11 @@ AND e.statistics_name = 'test_mr_stat';
 
 SELECT statname, (stats).*
 FROM stats_import.pg_stats_ext_get_difference('test_mr_stat', 'test_mr_stat_clone')
-/* \gx */;
+\gx
 
 SELECT statname, (stats).*
 FROM stats_import.pg_stats_ext_exprs_get_difference('test_mr_stat', 'test_mr_stat_clone')
-/* \gx */;
+\gx
 
 -- range_length_histogram, range_empty_frac, and range_bounds_histogram
 -- have been added to pg_stats_ext_exprs in PostgreSQL 19.  When dumping

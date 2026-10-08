@@ -3493,6 +3493,7 @@ dependencies = [
  "rustc-hash 2.1.1",
  "serde",
  "serde_json",
+ "squawk-lexer",
  "squawk-line-index",
  "toml",
  "ungrammar",

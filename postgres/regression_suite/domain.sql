@@ -60,11 +60,11 @@ INSERT INTO basictest values ('88', 'haha', 'short', '123.1212');    -- Truncate
 -- Test copy
 COPY basictest (testvarchar) FROM stdin; -- fail
 -- notsoshorttext
--- \.
+\.
 
 COPY basictest (testvarchar) FROM stdin;
 -- short
--- \.
+\.
 
 select * from basictest;
 
@@ -125,11 +125,11 @@ select array_dims(testint4arr), array_dims(testchar4arr) from domarrtest;
 COPY domarrtest FROM stdin;
 -- {3,4}	{q,w,e}
 -- \N	\N
--- \.
+\.
 
 COPY domarrtest FROM stdin;	-- fail
 -- {3,4}	{qwerty,w,e}
--- \.
+\.
 
 select * from domarrtest;
 
@@ -185,7 +185,7 @@ explain (verbose, costs off)
   update dcomptable set d1.r = (d1).r - 1, d1.i = (d1).i + 1 where (d1).i > 0;
 create rule silly as on delete to dcomptable do instead
   update dcomptable set d1.r = (d1).r - 1, d1.i = (d1).i + 1 where (d1).i > 0;
--- \d+ dcomptable
+\d+ dcomptable
 
 create function makedcomp(r float8, i float8) returns dcomptype
 as 'select row(r, i)' language sql;
@@ -260,7 +260,7 @@ explain (verbose, costs off)
 create rule silly as on delete to dcomptable do instead
   update dcomptable set d1[1].r = d1[1].r - 1, d1[1].i = d1[1].i + 1
     where d1[1].i > 0;
--- \d+ dcomptable
+\d+ dcomptable
 
 drop table dcomptable;
 drop type comptype cascade;
@@ -355,18 +355,18 @@ INSERT INTO nulltest values ('a', 'b', 'c', NULL, 'd'); -- Good
 -- Test copy
 COPY nulltest FROM stdin; --fail
 -- a	b	\N	d	d
--- \.
+\.
 
 COPY nulltest FROM stdin; --fail
 -- a	b	c	d	\N
--- \.
+\.
 
 -- Last row is bad
 COPY nulltest FROM stdin;
 -- a	b	c	\N	c
 -- a	b	c	\N	d
 -- a	b	c	\N	a
--- \.
+\.
 
 select * from nulltest;
 
@@ -414,7 +414,7 @@ insert into defaulttest default values;
 -- Test defaults with copy
 COPY defaulttest(col5) FROM stdin;
 -- 42
--- \.
+\.
 
 select * from defaulttest;
 
@@ -483,7 +483,7 @@ alter domain con add constraint t check (VALUE < 1); -- fails
 alter domain con add constraint t check (VALUE < 34);
 alter domain con add check (VALUE > 0);
 
--- \dD con
+\dD con
 
 insert into domcontest values (-5); -- fails
 insert into domcontest values (42); -- fails
@@ -516,7 +516,7 @@ select count(*) from pg_constraint where contypid = 'connotnull'::regtype and co
 alter domain connotnull add constraint constr1bis not null;  -- redundant
 select count(*) from pg_constraint where contypid = 'connotnull'::regtype and contype = 'n';
 
--- \dD connotnull
+\dD connotnull
 
 update domconnotnulltest set col1 = null; -- fails
 

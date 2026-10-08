@@ -1,0 +1,24 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r\"select 1 \\echo x \\gset x_\nselect $1 \\parse stmt\nselect 2 \\r\")"
+---
+[
+    "select" @ Ident,
+    " " @ Whitespace,
+    "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    " " @ Whitespace,
+    "\\echo x " @ PsqlCommand { ends_query: false },
+    "\\gset x_" @ PsqlCommand { ends_query: true },
+    "\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "$1" @ PositionalParam { trailing_junk_start: 2 },
+    " " @ Whitespace,
+    "\\parse stmt" @ PsqlCommand { ends_query: true },
+    "\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    " " @ Whitespace,
+    "\\r" @ PsqlCommand { ends_query: true },
+]

@@ -6985,8 +6985,12 @@ Stmt =
 | EmptyStmt
 
 
+PsqlCommand =
+  '@psql_command_text'
+| '@psql_terminator_text'
+
 SourceFile =
-  Stmt*
+  (Stmt | PsqlCommand)*
 
 NullsDistinctOption =
   NullsDistinct

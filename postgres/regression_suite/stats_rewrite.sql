@@ -7,7 +7,7 @@
 CREATE TABLE test_2pc_timestamp (a int) WITH (autovacuum_enabled = false);
 VACUUM ANALYZE test_2pc_timestamp;
 SELECT last_analyze AS last_vacuum_analyze
-  FROM pg_stat_all_tables WHERE relname = 'test_2pc_timestamp' /* \gset */;
+  FROM pg_stat_all_tables WHERE relname = 'test_2pc_timestamp' \gset
 BEGIN;
 ALTER TABLE test_2pc_timestamp ALTER COLUMN a TYPE int;
 PREPARE TRANSACTION 'test';
@@ -115,7 +115,7 @@ DROP TABLE test_2pc_savepoint;
 CREATE TABLE test_timestamp (a int) WITH (autovacuum_enabled = false);
 VACUUM ANALYZE test_timestamp;
 SELECT last_analyze AS last_vacuum_analyze
-  FROM pg_stat_all_tables WHERE relname = 'test_timestamp' /* \gset */;
+  FROM pg_stat_all_tables WHERE relname = 'test_timestamp' \gset
 ALTER TABLE test_timestamp ALTER COLUMN a TYPE bigint;
 SELECT pg_stat_force_next_flush();
 SELECT last_analyze = 'last_vacuum_analyze'::timestamptz AS same_vacuum_ts

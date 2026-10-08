@@ -1,0 +1,23 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r\"SELECT 1\\; SELECT 2\\; SELECT 3\\:\\:int;\")"
+---
+[
+    "SELECT" @ Ident,
+    " " @ Whitespace,
+    "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    "\\;" @ Semi,
+    " " @ Whitespace,
+    "SELECT" @ Ident,
+    " " @ Whitespace,
+    "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    "\\;" @ Semi,
+    " " @ Whitespace,
+    "SELECT" @ Ident,
+    " " @ Whitespace,
+    "3" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    "\\:" @ Colon,
+    "\\:" @ Colon,
+    "int" @ Ident,
+    ";" @ Semi,
+]

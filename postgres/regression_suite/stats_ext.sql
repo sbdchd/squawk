@@ -103,7 +103,7 @@ CREATE STATISTICS ab1_b_c_stats ON b, c FROM ab1;
 CREATE STATISTICS ab1_a_b_c_stats ON a, b, c FROM ab1;
 CREATE STATISTICS ab1_b_a_stats ON b, a FROM ab1;
 ALTER TABLE ab1 DROP COLUMN a;
--- \d ab1
+\d ab1
 -- Ensure statistics are dropped when table is
 SELECT stxname FROM pg_statistic_ext WHERE stxname LIKE 'ab1%';
 DROP TABLE ab1;
@@ -118,7 +118,7 @@ ANALYZE ab1;
 ALTER TABLE ab1 ALTER a SET STATISTICS -1;
 -- setting statistics target 0 skips the statistics, without printing any message, so check catalog
 ALTER STATISTICS ab1_a_b_stats SET STATISTICS 0;
--- \d ab1
+\d ab1
 ANALYZE ab1;
 SELECT stxname,
        replace(d.stxdndistinct, '}, ', E'},\n') AS stxdndistinct,
@@ -127,7 +127,7 @@ SELECT stxname,
   FROM pg_statistic_ext s LEFT JOIN pg_statistic_ext_data d ON (d.stxoid = s.oid)
  WHERE s.stxname = 'ab1_a_b_stats';
 ALTER STATISTICS ab1_a_b_stats SET STATISTICS -1;
--- \d+ ab1
+\d+ ab1
 -- partial analyze doesn't build stats either
 ANALYZE ab1 (a);
 ANALYZE ab1;
@@ -1649,28 +1649,28 @@ insert into stts_t1 select i,i from generate_series(1,100) i;
 analyze stts_t1;
 set search_path to public, stts_s1, stts_s2, tststats;
 
--- \dX
--- \dX stts_t*
--- \dX *stts_hoge
--- \dX+
--- \dX+ stts_t*
--- \dX+ *stts_hoge
--- \dX+ stts_s2.stts_yama
+\dX
+\dX stts_t*
+\dX *stts_hoge
+\dX+
+\dX+ stts_t*
+\dX+ *stts_hoge
+\dX+ stts_s2.stts_yama
 
 create statistics (mcv) ON a, b, (a+b), (a-b) FROM stts_t1;
 create statistics (mcv) ON a, b, (a+b), (a-b) FROM stts_t1;
 create statistics (mcv) ON (a+b), (a-b) FROM stts_t1;
--- \dX stts_t*expr*
+\dX stts_t*expr*
 drop statistics stts_t1_a_b_expr_expr_stat;
 drop statistics stts_t1_a_b_expr_expr_stat1;
 drop statistics stts_t1_expr_expr_stat;
 
 set search_path to public, stts_s1;
--- \dX
+\dX
 
 create role regress_stats_ext nosuperuser;
 set role regress_stats_ext;
--- \dX
+\dX
 reset role;
 
 drop table stts_t1, stts_t2, stts_t3;

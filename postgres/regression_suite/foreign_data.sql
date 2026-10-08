@@ -3,10 +3,10 @@
 --
 
 -- directory paths and dlsuffix are passed to us in environment variables
--- \getenv libdir PG_LIBDIR
--- \getenv dlsuffix PG_DLSUFFIX
+\getenv libdir PG_LIBDIR
+\getenv dlsuffix PG_DLSUFFIX
 
--- \set regresslib :libdir '/regress' :dlsuffix
+\set regresslib :libdir '/regress' :dlsuffix
 
 CREATE FUNCTION test_fdw_handler()
     RETURNS fdw_handler
@@ -48,24 +48,24 @@ SELECT * FROM pg_user_mapping;
 -- CREATE FOREIGN DATA WRAPPER
 CREATE FOREIGN DATA WRAPPER foo VALIDATOR bar;            -- ERROR
 CREATE FOREIGN DATA WRAPPER foo;
--- \dew
+\dew
 
 CREATE FOREIGN DATA WRAPPER foo; -- duplicate
 DROP FOREIGN DATA WRAPPER foo;
 CREATE FOREIGN DATA WRAPPER foo OPTIONS (testing '1');
--- \dew+
+\dew+
 
 DROP FOREIGN DATA WRAPPER foo;
 CREATE FOREIGN DATA WRAPPER foo OPTIONS (testing '1', testing '2');   -- ERROR
 CREATE FOREIGN DATA WRAPPER foo OPTIONS (testing '1', another '2');
--- \dew+
+\dew+
 
 DROP FOREIGN DATA WRAPPER foo;
 SET ROLE regress_test_role;
 CREATE FOREIGN DATA WRAPPER foo; -- ERROR
 RESET ROLE;
 CREATE FOREIGN DATA WRAPPER foo VALIDATOR postgresql_fdw_validator;
--- \dew+
+\dew+
 
 -- HANDLER related checks
 CREATE FUNCTION invalid_fdw_handler() RETURNS int LANGUAGE SQL AS 'SELECT 1;';
@@ -87,26 +87,26 @@ ALTER FOREIGN DATA WRAPPER foo OPTIONS (nonexistent 'fdw');         -- ERROR
 -- ALTER FOREIGN DATA WRAPPER foo;                             -- ERROR
 ALTER FOREIGN DATA WRAPPER foo VALIDATOR bar;               -- ERROR
 ALTER FOREIGN DATA WRAPPER foo NO VALIDATOR;
--- \dew+
+\dew+
 
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (a '1', b '2');
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (SET c '4');         -- ERROR
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (DROP c);            -- ERROR
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (ADD x '1', DROP x);
--- \dew+
+\dew+
 
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (DROP a, SET b '3', ADD c '4');
--- \dew+
+\dew+
 
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (a '2');
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (b '4');             -- ERROR
--- \dew+
+\dew+
 
 SET ROLE regress_test_role;
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (ADD d '5');         -- ERROR
 SET ROLE regress_test_role_super;
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (ADD d '5');
--- \dew+
+\dew+
 
 ALTER FOREIGN DATA WRAPPER foo OWNER TO regress_test_role;  -- ERROR
 ALTER FOREIGN DATA WRAPPER foo OWNER TO regress_test_role_super;
@@ -114,10 +114,10 @@ ALTER ROLE regress_test_role_super NOSUPERUSER;
 SET ROLE regress_test_role_super;
 ALTER FOREIGN DATA WRAPPER foo OPTIONS (ADD e '6');         -- ERROR
 RESET ROLE;
--- \dew+
+\dew+
 
 ALTER FOREIGN DATA WRAPPER foo RENAME TO foo1;
--- \dew+
+\dew+
 ALTER FOREIGN DATA WRAPPER foo1 RENAME TO foo;
 
 -- HANDLER related checks
@@ -129,14 +129,14 @@ DROP FUNCTION invalid_fdw_handler();
 -- DROP FOREIGN DATA WRAPPER
 DROP FOREIGN DATA WRAPPER nonexistent;                      -- ERROR
 DROP FOREIGN DATA WRAPPER IF EXISTS nonexistent;
--- \dew+
+\dew+
 
 DROP ROLE regress_test_role_super;                          -- ERROR
 SET ROLE regress_test_role_super;
 DROP FOREIGN DATA WRAPPER foo;
 RESET ROLE;
 DROP ROLE regress_test_role_super;
--- \dew+
+\dew+
 
 CREATE FOREIGN DATA WRAPPER foo;
 CREATE SERVER s1 FOREIGN DATA WRAPPER foo;
@@ -144,17 +144,17 @@ COMMENT ON SERVER s1 IS 'foreign server';
 CREATE USER MAPPING FOR current_user SERVER s1;
 CREATE USER MAPPING FOR current_user SERVER s1;				-- ERROR
 CREATE USER MAPPING IF NOT EXISTS FOR current_user SERVER s1; -- NOTICE
--- \dew+
--- \des+
--- \deu+
+\dew+
+\des+
+\deu+
 DROP FOREIGN DATA WRAPPER foo;                              -- ERROR
 SET ROLE regress_test_role;
 DROP FOREIGN DATA WRAPPER foo CASCADE;                      -- ERROR
 RESET ROLE;
 DROP FOREIGN DATA WRAPPER foo CASCADE;
--- \dew+
--- \des+
--- \deu+
+\dew+
+\des+
+\deu+
 
 -- exercise CREATE SERVER
 CREATE SERVER s1 FOREIGN DATA WRAPPER foo;                  -- ERROR
@@ -170,7 +170,7 @@ CREATE SERVER s6 VERSION '16.0' FOREIGN DATA WRAPPER foo OPTIONS (host 'a', dbna
 CREATE SERVER s7 TYPE 'oracle' VERSION '17.0' FOREIGN DATA WRAPPER foo OPTIONS (host 'a', dbname 'b');
 CREATE SERVER s8 FOREIGN DATA WRAPPER postgresql OPTIONS (foo '1'); -- ERROR
 CREATE SERVER s8 FOREIGN DATA WRAPPER postgresql OPTIONS (host 'localhost', dbname 's8db');
--- \des+
+\des+
 SET ROLE regress_test_role;
 CREATE SERVER t1 FOREIGN DATA WRAPPER foo;                 -- ERROR: no usage on FDW
 RESET ROLE;
@@ -178,7 +178,7 @@ GRANT USAGE ON FOREIGN DATA WRAPPER foo TO regress_test_role;
 SET ROLE regress_test_role;
 CREATE SERVER t1 FOREIGN DATA WRAPPER foo;
 RESET ROLE;
--- \des+
+\des+
 
 REVOKE USAGE ON FOREIGN DATA WRAPPER foo FROM regress_test_role;
 GRANT USAGE ON FOREIGN DATA WRAPPER foo TO regress_test_indirect;
@@ -188,7 +188,7 @@ RESET ROLE;
 GRANT regress_test_indirect TO regress_test_role;
 SET ROLE regress_test_role;
 CREATE SERVER t2 FOREIGN DATA WRAPPER foo;
--- \des+
+\des+
 RESET ROLE;
 REVOKE regress_test_indirect FROM regress_test_role;
 
@@ -200,7 +200,7 @@ ALTER SERVER s2 VERSION '1.1';
 ALTER SERVER s3 OPTIONS ("tns name" 'orcl', port '1521');
 GRANT USAGE ON FOREIGN SERVER s1 TO regress_test_role;
 GRANT USAGE ON FOREIGN SERVER s6 TO regress_test_role2 WITH GRANT OPTION;
--- \des+
+\des+
 SET ROLE regress_test_role;
 ALTER SERVER s1 VERSION '1.1';                              -- ERROR
 ALTER SERVER s1 OWNER TO regress_test_role;                 -- ERROR
@@ -225,32 +225,32 @@ SET ROLE regress_test_role;
 ALTER SERVER s1 OWNER TO regress_test_indirect;
 RESET ROLE;
 DROP ROLE regress_test_indirect;                            -- ERROR
--- \des+
+\des+
 
 ALTER SERVER s8 RENAME to s8new;
--- \des+
+\des+
 ALTER SERVER s8new RENAME to s8;
 
 -- DROP SERVER
 DROP SERVER nonexistent;                                    -- ERROR
 DROP SERVER IF EXISTS nonexistent;
--- \des
+\des
 SET ROLE regress_test_role;
 DROP SERVER s2;                                             -- ERROR
 DROP SERVER s1;
 RESET ROLE;
--- \des
+\des
 ALTER SERVER s2 OWNER TO regress_test_role;
 SET ROLE regress_test_role;
 DROP SERVER s2;
 RESET ROLE;
--- \des
+\des
 CREATE USER MAPPING FOR current_user SERVER s3;
--- \deu
+\deu
 DROP SERVER s3;                                             -- ERROR
 DROP SERVER s3 CASCADE;
--- \des
--- \deu
+\des
+\deu
 
 -- CREATE USER MAPPING
 CREATE USER MAPPING FOR regress_test_missing_role SERVER s1;  -- ERROR
@@ -274,7 +274,7 @@ SET ROLE regress_test_role;
 CREATE USER MAPPING FOR current_user SERVER t1 OPTIONS (username 'bob', password 'boo');
 CREATE USER MAPPING FOR public SERVER t1;
 RESET ROLE;
--- \deu
+\deu
 
 -- ALTER USER MAPPING
 ALTER USER MAPPING FOR regress_test_missing_role SERVER s4 OPTIONS (gotcha 'true'); -- ERROR
@@ -287,7 +287,7 @@ ALTER USER MAPPING FOR current_user SERVER s5 OPTIONS (ADD modified '1');
 ALTER USER MAPPING FOR public SERVER s4 OPTIONS (ADD modified '1'); -- ERROR
 ALTER USER MAPPING FOR public SERVER t1 OPTIONS (ADD modified '1');
 RESET ROLE;
--- \deu+
+\deu+
 
 -- DROP USER MAPPING
 DROP USER MAPPING FOR regress_test_missing_role SERVER s4;  -- ERROR
@@ -301,7 +301,7 @@ SET ROLE regress_test_role;
 DROP USER MAPPING FOR public SERVER s8;                     -- ERROR
 RESET ROLE;
 DROP SERVER s7;
--- \deu
+\deu
 
 -- CREATE FOREIGN TABLE
 CREATE SCHEMA foreign_schema;
@@ -334,8 +334,8 @@ CREATE FOREIGN TABLE ft1 (
 ) SERVER s0 OPTIONS (delimiter ',', quote '"', "be quoted" 'value');
 COMMENT ON FOREIGN TABLE ft1 IS 'ft1';
 COMMENT ON COLUMN ft1.c1 IS 'ft1.c1';
--- \d+ ft1
--- \det+
+\d+ ft1
+\det+
 CREATE INDEX id_ft1_c2 ON ft1 (c2);                             -- ERROR
 SELECT * FROM ft1;                                              -- ERROR
 EXPLAIN SELECT * FROM ft1;                                      -- ERROR
@@ -417,7 +417,7 @@ ALTER FOREIGN TABLE ft1 ALTER COLUMN c1 SET STATISTICS 10000;
 ALTER FOREIGN TABLE ft1 ALTER COLUMN c1 SET (n_distinct = 100);
 ALTER FOREIGN TABLE ft1 ALTER COLUMN c8 SET STATISTICS -1;
 ALTER FOREIGN TABLE ft1 ALTER COLUMN c8 SET STORAGE PLAIN;
--- \d+ ft1
+\d+ ft1
 -- can't change the column type if it's used elsewhere
 CREATE TABLE use_ft1_column_type (x ft1);
 ALTER FOREIGN TABLE ft1 ALTER COLUMN c8 SET DATA TYPE integer;	-- ERROR
@@ -440,7 +440,7 @@ ALTER FOREIGN TABLE ft1 SET TABLESPACE ts;                      -- ERROR
 ALTER SEQUENCE foreign_schema.ft1_c11_seq SET SCHEMA public;    -- ERROR
 ALTER FOREIGN TABLE foreign_schema.ft1 RENAME c1 TO foreign_column_1;
 ALTER FOREIGN TABLE foreign_schema.ft1 RENAME TO foreign_table_1;
--- \d foreign_schema.foreign_table_1
+\d foreign_schema.foreign_table_1
 
 -- alter noexisting table
 ALTER FOREIGN TABLE IF EXISTS doesnt_exist_ft1 ADD COLUMN c4 integer;
@@ -591,13 +591,13 @@ CREATE SERVER s10 FOREIGN DATA WRAPPER foo;
 CREATE USER MAPPING FOR public SERVER s10 OPTIONS (user 'secret');
 CREATE USER MAPPING FOR regress_unprivileged_role SERVER s10 OPTIONS (user 'secret');
 -- owner of server can see some option fields
--- \deu+
+\deu+
 RESET ROLE;
 -- superuser can see all option fields
--- \deu+
+\deu+
 -- unprivileged user cannot see any option field
 SET ROLE regress_unprivileged_role;
--- \deu+
+\deu+
 RESET ROLE;
 DROP SERVER s10 CASCADE;
 
@@ -659,19 +659,19 @@ CREATE TABLE fd_pt1 (
 );
 CREATE FOREIGN TABLE ft2 () INHERITS (fd_pt1)
   SERVER s0 OPTIONS (delimiter ',', quote '"', "be quoted" 'value');
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 DROP FOREIGN TABLE ft2;
--- \d+ fd_pt1
+\d+ fd_pt1
 CREATE FOREIGN TABLE ft2 (
 	c1 integer NOT NULL,
 	c2 text,
 	c3 date
 ) SERVER s0 OPTIONS (delimiter ',', quote '"', "be quoted" 'value');
--- \d+ ft2
+\d+ ft2
 ALTER FOREIGN TABLE ft2 INHERIT fd_pt1;
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 CREATE TABLE ct3() INHERITS(ft2);
 CREATE FOREIGN TABLE ft3 (
 	c1 integer NOT NULL,
@@ -679,9 +679,9 @@ CREATE FOREIGN TABLE ft3 (
 	c3 date
 ) INHERITS(ft2)
   SERVER s0;
--- \d+ ft2
--- \d+ ct3
--- \d+ ft3
+\d+ ft2
+\d+ ct3
+\d+ ft3
 
 -- add attributes recursively
 ALTER TABLE fd_pt1 ADD COLUMN c4 integer;
@@ -689,10 +689,10 @@ ALTER TABLE fd_pt1 ADD COLUMN c5 integer DEFAULT 0;
 ALTER TABLE fd_pt1 ADD COLUMN c6 integer;
 ALTER TABLE fd_pt1 ADD COLUMN c7 integer NOT NULL;
 ALTER TABLE fd_pt1 ADD COLUMN c8 integer;
--- \d+ fd_pt1
--- \d+ ft2
--- \d+ ct3
--- \d+ ft3
+\d+ fd_pt1
+\d+ ft2
+\d+ ct3
+\d+ ft3
 
 -- alter attributes recursively
 ALTER TABLE fd_pt1 ALTER COLUMN c4 SET DEFAULT 0;
@@ -706,8 +706,8 @@ ALTER TABLE fd_pt1 ALTER COLUMN c1 SET STATISTICS 10000;
 ALTER TABLE fd_pt1 ALTER COLUMN c1 SET (n_distinct = 100);
 ALTER TABLE fd_pt1 ALTER COLUMN c8 SET STATISTICS -1;
 ALTER TABLE fd_pt1 ALTER COLUMN c8 SET STORAGE EXTERNAL;
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 
 -- drop attributes recursively
 ALTER TABLE fd_pt1 DROP COLUMN c4;
@@ -715,8 +715,8 @@ ALTER TABLE fd_pt1 DROP COLUMN c5;
 ALTER TABLE fd_pt1 DROP COLUMN c6;
 ALTER TABLE fd_pt1 DROP COLUMN c7;
 ALTER TABLE fd_pt1 DROP COLUMN c8;
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 
 -- add constraints recursively
 ALTER TABLE fd_pt1 ADD CONSTRAINT fd_pt1chk1 CHECK (c1 > 0) NO INHERIT;
@@ -727,8 +727,8 @@ SELECT relname, conname, contype, conislocal, coninhcount, connoinherit
   WHERE pc.relname = 'fd_pt1'
   ORDER BY 1,2;
 -- child does not inherit NO INHERIT constraints
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 DROP FOREIGN TABLE ft2; -- ERROR
 DROP FOREIGN TABLE ft2 CASCADE;
 CREATE FOREIGN TABLE ft2 (
@@ -741,8 +741,8 @@ ALTER FOREIGN TABLE ft2 INHERIT fd_pt1;                            -- ERROR
 ALTER FOREIGN TABLE ft2 ADD CONSTRAINT fd_pt1chk2 CHECK (c2 <> '');
 ALTER FOREIGN TABLE ft2 INHERIT fd_pt1;
 -- child does not inherit NO INHERIT constraints
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 
 -- drop constraints recursively
 ALTER TABLE fd_pt1 DROP CONSTRAINT fd_pt1chk1 CASCADE;
@@ -751,12 +751,12 @@ ALTER TABLE fd_pt1 DROP CONSTRAINT fd_pt1chk2 CASCADE;
 -- NOT VALID case
 INSERT INTO fd_pt1 VALUES (1, 'fd_pt1'::text, '1994-01-01'::date);
 ALTER TABLE fd_pt1 ADD CONSTRAINT fd_pt1chk3 CHECK (c2 <> '') NOT VALID;
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 -- VALIDATE CONSTRAINT need do nothing on foreign tables
 ALTER TABLE fd_pt1 VALIDATE CONSTRAINT fd_pt1chk3;
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 
 -- changes name of an attribute recursively
 ALTER TABLE fd_pt1 RENAME COLUMN c1 TO f1;
@@ -764,8 +764,8 @@ ALTER TABLE fd_pt1 RENAME COLUMN c2 TO f2;
 ALTER TABLE fd_pt1 RENAME COLUMN c3 TO f3;
 -- changes name of a constraint recursively
 ALTER TABLE fd_pt1 RENAME CONSTRAINT fd_pt1chk3 TO f2_check;
--- \d+ fd_pt1
--- \d+ ft2
+\d+ fd_pt1
+\d+ ft2
 
 DROP TABLE fd_pt1 CASCADE;
 
@@ -794,8 +794,8 @@ CREATE TABLE fd_pt2 (
 ) PARTITION BY LIST (c1);
 CREATE FOREIGN TABLE fd_pt2_1 PARTITION OF fd_pt2 FOR VALUES IN (1)
   SERVER s0 OPTIONS (delimiter ',', quote '"', "be quoted" 'value');
--- \d+ fd_pt2
--- \d+ fd_pt2_1
+\d+ fd_pt2
+\d+ fd_pt2_1
 
 -- partition cannot have additional columns
 DROP FOREIGN TABLE fd_pt2_1;
@@ -805,21 +805,21 @@ CREATE FOREIGN TABLE fd_pt2_1 (
 	c3 date,
 	c4 char
 ) SERVER s0 OPTIONS (delimiter ',', quote '"', "be quoted" 'value');
--- \d+ fd_pt2_1
+\d+ fd_pt2_1
 ALTER TABLE fd_pt2 ATTACH PARTITION fd_pt2_1 FOR VALUES IN (1);       -- ERROR
 
 DROP FOREIGN TABLE fd_pt2_1;
--- \d+ fd_pt2
+\d+ fd_pt2
 CREATE FOREIGN TABLE fd_pt2_1 (
 	c1 integer NOT NULL,
 	c2 text,
 	c3 date
 ) SERVER s0 OPTIONS (delimiter ',', quote '"', "be quoted" 'value');
--- \d+ fd_pt2_1
+\d+ fd_pt2_1
 -- no attach partition validation occurs for foreign tables
 ALTER TABLE fd_pt2 ATTACH PARTITION fd_pt2_1 FOR VALUES IN (1);
--- \d+ fd_pt2
--- \d+ fd_pt2_1
+\d+ fd_pt2
+\d+ fd_pt2_1
 
 -- cannot add column to a partition
 ALTER TABLE fd_pt2_1 ADD c4 char;
@@ -827,8 +827,8 @@ ALTER TABLE fd_pt2_1 ADD c4 char;
 -- ok to have a partition's own constraints though
 ALTER TABLE fd_pt2_1 ALTER c3 SET NOT NULL;
 ALTER TABLE fd_pt2_1 ADD CONSTRAINT p21chk CHECK (c2 <> '');
--- \d+ fd_pt2
--- \d+ fd_pt2_1
+\d+ fd_pt2
+\d+ fd_pt2_1
 
 -- cannot drop inherited NOT NULL constraint from a partition
 ALTER TABLE fd_pt2_1 ALTER c1 DROP NOT NULL;
@@ -836,16 +836,16 @@ ALTER TABLE fd_pt2_1 ALTER c1 DROP NOT NULL;
 -- partition must have parent's constraints
 ALTER TABLE fd_pt2 DETACH PARTITION fd_pt2_1;
 ALTER TABLE fd_pt2 ALTER c2 SET NOT NULL;
--- \d+ fd_pt2
--- \d+ fd_pt2_1
+\d+ fd_pt2
+\d+ fd_pt2_1
 ALTER TABLE fd_pt2 ATTACH PARTITION fd_pt2_1 FOR VALUES IN (1);       -- ERROR
 ALTER FOREIGN TABLE fd_pt2_1 ALTER c2 SET NOT NULL;
 ALTER TABLE fd_pt2 ATTACH PARTITION fd_pt2_1 FOR VALUES IN (1);
 
 ALTER TABLE fd_pt2 DETACH PARTITION fd_pt2_1;
 ALTER TABLE fd_pt2 ADD CONSTRAINT fd_pt2chk1 CHECK (c1 > 0);
--- \d+ fd_pt2
--- \d+ fd_pt2_1
+\d+ fd_pt2
+\d+ fd_pt2_1
 ALTER TABLE fd_pt2 ATTACH PARTITION fd_pt2_1 FOR VALUES IN (1);       -- ERROR
 ALTER FOREIGN TABLE fd_pt2_1 ADD CONSTRAINT fd_pt2chk1 CHECK (c1 > 0);
 ALTER TABLE fd_pt2 ATTACH PARTITION fd_pt2_1 FOR VALUES IN (1);
@@ -878,7 +878,7 @@ DROP ROLE regress_unprivileged_role;
 DROP ROLE regress_test_role2;
 DROP FOREIGN DATA WRAPPER postgresql CASCADE;
 DROP FOREIGN DATA WRAPPER dummy CASCADE;
--- \c
+\c
 DROP ROLE regress_foreign_data_user;
 
 -- At this point we should have no wrappers, no servers, and no mappings.

@@ -4,7 +4,7 @@ CREATE TYPE person_type AS (id int, name text);
 CREATE TABLE persons OF person_type;
 CREATE TABLE IF NOT EXISTS persons OF person_type;
 SELECT * FROM persons;
--- \d persons
+\d persons
 
 CREATE FUNCTION get_all_persons() RETURNS SETOF person_type
 LANGUAGE SQL
@@ -30,14 +30,14 @@ CREATE TABLE persons2 OF person_type (
     UNIQUE (name)
 );
 
--- \d persons2
+\d persons2
 
 CREATE TABLE persons3 OF person_type (
     PRIMARY KEY (id),
     name WITH OPTIONS DEFAULT ''
 );
 
--- \d persons3
+\d persons3
 
 CREATE TABLE persons4 OF person_type (
     name WITH OPTIONS NOT NULL,
@@ -70,11 +70,11 @@ CREATE TABLE persons2 OF person_type (
     UNIQUE (name)
 );
 
--- \d persons2
+\d persons2
 
 CREATE TABLE persons3 OF person_type (
     PRIMARY KEY (id),
     name NOT NULL DEFAULT ''
 );
 
--- \d persons3
+\d persons3

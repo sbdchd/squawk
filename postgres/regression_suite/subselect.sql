@@ -110,7 +110,7 @@ SELECT * FROM (SELECT * FROM (SELECT abs(f1) AS a1 FROM int4_tbl)),
 
 SELECT * FROM view_unnamed_ss;
 
--- \sv view_unnamed_ss
+\sv view_unnamed_ss
 
 DROP VIEW view_unnamed_ss;
 
@@ -121,7 +121,7 @@ SELECT * FROM (SELECT * FROM int4_tbl), int8_tbl AS unnamed_subquery
   WHERE f1 = q1
   FOR UPDATE OF unnamed_subquery;
 
--- \sv view_unnamed_ss_locking
+\sv view_unnamed_ss_locking
 
 DROP VIEW view_unnamed_ss_locking;
 

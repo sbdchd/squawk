@@ -1,13 +1,13 @@
 /* skip test if not UTF8 server encoding */
-SELECT getdatabaseencoding() <> 'UTF8' AS skip_test /* \gset */;
--- \if :skip_test
--- \quit
--- \endif
+SELECT getdatabaseencoding() <> 'UTF8' AS skip_test \gset
+\if :skip_test
+\quit
+\endif
 
--- \getenv libdir PG_LIBDIR
--- \getenv dlsuffix PG_DLSUFFIX
+\getenv libdir PG_LIBDIR
+\getenv dlsuffix PG_DLSUFFIX
 
--- \set regresslib :libdir '/regress' :dlsuffix
+\set regresslib :libdir '/regress' :dlsuffix
 
 CREATE FUNCTION test_bytea_to_text(bytea) RETURNS text
     AS 'regresslib' LANGUAGE C STRICT;

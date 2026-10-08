@@ -125,7 +125,7 @@ INSERT INTO for_portion_of_test (id, valid_at, name) VALUES
   ('[4,5)', '(,2018-04-01)', 'four'),
   ('[5,6)', '(,)', 'five')
   ;
--- \set QUIET false
+\set QUIET false
 
 -- Updating with a missing column fails
 UPDATE for_portion_of_test
@@ -290,7 +290,7 @@ UPDATE for_portion_of_test
   SET name = name || '*';
 
 SELECT * FROM for_portion_of_test ORDER BY id, valid_at;
--- \set QUIET true
+\set QUIET true
 
 -- Updating with a shift/reduce conflict
 -- (requires a tsrange column)
@@ -419,7 +419,7 @@ BEGIN ATOMIC
     SET name = 'one^1'
     RETURNING name;
 END;
--- \sf+ fpo_update()
+\sf+ fpo_update()
 CREATE OR REPLACE function fpo_update()
 RETURNS text
 BEGIN ATOMIC
@@ -428,7 +428,7 @@ BEGIN ATOMIC
     SET name = 'one^1'
     RETURNING name;
 END;
--- \sf+ fpo_update()
+\sf+ fpo_update()
 DROP FUNCTION fpo_update();
 
 DROP TABLE for_portion_of_test;
@@ -457,7 +457,7 @@ INSERT INTO for_portion_of_test (id, valid_at, name) VALUES
   ('[8,9)', '[2018-02-03,2018-03-03)', 'eight'),
   ('[8,9)', '[2018-03-03,2018-04-04)', 'eight')
   ;
--- \set QUIET false
+\set QUIET false
 
 -- Deleting with a missing column fails
 DELETE FROM for_portion_of_test
@@ -586,7 +586,7 @@ DELETE FROM for_portion_of_test
   FOR PORTION OF valid_at FROM '2030-01-01' TO NULL;
 
 SELECT * FROM for_portion_of_test ORDER BY id, valid_at;
--- \set QUIET true
+\set QUIET true
 
 -- UPDATE ... RETURNING returns only the updated values
 -- (not the inserted side values, which are added by a separate "statement"):
@@ -655,7 +655,7 @@ BEGIN ATOMIC
     FOR PORTION OF valid_at FROM '2018-01-15' TO '2019-01-01'
     RETURNING name;
 END;
--- \sf+ fpo_delete()
+\sf+ fpo_delete()
 CREATE OR REPLACE function fpo_delete()
 RETURNS text
 BEGIN ATOMIC
@@ -663,7 +663,7 @@ BEGIN ATOMIC
     FOR PORTION OF valid_at (daterange('2018-01-15', '2020-01-01') * daterange('2019-01-01', '2022-01-01'))
     RETURNING name;
 END;
--- \sf+ fpo_delete()
+\sf+ fpo_delete()
 DROP FUNCTION fpo_delete();
 
 

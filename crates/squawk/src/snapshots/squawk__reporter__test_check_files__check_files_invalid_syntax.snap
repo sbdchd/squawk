@@ -2,4 +2,4 @@
 source: crates/squawk/src/reporter.rs
 expression: val
 ---
-[{"column":7,"column_end":7,"file":"test.sql","help":null,"level":"Error","line":1,"line_end":1,"message":"expected command, found ERROR","rule_name":"syntax-error"}]
+[{"column":8,"column_end":8,"file":"test.sql","help":null,"level":"Error","line":1,"line_end":1,"message":"expected an expression, found SEMICOLON","rule_name":"syntax-error"},{"column":8,"column_end":8,"file":"test.sql","help":null,"level":"Error","line":1,"line_end":1,"message":"expected R_PAREN","rule_name":"syntax-error"}]

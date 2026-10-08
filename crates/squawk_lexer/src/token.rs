@@ -15,6 +15,8 @@ pub enum TokenKind {
     ///
     /// case-sensitive
     Ident,
+    /// A psql backslash command
+    PsqlCommand { ends_query: bool },
     /// `;`
     Semi,
     /// End of file

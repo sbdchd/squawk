@@ -48,7 +48,7 @@ fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a>
     for el in source_file.syntax().children_with_tokens() {
         match el {
             rowan::NodeOrToken::Node(node) => {
-                if let Some(stmt) = ast::Stmt::cast(node) {
+                if let Some(stmt) = ast::Stmt::cast(node.clone()) {
                     let is_empty_stmt = matches!(&stmt, ast::Stmt::EmptyStmt(_));
                     if previous_was_stmt && !is_empty_stmt {
                         doc = doc.append(Doc::empty_line());
@@ -57,6 +57,14 @@ fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a>
                     }
                     doc = doc.append(build_stmt(ctx, stmt));
                     previous_was_stmt = !is_empty_stmt;
+                } else if let Some(command) = ast::PsqlCommand::cast(node) {
+                    if needs_space {
+                        doc = doc.append(Doc::space());
+                    }
+                    doc = doc.append(Doc::text(
+                        command.syntax().text().to_string().trim_end().to_string(),
+                    ));
+                    previous_was_stmt = false;
                 } else {
                     previous_was_stmt = false;
                 }
@@ -16666,7 +16674,8 @@ fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
     let Some(semi) = semi else {
         return Doc::nil();
     };
-    comments_before(&semi).append(Doc::text(";"))
+    let text = if semi.text() == "\\;" { "\\;" } else { ";" };
+    comments_before(&semi).append(Doc::text(text))
 }
 
 fn build_expr<'a>(ctx: &Ctx, expr: ast::Expr) -> Doc<'a> {

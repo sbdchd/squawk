@@ -569,7 +569,11 @@ fn validate_source_file(it: ast::SourceFile, acc: &mut Vec<SyntaxError>) {
             continue;
         };
         let ends_with_semi = syntax.last_token().is_some_and(|t| t.kind() == SEMICOLON);
-        if ends_with_semi || next.syntax().kind() == EMPTY_STMT {
+        let ends_with_psql_command =
+            std::iter::successors(syntax.next_sibling(), |node| node.next_sibling())
+                .map_while(ast::PsqlCommand::cast)
+                .any(|command| command.psql_terminator_text_token().is_some());
+        if ends_with_semi || ends_with_psql_command || next.syntax().kind() == EMPTY_STMT {
             continue;
         }
         let end = syntax.text_range().end();

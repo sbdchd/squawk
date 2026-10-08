@@ -1,0 +1,29 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r\"\\o | grep foo\\|bar\n\\g |sed s/a\\\\b/c/\n\\h select \\\\\n\\sf+ foo(int) \\x\n\\w out.txt \\echo hi\n\\g (format=csv) |cat \\\\ x\n\\gx (format=csv tuples_only) | cat\n\\g ( format=csv ) |cat\n\\g (fieldsep=')') |cat\n\\g (format=csv) out.csv \\echo hi\n\\COPY t to stdout \\\\ x\")"
+---
+[
+    "\\o | grep foo\\|bar" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\g |sed s/a\\\\b/c/" @ PsqlCommand { ends_query: true },
+    "\n" @ Whitespace,
+    "\\h select \\\\" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\sf+ foo(int) \\x" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\w out.txt " @ PsqlCommand { ends_query: false },
+    "\\echo hi" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\g (format=csv) |cat \\\\ x" @ PsqlCommand { ends_query: true },
+    "\n" @ Whitespace,
+    "\\gx (format=csv tuples_only) | cat" @ PsqlCommand { ends_query: true },
+    "\n" @ Whitespace,
+    "\\g ( format=csv ) |cat" @ PsqlCommand { ends_query: true },
+    "\n" @ Whitespace,
+    "\\g (fieldsep=')') |cat" @ PsqlCommand { ends_query: true },
+    "\n" @ Whitespace,
+    "\\g (format=csv) out.csv " @ PsqlCommand { ends_query: true },
+    "\\echo hi" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\COPY t to stdout \\\\ x" @ PsqlCommand { ends_query: false },
+]

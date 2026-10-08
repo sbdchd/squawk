@@ -330,7 +330,7 @@ SELECT regexp_substr('abcabcabc', 'a.c', 1, 1, 'g');
 SELECT regexp_substr('abcabcabc', 'a.c', 1, 1, '', -1);
 
 -- set so we can tell NULL from empty string
--- \pset null '\\N'
+\pset null '\\N'
 
 -- return all matches from regexp
 SELECT regexp_matches('foobarbequebaz', $re$(bar)(beque)$re$);
@@ -392,7 +392,7 @@ SELECT foo, length(foo) FROM regexp_split_to_table('thE QUick bROWn FOx jUMPs ov
 SELECT regexp_split_to_array('thE QUick bROWn FOx jUMPs ovEr The lazy dOG', 'e', 'g');
 
 -- change NULL-display back
--- \pset null ''
+\pset null ''
 
 -- E021-11 position expression
 SELECT POSITION('4' IN '1234567890') = '4' AS "4";
@@ -671,7 +671,7 @@ ALTER TABLE toasttest ALTER COLUMN f2 SET STORAGE EXTERNAL;
 -- and stored uncompressed.
 INSERT INTO toasttest values(repeat('1234', 1000), repeat('5678', 30));
 SELECT reltoastrelid::regclass AS reltoastname FROM pg_class
-  WHERE oid = 'toasttest'::regclass /* \gset */;
+  WHERE oid = 'toasttest'::regclass \gset
 -- There should be two values inserted in the toast relation.
 SELECT count(*) FROM reltoastname WHERE chunk_seq = 0;
 SELECT substr(f1, 5, 10) AS f1_data, substr(f2, 5, 10) AS f2_data

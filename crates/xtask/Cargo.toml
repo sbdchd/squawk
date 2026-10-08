@@ -27,6 +27,7 @@ proc-macro2.workspace = true
 regex.workspace = true
 rustc-hash.workspace = true
 squawk-line-index.workspace = true
+squawk-lexer.workspace = true
 
 [lints]
 workspace = true

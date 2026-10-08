@@ -379,9 +379,9 @@ VACUUM (PROCESS_MAIN FALSE, PROCESS_TOAST FALSE) vac_option_tab;
 SELECT * FROM vac_option_tab_counts;
 -- Check if the filenodes nodes have been updated as wanted after FULL.
 SELECT relfilenode AS main_filenode FROM pg_class
-  WHERE relname = 'vac_option_tab' /* \gset */;
+  WHERE relname = 'vac_option_tab' \gset
 SELECT t.relfilenode AS toast_filenode FROM pg_class c, pg_class t
-  WHERE c.reltoastrelid = t.oid AND c.relname = 'vac_option_tab' /* \gset */;
+  WHERE c.reltoastrelid = t.oid AND c.relname = 'vac_option_tab' \gset
 -- Only the toast relation is processed.
 VACUUM (PROCESS_MAIN FALSE, FULL) vac_option_tab;
 SELECT relfilenode = 'main_filenode' AS is_same_main_filenode
@@ -508,7 +508,7 @@ ALTER TABLE vac_rewrite_toast ALTER COLUMN f1 SET STORAGE EXTERNAL;
 -- same after rewrite.
 INSERT INTO vac_rewrite_toast values (2, repeat('a', 7000));
 SELECT pg_column_toast_chunk_id(f1) AS id_2_chunk FROM vac_rewrite_toast
-  WHERE id = 2 /* \gset */;
+  WHERE id = 2 \gset
 -- Check initial state of the data.
 SELECT id, pg_column_toast_chunk_id(f1) IS NULL AS f1_chunk_null,
   substr(f1, 5, 10) AS f1_data,

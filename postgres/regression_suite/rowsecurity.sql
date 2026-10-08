@@ -262,8 +262,8 @@ CREATE POLICY p2r ON document AS RESTRICTIVE TO regress_rls_dave
 CREATE POLICY p1r ON document AS RESTRICTIVE TO regress_rls_dave
     USING (cid <> 44);
 
--- \dp
--- \d document
+\dp
+\d document
 SELECT * FROM pg_policies WHERE schemaname = 'regress_rls_schema' AND tablename = 'document' ORDER BY policyname;
 
 -- viewpoint from regress_rls_bob
@@ -396,7 +396,7 @@ COPY t1 FROM stdin WITH ;
 -- 102	2	bbb
 -- 103	3	ccc
 -- 104	4	dad
--- \.
+\.
 
 CREATE TABLE t2 (c float) INHERITS (t1);
 GRANT ALL ON t2 TO public;
@@ -406,7 +406,7 @@ COPY t2 FROM stdin;
 -- 202	2	bcd	2.2
 -- 203	3	cde	3.3
 -- 204	4	def	4.4
--- \.
+\.
 
 CREATE TABLE t3 (id int not null primary key, c text, b text, a int);
 ALTER TABLE t3 INHERIT t1;
@@ -416,7 +416,7 @@ COPY t3(id, a,b,c) FROM stdin;
 -- 301	1	xxx	X
 -- 302	2	yyy	Y
 -- 303	3	zzz	Z
--- \.
+\.
 
 CREATE POLICY p1 ON t1 FOR ALL TO PUBLIC USING (a % 2 = 0); -- be even number
 CREATE POLICY p2 ON t2 FOR ALL TO PUBLIC USING (a % 2 = 1); -- be odd number
@@ -510,7 +510,7 @@ CREATE POLICY pp1 ON part_document AS PERMISSIVE
 CREATE POLICY pp1r ON part_document AS RESTRICTIVE TO regress_rls_dave
     USING (cid < 55);
 
--- \d+ part_document
+\d+ part_document
 SELECT * FROM pg_policies WHERE schemaname = 'regress_rls_schema' AND tablename like '%part_document%' ORDER BY policyname;
 
 -- viewpoint from regress_rls_bob
@@ -1838,14 +1838,14 @@ COPY copy_t FROM STDIN; --ok
 -- 2	bcd
 -- 3	cde
 -- 4	def
--- \.
+\.
 SET row_security TO ON;
 COPY copy_t FROM STDIN; --ok
 -- 1	abc
 -- 2	bcd
 -- 3	cde
 -- 4	def
--- \.
+\.
 
 -- Check COPY FROM as user with permissions.
 SET SESSION AUTHORIZATION regress_rls_bob;
@@ -1862,7 +1862,7 @@ COPY copy_t FROM STDIN; --ok
 -- 2	bcd
 -- 3	cde
 -- 4	def
--- \.
+\.
 
 -- Check COPY FROM as user without permissions.
 SET SESSION AUTHORIZATION regress_rls_carol;

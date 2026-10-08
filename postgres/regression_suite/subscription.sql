@@ -3,10 +3,10 @@
 --
 
 -- directory paths and dlsuffix are passed to us in environment variables
--- \getenv libdir PG_LIBDIR
--- \getenv dlsuffix PG_DLSUFFIX
+\getenv libdir PG_LIBDIR
+\getenv dlsuffix PG_DLSUFFIX
 
--- \set regresslib :libdir '/regress' :dlsuffix
+\set regresslib :libdir '/regress' :dlsuffix
 
 CREATE FUNCTION test_fdw_connection(oid, oid, internal)
     RETURNS text
@@ -60,7 +60,7 @@ SELECT pg_stat_reset_subscription_stats(oid) FROM pg_subscription WHERE subname 
 SELECT subname, stats_reset IS NULL stats_reset_is_null FROM pg_stat_subscription_stats WHERE subname = 'regress_testsub';
 
 -- Reset the stats again and check if the new reset_stats is updated.
-SELECT stats_reset as prev_stats_reset FROM pg_stat_subscription_stats WHERE subname = 'regress_testsub' /* \gset */;
+SELECT stats_reset as prev_stats_reset FROM pg_stat_subscription_stats WHERE subname = 'regress_testsub' \gset
 SELECT pg_stat_reset_subscription_stats(oid) FROM pg_subscription WHERE subname = 'regress_testsub';
 SELECT 'prev_stats_reset' < stats_reset FROM pg_stat_subscription_stats WHERE subname = 'regress_testsub';
 
@@ -93,9 +93,9 @@ CREATE SUBSCRIPTION regress_testsub4 CONNECTION 'dbname=regress_doesnotexist' PU
 
 -- now it works
 CREATE SUBSCRIPTION regress_testsub4 CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (slot_name = NONE, connect = false, origin = none);
--- \dRs+ regress_testsub4
+\dRs+ regress_testsub4
 ALTER SUBSCRIPTION regress_testsub4 SET (origin = any);
--- \dRs+ regress_testsub4
+\dRs+ regress_testsub4
 
 DROP SUBSCRIPTION regress_testsub3;
 DROP SUBSCRIPTION regress_testsub4;
@@ -188,14 +188,14 @@ DROP FOREIGN DATA WRAPPER test_fdw;
 -- fail - invalid connection string during ALTER
 ALTER SUBSCRIPTION regress_testsub CONNECTION 'foobar';
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET PUBLICATION testpub2, testpub3 WITH (refresh = false);
 ALTER SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist2';
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = 'newname');
 ALTER SUBSCRIPTION regress_testsub SET (password_required = false);
 ALTER SUBSCRIPTION regress_testsub SET (run_as_owner = true);
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (password_required = true);
 ALTER SUBSCRIPTION regress_testsub SET (run_as_owner = false);
@@ -210,7 +210,7 @@ ALTER SUBSCRIPTION regress_testsub SET (create_slot = false);
 -- ok
 ALTER SUBSCRIPTION regress_testsub SKIP (lsn = '0/12345');
 
--- \dRs+
+\dRs+
 
 -- ok - with lsn = NONE
 ALTER SUBSCRIPTION regress_testsub SKIP (lsn = NONE);
@@ -218,16 +218,16 @@ ALTER SUBSCRIPTION regress_testsub SKIP (lsn = NONE);
 -- fail
 ALTER SUBSCRIPTION regress_testsub SKIP (lsn = '0/0');
 
--- \dRs+
+\dRs+
 
 BEGIN;
 ALTER SUBSCRIPTION regress_testsub ENABLE;
 
--- \dRs
+\dRs
 
 ALTER SUBSCRIPTION regress_testsub DISABLE;
 
--- \dRs
+\dRs
 
 COMMIT;
 
@@ -243,7 +243,7 @@ ALTER SUBSCRIPTION regress_testsub_foo SET (wal_receiver_timeout = '-1');
 ALTER SUBSCRIPTION regress_testsub_foo SET (wal_receiver_timeout = '80s');
 ALTER SUBSCRIPTION regress_testsub_foo SET (wal_receiver_timeout = 'foobar');
 
--- \dRs+
+\dRs+
 
 -- rename back to keep the rest simple
 ALTER SUBSCRIPTION regress_testsub_foo RENAME TO regress_testsub;
@@ -272,12 +272,12 @@ CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUB
 -- now it works
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, binary = true);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (binary = false);
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = NONE);
 
--- \dRs+
+\dRs+
 
 DROP SUBSCRIPTION regress_testsub;
 
@@ -287,16 +287,16 @@ CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUB
 -- now it works
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, streaming = true);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (streaming = parallel);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (streaming = false);
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = NONE);
 
--- \dRs+
+\dRs+
 
 -- fail - publication already exists
 ALTER SUBSCRIPTION regress_testsub ADD PUBLICATION testpub WITH (refresh = false);
@@ -310,7 +310,7 @@ ALTER SUBSCRIPTION regress_testsub ADD PUBLICATION testpub1, testpub2 WITH (refr
 -- fail - publications already exist
 ALTER SUBSCRIPTION regress_testsub ADD PUBLICATION testpub1, testpub2 WITH (refresh = false);
 
--- \dRs+
+\dRs+
 
 -- fail - publication used more than once
 ALTER SUBSCRIPTION regress_testsub DROP PUBLICATION testpub1, testpub1 WITH (refresh = false);
@@ -324,7 +324,7 @@ ALTER SUBSCRIPTION regress_testsub DROP PUBLICATION testpub3 WITH (refresh = fal
 -- ok - delete publications
 ALTER SUBSCRIPTION regress_testsub DROP PUBLICATION testpub1, testpub2 WITH (refresh = false);
 
--- \dRs+
+\dRs+
 
 DROP SUBSCRIPTION regress_testsub;
 
@@ -358,11 +358,11 @@ CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUB
 -- now it works
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, two_phase = true);
 
--- \dRs+
+\dRs+
 -- we can alter streaming when two_phase enabled
 ALTER SUBSCRIPTION regress_testsub SET (streaming = true);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = NONE);
 DROP SUBSCRIPTION regress_testsub;
@@ -370,7 +370,7 @@ DROP SUBSCRIPTION regress_testsub;
 -- two_phase and streaming are compatible.
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, streaming = true, two_phase = true);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = NONE);
 DROP SUBSCRIPTION regress_testsub;
@@ -381,11 +381,11 @@ CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUB
 -- now it works
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, disable_on_error = false);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (disable_on_error = true);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = NONE);
 DROP SUBSCRIPTION regress_testsub;
@@ -396,7 +396,7 @@ CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUB
 -- ok
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, retain_dead_tuples = false);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = NONE);
 DROP SUBSCRIPTION regress_testsub;
@@ -410,7 +410,7 @@ CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUB
 -- ok
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, max_retention_duration = 1000);
 
--- \dRs+
+\dRs+
 
 -- fail - max_retention_duration must be non-negative
 ALTER SUBSCRIPTION regress_testsub SET (max_retention_duration = -1);
@@ -418,7 +418,7 @@ ALTER SUBSCRIPTION regress_testsub SET (max_retention_duration = -1);
 -- ok
 ALTER SUBSCRIPTION regress_testsub SET (max_retention_duration = 0);
 
--- \dRs+
+\dRs+
 
 ALTER SUBSCRIPTION regress_testsub SET (slot_name = NONE);
 DROP SUBSCRIPTION regress_testsub;
@@ -536,7 +536,7 @@ JOIN pg_catalog.pg_namespace n
 JOIN pg_catalog.pg_subscription s
 	ON c.relname = 'pg_conflict_log_' || s.oid
 WHERE s.subname = 'regress_conflict_test1'
-/* \gset */;
+\gset
 
 TRUNCATE TABLE conflict_log_table;
 DELETE FROM conflict_log_table;
@@ -565,7 +565,7 @@ FROM pg_subscription WHERE subname = 'regress_conflict_test2';
 
 -- transition from 'all' to 'table'
 -- should NOT drop the table, only change destination string
-SELECT subconflictlogrelid AS old_relid FROM pg_subscription WHERE subname = 'regress_conflict_test2' /* \gset */;
+SELECT subconflictlogrelid AS old_relid FROM pg_subscription WHERE subname = 'regress_conflict_test2' \gset
 ALTER SUBSCRIPTION regress_conflict_test2 SET (conflict_log_destination = 'table');
 SELECT subconflictlogdest, subconflictlogrelid = 'old_relid' AS relid_unchanged
 FROM pg_subscription WHERE subname = 'regress_conflict_test2';
@@ -611,17 +611,17 @@ ALTER SUBSCRIPTION regress_conflict_test1 SET (conflict_log_destination = 'table
 -- fail - drop table not allowed due to internal dependency
 SET client_min_messages = NOTICE;
 SELECT 'pg_conflict.pg_conflict_log_' || oid AS clt1
-    FROM pg_subscription WHERE subname = 'regress_conflict_test1' /* \gset */;
--- \set VERBOSITY sqlstate
+    FROM pg_subscription WHERE subname = 'regress_conflict_test1' \gset
+\set VERBOSITY sqlstate
 DROP TABLE clt1;
--- \set VERBOSITY default
+\set VERBOSITY default
 
 -- CLEANUP: DROP SUBSCRIPTION reaps the table
 ALTER SUBSCRIPTION regress_conflict_test1 DISABLE;
 ALTER SUBSCRIPTION regress_conflict_test1 SET (slot_name = NONE);
 
 -- Verify the table OID for reap check
-SELECT 'pg_conflict.pg_conflict_log_' || oid AS internal_tablename FROM pg_subscription WHERE subname = 'regress_conflict_test1' /* \gset */;
+SELECT 'pg_conflict.pg_conflict_log_' || oid AS internal_tablename FROM pg_subscription WHERE subname = 'regress_conflict_test1' \gset
 
 SET client_min_messages = WARNING;
 DROP SUBSCRIPTION regress_conflict_test1;
@@ -646,7 +646,7 @@ CREATE SUBSCRIPTION regress_conflict_protection_test CONNECTION 'dbname=regress_
 -- with 22023 (invalid_parameter_value).
 SELECT 'pg_conflict.' || relname AS clt
     FROM pg_class c JOIN pg_subscription s ON c.relname = 'pg_conflict_log_' || s.oid
-    WHERE s.subname = 'regress_conflict_protection_test' /* \gset */;
+    WHERE s.subname = 'regress_conflict_protection_test' \gset
 
 -- Trigger function used by the CREATE TRIGGER check below.
 CREATE FUNCTION public.dummy_trigger_func() RETURNS trigger AS $$
@@ -655,7 +655,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- \set VERBOSITY sqlstate
+\set VERBOSITY sqlstate
 ALTER TABLE clt ADD COLUMN extra_info text;
 INSERT INTO clt (relname) VALUES ('mytest');
 UPDATE clt SET relname = 'mytest';
@@ -673,7 +673,7 @@ ALTER RULE non_existent_rule ON clt RENAME TO new_rule;
 CREATE INDEX idx1 ON clt (relname);
 SELECT 1 FROM clt FOR UPDATE;
 CREATE PUBLICATION testpub_for_clt FOR TABLE clt;
--- \set VERBOSITY default
+\set VERBOSITY default
 
 -- Clean up the trigger function used above.
 DROP FUNCTION public.dummy_trigger_func();

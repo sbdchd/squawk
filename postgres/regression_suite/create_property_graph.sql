@@ -323,27 +323,27 @@ SELECT (pg_identify_object(classid, objid, objsubid)).*
     FROM (SELECT DISTINCT classid, objid, objsubid FROM deps_tree)
     ORDER BY 1, 2, 3, 4;
 
--- \a\t
+\a\t
 SELECT pg_get_propgraphdef('g2'::regclass);
 SELECT pg_get_propgraphdef('g3'::regclass);
 SELECT pg_get_propgraphdef('g4'::regclass);
 
 SELECT pg_get_propgraphdef('pg_type'::regclass);  -- error
--- \a\t
+\a\t
 
 -- Test \d variants for property graphs
--- \dG g1
--- \dG+ g1
--- \dGx g1
--- \d g2
--- \d g1
--- \d+ g2
--- \d+ g1
--- \dG g_nonexistent
--- \dG t11
--- \set QUIET 'off'
--- \dG g_nonexistent
--- \set QUIET 'on'
+\dG g1
+\dG+ g1
+\dGx g1
+\d g2
+\d g1
+\d+ g2
+\d+ g1
+\dG g_nonexistent
+\dG t11
+\set QUIET 'off'
+\dG g_nonexistent
+\set QUIET 'on'
 
 -- temporary property graph
 
@@ -351,7 +351,7 @@ SELECT pg_get_propgraphdef('pg_type'::regclass);  -- error
 -- namespace names in information schema query outputs
 CREATE TEMPORARY PROPERTY GRAPH g1; -- same name as persistent graph
 DROP PROPERTY GRAPH g1;  -- drops temporary graph retaining persistent graph
--- \dG g1
+\dG g1
 CREATE TEMPORARY TABLE v2tmp (m text, n text);
 CREATE TEMPORARY PROPERTY GRAPH gtmp
     VERTEX TABLES (v1 KEY (a), v2tmp KEY (m))

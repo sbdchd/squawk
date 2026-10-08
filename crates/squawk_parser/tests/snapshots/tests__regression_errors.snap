@@ -335,14 +335,10 @@ error[syntax-error]: expected path name
     ╭▸ 
 283 │ CREATE TABLE ;
     ╰╴             ━
-error[syntax-error]: expected command, found INTO_KW
+error[syntax-error]: expected path name
     ╭▸ 
-288 │ INSERT INTO foo VALUES(123) foo;
-    ╰╴       ━
-error[syntax-error]: expected command, found IDENT
-    ╭▸ 
-288 │ INSERT INTO foo VALUES(123) foo;
-    ╰╴            ━
+286 │ \g
+    ╰╴━
 error[syntax-error]: expected command, found IDENT
     ╭▸ 
 288 │ INSERT INTO foo VALUES(123) foo;

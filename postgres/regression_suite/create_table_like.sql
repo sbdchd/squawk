@@ -38,29 +38,29 @@ SELECT * FROM inhg; /* Two records with three columns in order x=x, xx=text, y=y
 DROP TABLE inhg;
 
 CREATE TABLE test_like_id_1 (a bigint GENERATED ALWAYS AS IDENTITY, b text);
--- \d test_like_id_1
+\d test_like_id_1
 INSERT INTO test_like_id_1 (b) VALUES ('b1');
 SELECT * FROM test_like_id_1;
 CREATE TABLE test_like_id_2 (LIKE test_like_id_1);
--- \d test_like_id_2
+\d test_like_id_2
 INSERT INTO test_like_id_2 (b) VALUES ('b2');
 SELECT * FROM test_like_id_2;  -- identity was not copied
 CREATE TABLE test_like_id_3 (LIKE test_like_id_1 INCLUDING IDENTITY);
--- \d test_like_id_3
+\d test_like_id_3
 INSERT INTO test_like_id_3 (b) VALUES ('b3');
 SELECT * FROM test_like_id_3;  -- identity was copied and applied
 DROP TABLE test_like_id_1, test_like_id_2, test_like_id_3;
 
 CREATE TABLE test_like_gen_1 (a int, b int GENERATED ALWAYS AS (a * 2) STORED, c int GENERATED ALWAYS AS (a * 3) VIRTUAL);
--- \d test_like_gen_1
+\d test_like_gen_1
 INSERT INTO test_like_gen_1 (a) VALUES (1);
 SELECT * FROM test_like_gen_1;
 CREATE TABLE test_like_gen_2 (LIKE test_like_gen_1);
--- \d test_like_gen_2
+\d test_like_gen_2
 INSERT INTO test_like_gen_2 (a) VALUES (1);
 SELECT * FROM test_like_gen_2;
 CREATE TABLE test_like_gen_3 (LIKE test_like_gen_1 INCLUDING GENERATED);
--- \d test_like_gen_3
+\d test_like_gen_3
 INSERT INTO test_like_gen_3 (a) VALUES (1);
 SELECT * FROM test_like_gen_3;
 DROP TABLE test_like_gen_1, test_like_gen_2, test_like_gen_3;
@@ -69,21 +69,21 @@ DROP TABLE test_like_gen_1, test_like_gen_2, test_like_gen_3;
 CREATE TABLE test_like_4 (b int DEFAULT 42,
   c int GENERATED ALWAYS AS (a * 2) STORED,
   a int CHECK (a > 0));
--- \d test_like_4
+\d test_like_4
 CREATE TABLE test_like_4a (LIKE test_like_4);
 CREATE TABLE test_like_4b (LIKE test_like_4 INCLUDING DEFAULTS);
 CREATE TABLE test_like_4c (LIKE test_like_4 INCLUDING GENERATED);
 CREATE TABLE test_like_4d (LIKE test_like_4 INCLUDING DEFAULTS INCLUDING GENERATED);
--- \d test_like_4a
+\d test_like_4a
 INSERT INTO test_like_4a (a) VALUES(11);
 SELECT a, b, c FROM test_like_4a;
--- \d test_like_4b
+\d test_like_4b
 INSERT INTO test_like_4b (a) VALUES(11);
 SELECT a, b, c FROM test_like_4b;
--- \d test_like_4c
+\d test_like_4c
 INSERT INTO test_like_4c (a) VALUES(11);
 SELECT a, b, c FROM test_like_4c;
--- \d test_like_4d
+\d test_like_4d
 INSERT INTO test_like_4d (a) VALUES(11);
 SELECT a, b, c FROM test_like_4d;
 
@@ -93,14 +93,14 @@ CREATE TABLE test_like_5x (p int CHECK (p > 0),
    q int GENERATED ALWAYS AS (p * 2) STORED);
 CREATE TABLE test_like_5c (LIKE test_like_4 INCLUDING ALL)
   INHERITS (test_like_5, test_like_5x);
--- \d test_like_5c
+\d test_like_5c
 
 -- Test updating of column numbers in statistics expressions (bug #18468)
 CREATE TABLE test_like_6 (a int, c text, b text);
 CREATE STATISTICS ext_stat ON (a || b) FROM test_like_6;
 ALTER TABLE test_like_6 DROP COLUMN c;
 CREATE TABLE test_like_6c (LIKE test_like_6 INCLUDING ALL);
--- \d+ test_like_6c
+\d+ test_like_6c
 
 DROP TABLE test_like_4, test_like_4a, test_like_4b, test_like_4c, test_like_4d;
 DROP TABLE test_like_5, test_like_5x, test_like_5c;
@@ -124,7 +124,7 @@ DROP TABLE inhz;
 
 /* Use primary key imported by LIKE for self-referential FK constraint */
 CREATE TABLE inhz (x text REFERENCES inhz, LIKE inhx INCLUDING INDEXES);
--- \d inhz
+\d inhz
 DROP TABLE inhz;
 
 -- including storage and comments
@@ -161,21 +161,21 @@ CREATE TABLE ctlt4 (a text, c text);
 ALTER TABLE ctlt4 ALTER COLUMN c SET STORAGE EXTERNAL;
 
 CREATE TABLE ctlt12_storage (LIKE ctlt1 INCLUDING STORAGE, LIKE ctlt2 INCLUDING STORAGE);
--- \d+ ctlt12_storage
+\d+ ctlt12_storage
 CREATE TABLE ctlt12_comments (LIKE ctlt1 INCLUDING COMMENTS, LIKE ctlt2 INCLUDING COMMENTS);
--- \d+ ctlt12_comments
+\d+ ctlt12_comments
 SELECT conname, description FROM pg_description, pg_constraint c WHERE classoid = 'pg_constraint'::regclass AND objoid = c.oid AND c.conrelid = 'ctlt12_comments'::regclass;
 CREATE TABLE ctlt1_inh (LIKE ctlt1 INCLUDING CONSTRAINTS INCLUDING COMMENTS) INHERITS (ctlt1);
--- \d+ ctlt1_inh
+\d+ ctlt1_inh
 SELECT description FROM pg_description, pg_constraint c WHERE classoid = 'pg_constraint'::regclass AND objoid = c.oid AND c.conrelid = 'ctlt1_inh'::regclass;
 CREATE TABLE ctlt13_inh () INHERITS (ctlt1, ctlt3);
--- \d+ ctlt13_inh
+\d+ ctlt13_inh
 CREATE TABLE ctlt13_like (LIKE ctlt3 INCLUDING CONSTRAINTS INCLUDING INDEXES INCLUDING COMMENTS INCLUDING STORAGE) INHERITS (ctlt1);
--- \d+ ctlt13_like
+\d+ ctlt13_like
 SELECT description FROM pg_description, pg_constraint c WHERE classoid = 'pg_constraint'::regclass AND objoid = c.oid AND c.conrelid = 'ctlt13_like'::regclass;
 
 CREATE TABLE ctlt_all (LIKE ctlt1 INCLUDING ALL);
--- \d+ ctlt_all
+\d+ ctlt_all
 SELECT c.relname, objsubid, description FROM pg_description, pg_index i, pg_class c WHERE classoid = 'pg_class'::regclass AND objoid = i.indexrelid AND c.oid = i.indexrelid AND i.indrelid = 'ctlt_all'::regclass ORDER BY c.relname, objsubid;
 SELECT s.stxname, objsubid, description FROM pg_description, pg_statistic_ext s WHERE classoid = 'pg_statistic_ext'::regclass AND objoid = s.oid AND s.stxrelid = 'ctlt_all'::regclass ORDER BY s.stxname, objsubid;
 
@@ -184,7 +184,7 @@ CREATE TABLE inh_error2 (LIKE ctlt4 INCLUDING STORAGE) INHERITS (ctlt1);
 
 -- Check that LIKE isn't confused by a system catalog of the same name
 CREATE TABLE pg_attrdef (LIKE ctlt1 INCLUDING ALL);
--- \d+ public.pg_attrdef
+\d+ public.pg_attrdef
 DROP TABLE public.pg_attrdef;
 
 -- Check that LIKE isn't confused when new table masks the old, either
@@ -192,7 +192,7 @@ BEGIN;
 CREATE SCHEMA ctl_schema;
 SET LOCAL search_path = ctl_schema, public;
 CREATE TABLE ctlt1 (LIKE ctlt1 INCLUDING ALL);
--- \d+ ctlt1
+\d+ ctlt1
 ROLLBACK;
 
 DROP TABLE ctlt1, ctlt2, ctlt3, ctlt4, ctlt12_storage, ctlt12_comments, ctlt1_inh, ctlt13_inh, ctlt13_like, ctlt_all, ctla, ctlb CASCADE;
@@ -205,7 +205,7 @@ COMMENT ON CONSTRAINT noinh_con_copy_b_not_null ON noinh_con_copy IS 'not null b
 COMMENT ON CONSTRAINT noinh_con_copy_c_not_null ON noinh_con_copy IS 'not null c no inherit';
 
 CREATE TABLE noinh_con_copy1 (LIKE noinh_con_copy INCLUDING CONSTRAINTS INCLUDING COMMENTS);
--- \d+ noinh_con_copy1
+\d+ noinh_con_copy1
 
 SELECT conname, description
 FROM  pg_description, pg_constraint c
@@ -257,11 +257,11 @@ CREATE STATISTICS ctl_table_stat ON a,b FROM ctl_table;
 ALTER TABLE ctl_table ADD CONSTRAINT foo CHECK (b = 'text');
 ALTER TABLE ctl_table ALTER COLUMN b SET STORAGE MAIN;
 
--- \d+ ctl_table
+\d+ ctl_table
 
 -- Test EXCLUDING ALL
 CREATE FOREIGN TABLE ctl_foreign_table1(LIKE ctl_table EXCLUDING ALL) SERVER ctl_s0;
--- \d+ ctl_foreign_table1
+\d+ ctl_foreign_table1
 -- \d+ does not report the value of attcompression for a foreign table, so
 -- check separately.
 SELECT attname, attcompression FROM pg_attribute
@@ -270,7 +270,7 @@ SELECT attname, attcompression FROM pg_attribute
 -- Test INCLUDING ALL
 -- INDEXES, IDENTITY, COMPRESSION, STORAGE are not copied.
 CREATE FOREIGN TABLE ctl_foreign_table2(LIKE ctl_table INCLUDING ALL) SERVER ctl_s0;
--- \d+ ctl_foreign_table2
+\d+ ctl_foreign_table2
 -- \d+ does not report the value of attcompression for a foreign table, so
 -- check separately.
 SELECT attname, attcompression FROM pg_attribute

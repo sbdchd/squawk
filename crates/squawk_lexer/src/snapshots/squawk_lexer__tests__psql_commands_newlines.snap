@@ -1,0 +1,26 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(\"\\\\echo 'unterminated\\nselect 1;\\n\\\\echo 'unterminated\\r\\nselect 1;\\r\\n\\\\echo 'unterminated\\rselect 1;\")"
+---
+[
+    "\\echo 'unterminated" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    ";" @ Semi,
+    "\n" @ Whitespace,
+    "\\echo 'unterminated" @ PsqlCommand { ends_query: false },
+    "\r\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    ";" @ Semi,
+    "\r\n" @ Whitespace,
+    "\\echo 'unterminated" @ PsqlCommand { ends_query: false },
+    "\r" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    ";" @ Semi,
+]

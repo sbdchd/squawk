@@ -1,7 +1,7 @@
-SELECT current_setting('max_prepared_transactions')::integer < 2 AS skip_test /* \gset */;
--- \if :skip_test
--- \quit
--- \endif
+SELECT current_setting('max_prepared_transactions')::integer < 2 AS skip_test \gset
+\if :skip_test
+\quit
+\endif
 
 --
 -- PREPARED TRANSACTIONS (two-phase commit)
@@ -138,7 +138,7 @@ lock table pxtest3 in access share mode nowait;
 rollback;
 
 -- Disconnect, we will continue testing in a different backend
--- \c -
+\c -
 
 -- There should still be two prepared transactions
 SELECT gid FROM pg_prepared_xacts WHERE gid ~ '^regress_' ORDER BY gid;
@@ -150,7 +150,7 @@ rollback;
 
 -- Commit table creation
 COMMIT PREPARED 'regress_sub1';
--- \d pxtest2
+\d pxtest2
 SELECT * FROM pxtest2;
 
 -- There should be one prepared transaction
