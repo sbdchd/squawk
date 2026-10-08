@@ -115,7 +115,7 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
         // Make sure that if we're on the whitespace at the start of a line, we
         // expand to the node on that line instead of the previous one
         if leaves.clone().all(|it| it.kind() == SyntaxKind::WHITESPACE) {
-            return Some(extend_ws(root, leaves.next()?, offset));
+            return Some(extend_ws(root, &leaves.next()?, offset));
         }
         let leaf_range = match root.token_at_offset(offset) {
             rowan::TokenAtOffset::None => return None,
@@ -138,7 +138,7 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
                 return Some(token.text_range());
             }
             if let Some(comment) = ast::Comment::cast(token.clone())
-                && let Some(range) = extend_comments(comment)
+                && let Some(range) = extend_comments(&comment)
             {
                 return Some(range);
             }
@@ -200,9 +200,9 @@ fn extend_single_word_in_comment_or_string(
     }
 }
 
-fn extend_comments(comment: ast::Comment) -> Option<TextRange> {
-    let prev = adj_comments(&comment, Direction::Prev);
-    let next = adj_comments(&comment, Direction::Next);
+fn extend_comments(comment: &ast::Comment) -> Option<TextRange> {
+    let prev = adj_comments(comment, Direction::Prev);
+    let next = adj_comments(comment, Direction::Next);
     if prev != next {
         Some(TextRange::new(
             prev.syntax().text_range().start(),
@@ -232,7 +232,7 @@ fn adj_comments(comment: &ast::Comment, dir: Direction) -> ast::Comment {
     res
 }
 
-fn extend_ws(root: &SyntaxNode, ws: SyntaxToken, offset: TextSize) -> TextRange {
+fn extend_ws(root: &SyntaxNode, ws: &SyntaxToken, offset: TextSize) -> TextRange {
     let ws_text = ws.text();
     let suffix = TextRange::new(offset, ws.text_range().end()) - ws.text_range().start();
     let prefix = TextRange::new(ws.text_range().start(), offset) - ws.text_range().start();

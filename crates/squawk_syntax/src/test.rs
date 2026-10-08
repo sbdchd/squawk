@@ -46,8 +46,8 @@ pub(crate) fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
     glob: "*.sql",
 )]
 fn parser_ok_validation(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let test_name = absolute_fixture_path
         .file_name()
         .and_then(|x| x.strip_suffix(".sql"))
@@ -68,8 +68,8 @@ fn parser_ok_validation(fixture: Fixture<&str>) {
     glob: "*.sql",
 )]
 fn regression_suite_validation(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let test_name = absolute_fixture_path
         .file_name()
         .and_then(|x| x.strip_suffix(".sql"))
@@ -150,8 +150,8 @@ fn plpgsql_fixture(sql: &str) -> (String, Vec<SyntaxError>) {
     glob: "*.sql",
 )]
 fn plpgsql_ok(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let input_file = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let test_name = input_file
         .file_name()
         .and_then(|x| x.strip_suffix(".sql"))
@@ -177,8 +177,8 @@ fn plpgsql_ok(fixture: Fixture<&str>) {
     glob: "*.sql",
 )]
 fn plpgsql_err(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let input_file = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let test_name = input_file
         .file_name()
         .and_then(|x| x.strip_suffix(".sql"))
@@ -294,8 +294,8 @@ fn plpgsql_suite_score() {
     glob: "**/*.sql",
 )]
 fn syntaxtest(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let input_file = absolute_fixture_path;
     let test_name = absolute_fixture_path
         .file_name()

@@ -44,19 +44,19 @@ impl ast::Literal {
             .syntax()
             .ancestors()
             .find_map(ast::FuncOptionList::cast)?;
-        SqlBody::from_options(options)
+        SqlBody::from_options(&options)
     }
 }
 
 impl ast::CreateFunction {
     pub fn sql_body(&self) -> Option<SqlBody> {
-        SqlBody::from_options(self.option_list()?)
+        SqlBody::from_options(&self.option_list()?)
     }
 }
 
 impl ast::CreateProcedure {
     pub fn sql_body(&self) -> Option<SqlBody> {
-        SqlBody::from_options(self.option_list()?)
+        SqlBody::from_options(&self.option_list()?)
     }
 }
 

@@ -1,4 +1,3 @@
-use anyhow::Result;
 use gen_lsp_types::{
     InlayHint, InlayHintKind, InlayHintLabelPart, InlayHintParams, Label, Location,
 };
@@ -8,10 +7,7 @@ use squawk_ide::inlay_hints::inlay_hints;
 use crate::global_state::Snapshot;
 use crate::lsp_utils;
 
-pub(crate) fn handle_inlay_hints(
-    snapshot: &Snapshot,
-    params: InlayHintParams,
-) -> Result<Option<Vec<InlayHint>>> {
+pub(crate) fn handle_inlay_hints(snapshot: &Snapshot, params: InlayHintParams) -> Vec<InlayHint> {
     let uri = params.text_document.uri;
 
     let db = snapshot.db();
@@ -61,5 +57,5 @@ pub(crate) fn handle_inlay_hints(
         })
         .collect();
 
-    Ok(Some(lsp_hints))
+    lsp_hints
 }

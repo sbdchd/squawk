@@ -74,7 +74,7 @@ pub(crate) enum ParentQuery {
     Merge(ast::Merge),
 }
 
-pub(crate) fn target_parent_query(target: ast::Target) -> Option<ParentQuery> {
+pub(crate) fn target_parent_query(target: &ast::Target) -> Option<ParentQuery> {
     node_parent_query(target.syntax())
 }
 
@@ -146,7 +146,7 @@ impl SelectContext {
     }
 }
 
-pub(crate) fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
+pub(crate) fn find_select_parent(token: &SyntaxToken) -> Option<SelectContext> {
     let mut found_select = None;
     let mut found_compound = None;
 

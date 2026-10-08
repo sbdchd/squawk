@@ -1,4 +1,3 @@
-use anyhow::Result;
 use gen_lsp_types::{FoldingRange, FoldingRangeParams};
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::folding_ranges;
@@ -9,7 +8,7 @@ use crate::lsp_utils;
 pub(crate) fn handle_folding_range(
     snapshot: &Snapshot,
     params: FoldingRangeParams,
-) -> Result<Option<Vec<FoldingRange>>> {
+) -> Vec<FoldingRange> {
     let uri = params.text_document.uri;
 
     let db = snapshot.db();
@@ -18,8 +17,8 @@ pub(crate) fn handle_folding_range(
 
     let lsp_folds: Vec<FoldingRange> = folding_ranges(db, file)
         .into_iter()
-        .map(|fold| lsp_utils::folding_range(&line_idx, fold))
+        .map(|fold| lsp_utils::folding_range(&line_idx, &fold))
         .collect();
 
-    Ok(Some(lsp_folds))
+    lsp_folds
 }

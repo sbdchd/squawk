@@ -77,19 +77,19 @@ pub(crate) fn codegen() -> Result<()> {
     let keyword_kinds = keyword_kinds()?;
     let contextual_keywords = contextual_keywords()?;
 
-    let token_sets = generate_token_sets(&keyword_kinds, &contextual_keywords)?;
+    let token_sets = generate_token_sets(&keyword_kinds, &contextual_keywords);
     let token_sets_file = project_root().join("crates/squawk_parser/src/generated/token_sets.rs");
     std::fs::write(token_sets_file, token_sets).context("problem writing generated token sets")?;
 
     update_textmate_keywords(&keyword_kinds.all)?;
 
-    let playground_keywords = generate_playground_keywords(&keyword_kinds.all)?;
+    let playground_keywords = generate_playground_keywords(&keyword_kinds.all);
     let playground_keywords_file = project_root().join("playground/src/generated/keywords.ts");
     std::fs::write(playground_keywords_file, playground_keywords)
         .context("problem writing playground keywords")?;
 
     let syntax_keywords = project_root().join("crates/squawk_syntax/src/generated/keywords.rs");
-    let keyword_arrays = generate_keyword_arrays(&keyword_kinds)?;
+    let keyword_arrays = generate_keyword_arrays(&keyword_kinds);
     std::fs::write(syntax_keywords, keyword_arrays).context("problem writing keyword arrays")?;
 
     let kinds = generate_kind_src(
@@ -99,7 +99,7 @@ pub(crate) fn codegen() -> Result<()> {
         contextual_keywords,
     );
 
-    let syntax_kinds = generate_syntax_kinds(kinds)?;
+    let syntax_kinds = generate_syntax_kinds(kinds);
     let syntax_kinds_file =
         project_root().join("crates/squawk_parser/src/generated/syntax_kind.rs");
     std::fs::write(syntax_kinds_file, syntax_kinds).context("problem writing syntax kinds")?;
@@ -264,7 +264,7 @@ const PRELUDE: &str = "\
 
 ";
 
-fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
+fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> String {
     let sorted = |keywords: &[String]| {
         let mut keywords = keywords
             .iter()
@@ -300,7 +300,7 @@ fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
     )
     .replace("pub(crate)", "\npub(crate)");
 
-    Ok(format!("{PRELUDE}{}", output.trim_start()))
+    format!("{PRELUDE}{}", output.trim_start())
 }
 
 fn keyword_lookup_conditions(keywords: &[&str]) -> Vec<proc_macro2::TokenStream> {
@@ -326,7 +326,7 @@ fn keyword_lookup_conditions(keywords: &[&str]) -> Vec<proc_macro2::TokenStream>
         .collect()
 }
 
-fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
+fn generate_syntax_kinds(grammar: KindsSrc) -> String {
     // TODO: we should have a check to make sure each keyword is used in the grammar once the grammar is ready
     let conditions = keyword_lookup_conditions(grammar.keywords);
     let contextual_conditions = keyword_lookup_conditions(grammar.contextual_keywords);
@@ -414,13 +414,10 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         .to_string(),
     ).replace("#[space_hack]", ""));
 
-    Ok(format!("{PRELUDE}{output}"))
+    format!("{PRELUDE}{output}")
 }
 
-fn generate_token_sets(
-    keyword_kinds: &KeywordKinds,
-    contextual_keywords: &[String],
-) -> Result<String> {
+fn generate_token_sets(keyword_kinds: &KeywordKinds, contextual_keywords: &[String]) -> String {
     let punctuation = PUNCT
         .iter()
         .filter(|(token, _)| PUNCTUATION.contains(token))
@@ -553,7 +550,7 @@ fn generate_token_sets(
     )
     .replace("pub(crate)", "\npub(crate)");
 
-    Ok(format!("{PRELUDE}{output}"))
+    format!("{PRELUDE}{output}")
 }
 
 #[derive(Debug, Default)]
@@ -1242,13 +1239,13 @@ fn keywords_match(all_keywords: &[String]) -> String {
     format!("(?xi)\\b({keywords_joined})\\b")
 }
 
-fn generate_playground_keywords(all_keywords: &[String]) -> Result<String> {
+fn generate_playground_keywords(all_keywords: &[String]) -> String {
     let mut lines = vec![format!("{PRELUDE}export const keywords = [")];
     for keyword in all_keywords {
         lines.push(format!("  \"{keyword}\","));
     }
     lines.push("] as const\n".to_string());
-    Ok(lines.join("\n"))
+    lines.join("\n")
 }
 
 fn update_textmate_keywords(all_keywords: &[String]) -> Result<()> {

@@ -133,7 +133,7 @@ impl Server {
         })
     }
 
-    fn request(&mut self, method: &str, params: Value) -> Result<Value> {
+    fn request(&mut self, method: &str, params: &Value) -> Result<Value> {
         self.next_id += 1;
         let id = self.next_id;
         write_message(
@@ -143,7 +143,7 @@ impl Server {
         self.wait_for_response(id)
     }
 
-    fn notify(&mut self, method: &str, params: Value) -> Result<()> {
+    fn notify(&mut self, method: &str, params: &Value) -> Result<()> {
         write_message(
             &mut self.stdin,
             &json!({"jsonrpc": "2.0", "method": method, "params": params}),
@@ -167,16 +167,16 @@ impl Server {
     fn initialize(&mut self) -> Result<()> {
         self.request(
             "initialize",
-            json!({"processId": null, "rootUri": null, "capabilities": {}}),
+            &json!({"processId": null, "rootUri": null, "capabilities": {}}),
         )?;
-        self.notify("initialized", json!({}))?;
+        self.notify("initialized", &json!({}))?;
         Ok(())
     }
 
     fn did_open(&mut self, content: &str) -> Result<()> {
         self.notify(
             "textDocument/didOpen",
-            json!({
+            &json!({
                 "textDocument": {
                     "uri": DOC_URI,
                     "languageId": "sql",
@@ -190,7 +190,7 @@ impl Server {
     fn goto_definition(&mut self, position: (u32, u32)) -> Result<Vec<Location>> {
         let result = self.request(
             "textDocument/definition",
-            json!({
+            &json!({
                 "textDocument": {"uri": DOC_URI},
                 "position": {"line": position.0, "character": position.1},
             }),
@@ -199,8 +199,8 @@ impl Server {
     }
 
     fn shutdown(&mut self) -> Result<()> {
-        self.request("shutdown", Value::Null)?;
-        self.notify("exit", Value::Null)?;
+        self.request("shutdown", &Value::Null)?;
+        self.notify("exit", &Value::Null)?;
         self.child.wait()?;
         Ok(())
     }

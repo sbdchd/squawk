@@ -9,8 +9,8 @@ use squawk_fmt::validation::assert_valid_format;
     glob: "*.sql",
 )]
 fn fmt(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let test_name = absolute_fixture_path
         .file_name()
         .and_then(|x| x.strip_suffix(".sql"))

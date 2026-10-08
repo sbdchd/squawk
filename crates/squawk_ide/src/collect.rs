@@ -256,7 +256,7 @@ fn target_list_columns_with_types_in_file(
     let mut columns = vec![];
 
     for target in target_list.targets() {
-        if let Some((col_name, _node)) = ColumnName::from_target(target.clone()) {
+        if let Some((col_name, _node)) = ColumnName::from_target(&target.clone()) {
             if let Some(col_name_str) = col_name.to_string() {
                 let ty = target_expr_type(db, file, &target);
                 columns.push((Name::from_string(col_name_str), ty));
@@ -348,7 +348,7 @@ fn table_query_columns_with_types(
         match kind {
             LocationKind::Table => {
                 if let Some(with_table) = node.ancestors().find_map(ast::WithTable::cast) {
-                    return with_table_columns_with_types(db, file, with_table);
+                    return with_table_columns_with_types(db, file, &with_table);
                 }
                 if let Some(t) = node.ancestors().find_map(ast::CreateTableLike::cast) {
                     return table_columns(db, file, &t);
@@ -422,7 +422,7 @@ fn returning_target_list_columns_with_types(
     let mut columns = vec![];
 
     for target in target_list.targets() {
-        if let Some((col_name, _node)) = ColumnName::from_target(target.clone()) {
+        if let Some((col_name, _node)) = ColumnName::from_target(&target.clone()) {
             if let Some(col_name_str) = col_name.to_string() {
                 let ty = target_expr_type(db, file, &target);
                 columns.push((Name::from_string(col_name_str), ty));
@@ -484,7 +484,7 @@ pub(crate) fn view_like_columns_with_types(
 pub(crate) fn with_table_columns_with_types(
     db: &dyn Db,
     file: FileId,
-    with_table: ast::WithTable,
+    with_table: &ast::WithTable,
 ) -> Vec<(Name, Option<Type>)> {
     let alias_columns: Vec<Name> = with_table
         .column_list()
@@ -516,7 +516,7 @@ pub(crate) fn with_table_columns_with_types(
 fn with_table_query_columns_with_types(
     db: &dyn Db,
     file: FileId,
-    with_table: ast::WithTable,
+    with_table: &ast::WithTable,
 ) -> Vec<(Name, Option<Type>)> {
     let Some(query) = with_table.query() else {
         return vec![];
@@ -574,7 +574,7 @@ fn column_type_at_location(db: &dyn Db, def: Location) -> Option<Type> {
     let column_name = column_name_from_node(&def_node)?;
     match ast_nav::parent_source(&def_node)? {
         ast_nav::ParentSouce::WithTable(with_table) => {
-            with_table_columns_with_types(db, def.file, with_table)
+            with_table_columns_with_types(db, def.file, &with_table)
                 .into_iter()
                 .find(|(n, _)| *n == column_name)
                 .and_then(|(_, t)| t)
@@ -628,7 +628,7 @@ pub(crate) fn column_name_from_node(node: &SyntaxNode) -> Option<Name> {
         Some(Name::from_node(&segment))
     } else {
         let target = node.ancestors().find_map(ast::Target::cast)?;
-        let (col_name, _) = ColumnName::from_target(target)?;
+        let (col_name, _) = ColumnName::from_target(&target)?;
         Some(Name::from_string(col_name.to_string()?))
     }
 }
@@ -721,7 +721,7 @@ fn columns_for_star_from_table_ptr(
             columns_for_star_from_alias(db, file, &from_item, &alias)
         }
         Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            with_table_columns_with_types(db, file, with_table)
+            with_table_columns_with_types(db, file, &with_table)
         }
         Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
             table_columns(db, file, &create_table)
@@ -805,7 +805,7 @@ pub(crate) fn star_column_names(db: &dyn Db, table_ptr: InFile<SyntaxNodePtr>) -
             .map(|name| Name::from_node(&name))
             .collect(),
         Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            with_table_columns_with_types(db, file, with_table)
+            with_table_columns_with_types(db, file, &with_table)
                 .into_iter()
                 .map(|(name, _)| name)
                 .collect()

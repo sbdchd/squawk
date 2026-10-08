@@ -183,6 +183,7 @@ pub(crate) struct Parser<'t> {
 
 const PARSER_STEP_LIMIT: usize = 15_000_000;
 
+#[derive(Clone, Copy)]
 enum TrivaBetween {
     NotAllowed,
     Allowed,

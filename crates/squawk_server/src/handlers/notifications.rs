@@ -9,31 +9,22 @@ use lsp_server::{Message, Notification};
 use crate::global_state::GlobalState;
 use crate::lsp_utils;
 
-pub(crate) fn handle_cancel(state: &mut GlobalState, params: CancelParams) -> Result<()> {
+pub(crate) fn handle_cancel(state: &mut GlobalState, params: CancelParams) {
     let id: lsp_server::RequestId = match params.id {
         Id::Int(id) => id.into(),
         Id::String(id) => id.into(),
     };
     state.cancel(id);
-    Ok(())
 }
 
-pub(crate) fn handle_did_open(
-    state: &mut GlobalState,
-    params: DidOpenTextDocumentParams,
-) -> Result<()> {
+pub(crate) fn handle_did_open(state: &mut GlobalState, params: DidOpenTextDocumentParams) {
     let uri = params.text_document.uri;
     let content = params.text_document.text;
 
     state.set(uri, content);
-
-    Ok(())
 }
 
-pub(crate) fn handle_did_change(
-    state: &mut GlobalState,
-    params: DidChangeTextDocumentParams,
-) -> Result<()> {
+pub(crate) fn handle_did_change(state: &mut GlobalState, params: DidChangeTextDocumentParams) {
     let uri = params.text_document.text_document_identifier.uri;
 
     let db = state.db();
@@ -43,8 +34,6 @@ pub(crate) fn handle_did_change(
     let updated_content = lsp_utils::apply_incremental_changes(content, params.content_changes);
 
     state.set(uri, updated_content);
-
-    Ok(())
 }
 
 pub(crate) fn handle_did_close(

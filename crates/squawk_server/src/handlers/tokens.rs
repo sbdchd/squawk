@@ -1,4 +1,3 @@
-use anyhow::Result;
 use gen_lsp_types::{LspRequestMethod, MessageDirection, Request};
 use log::info;
 
@@ -19,7 +18,7 @@ impl Request for TokensRequest {
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
-pub(crate) fn handle_tokens(snapshot: &Snapshot, params: TokensParams) -> Result<String> {
+pub(crate) fn handle_tokens(snapshot: &Snapshot, params: TokensParams) -> String {
     let uri = params.text_document.uri;
 
     info!("Generating tokens for: {uri}");
@@ -44,5 +43,5 @@ pub(crate) fn handle_tokens(snapshot: &Snapshot, params: TokensParams) -> Result
         char_pos = token_end;
     }
 
-    Ok(output.join("\n"))
+    output.join("\n")
 }

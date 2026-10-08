@@ -43,7 +43,7 @@ enum KeywordCategory {
     TypeFuncName,
 }
 
-#[derive(Sequence, PartialEq)]
+#[derive(Clone, Copy, Sequence, PartialEq)]
 enum KWType {
     ColumnTable,
     Type,

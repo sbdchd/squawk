@@ -209,12 +209,12 @@ pub(crate) fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
     }
 }
 
-pub(crate) fn lint_and_report<W: io::Write>(f: &mut W, args: LintArgs) -> Result<ExitCode> {
-    let violations = lint_files(&args)?;
+pub(crate) fn lint_and_report<W: io::Write>(f: &mut W, args: &LintArgs) -> Result<ExitCode> {
+    let violations = lint_files(args)?;
 
     let ok = violations.iter().map(|x| x.violations.len()).sum::<usize>() == 0;
 
-    print_violations(f, violations, &args.reporter, args.github_annotations)?;
+    print_violations(f, violations, args.reporter, args.github_annotations)?;
 
     Ok(if ok {
         ExitCode::SUCCESS
@@ -490,7 +490,7 @@ pub(crate) struct CheckReport {
 pub(crate) fn print_violations<W: io::Write>(
     writer: &mut W,
     reports: Vec<CheckReport>,
-    reporter: &Reporter,
+    reporter: Reporter,
     github_annotations: bool,
 ) -> Result<()> {
     if github_annotations {
@@ -556,7 +556,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Gcc,
+            Reporter::Gcc,
             false,
         );
         assert!(res.is_ok());
@@ -589,7 +589,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Tty,
+            Reporter::Tty,
             true,
         );
 
@@ -611,7 +611,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Tty,
+            Reporter::Tty,
             false,
         );
 
@@ -627,7 +627,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, "main.sql", &[], &[], None, false)],
-            &Reporter::Tty,
+            Reporter::Tty,
             false,
         );
 
@@ -649,7 +649,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Json,
+            Reporter::Json,
             false,
         );
 
@@ -670,7 +670,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Gitlab,
+            Reporter::Gitlab,
             false,
         );
 
@@ -706,7 +706,7 @@ SELECT 1;
         print_violations(
             &mut buff,
             vec![check_sql(sql, "main.sql", &[], &[], None, false)],
-            &reporter,
+            reporter,
             false,
         )
         .unwrap();

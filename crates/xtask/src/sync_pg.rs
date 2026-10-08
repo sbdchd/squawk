@@ -470,13 +470,13 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(
         output.push('\n');
     }
 
-    let processed = preprocess_sql_variables(&output, &template_vars_regex)?;
+    let processed = preprocess_sql_variables(&output, &template_vars_regex);
     dest.write_all(processed.as_bytes())?;
 
     Ok(())
 }
 
-fn preprocess_sql_variables(sql: &str, template_vars_regex: &Regex) -> Result<String> {
+fn preprocess_sql_variables(sql: &str, template_vars_regex: &Regex) -> String {
     let replace_sql = |sql: &str| {
         let mut sql = sql.to_owned();
         for &(from, to) in VARIABLE_REPLACEMENTS {
@@ -502,17 +502,17 @@ fn preprocess_sql_variables(sql: &str, template_vars_regex: &Regex) -> Result<St
             _ => false,
         };
         if verbatim {
-            result.push_str(&replace_sql(&sql[sql_start..offset])?);
+            result.push_str(&replace_sql(&sql[sql_start..offset]));
             result.push_str(text);
             sql_start = end;
         }
         offset = end;
     }
-    result.push_str(&replace_sql(&sql[sql_start..])?);
-    Ok(result)
+    result.push_str(&replace_sql(&sql[sql_start..]));
+    result
 }
 
-fn replace_template_vars(line: &str, template_vars_regex: &Regex) -> Result<String> {
+fn replace_template_vars(line: &str, template_vars_regex: &Regex) -> String {
     let mut result = String::new();
     let mut char_indices = line.char_indices().peekable();
     let mut in_single_quote = false;
@@ -578,7 +578,7 @@ fn replace_template_vars(line: &str, template_vars_regex: &Regex) -> Result<Stri
         }
     }
 
-    Ok(result)
+    result
 }
 
 #[cfg(test)]

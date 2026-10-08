@@ -9,7 +9,7 @@ use crate::lsp_utils;
 
 pub(crate) fn handle_formatting(
     snapshot: &Snapshot,
-    params: DocumentFormattingParams,
+    params: &DocumentFormattingParams,
 ) -> Result<Option<Vec<TextEdit>>> {
     let db = snapshot.db();
     let file = snapshot.file(&params.text_document.uri).unwrap();

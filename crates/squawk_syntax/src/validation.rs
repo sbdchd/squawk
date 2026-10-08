@@ -22,55 +22,55 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
         match_ast! {
             match node {
                 ast::Aggregate(it) => validate_aggregate_params(it.param_list(), errors),
-                ast::AtomicBody(it) => validate_atomic_body(it, errors),
-                ast::BinExpr(it) => validate_bin_expr(it, errors),
-                ast::CallExpr(it) => validate_call_expr(it, errors),
+                ast::AtomicBody(it) => validate_atomic_body(&it, errors),
+                ast::BinExpr(it) => validate_bin_expr(&it, errors),
+                ast::CallExpr(it) => validate_call_expr(&it, errors),
                 ast::CreateAggregate(it) => {
                     validate_aggregate_params(it.param_list(), errors);
                     validate_aggregate_variadic_params(it.param_list(), errors);
                 },
-                ast::CreateFunction(it) => validate_create_function(it, errors),
-                ast::CreateProcedure(it) => validate_create_procedure(it, errors),
-                ast::CreateTable(it) => validate_create_table(it, errors),
-                ast::CustomOp(it) => validate_custom_op_length(it, errors),
-                ast::Do(it) => validate_do(it, errors),
-                ast::DistinctOn(it) => validate_distinct_on(it, errors),
-                ast::ExceptTableClause(it) => validate_except_table_clause(it, errors),
-                ast::FuncOptionList(it) => validate_func_option_list(it, errors),
-                ast::FunctionFromItem(it) => validate_function_from_item(it, errors),
+                ast::CreateFunction(it) => validate_create_function(&it, errors),
+                ast::CreateProcedure(it) => validate_create_procedure(&it, errors),
+                ast::CreateTable(it) => validate_create_table(&it, errors),
+                ast::CustomOp(it) => validate_custom_op_length(&it, errors),
+                ast::Do(it) => validate_do(&it, errors),
+                ast::DistinctOn(it) => validate_distinct_on(&it, errors),
+                ast::ExceptTableClause(it) => validate_except_table_clause(&it, errors),
+                ast::FuncOptionList(it) => validate_func_option_list(&it, errors),
+                ast::FunctionFromItem(it) => validate_function_from_item(&it, errors),
                 ast::FunctionSig(it) => validate_param_defaults(it.param_list(), errors),
-                ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
+                ast::PrefixExpr(it) => validate_prefix_expr(&it, errors),
                 ast::ProcedureSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::RoutineSig(it) => validate_param_defaults(it.param_list(), errors),
-                ast::ArrayExpr(it) => validate_array_expr(it, errors),
-                ast::JoinExpr(it) => validate_join_expr(it, errors),
-                ast::JsonArrayFn(it) => validate_json_array_fn(it, errors),
-                ast::JsonObjectFn(it) => validate_json_object_fn(it, errors),
-                ast::Literal(it) => validate_literal(it, errors),
-                ast::NameRef(it) => validate_name_ref(it, errors),
-                ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
-                ast::ParenFromItem(it) => validate_paren_from_item(it, errors),
-                ast::PartitionForValuesWith(it) => validate_hash_partition_bounds(it, errors),
+                ast::ArrayExpr(it) => validate_array_expr(&it, errors),
+                ast::JoinExpr(it) => validate_join_expr(&it, errors),
+                ast::JsonArrayFn(it) => validate_json_array_fn(&it, errors),
+                ast::JsonObjectFn(it) => validate_json_object_fn(&it, errors),
+                ast::Literal(it) => validate_literal(&it, errors),
+                ast::NameRef(it) => validate_name_ref(&it, errors),
+                ast::NonStandardParam(it) => validate_non_standard_param(&it, errors),
+                ast::ParenFromItem(it) => validate_paren_from_item(&it, errors),
+                ast::PartitionForValuesWith(it) => validate_hash_partition_bounds(&it, errors),
                 ast::PercentType(it) => validate_plpgsql_percent_type(
                     it.syntax(),
                     it.percent_type_clause().and_then(|it| it.percent_token()),
                     "%TYPE",
                     errors,
                 ),
-                ast::PlpgsqlBlock(it) => validate_plpgsql_block(it, errors),
+                ast::PlpgsqlBlock(it) => validate_plpgsql_block(&it, errors),
                 ast::PlpgsqlCaseStmt(it) => validate_no_bare_case(it.subject(), errors),
                 ast::PlpgsqlCompOptionPrintStrictParams(it) => {
-                    validate_print_strict_params(it, errors);
+                    validate_print_strict_params(&it, errors);
                 },
                 ast::PlpgsqlCaseWhen(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlElsifClause(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlFetchStmt(it) => {
                     validate_fetch_no_strict(it.into_clause(), errors);
-                    validate_fetch_single_row(it, errors);
+                    validate_fetch_single_row(&it, errors);
                 },
-                ast::PlpgsqlForCursorStmt(it) => validate_for_cursor_single_var(it, errors),
-                ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(it, errors),
-                ast::PlpgsqlForQueryStmt(it) => validate_for_query_no_reverse(it, errors),
+                ast::PlpgsqlForCursorStmt(it) => validate_for_cursor_single_var(&it, errors),
+                ast::PlpgsqlForIStmt(it) => validate_for_i_single_var(&it, errors),
+                ast::PlpgsqlForQueryStmt(it) => validate_for_query_no_reverse(&it, errors),
                 ast::PlpgsqlIfStmt(it) => validate_no_bare_case(it.cond(), errors),
                 ast::PlpgsqlPercentRowtype(it) => validate_plpgsql_percent_type(
                     it.syntax(),
@@ -78,18 +78,18 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                     "%ROWTYPE",
                     errors,
                 ),
-                ast::RelationFromItem(it) => validate_relation_from_item(it, errors),
-                ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
-                ast::Select(it) => validate_select(it, errors),
-                ast::SelectClause(it) => validate_select_clause(it, errors),
-                ast::SelectInto(it) => validate_select_into(it, errors),
-                ast::SetColumnList(it) => validate_set_column_list(it, errors),
-                ast::SetSingleColumn(it) => validate_set_single_column(it, errors),
-                ast::ToConfigValue(it) => validate_to_config_value(it, errors),
-                ast::SourceFile(it) => validate_source_file(it, errors),
-                ast::StorageMode(it) => validate_storage_mode(it, errors),
-                ast::TableName(it) => validate_table_name(it, errors),
-                ast::Type(it) => validate_type_modifiers(it, errors),
+                ast::RelationFromItem(it) => validate_relation_from_item(&it, errors),
+                ast::RuleStmtList(it) => validate_rule_stmt_list(&it, errors),
+                ast::Select(it) => validate_select(&it, errors),
+                ast::SelectClause(it) => validate_select_clause(&it, errors),
+                ast::SelectInto(it) => validate_select_into(&it, errors),
+                ast::SetColumnList(it) => validate_set_column_list(&it, errors),
+                ast::SetSingleColumn(it) => validate_set_single_column(&it, errors),
+                ast::ToConfigValue(it) => validate_to_config_value(&it, errors),
+                ast::SourceFile(it) => validate_source_file(&it, errors),
+                ast::StorageMode(it) => validate_storage_mode(&it, errors),
+                ast::TableName(it) => validate_table_name(&it, errors),
+                ast::Type(it) => validate_type_modifiers(&it, errors),
                 _ => (),
             }
         }
@@ -103,7 +103,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_distinct_on(distinct_on: ast::DistinctOn, acc: &mut Vec<SyntaxError>) {
+fn validate_distinct_on(distinct_on: &ast::DistinctOn, acc: &mut Vec<SyntaxError>) {
     if distinct_on.exprs().next().is_none() {
         acc.push(SyntaxError::new(
             "Expected at least one expression in DISTINCT ON list.",
@@ -112,7 +112,7 @@ fn validate_distinct_on(distinct_on: ast::DistinctOn, acc: &mut Vec<SyntaxError>
     }
 }
 
-fn validate_except_table_clause(clause: ast::ExceptTableClause, acc: &mut Vec<SyntaxError>) {
+fn validate_except_table_clause(clause: &ast::ExceptTableClause, acc: &mut Vec<SyntaxError>) {
     let mut names = clause.except_table_names();
     let Some(first) = names.next() else {
         return;
@@ -133,7 +133,7 @@ fn validate_except_table_clause(clause: ast::ExceptTableClause, acc: &mut Vec<Sy
     }
 }
 
-fn validate_function_from_item(item: ast::FunctionFromItem, acc: &mut Vec<SyntaxError>) {
+fn validate_function_from_item(item: &ast::FunctionFromItem, acc: &mut Vec<SyntaxError>) {
     if let Some(only) = item.only_token() {
         acc.push(SyntaxError::new(
             "ONLY cannot be used with a function call",
@@ -142,7 +142,7 @@ fn validate_function_from_item(item: ast::FunctionFromItem, acc: &mut Vec<Syntax
     }
 }
 
-fn validate_hash_partition_bounds(it: ast::PartitionForValuesWith, acc: &mut Vec<SyntaxError>) {
+fn validate_hash_partition_bounds(it: &ast::PartitionForValuesWith, acc: &mut Vec<SyntaxError>) {
     let mut seen_modulus = false;
     let mut seen_remainder = false;
     for bound in it.bounds() {
@@ -180,7 +180,7 @@ fn validate_hash_partition_bounds(it: ast::PartitionForValuesWith, acc: &mut Vec
     }
 }
 
-fn validate_name_ref(name_ref: ast::NameRef, acc: &mut Vec<SyntaxError>) {
+fn validate_name_ref(name_ref: &ast::NameRef, acc: &mut Vec<SyntaxError>) {
     let Some(token) = name_ref.syntax().first_token() else {
         return;
     };
@@ -204,7 +204,7 @@ fn validate_name_ref(name_ref: ast::NameRef, acc: &mut Vec<SyntaxError>) {
 
 // err: `create table left ()`
 // ok:  `create table foo.left ()`
-fn validate_table_name(table_name: ast::TableName, acc: &mut Vec<SyntaxError>) {
+fn validate_table_name(table_name: &ast::TableName, acc: &mut Vec<SyntaxError>) {
     let Some(token) = table_name.syntax().first_token() else {
         return;
     };
@@ -217,8 +217,8 @@ fn validate_table_name(table_name: ast::TableName, acc: &mut Vec<SyntaxError>) {
     ));
 }
 
-fn validate_call_expr(call_expr: ast::CallExpr, acc: &mut Vec<SyntaxError>) {
-    validate_sub_type_fn(&call_expr, acc);
+fn validate_call_expr(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
+    validate_sub_type_fn(call_expr, acc);
     let Some(ast::Expr::NameRef(name_ref)) = call_expr.expr() else {
         return;
     };
@@ -275,7 +275,7 @@ fn validate_sub_type_fn(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_relation_from_item(item: ast::RelationFromItem, acc: &mut Vec<SyntaxError>) {
+fn validate_relation_from_item(item: &ast::RelationFromItem, acc: &mut Vec<SyntaxError>) {
     if let Some(lateral) = item.lateral_token() {
         acc.push(SyntaxError::new(
             "LATERAL cannot be used with a bare relation",
@@ -284,7 +284,7 @@ fn validate_relation_from_item(item: ast::RelationFromItem, acc: &mut Vec<Syntax
     }
 }
 
-fn validate_paren_from_item(item: ast::ParenFromItem, acc: &mut Vec<SyntaxError>) {
+fn validate_paren_from_item(item: &ast::ParenFromItem, acc: &mut Vec<SyntaxError>) {
     if item.only_token().is_some()
         && let Some(lateral) = item.lateral_token()
     {
@@ -305,7 +305,7 @@ fn validate_paren_from_item(item: ast::ParenFromItem, acc: &mut Vec<SyntaxError>
                 false
             }
             Some(ast::FromListItem::FromItem(ast::FromItem::ParenFromItem(item))) => {
-                !paren_from_item_contains_join(item)
+                !paren_from_item_contains_join(&item)
             }
             Some(ast::FromListItem::FromItem(_)) => true,
             None => false,
@@ -335,7 +335,7 @@ fn validate_paren_from_item(item: ast::ParenFromItem, acc: &mut Vec<SyntaxError>
     }
 }
 
-fn paren_from_item_contains_join(item: ast::ParenFromItem) -> bool {
+fn paren_from_item_contains_join(item: &ast::ParenFromItem) -> bool {
     if item.alias().is_some() {
         return false;
     }
@@ -345,13 +345,13 @@ fn paren_from_item_contains_join(item: ast::ParenFromItem) -> bool {
     match paren_expr.from_list_item() {
         Some(ast::FromListItem::JoinExpr(_)) => true,
         Some(ast::FromListItem::FromItem(ast::FromItem::ParenFromItem(item))) => {
-            paren_from_item_contains_join(item)
+            paren_from_item_contains_join(&item)
         }
         Some(ast::FromListItem::FromItem(_)) | None => false,
     }
 }
 
-fn validate_atomic_body(it: ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
+fn validate_atomic_body(it: &ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
     for option in it.routine_body_stmts() {
         let ast::RoutineBodyStmt::Stmt(stmt) = option else {
             continue;
@@ -402,7 +402,7 @@ fn validate_plpgsql_percent_type(
     ));
 }
 
-fn validate_plpgsql_block(it: ast::PlpgsqlBlock, acc: &mut Vec<SyntaxError>) {
+fn validate_plpgsql_block(it: &ast::PlpgsqlBlock, acc: &mut Vec<SyntaxError>) {
     if it.semicolon_token().is_some()
         || it
             .syntax()
@@ -418,7 +418,7 @@ fn validate_plpgsql_block(it: ast::PlpgsqlBlock, acc: &mut Vec<SyntaxError>) {
 }
 
 fn validate_print_strict_params(
-    it: ast::PlpgsqlCompOptionPrintStrictParams,
+    it: &ast::PlpgsqlCompOptionPrintStrictParams,
     acc: &mut Vec<SyntaxError>,
 ) {
     let Some(value) = it.option_value() else {
@@ -438,7 +438,7 @@ fn validate_print_strict_params(
 // fetch forward 2 from c into x;
 // -- ok
 // fetch forward from c into x;
-fn validate_fetch_single_row(it: ast::PlpgsqlFetchStmt, acc: &mut Vec<SyntaxError>) {
+fn validate_fetch_single_row(it: &ast::PlpgsqlFetchStmt, acc: &mut Vec<SyntaxError>) {
     let Some(direction) = it.direction() else {
         return;
     };
@@ -474,7 +474,7 @@ fn validate_fetch_no_strict(it: Option<ast::PlpgsqlIntoClause>, acc: &mut Vec<Sy
 // for i, j in 1..2 loop null; end loop;
 // -- ok
 // for i in 1..2 loop null; end loop;
-fn validate_for_i_single_var(it: ast::PlpgsqlForIStmt, acc: &mut Vec<SyntaxError>) {
+fn validate_for_i_single_var(it: &ast::PlpgsqlForIStmt, acc: &mut Vec<SyntaxError>) {
     for var in it.vars().skip(1) {
         acc.push(SyntaxError::new(
             "integer FOR loop takes one variable",
@@ -487,7 +487,7 @@ fn validate_for_i_single_var(it: ast::PlpgsqlForIStmt, acc: &mut Vec<SyntaxError
 // for a, b in c loop null; end loop;
 // -- ok
 // for a in c loop null; end loop;
-fn validate_for_cursor_single_var(it: ast::PlpgsqlForCursorStmt, acc: &mut Vec<SyntaxError>) {
+fn validate_for_cursor_single_var(it: &ast::PlpgsqlForCursorStmt, acc: &mut Vec<SyntaxError>) {
     for var in it.vars().skip(1) {
         acc.push(SyntaxError::new(
             "cursor FOR loop takes one variable",
@@ -500,7 +500,7 @@ fn validate_for_cursor_single_var(it: ast::PlpgsqlForCursorStmt, acc: &mut Vec<S
 // for r in reverse select 1 loop null; end loop;
 // -- ok
 // for r in select 1 loop null; end loop;
-fn validate_for_query_no_reverse(it: ast::PlpgsqlForQueryStmt, acc: &mut Vec<SyntaxError>) {
+fn validate_for_query_no_reverse(it: &ast::PlpgsqlForQueryStmt, acc: &mut Vec<SyntaxError>) {
     let Some(reverse) = it.reverse_token() else {
         return;
     };
@@ -539,7 +539,7 @@ fn validate_no_bare_case(cond: Option<ast::PlpgsqlExpr>, acc: &mut Vec<SyntaxErr
     }
 }
 
-fn validate_rule_stmt_list(it: ast::RuleStmtList, acc: &mut Vec<SyntaxError>) {
+fn validate_rule_stmt_list(it: &ast::RuleStmtList, acc: &mut Vec<SyntaxError>) {
     let mut stmts = it.rule_stmts().peekable();
     while let Some(stmt) = stmts.next() {
         let syntax = stmt.syntax();
@@ -558,7 +558,7 @@ fn validate_rule_stmt_list(it: ast::RuleStmtList, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_source_file(it: ast::SourceFile, acc: &mut Vec<SyntaxError>) {
+fn validate_source_file(it: &ast::SourceFile, acc: &mut Vec<SyntaxError>) {
     let mut stmts = it.stmts().peekable();
     while let Some(stmt) = stmts.next() {
         let syntax = stmt.syntax();
@@ -584,7 +584,7 @@ fn validate_source_file(it: ast::SourceFile, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_select_clause(clause: ast::SelectClause, acc: &mut Vec<SyntaxError>) {
+fn validate_select_clause(clause: &ast::SelectClause, acc: &mut Vec<SyntaxError>) {
     let Some(ast::SelectQuantifier::DistinctClause(distinct)) = clause.select_quantifier() else {
         return;
     };
@@ -596,7 +596,7 @@ fn validate_select_clause(clause: ast::SelectClause, acc: &mut Vec<SyntaxError>)
     }
 }
 
-fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
+fn validate_select(it: &ast::Select, acc: &mut Vec<SyntaxError>) {
     let parent_kind = it.syntax().parent().map(|parent| parent.kind());
     if parent_kind == Some(TUPLE_EXPR) {
         let message = if it
@@ -641,7 +641,7 @@ fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_storage_mode(mode: ast::StorageMode, acc: &mut Vec<SyntaxError>) {
+fn validate_storage_mode(mode: &ast::StorageMode, acc: &mut Vec<SyntaxError>) {
     let mode_name = ast::normalize_name_node(mode.syntax());
     if !["plain", "external", "extended", "main", "default"]
         .iter()
@@ -654,7 +654,7 @@ fn validate_storage_mode(mode: ast::StorageMode, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_type_modifiers(ty: ast::Type, acc: &mut Vec<SyntaxError>) {
+fn validate_type_modifiers(ty: &ast::Type, acc: &mut Vec<SyntaxError>) {
     let Some(arg_list) = ty.arg_list() else {
         return;
     };
@@ -737,7 +737,7 @@ fn is_simple_type_modifier(expr: &ast::Expr) -> bool {
     }
 }
 
-fn validate_select_into(it: ast::SelectInto, acc: &mut Vec<SyntaxError>) {
+fn validate_select_into(it: &ast::SelectInto, acc: &mut Vec<SyntaxError>) {
     for (child, ancestor) in it.syntax().ancestors().zip(it.syntax().ancestors().skip(1)) {
         let kind = ancestor.kind();
         if ast::ParenSelect::can_cast(kind) {
@@ -769,7 +769,7 @@ fn validate_select_into(it: ast::SelectInto, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_create_table(it: ast::CreateTable, acc: &mut Vec<SyntaxError>) {
+fn validate_create_table(it: &ast::CreateTable, acc: &mut Vec<SyntaxError>) {
     let Some(arg_list) = it.table_arg_list() else {
         return;
     };
@@ -800,7 +800,7 @@ enum LookingFor {
     OpenString,
     CloseString(TextSize, bool),
 }
-fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
+fn validate_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
     let mut state = LookingFor::OpenString;
     let mut maybe_errors = vec![];
 
@@ -862,8 +862,8 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
         }
     }
 
-    validate_unicode_esc_string(&lit, acc);
-    validate_default_literal(&lit, acc);
+    validate_unicode_esc_string(lit, acc);
+    validate_default_literal(lit, acc);
 }
 
 fn validate_default_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
@@ -903,7 +903,7 @@ fn is_row_in_insert_values(row: &SyntaxNode) -> bool {
         .is_some_and(|p| matches!(p.kind(), INSERT | MERGE_INSERT))
 }
 
-fn validate_set_column_list(list: ast::SetColumnList, acc: &mut Vec<SyntaxError>) {
+fn validate_set_column_list(list: &ast::SetColumnList, acc: &mut Vec<SyntaxError>) {
     if list.set_columns().next().is_none() {
         acc.push(SyntaxError::new(
             "Expected at least one column assignment after SET",
@@ -912,7 +912,7 @@ fn validate_set_column_list(list: ast::SetColumnList, acc: &mut Vec<SyntaxError>
     }
 }
 
-fn validate_to_config_value(it: ast::ToConfigValue, acc: &mut Vec<SyntaxError>) {
+fn validate_to_config_value(it: &ast::ToConfigValue, acc: &mut Vec<SyntaxError>) {
     if it.default_token().is_none() && it.config_values().next().is_none() {
         acc.push(SyntaxError::new(
             "Expected DEFAULT, string, identifier, number, or list of values",
@@ -921,7 +921,7 @@ fn validate_to_config_value(it: ast::ToConfigValue, acc: &mut Vec<SyntaxError>) 
     }
 }
 
-fn validate_set_single_column(it: ast::SetSingleColumn, acc: &mut Vec<SyntaxError>) {
+fn validate_set_single_column(it: &ast::SetSingleColumn, acc: &mut Vec<SyntaxError>) {
     let Some(set_expr) = it.set_expr() else {
         return;
     };
@@ -1079,10 +1079,10 @@ fn offset_range(start: TextSize, range: Range<usize>) -> TextRange {
     TextRange::new(begin, end)
 }
 
-fn validate_bin_expr(bin_expr: ast::BinExpr, acc: &mut Vec<SyntaxError>) {
+fn validate_bin_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
     match bin_expr.op() {
-        Some(ast::BinOp::In(_) | ast::BinOp::NotIn(_)) => validate_in_expr(&bin_expr, acc),
-        Some(ast::BinOp::Overlaps(_)) => validate_overlaps_expr(&bin_expr, acc),
+        Some(ast::BinOp::In(_) | ast::BinOp::NotIn(_)) => validate_in_expr(bin_expr, acc),
+        Some(ast::BinOp::Overlaps(_)) => validate_overlaps_expr(bin_expr, acc),
         _ => (),
     }
 }
@@ -1123,7 +1123,7 @@ fn validate_overlaps_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
+fn validate_join_expr(join_expr: &ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
     let Some(join) = join_expr.join() else {
         return;
     };
@@ -1183,7 +1183,7 @@ fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_json_array_fn(it: ast::JsonArrayFn, acc: &mut Vec<SyntaxError>) {
+fn validate_json_array_fn(it: &ast::JsonArrayFn, acc: &mut Vec<SyntaxError>) {
     let Some(select) = it.json_select_formats().next() else {
         return;
     };
@@ -1196,7 +1196,7 @@ fn validate_json_array_fn(it: ast::JsonArrayFn, acc: &mut Vec<SyntaxError>) {
     ));
 }
 
-fn validate_json_object_fn(it: ast::JsonObjectFn, acc: &mut Vec<SyntaxError>) {
+fn validate_json_object_fn(it: &ast::JsonObjectFn, acc: &mut Vec<SyntaxError>) {
     let Some(key_value) = it.json_key_values().next() else {
         return;
     };
@@ -1212,7 +1212,7 @@ fn validate_json_object_fn(it: ast::JsonObjectFn, acc: &mut Vec<SyntaxError>) {
     ));
 }
 
-fn validate_array_expr(array_expr: ast::ArrayExpr, acc: &mut Vec<SyntaxError>) {
+fn validate_array_expr(array_expr: &ast::ArrayExpr, acc: &mut Vec<SyntaxError>) {
     if array_expr.array_token().is_none() {
         let parent_kind = array_expr.syntax().parent().map(|x| x.kind());
         if matches!(parent_kind, Some(ARRAY_EXPR)) {
@@ -1238,7 +1238,7 @@ fn has_select_variant(node: &SyntaxNode) -> bool {
     })
 }
 
-fn validate_prefix_expr(prefix_expr: ast::PrefixExpr, acc: &mut Vec<SyntaxError>) {
+fn validate_prefix_expr(prefix_expr: &ast::PrefixExpr, acc: &mut Vec<SyntaxError>) {
     let Some(op) = prefix_expr
         .syntax()
         .children()
@@ -1246,12 +1246,12 @@ fn validate_prefix_expr(prefix_expr: ast::PrefixExpr, acc: &mut Vec<SyntaxError>
     else {
         return;
     };
-    validate_custom_op(op, acc);
+    validate_custom_op(&op, acc);
 }
 
 // NAMEDATALEN == 64 and idents and operators can be NAMEDATALEN - 1
 const MAX_OPERATOR_LEN: TextSize = TextSize::new(63);
-fn validate_custom_op_length(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
+fn validate_custom_op_length(op: &ast::CustomOp, acc: &mut Vec<SyntaxError>) {
     let range = op.syntax().text_range();
     if range.len() > MAX_OPERATOR_LEN {
         acc.push(SyntaxError::new("operator too long", range));
@@ -1259,7 +1259,7 @@ fn validate_custom_op_length(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
 }
 
 // https://www.postgresql.org/docs/17/sql-createoperator.html
-fn validate_custom_op(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
+fn validate_custom_op(op: &ast::CustomOp, acc: &mut Vec<SyntaxError>) {
     // TODO: there's more we can validate
     let mut found = 0;
     for node_or_token in op.syntax().children_with_tokens() {
@@ -1285,7 +1285,7 @@ fn validate_custom_op(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
     }
 }
 
-fn validate_create_function(function: ast::CreateFunction, acc: &mut Vec<SyntaxError>) {
+fn validate_create_function(function: &ast::CreateFunction, acc: &mut Vec<SyntaxError>) {
     validate_routine_body(function.option_list(), function.body(), acc);
     validate_variadic_params(function.param_list(), ParamContext::Func, acc);
 
@@ -1314,7 +1314,7 @@ fn validate_create_function(function: ast::CreateFunction, acc: &mut Vec<SyntaxE
     }
 }
 
-fn validate_create_procedure(procedure: ast::CreateProcedure, acc: &mut Vec<SyntaxError>) {
+fn validate_create_procedure(procedure: &ast::CreateProcedure, acc: &mut Vec<SyntaxError>) {
     validate_routine_body(procedure.option_list(), procedure.body(), acc);
     validate_variadic_params(procedure.param_list(), ParamContext::Procedure, acc);
 }
@@ -1410,7 +1410,7 @@ fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut
     }
 }
 
-fn validate_non_standard_param(param: ast::NonStandardParam, acc: &mut Vec<SyntaxError>) {
+fn validate_non_standard_param(param: &ast::NonStandardParam, acc: &mut Vec<SyntaxError>) {
     acc.push(SyntaxError::new(
         "Invalid parameter type. Use positional params like $1 instead.",
         param.syntax().text_range(),
@@ -1459,7 +1459,7 @@ fn func_option_group(option: &ast::FuncOption) -> Option<FuncOptionGroup> {
     Some(group)
 }
 
-fn validate_func_option_list(option_list: ast::FuncOptionList, acc: &mut Vec<SyntaxError>) {
+fn validate_func_option_list(option_list: &ast::FuncOptionList, acc: &mut Vec<SyntaxError>) {
     let mut seen: Vec<FuncOptionGroup> = vec![];
     for option in option_list.options() {
         let Some(group) = func_option_group(&option) else {
@@ -1496,7 +1496,7 @@ fn validate_routine_body(
     }
 }
 
-fn validate_do(do_: ast::Do, acc: &mut Vec<SyntaxError>) {
+fn validate_do(do_: &ast::Do, acc: &mut Vec<SyntaxError>) {
     let mut seen_language = false;
     let mut seen_body = false;
     for part in do_.language_and_body() {

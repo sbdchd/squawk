@@ -1,5 +1,4 @@
-use anyhow::Result;
-use gen_lsp_types::SelectionRangeParams;
+use gen_lsp_types::{SelectionRange, SelectionRangeParams};
 use rowan::TextRange;
 use squawk_ide::db::{line_index, parse};
 
@@ -9,7 +8,7 @@ use crate::lsp_utils;
 pub(crate) fn handle_selection_range(
     snapshot: &Snapshot,
     params: SelectionRangeParams,
-) -> Result<Option<Vec<gen_lsp_types::SelectionRange>>> {
+) -> Vec<SelectionRange> {
     let uri = params.text_document.uri;
 
     let db = snapshot.db();
@@ -53,5 +52,5 @@ pub(crate) fn handle_selection_range(
         selection_ranges.push(range);
     }
 
-    Ok(Some(selection_ranges))
+    selection_ranges
 }

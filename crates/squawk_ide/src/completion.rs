@@ -45,7 +45,7 @@ pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem
         CompletionContext::TableOnly => table_completions(&source_file, &token),
         CompletionContext::Default => default_completions(),
         CompletionContext::SelectClause(select_clause) => {
-            select_completions(db, file, select_clause, &token)
+            select_completions(db, file, &select_clause, &token)
         }
         CompletionContext::SelectClauses(select) => select_clauses_completions(&select),
         CompletionContext::SelectExpr(select) => select_expr_completions(db, file, &select, &token),
@@ -63,7 +63,7 @@ pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem
 fn select_completions(
     db: &dyn Db,
     file: FileId,
-    select_clause: ast::SelectClause,
+    select_clause: &ast::SelectClause,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
     let binder = bind(db, file);
@@ -369,7 +369,7 @@ fn column_completions_from_clause(
                 }));
             }
             Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-                let columns = collect::with_table_columns_with_types(db, file, with_table);
+                let columns = collect::with_table_columns_with_types(db, file, &with_table);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
                     kind: CompletionItemKind::Column,
@@ -497,7 +497,7 @@ fn alias_base_columns_with_types(
                 .collect()
         }
         Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            collect::with_table_columns_with_types(db, file, with_table)
+            collect::with_table_columns_with_types(db, file, &with_table)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()

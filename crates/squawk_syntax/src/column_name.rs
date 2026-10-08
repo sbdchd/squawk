@@ -40,7 +40,7 @@ impl fmt::Display for ColumnNameValue {
 
 impl ColumnName {
     // Get the alias, otherwise infer the column name.
-    pub fn from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
+    pub fn from_target(target: &ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(as_name) = target.as_name()
             && let Some(name_node) = as_name.name()
         {
@@ -53,7 +53,7 @@ impl ColumnName {
     }
 
     // Ignore any aliases, just infer the what the column name.
-    pub fn inferred_from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
+    pub fn inferred_from_target(target: &ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(expr) = target.expr()
             && let Some(name) = name_from_expr(expr, false)
         {
@@ -100,15 +100,13 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
     match ty {
         ast::Type::PathType(path_type) => {
             if let Some(name_ref) = path_type.path_ref().and_then(|x| x.segment()) {
-                return name_from_name_ref(&name_ref, true, path_type.arg_list().as_ref()).map(
-                    |(column, node)| {
-                        let column = match column {
-                            ColumnName::Column(c) => ColumnName::new(c, unknown_column),
-                            _ => column,
-                        };
-                        (column, node)
-                    },
-                );
+                let (column, node) =
+                    name_from_name_ref(&name_ref, true, path_type.arg_list().as_ref());
+                let column = match column {
+                    ColumnName::Column(c) => ColumnName::new(c, unknown_column),
+                    _ => column,
+                };
+                return Some((column, node));
             }
         }
         ast::Type::BitType(bit_type) => {
@@ -185,18 +183,18 @@ fn name_from_name_ref(
     name_ref: &impl ast::NameLike,
     in_type: bool,
     arg_list: Option<&ast::ArgList>,
-) -> Option<(ColumnName, SyntaxNode)> {
+) -> (ColumnName, SyntaxNode) {
     if in_type {
         for node in name_ref.syntax().children_with_tokens() {
             match node.kind() {
                 SyntaxKind::BIGINT_KW => {
-                    return Some((ColumnName::column("int8"), name_ref.syntax().clone()));
+                    return (ColumnName::column("int8"), name_ref.syntax().clone());
                 }
                 SyntaxKind::BOOLEAN_KW => {
-                    return Some((ColumnName::column("bool"), name_ref.syntax().clone()));
+                    return (ColumnName::column("bool"), name_ref.syntax().clone());
                 }
                 SyntaxKind::DEC_KW | SyntaxKind::DECIMAL_KW => {
-                    return Some((ColumnName::column("numeric"), name_ref.syntax().clone()));
+                    return (ColumnName::column("numeric"), name_ref.syntax().clone());
                 }
                 SyntaxKind::FLOAT_KW => {
                     let precision = arg_list.and_then(|arg| {
@@ -215,25 +213,25 @@ fn name_from_name_ref(
                     } else {
                         "float8"
                     };
-                    return Some((ColumnName::column(name), name_ref.syntax().clone()));
+                    return (ColumnName::column(name), name_ref.syntax().clone());
                 }
                 SyntaxKind::INT_KW | SyntaxKind::INTEGER_KW => {
-                    return Some((ColumnName::column("int4"), name_ref.syntax().clone()));
+                    return (ColumnName::column("int4"), name_ref.syntax().clone());
                 }
                 SyntaxKind::SMALLINT_KW => {
-                    return Some((ColumnName::column("int2"), name_ref.syntax().clone()));
+                    return (ColumnName::column("int2"), name_ref.syntax().clone());
                 }
                 SyntaxKind::REAL_KW => {
-                    return Some((ColumnName::column("float4"), name_ref.syntax().clone()));
+                    return (ColumnName::column("float4"), name_ref.syntax().clone());
                 }
                 _ => (),
             }
         }
     }
-    return Some((
+    return (
         ColumnName::from_name_node(name_ref.syntax()),
         name_ref.syntax().clone(),
-    ));
+    );
 }
 
 /*
@@ -413,11 +411,11 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     | ast::Expr::SliceExpr(_) => unreachable!("not possible in the grammar"),
                     ast::Expr::FieldExpr(field_expr) => {
                         if let Some(name_ref) = field_expr.field() {
-                            return name_from_name_ref(&name_ref, in_type, None);
+                            return Some(name_from_name_ref(&name_ref, in_type, None));
                         }
                     }
                     ast::Expr::NameRef(name_ref) => {
-                        return name_from_name_ref(&name_ref, in_type, None);
+                        return Some(name_from_name_ref(&name_ref, in_type, None));
                     }
                 }
             }
@@ -452,7 +450,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
         }
         ast::Expr::FieldExpr(field_expr) => {
             if let Some(name_ref) = field_expr.field() {
-                return name_from_name_ref(&name_ref, in_type, None);
+                return Some(name_from_name_ref(&name_ref, in_type, None));
             }
         }
         ast::Expr::IndexExpr(index_expr) => {
@@ -491,7 +489,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             _ => return Some((ColumnName::UnknownColumn(None), node)),
         },
         ast::Expr::NameRef(name_ref) => {
-            return name_from_name_ref(&name_ref, in_type, None);
+            return Some(name_from_name_ref(&name_ref, in_type, None));
         }
         ast::Expr::ParenExpr(paren_expr) => {
             if let Some(expr) = paren_expr.expr() {
@@ -503,7 +501,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     .map(|x| x.targets())
                 && let Some(target) = targets.next()
             {
-                return ColumnName::from_target(target);
+                return ColumnName::from_target(&target);
             }
         }
         ast::Expr::TupleExpr(_) => {
@@ -690,7 +688,7 @@ fn examples() {
             .and_then(|tl| tl.targets().next())
             .unwrap();
 
-        ColumnName::from_target(target)
+        ColumnName::from_target(&target)
             .and_then(|x| x.0.to_string())
             .unwrap()
     }

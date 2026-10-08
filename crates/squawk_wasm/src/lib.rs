@@ -59,6 +59,7 @@ fn semantic_token_type_index(ty: SemanticTokenType) -> u32 {
     .unwrap()
 }
 
+#[derive(Clone, Copy)]
 struct EncodedSemanticToken {
     line: u32,
     start: u32,

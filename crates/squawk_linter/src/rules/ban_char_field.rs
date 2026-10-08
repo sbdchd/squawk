@@ -31,7 +31,7 @@ fn create_fix(range: TextRange, args: Option<ast::ArgList>) -> Fix {
     }
 }
 
-fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
+fn check_path_type(ctx: &mut Linter, path_type: &ast::PathType) {
     if let Some(name_ref) = path_type.path_ref().and_then(|x| x.segment())
         && is_char_type(&name_ref.text())
     {
@@ -44,7 +44,7 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
     }
 }
 
-fn check_character_type(ctx: &mut Linter, character_type: ast::CharacterType) {
+fn check_character_type(ctx: &mut Linter, character_type: &ast::CharacterType) {
     let fix = create_fix(
         character_type.syntax().text_range(),
         character_type.arg_list(),
@@ -60,18 +60,18 @@ fn check_ty(ctx: &mut Linter, ty: Option<ast::Type>) {
     match ty {
         Some(ast::Type::ArrayType(array_type)) => match array_type.ty() {
             Some(ast::Type::CharacterType(character_type)) => {
-                check_character_type(ctx, character_type);
+                check_character_type(ctx, &character_type);
             }
             Some(ast::Type::PathType(path_type)) => {
-                check_path_type(ctx, path_type);
+                check_path_type(ctx, &path_type);
             }
             _ => (),
         },
         Some(ast::Type::PathType(path_type)) => {
-            check_path_type(ctx, path_type);
+            check_path_type(ctx, &path_type);
         }
         Some(ast::Type::CharacterType(character_type)) => {
-            check_character_type(ctx, character_type);
+            check_character_type(ctx, &character_type);
         }
         _ => (),
     }

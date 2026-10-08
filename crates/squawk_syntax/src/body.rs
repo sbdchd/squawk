@@ -46,7 +46,7 @@ impl<T: BodyLanguage> Body<T> {
         }
     }
 
-    pub(crate) fn from_options(options: ast::FuncOptionList) -> Option<Self> {
+    pub(crate) fn from_options(options: &ast::FuncOptionList) -> Option<Self> {
         let mut matches = false;
         let mut body = None;
 

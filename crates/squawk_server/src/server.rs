@@ -99,5 +99,5 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
     let client_name = init_params.client_info.map(|x| x.name);
     info!("Client name: {client_name:?}");
 
-    GlobalState::new(connection.sender).run(connection.receiver)
+    GlobalState::new(connection.sender).run(&connection.receiver)
 }

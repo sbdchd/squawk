@@ -165,7 +165,7 @@ pub(crate) fn range(line_index: &LineIndex, range: TextRange) -> gen_lsp_types::
     )
 }
 
-pub(crate) fn folding_range(line_index: &LineIndex, fold: Fold) -> FoldingRange {
+pub(crate) fn folding_range(line_index: &LineIndex, fold: &Fold) -> FoldingRange {
     let start = line_index.line_col(fold.range.start());
     let end = line_index.line_col(fold.range.end());
     let kind = match fold.kind {
@@ -253,8 +253,8 @@ pub(crate) fn to_location(
 
 pub(crate) fn to_semantic_tokens(
     text: &str,
-    line_index: LineIndex,
-    semantic_tokens: Vec<squawk_ide::semantic_tokens::SemanticToken>,
+    line_index: &LineIndex,
+    semantic_tokens: &[squawk_ide::semantic_tokens::SemanticToken],
 ) -> Vec<gen_lsp_types::SemanticToken> {
     let mut encoder = Encoder {
         tokens: Vec::with_capacity(semantic_tokens.len()),
@@ -263,7 +263,7 @@ pub(crate) fn to_semantic_tokens(
     };
 
     // Duplicated in squawk-wasm, fyi
-    for token in &*semantic_tokens {
+    for token in semantic_tokens {
         // Taken from rust-analyzer, this solves the case where we have a multi
         // line semantic token which isn't supported by the LSP spec.
         // see: https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/lsp/to_proto.rs#L781C28-L781C28
@@ -271,7 +271,7 @@ pub(crate) fn to_semantic_tokens(
             if let Some((index, _)) = find_newline(&text[text_range]) {
                 text_range = TextRange::at(text_range.start(), TextSize::try_from(index).unwrap());
             }
-            let lsp_range = range(&line_index, text_range);
+            let lsp_range = range(line_index, text_range);
             let len = lsp_range.end.character - lsp_range.start.character;
             encoder.push_token_at(lsp_range.start, len, token.token_type, token.modifiers);
         }
@@ -306,7 +306,7 @@ impl Encoder {
 
         let token_type = to_token_type(ty);
 
-        let token_index = semantic_tokens::type_index(token_type);
+        let token_index = semantic_tokens::type_index(&token_type);
 
         self.tokens.push(SemanticToken {
             delta_line,

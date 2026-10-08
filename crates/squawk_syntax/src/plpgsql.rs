@@ -19,13 +19,13 @@ impl BodyLanguage for ast::Plpgsql {
 
 impl ast::CreateFunction {
     pub fn plpgsql(&self) -> Option<Plpgsql> {
-        Plpgsql::from_options(self.option_list()?)
+        Plpgsql::from_options(&self.option_list()?)
     }
 }
 
 impl ast::CreateProcedure {
     pub fn plpgsql(&self) -> Option<Plpgsql> {
-        Plpgsql::from_options(self.option_list()?)
+        Plpgsql::from_options(&self.option_list()?)
     }
 }
 

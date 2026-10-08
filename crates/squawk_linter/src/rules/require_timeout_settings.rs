@@ -107,7 +107,7 @@ impl fmt::Display for LockKind {
 }
 
 impl LockKind {
-    fn from_lock_mode(lock_mode: ast::LockMode) -> LockKind {
+    fn from_lock_mode(lock_mode: &ast::LockMode) -> LockKind {
         match lock_mode {
             ast::LockMode::AccessExclusive(_) => LockKind::AccessExclusive,
             ast::LockMode::AccessShare(_) => LockKind::AccessShare,
@@ -244,7 +244,7 @@ impl LockKind {
             ast::Stmt::Lock(lock) => lock
                 .lock_mode_clause()
                 .and_then(|clause| clause.lock_mode())
-                .map(Self::from_lock_mode)
+                .map(|lock_mode| Self::from_lock_mode(&lock_mode))
                 .unwrap_or(LockKind::AccessExclusive),
             ast::Stmt::Refresh(refresh) => {
                 if refresh.concurrently_token().is_some() {

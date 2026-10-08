@@ -482,7 +482,7 @@ fn substring_args(p: &mut Parser<'_>) -> CompletedMarker {
             expr_bp(
                 p,
                 1,
-                &Restrictions {
+                Restrictions {
                     escape_disabled: true,
                     ..Restrictions::default()
                 },
@@ -1943,7 +1943,7 @@ fn opt_json_passing_clause(p: &mut Parser<'_>, follow: TokenSet) {
 }
 
 // unary / prefix stuff
-fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<(CompletedMarker, ExprKind)> {
+fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, ExprKind)> {
     let m;
     let (kind, prefix_bp) = match p.current() {
         MINUS | PLUS if p.op_len() == 1 => {
@@ -1987,7 +1987,7 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<(CompletedMarker, ExprKin
     expr_bp(
         p,
         prefix_bp,
-        &Restrictions {
+        Restrictions {
             bare_label: r.bare_label,
             ..Default::default()
         },
@@ -2125,6 +2125,7 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
     lhs
 }
 
+#[derive(Clone, Copy)]
 pub(crate) enum ListItems {
     Required,
     Optional,
@@ -2361,9 +2362,9 @@ fn type_mods(
     type_args_enabled: bool,
     percent_type_enabled: bool,
     kind: SyntaxKind,
-) -> Option<CompletedMarker> {
+) -> CompletedMarker {
     if percent_type_enabled && opt_percent_type(p).is_some() {
-        return Some(m.complete(p, PERCENT_TYPE));
+        return m.complete(p, PERCENT_TYPE);
     }
     if p.at(L_PAREN) && type_args_enabled && allows_type_mods(kind) {
         let m = p.start();
@@ -2381,7 +2382,7 @@ fn type_mods(
     }
     let cm = m.complete(p, kind);
     if !p.at(L_BRACK) && !p.at(ARRAY_KW) {
-        return Some(cm);
+        return cm;
     }
     let m = cm.precede(p);
     if p.eat(ARRAY_KW) {
@@ -2397,7 +2398,7 @@ fn type_mods(
             p.error("expected L_BRACK for ARRAY_TYPE");
         }
     }
-    Some(m.complete(p, ARRAY_TYPE))
+    m.complete(p, ARRAY_TYPE)
 }
 
 fn char_type(p: &mut Parser<'_>) -> SyntaxKind {
@@ -2515,7 +2516,13 @@ fn opt_type_name_with(
             return None;
         }
     };
-    type_mods(p, m, type_args_enabled, percent_type_enabled, wrapper_type)
+    Some(type_mods(
+        p,
+        m,
+        type_args_enabled,
+        percent_type_enabled,
+        wrapper_type,
+    ))
 }
 
 fn opt_with_timezone(p: &mut Parser<'_>) -> bool {
@@ -2998,7 +3005,7 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 }
 
 pub(crate) fn expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
-    expr_bp(p, 1, &Restrictions::default())
+    expr_bp(p, 1, Restrictions::default())
 }
 
 fn opt_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
@@ -3014,7 +3021,7 @@ fn b_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     expr_bp(
         p,
         1,
-        &Restrictions {
+        Restrictions {
             in_disabled: true,
             is_disabled: true,
             not_disabled: true,
@@ -3046,7 +3053,7 @@ enum Associativity {
 /// Binding powers of operators for a Pratt parser.
 ///
 /// See <https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html>
-fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativity) {
+fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity) {
     use Associativity::*;
     const NOT_AN_OP: (u8, SyntaxKind, Associativity) = (0, AT, Left);
     // For binding power, checkout:
@@ -3171,7 +3178,7 @@ struct Restrictions {
     bare_label: BareLabelBehavior,
 }
 
-fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMarker, ExprKind)> {
+fn expr_bp(p: &mut Parser<'_>, bp: u8, r: Restrictions) -> Option<(CompletedMarker, ExprKind)> {
     let m = p.start();
     if !p.at_ts(EXPR_FIRST) {
         p.err_recover(
@@ -3398,13 +3405,13 @@ const WITH_FOLLOW: TokenSet = TokenSet::new(&[
 ]);
 
 // [ WITH [ RECURSIVE ] with_query [, ...] ]
-fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn with_query_clause(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(WITH_KW);
     p.eat(RECURSIVE_KW);
     if p.at_ts(WITH_FOLLOW) {
         p.error("expected common table expression");
-        return Some(m.complete(p, WITH_CLAUSE));
+        return m.complete(p, WITH_CLAUSE);
     }
     while !p.at(EOF) {
         with_query(p);
@@ -3423,7 +3430,7 @@ fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             }
         }
     }
-    Some(m.complete(p, WITH_CLAUSE))
+    m.complete(p, WITH_CLAUSE)
 }
 
 fn select_clause(p: &mut Parser<'_>) -> CompletedMarker {
@@ -5359,7 +5366,7 @@ fn opt_op(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(OPERATOR_FIRST) || p.at(FAT_ARROW) {
         return false;
     }
-    let (power, kind, _) = current_op(p, &Restrictions::default());
+    let (power, kind, _) = current_op(p, Restrictions::default());
     if power == 0 {
         p.bump_any();
         return true;
@@ -5472,7 +5479,7 @@ fn qual_op_or_opcall(p: &mut Parser<'_>) {
 }
 
 pub(crate) fn current_operator(p: &Parser<'_>) -> Option<SyntaxKind> {
-    let (power, kind, _) = current_op(p, &Restrictions::default());
+    let (power, kind, _) = current_op(p, Restrictions::default());
     if power == 0 { None } else { Some(kind) }
 }
 
@@ -6449,7 +6456,7 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
     } else if expr_bp(
         p,
         1,
-        &Restrictions {
+        Restrictions {
             bare_label: BareLabelBehavior::Allowed,
             ..Restrictions::default()
         },
@@ -6639,7 +6646,7 @@ fn opt_nulls_order(p: &mut Parser<'_>) {
     }
 }
 
-fn table_arg_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn table_arg_list(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(L_PAREN));
     let m = p.start();
     delimited(
@@ -6652,7 +6659,7 @@ fn table_arg_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         COL_DEF_FIRST,
         |p| opt_col_def(p).is_some(),
     );
-    Some(m.complete(p, TABLE_ARG_LIST))
+    m.complete(p, TABLE_ARG_LIST)
 }
 
 // modulus 5
