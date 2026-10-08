@@ -3,9 +3,10 @@ use squawk_syntax::ast::{self, AstNode};
 use crate::{Linter, Rule, Violation};
 
 pub(super) fn check_table_action(ctx: &mut Linter, action: &ast::AlterTableAction) {
-    if let ast::AlterTableAction::AlterColumn(column) = action {
-        if let Some(option) = column.option() {
-            match option {
+    if let ast::AlterTableAction::AlterColumn(column) = action
+        && let Some(option) = column.option()
+    {
+        match option {
                 ast::AlterColumnOption::Restart(node) => ctx.report(Violation::for_node(
                     Rule::BanAlterSequenceValues, "Restarting an identity sequence can change values generated for existing clients.".into(), node.syntax())),
                 ast::AlterColumnOption::SetSequenceOption(node) => ctx.report(Violation::for_node(
@@ -20,7 +21,6 @@ pub(super) fn check_table_action(ctx: &mut Linter, action: &ast::AlterTableActio
                 }
                 _ => (),
             }
-        }
     }
 }
 

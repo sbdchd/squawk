@@ -19,13 +19,13 @@ impl BodyLanguage for ast::Plpgsql {
 
 impl ast::CreateFunction {
     pub fn plpgsql(&self) -> Option<Plpgsql> {
-        Plpgsql::from_options(self.option_list()?)
+        Plpgsql::from_options(&self.option_list()?)
     }
 }
 
 impl ast::CreateProcedure {
     pub fn plpgsql(&self) -> Option<Plpgsql> {
-        Plpgsql::from_options(self.option_list()?)
+        Plpgsql::from_options(&self.option_list()?)
     }
 }
 
@@ -42,6 +42,8 @@ impl ast::Do {
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::Write as _;
+
     use super::*;
     use crate::SourceFile;
     use crate::ast::AstNode;
@@ -69,7 +71,7 @@ mod tests {
         let end = usize::from(range.end());
 
         let mut out = format!("{:#?}", body.syntax());
-        out.push_str(&format!("---\nsource {range:?} {:?}\n", &sql[start..end]));
+        writeln!(out, "---\nsource {range:?} {:?}", &sql[start..end]).unwrap();
         out.push_str(&render_errors(sql, &body.errors()));
         out
     }

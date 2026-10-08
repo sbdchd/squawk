@@ -115,7 +115,7 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
         // Make sure that if we're on the whitespace at the start of a line, we
         // expand to the node on that line instead of the previous one
         if leaves.clone().all(|it| it.kind() == SyntaxKind::WHITESPACE) {
-            return Some(extend_ws(root, leaves.next()?, offset));
+            return Some(extend_ws(root, &leaves.next()?, offset));
         }
         let leaf_range = match root.token_at_offset(offset) {
             rowan::TokenAtOffset::None => return None,
@@ -138,7 +138,7 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
                 return Some(token.text_range());
             }
             if let Some(comment) = ast::Comment::cast(token.clone())
-                && let Some(range) = extend_comments(comment)
+                && let Some(range) = extend_comments(&comment)
             {
                 return Some(range);
             }
@@ -156,10 +156,9 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
     if node
         .parent()
         .is_some_and(|n| DELIMITED_LIST_KINDS.contains(&n.kind()))
+        && let Some(range) = extend_list_item(&node)
     {
-        if let Some(range) = extend_list_item(&node) {
-            return Some(range);
-        }
+        return Some(range);
     }
 
     node.parent().map(|it| it.text_range())
@@ -187,19 +186,11 @@ fn extend_single_word_in_comment_or_string(
         !(c.is_alphanumeric() || c == '_')
     }
 
-    let start_idx = before.rfind(non_word_char)? as u32;
-    let end_idx = after.find(non_word_char).unwrap_or(after.len()) as u32;
+    let start_idx = before.rfind(non_word_char)?;
+    let end_idx = after.find(non_word_char).unwrap_or(after.len());
 
-    // FIXME: use `ceil_char_boundary` from `std::str` when it gets stable
-    // https://github.com/rust-lang/rust/issues/93743
-    fn ceil_char_boundary(text: &str, index: u32) -> u32 {
-        (index..)
-            .find(|&index| text.is_char_boundary(index as usize))
-            .unwrap_or(text.len() as u32)
-    }
-
-    let from: TextSize = ceil_char_boundary(text, start_idx + 1).into();
-    let to: TextSize = (cursor_position + end_idx).into();
+    let from = TextSize::try_from(text.ceil_char_boundary(start_idx + 1)).unwrap();
+    let to = TextSize::from(cursor_position) + TextSize::try_from(end_idx).unwrap();
 
     let range = TextRange::new(from, to);
     if range.is_empty() {
@@ -209,9 +200,9 @@ fn extend_single_word_in_comment_or_string(
     }
 }
 
-fn extend_comments(comment: ast::Comment) -> Option<TextRange> {
-    let prev = adj_comments(&comment, Direction::Prev);
-    let next = adj_comments(&comment, Direction::Next);
+fn extend_comments(comment: &ast::Comment) -> Option<TextRange> {
+    let prev = adj_comments(comment, Direction::Prev);
+    let next = adj_comments(comment, Direction::Next);
     if prev != next {
         Some(TextRange::new(
             prev.syntax().text_range().start(),
@@ -229,7 +220,7 @@ fn adj_comments(comment: &ast::Comment, dir: Direction) -> ast::Comment {
             break;
         };
         if let Some(c) = ast::Comment::cast(token.clone()) {
-            res = c
+            res = c;
         } else if let Some(ws) = ast::Whitespace::cast(token.clone()) {
             if ws.spans_multiple_lines() {
                 break;
@@ -241,7 +232,7 @@ fn adj_comments(comment: &ast::Comment, dir: Direction) -> ast::Comment {
     res
 }
 
-fn extend_ws(root: &SyntaxNode, ws: SyntaxToken, offset: TextSize) -> TextRange {
+fn extend_ws(root: &SyntaxNode, ws: &SyntaxToken, offset: TextSize) -> TextRange {
     let ws_text = ws.text();
     let suffix = TextRange::new(offset, ws.text_range().end()) - ws.text_range().start();
     let prefix = TextRange::new(ws.text_range().start(), offset) - ws.text_range().start();
@@ -252,7 +243,7 @@ fn extend_ws(root: &SyntaxNode, ws: SyntaxToken, offset: TextSize) -> TextRange 
         && let Some(node) = ws.next_sibling_or_token()
     {
         let start = match last_newline_end(ws_prefix) {
-            Some(idx) => ws.text_range().start() + TextSize::from(idx as u32),
+            Some(idx) => ws.text_range().start() + TextSize::try_from(idx).unwrap(),
             None => node.text_range().start(),
         };
         let node_end = node.text_range().end();
@@ -647,6 +638,6 @@ $0
             unhandled_list_kinds,
             vec![],
             "We shouldn't have any unhandled list kinds"
-        )
+        );
     }
 }

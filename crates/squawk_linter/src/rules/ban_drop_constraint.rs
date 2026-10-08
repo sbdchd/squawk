@@ -29,15 +29,14 @@ pub(crate) fn ban_drop_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 _ => (),
             }
         }
-        if let ast::Stmt::AlterDomain(domain) = stmt {
-            if let Some(ast::AlterDomainAction::DropConstraint(node)) = domain.action() {
-                ctx.report(Violation::for_node(
-                    Rule::BanDropConstraint,
-                    "Dropping a constraint may remove a guarantee that existing clients assume."
-                        .into(),
-                    node.syntax(),
-                ));
-            }
+        if let ast::Stmt::AlterDomain(domain) = stmt
+            && let Some(ast::AlterDomainAction::DropConstraint(node)) = domain.action()
+        {
+            ctx.report(Violation::for_node(
+                Rule::BanDropConstraint,
+                "Dropping a constraint may remove a guarantee that existing clients assume.".into(),
+                node.syntax(),
+            ));
         }
     }
 }

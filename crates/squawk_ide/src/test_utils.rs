@@ -39,7 +39,7 @@ impl Fixture {
             }
             let file = File::new(&db, sql.as_str().into());
             return Self {
-                marker_offset: TextSize::new(pos as u32),
+                marker_offset: TextSize::try_from(pos).unwrap(),
                 sql,
                 db,
                 file,
@@ -64,12 +64,13 @@ impl Fixture {
             return 0.into();
         }
 
-        TextSize::new(
+        TextSize::try_from(
             self.sql[..marker_offset]
                 .char_indices()
                 .last()
-                .map_or(0, |(offset, _)| offset) as u32,
+                .map_or(0, |(offset, _)| offset),
         )
+        .unwrap()
     }
 
     fn char_span_at(&self, offset: TextSize) -> Range<usize> {
@@ -99,7 +100,7 @@ impl Marker {
 
 #[cfg(test)]
 mod tests {
-    use super::Fixture;
+    use super::{Fixture, TextSize};
 
     #[test]
     fn marker_tracks_offset_and_offset_before_for_multibyte_chars() {
@@ -107,10 +108,7 @@ mod tests {
         let marker = fixture.marker();
 
         assert_eq!(usize::from(marker.offset().value), "select 🦀".len());
-        assert_eq!(
-            marker.offset_before().value,
-            ("select ".len() as u32).into()
-        );
+        assert_eq!(marker.offset_before().value, TextSize::of("select "));
         assert_eq!(marker.range(), "select ".len().."select 🦀".len());
     }
 }

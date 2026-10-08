@@ -29,7 +29,7 @@ impl<T> TaskPool<T> {
         self.pool.spawn(intent, {
             let sender = self.sender.clone();
             move || sender.send(task()).unwrap()
-        })
+        });
     }
 
     pub fn spawn_with_sender<F>(&mut self, intent: ThreadIntent, task: F)
@@ -40,7 +40,7 @@ impl<T> TaskPool<T> {
         self.pool.spawn(intent, {
             let sender = self.sender.clone();
             move || task(sender)
-        })
+        });
     }
 
     pub fn len(&self) -> usize {

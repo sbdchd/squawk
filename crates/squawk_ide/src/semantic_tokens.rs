@@ -15,28 +15,28 @@ fn highlight_param_mode(out: &mut SemanticTokenBuilder, mode: ast::ParamMode) {
     match mode {
         ast::ParamMode::ParamIn(param_in) => {
             if let Some(token) = param_in.in_token() {
-                out.push_keyword(token.into());
+                out.push_keyword(&token.into());
             }
         }
         ast::ParamMode::ParamInOut(param_in_out) => {
             if let Some(token) = param_in_out.in_token() {
-                out.push_keyword(token.into());
+                out.push_keyword(&token.into());
             }
             if let Some(token) = param_in_out.inout_token() {
-                out.push_keyword(token.into());
+                out.push_keyword(&token.into());
             }
             if let Some(token) = param_in_out.out_token() {
-                out.push_keyword(token.into());
+                out.push_keyword(&token.into());
             }
         }
         ast::ParamMode::ParamOut(param_out) => {
             if let Some(token) = param_out.out_token() {
-                out.push_keyword(token.into());
+                out.push_keyword(&token.into());
             }
         }
         ast::ParamMode::ParamVariadic(param_variadic) => {
             if let Some(token) = param_variadic.variadic_token() {
-                out.push_keyword(token.into());
+                out.push_keyword(&token.into());
             }
         }
     }
@@ -46,24 +46,24 @@ fn highlight_timezone(out: &mut SemanticTokenBuilder, timezone: ast::Timezone) {
     match timezone {
         ast::Timezone::WithTimezone(with_timezone) => {
             if let Some(token) = with_timezone.with_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = with_timezone.time_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = with_timezone.zone_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Timezone::WithoutTimezone(without_timezone) => {
             if let Some(token) = without_timezone.without_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = without_timezone.time_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = without_timezone.zone_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
     }
@@ -74,29 +74,29 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
         ast::Type::ArrayType(_) => (),
         ast::Type::BitType(bit_type) => {
             if let Some(token) = bit_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = bit_type.bit_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Type::BitVaryingType(bit_varying_type) => {
             if let Some(token) = bit_varying_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = bit_varying_type.bit_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = bit_varying_type.varying_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Type::VarcharType(varchar_type) => {
             if let Some(token) = varchar_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = varchar_type.national_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = varchar_type
                 .varchar_token()
@@ -104,57 +104,57 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
                 .or_else(|| varchar_type.character_token())
                 .or_else(|| varchar_type.char_token())
             {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = varchar_type.varying_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Type::CharacterType(character_type) => {
             if let Some(token) = character_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = character_type.national_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = character_type
                 .nchar_token()
                 .or_else(|| character_type.character_token())
                 .or_else(|| character_type.char_token())
             {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Type::DoubleType(double_type) => {
             if let Some(token) = double_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = double_type.double_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = double_type.precision_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Type::IntervalType(interval_type) => {
             if let Some(token) = interval_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = interval_type.interval_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Type::PathType(path_type) => {
             if let Some(token) = path_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
         }
         ast::Type::TimeType(time_type) => {
             if let Some(token) = time_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = time_type.time_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(timezone) = time_type.timezone() {
                 highlight_timezone(out, timezone);
@@ -162,10 +162,10 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
         }
         ast::Type::TimestampType(timestamp_type) => {
             if let Some(token) = timestamp_type.setof_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(token) = timestamp_type.timestamp_token() {
-                out.push_type(token.into());
+                out.push_type(&token.into());
             }
             if let Some(timezone) = timestamp_type.timezone() {
                 highlight_timezone(out, timezone);
@@ -313,11 +313,11 @@ impl SemanticTokenBuilder {
         self.tokens
     }
 
-    fn push_keyword(&mut self, syntax_element: SyntaxElement) {
+    fn push_keyword(&mut self, syntax_element: &SyntaxElement) {
         self.push_token(syntax_element, SemanticTokenType::Keyword);
     }
 
-    fn push_type(&mut self, syntax_element: SyntaxElement) {
+    fn push_type(&mut self, syntax_element: &SyntaxElement) {
         self.push_token(syntax_element, SemanticTokenType::Type);
     }
 
@@ -325,7 +325,7 @@ impl SemanticTokenBuilder {
         self.highlighted_ranges.contains(&range)
     }
 
-    fn push_token(&mut self, syntax_element: SyntaxElement, token_type: SemanticTokenType) {
+    fn push_token(&mut self, syntax_element: &SyntaxElement, token_type: SemanticTokenType) {
         self.push(SemanticToken {
             range: syntax_element.text_range(),
             token_type,
@@ -395,7 +395,7 @@ fn highlight(
                 if let Some(name) = ast::AnyName::cast(node.clone())
                     && let Some(token_type) = token_type_for_node(db, InFile::new(file, &name))
                 {
-                    out.push_token(name.syntax().clone().into(), token_type);
+                    out.push_token(&name.syntax().clone().into(), token_type);
                 }
 
                 if let Some(ty) = ast::Type::cast(node.clone()) {
@@ -407,7 +407,7 @@ fn highlight(
                 }
 
                 if let Some(literal) = ast::Literal::cast(node.clone()) {
-                    highlight_embedded(db, file, literal, range_to_highlight, out);
+                    highlight_embedded(db, file, &literal, range_to_highlight, out);
                 }
 
                 // Cleanup various operators that the textmate grammar
@@ -416,17 +416,17 @@ fn highlight(
                 if let Some(like_clause) = ast::LikeClause::cast(node.clone())
                     && let Some(token) = like_clause.like_token()
                 {
-                    out.push_keyword(token.into());
+                    out.push_keyword(&token.into());
                 }
                 if let Some(not_null_constraint) = ast::NotNullConstraint::cast(node.clone())
                     && let Some(token) = not_null_constraint.not_token()
                 {
-                    out.push_keyword(token.into());
+                    out.push_keyword(&token.into());
                 }
                 if let Some(partition_for_values_in) = ast::PartitionForValuesIn::cast(node.clone())
                     && let Some(token) = partition_for_values_in.in_token()
                 {
-                    out.push_keyword(token.into());
+                    out.push_keyword(&token.into());
                 }
             }
             Enter(NodeOrToken::Token(token)) => {
@@ -434,12 +434,12 @@ fn highlight(
                     continue;
                 }
                 if token.kind() == SyntaxKind::POSITIONAL_PARAM {
-                    out.push_token(token.into(), SemanticTokenType::PositionalParam);
+                    out.push_token(&token.into(), SemanticTokenType::PositionalParam);
                 } else if matches!(file, FileId::Embedded(_))
                     && !out.contains_range(token.text_range())
                     && let Some(token_type) = embedded_token_type(token.kind())
                 {
-                    out.push_token(token.into(), token_type);
+                    out.push_token(&token.into(), token_type);
                 }
             }
             Leave(_) => {}
@@ -450,7 +450,7 @@ fn highlight(
 fn highlight_embedded(
     db: &dyn Db,
     file: FileId,
-    literal: ast::Literal,
+    literal: &ast::Literal,
     range_to_highlight: TextRange,
     out: &mut SemanticTokenBuilder,
 ) {
@@ -584,7 +584,7 @@ select 1 and, 2 select;
 "), @r#"
         "and" @ 10..13: Column
         "select" @ 17..23: Column
-        "#)
+        "#);
     }
 
     #[test]
@@ -594,7 +594,7 @@ select $1, $2;
 "), @r#"
         "$1" @ 8..10: PositionalParam
         "$2" @ 12..14: PositionalParam
-        "#)
+        "#);
     }
 
     #[test]
@@ -619,7 +619,7 @@ insert into products (product_no, name, price) values
         "product_no" @ 89..99: Column
         "name" @ 101..105: Column
         "price" @ 107..112: Column
-        "#)
+        "#);
     }
 
     #[test]
@@ -818,7 +818,7 @@ create table test (
         "test" @ 45..49: Table
         "like" @ 54..58: Keyword
         "products" @ 59..67: Table
-        "#)
+        "#);
     }
 
     #[test]
@@ -835,7 +835,7 @@ create table t_1 partition of t for values in (1);
         "t_1" @ 37..40: Table
         "t" @ 54..55: Table
         "in" @ 67..69: Keyword
-        "#)
+        "#);
     }
 
     #[test]

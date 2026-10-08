@@ -562,35 +562,34 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
                     }
                 }
             }
-            if ast::Insert::can_cast(ancestor.kind()) {
-                if in_returning_clause || (!in_from_clause && !in_on_clause) {
-                    if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::Schema);
-                    } else {
-                        return Some(NameRefClass::InsertQualifiedColumnTable);
-                    }
+            if ast::Insert::can_cast(ancestor.kind())
+                && (in_returning_clause || (!in_from_clause && !in_on_clause))
+            {
+                if is_function_call || is_schema_table_col {
+                    return Some(NameRefClass::Schema);
+                } else {
+                    return Some(NameRefClass::InsertQualifiedColumnTable);
                 }
             }
-            if ast::Delete::can_cast(ancestor.kind()) {
-                if in_returning_clause || in_where_clause || in_using_clause {
-                    if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::Schema);
-                    } else {
-                        return Some(NameRefClass::DeleteQualifiedColumnTable);
-                    }
+            if ast::Delete::can_cast(ancestor.kind())
+                && (in_returning_clause || in_where_clause || in_using_clause)
+            {
+                if is_function_call || is_schema_table_col {
+                    return Some(NameRefClass::Schema);
+                } else {
+                    return Some(NameRefClass::DeleteQualifiedColumnTable);
                 }
             }
-            if ast::Merge::can_cast(ancestor.kind()) {
-                if in_returning_clause
+            if ast::Merge::can_cast(ancestor.kind())
+                && (in_returning_clause
                     || in_on_clause
                     || in_when_clause
-                    || (in_using_clause && in_arg_list)
-                {
-                    if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::Schema);
-                    } else {
-                        return Some(NameRefClass::MergeQualifiedColumnTable);
-                    }
+                    || (in_using_clause && in_arg_list))
+            {
+                if is_function_call || is_schema_table_col {
+                    return Some(NameRefClass::Schema);
+                } else {
+                    return Some(NameRefClass::MergeQualifiedColumnTable);
                 }
             }
             if (ast::Select::can_cast(ancestor.kind())
@@ -702,12 +701,10 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             }
             if ast::Merge::can_cast(ancestor.kind())
                 && (in_on_clause || in_when_clause || in_returning_clause)
+                && let Some(base) = field_expr.base()
+                && matches!(base, ast::Expr::NameRef(_) | ast::Expr::FieldExpr(_))
             {
-                if let Some(base) = field_expr.base()
-                    && matches!(base, ast::Expr::NameRef(_) | ast::Expr::FieldExpr(_))
-                {
-                    return Some(NameRefClass::SelectQualifiedColumn);
-                }
+                return Some(NameRefClass::SelectQualifiedColumn);
             }
             if (ast::Select::can_cast(ancestor.kind())
                 || ast::SelectInto::can_cast(ancestor.kind()))

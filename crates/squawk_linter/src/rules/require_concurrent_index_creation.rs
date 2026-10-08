@@ -18,27 +18,24 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
     let file = parse.tree();
     let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
     for stmt in file.stmts() {
-        if let ast::Stmt::CreateIndex(create_index) = stmt {
-            if let Some(table_name) = create_index
+        if let ast::Stmt::CreateIndex(create_index) = stmt
+            && let Some(table_name) = create_index
                 .table_relation_name()
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
                 .and_then(|x| x.segment())
-            {
-                if create_index.concurrently_token().is_none()
-                    && !tables_created.contains(&table_name.text())
-                {
-                    let fix = concurrently_fix(&create_index);
+            && create_index.concurrently_token().is_none()
+            && !tables_created.contains(&table_name.text())
+        {
+            let fix = concurrently_fix(&create_index);
 
-                    ctx.report(Violation::for_node(
+            ctx.report(Violation::for_node(
                         Rule::RequireConcurrentIndexCreation,
                 "During normal index creation, table updates are blocked, but reads are still allowed.".into(),
                         create_index.syntax(),
                     )
                     .help("Use `concurrently` to avoid blocking writes.")
                     .fix(fix));
-                }
-            }
         }
     }
 }

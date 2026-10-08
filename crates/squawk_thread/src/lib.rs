@@ -15,6 +15,8 @@
 //! Thus, [`ThreadIntent`] has no default value
 //! and every entry point to creating a thread requires a [`ThreadIntent`] upfront.
 
+#![allow(unsafe_code)]
+
 use std::fmt;
 
 pub use crate::intent::ThreadIntent;

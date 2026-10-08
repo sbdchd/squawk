@@ -1,3 +1,5 @@
+use std::fmt::Write as _;
+
 use log::info;
 use rowan::{TextRange, TextSize};
 use salsa::Setter;
@@ -48,12 +50,16 @@ fn semantic_token_type_name(ty: SemanticTokenType) -> &'static str {
 
 fn semantic_token_type_index(ty: SemanticTokenType) -> u32 {
     let name = semantic_token_type_name(ty);
-    SEMANTIC_TOKEN_TYPES
-        .iter()
-        .position(|it| *it == name)
-        .unwrap() as u32
+    u32::try_from(
+        SEMANTIC_TOKEN_TYPES
+            .iter()
+            .position(|it| *it == name)
+            .unwrap(),
+    )
+    .unwrap()
 }
 
+#[derive(Clone, Copy)]
 struct EncodedSemanticToken {
     line: u32,
     start: u32,
@@ -207,7 +213,7 @@ impl SquawkDatabase {
         for token in tokens {
             let end = start + token.len;
             let text = &content[start as usize..(end) as usize];
-            out += &format!("{:?}@{start}..{end} {:?}\n", token.kind, text);
+            writeln!(out, "{:?}@{start}..{end} {:?}", token.kind, text).unwrap();
             start += token.len;
         }
         Ok(out)
@@ -223,7 +229,12 @@ impl SquawkDatabase {
         if !parse.errors().is_empty() {
             return Err(Error::new("Cannot format SQL with syntax errors."));
         }
-        squawk_fmt::fmt(&parse.tree(), line_ending, Default::default()).map_err(into_error)
+        squawk_fmt::fmt(
+            &parse.tree(),
+            line_ending,
+            squawk_fmt::FormatOptions::default(),
+        )
+        .map_err(into_error)
     }
 
     pub fn lint(&self) -> Result<JsValue, Error> {
@@ -308,7 +319,7 @@ impl SquawkDatabase {
                 code: x.code.to_string(),
                 range_start: x.text_range.start().into(),
                 range_end: x.text_range.end().into(),
-                message: x.message.clone(),
+                message: x.message,
                 messages,
                 severity: Severity::Warning,
                 start_line_number: start.line,

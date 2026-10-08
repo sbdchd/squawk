@@ -48,7 +48,7 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                             constraint.syntax(),
                                         )
                                         .help(help),
-                                    )
+                                    );
                                 }
                             }
                             ast::AlterTableAction::AddColumn(add_column) => {
@@ -65,7 +65,7 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                                 constraint.syntax(),
                                             )
                                             .help(help),
-                                        )
+                                        );
                                     }
                                 }
                             }

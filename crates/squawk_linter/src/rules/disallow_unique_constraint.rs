@@ -28,19 +28,17 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                     ast::AlterTableAction::AddConstraint(add_constraint) => {
                         if let Some(ast::Constraint::UniqueConstraint(unique_constraint)) =
                             add_constraint.constraint()
+                            && unique_constraint.using_index().is_none()
+                            && !tables_created.contains(&table_name)
                         {
-                            if unique_constraint.using_index().is_none()
-                                && !tables_created.contains(&table_name)
-                            {
-                                ctx.report(
-                                    Violation::for_node(
-                                        Rule::DisallowedUniqueConstraint,
-                                        message.to_string(),
-                                        unique_constraint.syntax(),
-                                    )
-                                    .help(help),
-                                );
-                            }
+                            ctx.report(
+                                Violation::for_node(
+                                    Rule::DisallowedUniqueConstraint,
+                                    message.to_string(),
+                                    unique_constraint.syntax(),
+                                )
+                                .help(help),
+                            );
                         }
                     }
                     ast::AlterTableAction::AddColumn(add_column) => {

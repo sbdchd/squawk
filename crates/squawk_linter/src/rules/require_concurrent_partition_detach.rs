@@ -16,10 +16,11 @@ pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, parse: &Pars
     for stmt in parse.tree().stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
-                if let ast::AlterTableAction::DetachPartition(detach_partition) = action {
-                    if detach_partition.detach_partition_option().is_none() {
-                        let fix = concurrently_fix(&detach_partition);
-                        ctx.report(
+                if let ast::AlterTableAction::DetachPartition(detach_partition) = action
+                    && detach_partition.detach_partition_option().is_none()
+                {
+                    let fix = concurrently_fix(&detach_partition);
+                    ctx.report(
                             Violation::for_node(
                                 Rule::RequireConcurrentPartitionDetach,
                                 "Detaching a partition requires an `ACCESS EXCLUSIVE` lock, which prevents reads and writes to the table.".into(),
@@ -28,7 +29,6 @@ pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, parse: &Pars
                             .help("Detach the partition `CONCURRENTLY`.")
                             .fix(fix),
                         );
-                    }
                 }
             }
         }

@@ -46,7 +46,7 @@ impl DecodedText {
     }
 
     fn sync(&mut self, pos: TextSize) {
-        let decoded = self.text.len() as u32;
+        let decoded = u32::try_from(self.text.len()).unwrap();
         let pos = pos.into();
         match self.marks.last_mut() {
             Some(mark) if mark.decoded == decoded => mark.pos = pos,
@@ -68,7 +68,7 @@ impl DecodedText {
 
     pub fn decoded_pos(&self, position: TextSize) -> Option<TextSize> {
         let position = u32::from(position);
-        let decoded_end = self.text.len() as u32;
+        let decoded_end = u32::try_from(self.text.len()).unwrap();
         let source_start = self.marks.first()?.pos;
         let source_end = u32::from(self.source_pos(TextSize::new(decoded_end)));
         if !(source_start..=source_end).contains(&position) {

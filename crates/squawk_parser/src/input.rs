@@ -49,11 +49,11 @@ pub struct Input {
 impl Input {
     #[inline]
     pub(crate) fn push(&mut self, kind: SyntaxKind) {
-        self.push_impl(kind, SyntaxKind::EOF)
+        self.push_impl(kind, SyntaxKind::EOF);
     }
     #[inline]
     pub(crate) fn push_ident(&mut self, contextual_kind: SyntaxKind) {
-        self.push_impl(SyntaxKind::IDENT, contextual_kind)
+        self.push_impl(SyntaxKind::IDENT, contextual_kind);
     }
     /// Sets jointness for the last token we've pushed.
     ///
@@ -74,7 +74,7 @@ impl Input {
     #[inline]
     pub(crate) fn was_joint(&mut self) {
         let n = self.len() - 1;
-        let (idx, b_idx) = self.bit_index(n);
+        let (idx, b_idx) = Self::bit_index(n);
         self.joint[idx] |= 1 << b_idx;
     }
     #[inline]
@@ -102,13 +102,13 @@ impl Input {
             .unwrap_or(SyntaxKind::EOF)
     }
     pub(crate) fn is_joint(&self, n: usize) -> bool {
-        let (idx, b_idx) = self.bit_index(n);
+        let (idx, b_idx) = Self::bit_index(n);
         self.joint[idx] & 1 << b_idx != 0
     }
 }
 
 impl Input {
-    fn bit_index(&self, n: usize) -> (usize, usize) {
+    fn bit_index(n: usize) -> (usize, usize) {
         let idx = n / (bits::BITS as usize);
         let b_idx = n % (bits::BITS as usize);
         (idx, b_idx)

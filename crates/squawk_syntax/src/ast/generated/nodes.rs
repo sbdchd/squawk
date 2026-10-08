@@ -59795,7 +59795,7 @@ impl AstNode for AlterMaterializedViewAction {
                 AlterMaterializedViewAction::ViewRenameTo(ViewRenameTo { syntax })
             }
             _ => {
-                if let Some(result) = AlterTableAction::cast(syntax.clone()) {
+                if let Some(result) = AlterTableAction::cast(syntax) {
                     return Some(AlterMaterializedViewAction::AlterTableAction(result));
                 }
                 return None;
@@ -60634,7 +60634,7 @@ impl AstNode for AlterSequenceAction {
             SyntaxKind::SET_SCHEMA => AlterSequenceAction::SetSchema(SetSchema { syntax }),
             SyntaxKind::SET_UNLOGGED => AlterSequenceAction::SetUnlogged(SetUnlogged { syntax }),
             _ => {
-                if let Some(result) = SequenceOption::cast(syntax.clone()) {
+                if let Some(result) = SequenceOption::cast(syntax) {
                     return Some(AlterSequenceAction::SequenceOption(result));
                 }
                 return None;
@@ -63657,7 +63657,7 @@ impl AstNode for ColumnClause {
             SyntaxKind::STORAGE => ColumnClause::Storage(Storage { syntax }),
             SyntaxKind::WITH_OPTIONS => ColumnClause::WithOptions(WithOptions { syntax }),
             _ => {
-                if let Some(result) = ColumnConstraint::cast(syntax.clone()) {
+                if let Some(result) = ColumnConstraint::cast(syntax) {
                     return Some(ColumnClause::ColumnConstraint(result));
                 }
                 return None;
@@ -64383,7 +64383,7 @@ impl AstNode for CompoundSelectOperand {
         let res = match syntax.kind() {
             SyntaxKind::PAREN_EXPR => CompoundSelectOperand::ParenExpr(ParenExpr { syntax }),
             _ => {
-                if let Some(result) = SelectVariant::cast(syntax.clone()) {
+                if let Some(result) = SelectVariant::cast(syntax) {
                     return Some(CompoundSelectOperand::SelectVariant(result));
                 }
                 return None;
@@ -65131,7 +65131,7 @@ impl AstNode for CreateTableAsQuery {
         let res = match syntax.kind() {
             SyntaxKind::EXECUTE => CreateTableAsQuery::Execute(Execute { syntax }),
             _ => {
-                if let Some(result) = SelectVariant::cast(syntax.clone()) {
+                if let Some(result) = SelectVariant::cast(syntax) {
                     return Some(CreateTableAsQuery::SelectVariant(result));
                 }
                 return None;
@@ -65240,7 +65240,7 @@ impl AstNode for CursorAction {
             SyntaxKind::PRIOR => CursorAction::Prior(Prior { syntax }),
             SyntaxKind::RELATIVE => CursorAction::Relative(Relative { syntax }),
             _ => {
-                if let Some(result) = Expr::cast(syntax.clone()) {
+                if let Some(result) = Expr::cast(syntax) {
                     return Some(CursorAction::Expr(result));
                 }
                 return None;
@@ -65665,7 +65665,7 @@ impl AstNode for DomainQualifier {
         let res = match syntax.kind() {
             SyntaxKind::COLLATE => DomainQualifier::Collate(Collate { syntax }),
             _ => {
-                if let Some(result) = Constraint::cast(syntax.clone()) {
+                if let Some(result) = Constraint::cast(syntax) {
                     return Some(DomainQualifier::Constraint(result));
                 }
                 return None;
@@ -65781,7 +65781,7 @@ impl AstNode for ElementTableLabelAndProperties {
                 })
             }
             _ => {
-                if let Some(result) = ElementTableProperties::cast(syntax.clone()) {
+                if let Some(result) = ElementTableProperties::cast(syntax) {
                     return Some(ElementTableLabelAndProperties::ElementTableProperties(
                         result,
                     ));
@@ -66937,7 +66937,7 @@ impl AstNode for FrameExtent {
         let res = match syntax.kind() {
             SyntaxKind::FRAME_BETWEEN => FrameExtent::FrameBetween(FrameBetween { syntax }),
             _ => {
-                if let Some(result) = FrameBound::cast(syntax.clone()) {
+                if let Some(result) = FrameBound::cast(syntax) {
                     return Some(FrameExtent::FrameBound(result));
                 }
                 return None;
@@ -67158,7 +67158,7 @@ impl AstNode for FromListItem {
         let res = match syntax.kind() {
             SyntaxKind::JOIN_EXPR => FromListItem::JoinExpr(JoinExpr { syntax }),
             _ => {
-                if let Some(result) = FromItem::cast(syntax.clone()) {
+                if let Some(result) = FromItem::cast(syntax) {
                     return Some(FromListItem::FromItem(result));
                 }
                 return None;
@@ -67190,7 +67190,7 @@ impl AstNode for FuncArgExpr {
         let res = match syntax.kind() {
             SyntaxKind::NAMED_ARG => FuncArgExpr::NamedArg(NamedArg { syntax }),
             _ => {
-                if let Some(result) = Expr::cast(syntax.clone()) {
+                if let Some(result) = Expr::cast(syntax) {
                     return Some(FuncArgExpr::Expr(result));
                 }
                 return None;
@@ -67285,7 +67285,7 @@ impl AstNode for FuncOption {
                 FuncOption::WindowFuncOption(WindowFuncOption { syntax })
             }
             _ => {
-                if let Some(result) = VolatilityFuncOption::cast(syntax.clone()) {
+                if let Some(result) = VolatilityFuncOption::cast(syntax) {
                     return Some(FuncOption::VolatilityFuncOption(result));
                 }
                 return None;
@@ -67429,7 +67429,7 @@ impl AstNode for FuncType {
         let res = match syntax.kind() {
             SyntaxKind::PERCENT_TYPE => FuncType::PercentType(PercentType { syntax }),
             _ => {
-                if let Some(result) = Type::cast(syntax.clone()) {
+                if let Some(result) = Type::cast(syntax) {
                     return Some(FuncType::Type(result));
                 }
                 return None;
@@ -67814,7 +67814,7 @@ impl AstNode for InsertSource {
         let res = match syntax.kind() {
             SyntaxKind::DEFAULT_VALUES => InsertSource::DefaultValues(DefaultValues { syntax }),
             _ => {
-                if let Some(result) = SelectVariant::cast(syntax.clone()) {
+                if let Some(result) = SelectVariant::cast(syntax) {
                     return Some(InsertSource::SelectVariant(result));
                 }
                 return None;
@@ -68565,7 +68565,7 @@ impl AstNode for LimitValue {
         let res = match syntax.kind() {
             SyntaxKind::ALL => LimitValue::All(All { syntax }),
             _ => {
-                if let Some(result) = Expr::cast(syntax.clone()) {
+                if let Some(result) = Expr::cast(syntax) {
                     return Some(LimitValue::Expr(result));
                 }
                 return None;
@@ -69754,7 +69754,7 @@ impl AstNode for PlpgsqlDeclType {
                 PlpgsqlDeclType::PlpgsqlPercentRowtype(PlpgsqlPercentRowtype { syntax })
             }
             _ => {
-                if let Some(result) = FuncType::cast(syntax.clone()) {
+                if let Some(result) = FuncType::cast(syntax) {
                     return Some(PlpgsqlDeclType::FuncType(result));
                 }
                 return None;
@@ -71915,7 +71915,7 @@ impl AstNode for RoutineBodyStmt {
         let res = match syntax.kind() {
             SyntaxKind::RETURN_STMT => RoutineBodyStmt::ReturnStmt(ReturnStmt { syntax }),
             _ => {
-                if let Some(result) = Stmt::cast(syntax.clone()) {
+                if let Some(result) = Stmt::cast(syntax) {
                     return Some(RoutineBodyStmt::Stmt(result));
                 }
                 return None;
@@ -71948,7 +71948,7 @@ impl AstNode for RuleAction {
             SyntaxKind::NOTHING => RuleAction::Nothing(Nothing { syntax }),
             SyntaxKind::RULE_STMT_LIST => RuleAction::RuleStmtList(RuleStmtList { syntax }),
             _ => {
-                if let Some(result) = RuleStmt::cast(syntax.clone()) {
+                if let Some(result) = RuleStmt::cast(syntax) {
                     return Some(RuleAction::RuleStmt(result));
                 }
                 return None;
@@ -71993,7 +71993,7 @@ impl AstNode for RuleStmt {
             SyntaxKind::NOTIFY => RuleStmt::Notify(Notify { syntax }),
             SyntaxKind::UPDATE => RuleStmt::Update(Update { syntax }),
             _ => {
-                if let Some(result) = SelectVariant::cast(syntax.clone()) {
+                if let Some(result) = SelectVariant::cast(syntax) {
                     return Some(RuleStmt::SelectVariant(result));
                 }
                 return None;
@@ -73724,7 +73724,7 @@ impl AstNode for Stmt {
                 if let Some(result) = Commit::cast(syntax.clone()) {
                     return Some(Stmt::Commit(result));
                 }
-                if let Some(result) = Rollback::cast(syntax.clone()) {
+                if let Some(result) = Rollback::cast(syntax) {
                     return Some(Stmt::Rollback(result));
                 }
                 return None;
@@ -75152,7 +75152,7 @@ impl AstNode for TableArg {
             SyntaxKind::COLUMN => TableArg::Column(Column { syntax }),
             SyntaxKind::LIKE_CLAUSE => TableArg::LikeClause(LikeClause { syntax }),
             _ => {
-                if let Some(result) = TableConstraint::cast(syntax.clone()) {
+                if let Some(result) = TableConstraint::cast(syntax) {
                     return Some(TableArg::TableConstraint(result));
                 }
                 return None;

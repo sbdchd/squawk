@@ -4,7 +4,10 @@ use std::path::PathBuf;
 use log::info;
 
 /// Given a list of patterns or paths, along with exclusion patterns, find matching files.
-pub fn find_paths(path_patterns: &[String], exclude_patterns: &[String]) -> Result<Vec<PathBuf>> {
+pub(crate) fn find_paths(
+    path_patterns: &[String],
+    exclude_patterns: &[String],
+) -> Result<Vec<PathBuf>> {
     let mut matched_paths = vec![];
     let exclude_paths: Vec<_> = exclude_patterns
         .iter()

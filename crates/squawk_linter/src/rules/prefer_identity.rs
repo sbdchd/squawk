@@ -53,21 +53,20 @@ fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
 }
 
 fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
-    if let Some(ty) = ty {
-        if is_not_valid_int_type(&ty, serial_types()) {
-            let fix = create_identity_fix(&ty);
+    if let Some(ty) = ty
+        && is_not_valid_int_type(&ty, serial_types())
+    {
+        let fix = create_identity_fix(&ty);
 
-            ctx.report(
-                Violation::for_node(
-                    Rule::PreferIdentity,
-                    "Serial types make schema, dependency, and permission management difficult."
-                        .into(),
-                    ty.syntax(),
-                )
-                .help("Use an `IDENTITY` column instead.")
-                .fix(fix),
-            );
-        };
+        ctx.report(
+            Violation::for_node(
+                Rule::PreferIdentity,
+                "Serial types make schema, dependency, and permission management difficult.".into(),
+                ty.syntax(),
+            )
+            .help("Use an `IDENTITY` column instead.")
+            .fix(fix),
+        );
     }
 }
 

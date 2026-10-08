@@ -93,14 +93,14 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
             }
             ast::Stmt::AlterView(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterViewAction::ViewRenameTo(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::RenamingObject,
-                            "Renaming a view may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterViewAction::ViewRenameTo(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a view may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterMaterializedView(node) => {
@@ -115,14 +115,14 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
             }
             ast::Stmt::AlterFunction(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterFunctionAction::FunctionRenameTo(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::RenamingObject,
-                            "Renaming a function may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterFunctionAction::FunctionRenameTo(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a function may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterAggregate(node) => {
@@ -135,25 +135,25 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
             }
             ast::Stmt::AlterProcedure(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterProcedureAction::ProcedureRenameTo(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::RenamingObject,
-                            "Renaming a procedure may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterProcedureAction::ProcedureRenameTo(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a procedure may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterType(node) => {
-                for action in node.action().into_iter() {
+                if let Some(action) = node.action() {
                     match action {
                         ast::AlterTypeAction::TypeRenameTo(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::RenamingObject,
                                 "Renaming a type may break existing clients.".into(),
                                 node.syntax(),
-                            ))
+                            ));
                         }
                         ast::AlterTypeAction::RenameValue(node) => ctx.report(Violation::for_node(
                             Rule::RenamingObject,
@@ -176,46 +176,46 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
             }
             ast::Stmt::AlterSchema(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterSchemaAction::SchemaRenameTo(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::RenamingObject,
-                            "Renaming a schema may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterSchemaAction::SchemaRenameTo(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming a schema may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             ast::Stmt::AlterDomain(node) => {
-                for action in node.action().into_iter() {
+                if let Some(action) = node.action() {
                     match action {
                         ast::AlterDomainAction::DomainRenameTo(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::RenamingObject,
                                 "Renaming a domain may break existing clients.".into(),
                                 node.syntax(),
-                            ))
+                            ));
                         }
                         ast::AlterDomainAction::RenameConstraint(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::RenamingObject,
                                 "Renaming a constraint may break existing clients.".into(),
                                 node.syntax(),
-                            ))
+                            ));
                         }
                         _ => (),
                     }
                 }
             }
             ast::Stmt::AlterIndex(node) => {
-                for action in node.action().into_iter() {
-                    if let ast::AlterIndexAction::IndexRenameTo(node) = action {
-                        ctx.report(Violation::for_node(
-                            Rule::RenamingObject,
-                            "Renaming an index may break existing clients.".into(),
-                            node.syntax(),
-                        ));
-                    }
+                if let Some(action) = node.action()
+                    && let ast::AlterIndexAction::IndexRenameTo(node) = action
+                {
+                    ctx.report(Violation::for_node(
+                        Rule::RenamingObject,
+                        "Renaming an index may break existing clients.".into(),
+                        node.syntax(),
+                    ));
                 }
             }
             _ => (),

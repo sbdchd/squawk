@@ -281,7 +281,7 @@ mod test {
     }
 
     fn lint_ok(sql: &str) {
-        crate::test_utils::lint_ok(sql, Rule::PreferRobustStmts)
+        crate::test_utils::lint_ok(sql, Rule::PreferRobustStmts);
     }
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {

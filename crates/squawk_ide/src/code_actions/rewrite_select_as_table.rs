@@ -30,7 +30,7 @@ pub(super) fn rewrite_select_as_table(
     let mut replacement = format!("table {table_name}");
     if select.semicolon_token().is_some() {
         replacement.push(';');
-    };
+    }
 
     actions.push(CodeAction {
         title: "Rewrite as `table`".to_owned(),

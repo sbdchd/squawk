@@ -44,24 +44,26 @@ impl ast::Literal {
             .syntax()
             .ancestors()
             .find_map(ast::FuncOptionList::cast)?;
-        SqlBody::from_options(options)
+        SqlBody::from_options(&options)
     }
 }
 
 impl ast::CreateFunction {
     pub fn sql_body(&self) -> Option<SqlBody> {
-        SqlBody::from_options(self.option_list()?)
+        SqlBody::from_options(&self.option_list()?)
     }
 }
 
 impl ast::CreateProcedure {
     pub fn sql_body(&self) -> Option<SqlBody> {
-        SqlBody::from_options(self.option_list()?)
+        SqlBody::from_options(&self.option_list()?)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::Write as _;
+
     use super::*;
     use crate::SourceFile;
     use crate::test::render_errors;
@@ -86,7 +88,7 @@ mod tests {
         let end = usize::from(range.end());
 
         let mut out = format!("{:#?}", body.syntax());
-        out.push_str(&format!("---\nsource {range:?} {:?}\n", &sql[start..end]));
+        writeln!(out, "---\nsource {range:?} {:?}", &sql[start..end]).unwrap();
         out.push_str(&render_errors(sql, &body.errors()));
         out
     }

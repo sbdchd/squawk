@@ -72,8 +72,9 @@ pub fn ignore_rule_info(token: &SyntaxToken) -> Option<(&str, TextRange, IgnoreK
             (IGNORE_LINE_TEXT, IgnoreKind::Line),
         ] {
             if let Some(without_prefix) = without_end.strip_prefix(prefix) {
-                let start = range.start() + TextSize::new((trim_start_size + prefix.len()) as u32);
-                let end = range.end() - TextSize::new(trim_end_size as u32);
+                let start =
+                    range.start() + TextSize::try_from(trim_start_size + prefix.len()).unwrap();
+                let end = range.end() - TextSize::try_from(trim_end_size).unwrap();
 
                 let range = TextRange::new(start, end);
                 return Some((without_prefix, range, kind));
@@ -100,7 +101,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                     // we need to keep track of our offset and report specific
                     // ranges for any unknown names we encounter, which makes
                     // this more complicated
-                    for x in rule_names.split(",") {
+                    for x in rule_names.split(',') {
                         if x.is_empty() {
                             continue;
                         }
@@ -112,10 +113,13 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                             let trim_start_size = x.len() - without_start.len();
                             let trimmed = without_start.trim_end();
 
-                            let range = range.checked_add(TextSize::new(offset as u32)).unwrap();
+                            let range = range
+                                .checked_add(TextSize::try_from(offset).unwrap())
+                                .unwrap();
 
-                            let start = range.start() + TextSize::new(trim_start_size as u32);
-                            let end = start + TextSize::new(trimmed.len() as u32);
+                            let start =
+                                range.start() + TextSize::try_from(trim_start_size).unwrap();
+                            let end = start + TextSize::of(trimmed);
                             let range = TextRange::new(start, end);
 
                             ctx.report(Violation::for_range(
@@ -148,10 +152,10 @@ pub fn has_disable_assume_in_transaction(file: &SyntaxNode) -> bool {
             rowan::WalkEvent::Enter(NodeOrToken::Token(token))
                 if token.kind() == SyntaxKind::COMMENT =>
             {
-                if let Some((body, _range)) = comment_body(&token) {
-                    if trim_trailing_comment(body) == DISABLE_ASSUME_IN_TRANSACTION {
-                        return true;
-                    }
+                if let Some((body, _range)) = comment_body(&token)
+                    && trim_trailing_comment(body) == DISABLE_ASSUME_IN_TRANSACTION
+                {
+                    return true;
                 }
             }
             _ => (),
@@ -466,12 +470,7 @@ alter table t drop column c cascade;
         assert!(matches!(ignore.kind, IgnoreKind::File));
         assert!(ignore.violation_names.is_empty());
 
-        let errors: Vec<_> = linter
-            .lint(&parse, sql)
-            .into_iter()
-            .map(|x| x.code)
-            .collect();
-        assert!(errors.is_empty());
+        assert!(linter.lint(&parse, sql).is_empty());
     }
 
     #[test]

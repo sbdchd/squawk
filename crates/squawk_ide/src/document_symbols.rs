@@ -63,7 +63,7 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
     for stmt in parse(db, file).tree().stmts() {
         match stmt {
             ast::Stmt::CreateSchema(create_schema) => {
-                if let Some(symbol) = create_schema_symbol(create_schema) {
+                if let Some(symbol) = create_schema_symbol(&create_schema) {
                     symbols.push(symbol);
                 }
             }
@@ -106,7 +106,7 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateIndex(create_index) => {
-                if let Some(symbol) = create_index_symbol(create_index) {
+                if let Some(symbol) = create_index_symbol(&create_index) {
                     symbols.push(symbol);
                 }
             }
@@ -129,52 +129,52 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateTrigger(create_trigger) => {
-                if let Some(symbol) = create_trigger_symbol(create_trigger) {
+                if let Some(symbol) = create_trigger_symbol(&create_trigger) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateEventTrigger(create_event_trigger) => {
-                if let Some(symbol) = create_event_trigger_symbol(create_event_trigger) {
+                if let Some(symbol) = create_event_trigger_symbol(&create_event_trigger) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateTablespace(create_tablespace) => {
-                if let Some(symbol) = create_tablespace_symbol(create_tablespace) {
+                if let Some(symbol) = create_tablespace_symbol(&create_tablespace) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateDatabase(create_database) => {
-                if let Some(symbol) = create_database_symbol(create_database) {
+                if let Some(symbol) = create_database_symbol(&create_database) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateServer(create_server) => {
-                if let Some(symbol) = create_server_symbol(create_server) {
+                if let Some(symbol) = create_server_symbol(&create_server) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateExtension(create_extension) => {
-                if let Some(symbol) = create_extension_symbol(create_extension) {
+                if let Some(symbol) = create_extension_symbol(&create_extension) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateRole(create_role) => {
-                if let Some(symbol) = create_role_symbol(create_role) {
+                if let Some(symbol) = create_role_symbol(&create_role) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateRule(create_rule) => {
-                if let Some(symbol) = create_rule_symbol(create_rule) {
+                if let Some(symbol) = create_rule_symbol(&create_rule) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreatePolicy(create_policy) => {
-                if let Some(symbol) = create_policy_symbol(create_policy) {
+                if let Some(symbol) = create_policy_symbol(&create_policy) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreatePropertyGraph(create_property_graph) => {
-                if let Some(symbol) = create_property_graph_symbol(create_property_graph) {
+                if let Some(symbol) = create_property_graph_symbol(&create_property_graph) {
                     symbols.push(symbol);
                 }
             }
@@ -196,47 +196,47 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::Declare(declare) => {
-                if let Some(symbol) = create_declare_cursor_symbol(declare) {
+                if let Some(symbol) = create_declare_cursor_symbol(&declare) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::Prepare(prepare) => {
-                if let Some(symbol) = create_prepare_symbol(prepare) {
+                if let Some(symbol) = create_prepare_symbol(&prepare) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::Select(select) => {
-                symbols.extend(cte_table_symbols(select));
+                symbols.extend(cte_table_symbols(&select));
             }
             ast::Stmt::SelectInto(select_into) => {
-                symbols.extend(cte_table_symbols(select_into));
+                symbols.extend(cte_table_symbols(&select_into));
             }
             ast::Stmt::Insert(insert) => {
-                symbols.extend(cte_table_symbols(insert));
+                symbols.extend(cte_table_symbols(&insert));
             }
             ast::Stmt::Update(update) => {
-                symbols.extend(cte_table_symbols(update));
+                symbols.extend(cte_table_symbols(&update));
             }
             ast::Stmt::Delete(delete) => {
-                symbols.extend(cte_table_symbols(delete));
+                symbols.extend(cte_table_symbols(&delete));
             }
             ast::Stmt::Listen(listen) => {
-                if let Some(symbol) = create_listen_symbol(listen) {
+                if let Some(symbol) = create_listen_symbol(&listen) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::SavepointCreate(savepoint) => {
-                if let Some(symbol) = create_savepoint_symbol(savepoint) {
+                if let Some(symbol) = create_savepoint_symbol(&savepoint) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::Notify(notify) => {
-                if let Some(symbol) = create_notify_symbol(notify) {
+                if let Some(symbol) = create_notify_symbol(&notify) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::Unlisten(unlisten) => {
-                if let Some(symbol) = create_unlisten_symbol(unlisten) {
+                if let Some(symbol) = create_unlisten_symbol(&unlisten) {
                     symbols.push(symbol);
                 }
             }
@@ -248,34 +248,34 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
     symbols
 }
 
-fn cte_table_symbols(stmt: impl ast::HasWithClause) -> Vec<DocumentSymbol> {
+fn cte_table_symbols(stmt: &impl ast::HasWithClause) -> Vec<DocumentSymbol> {
     let Some(with_clause) = stmt.with_clause() else {
         return vec![];
     };
 
     with_clause
         .with_tables()
-        .filter_map(create_cte_table_symbol)
+        .filter_map(|with_table| create_cte_table_symbol(&with_table))
         .collect()
 }
 
-fn create_cte_table_symbol(with_table: ast::WithTable) -> Option<DocumentSymbol> {
+fn create_cte_table_symbol(with_table: &ast::WithTable) -> Option<DocumentSymbol> {
     let name_node = with_table.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = with_table.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
-    symbols_from_column_list(
+    Some(symbols_from_column_list(
         with_table.column_list(),
         name,
         full_range,
         focus_range,
         DocumentSymbolKind::Table,
-    )
+    ))
 }
 
-fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymbol> {
+fn create_schema_symbol(create_schema: &ast::CreateSchema) -> Option<DocumentSymbol> {
     let name_node = create_schema.schema_name()?;
     let name = name_node.text().to_string();
     let focus_range = name_node.text_range();
@@ -310,7 +310,7 @@ fn create_table_symbol(
     let mut children = vec![];
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
-            && let Some(column_symbol) = create_column_symbol(column)
+            && let Some(column_symbol) = create_column_symbol(&column)
         {
             children.push(column_symbol);
         }
@@ -365,13 +365,13 @@ fn create_view_symbol(db: &dyn Db, create_view: InFile<ast::CreateView>) -> Opti
     let full_range = create_view.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
-    symbols_from_column_list(
+    Some(symbols_from_column_list(
         create_view.column_list(),
         name,
         full_range,
         focus_range,
         DocumentSymbolKind::View,
-    )
+    ))
 }
 
 fn symbols_from_column_list(
@@ -380,7 +380,7 @@ fn symbols_from_column_list(
     full_range: TextRange,
     focus_range: TextRange,
     kind: DocumentSymbolKind,
-) -> Option<DocumentSymbol> {
+) -> DocumentSymbol {
     let mut children = vec![];
     if let Some(column_list) = column_list {
         for column_name in column_list.column_names() {
@@ -388,14 +388,14 @@ fn symbols_from_column_list(
         }
     }
 
-    Some(DocumentSymbol {
+    DocumentSymbol {
         name,
         detail: None,
         kind,
         full_range,
         focus_range,
         children,
-    })
+    }
 }
 
 // TODO: combine with create_view_symbol
@@ -414,13 +414,13 @@ fn create_materialized_view_symbol(
     let full_range = create_view.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
-    symbols_from_column_list(
+    Some(symbols_from_column_list(
         create_view.column_list(),
         name,
         full_range,
         focus_range,
         DocumentSymbolKind::MaterializedView,
-    )
+    ))
 }
 
 fn create_function_symbol(
@@ -498,7 +498,7 @@ fn create_procedure_symbol(
     })
 }
 
-fn create_index_symbol(create_index: ast::CreateIndex) -> Option<DocumentSymbol> {
+fn create_index_symbol(create_index: &ast::CreateIndex) -> Option<DocumentSymbol> {
     let path = create_index.index()?.path()?;
     let name_node = path.segment()?;
     let name = path.syntax().text().to_string();
@@ -591,7 +591,7 @@ fn create_statistics_symbol(
     })
 }
 
-fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentSymbol> {
+fn create_trigger_symbol(create_trigger: &ast::CreateTrigger) -> Option<DocumentSymbol> {
     let name_node = create_trigger.trigger()?;
     let name = name_node.syntax().text().to_string();
 
@@ -609,7 +609,7 @@ fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentS
 }
 
 fn create_event_trigger_symbol(
-    create_event_trigger: ast::CreateEventTrigger,
+    create_event_trigger: &ast::CreateEventTrigger,
 ) -> Option<DocumentSymbol> {
     let name_node = create_event_trigger.event_trigger()?;
     let name = name_node.syntax().text().to_string();
@@ -627,7 +627,7 @@ fn create_event_trigger_symbol(
     })
 }
 
-fn create_tablespace_symbol(create_tablespace: ast::CreateTablespace) -> Option<DocumentSymbol> {
+fn create_tablespace_symbol(create_tablespace: &ast::CreateTablespace) -> Option<DocumentSymbol> {
     let name_node = create_tablespace.tablespace()?;
     let name = name_node.syntax().text().to_string();
 
@@ -644,7 +644,7 @@ fn create_tablespace_symbol(create_tablespace: ast::CreateTablespace) -> Option<
     })
 }
 
-fn create_database_symbol(create_database: ast::CreateDatabase) -> Option<DocumentSymbol> {
+fn create_database_symbol(create_database: &ast::CreateDatabase) -> Option<DocumentSymbol> {
     let name_node = create_database.database()?;
     let name = name_node.syntax().text().to_string();
 
@@ -661,7 +661,7 @@ fn create_database_symbol(create_database: ast::CreateDatabase) -> Option<Docume
     })
 }
 
-fn create_server_symbol(create_server: ast::CreateServer) -> Option<DocumentSymbol> {
+fn create_server_symbol(create_server: &ast::CreateServer) -> Option<DocumentSymbol> {
     let name_node = create_server.server()?;
     let name = name_node.syntax().text().to_string();
 
@@ -678,7 +678,7 @@ fn create_server_symbol(create_server: ast::CreateServer) -> Option<DocumentSymb
     })
 }
 
-fn create_extension_symbol(create_extension: ast::CreateExtension) -> Option<DocumentSymbol> {
+fn create_extension_symbol(create_extension: &ast::CreateExtension) -> Option<DocumentSymbol> {
     let name_node = create_extension.extension()?;
     let name = name_node.syntax().text().to_string();
 
@@ -695,7 +695,7 @@ fn create_extension_symbol(create_extension: ast::CreateExtension) -> Option<Doc
     })
 }
 
-fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
+fn create_role_symbol(create_role: &ast::CreateRole) -> Option<DocumentSymbol> {
     let role = create_role.role()?;
     let name = role.syntax().text().to_string();
 
@@ -712,7 +712,7 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
+fn create_rule_symbol(create_rule: &ast::CreateRule) -> Option<DocumentSymbol> {
     let name_node = create_rule.rule()?;
     let name = name_node.syntax().text().to_string();
 
@@ -729,7 +729,7 @@ fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymbol> {
+fn create_policy_symbol(create_policy: &ast::CreatePolicy) -> Option<DocumentSymbol> {
     let name_node = create_policy.policy()?;
     let name = name_node.syntax().text().to_string();
 
@@ -747,7 +747,7 @@ fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymb
 }
 
 fn create_property_graph_symbol(
-    create_property_graph: ast::CreatePropertyGraph,
+    create_property_graph: &ast::CreatePropertyGraph,
 ) -> Option<DocumentSymbol> {
     let path = create_property_graph.property_graph()?.path()?;
     let name_node = path.segment()?;
@@ -784,7 +784,7 @@ fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
         Some(ast::CreateTypeKind::EnumType(enum_type)) => {
             if let Some(variant_list) = enum_type.variant_list() {
                 for variant in variant_list.variants() {
-                    if let Some(variant_symbol) = create_variant_symbol(variant) {
+                    if let Some(variant_symbol) = create_variant_symbol(&variant) {
                         children.push(variant_symbol);
                     }
                 }
@@ -793,7 +793,7 @@ fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
         Some(ast::CreateTypeKind::CompositeType(composite_type)) => {
             if let Some(field_list) = composite_type.composite_field_list() {
                 for field in field_list.composite_field_defs() {
-                    if let Some(field_symbol) = create_composite_field_symbol(field) {
+                    if let Some(field_symbol) = create_composite_field_symbol(&field) {
                         children.push(field_symbol);
                     }
                 }
@@ -829,7 +829,7 @@ fn create_column_name_symbol(column_name: &ast::ColumnName) -> DocumentSymbol {
     }
 }
 
-fn create_column_symbol(column: ast::Column) -> Option<DocumentSymbol> {
+fn create_column_symbol(column: &ast::Column) -> Option<DocumentSymbol> {
     let name_node = column.name()?;
     let name = name_node.syntax().text().to_string();
 
@@ -848,7 +848,7 @@ fn create_column_symbol(column: ast::Column) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_composite_field_symbol(field: ast::CompositeFieldDef) -> Option<DocumentSymbol> {
+fn create_composite_field_symbol(field: &ast::CompositeFieldDef) -> Option<DocumentSymbol> {
     let name_node = field.name()?;
     let name = name_node.syntax().text().to_string();
 
@@ -867,7 +867,7 @@ fn create_composite_field_symbol(field: ast::CompositeFieldDef) -> Option<Docume
     })
 }
 
-fn create_variant_symbol(variant: ast::Variant) -> Option<DocumentSymbol> {
+fn create_variant_symbol(variant: &ast::Variant) -> Option<DocumentSymbol> {
     let literal = variant.literal()?;
     let name = extract_string_literal(&literal)?;
 
@@ -884,7 +884,7 @@ fn create_variant_symbol(variant: ast::Variant) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol> {
+fn create_declare_cursor_symbol(declare: &ast::Declare) -> Option<DocumentSymbol> {
     let name_node = declare.cursor()?;
     let name = name_node.syntax().text().to_string();
 
@@ -901,7 +901,7 @@ fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol>
     })
 }
 
-fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
+fn create_prepare_symbol(prepare: &ast::Prepare) -> Option<DocumentSymbol> {
     let name_node = prepare.name()?;
     let name = name_node.syntax().text().to_string();
 
@@ -918,7 +918,7 @@ fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
+fn create_listen_symbol(listen: &ast::Listen) -> Option<DocumentSymbol> {
     let name_node = listen.channel()?;
     let name = name_node.syntax().text().to_string();
 
@@ -935,7 +935,7 @@ fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_savepoint_symbol(savepoint: ast::SavepointCreate) -> Option<DocumentSymbol> {
+fn create_savepoint_symbol(savepoint: &ast::SavepointCreate) -> Option<DocumentSymbol> {
     let name_node = savepoint.savepoint()?;
     let name = name_node.syntax().text().to_string();
 
@@ -952,7 +952,7 @@ fn create_savepoint_symbol(savepoint: ast::SavepointCreate) -> Option<DocumentSy
     })
 }
 
-fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
+fn create_notify_symbol(notify: &ast::Notify) -> Option<DocumentSymbol> {
     let name_node = notify.channel_ref()?;
     let name = name_node.syntax().text().to_string();
 
@@ -969,7 +969,7 @@ fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_unlisten_symbol(unlisten: ast::Unlisten) -> Option<DocumentSymbol> {
+fn create_unlisten_symbol(unlisten: &ast::Unlisten) -> Option<DocumentSymbol> {
     let name_node = unlisten.channel_ref()?;
     let name = name_node.syntax().text().to_string();
 
@@ -999,9 +999,10 @@ mod tests {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());
         let symbols = document_symbols(&db, file);
-        if !symbols.is_empty() {
-            panic!("Symbols found. If this is expected, use `symbols` instead.")
-        }
+        assert!(
+            symbols.is_empty(),
+            "Symbols found. If this is expected, use `symbols` instead."
+        );
     }
 
     #[must_use]
@@ -1009,9 +1010,10 @@ mod tests {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());
         let symbols = document_symbols(&db, file);
-        if symbols.is_empty() {
-            panic!("No symbols found. If this is expected, use `symbols_not_found` instead.")
-        }
+        assert!(
+            !symbols.is_empty(),
+            "No symbols found. If this is expected, use `symbols_not_found` instead."
+        );
 
         let mut output = vec![];
         for symbol in symbols {
@@ -1021,7 +1023,6 @@ mod tests {
         Renderer::plain()
             .decor_style(DecorStyle::Unicode)
             .render(&output)
-            .to_string()
     }
 
     fn symbol_to_group<'a>(symbol: &DocumentSymbol, sql: &'a str) -> Group<'a> {
@@ -1076,7 +1077,7 @@ mod tests {
                     .label("full range"),
             );
 
-        let mut group = Level::INFO.primary_title(title.clone()).element(snippet);
+        let mut group = Level::INFO.primary_title(title).element(snippet);
 
         if !symbol.children.is_empty() {
             let child_labels: Vec<String> = symbol
@@ -1753,12 +1754,12 @@ prepare stmt as select 1;
 
     #[test]
     fn empty_file() {
-        symbols_not_found("")
+        symbols_not_found("");
     }
 
     #[test]
     fn non_create_statements() {
-        symbols_not_found("select * from users;")
+        symbols_not_found("select * from users;");
     }
 
     #[test]

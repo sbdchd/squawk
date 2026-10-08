@@ -76,7 +76,7 @@ fn check_target_aliases(ctx: &mut Linter, target_list: &ast::TargetList) {
     check_defined_nodes(
         ctx,
         target_list.targets().filter_map(|target| {
-            let (name, node) = ColumnName::from_target(target)?;
+            let (name, node) = ColumnName::from_target(&target)?;
             Some((Name::from_string(name.to_string()?), node))
         }),
     );

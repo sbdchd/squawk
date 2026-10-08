@@ -133,7 +133,7 @@ fn update_lib(name: &str) -> Result<()> {
     ];
 
     for (marker, replacement) in replacements {
-        file_content = file_content.replace(marker, &(replacement + marker))
+        file_content = file_content.replace(marker, &(replacement + marker));
     }
 
     fs::write(&lib, file_content)?;
@@ -160,7 +160,7 @@ fn update_rules_mod(name: &str) -> Result<()> {
     ];
 
     for (marker, replacement) in replacements {
-        file_content = file_content.replace(marker, &(replacement + marker))
+        file_content = file_content.replace(marker, &(replacement + marker));
     }
 
     fs::write(&lib, file_content)?;
@@ -240,7 +240,7 @@ fn docs_update_page_index(name: &str) -> Result<()> {
     )];
 
     for (marker, replacement) in replacements {
-        file_content = file_content.replace(marker, &(replacement + marker))
+        file_content = file_content.replace(marker, &(replacement + marker));
     }
 
     fs::write(&rule_sidebars, file_content)?;
@@ -262,7 +262,7 @@ fn docs_update_sidebar(name: &str) -> Result<()> {
     )];
 
     for (marker, replacement) in replacements {
-        file_content = file_content.replace(marker, &(replacement + marker))
+        file_content = file_content.replace(marker, &(replacement + marker));
     }
 
     fs::write(&rule_sidebars, file_content)?;

@@ -405,7 +405,7 @@ fn trim_args(p: &mut Parser<'_>) -> CompletedMarker {
     // | expr_list
     let kind = if p.eat(FROM_KW) {
         if !opt_expr_list(p) {
-            p.error("expected expression")
+            p.error("expected expression");
         }
         TRIM_FROM
     } else {
@@ -482,7 +482,7 @@ fn substring_args(p: &mut Parser<'_>) -> CompletedMarker {
             expr_bp(
                 p,
                 1,
-                &Restrictions {
+                Restrictions {
                     escape_disabled: true,
                     ..Restrictions::default()
                 },
@@ -1943,7 +1943,7 @@ fn opt_json_passing_clause(p: &mut Parser<'_>, follow: TokenSet) {
 }
 
 // unary / prefix stuff
-fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<(CompletedMarker, ExprKind)> {
+fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, ExprKind)> {
     let m;
     let (kind, prefix_bp) = match p.current() {
         MINUS | PLUS if p.op_len() == 1 => {
@@ -1987,7 +1987,7 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<(CompletedMarker, ExprKin
     expr_bp(
         p,
         prefix_bp,
-        &Restrictions {
+        Restrictions {
             bare_label: r.bare_label,
             ..Default::default()
         },
@@ -2125,6 +2125,7 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
     lhs
 }
 
+#[derive(Clone, Copy)]
 pub(crate) enum ListItems {
     Required,
     Optional,
@@ -2361,9 +2362,9 @@ fn type_mods(
     type_args_enabled: bool,
     percent_type_enabled: bool,
     kind: SyntaxKind,
-) -> Option<CompletedMarker> {
+) -> CompletedMarker {
     if percent_type_enabled && opt_percent_type(p).is_some() {
-        return Some(m.complete(p, PERCENT_TYPE));
+        return m.complete(p, PERCENT_TYPE);
     }
     if p.at(L_PAREN) && type_args_enabled && allows_type_mods(kind) {
         let m = p.start();
@@ -2381,7 +2382,7 @@ fn type_mods(
     }
     let cm = m.complete(p, kind);
     if !p.at(L_BRACK) && !p.at(ARRAY_KW) {
-        return Some(cm);
+        return cm;
     }
     let m = cm.precede(p);
     if p.eat(ARRAY_KW) {
@@ -2397,7 +2398,7 @@ fn type_mods(
             p.error("expected L_BRACK for ARRAY_TYPE");
         }
     }
-    Some(m.complete(p, ARRAY_TYPE))
+    m.complete(p, ARRAY_TYPE)
 }
 
 fn char_type(p: &mut Parser<'_>) -> SyntaxKind {
@@ -2515,7 +2516,13 @@ fn opt_type_name_with(
             return None;
         }
     };
-    type_mods(p, m, type_args_enabled, percent_type_enabled, wrapper_type)
+    Some(type_mods(
+        p,
+        m,
+        type_args_enabled,
+        percent_type_enabled,
+        wrapper_type,
+    ))
 }
 
 fn opt_with_timezone(p: &mut Parser<'_>) -> bool {
@@ -2998,7 +3005,7 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 }
 
 pub(crate) fn expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
-    expr_bp(p, 1, &Restrictions::default())
+    expr_bp(p, 1, Restrictions::default())
 }
 
 fn opt_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
@@ -3014,7 +3021,7 @@ fn b_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     expr_bp(
         p,
         1,
-        &Restrictions {
+        Restrictions {
             in_disabled: true,
             is_disabled: true,
             not_disabled: true,
@@ -3046,7 +3053,7 @@ enum Associativity {
 /// Binding powers of operators for a Pratt parser.
 ///
 /// See <https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html>
-fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativity) {
+fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity) {
     use Associativity::*;
     const NOT_AN_OP: (u8, SyntaxKind, Associativity) = (0, AT, Left);
     // For binding power, checkout:
@@ -3161,6 +3168,7 @@ enum BareLabelBehavior {
 }
 
 #[derive(Default, Clone, Copy)]
+#[allow(clippy::struct_excessive_bools)]
 struct Restrictions {
     escape_disabled: bool,
     in_disabled: bool,
@@ -3170,7 +3178,7 @@ struct Restrictions {
     bare_label: BareLabelBehavior,
 }
 
-fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMarker, ExprKind)> {
+fn expr_bp(p: &mut Parser<'_>, bp: u8, r: Restrictions) -> Option<(CompletedMarker, ExprKind)> {
     let m = p.start();
     if !p.at_ts(EXPR_FIRST) {
         p.err_recover(
@@ -3196,12 +3204,13 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<(CompletedMar
     // like an expr, in which case we assume we're dealing with a binary expr,
     // otherwise we assume it's a bare column label.
     loop {
-        if p.at_ts(OVERLAPPING_TOKENS) && !p.nth_at_ts(1, EXPR_FIRST) {
-            if !(p.nth_at(1, AS_KW) || (p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))) {
-                match r.bare_label {
-                    BareLabelBehavior::Allowed => break,
-                    BareLabelBehavior::Forbidden => (),
-                }
+        if p.at_ts(OVERLAPPING_TOKENS)
+            && !p.nth_at_ts(1, EXPR_FIRST)
+            && !(p.nth_at(1, AS_KW) || (p.at(IS_KW) && p.nth_at(1, DISTINCT_KW)))
+        {
+            match r.bare_label {
+                BareLabelBehavior::Allowed => break,
+                BareLabelBehavior::Forbidden => (),
             }
         }
         let (op_bp, op, associativity) = current_op(p, r);
@@ -3396,13 +3405,13 @@ const WITH_FOLLOW: TokenSet = TokenSet::new(&[
 ]);
 
 // [ WITH [ RECURSIVE ] with_query [, ...] ]
-fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn with_query_clause(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(WITH_KW);
     p.eat(RECURSIVE_KW);
     if p.at_ts(WITH_FOLLOW) {
         p.error("expected common table expression");
-        return Some(m.complete(p, WITH_CLAUSE));
+        return m.complete(p, WITH_CLAUSE);
     }
     while !p.at(EOF) {
         with_query(p);
@@ -3421,7 +3430,7 @@ fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             }
         }
     }
-    Some(m.complete(p, WITH_CLAUSE))
+    m.complete(p, WITH_CLAUSE)
 }
 
 fn select_clause(p: &mut Parser<'_>) -> CompletedMarker {
@@ -3540,7 +3549,7 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
         out_kind = TABLE;
     } else {
         if opt_from_clause(p).is_some() {
-            opt_select_clause(p)
+            opt_select_clause(p);
         } else {
             select_clause(p);
         }
@@ -5357,7 +5366,7 @@ fn opt_op(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(OPERATOR_FIRST) || p.at(FAT_ARROW) {
         return false;
     }
-    let (power, kind, _) = current_op(p, &Restrictions::default());
+    let (power, kind, _) = current_op(p, Restrictions::default());
     if power == 0 {
         p.bump_any();
         return true;
@@ -5470,7 +5479,7 @@ fn qual_op_or_opcall(p: &mut Parser<'_>) {
 }
 
 pub(crate) fn current_operator(p: &Parser<'_>) -> Option<SyntaxKind> {
-    let (power, kind, _) = current_op(p, &Restrictions::default());
+    let (power, kind, _) = current_op(p, Restrictions::default());
     if power == 0 { None } else { Some(kind) }
 }
 
@@ -6153,7 +6162,7 @@ fn opt_window_partition_by(p: &mut Parser<'_>) {
     p.bump(PARTITION_KW);
     p.expect(BY_KW);
     if !opt_expr_list(p) {
-        p.error("expected expression")
+        p.error("expected expression");
     }
     m.complete(p, PARTITION_BY_CLAUSE);
 }
@@ -6447,7 +6456,7 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
     } else if expr_bp(
         p,
         1,
-        &Restrictions {
+        Restrictions {
             bare_label: BareLabelBehavior::Allowed,
             ..Restrictions::default()
         },
@@ -6462,7 +6471,7 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
             p.current()
         ));
         return None;
-    };
+    }
     Some(m.complete(p, TARGET))
 }
 
@@ -6582,7 +6591,7 @@ fn partition_item(p: &mut Parser<'_>, allow_extra_params: bool) -> CompletedMark
     let m = p.start();
     // TODO: this can be more strict
     if expr(p).is_none() {
-        p.error("expected expr")
+        p.error("expected expr");
     }
     opt_collate(p);
     // [ opclass ]
@@ -6637,7 +6646,7 @@ fn opt_nulls_order(p: &mut Parser<'_>) {
     }
 }
 
-fn table_arg_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn table_arg_list(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(L_PAREN));
     let m = p.start();
     delimited(
@@ -6650,7 +6659,7 @@ fn table_arg_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         COL_DEF_FIRST,
         |p| opt_col_def(p).is_some(),
     );
-    Some(m.complete(p, TABLE_ARG_LIST))
+    m.complete(p, TABLE_ARG_LIST)
 }
 
 // modulus 5
@@ -9004,7 +9013,7 @@ fn opt_alter_table_action_list(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         if opt_alter_table_action(p).is_none() {
             break;
-        };
+        }
         if p.at(COMMA) && matches!(p.nth(1), EOF | SEMICOLON) {
             p.err_and_bump("unexpected trailing comma");
             break;
@@ -9318,7 +9327,7 @@ fn alter_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
         _ => opt_fdw_option_list(p).is_some(),
     };
     if !found_option {
-        p.error("Missing alter foreign data wrapper option or action.")
+        p.error("Missing alter foreign data wrapper option or action.");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_FOREIGN_DATA_WRAPPER)
@@ -10964,7 +10973,7 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
                 p.bump(SET_KW);
                 p.expect(DEFAULT_KW);
                 if expr(p).is_none() {
-                    p.error("expected expression")
+                    p.error("expected expression");
                 }
                 m.complete(p, SET_DEFAULT);
             } else if p.at(DROP_KW) {
@@ -11742,7 +11751,7 @@ fn alter_element_table_actions(p: &mut Parser<'_>) -> SyntaxKind {
         } else {
             p.expect(PROPERTIES_KW);
             if !opt_paren_property_name_ref_list(p) {
-                p.error("expected name ref list")
+                p.error("expected name ref list");
             }
             DROP_VERTEX_EDGE_LABEL_PROPERTIES
         }
@@ -11760,7 +11769,7 @@ fn alter_element_table_actions(p: &mut Parser<'_>) -> SyntaxKind {
             p.expect(DROP_KW);
             p.expect(PROPERTIES_KW);
             if !opt_paren_property_name_ref_list(p) {
-                p.error("expected name ref list")
+                p.error("expected name ref list");
             }
             opt_cascade_or_restrict(p);
             DROP_VERTEX_EDGE_LABEL_PROPERTIES
@@ -13200,7 +13209,7 @@ fn create_statistics(p: &mut Parser<'_>) -> CompletedMarker {
         let m = p.start();
         p.bump(ON_KW);
         if !opt_expr_list(p) {
-            p.error("expected expression")
+            p.error("expected expression");
         }
         m.complete(p, STATISTICS_ON_CLAUSE);
     }
@@ -14835,7 +14844,7 @@ fn grant_role_option(p: &mut Parser<'_>) {
     let m = p.start();
     grant_role_option_name(p);
     if !(p.eat(OPTION_KW) || p.eat(TRUE_KW) || p.eat(FALSE_KW)) {
-        p.error("expected OPTION, TRUE, or FALSE")
+        p.error("expected OPTION, TRUE, or FALSE");
     }
     m.complete(p, GRANT_ROLE_OPTION);
 }
@@ -15099,7 +15108,7 @@ fn revoke_command(p: &mut Parser<'_>) {
         } else if p.at_ts(REVOKE_COMMAND_FIRST) {
             p.bump_any();
         } else {
-            p.error(format!("expected command name, got {:?}", p.current()))
+            p.error(format!("expected command name, got {:?}", p.current()));
         }
     }
     // [ ( column_name [, ...] ) ]
@@ -15115,7 +15124,7 @@ fn revoke_command(p: &mut Parser<'_>) {
 //  | SESSION_USER
 fn role_ref(p: &mut Parser<'_>) {
     if !opt_role_ref(p) {
-        p.error(format!("expected role, got {:?}", p.current()))
+        p.error(format!("expected role, got {:?}", p.current()));
     }
 }
 
@@ -15135,7 +15144,7 @@ fn opt_role_ref(p: &mut Parser<'_>) -> bool {
 
 fn role(p: &mut Parser<'_>) {
     if !opt_role_(p, ROLE) {
-        p.error(format!("expected role, got {:?}", p.current()))
+        p.error(format!("expected role, got {:?}", p.current()));
     }
 }
 
@@ -15326,7 +15335,7 @@ fn security_label_object(p: &mut Parser<'_>) {
             p.bump(LARGE_KW);
             p.expect(OBJECT_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected large_object_oid")
+                p.error("expected large_object_oid");
             }
             m.complete(p, OBJECT_LARGE_OBJECT);
         }
@@ -16160,7 +16169,7 @@ pub(crate) fn opt_direction(p: &mut Parser<'_>) -> bool {
             let m = p.start();
             p.bump(RELATIVE_KW);
             if b_expr(p).is_none() {
-                p.error("expected count")
+                p.error("expected count");
             }
             m.complete(p, RELATIVE);
         }
@@ -16168,7 +16177,7 @@ pub(crate) fn opt_direction(p: &mut Parser<'_>) -> bool {
             let m = p.start();
             p.bump(ABSOLUTE_KW);
             if b_expr(p).is_none() {
-                p.error("expected count")
+                p.error("expected count");
             }
             m.complete(p, ABSOLUTE);
         }
@@ -16191,7 +16200,7 @@ pub(crate) fn opt_direction(p: &mut Parser<'_>) -> bool {
         // count
         _ if p.at_ts(NUMERIC_FIRST) || p.at(MINUS) || p.at(PLUS) => {
             if b_expr(p).is_none() {
-                p.error("expected count")
+                p.error("expected count");
             }
         }
         _ => return false,
@@ -17089,7 +17098,7 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
                 grant(p);
             }
             _ => return,
-        };
+        }
     }
 }
 
@@ -17137,7 +17146,7 @@ fn query(p: &mut Parser<'_>) {
     if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default()).is_none())
         && opt_paren_select(p, None, &SelectRestrictions::default()).is_none()
     {
-        p.error("expected select stmt")
+        p.error("expected select stmt");
     }
 }
 
@@ -18147,7 +18156,7 @@ fn routine_body_stmt(p: &mut Parser<'_>) {
         let m = p.start();
         p.bump(RETURN_KW);
         if expr(p).is_none() {
-            p.error("expected expr")
+            p.error("expected expr");
         }
         p.expect(SEMICOLON);
         m.complete(p, RETURN_STMT);
@@ -18277,7 +18286,7 @@ fn func_option_list(p: &mut Parser<'_>, kind: FuncOptionListKind) {
             }
             break;
         } else {
-            seen_func_option = true
+            seen_func_option = true;
         }
     }
     if !seen_func_option {
@@ -19329,7 +19338,7 @@ fn opt_attribute_option(p: &mut Parser<'_>) -> bool {
         if p.at_ts(COL_LABEL_FIRST) {
             attribute_name(p);
         } else {
-            p.error("expected column label")
+            p.error("expected column label");
         }
     } else {
         name.complete(p, ATTRIBUTE_NAME);

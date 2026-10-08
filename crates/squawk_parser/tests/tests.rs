@@ -11,8 +11,8 @@ use std::fmt::Write;
     glob: "*.sql",
 )]
 fn parser_ok(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let input_file = absolute_fixture_path;
     let test_name = absolute_fixture_path
         .file_name()
@@ -41,8 +41,8 @@ fn parser_ok(fixture: Fixture<&str>) {
     glob: "*.sql",
 )]
 fn parser_err(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let input_file = absolute_fixture_path;
     let test_name = absolute_fixture_path
         .file_name()
@@ -69,8 +69,8 @@ fn parser_err(fixture: Fixture<&str>) {
     glob: "*.sql",
 )]
 fn regression_suite(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     if absolute_fixture_path.to_string().contains("psql") {
         return;
     }
@@ -197,7 +197,7 @@ fn parse_text(text: &str) -> (String, Option<String>) {
                     .fold(true)
                     .annotation(AnnotationKind::Primary.span(range.clone())),
             );
-            let rendered = renderer.render(&[group]).to_string();
+            let rendered = renderer.render(&[group]).clone();
 
             out.push_str(&rendered);
             out.push('\n');

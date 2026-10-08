@@ -8,6 +8,7 @@
 //! - [`newlines`] adds helpers upstream doesn't have.
 
 #![deny(missing_debug_implementations, missing_docs, rust_2018_idioms)]
+#![allow(unsafe_code)]
 
 #[allow(missing_debug_implementations, missing_docs)]
 mod newlines;
@@ -74,12 +75,12 @@ struct WideChar {
 
 impl WideChar {
     /// Returns the length in 8-bit UTF-8 code units.
-    fn len(&self) -> TextSize {
+    fn len(self) -> TextSize {
         self.end - self.start
     }
 
     /// Returns the length in UTF-16 or UTF-32 code units.
-    fn wide_len(&self, enc: WideEncoding) -> u32 {
+    fn wide_len(self, enc: WideEncoding) -> u32 {
         match enc {
             WideEncoding::Utf16 => {
                 if self.len() == TextSize::from(4) {
@@ -136,7 +137,7 @@ impl LineIndex {
         let start = self.start_offset(line)?;
         let col = offset - start;
         let ret = LineCol {
-            line: line as u32,
+            line: u32::try_from(line).unwrap(),
             col: col.into(),
         };
         self.line_wide_chars
@@ -291,7 +292,7 @@ fn analyze_source_file_dispatch(
 #[target_feature(enable = "sse2")]
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 // This can be removed once 1.87 is stable due to some intrinsics switching to safe.
-#[allow(unsafe_op_in_unsafe_fn)]
+#[allow(unsafe_op_in_unsafe_fn, clippy::cast_possible_truncation)]
 unsafe fn analyze_source_file_sse2(
     src: &str,
     lines: &mut Vec<TextSize>,
@@ -315,7 +316,8 @@ unsafe fn analyze_source_file_sse2(
     let mut intra_chunk_offset = 0;
 
     for chunk_index in 0..chunk_count {
-        let ptr = src_bytes.as_ptr() as *const __m128i;
+        #[allow(clippy::cast_ptr_alignment)]
+        let ptr = src_bytes.as_ptr().cast::<__m128i>();
         // We don't know if the pointer is aligned to 16 bytes, so we
         // use `loadu`, which supports unaligned loading.
         let chunk = unsafe { _mm_loadu_si128(ptr.add(chunk_index)) };
@@ -329,7 +331,7 @@ unsafe fn analyze_source_file_sse2(
         // SQUAWK: `\r` needs to look at the following byte to tell `\r` from
         // `\r\n`, which the chunked mask can't do, so we send any chunk holding
         // one down the generic path instead.
-        let cr_test = _mm_cmpeq_epi8(chunk, _mm_set1_epi8(b'\r' as i8));
+        let cr_test = _mm_cmpeq_epi8(chunk, _mm_set1_epi8(b'\r'.cast_signed()));
         let cr_mask = _mm_movemask_epi8(cr_test);
 
         // If the bit mask is all zero, we only have ASCII chars here:
@@ -337,12 +339,12 @@ unsafe fn analyze_source_file_sse2(
             assert!(intra_chunk_offset == 0);
 
             // Check for newlines in the chunk
-            let newlines_test = _mm_cmpeq_epi8(chunk, _mm_set1_epi8(b'\n' as i8));
+            let newlines_test = _mm_cmpeq_epi8(chunk, _mm_set1_epi8(b'\n'.cast_signed()));
             let newlines_mask = _mm_movemask_epi8(newlines_test);
 
             if newlines_mask != 0 {
                 // All control characters are newlines, record them
-                let mut newlines_mask = 0xFFFF0000 | newlines_mask as u32;
+                let mut newlines_mask = 0xFFFF_0000 | newlines_mask.cast_unsigned();
                 let output_offset = TextSize::from((chunk_index * CHUNK_SIZE + 1) as u32);
 
                 loop {
@@ -407,7 +409,7 @@ unsafe fn move_mask(v: std::arch::aarch64::uint8x16_t) -> u64 {
 #[target_feature(enable = "neon")]
 #[cfg(all(target_arch = "aarch64", target_endian = "little"))]
 // This can be removed once 1.87 is stable due to some intrinsics switching to safe.
-#[allow(unsafe_op_in_unsafe_fn)]
+#[allow(unsafe_op_in_unsafe_fn, clippy::cast_possible_truncation)]
 unsafe fn analyze_source_file_neon(
     src: &str,
     lines: &mut Vec<TextSize>,
@@ -421,9 +423,9 @@ unsafe fn analyze_source_file_neon(
 
     let chunk_count = src.len() / CHUNK_SIZE;
 
-    let newline = vdupq_n_s8(b'\n' as i8);
+    let newline = vdupq_n_s8(b'\n'.cast_signed());
     // SQUAWK: see the matching comment in the sse2 version
-    let carriage_return = vdupq_n_s8(b'\r' as i8);
+    let carriage_return = vdupq_n_s8(b'\r'.cast_signed());
 
     // This variable keeps track of where we should start decoding a
     // chunk. If a multi-byte character spans across chunk boundaries,
@@ -432,7 +434,7 @@ unsafe fn analyze_source_file_neon(
     let mut intra_chunk_offset = 0;
 
     for chunk_index in 0..chunk_count {
-        let ptr = src_bytes.as_ptr() as *const i8;
+        let ptr = src_bytes.as_ptr().cast::<i8>();
         let chunk = unsafe { vld1q_s8(ptr.add(chunk_index * CHUNK_SIZE)) };
 
         // For character in the chunk, see if its byte value is < 0, which
@@ -531,13 +533,13 @@ fn analyze_source_file_generic(
         let mut char_len = 1;
 
         if byte == b'\n' {
-            lines.push(TextSize::from(i as u32 + 1) + output_offset);
+            lines.push(TextSize::try_from(i + 1).unwrap() + output_offset);
         // SQUAWK: `\r` and `\r\n` start a new line too. A `\r\n` pair is a
         // single break, so we skip the `\r` and let the `\n` push the start.
         // The `\n` can live past `scan_len` when the pair straddles a chunk
         // boundary, in which case the next chunk pushes it.
         } else if byte == b'\r' && src_bytes.get(i + 1) != Some(&b'\n') {
-            lines.push(TextSize::from(i as u32 + 1) + output_offset);
+            lines.push(TextSize::try_from(i + 1).unwrap() + output_offset);
         } else if byte >= 127 {
             // The slow path: Just decode to `char`.
             let c = src[i..].chars().next().unwrap();
@@ -545,17 +547,17 @@ fn analyze_source_file_generic(
 
             // The last element of `lines` represents the offset of the start of
             // current line. To get the offset inside the line, we subtract it.
-            let pos = TextSize::from(i as u32) + output_offset
+            let pos = TextSize::try_from(i).unwrap() + output_offset
                 - lines.last().unwrap_or(&TextSize::default());
 
             if char_len > 1 {
                 assert!((2..=4).contains(&char_len));
                 let mbc = WideChar {
                     start: pos,
-                    end: pos + TextSize::from(char_len as u32),
+                    end: pos + TextSize::try_from(char_len).unwrap(),
                 };
                 multi_byte_chars
-                    .entry(lines.len() as u32)
+                    .entry(u32::try_from(lines.len()).unwrap())
                     .or_default()
                     .push(mbc);
             }

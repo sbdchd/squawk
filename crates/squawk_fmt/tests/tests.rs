@@ -1,6 +1,7 @@
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
+use squawk_fmt::FormatOptions;
 use squawk_fmt::validation::assert_valid_format;
 
 #[dir_test(
@@ -8,16 +9,16 @@ use squawk_fmt::validation::assert_valid_format;
     glob: "*.sql",
 )]
 fn fmt(fixture: Fixture<&str>) {
-    let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let content = fixture.into_content();
     let test_name = absolute_fixture_path
         .file_name()
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let formatted = squawk_fmt::fmt_str(content, Default::default()).unwrap();
+    let formatted = squawk_fmt::fmt_str(content, FormatOptions::default()).unwrap();
 
-    assert_valid_format(content, &formatted, Default::default());
+    assert_valid_format(content, &formatted, FormatOptions::default());
     with_settings!({
         omit_expression => true,
         input_file => absolute_fixture_path,
@@ -41,9 +42,9 @@ fn fmt_with_line_ending(line_ending: &str) -> String {
     ]
     .join(line_ending);
 
-    match squawk_fmt::fmt_str(&sql, Default::default()) {
+    match squawk_fmt::fmt_str(&sql, FormatOptions::default()) {
         Ok(formatted) => {
-            assert_valid_format(&sql, &formatted, Default::default());
+            assert_valid_format(&sql, &formatted, FormatOptions::default());
             formatted.replace('\r', "<CR>")
         }
         Err(err) => format!("error: {err}"),
@@ -125,8 +126,8 @@ fn normalizes_line_endings_inside_block_comments() {
     let sql = "select 1;\r\n/* a\n * comment\n */\nselect 2;\n";
     let expected = "select 1;\r\n/* a\r\n * comment\r\n */\r\nselect 2;\r\n";
 
-    let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
-    assert_valid_format(sql, &formatted, Default::default());
+    let formatted = squawk_fmt::fmt_str(sql, FormatOptions::default()).unwrap();
+    assert_valid_format(sql, &formatted, FormatOptions::default());
     assert_eq!(formatted, expected);
 }
 
@@ -135,8 +136,8 @@ fn removes_trailing_whitespace_from_comments() {
     let sql = "select 1; -- ok   \n/* a  \n * comment\t\n */\nselect 2;\n";
     let expected = "select 1; -- ok\n/* a\n * comment\n */\nselect 2;\n";
 
-    let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
-    assert_valid_format(sql, &formatted, Default::default());
+    let formatted = squawk_fmt::fmt_str(sql, FormatOptions::default()).unwrap();
+    assert_valid_format(sql, &formatted, FormatOptions::default());
     assert_eq!(formatted, expected);
 }
 
@@ -145,8 +146,8 @@ fn preserves_a_leading_bom() {
     let sql = "\u{feff}select   1;\n";
     let expected = "\u{feff}select 1;\n";
 
-    let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
-    assert_valid_format(sql, &formatted, Default::default());
+    let formatted = squawk_fmt::fmt_str(sql, FormatOptions::default()).unwrap();
+    assert_valid_format(sql, &formatted, FormatOptions::default());
     assert_eq!(formatted, expected);
 }
 
@@ -162,8 +163,8 @@ fn removes_leading_and_trailing_whitespace() {
         ("\n\n  select 1;", "select 1;"),
         ("\u{feff}  /* c */ select 1;", "\u{feff}/* c */ select 1;"),
     ] {
-        let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
-        assert_valid_format(sql, &formatted, Default::default());
+        let formatted = squawk_fmt::fmt_str(sql, FormatOptions::default()).unwrap();
+        assert_valid_format(sql, &formatted, FormatOptions::default());
         assert_eq!(formatted, expected);
     }
 }
@@ -172,15 +173,16 @@ fn removes_leading_and_trailing_whitespace() {
 mod comment_spacing_test {
     use insta::assert_snapshot;
 
+    use squawk_fmt::FormatOptions;
     use squawk_fmt::validation::validate_format;
 
     fn assert_valid(sql: &str) {
-        let formatted = squawk_fmt::fmt_str(sql, Default::default()).unwrap();
-        validate_format(sql, &formatted, Default::default()).unwrap();
+        let formatted = squawk_fmt::fmt_str(sql, FormatOptions::default()).unwrap();
+        validate_format(sql, &formatted, FormatOptions::default()).unwrap();
     }
 
     fn validation_diagnostic(formatted: &str) -> String {
-        validate_format(formatted, formatted, Default::default())
+        validate_format(formatted, formatted, FormatOptions::default())
             .unwrap_err()
             .to_string()
     }

@@ -54,7 +54,7 @@ impl GlobalState {
         let threads = std::thread::available_parallelism().unwrap_or(NonZeroUsize::MIN);
         let task_pool = {
             let (sender, receiver) = unbounded();
-            let handle = TaskPool::new_with_threads(sender.clone(), threads);
+            let handle = TaskPool::new_with_threads(sender, threads);
             Handle { handle, receiver }
         };
         let db = Database::default();
@@ -151,9 +151,9 @@ impl GlobalState {
         self.sender.send(message).unwrap();
     }
 
-    pub(crate) fn run(&mut self, inbox: Receiver<Message>) -> anyhow::Result<()> {
+    pub(crate) fn run(&mut self, inbox: &Receiver<Message>) -> anyhow::Result<()> {
         let outbox = &self.task_pool.receiver.clone();
-        while let Ok(event) = self.next_event(&inbox, outbox) {
+        while let Ok(event) = Self::next_event(inbox, outbox) {
             let loop_start = Instant::now();
             match event {
                 Event::Inbox(msg) => match msg {
@@ -169,9 +169,18 @@ impl GlobalState {
                         }
 
                         NotificationDispatcher::new(notif, self)
-                            .on::<CancelNotification>(handle_cancel)?
-                            .on::<DidOpenTextDocumentNotification>(handle_did_open)?
-                            .on::<DidChangeTextDocumentNotification>(handle_did_change)?
+                            .on::<CancelNotification>(|state, params| {
+                                handle_cancel(state, params);
+                                Ok(())
+                            })?
+                            .on::<DidOpenTextDocumentNotification>(|state, params| {
+                                handle_did_open(state, params);
+                                Ok(())
+                            })?
+                            .on::<DidChangeTextDocumentNotification>(|state, params| {
+                                handle_did_change(state, params);
+                                Ok(())
+                            })?
                             .on::<DidCloseTextDocumentNotification>(handle_did_close)?
                             .finish();
                     }
@@ -182,10 +191,10 @@ impl GlobalState {
                             // Instead of having the tasks send directly via the sender
                             // channel, we handle them on the main thread so we can check
                             // for cancellation first.
-                            self.respond(resp)
+                            self.respond(resp);
                         }
                         TaskResult::Retry(req) if !self.is_completed(&req) => {
-                            self.handle_request(req, loop_start)
+                            self.handle_request(req, loop_start);
                         }
                         TaskResult::Retry(_) => (),
                     }
@@ -197,7 +206,6 @@ impl GlobalState {
     }
 
     fn next_event(
-        &self,
         inbox: &Receiver<Message>,
         outbox: &Receiver<TaskResult>,
     ) -> Result<Event, crossbeam_channel::RecvError> {
@@ -232,26 +240,53 @@ impl GlobalState {
         RequestDispatcher::new(req, self)
             // Request handlers that must run on the main thread because they
             // mutate GlobalState:
-            .on_sync_mut::<ShutdownRequest>(handle_shutdown)
+            .on_sync_mut::<ShutdownRequest>(|state, params| {
+                handle_shutdown(state, params);
+                Ok(())
+            })
             // Request handlers which are related to the user typing are run on
             // the main thread to reduce latency:
-            .on_sync::<SelectionRangeRequest>(handle_selection_range)
+            .on_sync::<SelectionRangeRequest>(|snapshot, params| {
+                Ok(Some(handle_selection_range(snapshot, params)))
+            })
             // latency-sensitive but can't run on the main thread due to
             // semantic analysis, so we use a higher priority thread
-            .on_latency_sensitive::<RETRY, CompletionRequest>(handle_completion)
-            .on::<NO_RETRY, DefinitionRequest>(handle_goto_definition)
-            .on::<NO_RETRY, HoverRequest>(handle_hover)
+            .on_latency_sensitive::<RETRY, CompletionRequest>(|snapshot, params| {
+                Ok(Some(handle_completion(snapshot, params)))
+            })
+            .on::<NO_RETRY, DefinitionRequest>(|snapshot, params| {
+                Ok(Some(handle_goto_definition(snapshot, params)))
+            })
+            .on::<NO_RETRY, HoverRequest>(|snapshot, params| Ok(handle_hover(snapshot, params)))
             .on::<NO_RETRY, CodeActionRequest>(handle_code_action)
-            .on::<NO_RETRY, InlayHintRequest>(handle_inlay_hints)
-            .on::<RETRY, DocumentSymbolRequest>(handle_document_symbol)
-            .on::<NO_RETRY, DocumentFormattingRequest>(handle_formatting)
-            .on::<RETRY, FoldingRangeRequest>(handle_folding_range)
-            .on::<NO_RETRY, DocumentDiagnosticRequest>(handle_document_diagnostic)
-            .on::<NO_RETRY, SyntaxTreeRequest>(handle_syntax_tree)
-            .on::<NO_RETRY, TokensRequest>(handle_tokens)
-            .on::<NO_RETRY, ReferencesRequest>(handle_references)
-            .on::<NO_RETRY, SemanticTokensRequest>(handle_semantic_tokens_full)
-            .on::<NO_RETRY, SemanticTokensRangeRequest>(handle_semantic_tokens_range)
+            .on::<NO_RETRY, InlayHintRequest>(|snapshot, params| {
+                Ok(Some(handle_inlay_hints(snapshot, params)))
+            })
+            .on::<RETRY, DocumentSymbolRequest>(|snapshot, params| {
+                Ok(Some(handle_document_symbol(snapshot, params)))
+            })
+            .on::<NO_RETRY, DocumentFormattingRequest>(|snapshot, params| {
+                handle_formatting(snapshot, &params)
+            })
+            .on::<RETRY, FoldingRangeRequest>(|snapshot, params| {
+                Ok(Some(handle_folding_range(snapshot, params)))
+            })
+            .on::<NO_RETRY, DocumentDiagnosticRequest>(|snapshot, params| {
+                Ok(handle_document_diagnostic(snapshot, params))
+            })
+            .on::<NO_RETRY, SyntaxTreeRequest>(|snapshot, params| {
+                Ok(handle_syntax_tree(snapshot, params))
+            })
+            .on::<NO_RETRY, TokensRequest>(|snapshot, params| Ok(handle_tokens(snapshot, params)))
+            .on::<NO_RETRY, ReferencesRequest>(|snapshot, params| {
+                Ok(Some(handle_references(snapshot, params)))
+            })
+            .on::<NO_RETRY, SemanticTokensRequest>(|snapshot, params| {
+                Ok(Some(handle_semantic_tokens_full(snapshot, params)))
+            })
+            .on::<NO_RETRY, SemanticTokensRangeRequest>(|snapshot, params| {
+                Ok(Some(handle_semantic_tokens_range(snapshot, params)))
+            })
             .finish();
     }
 }

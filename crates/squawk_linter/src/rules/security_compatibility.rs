@@ -111,7 +111,7 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                             "Changing role configuration may change behaviour for existing clients.",
                             config.syntax(),
                         ),
-                        _ => {}
+                        ast::AlterRoleAction::RoleRenameTo(_) => {}
                     }
                 }
             }
@@ -136,7 +136,7 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                             "Changing role configuration may change behaviour for existing clients.",
                             config.syntax(),
                         ),
-                        _ => {}
+                        ast::AlterUserAction::RoleRenameTo(_) => {}
                     }
                 }
             }

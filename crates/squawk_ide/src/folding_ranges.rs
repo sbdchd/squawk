@@ -71,7 +71,7 @@ pub fn folding_ranges(db: &dyn Db, file: File) -> Vec<Fold> {
                 if let Some(comment) = ast::Comment::cast(token.clone())
                     && !visited_comments.contains(&comment)
                     && let Some(range) =
-                        contiguous_range_for_comment(comment, &mut visited_comments)
+                        contiguous_range_for_comment(&comment, &mut visited_comments)
                 {
                     folds.push(Fold {
                         range,
@@ -208,7 +208,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
 }
 
 fn contiguous_range_for_comment(
-    comment: ast::Comment,
+    comment: &ast::Comment,
     visited: &mut FxHashSet<ast::Comment>,
 ) -> Option<TextRange> {
     visited.insert(comment.clone());
@@ -218,7 +218,7 @@ fn contiguous_range_for_comment(
         return None;
     }
 
-    let group = line_comment_group(&comment);
+    let group = line_comment_group(comment);
     visited.extend(group.iter().cloned());
 
     // A group of one element cannot be folded
@@ -235,6 +235,7 @@ fn contiguous_range_for_comment(
 #[cfg(test)]
 mod tests {
     use insta::assert_snapshot;
+    use std::fmt::Write as _;
 
     use crate::db::{Database, File};
 
@@ -300,7 +301,7 @@ mod tests {
             if event.is_end {
                 output.push_str("</fold>");
             } else {
-                output.push_str(&format!("<fold {}>", event.kind));
+                write!(output, "<fold {}>", event.kind).unwrap();
             }
         }
         if pos < sql.len() {

@@ -167,7 +167,7 @@ pub(crate) struct LintArgs {
     pub(crate) github_annotations: bool,
 }
 
-pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
+pub(crate) fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
     match &args.input {
         Input::Stdin(stdin) => {
             info!("reading content from stdin");
@@ -209,12 +209,12 @@ pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
     }
 }
 
-pub fn lint_and_report<W: io::Write>(f: &mut W, args: LintArgs) -> Result<ExitCode> {
-    let violations = lint_files(&args)?;
+pub(crate) fn lint_and_report<W: io::Write>(f: &mut W, args: &LintArgs) -> Result<ExitCode> {
+    let violations = lint_files(args)?;
 
     let ok = violations.iter().map(|x| x.violations.len()).sum::<usize>() == 0;
 
-    print_violations(f, violations, &args.reporter, args.github_annotations)?;
+    print_violations(f, violations, args.reporter, args.github_annotations)?;
 
     Ok(if ok {
         ExitCode::SUCCESS
@@ -307,7 +307,7 @@ impl std::fmt::Display for ViolationLevel {
 
 // TODO: don't use this for json dumps
 #[derive(Debug, Serialize)]
-pub struct ReportViolation {
+pub(crate) struct ReportViolation {
     pub file: String,
     pub line: usize,
     pub column: usize,
@@ -341,7 +341,7 @@ fn fmt_gcc<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
     Ok(())
 }
 
-pub fn fmt_tty_violation<W: io::Write>(
+pub(crate) fn fmt_tty_violation<W: io::Write>(
     f: &mut W,
     violation: &ReportViolation,
     filename: &str,
@@ -352,7 +352,7 @@ pub fn fmt_tty_violation<W: io::Write>(
     Ok(())
 }
 
-pub fn fmt_tty<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
+pub(crate) fn fmt_tty<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
     let summary = Summary::from(reports);
     for report in reports {
         for violation in &report.violations {
@@ -373,7 +373,10 @@ fn fmt_json<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> {
     Ok(())
 }
 
-pub fn fmt_github_annotations<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
+pub(crate) fn fmt_github_annotations<W: io::Write>(
+    f: &mut W,
+    reports: &[CheckReport],
+) -> Result<()> {
     for report in reports {
         for violation in &report.violations {
             let level = match violation.level {
@@ -439,11 +442,11 @@ fn make_fingerprint(v: &ReportViolation) -> String {
 
 fn to_gitlab_issue(v: &ReportViolation) -> GitLabIssue {
     let mut desc = v.message.clone();
-    if let Some(help) = &v.help {
-        if !help.trim().is_empty() {
-            desc.push_str(" Suggestion: ");
-            desc.push_str(help.trim());
-        }
+    if let Some(help) = &v.help
+        && !help.trim().is_empty()
+    {
+        desc.push_str(" Suggestion: ");
+        desc.push_str(help.trim());
     }
 
     GitLabIssue {
@@ -478,16 +481,16 @@ fn fmt_gitlab<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> 
 }
 
 #[derive(Debug)]
-pub struct CheckReport {
+pub(crate) struct CheckReport {
     pub path: String,
     pub sql: String,
     pub violations: Vec<ReportViolation>,
 }
 
-pub fn print_violations<W: io::Write>(
+pub(crate) fn print_violations<W: io::Write>(
     writer: &mut W,
     reports: Vec<CheckReport>,
-    reporter: &Reporter,
+    reporter: Reporter,
     github_annotations: bool,
 ) -> Result<()> {
     if github_annotations {
@@ -553,7 +556,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Gcc,
+            Reporter::Gcc,
             false,
         );
         assert!(res.is_ok());
@@ -586,7 +589,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Tty,
+            Reporter::Tty,
             true,
         );
 
@@ -608,7 +611,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Tty,
+            Reporter::Tty,
             false,
         );
 
@@ -624,7 +627,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, "main.sql", &[], &[], None, false)],
-            &Reporter::Tty,
+            Reporter::Tty,
             false,
         );
 
@@ -646,7 +649,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Json,
+            Reporter::Json,
             false,
         );
 
@@ -667,7 +670,7 @@ SELECT 1;
         let res = print_violations(
             &mut buff,
             vec![check_sql(sql, filename, &[], &[], None, false)],
-            &Reporter::Gitlab,
+            Reporter::Gitlab,
             false,
         );
 
@@ -703,7 +706,7 @@ SELECT 1;
         print_violations(
             &mut buff,
             vec![check_sql(sql, "main.sql", &[], &[], None, false)],
-            &reporter,
+            reporter,
             false,
         )
         .unwrap();

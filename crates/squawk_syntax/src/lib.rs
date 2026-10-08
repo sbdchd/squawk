@@ -268,7 +268,7 @@ fn api_walkthrough() {
     };
     let as_definition: ast::AsDefinition = match option.as_func_target().unwrap() {
         ast::AsFuncTarget::AsDefinition(d) => d,
-        _ => unreachable!(),
+        ast::AsFuncTarget::AsObjFile(_) => unreachable!(),
     };
     let definition: ast::Literal = as_definition.literal().unwrap();
     assert_eq!(definition.syntax().to_string(), "'select 1 + 1'");
@@ -501,7 +501,7 @@ fn create_table() {
             ],
         ),
     ]
-    "#)
+    "#);
 }
 
 #[test]

@@ -17,7 +17,7 @@ pub(super) fn remove_redundant_alias(
     let target = token.parent_ancestors().find_map(ast::Target::cast)?;
 
     let as_name = target.as_name()?;
-    let (inferred_column, _) = ColumnName::inferred_from_target(target.clone())?;
+    let (inferred_column, _) = ColumnName::inferred_from_target(&target)?;
     let inferred_column_alias = inferred_column.to_string()?;
 
     let alias = as_name.name()?;

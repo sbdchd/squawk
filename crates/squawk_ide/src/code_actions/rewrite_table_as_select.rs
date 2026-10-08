@@ -20,7 +20,7 @@ pub(super) fn rewrite_table_as_select(
     let mut replacement = format!("select * from {table_name}");
     if table.semicolon_token().is_some() {
         replacement.push(';');
-    };
+    }
 
     actions.push(CodeAction {
         title: "Rewrite as `select`".to_owned(),

@@ -64,7 +64,7 @@ impl<'a> RequestDispatcher<'a> {
 
         let snapshot = self.global_state.snapshot();
         let result = crate::panic::catch_unwind(|| handler(&snapshot, params));
-        if let Ok(response) = thread_result_to_response::<R>(request.id.clone(), result) {
+        if let Ok(response) = thread_result_to_response::<R>(request.id, result) {
             self.global_state.respond(response);
         }
         self
@@ -83,7 +83,7 @@ impl<'a> RequestDispatcher<'a> {
         };
 
         let result = handler(self.global_state, params);
-        if let Ok(response) = result_to_response::<R>(request.id.clone(), result) {
+        if let Ok(response) = result_to_response::<R>(request.id, result) {
             self.global_state.respond(response);
         }
         self
@@ -205,7 +205,7 @@ where
 
 // lsp-server has req.extract(R::METHOD), but it doesn't work for us due to
 // ownership so we use this instead.
-pub fn from_json<T: DeserializeOwned>(
+pub(crate) fn from_json<T: DeserializeOwned>(
     what: &'static str,
     json: &serde_json::Value,
 ) -> anyhow::Result<T> {

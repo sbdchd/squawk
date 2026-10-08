@@ -6,7 +6,7 @@ use squawk_syntax::{
 use crate::visitors::check_not_allowed_types;
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
-pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
+pub(crate) fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
     match ty {
         ast::Type::ArrayType(array_type) => {
             if let Some(ty) = array_type.ty() {
@@ -57,15 +57,15 @@ fn fix_timestamp(ty: &ast::Type) -> Option<Fix> {
 }
 
 fn check_ty_for_timestamp(ctx: &mut Linter, ty: Option<ast::Type>) {
-    if let Some(ty) = ty {
-        if is_not_allowed_timestamp(&ty) {
-            let fix = fix_timestamp(&ty);
-            ctx.report(Violation::for_node(
+    if let Some(ty) = ty
+        && is_not_allowed_timestamp(&ty)
+    {
+        let fix = fix_timestamp(&ty);
+        ctx.report(Violation::for_node(
                 Rule::PreferTimestampTz,
             "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.".into(),
                 ty.syntax(),
             ).help("Use `timestamptz` instead of `timestamp` for your column type.").fix(fix));
-        };
     }
 }
 

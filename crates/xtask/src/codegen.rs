@@ -40,12 +40,11 @@ fn ensure_rustfmt(sh: &Shell) {
     let version = cmd!(sh, "rustup run stable rustfmt --version")
         .read()
         .unwrap_or_default();
-    if !version.contains("stable") {
-        panic!(
-            "Failed to run rustfmt from toolchain 'stable'. \
-                 Please run `rustup component add rustfmt --toolchain stable` to install it.",
-        );
-    }
+    assert!(
+        version.contains("stable"),
+        "Failed to run rustfmt from toolchain 'stable'. \
+             Please run `rustup component add rustfmt --toolchain stable` to install it.",
+    );
 }
 
 fn reformat(text: String) -> String {
@@ -78,29 +77,29 @@ pub(crate) fn codegen() -> Result<()> {
     let keyword_kinds = keyword_kinds()?;
     let contextual_keywords = contextual_keywords()?;
 
-    let token_sets = generate_token_sets(&keyword_kinds, &contextual_keywords)?;
+    let token_sets = generate_token_sets(&keyword_kinds, &contextual_keywords);
     let token_sets_file = project_root().join("crates/squawk_parser/src/generated/token_sets.rs");
     std::fs::write(token_sets_file, token_sets).context("problem writing generated token sets")?;
 
-    update_textmate_keywords(&keyword_kinds.all_keywords)?;
+    update_textmate_keywords(&keyword_kinds.all)?;
 
-    let playground_keywords = generate_playground_keywords(&keyword_kinds.all_keywords)?;
+    let playground_keywords = generate_playground_keywords(&keyword_kinds.all);
     let playground_keywords_file = project_root().join("playground/src/generated/keywords.ts");
     std::fs::write(playground_keywords_file, playground_keywords)
         .context("problem writing playground keywords")?;
 
     let syntax_keywords = project_root().join("crates/squawk_syntax/src/generated/keywords.rs");
-    let keyword_arrays = generate_keyword_arrays(&keyword_kinds)?;
+    let keyword_arrays = generate_keyword_arrays(&keyword_kinds);
     std::fs::write(syntax_keywords, keyword_arrays).context("problem writing keyword arrays")?;
 
     let kinds = generate_kind_src(
         &ast_src.nodes,
         &grammar,
-        keyword_kinds.all_keywords,
+        keyword_kinds.all,
         contextual_keywords,
     );
 
-    let syntax_kinds = generate_syntax_kinds(kinds)?;
+    let syntax_kinds = generate_syntax_kinds(kinds);
     let syntax_kinds_file =
         project_root().join("crates/squawk_parser/src/generated/syntax_kind.rs");
     std::fs::write(syntax_kinds_file, syntax_kinds).context("problem writing syntax kinds")?;
@@ -212,19 +211,20 @@ fn generate_kind_src(
         .for_each(|((punct, _), _)| {
             // `..`, `<<` and `>>` are unused in SQL, but used for PL/pgSQL
             // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/gram.y#L692
-            if *punct != "_" && *punct != ".." && *punct != "<<" && *punct != ">>" {
-                panic!("Punctuation {punct:?} is not used in grammar");
-            }
+            assert!(
+                !(*punct != "_" && *punct != ".." && *punct != "<<" && *punct != ">>"),
+                "Punctuation {punct:?} is not used in grammar"
+            );
         });
     keywords.extend(pg_keywords.into_iter().map(|s| &*s.leak()));
-    keywords.sort();
+    keywords.sort_unstable();
     keywords.dedup();
 
     let mut contextual_keywords: Vec<&_> = pl_keywords
         .into_iter()
         .map(|s| &*s.leak())
         .collect::<Vec<_>>();
-    contextual_keywords.sort();
+    contextual_keywords.sort_unstable();
     contextual_keywords.dedup();
     let contextual_keywords = Vec::leak(contextual_keywords);
 
@@ -240,11 +240,11 @@ fn generate_kind_src(
         .map(|it| &*it)
         .collect();
     let nodes = Vec::leak(nodes);
-    nodes.sort();
+    nodes.sort_unstable();
     let keywords = Vec::leak(keywords);
     let literals = Vec::leak(literals);
-    literals.sort();
-    tokens.sort();
+    literals.sort_unstable();
+    tokens.sort_unstable();
     tokens.dedup();
     let tokens = Vec::leak(tokens);
 
@@ -264,7 +264,7 @@ const PRELUDE: &str = "\
 
 ";
 
-fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
+fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> String {
     let sorted = |keywords: &[String]| {
         let mut keywords = keywords
             .iter()
@@ -273,10 +273,10 @@ fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
         keywords.sort();
         keywords
     };
-    let reserved_keywords = sorted(&keyword_kinds.reserved_keywords);
-    let type_func_name_keywords = sorted(&keyword_kinds.type_func_name_keywords);
-    let col_name_keywords = sorted(&keyword_kinds.col_name_keywords);
-    let as_label_keywords = sorted(&keyword_kinds.as_label_keywords);
+    let reserved_keywords = sorted(&keyword_kinds.reserved);
+    let type_func_name_keywords = sorted(&keyword_kinds.type_func_name);
+    let col_name_keywords = sorted(&keyword_kinds.col_name);
+    let as_label_keywords = sorted(&keyword_kinds.as_label);
 
     let output = reformat(
         quote! {
@@ -300,7 +300,7 @@ fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> Result<String> {
     )
     .replace("pub(crate)", "\npub(crate)");
 
-    Ok(format!("{PRELUDE}{}", output.trim_start()))
+    format!("{PRELUDE}{}", output.trim_start())
 }
 
 fn keyword_lookup_conditions(keywords: &[&str]) -> Vec<proc_macro2::TokenStream> {
@@ -326,7 +326,7 @@ fn keyword_lookup_conditions(keywords: &[&str]) -> Vec<proc_macro2::TokenStream>
         .collect()
 }
 
-fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
+fn generate_syntax_kinds(grammar: KindsSrc) -> String {
     // TODO: we should have a check to make sure each keyword is used in the grammar once the grammar is ready
     let conditions = keyword_lookup_conditions(grammar.keywords);
     let contextual_conditions = keyword_lookup_conditions(grammar.contextual_keywords);
@@ -414,13 +414,10 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         .to_string(),
     ).replace("#[space_hack]", ""));
 
-    Ok(format!("{PRELUDE}{output}"))
+    format!("{PRELUDE}{output}")
 }
 
-fn generate_token_sets(
-    keyword_kinds: &KeywordKinds,
-    contextual_keywords: &[String],
-) -> Result<String> {
+fn generate_token_sets(keyword_kinds: &KeywordKinds, contextual_keywords: &[String]) -> String {
     let punctuation = PUNCT
         .iter()
         .filter(|(token, _)| PUNCTUATION.contains(token))
@@ -438,56 +435,56 @@ fn generate_token_sets(
         .collect::<Vec<_>>();
 
     let column_or_table_keywords = keyword_kinds
-        .col_table_keywords
+        .col_table
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
 
     let type_keywords = keyword_kinds
-        .type_keywords
+        .types
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
 
     let col_name_keywords = keyword_kinds
-        .col_name_keywords
+        .col_name
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
 
     let type_func_name_keywords = keyword_kinds
-        .type_func_name_keywords
+        .type_func_name
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
 
     let all_keywords = &keyword_kinds
-        .all_keywords
+        .all
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
     let bare_label_keywords = &keyword_kinds
-        .bare_label_keywords
+        .bare_label
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
     let unreserved_keywords = &keyword_kinds
-        .unreserved_keywords
+        .unreserved
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
     let reserved_keywords = &keyword_kinds
-        .reserved_keywords
+        .reserved
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
     let plpgsql_reserved_keywords = &keyword_kinds
-        .plpgsql_reserved_keywords
+        .plpgsql_reserved
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
     let plpgsql_reserved_contextual_keywords = &keyword_kinds
-        .plpgsql_reserved_contextual_keywords
+        .plpgsql_reserved_contextual
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
@@ -553,7 +550,7 @@ fn generate_token_sets(
     )
     .replace("pub(crate)", "\npub(crate)");
 
-    Ok(format!("{PRELUDE}{output}"))
+    format!("{PRELUDE}{output}")
 }
 
 #[derive(Debug, Default)]
@@ -663,7 +660,7 @@ impl Field {
                     None => Some(format_ident!("{}_KW", token.to_case(Case::UpperSnake))),
                 },
             },
-            _ => None,
+            Field::Node { .. } => None,
         }
     }
     fn method_name(&self) -> String {
@@ -756,7 +753,7 @@ fn lower(grammar: &Grammar) -> AstSrc {
     drop_ambiguous_fields(&mut res);
     res.nodes.sort_by_key(|it| it.name.clone());
     res.enums.sort_by_key(|it| it.name.clone());
-    res.tokens.sort();
+    res.tokens.sort_unstable();
     res.nodes.iter_mut().for_each(|it| {
         it.fields.sort_by_key(|it| match it {
             Field::Token(name) => (true, name.clone()),
@@ -903,7 +900,7 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         }
         Rule::Seq(rules) | Rule::Alt(rules) => {
             for rule in rules {
-                lower_rule(acc, grammar, label, rule)
+                lower_rule(acc, grammar, label, rule);
             }
         }
         Rule::Opt(rule) => lower_rule(acc, grammar, label, rule),
@@ -1069,6 +1066,18 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
                 .map(|name| format_ident!("{}", name.to_string().to_case(Case::UpperSnake)))
                 .collect::<Vec<_>>();
             let name = format_ident!("{}", e.name);
+            let cast_calls = cast_variants.iter().enumerate().map(|(i, variant)| {
+                let syntax = if i + 1 == cast_variants.len() {
+                    quote!(syntax)
+                } else {
+                    quote!(syntax.clone())
+                };
+                quote! {
+                    if let Some(result) = #variant::cast(#syntax) {
+                        return Some(#name::#variant(result));
+                    }
+                }
+            });
 
             (
                 quote! {
@@ -1092,11 +1101,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
                             SyntaxKind::#kinds => #name::#variants(#variants { syntax }),
                             )*
                             _ => {
-                                #(
-                                    if let Some(result) = #cast_variants::cast(syntax.clone()) {
-                                        return Some(#name::#cast_variants(result));
-                                    }
-                                )*
+                                #(#cast_calls)*
                                 return None;
                             }
                         };
@@ -1234,13 +1239,13 @@ fn keywords_match(all_keywords: &[String]) -> String {
     format!("(?xi)\\b({keywords_joined})\\b")
 }
 
-fn generate_playground_keywords(all_keywords: &[String]) -> Result<String> {
+fn generate_playground_keywords(all_keywords: &[String]) -> String {
     let mut lines = vec![format!("{PRELUDE}export const keywords = [")];
     for keyword in all_keywords {
         lines.push(format!("  \"{keyword}\","));
     }
     lines.push("] as const\n".to_string());
-    Ok(lines.join("\n"))
+    lines.join("\n")
 }
 
 fn update_textmate_keywords(all_keywords: &[String]) -> Result<()> {

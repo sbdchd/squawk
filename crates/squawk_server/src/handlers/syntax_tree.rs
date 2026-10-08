@@ -1,4 +1,3 @@
-use anyhow::Result;
 use gen_lsp_types::{LspRequestMethod, MessageDirection, Request};
 use log::info;
 use squawk_ide::db::parse;
@@ -20,7 +19,7 @@ impl Request for SyntaxTreeRequest {
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
-pub(crate) fn handle_syntax_tree(snapshot: &Snapshot, params: SyntaxTreeParams) -> Result<String> {
+pub(crate) fn handle_syntax_tree(snapshot: &Snapshot, params: SyntaxTreeParams) -> String {
     let uri = params.text_document.uri;
 
     info!("Generating syntax tree for: {uri}");
@@ -30,5 +29,5 @@ pub(crate) fn handle_syntax_tree(snapshot: &Snapshot, params: SyntaxTreeParams) 
     let parse = parse(db, file);
     let syntax_tree = format!("{:#?}", parse.syntax_node());
 
-    Ok(syntax_tree)
+    syntax_tree
 }

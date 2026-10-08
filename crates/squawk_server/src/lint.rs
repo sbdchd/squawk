@@ -81,7 +81,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
         let (title, fix_edits) = if let Some(fix) = violation.fix {
             (fix.title, fix.edits)
         } else {
-            ("".to_string(), vec![])
+            (String::new(), vec![])
         };
 
         let edits = fix_edits

@@ -109,28 +109,28 @@ impl Output {
     }
 
     pub(crate) fn token(&mut self, kind: SyntaxKind, n_tokens: u8) {
-        let e = ((kind as u16 as u32) << Self::KIND_SHIFT)
-            | ((n_tokens as u32) << Self::N_INPUT_TOKEN_SHIFT)
+        let e = (u32::from(kind as u16) << Self::KIND_SHIFT)
+            | (u32::from(n_tokens) << Self::N_INPUT_TOKEN_SHIFT)
             | Self::EVENT_MASK;
-        self.event.push(e)
+        self.event.push(e);
     }
 
     pub(crate) fn enter_node(&mut self, kind: SyntaxKind) {
-        let e = ((kind as u16 as u32) << Self::KIND_SHIFT)
-            | ((Self::ENTER_EVENT as u32) << Self::TAG_SHIFT)
+        let e = (u32::from(kind as u16) << Self::KIND_SHIFT)
+            | (u32::from(Self::ENTER_EVENT) << Self::TAG_SHIFT)
             | Self::EVENT_MASK;
-        self.event.push(e)
+        self.event.push(e);
     }
 
     pub(crate) fn leave_node(&mut self) {
-        let e = (Self::EXIT_EVENT as u32) << Self::TAG_SHIFT | Self::EVENT_MASK;
-        self.event.push(e)
+        let e = u32::from(Self::EXIT_EVENT) << Self::TAG_SHIFT | Self::EVENT_MASK;
+        self.event.push(e);
     }
 
     pub(crate) fn error(&mut self, error: String) {
         let idx = self.error.len();
         self.error.push(error);
-        let e = (idx as u32) << Self::ERROR_SHIFT;
+        let e = u32::try_from(idx).unwrap() << Self::ERROR_SHIFT;
         self.event.push(e);
     }
 }

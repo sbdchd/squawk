@@ -106,7 +106,7 @@ impl Location {
         let tree = parse(db, self.file).tree();
         match tree.syntax().covering_element(self.range) {
             rowan::NodeOrToken::Token(token) => token.parent(),
-            rowan::NodeOrToken::Node(node) => Some(node.clone()),
+            rowan::NodeOrToken::Node(node) => Some(node),
         }
     }
 }

@@ -19,9 +19,9 @@ pub(super) fn rewrite_select_as_values(
 ) -> Option<()> {
     let token = token_from_offset(db, position)?;
 
-    let parent = ast_nav::find_select_parent(token)?;
+    let parent = ast_nav::find_select_parent(&token)?;
 
-    let mut selects = parent.iter()?.peekable();
+    let mut selects = parent.selects()?.peekable();
     let select_token_start = selects
         .peek()?
         .select_clause()

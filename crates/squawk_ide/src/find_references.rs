@@ -108,7 +108,7 @@ mod test {
 
         let mut snippet = Snippet::source(current_file.content(db).as_ref()).fold(true);
         if multi_file {
-            snippet = snippet.path(*file_paths.get(&current_file).unwrap());
+            snippet = snippet.path(file_paths[&current_file]);
         }
         snippet = snippet.annotation(AnnotationKind::Context.span(query_span).label("0. query"));
         if let Some(current_refs) = refs_by_file.remove(&current_file) {
@@ -118,7 +118,7 @@ mod test {
         let mut groups = vec![Level::INFO.primary_title("references").element(snippet)];
 
         for (ref_file, refs) in refs_by_file {
-            let path = file_paths.get(&ref_file).unwrap();
+            let path = &file_paths[&ref_file];
             let other_snippet = Snippet::source(ref_file.content(db).as_ref())
                 .path(*path)
                 .fold(true);
@@ -131,10 +131,7 @@ mod test {
         }
 
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
-        renderer
-            .render(&groups)
-            .to_string()
-            .replace("info: references", "")
+        renderer.render(&groups).replace("info: references", "")
     }
 
     fn annotate_refs<'a>(

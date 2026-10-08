@@ -20,20 +20,20 @@ pub(crate) fn ban_replica_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) 
                 node.syntax(),
             )),
             ast::Stmt::AlterPublication(publication) => {
-                if let Some(action) = publication.action() {
-                    if matches!(
+                if let Some(action) = publication.action()
+                    && matches!(
                         action,
                         ast::AlterPublicationAction::DropPublicationObjects(_)
                             | ast::AlterPublicationAction::SetPublicationObjects(_)
                             | ast::AlterPublicationAction::SetAllPublicationObjectList(_)
                             | ast::AlterPublicationAction::SetOptions(_)
-                    ) {
-                        ctx.report(Violation::for_node(
+                    )
+                {
+                    ctx.report(Violation::for_node(
                             Rule::BanReplicaIdentity,
                             "Changing publication tables or options can stop or change replication for existing consumers.".into(),
                             action.syntax(),
                         ));
-                    }
                 }
             }
             _ => (),

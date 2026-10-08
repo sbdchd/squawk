@@ -1,3 +1,5 @@
+#![allow(clippy::print_stdout, clippy::print_stderr)]
+
 mod cmd;
 mod config;
 mod debug;
@@ -237,7 +239,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
         Cmd::Lint(lint_args) => {
             let stdout = io::stdout();
             let mut handle = stdout.lock();
-            return lint_and_report(&mut handle, lint_args);
+            return lint_and_report(&mut handle, &lint_args);
         }
         Cmd::Help => {
             Opts::command().print_long_help()?;

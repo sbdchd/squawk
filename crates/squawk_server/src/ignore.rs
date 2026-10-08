@@ -91,7 +91,7 @@ create table c (
 ";
         let ignore_line_edits = lint_sql(sql)
             .into_iter()
-            .flat_map(|x| {
+            .filter_map(|x| {
                 let data = x.data?;
                 let associated_data: AssociatedDiagnosticData =
                     serde_json::from_value(data).unwrap();
@@ -138,7 +138,7 @@ create table c (
 ";
         let ignore_line_edits = lint_sql(sql)
             .into_iter()
-            .flat_map(|x| {
+            .filter_map(|x| {
                 let data = x.data?;
                 let associated_data: AssociatedDiagnosticData =
                     serde_json::from_value(data).unwrap();
@@ -240,7 +240,7 @@ create table c (
 
         edits.sort_by_key(|e| std::cmp::Reverse(e.text_range.start()));
 
-        let mut result = sql.clone();
+        let mut result = sql;
         for edit in edits {
             let start: usize = edit.text_range.start().into();
             let end: usize = edit.text_range.end().into();

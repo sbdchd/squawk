@@ -1,4 +1,3 @@
-use anyhow::Result;
 use gen_lsp_types::{DocumentSymbol, DocumentSymbolParams, DocumentSymbolResponse, SymbolKind};
 use squawk_ide::db::line_index;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
@@ -10,7 +9,7 @@ use crate::lsp_utils;
 pub(crate) fn handle_document_symbol(
     snapshot: &Snapshot,
     params: DocumentSymbolParams,
-) -> Result<Option<DocumentSymbolResponse>> {
+) -> DocumentSymbolResponse {
     let uri = params.text_document.uri;
 
     let db = snapshot.db();
@@ -82,7 +81,5 @@ pub(crate) fn handle_document_symbol(
         .map(|sym| convert_symbol(sym, &line_index))
         .collect();
 
-    Ok(Some(DocumentSymbolResponse::DocumentSymbolList(
-        lsp_symbols,
-    )))
+    DocumentSymbolResponse::DocumentSymbolList(lsp_symbols)
 }

@@ -7,7 +7,7 @@ use squawk_syntax::{
 
 use crate::{Linter, Rule, Violation};
 
-pub fn tables_created_in_transaction(
+pub(crate) fn tables_created_in_transaction(
     assume_in_transaction: bool,
     file: &ast::SourceFile,
 ) -> FxHashSet<String> {
@@ -55,16 +55,15 @@ fn not_valid_validate_in_transaction(
                                 .and_then(|constraint| constraint.path_ref())
                                 .and_then(|path| path.segment())
                                 .map(|name| name.text())
+                                && inside_transaction
+                                && not_valid_names.contains(&constraint_name)
                             {
-                                if inside_transaction && not_valid_names.contains(&constraint_name)
-                                {
-                                    ctx.report(
+                                ctx.report(
                                         Violation::for_node(
                                         Rule::ConstraintMissingNotValid,
                                         "Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.".into(),
                                         validate_constraint.syntax(),
-                                    ).help("Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction."))
-                                }
+                                    ).help("Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction."));
                             }
                         }
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
@@ -114,28 +113,27 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                 continue;
             };
             for action in alter_table.actions() {
-                if let ast::AlterTableAction::AddConstraint(add_constraint) = action {
-                    if !tables_created.contains(&table_name)
-                        && let Some(constraint) = add_constraint.constraint()
-                        && !constraint.is_not_valid()
+                if let ast::AlterTableAction::AddConstraint(add_constraint) = action
+                    && !tables_created.contains(&table_name)
+                    && let Some(constraint) = add_constraint.constraint()
+                    && !constraint.is_not_valid()
+                {
+                    if let ast::Constraint::UniqueConstraint(uc) = &constraint
+                        && uc.using_index().is_some()
                     {
-                        if let ast::Constraint::UniqueConstraint(uc) = &constraint {
-                            if uc.using_index().is_some() {
-                                continue;
-                            }
-                        }
-                        if let ast::Constraint::PrimaryKeyConstraint(pk) = &constraint {
-                            if pk.using_index().is_some() {
-                                continue;
-                            }
-                        }
+                        continue;
+                    }
+                    if let ast::Constraint::PrimaryKeyConstraint(pk) = &constraint
+                        && pk.using_index().is_some()
+                    {
+                        continue;
+                    }
 
-                        ctx.report(Violation::for_node(
+                    ctx.report(Violation::for_node(
                             Rule::ConstraintMissingNotValid,
                             "By default new constraints require a table scan and block writes to the table while that scan occurs.".into(),
                             add_constraint.syntax(),
                         ).help("Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call."));
-                    }
                 }
             }
         }

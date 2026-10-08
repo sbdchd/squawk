@@ -32,7 +32,7 @@ pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
     let lexed = squawk_parser::LexedStr::new(text);
     let parser_input = lexed.to_input();
     let parser_output = squawk_parser::EntryPoint::SourceFile.parse(&parser_input);
-    let (node, errors, _eof) = build_tree(lexed, parser_output);
+    let (node, errors, _eof) = build_tree(&lexed, &parser_output);
     (node, errors)
 }
 
@@ -40,29 +40,29 @@ pub(crate) fn parse_plpgsql_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
     let lexed = squawk_parser::LexedStr::new(text);
     let parser_input = lexed.to_input();
     let parser_output = squawk_parser::EntryPoint::Plpgsql.parse(&parser_input);
-    let (node, errors, _eof) = build_tree(lexed, parser_output);
+    let (node, errors, _eof) = build_tree(&lexed, &parser_output);
     (node, errors)
 }
 
 pub(crate) fn build_tree(
-    lexed: squawk_parser::LexedStr<'_>,
-    parser_output: squawk_parser::Output,
+    lexed: &squawk_parser::LexedStr<'_>,
+    parser_output: &squawk_parser::Output,
 ) -> (GreenNode, Vec<SyntaxError>, bool) {
     let mut builder = SyntaxTreeBuilder::default();
 
-    let is_eof = lexed.intersperse_trivia(&parser_output, &mut |step| match step {
+    let is_eof = lexed.intersperse_trivia(parser_output, &mut |step| match step {
         squawk_parser::StrStep::Token { kind, text } => builder.token(kind, text),
         squawk_parser::StrStep::Enter { kind } => builder.start_node(kind),
         squawk_parser::StrStep::Exit => builder.finish_node(),
         squawk_parser::StrStep::Error { msg, pos } => {
-            builder.error(msg.to_owned(), pos.try_into().unwrap())
+            builder.error(msg.to_owned(), pos.try_into().unwrap());
         }
     });
 
     let (node, mut errors) = builder.finish_raw();
     for (text_range, err) in lexed.errors() {
         let text_range = TextRange::new(text_range.start.into(), text_range.end.into());
-        errors.push(SyntaxError::new(err, text_range))
+        errors.push(SyntaxError::new(err, text_range));
     }
 
     (node, errors, is_eof)
