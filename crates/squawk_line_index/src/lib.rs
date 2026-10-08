@@ -316,6 +316,7 @@ unsafe fn analyze_source_file_sse2(
     let mut intra_chunk_offset = 0;
 
     for chunk_index in 0..chunk_count {
+        #[allow(clippy::cast_ptr_alignment)]
         let ptr = src_bytes.as_ptr().cast::<__m128i>();
         // We don't know if the pointer is aligned to 16 bytes, so we
         // use `loadu`, which supports unaligned loading.
