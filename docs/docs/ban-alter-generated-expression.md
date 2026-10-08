@@ -13,6 +13,6 @@ ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 1);
 
 ## solution
 
-Check client reads and positional inserts before adding a generated column. Check client reads before changing its expression. The default `ban-drop-generated-expression` rule checks `DROP EXPRESSION`.
+Check client reads and positional inserts before adding a generated column. Check client reads before changing its expression. The default [`ban-drop-generated-expression`](./ban-drop-generated-expression.md) rule checks `DROP EXPRESSION`.
 
 Enable this rule with `--include ban-alter-generated-expression` (or add `ban-alter-generated-expression` to your configured include list).

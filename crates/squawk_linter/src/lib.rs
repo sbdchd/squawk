@@ -19,6 +19,7 @@ pub use version::Version;
 pub mod analyze;
 pub mod ignore;
 mod ignore_index;
+mod name;
 mod version;
 mod visitors;
 
@@ -723,7 +724,23 @@ impl Linter {
         if self.rules.contains(&Rule::BanReplaceViewFunction) {
             ban_replace_view_function(self, file);
         }
-        security_compatibility(self, file);
+        if [
+            Rule::BanCreatePolicy,
+            Rule::BanAlterPolicyRoles,
+            Rule::BanAlterPolicyCondition,
+            Rule::BanAlterFunctionOptions,
+            Rule::BanAlterViewOptions,
+            Rule::BanAlterRoleOptions,
+            Rule::BanAlterDatabaseOptions,
+            Rule::BanAlterSystemOptions,
+            Rule::BanAlterExtension,
+            Rule::BanAlterRowLevelSecurity,
+        ]
+        .iter()
+        .any(|rule| self.rules.contains(rule))
+        {
+            security_compatibility(self, file);
+        }
         if [
             Rule::BanNewWriteRestriction,
             Rule::BanAddEnumValue,
