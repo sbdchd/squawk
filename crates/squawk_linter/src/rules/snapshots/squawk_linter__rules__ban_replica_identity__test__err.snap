@@ -1,0 +1,8 @@
+---
+source: crates/squawk_linter/src/rules/ban_replica_identity.rs
+expression: "lint_errors(sql, Rule::BanReplicaIdentity)"
+---
+warning[ban-replica-identity]: Changing replica identity may silently change replication for existing clients.
+  ╭▸ 
+1 │ ALTER TABLE t REPLICA IDENTITY FULL;
+  ╰╴              ━━━━━━━━━━━━━━━━━━━━━
