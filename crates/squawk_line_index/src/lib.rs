@@ -316,7 +316,7 @@ unsafe fn analyze_source_file_sse2(
     let mut intra_chunk_offset = 0;
 
     for chunk_index in 0..chunk_count {
-        let ptr = src_bytes.as_ptr() as *const __m128i;
+        let ptr = src_bytes.as_ptr().cast::<__m128i>();
         // We don't know if the pointer is aligned to 16 bytes, so we
         // use `loadu`, which supports unaligned loading.
         let chunk = unsafe { _mm_loadu_si128(ptr.add(chunk_index)) };
@@ -343,7 +343,7 @@ unsafe fn analyze_source_file_sse2(
 
             if newlines_mask != 0 {
                 // All control characters are newlines, record them
-                let mut newlines_mask = 0xFFFF0000 | newlines_mask as u32;
+                let mut newlines_mask = 0xFFFF_0000 | newlines_mask.cast_unsigned();
                 let output_offset = TextSize::from((chunk_index * CHUNK_SIZE + 1) as u32);
 
                 loop {
