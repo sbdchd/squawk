@@ -1,6 +1,6 @@
 {
   "name": "squawk-cli",
-  "version": "2.67.0",
+  "version": "2.68.0",
   "description": "linter for PostgreSQL, focused on migrations",
   "repository": "git@github.com:sbdchd/squawk.git",
   "author": "Squawk Team & Contributors",
@@ -29,13 +29,13 @@
     "typescript": "^3.9.5"
   },
   "optionalDependencies": {
-    "@squawk-cli/darwin-arm64": "2.67.0",
-    "@squawk-cli/darwin-x64": "2.67.0",
-    "@squawk-cli/linux-arm64": "2.67.0",
-    "@squawk-cli/linux-arm64-musl": "2.67.0",
-    "@squawk-cli/linux-x64": "2.67.0",
-    "@squawk-cli/linux-x64-musl": "2.67.0",
-    "@squawk-cli/win32-x64": "2.67.0"
+    "@squawk-cli/darwin-arm64": "2.68.0",
+    "@squawk-cli/darwin-x64": "2.68.0",
+    "@squawk-cli/linux-arm64": "2.68.0",
+    "@squawk-cli/linux-arm64-musl": "2.68.0",
+    "@squawk-cli/linux-x64": "2.68.0",
+    "@squawk-cli/linux-x64-musl": "2.68.0",
+    "@squawk-cli/win32-x64": "2.68.0"
   },
   "volta": {
     "node": "20.19.0",

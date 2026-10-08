@@ -7,15 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.68.0 - 2026-10-07
+
 ### Added
 
-- linter: default rollback compatibility rules: ban-drop-schema, ban-drop-sequence, ban-drop-domain, ban-drop-constraint, ban-drop-generated-expression, ban-drop-extension, ban-alter-identity, renaming-object, ban-set-schema
-- linter: opt-in rollback compatibility rules: ban-alter-generated-expression, ban-drop-index, ban-set-default, ban-disable-trigger, ban-replica-identity, ban-drop-policy, ban-revoke, ban-replace-view-function, ban-create-policy, ban-alter-policy-condition, ban-alter-policy-roles, ban-alter-row-level-security, ban-alter-function-options, ban-alter-view-options, ban-alter-role-options, ban-alter-database-options, ban-alter-system-options, ban-alter-extension, ban-new-write-restriction, ban-add-column, ban-add-enum-value, ban-add-composite-attribute, ban-detach-inheritance, ban-alter-sequence-values
+- linter: add default rollback compatibility rules (#1383). Thanks @t-monaghan!
+  - ban-drop-schema, ban-drop-sequence, ban-drop-domain, ban-drop-constraint, ban-drop-generated-expression, ban-drop-extension, ban-alter-identity, renaming-object, ban-set-schema.
 
-### Changed
+- linter: add opt-in rollback compatibility rules (#1384). Thanks @t-monaghan!
+  - ban-alter-generated-expression, ban-drop-index, ban-set-default, ban-disable-trigger, ban-replica-identity, ban-drop-policy, ban-revoke, ban-replace-view-function, ban-create-policy, ban-alter-policy-condition, ban-alter-policy-roles, ban-alter-row-level-security, ban-alter-function-options, ban-alter-view-options, ban-alter-role-options, ban-alter-database-options, ban-alter-system-options, ban-alter-extension, ban-new-write-restriction, ban-add-column, ban-add-enum-value, ban-add-composite-attribute, ban-detach-inheritance, ban-alter-sequence-values
 
-- linter: extend adding-not-nullable-field and ban-drop-not-null to domains and foreign tables; ban-drop-default to domains, foreign tables, and views; ban-drop-column and changing-column-type to foreign tables and composite attributes; renaming-column to foreign tables, composite attributes, views, and materialized views
-- linter: extend ban-drop-function to aggregates and routines, ban-drop-table to foreign tables, and ban-drop-type to operators, operator classes, operator families, and casts
+### Fixed
+
+- nix: fix flake (#1386). Thanks @t-monaghan!
+
+### Internal
+
+- linter: cleanup some allocations (#1385)
 
 ## v2.67.0 - 2026-10-04
 
