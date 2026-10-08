@@ -1,7 +1,7 @@
 use rustc_hash::FxHashMap;
 use squawk_syntax::{
     Parse, SourceFile, SyntaxKind, SyntaxNode,
-    ast::{self, AstNode, NameLike},
+    ast::{self, AstNode},
     column_name::ColumnName,
 };
 
@@ -9,25 +9,7 @@ use rowan::TextRange;
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
-use super::identifier_too_long::MAX_IDENT_BYTES;
-
-#[derive(Debug, Eq, Hash, PartialEq)]
-struct Name(String);
-
-impl Name {
-    fn from_node(node: &impl NameLike) -> Self {
-        Self::from_string(node.text())
-    }
-
-    fn from_string(mut text: String) -> Self {
-        text.truncate(text.floor_char_boundary(MAX_IDENT_BYTES));
-        Self(text)
-    }
-
-    fn as_str(&self) -> &str {
-        &self.0
-    }
-}
+use crate::name::Name;
 
 #[derive(Debug)]
 struct Assignment {
