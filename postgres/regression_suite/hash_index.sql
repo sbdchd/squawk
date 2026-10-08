@@ -3,7 +3,7 @@
 --
 
 -- directory paths are passed to us in environment variables
--- \getenv abs_srcdir PG_ABS_SRCDIR
+\getenv abs_srcdir PG_ABS_SRCDIR
 
 CREATE TABLE hash_i4_heap (
 	seqno 		int4,
@@ -25,7 +25,7 @@ CREATE TABLE hash_f8_heap (
 	random 		float8
 );
 
--- \set filename :abs_srcdir '/data/hash.data'
+\set filename :abs_srcdir '/data/hash.data'
 COPY hash_i4_heap FROM 'filename';
 COPY hash_name_heap FROM 'filename';
 COPY hash_txt_heap FROM 'filename';

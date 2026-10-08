@@ -283,7 +283,7 @@ CREATE foo;
 CREATE TABLE ;
 
 CREATE TABLE
--- \g
+\g
 
 INSERT INTO foo VALUES(123) foo;
 

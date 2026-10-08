@@ -59,18 +59,18 @@ CREATE SCHEMA regress_schema_1 AUTHORIZATION CURRENT_ROLE
 -- The schema created matches the role name.
 CREATE SCHEMA AUTHORIZATION regress_create_schema_role
   CREATE TABLE regress_create_schema_role.tab (id int);
--- \d regress_create_schema_role.tab
+\d regress_create_schema_role.tab
 DROP SCHEMA regress_create_schema_role CASCADE;
 -- Again, with a different role specification and no schema names.
 SET ROLE regress_create_schema_role;
 CREATE SCHEMA AUTHORIZATION CURRENT_ROLE
   CREATE TABLE regress_create_schema_role.tab (id int);
--- \d regress_create_schema_role.tab
+\d regress_create_schema_role.tab
 DROP SCHEMA regress_create_schema_role CASCADE;
 -- Again, with a schema name and a role specification.
 CREATE SCHEMA regress_schema_1 AUTHORIZATION CURRENT_ROLE
   CREATE TABLE regress_schema_1.tab (id int);
--- \d regress_schema_1.tab
+\d regress_schema_1.tab
 DROP SCHEMA regress_schema_1 CASCADE;
 RESET ROLE;
 
@@ -96,8 +96,8 @@ CREATE SCHEMA regress_schema_fk
 
     CREATE TABLE t6 (a int, b int, PRIMARY KEY (a));
 
--- \d regress_schema_fk.t2
--- \d regress_schema_fk.t4
+\d regress_schema_fk.t2
+\d regress_schema_fk.t4
 
 DROP SCHEMA regress_schema_fk CASCADE;
 
@@ -164,16 +164,16 @@ CREATE SCHEMA regress_schema_misc
   GRANT USAGE ON TYPE cs_type TO public
 ;
 
--- \df regress_schema_misc.cs_add
--- \df regress_schema_misc.cs_proc
--- \da regress_schema_misc.cs_sum
--- \do regress_schema_misc.+
--- \dO regress_schema_misc.*
--- \dT regress_schema_misc.*
--- \dF regress_schema_misc.*
--- \dFd regress_schema_misc.*
--- \dFp regress_schema_misc.*
--- \dFt regress_schema_misc.*
+\df regress_schema_misc.cs_add
+\df regress_schema_misc.cs_proc
+\da regress_schema_misc.cs_sum
+\do regress_schema_misc.+
+\dO regress_schema_misc.*
+\dT regress_schema_misc.*
+\dF regress_schema_misc.*
+\dFd regress_schema_misc.*
+\dFp regress_schema_misc.*
+\dFt regress_schema_misc.*
 
 DROP SCHEMA regress_schema_misc CASCADE;
 

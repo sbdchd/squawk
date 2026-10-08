@@ -9,10 +9,10 @@ INSERT INTO xmltest VALUES (3, '<value>three</wrong>  ');
 
 -- If no XML data could be inserted, skip the tests as the server has been
 -- compiled without libxml support.
-SELECT count(*) = 0 AS skip_test FROM xmltest /* \gset */;
--- \if :skip_test
--- \quit
--- \endif
+SELECT count(*) = 0 AS skip_test FROM xmltest \gset
+\if :skip_test
+\quit
+\endif
 
 SELECT * FROM xmltest;
 
@@ -352,9 +352,9 @@ SELECT xml_is_well_formed('abc');
 -- attribute values.
 -- Since different libxml versions emit slightly different
 -- error messages, we suppress the DETAIL in this test.
--- \set VERBOSITY terse
+\set VERBOSITY terse
 SELECT xpath('/*', '<invalidns xmlns=''&lt;''/>');
--- \set VERBOSITY default
+\set VERBOSITY default
 
 -- Again, the XML isn't well-formed for namespace purposes
 SELECT xpath('/*', '<nosuchprefix:tag/>');
@@ -433,7 +433,7 @@ CREATE VIEW xmltableview1 AS SELECT  xmltable.*
 
 SELECT * FROM xmltableview1;
 
--- \sv xmltableview1
+\sv xmltableview1
 
 EXPLAIN (COSTS OFF) SELECT * FROM xmltableview1;
 EXPLAIN (COSTS OFF, VERBOSE) SELECT * FROM xmltableview1;
@@ -456,7 +456,7 @@ CREATE VIEW xmltableview2 AS SELECT * FROM XMLTABLE(XMLNAMESPACES('http://x.y' A
 
 SELECT * FROM xmltableview2;
 
--- \sv xmltableview2
+\sv xmltableview2
 
 SELECT * FROM XMLTABLE(XMLNAMESPACES(DEFAULT 'http://x.y'),
                       '/rows/row'
@@ -673,9 +673,9 @@ SELECT xmltable.* FROM xmltest2, LATERAL xmltable(('/d/r/' || lower(_path) || 'c
 
 -- XPath result can be boolean or number too
 SELECT * FROM XMLTABLE('*' PASSING '<a>a</a>' COLUMNS a xml PATH '.', b text PATH '.', c text PATH '"hi"', d boolean PATH '. = "a"', e integer PATH 'string-length(.)');
--- \x
+\x
 SELECT * FROM XMLTABLE('*' PASSING '<e>pre<!--c1--><?pi arg?><![CDATA[&ent1]]><n2>&amp;deep</n2>post</e>' COLUMNS x xml PATH '/e/n2', y xml PATH '/');
--- \x
+\x
 
 SELECT * FROM XMLTABLE('.' PASSING XMLELEMENT(NAME a) columns a varchar(20) PATH '"<foo/>"', b xml PATH '"<foo/>"');
 

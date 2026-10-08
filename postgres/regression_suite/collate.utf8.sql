@@ -4,10 +4,10 @@
  */
 
 /* skip test if not UTF8 server encoding */
-SELECT getdatabaseencoding() <> 'UTF8' AS skip_test /* \gset */;
--- \if :skip_test
--- \quit
--- \endif
+SELECT getdatabaseencoding() <> 'UTF8' AS skip_test \gset
+\if :skip_test
+\quit
+\endif
 
 SET client_encoding TO UTF8;
 

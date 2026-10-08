@@ -1,10 +1,10 @@
 -- This test is about EUC_KR encoding, chosen as perhaps the most prevalent
 -- non-UTF8, multibyte encoding as of 2026-01.  Since UTF8 can represent all
 -- of EUC_KR, also run the test in UTF8.
-SELECT getdatabaseencoding() NOT IN ('EUC_KR', 'UTF8') AS skip_test /* \gset */;
--- \if :skip_test
--- \quit
--- \endif
+SELECT getdatabaseencoding() NOT IN ('EUC_KR', 'UTF8') AS skip_test \gset
+\if :skip_test
+\quit
+\endif
 
 -- Exercise is_multibyte_char_in_char (non-UTF8) slow path.
 SELECT POSITION(

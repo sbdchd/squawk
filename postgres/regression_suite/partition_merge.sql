@@ -459,7 +459,7 @@ CREATE INDEX tidx ON t(i);
 ALTER TABLE t MERGE PARTITIONS (tp_1_2, tp_0_1) INTO tp_1_2;
 
 -- Indexname values should be 'tp_1_2_pkey' and 'tp_1_2_i_idx'.
--- \d+ tp_1_2
+\d+ tp_1_2
 
 DROP TABLE t;
 
@@ -601,9 +601,9 @@ ALTER TABLE t ATTACH PARTITION tp_0_1 FOR VALUES FROM (0) TO (1);
 ALTER TABLE t ATTACH PARTITION tp_1_2 FOR VALUES FROM (1) TO (2);
 
 -- Owner is 'regress_partition_merge_alice':
--- \dt tp_0_1
+\dt tp_0_1
 -- Owner is 'regress_partition_merge_bob':
--- \dt tp_1_2
+\dt tp_1_2
 
 -- ERROR
 ALTER TABLE t MERGE PARTITIONS (tp_0_1, tp_1_2) INTO tp_0_2;
@@ -636,7 +636,7 @@ DROP TABLE t;
 -- * STORAGE is the same as STORAGE for partitioned table
 -- * GENERATED and CONSTRAINTS are the same as GENERATED and CONSTRAINTS for partitioned table
 -- * TRIGGERS are the same as TRIGGERS for partitioned table
--- \set HIDE_TOAST_COMPRESSION false
+\set HIDE_TOAST_COMPRESSION false
 
 CREATE TABLE t
 (i int NOT NULL,
@@ -687,15 +687,15 @@ CREATE TRIGGER tp_0_1_before_insert_row_trigger BEFORE INSERT ON tp_0_1 FOR EACH
 CREATE TRIGGER tp_1_2_before_insert_row_trigger BEFORE INSERT ON tp_1_2 FOR EACH ROW
   EXECUTE PROCEDURE trigger_function('tp_1_2');
 
--- \d+ tp_0_1
+\d+ tp_0_1
 ALTER TABLE t MERGE PARTITIONS (tp_0_1, tp_1_2) INTO tp_0_1;
--- \d+ tp_0_1
+\d+ tp_0_1
 
 INSERT INTO t(i, t, b) VALUES(1, DEFAULT, 3);
 SELECT tableoid::regclass, * FROM t ORDER BY b;
 DROP TABLE t;
 DROP FUNCTION trigger_function();
--- \set HIDE_TOAST_COMPRESSION true
+\set HIDE_TOAST_COMPRESSION true
 
 
 -- Test MERGE PARTITIONS with not valid foreign key constraint
@@ -709,7 +709,7 @@ ALTER TABLE t_fk ADD CONSTRAINT t_fk_i_fkey FOREIGN KEY (i) REFERENCES t NOT VAL
 ALTER TABLE t MERGE PARTITIONS (tp_0_1, tp_1_2) INTO tp_0_2;
 
 -- Should be NOT VALID FOREIGN KEY
--- \d tp_0_2
+\d tp_0_2
 -- ERROR
 ALTER TABLE t_fk VALIDATE CONSTRAINT t_fk_i_fkey;
 
@@ -728,7 +728,7 @@ ALTER TABLE t_fk ADD CONSTRAINT t_fk_i_fkey FOREIGN KEY (i) REFERENCES t NOT ENF
 ALTER TABLE t MERGE PARTITIONS (tp_0_1, tp_1_2) INTO tp_0_2;
 
 -- Should be NOT ENFORCED FOREIGN KEY
--- \d tp_0_2
+\d tp_0_2
 -- ERROR
 ALTER TABLE t_fk ALTER CONSTRAINT t_fk_i_fkey ENFORCED;
 

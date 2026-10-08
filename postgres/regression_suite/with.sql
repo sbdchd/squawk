@@ -277,7 +277,7 @@ UNION ALL
 )
 SELECT sum(n) FROM t;
 
--- \d+ sums_1_100
+\d+ sums_1_100
 
 -- corner case in which sub-WITH gets initialized first
 with recursive q as (

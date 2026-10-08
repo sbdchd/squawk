@@ -1287,7 +1287,7 @@ create table hp_prefix_test (a int, b int, c int, d int)
 -- create 8 partitions
 select 'create table hp_prefix_test_p' || x::text || ' partition of hp_prefix_test for values with (modulus 8, remainder ' || x::text || ');'
 from generate_Series(0,7) x;
--- \gexec
+\gexec
 
 -- insert 16 rows, one row for each test to perform.
 insert into hp_prefix_test
@@ -1306,14 +1306,14 @@ from
 -- and equality quals.  This may seem a little excessive, but there have been
 -- a number of bugs in this area over the years.  We make use of row only
 -- output to reduce the size of the expected results.
--- \t on
+\t on
 select
   'explain (costs off) select tableoid::regclass,* from hp_prefix_test where ' ||
   string_agg(c.colname || case when g.s & (1 << c.colpos) = 0 then ' is null' else ' = ' || (colpos+1)::text end, ' and ' order by c.colpos)
 from (values('a',0),('b',1),('c',2),('d',3)) c(colname, colpos), generate_Series(0,15) g(s)
 group by g.s
 order by g.s;
--- \gexec
+\gexec
 
 -- And ensure we get exactly 1 row from each. Again, all 16 possible combinations.
 select
@@ -1322,8 +1322,8 @@ select
 from (values('a',0),('b',1),('c',2),('d',3)) c(colname, colpos), generate_Series(0,15) g(s)
 group by g.s
 order by g.s;
--- \gexec
--- \t off
+\gexec
+\t off
 
 drop table hp_prefix_test;
 

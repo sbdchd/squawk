@@ -12,7 +12,7 @@ SELECT table_name, column_name, column_default, is_nullable, is_generated, gener
 
 SELECT table_name, column_name, dependent_column FROM information_schema.column_column_usage WHERE table_schema = 'generated_virtual_tests' ORDER BY 1, 2, 3;
 
--- \d gtest1
+\d gtest1
 
 -- duplicate generated
 CREATE TABLE gtest_err_1 (a int PRIMARY KEY, b int GENERATED ALWAYS AS (a * 2) VIRTUAL GENERATED ALWAYS AS (a * 3) VIRTUAL);
@@ -137,7 +137,7 @@ WITH foo AS (SELECT * FROM gtest1) SELECT * FROM foo;
 -- inheritance
 CREATE TABLE gtest1_1 () INHERITS (gtest1);
 SELECT * FROM gtest1_1;
--- \d gtest1_1
+\d gtest1_1
 INSERT INTO gtest1_1 VALUES (4);
 SELECT * FROM gtest1_1;
 SELECT * FROM gtest1;
@@ -154,7 +154,7 @@ CREATE TABLE gtestx (x int, b int DEFAULT 10) INHERITS (gtest1);  -- error
 CREATE TABLE gtestx (x int, b int GENERATED ALWAYS AS IDENTITY) INHERITS (gtest1);  -- error
 CREATE TABLE gtestx (x int, b int GENERATED ALWAYS AS (a * 22) STORED) INHERITS (gtest1);  -- error
 CREATE TABLE gtestx (x int, b int GENERATED ALWAYS AS (a * 22) VIRTUAL) INHERITS (gtest1);  -- ok, overrides parent
--- \d+ gtestx
+\d+ gtestx
 INSERT INTO gtestx (a, x) VALUES (11, 22);
 SELECT * FROM gtest1;
 SELECT * FROM gtestx;
@@ -178,7 +178,7 @@ DROP TABLE gtesty;
 CREATE TABLE gtesty (x int, b int GENERATED ALWAYS AS (x * 22) VIRTUAL);
 CREATE TABLE gtest1_y () INHERITS (gtest1, gtesty);  -- error
 CREATE TABLE gtest1_y (b int GENERATED ALWAYS AS (x + 1) VIRTUAL) INHERITS (gtest1, gtesty);  -- ok
--- \d gtest1_y
+\d gtest1_y
 
 -- test correct handling of GENERATED column that's only in child
 CREATE TABLE gtestp (f1 int);
@@ -213,7 +213,7 @@ COPY gtest1 (a, b) TO stdout;
 COPY gtest1 FROM stdin;
 -- 3
 -- 4
--- \.
+\.
 
 COPY gtest1 (a, b) FROM stdin;
 -- 
@@ -233,7 +233,7 @@ COPY gtest3 (a, b) TO stdout;
 COPY gtest3 FROM stdin;
 -- 3
 -- 4
--- \.
+\.
 
 COPY gtest3 (a, b) FROM stdin;
 -- 
@@ -281,7 +281,7 @@ CREATE TABLE gtest10 (a int PRIMARY KEY, b int, c int GENERATED ALWAYS AS (b * 2
 ALTER TABLE gtest10 DROP COLUMN b;  -- fails
 ALTER TABLE gtest10 DROP COLUMN b CASCADE;  -- drops c too
 
--- \d gtest10
+\d gtest10
 
 CREATE TABLE gtest10a (a int PRIMARY KEY, b int GENERATED ALWAYS AS (a * 2) VIRTUAL);
 ALTER TABLE gtest10a DROP COLUMN b;
@@ -323,10 +323,10 @@ INSERT INTO gtest20 (a) VALUES (30);  -- violates constraint
 ALTER TABLE gtest20 ALTER COLUMN b SET EXPRESSION AS (a * 100);  -- violates constraint
 ALTER TABLE gtest20 ALTER COLUMN b SET EXPRESSION AS (a * 3);  -- ok
 -- table rewrite should not happen
-SELECT pg_relation_filenode('gtest20') AS gtest20_filenode /* \gset */;
+SELECT pg_relation_filenode('gtest20') AS gtest20_filenode \gset
 ALTER TABLE gtest20 ALTER COLUMN b SET EXPRESSION AS (a * 4), ADD COLUMN c INT DEFAULT 11;
 SELECT pg_relation_filenode('gtest20') = 'gtest20_filenode' AS is_same_file;
--- \d gtest20
+\d gtest20
 
 CREATE TABLE gtest20a (a int PRIMARY KEY, b int GENERATED ALWAYS AS (a * 2) VIRTUAL);
 INSERT INTO gtest20a (a) VALUES (10);
@@ -550,9 +550,9 @@ ALTER TABLE gtest_parent ATTACH PARTITION gtest_child3 FOR VALUES FROM ('2016-09
 DROP TABLE gtest_child3;
 CREATE TABLE gtest_child3 (f1 date NOT NULL, f2 bigint, f3 bigint GENERATED ALWAYS AS (f2 * 33) VIRTUAL);
 ALTER TABLE gtest_parent ATTACH PARTITION gtest_child3 FOR VALUES FROM ('2016-09-01') TO ('2016-10-01');
--- \d gtest_child
--- \d gtest_child2
--- \d gtest_child3
+\d gtest_child
+\d gtest_child2
+\d gtest_child3
 INSERT INTO gtest_parent (f1, f2) VALUES ('2016-07-15', 1);
 INSERT INTO gtest_parent (f1, f2) VALUES ('2016-07-15', 2);
 INSERT INTO gtest_parent (f1, f2) VALUES ('2016-08-15', 3);
@@ -566,10 +566,10 @@ SELECT tableoid::regclass, * FROM gtest_parent ORDER BY 1, 2, 3;
 -- alter only parent's and one child's generation expression
 ALTER TABLE ONLY gtest_parent ALTER COLUMN f3 SET EXPRESSION AS (f2 * 4);
 ALTER TABLE gtest_child ALTER COLUMN f3 SET EXPRESSION AS (f2 * 10);
--- \d gtest_parent
--- \d gtest_child
--- \d gtest_child2
--- \d gtest_child3
+\d gtest_parent
+\d gtest_child
+\d gtest_child2
+\d gtest_child3
 SELECT tableoid::regclass, * FROM gtest_parent ORDER BY 1, 2, 3;
 
 -- check constraint was validated based on each partitions's generation expression
@@ -581,10 +581,10 @@ ALTER TABLE gtest_parent DROP CONSTRAINT cc;
 
 -- alter generation expression of parent and all its children altogether
 ALTER TABLE gtest_parent ALTER COLUMN f3 SET EXPRESSION AS (f2 * 2);
--- \d gtest_parent
--- \d gtest_child
--- \d gtest_child2
--- \d gtest_child3
+\d gtest_parent
+\d gtest_child
+\d gtest_child2
+\d gtest_child3
 SELECT tableoid::regclass, * FROM gtest_parent ORDER BY 1, 2, 3;
 -- we leave these tables around for purposes of testing dump/reload/upgrade
 
@@ -608,7 +608,7 @@ ALTER TABLE gtest25 ADD COLUMN d int DEFAULT 101;
 ALTER TABLE gtest25 ALTER COLUMN d SET DATA TYPE float8,
   ADD COLUMN y float8 GENERATED ALWAYS AS (d * 4) VIRTUAL;
 SELECT * FROM gtest25 ORDER BY a;
--- \d gtest25
+\d gtest25
 
 -- ALTER TABLE ... ALTER COLUMN
 CREATE TABLE gtest27 (
@@ -619,7 +619,7 @@ CREATE TABLE gtest27 (
 INSERT INTO gtest27 (a, b) VALUES (3, 7), (4, 11);
 ALTER TABLE gtest27 ALTER COLUMN a TYPE text;  -- error
 ALTER TABLE gtest27 ALTER COLUMN x TYPE numeric;
--- \d gtest27
+\d gtest27
 SELECT * FROM gtest27;
 ALTER TABLE gtest27 ALTER COLUMN x TYPE boolean USING x <> 0;  -- error
 ALTER TABLE gtest27 ALTER COLUMN x DROP DEFAULT;  -- error
@@ -637,12 +637,12 @@ ALTER TABLE gtest27
   ALTER COLUMN a TYPE bigint,
   ALTER COLUMN b TYPE bigint,
   ADD COLUMN x bigint GENERATED ALWAYS AS ((a + b) * 2) VIRTUAL;
--- \d gtest27
+\d gtest27
 -- Ideally you could just do this, but not today (and should x change type?):
 ALTER TABLE gtest27
   ALTER COLUMN a TYPE float8,
   ALTER COLUMN b TYPE float8;  -- error
--- \d gtest27
+\d gtest27
 SELECT * FROM gtest27;
 
 -- ALTER TABLE ... ALTER COLUMN ... DROP EXPRESSION
@@ -652,7 +652,7 @@ CREATE TABLE gtest29 (
 );
 INSERT INTO gtest29 (a) VALUES (3), (4);
 SELECT * FROM gtest29;
--- \d gtest29
+\d gtest29
 ALTER TABLE gtest29 ALTER COLUMN a SET EXPRESSION AS (a * 3);  -- error
 ALTER TABLE gtest29 ALTER COLUMN a DROP EXPRESSION;  -- error
 ALTER TABLE gtest29 ALTER COLUMN a DROP EXPRESSION IF EXISTS;  -- notice
@@ -660,13 +660,13 @@ ALTER TABLE gtest29 ALTER COLUMN a DROP EXPRESSION IF EXISTS;  -- notice
 -- Change the expression
 ALTER TABLE gtest29 ALTER COLUMN b SET EXPRESSION AS (a * 3);
 SELECT * FROM gtest29;
--- \d gtest29
+\d gtest29
 
 ALTER TABLE gtest29 ALTER COLUMN b DROP EXPRESSION;  -- not supported
 INSERT INTO gtest29 (a) VALUES (5);
 INSERT INTO gtest29 (a, b) VALUES (6, 66);
 SELECT * FROM gtest29;
--- \d gtest29
+\d gtest29
 
 -- check that dependencies between columns have also been removed
 --ALTER TABLE gtest29 DROP COLUMN a;  -- should not drop b
@@ -679,8 +679,8 @@ CREATE TABLE gtest30 (
 );
 CREATE TABLE gtest30_1 () INHERITS (gtest30);
 ALTER TABLE gtest30 ALTER COLUMN b DROP EXPRESSION;
--- \d gtest30
--- \d gtest30_1
+\d gtest30
+\d gtest30_1
 DROP TABLE gtest30 CASCADE;
 CREATE TABLE gtest30 (
     a int,
@@ -688,8 +688,8 @@ CREATE TABLE gtest30 (
 );
 CREATE TABLE gtest30_1 () INHERITS (gtest30);
 ALTER TABLE ONLY gtest30 ALTER COLUMN b DROP EXPRESSION;  -- error
--- \d gtest30
--- \d gtest30_1
+\d gtest30
+\d gtest30_1
 ALTER TABLE gtest30_1 ALTER COLUMN b DROP EXPRESSION;  -- error
 
 -- composite type dependencies
@@ -843,7 +843,7 @@ ALTER TABLE gtest28a DROP COLUMN a;
 
 CREATE TABLE gtest28b (LIKE gtest28a INCLUDING GENERATED);
 
--- \d gtest28*
+\d gtest28*
 
 -- rule actions referring to generated columns:
 -- NEW.b in a rule action should reflect the generated column's new value

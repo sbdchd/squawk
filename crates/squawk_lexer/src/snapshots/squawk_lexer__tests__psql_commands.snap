@@ -1,0 +1,21 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\\dt+ public.*\n\\set value :'other'\n\\echo 'it\\'s a \\\\ path' `echo hello`\n\\echo \"quoted\\name\" 'two''quotes'\n\\! echo C:\\tmp\n\\copy t from 'C:\\tmp'\n\\echo 'unterminated\n\\\"#)"
+---
+[
+    "\\dt+ public.*" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\set value :'other'" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\echo 'it\\'s a \\\\ path' `echo hello`" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\echo \"quoted\\name\" 'two''quotes'" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\! echo C:\\tmp" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\copy t from 'C:\\tmp'" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\echo 'unterminated" @ PsqlCommand { ends_query: false },
+    "\n" @ Whitespace,
+    "\\" @ PsqlCommand { ends_query: false },
+]

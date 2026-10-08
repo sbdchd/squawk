@@ -1,0 +1,126 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/psql_terminators.sql
+---
+SOURCE_FILE@0..162
+  SELECT@0..8
+    SELECT_CLAUSE@0..8
+      SELECT_KW@0..6 "SELECT"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..8
+        TARGET@7..8
+          LITERAL@7..8
+            INT_NUMBER@7..8 "1"
+  WHITESPACE@8..9 "\n"
+  PSQL_COMMAND@9..24
+    PSQL_COMMAND_TEXT@9..24 "\\echo executing"
+  WHITESPACE@24..25 "\n"
+  SELECT@25..33
+    SELECT_CLAUSE@25..33
+      SELECT_KW@25..31 "SELECT"
+      WHITESPACE@31..32 " "
+      TARGET_LIST@32..33
+        TARGET@32..33
+          LITERAL@32..33
+            INT_NUMBER@32..33 "2"
+  WHITESPACE@33..34 "\n"
+  PSQL_COMMAND@34..36
+    PSQL_TERMINATOR_TEXT@34..36 "\\g"
+  WHITESPACE@36..37 "\n"
+  SELECT@37..46
+    SELECT_CLAUSE@37..45
+      SELECT_KW@37..43 "SELECT"
+      WHITESPACE@43..44 " "
+      TARGET_LIST@44..45
+        TARGET@44..45
+          LITERAL@44..45
+            INT_NUMBER@44..45 "3"
+    SEMICOLON@45..46 ";"
+  WHITESPACE@46..48 "\n\n"
+  SELECT@48..56
+    SELECT_CLAUSE@48..56
+      SELECT_KW@48..54 "SELECT"
+      WHITESPACE@54..55 " "
+      TARGET_LIST@55..56
+        TARGET@55..56
+          LITERAL@55..56
+            INT_NUMBER@55..56 "1"
+  WHITESPACE@56..57 "\n"
+  PSQL_COMMAND@57..72
+    PSQL_COMMAND_TEXT@57..72 "\\echo executing"
+  WHITESPACE@72..73 "\n"
+  SELECT@73..82
+    SELECT_CLAUSE@73..81
+      SELECT_KW@73..79 "SELECT"
+      WHITESPACE@79..80 " "
+      TARGET_LIST@80..81
+        TARGET@80..81
+          LITERAL@80..81
+            INT_NUMBER@80..81 "2"
+    SEMICOLON@81..82 ";"
+  WHITESPACE@82..84 "\n\n"
+  SELECT@84..93
+    SELECT_CLAUSE@84..93
+      SELECT_KW@84..90 "select"
+      WHITESPACE@90..91 " "
+      TARGET_LIST@91..93
+        TARGET@91..93
+          LITERAL@91..93
+            POSITIONAL_PARAM@91..93 "$1"
+  WHITESPACE@93..94 " "
+  PSQL_COMMAND@94..105
+    PSQL_TERMINATOR_TEXT@94..105 "\\parse stmt"
+  WHITESPACE@105..106 "\n"
+  SELECT@106..114
+    SELECT_CLAUSE@106..114
+      SELECT_KW@106..112 "select"
+      WHITESPACE@112..113 " "
+      TARGET_LIST@113..114
+        TARGET@113..114
+          LITERAL@113..114
+            INT_NUMBER@113..114 "4"
+  WHITESPACE@114..115 " "
+  PSQL_COMMAND@115..128
+    PSQL_TERMINATOR_TEXT@115..128 "\\sendpipeline"
+  WHITESPACE@128..129 "\n"
+  SELECT@129..137
+    SELECT_CLAUSE@129..137
+      SELECT_KW@129..135 "select"
+      WHITESPACE@135..136 " "
+      TARGET_LIST@136..137
+        TARGET@136..137
+          LITERAL@136..137
+            INT_NUMBER@136..137 "5"
+  WHITESPACE@137..138 " "
+  PSQL_COMMAND@138..140
+    PSQL_TERMINATOR_TEXT@138..140 "\\r"
+  WHITESPACE@140..141 "\n"
+  SELECT@141..151
+    SELECT_CLAUSE@141..149
+      SELECT_KW@141..147 "select"
+      WHITESPACE@147..148 " "
+      TARGET_LIST@148..149
+        TARGET@148..149
+          LITERAL@148..149
+            INT_NUMBER@148..149 "6"
+    SEMICOLON@149..151 "\\;"
+  WHITESPACE@151..152 " "
+  SELECT@152..161
+    SELECT_CLAUSE@152..160
+      SELECT_KW@152..158 "select"
+      WHITESPACE@158..159 " "
+      TARGET_LIST@159..160
+        TARGET@159..160
+          LITERAL@159..160
+            INT_NUMBER@159..160 "7"
+    SEMICOLON@160..161 ";"
+  WHITESPACE@161..162 "\n"
+
+error[syntax-error]: Missing semicolon between statements
+  ╭▸ 
+1 │ SELECT 1
+  ╰╴        ━
+error[syntax-error]: Missing semicolon between statements
+  ╭▸ 
+7 │ SELECT 1
+  ╰╴        ━

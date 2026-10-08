@@ -850,6 +850,15 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         }
         Rule::Rep(inner) => {
             let rule = &**inner;
+            if let Rule::Alt(rules) = rule {
+                for rule in rules {
+                    let Rule::Node(node) = rule else {
+                        panic!("expected node in repeated alternative: {rule:?}");
+                    };
+                    lower_rule(acc, grammar, label, &Rule::Rep(Box::new(Rule::Node(*node))));
+                }
+                return;
+            }
             if let Rule::Node(node) = rule {
                 let ty = grammar[*node].name.clone();
                 let name = label

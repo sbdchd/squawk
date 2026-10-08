@@ -56,7 +56,7 @@ create view numeric_view as
     f2, f2::numeric(16,4) as f2164, f2::numeric as f2n
   from numeric_tbl;
 
--- \d+ numeric_view
+\d+ numeric_view
 
 explain (verbose, costs off) select * from numeric_view;
 
@@ -71,7 +71,7 @@ create view bpchar_view as
     f2, f2::character(14) as f214, f2::bpchar as f2n
   from bpchar_tbl;
 
--- \d+ bpchar_view
+\d+ bpchar_view
 
 explain (verbose, costs off) select * from bpchar_view
   where f1::bpchar = 'foo';

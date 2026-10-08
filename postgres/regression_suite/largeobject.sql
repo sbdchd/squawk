@@ -3,8 +3,8 @@
 --
 
 -- directory paths are passed to us in environment variables
--- \getenv abs_srcdir PG_ABS_SRCDIR
--- \getenv abs_builddir PG_ABS_BUILDDIR
+\getenv abs_srcdir PG_ABS_SRCDIR
+\getenv abs_builddir PG_ABS_BUILDDIR
 
 -- ensure consistent test output regardless of the default bytea format
 SET bytea_output TO escape;
@@ -23,10 +23,10 @@ COMMENT ON LARGE OBJECT 42 IS 'the ultimate answer';
 RESET SESSION AUTHORIZATION;
 
 -- Test psql's \lo_list et al (we assume no other LOs exist yet)
--- \lo_list
--- \lo_list+
--- \lo_unlink 42
--- \dl
+\lo_list
+\lo_list+
+\lo_unlink 42
+\dl
 
 -- Load a file
 CREATE TABLE lotest_stash_values (loid oid, fd integer);
@@ -92,7 +92,7 @@ END;
 -- it's left behind to help test pg_dump.
 
 SELECT lo_from_bytea(0, lo_get(loid)) AS newloid FROM lotest_stash_values
-/* \gset */;
+\gset
 
 -- Add a comment to it, as well, for pg_dump/pg_upgrade testing.
 COMMENT ON LARGE OBJECT 10101 IS 'I Wandered Lonely as a Cloud';
@@ -132,12 +132,12 @@ BEGIN;
 SELECT lo_open(loid, x'40000'::int) from lotest_stash_values;
 ABORT;
 
--- \set filename :abs_builddir '/results/invalid/path'
--- \set dobody 'DECLARE loid oid; BEGIN '
--- \set dobody :dobody 'SELECT tbl.loid INTO loid FROM lotest_stash_values tbl; '
--- \set dobody :dobody 'PERFORM lo_export(loid, ' :'filename' '); '
--- \set dobody :dobody 'EXCEPTION WHEN UNDEFINED_FILE THEN '
--- \set dobody :dobody 'RAISE NOTICE ''could not open file, as expected''; END'
+\set filename :abs_builddir '/results/invalid/path'
+\set dobody 'DECLARE loid oid; BEGIN '
+\set dobody :dobody 'SELECT tbl.loid INTO loid FROM lotest_stash_values tbl; '
+\set dobody :dobody 'PERFORM lo_export(loid, ' :'filename' '); '
+\set dobody :dobody 'EXCEPTION WHEN UNDEFINED_FILE THEN '
+\set dobody :dobody 'RAISE NOTICE ''could not open file, as expected''; END'
 DO 'dobody';
 
 -- Test truncation.
@@ -188,7 +188,7 @@ SELECT lo_unlink(loid) from lotest_stash_values;
 
 TRUNCATE lotest_stash_values;
 
--- \set filename :abs_srcdir '/data/tenk.data'
+\set filename :abs_srcdir '/data/tenk.data'
 INSERT INTO lotest_stash_values (loid) SELECT lo_import('filename');
 
 BEGIN;
@@ -218,16 +218,16 @@ SELECT loread(fd, 36) FROM lotest_stash_values;
 SELECT lo_close(fd) FROM lotest_stash_values;
 END;
 
--- \set filename :abs_builddir '/results/lotest.txt'
+\set filename :abs_builddir '/results/lotest.txt'
 SELECT lo_export(loid, 'filename') FROM lotest_stash_values;
 
--- \lo_import :filename
+\lo_import :filename
 
--- \set newloid :LASTOID
+\set newloid :LASTOID
 
 -- just make sure \lo_export does not barf
--- \set filename :abs_builddir '/results/lotest2.txt'
--- \lo_export 10101 :filename
+\set filename :abs_builddir '/results/lotest2.txt'
+\lo_export :newloid :filename
 
 -- This is a hack to test that export/import are reversible
 -- This uses knowledge about the inner workings of large object mechanism
@@ -240,15 +240,15 @@ SELECT lo_unlink(loid) FROM lotest_stash_values;
 
 TRUNCATE lotest_stash_values;
 
--- \lo_unlink 10101
+\lo_unlink :newloid
 
--- \set filename :abs_builddir '/results/lotest.txt'
--- \lo_import :filename
+\set filename :abs_builddir '/results/lotest.txt'
+\lo_import :filename
 
--- \set newloid_1 :LASTOID
+\set newloid_1 :LASTOID
 
 SELECT lo_from_bytea(0, lo_get(10101_1)) AS newloid_2
-/* \gset */;
+\gset
 
 SELECT fipshash(lo_get(10101_1)) = fipshash(lo_get(10101_2));
 
@@ -261,12 +261,12 @@ SELECT lo_put(10101_1, 4294967310, 'foo');
 SELECT lo_get(10101_1);
 SELECT lo_get(10101_1, 4294967294, 100);
 
--- \lo_unlink 10101_1
--- \lo_unlink 10101_2
+\lo_unlink :newloid_1
+\lo_unlink :newloid_2
 
 -- This object is left in the database for pg_dump test purposes
 SELECT lo_from_bytea(0, E'\\xdeadbeef') AS newloid
-/* \gset */;
+\gset
 
 SET bytea_output TO hex;
 SELECT lo_get(10101);

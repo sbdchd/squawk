@@ -1,0 +1,14 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r\"\\echo hello \\dt \\\\ select 1;\")"
+---
+[
+    "\\echo hello " @ PsqlCommand { ends_query: false },
+    "\\dt " @ PsqlCommand { ends_query: false },
+    "\\\\" @ PsqlCommand { ends_query: false },
+    " " @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+    ";" @ Semi,
+]

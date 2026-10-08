@@ -293,7 +293,7 @@ SELECT $$
     HAVING count(*) > 1
     ORDER BY 2 DESC, 1 DESC, 3 DESC, 4 DESC, 5 DESC, 6 DESC
     LIMIT 10
-$$ AS qry /* \gset */;
+$$ AS qry \gset
 
 -- test mark/restore with in-memory sorts
 -- EXPLAIN (COSTS OFF) :qry;

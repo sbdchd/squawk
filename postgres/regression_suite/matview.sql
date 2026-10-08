@@ -40,18 +40,18 @@ CREATE MATERIALIZED VIEW mvtest_bb AS SELECT * FROM mvtest_tvvmv;
 CREATE INDEX mvtest_aa ON mvtest_bb (grandtot);
 
 -- check that plans seem reasonable
--- \d+ mvtest_tvm
--- \d+ mvtest_tvm
--- \d+ mvtest_tvvm
--- \d+ mvtest_bb
+\d+ mvtest_tvm
+\d+ mvtest_tvm
+\d+ mvtest_tvvm
+\d+ mvtest_bb
 
 -- test schema behavior
 CREATE SCHEMA mvtest_mvschema;
 ALTER MATERIALIZED VIEW mvtest_tvm SET SCHEMA mvtest_mvschema;
--- \d+ mvtest_tvm
--- \d+ mvtest_tvmm
+\d+ mvtest_tvm
+\d+ mvtest_tvmm
 SET search_path = mvtest_mvschema, public;
--- \d+ mvtest_tvm
+\d+ mvtest_tvm
 
 -- modify the underlying table data
 INSERT INTO mvtest_t VALUES (6, 'z', 13);
@@ -118,9 +118,9 @@ ROLLBACK;
 -- some additional tests not using base tables
 CREATE VIEW mvtest_vt1 AS SELECT 1 moo;
 CREATE VIEW mvtest_vt2 AS SELECT moo, 2*moo FROM mvtest_vt1 UNION ALL SELECT moo, 3*moo FROM mvtest_vt1;
--- \d+ mvtest_vt2
+\d+ mvtest_vt2
 CREATE MATERIALIZED VIEW mv_test2 AS SELECT moo, 2*moo FROM mvtest_vt2 UNION ALL SELECT moo, 3*moo FROM mvtest_vt2;
--- \d+ mv_test2
+\d+ mv_test2
 CREATE MATERIALIZED VIEW mv_test3 AS SELECT * FROM mv_test2 WHERE moo = 12345;
 SELECT relispopulated FROM pg_class WHERE oid = 'mv_test3'::regclass;
 
@@ -194,7 +194,7 @@ DROP TABLE mvtest_v CASCADE;
 -- so that we don't end up with unknown-type columns.
 CREATE MATERIALIZED VIEW mv_unspecified_types AS
   SELECT 42 as i, 42.5 as num, 'foo' as u, 'foo'::unknown as u2, null as n;
--- \d+ mv_unspecified_types
+\d+ mv_unspecified_types
 SELECT * FROM mv_unspecified_types;
 DROP MATERIALIZED VIEW mv_unspecified_types;
 

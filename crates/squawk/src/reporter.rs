@@ -511,7 +511,7 @@ mod test_check_files {
     #[test]
     fn check_files_invalid_syntax() {
         let sql = r"
-select \;
+select (;
         ";
         let mut buff = Vec::new();
         let res = check_sql(sql, "test.sql", &[], &[], None, false);

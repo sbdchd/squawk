@@ -107,7 +107,7 @@ SPLIT PARTITION partition_split_schema.sales_feb_mar_apr2022 INTO
    PARTITION sales_mar2022 FOR VALUES FROM ('2022-03-01') TO ('2022-04-01'),
    PARTITION sales_apr2022 FOR VALUES FROM ('2022-04-01') TO ('2022-05-01'));
 SET search_path = partition_split_schema, public;
--- \d+ sales_range
+\d+ sales_range
 
 DROP TABLE sales_range;
 DROP TABLE sales_others;
@@ -186,7 +186,7 @@ ALTER TABLE sales_range SPLIT PARTITION sales_feb_mar_apr2022 INTO
   (PARTITION partition_split_schema.sales_feb2022 FOR VALUES FROM ('2022-02-01') TO ('2022-03-01'),
    PARTITION partition_split_schema2.sales_mar2022 FOR VALUES FROM ('2022-03-01') TO ('2022-04-01'),
    PARTITION sales_apr2022 FOR VALUES FROM ('2022-04-01') TO ('2022-05-01'));
--- \d+ sales_range
+\d+ sales_range
 
 SELECT tableoid::regclass, * FROM sales_range ORDER BY tableoid::regclass::text COLLATE "C", salesperson_id;
 
@@ -991,14 +991,14 @@ CREATE TABLE t_bigint (
 PARTITION BY RANGE (b);
 CREATE TABLE t_bigint_default PARTITION OF t_bigint DEFAULT;
 -- Show defaults/constraints before SPLIT PARTITION
--- \d+ t_bigint
--- \d+ t_bigint_default
+\d+ t_bigint
+\d+ t_bigint_default
 ALTER TABLE t_bigint SPLIT PARTITION t_bigint_default INTO
   (PARTITION t_bigint_01_10 FOR VALUES FROM (0) TO (10),
    PARTITION t_bigint_default DEFAULT);
 -- Show defaults/constraints after SPLIT PARTITION
--- \d+ t_bigint_default
--- \d+ t_bigint_01_10
+\d+ t_bigint_default
+\d+ t_bigint_01_10
 DROP TABLE t_bigint;
 
 -- Test permission checks.  The user needs to own the parent table and the
@@ -1044,15 +1044,15 @@ RESET SESSION AUTHORIZATION;
 ALTER TABLE t ATTACH PARTITION tp_0_2 FOR VALUES FROM (0) TO (2);
 
 -- Owner is 'regress_partition_split_alice':
--- \dt tp_0_2
+\dt tp_0_2
 
 ALTER TABLE t SPLIT PARTITION tp_0_2 INTO
   (PARTITION tp_0_1 FOR VALUES FROM (0) TO (1),
    PARTITION tp_1_2 FOR VALUES FROM (1) TO (2));
 
 -- Owner should be 'regress_partition_split_alice':
--- \dt tp_0_1
--- \dt tp_1_2
+\dt tp_0_1
+\dt tp_1_2
 
 DROP TABLE t;
 
@@ -1150,11 +1150,11 @@ CREATE TRIGGER t_before_insert_row_trigger BEFORE INSERT ON t FOR EACH ROW
 CREATE TRIGGER tp_x_before_insert_row_trigger BEFORE INSERT ON tp_x FOR EACH ROW
   EXECUTE PROCEDURE trigger_function('tp_x');
 
--- \d+ tp_x
+\d+ tp_x
 ALTER TABLE t SPLIT PARTITION tp_x INTO
   (PARTITION tp_0_1 FOR VALUES FROM (0) TO (1),
    PARTITION tp_x FOR VALUES FROM (1) TO (2));
--- \d+ tp_x
+\d+ tp_x
 
 INSERT INTO t(i, t, b) VALUES(1, DEFAULT, 3);
 SELECT tableoid::regclass, * FROM t ORDER BY tableoid::regclass::text COLLATE "C", b;

@@ -417,7 +417,7 @@ BEGIN ATOMIC
               (SELECT count(*) FROM foo WHERE foo = n);
 END;
 
--- \sf foo_update
+\sf foo_update
 DROP FUNCTION foo_update;
 
 -- Test that the planner does not fold OLD/NEW IS NULL tests to constants

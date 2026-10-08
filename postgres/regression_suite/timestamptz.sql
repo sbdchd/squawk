@@ -666,9 +666,9 @@ CREATE VIEW timestamp_local_view AS
          TIMESTAMP '1978-07-07 19:38' AT LOCAL AS t_at_local,
          timezone(TIMESTAMP '1978-07-07 19:38') AS t_func;
 SELECT pg_get_viewdef('timestamp_local_view', true);
--- \x
+\x
 TABLE timestamp_local_view;
--- \x
+\x
 DROP VIEW timestamp_local_view;
 COMMIT;
 

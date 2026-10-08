@@ -3,8 +3,8 @@
 --
 
 -- directory paths are passed to us in environment variables
--- \getenv abs_srcdir PG_ABS_SRCDIR
--- \getenv abs_builddir PG_ABS_BUILDDIR
+\getenv abs_srcdir PG_ABS_SRCDIR
+\getenv abs_builddir PG_ABS_BUILDDIR
 
 --- test copying in CSV mode with various styles
 --- of embedded line ending characters
@@ -19,7 +19,7 @@ insert into copytest values('Unix',E'abc\ndef',2);
 insert into copytest values('Mac',E'abc\rdef',3);
 insert into copytest values(E'esc\\ape',E'a\\r\\\r\\\n\\nb',4);
 
--- \set filename :abs_builddir '/results/copytest.csv'
+\set filename :abs_builddir '/results/copytest.csv'
 copy copytest to 'filename' csv;
 
 create temp table copytest2 (like copytest);
@@ -40,11 +40,11 @@ select * from copytest except select * from copytest2;
 
 --- test unquoted \. as data inside CSV
 -- do not use copy out to export the data, as it would quote \.
--- \o :filename
--- \qecho line1
--- \qecho '\\.'
--- \qecho line2
--- \o
+\o :filename
+\qecho line1
+\qecho '\\.'
+\qecho line2
+\o
 -- get the data back in with copy
 truncate copytest2;
 copy copytest2(test) from 'filename' csv;
@@ -57,13 +57,13 @@ copy copytest2(test) from stdin;
 -- line2
 -- foo\.
 -- line3
--- \.
+\.
 copy copytest2(test) from stdin;
 -- line4
 -- line5
 -- \.foo
 -- line6
--- \.
+\.
 select test from copytest2;
 
 
@@ -78,7 +78,7 @@ copy copytest3 from stdin csv header;
 -- this is just a line full of junk that would error out if parsed
 -- 1,a,1
 -- 2,b,2
--- \.
+\.
 
 copy copytest3 to stdout csv header;
 
@@ -86,7 +86,7 @@ copy copytest3 to stdout csv header;
 create temp table copytest_order (a int, b int, c int);
 copy copytest_order from stdin;
 -- 1	2	3
--- \.
+\.
 copy copytest_order (c, b, a) to stdout;
 copy copytest_order (c, b, a) to stdout (format csv);
 copy copytest_order (c, b, a) to stdout (format json);
@@ -200,7 +200,7 @@ copy copytest4 from stdin (header);
 -- this is just a line full of junk that would error out if parsed
 -- 1	a
 -- 2	b
--- \.
+\.
 
 copy copytest4 to stdout (header);
 
@@ -213,7 +213,7 @@ copy copytest5 from stdin (format csv, header 2);
 -- this is a second header line.
 -- 1
 -- 2
--- \.
+\.
 copy copytest5 to stdout (header);
 
 truncate copytest5;
@@ -222,7 +222,7 @@ copy copytest5 from stdin (format csv, header 4);
 -- this is a second header line.
 -- 1
 -- 2
--- \.
+\.
 select count(*) from copytest5;
 
 truncate copytest5;
@@ -231,7 +231,7 @@ copy copytest5 from stdin (format csv, header 5);
 -- this is a second header line.
 -- 1
 -- 2
--- \.
+\.
 select count(*) from copytest5;
 
 -- test header line feature (given as strings)
@@ -239,14 +239,14 @@ truncate copytest5;
 copy copytest5 from stdin (format csv, header '0');
 -- 1
 -- 2
--- \.
+\.
 select * from copytest5 order by c1;
 
 truncate copytest5;
 copy copytest5 from stdin (format csv, header '1');
 -- 1
 -- 2
--- \.
+\.
 select * from copytest5 order by c1;
 
 -- test copy from with a partitioned table
@@ -268,7 +268,7 @@ insert into parted_copytest select x,1,'One' from generate_series(1,1000) x;
 insert into parted_copytest select x,2,'Two' from generate_series(1001,1010) x;
 insert into parted_copytest select x,1,'One' from generate_series(1011,1020) x;
 
--- \set filename :abs_builddir '/results/parted_copytest.csv'
+\set filename :abs_builddir '/results/parted_copytest.csv'
 copy (select * from parted_copytest order by a) to 'filename';
 
 truncate parted_copytest;
@@ -310,7 +310,7 @@ drop trigger part_ins_trig on parted_copytest_a2;
 copy parted_copytest from stdin;
 -- 1	1	str1
 -- 2	2	str2
--- \.
+\.
 
 -- Ensure index entries were properly added during the copy.
 select * from parted_copytest where b = 1;
@@ -370,11 +370,11 @@ copy tab_progress_reporting from stdin;
 -- sharon	25	(15,12)	1000	sam
 -- sam	30	(10,5)	2000	bill
 -- bill	20	(11,10)	1000	sharon
--- \.
+\.
 
 -- Generate COPY FROM report with FILE, with some excluded tuples.
 truncate tab_progress_reporting;
--- \set filename :abs_srcdir '/data/emp.data'
+\set filename :abs_srcdir '/data/emp.data'
 copy tab_progress_reporting from 'filename'
 	where (salary < 2000);
 
@@ -383,7 +383,7 @@ copy tab_progress_reporting from stdin(on_error ignore);
 -- sharon	x	(15,12)	x	sam
 -- sharon	25	(15,12)	1000	sam
 -- sharon	y	(15,12)	x	sam
--- \.
+\.
 
 drop trigger check_after_tab_progress_reporting on tab_progress_reporting;
 drop function notice_after_tab_progress_reporting();
@@ -404,36 +404,36 @@ copy header_copytest from stdin with (header wrong_choice);
 copy header_copytest from stdin with (header match);
 -- a	b	c
 -- 1	2	foo
--- \.
+\.
 copy header_copytest (c, a, b) from stdin with (header match);
 -- c	a	b
 -- bar	3	4
--- \.
+\.
 copy header_copytest from stdin with (header match, format csv);
 -- a,b,c
 -- 5,6,baz
--- \.
+\.
 -- errors
 copy header_copytest (c, b, a) from stdin with (header match);
 -- a	b	c
 -- 1	2	foo
--- \.
+\.
 copy header_copytest from stdin with (header match);
 -- a	b	\N
 -- 1	2	foo
--- \.
+\.
 copy header_copytest from stdin with (header match);
 -- a	b
 -- 1	2
--- \.
+\.
 copy header_copytest from stdin with (header match);
 -- a	b	c	d
 -- 1	2	foo	bar
--- \.
+\.
 copy header_copytest from stdin with (header match);
 -- a	b	d
 -- 1	2	foo
--- \.
+\.
 SELECT * FROM header_copytest ORDER BY a;
 
 -- Drop an extra column, in the middle of the existing set.
@@ -442,20 +442,20 @@ alter table header_copytest drop column b;
 copy header_copytest (c, a) from stdin with (header match);
 -- c	a
 -- foo	7
--- \.
+\.
 copy header_copytest (a, c) from stdin with (header match);
 -- a	c
 -- 8	foo
--- \.
+\.
 -- errors
 copy header_copytest from stdin with (header match);
 -- a	........pg.dropped.2........	c
 -- 1	2	foo
--- \.
+\.
 copy header_copytest (a, c) from stdin with (header match);
 -- a	c	b
 -- 1	foo	2
--- \.
+\.
 
 SELECT * FROM header_copytest ORDER BY a;
 drop table header_copytest;
@@ -466,13 +466,13 @@ create temp table oversized_column_default (
     col2 varchar(5));
 -- normal COPY should work
 copy oversized_column_default from stdin;
--- \.
+\.
 -- error if the column is excluded
 copy oversized_column_default (col2) from stdin;
--- \.
+\.
 -- error if the DEFAULT option is given
 copy oversized_column_default from stdin (default '');
--- \.
+\.
 drop table oversized_column_default;
 
 
@@ -501,7 +501,7 @@ CREATE TABLE parted_si_p_odd PARTITION OF parted_si FOR VALUES IN (1);
 -- relation extension). See
 -- https://postgr.es/m/18130-7a86a7356a75209d%40postgresql.org
 -- https://postgr.es/m/257696.1695670946%40sss.pgh.pa.us
--- \set filename :abs_srcdir '/data/desc.data'
+\set filename :abs_srcdir '/data/desc.data'
 COPY parted_si(id, data) FROM 'filename';
 
 -- An earlier bug (see commit b1ecb9b3fcf) could end up using a buffer from
@@ -519,7 +519,7 @@ create server copytest_server foreign data wrapper copytest_wrapper;
 create foreign table copytest_foreign_table (a int) server copytest_server;
 copy copytest_foreign_table from stdin (freeze);
 -- 1
--- \.
+\.
 rollback;
 
 -- Tests for COPY TO with materialized views.

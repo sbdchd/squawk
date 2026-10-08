@@ -207,8 +207,8 @@ ALTER TABLE part_b_10_b_20 ATTACH PARTITION part_c_100_200 FOR VALUES FROM (100)
 CREATE TABLE part_c_1_100 (e varchar, d int, c numeric, b bigint, a text);
 ALTER TABLE part_b_10_b_20 ATTACH PARTITION part_c_1_100 FOR VALUES FROM (1) TO (100);
 
--- \set init_range_parted 'truncate range_parted; insert into range_parted VALUES (''a'', 1, 1, 1), (''a'', 10, 200, 1), (''b'', 12, 96, 1), (''b'', 13, 97, 2), (''b'', 15, 105, 16), (''b'', 17, 105, 19)'
--- \set show_data 'select tableoid::regclass::text COLLATE "C" partname, * from range_parted ORDER BY 1, 2, 3, 4, 5, 6'
+\set init_range_parted 'truncate range_parted; insert into range_parted VALUES (''a'', 1, 1, 1), (''a'', 10, 200, 1), (''b'', 12, 96, 1), (''b'', 13, 97, 2), (''b'', 15, 105, 16), (''b'', 17, 105, 19)'
+\set show_data 'select tableoid::regclass::text COLLATE "C" partname, * from range_parted ORDER BY 1, 2, 3, 4, 5, 6'
 -- :init_range_parted;
 -- :show_data;
 
@@ -487,7 +487,7 @@ DROP TRIGGER d15_insert_trig ON part_d_15_20;
 -- Creating default partition for range
 -- :init_range_parted;
 create table part_def partition of range_parted default;
--- \d+ part_def
+\d+ part_def
 insert into range_parted values ('c', 9);
 -- ok
 update part_def set a = 'd' where a = 'c';

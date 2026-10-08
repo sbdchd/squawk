@@ -105,9 +105,9 @@ SELECT regproc('ng_catalog.now');
 SELECT regprocedure('ng_catalog.abs(numeric)');
 SELECT regclass('ng_catalog.pg_class');
 SELECT regtype('ng_catalog.int4');
--- \set VERBOSITY sqlstate \\ -- error message is encoding-dependent
+\set VERBOSITY sqlstate \\ -- error message is encoding-dependent
 SELECT regcollation('ng_catalog."POSIX"');
--- \set VERBOSITY default
+\set VERBOSITY default
 
 -- schemaname not applicable
 

@@ -146,6 +146,7 @@ impl Cursor<'_> {
                     }
                 }
             }
+            '\\' => self.psql_command(),
             '`' => TokenKind::Backtick,
             '=' => TokenKind::Eq,
             '!' => TokenKind::Bang,
@@ -179,6 +180,118 @@ impl Cursor<'_> {
         self.reset_pos_within_token();
         res
     }
+    fn psql_command(&mut self) -> TokenKind {
+        match self.first() {
+            '\\' => {
+                self.bump();
+                return TokenKind::PsqlCommand { ends_query: false };
+            }
+            ';' => {
+                self.bump();
+                return TokenKind::Semi;
+            }
+            ':' => {
+                self.bump();
+                return TokenKind::Colon;
+            }
+            _ => {}
+        }
+
+        let chars = self.chars();
+        let remaining = chars.as_str();
+        let start = self.pos_within_token();
+        self.eat_while(|c| !is_whitespace(c) && c != '\\');
+        let command = &remaining[..(self.pos_within_token() - start) as usize];
+        let ends_query = matches!(
+            command,
+            "g" | "gx"
+                | "gdesc"
+                | "gexec"
+                | "gset"
+                | "getresults"
+                | "crosstabview"
+                | "watch"
+                | "parse"
+                | "close_prepared"
+                | "sendpipeline"
+                | "startpipeline"
+                | "syncpipeline"
+                | "endpipeline"
+                | "flush"
+                | "flushrequest"
+                | "r"
+                | "reset"
+        );
+        let takes_pipe = matches!(command, "g" | "gx" | "o" | "out" | "w" | "write");
+        if takes_pipe {
+            self.eat_psql_arg_space();
+            if matches!(command, "g" | "gx") && self.first() == '(' {
+                while !self.at_psql_args_end() {
+                    let last = self.psql_arg();
+                    self.eat_psql_arg_space();
+                    if last == Some(')') {
+                        break;
+                    }
+                }
+            }
+        }
+        let reads_whole_line = matches!(
+            command,
+            "!" | "ef" | "ev" | "sf" | "sf+" | "sv" | "sv+" | "h" | "help"
+        ) || command.eq_ignore_ascii_case("copy")
+            || (takes_pipe && self.first() == '|');
+        if reads_whole_line {
+            self.eat_while(|c| !matches!(c, '\n' | '\r'));
+            return TokenKind::PsqlCommand { ends_query };
+        }
+        while !self.at_psql_args_end() {
+            self.psql_arg();
+            self.eat_psql_arg_space();
+        }
+        TokenKind::PsqlCommand { ends_query }
+    }
+
+    fn eat_psql_arg_space(&mut self) {
+        self.eat_while(|c| is_whitespace(c) && !matches!(c, '\n' | '\r'));
+    }
+
+    fn at_psql_args_end(&self) -> bool {
+        self.is_eof() || matches!(self.first(), '\n' | '\r' | '\\')
+    }
+
+    fn psql_arg(&mut self) -> Option<char> {
+        let mut last = None;
+        let mut quote = None;
+        while !self.is_eof() {
+            let c = self.first();
+            if matches!(c, '\n' | '\r') || (quote.is_none() && (c == '\\' || is_whitespace(c))) {
+                break;
+            }
+            self.bump();
+            match (quote, c) {
+                (Some('\''), '\\') if !matches!(self.first(), '\n' | '\r') => {
+                    last = self.bump();
+                }
+                (Some(q), c) if q == c => {
+                    quote = None;
+                    match q {
+                        '"' => last = Some(c),
+                        '`' => last = None,
+                        _ => {}
+                    }
+                }
+                (None, '\'' | '`') => quote = Some(c),
+                (None, '"') => {
+                    quote = Some(c);
+                    last = Some(c);
+                }
+                (Some('`'), _) => {}
+                _ => last = Some(c),
+            }
+        }
+        last
+    }
+
     pub(crate) fn ident(&mut self) -> TokenKind {
         self.eat_while(is_ident_cont);
         TokenKind::Ident
@@ -624,6 +737,63 @@ mod tests {
         }
         tokens
     }
+    #[test]
+    fn psql_commands() {
+        assert_debug_snapshot!(lex(r#"\dt+ public.*
+\set value :'other'
+\echo 'it\'s a \\ path' `echo hello`
+\echo "quoted\name" 'two''quotes'
+\! echo C:\tmp
+\copy t from 'C:\tmp'
+\echo 'unterminated
+\"#));
+    }
+
+    #[test]
+    fn psql_commands_newlines() {
+        assert_debug_snapshot!(lex(
+            "\\echo 'unterminated\nselect 1;\n\\echo 'unterminated\r\nselect 1;\r\n\\echo 'unterminated\rselect 1;"
+        ));
+    }
+
+    #[test]
+    fn psql_commands_same_line() {
+        assert_debug_snapshot!(lex(r"\echo hello \dt \\ select 1;"));
+    }
+
+    #[test]
+    fn psql_escaped_semicolon_and_colon() {
+        assert_debug_snapshot!(lex(r"SELECT 1\; SELECT 2\; SELECT 3\:\:int;"));
+    }
+
+    #[test]
+    fn psql_command_quotes_without_escapes() {
+        assert_debug_snapshot!(lex(r#"\echo "C:\" \\ select 1;
+\echo `echo a\` \\ select 2;"#));
+    }
+
+    #[test]
+    fn psql_commands_reading_whole_line() {
+        assert_debug_snapshot!(lex(r"\o | grep foo\|bar
+\g |sed s/a\\b/c/
+\h select \\
+\sf+ foo(int) \x
+\w out.txt \echo hi
+\g (format=csv) |cat \\ x
+\gx (format=csv tuples_only) | cat
+\g ( format=csv ) |cat
+\g (fieldsep=')') |cat
+\g (format=csv) out.csv \echo hi
+\COPY t to stdout \\ x"));
+    }
+
+    #[test]
+    fn psql_commands_ending_query() {
+        assert_debug_snapshot!(lex(r"select 1 \echo x \gset x_
+select $1 \parse stmt
+select 2 \r"));
+    }
+
     #[test]
     fn lex_statement() {
         let result = lex("select 1;");

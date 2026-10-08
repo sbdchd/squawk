@@ -1,16 +1,16 @@
 -- Tests for TOAST compression with lz4
 
 SELECT NOT(enumvals @> '{lz4}') AS skip_test FROM pg_settings WHERE
-  name = 'default_toast_compression' /* \gset */;
--- \if :skip_test
---    \echo '*** skipping TOAST tests with lz4 (not supported) ***'
---    \quit
--- \endif
+  name = 'default_toast_compression' \gset
+\if :skip_test
+   \echo '*** skipping TOAST tests with lz4 (not supported) ***'
+   \quit
+\endif
 
 CREATE SCHEMA lz4;
 SET search_path TO lz4, public;
 
--- \set HIDE_TOAST_COMPRESSION false
+\set HIDE_TOAST_COMPRESSION false
 
 -- Ensure we get stable results regardless of the installation's default.
 -- We rely on this GUC value for a few tests.
@@ -20,10 +20,10 @@ SET default_toast_compression = 'pglz';
 CREATE TABLE cmdata_pglz(f1 text COMPRESSION pglz);
 CREATE INDEX idx ON cmdata_pglz(f1);
 INSERT INTO cmdata_pglz VALUES(repeat('1234567890', 1000));
--- \d+ cmdata
+\d+ cmdata
 CREATE TABLE cmdata_lz4(f1 TEXT COMPRESSION lz4);
 INSERT INTO cmdata_lz4 VALUES(repeat('1234567890', 1004));
--- \d+ cmdata1
+\d+ cmdata1
 
 -- verify stored compression method in the data
 SELECT pg_column_compression(f1) FROM cmdata_lz4;
@@ -34,13 +34,13 @@ SELECT SUBSTR(f1, 2000, 50) FROM cmdata_lz4;
 
 -- copy with table creation
 SELECT * INTO cmmove1 FROM cmdata_lz4;
--- \d+ cmmove1
+\d+ cmmove1
 SELECT pg_column_compression(f1) FROM cmmove1;
 
 -- test LIKE INCLUDING COMPRESSION.  The GUC default_toast_compression
 -- has no effect, the compression method from the table being copied.
 CREATE TABLE cmdata2 (LIKE cmdata_lz4 INCLUDING COMPRESSION);
--- \d+ cmdata2
+\d+ cmdata2
 DROP TABLE cmdata2;
 
 -- copy to existing table
@@ -68,7 +68,7 @@ DROP FUNCTION large_val_lz4;
 
 -- test compression with materialized view
 CREATE MATERIALIZED VIEW compressmv(x) AS SELECT * FROM cmdata_lz4;
--- \d+ compressmv
+\d+ compressmv
 SELECT pg_column_compression(f1) FROM cmdata_lz4;
 SELECT pg_column_compression(x) FROM compressmv;
 
@@ -95,13 +95,13 @@ SET default_toast_compression = 'lz4';
 -- test alter compression method
 ALTER TABLE cmdata_pglz ALTER COLUMN f1 SET COMPRESSION lz4;
 INSERT INTO cmdata_pglz VALUES (repeat('123456789', 4004));
--- \d+ cmdata
+\d+ cmdata
 SELECT pg_column_compression(f1) FROM cmdata_pglz;
 ALTER TABLE cmdata_pglz ALTER COLUMN f1 SET COMPRESSION pglz;
 
 -- test alter compression method for materialized views
 ALTER MATERIALIZED VIEW compressmv ALTER COLUMN x SET COMPRESSION lz4;
--- \d+ compressmv
+\d+ compressmv
 
 -- test alter compression method for partitioned tables
 ALTER TABLE cmpart1 ALTER COLUMN f1 SET COMPRESSION pglz;
@@ -126,4 +126,4 @@ SELECT length(f1) FROM cmmove1;
 SELECT length(f1) FROM cmmove2;
 SELECT length(f1) FROM cmmove3;
 
--- \set HIDE_TOAST_COMPRESSION true
+\set HIDE_TOAST_COMPRESSION true

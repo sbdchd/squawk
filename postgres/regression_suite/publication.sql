@@ -28,11 +28,11 @@ CREATE PUBLICATION testpub_xxx WITH (publish_generated_columns = stored, publish
 CREATE PUBLICATION testpub_xxx WITH (publish_generated_columns = foo);
 CREATE PUBLICATION testpub_xxx WITH (publish_generated_columns);
 
--- \dRp
+\dRp
 
 ALTER PUBLICATION testpub_default SET (publish = 'insert, update, delete');
 
--- \dRp
+\dRp
 
 --- adding tables
 CREATE SCHEMA pub_test;
@@ -66,25 +66,25 @@ CREATE PUBLICATION testpub_fortable FOR TABLE testpub_tbl1;
 RESET client_min_messages;
 -- should be able to add schema to 'FOR TABLE' publication
 ALTER PUBLICATION testpub_fortable ADD TABLES IN SCHEMA pub_test;
--- \dRp+ testpub_fortable
+\dRp+ testpub_fortable
 -- should be able to drop schema from 'FOR TABLE' publication
 ALTER PUBLICATION testpub_fortable DROP TABLES IN SCHEMA pub_test;
--- \dRp+ testpub_fortable
+\dRp+ testpub_fortable
 -- should be able to set schema to 'FOR TABLE' publication
 ALTER PUBLICATION testpub_fortable SET TABLES IN SCHEMA pub_test;
--- \dRp+ testpub_fortable
+\dRp+ testpub_fortable
 
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION testpub_forschema FOR TABLES IN SCHEMA pub_test;
--- \dn pub_test
+\dn pub_test
 
 -- should be able to create publication with schema and table of the same
 -- schema
 CREATE PUBLICATION testpub_for_tbl_schema FOR TABLES IN SCHEMA pub_test, TABLE pub_test.testpub_nopk;
 RESET client_min_messages;
--- \dRp+ testpub_for_tbl_schema
+\dRp+ testpub_for_tbl_schema
 -- table also covered by a published schema should appear only once in \d output
--- \d pub_test.testpub_nopk
+\d pub_test.testpub_nopk
 
 -- weird parser corner case
 CREATE PUBLICATION testpub_parsertst FOR TABLE pub_test.testpub_nopk, CURRENT_SCHEMA;
@@ -92,22 +92,22 @@ CREATE PUBLICATION testpub_parsertst FOR TABLES IN SCHEMA foo, test.foo;
 
 -- should be able to add a table of the same schema to the schema publication
 ALTER PUBLICATION testpub_forschema ADD TABLE pub_test.testpub_nopk;
--- \dRp+ testpub_forschema
+\dRp+ testpub_forschema
 
 -- should be able to drop the table
 ALTER PUBLICATION testpub_forschema DROP TABLE pub_test.testpub_nopk;
--- \dRp+ testpub_forschema
+\dRp+ testpub_forschema
 
 -- fail - can't drop a table from the schema publication which isn't in the
 -- publication
 ALTER PUBLICATION testpub_forschema DROP TABLE pub_test.testpub_nopk;
 -- should be able to set table to schema publication
 ALTER PUBLICATION testpub_forschema SET TABLE pub_test.testpub_nopk;
--- \dRp+ testpub_forschema
+\dRp+ testpub_forschema
 
 SELECT pubname, puballtables FROM pg_publication WHERE pubname = 'testpub_foralltables';
--- \d+ testpub_tbl2
--- \dRp+ testpub_foralltables
+\d+ testpub_tbl2
+\dRp+ testpub_foralltables
 
 ---------------------------------------------
 -- EXCEPT clause tests for normal tables
@@ -116,13 +116,13 @@ SET client_min_messages = 'ERROR';
 CREATE TABLE testpub_tbl3 (id serial primary key, data text);
 -- Specify table list in the EXCEPT clause of a FOR ALL TABLES publication
 CREATE PUBLICATION testpub_foralltables_excepttable FOR ALL TABLES EXCEPT (TABLE testpub_tbl1, testpub_tbl2, TABLE testpub_tbl3);
--- \dRp+ testpub_foralltables_excepttable
+\dRp+ testpub_foralltables_excepttable
 -- Specify table in the EXCEPT clause of a FOR ALL TABLES publication
 CREATE PUBLICATION testpub_foralltables_excepttable1 FOR ALL TABLES EXCEPT (TABLE testpub_tbl1);
--- \dRp+ testpub_foralltables_excepttable1
+\dRp+ testpub_foralltables_excepttable1
 -- Check that the table description shows the publications where it is listed
 -- in the EXCEPT clause
--- \d testpub_tbl1
+\d testpub_tbl1
 -- fail - first table in the EXCEPT list should use TABLE keyword
 -- CREATE PUBLICATION testpub_foralltables_excepttable2 FOR ALL TABLES EXCEPT (testpub_tbl1, testpub_tbl2);
 
@@ -132,34 +132,34 @@ CREATE PUBLICATION testpub_foralltables_excepttable1 FOR ALL TABLES EXCEPT (TABL
 -- Replace the existing table list in the EXCEPT clause (testpub_tbl1,
 -- testpub_tbl2, testpub_tbl3) with table (testpub_tbl2).
 ALTER PUBLICATION testpub_foralltables_excepttable SET ALL TABLES EXCEPT (TABLE testpub_tbl2);
--- \dRp+ testpub_foralltables_excepttable
+\dRp+ testpub_foralltables_excepttable
 
 -- Replace the existing table list in the EXCEPT clause (testpub_tbl2) with a
 -- table list containing (testpub_tbl1, testpub_tbl2, testpub_tbl3).
 ALTER PUBLICATION testpub_foralltables_excepttable SET ALL TABLES EXCEPT (TABLE testpub_tbl1, testpub_tbl2, TABLE testpub_tbl3);
--- \dRp+ testpub_foralltables_excepttable
+\dRp+ testpub_foralltables_excepttable
 
 -- Clear the table list in the EXCEPT clause, making the publication include all
 -- tables.
 ALTER PUBLICATION testpub_foralltables_excepttable SET ALL TABLES;
--- \dRp+ testpub_foralltables_excepttable
+\dRp+ testpub_foralltables_excepttable
 
 -- Create an empty publication for subsequent tests.
 CREATE PUBLICATION testpub_forall_tbls_seqs;
 
 -- Enable both puballtables and puballsequences
 ALTER PUBLICATION testpub_forall_tbls_seqs SET ALL TABLES, ALL SEQUENCES;
--- \dRp+ testpub_forall_tbls_seqs
+\dRp+ testpub_forall_tbls_seqs
 
 -- Explicitly test that SET ALL TABLES resets puballsequences to false
 -- Result should be: puballtables = true, puballsequences = false
 ALTER PUBLICATION testpub_forall_tbls_seqs SET ALL TABLES;
--- \dRp+ testpub_forall_tbls_seqs
+\dRp+ testpub_forall_tbls_seqs
 
 -- Explicitly test that SET ALL SEQUENCES resets puballtables to false
 -- Result should be: puballtables = false, puballsequences = true
 ALTER PUBLICATION testpub_forall_tbls_seqs SET ALL SEQUENCES;
--- \dRp+ testpub_forall_tbls_seqs
+\dRp+ testpub_forall_tbls_seqs
 
 -- fail - SET ALL TABLES/SEQUENCES is not allowed for a 'FOR TABLE' publication
 ALTER PUBLICATION testpub_fortable SET ALL TABLES EXCEPT (TABLE testpub_tbl1);
@@ -184,18 +184,18 @@ SET client_min_messages = 'ERROR';
 CREATE TABLE testpub_tbl_parent (a int);
 CREATE TABLE testpub_tbl_child (b text) INHERITS (testpub_tbl_parent);
 CREATE PUBLICATION testpub3 FOR TABLE testpub_tbl_parent;
--- \dRp+ testpub3
+\dRp+ testpub3
 CREATE PUBLICATION testpub4 FOR TABLE ONLY testpub_tbl_parent;
--- \dRp+ testpub4
+\dRp+ testpub4
 -- List the parent table in the EXCEPT clause (without ONLY or '*')
 CREATE PUBLICATION testpub5 FOR ALL TABLES EXCEPT (TABLE testpub_tbl_parent);
--- \dRp+ testpub5
+\dRp+ testpub5
 -- EXCEPT with '*': list the table and all its descendants in the EXCEPT clause
 CREATE PUBLICATION testpub6 FOR ALL TABLES EXCEPT (TABLE testpub_tbl_parent *);
--- \dRp+ testpub6
+\dRp+ testpub6
 -- EXCEPT with ONLY: list the table in the EXCEPT clause, but not its descendants
 CREATE PUBLICATION testpub7 FOR ALL TABLES EXCEPT (TABLE ONLY testpub_tbl_parent);
--- \dRp+ testpub7
+\dRp+ testpub7
 
 RESET client_min_messages;
 DROP TABLE testpub_tbl_parent, testpub_tbl_child;
@@ -208,9 +208,9 @@ SET client_min_messages = 'ERROR';
 CREATE TABLE testpub_root(a int) PARTITION BY RANGE(a);
 CREATE TABLE testpub_part1 PARTITION OF testpub_root FOR VALUES FROM (0) TO (100);
 CREATE PUBLICATION testpub8 FOR ALL TABLES EXCEPT (TABLE testpub_root);
--- \dRp+ testpub8;
--- \d testpub_part1
--- \d testpub_root
+\dRp+ testpub8;
+\d testpub_part1
+\d testpub_root
 CREATE PUBLICATION testpub9 FOR ALL TABLES EXCEPT (TABLE testpub_part1);
 
 CREATE TABLE tab_main (a int) PARTITION BY RANGE(a);
@@ -232,15 +232,15 @@ CREATE PUBLICATION regress_pub_forallsequences1 FOR ALL SEQUENCES;
 RESET client_min_messages;
 
 SELECT pubname, puballtables, puballsequences FROM pg_publication WHERE pubname = 'regress_pub_forallsequences1';
--- \d+ regress_pub_seq0
--- \dRp+ regress_pub_forallsequences1
+\d+ regress_pub_seq0
+\dRp+ regress_pub_forallsequences1
 
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION regress_pub_forallsequences2 FOR ALL SEQUENCES;
 RESET client_min_messages;
 
 -- check that describe sequence lists both publications the sequence belongs to
--- \d+ pub_test.regress_pub_seq1
+\d+ pub_test.regress_pub_seq1
 
 --- Specifying both ALL TABLES and ALL SEQUENCES
 SET client_min_messages = 'ERROR';
@@ -253,7 +253,7 @@ ALTER PUBLICATION regress_pub_for_allsequences_alltables SET (publish_generated_
 RESET client_min_messages;
 
 SELECT pubname, puballtables, puballsequences FROM pg_publication WHERE pubname = 'regress_pub_for_allsequences_alltables';
--- \dRp+ regress_pub_for_allsequences_alltables
+\dRp+ regress_pub_for_allsequences_alltables
 
 DROP SEQUENCE regress_pub_seq0, pub_test.regress_pub_seq1;
 DROP PUBLICATION regress_pub_forallsequences1;
@@ -280,7 +280,7 @@ ALTER TABLE testpub_parted ATTACH PARTITION testpub_parted2 FOR VALUES IN (2);
 UPDATE testpub_parted1 SET a = 1;
 -- only parent is listed as being in publication, not the partition
 ALTER PUBLICATION testpub_forparted ADD TABLE testpub_parted;
--- \dRp+ testpub_forparted
+\dRp+ testpub_forparted
 -- works despite missing REPLICA IDENTITY, because no actual update happened
 UPDATE testpub_parted SET a = 1 WHERE false;
 -- should now fail, because parent's publication replicates updates
@@ -289,7 +289,7 @@ ALTER TABLE testpub_parted DETACH PARTITION testpub_parted1;
 -- works again, because parent's publication is no longer considered
 UPDATE testpub_parted1 SET a = 1;
 ALTER PUBLICATION testpub_forparted SET (publish_via_partition_root = true);
--- \dRp+ testpub_forparted
+\dRp+ testpub_forparted
 -- still fail, because parent's publication replicates updates
 UPDATE testpub_parted2 SET a = 2;
 ALTER PUBLICATION testpub_forparted DROP TABLE testpub_parted;
@@ -313,34 +313,34 @@ SET client_min_messages = 'ERROR';
 -- validation of referenced columns is less strict than for delete/update.
 CREATE PUBLICATION testpub5 FOR TABLE testpub_rf_tbl1, testpub_rf_tbl2 WHERE (c <> 'test' AND d < 5) WITH (publish = 'insert');
 RESET client_min_messages;
--- \dRp+ testpub5
--- \d testpub_rf_tbl3
+\dRp+ testpub5
+\d testpub_rf_tbl3
 ALTER PUBLICATION testpub5 ADD TABLE testpub_rf_tbl3 WHERE (e > 1000 AND e < 2000);
--- \dRp+ testpub5
--- \d testpub_rf_tbl3
+\dRp+ testpub5
+\d testpub_rf_tbl3
 ALTER PUBLICATION testpub5 DROP TABLE testpub_rf_tbl2;
--- \dRp+ testpub5
+\dRp+ testpub5
 -- remove testpub_rf_tbl1 and add testpub_rf_tbl3 again (another WHERE expression)
 ALTER PUBLICATION testpub5 SET TABLE testpub_rf_tbl3 WHERE (e > 300 AND e < 500);
--- \dRp+ testpub5
--- \d testpub_rf_tbl3
+\dRp+ testpub5
+\d testpub_rf_tbl3
 -- test \d <tablename> (now it displays filter information)
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION testpub_rf_yes FOR TABLE testpub_rf_tbl1 WHERE (a > 1) WITH (publish = 'insert');
 CREATE PUBLICATION testpub_rf_no FOR TABLE testpub_rf_tbl1;
 RESET client_min_messages;
--- \d testpub_rf_tbl1
+\d testpub_rf_tbl1
 DROP PUBLICATION testpub_rf_yes, testpub_rf_no;
 -- some more syntax tests to exercise other parser pathways
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION testpub_syntax1 FOR TABLE testpub_rf_tbl1, ONLY testpub_rf_tbl3 WHERE (e < 999) WITH (publish = 'insert');
 RESET client_min_messages;
--- \dRp+ testpub_syntax1
+\dRp+ testpub_syntax1
 DROP PUBLICATION testpub_syntax1;
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION testpub_syntax2 FOR TABLE testpub_rf_tbl1, testpub_rf_schema1.testpub_rf_tbl5 WHERE (h < 999) WITH (publish = 'insert');
 RESET client_min_messages;
--- \dRp+ testpub_syntax2
+\dRp+ testpub_syntax2
 DROP PUBLICATION testpub_syntax2;
 -- fail - schemas don't allow WHERE clause
 SET client_min_messages = 'ERROR';
@@ -407,10 +407,10 @@ CREATE PUBLICATION testpub6 FOR TABLES IN SCHEMA testpub_rf_schema2;
 -- should be able to set publication with schema and table of the same schema
 ALTER PUBLICATION testpub6 SET TABLES IN SCHEMA testpub_rf_schema2, TABLE testpub_rf_schema2.testpub_rf_tbl6 WHERE (i < 99);
 RESET client_min_messages;
--- \dRp+ testpub6
+\dRp+ testpub6
 -- table with a row-filter, also covered by a published schema, should appear
 -- only once in \d output and without the row filter
--- \d testpub_rf_schema2.testpub_rf_tbl6
+\d testpub_rf_schema2.testpub_rf_tbl6
 -- fail - virtual generated column uses user-defined function
 -- (Actually, this already fails at CREATE TABLE rather than at CREATE
 -- PUBLICATION, but let's keep the test in case the former gets
@@ -667,7 +667,7 @@ SET client_min_messages = 'ERROR';
 CREATE PUBLICATION testpub_table_ins WITH (publish = 'insert, truncate');
 RESET client_min_messages;
 ALTER PUBLICATION testpub_table_ins ADD TABLE testpub_tbl5 (a);		-- ok
--- \dRp+ testpub_table_ins
+\dRp+ testpub_table_ins
 
 -- error: cannot work with deferrable primary keys
 CREATE TABLE testpub_tbl5d (a int PRIMARY KEY DEFERRABLE);
@@ -692,13 +692,13 @@ UPDATE testpub_tbl6 SET a = 1;
 -- make sure changing the column list is propagated to the catalog
 CREATE TABLE testpub_tbl7 (a int primary key, b text, c text);
 ALTER PUBLICATION testpub_fortable ADD TABLE testpub_tbl7 (a, b);
--- \d+ testpub_tbl7
+\d+ testpub_tbl7
 -- ok: the column list is the same, we should skip this table (or at least not fail)
 ALTER PUBLICATION testpub_fortable SET TABLE testpub_tbl7 (a, b);
--- \d+ testpub_tbl7
+\d+ testpub_tbl7
 -- ok: the column list changes, make sure the catalog gets updated
 ALTER PUBLICATION testpub_fortable SET TABLE testpub_tbl7 (a, c);
--- \d+ testpub_tbl7
+\d+ testpub_tbl7
 
 -- column list for partitioned tables has to cover replica identities for
 -- all child relations
@@ -808,8 +808,8 @@ RESET client_min_messages;
 CREATE TABLE testpub_tbl_both_filters (a int, b int, c int, PRIMARY KEY (a,c));
 ALTER TABLE testpub_tbl_both_filters REPLICA IDENTITY USING INDEX testpub_tbl_both_filters_pkey;
 ALTER PUBLICATION testpub_both_filters ADD TABLE testpub_tbl_both_filters (a,c) WHERE (c != 1);
--- \dRp+ testpub_both_filters
--- \d+ testpub_tbl_both_filters
+\dRp+ testpub_both_filters
+\d+ testpub_tbl_both_filters
 
 DROP TABLE testpub_tbl_both_filters;
 DROP PUBLICATION testpub_both_filters;
@@ -976,7 +976,7 @@ ALTER PUBLICATION testpub_fortbl ADD TABLE testpub_tbl1;
 -- fail - already added
 CREATE PUBLICATION testpub_fortbl FOR TABLE testpub_tbl1;
 
--- \dRp+ testpub_fortbl
+\dRp+ testpub_fortbl
 
 -- fail - view
 ALTER PUBLICATION testpub_default ADD TABLE testpub_view;
@@ -987,15 +987,15 @@ ALTER PUBLICATION testpub_default ADD TABLE pub_test.testpub_nopk;
 
 ALTER PUBLICATION testpub_ins_trunct ADD TABLE pub_test.testpub_nopk, testpub_tbl1;
 
--- \d+ pub_test.testpub_nopk
--- \d+ testpub_tbl1
--- \dRp+ testpub_default
+\d+ pub_test.testpub_nopk
+\d+ testpub_tbl1
+\dRp+ testpub_default
 
 ALTER PUBLICATION testpub_default DROP TABLE testpub_tbl1, pub_test.testpub_nopk;
 -- fail - nonexistent
 ALTER PUBLICATION testpub_default DROP TABLE pub_test.testpub_nopk;
 
--- \d+ testpub_tbl1
+\d+ testpub_tbl1
 
 -- verify relation cache invalidation when a primary key is added using
 -- an existing index
@@ -1066,7 +1066,7 @@ REVOKE CREATE ON DATABASE regression FROM regress_publication_user2;
 DROP TABLE testpub_parted;
 DROP TABLE testpub_tbl1;
 
--- \dRp+ testpub_default
+\dRp+ testpub_default
 
 -- fail - must be owner of publication
 SET ROLE regress_publication_user_dummy;
@@ -1075,14 +1075,14 @@ RESET ROLE;
 
 ALTER PUBLICATION testpub_default RENAME TO testpub_foo;
 
--- \dRp testpub_foo
+\dRp testpub_foo
 
 -- rename back to keep the rest simple
 ALTER PUBLICATION testpub_foo RENAME TO testpub_default;
 
 ALTER PUBLICATION testpub_default OWNER TO regress_publication_user2;
 
--- \dRp testpub_default
+\dRp testpub_default
 
 -- adding schemas and tables
 CREATE SCHEMA pub_test1;
@@ -1097,10 +1097,10 @@ CREATE TABLE "CURRENT_SCHEMA"."CURRENT_SCHEMA"(id int);
 -- suppress warning that depends on wal_level
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION testpub1_forschema FOR TABLES IN SCHEMA pub_test1;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 CREATE PUBLICATION testpub2_forschema FOR TABLES IN SCHEMA pub_test1, pub_test2, pub_test3;
--- \dRp+ testpub2_forschema
+\dRp+ testpub2_forschema
 
 -- check create publication on CURRENT_SCHEMA
 CREATE PUBLICATION testpub3_forschema FOR TABLES IN SCHEMA CURRENT_SCHEMA;
@@ -1111,11 +1111,11 @@ CREATE PUBLICATION testpub_fortable FOR TABLE "CURRENT_SCHEMA"."CURRENT_SCHEMA";
 
 RESET client_min_messages;
 
--- \dRp+ testpub3_forschema
--- \dRp+ testpub4_forschema
--- \dRp+ testpub5_forschema
--- \dRp+ testpub6_forschema
--- \dRp+ testpub_fortable
+\dRp+ testpub3_forschema
+\dRp+ testpub4_forschema
+\dRp+ testpub5_forschema
+\dRp+ testpub6_forschema
+\dRp+ testpub_fortable
 
 -- check create publication on CURRENT_SCHEMA where search_path is not set
 SET SEARCH_PATH='';
@@ -1140,55 +1140,55 @@ CREATE PUBLICATION testpub1_forschema1 FOR TABLES IN SCHEMA testpub_view;
 
 -- dropping the schema should reflect the change in publication
 DROP SCHEMA pub_test3;
--- \dRp+ testpub2_forschema
+\dRp+ testpub2_forschema
 
 -- renaming the schema should reflect the change in publication
 ALTER SCHEMA pub_test1 RENAME to pub_test1_renamed;
--- \dRp+ testpub2_forschema
+\dRp+ testpub2_forschema
 
 ALTER SCHEMA pub_test1_renamed RENAME to pub_test1;
--- \dRp+ testpub2_forschema
+\dRp+ testpub2_forschema
 
 -- alter publication add schema
 ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA pub_test2;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- add non existent schema
 ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA non_existent_schema;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- add a schema which is already added to the publication
 ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA pub_test1;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- alter publication drop schema
 ALTER PUBLICATION testpub1_forschema DROP TABLES IN SCHEMA pub_test2;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- drop schema that is not present in the publication
 ALTER PUBLICATION testpub1_forschema DROP TABLES IN SCHEMA pub_test2;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- drop a schema that does not exist in the system
 ALTER PUBLICATION testpub1_forschema DROP TABLES IN SCHEMA non_existent_schema;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- drop all schemas
 ALTER PUBLICATION testpub1_forschema DROP TABLES IN SCHEMA pub_test1;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- alter publication set multiple schema
 ALTER PUBLICATION testpub1_forschema SET TABLES IN SCHEMA pub_test1, pub_test2;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- alter publication set non-existent schema
 ALTER PUBLICATION testpub1_forschema SET TABLES IN SCHEMA non_existent_schema;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- alter publication set it duplicate schemas should set the schemas after
 -- removing the duplicate schemas
 ALTER PUBLICATION testpub1_forschema SET TABLES IN SCHEMA pub_test1, pub_test1;
--- \dRp+ testpub1_forschema
+\dRp+ testpub1_forschema
 
 -- Verify that it fails to add a schema with a column specification
 -- ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo (a, b);
@@ -1255,9 +1255,9 @@ UPDATE pub_testpart1.child_parent2 set a = 1;
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION testpub3_forschema;
 RESET client_min_messages;
--- \dRp+ testpub3_forschema
+\dRp+ testpub3_forschema
 ALTER PUBLICATION testpub3_forschema SET TABLES IN SCHEMA pub_test1;
--- \dRp+ testpub3_forschema
+\dRp+ testpub3_forschema
 
 -- create publication including both 'FOR TABLE' and 'FOR TABLES IN SCHEMA'
 SET client_min_messages = 'ERROR';
@@ -1265,8 +1265,8 @@ CREATE PUBLICATION testpub_forschema_fortable FOR TABLES IN SCHEMA pub_test1, TA
 CREATE PUBLICATION testpub_fortable_forschema FOR TABLE pub_test2.tbl1, TABLES IN SCHEMA pub_test1;
 RESET client_min_messages;
 
--- \dRp+ testpub_forschema_fortable
--- \dRp+ testpub_fortable_forschema
+\dRp+ testpub_forschema_fortable
+\dRp+ testpub_fortable_forschema
 
 -- fail specifying table without any of 'FOR TABLES IN SCHEMA' or
 --'FOR TABLE' or 'FOR ALL TABLES'
@@ -1347,9 +1347,9 @@ DROP SCHEMA sch2 cascade;
 -- 'stored', 'none'.
 SET client_min_messages = 'ERROR';
 CREATE PUBLICATION pub1 FOR ALL TABLES WITH (publish_generated_columns = stored);
--- \dRp+ pub1
+\dRp+ pub1
 CREATE PUBLICATION pub2 FOR ALL TABLES WITH (publish_generated_columns = none);
--- \dRp+ pub2
+\dRp+ pub2
 
 DROP PUBLICATION pub1;
 DROP PUBLICATION pub2;
@@ -1360,23 +1360,23 @@ CREATE TABLE gencols (a int, gen1 int GENERATED ALWAYS AS (a * 2) STORED);
 
 -- Generated columns in column list, when 'publish_generated_columns'='none'
 CREATE PUBLICATION pub1 FOR table gencols(a, gen1) WITH (publish_generated_columns = none);
--- \dRp+ pub1
+\dRp+ pub1
 
 -- Generated columns in column list, when 'publish_generated_columns'='stored'
 CREATE PUBLICATION pub2 FOR table gencols(a, gen1) WITH (publish_generated_columns = stored);
--- \dRp+ pub2
+\dRp+ pub2
 
 -- Generated columns in column list, then set 'publish_generated_columns'='none'
 ALTER PUBLICATION pub2 SET (publish_generated_columns = none);
--- \dRp+ pub2
+\dRp+ pub2
 
 -- Remove generated columns from column list, when 'publish_generated_columns'='none'
 ALTER PUBLICATION pub2 SET TABLE gencols(a);
--- \dRp+ pub2
+\dRp+ pub2
 
 -- Add generated columns in column list, when 'publish_generated_columns'='none'
 ALTER PUBLICATION pub2 SET TABLE gencols(a, gen1);
--- \dRp+ pub2
+\dRp+ pub2
 
 DROP PUBLICATION pub1;
 DROP PUBLICATION pub2;

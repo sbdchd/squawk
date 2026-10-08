@@ -19608,9 +19608,17 @@ fn set_data_type(p: &mut Parser<'_>) {
     }
 }
 
+const PSQL_COMMAND_FIRST: TokenSet = TokenSet::new(&[PSQL_COMMAND_TEXT, PSQL_TERMINATOR_TEXT]);
+
 pub(crate) fn entry_point(p: &mut Parser) {
     let m = p.start();
     while !p.at(EOF) {
+        if p.at_ts(PSQL_COMMAND_FIRST) {
+            let m = p.start();
+            p.bump_any();
+            m.complete(p, PSQL_COMMAND);
+            continue;
+        }
         stmt(
             p,
             &StmtRestrictions {

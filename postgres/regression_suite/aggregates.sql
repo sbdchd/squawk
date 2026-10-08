@@ -3,7 +3,7 @@
 --
 
 -- directory paths are passed to us in environment variables
--- \getenv abs_srcdir PG_ABS_SRCDIR
+\getenv abs_srcdir PG_ABS_SRCDIR
 
 -- avoid bit-exact output here because operations may not be bit-exact.
 SET extra_float_digits = 0;
@@ -14,7 +14,7 @@ CREATE TABLE aggtest (
 	b			float4
 );
 
--- \set filename :abs_srcdir '/data/agg.data'
+\set filename :abs_srcdir '/data/agg.data'
 COPY aggtest FROM 'filename';
 
 ANALYZE aggtest;
@@ -290,7 +290,7 @@ COPY bitwise_test FROM STDIN NULL 'null';
 -- 1	1	1	1	1	B0101
 -- 3	3	3	null	2	B0100
 -- 7	7	7	3	4	B1100
--- \.
+\.
 
 SELECT
   BIT_AND(i2) AS "1",
@@ -364,7 +364,7 @@ COPY bool_test FROM STDIN NULL 'null';
 -- TRUE	null	FALSE	null
 -- FALSE	TRUE	null	null
 -- null	TRUE	FALSE	null
--- \.
+\.
 
 SELECT
   BOOL_AND(b1)     AS "f",

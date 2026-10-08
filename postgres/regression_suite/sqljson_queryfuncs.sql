@@ -344,7 +344,7 @@ CREATE TABLE test_jsonb_constraints (
 		CHECK (JSON_QUERY(js::jsonb, '$.a' RETURNING char(5) OMIT QUOTES EMPTY ARRAY ON EMPTY) >  'a' COLLATE "C")
 );
 
--- \d test_jsonb_constraints
+\d test_jsonb_constraints
 
 SELECT check_clause
 FROM information_schema.check_constraints

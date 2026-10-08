@@ -1,0 +1,310 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/psql_commands.sql
+---
+SOURCE_FILE
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\set ON_ERROR_STOP on"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\connect my_database"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\conninfo"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\d my_table"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\dt+ public.*"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\pset format aligned"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\timing on"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\x auto"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\o 'output.txt'"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\o"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\unset unused_variable"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo 'hello; -- not SQL' \"a\\b\" `echo hello` :'variable'"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\g"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "2"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\gset prefix_"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "5"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\gx"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "6"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\gexec"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "7"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\gdesc"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "8"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\watch 1"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "9"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\crosstabview"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "10"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo executing"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo 'still executing'"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\g"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "11"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            POSITIONAL_PARAM "$1"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\parse stmt"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "12"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo x "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\g"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "13"
+  WHITESPACE " "
+  PSQL_COMMAND
+    PSQL_TERMINATOR_TEXT "\\r"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "14"
+    SEMICOLON "\\;"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "15"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\if :condition"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\include 'other.sql'"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\if :nested_condition"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\i 'nested.sql'"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\else"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\ir 'relative.sql'"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\endif"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\elif :other_condition"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo alternate branch"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\else"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo skipped "
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo 'second command'"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\endif"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\copy my_table from 'data.csv' with (format csv)"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\! echo C:\\tmp"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\echo done "
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\\\"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "4"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'\\not_a_command'"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          LITERAL
+            ESC_STRING "E'\\\\escaped'"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$\\also_not_a_command$$"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- \\not_a_command"
+  WHITESPACE "\n"
+  COMMENT "/* \\not_a_command */"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\unknown_command raw arguments;"
+  WHITESPACE "\n"
+  PSQL_COMMAND
+    PSQL_COMMAND_TEXT "\\q"
+  WHITESPACE "\n"

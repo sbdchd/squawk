@@ -22588,6 +22588,21 @@ impl PropertyStorage {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PsqlCommand {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PsqlCommand {
+    #[inline]
+    pub fn psql_command_text_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PSQL_COMMAND_TEXT)
+    }
+    #[inline]
+    pub fn psql_terminator_text_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PSQL_TERMINATOR_TEXT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Publication {
     pub(crate) syntax: SyntaxNode,
 }
@@ -26660,6 +26675,10 @@ pub struct SourceFile {
     pub(crate) syntax: SyntaxNode,
 }
 impl SourceFile {
+    #[inline]
+    pub fn psql_commands(&self) -> AstChildren<PsqlCommand> {
+        support::children(&self.syntax)
+    }
     #[inline]
     pub fn stmts(&self) -> AstChildren<Stmt> {
         support::children(&self.syntax)
@@ -51104,6 +51123,24 @@ impl AstNode for PropertyStorage {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PROPERTY_STORAGE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PsqlCommand {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PSQL_COMMAND
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

@@ -18,7 +18,7 @@ CREATE TABLE collate_test1 (
     b text COLLATE "C" NOT NULL
 );
 
--- \d collate_test1
+\d collate_test1
 
 CREATE TABLE collate_test_fail (
     a int COLLATE "C",
@@ -29,7 +29,7 @@ CREATE TABLE collate_test_like (
     LIKE collate_test1
 );
 
--- \d collate_test_like
+\d collate_test_like
 
 CREATE TABLE collate_test2 (
     a int,
@@ -278,7 +278,7 @@ SELECT collation for ((SELECT b FROM collate_test1 LIMIT 1));
 CREATE VIEW collate_on_int AS
 SELECT c1+1 AS c1p FROM
   (SELECT ('4' COLLATE "C")::INT AS c1) ss;
--- \d+ collate_on_int
+\d+ collate_on_int
 
 -- Check conflicting or redundant options in CREATE COLLATION
 -- LC_COLLATE

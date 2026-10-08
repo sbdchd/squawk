@@ -207,6 +207,12 @@ impl<'a> Converter<'a> {
                     self.extend_literal(token_text, kind);
                     return;
                 }
+                squawk_lexer::TokenKind::PsqlCommand { ends_query: false } => {
+                    SyntaxKind::PSQL_COMMAND_TEXT
+                }
+                squawk_lexer::TokenKind::PsqlCommand { ends_query: true } => {
+                    SyntaxKind::PSQL_TERMINATOR_TEXT
+                }
                 squawk_lexer::TokenKind::Semi => SyntaxKind::SEMICOLON,
                 squawk_lexer::TokenKind::Comma => SyntaxKind::COMMA,
                 squawk_lexer::TokenKind::Dot => SyntaxKind::DOT,

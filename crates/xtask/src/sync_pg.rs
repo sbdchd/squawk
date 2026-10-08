@@ -68,6 +68,7 @@ const AFTER_START_END_MARKERS: &[(&str, &str, &str)] = &[(
 
 const IGNORED_LINES: &[&str] = &[
     r#"SELECT JSON_TABLE('[]', '$');"#,
+    "SELECT * FROM JSON_TABLE(NULL, '$' COLUMNS ());",
     r#"SELECT rank() OVER (PARTITION BY four, ORDER BY ten) FROM tenk1;"#,
     r#"SELECT q.* FROM (SELECT * FROM test_tablesample) as q TABLESAMPLE BERNOULLI (5);"#,
     r#"CREATE SEQUENCE tableam_seq_heap2 USING heap2;"#,
@@ -186,8 +187,8 @@ const IGNORED_LINES: &[&str] = &[
     r#"SELECT x' 0';"#,
     r#"SELECT b' 0';"#,
     r#"SELECT b'0 ';"#,
-    // the psql variable this reads is set by a \set we comment out, so the body
-    // would otherwise parse as the literal string `dobody`
+    // We don't expand psql variables, so the body would otherwise parse as
+    // the literal string `dobody`.
     "DO LANGUAGE plpgsql :'dobody';",
     "    Johnny Yuma;",
     "  return query select 10 into no_such_table;",
@@ -202,21 +203,6 @@ const VARIABLE_REPLACEMENTS: &[(&str, &str)] = &[
     (":clt1", "clt1"),
     (":clt", "clt"),
     (r#" :""#, r#" ""#),
-];
-
-const GSET_REPLACEMENTS: &[(&str, &str)] = &[
-    (
-        "\\gset my_io_sum_shared_before_",
-        "/* \\gset my_io_sum_shared_before_ */;",
-    ),
-    (
-        "\\gset io_sum_shared_before_",
-        "/* \\gset io_sum_shared_before_ */;",
-    ),
-    (
-        "\\gset io_sum_wal_normal_before_",
-        "/* \\gset io_sum_wal_normal_before_ */;",
-    ),
 ];
 
 pub(crate) fn sync_pg() -> Result<()> {
@@ -406,6 +392,7 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(
     let mut in_bogus_cases = false;
     let mut in_copy_select_input = false;
     let mut looking_for_end: Option<&str> = None;
+    let mut output = String::new();
 
     for line in source.lines() {
         let mut line = line?;
@@ -443,15 +430,13 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(
         }
 
         let line_lower = line.to_ascii_lowercase();
-        if (line_lower.starts_with("copy ") || line_lower.starts_with("\\copy"))
+        if (line_lower.starts_with("copy ") || line_lower.trim_start().starts_with("\\copy"))
             && (line_lower.contains("from stdin") || line_lower.contains("from stdout"))
         {
             in_copy_stdin = true;
-            if line.starts_with("\\copy") {
-                should_comment = true;
-            }
         } else if in_copy_stdin {
-            if line == "\\."
+            let is_terminator = line.trim() == "\\.";
+            if is_terminator
                 || line.starts_with("--")
                 || ["copy", "begin", "rollback", "select"]
                     .iter()
@@ -459,13 +444,8 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(
             {
                 in_copy_stdin = false;
             }
-            should_comment = true;
-        } else if (line.trim_start().starts_with('\\')
-            && !line.contains("\\gset")
-            && !line.contains("\\gx"))
-            || line.starts_with("'show_data'")
-            || line.starts_with(':')
-        {
+            should_comment = !is_terminator;
+        } else if line.starts_with("'show_data'") || line.starts_with(':') {
             should_comment = true;
         }
 
@@ -477,7 +457,8 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(
             should_comment = true;
         }
 
-        if line.contains("\\;") || line.starts_with("**") {
+        if (line.contains("\\;") && !line.trim_start().starts_with('\\')) || line.starts_with("**")
+        {
             should_comment = true;
         }
 
@@ -485,40 +466,50 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(
             line = format!("-- {line}");
         }
 
-        for &(from, to) in GSET_REPLACEMENTS {
-            line = line.replace(from, to);
-        }
-
-        line = line.replace(
-            "FROM generate_series(1, 1100) g(i)",
-            "FROM generate_series(1, 1100) g(i);",
-        );
-
-        for &(from, to) in VARIABLE_REPLACEMENTS {
-            line = line.replace(from, to);
-        }
-
-        for pattern in ["\\gx", "\\gset"] {
-            if let Some(start) = line.find(pattern) {
-                let end = line[start..]
-                    .find('\n')
-                    .map(|i| start + i)
-                    .unwrap_or(line.len());
-                let gset_cmd = line[start..end].trim_end();
-                line = format!("{}/* {} */;{}", &line[..start], gset_cmd, &line[end..]);
-            }
-        }
-
-        if line.trim_start().starts_with("--") {
-            writeln!(dest, "{line}")?;
-            continue;
-        }
-
-        let processed = replace_template_vars(&line, &template_vars_regex)?;
-        writeln!(dest, "{processed}")?;
+        output.push_str(&line);
+        output.push('\n');
     }
 
+    let processed = preprocess_sql_variables(&output, &template_vars_regex)?;
+    dest.write_all(processed.as_bytes())?;
+
     Ok(())
+}
+
+fn preprocess_sql_variables(sql: &str, template_vars_regex: &Regex) -> Result<String> {
+    let replace_sql = |sql: &str| {
+        let mut sql = sql.to_owned();
+        for &(from, to) in VARIABLE_REPLACEMENTS {
+            sql = sql.replace(from, to);
+        }
+        replace_template_vars(&sql, template_vars_regex)
+    };
+
+    let mut result = String::new();
+    let mut offset = 0;
+    let mut sql_start = 0;
+    for token in squawk_lexer::tokenize(sql) {
+        let end = offset + token.len as usize;
+        let text = &sql[offset..end];
+        let verbatim = match token.kind {
+            squawk_lexer::TokenKind::PsqlCommand { .. }
+            | squawk_lexer::TokenKind::LineComment
+            | squawk_lexer::TokenKind::BlockComment { .. }
+            | squawk_lexer::TokenKind::Literal {
+                kind: squawk_lexer::LiteralKind::DollarQuotedString { .. },
+            } => true,
+            squawk_lexer::TokenKind::Whitespace => text.contains('\n'),
+            _ => false,
+        };
+        if verbatim {
+            result.push_str(&replace_sql(&sql[sql_start..offset])?);
+            result.push_str(text);
+            sql_start = end;
+        }
+        offset = end;
+    }
+    result.push_str(&replace_sql(&sql[sql_start..])?);
+    Ok(result)
 }
 
 fn replace_template_vars(line: &str, template_vars_regex: &Regex) -> Result<String> {
@@ -686,6 +677,15 @@ mod tests {
             (
                 "ALTER TABLE :clt ADD COLUMN extra_info text;",
                 "ALTER TABLE clt ADD COLUMN extra_info text;",
+            ),
+            (
+                "select $$\nx = :foo\n$$;\nselect :bar;",
+                "select $$\nx = :foo\n$$;\nselect 'bar';",
+            ),
+            ("select 'a\n\\echo :foo';", "select 'a\n\\echo :foo';"),
+            (
+                "copy t from stdin;\n1\n \\.\nselect 1;",
+                "copy t from stdin;\n-- 1\n \\.\nselect 1;",
             ),
         ];
 

@@ -304,7 +304,7 @@ SELECT * FROM atest2 WHERE ( col1 IN ( SELECT b FROM atest1 ) );
 SET SESSION AUTHORIZATION regress_priv_user4;
 COPY atest2 FROM stdin; -- ok
 -- bar	true
--- \.
+\.
 SELECT * FROM atest1; -- ok
 
 
@@ -545,7 +545,7 @@ INSERT INTO atest5 (two) VALUES (3); -- ok
 COPY atest5 FROM stdin; -- fail
 COPY atest5 (two) FROM stdin; -- ok
 -- 1
--- \.
+\.
 INSERT INTO atest5 (three) VALUES (4); -- fail
 INSERT INTO atest5 VALUES (5,5,5); -- fail
 UPDATE atest5 SET three = 10; -- ok
@@ -896,7 +896,7 @@ END;
 -- privileges on functions, languages
 
 -- switch to superuser
--- \c -
+\c -
 
 REVOKE ALL PRIVILEGES ON LANGUAGE sql FROM PUBLIC;
 GRANT USAGE ON LANGUAGE sql TO regress_priv_user1; -- ok
@@ -949,7 +949,7 @@ DROP FUNCTION priv_testfunc1(int); -- fail
 DROP AGGREGATE priv_testagg1(int); -- fail
 DROP PROCEDURE priv_testproc1(int); -- fail
 
--- \c -
+\c -
 
 DROP FUNCTION priv_testfunc1(int); -- ok
 -- restore to sanity
@@ -967,7 +967,7 @@ ROLLBACK;
 -- privileges on types
 
 -- switch to superuser
--- \c -
+\c -
 
 CREATE TYPE priv_testtype1 AS (a int, b text);
 REVOKE USAGE ON TYPE priv_testtype1 FROM PUBLIC;
@@ -1052,7 +1052,7 @@ CREATE TABLE test11b AS (SELECT 1::priv_testdomain1 AS a);
 
 REVOKE ALL ON TYPE priv_testtype1 FROM PUBLIC;
 
--- \c -
+\c -
 DROP AGGREGATE priv_testagg1b(priv_testdomain1);
 DROP DOMAIN priv_testdomain2b;
 DROP OPERATOR !! (NONE, priv_testdomain1);
@@ -1089,7 +1089,7 @@ select has_table_privilege(-999999,'pg_authid','update');
 select has_table_privilege(1,'select');
 
 -- superuser
--- \c -
+\c -
 
 select has_table_privilege(current_user,'pg_authid','select');
 select has_table_privilege(current_user,'pg_authid','insert');
@@ -1224,7 +1224,7 @@ SELECT has_table_privilege('regress_priv_user1', 'atest4', 'SELECT WITH GRANT OP
 
 
 -- security-restricted operations
--- \c -
+\c -
 CREATE ROLE regress_sro_user;
 
 -- Check that index expressions and predicates are run as the table's owner
@@ -1282,7 +1282,7 @@ CREATE FUNCTION mv_action() RETURNS bool LANGUAGE sql AS
 -- REFRESH of this MV will queue a GRANT at end of transaction
 CREATE MATERIALIZED VIEW sro_mv AS SELECT mv_action() WITH NO DATA;
 REFRESH MATERIALIZED VIEW sro_mv;
--- \c -
+\c -
 REFRESH MATERIALIZED VIEW sro_mv;
 
 SET SESSION AUTHORIZATION regress_sro_user;
@@ -1296,7 +1296,7 @@ CREATE CONSTRAINT TRIGGER t AFTER INSERT ON sro_trojan_table
 CREATE OR REPLACE FUNCTION mv_action() RETURNS bool LANGUAGE sql AS
 	'INSERT INTO public.sro_trojan_table DEFAULT VALUES; SELECT true';
 REFRESH MATERIALIZED VIEW sro_mv;
--- \c -
+\c -
 REFRESH MATERIALIZED VIEW sro_mv;
 BEGIN; SET CONSTRAINTS ALL IMMEDIATE; REFRESH MATERIALIZED VIEW sro_mv; COMMIT;
 
@@ -1313,7 +1313,7 @@ EXCEPTION WHEN OTHERS THEN
 END$$;
 CREATE MATERIALIZED VIEW sro_index_mv AS SELECT 1 AS c;
 CREATE UNIQUE INDEX ON sro_index_mv (c) WHERE unwanted_grant_nofail(1) > 0;
--- \c -
+\c -
 REFRESH MATERIALIZED VIEW CONCURRENTLY sro_index_mv;
 REFRESH MATERIALIZED VIEW sro_index_mv;
 
@@ -1345,7 +1345,7 @@ REVOKE regress_priv_group2 FROM regress_priv_user5;
 
 
 -- has_sequence_privilege tests
--- \c -
+\c -
 
 CREATE SEQUENCE x_seq;
 
@@ -1360,7 +1360,7 @@ SET SESSION AUTHORIZATION regress_priv_user2;
 SELECT has_sequence_privilege('x_seq', 'USAGE');
 
 -- largeobject privilege tests
--- \c -
+\c -
 SET SESSION AUTHORIZATION regress_priv_user1;
 
 SELECT lo_create(1001);
@@ -1379,7 +1379,7 @@ GRANT SELECT, INSERT ON LARGE OBJECT 1001 TO PUBLIC;	-- to be failed
 GRANT SELECT, UPDATE ON LARGE OBJECT 1001 TO nosuchuser;	-- to be failed
 GRANT SELECT, UPDATE ON LARGE OBJECT  999 TO PUBLIC;	-- to be failed
 
--- \c -
+\c -
 SET SESSION AUTHORIZATION regress_priv_user2;
 
 SELECT lo_create(2001);
@@ -1406,7 +1406,7 @@ GRANT ALL ON LARGE OBJECT 2001 TO regress_priv_user3;
 SELECT lo_unlink(1001);		-- to be denied
 SELECT lo_unlink(2002);
 
--- \c -
+\c -
 -- confirm ACL setting
 SELECT oid, pg_get_userbyid(lomowner) ownername, lomacl FROM pg_largeobject_metadata WHERE oid >= 1000 AND oid < 3000 ORDER BY oid;
 
@@ -1419,7 +1419,7 @@ SELECT loread(lo_open(1005, x'40000'::int), 32);
 SELECT lo_truncate(lo_open(1005, x'20000'::int), 10);	-- to be denied
 SELECT lo_truncate(lo_open(2001, x'20000'::int), 10);
 
--- \c -
+\c -
 -- confirm role with privileges of pg_read_all_data can read large objects
 SET SESSION AUTHORIZATION regress_priv_user6;
 
@@ -1430,7 +1430,7 @@ SELECT lo_put(1002, 1, 'abcd');							-- to be denied
 SELECT lo_truncate(lo_open(1002, x'20000'::int), 0);	-- to be denied
 SELECT lo_unlink(1002);									-- to be denied
 
--- \c -
+\c -
 -- confirm role with privileges of pg_write_all_data can write large objects
 GRANT SELECT ON LARGE OBJECT 1002 TO regress_priv_user7;
 SET SESSION AUTHORIZATION regress_priv_user7;
@@ -1443,7 +1443,7 @@ SELECT lo_unlink(1002);									-- to be denied
 -- has_largeobject_privilege function
 
 -- superuser
--- \c -
+\c -
 SELECT has_largeobject_privilege(1001, 'SELECT');
 SELECT has_largeobject_privilege(1002, 'SELECT');
 SELECT has_largeobject_privilege(1003, 'SELECT');
@@ -1477,7 +1477,7 @@ SELECT has_largeobject_privilege('regress_priv_user3', 1005, 'UPDATE');	-- false
 SELECT has_largeobject_privilege('regress_priv_user3', 2001, 'UPDATE');
 
 -- compatibility mode in largeobject permission
--- \c -
+\c -
 SET lo_compat_privileges = false;	-- default setting
 SET SESSION AUTHORIZATION regress_priv_user4;
 
@@ -1493,7 +1493,7 @@ SELECT lo_export(1001, '/dev/null');			-- to be denied
 SELECT lo_import('/dev/null');				-- to be denied
 SELECT lo_import('/dev/null', 2003);			-- to be denied
 
--- \c -
+\c -
 SET lo_compat_privileges = true;	-- compatibility mode
 SET SESSION AUTHORIZATION regress_priv_user4;
 
@@ -1507,7 +1507,7 @@ SELECT lo_unlink(1002);
 SELECT lo_export(1001, '/dev/null');			-- to be denied
 
 -- don't allow unpriv users to access pg_largeobject contents
--- \c -
+\c -
 SELECT * FROM pg_largeobject LIMIT 0;
 
 SET SESSION AUTHORIZATION regress_priv_user1;
@@ -1560,7 +1560,7 @@ INSERT INTO datdba_only DEFAULT VALUES;
 ROLLBACK;
 
 -- test default ACLs
--- \c -
+\c -
 
 CREATE SCHEMA testns;
 GRANT ALL ON SCHEMA testns TO regress_priv_user1;
@@ -1692,7 +1692,7 @@ ROLLBACK;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON LARGE OBJECTS TO public; -- error
 
--- \c -
+\c -
 
 -- Test for DROP OWNED BY with shared dependencies.  This is done in a
 -- separate, rollbacked, transaction to avoid any trouble with other
@@ -1780,7 +1780,7 @@ SELECT d.*     -- check that entries went away
 
 
 -- Grant on all objects of given type in a schema
--- \c -
+\c -
 
 CREATE SCHEMA testns;
 CREATE TABLE testns.t1 (f1 int);
@@ -1826,7 +1826,7 @@ DROP SCHEMA testns CASCADE;
 
 
 -- Change owner of the schema & and rename of new schema owner
--- \c -
+\c -
 
 CREATE ROLE regress_schemauser1 superuser login;
 CREATE ROLE regress_schemauser2 superuser login;
@@ -1844,14 +1844,14 @@ set session role regress_schemauser_renamed;
 DROP SCHEMA testns CASCADE;
 
 -- clean up
--- \c -
+\c -
 
 DROP ROLE regress_schemauser1;
 DROP ROLE regress_schemauser_renamed;
 
 
 -- test that dependent privileges are revoked (or not) properly
--- \c -
+\c -
 
 set session role regress_priv_user1;
 create table dep_priv_test (a int);
@@ -1863,13 +1863,13 @@ set session role regress_priv_user3;
 grant select on dep_priv_test to regress_priv_user4 with grant option;
 set session role regress_priv_user4;
 grant select on dep_priv_test to regress_priv_user5;
--- \dp dep_priv_test
+\dp dep_priv_test
 set session role regress_priv_user2;
 revoke select on dep_priv_test from regress_priv_user4 cascade;
--- \dp dep_priv_test
+\dp dep_priv_test
 set session role regress_priv_user3;
 revoke select on dep_priv_test from regress_priv_user4 cascade;
--- \dp dep_priv_test
+\dp dep_priv_test
 set session role regress_priv_user1;
 drop table dep_priv_test;
 
@@ -1930,7 +1930,7 @@ select * from atpgv2; -- ok
 
 -- clean up
 
--- \c
+\c
 
 drop sequence x_seq;
 
@@ -2003,7 +2003,7 @@ ROLLBACK;
 BEGIN;
 LOCK TABLE lock_table IN ACCESS EXCLUSIVE MODE; -- should fail
 ROLLBACK;
--- \c
+\c
 REVOKE SELECT ON lock_table FROM regress_locktable_user;
 
 -- LOCK TABLE and INSERT permission
@@ -2018,7 +2018,7 @@ COMMIT;
 BEGIN;
 LOCK TABLE lock_table IN ACCESS EXCLUSIVE MODE; -- should fail
 ROLLBACK;
--- \c
+\c
 REVOKE INSERT ON lock_table FROM regress_locktable_user;
 
 -- LOCK TABLE and UPDATE permission
@@ -2033,7 +2033,7 @@ COMMIT;
 BEGIN;
 LOCK TABLE lock_table IN ACCESS EXCLUSIVE MODE; -- should pass
 COMMIT;
--- \c
+\c
 REVOKE UPDATE ON lock_table FROM regress_locktable_user;
 
 -- LOCK TABLE and DELETE permission
@@ -2048,7 +2048,7 @@ COMMIT;
 BEGIN;
 LOCK TABLE lock_table IN ACCESS EXCLUSIVE MODE; -- should pass
 COMMIT;
--- \c
+\c
 REVOKE DELETE ON lock_table FROM regress_locktable_user;
 
 -- LOCK TABLE and TRUNCATE permission
@@ -2063,7 +2063,7 @@ COMMIT;
 BEGIN;
 LOCK TABLE lock_table IN ACCESS EXCLUSIVE MODE; -- should pass
 COMMIT;
--- \c
+\c
 REVOKE TRUNCATE ON lock_table FROM regress_locktable_user;
 
 -- LOCK TABLE and MAINTAIN permission
@@ -2078,7 +2078,7 @@ COMMIT;
 BEGIN;
 LOCK TABLE lock_table IN ACCESS EXCLUSIVE MODE; -- should pass
 COMMIT;
--- \c
+\c
 REVOKE MAINTAIN ON lock_table FROM regress_locktable_user;
 
 -- clean up
@@ -2090,7 +2090,7 @@ DROP USER regress_locktable_user;
 -- pg_backend_memory_contexts.
 
 -- switch to superuser
--- \c -
+\c -
 
 CREATE ROLE regress_readallstats;
 

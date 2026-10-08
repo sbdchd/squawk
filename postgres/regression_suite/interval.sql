@@ -133,7 +133,7 @@ COPY INTERVAL_MULDIV_TBL FROM STDIN;
 -- 4 mon
 -- 14 mon
 -- 999 mon 999 days
--- \.
+\.
 
 SELECT span * 0.3 AS product
 FROM INTERVAL_MULDIV_TBL;
@@ -252,7 +252,7 @@ SELECT interval '1 -2:03:04' minute to second;
 SELECT interval '123 11' day to hour; -- ok
 SELECT interval '123 11' day; -- not ok
 SELECT interval '123 11'; -- not ok, too ambiguous
-SELECT interval '123 2:03 -2:04'; -- not ok, redundant hh'mm' fields
+SELECT interval '123 2:03 -2:04'; -- not ok, redundant hh:mm fields
 
 -- test syntaxes for restricted precision
 SELECT interval(0) '1 day 01:23:45.6789';

@@ -225,6 +225,9 @@ fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> boo
         if before_kind == TokenKind::LineComment {
             return line_comments_equivalent(before_text, after_text);
         }
+        if let TokenKind::PsqlCommand { .. } = before_kind {
+            return before_text.trim_end() == after_text.trim_end();
+        }
         if matches!(before_kind, TokenKind::BlockComment { .. }) {
             let normalize = |text: &str| {
                 let align_stars = text
