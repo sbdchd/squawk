@@ -23010,3 +23010,24 @@ create operator pg_catalog.~~* (
   function = pg_catalog.texticlike
 );
 
+-- standard C collation
+create collation pg_catalog."C" (provider = libc, locale = 'C');
+
+-- standard POSIX collation
+create collation pg_catalog."POSIX" (provider = libc, locale = 'POSIX');
+
+-- database's default collation
+create collation pg_catalog."default" (provider = default);
+
+-- sorts by Unicode code point; Unicode and POSIX character semantics
+create collation pg_catalog.pg_c_utf8 (provider = builtin, locale = 'C.UTF-8');
+
+-- sorts by Unicode code point; Unicode character semantics
+create collation pg_catalog.pg_unicode_fast (provider = builtin, locale = 'PG_UNICODE_FAST');
+
+-- sorts by Unicode code point, C character semantics
+create collation pg_catalog.ucs_basic (provider = builtin, locale = 'C');
+
+-- sorts using the Unicode Collation Algorithm with default settings
+create collation pg_catalog.unicode (provider = icu, locale = 'und');
+
