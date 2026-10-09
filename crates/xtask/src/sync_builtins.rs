@@ -304,6 +304,40 @@ order by n.nspname, o.oprname, format_type(o.oprleft, null), format_type(o.oprri
 }
 
 #[derive(Deserialize)]
+struct CollationQuery {
+    schema: String,
+    name: String,
+    provider: String,
+    locale: String,
+    is_deterministic: i32,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for CollationQuery {
+    const QUERY: &'static str = r"
+select
+  n.nspname as schema,
+  quote_ident(c.collname) as name,
+  c.collprovider as provider,
+  coalesce(c.colllocale, c.collcollate, '') as locale,
+  case when c.collisdeterministic then 1 else 0 end as is_deterministic,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_collation c
+  join pg_namespace n on n.oid = c.collnamespace
+  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_collation'::regclass
+  left join pg_depend dep on dep.classid = 'pg_collation'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+  and (c.oid < 10000 or ext.extname is not null)
+order by n.nspname, c.collname, c.oid;
+";
+}
+
+#[derive(Deserialize)]
 struct VersionQuery {
     server_version: String,
 }
@@ -626,6 +660,48 @@ impl WriteSql for OperatorDef {
     }
 }
 
+struct CollationDef {
+    schema: String,
+    name: String,
+    provider: String,
+    locale: String,
+    deterministic: bool,
+    description: String,
+}
+
+impl WriteSql for CollationDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        let mut options = vec![];
+        match self.provider.as_str() {
+            "d" => options.push("provider = default".to_string()),
+            "c" => options.push("provider = libc".to_string()),
+            "i" => options.push("provider = icu".to_string()),
+            "b" => options.push("provider = builtin".to_string()),
+            provider => {
+                return Err(io::Error::other(format!(
+                    "unexpected collation provider: {provider}"
+                )));
+            }
+        }
+        if !self.locale.is_empty() {
+            options.push(format!("locale = '{}'", self.locale.replace('\'', "''")));
+        }
+        if !self.deterministic {
+            options.push("deterministic = false".to_string());
+        }
+        writeln!(
+            f,
+            "create collation {}.{} ({});",
+            self.schema,
+            self.name,
+            options.join(", ")
+        )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
 // Module / File / Extension
 //
 // General either the builtins or an extension's defs
@@ -639,6 +715,7 @@ struct Module {
     views: Vec<ViewDef>,
     functions: Vec<FunctionDef>,
     operators: Vec<OperatorDef>,
+    collations: Vec<CollationDef>,
 }
 
 impl Module {
@@ -673,6 +750,10 @@ impl Module {
 
         for operator in &self.operators {
             operator.write_sql(f)?;
+        }
+
+        for collation in &self.collations {
+            collation.write_sql(f)?;
         }
 
         Ok(())
@@ -845,6 +926,25 @@ fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     Ok(())
 }
 
+fn query_collations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in CollationQuery::run()? {
+        modules
+            .entry(row.extension_name)
+            .or_default()
+            .collations
+            .push(CollationDef {
+                deterministic: row.is_deterministic == 1,
+                description: row.description,
+                locale: row.locale,
+                name: row.name,
+                provider: row.provider,
+                schema: row.schema,
+            });
+    }
+
+    Ok(())
+}
+
 pub(crate) fn sync_builtins() -> Result<()> {
     CreateExtensionsQuery::execute()?;
 
@@ -864,6 +964,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
     query_relations(&mut modules)?;
     query_functions(&mut modules)?;
     query_operators(&mut modules)?;
+    query_collations(&mut modules)?;
 
     let extensions_root = project_root().join("crates/squawk_ide/src/generated/extensions");
     let builtins_path = project_root().join("crates/squawk_ide/src/generated/builtins.sql");
