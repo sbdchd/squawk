@@ -449,7 +449,7 @@ unsafe fn analyze_source_file_neon(
 
         // If the bit mask is all zero, we only have ASCII chars here:
         if multibyte_mask == 0 && cr_mask == 0 {
-            assert!(intra_chunk_offset == 0);
+            assert_eq!(intra_chunk_offset, 0);
 
             // Check for newlines in the chunk
             let newlines_test = vceqq_s8(chunk, newline);
