@@ -338,6 +338,25 @@ order by n.nspname, c.collname, c.oid;
 }
 
 #[derive(Deserialize)]
+struct TablespaceQuery {
+    name: String,
+    location: String,
+    description: String,
+}
+
+impl Query for TablespaceQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(t.spcname) as name,
+  quote_literal(pg_tablespace_location(t.oid)) as location,
+  coalesce(d.description, '') as description
+from pg_tablespace t
+  left join pg_shdescription d on d.objoid = t.oid and d.classoid = 'pg_tablespace'::regclass
+order by t.spcname, t.oid;
+";
+}
+
+#[derive(Deserialize)]
 struct VersionQuery {
     server_version: String,
 }
@@ -408,6 +427,25 @@ impl WriteSql for SchemaDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
         writeln!(f, "create schema {};", self.schema)?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct TablespaceDef {
+    name: String,
+    location: String,
+    description: String,
+}
+
+impl WriteSql for TablespaceDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        writeln!(
+            f,
+            "create tablespace {} location {};",
+            self.name, self.location
+        )?;
         writeln!(f)?;
         Ok(())
     }
@@ -707,6 +745,7 @@ impl WriteSql for CollationDef {
 // General either the builtins or an extension's defs
 #[derive(Default)]
 struct Module {
+    tablespaces: Vec<TablespaceDef>,
     schemas: Vec<SchemaDef>,
     types: Vec<TypeDef>,
     range_types: Vec<RangeTypeDef>,
@@ -720,6 +759,10 @@ struct Module {
 
 impl Module {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        for tablespace in &self.tablespaces {
+            tablespace.write_sql(f)?;
+        }
+
         for schema in &self.schemas {
             schema.write_sql(f)?;
         }
@@ -784,6 +827,18 @@ fn write_module(
     module.write_sql(&mut writer)?;
     writer.flush()?;
 
+    Ok(())
+}
+
+fn query_tablespaces(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    let module = modules.entry("builtins".to_string()).or_default();
+    for row in TablespaceQuery::run()? {
+        module.tablespaces.push(TablespaceDef {
+            name: row.name,
+            location: row.location,
+            description: row.description,
+        });
+    }
     Ok(())
 }
 
@@ -958,6 +1013,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
 
     let mut modules: BTreeMap<String, Module> = BTreeMap::new();
 
+    query_tablespaces(&mut modules)?;
     query_schemas(&mut modules)?;
     query_types(&mut modules)?;
     query_composite_types(&mut modules)?;

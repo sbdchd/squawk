@@ -5,6 +5,10 @@
 
 create schema pg_temp;
 
+create tablespace pg_default location '';
+
+create tablespace pg_global location '';
+
 create schema information_schema;
 
 -- system catalog schema
