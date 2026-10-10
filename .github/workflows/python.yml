@@ -37,15 +37,11 @@ jobs:
             sccache: "false"
             before-script: yum install clang llvm llvm-devel perl-IPC-Cmd -y && python3 -m ensurepip
             manylinux: manylinux_2_28
-          - runner: ubuntu-latest
+          - runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             sccache: "true"
-            maturin-options: --zig
-            # Use zig 0.11.0 because this version contains generic-glibc < 2.38
-            # after glibc >= 2.38 strchrnul available in glibc by default
-            # and zig cc doesn't provide mechanism to disable it in older glibc targets
-            before-script: |
-              python3 -m pip install ziglang==0.11.0
+            before-script: yum install clang llvm llvm-devel perl-IPC-Cmd -y && python3 -m ensurepip
+            manylinux: manylinux_2_28
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -56,7 +52,7 @@ jobs:
           target: ${{ matrix.platform.target }}
           maturin-version: v1.7.1
           working-directory: crates/squawk
-          args: --release --out dist ${{ matrix.platform.maturin-options }}
+          args: --release --out dist
           manylinux: ${{ matrix.platform.manylinux }}
           sccache: ${{ matrix.platform.sccache }}
           before-script-linux: ${{ matrix.platform.before-script }}
