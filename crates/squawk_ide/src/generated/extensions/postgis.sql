@@ -2779,3 +2779,55 @@ create operator public.~~= (
   function = public.geometry_same_nd
 );
 
+create cast (box2d as box3d) with function public.box3d(box2d) as implicit;
+
+create cast (box2d as geometry) with function public.geometry(box2d) as implicit;
+
+create cast (box3d as box) with function public.box(box3d) as implicit;
+
+create cast (box3d as box2d) with function public.box2d(box3d) as implicit;
+
+create cast (box3d as geometry) with function public.geometry(box3d) as implicit;
+
+create cast (bytea as geography) with function public.geography(bytea) as implicit;
+
+create cast (bytea as geometry) with function public.geometry(bytea) as implicit;
+
+create cast (geography as bytea) with function public.bytea(geography) as implicit;
+
+create cast (geography as geography) with function public.geography(geography, integer, boolean) as implicit;
+
+create cast (geography as geometry) with function public.geometry(geography);
+
+create cast (geometry as box) with function public.box(geometry) as assignment;
+
+create cast (geometry as box2d) with function public.box2d(geometry) as implicit;
+
+create cast (geometry as box3d) with function public.box3d(geometry) as implicit;
+
+create cast (geometry as bytea) with function public.bytea(geometry) as implicit;
+
+create cast (geometry as geography) with function public.geography(geometry) as implicit;
+
+create cast (geometry as geometry) with function public.geometry(geometry, integer, boolean) as implicit;
+
+create cast (geometry as json) with function public."json"(geometry);
+
+create cast (geometry as jsonb) with function public.jsonb(geometry);
+
+create cast (geometry as path) with function public.path(geometry);
+
+create cast (geometry as point) with function public.point(geometry);
+
+create cast (geometry as polygon) with function public.polygon(geometry);
+
+create cast (geometry as text) with function public.text(geometry) as implicit;
+
+create cast (path as geometry) with function public.geometry(path);
+
+create cast (point as geometry) with function public.geometry(point);
+
+create cast (polygon as geometry) with function public.geometry(polygon);
+
+create cast (text as geometry) with function public.geometry(text) as implicit;
+

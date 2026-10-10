@@ -23014,6 +23014,476 @@ create operator pg_catalog.~~* (
   function = pg_catalog.texticlike
 );
 
+create cast ("char" as character) with function pg_catalog.bpchar("char") as assignment;
+
+create cast ("char" as character varying) with function pg_catalog.text("char") as assignment;
+
+create cast ("char" as integer) with function pg_catalog.int4("char");
+
+create cast ("char" as text) with function pg_catalog.text("char") as implicit;
+
+create cast (bigint as bit) with function pg_catalog."bit"(bigint, integer);
+
+create cast (bigint as bytea) with function pg_catalog.bytea(bigint);
+
+create cast (bigint as double precision) with function pg_catalog.float8(bigint) as implicit;
+
+create cast (bigint as integer) with function pg_catalog.int4(bigint) as assignment;
+
+create cast (bigint as money) with function pg_catalog.money(bigint) as assignment;
+
+create cast (bigint as numeric) with function pg_catalog."numeric"(bigint) as implicit;
+
+create cast (bigint as oid) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as real) with function pg_catalog.float4(bigint) as implicit;
+
+create cast (bigint as regclass) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regcollation) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regconfig) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regdictionary) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regnamespace) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regoper) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regoperator) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regproc) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regprocedure) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regrole) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as regtype) with function pg_catalog.oid(bigint) as implicit;
+
+create cast (bigint as smallint) with function pg_catalog.int2(bigint) as assignment;
+
+create cast (bit as bigint) with function pg_catalog.int8(bit);
+
+create cast (bit as bit) with function pg_catalog."bit"(bit, integer, boolean) as implicit;
+
+create cast (bit as bit varying) without function as implicit;
+
+create cast (bit as integer) with function pg_catalog.int4(bit);
+
+create cast (bit varying as bit) without function as implicit;
+
+create cast (bit varying as bit varying) with function pg_catalog.varbit(bit varying, integer, boolean) as implicit;
+
+create cast (boolean as character) with function pg_catalog.text(boolean) as assignment;
+
+create cast (boolean as character varying) with function pg_catalog.text(boolean) as assignment;
+
+create cast (boolean as integer) with function pg_catalog.int4(boolean);
+
+create cast (boolean as text) with function pg_catalog.text(boolean) as assignment;
+
+create cast (box as circle) with function pg_catalog.circle(box);
+
+create cast (box as lseg) with function pg_catalog.lseg(box);
+
+create cast (box as point) with function pg_catalog.point(box);
+
+create cast (box as polygon) with function pg_catalog.polygon(box) as assignment;
+
+create cast (bytea as bigint) with function pg_catalog.int8(bytea);
+
+create cast (bytea as integer) with function pg_catalog.int4(bytea);
+
+create cast (bytea as smallint) with function pg_catalog.int2(bytea);
+
+create cast (character as "char") with function pg_catalog."char"(text) as assignment;
+
+create cast (character as character) with function pg_catalog.bpchar(character, integer, boolean) as implicit;
+
+create cast (character as character varying) with function pg_catalog.text(character) as implicit;
+
+create cast (character as name) with function pg_catalog.name(character) as implicit;
+
+create cast (character as text) with function pg_catalog.text(character) as implicit;
+
+create cast (character as xml) with function pg_catalog.xml(text);
+
+create cast (character varying as "char") with function pg_catalog."char"(text) as assignment;
+
+create cast (character varying as character) without function as implicit;
+
+create cast (character varying as character varying) with function pg_catalog."varchar"(character varying, integer, boolean) as implicit;
+
+create cast (character varying as name) with function pg_catalog.name(character varying) as implicit;
+
+create cast (character varying as regclass) with function pg_catalog.regclass(text) as implicit;
+
+create cast (character varying as text) without function as implicit;
+
+create cast (character varying as xml) with function pg_catalog.xml(text);
+
+create cast (cidr as character) with function pg_catalog.text(inet) as assignment;
+
+create cast (cidr as character varying) with function pg_catalog.text(inet) as assignment;
+
+create cast (cidr as inet) without function as implicit;
+
+create cast (cidr as text) with function pg_catalog.text(inet) as assignment;
+
+create cast (circle as box) with function pg_catalog.box(circle);
+
+create cast (circle as point) with function pg_catalog.point(circle);
+
+create cast (circle as polygon) with function pg_catalog.polygon(circle);
+
+create cast (date as timestamp with time zone) with function pg_catalog.timestamptz(date) as implicit;
+
+create cast (date as timestamp without time zone) with function pg_catalog."timestamp"(date) as implicit;
+
+create cast (daterange as datemultirange) with function pg_catalog.datemultirange(daterange);
+
+create cast (double precision as bigint) with function pg_catalog.int8(double precision) as assignment;
+
+create cast (double precision as integer) with function pg_catalog.int4(double precision) as assignment;
+
+create cast (double precision as numeric) with function pg_catalog."numeric"(double precision) as assignment;
+
+create cast (double precision as real) with function pg_catalog.float4(double precision) as assignment;
+
+create cast (double precision as smallint) with function pg_catalog.int2(double precision) as assignment;
+
+create cast (inet as character) with function pg_catalog.text(inet) as assignment;
+
+create cast (inet as character varying) with function pg_catalog.text(inet) as assignment;
+
+create cast (inet as cidr) with function pg_catalog.cidr(inet) as assignment;
+
+create cast (inet as text) with function pg_catalog.text(inet) as assignment;
+
+create cast (int4range as int4multirange) with function pg_catalog.int4multirange(int4range);
+
+create cast (int8range as int8multirange) with function pg_catalog.int8multirange(int8range);
+
+create cast (integer as "char") with function pg_catalog."char"(integer);
+
+create cast (integer as bigint) with function pg_catalog.int8(integer) as implicit;
+
+create cast (integer as bit) with function pg_catalog."bit"(integer, integer);
+
+create cast (integer as boolean) with function pg_catalog.bool(integer);
+
+create cast (integer as bytea) with function pg_catalog.bytea(integer);
+
+create cast (integer as double precision) with function pg_catalog.float8(integer) as implicit;
+
+create cast (integer as money) with function pg_catalog.money(integer) as assignment;
+
+create cast (integer as numeric) with function pg_catalog."numeric"(integer) as implicit;
+
+create cast (integer as oid) without function as implicit;
+
+create cast (integer as real) with function pg_catalog.float4(integer) as implicit;
+
+create cast (integer as regclass) without function as implicit;
+
+create cast (integer as regcollation) without function as implicit;
+
+create cast (integer as regconfig) without function as implicit;
+
+create cast (integer as regdictionary) without function as implicit;
+
+create cast (integer as regnamespace) without function as implicit;
+
+create cast (integer as regoper) without function as implicit;
+
+create cast (integer as regoperator) without function as implicit;
+
+create cast (integer as regproc) without function as implicit;
+
+create cast (integer as regprocedure) without function as implicit;
+
+create cast (integer as regrole) without function as implicit;
+
+create cast (integer as regtype) without function as implicit;
+
+create cast (integer as smallint) with function pg_catalog.int2(integer) as assignment;
+
+create cast (interval as interval) with function pg_catalog."interval"(interval, integer) as implicit;
+
+create cast (interval as time without time zone) with function pg_catalog."time"(interval) as assignment;
+
+create cast (json as jsonb) with inout as assignment;
+
+create cast (jsonb as bigint) with function pg_catalog.int8(jsonb);
+
+create cast (jsonb as boolean) with function pg_catalog.bool(jsonb);
+
+create cast (jsonb as double precision) with function pg_catalog.float8(jsonb);
+
+create cast (jsonb as integer) with function pg_catalog.int4(jsonb);
+
+create cast (jsonb as json) with inout as assignment;
+
+create cast (jsonb as numeric) with function pg_catalog."numeric"(jsonb);
+
+create cast (jsonb as real) with function pg_catalog.float4(jsonb);
+
+create cast (jsonb as smallint) with function pg_catalog.int2(jsonb);
+
+create cast (lseg as point) with function pg_catalog.point(lseg);
+
+create cast (macaddr as macaddr8) with function pg_catalog.macaddr8(macaddr) as implicit;
+
+create cast (macaddr8 as macaddr) with function pg_catalog.macaddr(macaddr8) as implicit;
+
+create cast (money as numeric) with function pg_catalog."numeric"(money) as assignment;
+
+create cast (name as character) with function pg_catalog.bpchar(name) as assignment;
+
+create cast (name as character varying) with function pg_catalog."varchar"(name) as assignment;
+
+create cast (name as text) with function pg_catalog.text(name) as implicit;
+
+create cast (numeric as bigint) with function pg_catalog.int8(numeric) as assignment;
+
+create cast (numeric as double precision) with function pg_catalog.float8(numeric) as implicit;
+
+create cast (numeric as integer) with function pg_catalog.int4(numeric) as assignment;
+
+create cast (numeric as money) with function pg_catalog.money(numeric) as assignment;
+
+create cast (numeric as numeric) with function pg_catalog."numeric"(numeric, integer) as implicit;
+
+create cast (numeric as real) with function pg_catalog.float4(numeric) as implicit;
+
+create cast (numeric as smallint) with function pg_catalog.int2(numeric) as assignment;
+
+create cast (numrange as nummultirange) with function pg_catalog.nummultirange(numrange);
+
+create cast (oid as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (oid as integer) without function as assignment;
+
+create cast (oid as regclass) without function as implicit;
+
+create cast (oid as regcollation) without function as implicit;
+
+create cast (oid as regconfig) without function as implicit;
+
+create cast (oid as regdictionary) without function as implicit;
+
+create cast (oid as regnamespace) without function as implicit;
+
+create cast (oid as regoper) without function as implicit;
+
+create cast (oid as regoperator) without function as implicit;
+
+create cast (oid as regproc) without function as implicit;
+
+create cast (oid as regprocedure) without function as implicit;
+
+create cast (oid as regrole) without function as implicit;
+
+create cast (oid as regtype) without function as implicit;
+
+create cast (path as polygon) with function pg_catalog.polygon(path) as assignment;
+
+create cast (pg_dependencies as bytea) without function as implicit;
+
+create cast (pg_dependencies as text) with inout as implicit;
+
+create cast (pg_mcv_list as bytea) without function as implicit;
+
+create cast (pg_mcv_list as text) with inout as implicit;
+
+create cast (pg_ndistinct as bytea) without function as implicit;
+
+create cast (pg_ndistinct as text) with inout as implicit;
+
+create cast (pg_node_tree as text) without function as implicit;
+
+create cast (point as box) with function pg_catalog.box(point) as assignment;
+
+create cast (polygon as box) with function pg_catalog.box(polygon);
+
+create cast (polygon as circle) with function pg_catalog.circle(polygon);
+
+create cast (polygon as path) with function pg_catalog.path(polygon) as assignment;
+
+create cast (polygon as point) with function pg_catalog.point(polygon);
+
+create cast (real as bigint) with function pg_catalog.int8(real) as assignment;
+
+create cast (real as double precision) with function pg_catalog.float8(real) as implicit;
+
+create cast (real as integer) with function pg_catalog.int4(real) as assignment;
+
+create cast (real as numeric) with function pg_catalog."numeric"(real) as assignment;
+
+create cast (real as smallint) with function pg_catalog.int2(real) as assignment;
+
+create cast (regclass as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regclass as integer) without function as assignment;
+
+create cast (regclass as oid) without function as implicit;
+
+create cast (regcollation as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regcollation as integer) without function as assignment;
+
+create cast (regcollation as oid) without function as implicit;
+
+create cast (regconfig as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regconfig as integer) without function as assignment;
+
+create cast (regconfig as oid) without function as implicit;
+
+create cast (regdictionary as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regdictionary as integer) without function as assignment;
+
+create cast (regdictionary as oid) without function as implicit;
+
+create cast (regnamespace as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regnamespace as integer) without function as assignment;
+
+create cast (regnamespace as oid) without function as implicit;
+
+create cast (regoper as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regoper as integer) without function as assignment;
+
+create cast (regoper as oid) without function as implicit;
+
+create cast (regoper as regoperator) without function as implicit;
+
+create cast (regoperator as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regoperator as integer) without function as assignment;
+
+create cast (regoperator as oid) without function as implicit;
+
+create cast (regoperator as regoper) without function as implicit;
+
+create cast (regproc as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regproc as integer) without function as assignment;
+
+create cast (regproc as oid) without function as implicit;
+
+create cast (regproc as regprocedure) without function as implicit;
+
+create cast (regprocedure as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regprocedure as integer) without function as assignment;
+
+create cast (regprocedure as oid) without function as implicit;
+
+create cast (regprocedure as regproc) without function as implicit;
+
+create cast (regrole as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regrole as integer) without function as assignment;
+
+create cast (regrole as oid) without function as implicit;
+
+create cast (regtype as bigint) with function pg_catalog.int8(oid) as assignment;
+
+create cast (regtype as integer) without function as assignment;
+
+create cast (regtype as oid) without function as implicit;
+
+create cast (smallint as bigint) with function pg_catalog.int8(smallint) as implicit;
+
+create cast (smallint as bytea) with function pg_catalog.bytea(smallint);
+
+create cast (smallint as double precision) with function pg_catalog.float8(smallint) as implicit;
+
+create cast (smallint as integer) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as numeric) with function pg_catalog."numeric"(smallint) as implicit;
+
+create cast (smallint as oid) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as real) with function pg_catalog.float4(smallint) as implicit;
+
+create cast (smallint as regclass) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regcollation) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regconfig) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regdictionary) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regnamespace) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regoper) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regoperator) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regproc) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regprocedure) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regrole) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (smallint as regtype) with function pg_catalog.int4(smallint) as implicit;
+
+create cast (text as "char") with function pg_catalog."char"(text) as assignment;
+
+create cast (text as character) without function as implicit;
+
+create cast (text as character varying) without function as implicit;
+
+create cast (text as name) with function pg_catalog.name(text) as implicit;
+
+create cast (text as regclass) with function pg_catalog.regclass(text) as implicit;
+
+create cast (text as xml) with function pg_catalog.xml(text);
+
+create cast (time with time zone as time with time zone) with function pg_catalog.timetz(time with time zone, integer) as implicit;
+
+create cast (time with time zone as time without time zone) with function pg_catalog."time"(time with time zone) as assignment;
+
+create cast (time without time zone as interval) with function pg_catalog."interval"(time without time zone) as implicit;
+
+create cast (time without time zone as time with time zone) with function pg_catalog.timetz(time without time zone) as implicit;
+
+create cast (time without time zone as time without time zone) with function pg_catalog."time"(time without time zone, integer) as implicit;
+
+create cast (timestamp with time zone as date) with function pg_catalog.date(timestamp with time zone) as assignment;
+
+create cast (timestamp with time zone as time with time zone) with function pg_catalog.timetz(timestamp with time zone) as assignment;
+
+create cast (timestamp with time zone as time without time zone) with function pg_catalog."time"(timestamp with time zone) as assignment;
+
+create cast (timestamp with time zone as timestamp with time zone) with function pg_catalog.timestamptz(timestamp with time zone, integer) as implicit;
+
+create cast (timestamp with time zone as timestamp without time zone) with function pg_catalog."timestamp"(timestamp with time zone) as assignment;
+
+create cast (timestamp without time zone as date) with function pg_catalog.date(timestamp without time zone) as assignment;
+
+create cast (timestamp without time zone as time without time zone) with function pg_catalog."time"(timestamp without time zone) as assignment;
+
+create cast (timestamp without time zone as timestamp with time zone) with function pg_catalog.timestamptz(timestamp without time zone) as implicit;
+
+create cast (timestamp without time zone as timestamp without time zone) with function pg_catalog."timestamp"(timestamp without time zone, integer) as implicit;
+
+create cast (tsrange as tsmultirange) with function pg_catalog.tsmultirange(tsrange);
+
+create cast (tstzrange as tstzmultirange) with function pg_catalog.tstzmultirange(tstzrange);
+
+create cast (xid8 as xid) with function pg_catalog.xid(xid8);
+
+create cast (xml as character) without function as assignment;
+
+create cast (xml as character varying) without function as assignment;
+
+create cast (xml as text) without function as assignment;
+
 -- standard C collation
 create collation pg_catalog."C" (provider = libc, locale = 'C');
 

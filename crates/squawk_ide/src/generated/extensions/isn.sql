@@ -1778,3 +1778,43 @@ create operator public.>= (
   function = public.isnge
 );
 
+create cast (ean13 as isbn) with function public.isbn(ean13);
+
+create cast (ean13 as isbn13) with function public.isbn13(ean13);
+
+create cast (ean13 as ismn) with function public.ismn(ean13);
+
+create cast (ean13 as ismn13) with function public.ismn13(ean13);
+
+create cast (ean13 as issn) with function public.issn(ean13);
+
+create cast (ean13 as issn13) with function public.issn13(ean13);
+
+create cast (ean13 as upc) with function public.upc(ean13);
+
+create cast (isbn as ean13) without function as assignment;
+
+create cast (isbn as isbn13) without function as assignment;
+
+create cast (isbn13 as ean13) without function as assignment;
+
+create cast (isbn13 as isbn) without function as assignment;
+
+create cast (ismn as ean13) without function as assignment;
+
+create cast (ismn as ismn13) without function as assignment;
+
+create cast (ismn13 as ean13) without function as assignment;
+
+create cast (ismn13 as ismn) without function as assignment;
+
+create cast (issn as ean13) without function as assignment;
+
+create cast (issn as issn13) without function as assignment;
+
+create cast (issn13 as ean13) without function as assignment;
+
+create cast (issn13 as issn) without function as assignment;
+
+create cast (upc as ean13) without function as assignment;
+

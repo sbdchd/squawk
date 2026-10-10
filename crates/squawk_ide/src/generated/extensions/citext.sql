@@ -309,3 +309,19 @@ create operator public.~~* (
   function = public.texticlike
 );
 
+create cast (boolean as citext) with function public.citext(boolean) as assignment;
+
+create cast (character as citext) with function public.citext(character) as assignment;
+
+create cast (character varying as citext) without function as assignment;
+
+create cast (citext as character) without function as assignment;
+
+create cast (citext as character varying) without function as implicit;
+
+create cast (citext as text) without function as implicit;
+
+create cast (inet as citext) with function public.citext(inet) as assignment;
+
+create cast (text as citext) without function as assignment;
+

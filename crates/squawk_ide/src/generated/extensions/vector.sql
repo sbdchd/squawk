@@ -622,3 +622,49 @@ create operator public.|| (
   function = public.vector_concat
 );
 
+create cast (double precision[] as halfvec) with function public.array_to_halfvec(double precision[], integer, boolean) as assignment;
+
+create cast (double precision[] as sparsevec) with function public.array_to_sparsevec(double precision[], integer, boolean) as assignment;
+
+create cast (double precision[] as vector) with function public.array_to_vector(double precision[], integer, boolean) as assignment;
+
+create cast (halfvec as halfvec) with function public.halfvec(halfvec, integer, boolean) as implicit;
+
+create cast (halfvec as real[]) with function public.halfvec_to_float4(halfvec, integer, boolean) as assignment;
+
+create cast (halfvec as sparsevec) with function public.halfvec_to_sparsevec(halfvec, integer, boolean) as implicit;
+
+create cast (halfvec as vector) with function public.halfvec_to_vector(halfvec, integer, boolean) as assignment;
+
+create cast (integer[] as halfvec) with function public.array_to_halfvec(integer[], integer, boolean) as assignment;
+
+create cast (integer[] as sparsevec) with function public.array_to_sparsevec(integer[], integer, boolean) as assignment;
+
+create cast (integer[] as vector) with function public.array_to_vector(integer[], integer, boolean) as assignment;
+
+create cast (numeric[] as halfvec) with function public.array_to_halfvec(numeric[], integer, boolean) as assignment;
+
+create cast (numeric[] as sparsevec) with function public.array_to_sparsevec(numeric[], integer, boolean) as assignment;
+
+create cast (numeric[] as vector) with function public.array_to_vector(numeric[], integer, boolean) as assignment;
+
+create cast (real[] as halfvec) with function public.array_to_halfvec(real[], integer, boolean) as assignment;
+
+create cast (real[] as sparsevec) with function public.array_to_sparsevec(real[], integer, boolean) as assignment;
+
+create cast (real[] as vector) with function public.array_to_vector(real[], integer, boolean) as assignment;
+
+create cast (sparsevec as halfvec) with function public.sparsevec_to_halfvec(sparsevec, integer, boolean) as assignment;
+
+create cast (sparsevec as sparsevec) with function public.sparsevec(sparsevec, integer, boolean) as implicit;
+
+create cast (sparsevec as vector) with function public.sparsevec_to_vector(sparsevec, integer, boolean) as assignment;
+
+create cast (vector as halfvec) with function public.vector_to_halfvec(vector, integer, boolean) as implicit;
+
+create cast (vector as real[]) with function public.vector_to_float4(vector, integer, boolean) as implicit;
+
+create cast (vector as sparsevec) with function public.vector_to_sparsevec(vector, integer, boolean) as implicit;
+
+create cast (vector as vector) with function public.vector(vector, integer, boolean) as implicit;
+
