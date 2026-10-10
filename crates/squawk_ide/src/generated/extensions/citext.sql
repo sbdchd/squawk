@@ -4,7 +4,7 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.citext;
+create type public.citext (input = citextin, output = citextout);
 
 create function public.citext(boolean) returns citext
   language internal;

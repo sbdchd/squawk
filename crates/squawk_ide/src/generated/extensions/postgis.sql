@@ -4,25 +4,25 @@
 --   cargo xtask sync-builtins
 
 -- size: 65, align: 4
-create type public.box2d;
+create type public.box2d (input = box2d_in, output = box2d_out);
 
 -- size: 16, align: 8
-create type public.box2df;
+create type public.box2df (input = box2df_in, output = box2df_out);
 
 -- size: 52, align: 8
-create type public.box3d;
+create type public.box3d (input = box3d_in, output = box3d_out);
 
 -- size: -1, align: 8
-create type public.geography;
+create type public.geography (input = geography_in, output = geography_out);
 
 -- size: -1, align: 8
-create type public.geometry;
+create type public.geometry (input = geometry_in, output = geometry_out);
 
 -- size: -1, align: 8
-create type public.gidx;
+create type public.gidx (input = gidx_in, output = gidx_out);
 
 -- size: 65, align: 8
-create type public.spheroid;
+create type public.spheroid (input = spheroid_in, output = spheroid_out);
 
 create type public.geometry_dump as (
   path integer[],

@@ -95,12 +95,25 @@ struct TypeQuery {
     align: String,
     subtype: String,
     is_range: i32,
+    input: String,
+    output: String,
+    element: String,
+    subscript: String,
     description: String,
     extension_name: String,
 }
 
 impl Query for TypeQuery {
     const QUERY: &'static str = r"
+with recursive type_depths as (
+  select oid, 0 as depth
+  from pg_type
+  where typelem = 0
+  union all
+  select t.oid, d.depth + 1
+  from pg_type t
+    join type_depths d on d.oid = t.typelem
+)
 select
   n.nspname as schema,
   t.typname as name,
@@ -113,9 +126,14 @@ select
   end as align,
   coalesce(format_type(r.rngsubtype, null), '') as subtype,
   case when r.rngtypid is null then 0 else 1 end as is_range,
+  case when t.typtype in ('b', 'p') then t.typinput::text else '' end as input,
+  case when t.typtype in ('b', 'p') then t.typoutput::text else '' end as output,
+  case when t.typtype = 'b' and t.typelem <> 0 then format_type(t.typelem, null) else '' end as element,
+  case when t.typtype = 'b' and t.typsubscript <> 0 then t.typsubscript::text else '' end as subscript,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_type t
+  join type_depths td on td.oid = t.oid
   join pg_namespace n on n.oid = t.typnamespace
   left join pg_range r on r.rngtypid = t.oid
   left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_type'::regclass
@@ -128,7 +146,7 @@ where n.nspname not like 'pg_temp%'
     r.rngtypid is not null
     or (t.typtype in ('b', 'p', 'd', 'e') and t.typname not like '\_%')
   )
-order by n.nspname, t.typname, t.oid;
+order by td.depth, n.nspname, t.typname, t.oid;
 ";
 }
 
@@ -487,6 +505,10 @@ struct TypeDef {
     name: String,
     size: String,
     align: String,
+    input: String,
+    output: String,
+    element: String,
+    subscript: String,
     description: String,
 }
 
@@ -494,7 +516,27 @@ impl WriteSql for TypeDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
         writeln!(f, "-- size: {}, align: {}", self.size, self.align)?;
-        writeln!(f, "create type {}.{};", self.schema, self.name)?;
+        if self.input.is_empty() {
+            writeln!(f, "create type {}.{};", self.schema, self.name)?;
+        } else {
+            let mut options = vec![
+                format!("input = {}", self.input),
+                format!("output = {}", self.output),
+            ];
+            if !self.element.is_empty() {
+                options.push(format!("element = {}", self.element));
+            }
+            if !self.subscript.is_empty() {
+                options.push(format!("subscript = {}", self.subscript));
+            }
+            writeln!(
+                f,
+                "create type {}.{} ({});",
+                self.schema,
+                self.name,
+                options.join(", ")
+            )?;
+        }
         writeln!(f)?;
         Ok(())
     }
@@ -954,9 +996,13 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
             module.types.push(TypeDef {
                 align: row.align,
                 description: row.description,
+                element: row.element,
+                input: row.input,
                 name: row.name,
+                output: row.output,
                 schema: row.schema,
                 size: row.size,
+                subscript: row.subscript,
             });
         }
     }

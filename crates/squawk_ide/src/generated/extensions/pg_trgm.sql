@@ -4,7 +4,7 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.gtrgm;
+create type public.gtrgm (input = gtrgm_in, output = gtrgm_out);
 
 create function public.gin_extract_query_trgm(text, internal, smallint, internal, internal, internal, internal) returns internal
   language c;

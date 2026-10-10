@@ -4,10 +4,10 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.ghstore;
+create type public.ghstore (input = ghstore_in, output = ghstore_out);
 
 -- size: -1, align: 4
-create type public.hstore;
+create type public.hstore (input = hstore_in, output = hstore_out, subscript = hstore_subscript_handler);
 
 create function public.akeys(hstore) returns text[]
   language c;

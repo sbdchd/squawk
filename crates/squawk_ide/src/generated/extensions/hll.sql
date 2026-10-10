@@ -4,10 +4,10 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.hll;
+create type public.hll (input = hll_in, output = hll_out);
 
 -- size: 8, align: 8
-create type public.hll_hashval;
+create type public.hll_hashval (input = hll_hashval_in, output = hll_hashval_out);
 
 create function public.hll(hll, integer, boolean) returns hll
   language c;
