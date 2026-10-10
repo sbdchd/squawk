@@ -125,9 +125,9 @@ impl Config {
         };
 
         info!("pg version: {pg_version:?}");
-        info!("excluded rules: {:?}", &excluded_rules);
-        info!("included rules: {:?}", &included_rules);
-        info!("excluded paths: {:?}", &excluded_paths);
+        info!("excluded rules: {excluded_rules:?}");
+        info!("included rules: {included_rules:?}");
+        info!("excluded paths: {excluded_paths:?}");
         info!("assume in a transaction: {assume_in_transaction:?}");
         info!("no error on unmatched pattern: {no_error_on_unmatched_pattern:?}");
 

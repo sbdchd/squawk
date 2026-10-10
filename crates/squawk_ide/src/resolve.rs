@@ -626,14 +626,12 @@ pub(crate) fn resolve_name_ref(
                 .find_map(ast::ForeignKeyConstraint::cast)
             {
                 foreign_key.table_name_ref()?.path_ref()?
-            } else if let Some(references_constraint) = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::ReferencesConstraint::cast)
-            {
-                references_constraint.table()?.path_ref()?
             } else {
-                return None;
+                let references_constraint = name_ref
+                    .syntax()
+                    .ancestors()
+                    .find_map(ast::ReferencesConstraint::cast)?;
+                references_constraint.table()?.path_ref()?
             };
             let column_name = Name::from_node(name_ref);
             resolve_column_for_path(db, InFile::new(file, &path), &column_name)
@@ -5780,7 +5778,8 @@ impl DmlScope {
                 alias: merge.alias().and_then(|alias| alias.name()),
                 returning_clause: merge.returning_clause(),
             }
-        } else if let Some(insert) = ast::Insert::cast(stmt.clone()) {
+        } else {
+            let insert = ast::Insert::cast(stmt.clone())?;
             // The insert target is only visible from `on conflict` and
             // `returning`, not from the rows being inserted
             DmlScope {
@@ -5793,8 +5792,6 @@ impl DmlScope {
                 alias: insert.alias().and_then(|alias| alias.name()),
                 returning_clause: insert.returning_clause(),
             }
-        } else {
-            return None;
         };
         let source_list_items = dml_source_from_list_items(stmt).unwrap_or_default();
         scope.in_source = source_list_items

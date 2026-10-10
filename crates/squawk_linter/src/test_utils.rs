@@ -65,7 +65,7 @@ pub(crate) fn fix_sql_with(sql: &str, settings: LinterSettings, rule: Rule) -> S
 
     let mut all_edits: Vec<&Edit> = fixes.iter().flat_map(|fix| &fix.edits).collect();
 
-    all_edits.sort_by(|a, b| b.text_range.start().cmp(&a.text_range.start()));
+    all_edits.sort_by_key(|edit| std::cmp::Reverse(edit.text_range.start()));
 
     for edit in all_edits {
         let start: usize = edit.text_range.start().into();

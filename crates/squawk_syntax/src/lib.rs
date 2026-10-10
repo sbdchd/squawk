@@ -278,7 +278,7 @@ fn api_walkthrough() {
     let func_option_syntax = func_option.syntax();
 
     // Note how `func_option_syntax` and `option` are in fact the same node underneath:
-    assert!(func_option_syntax == option.syntax());
+    assert_eq!(func_option_syntax, option.syntax());
 
     // To go from CST to AST, `AstNode::cast` function is used:
     let _expr: ast::FuncOption = match ast::FuncOption::cast(func_option_syntax.clone()) {

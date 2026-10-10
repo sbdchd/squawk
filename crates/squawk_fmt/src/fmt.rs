@@ -8673,16 +8673,13 @@ fn build_foreign_key_column_list<'a>(ctx: &Ctx, list: &ast::ForeignKeyColumnList
         .map(|el| comments_before(&el))
         .unwrap_or_else(Doc::nil)
         .append(Doc::text("("));
-    let mut items = list
-        .column_name_refs()
-        .map(|name| {
-            (
-                leading_comments(name.syntax()).append(build_name(name.syntax())),
-                name.syntax().clone(),
-            )
-        })
-        .collect::<Vec<_>>();
-    if let Some(period) = list.period_column() {
+    let items = list.column_name_refs().map(|name| {
+        (
+            leading_comments(name.syntax()).append(build_name(name.syntax())),
+            name.syntax().clone(),
+        )
+    });
+    let period = list.period_column().map(|period| {
         let mut period_doc = period
             .period_token()
             .map(|_| leading_comments(period.syntax()).append(Doc::text("period")))
@@ -8692,9 +8689,9 @@ fn build_foreign_key_column_list<'a>(ctx: &Ctx, list: &ast::ForeignKeyColumnList
                 .append(space_before(name.syntax()))
                 .append(build_name(name.syntax()));
         }
-        items.push((period_doc, period.syntax().clone()));
-    }
-    let body = build_comma_separated_docs(items.into_iter()).unwrap_or_else(Doc::nil);
+        (period_doc, period.syntax().clone())
+    });
+    let body = build_comma_separated_docs(items.chain(period)).unwrap_or_else(Doc::nil);
     doc.append(wrap_body(ctx, body, list.r_paren_token().as_ref()))
         .append(Doc::text(")"))
         .group()
