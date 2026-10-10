@@ -428,3 +428,11 @@ create operator public.@> (
   function = public.h3index_contains
 );
 
+create cast (bigint as h3index) with function public.bigint_to_h3index(bigint);
+
+-- Convert bigint to H3 index.
+create cast (h3index as bigint) with function public.h3index_to_bigint(h3index);
+
+-- Convert H3 index to point.
+create cast (h3index as point) with function public.h3_cell_to_latlng(h3index);
+

@@ -304,6 +304,37 @@ order by n.nspname, o.oprname, format_type(o.oprleft, null), format_type(o.oprri
 }
 
 #[derive(Deserialize)]
+struct CastQuery {
+    source: String,
+    target: String,
+    context: String,
+    method: String,
+    function: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for CastQuery {
+    const QUERY: &'static str = r"
+select
+  format_type(c.castsource, null) as source,
+  format_type(c.casttarget, null) as target,
+  c.castcontext as context,
+  c.castmethod as method,
+  coalesce(pn.nspname || '.' || quote_ident(p.proname) || '(' || oidvectortypes(p.proargtypes) || ')', '') as function,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_cast c
+  left join pg_proc p on p.oid = c.castfunc
+  left join pg_namespace pn on pn.oid = p.pronamespace
+  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_cast'::regclass
+  left join pg_depend dep on dep.classid = 'pg_cast'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+order by format_type(c.castsource, null), format_type(c.casttarget, null), c.oid;
+";
+}
+
+#[derive(Deserialize)]
 struct CollationQuery {
     schema: String,
     name: String,
@@ -698,6 +729,48 @@ impl WriteSql for OperatorDef {
     }
 }
 
+struct CastDef {
+    source: String,
+    target: String,
+    context: String,
+    method: String,
+    function: String,
+    description: String,
+}
+
+impl WriteSql for CastDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        let method = match self.method.as_str() {
+            "f" => format!("with function {}", self.function),
+            "b" => "without function".to_string(),
+            "i" => "with inout".to_string(),
+            method => {
+                return Err(io::Error::other(format!(
+                    "unexpected cast method: {method}"
+                )));
+            }
+        };
+        let context = match self.context.as_str() {
+            "i" => " as implicit",
+            "a" => " as assignment",
+            "e" => "",
+            context => {
+                return Err(io::Error::other(format!(
+                    "unexpected cast context: {context}"
+                )));
+            }
+        };
+        writeln!(
+            f,
+            "create cast ({} as {}) {method}{context};",
+            self.source, self.target
+        )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
 struct CollationDef {
     schema: String,
     name: String,
@@ -754,6 +827,7 @@ struct Module {
     views: Vec<ViewDef>,
     functions: Vec<FunctionDef>,
     operators: Vec<OperatorDef>,
+    casts: Vec<CastDef>,
     collations: Vec<CollationDef>,
 }
 
@@ -793,6 +867,10 @@ impl Module {
 
         for operator in &self.operators {
             operator.write_sql(f)?;
+        }
+
+        for cast in &self.casts {
+            cast.write_sql(f)?;
         }
 
         for collation in &self.collations {
@@ -981,6 +1059,25 @@ fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     Ok(())
 }
 
+fn query_casts(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in CastQuery::run()? {
+        modules
+            .entry(row.extension_name)
+            .or_default()
+            .casts
+            .push(CastDef {
+                context: row.context,
+                description: row.description,
+                function: row.function,
+                method: row.method,
+                source: row.source,
+                target: row.target,
+            });
+    }
+
+    Ok(())
+}
+
 fn query_collations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in CollationQuery::run()? {
         modules
@@ -1020,6 +1117,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
     query_relations(&mut modules)?;
     query_functions(&mut modules)?;
     query_operators(&mut modules)?;
+    query_casts(&mut modules)?;
     query_collations(&mut modules)?;
 
     let extensions_root = project_root().join("crates/squawk_ide/src/generated/extensions");

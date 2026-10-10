@@ -260,3 +260,11 @@ create operator public.|| (
   function = public.hll_add_rev
 );
 
+create cast (bigint as hll_hashval) without function;
+
+create cast (bytea as hll) without function;
+
+create cast (hll as hll) with function public.hll(hll, integer, boolean) as implicit;
+
+create cast (integer as hll_hashval) with function public.hll_hashval_int4(integer);
+

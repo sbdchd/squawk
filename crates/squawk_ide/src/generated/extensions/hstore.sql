@@ -307,3 +307,9 @@ create operator public.|| (
   function = public.hs_concat
 );
 
+create cast (hstore as json) with function public.hstore_to_json(hstore);
+
+create cast (hstore as jsonb) with function public.hstore_to_jsonb(hstore);
+
+create cast (text[] as hstore) with function public.hstore(text[]);
+
