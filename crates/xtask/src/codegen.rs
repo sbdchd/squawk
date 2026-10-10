@@ -669,7 +669,7 @@ impl Field {
                 let name = literal_token_name(name)
                     .or_else(|| token_to_name(name))
                     .unwrap_or(name);
-                format!("{name}_token",)
+                format!("{name}_token")
             }
             Field::Node { name, .. } => {
                 if name == "type" {

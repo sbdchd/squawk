@@ -5,7 +5,7 @@ resolver = "2"
 [workspace.package]
 version = "2.68.0"
 edition = "2024"
-rust-version = "1.94"
+rust-version = "1.99"
 authors = ["Squawk Team & Contributors"]
 license = "Apache-2.0 OR MIT"
 description = "Linter for Postgres migrations & SQL"
@@ -101,6 +101,7 @@ unexpected_cfgs = "warn"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -2 }
+assert_is_empty = "allow"
 char_lit_as_u8 = "allow"
 implicit_hasher = "allow"
 map_unwrap_or = "allow"

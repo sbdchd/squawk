@@ -155,7 +155,7 @@ fn update_rules_mod(name: &str) -> Result<()> {
         ),
         (
             "// xtask:new-rule:export",
-            format!("pub(crate) use {name_snake}::{name_snake};\n",),
+            format!("pub(crate) use {name_snake}::{name_snake};\n"),
         ),
     ];
 
