@@ -5,35 +5,35 @@
 
 -- International European Article Number (EAN13)
 -- size: 8, align: 8
-create type public.ean13;
+create type public.ean13 (input = ean13_in, output = public.ean13_out);
 
 -- International Standard Book Number (ISBN)
 -- size: 8, align: 8
-create type public.isbn;
+create type public.isbn (input = isbn_in, output = public.isn_out);
 
 -- International Standard Book Number 13 (ISBN13)
 -- size: 8, align: 8
-create type public.isbn13;
+create type public.isbn13 (input = isbn13_in, output = public.ean13_out);
 
 -- International Standard Music Number (ISMN)
 -- size: 8, align: 8
-create type public.ismn;
+create type public.ismn (input = ismn_in, output = public.isn_out);
 
 -- International Standard Music Number 13 (ISMN13)
 -- size: 8, align: 8
-create type public.ismn13;
+create type public.ismn13 (input = ismn13_in, output = public.ean13_out);
 
 -- International Standard Serial Number (ISSN)
 -- size: 8, align: 8
-create type public.issn;
+create type public.issn (input = issn_in, output = public.isn_out);
 
 -- International Standard Serial Number 13 (ISSN13)
 -- size: 8, align: 8
-create type public.issn13;
+create type public.issn13 (input = issn13_in, output = public.ean13_out);
 
 -- Universal Product Code (UPC)
 -- size: 8, align: 8
-create type public.upc;
+create type public.upc (input = upc_in, output = public.isn_out);
 
 create function public.btean13cmp(ean13, ean13) returns integer
   language internal;

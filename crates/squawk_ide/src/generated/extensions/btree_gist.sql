@@ -4,22 +4,22 @@
 --   cargo xtask sync-builtins
 
 -- size: 16, align: 4
-create type public.gbtreekey16;
+create type public.gbtreekey16 (input = gbtreekey16_in, output = gbtreekey16_out);
 
 -- size: 2, align: 4
-create type public.gbtreekey2;
+create type public.gbtreekey2 (input = gbtreekey2_in, output = gbtreekey2_out);
 
 -- size: 32, align: 4
-create type public.gbtreekey32;
+create type public.gbtreekey32 (input = gbtreekey32_in, output = gbtreekey32_out);
 
 -- size: 4, align: 4
-create type public.gbtreekey4;
+create type public.gbtreekey4 (input = gbtreekey4_in, output = gbtreekey4_out);
 
 -- size: 8, align: 4
-create type public.gbtreekey8;
+create type public.gbtreekey8 (input = gbtreekey8_in, output = gbtreekey8_out);
 
 -- size: -1, align: 4
-create type public.gbtreekey_var;
+create type public.gbtreekey_var (input = gbtreekey_var_in, output = gbtreekey_var_out);
 
 create function public.cash_dist(money, money) returns money
   language c;

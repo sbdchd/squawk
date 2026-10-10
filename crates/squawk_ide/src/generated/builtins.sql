@@ -34,383 +34,383 @@ create type information_schema.yes_or_no;
 
 -- access control list
 -- size: 16, align: 8
-create type pg_catalog.aclitem;
+create type pg_catalog.aclitem (input = aclitemin, output = aclitemout);
 
 -- pseudo-type representing any type
 -- size: 4, align: 4
-create type pg_catalog.any;
+create type pg_catalog.any (input = any_in, output = any_out);
 
 -- pseudo-type representing a polymorphic array type
 -- size: -1, align: 8
-create type pg_catalog.anyarray;
+create type pg_catalog.anyarray (input = anyarray_in, output = anyarray_out);
 
 -- pseudo-type representing a polymorphic common type
 -- size: 4, align: 4
-create type pg_catalog.anycompatible;
+create type pg_catalog.anycompatible (input = anycompatible_in, output = anycompatible_out);
 
 -- pseudo-type representing an array of polymorphic common type elements
 -- size: -1, align: 8
-create type pg_catalog.anycompatiblearray;
+create type pg_catalog.anycompatiblearray (input = anycompatiblearray_in, output = anycompatiblearray_out);
 
 -- pseudo-type representing a multirange over a polymorphic common type
 -- size: -1, align: 8
-create type pg_catalog.anycompatiblemultirange;
+create type pg_catalog.anycompatiblemultirange (input = anycompatiblemultirange_in, output = anycompatiblemultirange_out);
 
 -- pseudo-type representing a polymorphic common type that is not an array
 -- size: 4, align: 4
-create type pg_catalog.anycompatiblenonarray;
+create type pg_catalog.anycompatiblenonarray (input = anycompatiblenonarray_in, output = anycompatiblenonarray_out);
 
 -- pseudo-type representing a range over a polymorphic common type
 -- size: -1, align: 8
-create type pg_catalog.anycompatiblerange;
+create type pg_catalog.anycompatiblerange (input = anycompatiblerange_in, output = anycompatiblerange_out);
 
 -- pseudo-type representing a polymorphic base type
 -- size: 4, align: 4
-create type pg_catalog.anyelement;
+create type pg_catalog.anyelement (input = anyelement_in, output = anyelement_out);
 
 -- pseudo-type representing a polymorphic base type that is an enum
 -- size: 4, align: 4
-create type pg_catalog.anyenum;
+create type pg_catalog.anyenum (input = anyenum_in, output = anyenum_out);
 
 -- pseudo-type representing a polymorphic base type that is a multirange
 -- size: -1, align: 8
-create type pg_catalog.anymultirange;
+create type pg_catalog.anymultirange (input = anymultirange_in, output = anymultirange_out);
 
 -- pseudo-type representing a polymorphic base type that is not an array
 -- size: 4, align: 4
-create type pg_catalog.anynonarray;
+create type pg_catalog.anynonarray (input = anynonarray_in, output = anynonarray_out);
 
 -- pseudo-type representing a range over a polymorphic base type
 -- size: -1, align: 8
-create type pg_catalog.anyrange;
+create type pg_catalog.anyrange (input = anyrange_in, output = anyrange_out);
 
 -- fixed-length bit string
 -- size: -1, align: 4
-create type pg_catalog.bit;
+create type pg_catalog.bit (input = bit_in, output = bit_out);
 
 -- boolean, format 't'/'f'
 -- size: 1, align: 1
-create type pg_catalog.bool;
-
--- geometric box, format 'lower left point,upper right point'
--- size: 32, align: 8
-create type pg_catalog.box;
+create type pg_catalog.bool (input = boolin, output = boolout);
 
 -- 'char(length)' blank-padded string, fixed storage length
 -- size: -1, align: 4
-create type pg_catalog.bpchar;
+create type pg_catalog.bpchar (input = bpcharin, output = bpcharout);
 
 -- variable-length string, binary values escaped
 -- size: -1, align: 4
-create type pg_catalog.bytea;
+create type pg_catalog.bytea (input = byteain, output = byteaout);
 
 -- single character
 -- size: 1, align: 1
-create type pg_catalog.char;
+create type pg_catalog.char (input = charin, output = charout);
 
 -- command identifier type, sequence in transaction id
 -- size: 4, align: 4
-create type pg_catalog.cid;
+create type pg_catalog.cid (input = cidin, output = cidout);
 
 -- network IP address/netmask, network address
 -- size: -1, align: 4
-create type pg_catalog.cidr;
+create type pg_catalog.cidr (input = cidr_in, output = cidr_out);
 
 -- geometric circle, format '<center point,radius>'
 -- size: 24, align: 8
-create type pg_catalog.circle;
+create type pg_catalog.circle (input = circle_in, output = circle_out);
 
 -- C-style string
 -- size: -2, align: 1
-create type pg_catalog.cstring;
+create type pg_catalog.cstring (input = cstring_in, output = cstring_out);
 
 -- date
 -- size: 4, align: 4
-create type pg_catalog.date;
+create type pg_catalog.date (input = date_in, output = date_out);
 
 -- pseudo-type for the result of an event trigger function
 -- size: 4, align: 4
-create type pg_catalog.event_trigger;
+create type pg_catalog.event_trigger (input = event_trigger_in, output = event_trigger_out);
 
 -- pseudo-type for the result of an FDW handler function
 -- size: 4, align: 4
-create type pg_catalog.fdw_handler;
+create type pg_catalog.fdw_handler (input = fdw_handler_in, output = fdw_handler_out);
 
 -- single-precision floating point number, 4-byte storage
 -- size: 4, align: 4
-create type pg_catalog.float4;
+create type pg_catalog.float4 (input = float4in, output = float4out);
 
 -- double-precision floating point number, 8-byte storage
 -- size: 8, align: 8
-create type pg_catalog.float8;
+create type pg_catalog.float8 (input = float8in, output = float8out);
 
 -- GiST index internal text representation for text search
 -- size: -1, align: 4
-create type pg_catalog.gtsvector;
+create type pg_catalog.gtsvector (input = gtsvectorin, output = gtsvectorout);
 
 -- pseudo-type for the result of an index AM handler function
 -- size: 4, align: 4
-create type pg_catalog.index_am_handler;
+create type pg_catalog.index_am_handler (input = index_am_handler_in, output = index_am_handler_out);
 
 -- IP address/netmask, host address, netmask optional
 -- size: -1, align: 4
-create type pg_catalog.inet;
+create type pg_catalog.inet (input = inet_in, output = inet_out);
 
 -- -32 thousand to 32 thousand, 2-byte storage
 -- size: 2, align: 2
-create type pg_catalog.int2;
-
--- array of int2, used in system tables
--- size: -1, align: 4
-create type pg_catalog.int2vector;
+create type pg_catalog.int2 (input = int2in, output = int2out);
 
 -- -2 billion to 2 billion integer, 4-byte storage
 -- size: 4, align: 4
-create type pg_catalog.int4;
+create type pg_catalog.int4 (input = int4in, output = int4out);
 
 -- ~18 digit integer, 8-byte storage
 -- size: 8, align: 8
-create type pg_catalog.int8;
+create type pg_catalog.int8 (input = int8in, output = int8out);
 
 -- pseudo-type representing an internal data structure
 -- size: 8, align: 8
-create type pg_catalog.internal;
+create type pg_catalog.internal (input = internal_in, output = internal_out);
 
 -- time interval, format 'number units ...'
 -- size: 16, align: 8
-create type pg_catalog.interval;
+create type pg_catalog.interval (input = interval_in, output = interval_out);
 
 -- JSON stored as text
 -- size: -1, align: 4
-create type pg_catalog.json;
+create type pg_catalog.json (input = json_in, output = json_out);
 
 -- Binary JSON
 -- size: -1, align: 4
-create type pg_catalog.jsonb;
+create type pg_catalog.jsonb (input = jsonb_in, output = jsonb_out, subscript = jsonb_subscript_handler);
 
 -- JSON path
 -- size: -1, align: 4
-create type pg_catalog.jsonpath;
+create type pg_catalog.jsonpath (input = jsonpath_in, output = jsonpath_out);
 
 -- pseudo-type for the result of a language handler function
 -- size: 4, align: 4
-create type pg_catalog.language_handler;
-
--- geometric line, formats '{A,B,C}'/'[point1,point2]'
--- size: 24, align: 8
-create type pg_catalog.line;
-
--- geometric line segment, format '[point1,point2]'
--- size: 32, align: 8
-create type pg_catalog.lseg;
+create type pg_catalog.language_handler (input = language_handler_in, output = language_handler_out);
 
 -- XX:XX:XX:XX:XX:XX, MAC address
 -- size: 6, align: 4
-create type pg_catalog.macaddr;
+create type pg_catalog.macaddr (input = macaddr_in, output = macaddr_out);
 
 -- XX:XX:XX:XX:XX:XX:XX:XX, MAC address
 -- size: 8, align: 4
-create type pg_catalog.macaddr8;
+create type pg_catalog.macaddr8 (input = macaddr8_in, output = macaddr8_out);
 
 -- monetary amounts, $d,ddd.cc
 -- size: 8, align: 8
-create type pg_catalog.money;
-
--- 63-byte type for storing system identifiers
--- size: 64, align: 1
-create type pg_catalog.name;
+create type pg_catalog.money (input = cash_in, output = cash_out);
 
 -- 'numeric(precision, scale)' arbitrary precision number
 -- size: -1, align: 4
-create type pg_catalog.numeric;
+create type pg_catalog.numeric (input = numeric_in, output = numeric_out);
 
 -- object identifier(oid), maximum 4 billion
 -- size: 4, align: 4
-create type pg_catalog.oid;
-
--- array of oids, used in system tables
--- size: -1, align: 4
-create type pg_catalog.oidvector;
+create type pg_catalog.oid (input = oidin, output = oidout);
 
 -- geometric path, format '(point1,...)'
 -- size: -1, align: 8
-create type pg_catalog.path;
+create type pg_catalog.path (input = path_in, output = path_out);
 
 -- pseudo-type representing BRIN bloom summary
 -- size: -1, align: 4
-create type pg_catalog.pg_brin_bloom_summary;
+create type pg_catalog.pg_brin_bloom_summary (input = brin_bloom_summary_in, output = brin_bloom_summary_out);
 
 -- pseudo-type representing BRIN minmax-multi summary
 -- size: -1, align: 4
-create type pg_catalog.pg_brin_minmax_multi_summary;
+create type pg_catalog.pg_brin_minmax_multi_summary (input = brin_minmax_multi_summary_in, output = brin_minmax_multi_summary_out);
 
 -- internal type for passing CollectedCommand
 -- size: 8, align: 8
-create type pg_catalog.pg_ddl_command;
+create type pg_catalog.pg_ddl_command (input = pg_ddl_command_in, output = pg_ddl_command_out);
 
 -- multivariate dependencies
 -- size: -1, align: 4
-create type pg_catalog.pg_dependencies;
+create type pg_catalog.pg_dependencies (input = pg_dependencies_in, output = pg_dependencies_out);
 
 -- PostgreSQL LSN
 -- size: 8, align: 8
-create type pg_catalog.pg_lsn;
+create type pg_catalog.pg_lsn (input = pg_lsn_in, output = pg_lsn_out);
 
 -- multivariate MCV list
 -- size: -1, align: 4
-create type pg_catalog.pg_mcv_list;
+create type pg_catalog.pg_mcv_list (input = pg_mcv_list_in, output = pg_mcv_list_out);
 
 -- multivariate ndistinct coefficients
 -- size: -1, align: 4
-create type pg_catalog.pg_ndistinct;
+create type pg_catalog.pg_ndistinct (input = pg_ndistinct_in, output = pg_ndistinct_out);
 
 -- string representing an internal node tree
 -- size: -1, align: 4
-create type pg_catalog.pg_node_tree;
+create type pg_catalog.pg_node_tree (input = pg_node_tree_in, output = pg_node_tree_out);
 
 -- transaction snapshot
 -- size: -1, align: 8
-create type pg_catalog.pg_snapshot;
-
--- geometric point, format '(x,y)'
--- size: 16, align: 8
-create type pg_catalog.point;
+create type pg_catalog.pg_snapshot (input = pg_snapshot_in, output = pg_snapshot_out);
 
 -- geometric polygon, format '(point1,...)'
 -- size: -1, align: 8
-create type pg_catalog.polygon;
+create type pg_catalog.polygon (input = poly_in, output = poly_out);
 
 -- pseudo-type representing any composite type
 -- size: -1, align: 8
-create type pg_catalog.record;
+create type pg_catalog.record (input = record_in, output = record_out);
 
 -- reference to cursor (portal name)
 -- size: -1, align: 4
-create type pg_catalog.refcursor;
+create type pg_catalog.refcursor (input = textin, output = textout);
 
 -- registered class
 -- size: 4, align: 4
-create type pg_catalog.regclass;
+create type pg_catalog.regclass (input = regclassin, output = regclassout);
 
 -- registered collation
 -- size: 4, align: 4
-create type pg_catalog.regcollation;
+create type pg_catalog.regcollation (input = regcollationin, output = regcollationout);
 
 -- registered text search configuration
 -- size: 4, align: 4
-create type pg_catalog.regconfig;
+create type pg_catalog.regconfig (input = regconfigin, output = regconfigout);
 
 -- registered text search dictionary
 -- size: 4, align: 4
-create type pg_catalog.regdictionary;
+create type pg_catalog.regdictionary (input = regdictionaryin, output = regdictionaryout);
 
 -- registered namespace
 -- size: 4, align: 4
-create type pg_catalog.regnamespace;
+create type pg_catalog.regnamespace (input = regnamespacein, output = regnamespaceout);
 
 -- registered operator
 -- size: 4, align: 4
-create type pg_catalog.regoper;
+create type pg_catalog.regoper (input = regoperin, output = regoperout);
 
 -- registered operator (with args)
 -- size: 4, align: 4
-create type pg_catalog.regoperator;
+create type pg_catalog.regoperator (input = regoperatorin, output = regoperatorout);
 
 -- registered procedure
 -- size: 4, align: 4
-create type pg_catalog.regproc;
+create type pg_catalog.regproc (input = regprocin, output = regprocout);
 
 -- registered procedure (with args)
 -- size: 4, align: 4
-create type pg_catalog.regprocedure;
+create type pg_catalog.regprocedure (input = regprocedurein, output = regprocedureout);
 
 -- registered role
 -- size: 4, align: 4
-create type pg_catalog.regrole;
+create type pg_catalog.regrole (input = regrolein, output = regroleout);
 
 -- registered type
 -- size: 4, align: 4
-create type pg_catalog.regtype;
+create type pg_catalog.regtype (input = regtypein, output = regtypeout);
 
 -- pseudo-type for the result of a table AM handler function
 -- size: 4, align: 4
-create type pg_catalog.table_am_handler;
+create type pg_catalog.table_am_handler (input = table_am_handler_in, output = table_am_handler_out);
 
 -- variable-length string, no limit specified
 -- size: -1, align: 4
-create type pg_catalog.text;
+create type pg_catalog.text (input = textin, output = textout);
 
 -- tuple physical location, format '(block,offset)'
 -- size: 6, align: 2
-create type pg_catalog.tid;
+create type pg_catalog.tid (input = tidin, output = tidout);
 
 -- time of day
 -- size: 8, align: 8
-create type pg_catalog.time;
+create type pg_catalog.time (input = time_in, output = time_out);
 
 -- date and time
 -- size: 8, align: 8
-create type pg_catalog.timestamp;
+create type pg_catalog.timestamp (input = timestamp_in, output = timestamp_out);
 
 -- date and time with time zone
 -- size: 8, align: 8
-create type pg_catalog.timestamptz;
+create type pg_catalog.timestamptz (input = timestamptz_in, output = timestamptz_out);
 
 -- time of day with time zone
 -- size: 12, align: 8
-create type pg_catalog.timetz;
+create type pg_catalog.timetz (input = timetz_in, output = timetz_out);
 
 -- pseudo-type for the result of a trigger function
 -- size: 4, align: 4
-create type pg_catalog.trigger;
+create type pg_catalog.trigger (input = trigger_in, output = trigger_out);
 
 -- pseudo-type for the result of a tablesample method function
 -- size: 4, align: 4
-create type pg_catalog.tsm_handler;
+create type pg_catalog.tsm_handler (input = tsm_handler_in, output = tsm_handler_out);
 
 -- query representation for text search
 -- size: -1, align: 4
-create type pg_catalog.tsquery;
+create type pg_catalog.tsquery (input = tsqueryin, output = tsqueryout);
 
 -- text representation for text search
 -- size: -1, align: 4
-create type pg_catalog.tsvector;
+create type pg_catalog.tsvector (input = tsvectorin, output = tsvectorout);
 
 -- transaction snapshot
 -- size: -1, align: 8
-create type pg_catalog.txid_snapshot;
+create type pg_catalog.txid_snapshot (input = txid_snapshot_in, output = txid_snapshot_out);
 
 -- pseudo-type representing an undetermined type
 -- size: -2, align: 1
-create type pg_catalog.unknown;
+create type pg_catalog.unknown (input = unknownin, output = unknownout);
 
 -- UUID
 -- size: 16, align: 1
-create type pg_catalog.uuid;
+create type pg_catalog.uuid (input = uuid_in, output = uuid_out);
 
 -- variable-length bit string
 -- size: -1, align: 4
-create type pg_catalog.varbit;
+create type pg_catalog.varbit (input = varbit_in, output = varbit_out);
 
 -- 'varchar(length)' non-blank-padded string, variable storage length
 -- size: -1, align: 4
-create type pg_catalog.varchar;
+create type pg_catalog.varchar (input = varcharin, output = varcharout);
 
 -- pseudo-type for the result of a function with no real result
 -- size: 4, align: 4
-create type pg_catalog.void;
+create type pg_catalog.void (input = void_in, output = void_out);
 
 -- transaction id
 -- size: 4, align: 4
-create type pg_catalog.xid;
+create type pg_catalog.xid (input = xidin, output = xidout);
 
 -- full transaction id
 -- size: 8, align: 8
-create type pg_catalog.xid8;
+create type pg_catalog.xid8 (input = xid8in, output = xid8out);
 
 -- XML content
 -- size: -1, align: 4
-create type pg_catalog.xml;
+create type pg_catalog.xml (input = xml_in, output = xml_out);
+
+-- array of int2, used in system tables
+-- size: -1, align: 4
+create type pg_catalog.int2vector (input = int2vectorin, output = int2vectorout, element = smallint, subscript = array_subscript_handler);
+
+-- geometric line, formats '{A,B,C}'/'[point1,point2]'
+-- size: 24, align: 8
+create type pg_catalog.line (input = line_in, output = line_out, element = double precision, subscript = raw_array_subscript_handler);
+
+-- 63-byte type for storing system identifiers
+-- size: 64, align: 1
+create type pg_catalog.name (input = namein, output = nameout, element = "char", subscript = raw_array_subscript_handler);
+
+-- array of oids, used in system tables
+-- size: -1, align: 4
+create type pg_catalog.oidvector (input = oidvectorin, output = oidvectorout, element = oid, subscript = array_subscript_handler);
+
+-- geometric point, format '(x,y)'
+-- size: 16, align: 8
+create type pg_catalog.point (input = point_in, output = point_out, element = double precision, subscript = raw_array_subscript_handler);
+
+-- geometric box, format 'lower left point,upper right point'
+-- size: 32, align: 8
+create type pg_catalog.box (input = box_in, output = box_out, element = point, subscript = raw_array_subscript_handler);
+
+-- geometric line segment, format '[point1,point2]'
+-- size: 32, align: 8
+create type pg_catalog.lseg (input = lseg_in, output = lseg_out, element = point, subscript = raw_array_subscript_handler);
 
 -- range of dates
 -- size: -1, align: 4

@@ -5,7 +5,7 @@
 
 -- multi-dimensional cube '(FLOAT-1, FLOAT-2, ..., FLOAT-N), (FLOAT-1, FLOAT-2, ..., FLOAT-N)'
 -- size: -1, align: 8
-create type public.cube;
+create type public.cube (input = cube_in, output = cube_out);
 
 create function public.cube(cube, double precision) returns cube
   language c;

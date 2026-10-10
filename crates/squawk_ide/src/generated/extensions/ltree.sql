@@ -4,16 +4,16 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.lquery;
+create type public.lquery (input = lquery_in, output = lquery_out);
 
 -- size: -1, align: 4
-create type public.ltree;
+create type public.ltree (input = ltree_in, output = ltree_out);
 
 -- size: -1, align: 4
-create type public.ltree_gist;
+create type public.ltree_gist (input = ltree_gist_in, output = ltree_gist_out);
 
 -- size: -1, align: 4
-create type public.ltxtquery;
+create type public.ltxtquery (input = ltxtq_in, output = ltxtq_out);
 
 create function public._lt_q_regex(ltree[], lquery[]) returns boolean
   language c;

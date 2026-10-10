@@ -4,13 +4,13 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.halfvec;
+create type public.halfvec (input = halfvec_in, output = halfvec_out);
 
 -- size: -1, align: 4
-create type public.sparsevec;
+create type public.sparsevec (input = sparsevec_in, output = sparsevec_out);
 
 -- size: -1, align: 4
-create type public.vector;
+create type public.vector (input = vector_in, output = vector_out);
 
 create function public.array_to_halfvec(double precision[], integer, boolean) returns halfvec
   language c;
