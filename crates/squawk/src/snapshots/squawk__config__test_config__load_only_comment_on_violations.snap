@@ -6,15 +6,15 @@ Ok(
     Some(
         ConfigFile {
             excluded_paths: [],
-            excluded_rules: [
-                RequireConcurrentIndexCreation,
-            ],
+            excluded_rules: [],
             included_rules: [],
             pg_version: None,
             assume_in_transaction: None,
             upload_to_github: UploadToGitHubConfig {
                 fail_on_violations: None,
-                only_comment_on_violations: None,
+                only_comment_on_violations: Some(
+                    true,
+                ),
             },
         },
     ),

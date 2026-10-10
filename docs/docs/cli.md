@@ -149,6 +149,7 @@ excluded_paths = [
 ]
 [upload_to_github]
 fail_on_violations = true
+only_comment_on_violations = true
 ```
 
 See the [Squawk website](https://squawkhq.com/docs/rules) for documentation on each rule with examples and reasoning.
