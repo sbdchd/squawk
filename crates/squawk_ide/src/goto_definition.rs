@@ -2296,9 +2296,9 @@ $$;
             │                ─ 1. source
             ╰╴
 
-            ╭▸ builtins.sql:605:3
+            ╭▸ builtins.sql:637:3
             │
-        605 │   relname name,
+        637 │   relname name,
             ╰╴  ─────── 2. destination
         ");
     }
@@ -2334,9 +2334,9 @@ $$;
               │            ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:11102:28
+              ╭▸ builtins.sql:10492:28
               │
-        11102 │ create function pg_catalog.now() returns timestamp with time zone
+        10492 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -2648,9 +2648,9 @@ select now$0();
               │          ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:11102:28
+              ╭▸ builtins.sql:10492:28
               │
-        11102 │ create function pg_catalog.now() returns timestamp with time zone
+        10492 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -2667,9 +2667,9 @@ select extract$0(year from now());
              │              ─ 1. source
              ╰╴
 
-             ╭▸ builtins.sql:6322:28
+             ╭▸ builtins.sql:6132:28
              │
-        6322 │ create function pg_catalog.extract(text, date) returns numeric
+        6132 │ create function pg_catalog.extract(text, date) returns numeric
              ╰╴                           ─────── 2. destination
         ");
     }
@@ -2686,9 +2686,9 @@ select substring$0('abc' from 2);
               │                ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:15196:28
+              ╭▸ builtins.sql:14321:28
               │
-        15196 │ create function pg_catalog.substring(bit, integer) returns bit
+        14321 │ create function pg_catalog.substring(bit, integer) returns bit
               ╰╴                           ───────── 2. destination
         ");
     }
@@ -2705,9 +2705,9 @@ select position$0('b' in 'abc');
               │               ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:13762:28
+              ╭▸ builtins.sql:13161:28
               │
-        13762 │ create function pg_catalog.position(bit, bit) returns integer
+        13161 │ create function pg_catalog.position(bit, bit) returns integer
               ╰╴                           ──────── 2. destination
         ");
     }
@@ -2724,9 +2724,9 @@ select overlay$0('abc' placing 'x' from 2);
               │              ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:11622:28
+              ╭▸ builtins.sql:11012:28
               │
-        11622 │ create function pg_catalog.overlay(bit, bit, integer) returns bit
+        11012 │ create function pg_catalog.overlay(bit, bit, integer) returns bit
               ╰╴                           ─────── 2. destination
         ");
     }
@@ -2743,9 +2743,9 @@ select xmlexists$0('//town[text() = ''Toronto'']' passing by value '<town>Toront
               │                ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:17447:28
+              ╭▸ builtins.sql:16357:28
               │
-        17447 │ create function pg_catalog.xmlexists(text, xml) returns boolean
+        16357 │ create function pg_catalog.xmlexists(text, xml) returns boolean
               ╰╴                           ───────── 2. destination
         ");
     }
@@ -2762,9 +2762,9 @@ select system_user$0;
               │                  ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:15295:28
+              ╭▸ builtins.sql:14361:28
               │
-        15295 │ create function pg_catalog.system_user() returns text
+        14361 │ create function pg_catalog.system_user() returns text
               ╰╴                           ─────────── 2. destination
         ");
     }
@@ -2781,9 +2781,9 @@ select trim$0(both 'x' from 'xxhixx');
              │           ─ 1. source
              ╰╴
 
-             ╭▸ builtins.sql:5018:28
+             ╭▸ builtins.sql:4878:28
              │
-        5018 │ create function pg_catalog.btrim(bytea, bytea) returns bytea
+        4878 │ create function pg_catalog.btrim(bytea, bytea) returns bytea
              ╰╴                           ───── 2. destination
         ");
     }
@@ -2794,16 +2794,16 @@ select trim$0(both 'x' from 'xxhixx');
 -- include-builtins
 select trim$0(leading 'x' from 'xxhi');
 "), @"
-              ╭▸ current.sql:3:11
-              │
-            3 │ select trim(leading 'x' from 'xxhi');
-              │           ─ 1. source
-              ╰╴
+             ╭▸ current.sql:3:11
+             │
+           3 │ select trim(leading 'x' from 'xxhi');
+             │           ─ 1. source
+             ╰╴
 
-              ╭▸ builtins.sql:10090:28
-              │
-        10090 │ create function pg_catalog.ltrim(bytea, bytea) returns bytea
-              ╰╴                           ───── 2. destination
+             ╭▸ builtins.sql:9816:28
+             │
+        9816 │ create function pg_catalog.ltrim(bytea, bytea) returns bytea
+             ╰╴                           ───── 2. destination
         ");
     }
 
@@ -2819,9 +2819,9 @@ select trim$0(trailing 'x' from 'hixx');
               │           ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:14646:28
+              ╭▸ builtins.sql:13937:28
               │
-        14646 │ create function pg_catalog.rtrim(bytea, bytea) returns bytea
+        13937 │ create function pg_catalog.rtrim(bytea, bytea) returns bytea
               ╰╴                           ───── 2. destination
         ");
     }
@@ -2838,9 +2838,9 @@ select collation$0 for ('x');
               │                ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:11874:28
+              ╭▸ builtins.sql:11264:28
               │
-        11874 │ create function pg_catalog.pg_collation_for("any") returns text
+        11264 │ create function pg_catalog.pg_collation_for("any") returns text
               ╰╴                           ──────────────── 2. destination
         "#);
     }
@@ -2857,9 +2857,9 @@ select 'abc' is normalized$0;
              │                          ─ 1. source
              ╰╴
 
-             ╭▸ builtins.sql:8978:28
+             ╭▸ builtins.sql:8788:28
              │
-        8978 │ create function pg_catalog.is_normalized(text, text DEFAULT 'NFC'::text) returns boolean
+        8788 │ create function pg_catalog.is_normalized(text, text DEFAULT 'NFC'::text) returns boolean
              ╰╴                           ───────────── 2. destination
         ");
     }
@@ -2876,9 +2876,9 @@ select (date '2026-01-01', date '2026-01-02') overlaps$0 (date '2026-01-02', dat
               │                                                      ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:11570:28
+              ╭▸ builtins.sql:10960:28
               │
-        11570 │ create function pg_catalog.overlaps(time with time zone, time with time zone, time with time zone, time with time zone) returns boo…
+        10960 │ create function pg_catalog.overlaps(time with time zone, time with time zone, time with time zone, time with time zone) returns boo…
               ╰╴                           ──────── 2. destination
         ");
     }
@@ -2895,9 +2895,9 @@ select timestamp '2026-01-01' at time zone$0 'UTC';
               │                                          ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:16087:28
+              ╭▸ builtins.sql:15153:28
               │
-        16087 │ create function pg_catalog.timezone(interval, time with time zone) returns time with time zone
+        15153 │ create function pg_catalog.timezone(interval, time with time zone) returns time with time zone
               ╰╴                           ──────── 2. destination
         ");
     }
@@ -2914,9 +2914,9 @@ select timestamptz '2026-01-01 UTC' at local$0;
               │                                            ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:16087:28
+              ╭▸ builtins.sql:15153:28
               │
-        16087 │ create function pg_catalog.timezone(interval, time with time zone) returns time with time zone
+        15153 │ create function pg_catalog.timezone(interval, time with time zone) returns time with time zone
               ╰╴                           ──────── 2. destination
         ");
     }
@@ -2933,9 +2933,9 @@ select current_role$0;
              │                   ─ 1. source
              ╰╴
 
-             ╭▸ builtins.sql:5705:28
+             ╭▸ builtins.sql:5522:28
              │
-        5705 │ create function pg_catalog.current_user() returns name
+        5522 │ create function pg_catalog.current_user() returns name
              ╰╴                           ──────────── 2. destination
         ");
     }
@@ -2952,9 +2952,9 @@ select current_catalog$0;
              │                      ─ 1. source
              ╰╴
 
-             ╭▸ builtins.sql:5681:28
+             ╭▸ builtins.sql:5498:28
              │
-        5681 │ create function pg_catalog.current_database() returns name
+        5498 │ create function pg_catalog.current_database() returns name
              ╰╴                           ──────────────── 2. destination
         ");
     }
@@ -2971,9 +2971,9 @@ select current_timestamp$0;
               │                        ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:11102:28
+              ╭▸ builtins.sql:10492:28
               │
-        11102 │ create function pg_catalog.now() returns timestamp with time zone
+        10492 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -3099,9 +3099,9 @@ select * from t where current_timestamp$0 > t.created_at;
               │                                       ─ 1. source
               ╰╴
 
-              ╭▸ builtins.sql:11102:28
+              ╭▸ builtins.sql:10492:28
               │
-        11102 │ create function pg_catalog.now() returns timestamp with time zone
+        10492 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -5035,9 +5035,9 @@ select feature_name$0 from t;
             │                   ─ 1. source
             ╰╴
 
-            ╭▸ builtins.sql:450:3
+            ╭▸ builtins.sql:482:3
             │
-        450 │   feature_name information_schema.character_data,
+        482 │   feature_name information_schema.character_data,
             ╰╴  ──────────── 2. destination
         ");
     }

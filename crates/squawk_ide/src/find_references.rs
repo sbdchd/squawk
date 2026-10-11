@@ -425,9 +425,9 @@ select now();
               │        ─── 2. reference
               ╰╴
 
-              ╭▸ builtins.sql:11102:28
+              ╭▸ builtins.sql:10492:28
               │
-        11102 │ create function pg_catalog.now() returns timestamp with time zone
+        10492 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 3. reference
         ");
     }
