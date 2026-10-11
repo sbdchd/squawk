@@ -4,10 +4,10 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.ghstore (input = ghstore_in, output = ghstore_out);
+create type public.ghstore;
 
 -- size: -1, align: 4
-create type public.hstore (input = hstore_in, output = hstore_out, subscript = hstore_subscript_handler);
+create type public.hstore;
 
 create function public.akeys(hstore) returns text[]
   language c;
@@ -189,6 +189,11 @@ create function public.svals(hstore) returns SETOF text
 create function public.tconvert(text, text) returns hstore
   language c;
 
+create type public.ghstore (input = ghstore_in, output = ghstore_out);
+
+-- subscript: pg_catalog.text
+create type public.hstore (input = hstore_in, output = hstore_out, subscript = hstore_subscript_handler);
+
 create operator public.#<# (
   leftarg = hstore,
   rightarg = hstore,
@@ -312,4 +317,20 @@ create cast (hstore as json) with function public.hstore_to_json(hstore);
 create cast (hstore as jsonb) with function public.hstore_to_jsonb(hstore);
 
 create cast (text[] as hstore) with function public.hstore(text[]);
+
+create operator family public.btree_hstore_ops using btree;
+
+create operator family public.gin_hstore_ops using gin;
+
+create operator family public.gist_hstore_ops using gist;
+
+create operator family public.hash_hstore_ops using hash;
+
+create operator class public.btree_hstore_ops default for type hstore using btree family public.btree_hstore_ops as storage hstore;
+
+create operator class public.gin_hstore_ops default for type hstore using gin family public.gin_hstore_ops as storage text;
+
+create operator class public.gist_hstore_ops default for type hstore using gist family public.gist_hstore_ops as storage ghstore;
+
+create operator class public.hash_hstore_ops default for type hstore using hash family public.hash_hstore_ops as storage hstore;
 

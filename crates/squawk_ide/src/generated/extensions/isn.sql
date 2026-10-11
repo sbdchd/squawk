@@ -5,35 +5,35 @@
 
 -- International European Article Number (EAN13)
 -- size: 8, align: 8
-create type public.ean13 (input = ean13_in, output = public.ean13_out);
+create type public.ean13;
 
 -- International Standard Book Number (ISBN)
 -- size: 8, align: 8
-create type public.isbn (input = isbn_in, output = public.isn_out);
+create type public.isbn;
 
 -- International Standard Book Number 13 (ISBN13)
 -- size: 8, align: 8
-create type public.isbn13 (input = isbn13_in, output = public.ean13_out);
+create type public.isbn13;
 
 -- International Standard Music Number (ISMN)
 -- size: 8, align: 8
-create type public.ismn (input = ismn_in, output = public.isn_out);
+create type public.ismn;
 
 -- International Standard Music Number 13 (ISMN13)
 -- size: 8, align: 8
-create type public.ismn13 (input = ismn13_in, output = public.ean13_out);
+create type public.ismn13;
 
 -- International Standard Serial Number (ISSN)
 -- size: 8, align: 8
-create type public.issn (input = issn_in, output = public.isn_out);
+create type public.issn;
 
 -- International Standard Serial Number 13 (ISSN13)
 -- size: 8, align: 8
-create type public.issn13 (input = issn13_in, output = public.ean13_out);
+create type public.issn13;
 
 -- Universal Product Code (UPC)
 -- size: 8, align: 8
-create type public.upc (input = upc_in, output = public.isn_out);
+create type public.upc;
 
 create function public.btean13cmp(ean13, ean13) returns integer
   language internal;
@@ -769,6 +769,22 @@ create function public.upc(ean13) returns upc
 
 create function public.upc_in(cstring) returns upc
   language c;
+
+create type public.ean13 (input = ean13_in, output = public.ean13_out);
+
+create type public.isbn (input = isbn_in, output = public.isn_out);
+
+create type public.isbn13 (input = isbn13_in, output = public.ean13_out);
+
+create type public.ismn (input = ismn_in, output = public.isn_out);
+
+create type public.ismn13 (input = ismn13_in, output = public.ean13_out);
+
+create type public.issn (input = issn_in, output = public.isn_out);
+
+create type public.issn13 (input = issn13_in, output = public.ean13_out);
+
+create type public.upc (input = upc_in, output = public.isn_out);
 
 create operator public.< (
   leftarg = ean13,
@@ -1817,4 +1833,40 @@ create cast (issn13 as ean13) without function as assignment;
 create cast (issn13 as issn) without function as assignment;
 
 create cast (upc as ean13) without function as assignment;
+
+create operator family public.isn_ops using btree;
+
+create operator family public.isn_ops using hash;
+
+create operator class public.ean13_ops default for type ean13 using btree family public.isn_ops as storage ean13;
+
+create operator class public.ean13_ops default for type ean13 using hash family public.isn_ops as storage ean13;
+
+create operator class public.isbn13_ops default for type isbn13 using btree family public.isn_ops as storage isbn13;
+
+create operator class public.isbn13_ops default for type isbn13 using hash family public.isn_ops as storage isbn13;
+
+create operator class public.isbn_ops default for type isbn using btree family public.isn_ops as storage isbn;
+
+create operator class public.isbn_ops default for type isbn using hash family public.isn_ops as storage isbn;
+
+create operator class public.ismn13_ops default for type ismn13 using btree family public.isn_ops as storage ismn13;
+
+create operator class public.ismn13_ops default for type ismn13 using hash family public.isn_ops as storage ismn13;
+
+create operator class public.ismn_ops default for type ismn using btree family public.isn_ops as storage ismn;
+
+create operator class public.ismn_ops default for type ismn using hash family public.isn_ops as storage ismn;
+
+create operator class public.issn13_ops default for type issn13 using btree family public.isn_ops as storage issn13;
+
+create operator class public.issn13_ops default for type issn13 using hash family public.isn_ops as storage issn13;
+
+create operator class public.issn_ops default for type issn using btree family public.isn_ops as storage issn;
+
+create operator class public.issn_ops default for type issn using hash family public.isn_ops as storage issn;
+
+create operator class public.upc_ops default for type upc using btree family public.isn_ops as storage upc;
+
+create operator class public.upc_ops default for type upc using hash family public.isn_ops as storage upc;
 

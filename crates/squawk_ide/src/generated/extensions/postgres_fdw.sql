@@ -18,3 +18,5 @@ create function public.postgres_fdw_handler() returns fdw_handler
 create function public.postgres_fdw_validator(text[], oid) returns void
   language c;
 
+create foreign data wrapper postgres_fdw handler public.postgres_fdw_handler validator public.postgres_fdw_validator;
+

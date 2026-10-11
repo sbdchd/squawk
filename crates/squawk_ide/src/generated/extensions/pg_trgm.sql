@@ -4,7 +4,7 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.gtrgm (input = gtrgm_in, output = gtrgm_out);
+create type public.gtrgm;
 
 create function public.gin_extract_query_trgm(text, internal, smallint, internal, internal, internal, internal) returns internal
   language c;
@@ -99,6 +99,8 @@ create function public.word_similarity_dist_op(text, text) returns real
 create function public.word_similarity_op(text, text) returns boolean
   language c;
 
+create type public.gtrgm (input = gtrgm_in, output = gtrgm_out);
+
 create operator public.% (
   leftarg = text,
   rightarg = text,
@@ -158,4 +160,12 @@ create operator public.<<<-> (
   rightarg = text,
   function = public.strict_word_similarity_dist_op
 );
+
+create operator family public.gin_trgm_ops using gin;
+
+create operator family public.gist_trgm_ops using gist;
+
+create operator class public.gin_trgm_ops for type text using gin family public.gin_trgm_ops as storage integer;
+
+create operator class public.gist_trgm_ops for type text using gist family public.gist_trgm_ops as storage gtrgm;
 

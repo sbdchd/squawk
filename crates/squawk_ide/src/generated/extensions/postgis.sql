@@ -4,25 +4,25 @@
 --   cargo xtask sync-builtins
 
 -- size: 65, align: 4
-create type public.box2d (input = box2d_in, output = box2d_out);
+create type public.box2d;
 
 -- size: 16, align: 8
-create type public.box2df (input = box2df_in, output = box2df_out);
+create type public.box2df;
 
 -- size: 52, align: 8
-create type public.box3d (input = box3d_in, output = box3d_out);
+create type public.box3d;
 
 -- size: -1, align: 8
-create type public.geography (input = geography_in, output = geography_out);
+create type public.geography;
 
 -- size: -1, align: 8
-create type public.geometry (input = geometry_in, output = geometry_out);
+create type public.geometry;
 
 -- size: -1, align: 8
-create type public.gidx (input = gidx_in, output = gidx_out);
+create type public.gidx;
 
 -- size: 65, align: 8
-create type public.spheroid (input = spheroid_in, output = spheroid_out);
+create type public.spheroid;
 
 create type public.geometry_dump as (
   path integer[],
@@ -980,12 +980,6 @@ create function public.st_3ddistance(geom1 geometry, geom2 geometry) returns dou
 create function public.st_3ddwithin(geom1 geometry, geom2 geometry, double precision) returns boolean
   language c;
 
-create aggregate public.st_3dextent(geometry) (
-  sfunc = public.st_combinebbox,
-  stype = box3d,
-  combinefunc = public.st_combinebbox
-);
-
 create function public.st_3dintersects(geom1 geometry, geom2 geometry) returns boolean
   language c;
 
@@ -1079,36 +1073,6 @@ create function public.st_asewkt(geometry, integer) returns text
 create function public.st_asewkt(text) returns text
   language sql;
 
-create aggregate public.st_asflatgeobuf(anyelement) (
-  sfunc = public.pgis_asflatgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asflatgeobuf_finalfn
-);
-
-create aggregate public.st_asflatgeobuf(anyelement, boolean) (
-  sfunc = public.pgis_asflatgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asflatgeobuf_finalfn
-);
-
-create aggregate public.st_asflatgeobuf(anyelement, boolean, text) (
-  sfunc = public.pgis_asflatgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asflatgeobuf_finalfn
-);
-
-create aggregate public.st_asgeobuf(anyelement) (
-  sfunc = public.pgis_asgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asgeobuf_finalfn
-);
-
-create aggregate public.st_asgeobuf(anyelement, text) (
-  sfunc = public.pgis_asgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asgeobuf_finalfn
-);
-
 create function public.st_asgeojson(geog geography, maxdecimaldigits integer DEFAULT 9, options integer DEFAULT 0) returns text
   language c;
 
@@ -1156,41 +1120,6 @@ create function public.st_aslatlontext(geom geometry, tmpl text DEFAULT ''::text
 
 create function public.st_asmarc21(geom geometry, format text DEFAULT 'hdddmmss'::text) returns text
   language c;
-
-create aggregate public.st_asmvt(anyelement) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text, integer) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text, integer, text) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text, integer, text, text) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
 
 create function public.st_asmvtgeom(geom geometry, bounds box2d, extent integer DEFAULT 4096, buffer integer DEFAULT 256, clip_geom boolean DEFAULT true) returns geometry
   language c;
@@ -1309,12 +1238,6 @@ create function public.st_closestpointofapproach(geometry, geometry) returns dou
 create function public.st_clusterdbscan(geometry, eps double precision, minpoints integer) returns integer
   language c;
 
-create aggregate public.st_clusterintersecting(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_clusterintersecting_finalfn
-);
-
 create function public.st_clusterintersecting(geometry[]) returns geometry[]
   language c;
 
@@ -1324,12 +1247,6 @@ create function public.st_clusterintersectingwin(geometry) returns integer
 create function public.st_clusterkmeans(geom geometry, k integer, max_radius double precision DEFAULT NULL::double precision) returns integer
   language c;
 
-create aggregate public.st_clusterwithin(geometry, double precision) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_clusterwithin_finalfn
-);
-
 create function public.st_clusterwithin(geometry[], double precision) returns geometry[]
   language c;
 
@@ -1338,12 +1255,6 @@ create function public.st_clusterwithinwin(geometry, distance double precision) 
 
 create function public.st_collect(geom1 geometry, geom2 geometry) returns geometry
   language c;
-
-create aggregate public.st_collect(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_collect_finalfn
-);
 
 create function public.st_collect(geometry[]) returns geometry
   language c;
@@ -1389,12 +1300,6 @@ create function public.st_coverageinvalidedges(geom geometry, tolerance double p
 
 create function public.st_coveragesimplify(geom geometry, tolerance double precision, simplifyboundary boolean DEFAULT true) returns geometry
   language c;
-
-create aggregate public.st_coverageunion(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_coverageunion_finalfn
-);
 
 create function public.st_coverageunion(geometry[]) returns geometry
   language c;
@@ -1524,13 +1429,6 @@ create function public.st_expand(geom geometry, dx double precision, dy double p
 
 create function public.st_expand(geometry, double precision) returns geometry
   language c;
-
-create aggregate public.st_extent(geometry) (
-  sfunc = public.st_combinebbox,
-  stype = box3d,
-  finalfunc = public.box2d,
-  combinefunc = public.st_combinebbox
-);
 
 create function public.st_exteriorring(geometry) returns geometry
   language c;
@@ -1901,12 +1799,6 @@ create function public.st_makeenvelope(double precision, double precision, doubl
 create function public.st_makeline(geom1 geometry, geom2 geometry) returns geometry
   language c;
 
-create aggregate public.st_makeline(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_makeline_finalfn
-);
-
 create function public.st_makeline(geometry[]) returns geometry
   language c;
 
@@ -1940,20 +1832,8 @@ create function public.st_maxdistance(geom1 geometry, geom2 geometry) returns do
 create function public.st_maximuminscribedcircle(geometry, OUT center geometry, OUT nearest geometry, OUT radius double precision) returns record
   language c;
 
-create aggregate public.st_memcollect(geometry) (
-  sfunc = public.st_collect,
-  stype = geometry,
-  combinefunc = public.st_collect
-);
-
 create function public.st_memsize(geometry) returns integer
   language c;
-
-create aggregate public.st_memunion(geometry) (
-  sfunc = public.st_union,
-  stype = geometry,
-  combinefunc = public.st_union
-);
 
 create function public.st_minimumboundingcircle(inputgeom geometry, segs_per_quarter integer DEFAULT 48) returns geometry
   language c;
@@ -2161,12 +2041,6 @@ create function public.st_polygonfromwkb(bytea) returns geometry
 
 create function public.st_polygonfromwkb(bytea, integer) returns geometry
   language sql;
-
-create aggregate public.st_polygonize(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_polygonize_finalfn
-);
 
 create function public.st_polygonize(geometry[]) returns geometry
   language c;
@@ -2390,20 +2264,6 @@ create function public.st_union(geom1 geometry, geom2 geometry) returns geometry
 create function public.st_union(geom1 geometry, geom2 geometry, gridsize double precision) returns geometry
   language c;
 
-create aggregate public.st_union(geometry) (
-  sfunc = public.pgis_geometry_union_parallel_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_union_parallel_finalfn,
-  combinefunc = pgis_geometry_union_parallel_combinefn
-);
-
-create aggregate public.st_union(geometry, gridsize double precision) (
-  sfunc = public.pgis_geometry_union_parallel_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_union_parallel_finalfn,
-  combinefunc = pgis_geometry_union_parallel_combinefn
-);
-
 create function public.st_union(geometry[]) returns geometry
   language c;
 
@@ -2466,6 +2326,160 @@ create function public.updategeometrysrid(character varying, character varying, 
 
 create function public.updategeometrysrid(character varying, character varying, integer) returns text
   language plpgsql;
+
+create aggregate public.st_3dextent(geometry) (
+  sfunc = public.st_combinebbox,
+  stype = box3d,
+  combinefunc = public.st_combinebbox
+);
+
+create aggregate public.st_asflatgeobuf(anyelement) (
+  sfunc = public.pgis_asflatgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asflatgeobuf_finalfn
+);
+
+create aggregate public.st_asflatgeobuf(anyelement, boolean) (
+  sfunc = public.pgis_asflatgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asflatgeobuf_finalfn
+);
+
+create aggregate public.st_asflatgeobuf(anyelement, boolean, text) (
+  sfunc = public.pgis_asflatgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asflatgeobuf_finalfn
+);
+
+create aggregate public.st_asgeobuf(anyelement) (
+  sfunc = public.pgis_asgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asgeobuf_finalfn
+);
+
+create aggregate public.st_asgeobuf(anyelement, text) (
+  sfunc = public.pgis_asgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asgeobuf_finalfn
+);
+
+create aggregate public.st_asmvt(anyelement) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn
+);
+
+create aggregate public.st_asmvt(anyelement, text) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn
+);
+
+create aggregate public.st_asmvt(anyelement, text, integer) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn
+);
+
+create aggregate public.st_asmvt(anyelement, text, integer, text) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn
+);
+
+create aggregate public.st_asmvt(anyelement, text, integer, text, text) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn
+);
+
+create aggregate public.st_clusterintersecting(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_clusterintersecting_finalfn
+);
+
+create aggregate public.st_clusterwithin(geometry, double precision) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_clusterwithin_finalfn
+);
+
+create aggregate public.st_collect(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_collect_finalfn
+);
+
+create aggregate public.st_coverageunion(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_coverageunion_finalfn
+);
+
+create aggregate public.st_extent(geometry) (
+  sfunc = public.st_combinebbox,
+  stype = box3d,
+  finalfunc = public.box2d,
+  combinefunc = public.st_combinebbox
+);
+
+create aggregate public.st_makeline(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_makeline_finalfn
+);
+
+create aggregate public.st_memcollect(geometry) (
+  sfunc = public.st_collect,
+  stype = geometry,
+  combinefunc = public.st_collect
+);
+
+create aggregate public.st_memunion(geometry) (
+  sfunc = public.st_union,
+  stype = geometry,
+  combinefunc = public.st_union
+);
+
+create aggregate public.st_polygonize(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_polygonize_finalfn
+);
+
+create aggregate public.st_union(geometry) (
+  sfunc = public.pgis_geometry_union_parallel_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_union_parallel_finalfn,
+  combinefunc = pgis_geometry_union_parallel_combinefn
+);
+
+create aggregate public.st_union(geometry, gridsize double precision) (
+  sfunc = public.pgis_geometry_union_parallel_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_union_parallel_finalfn,
+  combinefunc = pgis_geometry_union_parallel_combinefn
+);
+
+create type public.box2d (input = box2d_in, output = box2d_out);
+
+create type public.box2df (input = box2df_in, output = box2df_out);
+
+create type public.box3d (input = box3d_in, output = box3d_out);
+
+create type public.geography (input = geography_in, output = geography_out);
+
+create type public.geometry (input = geometry_in, output = geometry_out);
+
+create type public.gidx (input = gidx_in, output = gidx_out);
+
+create type public.spheroid (input = spheroid_in, output = spheroid_out);
 
 create operator public.&& (
   leftarg = box2df,
@@ -2830,4 +2844,60 @@ create cast (point as geometry) with function public.geometry(point);
 create cast (polygon as geometry) with function public.geometry(polygon);
 
 create cast (text as geometry) with function public.geometry(text) as implicit;
+
+create operator family public.brin_geography_inclusion_ops using brin;
+
+create operator family public.brin_geometry_inclusion_ops_2d using brin;
+
+create operator family public.brin_geometry_inclusion_ops_3d using brin;
+
+create operator family public.brin_geometry_inclusion_ops_4d using brin;
+
+create operator family public.btree_geography_ops using btree;
+
+create operator family public.btree_geometry_ops using btree;
+
+create operator family public.gist_geography_ops using gist;
+
+create operator family public.gist_geometry_ops_2d using gist;
+
+create operator family public.gist_geometry_ops_nd using gist;
+
+create operator family public.hash_geometry_ops using hash;
+
+create operator family public.spgist_geography_ops_nd using spgist;
+
+create operator family public.spgist_geometry_ops_2d using spgist;
+
+create operator family public.spgist_geometry_ops_3d using spgist;
+
+create operator family public.spgist_geometry_ops_nd using spgist;
+
+create operator class public.brin_geography_inclusion_ops default for type geography using brin family public.brin_geography_inclusion_ops as storage gidx;
+
+create operator class public.brin_geometry_inclusion_ops_2d default for type geometry using brin family public.brin_geometry_inclusion_ops_2d as storage box2df;
+
+create operator class public.brin_geometry_inclusion_ops_3d for type geometry using brin family public.brin_geometry_inclusion_ops_3d as storage gidx;
+
+create operator class public.brin_geometry_inclusion_ops_4d for type geometry using brin family public.brin_geometry_inclusion_ops_4d as storage gidx;
+
+create operator class public.btree_geography_ops default for type geography using btree family public.btree_geography_ops as storage geography;
+
+create operator class public.btree_geometry_ops default for type geometry using btree family public.btree_geometry_ops as storage geometry;
+
+create operator class public.gist_geography_ops default for type geography using gist family public.gist_geography_ops as storage gidx;
+
+create operator class public.gist_geometry_ops_2d default for type geometry using gist family public.gist_geometry_ops_2d as storage box2df;
+
+create operator class public.gist_geometry_ops_nd for type geometry using gist family public.gist_geometry_ops_nd as storage gidx;
+
+create operator class public.hash_geometry_ops default for type geometry using hash family public.hash_geometry_ops as storage geometry;
+
+create operator class public.spgist_geography_ops_nd default for type geography using spgist family public.spgist_geography_ops_nd as storage geography;
+
+create operator class public.spgist_geometry_ops_2d default for type geometry using spgist family public.spgist_geometry_ops_2d as storage geometry;
+
+create operator class public.spgist_geometry_ops_3d for type geometry using spgist family public.spgist_geometry_ops_3d as storage geometry;
+
+create operator class public.spgist_geometry_ops_nd for type geometry using spgist family public.spgist_geometry_ops_nd as storage geometry;
 

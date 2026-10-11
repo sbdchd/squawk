@@ -4,51 +4,16 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.hll (input = hll_in, output = hll_out);
+create type public.hll;
 
 -- size: 8, align: 8
-create type public.hll_hashval (input = hll_hashval_in, output = hll_hashval_out);
+create type public.hll_hashval;
 
 create function public.hll(hll, integer, boolean) returns hll
   language c;
 
 create function public.hll_add(hll, hll_hashval) returns hll
   language c;
-
-create aggregate public.hll_add_agg(hll_hashval) (
-  sfunc = hll_add_trans0,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer) (
-  sfunc = hll_add_trans1,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer, integer) (
-  sfunc = hll_add_trans2,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint) (
-  sfunc = hll_add_trans3,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
-  sfunc = hll_add_trans4,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
 
 create function public.hll_add_rev(hll_hashval, hll) returns hll
   language c;
@@ -200,6 +165,47 @@ create function public.hll_typmod_out(integer) returns cstring
 create function public.hll_union(hll, hll) returns hll
   language c;
 
+create function public.hll_union_internal(internal, internal) returns internal
+  language c;
+
+create function public.hll_union_trans(internal, hll) returns internal
+  language c;
+
+create aggregate public.hll_add_agg(hll_hashval) (
+  sfunc = hll_add_trans0,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer) (
+  sfunc = hll_add_trans1,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer, integer) (
+  sfunc = hll_add_trans2,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint) (
+  sfunc = hll_add_trans3,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
+  sfunc = hll_add_trans4,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal
+);
+
 create aggregate public.hll_union_agg(hll) (
   sfunc = hll_union_trans,
   stype = internal,
@@ -207,11 +213,9 @@ create aggregate public.hll_union_agg(hll) (
   combinefunc = hll_union_internal
 );
 
-create function public.hll_union_internal(internal, internal) returns internal
-  language c;
+create type public.hll (input = hll_in, output = hll_out);
 
-create function public.hll_union_trans(internal, hll) returns internal
-  language c;
+create type public.hll_hashval (input = hll_hashval_in, output = hll_hashval_out);
 
 create operator public.# (
   rightarg = hll,

@@ -4,7 +4,7 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.citext (input = citextin, output = citextout);
+create type public.citext;
 
 create function public.citext(boolean) returns citext
   language internal;
@@ -75,18 +75,6 @@ create function public.citextrecv(internal) returns citext
 create function public.citextsend(citext) returns bytea
   language internal;
 
-create aggregate public.max(citext) (
-  sfunc = citext_larger,
-  stype = citext,
-  combinefunc = citext_larger
-);
-
-create aggregate public.min(citext) (
-  sfunc = citext_smaller,
-  stype = citext,
-  combinefunc = citext_smaller
-);
-
 create function public.regexp_match(string citext, pattern citext) returns text[]
   language sql;
 
@@ -152,6 +140,20 @@ create function public.texticregexne(citext, text) returns boolean
 
 create function public.translate(citext, citext, text) returns text
   language sql;
+
+create aggregate public.max(citext) (
+  sfunc = citext_larger,
+  stype = citext,
+  combinefunc = citext_larger
+);
+
+create aggregate public.min(citext) (
+  sfunc = citext_smaller,
+  stype = citext,
+  combinefunc = citext_smaller
+);
+
+create type public.citext (input = citextin, output = citextout, category = 'S');
 
 create operator public.!~ (
   leftarg = citext,
@@ -324,4 +326,16 @@ create cast (citext as text) without function as implicit;
 create cast (inet as citext) with function public.citext(inet) as assignment;
 
 create cast (text as citext) without function as assignment;
+
+create operator family public.citext_ops using btree;
+
+create operator family public.citext_ops using hash;
+
+create operator family public.citext_pattern_ops using btree;
+
+create operator class public.citext_ops default for type citext using btree family public.citext_ops as storage citext;
+
+create operator class public.citext_ops default for type citext using hash family public.citext_ops as storage citext;
+
+create operator class public.citext_pattern_ops for type citext using btree family public.citext_pattern_ops as storage citext;
 

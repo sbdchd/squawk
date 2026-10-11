@@ -4,13 +4,13 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.halfvec (input = halfvec_in, output = halfvec_out);
+create type public.halfvec;
 
 -- size: -1, align: 4
-create type public.sparsevec (input = sparsevec_in, output = sparsevec_out);
+create type public.sparsevec;
 
 -- size: -1, align: 4
-create type public.vector (input = vector_in, output = vector_out);
+create type public.vector;
 
 create function public.array_to_halfvec(double precision[], integer, boolean) returns halfvec
   language c;
@@ -47,22 +47,6 @@ create function public.array_to_vector(numeric[], integer, boolean) returns vect
 
 create function public.array_to_vector(real[], integer, boolean) returns vector
   language c;
-
-create aggregate public.avg(halfvec) (
-  sfunc = halfvec_accum,
-  stype = double precision[],
-  finalfunc = halfvec_avg,
-  combinefunc = halfvec_combine,
-  initcond = '{0}'
-);
-
-create aggregate public.avg(vector) (
-  sfunc = vector_accum,
-  stype = double precision[],
-  finalfunc = vector_avg,
-  combinefunc = vector_combine,
-  initcond = '{0}'
-);
 
 create function public.binary_quantize(halfvec) returns bit
   language c;
@@ -283,18 +267,6 @@ create function public.subvector(halfvec, integer, integer) returns halfvec
 create function public.subvector(vector, integer, integer) returns vector
   language c;
 
-create aggregate public.sum(halfvec) (
-  sfunc = halfvec_add,
-  stype = halfvec,
-  combinefunc = halfvec_add
-);
-
-create aggregate public.sum(vector) (
-  sfunc = vector_add,
-  stype = vector,
-  combinefunc = vector_add
-);
-
 create function public.vector(vector, integer, boolean) returns vector
   language c;
 
@@ -381,6 +353,40 @@ create function public.vector_to_sparsevec(vector, integer, boolean) returns spa
 
 create function public.vector_typmod_in(cstring[]) returns integer
   language c;
+
+create aggregate public.avg(halfvec) (
+  sfunc = halfvec_accum,
+  stype = double precision[],
+  finalfunc = halfvec_avg,
+  combinefunc = halfvec_combine,
+  initcond = '{0}'
+);
+
+create aggregate public.avg(vector) (
+  sfunc = vector_accum,
+  stype = double precision[],
+  finalfunc = vector_avg,
+  combinefunc = vector_combine,
+  initcond = '{0}'
+);
+
+create aggregate public.sum(halfvec) (
+  sfunc = halfvec_add,
+  stype = halfvec,
+  combinefunc = halfvec_add
+);
+
+create aggregate public.sum(vector) (
+  sfunc = vector_add,
+  stype = vector,
+  combinefunc = vector_add
+);
+
+create type public.halfvec (input = halfvec_in, output = halfvec_out);
+
+create type public.sparsevec (input = sparsevec_in, output = sparsevec_out);
+
+create type public.vector (input = vector_in, output = vector_out);
 
 create operator public.* (
   leftarg = halfvec,
@@ -667,4 +673,106 @@ create cast (vector as real[]) with function public.vector_to_float4(vector, int
 create cast (vector as sparsevec) with function public.vector_to_sparsevec(vector, integer, boolean) as implicit;
 
 create cast (vector as vector) with function public.vector(vector, integer, boolean) as implicit;
+
+-- hnsw index access method
+create access method hnsw type index handler public.hnswhandler;
+
+-- ivfflat index access method
+create access method ivfflat type index handler public.ivfflathandler;
+
+create operator family public.bit_hamming_ops using hnsw;
+
+create operator family public.bit_hamming_ops using ivfflat;
+
+create operator family public.bit_jaccard_ops using hnsw;
+
+create operator family public.halfvec_cosine_ops using hnsw;
+
+create operator family public.halfvec_cosine_ops using ivfflat;
+
+create operator family public.halfvec_ip_ops using hnsw;
+
+create operator family public.halfvec_ip_ops using ivfflat;
+
+create operator family public.halfvec_l1_ops using hnsw;
+
+create operator family public.halfvec_l2_ops using hnsw;
+
+create operator family public.halfvec_l2_ops using ivfflat;
+
+create operator family public.halfvec_ops using btree;
+
+create operator family public.sparsevec_cosine_ops using hnsw;
+
+create operator family public.sparsevec_ip_ops using hnsw;
+
+create operator family public.sparsevec_l1_ops using hnsw;
+
+create operator family public.sparsevec_l2_ops using hnsw;
+
+create operator family public.sparsevec_ops using btree;
+
+create operator family public.vector_cosine_ops using hnsw;
+
+create operator family public.vector_cosine_ops using ivfflat;
+
+create operator family public.vector_ip_ops using hnsw;
+
+create operator family public.vector_ip_ops using ivfflat;
+
+create operator family public.vector_l1_ops using hnsw;
+
+create operator family public.vector_l2_ops using hnsw;
+
+create operator family public.vector_l2_ops using ivfflat;
+
+create operator family public.vector_ops using btree;
+
+create operator class public.bit_hamming_ops for type bit using hnsw family public.bit_hamming_ops as storage bit;
+
+create operator class public.bit_hamming_ops for type bit using ivfflat family public.bit_hamming_ops as storage bit;
+
+create operator class public.bit_jaccard_ops for type bit using hnsw family public.bit_jaccard_ops as storage bit;
+
+create operator class public.halfvec_cosine_ops for type halfvec using hnsw family public.halfvec_cosine_ops as storage halfvec;
+
+create operator class public.halfvec_cosine_ops for type halfvec using ivfflat family public.halfvec_cosine_ops as storage halfvec;
+
+create operator class public.halfvec_ip_ops for type halfvec using hnsw family public.halfvec_ip_ops as storage halfvec;
+
+create operator class public.halfvec_ip_ops for type halfvec using ivfflat family public.halfvec_ip_ops as storage halfvec;
+
+create operator class public.halfvec_l1_ops for type halfvec using hnsw family public.halfvec_l1_ops as storage halfvec;
+
+create operator class public.halfvec_l2_ops for type halfvec using hnsw family public.halfvec_l2_ops as storage halfvec;
+
+create operator class public.halfvec_l2_ops for type halfvec using ivfflat family public.halfvec_l2_ops as storage halfvec;
+
+create operator class public.halfvec_ops default for type halfvec using btree family public.halfvec_ops as storage halfvec;
+
+create operator class public.sparsevec_cosine_ops for type sparsevec using hnsw family public.sparsevec_cosine_ops as storage sparsevec;
+
+create operator class public.sparsevec_ip_ops for type sparsevec using hnsw family public.sparsevec_ip_ops as storage sparsevec;
+
+create operator class public.sparsevec_l1_ops for type sparsevec using hnsw family public.sparsevec_l1_ops as storage sparsevec;
+
+create operator class public.sparsevec_l2_ops for type sparsevec using hnsw family public.sparsevec_l2_ops as storage sparsevec;
+
+create operator class public.sparsevec_ops default for type sparsevec using btree family public.sparsevec_ops as storage sparsevec;
+
+create operator class public.vector_cosine_ops for type vector using hnsw family public.vector_cosine_ops as storage vector;
+
+create operator class public.vector_cosine_ops for type vector using ivfflat family public.vector_cosine_ops as storage vector;
+
+create operator class public.vector_ip_ops for type vector using hnsw family public.vector_ip_ops as storage vector;
+
+create operator class public.vector_ip_ops for type vector using ivfflat family public.vector_ip_ops as storage vector;
+
+create operator class public.vector_l1_ops for type vector using hnsw family public.vector_l1_ops as storage vector;
+
+create operator class public.vector_l2_ops for type vector using hnsw family public.vector_l2_ops as storage vector;
+
+create operator class public.vector_l2_ops default for type vector using ivfflat family public.vector_l2_ops as storage vector;
+
+create operator class public.vector_ops default for type vector using btree family public.vector_ops as storage vector;
 

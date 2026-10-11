@@ -431,9 +431,9 @@ select json_strip_nulls('[1, null]', true);
              │                         ──────── 1. label    ───────────────── 2. label
              ╰╴
         targets:
-             ╭▸ builtins.sql:9243:45
+             ╭▸ builtins.sql:9252:45
              │
-        9243 │ create function pg_catalog.json_strip_nulls(target json, strip_in_arrays boolean DEFAULT false) returns json
+        9252 │ create function pg_catalog.json_strip_nulls(target json, strip_in_arrays boolean DEFAULT false) returns json
              │                                             ┬─────       ─────────────── 2. target
              │                                             │
              ╰╴                                            1. target
@@ -598,21 +598,21 @@ insert into t values (1, 2, 3, 4, 5, 6, 7);
             │       1. label
             ╰╴
         targets:
-            ╭▸ builtins.sql:440:3
+            ╭▸ builtins.sql:449:3
             │
-        440 │   feature_id information_schema.character_data,
+        449 │   feature_id information_schema.character_data,
             │   ────────── 1. target
-        441 │   feature_name information_schema.character_data,
+        450 │   feature_name information_schema.character_data,
             │   ──────────── 2. target
-        442 │   sub_feature_id information_schema.character_data,
+        451 │   sub_feature_id information_schema.character_data,
             │   ────────────── 3. target
-        443 │   sub_feature_name information_schema.character_data,
+        452 │   sub_feature_name information_schema.character_data,
             │   ──────────────── 4. target
-        444 │   is_supported information_schema.yes_or_no,
+        453 │   is_supported information_schema.yes_or_no,
             │   ──────────── 5. target
-        445 │   is_verified_by information_schema.character_data,
+        454 │   is_verified_by information_schema.character_data,
             │   ────────────── 6. target
-        446 │   comments information_schema.character_data
+        455 │   comments information_schema.character_data
             ╰╴  ──────── 7. target
         ");
     }
@@ -733,21 +733,21 @@ insert into t values (1, 2, 3, 4, 5, 6, 7);
             │       1. label
             ╰╴
         targets:
-            ╭▸ builtins.sql:440:3
+            ╭▸ builtins.sql:449:3
             │
-        440 │   feature_id information_schema.character_data,
+        449 │   feature_id information_schema.character_data,
             │   ────────── 1. target
-        441 │   feature_name information_schema.character_data,
+        450 │   feature_name information_schema.character_data,
             │   ──────────── 2. target
-        442 │   sub_feature_id information_schema.character_data,
+        451 │   sub_feature_id information_schema.character_data,
             │   ────────────── 3. target
-        443 │   sub_feature_name information_schema.character_data,
+        452 │   sub_feature_name information_schema.character_data,
             │   ──────────────── 4. target
-        444 │   is_supported information_schema.yes_or_no,
+        453 │   is_supported information_schema.yes_or_no,
             │   ──────────── 5. target
-        445 │   is_verified_by information_schema.character_data,
+        454 │   is_verified_by information_schema.character_data,
             │   ────────────── 6. target
-        446 │   comments information_schema.character_data
+        455 │   comments information_schema.character_data
             ╰╴  ──────── 7. target
         ");
     }

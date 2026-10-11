@@ -5,9 +5,50 @@
 
 create schema pg_temp;
 
+create role pg_checkpoint;
+
+create role pg_create_subscription;
+
+create role pg_database_owner;
+
+create role pg_execute_server_program;
+
+create role pg_maintain;
+
+create role pg_monitor;
+
+create role pg_read_all_data;
+
+create role pg_read_all_settings;
+
+create role pg_read_all_stats;
+
+create role pg_read_server_files;
+
+create role pg_signal_autovacuum_worker;
+
+create role pg_signal_backend;
+
+create role pg_stat_scan_tables;
+
+create role pg_use_reserved_connections;
+
+create role pg_write_all_data;
+
+create role pg_write_server_files;
+
 create tablespace pg_default location '';
 
 create tablespace pg_global location '';
+
+-- default administrative connection database
+create database postgres;
+
+-- unmodifiable empty database
+create database template0;
+
+-- default template for new databases
+create database template1;
 
 create schema information_schema;
 
@@ -34,383 +75,383 @@ create type information_schema.yes_or_no;
 
 -- access control list
 -- size: 16, align: 8
-create type pg_catalog.aclitem (input = aclitemin, output = aclitemout);
+create type pg_catalog.aclitem;
 
 -- pseudo-type representing any type
 -- size: 4, align: 4
-create type pg_catalog.any (input = any_in, output = any_out);
+create type pg_catalog.any;
 
 -- pseudo-type representing a polymorphic array type
 -- size: -1, align: 8
-create type pg_catalog.anyarray (input = anyarray_in, output = anyarray_out);
+create type pg_catalog.anyarray;
 
 -- pseudo-type representing a polymorphic common type
 -- size: 4, align: 4
-create type pg_catalog.anycompatible (input = anycompatible_in, output = anycompatible_out);
+create type pg_catalog.anycompatible;
 
 -- pseudo-type representing an array of polymorphic common type elements
 -- size: -1, align: 8
-create type pg_catalog.anycompatiblearray (input = anycompatiblearray_in, output = anycompatiblearray_out);
+create type pg_catalog.anycompatiblearray;
 
 -- pseudo-type representing a multirange over a polymorphic common type
 -- size: -1, align: 8
-create type pg_catalog.anycompatiblemultirange (input = anycompatiblemultirange_in, output = anycompatiblemultirange_out);
+create type pg_catalog.anycompatiblemultirange;
 
 -- pseudo-type representing a polymorphic common type that is not an array
 -- size: 4, align: 4
-create type pg_catalog.anycompatiblenonarray (input = anycompatiblenonarray_in, output = anycompatiblenonarray_out);
+create type pg_catalog.anycompatiblenonarray;
 
 -- pseudo-type representing a range over a polymorphic common type
 -- size: -1, align: 8
-create type pg_catalog.anycompatiblerange (input = anycompatiblerange_in, output = anycompatiblerange_out);
+create type pg_catalog.anycompatiblerange;
 
 -- pseudo-type representing a polymorphic base type
 -- size: 4, align: 4
-create type pg_catalog.anyelement (input = anyelement_in, output = anyelement_out);
+create type pg_catalog.anyelement;
 
 -- pseudo-type representing a polymorphic base type that is an enum
 -- size: 4, align: 4
-create type pg_catalog.anyenum (input = anyenum_in, output = anyenum_out);
+create type pg_catalog.anyenum;
 
 -- pseudo-type representing a polymorphic base type that is a multirange
 -- size: -1, align: 8
-create type pg_catalog.anymultirange (input = anymultirange_in, output = anymultirange_out);
+create type pg_catalog.anymultirange;
 
 -- pseudo-type representing a polymorphic base type that is not an array
 -- size: 4, align: 4
-create type pg_catalog.anynonarray (input = anynonarray_in, output = anynonarray_out);
+create type pg_catalog.anynonarray;
 
 -- pseudo-type representing a range over a polymorphic base type
 -- size: -1, align: 8
-create type pg_catalog.anyrange (input = anyrange_in, output = anyrange_out);
+create type pg_catalog.anyrange;
 
 -- fixed-length bit string
 -- size: -1, align: 4
-create type pg_catalog.bit (input = bit_in, output = bit_out);
+create type pg_catalog.bit;
 
 -- boolean, format 't'/'f'
 -- size: 1, align: 1
-create type pg_catalog.bool (input = boolin, output = boolout);
+create type pg_catalog.bool;
 
 -- 'char(length)' blank-padded string, fixed storage length
 -- size: -1, align: 4
-create type pg_catalog.bpchar (input = bpcharin, output = bpcharout);
+create type pg_catalog.bpchar;
 
 -- variable-length string, binary values escaped
 -- size: -1, align: 4
-create type pg_catalog.bytea (input = byteain, output = byteaout);
+create type pg_catalog.bytea;
 
 -- single character
 -- size: 1, align: 1
-create type pg_catalog.char (input = charin, output = charout);
+create type pg_catalog.char;
 
 -- command identifier type, sequence in transaction id
 -- size: 4, align: 4
-create type pg_catalog.cid (input = cidin, output = cidout);
+create type pg_catalog.cid;
 
 -- network IP address/netmask, network address
 -- size: -1, align: 4
-create type pg_catalog.cidr (input = cidr_in, output = cidr_out);
+create type pg_catalog.cidr;
 
 -- geometric circle, format '<center point,radius>'
 -- size: 24, align: 8
-create type pg_catalog.circle (input = circle_in, output = circle_out);
+create type pg_catalog.circle;
 
 -- C-style string
 -- size: -2, align: 1
-create type pg_catalog.cstring (input = cstring_in, output = cstring_out);
+create type pg_catalog.cstring;
 
 -- date
 -- size: 4, align: 4
-create type pg_catalog.date (input = date_in, output = date_out);
+create type pg_catalog.date;
 
 -- pseudo-type for the result of an event trigger function
 -- size: 4, align: 4
-create type pg_catalog.event_trigger (input = event_trigger_in, output = event_trigger_out);
+create type pg_catalog.event_trigger;
 
 -- pseudo-type for the result of an FDW handler function
 -- size: 4, align: 4
-create type pg_catalog.fdw_handler (input = fdw_handler_in, output = fdw_handler_out);
+create type pg_catalog.fdw_handler;
 
 -- single-precision floating point number, 4-byte storage
 -- size: 4, align: 4
-create type pg_catalog.float4 (input = float4in, output = float4out);
+create type pg_catalog.float4;
 
 -- double-precision floating point number, 8-byte storage
 -- size: 8, align: 8
-create type pg_catalog.float8 (input = float8in, output = float8out);
+create type pg_catalog.float8;
 
 -- GiST index internal text representation for text search
 -- size: -1, align: 4
-create type pg_catalog.gtsvector (input = gtsvectorin, output = gtsvectorout);
+create type pg_catalog.gtsvector;
 
 -- pseudo-type for the result of an index AM handler function
 -- size: 4, align: 4
-create type pg_catalog.index_am_handler (input = index_am_handler_in, output = index_am_handler_out);
+create type pg_catalog.index_am_handler;
 
 -- IP address/netmask, host address, netmask optional
 -- size: -1, align: 4
-create type pg_catalog.inet (input = inet_in, output = inet_out);
+create type pg_catalog.inet;
 
 -- -32 thousand to 32 thousand, 2-byte storage
 -- size: 2, align: 2
-create type pg_catalog.int2 (input = int2in, output = int2out);
+create type pg_catalog.int2;
 
 -- -2 billion to 2 billion integer, 4-byte storage
 -- size: 4, align: 4
-create type pg_catalog.int4 (input = int4in, output = int4out);
+create type pg_catalog.int4;
 
 -- ~18 digit integer, 8-byte storage
 -- size: 8, align: 8
-create type pg_catalog.int8 (input = int8in, output = int8out);
+create type pg_catalog.int8;
 
 -- pseudo-type representing an internal data structure
 -- size: 8, align: 8
-create type pg_catalog.internal (input = internal_in, output = internal_out);
+create type pg_catalog.internal;
 
 -- time interval, format 'number units ...'
 -- size: 16, align: 8
-create type pg_catalog.interval (input = interval_in, output = interval_out);
+create type pg_catalog.interval;
 
 -- JSON stored as text
 -- size: -1, align: 4
-create type pg_catalog.json (input = json_in, output = json_out);
+create type pg_catalog.json;
 
 -- Binary JSON
 -- size: -1, align: 4
-create type pg_catalog.jsonb (input = jsonb_in, output = jsonb_out, subscript = jsonb_subscript_handler);
+create type pg_catalog.jsonb;
 
 -- JSON path
 -- size: -1, align: 4
-create type pg_catalog.jsonpath (input = jsonpath_in, output = jsonpath_out);
+create type pg_catalog.jsonpath;
 
 -- pseudo-type for the result of a language handler function
 -- size: 4, align: 4
-create type pg_catalog.language_handler (input = language_handler_in, output = language_handler_out);
+create type pg_catalog.language_handler;
 
 -- XX:XX:XX:XX:XX:XX, MAC address
 -- size: 6, align: 4
-create type pg_catalog.macaddr (input = macaddr_in, output = macaddr_out);
+create type pg_catalog.macaddr;
 
 -- XX:XX:XX:XX:XX:XX:XX:XX, MAC address
 -- size: 8, align: 4
-create type pg_catalog.macaddr8 (input = macaddr8_in, output = macaddr8_out);
+create type pg_catalog.macaddr8;
 
 -- monetary amounts, $d,ddd.cc
 -- size: 8, align: 8
-create type pg_catalog.money (input = cash_in, output = cash_out);
+create type pg_catalog.money;
 
 -- 'numeric(precision, scale)' arbitrary precision number
 -- size: -1, align: 4
-create type pg_catalog.numeric (input = numeric_in, output = numeric_out);
+create type pg_catalog.numeric;
 
 -- object identifier(oid), maximum 4 billion
 -- size: 4, align: 4
-create type pg_catalog.oid (input = oidin, output = oidout);
+create type pg_catalog.oid;
 
 -- geometric path, format '(point1,...)'
 -- size: -1, align: 8
-create type pg_catalog.path (input = path_in, output = path_out);
+create type pg_catalog.path;
 
 -- pseudo-type representing BRIN bloom summary
 -- size: -1, align: 4
-create type pg_catalog.pg_brin_bloom_summary (input = brin_bloom_summary_in, output = brin_bloom_summary_out);
+create type pg_catalog.pg_brin_bloom_summary;
 
 -- pseudo-type representing BRIN minmax-multi summary
 -- size: -1, align: 4
-create type pg_catalog.pg_brin_minmax_multi_summary (input = brin_minmax_multi_summary_in, output = brin_minmax_multi_summary_out);
+create type pg_catalog.pg_brin_minmax_multi_summary;
 
 -- internal type for passing CollectedCommand
 -- size: 8, align: 8
-create type pg_catalog.pg_ddl_command (input = pg_ddl_command_in, output = pg_ddl_command_out);
+create type pg_catalog.pg_ddl_command;
 
 -- multivariate dependencies
 -- size: -1, align: 4
-create type pg_catalog.pg_dependencies (input = pg_dependencies_in, output = pg_dependencies_out);
+create type pg_catalog.pg_dependencies;
 
 -- PostgreSQL LSN
 -- size: 8, align: 8
-create type pg_catalog.pg_lsn (input = pg_lsn_in, output = pg_lsn_out);
+create type pg_catalog.pg_lsn;
 
 -- multivariate MCV list
 -- size: -1, align: 4
-create type pg_catalog.pg_mcv_list (input = pg_mcv_list_in, output = pg_mcv_list_out);
+create type pg_catalog.pg_mcv_list;
 
 -- multivariate ndistinct coefficients
 -- size: -1, align: 4
-create type pg_catalog.pg_ndistinct (input = pg_ndistinct_in, output = pg_ndistinct_out);
+create type pg_catalog.pg_ndistinct;
 
 -- string representing an internal node tree
 -- size: -1, align: 4
-create type pg_catalog.pg_node_tree (input = pg_node_tree_in, output = pg_node_tree_out);
+create type pg_catalog.pg_node_tree;
 
 -- transaction snapshot
 -- size: -1, align: 8
-create type pg_catalog.pg_snapshot (input = pg_snapshot_in, output = pg_snapshot_out);
+create type pg_catalog.pg_snapshot;
 
 -- geometric polygon, format '(point1,...)'
 -- size: -1, align: 8
-create type pg_catalog.polygon (input = poly_in, output = poly_out);
+create type pg_catalog.polygon;
 
 -- pseudo-type representing any composite type
 -- size: -1, align: 8
-create type pg_catalog.record (input = record_in, output = record_out);
+create type pg_catalog.record;
 
 -- reference to cursor (portal name)
 -- size: -1, align: 4
-create type pg_catalog.refcursor (input = textin, output = textout);
+create type pg_catalog.refcursor;
 
 -- registered class
 -- size: 4, align: 4
-create type pg_catalog.regclass (input = regclassin, output = regclassout);
+create type pg_catalog.regclass;
 
 -- registered collation
 -- size: 4, align: 4
-create type pg_catalog.regcollation (input = regcollationin, output = regcollationout);
+create type pg_catalog.regcollation;
 
 -- registered text search configuration
 -- size: 4, align: 4
-create type pg_catalog.regconfig (input = regconfigin, output = regconfigout);
+create type pg_catalog.regconfig;
 
 -- registered text search dictionary
 -- size: 4, align: 4
-create type pg_catalog.regdictionary (input = regdictionaryin, output = regdictionaryout);
+create type pg_catalog.regdictionary;
 
 -- registered namespace
 -- size: 4, align: 4
-create type pg_catalog.regnamespace (input = regnamespacein, output = regnamespaceout);
+create type pg_catalog.regnamespace;
 
 -- registered operator
 -- size: 4, align: 4
-create type pg_catalog.regoper (input = regoperin, output = regoperout);
+create type pg_catalog.regoper;
 
 -- registered operator (with args)
 -- size: 4, align: 4
-create type pg_catalog.regoperator (input = regoperatorin, output = regoperatorout);
+create type pg_catalog.regoperator;
 
 -- registered procedure
 -- size: 4, align: 4
-create type pg_catalog.regproc (input = regprocin, output = regprocout);
+create type pg_catalog.regproc;
 
 -- registered procedure (with args)
 -- size: 4, align: 4
-create type pg_catalog.regprocedure (input = regprocedurein, output = regprocedureout);
+create type pg_catalog.regprocedure;
 
 -- registered role
 -- size: 4, align: 4
-create type pg_catalog.regrole (input = regrolein, output = regroleout);
+create type pg_catalog.regrole;
 
 -- registered type
 -- size: 4, align: 4
-create type pg_catalog.regtype (input = regtypein, output = regtypeout);
+create type pg_catalog.regtype;
 
 -- pseudo-type for the result of a table AM handler function
 -- size: 4, align: 4
-create type pg_catalog.table_am_handler (input = table_am_handler_in, output = table_am_handler_out);
+create type pg_catalog.table_am_handler;
 
 -- variable-length string, no limit specified
 -- size: -1, align: 4
-create type pg_catalog.text (input = textin, output = textout);
+create type pg_catalog.text;
 
 -- tuple physical location, format '(block,offset)'
 -- size: 6, align: 2
-create type pg_catalog.tid (input = tidin, output = tidout);
+create type pg_catalog.tid;
 
 -- time of day
 -- size: 8, align: 8
-create type pg_catalog.time (input = time_in, output = time_out);
+create type pg_catalog.time;
 
 -- date and time
 -- size: 8, align: 8
-create type pg_catalog.timestamp (input = timestamp_in, output = timestamp_out);
+create type pg_catalog.timestamp;
 
 -- date and time with time zone
 -- size: 8, align: 8
-create type pg_catalog.timestamptz (input = timestamptz_in, output = timestamptz_out);
+create type pg_catalog.timestamptz;
 
 -- time of day with time zone
 -- size: 12, align: 8
-create type pg_catalog.timetz (input = timetz_in, output = timetz_out);
+create type pg_catalog.timetz;
 
 -- pseudo-type for the result of a trigger function
 -- size: 4, align: 4
-create type pg_catalog.trigger (input = trigger_in, output = trigger_out);
+create type pg_catalog.trigger;
 
 -- pseudo-type for the result of a tablesample method function
 -- size: 4, align: 4
-create type pg_catalog.tsm_handler (input = tsm_handler_in, output = tsm_handler_out);
+create type pg_catalog.tsm_handler;
 
 -- query representation for text search
 -- size: -1, align: 4
-create type pg_catalog.tsquery (input = tsqueryin, output = tsqueryout);
+create type pg_catalog.tsquery;
 
 -- text representation for text search
 -- size: -1, align: 4
-create type pg_catalog.tsvector (input = tsvectorin, output = tsvectorout);
+create type pg_catalog.tsvector;
 
 -- transaction snapshot
 -- size: -1, align: 8
-create type pg_catalog.txid_snapshot (input = txid_snapshot_in, output = txid_snapshot_out);
+create type pg_catalog.txid_snapshot;
 
 -- pseudo-type representing an undetermined type
 -- size: -2, align: 1
-create type pg_catalog.unknown (input = unknownin, output = unknownout);
+create type pg_catalog.unknown;
 
 -- UUID
 -- size: 16, align: 1
-create type pg_catalog.uuid (input = uuid_in, output = uuid_out);
+create type pg_catalog.uuid;
 
 -- variable-length bit string
 -- size: -1, align: 4
-create type pg_catalog.varbit (input = varbit_in, output = varbit_out);
+create type pg_catalog.varbit;
 
 -- 'varchar(length)' non-blank-padded string, variable storage length
 -- size: -1, align: 4
-create type pg_catalog.varchar (input = varcharin, output = varcharout);
+create type pg_catalog.varchar;
 
 -- pseudo-type for the result of a function with no real result
 -- size: 4, align: 4
-create type pg_catalog.void (input = void_in, output = void_out);
+create type pg_catalog.void;
 
 -- transaction id
 -- size: 4, align: 4
-create type pg_catalog.xid (input = xidin, output = xidout);
+create type pg_catalog.xid;
 
 -- full transaction id
 -- size: 8, align: 8
-create type pg_catalog.xid8 (input = xid8in, output = xid8out);
+create type pg_catalog.xid8;
 
 -- XML content
 -- size: -1, align: 4
-create type pg_catalog.xml (input = xml_in, output = xml_out);
+create type pg_catalog.xml;
 
 -- array of int2, used in system tables
 -- size: -1, align: 4
-create type pg_catalog.int2vector (input = int2vectorin, output = int2vectorout, element = smallint, subscript = array_subscript_handler);
+create type pg_catalog.int2vector;
 
 -- geometric line, formats '{A,B,C}'/'[point1,point2]'
 -- size: 24, align: 8
-create type pg_catalog.line (input = line_in, output = line_out, element = double precision, subscript = raw_array_subscript_handler);
+create type pg_catalog.line;
 
 -- 63-byte type for storing system identifiers
 -- size: 64, align: 1
-create type pg_catalog.name (input = namein, output = nameout, element = "char", subscript = raw_array_subscript_handler);
+create type pg_catalog.name;
 
 -- array of oids, used in system tables
 -- size: -1, align: 4
-create type pg_catalog.oidvector (input = oidvectorin, output = oidvectorout, element = oid, subscript = array_subscript_handler);
+create type pg_catalog.oidvector;
 
 -- geometric point, format '(x,y)'
 -- size: 16, align: 8
-create type pg_catalog.point (input = point_in, output = point_out, element = double precision, subscript = raw_array_subscript_handler);
+create type pg_catalog.point;
 
 -- geometric box, format 'lower left point,upper right point'
 -- size: 32, align: 8
-create type pg_catalog.box (input = box_in, output = box_out, element = point, subscript = raw_array_subscript_handler);
+create type pg_catalog.box;
 
 -- geometric line segment, format '[point1,point2]'
 -- size: 32, align: 8
-create type pg_catalog.lseg (input = lseg_in, output = lseg_out, element = point, subscript = raw_array_subscript_handler);
+create type pg_catalog.lseg;
 
 -- range of dates
 -- size: -1, align: 4
@@ -3339,6 +3380,15 @@ create view pg_catalog.pg_wait_events(type, name, description) as
     null::text
 ;
 
+-- dynamically-loaded C functions
+create language c;
+
+-- built-in functions
+create language internal;
+
+-- SQL-language functions
+create language sql;
+
 create function information_schema._pg_char_max_length(typid oid, typmod integer) returns integer
   language sql;
 
@@ -3528,13 +3578,6 @@ create function pg_catalog.any_in(cstring) returns "any"
 create function pg_catalog.any_out("any") returns cstring
   language internal;
 
--- arbitrary value from among input values
-create aggregate pg_catalog.any_value(anyelement) (
-  sfunc = any_value_transfn,
-  stype = anyelement,
-  combinefunc = any_value_transfn
-);
-
 -- aggregate transition function
 create function pg_catalog.any_value_transfn(anyelement, anyelement) returns anyelement
   language internal;
@@ -3666,22 +3709,6 @@ create function pg_catalog.areajoinsel(internal, oid, internal, smallint, intern
 -- restriction selectivity for area-comparison operators
 create function pg_catalog.areasel(internal, oid, internal, integer) returns double precision
   language internal;
-
--- concatenate aggregate input into an array
-create aggregate pg_catalog.array_agg(anyarray) (
-  sfunc = array_agg_array_transfn,
-  stype = internal,
-  finalfunc = array_agg_array_finalfn,
-  combinefunc = array_agg_array_combine
-);
-
--- concatenate aggregate input into an array
-create aggregate pg_catalog.array_agg(anynonarray) (
-  sfunc = array_agg_transfn,
-  stype = internal,
-  finalfunc = array_agg_finalfn,
-  combinefunc = array_agg_combine
-);
 
 -- aggregate combine function
 create function pg_catalog.array_agg_array_combine(internal, internal) returns internal
@@ -3955,66 +3982,6 @@ create function pg_catalog.atand(double precision) returns double precision
 create function pg_catalog.atanh(double precision) returns double precision
   language internal;
 
--- the average (arithmetic mean) as numeric of all bigint values
-create aggregate pg_catalog.avg(bigint) (
-  sfunc = int8_avg_accum,
-  stype = internal,
-  finalfunc = numeric_poly_avg,
-  combinefunc = int8_avg_combine
-);
-
--- the average (arithmetic mean) as float8 of all float8 values
-create aggregate pg_catalog.avg(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_avg,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- the average (arithmetic mean) as numeric of all integer values
-create aggregate pg_catalog.avg(integer) (
-  sfunc = int4_avg_accum,
-  stype = bigint[],
-  finalfunc = int8_avg,
-  combinefunc = int4_avg_combine,
-  initcond = '{0,0}'
-);
-
--- the average (arithmetic mean) as interval of all interval values
-create aggregate pg_catalog.avg(interval) (
-  sfunc = interval_avg_accum,
-  stype = internal,
-  finalfunc = interval_avg,
-  combinefunc = interval_avg_combine
-);
-
--- the average (arithmetic mean) as numeric of all numeric values
-create aggregate pg_catalog.avg(numeric) (
-  sfunc = numeric_avg_accum,
-  stype = internal,
-  finalfunc = numeric_avg,
-  combinefunc = numeric_avg_combine
-);
-
--- the average (arithmetic mean) as float8 of all float4 values
-create aggregate pg_catalog.avg(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_avg,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- the average (arithmetic mean) as numeric of all smallint values
-create aggregate pg_catalog.avg(smallint) (
-  sfunc = int2_avg_accum,
-  stype = bigint[],
-  finalfunc = int8_avg,
-  combinefunc = int4_avg_combine,
-  initcond = '{0,0}'
-);
-
 -- BERNOULLI tablesample method handler
 create function pg_catalog.bernoulli(internal) returns tsm_handler
   language internal;
@@ -4119,34 +4086,6 @@ create function pg_catalog.bit(bit, integer, boolean) returns bit
 create function pg_catalog.bit(integer, integer) returns bit
   language internal;
 
--- bitwise-and bigint aggregate
-create aggregate pg_catalog.bit_and(bigint) (
-  sfunc = int8and,
-  stype = bigint,
-  combinefunc = int8and
-);
-
--- bitwise-and bit aggregate
-create aggregate pg_catalog.bit_and(bit) (
-  sfunc = bitand,
-  stype = bit,
-  combinefunc = bitand
-);
-
--- bitwise-and integer aggregate
-create aggregate pg_catalog.bit_and(integer) (
-  sfunc = int4and,
-  stype = integer,
-  combinefunc = int4and
-);
-
--- bitwise-and smallint aggregate
-create aggregate pg_catalog.bit_and(smallint) (
-  sfunc = int2and,
-  stype = smallint,
-  combinefunc = int2and
-);
-
 -- number of set bits
 create function pg_catalog.bit_count(bit) returns bigint
   language internal;
@@ -4171,34 +4110,6 @@ create function pg_catalog.bit_length(bytea) returns integer
 create function pg_catalog.bit_length(text) returns integer
   language sql;
 
--- bitwise-or bigint aggregate
-create aggregate pg_catalog.bit_or(bigint) (
-  sfunc = int8or,
-  stype = bigint,
-  combinefunc = int8or
-);
-
--- bitwise-or bit aggregate
-create aggregate pg_catalog.bit_or(bit) (
-  sfunc = bitor,
-  stype = bit,
-  combinefunc = bitor
-);
-
--- bitwise-or integer aggregate
-create aggregate pg_catalog.bit_or(integer) (
-  sfunc = int4or,
-  stype = integer,
-  combinefunc = int4or
-);
-
--- bitwise-or smallint aggregate
-create aggregate pg_catalog.bit_or(smallint) (
-  sfunc = int2or,
-  stype = smallint,
-  combinefunc = int2or
-);
-
 -- I/O
 create function pg_catalog.bit_out(bit) returns cstring
   language internal;
@@ -4210,34 +4121,6 @@ create function pg_catalog.bit_recv(internal, oid, integer) returns bit
 -- I/O
 create function pg_catalog.bit_send(bit) returns bytea
   language internal;
-
--- bitwise-xor bigint aggregate
-create aggregate pg_catalog.bit_xor(bigint) (
-  sfunc = int8xor,
-  stype = bigint,
-  combinefunc = int8xor
-);
-
--- bitwise-xor bit aggregate
-create aggregate pg_catalog.bit_xor(bit) (
-  sfunc = bitxor,
-  stype = bit,
-  combinefunc = bitxor
-);
-
--- bitwise-xor integer aggregate
-create aggregate pg_catalog.bit_xor(integer) (
-  sfunc = int4xor,
-  stype = integer,
-  combinefunc = int4xor
-);
-
--- bitwise-xor smallint aggregate
-create aggregate pg_catalog.bit_xor(smallint) (
-  sfunc = int2xor,
-  stype = smallint,
-  combinefunc = int2xor
-);
 
 -- implementation of & operator
 create function pg_catalog.bitand(bit, bit) returns bit
@@ -4323,23 +4206,9 @@ create function pg_catalog.bool_accum_inv(internal, boolean) returns internal
 create function pg_catalog.bool_alltrue(internal) returns boolean
   language internal;
 
--- boolean-and aggregate
-create aggregate pg_catalog.bool_and(boolean) (
-  sfunc = booland_statefunc,
-  stype = boolean,
-  combinefunc = booland_statefunc
-);
-
 -- aggregate final function
 create function pg_catalog.bool_anytrue(internal) returns boolean
   language internal;
-
--- boolean-or aggregate
-create aggregate pg_catalog.bool_or(boolean) (
-  sfunc = boolor_statefunc,
-  stype = boolean,
-  combinefunc = boolor_statefunc
-);
 
 -- aggregate transition function
 create function pg_catalog.booland_statefunc(boolean, boolean) returns boolean
@@ -5573,15 +5442,6 @@ create function pg_catalog.convert_from(bytea, name) returns text
 create function pg_catalog.convert_to(text, name) returns bytea
   language internal;
 
--- correlation coefficient
-create aggregate pg_catalog.corr(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_corr,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
 -- cosine
 create function pg_catalog.cos(double precision) returns double precision
   language internal;
@@ -5601,40 +5461,6 @@ create function pg_catalog.cot(double precision) returns double precision
 -- cotangent, degrees
 create function pg_catalog.cotd(double precision) returns double precision
   language internal;
-
--- number of input rows
-create aggregate pg_catalog.count(*) (
-  sfunc = int8inc,
-  stype = bigint,
-  combinefunc = int8pl,
-  initcond = '0'
-);
-
--- number of input rows for which the input expression is not null
-create aggregate pg_catalog.count("any") (
-  sfunc = int8inc_any,
-  stype = bigint,
-  combinefunc = int8pl,
-  initcond = '0'
-);
-
--- population covariance
-create aggregate pg_catalog.covar_pop(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_covar_pop,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sample covariance
-create aggregate pg_catalog.covar_samp(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_covar_samp,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
 
 -- CRC-32 value
 create function pg_catalog.crc32(bytea) returns bigint
@@ -6293,13 +6119,6 @@ create function pg_catalog.event_trigger_in(cstring) returns event_trigger
 -- I/O
 create function pg_catalog.event_trigger_out(event_trigger) returns cstring
   language internal;
-
--- boolean-and aggregate
-create aggregate pg_catalog.every(boolean) (
-  sfunc = booland_statefunc,
-  stype = boolean,
-  combinefunc = booland_statefunc
-);
 
 -- natural exponential (e^x)
 create function pg_catalog.exp(double precision) returns double precision
@@ -9069,23 +8888,9 @@ create function pg_catalog.isvertical(point, point) returns boolean
 create function pg_catalog.johab_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
   language c;
 
--- aggregate input into json
-create aggregate pg_catalog.json_agg(anyelement) (
-  sfunc = json_agg_transfn,
-  stype = internal,
-  finalfunc = json_agg_finalfn
-);
-
 -- json aggregate final function
 create function pg_catalog.json_agg_finalfn(internal) returns json
   language internal;
-
--- aggregate input into json
-create aggregate pg_catalog.json_agg_strict(anyelement) (
-  sfunc = json_agg_strict_transfn,
-  stype = internal,
-  finalfunc = json_agg_finalfn
-);
 
 -- json aggregate transition function
 create function pg_catalog.json_agg_strict_transfn(internal, anyelement) returns internal
@@ -9159,23 +8964,9 @@ create function pg_catalog.json_object(text[]) returns json
 create function pg_catalog.json_object(text[], text[]) returns json
   language internal;
 
--- aggregate input into a json object
-create aggregate pg_catalog.json_object_agg(key "any", value "any") (
-  sfunc = json_object_agg_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
-
 -- json object aggregate final function
 create function pg_catalog.json_object_agg_finalfn(internal) returns json
   language internal;
-
--- aggregate non-NULL input into a json object
-create aggregate pg_catalog.json_object_agg_strict(key "any", value "any") (
-  sfunc = json_object_agg_strict_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
 
 -- json object aggregate transition function
 create function pg_catalog.json_object_agg_strict_transfn(internal, "any", "any") returns internal
@@ -9184,20 +8975,6 @@ create function pg_catalog.json_object_agg_strict_transfn(internal, "any", "any"
 -- json object aggregate transition function
 create function pg_catalog.json_object_agg_transfn(internal, "any", "any") returns internal
   language internal;
-
--- aggregate input into a json object with unique keys
-create aggregate pg_catalog.json_object_agg_unique(key "any", value "any") (
-  sfunc = json_object_agg_unique_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
-
--- aggregate non-NULL input into a json object with unique keys
-create aggregate pg_catalog.json_object_agg_unique_strict(key "any", value "any") (
-  sfunc = json_object_agg_unique_strict_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
 
 -- json object aggregate transition function
 create function pg_catalog.json_object_agg_unique_strict_transfn(internal, "any", "any") returns internal
@@ -9263,23 +9040,9 @@ create function pg_catalog.json_to_tsvector(regconfig, json, jsonb) returns tsve
 create function pg_catalog.json_typeof(json) returns text
   language internal;
 
--- aggregate input into jsonb
-create aggregate pg_catalog.jsonb_agg(anyelement) (
-  sfunc = jsonb_agg_transfn,
-  stype = internal,
-  finalfunc = jsonb_agg_finalfn
-);
-
 -- jsonb aggregate final function
 create function pg_catalog.jsonb_agg_finalfn(internal) returns jsonb
   language internal;
-
--- aggregate input into jsonb skipping nulls
-create aggregate pg_catalog.jsonb_agg_strict(anyelement) (
-  sfunc = jsonb_agg_strict_transfn,
-  stype = internal,
-  finalfunc = jsonb_agg_finalfn
-);
 
 -- jsonb aggregate transition function
 create function pg_catalog.jsonb_agg_strict_transfn(internal, anyelement) returns internal
@@ -9433,23 +9196,9 @@ create function pg_catalog.jsonb_object(text[]) returns jsonb
 create function pg_catalog.jsonb_object(text[], text[]) returns jsonb
   language internal;
 
--- aggregate inputs into jsonb object
-create aggregate pg_catalog.jsonb_object_agg(key "any", value "any") (
-  sfunc = jsonb_object_agg_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
-
 -- jsonb object aggregate final function
 create function pg_catalog.jsonb_object_agg_finalfn(internal) returns jsonb
   language internal;
-
--- aggregate non-NULL inputs into jsonb object
-create aggregate pg_catalog.jsonb_object_agg_strict(key "any", value "any") (
-  sfunc = jsonb_object_agg_strict_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
 
 -- jsonb object aggregate transition function
 create function pg_catalog.jsonb_object_agg_strict_transfn(internal, "any", "any") returns internal
@@ -9458,20 +9207,6 @@ create function pg_catalog.jsonb_object_agg_strict_transfn(internal, "any", "any
 -- jsonb object aggregate transition function
 create function pg_catalog.jsonb_object_agg_transfn(internal, "any", "any") returns internal
   language internal;
-
--- aggregate inputs into jsonb object checking key uniqueness
-create aggregate pg_catalog.jsonb_object_agg_unique(key "any", value "any") (
-  sfunc = jsonb_object_agg_unique_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
-
--- aggregate non-NULL inputs into jsonb object checking key uniqueness
-create aggregate pg_catalog.jsonb_object_agg_unique_strict(key "any", value "any") (
-  sfunc = jsonb_object_agg_unique_strict_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
 
 -- jsonb object aggregate transition function
 create function pg_catalog.jsonb_object_agg_unique_strict_transfn(internal, "any", "any") returns internal
@@ -10257,174 +9992,6 @@ create function pg_catalog.matchingjoinsel(internal, oid, internal, smallint, in
 create function pg_catalog.matchingsel(internal, oid, internal, integer) returns double precision
   language internal;
 
--- maximum value of all anyarray input values
-create aggregate pg_catalog.max(anyarray) (
-  sfunc = array_larger,
-  stype = anyarray,
-  combinefunc = array_larger
-);
-
--- maximum value of all enum input values
-create aggregate pg_catalog.max(anyenum) (
-  sfunc = enum_larger,
-  stype = anyenum,
-  combinefunc = enum_larger
-);
-
--- maximum value of all bigint input values
-create aggregate pg_catalog.max(bigint) (
-  sfunc = int8larger,
-  stype = bigint,
-  combinefunc = int8larger
-);
-
--- maximum value of all bytea input values
-create aggregate pg_catalog.max(bytea) (
-  sfunc = bytea_larger,
-  stype = bytea,
-  combinefunc = bytea_larger
-);
-
--- maximum value of all bpchar input values
-create aggregate pg_catalog.max(character) (
-  sfunc = bpchar_larger,
-  stype = character,
-  combinefunc = bpchar_larger
-);
-
--- maximum value of all date input values
-create aggregate pg_catalog.max(date) (
-  sfunc = date_larger,
-  stype = date,
-  combinefunc = date_larger
-);
-
--- maximum value of all float8 input values
-create aggregate pg_catalog.max(double precision) (
-  sfunc = float8larger,
-  stype = double precision,
-  combinefunc = float8larger
-);
-
--- maximum value of all inet input values
-create aggregate pg_catalog.max(inet) (
-  sfunc = network_larger,
-  stype = inet,
-  combinefunc = network_larger
-);
-
--- maximum value of all integer input values
-create aggregate pg_catalog.max(integer) (
-  sfunc = int4larger,
-  stype = integer,
-  combinefunc = int4larger
-);
-
--- maximum value of all interval input values
-create aggregate pg_catalog.max(interval) (
-  sfunc = interval_larger,
-  stype = interval,
-  combinefunc = interval_larger
-);
-
--- maximum value of all money input values
-create aggregate pg_catalog.max(money) (
-  sfunc = cashlarger,
-  stype = money,
-  combinefunc = cashlarger
-);
-
--- maximum value of all numeric input values
-create aggregate pg_catalog.max(numeric) (
-  sfunc = numeric_larger,
-  stype = numeric,
-  combinefunc = numeric_larger
-);
-
--- maximum value of all oid input values
-create aggregate pg_catalog.max(oid) (
-  sfunc = oidlarger,
-  stype = oid,
-  combinefunc = oidlarger
-);
-
--- maximum value of all pg_lsn input values
-create aggregate pg_catalog.max(pg_lsn) (
-  sfunc = pg_lsn_larger,
-  stype = pg_lsn,
-  combinefunc = pg_lsn_larger
-);
-
--- maximum value of all float4 input values
-create aggregate pg_catalog.max(real) (
-  sfunc = float4larger,
-  stype = real,
-  combinefunc = float4larger
-);
-
--- maximum value of all record input values
-create aggregate pg_catalog.max(record) (
-  sfunc = record_larger,
-  stype = record,
-  combinefunc = record_larger
-);
-
--- maximum value of all smallint input values
-create aggregate pg_catalog.max(smallint) (
-  sfunc = int2larger,
-  stype = smallint,
-  combinefunc = int2larger
-);
-
--- maximum value of all text input values
-create aggregate pg_catalog.max(text) (
-  sfunc = text_larger,
-  stype = text,
-  combinefunc = text_larger
-);
-
--- maximum value of all tid input values
-create aggregate pg_catalog.max(tid) (
-  sfunc = tidlarger,
-  stype = tid,
-  combinefunc = tidlarger
-);
-
--- maximum value of all time with time zone input values
-create aggregate pg_catalog.max(time with time zone) (
-  sfunc = timetz_larger,
-  stype = time with time zone,
-  combinefunc = timetz_larger
-);
-
--- maximum value of all time input values
-create aggregate pg_catalog.max(time without time zone) (
-  sfunc = time_larger,
-  stype = time without time zone,
-  combinefunc = time_larger
-);
-
--- maximum value of all timestamp with time zone input values
-create aggregate pg_catalog.max(timestamp with time zone) (
-  sfunc = timestamptz_larger,
-  stype = timestamp with time zone,
-  combinefunc = timestamptz_larger
-);
-
--- maximum value of all timestamp input values
-create aggregate pg_catalog.max(timestamp without time zone) (
-  sfunc = timestamp_larger,
-  stype = timestamp without time zone,
-  combinefunc = timestamp_larger
-);
-
--- maximum value of all xid8 input values
-create aggregate pg_catalog.max(xid8) (
-  sfunc = xid8_larger,
-  stype = xid8,
-  combinefunc = xid8_larger
-);
-
 -- MD5 hash
 create function pg_catalog.md5(bytea) returns text
   language internal;
@@ -10492,174 +10059,6 @@ create function pg_catalog.mic_to_win1251(integer, integer, cstring, internal, i
 -- internal conversion function for MULE_INTERNAL to WIN866
 create function pg_catalog.mic_to_win866(integer, integer, cstring, internal, integer, boolean) returns integer
   language c;
-
--- minimum value of all anyarray input values
-create aggregate pg_catalog.min(anyarray) (
-  sfunc = array_smaller,
-  stype = anyarray,
-  combinefunc = array_smaller
-);
-
--- minimum value of all enum input values
-create aggregate pg_catalog.min(anyenum) (
-  sfunc = enum_smaller,
-  stype = anyenum,
-  combinefunc = enum_smaller
-);
-
--- minimum value of all bigint input values
-create aggregate pg_catalog.min(bigint) (
-  sfunc = int8smaller,
-  stype = bigint,
-  combinefunc = int8smaller
-);
-
--- minimum value of all bytea input values
-create aggregate pg_catalog.min(bytea) (
-  sfunc = bytea_smaller,
-  stype = bytea,
-  combinefunc = bytea_smaller
-);
-
--- minimum value of all bpchar input values
-create aggregate pg_catalog.min(character) (
-  sfunc = bpchar_smaller,
-  stype = character,
-  combinefunc = bpchar_smaller
-);
-
--- minimum value of all date input values
-create aggregate pg_catalog.min(date) (
-  sfunc = date_smaller,
-  stype = date,
-  combinefunc = date_smaller
-);
-
--- minimum value of all float8 input values
-create aggregate pg_catalog.min(double precision) (
-  sfunc = float8smaller,
-  stype = double precision,
-  combinefunc = float8smaller
-);
-
--- minimum value of all inet input values
-create aggregate pg_catalog.min(inet) (
-  sfunc = network_smaller,
-  stype = inet,
-  combinefunc = network_smaller
-);
-
--- minimum value of all integer input values
-create aggregate pg_catalog.min(integer) (
-  sfunc = int4smaller,
-  stype = integer,
-  combinefunc = int4smaller
-);
-
--- minimum value of all interval input values
-create aggregate pg_catalog.min(interval) (
-  sfunc = interval_smaller,
-  stype = interval,
-  combinefunc = interval_smaller
-);
-
--- minimum value of all money input values
-create aggregate pg_catalog.min(money) (
-  sfunc = cashsmaller,
-  stype = money,
-  combinefunc = cashsmaller
-);
-
--- minimum value of all numeric input values
-create aggregate pg_catalog.min(numeric) (
-  sfunc = numeric_smaller,
-  stype = numeric,
-  combinefunc = numeric_smaller
-);
-
--- minimum value of all oid input values
-create aggregate pg_catalog.min(oid) (
-  sfunc = oidsmaller,
-  stype = oid,
-  combinefunc = oidsmaller
-);
-
--- minimum value of all pg_lsn input values
-create aggregate pg_catalog.min(pg_lsn) (
-  sfunc = pg_lsn_smaller,
-  stype = pg_lsn,
-  combinefunc = pg_lsn_smaller
-);
-
--- minimum value of all float4 input values
-create aggregate pg_catalog.min(real) (
-  sfunc = float4smaller,
-  stype = real,
-  combinefunc = float4smaller
-);
-
--- minimum value of all record input values
-create aggregate pg_catalog.min(record) (
-  sfunc = record_smaller,
-  stype = record,
-  combinefunc = record_smaller
-);
-
--- minimum value of all smallint input values
-create aggregate pg_catalog.min(smallint) (
-  sfunc = int2smaller,
-  stype = smallint,
-  combinefunc = int2smaller
-);
-
--- minimum value of all text values
-create aggregate pg_catalog.min(text) (
-  sfunc = text_smaller,
-  stype = text,
-  combinefunc = text_smaller
-);
-
--- minimum value of all tid input values
-create aggregate pg_catalog.min(tid) (
-  sfunc = tidsmaller,
-  stype = tid,
-  combinefunc = tidsmaller
-);
-
--- minimum value of all time with time zone input values
-create aggregate pg_catalog.min(time with time zone) (
-  sfunc = timetz_smaller,
-  stype = time with time zone,
-  combinefunc = timetz_smaller
-);
-
--- minimum value of all time input values
-create aggregate pg_catalog.min(time without time zone) (
-  sfunc = time_smaller,
-  stype = time without time zone,
-  combinefunc = time_smaller
-);
-
--- minimum value of all timestamp with time zone input values
-create aggregate pg_catalog.min(timestamp with time zone) (
-  sfunc = timestamptz_smaller,
-  stype = timestamp with time zone,
-  combinefunc = timestamptz_smaller
-);
-
--- minimum value of all timestamp input values
-create aggregate pg_catalog.min(timestamp without time zone) (
-  sfunc = timestamp_smaller,
-  stype = timestamp without time zone,
-  combinefunc = timestamp_smaller
-);
-
--- minimum value of all xid8 input values
-create aggregate pg_catalog.min(xid8) (
-  sfunc = xid8_smaller,
-  stype = xid8,
-  combinefunc = xid8_smaller
-);
 
 -- minimum scale needed to represent the value
 create function pg_catalog.min_scale(numeric) returns integer
@@ -13561,6 +12960,15 @@ create function pg_catalog.plainto_tsquery(regconfig, text) returns tsquery
 create function pg_catalog.plainto_tsquery(text) returns tsquery
   language internal;
 
+create function pg_catalog.plpgsql_call_handler() returns language_handler
+  language c;
+
+create function pg_catalog.plpgsql_inline_handler(internal) returns void
+  language c;
+
+create function pg_catalog.plpgsql_validator(oid) returns void
+  language c;
+
 -- center of
 create function pg_catalog.point(box) returns point
   language internal;
@@ -13905,20 +13313,6 @@ create function pg_catalog.range_after(anyrange, anyrange) returns boolean
 create function pg_catalog.range_after_multirange(anyrange, anymultirange) returns boolean
   language internal;
 
--- combine aggregate input into a multirange
-create aggregate pg_catalog.range_agg(anymultirange) (
-  sfunc = multirange_agg_transfn,
-  stype = internal,
-  finalfunc = multirange_agg_finalfn
-);
-
--- combine aggregate input into a multirange
-create aggregate pg_catalog.range_agg(anyrange) (
-  sfunc = range_agg_transfn,
-  stype = internal,
-  finalfunc = range_agg_finalfn
-);
-
 -- aggregate final function
 create function pg_catalog.range_agg_finalfn(internal, anyrange) returns anymultirange
   language internal;
@@ -14002,20 +13396,6 @@ create function pg_catalog.range_in(cstring, oid, integer) returns anyrange
 -- implementation of * operator
 create function pg_catalog.range_intersect(anyrange, anyrange) returns anyrange
   language internal;
-
--- range aggregate by intersecting
-create aggregate pg_catalog.range_intersect_agg(anymultirange) (
-  sfunc = multirange_intersect_agg_transfn,
-  stype = anymultirange,
-  combinefunc = multirange_intersect_agg_transfn
-);
-
--- range aggregate by intersecting
-create aggregate pg_catalog.range_intersect_agg(anyrange) (
-  sfunc = range_intersect_agg_transfn,
-  stype = anyrange,
-  combinefunc = range_intersect_agg_transfn
-);
 
 -- range aggregate by intersecting
 create function pg_catalog.range_intersect_agg_transfn(anyrange, anyrange) returns anyrange
@@ -14461,86 +13841,6 @@ create function pg_catalog.regprocrecv(internal) returns regproc
 create function pg_catalog.regprocsend(regproc) returns bytea
   language internal;
 
--- average of the independent variable (sum(X)/N)
-create aggregate pg_catalog.regr_avgx(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_avgx,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- average of the dependent variable (sum(Y)/N)
-create aggregate pg_catalog.regr_avgy(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_avgy,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- number of input rows in which both expressions are not null
-create aggregate pg_catalog.regr_count(double precision, double precision) (
-  sfunc = int8inc_float8_float8,
-  stype = bigint,
-  combinefunc = int8pl,
-  initcond = '0'
-);
-
--- y-intercept of the least-squares-fit linear equation determined by the (X, Y) pairs
-create aggregate pg_catalog.regr_intercept(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_intercept,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- square of the correlation coefficient
-create aggregate pg_catalog.regr_r2(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_r2,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- slope of the least-squares-fit linear equation determined by the (X, Y) pairs
-create aggregate pg_catalog.regr_slope(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_slope,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sum of squares of the independent variable (sum(X^2) - sum(X)^2/N)
-create aggregate pg_catalog.regr_sxx(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_sxx,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sum of products of independent times dependent variable (sum(X*Y) - sum(X) * sum(Y)/N)
-create aggregate pg_catalog.regr_sxy(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_sxy,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sum of squares of the dependent variable (sum(Y^2) - sum(Y)^2/N)
-create aggregate pg_catalog.regr_syy(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_syy,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
 -- I/O
 create function pg_catalog.regrolein(cstring) returns regrole
   language internal;
@@ -14957,172 +14257,6 @@ create function pg_catalog.starts_with(text, text) returns boolean
 create function pg_catalog.statement_timestamp() returns timestamp with time zone
   language internal;
 
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- population standard deviation of bigint input values
-create aggregate pg_catalog.stddev_pop(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_pop,
-  combinefunc = numeric_combine
-);
-
--- population standard deviation of float8 input values
-create aggregate pg_catalog.stddev_pop(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population standard deviation of integer input values
-create aggregate pg_catalog.stddev_pop(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- population standard deviation of numeric input values
-create aggregate pg_catalog.stddev_pop(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_pop,
-  combinefunc = numeric_combine
-);
-
--- population standard deviation of float4 input values
-create aggregate pg_catalog.stddev_pop(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population standard deviation of smallint input values
-create aggregate pg_catalog.stddev_pop(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- sample standard deviation of bigint input values
-create aggregate pg_catalog.stddev_samp(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- sample standard deviation of float8 input values
-create aggregate pg_catalog.stddev_samp(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample standard deviation of integer input values
-create aggregate pg_catalog.stddev_samp(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- sample standard deviation of numeric input values
-create aggregate pg_catalog.stddev_samp(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- sample standard deviation of float4 input values
-create aggregate pg_catalog.stddev_samp(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample standard deviation of smallint input values
-create aggregate pg_catalog.stddev_samp(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- concatenate aggregate input into a bytea
-create aggregate pg_catalog.string_agg(value bytea, delimiter bytea) (
-  sfunc = bytea_string_agg_transfn,
-  stype = internal,
-  finalfunc = bytea_string_agg_finalfn,
-  combinefunc = string_agg_combine
-);
-
--- concatenate aggregate input into a string
-create aggregate pg_catalog.string_agg(value text, delimiter text) (
-  sfunc = string_agg_transfn,
-  stype = internal,
-  finalfunc = string_agg_finalfn,
-  combinefunc = string_agg_combine
-);
-
 -- aggregate combine function
 create function pg_catalog.string_agg_combine(internal, internal) returns internal
   language internal;
@@ -15214,65 +14348,6 @@ create function pg_catalog.substring(text, text) returns text
 -- extract text matching SQL regular expression
 create function pg_catalog.substring(text, text, text) returns text
   language sql;
-
--- sum as numeric across all bigint input values
-create aggregate pg_catalog.sum(bigint) (
-  sfunc = int8_avg_accum,
-  stype = internal,
-  finalfunc = numeric_poly_sum,
-  combinefunc = int8_avg_combine
-);
-
--- sum as float8 across all float8 input values
-create aggregate pg_catalog.sum(double precision) (
-  sfunc = float8pl,
-  stype = double precision,
-  combinefunc = float8pl
-);
-
--- sum as bigint across all integer input values
-create aggregate pg_catalog.sum(integer) (
-  sfunc = int4_sum,
-  stype = bigint,
-  combinefunc = int8pl
-);
-
--- sum as interval across all interval input values
-create aggregate pg_catalog.sum(interval) (
-  sfunc = interval_avg_accum,
-  stype = internal,
-  finalfunc = interval_sum,
-  combinefunc = interval_avg_combine
-);
-
--- sum as money across all money input values
-create aggregate pg_catalog.sum(money) (
-  sfunc = cash_pl,
-  stype = money,
-  combinefunc = cash_pl
-);
-
--- sum as numeric across all numeric input values
-create aggregate pg_catalog.sum(numeric) (
-  sfunc = numeric_avg_accum,
-  stype = internal,
-  finalfunc = numeric_sum,
-  combinefunc = numeric_avg_combine
-);
-
--- sum as float4 across all float4 input values
-create aggregate pg_catalog.sum(real) (
-  sfunc = float4pl,
-  stype = real,
-  combinefunc = float4pl
-);
-
--- sum as bigint across all smallint input values
-create aggregate pg_catalog.sum(smallint) (
-  sfunc = int2_sum,
-  stype = bigint,
-  combinefunc = int8pl
-);
 
 -- trigger to suppress updates when new and old records match
 create function pg_catalog.suppress_redundant_updates_trigger() returns trigger
@@ -16942,106 +16017,6 @@ create function pg_catalog.uuidv7() returns uuid
 create function pg_catalog.uuidv7(shift interval) returns uuid
   language internal;
 
--- population variance of bigint input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_var_pop,
-  combinefunc = numeric_combine
-);
-
--- population variance of float8 input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_var_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population variance of integer input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- population variance of numeric input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_var_pop,
-  combinefunc = numeric_combine
-);
-
--- population variance of float4 input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_var_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population variance of smallint input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- sample variance of bigint input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- sample variance of float8 input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample variance of integer input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- sample variance of numeric input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- sample variance of float4 input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample variance of smallint input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
-
 -- adjust varbit() to typmod length
 create function pg_catalog.varbit(bit varying, integer, boolean) returns bit varying
   language internal;
@@ -17137,56 +16112,6 @@ create function pg_catalog.varchartypmodin(cstring[]) returns integer
 -- I/O typmod
 create function pg_catalog.varchartypmodout(integer) returns cstring
   language internal;
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
 
 -- PostgreSQL version string
 create function pg_catalog.version() returns text
@@ -17420,12 +16345,6 @@ create function pg_catalog.xml_recv(internal) returns xml
 create function pg_catalog.xml_send(xml) returns bytea
   language internal;
 
--- concatenate XML values
-create aggregate pg_catalog.xmlagg(xml) (
-  sfunc = xmlconcat2,
-  stype = xml
-);
-
 -- generate XML comment
 create function pg_catalog.xmlcomment(text) returns xml
   language internal;
@@ -17461,6 +16380,1358 @@ create function pg_catalog.xpath_exists(text, xml) returns boolean
 -- test XML value against XPath expression, with namespace support
 create function pg_catalog.xpath_exists(text, xml, text[]) returns boolean
   language internal;
+
+-- arbitrary value from among input values
+create aggregate pg_catalog.any_value(anyelement) (
+  sfunc = any_value_transfn,
+  stype = anyelement,
+  combinefunc = any_value_transfn
+);
+
+-- concatenate aggregate input into an array
+create aggregate pg_catalog.array_agg(anyarray) (
+  sfunc = array_agg_array_transfn,
+  stype = internal,
+  finalfunc = array_agg_array_finalfn,
+  finalfunc_extra,
+  combinefunc = array_agg_array_combine
+);
+
+-- concatenate aggregate input into an array
+create aggregate pg_catalog.array_agg(anynonarray) (
+  sfunc = array_agg_transfn,
+  stype = internal,
+  finalfunc = array_agg_finalfn,
+  finalfunc_extra,
+  combinefunc = array_agg_combine
+);
+
+-- the average (arithmetic mean) as numeric of all bigint values
+create aggregate pg_catalog.avg(bigint) (
+  sfunc = int8_avg_accum,
+  stype = internal,
+  finalfunc = numeric_poly_avg,
+  combinefunc = int8_avg_combine
+);
+
+-- the average (arithmetic mean) as float8 of all float8 values
+create aggregate pg_catalog.avg(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_avg,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- the average (arithmetic mean) as numeric of all integer values
+create aggregate pg_catalog.avg(integer) (
+  sfunc = int4_avg_accum,
+  stype = bigint[],
+  finalfunc = int8_avg,
+  combinefunc = int4_avg_combine,
+  initcond = '{0,0}'
+);
+
+-- the average (arithmetic mean) as interval of all interval values
+create aggregate pg_catalog.avg(interval) (
+  sfunc = interval_avg_accum,
+  stype = internal,
+  finalfunc = interval_avg,
+  combinefunc = interval_avg_combine
+);
+
+-- the average (arithmetic mean) as numeric of all numeric values
+create aggregate pg_catalog.avg(numeric) (
+  sfunc = numeric_avg_accum,
+  stype = internal,
+  finalfunc = numeric_avg,
+  combinefunc = numeric_avg_combine
+);
+
+-- the average (arithmetic mean) as float8 of all float4 values
+create aggregate pg_catalog.avg(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_avg,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- the average (arithmetic mean) as numeric of all smallint values
+create aggregate pg_catalog.avg(smallint) (
+  sfunc = int2_avg_accum,
+  stype = bigint[],
+  finalfunc = int8_avg,
+  combinefunc = int4_avg_combine,
+  initcond = '{0,0}'
+);
+
+-- bitwise-and bigint aggregate
+create aggregate pg_catalog.bit_and(bigint) (
+  sfunc = int8and,
+  stype = bigint,
+  combinefunc = int8and
+);
+
+-- bitwise-and bit aggregate
+create aggregate pg_catalog.bit_and(bit) (
+  sfunc = bitand,
+  stype = bit,
+  combinefunc = bitand
+);
+
+-- bitwise-and integer aggregate
+create aggregate pg_catalog.bit_and(integer) (
+  sfunc = int4and,
+  stype = integer,
+  combinefunc = int4and
+);
+
+-- bitwise-and smallint aggregate
+create aggregate pg_catalog.bit_and(smallint) (
+  sfunc = int2and,
+  stype = smallint,
+  combinefunc = int2and
+);
+
+-- bitwise-or bigint aggregate
+create aggregate pg_catalog.bit_or(bigint) (
+  sfunc = int8or,
+  stype = bigint,
+  combinefunc = int8or
+);
+
+-- bitwise-or bit aggregate
+create aggregate pg_catalog.bit_or(bit) (
+  sfunc = bitor,
+  stype = bit,
+  combinefunc = bitor
+);
+
+-- bitwise-or integer aggregate
+create aggregate pg_catalog.bit_or(integer) (
+  sfunc = int4or,
+  stype = integer,
+  combinefunc = int4or
+);
+
+-- bitwise-or smallint aggregate
+create aggregate pg_catalog.bit_or(smallint) (
+  sfunc = int2or,
+  stype = smallint,
+  combinefunc = int2or
+);
+
+-- bitwise-xor bigint aggregate
+create aggregate pg_catalog.bit_xor(bigint) (
+  sfunc = int8xor,
+  stype = bigint,
+  combinefunc = int8xor
+);
+
+-- bitwise-xor bit aggregate
+create aggregate pg_catalog.bit_xor(bit) (
+  sfunc = bitxor,
+  stype = bit,
+  combinefunc = bitxor
+);
+
+-- bitwise-xor integer aggregate
+create aggregate pg_catalog.bit_xor(integer) (
+  sfunc = int4xor,
+  stype = integer,
+  combinefunc = int4xor
+);
+
+-- bitwise-xor smallint aggregate
+create aggregate pg_catalog.bit_xor(smallint) (
+  sfunc = int2xor,
+  stype = smallint,
+  combinefunc = int2xor
+);
+
+-- boolean-and aggregate
+create aggregate pg_catalog.bool_and(boolean) (
+  sfunc = booland_statefunc,
+  stype = boolean,
+  combinefunc = booland_statefunc
+);
+
+-- boolean-or aggregate
+create aggregate pg_catalog.bool_or(boolean) (
+  sfunc = boolor_statefunc,
+  stype = boolean,
+  combinefunc = boolor_statefunc
+);
+
+-- correlation coefficient
+create aggregate pg_catalog.corr(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_corr,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- number of input rows
+create aggregate pg_catalog.count(*) (
+  sfunc = int8inc,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
+
+-- number of input rows for which the input expression is not null
+create aggregate pg_catalog.count("any") (
+  sfunc = int8inc_any,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
+
+-- population covariance
+create aggregate pg_catalog.covar_pop(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_covar_pop,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sample covariance
+create aggregate pg_catalog.covar_samp(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_covar_samp,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- boolean-and aggregate
+create aggregate pg_catalog.every(boolean) (
+  sfunc = booland_statefunc,
+  stype = boolean,
+  combinefunc = booland_statefunc
+);
+
+-- aggregate input into json
+create aggregate pg_catalog.json_agg(anyelement) (
+  sfunc = json_agg_transfn,
+  stype = internal,
+  finalfunc = json_agg_finalfn
+);
+
+-- aggregate input into json
+create aggregate pg_catalog.json_agg_strict(anyelement) (
+  sfunc = json_agg_strict_transfn,
+  stype = internal,
+  finalfunc = json_agg_finalfn
+);
+
+-- aggregate input into a json object
+create aggregate pg_catalog.json_object_agg(key "any", value "any") (
+  sfunc = json_object_agg_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate non-NULL input into a json object
+create aggregate pg_catalog.json_object_agg_strict(key "any", value "any") (
+  sfunc = json_object_agg_strict_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate input into a json object with unique keys
+create aggregate pg_catalog.json_object_agg_unique(key "any", value "any") (
+  sfunc = json_object_agg_unique_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate non-NULL input into a json object with unique keys
+create aggregate pg_catalog.json_object_agg_unique_strict(key "any", value "any") (
+  sfunc = json_object_agg_unique_strict_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate input into jsonb
+create aggregate pg_catalog.jsonb_agg(anyelement) (
+  sfunc = jsonb_agg_transfn,
+  stype = internal,
+  finalfunc = jsonb_agg_finalfn
+);
+
+-- aggregate input into jsonb skipping nulls
+create aggregate pg_catalog.jsonb_agg_strict(anyelement) (
+  sfunc = jsonb_agg_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_agg_finalfn
+);
+
+-- aggregate inputs into jsonb object
+create aggregate pg_catalog.jsonb_object_agg(key "any", value "any") (
+  sfunc = jsonb_object_agg_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- aggregate non-NULL inputs into jsonb object
+create aggregate pg_catalog.jsonb_object_agg_strict(key "any", value "any") (
+  sfunc = jsonb_object_agg_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- aggregate inputs into jsonb object checking key uniqueness
+create aggregate pg_catalog.jsonb_object_agg_unique(key "any", value "any") (
+  sfunc = jsonb_object_agg_unique_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- aggregate non-NULL inputs into jsonb object checking key uniqueness
+create aggregate pg_catalog.jsonb_object_agg_unique_strict(key "any", value "any") (
+  sfunc = jsonb_object_agg_unique_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- maximum value of all anyarray input values
+create aggregate pg_catalog.max(anyarray) (
+  sfunc = array_larger,
+  stype = anyarray,
+  combinefunc = array_larger
+);
+
+-- maximum value of all enum input values
+create aggregate pg_catalog.max(anyenum) (
+  sfunc = enum_larger,
+  stype = anyenum,
+  combinefunc = enum_larger
+);
+
+-- maximum value of all bigint input values
+create aggregate pg_catalog.max(bigint) (
+  sfunc = int8larger,
+  stype = bigint,
+  combinefunc = int8larger
+);
+
+-- maximum value of all bytea input values
+create aggregate pg_catalog.max(bytea) (
+  sfunc = bytea_larger,
+  stype = bytea,
+  combinefunc = bytea_larger
+);
+
+-- maximum value of all bpchar input values
+create aggregate pg_catalog.max(character) (
+  sfunc = bpchar_larger,
+  stype = character,
+  combinefunc = bpchar_larger
+);
+
+-- maximum value of all date input values
+create aggregate pg_catalog.max(date) (
+  sfunc = date_larger,
+  stype = date,
+  combinefunc = date_larger
+);
+
+-- maximum value of all float8 input values
+create aggregate pg_catalog.max(double precision) (
+  sfunc = float8larger,
+  stype = double precision,
+  combinefunc = float8larger
+);
+
+-- maximum value of all inet input values
+create aggregate pg_catalog.max(inet) (
+  sfunc = network_larger,
+  stype = inet,
+  combinefunc = network_larger
+);
+
+-- maximum value of all integer input values
+create aggregate pg_catalog.max(integer) (
+  sfunc = int4larger,
+  stype = integer,
+  combinefunc = int4larger
+);
+
+-- maximum value of all interval input values
+create aggregate pg_catalog.max(interval) (
+  sfunc = interval_larger,
+  stype = interval,
+  combinefunc = interval_larger
+);
+
+-- maximum value of all money input values
+create aggregate pg_catalog.max(money) (
+  sfunc = cashlarger,
+  stype = money,
+  combinefunc = cashlarger
+);
+
+-- maximum value of all numeric input values
+create aggregate pg_catalog.max(numeric) (
+  sfunc = numeric_larger,
+  stype = numeric,
+  combinefunc = numeric_larger
+);
+
+-- maximum value of all oid input values
+create aggregate pg_catalog.max(oid) (
+  sfunc = oidlarger,
+  stype = oid,
+  combinefunc = oidlarger
+);
+
+-- maximum value of all pg_lsn input values
+create aggregate pg_catalog.max(pg_lsn) (
+  sfunc = pg_lsn_larger,
+  stype = pg_lsn,
+  combinefunc = pg_lsn_larger
+);
+
+-- maximum value of all float4 input values
+create aggregate pg_catalog.max(real) (
+  sfunc = float4larger,
+  stype = real,
+  combinefunc = float4larger
+);
+
+-- maximum value of all record input values
+create aggregate pg_catalog.max(record) (
+  sfunc = record_larger,
+  stype = record,
+  combinefunc = record_larger
+);
+
+-- maximum value of all smallint input values
+create aggregate pg_catalog.max(smallint) (
+  sfunc = int2larger,
+  stype = smallint,
+  combinefunc = int2larger
+);
+
+-- maximum value of all text input values
+create aggregate pg_catalog.max(text) (
+  sfunc = text_larger,
+  stype = text,
+  combinefunc = text_larger
+);
+
+-- maximum value of all tid input values
+create aggregate pg_catalog.max(tid) (
+  sfunc = tidlarger,
+  stype = tid,
+  combinefunc = tidlarger
+);
+
+-- maximum value of all time with time zone input values
+create aggregate pg_catalog.max(time with time zone) (
+  sfunc = timetz_larger,
+  stype = time with time zone,
+  combinefunc = timetz_larger
+);
+
+-- maximum value of all time input values
+create aggregate pg_catalog.max(time without time zone) (
+  sfunc = time_larger,
+  stype = time without time zone,
+  combinefunc = time_larger
+);
+
+-- maximum value of all timestamp with time zone input values
+create aggregate pg_catalog.max(timestamp with time zone) (
+  sfunc = timestamptz_larger,
+  stype = timestamp with time zone,
+  combinefunc = timestamptz_larger
+);
+
+-- maximum value of all timestamp input values
+create aggregate pg_catalog.max(timestamp without time zone) (
+  sfunc = timestamp_larger,
+  stype = timestamp without time zone,
+  combinefunc = timestamp_larger
+);
+
+-- maximum value of all xid8 input values
+create aggregate pg_catalog.max(xid8) (
+  sfunc = xid8_larger,
+  stype = xid8,
+  combinefunc = xid8_larger
+);
+
+-- minimum value of all anyarray input values
+create aggregate pg_catalog.min(anyarray) (
+  sfunc = array_smaller,
+  stype = anyarray,
+  combinefunc = array_smaller
+);
+
+-- minimum value of all enum input values
+create aggregate pg_catalog.min(anyenum) (
+  sfunc = enum_smaller,
+  stype = anyenum,
+  combinefunc = enum_smaller
+);
+
+-- minimum value of all bigint input values
+create aggregate pg_catalog.min(bigint) (
+  sfunc = int8smaller,
+  stype = bigint,
+  combinefunc = int8smaller
+);
+
+-- minimum value of all bytea input values
+create aggregate pg_catalog.min(bytea) (
+  sfunc = bytea_smaller,
+  stype = bytea,
+  combinefunc = bytea_smaller
+);
+
+-- minimum value of all bpchar input values
+create aggregate pg_catalog.min(character) (
+  sfunc = bpchar_smaller,
+  stype = character,
+  combinefunc = bpchar_smaller
+);
+
+-- minimum value of all date input values
+create aggregate pg_catalog.min(date) (
+  sfunc = date_smaller,
+  stype = date,
+  combinefunc = date_smaller
+);
+
+-- minimum value of all float8 input values
+create aggregate pg_catalog.min(double precision) (
+  sfunc = float8smaller,
+  stype = double precision,
+  combinefunc = float8smaller
+);
+
+-- minimum value of all inet input values
+create aggregate pg_catalog.min(inet) (
+  sfunc = network_smaller,
+  stype = inet,
+  combinefunc = network_smaller
+);
+
+-- minimum value of all integer input values
+create aggregate pg_catalog.min(integer) (
+  sfunc = int4smaller,
+  stype = integer,
+  combinefunc = int4smaller
+);
+
+-- minimum value of all interval input values
+create aggregate pg_catalog.min(interval) (
+  sfunc = interval_smaller,
+  stype = interval,
+  combinefunc = interval_smaller
+);
+
+-- minimum value of all money input values
+create aggregate pg_catalog.min(money) (
+  sfunc = cashsmaller,
+  stype = money,
+  combinefunc = cashsmaller
+);
+
+-- minimum value of all numeric input values
+create aggregate pg_catalog.min(numeric) (
+  sfunc = numeric_smaller,
+  stype = numeric,
+  combinefunc = numeric_smaller
+);
+
+-- minimum value of all oid input values
+create aggregate pg_catalog.min(oid) (
+  sfunc = oidsmaller,
+  stype = oid,
+  combinefunc = oidsmaller
+);
+
+-- minimum value of all pg_lsn input values
+create aggregate pg_catalog.min(pg_lsn) (
+  sfunc = pg_lsn_smaller,
+  stype = pg_lsn,
+  combinefunc = pg_lsn_smaller
+);
+
+-- minimum value of all float4 input values
+create aggregate pg_catalog.min(real) (
+  sfunc = float4smaller,
+  stype = real,
+  combinefunc = float4smaller
+);
+
+-- minimum value of all record input values
+create aggregate pg_catalog.min(record) (
+  sfunc = record_smaller,
+  stype = record,
+  combinefunc = record_smaller
+);
+
+-- minimum value of all smallint input values
+create aggregate pg_catalog.min(smallint) (
+  sfunc = int2smaller,
+  stype = smallint,
+  combinefunc = int2smaller
+);
+
+-- minimum value of all text values
+create aggregate pg_catalog.min(text) (
+  sfunc = text_smaller,
+  stype = text,
+  combinefunc = text_smaller
+);
+
+-- minimum value of all tid input values
+create aggregate pg_catalog.min(tid) (
+  sfunc = tidsmaller,
+  stype = tid,
+  combinefunc = tidsmaller
+);
+
+-- minimum value of all time with time zone input values
+create aggregate pg_catalog.min(time with time zone) (
+  sfunc = timetz_smaller,
+  stype = time with time zone,
+  combinefunc = timetz_smaller
+);
+
+-- minimum value of all time input values
+create aggregate pg_catalog.min(time without time zone) (
+  sfunc = time_smaller,
+  stype = time without time zone,
+  combinefunc = time_smaller
+);
+
+-- minimum value of all timestamp with time zone input values
+create aggregate pg_catalog.min(timestamp with time zone) (
+  sfunc = timestamptz_smaller,
+  stype = timestamp with time zone,
+  combinefunc = timestamptz_smaller
+);
+
+-- minimum value of all timestamp input values
+create aggregate pg_catalog.min(timestamp without time zone) (
+  sfunc = timestamp_smaller,
+  stype = timestamp without time zone,
+  combinefunc = timestamp_smaller
+);
+
+-- minimum value of all xid8 input values
+create aggregate pg_catalog.min(xid8) (
+  sfunc = xid8_smaller,
+  stype = xid8,
+  combinefunc = xid8_smaller
+);
+
+-- combine aggregate input into a multirange
+create aggregate pg_catalog.range_agg(anymultirange) (
+  sfunc = multirange_agg_transfn,
+  stype = internal,
+  finalfunc = multirange_agg_finalfn,
+  finalfunc_extra
+);
+
+-- combine aggregate input into a multirange
+create aggregate pg_catalog.range_agg(anyrange) (
+  sfunc = range_agg_transfn,
+  stype = internal,
+  finalfunc = range_agg_finalfn,
+  finalfunc_extra
+);
+
+-- range aggregate by intersecting
+create aggregate pg_catalog.range_intersect_agg(anymultirange) (
+  sfunc = multirange_intersect_agg_transfn,
+  stype = anymultirange,
+  combinefunc = multirange_intersect_agg_transfn
+);
+
+-- range aggregate by intersecting
+create aggregate pg_catalog.range_intersect_agg(anyrange) (
+  sfunc = range_intersect_agg_transfn,
+  stype = anyrange,
+  combinefunc = range_intersect_agg_transfn
+);
+
+-- average of the independent variable (sum(X)/N)
+create aggregate pg_catalog.regr_avgx(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_avgx,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- average of the dependent variable (sum(Y)/N)
+create aggregate pg_catalog.regr_avgy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_avgy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- number of input rows in which both expressions are not null
+create aggregate pg_catalog.regr_count(double precision, double precision) (
+  sfunc = int8inc_float8_float8,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
+
+-- y-intercept of the least-squares-fit linear equation determined by the (X, Y) pairs
+create aggregate pg_catalog.regr_intercept(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_intercept,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- square of the correlation coefficient
+create aggregate pg_catalog.regr_r2(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_r2,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- slope of the least-squares-fit linear equation determined by the (X, Y) pairs
+create aggregate pg_catalog.regr_slope(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_slope,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sum of squares of the independent variable (sum(X^2) - sum(X)^2/N)
+create aggregate pg_catalog.regr_sxx(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_sxx,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sum of products of independent times dependent variable (sum(X*Y) - sum(X) * sum(Y)/N)
+create aggregate pg_catalog.regr_sxy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_sxy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sum of squares of the dependent variable (sum(Y^2) - sum(Y)^2/N)
+create aggregate pg_catalog.regr_syy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_syy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- population standard deviation of bigint input values
+create aggregate pg_catalog.stddev_pop(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_pop,
+  combinefunc = numeric_combine
+);
+
+-- population standard deviation of float8 input values
+create aggregate pg_catalog.stddev_pop(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population standard deviation of integer input values
+create aggregate pg_catalog.stddev_pop(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_pop,
+  combinefunc = numeric_poly_combine
+);
+
+-- population standard deviation of numeric input values
+create aggregate pg_catalog.stddev_pop(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_pop,
+  combinefunc = numeric_combine
+);
+
+-- population standard deviation of float4 input values
+create aggregate pg_catalog.stddev_pop(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population standard deviation of smallint input values
+create aggregate pg_catalog.stddev_pop(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_pop,
+  combinefunc = numeric_poly_combine
+);
+
+-- sample standard deviation of bigint input values
+create aggregate pg_catalog.stddev_samp(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
+
+-- sample standard deviation of float8 input values
+create aggregate pg_catalog.stddev_samp(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample standard deviation of integer input values
+create aggregate pg_catalog.stddev_samp(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- sample standard deviation of numeric input values
+create aggregate pg_catalog.stddev_samp(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
+
+-- sample standard deviation of float4 input values
+create aggregate pg_catalog.stddev_samp(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample standard deviation of smallint input values
+create aggregate pg_catalog.stddev_samp(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- concatenate aggregate input into a bytea
+create aggregate pg_catalog.string_agg(value bytea, delimiter bytea) (
+  sfunc = bytea_string_agg_transfn,
+  stype = internal,
+  finalfunc = bytea_string_agg_finalfn,
+  combinefunc = string_agg_combine
+);
+
+-- concatenate aggregate input into a string
+create aggregate pg_catalog.string_agg(value text, delimiter text) (
+  sfunc = string_agg_transfn,
+  stype = internal,
+  finalfunc = string_agg_finalfn,
+  combinefunc = string_agg_combine
+);
+
+-- sum as numeric across all bigint input values
+create aggregate pg_catalog.sum(bigint) (
+  sfunc = int8_avg_accum,
+  stype = internal,
+  finalfunc = numeric_poly_sum,
+  combinefunc = int8_avg_combine
+);
+
+-- sum as float8 across all float8 input values
+create aggregate pg_catalog.sum(double precision) (
+  sfunc = float8pl,
+  stype = double precision,
+  combinefunc = float8pl
+);
+
+-- sum as bigint across all integer input values
+create aggregate pg_catalog.sum(integer) (
+  sfunc = int4_sum,
+  stype = bigint,
+  combinefunc = int8pl
+);
+
+-- sum as interval across all interval input values
+create aggregate pg_catalog.sum(interval) (
+  sfunc = interval_avg_accum,
+  stype = internal,
+  finalfunc = interval_sum,
+  combinefunc = interval_avg_combine
+);
+
+-- sum as money across all money input values
+create aggregate pg_catalog.sum(money) (
+  sfunc = cash_pl,
+  stype = money,
+  combinefunc = cash_pl
+);
+
+-- sum as numeric across all numeric input values
+create aggregate pg_catalog.sum(numeric) (
+  sfunc = numeric_avg_accum,
+  stype = internal,
+  finalfunc = numeric_sum,
+  combinefunc = numeric_avg_combine
+);
+
+-- sum as float4 across all float4 input values
+create aggregate pg_catalog.sum(real) (
+  sfunc = float4pl,
+  stype = real,
+  combinefunc = float4pl
+);
+
+-- sum as bigint across all smallint input values
+create aggregate pg_catalog.sum(smallint) (
+  sfunc = int2_sum,
+  stype = bigint,
+  combinefunc = int8pl
+);
+
+-- population variance of bigint input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_pop,
+  combinefunc = numeric_combine
+);
+
+-- population variance of float8 input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population variance of integer input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_pop,
+  combinefunc = numeric_poly_combine
+);
+
+-- population variance of numeric input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_pop,
+  combinefunc = numeric_combine
+);
+
+-- population variance of float4 input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population variance of smallint input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_pop,
+  combinefunc = numeric_poly_combine
+);
+
+-- sample variance of bigint input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
+
+-- sample variance of float8 input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample variance of integer input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- sample variance of numeric input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
+
+-- sample variance of float4 input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample variance of smallint input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
+
+-- concatenate XML values
+create aggregate pg_catalog.xmlagg(xml) (
+  sfunc = xmlconcat2,
+  stype = xml
+);
+
+-- PL/pgSQL procedural language
+create language plpgsql handler pg_catalog.plpgsql_call_handler inline pg_catalog.plpgsql_inline_handler validator pg_catalog.plpgsql_validator;
+
+create type pg_catalog.aclitem (input = aclitemin, output = aclitemout);
+
+create type pg_catalog.any (input = any_in, output = any_out, category = 'P');
+
+create type pg_catalog.anyarray (input = anyarray_in, output = anyarray_out, category = 'P');
+
+create type pg_catalog.anycompatible (input = anycompatible_in, output = anycompatible_out, category = 'P');
+
+create type pg_catalog.anycompatiblearray (input = anycompatiblearray_in, output = anycompatiblearray_out, category = 'P');
+
+create type pg_catalog.anycompatiblemultirange (input = anycompatiblemultirange_in, output = anycompatiblemultirange_out, category = 'P');
+
+create type pg_catalog.anycompatiblenonarray (input = anycompatiblenonarray_in, output = anycompatiblenonarray_out, category = 'P');
+
+create type pg_catalog.anycompatiblerange (input = anycompatiblerange_in, output = anycompatiblerange_out, category = 'P');
+
+create type pg_catalog.anyelement (input = anyelement_in, output = anyelement_out, category = 'P');
+
+create type pg_catalog.anyenum (input = anyenum_in, output = anyenum_out, category = 'P');
+
+create type pg_catalog.anymultirange (input = anymultirange_in, output = anymultirange_out, category = 'P');
+
+create type pg_catalog.anynonarray (input = anynonarray_in, output = anynonarray_out, category = 'P');
+
+create type pg_catalog.anyrange (input = anyrange_in, output = anyrange_out, category = 'P');
+
+create type pg_catalog.bit (input = bit_in, output = bit_out, category = 'V');
+
+create type pg_catalog.bool (input = boolin, output = boolout, category = 'B', preferred = true);
+
+create type pg_catalog.bpchar (input = bpcharin, output = bpcharout, category = 'S');
+
+create type pg_catalog.bytea (input = byteain, output = byteaout);
+
+create type pg_catalog.char (input = charin, output = charout, category = 'Z');
+
+create type pg_catalog.cid (input = cidin, output = cidout);
+
+create type pg_catalog.cidr (input = cidr_in, output = cidr_out, category = 'I');
+
+create type pg_catalog.circle (input = circle_in, output = circle_out, category = 'G');
+
+create type pg_catalog.cstring (input = cstring_in, output = cstring_out, category = 'P');
+
+create type pg_catalog.date (input = date_in, output = date_out, category = 'D');
+
+create type pg_catalog.event_trigger (input = event_trigger_in, output = event_trigger_out, category = 'P');
+
+create type pg_catalog.fdw_handler (input = fdw_handler_in, output = fdw_handler_out, category = 'P');
+
+create type pg_catalog.float4 (input = float4in, output = float4out, category = 'N');
+
+create type pg_catalog.float8 (input = float8in, output = float8out, category = 'N', preferred = true);
+
+create type pg_catalog.gtsvector (input = gtsvectorin, output = gtsvectorout);
+
+create type pg_catalog.index_am_handler (input = index_am_handler_in, output = index_am_handler_out, category = 'P');
+
+create type pg_catalog.inet (input = inet_in, output = inet_out, category = 'I', preferred = true);
+
+create type pg_catalog.int2 (input = int2in, output = int2out, category = 'N');
+
+create type pg_catalog.int4 (input = int4in, output = int4out, category = 'N');
+
+create type pg_catalog.int8 (input = int8in, output = int8out, category = 'N');
+
+create type pg_catalog.internal (input = internal_in, output = internal_out, category = 'P');
+
+create type pg_catalog.interval (input = interval_in, output = interval_out, category = 'T', preferred = true);
+
+create type pg_catalog.json (input = json_in, output = json_out);
+
+-- subscript: pg_catalog.jsonb
+create type pg_catalog.jsonb (input = jsonb_in, output = jsonb_out, subscript = jsonb_subscript_handler);
+
+create type pg_catalog.jsonpath (input = jsonpath_in, output = jsonpath_out);
+
+create type pg_catalog.language_handler (input = language_handler_in, output = language_handler_out, category = 'P');
+
+create type pg_catalog.macaddr (input = macaddr_in, output = macaddr_out);
+
+create type pg_catalog.macaddr8 (input = macaddr8_in, output = macaddr8_out);
+
+create type pg_catalog.money (input = cash_in, output = cash_out, category = 'N');
+
+create type pg_catalog.numeric (input = numeric_in, output = numeric_out, category = 'N');
+
+create type pg_catalog.oid (input = oidin, output = oidout, category = 'N', preferred = true);
+
+create type pg_catalog.path (input = path_in, output = path_out, category = 'G');
+
+create type pg_catalog.pg_brin_bloom_summary (input = brin_bloom_summary_in, output = brin_bloom_summary_out, category = 'Z');
+
+create type pg_catalog.pg_brin_minmax_multi_summary (input = brin_minmax_multi_summary_in, output = brin_minmax_multi_summary_out, category = 'Z');
+
+create type pg_catalog.pg_ddl_command (input = pg_ddl_command_in, output = pg_ddl_command_out, category = 'P');
+
+create type pg_catalog.pg_dependencies (input = pg_dependencies_in, output = pg_dependencies_out, category = 'Z');
+
+create type pg_catalog.pg_lsn (input = pg_lsn_in, output = pg_lsn_out);
+
+create type pg_catalog.pg_mcv_list (input = pg_mcv_list_in, output = pg_mcv_list_out, category = 'Z');
+
+create type pg_catalog.pg_ndistinct (input = pg_ndistinct_in, output = pg_ndistinct_out, category = 'Z');
+
+create type pg_catalog.pg_node_tree (input = pg_node_tree_in, output = pg_node_tree_out, category = 'Z');
+
+create type pg_catalog.pg_snapshot (input = pg_snapshot_in, output = pg_snapshot_out);
+
+create type pg_catalog.polygon (input = poly_in, output = poly_out, category = 'G');
+
+create type pg_catalog.record (input = record_in, output = record_out, category = 'P');
+
+create type pg_catalog.refcursor (input = textin, output = textout);
+
+create type pg_catalog.regclass (input = regclassin, output = regclassout, category = 'N');
+
+create type pg_catalog.regcollation (input = regcollationin, output = regcollationout, category = 'N');
+
+create type pg_catalog.regconfig (input = regconfigin, output = regconfigout, category = 'N');
+
+create type pg_catalog.regdictionary (input = regdictionaryin, output = regdictionaryout, category = 'N');
+
+create type pg_catalog.regnamespace (input = regnamespacein, output = regnamespaceout, category = 'N');
+
+create type pg_catalog.regoper (input = regoperin, output = regoperout, category = 'N');
+
+create type pg_catalog.regoperator (input = regoperatorin, output = regoperatorout, category = 'N');
+
+create type pg_catalog.regproc (input = regprocin, output = regprocout, category = 'N');
+
+create type pg_catalog.regprocedure (input = regprocedurein, output = regprocedureout, category = 'N');
+
+create type pg_catalog.regrole (input = regrolein, output = regroleout, category = 'N');
+
+create type pg_catalog.regtype (input = regtypein, output = regtypeout, category = 'N');
+
+create type pg_catalog.table_am_handler (input = table_am_handler_in, output = table_am_handler_out, category = 'P');
+
+create type pg_catalog.text (input = textin, output = textout, category = 'S', preferred = true);
+
+create type pg_catalog.tid (input = tidin, output = tidout);
+
+create type pg_catalog.time (input = time_in, output = time_out, category = 'D');
+
+create type pg_catalog.timestamp (input = timestamp_in, output = timestamp_out, category = 'D');
+
+create type pg_catalog.timestamptz (input = timestamptz_in, output = timestamptz_out, category = 'D', preferred = true);
+
+create type pg_catalog.timetz (input = timetz_in, output = timetz_out, category = 'D');
+
+create type pg_catalog.trigger (input = trigger_in, output = trigger_out, category = 'P');
+
+create type pg_catalog.tsm_handler (input = tsm_handler_in, output = tsm_handler_out, category = 'P');
+
+create type pg_catalog.tsquery (input = tsqueryin, output = tsqueryout);
+
+create type pg_catalog.tsvector (input = tsvectorin, output = tsvectorout);
+
+create type pg_catalog.txid_snapshot (input = txid_snapshot_in, output = txid_snapshot_out);
+
+create type pg_catalog.unknown (input = unknownin, output = unknownout, category = 'X');
+
+create type pg_catalog.uuid (input = uuid_in, output = uuid_out);
+
+create type pg_catalog.varbit (input = varbit_in, output = varbit_out, category = 'V', preferred = true);
+
+create type pg_catalog.varchar (input = varcharin, output = varcharout, category = 'S');
+
+create type pg_catalog.void (input = void_in, output = void_out, category = 'P');
+
+create type pg_catalog.xid (input = xidin, output = xidout);
+
+create type pg_catalog.xid8 (input = xid8in, output = xid8out);
+
+create type pg_catalog.xml (input = xml_in, output = xml_out);
+
+-- subscript: pg_catalog.int2
+-- subscript slice: pg_catalog.int2[]
+create type pg_catalog.int2vector (input = int2vectorin, output = int2vectorout, element = smallint, subscript = array_subscript_handler, category = 'A');
+
+-- subscript: pg_catalog.float8
+-- subscript slice: pg_catalog.line
+create type pg_catalog.line (input = line_in, output = line_out, element = double precision, subscript = raw_array_subscript_handler, category = 'G');
+
+-- subscript: pg_catalog."char"
+-- subscript slice: pg_catalog.name
+create type pg_catalog.name (input = namein, output = nameout, element = "char", subscript = raw_array_subscript_handler, category = 'S');
+
+-- subscript: pg_catalog.oid
+-- subscript slice: pg_catalog.oid[]
+create type pg_catalog.oidvector (input = oidvectorin, output = oidvectorout, element = oid, subscript = array_subscript_handler, category = 'A');
+
+-- subscript: pg_catalog.float8
+-- subscript slice: pg_catalog.point
+create type pg_catalog.point (input = point_in, output = point_out, element = double precision, subscript = raw_array_subscript_handler, category = 'G');
+
+-- subscript: pg_catalog.point
+-- subscript slice: pg_catalog.box
+create type pg_catalog.box (input = box_in, output = box_out, element = point, subscript = raw_array_subscript_handler, category = 'G');
+
+-- subscript: pg_catalog.point
+-- subscript slice: pg_catalog.lseg
+create type pg_catalog.lseg (input = lseg_in, output = lseg_out, element = point, subscript = raw_array_subscript_handler, category = 'G');
 
 -- NOT tsquery
 create operator pg_catalog.!! (
@@ -23504,4 +23775,1253 @@ create collation pg_catalog.ucs_basic (provider = builtin, locale = 'C');
 
 -- sorts using the Unicode Collation Algorithm with default settings
 create collation pg_catalog.unicode (provider = icu, locale = 'und');
+
+-- block range index (BRIN) access method
+create access method brin type index handler pg_catalog.brinhandler;
+
+-- b-tree index access method
+create access method btree type index handler pg_catalog.bthandler;
+
+-- GIN index access method
+create access method gin type index handler pg_catalog.ginhandler;
+
+-- GiST index access method
+create access method gist type index handler pg_catalog.gisthandler;
+
+-- hash index access method
+create access method hash type index handler pg_catalog.hashhandler;
+
+-- heap table access method
+create access method heap type table handler pg_catalog.heap_tableam_handler;
+
+-- SP-GiST index access method
+create access method spgist type index handler pg_catalog.spghandler;
+
+-- conversion for BIG5 to EUC_TW
+create default conversion pg_catalog.big5_to_euc_tw for 'BIG5' to 'EUC_TW' from pg_catalog.big5_to_euc_tw;
+
+-- conversion for BIG5 to MULE_INTERNAL
+create default conversion pg_catalog.big5_to_mic for 'BIG5' to 'MULE_INTERNAL' from pg_catalog.big5_to_mic;
+
+-- conversion for BIG5 to UTF8
+create default conversion pg_catalog.big5_to_utf8 for 'BIG5' to 'UTF8' from pg_catalog.big5_to_utf8;
+
+-- conversion for EUC_CN to MULE_INTERNAL
+create default conversion pg_catalog.euc_cn_to_mic for 'EUC_CN' to 'MULE_INTERNAL' from pg_catalog.euc_cn_to_mic;
+
+-- conversion for EUC_CN to UTF8
+create default conversion pg_catalog.euc_cn_to_utf8 for 'EUC_CN' to 'UTF8' from pg_catalog.euc_cn_to_utf8;
+
+-- conversion for EUC_JIS_2004 to SHIFT_JIS_2004
+create default conversion pg_catalog.euc_jis_2004_to_shift_jis_2004 for 'EUC_JIS_2004' to 'SHIFT_JIS_2004' from pg_catalog.euc_jis_2004_to_shift_jis_2004;
+
+-- conversion for EUC_JIS_2004 to UTF8
+create default conversion pg_catalog.euc_jis_2004_to_utf8 for 'EUC_JIS_2004' to 'UTF8' from pg_catalog.euc_jis_2004_to_utf8;
+
+-- conversion for EUC_JP to MULE_INTERNAL
+create default conversion pg_catalog.euc_jp_to_mic for 'EUC_JP' to 'MULE_INTERNAL' from pg_catalog.euc_jp_to_mic;
+
+-- conversion for EUC_JP to SJIS
+create default conversion pg_catalog.euc_jp_to_sjis for 'EUC_JP' to 'SJIS' from pg_catalog.euc_jp_to_sjis;
+
+-- conversion for EUC_JP to UTF8
+create default conversion pg_catalog.euc_jp_to_utf8 for 'EUC_JP' to 'UTF8' from pg_catalog.euc_jp_to_utf8;
+
+-- conversion for EUC_KR to MULE_INTERNAL
+create default conversion pg_catalog.euc_kr_to_mic for 'EUC_KR' to 'MULE_INTERNAL' from pg_catalog.euc_kr_to_mic;
+
+-- conversion for EUC_KR to UTF8
+create default conversion pg_catalog.euc_kr_to_utf8 for 'EUC_KR' to 'UTF8' from pg_catalog.euc_kr_to_utf8;
+
+-- conversion for EUC_TW to BIG5
+create default conversion pg_catalog.euc_tw_to_big5 for 'EUC_TW' to 'BIG5' from pg_catalog.euc_tw_to_big5;
+
+-- conversion for EUC_TW to MULE_INTERNAL
+create default conversion pg_catalog.euc_tw_to_mic for 'EUC_TW' to 'MULE_INTERNAL' from pg_catalog.euc_tw_to_mic;
+
+-- conversion for EUC_TW to UTF8
+create default conversion pg_catalog.euc_tw_to_utf8 for 'EUC_TW' to 'UTF8' from pg_catalog.euc_tw_to_utf8;
+
+-- conversion for GB18030 to UTF8
+create default conversion pg_catalog.gb18030_to_utf8 for 'GB18030' to 'UTF8' from pg_catalog.gb18030_to_utf8;
+
+-- conversion for GBK to UTF8
+create default conversion pg_catalog.gbk_to_utf8 for 'GBK' to 'UTF8' from pg_catalog.gbk_to_utf8;
+
+-- conversion for LATIN6 to UTF8
+create default conversion pg_catalog.iso_8859_10_to_utf8 for 'LATIN6' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN7 to UTF8
+create default conversion pg_catalog.iso_8859_13_to_utf8 for 'LATIN7' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN8 to UTF8
+create default conversion pg_catalog.iso_8859_14_to_utf8 for 'LATIN8' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN9 to UTF8
+create default conversion pg_catalog.iso_8859_15_to_utf8 for 'LATIN9' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN10 to UTF8
+create default conversion pg_catalog.iso_8859_16_to_utf8 for 'LATIN10' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN1 to MULE_INTERNAL
+create default conversion pg_catalog.iso_8859_1_to_mic for 'LATIN1' to 'MULE_INTERNAL' from pg_catalog.latin1_to_mic;
+
+-- conversion for LATIN1 to UTF8
+create default conversion pg_catalog.iso_8859_1_to_utf8 for 'LATIN1' to 'UTF8' from pg_catalog.iso8859_1_to_utf8;
+
+-- conversion for LATIN2 to MULE_INTERNAL
+create default conversion pg_catalog.iso_8859_2_to_mic for 'LATIN2' to 'MULE_INTERNAL' from pg_catalog.latin2_to_mic;
+
+-- conversion for LATIN2 to UTF8
+create default conversion pg_catalog.iso_8859_2_to_utf8 for 'LATIN2' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN2 to WIN1250
+create default conversion pg_catalog.iso_8859_2_to_windows_1250 for 'LATIN2' to 'WIN1250' from pg_catalog.latin2_to_win1250;
+
+-- conversion for LATIN3 to MULE_INTERNAL
+create default conversion pg_catalog.iso_8859_3_to_mic for 'LATIN3' to 'MULE_INTERNAL' from pg_catalog.latin3_to_mic;
+
+-- conversion for LATIN3 to UTF8
+create default conversion pg_catalog.iso_8859_3_to_utf8 for 'LATIN3' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN4 to MULE_INTERNAL
+create default conversion pg_catalog.iso_8859_4_to_mic for 'LATIN4' to 'MULE_INTERNAL' from pg_catalog.latin4_to_mic;
+
+-- conversion for LATIN4 to UTF8
+create default conversion pg_catalog.iso_8859_4_to_utf8 for 'LATIN4' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for ISO-8859-5 to KOI8R
+create default conversion pg_catalog.iso_8859_5_to_koi8_r for 'ISO_8859_5' to 'KOI8R' from pg_catalog.iso_to_koi8r;
+
+-- conversion for ISO-8859-5 to MULE_INTERNAL
+create default conversion pg_catalog.iso_8859_5_to_mic for 'ISO_8859_5' to 'MULE_INTERNAL' from pg_catalog.iso_to_mic;
+
+-- conversion for ISO-8859-5 to UTF8
+create default conversion pg_catalog.iso_8859_5_to_utf8 for 'ISO_8859_5' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for ISO-8859-5 to WIN1251
+create default conversion pg_catalog.iso_8859_5_to_windows_1251 for 'ISO_8859_5' to 'WIN1251' from pg_catalog.iso_to_win1251;
+
+-- conversion for ISO-8859-5 to WIN866
+create default conversion pg_catalog.iso_8859_5_to_windows_866 for 'ISO_8859_5' to 'WIN866' from pg_catalog.iso_to_win866;
+
+-- conversion for ISO-8859-6 to UTF8
+create default conversion pg_catalog.iso_8859_6_to_utf8 for 'ISO_8859_6' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for ISO-8859-7 to UTF8
+create default conversion pg_catalog.iso_8859_7_to_utf8 for 'ISO_8859_7' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for ISO-8859-8 to UTF8
+create default conversion pg_catalog.iso_8859_8_to_utf8 for 'ISO_8859_8' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for LATIN5 to UTF8
+create default conversion pg_catalog.iso_8859_9_to_utf8 for 'LATIN5' to 'UTF8' from pg_catalog.iso8859_to_utf8;
+
+-- conversion for JOHAB to UTF8
+create default conversion pg_catalog.johab_to_utf8 for 'JOHAB' to 'UTF8' from pg_catalog.johab_to_utf8;
+
+-- conversion for KOI8R to ISO-8859-5
+create default conversion pg_catalog.koi8_r_to_iso_8859_5 for 'KOI8R' to 'ISO_8859_5' from pg_catalog.koi8r_to_iso;
+
+-- conversion for KOI8R to MULE_INTERNAL
+create default conversion pg_catalog.koi8_r_to_mic for 'KOI8R' to 'MULE_INTERNAL' from pg_catalog.koi8r_to_mic;
+
+-- conversion for KOI8R to UTF8
+create default conversion pg_catalog.koi8_r_to_utf8 for 'KOI8R' to 'UTF8' from pg_catalog.koi8r_to_utf8;
+
+-- conversion for KOI8R to WIN1251
+create default conversion pg_catalog.koi8_r_to_windows_1251 for 'KOI8R' to 'WIN1251' from pg_catalog.koi8r_to_win1251;
+
+-- conversion for KOI8R to WIN866
+create default conversion pg_catalog.koi8_r_to_windows_866 for 'KOI8R' to 'WIN866' from pg_catalog.koi8r_to_win866;
+
+-- conversion for KOI8U to UTF8
+create default conversion pg_catalog.koi8_u_to_utf8 for 'KOI8U' to 'UTF8' from pg_catalog.koi8u_to_utf8;
+
+-- conversion for MULE_INTERNAL to BIG5
+create default conversion pg_catalog.mic_to_big5 for 'MULE_INTERNAL' to 'BIG5' from pg_catalog.mic_to_big5;
+
+-- conversion for MULE_INTERNAL to EUC_CN
+create default conversion pg_catalog.mic_to_euc_cn for 'MULE_INTERNAL' to 'EUC_CN' from pg_catalog.mic_to_euc_cn;
+
+-- conversion for MULE_INTERNAL to EUC_JP
+create default conversion pg_catalog.mic_to_euc_jp for 'MULE_INTERNAL' to 'EUC_JP' from pg_catalog.mic_to_euc_jp;
+
+-- conversion for MULE_INTERNAL to EUC_KR
+create default conversion pg_catalog.mic_to_euc_kr for 'MULE_INTERNAL' to 'EUC_KR' from pg_catalog.mic_to_euc_kr;
+
+-- conversion for MULE_INTERNAL to EUC_TW
+create default conversion pg_catalog.mic_to_euc_tw for 'MULE_INTERNAL' to 'EUC_TW' from pg_catalog.mic_to_euc_tw;
+
+-- conversion for MULE_INTERNAL to LATIN1
+create default conversion pg_catalog.mic_to_iso_8859_1 for 'MULE_INTERNAL' to 'LATIN1' from pg_catalog.mic_to_latin1;
+
+-- conversion for MULE_INTERNAL to LATIN2
+create default conversion pg_catalog.mic_to_iso_8859_2 for 'MULE_INTERNAL' to 'LATIN2' from pg_catalog.mic_to_latin2;
+
+-- conversion for MULE_INTERNAL to LATIN3
+create default conversion pg_catalog.mic_to_iso_8859_3 for 'MULE_INTERNAL' to 'LATIN3' from pg_catalog.mic_to_latin3;
+
+-- conversion for MULE_INTERNAL to LATIN4
+create default conversion pg_catalog.mic_to_iso_8859_4 for 'MULE_INTERNAL' to 'LATIN4' from pg_catalog.mic_to_latin4;
+
+-- conversion for MULE_INTERNAL to ISO-8859-5
+create default conversion pg_catalog.mic_to_iso_8859_5 for 'MULE_INTERNAL' to 'ISO_8859_5' from pg_catalog.mic_to_iso;
+
+-- conversion for MULE_INTERNAL to KOI8R
+create default conversion pg_catalog.mic_to_koi8_r for 'MULE_INTERNAL' to 'KOI8R' from pg_catalog.mic_to_koi8r;
+
+-- conversion for MULE_INTERNAL to SJIS
+create default conversion pg_catalog.mic_to_sjis for 'MULE_INTERNAL' to 'SJIS' from pg_catalog.mic_to_sjis;
+
+-- conversion for MULE_INTERNAL to WIN1250
+create default conversion pg_catalog.mic_to_windows_1250 for 'MULE_INTERNAL' to 'WIN1250' from pg_catalog.mic_to_win1250;
+
+-- conversion for MULE_INTERNAL to WIN1251
+create default conversion pg_catalog.mic_to_windows_1251 for 'MULE_INTERNAL' to 'WIN1251' from pg_catalog.mic_to_win1251;
+
+-- conversion for MULE_INTERNAL to WIN866
+create default conversion pg_catalog.mic_to_windows_866 for 'MULE_INTERNAL' to 'WIN866' from pg_catalog.mic_to_win866;
+
+-- conversion for SHIFT_JIS_2004 to EUC_JIS_2004
+create default conversion pg_catalog.shift_jis_2004_to_euc_jis_2004 for 'SHIFT_JIS_2004' to 'EUC_JIS_2004' from pg_catalog.shift_jis_2004_to_euc_jis_2004;
+
+-- conversion for SHIFT_JIS_2004 to UTF8
+create default conversion pg_catalog.shift_jis_2004_to_utf8 for 'SHIFT_JIS_2004' to 'UTF8' from pg_catalog.shift_jis_2004_to_utf8;
+
+-- conversion for SJIS to EUC_JP
+create default conversion pg_catalog.sjis_to_euc_jp for 'SJIS' to 'EUC_JP' from pg_catalog.sjis_to_euc_jp;
+
+-- conversion for SJIS to MULE_INTERNAL
+create default conversion pg_catalog.sjis_to_mic for 'SJIS' to 'MULE_INTERNAL' from pg_catalog.sjis_to_mic;
+
+-- conversion for SJIS to UTF8
+create default conversion pg_catalog.sjis_to_utf8 for 'SJIS' to 'UTF8' from pg_catalog.sjis_to_utf8;
+
+-- conversion for UHC to UTF8
+create default conversion pg_catalog.uhc_to_utf8 for 'UHC' to 'UTF8' from pg_catalog.uhc_to_utf8;
+
+-- conversion for UTF8 to BIG5
+create default conversion pg_catalog.utf8_to_big5 for 'UTF8' to 'BIG5' from pg_catalog.utf8_to_big5;
+
+-- conversion for UTF8 to EUC_CN
+create default conversion pg_catalog.utf8_to_euc_cn for 'UTF8' to 'EUC_CN' from pg_catalog.utf8_to_euc_cn;
+
+-- conversion for UTF8 to EUC_JIS_2004
+create default conversion pg_catalog.utf8_to_euc_jis_2004 for 'UTF8' to 'EUC_JIS_2004' from pg_catalog.utf8_to_euc_jis_2004;
+
+-- conversion for UTF8 to EUC_JP
+create default conversion pg_catalog.utf8_to_euc_jp for 'UTF8' to 'EUC_JP' from pg_catalog.utf8_to_euc_jp;
+
+-- conversion for UTF8 to EUC_KR
+create default conversion pg_catalog.utf8_to_euc_kr for 'UTF8' to 'EUC_KR' from pg_catalog.utf8_to_euc_kr;
+
+-- conversion for UTF8 to EUC_TW
+create default conversion pg_catalog.utf8_to_euc_tw for 'UTF8' to 'EUC_TW' from pg_catalog.utf8_to_euc_tw;
+
+-- conversion for UTF8 to GB18030
+create default conversion pg_catalog.utf8_to_gb18030 for 'UTF8' to 'GB18030' from pg_catalog.utf8_to_gb18030;
+
+-- conversion for UTF8 to GBK
+create default conversion pg_catalog.utf8_to_gbk for 'UTF8' to 'GBK' from pg_catalog.utf8_to_gbk;
+
+-- conversion for UTF8 to LATIN1
+create default conversion pg_catalog.utf8_to_iso_8859_1 for 'UTF8' to 'LATIN1' from pg_catalog.utf8_to_iso8859_1;
+
+-- conversion for UTF8 to LATIN6
+create default conversion pg_catalog.utf8_to_iso_8859_10 for 'UTF8' to 'LATIN6' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN7
+create default conversion pg_catalog.utf8_to_iso_8859_13 for 'UTF8' to 'LATIN7' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN8
+create default conversion pg_catalog.utf8_to_iso_8859_14 for 'UTF8' to 'LATIN8' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN9
+create default conversion pg_catalog.utf8_to_iso_8859_15 for 'UTF8' to 'LATIN9' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN10
+create default conversion pg_catalog.utf8_to_iso_8859_16 for 'UTF8' to 'LATIN10' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN2
+create default conversion pg_catalog.utf8_to_iso_8859_2 for 'UTF8' to 'LATIN2' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN3
+create default conversion pg_catalog.utf8_to_iso_8859_3 for 'UTF8' to 'LATIN3' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN4
+create default conversion pg_catalog.utf8_to_iso_8859_4 for 'UTF8' to 'LATIN4' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to ISO-8859-5
+create default conversion pg_catalog.utf8_to_iso_8859_5 for 'UTF8' to 'ISO_8859_5' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to ISO-8859-6
+create default conversion pg_catalog.utf8_to_iso_8859_6 for 'UTF8' to 'ISO_8859_6' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to ISO-8859-7
+create default conversion pg_catalog.utf8_to_iso_8859_7 for 'UTF8' to 'ISO_8859_7' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to ISO-8859-8
+create default conversion pg_catalog.utf8_to_iso_8859_8 for 'UTF8' to 'ISO_8859_8' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to LATIN5
+create default conversion pg_catalog.utf8_to_iso_8859_9 for 'UTF8' to 'LATIN5' from pg_catalog.utf8_to_iso8859;
+
+-- conversion for UTF8 to JOHAB
+create default conversion pg_catalog.utf8_to_johab for 'UTF8' to 'JOHAB' from pg_catalog.utf8_to_johab;
+
+-- conversion for UTF8 to KOI8R
+create default conversion pg_catalog.utf8_to_koi8_r for 'UTF8' to 'KOI8R' from pg_catalog.utf8_to_koi8r;
+
+-- conversion for UTF8 to KOI8U
+create default conversion pg_catalog.utf8_to_koi8_u for 'UTF8' to 'KOI8U' from pg_catalog.utf8_to_koi8u;
+
+-- conversion for UTF8 to SHIFT_JIS_2004
+create default conversion pg_catalog.utf8_to_shift_jis_2004 for 'UTF8' to 'SHIFT_JIS_2004' from pg_catalog.utf8_to_shift_jis_2004;
+
+-- conversion for UTF8 to SJIS
+create default conversion pg_catalog.utf8_to_sjis for 'UTF8' to 'SJIS' from pg_catalog.utf8_to_sjis;
+
+-- conversion for UTF8 to UHC
+create default conversion pg_catalog.utf8_to_uhc for 'UTF8' to 'UHC' from pg_catalog.utf8_to_uhc;
+
+-- conversion for UTF8 to WIN1250
+create default conversion pg_catalog.utf8_to_windows_1250 for 'UTF8' to 'WIN1250' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1251
+create default conversion pg_catalog.utf8_to_windows_1251 for 'UTF8' to 'WIN1251' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1252
+create default conversion pg_catalog.utf8_to_windows_1252 for 'UTF8' to 'WIN1252' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1253
+create default conversion pg_catalog.utf8_to_windows_1253 for 'UTF8' to 'WIN1253' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1254
+create default conversion pg_catalog.utf8_to_windows_1254 for 'UTF8' to 'WIN1254' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1255
+create default conversion pg_catalog.utf8_to_windows_1255 for 'UTF8' to 'WIN1255' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1256
+create default conversion pg_catalog.utf8_to_windows_1256 for 'UTF8' to 'WIN1256' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1257
+create default conversion pg_catalog.utf8_to_windows_1257 for 'UTF8' to 'WIN1257' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN1258
+create default conversion pg_catalog.utf8_to_windows_1258 for 'UTF8' to 'WIN1258' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN866
+create default conversion pg_catalog.utf8_to_windows_866 for 'UTF8' to 'WIN866' from pg_catalog.utf8_to_win;
+
+-- conversion for UTF8 to WIN874
+create default conversion pg_catalog.utf8_to_windows_874 for 'UTF8' to 'WIN874' from pg_catalog.utf8_to_win;
+
+-- conversion for WIN1250 to LATIN2
+create default conversion pg_catalog.windows_1250_to_iso_8859_2 for 'WIN1250' to 'LATIN2' from pg_catalog.win1250_to_latin2;
+
+-- conversion for WIN1250 to MULE_INTERNAL
+create default conversion pg_catalog.windows_1250_to_mic for 'WIN1250' to 'MULE_INTERNAL' from pg_catalog.win1250_to_mic;
+
+-- conversion for WIN1250 to UTF8
+create default conversion pg_catalog.windows_1250_to_utf8 for 'WIN1250' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1251 to ISO-8859-5
+create default conversion pg_catalog.windows_1251_to_iso_8859_5 for 'WIN1251' to 'ISO_8859_5' from pg_catalog.win1251_to_iso;
+
+-- conversion for WIN1251 to KOI8R
+create default conversion pg_catalog.windows_1251_to_koi8_r for 'WIN1251' to 'KOI8R' from pg_catalog.win1251_to_koi8r;
+
+-- conversion for WIN1251 to MULE_INTERNAL
+create default conversion pg_catalog.windows_1251_to_mic for 'WIN1251' to 'MULE_INTERNAL' from pg_catalog.win1251_to_mic;
+
+-- conversion for WIN1251 to UTF8
+create default conversion pg_catalog.windows_1251_to_utf8 for 'WIN1251' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1251 to WIN866
+create default conversion pg_catalog.windows_1251_to_windows_866 for 'WIN1251' to 'WIN866' from pg_catalog.win1251_to_win866;
+
+-- conversion for WIN1252 to UTF8
+create default conversion pg_catalog.windows_1252_to_utf8 for 'WIN1252' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1253 to UTF8
+create default conversion pg_catalog.windows_1253_to_utf8 for 'WIN1253' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1254 to UTF8
+create default conversion pg_catalog.windows_1254_to_utf8 for 'WIN1254' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1255 to UTF8
+create default conversion pg_catalog.windows_1255_to_utf8 for 'WIN1255' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1256 to UTF8
+create default conversion pg_catalog.windows_1256_to_utf8 for 'WIN1256' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1257 to UTF8
+create default conversion pg_catalog.windows_1257_to_utf8 for 'WIN1257' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN1258 to UTF8
+create default conversion pg_catalog.windows_1258_to_utf8 for 'WIN1258' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN866 to ISO-8859-5
+create default conversion pg_catalog.windows_866_to_iso_8859_5 for 'WIN866' to 'ISO_8859_5' from pg_catalog.win866_to_iso;
+
+-- conversion for WIN866 to KOI8R
+create default conversion pg_catalog.windows_866_to_koi8_r for 'WIN866' to 'KOI8R' from pg_catalog.win866_to_koi8r;
+
+-- conversion for WIN866 to MULE_INTERNAL
+create default conversion pg_catalog.windows_866_to_mic for 'WIN866' to 'MULE_INTERNAL' from pg_catalog.win866_to_mic;
+
+-- conversion for WIN866 to UTF8
+create default conversion pg_catalog.windows_866_to_utf8 for 'WIN866' to 'UTF8' from pg_catalog.win_to_utf8;
+
+-- conversion for WIN866 to WIN1251
+create default conversion pg_catalog.windows_866_to_windows_1251 for 'WIN866' to 'WIN1251' from pg_catalog.win866_to_win1251;
+
+-- conversion for WIN874 to UTF8
+create default conversion pg_catalog.windows_874_to_utf8 for 'WIN874' to 'UTF8' from pg_catalog.win_to_utf8;
+
+create operator family pg_catalog.aclitem_ops using hash;
+
+create operator family pg_catalog.array_ops using btree;
+
+create operator family pg_catalog.array_ops using gin;
+
+create operator family pg_catalog.array_ops using hash;
+
+create operator family pg_catalog.bit_minmax_ops using brin;
+
+create operator family pg_catalog.bit_ops using btree;
+
+create operator family pg_catalog.bool_ops using btree;
+
+create operator family pg_catalog.bool_ops using hash;
+
+create operator family pg_catalog.box_inclusion_ops using brin;
+
+create operator family pg_catalog.box_ops using gist;
+
+create operator family pg_catalog.box_ops using spgist;
+
+create operator family pg_catalog.bpchar_bloom_ops using brin;
+
+create operator family pg_catalog.bpchar_minmax_ops using brin;
+
+create operator family pg_catalog.bpchar_ops using btree;
+
+create operator family pg_catalog.bpchar_ops using hash;
+
+create operator family pg_catalog.bpchar_pattern_ops using btree;
+
+create operator family pg_catalog.bpchar_pattern_ops using hash;
+
+create operator family pg_catalog.bytea_bloom_ops using brin;
+
+create operator family pg_catalog.bytea_minmax_ops using brin;
+
+create operator family pg_catalog.bytea_ops using btree;
+
+create operator family pg_catalog.bytea_ops using hash;
+
+create operator family pg_catalog.char_bloom_ops using brin;
+
+create operator family pg_catalog.char_minmax_ops using brin;
+
+create operator family pg_catalog.char_ops using btree;
+
+create operator family pg_catalog.char_ops using hash;
+
+create operator family pg_catalog.cid_ops using hash;
+
+create operator family pg_catalog.circle_ops using gist;
+
+create operator family pg_catalog.date_ops using hash;
+
+create operator family pg_catalog.datetime_bloom_ops using brin;
+
+create operator family pg_catalog.datetime_minmax_multi_ops using brin;
+
+create operator family pg_catalog.datetime_minmax_ops using brin;
+
+create operator family pg_catalog.datetime_ops using btree;
+
+create operator family pg_catalog.enum_ops using btree;
+
+create operator family pg_catalog.enum_ops using hash;
+
+create operator family pg_catalog.float_bloom_ops using brin;
+
+create operator family pg_catalog.float_minmax_multi_ops using brin;
+
+create operator family pg_catalog.float_minmax_ops using brin;
+
+create operator family pg_catalog.float_ops using btree;
+
+create operator family pg_catalog.float_ops using hash;
+
+create operator family pg_catalog.integer_bloom_ops using brin;
+
+create operator family pg_catalog.integer_minmax_multi_ops using brin;
+
+create operator family pg_catalog.integer_minmax_ops using brin;
+
+create operator family pg_catalog.integer_ops using btree;
+
+create operator family pg_catalog.integer_ops using hash;
+
+create operator family pg_catalog.interval_bloom_ops using brin;
+
+create operator family pg_catalog.interval_minmax_multi_ops using brin;
+
+create operator family pg_catalog.interval_minmax_ops using brin;
+
+create operator family pg_catalog.interval_ops using btree;
+
+create operator family pg_catalog.interval_ops using hash;
+
+create operator family pg_catalog.jsonb_ops using btree;
+
+create operator family pg_catalog.jsonb_ops using gin;
+
+create operator family pg_catalog.jsonb_ops using hash;
+
+create operator family pg_catalog.jsonb_path_ops using gin;
+
+create operator family pg_catalog.kd_point_ops using spgist;
+
+create operator family pg_catalog.macaddr8_bloom_ops using brin;
+
+create operator family pg_catalog.macaddr8_minmax_multi_ops using brin;
+
+create operator family pg_catalog.macaddr8_minmax_ops using brin;
+
+create operator family pg_catalog.macaddr8_ops using btree;
+
+create operator family pg_catalog.macaddr8_ops using hash;
+
+create operator family pg_catalog.macaddr_bloom_ops using brin;
+
+create operator family pg_catalog.macaddr_minmax_multi_ops using brin;
+
+create operator family pg_catalog.macaddr_minmax_ops using brin;
+
+create operator family pg_catalog.macaddr_ops using btree;
+
+create operator family pg_catalog.macaddr_ops using hash;
+
+create operator family pg_catalog.money_ops using btree;
+
+create operator family pg_catalog.multirange_ops using btree;
+
+create operator family pg_catalog.multirange_ops using gist;
+
+create operator family pg_catalog.multirange_ops using hash;
+
+create operator family pg_catalog.name_bloom_ops using brin;
+
+create operator family pg_catalog.name_minmax_ops using brin;
+
+create operator family pg_catalog.network_bloom_ops using brin;
+
+create operator family pg_catalog.network_inclusion_ops using brin;
+
+create operator family pg_catalog.network_minmax_multi_ops using brin;
+
+create operator family pg_catalog.network_minmax_ops using brin;
+
+create operator family pg_catalog.network_ops using btree;
+
+create operator family pg_catalog.network_ops using gist;
+
+create operator family pg_catalog.network_ops using hash;
+
+create operator family pg_catalog.network_ops using spgist;
+
+create operator family pg_catalog.numeric_bloom_ops using brin;
+
+create operator family pg_catalog.numeric_minmax_multi_ops using brin;
+
+create operator family pg_catalog.numeric_minmax_ops using brin;
+
+create operator family pg_catalog.numeric_ops using btree;
+
+create operator family pg_catalog.numeric_ops using hash;
+
+create operator family pg_catalog.oid_bloom_ops using brin;
+
+create operator family pg_catalog.oid_minmax_multi_ops using brin;
+
+create operator family pg_catalog.oid_minmax_ops using brin;
+
+create operator family pg_catalog.oid_ops using btree;
+
+create operator family pg_catalog.oid_ops using hash;
+
+create operator family pg_catalog.oidvector_ops using btree;
+
+create operator family pg_catalog.oidvector_ops using hash;
+
+create operator family pg_catalog.pg_lsn_bloom_ops using brin;
+
+create operator family pg_catalog.pg_lsn_minmax_multi_ops using brin;
+
+create operator family pg_catalog.pg_lsn_minmax_ops using brin;
+
+create operator family pg_catalog.pg_lsn_ops using btree;
+
+create operator family pg_catalog.pg_lsn_ops using hash;
+
+create operator family pg_catalog.point_ops using gist;
+
+create operator family pg_catalog.poly_ops using gist;
+
+create operator family pg_catalog.poly_ops using spgist;
+
+create operator family pg_catalog.quad_point_ops using spgist;
+
+create operator family pg_catalog.range_inclusion_ops using brin;
+
+create operator family pg_catalog.range_ops using btree;
+
+create operator family pg_catalog.range_ops using gist;
+
+create operator family pg_catalog.range_ops using hash;
+
+create operator family pg_catalog.range_ops using spgist;
+
+create operator family pg_catalog.record_image_ops using btree;
+
+create operator family pg_catalog.record_ops using btree;
+
+create operator family pg_catalog.record_ops using hash;
+
+create operator family pg_catalog.text_bloom_ops using brin;
+
+create operator family pg_catalog.text_minmax_ops using brin;
+
+create operator family pg_catalog.text_ops using btree;
+
+create operator family pg_catalog.text_ops using hash;
+
+create operator family pg_catalog.text_ops using spgist;
+
+create operator family pg_catalog.text_pattern_ops using btree;
+
+create operator family pg_catalog.text_pattern_ops using hash;
+
+create operator family pg_catalog.tid_bloom_ops using brin;
+
+create operator family pg_catalog.tid_minmax_multi_ops using brin;
+
+create operator family pg_catalog.tid_minmax_ops using brin;
+
+create operator family pg_catalog.tid_ops using btree;
+
+create operator family pg_catalog.tid_ops using hash;
+
+create operator family pg_catalog.time_bloom_ops using brin;
+
+create operator family pg_catalog.time_minmax_multi_ops using brin;
+
+create operator family pg_catalog.time_minmax_ops using brin;
+
+create operator family pg_catalog.time_ops using btree;
+
+create operator family pg_catalog.time_ops using hash;
+
+create operator family pg_catalog.timestamp_ops using hash;
+
+create operator family pg_catalog.timestamptz_ops using hash;
+
+create operator family pg_catalog.timetz_bloom_ops using brin;
+
+create operator family pg_catalog.timetz_minmax_multi_ops using brin;
+
+create operator family pg_catalog.timetz_minmax_ops using brin;
+
+create operator family pg_catalog.timetz_ops using btree;
+
+create operator family pg_catalog.timetz_ops using hash;
+
+create operator family pg_catalog.tsquery_ops using btree;
+
+create operator family pg_catalog.tsquery_ops using gist;
+
+create operator family pg_catalog.tsvector_ops using btree;
+
+create operator family pg_catalog.tsvector_ops using gin;
+
+create operator family pg_catalog.tsvector_ops using gist;
+
+create operator family pg_catalog.uuid_bloom_ops using brin;
+
+create operator family pg_catalog.uuid_minmax_multi_ops using brin;
+
+create operator family pg_catalog.uuid_minmax_ops using brin;
+
+create operator family pg_catalog.uuid_ops using btree;
+
+create operator family pg_catalog.uuid_ops using hash;
+
+create operator family pg_catalog.varbit_minmax_ops using brin;
+
+create operator family pg_catalog.varbit_ops using btree;
+
+create operator family pg_catalog.xid8_ops using btree;
+
+create operator family pg_catalog.xid8_ops using hash;
+
+create operator family pg_catalog.xid_ops using hash;
+
+create operator class pg_catalog.aclitem_ops default for type aclitem using hash family pg_catalog.aclitem_ops as storage aclitem;
+
+create operator class pg_catalog.array_ops default for type anyarray using btree family pg_catalog.array_ops as storage anyarray;
+
+create operator class pg_catalog.array_ops default for type anyarray using gin family pg_catalog.array_ops as storage anyelement;
+
+create operator class pg_catalog.array_ops default for type anyarray using hash family pg_catalog.array_ops as storage anyarray;
+
+create operator class pg_catalog.bit_minmax_ops default for type bit using brin family pg_catalog.bit_minmax_ops as storage bit;
+
+create operator class pg_catalog.bit_ops default for type bit using btree family pg_catalog.bit_ops as storage bit;
+
+create operator class pg_catalog.bool_ops default for type boolean using btree family pg_catalog.bool_ops as storage boolean;
+
+create operator class pg_catalog.bool_ops default for type boolean using hash family pg_catalog.bool_ops as storage boolean;
+
+create operator class pg_catalog.box_inclusion_ops default for type box using brin family pg_catalog.box_inclusion_ops as storage box;
+
+create operator class pg_catalog.box_ops default for type box using gist family pg_catalog.box_ops as storage box;
+
+create operator class pg_catalog.box_ops default for type box using spgist family pg_catalog.box_ops as storage box;
+
+create operator class pg_catalog.bpchar_bloom_ops for type character using brin family pg_catalog.bpchar_bloom_ops as storage character;
+
+create operator class pg_catalog.bpchar_minmax_ops default for type character using brin family pg_catalog.bpchar_minmax_ops as storage character;
+
+create operator class pg_catalog.bpchar_ops default for type character using btree family pg_catalog.bpchar_ops as storage character;
+
+create operator class pg_catalog.bpchar_ops default for type character using hash family pg_catalog.bpchar_ops as storage character;
+
+create operator class pg_catalog.bpchar_pattern_ops for type character using btree family pg_catalog.bpchar_pattern_ops as storage character;
+
+create operator class pg_catalog.bpchar_pattern_ops for type character using hash family pg_catalog.bpchar_pattern_ops as storage character;
+
+create operator class pg_catalog.bytea_bloom_ops for type bytea using brin family pg_catalog.bytea_bloom_ops as storage bytea;
+
+create operator class pg_catalog.bytea_minmax_ops default for type bytea using brin family pg_catalog.bytea_minmax_ops as storage bytea;
+
+create operator class pg_catalog.bytea_ops default for type bytea using btree family pg_catalog.bytea_ops as storage bytea;
+
+create operator class pg_catalog.bytea_ops default for type bytea using hash family pg_catalog.bytea_ops as storage bytea;
+
+create operator class pg_catalog.char_bloom_ops for type "char" using brin family pg_catalog.char_bloom_ops as storage "char";
+
+create operator class pg_catalog.char_minmax_ops default for type "char" using brin family pg_catalog.char_minmax_ops as storage "char";
+
+create operator class pg_catalog.char_ops default for type "char" using btree family pg_catalog.char_ops as storage "char";
+
+create operator class pg_catalog.char_ops default for type "char" using hash family pg_catalog.char_ops as storage "char";
+
+create operator class pg_catalog.cid_ops default for type cid using hash family pg_catalog.cid_ops as storage cid;
+
+create operator class pg_catalog.cidr_ops for type inet using btree family pg_catalog.network_ops as storage inet;
+
+create operator class pg_catalog.cidr_ops for type inet using hash family pg_catalog.network_ops as storage inet;
+
+create operator class pg_catalog.circle_ops default for type circle using gist family pg_catalog.circle_ops as storage box;
+
+create operator class pg_catalog.date_bloom_ops for type date using brin family pg_catalog.datetime_bloom_ops as storage date;
+
+create operator class pg_catalog.date_minmax_multi_ops for type date using brin family pg_catalog.datetime_minmax_multi_ops as storage date;
+
+create operator class pg_catalog.date_minmax_ops default for type date using brin family pg_catalog.datetime_minmax_ops as storage date;
+
+create operator class pg_catalog.date_ops default for type date using btree family pg_catalog.datetime_ops as storage date;
+
+create operator class pg_catalog.date_ops default for type date using hash family pg_catalog.date_ops as storage date;
+
+create operator class pg_catalog.enum_ops default for type anyenum using btree family pg_catalog.enum_ops as storage anyenum;
+
+create operator class pg_catalog.enum_ops default for type anyenum using hash family pg_catalog.enum_ops as storage anyenum;
+
+create operator class pg_catalog.float4_bloom_ops for type real using brin family pg_catalog.float_bloom_ops as storage real;
+
+create operator class pg_catalog.float4_minmax_multi_ops for type real using brin family pg_catalog.float_minmax_multi_ops as storage real;
+
+create operator class pg_catalog.float4_minmax_ops default for type real using brin family pg_catalog.float_minmax_ops as storage real;
+
+create operator class pg_catalog.float4_ops default for type real using btree family pg_catalog.float_ops as storage real;
+
+create operator class pg_catalog.float4_ops default for type real using hash family pg_catalog.float_ops as storage real;
+
+create operator class pg_catalog.float8_bloom_ops for type double precision using brin family pg_catalog.float_bloom_ops as storage double precision;
+
+create operator class pg_catalog.float8_minmax_multi_ops for type double precision using brin family pg_catalog.float_minmax_multi_ops as storage double precision;
+
+create operator class pg_catalog.float8_minmax_ops default for type double precision using brin family pg_catalog.float_minmax_ops as storage double precision;
+
+create operator class pg_catalog.float8_ops default for type double precision using btree family pg_catalog.float_ops as storage double precision;
+
+create operator class pg_catalog.float8_ops default for type double precision using hash family pg_catalog.float_ops as storage double precision;
+
+create operator class pg_catalog.inet_bloom_ops for type inet using brin family pg_catalog.network_bloom_ops as storage inet;
+
+create operator class pg_catalog.inet_inclusion_ops default for type inet using brin family pg_catalog.network_inclusion_ops as storage inet;
+
+create operator class pg_catalog.inet_minmax_multi_ops for type inet using brin family pg_catalog.network_minmax_multi_ops as storage inet;
+
+create operator class pg_catalog.inet_minmax_ops for type inet using brin family pg_catalog.network_minmax_ops as storage inet;
+
+create operator class pg_catalog.inet_ops default for type inet using btree family pg_catalog.network_ops as storage inet;
+
+create operator class pg_catalog.inet_ops for type inet using gist family pg_catalog.network_ops as storage inet;
+
+create operator class pg_catalog.inet_ops default for type inet using hash family pg_catalog.network_ops as storage inet;
+
+create operator class pg_catalog.inet_ops default for type inet using spgist family pg_catalog.network_ops as storage inet;
+
+create operator class pg_catalog.int2_bloom_ops for type smallint using brin family pg_catalog.integer_bloom_ops as storage smallint;
+
+create operator class pg_catalog.int2_minmax_multi_ops for type smallint using brin family pg_catalog.integer_minmax_multi_ops as storage smallint;
+
+create operator class pg_catalog.int2_minmax_ops default for type smallint using brin family pg_catalog.integer_minmax_ops as storage smallint;
+
+create operator class pg_catalog.int2_ops default for type smallint using btree family pg_catalog.integer_ops as storage smallint;
+
+create operator class pg_catalog.int2_ops default for type smallint using hash family pg_catalog.integer_ops as storage smallint;
+
+create operator class pg_catalog.int4_bloom_ops for type integer using brin family pg_catalog.integer_bloom_ops as storage integer;
+
+create operator class pg_catalog.int4_minmax_multi_ops for type integer using brin family pg_catalog.integer_minmax_multi_ops as storage integer;
+
+create operator class pg_catalog.int4_minmax_ops default for type integer using brin family pg_catalog.integer_minmax_ops as storage integer;
+
+create operator class pg_catalog.int4_ops default for type integer using btree family pg_catalog.integer_ops as storage integer;
+
+create operator class pg_catalog.int4_ops default for type integer using hash family pg_catalog.integer_ops as storage integer;
+
+create operator class pg_catalog.int8_bloom_ops for type bigint using brin family pg_catalog.integer_bloom_ops as storage bigint;
+
+create operator class pg_catalog.int8_minmax_multi_ops for type bigint using brin family pg_catalog.integer_minmax_multi_ops as storage bigint;
+
+create operator class pg_catalog.int8_minmax_ops default for type bigint using brin family pg_catalog.integer_minmax_ops as storage bigint;
+
+create operator class pg_catalog.int8_ops default for type bigint using btree family pg_catalog.integer_ops as storage bigint;
+
+create operator class pg_catalog.int8_ops default for type bigint using hash family pg_catalog.integer_ops as storage bigint;
+
+create operator class pg_catalog.interval_bloom_ops for type interval using brin family pg_catalog.interval_bloom_ops as storage interval;
+
+create operator class pg_catalog.interval_minmax_multi_ops for type interval using brin family pg_catalog.interval_minmax_multi_ops as storage interval;
+
+create operator class pg_catalog.interval_minmax_ops default for type interval using brin family pg_catalog.interval_minmax_ops as storage interval;
+
+create operator class pg_catalog.interval_ops default for type interval using btree family pg_catalog.interval_ops as storage interval;
+
+create operator class pg_catalog.interval_ops default for type interval using hash family pg_catalog.interval_ops as storage interval;
+
+create operator class pg_catalog.jsonb_ops default for type jsonb using btree family pg_catalog.jsonb_ops as storage jsonb;
+
+create operator class pg_catalog.jsonb_ops default for type jsonb using gin family pg_catalog.jsonb_ops as storage text;
+
+create operator class pg_catalog.jsonb_ops default for type jsonb using hash family pg_catalog.jsonb_ops as storage jsonb;
+
+create operator class pg_catalog.jsonb_path_ops for type jsonb using gin family pg_catalog.jsonb_path_ops as storage integer;
+
+create operator class pg_catalog.kd_point_ops for type point using spgist family pg_catalog.kd_point_ops as storage point;
+
+create operator class pg_catalog.macaddr8_bloom_ops for type macaddr8 using brin family pg_catalog.macaddr8_bloom_ops as storage macaddr8;
+
+create operator class pg_catalog.macaddr8_minmax_multi_ops for type macaddr8 using brin family pg_catalog.macaddr8_minmax_multi_ops as storage macaddr8;
+
+create operator class pg_catalog.macaddr8_minmax_ops default for type macaddr8 using brin family pg_catalog.macaddr8_minmax_ops as storage macaddr8;
+
+create operator class pg_catalog.macaddr8_ops default for type macaddr8 using btree family pg_catalog.macaddr8_ops as storage macaddr8;
+
+create operator class pg_catalog.macaddr8_ops default for type macaddr8 using hash family pg_catalog.macaddr8_ops as storage macaddr8;
+
+create operator class pg_catalog.macaddr_bloom_ops for type macaddr using brin family pg_catalog.macaddr_bloom_ops as storage macaddr;
+
+create operator class pg_catalog.macaddr_minmax_multi_ops for type macaddr using brin family pg_catalog.macaddr_minmax_multi_ops as storage macaddr;
+
+create operator class pg_catalog.macaddr_minmax_ops default for type macaddr using brin family pg_catalog.macaddr_minmax_ops as storage macaddr;
+
+create operator class pg_catalog.macaddr_ops default for type macaddr using btree family pg_catalog.macaddr_ops as storage macaddr;
+
+create operator class pg_catalog.macaddr_ops default for type macaddr using hash family pg_catalog.macaddr_ops as storage macaddr;
+
+create operator class pg_catalog.money_ops default for type money using btree family pg_catalog.money_ops as storage money;
+
+create operator class pg_catalog.multirange_ops default for type anymultirange using btree family pg_catalog.multirange_ops as storage anymultirange;
+
+create operator class pg_catalog.multirange_ops default for type anymultirange using gist family pg_catalog.multirange_ops as storage anyrange;
+
+create operator class pg_catalog.multirange_ops default for type anymultirange using hash family pg_catalog.multirange_ops as storage anymultirange;
+
+create operator class pg_catalog.name_bloom_ops for type name using brin family pg_catalog.name_bloom_ops as storage name;
+
+create operator class pg_catalog.name_minmax_ops default for type name using brin family pg_catalog.name_minmax_ops as storage name;
+
+create operator class pg_catalog.name_ops default for type name using btree family pg_catalog.text_ops as storage cstring;
+
+create operator class pg_catalog.name_ops default for type name using hash family pg_catalog.text_ops as storage name;
+
+create operator class pg_catalog.numeric_bloom_ops for type numeric using brin family pg_catalog.numeric_bloom_ops as storage numeric;
+
+create operator class pg_catalog.numeric_minmax_multi_ops for type numeric using brin family pg_catalog.numeric_minmax_multi_ops as storage numeric;
+
+create operator class pg_catalog.numeric_minmax_ops default for type numeric using brin family pg_catalog.numeric_minmax_ops as storage numeric;
+
+create operator class pg_catalog.numeric_ops default for type numeric using btree family pg_catalog.numeric_ops as storage numeric;
+
+create operator class pg_catalog.numeric_ops default for type numeric using hash family pg_catalog.numeric_ops as storage numeric;
+
+create operator class pg_catalog.oid_bloom_ops for type oid using brin family pg_catalog.oid_bloom_ops as storage oid;
+
+create operator class pg_catalog.oid_minmax_multi_ops for type oid using brin family pg_catalog.oid_minmax_multi_ops as storage oid;
+
+create operator class pg_catalog.oid_minmax_ops default for type oid using brin family pg_catalog.oid_minmax_ops as storage oid;
+
+create operator class pg_catalog.oid_ops default for type oid using btree family pg_catalog.oid_ops as storage oid;
+
+create operator class pg_catalog.oid_ops default for type oid using hash family pg_catalog.oid_ops as storage oid;
+
+create operator class pg_catalog.oidvector_ops default for type oidvector using btree family pg_catalog.oidvector_ops as storage oidvector;
+
+create operator class pg_catalog.oidvector_ops default for type oidvector using hash family pg_catalog.oidvector_ops as storage oidvector;
+
+create operator class pg_catalog.pg_lsn_bloom_ops for type pg_lsn using brin family pg_catalog.pg_lsn_bloom_ops as storage pg_lsn;
+
+create operator class pg_catalog.pg_lsn_minmax_multi_ops for type pg_lsn using brin family pg_catalog.pg_lsn_minmax_multi_ops as storage pg_lsn;
+
+create operator class pg_catalog.pg_lsn_minmax_ops default for type pg_lsn using brin family pg_catalog.pg_lsn_minmax_ops as storage pg_lsn;
+
+create operator class pg_catalog.pg_lsn_ops default for type pg_lsn using btree family pg_catalog.pg_lsn_ops as storage pg_lsn;
+
+create operator class pg_catalog.pg_lsn_ops default for type pg_lsn using hash family pg_catalog.pg_lsn_ops as storage pg_lsn;
+
+create operator class pg_catalog.point_ops default for type point using gist family pg_catalog.point_ops as storage box;
+
+create operator class pg_catalog.poly_ops default for type polygon using gist family pg_catalog.poly_ops as storage box;
+
+create operator class pg_catalog.poly_ops default for type polygon using spgist family pg_catalog.poly_ops as storage box;
+
+create operator class pg_catalog.quad_point_ops default for type point using spgist family pg_catalog.quad_point_ops as storage point;
+
+create operator class pg_catalog.range_inclusion_ops default for type anyrange using brin family pg_catalog.range_inclusion_ops as storage anyrange;
+
+create operator class pg_catalog.range_ops default for type anyrange using btree family pg_catalog.range_ops as storage anyrange;
+
+create operator class pg_catalog.range_ops default for type anyrange using gist family pg_catalog.range_ops as storage anyrange;
+
+create operator class pg_catalog.range_ops default for type anyrange using hash family pg_catalog.range_ops as storage anyrange;
+
+create operator class pg_catalog.range_ops default for type anyrange using spgist family pg_catalog.range_ops as storage anyrange;
+
+create operator class pg_catalog.record_image_ops for type record using btree family pg_catalog.record_image_ops as storage record;
+
+create operator class pg_catalog.record_ops default for type record using btree family pg_catalog.record_ops as storage record;
+
+create operator class pg_catalog.record_ops default for type record using hash family pg_catalog.record_ops as storage record;
+
+create operator class pg_catalog.text_bloom_ops for type text using brin family pg_catalog.text_bloom_ops as storage text;
+
+create operator class pg_catalog.text_minmax_ops default for type text using brin family pg_catalog.text_minmax_ops as storage text;
+
+create operator class pg_catalog.text_ops default for type text using btree family pg_catalog.text_ops as storage text;
+
+create operator class pg_catalog.text_ops default for type text using hash family pg_catalog.text_ops as storage text;
+
+create operator class pg_catalog.text_ops default for type text using spgist family pg_catalog.text_ops as storage text;
+
+create operator class pg_catalog.text_pattern_ops for type text using btree family pg_catalog.text_pattern_ops as storage text;
+
+create operator class pg_catalog.text_pattern_ops for type text using hash family pg_catalog.text_pattern_ops as storage text;
+
+create operator class pg_catalog.tid_bloom_ops for type tid using brin family pg_catalog.tid_bloom_ops as storage tid;
+
+create operator class pg_catalog.tid_minmax_multi_ops for type tid using brin family pg_catalog.tid_minmax_multi_ops as storage tid;
+
+create operator class pg_catalog.tid_minmax_ops default for type tid using brin family pg_catalog.tid_minmax_ops as storage tid;
+
+create operator class pg_catalog.tid_ops default for type tid using btree family pg_catalog.tid_ops as storage tid;
+
+create operator class pg_catalog.tid_ops default for type tid using hash family pg_catalog.tid_ops as storage tid;
+
+create operator class pg_catalog.time_bloom_ops for type time without time zone using brin family pg_catalog.time_bloom_ops as storage time without time zone;
+
+create operator class pg_catalog.time_minmax_multi_ops for type time without time zone using brin family pg_catalog.time_minmax_multi_ops as storage time without time zone;
+
+create operator class pg_catalog.time_minmax_ops default for type time without time zone using brin family pg_catalog.time_minmax_ops as storage time without time zone;
+
+create operator class pg_catalog.time_ops default for type time without time zone using btree family pg_catalog.time_ops as storage time without time zone;
+
+create operator class pg_catalog.time_ops default for type time without time zone using hash family pg_catalog.time_ops as storage time without time zone;
+
+create operator class pg_catalog.timestamp_bloom_ops for type timestamp without time zone using brin family pg_catalog.datetime_bloom_ops as storage timestamp without time zone;
+
+create operator class pg_catalog.timestamp_minmax_multi_ops for type timestamp without time zone using brin family pg_catalog.datetime_minmax_multi_ops as storage timestamp without time zone;
+
+create operator class pg_catalog.timestamp_minmax_ops default for type timestamp without time zone using brin family pg_catalog.datetime_minmax_ops as storage timestamp without time zone;
+
+create operator class pg_catalog.timestamp_ops default for type timestamp without time zone using btree family pg_catalog.datetime_ops as storage timestamp without time zone;
+
+create operator class pg_catalog.timestamp_ops default for type timestamp without time zone using hash family pg_catalog.timestamp_ops as storage timestamp without time zone;
+
+create operator class pg_catalog.timestamptz_bloom_ops for type timestamp with time zone using brin family pg_catalog.datetime_bloom_ops as storage timestamp with time zone;
+
+create operator class pg_catalog.timestamptz_minmax_multi_ops for type timestamp with time zone using brin family pg_catalog.datetime_minmax_multi_ops as storage timestamp with time zone;
+
+create operator class pg_catalog.timestamptz_minmax_ops default for type timestamp with time zone using brin family pg_catalog.datetime_minmax_ops as storage timestamp with time zone;
+
+create operator class pg_catalog.timestamptz_ops default for type timestamp with time zone using btree family pg_catalog.datetime_ops as storage timestamp with time zone;
+
+create operator class pg_catalog.timestamptz_ops default for type timestamp with time zone using hash family pg_catalog.timestamptz_ops as storage timestamp with time zone;
+
+create operator class pg_catalog.timetz_bloom_ops for type time with time zone using brin family pg_catalog.timetz_bloom_ops as storage time with time zone;
+
+create operator class pg_catalog.timetz_minmax_multi_ops for type time with time zone using brin family pg_catalog.timetz_minmax_multi_ops as storage time with time zone;
+
+create operator class pg_catalog.timetz_minmax_ops default for type time with time zone using brin family pg_catalog.timetz_minmax_ops as storage time with time zone;
+
+create operator class pg_catalog.timetz_ops default for type time with time zone using btree family pg_catalog.timetz_ops as storage time with time zone;
+
+create operator class pg_catalog.timetz_ops default for type time with time zone using hash family pg_catalog.timetz_ops as storage time with time zone;
+
+create operator class pg_catalog.tsquery_ops default for type tsquery using btree family pg_catalog.tsquery_ops as storage tsquery;
+
+create operator class pg_catalog.tsquery_ops default for type tsquery using gist family pg_catalog.tsquery_ops as storage bigint;
+
+create operator class pg_catalog.tsvector_ops default for type tsvector using btree family pg_catalog.tsvector_ops as storage tsvector;
+
+create operator class pg_catalog.tsvector_ops default for type tsvector using gin family pg_catalog.tsvector_ops as storage text;
+
+create operator class pg_catalog.tsvector_ops default for type tsvector using gist family pg_catalog.tsvector_ops as storage gtsvector;
+
+create operator class pg_catalog.uuid_bloom_ops for type uuid using brin family pg_catalog.uuid_bloom_ops as storage uuid;
+
+create operator class pg_catalog.uuid_minmax_multi_ops for type uuid using brin family pg_catalog.uuid_minmax_multi_ops as storage uuid;
+
+create operator class pg_catalog.uuid_minmax_ops default for type uuid using brin family pg_catalog.uuid_minmax_ops as storage uuid;
+
+create operator class pg_catalog.uuid_ops default for type uuid using btree family pg_catalog.uuid_ops as storage uuid;
+
+create operator class pg_catalog.uuid_ops default for type uuid using hash family pg_catalog.uuid_ops as storage uuid;
+
+create operator class pg_catalog.varbit_minmax_ops default for type bit varying using brin family pg_catalog.varbit_minmax_ops as storage bit varying;
+
+create operator class pg_catalog.varbit_ops default for type bit varying using btree family pg_catalog.varbit_ops as storage bit varying;
+
+create operator class pg_catalog.varchar_ops for type text using btree family pg_catalog.text_ops as storage text;
+
+create operator class pg_catalog.varchar_ops for type text using hash family pg_catalog.text_ops as storage text;
+
+create operator class pg_catalog.varchar_pattern_ops for type text using btree family pg_catalog.text_pattern_ops as storage text;
+
+create operator class pg_catalog.varchar_pattern_ops for type text using hash family pg_catalog.text_pattern_ops as storage text;
+
+create operator class pg_catalog.xid8_ops default for type xid8 using btree family pg_catalog.xid8_ops as storage xid8;
+
+create operator class pg_catalog.xid8_ops default for type xid8 using hash family pg_catalog.xid8_ops as storage xid8;
+
+create operator class pg_catalog.xid_ops default for type xid using hash family pg_catalog.xid_ops as storage xid;
+
+-- default word parser
+create text search parser pg_catalog."default" (start = pg_catalog.prsd_start, gettoken = pg_catalog.prsd_nexttoken, end = pg_catalog.prsd_end, lextypes = pg_catalog.prsd_lextype, headline = pg_catalog.prsd_headline);
+
+-- ispell dictionary
+create text search template pg_catalog.ispell (init = pg_catalog.dispell_init, lexize = pg_catalog.dispell_lexize);
+
+-- simple dictionary: just lower case and check for stopword
+create text search template pg_catalog.simple (init = pg_catalog.dsimple_init, lexize = pg_catalog.dsimple_lexize);
+
+-- snowball stemmer
+create text search template pg_catalog.snowball (init = pg_catalog.dsnowball_init, lexize = pg_catalog.dsnowball_lexize);
+
+-- synonym dictionary: replace word by its synonym
+create text search template pg_catalog.synonym (init = pg_catalog.dsynonym_init, lexize = pg_catalog.dsynonym_lexize);
+
+-- thesaurus dictionary: phrase by phrase substitution
+create text search template pg_catalog.thesaurus (init = pg_catalog.thesaurus_init, lexize = pg_catalog.thesaurus_lexize);
+
+-- snowball stemmer for arabic language
+create text search dictionary pg_catalog.arabic_stem (template = pg_catalog.snowball, language = 'arabic');
+
+-- snowball stemmer for armenian language
+create text search dictionary pg_catalog.armenian_stem (template = pg_catalog.snowball, language = 'armenian');
+
+-- snowball stemmer for basque language
+create text search dictionary pg_catalog.basque_stem (template = pg_catalog.snowball, language = 'basque');
+
+-- snowball stemmer for catalan language
+create text search dictionary pg_catalog.catalan_stem (template = pg_catalog.snowball, language = 'catalan');
+
+-- snowball stemmer for danish language
+create text search dictionary pg_catalog.danish_stem (template = pg_catalog.snowball, language = 'danish', stopwords = 'danish');
+
+-- snowball stemmer for dutch language
+create text search dictionary pg_catalog.dutch_stem (template = pg_catalog.snowball, language = 'dutch', stopwords = 'dutch');
+
+-- snowball stemmer for english language
+create text search dictionary pg_catalog.english_stem (template = pg_catalog.snowball, language = 'english', stopwords = 'english');
+
+-- snowball stemmer for estonian language
+create text search dictionary pg_catalog.estonian_stem (template = pg_catalog.snowball, language = 'estonian');
+
+-- snowball stemmer for finnish language
+create text search dictionary pg_catalog.finnish_stem (template = pg_catalog.snowball, language = 'finnish', stopwords = 'finnish');
+
+-- snowball stemmer for french language
+create text search dictionary pg_catalog.french_stem (template = pg_catalog.snowball, language = 'french', stopwords = 'french');
+
+-- snowball stemmer for german language
+create text search dictionary pg_catalog.german_stem (template = pg_catalog.snowball, language = 'german', stopwords = 'german');
+
+-- snowball stemmer for greek language
+create text search dictionary pg_catalog.greek_stem (template = pg_catalog.snowball, language = 'greek');
+
+-- snowball stemmer for hindi language
+create text search dictionary pg_catalog.hindi_stem (template = pg_catalog.snowball, language = 'hindi');
+
+-- snowball stemmer for hungarian language
+create text search dictionary pg_catalog.hungarian_stem (template = pg_catalog.snowball, language = 'hungarian', stopwords = 'hungarian');
+
+-- snowball stemmer for indonesian language
+create text search dictionary pg_catalog.indonesian_stem (template = pg_catalog.snowball, language = 'indonesian');
+
+-- snowball stemmer for irish language
+create text search dictionary pg_catalog.irish_stem (template = pg_catalog.snowball, language = 'irish');
+
+-- snowball stemmer for italian language
+create text search dictionary pg_catalog.italian_stem (template = pg_catalog.snowball, language = 'italian', stopwords = 'italian');
+
+-- snowball stemmer for lithuanian language
+create text search dictionary pg_catalog.lithuanian_stem (template = pg_catalog.snowball, language = 'lithuanian');
+
+-- snowball stemmer for nepali language
+create text search dictionary pg_catalog.nepali_stem (template = pg_catalog.snowball, language = 'nepali', stopwords = 'nepali');
+
+-- snowball stemmer for norwegian language
+create text search dictionary pg_catalog.norwegian_stem (template = pg_catalog.snowball, language = 'norwegian', stopwords = 'norwegian');
+
+-- snowball stemmer for portuguese language
+create text search dictionary pg_catalog.portuguese_stem (template = pg_catalog.snowball, language = 'portuguese', stopwords = 'portuguese');
+
+-- snowball stemmer for romanian language
+create text search dictionary pg_catalog.romanian_stem (template = pg_catalog.snowball, language = 'romanian');
+
+-- snowball stemmer for russian language
+create text search dictionary pg_catalog.russian_stem (template = pg_catalog.snowball, language = 'russian', stopwords = 'russian');
+
+-- snowball stemmer for serbian language
+create text search dictionary pg_catalog.serbian_stem (template = pg_catalog.snowball, language = 'serbian');
+
+-- simple dictionary: just lower case and check for stopword
+create text search dictionary pg_catalog.simple (template = pg_catalog.simple);
+
+-- snowball stemmer for spanish language
+create text search dictionary pg_catalog.spanish_stem (template = pg_catalog.snowball, language = 'spanish', stopwords = 'spanish');
+
+-- snowball stemmer for swedish language
+create text search dictionary pg_catalog.swedish_stem (template = pg_catalog.snowball, language = 'swedish', stopwords = 'swedish');
+
+-- snowball stemmer for tamil language
+create text search dictionary pg_catalog.tamil_stem (template = pg_catalog.snowball, language = 'tamil');
+
+-- snowball stemmer for turkish language
+create text search dictionary pg_catalog.turkish_stem (template = pg_catalog.snowball, language = 'turkish', stopwords = 'turkish');
+
+-- snowball stemmer for yiddish language
+create text search dictionary pg_catalog.yiddish_stem (template = pg_catalog.snowball, language = 'yiddish');
+
+-- configuration for arabic language
+create text search configuration pg_catalog.arabic (parser = pg_catalog."default");
+
+-- configuration for armenian language
+create text search configuration pg_catalog.armenian (parser = pg_catalog."default");
+
+-- configuration for basque language
+create text search configuration pg_catalog.basque (parser = pg_catalog."default");
+
+-- configuration for catalan language
+create text search configuration pg_catalog.catalan (parser = pg_catalog."default");
+
+-- configuration for danish language
+create text search configuration pg_catalog.danish (parser = pg_catalog."default");
+
+-- configuration for dutch language
+create text search configuration pg_catalog.dutch (parser = pg_catalog."default");
+
+-- configuration for english language
+create text search configuration pg_catalog.english (parser = pg_catalog."default");
+
+-- configuration for estonian language
+create text search configuration pg_catalog.estonian (parser = pg_catalog."default");
+
+-- configuration for finnish language
+create text search configuration pg_catalog.finnish (parser = pg_catalog."default");
+
+-- configuration for french language
+create text search configuration pg_catalog.french (parser = pg_catalog."default");
+
+-- configuration for german language
+create text search configuration pg_catalog.german (parser = pg_catalog."default");
+
+-- configuration for greek language
+create text search configuration pg_catalog.greek (parser = pg_catalog."default");
+
+-- configuration for hindi language
+create text search configuration pg_catalog.hindi (parser = pg_catalog."default");
+
+-- configuration for hungarian language
+create text search configuration pg_catalog.hungarian (parser = pg_catalog."default");
+
+-- configuration for indonesian language
+create text search configuration pg_catalog.indonesian (parser = pg_catalog."default");
+
+-- configuration for irish language
+create text search configuration pg_catalog.irish (parser = pg_catalog."default");
+
+-- configuration for italian language
+create text search configuration pg_catalog.italian (parser = pg_catalog."default");
+
+-- configuration for lithuanian language
+create text search configuration pg_catalog.lithuanian (parser = pg_catalog."default");
+
+-- configuration for nepali language
+create text search configuration pg_catalog.nepali (parser = pg_catalog."default");
+
+-- configuration for norwegian language
+create text search configuration pg_catalog.norwegian (parser = pg_catalog."default");
+
+-- configuration for portuguese language
+create text search configuration pg_catalog.portuguese (parser = pg_catalog."default");
+
+-- configuration for romanian language
+create text search configuration pg_catalog.romanian (parser = pg_catalog."default");
+
+-- configuration for russian language
+create text search configuration pg_catalog.russian (parser = pg_catalog."default");
+
+-- configuration for serbian language
+create text search configuration pg_catalog.serbian (parser = pg_catalog."default");
+
+-- simple configuration
+create text search configuration pg_catalog.simple (parser = pg_catalog."default");
+
+-- configuration for spanish language
+create text search configuration pg_catalog.spanish (parser = pg_catalog."default");
+
+-- configuration for swedish language
+create text search configuration pg_catalog.swedish (parser = pg_catalog."default");
+
+-- configuration for tamil language
+create text search configuration pg_catalog.tamil (parser = pg_catalog."default");
+
+-- configuration for turkish language
+create text search configuration pg_catalog.turkish (parser = pg_catalog."default");
+
+-- configuration for yiddish language
+create text search configuration pg_catalog.yiddish (parser = pg_catalog."default");
 
