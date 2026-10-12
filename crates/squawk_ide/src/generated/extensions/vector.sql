@@ -354,34 +354,6 @@ create function public.vector_to_sparsevec(vector, integer, boolean) returns spa
 create function public.vector_typmod_in(cstring[]) returns integer
   language c;
 
-create aggregate public.avg(halfvec) (
-  sfunc = halfvec_accum,
-  stype = double precision[],
-  finalfunc = halfvec_avg,
-  combinefunc = halfvec_combine,
-  initcond = '{0}'
-);
-
-create aggregate public.avg(vector) (
-  sfunc = vector_accum,
-  stype = double precision[],
-  finalfunc = vector_avg,
-  combinefunc = vector_combine,
-  initcond = '{0}'
-);
-
-create aggregate public.sum(halfvec) (
-  sfunc = halfvec_add,
-  stype = halfvec,
-  combinefunc = halfvec_add
-);
-
-create aggregate public.sum(vector) (
-  sfunc = vector_add,
-  stype = vector,
-  combinefunc = vector_add
-);
-
 create type public.halfvec (input = halfvec_in, output = halfvec_out);
 
 create type public.sparsevec (input = sparsevec_in, output = sparsevec_out);
@@ -626,6 +598,34 @@ create operator public.|| (
   leftarg = vector,
   rightarg = vector,
   function = public.vector_concat
+);
+
+create aggregate public.avg(halfvec) (
+  sfunc = halfvec_accum,
+  stype = double precision[],
+  finalfunc = halfvec_avg,
+  combinefunc = halfvec_combine,
+  initcond = '{0}'
+);
+
+create aggregate public.avg(vector) (
+  sfunc = vector_accum,
+  stype = double precision[],
+  finalfunc = vector_avg,
+  combinefunc = vector_combine,
+  initcond = '{0}'
+);
+
+create aggregate public.sum(halfvec) (
+  sfunc = halfvec_add,
+  stype = halfvec,
+  combinefunc = halfvec_add
+);
+
+create aggregate public.sum(vector) (
+  sfunc = vector_add,
+  stype = vector,
+  combinefunc = vector_add
 );
 
 create cast (double precision[] as halfvec) with function public.array_to_halfvec(double precision[], integer, boolean) as assignment;

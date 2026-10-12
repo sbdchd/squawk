@@ -141,18 +141,6 @@ create function public.texticregexne(citext, text) returns boolean
 create function public.translate(citext, citext, text) returns text
   language sql;
 
-create aggregate public.max(citext) (
-  sfunc = citext_larger,
-  stype = citext,
-  combinefunc = citext_larger
-);
-
-create aggregate public.min(citext) (
-  sfunc = citext_smaller,
-  stype = citext,
-  combinefunc = citext_smaller
-);
-
 create type public.citext (input = citextin, output = citextout, category = 'S');
 
 create operator public.!~ (
@@ -309,6 +297,20 @@ create operator public.~~* (
   leftarg = citext,
   rightarg = text,
   function = public.texticlike
+);
+
+create aggregate public.max(citext) (
+  sfunc = citext_larger,
+  stype = citext,
+  combinefunc = citext_larger,
+  sortop = OPERATOR(public.>)
+);
+
+create aggregate public.min(citext) (
+  sfunc = citext_smaller,
+  stype = citext,
+  combinefunc = citext_smaller,
+  sortop = OPERATOR(public.<)
 );
 
 create cast (boolean as citext) with function public.citext(boolean) as assignment;

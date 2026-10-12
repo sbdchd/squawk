@@ -16381,1150 +16381,6 @@ create function pg_catalog.xpath_exists(text, xml) returns boolean
 create function pg_catalog.xpath_exists(text, xml, text[]) returns boolean
   language internal;
 
--- arbitrary value from among input values
-create aggregate pg_catalog.any_value(anyelement) (
-  sfunc = any_value_transfn,
-  stype = anyelement,
-  combinefunc = any_value_transfn
-);
-
--- concatenate aggregate input into an array
-create aggregate pg_catalog.array_agg(anyarray) (
-  sfunc = array_agg_array_transfn,
-  stype = internal,
-  finalfunc = array_agg_array_finalfn,
-  finalfunc_extra,
-  combinefunc = array_agg_array_combine
-);
-
--- concatenate aggregate input into an array
-create aggregate pg_catalog.array_agg(anynonarray) (
-  sfunc = array_agg_transfn,
-  stype = internal,
-  finalfunc = array_agg_finalfn,
-  finalfunc_extra,
-  combinefunc = array_agg_combine
-);
-
--- the average (arithmetic mean) as numeric of all bigint values
-create aggregate pg_catalog.avg(bigint) (
-  sfunc = int8_avg_accum,
-  stype = internal,
-  finalfunc = numeric_poly_avg,
-  combinefunc = int8_avg_combine
-);
-
--- the average (arithmetic mean) as float8 of all float8 values
-create aggregate pg_catalog.avg(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_avg,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- the average (arithmetic mean) as numeric of all integer values
-create aggregate pg_catalog.avg(integer) (
-  sfunc = int4_avg_accum,
-  stype = bigint[],
-  finalfunc = int8_avg,
-  combinefunc = int4_avg_combine,
-  initcond = '{0,0}'
-);
-
--- the average (arithmetic mean) as interval of all interval values
-create aggregate pg_catalog.avg(interval) (
-  sfunc = interval_avg_accum,
-  stype = internal,
-  finalfunc = interval_avg,
-  combinefunc = interval_avg_combine
-);
-
--- the average (arithmetic mean) as numeric of all numeric values
-create aggregate pg_catalog.avg(numeric) (
-  sfunc = numeric_avg_accum,
-  stype = internal,
-  finalfunc = numeric_avg,
-  combinefunc = numeric_avg_combine
-);
-
--- the average (arithmetic mean) as float8 of all float4 values
-create aggregate pg_catalog.avg(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_avg,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- the average (arithmetic mean) as numeric of all smallint values
-create aggregate pg_catalog.avg(smallint) (
-  sfunc = int2_avg_accum,
-  stype = bigint[],
-  finalfunc = int8_avg,
-  combinefunc = int4_avg_combine,
-  initcond = '{0,0}'
-);
-
--- bitwise-and bigint aggregate
-create aggregate pg_catalog.bit_and(bigint) (
-  sfunc = int8and,
-  stype = bigint,
-  combinefunc = int8and
-);
-
--- bitwise-and bit aggregate
-create aggregate pg_catalog.bit_and(bit) (
-  sfunc = bitand,
-  stype = bit,
-  combinefunc = bitand
-);
-
--- bitwise-and integer aggregate
-create aggregate pg_catalog.bit_and(integer) (
-  sfunc = int4and,
-  stype = integer,
-  combinefunc = int4and
-);
-
--- bitwise-and smallint aggregate
-create aggregate pg_catalog.bit_and(smallint) (
-  sfunc = int2and,
-  stype = smallint,
-  combinefunc = int2and
-);
-
--- bitwise-or bigint aggregate
-create aggregate pg_catalog.bit_or(bigint) (
-  sfunc = int8or,
-  stype = bigint,
-  combinefunc = int8or
-);
-
--- bitwise-or bit aggregate
-create aggregate pg_catalog.bit_or(bit) (
-  sfunc = bitor,
-  stype = bit,
-  combinefunc = bitor
-);
-
--- bitwise-or integer aggregate
-create aggregate pg_catalog.bit_or(integer) (
-  sfunc = int4or,
-  stype = integer,
-  combinefunc = int4or
-);
-
--- bitwise-or smallint aggregate
-create aggregate pg_catalog.bit_or(smallint) (
-  sfunc = int2or,
-  stype = smallint,
-  combinefunc = int2or
-);
-
--- bitwise-xor bigint aggregate
-create aggregate pg_catalog.bit_xor(bigint) (
-  sfunc = int8xor,
-  stype = bigint,
-  combinefunc = int8xor
-);
-
--- bitwise-xor bit aggregate
-create aggregate pg_catalog.bit_xor(bit) (
-  sfunc = bitxor,
-  stype = bit,
-  combinefunc = bitxor
-);
-
--- bitwise-xor integer aggregate
-create aggregate pg_catalog.bit_xor(integer) (
-  sfunc = int4xor,
-  stype = integer,
-  combinefunc = int4xor
-);
-
--- bitwise-xor smallint aggregate
-create aggregate pg_catalog.bit_xor(smallint) (
-  sfunc = int2xor,
-  stype = smallint,
-  combinefunc = int2xor
-);
-
--- boolean-and aggregate
-create aggregate pg_catalog.bool_and(boolean) (
-  sfunc = booland_statefunc,
-  stype = boolean,
-  combinefunc = booland_statefunc
-);
-
--- boolean-or aggregate
-create aggregate pg_catalog.bool_or(boolean) (
-  sfunc = boolor_statefunc,
-  stype = boolean,
-  combinefunc = boolor_statefunc
-);
-
--- correlation coefficient
-create aggregate pg_catalog.corr(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_corr,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- number of input rows
-create aggregate pg_catalog.count(*) (
-  sfunc = int8inc,
-  stype = bigint,
-  combinefunc = int8pl,
-  initcond = '0'
-);
-
--- number of input rows for which the input expression is not null
-create aggregate pg_catalog.count("any") (
-  sfunc = int8inc_any,
-  stype = bigint,
-  combinefunc = int8pl,
-  initcond = '0'
-);
-
--- population covariance
-create aggregate pg_catalog.covar_pop(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_covar_pop,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sample covariance
-create aggregate pg_catalog.covar_samp(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_covar_samp,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- boolean-and aggregate
-create aggregate pg_catalog.every(boolean) (
-  sfunc = booland_statefunc,
-  stype = boolean,
-  combinefunc = booland_statefunc
-);
-
--- aggregate input into json
-create aggregate pg_catalog.json_agg(anyelement) (
-  sfunc = json_agg_transfn,
-  stype = internal,
-  finalfunc = json_agg_finalfn
-);
-
--- aggregate input into json
-create aggregate pg_catalog.json_agg_strict(anyelement) (
-  sfunc = json_agg_strict_transfn,
-  stype = internal,
-  finalfunc = json_agg_finalfn
-);
-
--- aggregate input into a json object
-create aggregate pg_catalog.json_object_agg(key "any", value "any") (
-  sfunc = json_object_agg_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
-
--- aggregate non-NULL input into a json object
-create aggregate pg_catalog.json_object_agg_strict(key "any", value "any") (
-  sfunc = json_object_agg_strict_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
-
--- aggregate input into a json object with unique keys
-create aggregate pg_catalog.json_object_agg_unique(key "any", value "any") (
-  sfunc = json_object_agg_unique_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
-
--- aggregate non-NULL input into a json object with unique keys
-create aggregate pg_catalog.json_object_agg_unique_strict(key "any", value "any") (
-  sfunc = json_object_agg_unique_strict_transfn,
-  stype = internal,
-  finalfunc = json_object_agg_finalfn
-);
-
--- aggregate input into jsonb
-create aggregate pg_catalog.jsonb_agg(anyelement) (
-  sfunc = jsonb_agg_transfn,
-  stype = internal,
-  finalfunc = jsonb_agg_finalfn
-);
-
--- aggregate input into jsonb skipping nulls
-create aggregate pg_catalog.jsonb_agg_strict(anyelement) (
-  sfunc = jsonb_agg_strict_transfn,
-  stype = internal,
-  finalfunc = jsonb_agg_finalfn
-);
-
--- aggregate inputs into jsonb object
-create aggregate pg_catalog.jsonb_object_agg(key "any", value "any") (
-  sfunc = jsonb_object_agg_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
-
--- aggregate non-NULL inputs into jsonb object
-create aggregate pg_catalog.jsonb_object_agg_strict(key "any", value "any") (
-  sfunc = jsonb_object_agg_strict_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
-
--- aggregate inputs into jsonb object checking key uniqueness
-create aggregate pg_catalog.jsonb_object_agg_unique(key "any", value "any") (
-  sfunc = jsonb_object_agg_unique_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
-
--- aggregate non-NULL inputs into jsonb object checking key uniqueness
-create aggregate pg_catalog.jsonb_object_agg_unique_strict(key "any", value "any") (
-  sfunc = jsonb_object_agg_unique_strict_transfn,
-  stype = internal,
-  finalfunc = jsonb_object_agg_finalfn
-);
-
--- maximum value of all anyarray input values
-create aggregate pg_catalog.max(anyarray) (
-  sfunc = array_larger,
-  stype = anyarray,
-  combinefunc = array_larger
-);
-
--- maximum value of all enum input values
-create aggregate pg_catalog.max(anyenum) (
-  sfunc = enum_larger,
-  stype = anyenum,
-  combinefunc = enum_larger
-);
-
--- maximum value of all bigint input values
-create aggregate pg_catalog.max(bigint) (
-  sfunc = int8larger,
-  stype = bigint,
-  combinefunc = int8larger
-);
-
--- maximum value of all bytea input values
-create aggregate pg_catalog.max(bytea) (
-  sfunc = bytea_larger,
-  stype = bytea,
-  combinefunc = bytea_larger
-);
-
--- maximum value of all bpchar input values
-create aggregate pg_catalog.max(character) (
-  sfunc = bpchar_larger,
-  stype = character,
-  combinefunc = bpchar_larger
-);
-
--- maximum value of all date input values
-create aggregate pg_catalog.max(date) (
-  sfunc = date_larger,
-  stype = date,
-  combinefunc = date_larger
-);
-
--- maximum value of all float8 input values
-create aggregate pg_catalog.max(double precision) (
-  sfunc = float8larger,
-  stype = double precision,
-  combinefunc = float8larger
-);
-
--- maximum value of all inet input values
-create aggregate pg_catalog.max(inet) (
-  sfunc = network_larger,
-  stype = inet,
-  combinefunc = network_larger
-);
-
--- maximum value of all integer input values
-create aggregate pg_catalog.max(integer) (
-  sfunc = int4larger,
-  stype = integer,
-  combinefunc = int4larger
-);
-
--- maximum value of all interval input values
-create aggregate pg_catalog.max(interval) (
-  sfunc = interval_larger,
-  stype = interval,
-  combinefunc = interval_larger
-);
-
--- maximum value of all money input values
-create aggregate pg_catalog.max(money) (
-  sfunc = cashlarger,
-  stype = money,
-  combinefunc = cashlarger
-);
-
--- maximum value of all numeric input values
-create aggregate pg_catalog.max(numeric) (
-  sfunc = numeric_larger,
-  stype = numeric,
-  combinefunc = numeric_larger
-);
-
--- maximum value of all oid input values
-create aggregate pg_catalog.max(oid) (
-  sfunc = oidlarger,
-  stype = oid,
-  combinefunc = oidlarger
-);
-
--- maximum value of all pg_lsn input values
-create aggregate pg_catalog.max(pg_lsn) (
-  sfunc = pg_lsn_larger,
-  stype = pg_lsn,
-  combinefunc = pg_lsn_larger
-);
-
--- maximum value of all float4 input values
-create aggregate pg_catalog.max(real) (
-  sfunc = float4larger,
-  stype = real,
-  combinefunc = float4larger
-);
-
--- maximum value of all record input values
-create aggregate pg_catalog.max(record) (
-  sfunc = record_larger,
-  stype = record,
-  combinefunc = record_larger
-);
-
--- maximum value of all smallint input values
-create aggregate pg_catalog.max(smallint) (
-  sfunc = int2larger,
-  stype = smallint,
-  combinefunc = int2larger
-);
-
--- maximum value of all text input values
-create aggregate pg_catalog.max(text) (
-  sfunc = text_larger,
-  stype = text,
-  combinefunc = text_larger
-);
-
--- maximum value of all tid input values
-create aggregate pg_catalog.max(tid) (
-  sfunc = tidlarger,
-  stype = tid,
-  combinefunc = tidlarger
-);
-
--- maximum value of all time with time zone input values
-create aggregate pg_catalog.max(time with time zone) (
-  sfunc = timetz_larger,
-  stype = time with time zone,
-  combinefunc = timetz_larger
-);
-
--- maximum value of all time input values
-create aggregate pg_catalog.max(time without time zone) (
-  sfunc = time_larger,
-  stype = time without time zone,
-  combinefunc = time_larger
-);
-
--- maximum value of all timestamp with time zone input values
-create aggregate pg_catalog.max(timestamp with time zone) (
-  sfunc = timestamptz_larger,
-  stype = timestamp with time zone,
-  combinefunc = timestamptz_larger
-);
-
--- maximum value of all timestamp input values
-create aggregate pg_catalog.max(timestamp without time zone) (
-  sfunc = timestamp_larger,
-  stype = timestamp without time zone,
-  combinefunc = timestamp_larger
-);
-
--- maximum value of all xid8 input values
-create aggregate pg_catalog.max(xid8) (
-  sfunc = xid8_larger,
-  stype = xid8,
-  combinefunc = xid8_larger
-);
-
--- minimum value of all anyarray input values
-create aggregate pg_catalog.min(anyarray) (
-  sfunc = array_smaller,
-  stype = anyarray,
-  combinefunc = array_smaller
-);
-
--- minimum value of all enum input values
-create aggregate pg_catalog.min(anyenum) (
-  sfunc = enum_smaller,
-  stype = anyenum,
-  combinefunc = enum_smaller
-);
-
--- minimum value of all bigint input values
-create aggregate pg_catalog.min(bigint) (
-  sfunc = int8smaller,
-  stype = bigint,
-  combinefunc = int8smaller
-);
-
--- minimum value of all bytea input values
-create aggregate pg_catalog.min(bytea) (
-  sfunc = bytea_smaller,
-  stype = bytea,
-  combinefunc = bytea_smaller
-);
-
--- minimum value of all bpchar input values
-create aggregate pg_catalog.min(character) (
-  sfunc = bpchar_smaller,
-  stype = character,
-  combinefunc = bpchar_smaller
-);
-
--- minimum value of all date input values
-create aggregate pg_catalog.min(date) (
-  sfunc = date_smaller,
-  stype = date,
-  combinefunc = date_smaller
-);
-
--- minimum value of all float8 input values
-create aggregate pg_catalog.min(double precision) (
-  sfunc = float8smaller,
-  stype = double precision,
-  combinefunc = float8smaller
-);
-
--- minimum value of all inet input values
-create aggregate pg_catalog.min(inet) (
-  sfunc = network_smaller,
-  stype = inet,
-  combinefunc = network_smaller
-);
-
--- minimum value of all integer input values
-create aggregate pg_catalog.min(integer) (
-  sfunc = int4smaller,
-  stype = integer,
-  combinefunc = int4smaller
-);
-
--- minimum value of all interval input values
-create aggregate pg_catalog.min(interval) (
-  sfunc = interval_smaller,
-  stype = interval,
-  combinefunc = interval_smaller
-);
-
--- minimum value of all money input values
-create aggregate pg_catalog.min(money) (
-  sfunc = cashsmaller,
-  stype = money,
-  combinefunc = cashsmaller
-);
-
--- minimum value of all numeric input values
-create aggregate pg_catalog.min(numeric) (
-  sfunc = numeric_smaller,
-  stype = numeric,
-  combinefunc = numeric_smaller
-);
-
--- minimum value of all oid input values
-create aggregate pg_catalog.min(oid) (
-  sfunc = oidsmaller,
-  stype = oid,
-  combinefunc = oidsmaller
-);
-
--- minimum value of all pg_lsn input values
-create aggregate pg_catalog.min(pg_lsn) (
-  sfunc = pg_lsn_smaller,
-  stype = pg_lsn,
-  combinefunc = pg_lsn_smaller
-);
-
--- minimum value of all float4 input values
-create aggregate pg_catalog.min(real) (
-  sfunc = float4smaller,
-  stype = real,
-  combinefunc = float4smaller
-);
-
--- minimum value of all record input values
-create aggregate pg_catalog.min(record) (
-  sfunc = record_smaller,
-  stype = record,
-  combinefunc = record_smaller
-);
-
--- minimum value of all smallint input values
-create aggregate pg_catalog.min(smallint) (
-  sfunc = int2smaller,
-  stype = smallint,
-  combinefunc = int2smaller
-);
-
--- minimum value of all text values
-create aggregate pg_catalog.min(text) (
-  sfunc = text_smaller,
-  stype = text,
-  combinefunc = text_smaller
-);
-
--- minimum value of all tid input values
-create aggregate pg_catalog.min(tid) (
-  sfunc = tidsmaller,
-  stype = tid,
-  combinefunc = tidsmaller
-);
-
--- minimum value of all time with time zone input values
-create aggregate pg_catalog.min(time with time zone) (
-  sfunc = timetz_smaller,
-  stype = time with time zone,
-  combinefunc = timetz_smaller
-);
-
--- minimum value of all time input values
-create aggregate pg_catalog.min(time without time zone) (
-  sfunc = time_smaller,
-  stype = time without time zone,
-  combinefunc = time_smaller
-);
-
--- minimum value of all timestamp with time zone input values
-create aggregate pg_catalog.min(timestamp with time zone) (
-  sfunc = timestamptz_smaller,
-  stype = timestamp with time zone,
-  combinefunc = timestamptz_smaller
-);
-
--- minimum value of all timestamp input values
-create aggregate pg_catalog.min(timestamp without time zone) (
-  sfunc = timestamp_smaller,
-  stype = timestamp without time zone,
-  combinefunc = timestamp_smaller
-);
-
--- minimum value of all xid8 input values
-create aggregate pg_catalog.min(xid8) (
-  sfunc = xid8_smaller,
-  stype = xid8,
-  combinefunc = xid8_smaller
-);
-
--- combine aggregate input into a multirange
-create aggregate pg_catalog.range_agg(anymultirange) (
-  sfunc = multirange_agg_transfn,
-  stype = internal,
-  finalfunc = multirange_agg_finalfn,
-  finalfunc_extra
-);
-
--- combine aggregate input into a multirange
-create aggregate pg_catalog.range_agg(anyrange) (
-  sfunc = range_agg_transfn,
-  stype = internal,
-  finalfunc = range_agg_finalfn,
-  finalfunc_extra
-);
-
--- range aggregate by intersecting
-create aggregate pg_catalog.range_intersect_agg(anymultirange) (
-  sfunc = multirange_intersect_agg_transfn,
-  stype = anymultirange,
-  combinefunc = multirange_intersect_agg_transfn
-);
-
--- range aggregate by intersecting
-create aggregate pg_catalog.range_intersect_agg(anyrange) (
-  sfunc = range_intersect_agg_transfn,
-  stype = anyrange,
-  combinefunc = range_intersect_agg_transfn
-);
-
--- average of the independent variable (sum(X)/N)
-create aggregate pg_catalog.regr_avgx(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_avgx,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- average of the dependent variable (sum(Y)/N)
-create aggregate pg_catalog.regr_avgy(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_avgy,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- number of input rows in which both expressions are not null
-create aggregate pg_catalog.regr_count(double precision, double precision) (
-  sfunc = int8inc_float8_float8,
-  stype = bigint,
-  combinefunc = int8pl,
-  initcond = '0'
-);
-
--- y-intercept of the least-squares-fit linear equation determined by the (X, Y) pairs
-create aggregate pg_catalog.regr_intercept(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_intercept,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- square of the correlation coefficient
-create aggregate pg_catalog.regr_r2(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_r2,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- slope of the least-squares-fit linear equation determined by the (X, Y) pairs
-create aggregate pg_catalog.regr_slope(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_slope,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sum of squares of the independent variable (sum(X^2) - sum(X)^2/N)
-create aggregate pg_catalog.regr_sxx(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_sxx,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sum of products of independent times dependent variable (sum(X*Y) - sum(X) * sum(Y)/N)
-create aggregate pg_catalog.regr_sxy(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_sxy,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- sum of squares of the dependent variable (sum(Y^2) - sum(Y)^2/N)
-create aggregate pg_catalog.regr_syy(double precision, double precision) (
-  sfunc = float8_regr_accum,
-  stype = double precision[],
-  finalfunc = float8_regr_syy,
-  combinefunc = float8_regr_combine,
-  initcond = '{0,0,0,0,0,0}'
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for stddev_samp
-create aggregate pg_catalog.stddev(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- population standard deviation of bigint input values
-create aggregate pg_catalog.stddev_pop(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_pop,
-  combinefunc = numeric_combine
-);
-
--- population standard deviation of float8 input values
-create aggregate pg_catalog.stddev_pop(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population standard deviation of integer input values
-create aggregate pg_catalog.stddev_pop(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- population standard deviation of numeric input values
-create aggregate pg_catalog.stddev_pop(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_pop,
-  combinefunc = numeric_combine
-);
-
--- population standard deviation of float4 input values
-create aggregate pg_catalog.stddev_pop(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population standard deviation of smallint input values
-create aggregate pg_catalog.stddev_pop(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- sample standard deviation of bigint input values
-create aggregate pg_catalog.stddev_samp(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- sample standard deviation of float8 input values
-create aggregate pg_catalog.stddev_samp(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample standard deviation of integer input values
-create aggregate pg_catalog.stddev_samp(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- sample standard deviation of numeric input values
-create aggregate pg_catalog.stddev_samp(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_stddev_samp,
-  combinefunc = numeric_combine
-);
-
--- sample standard deviation of float4 input values
-create aggregate pg_catalog.stddev_samp(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_stddev_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample standard deviation of smallint input values
-create aggregate pg_catalog.stddev_samp(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_stddev_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- concatenate aggregate input into a bytea
-create aggregate pg_catalog.string_agg(value bytea, delimiter bytea) (
-  sfunc = bytea_string_agg_transfn,
-  stype = internal,
-  finalfunc = bytea_string_agg_finalfn,
-  combinefunc = string_agg_combine
-);
-
--- concatenate aggregate input into a string
-create aggregate pg_catalog.string_agg(value text, delimiter text) (
-  sfunc = string_agg_transfn,
-  stype = internal,
-  finalfunc = string_agg_finalfn,
-  combinefunc = string_agg_combine
-);
-
--- sum as numeric across all bigint input values
-create aggregate pg_catalog.sum(bigint) (
-  sfunc = int8_avg_accum,
-  stype = internal,
-  finalfunc = numeric_poly_sum,
-  combinefunc = int8_avg_combine
-);
-
--- sum as float8 across all float8 input values
-create aggregate pg_catalog.sum(double precision) (
-  sfunc = float8pl,
-  stype = double precision,
-  combinefunc = float8pl
-);
-
--- sum as bigint across all integer input values
-create aggregate pg_catalog.sum(integer) (
-  sfunc = int4_sum,
-  stype = bigint,
-  combinefunc = int8pl
-);
-
--- sum as interval across all interval input values
-create aggregate pg_catalog.sum(interval) (
-  sfunc = interval_avg_accum,
-  stype = internal,
-  finalfunc = interval_sum,
-  combinefunc = interval_avg_combine
-);
-
--- sum as money across all money input values
-create aggregate pg_catalog.sum(money) (
-  sfunc = cash_pl,
-  stype = money,
-  combinefunc = cash_pl
-);
-
--- sum as numeric across all numeric input values
-create aggregate pg_catalog.sum(numeric) (
-  sfunc = numeric_avg_accum,
-  stype = internal,
-  finalfunc = numeric_sum,
-  combinefunc = numeric_avg_combine
-);
-
--- sum as float4 across all float4 input values
-create aggregate pg_catalog.sum(real) (
-  sfunc = float4pl,
-  stype = real,
-  combinefunc = float4pl
-);
-
--- sum as bigint across all smallint input values
-create aggregate pg_catalog.sum(smallint) (
-  sfunc = int2_sum,
-  stype = bigint,
-  combinefunc = int8pl
-);
-
--- population variance of bigint input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_var_pop,
-  combinefunc = numeric_combine
-);
-
--- population variance of float8 input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_var_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population variance of integer input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- population variance of numeric input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_var_pop,
-  combinefunc = numeric_combine
-);
-
--- population variance of float4 input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_var_pop,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- population variance of smallint input values (square of the population standard deviation)
-create aggregate pg_catalog.var_pop(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_pop,
-  combinefunc = numeric_poly_combine
-);
-
--- sample variance of bigint input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- sample variance of float8 input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample variance of integer input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- sample variance of numeric input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- sample variance of float4 input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- sample variance of smallint input values (square of the sample standard deviation)
-create aggregate pg_catalog.var_samp(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(bigint) (
-  sfunc = int8_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(double precision) (
-  sfunc = float8_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(integer) (
-  sfunc = int4_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(numeric) (
-  sfunc = numeric_accum,
-  stype = internal,
-  finalfunc = numeric_var_samp,
-  combinefunc = numeric_combine
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(real) (
-  sfunc = float4_accum,
-  stype = double precision[],
-  finalfunc = float8_var_samp,
-  combinefunc = float8_combine,
-  initcond = '{0,0,0}'
-);
-
--- historical alias for var_samp
-create aggregate pg_catalog.variance(smallint) (
-  sfunc = int2_accum,
-  stype = internal,
-  finalfunc = numeric_poly_var_samp,
-  combinefunc = numeric_poly_combine
-);
-
--- concatenate XML values
-create aggregate pg_catalog.xmlagg(xml) (
-  sfunc = xmlconcat2,
-  stype = xml
-);
-
 -- PL/pgSQL procedural language
 create language plpgsql handler pg_catalog.plpgsql_call_handler inline pg_catalog.plpgsql_inline_handler validator pg_catalog.plpgsql_validator;
 
@@ -23283,6 +22139,1520 @@ create operator pg_catalog.~~* (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.texticlike
+);
+
+-- arbitrary value from among input values
+create aggregate pg_catalog.any_value(anyelement) (
+  sfunc = any_value_transfn,
+  stype = anyelement,
+  combinefunc = any_value_transfn
+);
+
+-- concatenate aggregate input into an array
+create aggregate pg_catalog.array_agg(anyarray) (
+  sfunc = array_agg_array_transfn,
+  stype = internal,
+  finalfunc = array_agg_array_finalfn,
+  finalfunc_extra,
+  combinefunc = array_agg_array_combine,
+  serialfunc = array_agg_array_serialize,
+  deserialfunc = array_agg_array_deserialize
+);
+
+-- concatenate aggregate input into an array
+create aggregate pg_catalog.array_agg(anynonarray) (
+  sfunc = array_agg_transfn,
+  stype = internal,
+  finalfunc = array_agg_finalfn,
+  finalfunc_extra,
+  combinefunc = array_agg_combine,
+  serialfunc = array_agg_serialize,
+  deserialfunc = array_agg_deserialize
+);
+
+-- the average (arithmetic mean) as numeric of all bigint values
+create aggregate pg_catalog.avg(bigint) (
+  sfunc = int8_avg_accum,
+  stype = internal,
+  finalfunc = numeric_poly_avg,
+  combinefunc = int8_avg_combine,
+  serialfunc = int8_avg_serialize,
+  deserialfunc = int8_avg_deserialize,
+  msfunc = int8_avg_accum,
+  minvfunc = int8_avg_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_avg
+);
+
+-- the average (arithmetic mean) as float8 of all float8 values
+create aggregate pg_catalog.avg(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_avg,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- the average (arithmetic mean) as numeric of all integer values
+create aggregate pg_catalog.avg(integer) (
+  sfunc = int4_avg_accum,
+  stype = bigint[],
+  finalfunc = int8_avg,
+  combinefunc = int4_avg_combine,
+  initcond = '{0,0}',
+  msfunc = int4_avg_accum,
+  minvfunc = int4_avg_accum_inv,
+  mstype = bigint[],
+  mfinalfunc = int8_avg,
+  minitcond = '{0,0}'
+);
+
+-- the average (arithmetic mean) as interval of all interval values
+create aggregate pg_catalog.avg(interval) (
+  sfunc = interval_avg_accum,
+  stype = internal,
+  finalfunc = interval_avg,
+  combinefunc = interval_avg_combine,
+  serialfunc = interval_avg_serialize,
+  deserialfunc = interval_avg_deserialize,
+  msfunc = interval_avg_accum,
+  minvfunc = interval_avg_accum_inv,
+  mstype = internal,
+  mfinalfunc = interval_avg
+);
+
+-- the average (arithmetic mean) as numeric of all numeric values
+create aggregate pg_catalog.avg(numeric) (
+  sfunc = numeric_avg_accum,
+  stype = internal,
+  finalfunc = numeric_avg,
+  combinefunc = numeric_avg_combine,
+  serialfunc = numeric_avg_serialize,
+  deserialfunc = numeric_avg_deserialize,
+  msfunc = numeric_avg_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_avg
+);
+
+-- the average (arithmetic mean) as float8 of all float4 values
+create aggregate pg_catalog.avg(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_avg,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- the average (arithmetic mean) as numeric of all smallint values
+create aggregate pg_catalog.avg(smallint) (
+  sfunc = int2_avg_accum,
+  stype = bigint[],
+  finalfunc = int8_avg,
+  combinefunc = int4_avg_combine,
+  initcond = '{0,0}',
+  msfunc = int2_avg_accum,
+  minvfunc = int2_avg_accum_inv,
+  mstype = bigint[],
+  mfinalfunc = int8_avg,
+  minitcond = '{0,0}'
+);
+
+-- bitwise-and bigint aggregate
+create aggregate pg_catalog.bit_and(bigint) (
+  sfunc = int8and,
+  stype = bigint,
+  combinefunc = int8and
+);
+
+-- bitwise-and bit aggregate
+create aggregate pg_catalog.bit_and(bit) (
+  sfunc = bitand,
+  stype = bit,
+  combinefunc = bitand
+);
+
+-- bitwise-and integer aggregate
+create aggregate pg_catalog.bit_and(integer) (
+  sfunc = int4and,
+  stype = integer,
+  combinefunc = int4and
+);
+
+-- bitwise-and smallint aggregate
+create aggregate pg_catalog.bit_and(smallint) (
+  sfunc = int2and,
+  stype = smallint,
+  combinefunc = int2and
+);
+
+-- bitwise-or bigint aggregate
+create aggregate pg_catalog.bit_or(bigint) (
+  sfunc = int8or,
+  stype = bigint,
+  combinefunc = int8or
+);
+
+-- bitwise-or bit aggregate
+create aggregate pg_catalog.bit_or(bit) (
+  sfunc = bitor,
+  stype = bit,
+  combinefunc = bitor
+);
+
+-- bitwise-or integer aggregate
+create aggregate pg_catalog.bit_or(integer) (
+  sfunc = int4or,
+  stype = integer,
+  combinefunc = int4or
+);
+
+-- bitwise-or smallint aggregate
+create aggregate pg_catalog.bit_or(smallint) (
+  sfunc = int2or,
+  stype = smallint,
+  combinefunc = int2or
+);
+
+-- bitwise-xor bigint aggregate
+create aggregate pg_catalog.bit_xor(bigint) (
+  sfunc = int8xor,
+  stype = bigint,
+  combinefunc = int8xor
+);
+
+-- bitwise-xor bit aggregate
+create aggregate pg_catalog.bit_xor(bit) (
+  sfunc = bitxor,
+  stype = bit,
+  combinefunc = bitxor
+);
+
+-- bitwise-xor integer aggregate
+create aggregate pg_catalog.bit_xor(integer) (
+  sfunc = int4xor,
+  stype = integer,
+  combinefunc = int4xor
+);
+
+-- bitwise-xor smallint aggregate
+create aggregate pg_catalog.bit_xor(smallint) (
+  sfunc = int2xor,
+  stype = smallint,
+  combinefunc = int2xor
+);
+
+-- boolean-and aggregate
+create aggregate pg_catalog.bool_and(boolean) (
+  sfunc = booland_statefunc,
+  stype = boolean,
+  combinefunc = booland_statefunc,
+  msfunc = bool_accum,
+  minvfunc = bool_accum_inv,
+  mstype = internal,
+  mfinalfunc = bool_alltrue,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- boolean-or aggregate
+create aggregate pg_catalog.bool_or(boolean) (
+  sfunc = boolor_statefunc,
+  stype = boolean,
+  combinefunc = boolor_statefunc,
+  msfunc = bool_accum,
+  minvfunc = bool_accum_inv,
+  mstype = internal,
+  mfinalfunc = bool_anytrue,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- correlation coefficient
+create aggregate pg_catalog.corr(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_corr,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- number of input rows
+create aggregate pg_catalog.count(*) (
+  sfunc = int8inc,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0',
+  msfunc = int8inc,
+  minvfunc = int8dec,
+  mstype = bigint,
+  minitcond = '0'
+);
+
+-- number of input rows for which the input expression is not null
+create aggregate pg_catalog.count("any") (
+  sfunc = int8inc_any,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0',
+  msfunc = int8inc_any,
+  minvfunc = int8dec_any,
+  mstype = bigint,
+  minitcond = '0'
+);
+
+-- population covariance
+create aggregate pg_catalog.covar_pop(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_covar_pop,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sample covariance
+create aggregate pg_catalog.covar_samp(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_covar_samp,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- cumulative distribution of hypothetical row
+create aggregate pg_catalog.cume_dist(VARIADIC "any" ORDER BY VARIADIC "any") (
+  sfunc = ordered_set_transition_multi,
+  stype = internal,
+  finalfunc = cume_dist_final,
+  finalfunc_extra,
+  hypothetical
+);
+
+-- rank of hypothetical row without gaps
+create aggregate pg_catalog.dense_rank(VARIADIC "any" ORDER BY VARIADIC "any") (
+  sfunc = ordered_set_transition_multi,
+  stype = internal,
+  finalfunc = dense_rank_final,
+  finalfunc_extra,
+  hypothetical
+);
+
+-- boolean-and aggregate
+create aggregate pg_catalog.every(boolean) (
+  sfunc = booland_statefunc,
+  stype = boolean,
+  combinefunc = booland_statefunc,
+  msfunc = bool_accum,
+  minvfunc = bool_accum_inv,
+  mstype = internal,
+  mfinalfunc = bool_alltrue,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- aggregate input into json
+create aggregate pg_catalog.json_agg(anyelement) (
+  sfunc = json_agg_transfn,
+  stype = internal,
+  finalfunc = json_agg_finalfn
+);
+
+-- aggregate input into json
+create aggregate pg_catalog.json_agg_strict(anyelement) (
+  sfunc = json_agg_strict_transfn,
+  stype = internal,
+  finalfunc = json_agg_finalfn
+);
+
+-- aggregate input into a json object
+create aggregate pg_catalog.json_object_agg(key "any", value "any") (
+  sfunc = json_object_agg_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate non-NULL input into a json object
+create aggregate pg_catalog.json_object_agg_strict(key "any", value "any") (
+  sfunc = json_object_agg_strict_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate input into a json object with unique keys
+create aggregate pg_catalog.json_object_agg_unique(key "any", value "any") (
+  sfunc = json_object_agg_unique_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate non-NULL input into a json object with unique keys
+create aggregate pg_catalog.json_object_agg_unique_strict(key "any", value "any") (
+  sfunc = json_object_agg_unique_strict_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
+
+-- aggregate input into jsonb
+create aggregate pg_catalog.jsonb_agg(anyelement) (
+  sfunc = jsonb_agg_transfn,
+  stype = internal,
+  finalfunc = jsonb_agg_finalfn
+);
+
+-- aggregate input into jsonb skipping nulls
+create aggregate pg_catalog.jsonb_agg_strict(anyelement) (
+  sfunc = jsonb_agg_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_agg_finalfn
+);
+
+-- aggregate inputs into jsonb object
+create aggregate pg_catalog.jsonb_object_agg(key "any", value "any") (
+  sfunc = jsonb_object_agg_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- aggregate non-NULL inputs into jsonb object
+create aggregate pg_catalog.jsonb_object_agg_strict(key "any", value "any") (
+  sfunc = jsonb_object_agg_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- aggregate inputs into jsonb object checking key uniqueness
+create aggregate pg_catalog.jsonb_object_agg_unique(key "any", value "any") (
+  sfunc = jsonb_object_agg_unique_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- aggregate non-NULL inputs into jsonb object checking key uniqueness
+create aggregate pg_catalog.jsonb_object_agg_unique_strict(key "any", value "any") (
+  sfunc = jsonb_object_agg_unique_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
+
+-- maximum value of all anyarray input values
+create aggregate pg_catalog.max(anyarray) (
+  sfunc = array_larger,
+  stype = anyarray,
+  combinefunc = array_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all enum input values
+create aggregate pg_catalog.max(anyenum) (
+  sfunc = enum_larger,
+  stype = anyenum,
+  combinefunc = enum_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all bigint input values
+create aggregate pg_catalog.max(bigint) (
+  sfunc = int8larger,
+  stype = bigint,
+  combinefunc = int8larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all bytea input values
+create aggregate pg_catalog.max(bytea) (
+  sfunc = bytea_larger,
+  stype = bytea,
+  combinefunc = bytea_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all bpchar input values
+create aggregate pg_catalog.max(character) (
+  sfunc = bpchar_larger,
+  stype = character,
+  combinefunc = bpchar_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all date input values
+create aggregate pg_catalog.max(date) (
+  sfunc = date_larger,
+  stype = date,
+  combinefunc = date_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all float8 input values
+create aggregate pg_catalog.max(double precision) (
+  sfunc = float8larger,
+  stype = double precision,
+  combinefunc = float8larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all inet input values
+create aggregate pg_catalog.max(inet) (
+  sfunc = network_larger,
+  stype = inet,
+  combinefunc = network_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all integer input values
+create aggregate pg_catalog.max(integer) (
+  sfunc = int4larger,
+  stype = integer,
+  combinefunc = int4larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all interval input values
+create aggregate pg_catalog.max(interval) (
+  sfunc = interval_larger,
+  stype = interval,
+  combinefunc = interval_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all money input values
+create aggregate pg_catalog.max(money) (
+  sfunc = cashlarger,
+  stype = money,
+  combinefunc = cashlarger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all numeric input values
+create aggregate pg_catalog.max(numeric) (
+  sfunc = numeric_larger,
+  stype = numeric,
+  combinefunc = numeric_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all oid input values
+create aggregate pg_catalog.max(oid) (
+  sfunc = oidlarger,
+  stype = oid,
+  combinefunc = oidlarger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all pg_lsn input values
+create aggregate pg_catalog.max(pg_lsn) (
+  sfunc = pg_lsn_larger,
+  stype = pg_lsn,
+  combinefunc = pg_lsn_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all float4 input values
+create aggregate pg_catalog.max(real) (
+  sfunc = float4larger,
+  stype = real,
+  combinefunc = float4larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all record input values
+create aggregate pg_catalog.max(record) (
+  sfunc = record_larger,
+  stype = record,
+  combinefunc = record_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all smallint input values
+create aggregate pg_catalog.max(smallint) (
+  sfunc = int2larger,
+  stype = smallint,
+  combinefunc = int2larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all text input values
+create aggregate pg_catalog.max(text) (
+  sfunc = text_larger,
+  stype = text,
+  combinefunc = text_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all tid input values
+create aggregate pg_catalog.max(tid) (
+  sfunc = tidlarger,
+  stype = tid,
+  combinefunc = tidlarger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all time with time zone input values
+create aggregate pg_catalog.max(time with time zone) (
+  sfunc = timetz_larger,
+  stype = time with time zone,
+  combinefunc = timetz_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all time input values
+create aggregate pg_catalog.max(time without time zone) (
+  sfunc = time_larger,
+  stype = time without time zone,
+  combinefunc = time_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all timestamp with time zone input values
+create aggregate pg_catalog.max(timestamp with time zone) (
+  sfunc = timestamptz_larger,
+  stype = timestamp with time zone,
+  combinefunc = timestamptz_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all timestamp input values
+create aggregate pg_catalog.max(timestamp without time zone) (
+  sfunc = timestamp_larger,
+  stype = timestamp without time zone,
+  combinefunc = timestamp_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- maximum value of all xid8 input values
+create aggregate pg_catalog.max(xid8) (
+  sfunc = xid8_larger,
+  stype = xid8,
+  combinefunc = xid8_larger,
+  sortop = OPERATOR(pg_catalog.>)
+);
+
+-- minimum value of all anyarray input values
+create aggregate pg_catalog.min(anyarray) (
+  sfunc = array_smaller,
+  stype = anyarray,
+  combinefunc = array_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all enum input values
+create aggregate pg_catalog.min(anyenum) (
+  sfunc = enum_smaller,
+  stype = anyenum,
+  combinefunc = enum_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all bigint input values
+create aggregate pg_catalog.min(bigint) (
+  sfunc = int8smaller,
+  stype = bigint,
+  combinefunc = int8smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all bytea input values
+create aggregate pg_catalog.min(bytea) (
+  sfunc = bytea_smaller,
+  stype = bytea,
+  combinefunc = bytea_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all bpchar input values
+create aggregate pg_catalog.min(character) (
+  sfunc = bpchar_smaller,
+  stype = character,
+  combinefunc = bpchar_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all date input values
+create aggregate pg_catalog.min(date) (
+  sfunc = date_smaller,
+  stype = date,
+  combinefunc = date_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all float8 input values
+create aggregate pg_catalog.min(double precision) (
+  sfunc = float8smaller,
+  stype = double precision,
+  combinefunc = float8smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all inet input values
+create aggregate pg_catalog.min(inet) (
+  sfunc = network_smaller,
+  stype = inet,
+  combinefunc = network_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all integer input values
+create aggregate pg_catalog.min(integer) (
+  sfunc = int4smaller,
+  stype = integer,
+  combinefunc = int4smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all interval input values
+create aggregate pg_catalog.min(interval) (
+  sfunc = interval_smaller,
+  stype = interval,
+  combinefunc = interval_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all money input values
+create aggregate pg_catalog.min(money) (
+  sfunc = cashsmaller,
+  stype = money,
+  combinefunc = cashsmaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all numeric input values
+create aggregate pg_catalog.min(numeric) (
+  sfunc = numeric_smaller,
+  stype = numeric,
+  combinefunc = numeric_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all oid input values
+create aggregate pg_catalog.min(oid) (
+  sfunc = oidsmaller,
+  stype = oid,
+  combinefunc = oidsmaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all pg_lsn input values
+create aggregate pg_catalog.min(pg_lsn) (
+  sfunc = pg_lsn_smaller,
+  stype = pg_lsn,
+  combinefunc = pg_lsn_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all float4 input values
+create aggregate pg_catalog.min(real) (
+  sfunc = float4smaller,
+  stype = real,
+  combinefunc = float4smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all record input values
+create aggregate pg_catalog.min(record) (
+  sfunc = record_smaller,
+  stype = record,
+  combinefunc = record_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all smallint input values
+create aggregate pg_catalog.min(smallint) (
+  sfunc = int2smaller,
+  stype = smallint,
+  combinefunc = int2smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all text values
+create aggregate pg_catalog.min(text) (
+  sfunc = text_smaller,
+  stype = text,
+  combinefunc = text_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all tid input values
+create aggregate pg_catalog.min(tid) (
+  sfunc = tidsmaller,
+  stype = tid,
+  combinefunc = tidsmaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all time with time zone input values
+create aggregate pg_catalog.min(time with time zone) (
+  sfunc = timetz_smaller,
+  stype = time with time zone,
+  combinefunc = timetz_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all time input values
+create aggregate pg_catalog.min(time without time zone) (
+  sfunc = time_smaller,
+  stype = time without time zone,
+  combinefunc = time_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all timestamp with time zone input values
+create aggregate pg_catalog.min(timestamp with time zone) (
+  sfunc = timestamptz_smaller,
+  stype = timestamp with time zone,
+  combinefunc = timestamptz_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all timestamp input values
+create aggregate pg_catalog.min(timestamp without time zone) (
+  sfunc = timestamp_smaller,
+  stype = timestamp without time zone,
+  combinefunc = timestamp_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- minimum value of all xid8 input values
+create aggregate pg_catalog.min(xid8) (
+  sfunc = xid8_smaller,
+  stype = xid8,
+  combinefunc = xid8_smaller,
+  sortop = OPERATOR(pg_catalog.<)
+);
+
+-- most common value
+create aggregate pg_catalog.mode(ORDER BY anyelement) (
+  sfunc = ordered_set_transition,
+  stype = internal,
+  finalfunc = mode_final,
+  finalfunc_extra
+);
+
+-- fractional rank of hypothetical row
+create aggregate pg_catalog.percent_rank(VARIADIC "any" ORDER BY VARIADIC "any") (
+  sfunc = ordered_set_transition_multi,
+  stype = internal,
+  finalfunc = percent_rank_final,
+  finalfunc_extra,
+  hypothetical
+);
+
+-- continuous distribution percentile
+create aggregate pg_catalog.percentile_cont(double precision ORDER BY double precision) (
+  sfunc = ordered_set_transition,
+  stype = internal,
+  finalfunc = percentile_cont_float8_final
+);
+
+-- continuous distribution percentile
+create aggregate pg_catalog.percentile_cont(double precision ORDER BY interval) (
+  sfunc = ordered_set_transition,
+  stype = internal,
+  finalfunc = percentile_cont_interval_final
+);
+
+-- multiple continuous percentiles
+create aggregate pg_catalog.percentile_cont(double precision[] ORDER BY double precision) (
+  sfunc = ordered_set_transition,
+  stype = internal,
+  finalfunc = percentile_cont_float8_multi_final
+);
+
+-- multiple continuous percentiles
+create aggregate pg_catalog.percentile_cont(double precision[] ORDER BY interval) (
+  sfunc = ordered_set_transition,
+  stype = internal,
+  finalfunc = percentile_cont_interval_multi_final
+);
+
+-- discrete percentile
+create aggregate pg_catalog.percentile_disc(double precision ORDER BY anyelement) (
+  sfunc = ordered_set_transition,
+  stype = internal,
+  finalfunc = percentile_disc_final,
+  finalfunc_extra
+);
+
+-- multiple discrete percentiles
+create aggregate pg_catalog.percentile_disc(double precision[] ORDER BY anyelement) (
+  sfunc = ordered_set_transition,
+  stype = internal,
+  finalfunc = percentile_disc_multi_final,
+  finalfunc_extra
+);
+
+-- combine aggregate input into a multirange
+create aggregate pg_catalog.range_agg(anymultirange) (
+  sfunc = multirange_agg_transfn,
+  stype = internal,
+  finalfunc = multirange_agg_finalfn,
+  finalfunc_extra
+);
+
+-- combine aggregate input into a multirange
+create aggregate pg_catalog.range_agg(anyrange) (
+  sfunc = range_agg_transfn,
+  stype = internal,
+  finalfunc = range_agg_finalfn,
+  finalfunc_extra
+);
+
+-- range aggregate by intersecting
+create aggregate pg_catalog.range_intersect_agg(anymultirange) (
+  sfunc = multirange_intersect_agg_transfn,
+  stype = anymultirange,
+  combinefunc = multirange_intersect_agg_transfn
+);
+
+-- range aggregate by intersecting
+create aggregate pg_catalog.range_intersect_agg(anyrange) (
+  sfunc = range_intersect_agg_transfn,
+  stype = anyrange,
+  combinefunc = range_intersect_agg_transfn
+);
+
+-- rank of hypothetical row
+create aggregate pg_catalog.rank(VARIADIC "any" ORDER BY VARIADIC "any") (
+  sfunc = ordered_set_transition_multi,
+  stype = internal,
+  finalfunc = rank_final,
+  finalfunc_extra,
+  hypothetical
+);
+
+-- average of the independent variable (sum(X)/N)
+create aggregate pg_catalog.regr_avgx(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_avgx,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- average of the dependent variable (sum(Y)/N)
+create aggregate pg_catalog.regr_avgy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_avgy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- number of input rows in which both expressions are not null
+create aggregate pg_catalog.regr_count(double precision, double precision) (
+  sfunc = int8inc_float8_float8,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
+
+-- y-intercept of the least-squares-fit linear equation determined by the (X, Y) pairs
+create aggregate pg_catalog.regr_intercept(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_intercept,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- square of the correlation coefficient
+create aggregate pg_catalog.regr_r2(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_r2,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- slope of the least-squares-fit linear equation determined by the (X, Y) pairs
+create aggregate pg_catalog.regr_slope(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_slope,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sum of squares of the independent variable (sum(X^2) - sum(X)^2/N)
+create aggregate pg_catalog.regr_sxx(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_sxx,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sum of products of independent times dependent variable (sum(X*Y) - sum(X) * sum(Y)/N)
+create aggregate pg_catalog.regr_sxy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_sxy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- sum of squares of the dependent variable (sum(Y^2) - sum(Y)^2/N)
+create aggregate pg_catalog.regr_syy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_syy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = int8_accum,
+  minvfunc = int8_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_stddev_samp
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int4_accum,
+  minvfunc = int4_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_stddev_samp
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = numeric_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_stddev_samp
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for stddev_samp
+create aggregate pg_catalog.stddev(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int2_accum,
+  minvfunc = int2_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_stddev_samp
+);
+
+-- population standard deviation of bigint input values
+create aggregate pg_catalog.stddev_pop(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_pop,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = int8_accum,
+  minvfunc = int8_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_stddev_pop
+);
+
+-- population standard deviation of float8 input values
+create aggregate pg_catalog.stddev_pop(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population standard deviation of integer input values
+create aggregate pg_catalog.stddev_pop(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_pop,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int4_accum,
+  minvfunc = int4_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_stddev_pop
+);
+
+-- population standard deviation of numeric input values
+create aggregate pg_catalog.stddev_pop(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_pop,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = numeric_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_stddev_pop
+);
+
+-- population standard deviation of float4 input values
+create aggregate pg_catalog.stddev_pop(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population standard deviation of smallint input values
+create aggregate pg_catalog.stddev_pop(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_pop,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int2_accum,
+  minvfunc = int2_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_stddev_pop
+);
+
+-- sample standard deviation of bigint input values
+create aggregate pg_catalog.stddev_samp(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = int8_accum,
+  minvfunc = int8_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_stddev_samp
+);
+
+-- sample standard deviation of float8 input values
+create aggregate pg_catalog.stddev_samp(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample standard deviation of integer input values
+create aggregate pg_catalog.stddev_samp(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int4_accum,
+  minvfunc = int4_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_stddev_samp
+);
+
+-- sample standard deviation of numeric input values
+create aggregate pg_catalog.stddev_samp(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = numeric_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_stddev_samp
+);
+
+-- sample standard deviation of float4 input values
+create aggregate pg_catalog.stddev_samp(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample standard deviation of smallint input values
+create aggregate pg_catalog.stddev_samp(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int2_accum,
+  minvfunc = int2_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_stddev_samp
+);
+
+-- concatenate aggregate input into a bytea
+create aggregate pg_catalog.string_agg(value bytea, delimiter bytea) (
+  sfunc = bytea_string_agg_transfn,
+  stype = internal,
+  finalfunc = bytea_string_agg_finalfn,
+  combinefunc = string_agg_combine,
+  serialfunc = string_agg_serialize,
+  deserialfunc = string_agg_deserialize
+);
+
+-- concatenate aggregate input into a string
+create aggregate pg_catalog.string_agg(value text, delimiter text) (
+  sfunc = string_agg_transfn,
+  stype = internal,
+  finalfunc = string_agg_finalfn,
+  combinefunc = string_agg_combine,
+  serialfunc = string_agg_serialize,
+  deserialfunc = string_agg_deserialize
+);
+
+-- sum as numeric across all bigint input values
+create aggregate pg_catalog.sum(bigint) (
+  sfunc = int8_avg_accum,
+  stype = internal,
+  finalfunc = numeric_poly_sum,
+  combinefunc = int8_avg_combine,
+  serialfunc = int8_avg_serialize,
+  deserialfunc = int8_avg_deserialize,
+  msfunc = int8_avg_accum,
+  minvfunc = int8_avg_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_sum
+);
+
+-- sum as float8 across all float8 input values
+create aggregate pg_catalog.sum(double precision) (
+  sfunc = float8pl,
+  stype = double precision,
+  combinefunc = float8pl
+);
+
+-- sum as bigint across all integer input values
+create aggregate pg_catalog.sum(integer) (
+  sfunc = int4_sum,
+  stype = bigint,
+  combinefunc = int8pl,
+  msfunc = int4_avg_accum,
+  minvfunc = int4_avg_accum_inv,
+  mstype = bigint[],
+  mfinalfunc = int2int4_sum,
+  minitcond = '{0,0}'
+);
+
+-- sum as interval across all interval input values
+create aggregate pg_catalog.sum(interval) (
+  sfunc = interval_avg_accum,
+  stype = internal,
+  finalfunc = interval_sum,
+  combinefunc = interval_avg_combine,
+  serialfunc = interval_avg_serialize,
+  deserialfunc = interval_avg_deserialize,
+  msfunc = interval_avg_accum,
+  minvfunc = interval_avg_accum_inv,
+  mstype = internal,
+  mfinalfunc = interval_sum
+);
+
+-- sum as money across all money input values
+create aggregate pg_catalog.sum(money) (
+  sfunc = cash_pl,
+  stype = money,
+  combinefunc = cash_pl,
+  msfunc = cash_pl,
+  minvfunc = cash_mi,
+  mstype = money
+);
+
+-- sum as numeric across all numeric input values
+create aggregate pg_catalog.sum(numeric) (
+  sfunc = numeric_avg_accum,
+  stype = internal,
+  finalfunc = numeric_sum,
+  combinefunc = numeric_avg_combine,
+  serialfunc = numeric_avg_serialize,
+  deserialfunc = numeric_avg_deserialize,
+  msfunc = numeric_avg_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_sum
+);
+
+-- sum as float4 across all float4 input values
+create aggregate pg_catalog.sum(real) (
+  sfunc = float4pl,
+  stype = real,
+  combinefunc = float4pl
+);
+
+-- sum as bigint across all smallint input values
+create aggregate pg_catalog.sum(smallint) (
+  sfunc = int2_sum,
+  stype = bigint,
+  combinefunc = int8pl,
+  msfunc = int2_avg_accum,
+  minvfunc = int2_avg_accum_inv,
+  mstype = bigint[],
+  mfinalfunc = int2int4_sum,
+  minitcond = '{0,0}'
+);
+
+-- population variance of bigint input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_pop,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = int8_accum,
+  minvfunc = int8_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_var_pop
+);
+
+-- population variance of float8 input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population variance of integer input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_pop,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int4_accum,
+  minvfunc = int4_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_var_pop
+);
+
+-- population variance of numeric input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_pop,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = numeric_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_var_pop
+);
+
+-- population variance of float4 input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- population variance of smallint input values (square of the population standard deviation)
+create aggregate pg_catalog.var_pop(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_pop,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int2_accum,
+  minvfunc = int2_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_var_pop
+);
+
+-- sample variance of bigint input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = int8_accum,
+  minvfunc = int8_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_var_samp
+);
+
+-- sample variance of float8 input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample variance of integer input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int4_accum,
+  minvfunc = int4_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_var_samp
+);
+
+-- sample variance of numeric input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = numeric_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_var_samp
+);
+
+-- sample variance of float4 input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- sample variance of smallint input values (square of the sample standard deviation)
+create aggregate pg_catalog.var_samp(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int2_accum,
+  minvfunc = int2_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_var_samp
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = int8_accum,
+  minvfunc = int8_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_var_samp
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int4_accum,
+  minvfunc = int4_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_var_samp
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine,
+  serialfunc = numeric_serialize,
+  deserialfunc = numeric_deserialize,
+  msfunc = numeric_accum,
+  minvfunc = numeric_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_var_samp
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
+
+-- historical alias for var_samp
+create aggregate pg_catalog.variance(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine,
+  serialfunc = numeric_poly_serialize,
+  deserialfunc = numeric_poly_deserialize,
+  msfunc = int2_accum,
+  minvfunc = int2_accum_inv,
+  mstype = internal,
+  mfinalfunc = numeric_poly_var_samp
+);
+
+-- concatenate XML values
+create aggregate pg_catalog.xmlagg(xml) (
+  sfunc = xmlconcat2,
+  stype = xml
 );
 
 create cast ("char" as character) with function pg_catalog.bpchar("char") as assignment;

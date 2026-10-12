@@ -234,6 +234,16 @@ struct FunctionQuery {
     is_final_extra: i32,
     combine_fn: String,
     init_val: String,
+    sort_op: String,
+    moving_trans_fn: String,
+    moving_inv_trans_fn: String,
+    moving_trans_type: String,
+    moving_final_fn: String,
+    is_moving_final_extra: i32,
+    moving_init_val: String,
+    serial_fn: String,
+    deserial_fn: String,
+    is_hypothetical: i32,
     extension_name: String,
 }
 
@@ -253,18 +263,29 @@ select
   case when a.aggfinalextra then 1 else 0 end as is_final_extra,
   a.aggcombinefn::regproc::text as combine_fn,
   coalesce(quote_literal(a.agginitval), '') as init_val,
+  coalesce('OPERATOR(' || son.nspname || '.' || so.oprname || ')', '') as sort_op,
+  a.aggmtransfn::regproc::text as moving_trans_fn,
+  a.aggminvtransfn::regproc::text as moving_inv_trans_fn,
+  case when a.aggmtranstype = 0 then '' else format_type(a.aggmtranstype, null) end as moving_trans_type,
+  a.aggmfinalfn::regproc::text as moving_final_fn,
+  case when a.aggmfinalextra then 1 else 0 end as is_moving_final_extra,
+  coalesce(quote_literal(a.aggminitval), '') as moving_init_val,
+  a.aggserialfn::regproc::text as serial_fn,
+  a.aggdeserialfn::regproc::text as deserial_fn,
+  case when a.aggkind = 'h' then 1 else 0 end as is_hypothetical,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_proc p
   join pg_namespace n on n.oid = p.pronamespace
   join pg_language l on l.oid = p.prolang
   left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
   left join pg_aggregate a on a.aggfnoid = p.oid
+  left join pg_operator so on so.oid = a.aggsortop
+  left join pg_namespace son on son.oid = so.oprnamespace
   left join pg_depend dep on dep.classid = 'pg_proc'::regclass and dep.objid = p.oid and dep.objsubid = 0 and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
-  and pg_get_function_arguments(p.oid) not like '%ORDER BY%'
 order by n.nspname, p.proname, pg_get_function_arguments(p.oid), pg_get_function_result(p.oid), p.oid;
 ";
 }
@@ -1377,6 +1398,16 @@ struct AggregateDef {
     final_extra: bool,
     combine_fn: String,
     init_val: String,
+    sort_op: String,
+    moving_trans_fn: String,
+    moving_inv_trans_fn: String,
+    moving_trans_type: String,
+    moving_final_fn: String,
+    moving_final_extra: bool,
+    moving_init_val: String,
+    serial_fn: String,
+    deserial_fn: String,
+    hypothetical: bool,
     description: String,
 }
 
@@ -1414,6 +1445,46 @@ impl WriteSql for AggregateDef {
             write!(f, ",\n  initcond = {}", self.init_val)?;
         }
 
+        if self.serial_fn != "-" {
+            write!(f, ",\n  serialfunc = {}", self.serial_fn)?;
+        }
+
+        if self.deserial_fn != "-" {
+            write!(f, ",\n  deserialfunc = {}", self.deserial_fn)?;
+        }
+
+        if self.moving_trans_fn != "-" {
+            write!(f, ",\n  msfunc = {}", self.moving_trans_fn)?;
+        }
+
+        if self.moving_inv_trans_fn != "-" {
+            write!(f, ",\n  minvfunc = {}", self.moving_inv_trans_fn)?;
+        }
+
+        if !self.moving_trans_type.is_empty() {
+            write!(f, ",\n  mstype = {}", self.moving_trans_type)?;
+        }
+
+        if self.moving_final_fn != "-" {
+            write!(f, ",\n  mfinalfunc = {}", self.moving_final_fn)?;
+        }
+
+        if self.moving_final_extra {
+            write!(f, ",\n  mfinalfunc_extra")?;
+        }
+
+        if !self.moving_init_val.is_empty() {
+            write!(f, ",\n  minitcond = {}", self.moving_init_val)?;
+        }
+
+        if !self.sort_op.is_empty() {
+            write!(f, ",\n  sortop = {}", self.sort_op)?;
+        }
+
+        if self.hypothetical {
+            write!(f, ",\n  hypothetical")?;
+        }
+
         write!(f, "\n);\n\n")?;
 
         Ok(())
@@ -1421,7 +1492,7 @@ impl WriteSql for AggregateDef {
 }
 
 enum FunctionDef {
-    Aggregate(AggregateDef),
+    Aggregate(Box<AggregateDef>),
     Regular(RegularFunctionDef),
 }
 
@@ -1632,14 +1703,6 @@ impl Module {
             function.write_sql(f)?;
         }
 
-        for function in self
-            .functions
-            .iter()
-            .filter(|function| matches!(function, FunctionDef::Aggregate(_)))
-        {
-            function.write_sql(f)?;
-        }
-
         for language in self.languages.iter().filter(|l| !l.handler.is_empty()) {
             language.write_sql(f)?;
         }
@@ -1654,6 +1717,14 @@ impl Module {
 
         for operator in &self.operators {
             operator.write_sql(f)?;
+        }
+
+        for function in self
+            .functions
+            .iter()
+            .filter(|function| matches!(function, FunctionDef::Aggregate(_)))
+        {
+            function.write_sql(f)?;
         }
 
         for cast in &self.casts {
@@ -1860,7 +1931,7 @@ fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in FunctionQuery::run()? {
         let function = if row.prokind == "a" {
-            FunctionDef::Aggregate(AggregateDef {
+            FunctionDef::Aggregate(Box::new(AggregateDef {
                 args: row.args,
                 combine_fn: row.combine_fn,
                 description: row.description,
@@ -1871,7 +1942,17 @@ fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
                 schema: row.schema,
                 trans_fn: row.trans_fn,
                 trans_type: row.trans_type,
-            })
+                sort_op: row.sort_op,
+                moving_trans_fn: row.moving_trans_fn,
+                moving_inv_trans_fn: row.moving_inv_trans_fn,
+                moving_trans_type: row.moving_trans_type,
+                moving_final_fn: row.moving_final_fn,
+                moving_final_extra: row.is_moving_final_extra == 1,
+                moving_init_val: row.moving_init_val,
+                serial_fn: row.serial_fn,
+                deserial_fn: row.deserial_fn,
+                hypothetical: row.is_hypothetical == 1,
+            }))
         } else {
             FunctionDef::Regular(RegularFunctionDef {
                 args: row.args,

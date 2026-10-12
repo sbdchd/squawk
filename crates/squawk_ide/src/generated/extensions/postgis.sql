@@ -2327,146 +2327,6 @@ create function public.updategeometrysrid(character varying, character varying, 
 create function public.updategeometrysrid(character varying, character varying, integer) returns text
   language plpgsql;
 
-create aggregate public.st_3dextent(geometry) (
-  sfunc = public.st_combinebbox,
-  stype = box3d,
-  combinefunc = public.st_combinebbox
-);
-
-create aggregate public.st_asflatgeobuf(anyelement) (
-  sfunc = public.pgis_asflatgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asflatgeobuf_finalfn
-);
-
-create aggregate public.st_asflatgeobuf(anyelement, boolean) (
-  sfunc = public.pgis_asflatgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asflatgeobuf_finalfn
-);
-
-create aggregate public.st_asflatgeobuf(anyelement, boolean, text) (
-  sfunc = public.pgis_asflatgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asflatgeobuf_finalfn
-);
-
-create aggregate public.st_asgeobuf(anyelement) (
-  sfunc = public.pgis_asgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asgeobuf_finalfn
-);
-
-create aggregate public.st_asgeobuf(anyelement, text) (
-  sfunc = public.pgis_asgeobuf_transfn,
-  stype = internal,
-  finalfunc = pgis_asgeobuf_finalfn
-);
-
-create aggregate public.st_asmvt(anyelement) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text, integer) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text, integer, text) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_asmvt(anyelement, text, integer, text, text) (
-  sfunc = public.pgis_asmvt_transfn,
-  stype = internal,
-  finalfunc = pgis_asmvt_finalfn,
-  combinefunc = pgis_asmvt_combinefn
-);
-
-create aggregate public.st_clusterintersecting(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_clusterintersecting_finalfn
-);
-
-create aggregate public.st_clusterwithin(geometry, double precision) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_clusterwithin_finalfn
-);
-
-create aggregate public.st_collect(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_collect_finalfn
-);
-
-create aggregate public.st_coverageunion(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_coverageunion_finalfn
-);
-
-create aggregate public.st_extent(geometry) (
-  sfunc = public.st_combinebbox,
-  stype = box3d,
-  finalfunc = public.box2d,
-  combinefunc = public.st_combinebbox
-);
-
-create aggregate public.st_makeline(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_makeline_finalfn
-);
-
-create aggregate public.st_memcollect(geometry) (
-  sfunc = public.st_collect,
-  stype = geometry,
-  combinefunc = public.st_collect
-);
-
-create aggregate public.st_memunion(geometry) (
-  sfunc = public.st_union,
-  stype = geometry,
-  combinefunc = public.st_union
-);
-
-create aggregate public.st_polygonize(geometry) (
-  sfunc = public.pgis_geometry_accum_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_polygonize_finalfn
-);
-
-create aggregate public.st_union(geometry) (
-  sfunc = public.pgis_geometry_union_parallel_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_union_parallel_finalfn,
-  combinefunc = pgis_geometry_union_parallel_combinefn
-);
-
-create aggregate public.st_union(geometry, gridsize double precision) (
-  sfunc = public.pgis_geometry_union_parallel_transfn,
-  stype = internal,
-  finalfunc = pgis_geometry_union_parallel_finalfn,
-  combinefunc = pgis_geometry_union_parallel_combinefn
-);
-
 create type public.box2d (input = box2d_in, output = box2d_out);
 
 create type public.box2df (input = box2df_in, output = box2df_out);
@@ -2791,6 +2651,160 @@ create operator public.~~= (
   leftarg = geometry,
   rightarg = geometry,
   function = public.geometry_same_nd
+);
+
+create aggregate public.st_3dextent(geometry) (
+  sfunc = public.st_combinebbox,
+  stype = box3d,
+  combinefunc = public.st_combinebbox
+);
+
+create aggregate public.st_asflatgeobuf(anyelement) (
+  sfunc = public.pgis_asflatgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asflatgeobuf_finalfn
+);
+
+create aggregate public.st_asflatgeobuf(anyelement, boolean) (
+  sfunc = public.pgis_asflatgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asflatgeobuf_finalfn
+);
+
+create aggregate public.st_asflatgeobuf(anyelement, boolean, text) (
+  sfunc = public.pgis_asflatgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asflatgeobuf_finalfn
+);
+
+create aggregate public.st_asgeobuf(anyelement) (
+  sfunc = public.pgis_asgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asgeobuf_finalfn
+);
+
+create aggregate public.st_asgeobuf(anyelement, text) (
+  sfunc = public.pgis_asgeobuf_transfn,
+  stype = internal,
+  finalfunc = pgis_asgeobuf_finalfn
+);
+
+create aggregate public.st_asmvt(anyelement) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn,
+  serialfunc = pgis_asmvt_serialfn,
+  deserialfunc = pgis_asmvt_deserialfn
+);
+
+create aggregate public.st_asmvt(anyelement, text) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn,
+  serialfunc = pgis_asmvt_serialfn,
+  deserialfunc = pgis_asmvt_deserialfn
+);
+
+create aggregate public.st_asmvt(anyelement, text, integer) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn,
+  serialfunc = pgis_asmvt_serialfn,
+  deserialfunc = pgis_asmvt_deserialfn
+);
+
+create aggregate public.st_asmvt(anyelement, text, integer, text) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn,
+  serialfunc = pgis_asmvt_serialfn,
+  deserialfunc = pgis_asmvt_deserialfn
+);
+
+create aggregate public.st_asmvt(anyelement, text, integer, text, text) (
+  sfunc = public.pgis_asmvt_transfn,
+  stype = internal,
+  finalfunc = pgis_asmvt_finalfn,
+  combinefunc = pgis_asmvt_combinefn,
+  serialfunc = pgis_asmvt_serialfn,
+  deserialfunc = pgis_asmvt_deserialfn
+);
+
+create aggregate public.st_clusterintersecting(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_clusterintersecting_finalfn
+);
+
+create aggregate public.st_clusterwithin(geometry, double precision) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_clusterwithin_finalfn
+);
+
+create aggregate public.st_collect(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_collect_finalfn
+);
+
+create aggregate public.st_coverageunion(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_coverageunion_finalfn
+);
+
+create aggregate public.st_extent(geometry) (
+  sfunc = public.st_combinebbox,
+  stype = box3d,
+  finalfunc = public.box2d,
+  combinefunc = public.st_combinebbox
+);
+
+create aggregate public.st_makeline(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_makeline_finalfn
+);
+
+create aggregate public.st_memcollect(geometry) (
+  sfunc = public.st_collect,
+  stype = geometry,
+  combinefunc = public.st_collect
+);
+
+create aggregate public.st_memunion(geometry) (
+  sfunc = public.st_union,
+  stype = geometry,
+  combinefunc = public.st_union
+);
+
+create aggregate public.st_polygonize(geometry) (
+  sfunc = public.pgis_geometry_accum_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_polygonize_finalfn
+);
+
+create aggregate public.st_union(geometry) (
+  sfunc = public.pgis_geometry_union_parallel_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_union_parallel_finalfn,
+  combinefunc = pgis_geometry_union_parallel_combinefn,
+  serialfunc = pgis_geometry_union_parallel_serialfn,
+  deserialfunc = pgis_geometry_union_parallel_deserialfn
+);
+
+create aggregate public.st_union(geometry, gridsize double precision) (
+  sfunc = public.pgis_geometry_union_parallel_transfn,
+  stype = internal,
+  finalfunc = pgis_geometry_union_parallel_finalfn,
+  combinefunc = pgis_geometry_union_parallel_combinefn,
+  serialfunc = pgis_geometry_union_parallel_serialfn,
+  deserialfunc = pgis_geometry_union_parallel_deserialfn
 );
 
 create cast (box2d as box3d) with function public.box3d(box2d) as implicit;

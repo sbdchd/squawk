@@ -171,48 +171,6 @@ create function public.hll_union_internal(internal, internal) returns internal
 create function public.hll_union_trans(internal, hll) returns internal
   language c;
 
-create aggregate public.hll_add_agg(hll_hashval) (
-  sfunc = hll_add_trans0,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer) (
-  sfunc = hll_add_trans1,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer, integer) (
-  sfunc = hll_add_trans2,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint) (
-  sfunc = hll_add_trans3,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
-  sfunc = hll_add_trans4,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
-create aggregate public.hll_union_agg(hll) (
-  sfunc = hll_union_trans,
-  stype = internal,
-  finalfunc = hll_pack,
-  combinefunc = hll_union_internal
-);
-
 create type public.hll (input = hll_in, output = hll_out);
 
 create type public.hll_hashval (input = hll_hashval_in, output = hll_hashval_out);
@@ -262,6 +220,60 @@ create operator public.|| (
   leftarg = hll_hashval,
   rightarg = hll,
   function = public.hll_add_rev
+);
+
+create aggregate public.hll_add_agg(hll_hashval) (
+  sfunc = hll_add_trans0,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal,
+  serialfunc = hll_serialize,
+  deserialfunc = hll_deserialize
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer) (
+  sfunc = hll_add_trans1,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal,
+  serialfunc = hll_serialize,
+  deserialfunc = hll_deserialize
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer, integer) (
+  sfunc = hll_add_trans2,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal,
+  serialfunc = hll_serialize,
+  deserialfunc = hll_deserialize
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint) (
+  sfunc = hll_add_trans3,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal,
+  serialfunc = hll_serialize,
+  deserialfunc = hll_deserialize
+);
+
+create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
+  sfunc = hll_add_trans4,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal,
+  serialfunc = hll_serialize,
+  deserialfunc = hll_deserialize
+);
+
+create aggregate public.hll_union_agg(hll) (
+  sfunc = hll_union_trans,
+  stype = internal,
+  finalfunc = hll_pack,
+  combinefunc = hll_union_internal,
+  serialfunc = hll_serialize,
+  deserialfunc = hll_deserialize
 );
 
 create cast (bigint as hll_hashval) without function;
