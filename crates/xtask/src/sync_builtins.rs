@@ -52,7 +52,7 @@ trait Query {
         Self: serde::de::DeserializeOwned,
     {
         let output = Command::new("psql")
-            .args(["--csv", "--command", Self::QUERY])
+            .args(["--csv", "--quiet", "--command", Self::QUERY])
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .output()
@@ -99,12 +99,34 @@ struct TypeQuery {
     output: String,
     element: String,
     subscript: String,
+    subscript_result: String,
+    slice_result: String,
+    category: String,
+    is_preferred: i32,
     description: String,
     extension_name: String,
 }
 
 impl Query for TypeQuery {
     const QUERY: &'static str = r"
+create function pg_temp.subscript_result(ty regtype, index text) returns text
+language plpgsql as $$
+declare
+  result regtype;
+begin
+  execute format('select pg_typeof((null::%s)[%s])', ty, index) into result;
+  return case
+    when e.oid is not null then format('%I.%I[]', en.nspname, e.typname)
+    else format('%I.%I', n.nspname, t.typname)
+  end
+  from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    left join pg_type e on e.typarray = t.oid
+    left join pg_namespace en on en.oid = e.typnamespace
+  where t.oid = result;
+exception when others then
+  return '';
+end $$;
 with recursive type_depths as (
   select oid, 0 as depth
   from pg_type
@@ -130,6 +152,10 @@ select
   case when t.typtype in ('b', 'p') then t.typoutput::text else '' end as output,
   case when t.typtype = 'b' and t.typelem <> 0 then format_type(t.typelem, null) else '' end as element,
   case when t.typtype = 'b' and t.typsubscript <> 0 then t.typsubscript::text else '' end as subscript,
+  case when t.typtype = 'b' and t.typsubscript <> 0 then pg_temp.subscript_result(t.oid, $$'1'$$) else '' end as subscript_result,
+  case when t.typtype = 'b' and t.typsubscript <> 0 then pg_temp.subscript_result(t.oid, $$'1':'1'$$) else '' end as slice_result,
+  case when t.typtype in ('b', 'p') and t.typcategory <> 'U' then quote_literal(t.typcategory::text) else '' end as category,
+  case when t.typtype in ('b', 'p') and t.typispreferred then 1 else 0 end as is_preferred,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_type t
@@ -205,8 +231,19 @@ struct FunctionQuery {
     trans_fn: String,
     trans_type: String,
     final_fn: String,
+    is_final_extra: i32,
     combine_fn: String,
     init_val: String,
+    sort_op: String,
+    moving_trans_fn: String,
+    moving_inv_trans_fn: String,
+    moving_trans_type: String,
+    moving_final_fn: String,
+    is_moving_final_extra: i32,
+    moving_init_val: String,
+    serial_fn: String,
+    deserial_fn: String,
+    is_hypothetical: i32,
     extension_name: String,
 }
 
@@ -223,20 +260,32 @@ select
   a.aggtransfn::regproc::text as trans_fn,
   format_type(a.aggtranstype, null) as trans_type,
   a.aggfinalfn::regproc::text as final_fn,
+  case when a.aggfinalextra then 1 else 0 end as is_final_extra,
   a.aggcombinefn::regproc::text as combine_fn,
   coalesce(quote_literal(a.agginitval), '') as init_val,
+  coalesce('OPERATOR(' || son.nspname || '.' || so.oprname || ')', '') as sort_op,
+  a.aggmtransfn::regproc::text as moving_trans_fn,
+  a.aggminvtransfn::regproc::text as moving_inv_trans_fn,
+  case when a.aggmtranstype = 0 then '' else format_type(a.aggmtranstype, null) end as moving_trans_type,
+  a.aggmfinalfn::regproc::text as moving_final_fn,
+  case when a.aggmfinalextra then 1 else 0 end as is_moving_final_extra,
+  coalesce(quote_literal(a.aggminitval), '') as moving_init_val,
+  a.aggserialfn::regproc::text as serial_fn,
+  a.aggdeserialfn::regproc::text as deserial_fn,
+  case when a.aggkind = 'h' then 1 else 0 end as is_hypothetical,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_proc p
   join pg_namespace n on n.oid = p.pronamespace
   join pg_language l on l.oid = p.prolang
   left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
   left join pg_aggregate a on a.aggfnoid = p.oid
+  left join pg_operator so on so.oid = a.aggsortop
+  left join pg_namespace son on son.oid = so.oprnamespace
   left join pg_depend dep on dep.classid = 'pg_proc'::regclass and dep.objid = p.oid and dep.objsubid = 0 and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
-  and pg_get_function_arguments(p.oid) not like '%ORDER BY%'
 order by n.nspname, p.proname, pg_get_function_arguments(p.oid), pg_get_function_result(p.oid), p.oid;
 ";
 }
@@ -387,6 +436,352 @@ order by n.nspname, c.collname, c.oid;
 }
 
 #[derive(Deserialize)]
+struct LanguageQuery {
+    name: String,
+    handler: String,
+    inline: String,
+    validator: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for LanguageQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(l.lanname) as name,
+  coalesce(quote_ident(hn.nspname) || '.' || quote_ident(h.proname), '') as handler,
+  coalesce(quote_ident(inn.nspname) || '.' || quote_ident(i.proname), '') as inline,
+  coalesce(quote_ident(vn.nspname) || '.' || quote_ident(v.proname), '') as validator,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_language l
+  left join pg_proc h on h.oid = l.lanplcallfoid
+  left join pg_namespace hn on hn.oid = h.pronamespace
+  left join pg_proc i on i.oid = l.laninline
+  left join pg_namespace inn on inn.oid = i.pronamespace
+  left join pg_proc v on v.oid = l.lanvalidator
+  left join pg_namespace vn on vn.oid = v.pronamespace
+  left join pg_description d on d.objoid = l.oid and d.classoid = 'pg_language'::regclass
+  left join pg_depend dep on dep.classid = 'pg_language'::regclass and dep.objid = l.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+order by l.lanname, l.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct ForeignDataWrapperQuery {
+    name: String,
+    handler: String,
+    validator: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for ForeignDataWrapperQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(w.fdwname) as name,
+  coalesce(quote_ident(hn.nspname) || '.' || quote_ident(h.proname), '') as handler,
+  coalesce(quote_ident(vn.nspname) || '.' || quote_ident(v.proname), '') as validator,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_foreign_data_wrapper w
+  left join pg_proc h on h.oid = w.fdwhandler
+  left join pg_namespace hn on hn.oid = h.pronamespace
+  left join pg_proc v on v.oid = w.fdwvalidator
+  left join pg_namespace vn on vn.oid = v.pronamespace
+  left join pg_description d on d.objoid = w.oid and d.classoid = 'pg_foreign_data_wrapper'::regclass
+  left join pg_depend dep on dep.classid = 'pg_foreign_data_wrapper'::regclass and dep.objid = w.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+order by w.fdwname, w.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct ConversionQuery {
+    schema: String,
+    name: String,
+    source_encoding: String,
+    target_encoding: String,
+    function: String,
+    is_default: i32,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for ConversionQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(n.nspname) as schema,
+  quote_ident(c.conname) as name,
+  quote_literal(pg_encoding_to_char(c.conforencoding)) as source_encoding,
+  quote_literal(pg_encoding_to_char(c.contoencoding)) as target_encoding,
+  quote_ident(pn.nspname) || '.' || quote_ident(p.proname) as function,
+  case when c.condefault then 1 else 0 end as is_default,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_conversion c
+  join pg_namespace n on n.oid = c.connamespace
+  join pg_proc p on p.oid = c.conproc
+  join pg_namespace pn on pn.oid = p.pronamespace
+  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_conversion'::regclass
+  left join pg_depend dep on dep.classid = 'pg_conversion'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+order by n.nspname, c.conname, c.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct OperatorFamilyQuery {
+    schema: String,
+    name: String,
+    access_method: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for OperatorFamilyQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(n.nspname) as schema,
+  quote_ident(f.opfname) as name,
+  quote_ident(a.amname) as access_method,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_opfamily f
+  join pg_namespace n on n.oid = f.opfnamespace
+  join pg_am a on a.oid = f.opfmethod
+  left join pg_description d on d.objoid = f.oid and d.classoid = 'pg_opfamily'::regclass
+  left join pg_depend dep on dep.classid = 'pg_opfamily'::regclass and dep.objid = f.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+order by n.nspname, f.opfname, a.amname, f.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct OperatorClassQuery {
+    schema: String,
+    name: String,
+    is_default: i32,
+    data_type: String,
+    access_method: String,
+    family: String,
+    storage_type: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for OperatorClassQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(n.nspname) as schema,
+  quote_ident(c.opcname) as name,
+  case when c.opcdefault then 1 else 0 end as is_default,
+  format_type(c.opcintype, null) as data_type,
+  quote_ident(a.amname) as access_method,
+  quote_ident(fn.nspname) || '.' || quote_ident(f.opfname) as family,
+  format_type(coalesce(nullif(c.opckeytype, 0), c.opcintype), null) as storage_type,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_opclass c
+  join pg_namespace n on n.oid = c.opcnamespace
+  join pg_am a on a.oid = c.opcmethod
+  join pg_opfamily f on f.oid = c.opcfamily
+  join pg_namespace fn on fn.oid = f.opfnamespace
+  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_opclass'::regclass
+  left join pg_depend dep on dep.classid = 'pg_opclass'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+order by n.nspname, c.opcname, a.amname, c.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct TextSearchParserQuery {
+    schema: String,
+    name: String,
+    start: String,
+    gettoken: String,
+    end: String,
+    lextypes: String,
+    headline: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for TextSearchParserQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(n.nspname) as schema,
+  quote_ident(p.prsname) as name,
+  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prsstart), '') as start,
+  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prstoken), '') as gettoken,
+  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prsend), '') as end,
+  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prslextype), '') as lextypes,
+  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prsheadline), '') as headline,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_ts_parser p
+  join pg_namespace n on n.oid = p.prsnamespace
+  left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_ts_parser'::regclass
+  left join pg_depend dep on dep.classid = 'pg_ts_parser'::regclass and dep.objid = p.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+order by n.nspname, p.prsname, p.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct TextSearchTemplateQuery {
+    schema: String,
+    name: String,
+    init: String,
+    lexize: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for TextSearchTemplateQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(n.nspname) as schema,
+  quote_ident(t.tmplname) as name,
+  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = t.tmplinit), '') as init,
+  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = t.tmpllexize), '') as lexize,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_ts_template t
+  join pg_namespace n on n.oid = t.tmplnamespace
+  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_ts_template'::regclass
+  left join pg_depend dep on dep.classid = 'pg_ts_template'::regclass and dep.objid = t.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+order by n.nspname, t.tmplname, t.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct TextSearchDictionaryQuery {
+    schema: String,
+    name: String,
+    template: String,
+    options: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for TextSearchDictionaryQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(n.nspname) as schema,
+  quote_ident(dc.dictname) as name,
+  quote_ident(tn.nspname) || '.' || quote_ident(t.tmplname) as template,
+  coalesce(dc.dictinitoption, '') as options,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_ts_dict dc
+  join pg_namespace n on n.oid = dc.dictnamespace
+  join pg_ts_template t on t.oid = dc.dicttemplate
+  join pg_namespace tn on tn.oid = t.tmplnamespace
+  left join pg_description d on d.objoid = dc.oid and d.classoid = 'pg_ts_dict'::regclass
+  left join pg_depend dep on dep.classid = 'pg_ts_dict'::regclass and dep.objid = dc.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+order by n.nspname, dc.dictname, dc.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct TextSearchConfigurationQuery {
+    schema: String,
+    name: String,
+    parser: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for TextSearchConfigurationQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(n.nspname) as schema,
+  quote_ident(c.cfgname) as name,
+  quote_ident(pn.nspname) || '.' || quote_ident(p.prsname) as parser,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_ts_config c
+  join pg_namespace n on n.oid = c.cfgnamespace
+  join pg_ts_parser p on p.oid = c.cfgparser
+  join pg_namespace pn on pn.oid = p.prsnamespace
+  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_ts_config'::regclass
+  left join pg_depend dep on dep.classid = 'pg_ts_config'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+order by n.nspname, c.cfgname, c.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct AccessMethodQuery {
+    name: String,
+    kind: String,
+    handler: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for AccessMethodQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(a.amname) as name,
+  case a.amtype when 't' then 'table' when 'i' then 'index' end as kind,
+  quote_ident(n.nspname) || '.' || quote_ident(p.proname) as handler,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name
+from pg_am a
+  join pg_proc p on p.oid = a.amhandler
+  join pg_namespace n on n.oid = p.pronamespace
+  left join pg_description d on d.objoid = a.oid and d.classoid = 'pg_am'::regclass
+  left join pg_depend dep on dep.classid = 'pg_am'::regclass and dep.objid = a.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+order by a.amname, a.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct RoleQuery {
+    name: String,
+    description: String,
+}
+
+impl Query for RoleQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(r.rolname) as name,
+  coalesce(d.description, '') as description
+from pg_roles r
+  left join pg_shdescription d on d.objoid = r.oid and d.classoid = 'pg_authid'::regclass
+where r.rolname like 'pg\_%'
+order by r.rolname, r.oid;
+";
+}
+
+#[derive(Deserialize)]
 struct TablespaceQuery {
     name: String,
     location: String,
@@ -402,6 +797,24 @@ select
 from pg_tablespace t
   left join pg_shdescription d on d.objoid = t.oid and d.classoid = 'pg_tablespace'::regclass
 order by t.spcname, t.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct DatabaseQuery {
+    name: String,
+    description: String,
+}
+
+impl Query for DatabaseQuery {
+    const QUERY: &'static str = r"
+select
+  quote_ident(d.datname) as name,
+  coalesce(s.description, '') as description
+from pg_database d
+  left join pg_shdescription s on s.objoid = d.oid and s.classoid = 'pg_database'::regclass
+where d.datname in ('postgres', 'template0', 'template1')
+order by d.datname, d.oid;
 ";
 }
 
@@ -481,6 +894,267 @@ impl WriteSql for SchemaDef {
     }
 }
 
+struct LanguageDef {
+    name: String,
+    handler: String,
+    inline: String,
+    validator: String,
+    description: String,
+}
+
+impl WriteSql for LanguageDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(f, "create language {}", self.name)?;
+        if !self.handler.is_empty() {
+            write!(f, " handler {}", self.handler)?;
+            if !self.inline.is_empty() {
+                write!(f, " inline {}", self.inline)?;
+            }
+            if !self.validator.is_empty() {
+                write!(f, " validator {}", self.validator)?;
+            }
+        }
+        writeln!(f, ";")?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct ForeignDataWrapperDef {
+    name: String,
+    handler: String,
+    validator: String,
+    description: String,
+}
+
+impl WriteSql for ForeignDataWrapperDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(f, "create foreign data wrapper {}", self.name)?;
+        if !self.handler.is_empty() {
+            write!(f, " handler {}", self.handler)?;
+        }
+        if !self.validator.is_empty() {
+            write!(f, " validator {}", self.validator)?;
+        }
+        writeln!(f, ";")?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct ConversionDef {
+    schema: String,
+    name: String,
+    source_encoding: String,
+    target_encoding: String,
+    function: String,
+    default: bool,
+    description: String,
+}
+
+impl WriteSql for ConversionDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(f, "create ")?;
+        if self.default {
+            write!(f, "default ")?;
+        }
+        writeln!(
+            f,
+            "conversion {}.{} for {} to {} from {};",
+            self.schema, self.name, self.source_encoding, self.target_encoding, self.function
+        )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct OperatorFamilyDef {
+    schema: String,
+    name: String,
+    access_method: String,
+    description: String,
+}
+
+impl WriteSql for OperatorFamilyDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        writeln!(
+            f,
+            "create operator family {}.{} using {};",
+            self.schema, self.name, self.access_method
+        )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct OperatorClassDef {
+    schema: String,
+    name: String,
+    default: bool,
+    data_type: String,
+    access_method: String,
+    family: String,
+    storage_type: String,
+    description: String,
+}
+
+impl WriteSql for OperatorClassDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(f, "create operator class {}.{} ", self.schema, self.name)?;
+        if self.default {
+            write!(f, "default ")?;
+        }
+        // TODO: emit the class's OPERATOR and FUNCTION members (pg_amop/pg_amproc), and the
+        // loose family members as `alter operator family ... add`, split using pg_depend.
+        writeln!(
+            f,
+            "for type {} using {} family {} as storage {};",
+            self.data_type, self.access_method, self.family, self.storage_type
+        )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct TextSearchParserDef {
+    schema: String,
+    name: String,
+    start: String,
+    gettoken: String,
+    end: String,
+    lextypes: String,
+    headline: String,
+    description: String,
+}
+
+impl WriteSql for TextSearchParserDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(
+            f,
+            "create text search parser {}.{} (start = {}, gettoken = {}, end = {}, lextypes = {}",
+            self.schema, self.name, self.start, self.gettoken, self.end, self.lextypes
+        )?;
+        if !self.headline.is_empty() {
+            write!(f, ", headline = {}", self.headline)?;
+        }
+        writeln!(f, ");")?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct TextSearchTemplateDef {
+    schema: String,
+    name: String,
+    init: String,
+    lexize: String,
+    description: String,
+}
+
+impl WriteSql for TextSearchTemplateDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(
+            f,
+            "create text search template {}.{} (",
+            self.schema, self.name
+        )?;
+        if !self.init.is_empty() {
+            write!(f, "init = {}, ", self.init)?;
+        }
+        writeln!(f, "lexize = {});", self.lexize)?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct TextSearchDictionaryDef {
+    schema: String,
+    name: String,
+    template: String,
+    options: String,
+    description: String,
+}
+
+impl WriteSql for TextSearchDictionaryDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(
+            f,
+            "create text search dictionary {}.{} (template = {}",
+            self.schema, self.name, self.template
+        )?;
+        if !self.options.is_empty() {
+            write!(f, ", {}", self.options)?;
+        }
+        writeln!(f, ");")?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct TextSearchConfigurationDef {
+    schema: String,
+    name: String,
+    parser: String,
+    description: String,
+}
+
+impl WriteSql for TextSearchConfigurationDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        // TODO: emit the token type to dictionary mappings (pg_ts_config_map) as
+        // `alter text search configuration ... add mapping for ... with ...`.
+        writeln!(
+            f,
+            "create text search configuration {}.{} (parser = {});",
+            self.schema, self.name, self.parser
+        )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct AccessMethodDef {
+    name: String,
+    kind: String,
+    handler: String,
+    description: String,
+}
+
+impl WriteSql for AccessMethodDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        writeln!(
+            f,
+            "create access method {} type {} handler {};",
+            self.name, self.kind, self.handler
+        )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct RoleDef {
+    name: String,
+    description: String,
+}
+
+impl WriteSql for RoleDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        writeln!(f, "create role {};", self.name)?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
 struct TablespaceDef {
     name: String,
     location: String,
@@ -500,6 +1174,20 @@ impl WriteSql for TablespaceDef {
     }
 }
 
+struct DatabaseDef {
+    name: String,
+    description: String,
+}
+
+impl WriteSql for DatabaseDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        writeln!(f, "create database {};", self.name)?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
 struct TypeDef {
     schema: String,
     name: String,
@@ -509,6 +1197,10 @@ struct TypeDef {
     output: String,
     element: String,
     subscript: String,
+    subscript_result: String,
+    slice_result: String,
+    category: String,
+    preferred: bool,
     description: String,
 }
 
@@ -516,27 +1208,48 @@ impl WriteSql for TypeDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
         writeln!(f, "-- size: {}, align: {}", self.size, self.align)?;
-        if self.input.is_empty() {
-            writeln!(f, "create type {}.{};", self.schema, self.name)?;
-        } else {
-            let mut options = vec![
-                format!("input = {}", self.input),
-                format!("output = {}", self.output),
-            ];
-            if !self.element.is_empty() {
-                options.push(format!("element = {}", self.element));
-            }
-            if !self.subscript.is_empty() {
-                options.push(format!("subscript = {}", self.subscript));
-            }
-            writeln!(
-                f,
-                "create type {}.{} ({});",
-                self.schema,
-                self.name,
-                options.join(", ")
-            )?;
+        writeln!(f, "create type {}.{};", self.schema, self.name)?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+// Base types start as shells so their I/O functions can reference them, then
+// get filled in once the functions exist, matching the order Postgres needs.
+struct BaseTypeDef<'a>(&'a TypeDef);
+
+impl WriteSql for BaseTypeDef<'_> {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        let ty = self.0;
+        let mut options = vec![
+            format!("input = {}", ty.input),
+            format!("output = {}", ty.output),
+        ];
+        if !ty.element.is_empty() {
+            options.push(format!("element = {}", ty.element));
         }
+        if !ty.subscript.is_empty() {
+            options.push(format!("subscript = {}", ty.subscript));
+        }
+        if !ty.category.is_empty() {
+            options.push(format!("category = {}", ty.category));
+        }
+        if ty.preferred {
+            options.push("preferred = true".to_string());
+        }
+        if !ty.subscript_result.is_empty() {
+            writeln!(f, "-- subscript: {}", ty.subscript_result)?;
+        }
+        if !ty.slice_result.is_empty() {
+            writeln!(f, "-- subscript slice: {}", ty.slice_result)?;
+        }
+        writeln!(
+            f,
+            "create type {}.{} ({});",
+            ty.schema,
+            ty.name,
+            options.join(", ")
+        )?;
         writeln!(f)?;
         Ok(())
     }
@@ -682,8 +1395,19 @@ struct AggregateDef {
     trans_fn: String,
     trans_type: String,
     final_fn: String,
+    final_extra: bool,
     combine_fn: String,
     init_val: String,
+    sort_op: String,
+    moving_trans_fn: String,
+    moving_inv_trans_fn: String,
+    moving_trans_type: String,
+    moving_final_fn: String,
+    moving_final_extra: bool,
+    moving_init_val: String,
+    serial_fn: String,
+    deserial_fn: String,
+    hypothetical: bool,
     description: String,
 }
 
@@ -709,12 +1433,56 @@ impl WriteSql for AggregateDef {
             write!(f, ",\n  finalfunc = {}", self.final_fn)?;
         }
 
+        if self.final_extra {
+            write!(f, ",\n  finalfunc_extra")?;
+        }
+
         if self.combine_fn != "-" {
             write!(f, ",\n  combinefunc = {}", self.combine_fn)?;
         }
 
         if !self.init_val.is_empty() {
             write!(f, ",\n  initcond = {}", self.init_val)?;
+        }
+
+        if self.serial_fn != "-" {
+            write!(f, ",\n  serialfunc = {}", self.serial_fn)?;
+        }
+
+        if self.deserial_fn != "-" {
+            write!(f, ",\n  deserialfunc = {}", self.deserial_fn)?;
+        }
+
+        if self.moving_trans_fn != "-" {
+            write!(f, ",\n  msfunc = {}", self.moving_trans_fn)?;
+        }
+
+        if self.moving_inv_trans_fn != "-" {
+            write!(f, ",\n  minvfunc = {}", self.moving_inv_trans_fn)?;
+        }
+
+        if !self.moving_trans_type.is_empty() {
+            write!(f, ",\n  mstype = {}", self.moving_trans_type)?;
+        }
+
+        if self.moving_final_fn != "-" {
+            write!(f, ",\n  mfinalfunc = {}", self.moving_final_fn)?;
+        }
+
+        if self.moving_final_extra {
+            write!(f, ",\n  mfinalfunc_extra")?;
+        }
+
+        if !self.moving_init_val.is_empty() {
+            write!(f, ",\n  minitcond = {}", self.moving_init_val)?;
+        }
+
+        if !self.sort_op.is_empty() {
+            write!(f, ",\n  sortop = {}", self.sort_op)?;
+        }
+
+        if self.hypothetical {
+            write!(f, ",\n  hypothetical")?;
         }
 
         write!(f, "\n);\n\n")?;
@@ -724,7 +1492,7 @@ impl WriteSql for AggregateDef {
 }
 
 enum FunctionDef {
-    Aggregate(AggregateDef),
+    Aggregate(Box<AggregateDef>),
     Regular(RegularFunctionDef),
 }
 
@@ -860,7 +1628,9 @@ impl WriteSql for CollationDef {
 // General either the builtins or an extension's defs
 #[derive(Default)]
 struct Module {
+    roles: Vec<RoleDef>,
     tablespaces: Vec<TablespaceDef>,
+    databases: Vec<DatabaseDef>,
     schemas: Vec<SchemaDef>,
     types: Vec<TypeDef>,
     range_types: Vec<RangeTypeDef>,
@@ -871,12 +1641,30 @@ struct Module {
     operators: Vec<OperatorDef>,
     casts: Vec<CastDef>,
     collations: Vec<CollationDef>,
+    access_methods: Vec<AccessMethodDef>,
+    languages: Vec<LanguageDef>,
+    foreign_data_wrappers: Vec<ForeignDataWrapperDef>,
+    conversions: Vec<ConversionDef>,
+    operator_families: Vec<OperatorFamilyDef>,
+    operator_classes: Vec<OperatorClassDef>,
+    text_search_parsers: Vec<TextSearchParserDef>,
+    text_search_templates: Vec<TextSearchTemplateDef>,
+    text_search_dictionaries: Vec<TextSearchDictionaryDef>,
+    text_search_configurations: Vec<TextSearchConfigurationDef>,
 }
 
 impl Module {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        for role in &self.roles {
+            role.write_sql(f)?;
+        }
+
         for tablespace in &self.tablespaces {
             tablespace.write_sql(f)?;
+        }
+
+        for database in &self.databases {
+            database.write_sql(f)?;
         }
 
         for schema in &self.schemas {
@@ -903,12 +1691,40 @@ impl Module {
             view.write_sql(f)?;
         }
 
-        for function in &self.functions {
+        for language in self.languages.iter().filter(|l| l.handler.is_empty()) {
+            language.write_sql(f)?;
+        }
+
+        for function in self
+            .functions
+            .iter()
+            .filter(|function| matches!(function, FunctionDef::Regular(_)))
+        {
             function.write_sql(f)?;
+        }
+
+        for language in self.languages.iter().filter(|l| !l.handler.is_empty()) {
+            language.write_sql(f)?;
+        }
+
+        for type_def in self
+            .types
+            .iter()
+            .filter(|type_def| !type_def.input.is_empty())
+        {
+            BaseTypeDef(type_def).write_sql(f)?;
         }
 
         for operator in &self.operators {
             operator.write_sql(f)?;
+        }
+
+        for function in self
+            .functions
+            .iter()
+            .filter(|function| matches!(function, FunctionDef::Aggregate(_)))
+        {
+            function.write_sql(f)?;
         }
 
         for cast in &self.casts {
@@ -917,6 +1733,42 @@ impl Module {
 
         for collation in &self.collations {
             collation.write_sql(f)?;
+        }
+
+        for access_method in &self.access_methods {
+            access_method.write_sql(f)?;
+        }
+
+        for foreign_data_wrapper in &self.foreign_data_wrappers {
+            foreign_data_wrapper.write_sql(f)?;
+        }
+
+        for conversion in &self.conversions {
+            conversion.write_sql(f)?;
+        }
+
+        for operator_family in &self.operator_families {
+            operator_family.write_sql(f)?;
+        }
+
+        for operator_class in &self.operator_classes {
+            operator_class.write_sql(f)?;
+        }
+
+        for parser in &self.text_search_parsers {
+            parser.write_sql(f)?;
+        }
+
+        for template in &self.text_search_templates {
+            template.write_sql(f)?;
+        }
+
+        for dictionary in &self.text_search_dictionaries {
+            dictionary.write_sql(f)?;
+        }
+
+        for configuration in &self.text_search_configurations {
+            configuration.write_sql(f)?;
         }
 
         Ok(())
@@ -950,6 +1802,17 @@ fn write_module(
     Ok(())
 }
 
+fn query_roles(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    let module = modules.entry("builtins".to_string()).or_default();
+    for row in RoleQuery::run()? {
+        module.roles.push(RoleDef {
+            name: row.name,
+            description: row.description,
+        });
+    }
+    Ok(())
+}
+
 fn query_tablespaces(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     let module = modules.entry("builtins".to_string()).or_default();
     for row in TablespaceQuery::run()? {
@@ -962,10 +1825,21 @@ fn query_tablespaces(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     Ok(())
 }
 
+fn query_databases(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    let module = modules.entry("builtins".to_string()).or_default();
+    for row in DatabaseQuery::run()? {
+        module.databases.push(DatabaseDef {
+            name: row.name,
+            description: row.description,
+        });
+    }
+    Ok(())
+}
+
 fn query_schemas(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in SchemaQuery::run()? {
         modules
-            .entry(row.extension_name)
+            .entry(module_name(row.extension_name))
             .or_default()
             .schemas
             .push(SchemaDef {
@@ -982,7 +1856,7 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
             bail!("unexpected type alignment for {}.{}", row.schema, row.name);
         }
 
-        let module = modules.entry(row.extension_name).or_default();
+        let module = modules.entry(module_name(row.extension_name)).or_default();
         if row.is_range == 1 {
             module.range_types.push(RangeTypeDef {
                 align: row.align,
@@ -1003,6 +1877,10 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
                 schema: row.schema,
                 size: row.size,
                 subscript: row.subscript,
+                subscript_result: row.subscript_result,
+                slice_result: row.slice_result,
+                category: row.category,
+                preferred: row.is_preferred == 1,
             });
         }
     }
@@ -1013,7 +1891,7 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 fn query_composite_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in CompositeTypeQuery::run()? {
         modules
-            .entry(row.extension_name)
+            .entry(module_name(row.extension_name))
             .or_default()
             .composite_types
             .push(CompositeTypeDef {
@@ -1029,7 +1907,7 @@ fn query_composite_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 
 fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in RelationQuery::run()? {
-        let module = modules.entry(row.extension_name).or_default();
+        let module = modules.entry(module_name(row.extension_name)).or_default();
         match row.relkind.as_str() {
             "r" => module.tables.push(TableDef {
                 columns: row.columns,
@@ -1053,17 +1931,28 @@ fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in FunctionQuery::run()? {
         let function = if row.prokind == "a" {
-            FunctionDef::Aggregate(AggregateDef {
+            FunctionDef::Aggregate(Box::new(AggregateDef {
                 args: row.args,
                 combine_fn: row.combine_fn,
                 description: row.description,
                 final_fn: row.final_fn,
+                final_extra: row.is_final_extra == 1,
                 init_val: row.init_val,
                 name: row.name,
                 schema: row.schema,
                 trans_fn: row.trans_fn,
                 trans_type: row.trans_type,
-            })
+                sort_op: row.sort_op,
+                moving_trans_fn: row.moving_trans_fn,
+                moving_inv_trans_fn: row.moving_inv_trans_fn,
+                moving_trans_type: row.moving_trans_type,
+                moving_final_fn: row.moving_final_fn,
+                moving_final_extra: row.is_moving_final_extra == 1,
+                moving_init_val: row.moving_init_val,
+                serial_fn: row.serial_fn,
+                deserial_fn: row.deserial_fn,
+                hypothetical: row.is_hypothetical == 1,
+            }))
         } else {
             FunctionDef::Regular(RegularFunctionDef {
                 args: row.args,
@@ -1076,7 +1965,7 @@ fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
         };
 
         modules
-            .entry(row.extension_name)
+            .entry(module_name(row.extension_name))
             .or_default()
             .functions
             .push(function);
@@ -1088,7 +1977,7 @@ fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in OperatorQuery::run()? {
         modules
-            .entry(row.extension_name)
+            .entry(module_name(row.extension_name))
             .or_default()
             .operators
             .push(OperatorDef {
@@ -1108,7 +1997,7 @@ fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 fn query_casts(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in CastQuery::run()? {
         modules
-            .entry(row.extension_name)
+            .entry(module_name(row.extension_name))
             .or_default()
             .casts
             .push(CastDef {
@@ -1127,7 +2016,7 @@ fn query_casts(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 fn query_collations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in CollationQuery::run()? {
         modules
-            .entry(row.extension_name)
+            .entry(module_name(row.extension_name))
             .or_default()
             .collations
             .push(CollationDef {
@@ -1140,6 +2029,176 @@ fn query_collations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
             });
     }
 
+    Ok(())
+}
+
+fn query_languages(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in LanguageQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .languages
+            .push(LanguageDef {
+                name: row.name,
+                handler: row.handler,
+                inline: row.inline,
+                validator: row.validator,
+                description: row.description,
+            });
+    }
+    Ok(())
+}
+
+fn query_foreign_data_wrappers(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in ForeignDataWrapperQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .foreign_data_wrappers
+            .push(ForeignDataWrapperDef {
+                name: row.name,
+                handler: row.handler,
+                validator: row.validator,
+                description: row.description,
+            });
+    }
+    Ok(())
+}
+
+fn query_conversions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in ConversionQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .conversions
+            .push(ConversionDef {
+                schema: row.schema,
+                name: row.name,
+                source_encoding: row.source_encoding,
+                target_encoding: row.target_encoding,
+                function: row.function,
+                default: row.is_default == 1,
+                description: row.description,
+            });
+    }
+    Ok(())
+}
+
+fn query_operator_families(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in OperatorFamilyQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .operator_families
+            .push(OperatorFamilyDef {
+                schema: row.schema,
+                name: row.name,
+                access_method: row.access_method,
+                description: row.description,
+            });
+    }
+    Ok(())
+}
+
+fn query_operator_classes(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in OperatorClassQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .operator_classes
+            .push(OperatorClassDef {
+                schema: row.schema,
+                name: row.name,
+                default: row.is_default == 1,
+                data_type: row.data_type,
+                access_method: row.access_method,
+                family: row.family,
+                storage_type: row.storage_type,
+                description: row.description,
+            });
+    }
+    Ok(())
+}
+
+fn query_text_search(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in TextSearchParserQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .text_search_parsers
+            .push(TextSearchParserDef {
+                schema: row.schema,
+                name: row.name,
+                start: row.start,
+                gettoken: row.gettoken,
+                end: row.end,
+                lextypes: row.lextypes,
+                headline: row.headline,
+                description: row.description,
+            });
+    }
+    for row in TextSearchTemplateQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .text_search_templates
+            .push(TextSearchTemplateDef {
+                schema: row.schema,
+                name: row.name,
+                init: row.init,
+                lexize: row.lexize,
+                description: row.description,
+            });
+    }
+    for row in TextSearchDictionaryQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .text_search_dictionaries
+            .push(TextSearchDictionaryDef {
+                schema: row.schema,
+                name: row.name,
+                template: row.template,
+                options: row.options,
+                description: row.description,
+            });
+    }
+    for row in TextSearchConfigurationQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .text_search_configurations
+            .push(TextSearchConfigurationDef {
+                schema: row.schema,
+                name: row.name,
+                parser: row.parser,
+                description: row.description,
+            });
+    }
+    Ok(())
+}
+
+fn module_name(extension_name: String) -> String {
+    if extension_name == "plpgsql" {
+        "builtins".to_string()
+    } else {
+        extension_name
+    }
+}
+
+fn query_access_methods(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in AccessMethodQuery::run()? {
+        modules
+            .entry(module_name(row.extension_name))
+            .or_default()
+            .access_methods
+            .push(AccessMethodDef {
+                name: row.name,
+                kind: row.kind,
+                handler: row.handler,
+                description: row.description,
+            });
+    }
     Ok(())
 }
 
@@ -1156,7 +2215,9 @@ pub(crate) fn sync_builtins() -> Result<()> {
 
     let mut modules: BTreeMap<String, Module> = BTreeMap::new();
 
+    query_roles(&mut modules)?;
     query_tablespaces(&mut modules)?;
+    query_databases(&mut modules)?;
     query_schemas(&mut modules)?;
     query_types(&mut modules)?;
     query_composite_types(&mut modules)?;
@@ -1165,6 +2226,13 @@ pub(crate) fn sync_builtins() -> Result<()> {
     query_operators(&mut modules)?;
     query_casts(&mut modules)?;
     query_collations(&mut modules)?;
+    query_access_methods(&mut modules)?;
+    query_languages(&mut modules)?;
+    query_foreign_data_wrappers(&mut modules)?;
+    query_conversions(&mut modules)?;
+    query_operator_families(&mut modules)?;
+    query_operator_classes(&mut modules)?;
+    query_text_search(&mut modules)?;
 
     let extensions_root = project_root().join("crates/squawk_ide/src/generated/extensions");
     let builtins_path = project_root().join("crates/squawk_ide/src/generated/builtins.sql");

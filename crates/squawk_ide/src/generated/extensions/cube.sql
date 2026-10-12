@@ -5,7 +5,7 @@
 
 -- multi-dimensional cube '(FLOAT-1, FLOAT-2, ..., FLOAT-N), (FLOAT-1, FLOAT-2, ..., FLOAT-N)'
 -- size: -1, align: 8
-create type public.cube (input = cube_in, output = cube_out);
+create type public.cube;
 
 create function public.cube(cube, double precision) returns cube
   language c;
@@ -137,6 +137,8 @@ create function public.g_cube_same(cube, cube, internal) returns internal
 create function public.g_cube_union(internal, internal) returns cube
   language c;
 
+create type public.cube (input = cube_in, output = cube_out);
+
 create operator public.&& (
   leftarg = cube,
   rightarg = cube,
@@ -220,4 +222,12 @@ create operator public.~> (
   rightarg = integer,
   function = public.cube_coord_llur
 );
+
+create operator family public.cube_ops using btree;
+
+create operator family public.gist_cube_ops using gist;
+
+create operator class public.cube_ops default for type cube using btree family public.cube_ops as storage cube;
+
+create operator class public.gist_cube_ops default for type cube using gist family public.gist_cube_ops as storage cube;
 

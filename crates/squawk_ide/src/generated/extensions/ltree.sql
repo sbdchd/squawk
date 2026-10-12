@@ -4,16 +4,16 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.lquery (input = lquery_in, output = lquery_out);
+create type public.lquery;
 
 -- size: -1, align: 4
-create type public.ltree (input = ltree_in, output = ltree_out);
+create type public.ltree;
 
 -- size: -1, align: 4
-create type public.ltree_gist (input = ltree_gist_in, output = ltree_gist_out);
+create type public.ltree_gist;
 
 -- size: -1, align: 4
-create type public.ltxtquery (input = ltxtq_in, output = ltxtq_out);
+create type public.ltxtquery;
 
 create function public._lt_q_regex(ltree[], lquery[]) returns boolean
   language c;
@@ -254,6 +254,14 @@ create function public.subpath(ltree, integer, integer) returns ltree
 
 create function public.text2ltree(text) returns ltree
   language c;
+
+create type public.lquery (input = lquery_in, output = lquery_out);
+
+create type public.ltree (input = ltree_in, output = ltree_out);
+
+create type public.ltree_gist (input = ltree_gist_in, output = ltree_gist_out);
+
+create type public.ltxtquery (input = ltxtq_in, output = ltxtq_out);
 
 create operator public.< (
   leftarg = ltree,
@@ -548,4 +556,20 @@ create operator public.~ (
   rightarg = lquery,
   function = public._ltq_regex
 );
+
+create operator family public.gist__ltree_ops using gist;
+
+create operator family public.gist_ltree_ops using gist;
+
+create operator family public.hash_ltree_ops using hash;
+
+create operator family public.ltree_ops using btree;
+
+create operator class public.gist__ltree_ops default for type ltree[] using gist family public.gist__ltree_ops as storage ltree_gist;
+
+create operator class public.gist_ltree_ops default for type ltree using gist family public.gist_ltree_ops as storage ltree_gist;
+
+create operator class public.hash_ltree_ops default for type ltree using hash family public.hash_ltree_ops as storage ltree;
+
+create operator class public.ltree_ops default for type ltree using btree family public.ltree_ops as storage ltree;
 

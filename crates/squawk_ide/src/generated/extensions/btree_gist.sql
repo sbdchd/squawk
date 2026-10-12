@@ -4,22 +4,22 @@
 --   cargo xtask sync-builtins
 
 -- size: 16, align: 4
-create type public.gbtreekey16 (input = gbtreekey16_in, output = gbtreekey16_out);
+create type public.gbtreekey16;
 
 -- size: 2, align: 4
-create type public.gbtreekey2 (input = gbtreekey2_in, output = gbtreekey2_out);
+create type public.gbtreekey2;
 
 -- size: 32, align: 4
-create type public.gbtreekey32 (input = gbtreekey32_in, output = gbtreekey32_out);
+create type public.gbtreekey32;
 
 -- size: 4, align: 4
-create type public.gbtreekey4 (input = gbtreekey4_in, output = gbtreekey4_out);
+create type public.gbtreekey4;
 
 -- size: 8, align: 4
-create type public.gbtreekey8 (input = gbtreekey8_in, output = gbtreekey8_out);
+create type public.gbtreekey8;
 
 -- size: -1, align: 4
-create type public.gbtreekey_var (input = gbtreekey_var_in, output = gbtreekey_var_out);
+create type public.gbtreekey_var;
 
 create function public.cash_dist(money, money) returns money
   language c;
@@ -657,6 +657,18 @@ create function public.ts_dist(timestamp without time zone, timestamp without ti
 create function public.tstz_dist(timestamp with time zone, timestamp with time zone) returns interval
   language c;
 
+create type public.gbtreekey16 (input = gbtreekey16_in, output = gbtreekey16_out);
+
+create type public.gbtreekey2 (input = gbtreekey2_in, output = gbtreekey2_out);
+
+create type public.gbtreekey32 (input = gbtreekey32_in, output = gbtreekey32_out);
+
+create type public.gbtreekey4 (input = gbtreekey4_in, output = gbtreekey4_out);
+
+create type public.gbtreekey8 (input = gbtreekey8_in, output = gbtreekey8_out);
+
+create type public.gbtreekey_var (input = gbtreekey_var_in, output = gbtreekey_var_out);
+
 create operator public.<-> (
   leftarg = bigint,
   rightarg = bigint,
@@ -728,4 +740,108 @@ create operator public.<-> (
   rightarg = timestamp without time zone,
   function = public.ts_dist
 );
+
+create operator family public.gist_bit_ops using gist;
+
+create operator family public.gist_bool_ops using gist;
+
+create operator family public.gist_bpchar_ops using gist;
+
+create operator family public.gist_bytea_ops using gist;
+
+create operator family public.gist_cash_ops using gist;
+
+create operator family public.gist_cidr_ops using gist;
+
+create operator family public.gist_date_ops using gist;
+
+create operator family public.gist_enum_ops using gist;
+
+create operator family public.gist_float4_ops using gist;
+
+create operator family public.gist_float8_ops using gist;
+
+create operator family public.gist_inet_ops using gist;
+
+create operator family public.gist_int2_ops using gist;
+
+create operator family public.gist_int4_ops using gist;
+
+create operator family public.gist_int8_ops using gist;
+
+create operator family public.gist_interval_ops using gist;
+
+create operator family public.gist_macaddr8_ops using gist;
+
+create operator family public.gist_macaddr_ops using gist;
+
+create operator family public.gist_numeric_ops using gist;
+
+create operator family public.gist_oid_ops using gist;
+
+create operator family public.gist_text_ops using gist;
+
+create operator family public.gist_time_ops using gist;
+
+create operator family public.gist_timestamp_ops using gist;
+
+create operator family public.gist_timestamptz_ops using gist;
+
+create operator family public.gist_timetz_ops using gist;
+
+create operator family public.gist_uuid_ops using gist;
+
+create operator family public.gist_vbit_ops using gist;
+
+create operator class public.gist_bit_ops default for type bit using gist family public.gist_bit_ops as storage gbtreekey_var;
+
+create operator class public.gist_bool_ops default for type boolean using gist family public.gist_bool_ops as storage gbtreekey2;
+
+create operator class public.gist_bpchar_ops default for type character using gist family public.gist_bpchar_ops as storage gbtreekey_var;
+
+create operator class public.gist_bytea_ops default for type bytea using gist family public.gist_bytea_ops as storage gbtreekey_var;
+
+create operator class public.gist_cash_ops default for type money using gist family public.gist_cash_ops as storage gbtreekey16;
+
+create operator class public.gist_cidr_ops default for type cidr using gist family public.gist_cidr_ops as storage gbtreekey16;
+
+create operator class public.gist_date_ops default for type date using gist family public.gist_date_ops as storage gbtreekey8;
+
+create operator class public.gist_enum_ops default for type anyenum using gist family public.gist_enum_ops as storage gbtreekey8;
+
+create operator class public.gist_float4_ops default for type real using gist family public.gist_float4_ops as storage gbtreekey8;
+
+create operator class public.gist_float8_ops default for type double precision using gist family public.gist_float8_ops as storage gbtreekey16;
+
+create operator class public.gist_inet_ops default for type inet using gist family public.gist_inet_ops as storage gbtreekey16;
+
+create operator class public.gist_int2_ops default for type smallint using gist family public.gist_int2_ops as storage gbtreekey4;
+
+create operator class public.gist_int4_ops default for type integer using gist family public.gist_int4_ops as storage gbtreekey8;
+
+create operator class public.gist_int8_ops default for type bigint using gist family public.gist_int8_ops as storage gbtreekey16;
+
+create operator class public.gist_interval_ops default for type interval using gist family public.gist_interval_ops as storage gbtreekey32;
+
+create operator class public.gist_macaddr8_ops default for type macaddr8 using gist family public.gist_macaddr8_ops as storage gbtreekey16;
+
+create operator class public.gist_macaddr_ops default for type macaddr using gist family public.gist_macaddr_ops as storage gbtreekey16;
+
+create operator class public.gist_numeric_ops default for type numeric using gist family public.gist_numeric_ops as storage gbtreekey_var;
+
+create operator class public.gist_oid_ops default for type oid using gist family public.gist_oid_ops as storage gbtreekey8;
+
+create operator class public.gist_text_ops default for type text using gist family public.gist_text_ops as storage gbtreekey_var;
+
+create operator class public.gist_time_ops default for type time without time zone using gist family public.gist_time_ops as storage gbtreekey16;
+
+create operator class public.gist_timestamp_ops default for type timestamp without time zone using gist family public.gist_timestamp_ops as storage gbtreekey16;
+
+create operator class public.gist_timestamptz_ops default for type timestamp with time zone using gist family public.gist_timestamptz_ops as storage gbtreekey16;
+
+create operator class public.gist_timetz_ops default for type time with time zone using gist family public.gist_timetz_ops as storage gbtreekey16;
+
+create operator class public.gist_uuid_ops default for type uuid using gist family public.gist_uuid_ops as storage gbtreekey32;
+
+create operator class public.gist_vbit_ops default for type bit varying using gist family public.gist_vbit_ops as storage gbtreekey_var;
 
