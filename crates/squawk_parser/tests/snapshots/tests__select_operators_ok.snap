@@ -3524,6 +3524,59 @@ SOURCE_FILE
             LITERAL
               STRING "'b'"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "j"
+              WHITESPACE " "
+              CUSTOM_OP
+                MINUS "-"
+                R_ANGLE ">"
+              WHITESPACE " "
+              LITERAL
+                STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              LITERAL
+                STRING "'a'"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              LITERAL
+                STRING "'b'"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              STRING "'c'"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract path as json"
   WHITESPACE "\n"

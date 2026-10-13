@@ -393,6 +393,8 @@ select '{"a": {"b":"foo"}}'::json -> 'a';
 -- extract as text
 select '[1,2,3]'::json ->> 2;
 select '{"a":1,"b":2}'::json ->> 'b';
+select j -> 'a' ->> 'b';
+select 'a' || 'b' || 'c';
 
 -- extract path as json
 select '{"a": {"b": ["foo","bar"]}}'::json #> '{a,b,1}';
