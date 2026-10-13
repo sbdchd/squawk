@@ -1,5 +1,8 @@
 create index users_email_idx on users (email);
 
+create index
+  on t using btree$0 (x);
+
 create unique index concurrently if not exists idx_users_email on only public.users using btree (email collate public."C" text_pattern_ops desc nulls last, (lower(display_name)) asc) include (id, created_at) nulls not distinct with (fillfactor = 70, deduplicate_items = off) tablespace fastspace where active and email is not null;
 
 create index reservations_during_idx on reservations using gist (during);

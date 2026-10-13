@@ -6909,7 +6909,12 @@ fn build_create_index<'a>(ctx: &Ctx, create_index: &ast::CreateIndex) -> Doc<'a>
                 .append(build_create_table_partition_items(ctx, &items));
         }
         on_doc = on_doc.append(Doc::line_or_space()).append(using_doc);
-        doc = doc.append(Doc::hard_line().append(on_doc.group()).nest(ctx.indent));
+        let line = if create_index.index().is_some() {
+            Doc::hard_line()
+        } else {
+            Doc::line_or_space()
+        };
+        doc = doc.append(line.append(on_doc.group()).nest(ctx.indent));
     } else {
         doc = doc
             .append(Doc::line_or_space().append(on_doc).nest(ctx.indent))
