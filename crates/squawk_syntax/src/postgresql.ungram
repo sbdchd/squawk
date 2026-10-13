@@ -3626,7 +3626,7 @@ ConstraintExclusionList =
   '(' (ConstraintExclusion (',' ConstraintExclusion)*) ')'
 
 ConstraintExclusion =
- Expr 'with' (Op | OperatorCall)
+ PartitionItem 'with' (Op | OperatorCall)
 
 WhereConditionClause =
   'where' '(' Expr ')'
@@ -4777,7 +4777,7 @@ ElementTableAlias =
   '#name'?
 
 ElementVariable =
-  '#ident'?
+  '#name'?
 
 PropertyName =
   '#name'?
@@ -6296,7 +6296,6 @@ OnTable =
 
 PartitionItem =
   Expr
-  Collate?
   OpClassRef?
   AttributeList?
   SortOrder?

@@ -4946,7 +4946,7 @@ fn opt_index_include_columns(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(INCLUDE_KW) {
         let m = p.start();
         p.bump(INCLUDE_KW);
-        partition_items(p, true);
+        partition_items(p, PartitionItemKind::Index);
         Some(m.complete(p, INDEX_INCLUDE_CLAUSE))
     } else {
         None
@@ -5686,7 +5686,7 @@ const CONSTRAINT_EXCLUSION_FIRST: TokenSet = EXPR_FIRST.union(TokenSet::new(&[L_
 
 fn opt_constraint_exclusion(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
-    if opt_expr(p).is_none() {
+    if opt_partition_item(p, PartitionItemKind::Index).is_none() {
         m.abandon(p);
         return None;
     }
@@ -6576,7 +6576,7 @@ fn drop_table(p: &mut Parser<'_>) -> CompletedMarker {
 //   [ COLLATE collation ]
 //   [ opclass ]
 //
-// if we pass allow_extra_params:
+// index_elem:
 //   { column_name | ( expression ) }
 //   [ COLLATE collation ]
 //   [ opclass [ ( opclass_parameter = value [, ... ] ) ] ]
@@ -6587,16 +6587,22 @@ fn drop_table(p: &mut Parser<'_>) -> CompletedMarker {
 //  | ColId opt_collate opt_qualified_name
 //  | func_expr_windowless opt_collate opt_qualified_name
 //  | '(' a_expr ')' opt_collate opt_qualified_name
-fn partition_item(p: &mut Parser<'_>, allow_extra_params: bool) -> CompletedMarker {
+#[derive(Clone, Copy)]
+enum PartitionItemKind {
+    Partition,
+    Index,
+}
+
+fn partition_item(p: &mut Parser<'_>, part_kind: PartitionItemKind) -> CompletedMarker {
+    assert!(p.at_ts(EXPR_FIRST));
     let m = p.start();
     // TODO: this can be more strict
     if expr(p).is_none() {
         p.error("expected expr");
     }
-    opt_collate(p);
     // [ opclass ]
     opt_index_opclass(p);
-    if allow_extra_params {
+    if matches!(part_kind, PartitionItemKind::Index) {
         // [ ( opclass_parameter = value [, ... ] ) ]
         if p.at(L_PAREN) {
             attribute_list(p);
@@ -6607,11 +6613,11 @@ fn partition_item(p: &mut Parser<'_>, allow_extra_params: bool) -> CompletedMark
     m.complete(p, PARTITION_ITEM)
 }
 
-fn opt_partition_item(p: &mut Parser<'_>, allow_extra_params: bool) -> Option<CompletedMarker> {
+fn opt_partition_item(p: &mut Parser<'_>, part_kind: PartitionItemKind) -> Option<CompletedMarker> {
     if !p.at_ts(EXPR_FIRST) {
         return None;
     }
-    Some(partition_item(p, allow_extra_params))
+    Some(partition_item(p, part_kind))
 }
 
 fn opt_index_opclass(p: &mut Parser<'_>) {
@@ -7732,7 +7738,7 @@ fn opt_partition_by(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         //   [ opclass ]
         //   [, ... ]
         // )
-        partition_items(p, false);
+        partition_items(p, PartitionItemKind::Partition);
         Some(m.complete(p, PARTITION_BY))
     } else {
         m.abandon(p);
@@ -17792,7 +17798,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
     //   [ NULLS { FIRST | LAST } ]
     //   [, ...]
     // )
-    partition_items(p, true);
+    partition_items(p, PartitionItemKind::Index);
     opt_index_include_columns(p);
     opt_nulls_not_distinct(p);
     opt_with_params(p);
@@ -17809,7 +17815,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
 //   [, ... ]
 // )
 //
-// if we pass allow_extra_params:
+// index elements:
 // (
 //   { column_name | ( expression ) }
 //   [ COLLATE collation ]
@@ -17818,7 +17824,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
 //   [ NULLS { FIRST | LAST } ]
 //   [, ...]
 // )
-fn partition_items(p: &mut Parser<'_>, allow_extra_params: bool) {
+fn partition_items(p: &mut Parser<'_>, part_kind: PartitionItemKind) {
     let m = p.start();
     delimited(
         p,
@@ -17828,7 +17834,7 @@ fn partition_items(p: &mut Parser<'_>, allow_extra_params: bool) {
         ListItems::Required,
         || "unexpected comma".to_string(),
         EXPR_FIRST,
-        |p| opt_partition_item(p, allow_extra_params).is_some(),
+        |p| opt_partition_item(p, part_kind).is_some(),
     );
     m.complete(p, PARTITION_ITEM_LIST);
 }

@@ -239,6 +239,16 @@ create table t (
 create table t (c int, exclude using gist (c with operator(pg_catalog.=)));
 create table t (c int, exclude using gist (c with operator(=)));
 
+create table t (b int, exclude (b int4_ops with =));
+
+create table t (b int, exclude (b pg_catalog.int4_ops asc nulls first with =));
+
+create table t (b int, exclude ((b + 1) int4_ops desc nulls last with operator(pg_catalog.=)));
+
+create table t (b text, exclude (b collate "x" text_ops with =));
+
+create table t (b int, exclude (b int4_ops (foo = 1) with =));
+
 -- exclude constraint multiple exclusions
 create table t (
   a int,

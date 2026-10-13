@@ -7457,38 +7457,37 @@ fn build_create_table_partition_items<'a>(ctx: &Ctx, items: &ast::PartitionItemL
         .map(|el| comments_before(&el))
         .unwrap_or_else(Doc::nil)
         .append(Doc::text("("));
-    let item_docs = items.partition_items().map(|item| {
-        let mut item_doc = leading_comments(item.syntax());
-        if let Some(expr) = item.expr() {
-            item_doc = item_doc.append(build_expr(ctx, expr));
-        }
-        if item.expr().is_none()
-            && let Some(collate) = item.collate()
-        {
-            item_doc = item_doc.append(build_collate_expr(ctx, &collate));
-        }
-        item_doc = append_commented_path_ref(item_doc, item.op_class_ref());
-        if let Some(attributes) = item.attribute_list() {
-            item_doc = item_doc
-                .append(space_before(attributes.syntax()))
-                .append(build_attribute_list(ctx, &attributes));
-        }
-        if let Some(order) = item.sort_order() {
-            item_doc = item_doc
-                .append(space_before(order.syntax()))
-                .append(build_keyword_node(order.syntax()));
-        }
-        if let Some(nulls) = item.nulls_order() {
-            item_doc = item_doc
-                .append(space_before(nulls.syntax()))
-                .append(build_keyword_node(nulls.syntax()));
-        }
-        (item_doc, item.syntax().clone())
-    });
+    let item_docs = items
+        .partition_items()
+        .map(|item| (build_partition_item(ctx, &item), item.syntax().clone()));
     let body = build_comma_separated_docs(item_docs).unwrap_or_else(Doc::nil);
     doc.append(wrap_body(ctx, body, items.r_paren_token().as_ref()))
         .append(Doc::text(")"))
         .group()
+}
+
+fn build_partition_item<'a>(ctx: &Ctx, item: &ast::PartitionItem) -> Doc<'a> {
+    let mut doc = leading_comments(item.syntax());
+    if let Some(expr) = item.expr() {
+        doc = doc.append(build_expr(ctx, expr));
+    }
+    doc = append_commented_path_ref(doc, item.op_class_ref());
+    if let Some(attributes) = item.attribute_list() {
+        doc = doc
+            .append(space_before(attributes.syntax()))
+            .append(build_attribute_list(ctx, &attributes));
+    }
+    if let Some(order) = item.sort_order() {
+        doc = doc
+            .append(space_before(order.syntax()))
+            .append(build_keyword_node(order.syntax()));
+    }
+    if let Some(nulls) = item.nulls_order() {
+        doc = doc
+            .append(space_before(nulls.syntax()))
+            .append(build_keyword_node(nulls.syntax()));
+    }
+    doc
 }
 
 fn build_create_table_partition_type<'a>(ctx: &Ctx, partition_type: ast::PartitionType) -> Doc<'a> {
@@ -8823,8 +8822,8 @@ fn build_constraint_exclusion_list<'a>(ctx: &Ctx, list: &ast::ConstraintExclusio
         .append(Doc::text("("));
     let items = list.constraint_exclusions().map(|exclusion| {
         let mut item = exclusion
-            .expr()
-            .map(|value| build_expr(ctx, value))
+            .partition_item()
+            .map(|value| build_partition_item(ctx, &value))
             .unwrap_or_else(Doc::nil);
         if let Some(with) = exclusion.with_token() {
             item = item.append(line_before(&with)).append(Doc::text("with"));
