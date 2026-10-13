@@ -4528,15 +4528,15 @@ pub struct ConstraintExclusion {
 }
 impl ConstraintExclusion {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn op(&self) -> Option<Op> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn operator_call(&self) -> Option<OperatorCall> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn partition_item(&self) -> Option<PartitionItem> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19112,10 +19112,6 @@ impl PartitionItem {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn collate(&self) -> Option<Collate> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
@@ -30603,6 +30599,7 @@ pub enum AnyName {
     ElementTableAlias(ElementTableAlias),
     ElementTableRef(ElementTableRef),
     ElementTag(ElementTag),
+    ElementVariable(ElementVariable),
     EventTrigger(EventTrigger),
     EventTriggerRef(EventTriggerRef),
     ExplainOptionName(ExplainOptionName),
@@ -62192,6 +62189,7 @@ impl AstNode for AnyName {
                 | SyntaxKind::ELEMENT_TABLE_ALIAS
                 | SyntaxKind::ELEMENT_TABLE_REF
                 | SyntaxKind::ELEMENT_TAG
+                | SyntaxKind::ELEMENT_VARIABLE
                 | SyntaxKind::EVENT_TRIGGER
                 | SyntaxKind::EVENT_TRIGGER_REF
                 | SyntaxKind::EXPLAIN_OPTION_NAME
@@ -62296,6 +62294,7 @@ impl AstNode for AnyName {
             }
             SyntaxKind::ELEMENT_TABLE_REF => AnyName::ElementTableRef(ElementTableRef { syntax }),
             SyntaxKind::ELEMENT_TAG => AnyName::ElementTag(ElementTag { syntax }),
+            SyntaxKind::ELEMENT_VARIABLE => AnyName::ElementVariable(ElementVariable { syntax }),
             SyntaxKind::EVENT_TRIGGER => AnyName::EventTrigger(EventTrigger { syntax }),
             SyntaxKind::EVENT_TRIGGER_REF => AnyName::EventTriggerRef(EventTriggerRef { syntax }),
             SyntaxKind::EXPLAIN_OPTION_NAME => {
@@ -62432,6 +62431,7 @@ impl AstNode for AnyName {
             AnyName::ElementTableAlias(it) => &it.syntax,
             AnyName::ElementTableRef(it) => &it.syntax,
             AnyName::ElementTag(it) => &it.syntax,
+            AnyName::ElementVariable(it) => &it.syntax,
             AnyName::EventTrigger(it) => &it.syntax,
             AnyName::EventTriggerRef(it) => &it.syntax,
             AnyName::ExplainOptionName(it) => &it.syntax,
@@ -62637,6 +62637,12 @@ impl From<ElementTag> for AnyName {
     #[inline]
     fn from(node: ElementTag) -> AnyName {
         AnyName::ElementTag(node)
+    }
+}
+impl From<ElementVariable> for AnyName {
+    #[inline]
+    fn from(node: ElementVariable) -> AnyName {
+        AnyName::ElementVariable(node)
     }
 }
 impl From<EventTrigger> for AnyName {

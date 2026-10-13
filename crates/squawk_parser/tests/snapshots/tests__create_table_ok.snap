@@ -2076,8 +2076,9 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "a"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "a"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2151,8 +2152,9 @@ SOURCE_FILE
         CONSTRAINT_EXCLUSION_LIST
           L_PAREN "("
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "c"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "c"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2206,8 +2208,9 @@ SOURCE_FILE
         CONSTRAINT_EXCLUSION_LIST
           L_PAREN "("
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "c"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "c"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2217,6 +2220,291 @@ SOURCE_FILE
               OP
                 EQ "="
               R_PAREN ")"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              OP_CLASS_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "int4_ops"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OP
+              EQ "="
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              OP_CLASS_REF
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "pg_catalog"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                    IDENT "int4_ops"
+              WHITESPACE " "
+              SORT_ASC
+                ASC_KW "asc"
+              WHITESPACE " "
+              NULLS_FIRST
+                NULLS_KW "nulls"
+                WHITESPACE " "
+                FIRST_KW "first"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OP
+              EQ "="
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            PARTITION_ITEM
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "b"
+                  WHITESPACE " "
+                  PLUS "+"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
+                R_PAREN ")"
+              WHITESPACE " "
+              OP_CLASS_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "int4_ops"
+              WHITESPACE " "
+              SORT_DESC
+                DESC_KW "desc"
+              WHITESPACE " "
+              NULLS_LAST
+                NULLS_KW "nulls"
+                WHITESPACE " "
+                LAST_KW "last"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              OP
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "pg_catalog"
+                  DOT "."
+                  PATH_SEGMENT_REF
+                EQ "="
+              R_PAREN ")"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            PARTITION_ITEM
+              COLLATE
+                NAME_REF
+                  IDENT "b"
+                WHITESPACE " "
+                COLLATE_KW "collate"
+                WHITESPACE " "
+                COLLATION_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "\"x\""
+              WHITESPACE " "
+              OP_CLASS_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "text_ops"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OP
+              EQ "="
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              OP_CLASS_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "int4_ops"
+              WHITESPACE " "
+              ATTRIBUTE_LIST
+                L_PAREN "("
+                ATTRIBUTE_OPTION
+                  ATTRIBUTE_NAME
+                    IDENT "foo"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  ATTRIBUTE_VALUE
+                    LITERAL
+                      INT_NUMBER "1"
+                R_PAREN ")"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OP
+              EQ "="
           R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
@@ -2269,8 +2557,9 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "a"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "a"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2285,8 +2574,9 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "b"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "b"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2374,8 +2664,9 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "a"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "a"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2696,8 +2987,9 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "a"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "a"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "

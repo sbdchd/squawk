@@ -2569,8 +2569,9 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE "\n  "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "a"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "a"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2579,20 +2580,21 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE "\n  "
           CONSTRAINT_EXCLUSION
-            CALL_EXPR
-              NAME_REF
-                IDENT "tsrange"
-              ARG_LIST
-                L_PAREN "("
-                ARG
-                  NAME_REF
-                    IDENT "b"
-                COMMA ","
-                WHITESPACE " "
-                ARG
-                  NAME_REF
-                    IDENT "c"
-                R_PAREN ")"
+            PARTITION_ITEM
+              CALL_EXPR
+                NAME_REF
+                  IDENT "tsrange"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
+                    NAME_REF
+                      IDENT "b"
+                  COMMA ","
+                  WHITESPACE " "
+                  ARG
+                    NAME_REF
+                      IDENT "c"
+                  R_PAREN ")"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2631,8 +2633,9 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE "\n  "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "a"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "a"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -2641,20 +2644,21 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE "\n  "
           CONSTRAINT_EXCLUSION
-            CALL_EXPR
-              NAME_REF
-                IDENT "tsrange"
-              ARG_LIST
-                L_PAREN "("
-                ARG
-                  NAME_REF
-                    IDENT "b"
-                COMMA ","
-                WHITESPACE " "
-                ARG
-                  NAME_REF
-                    IDENT "c"
-                R_PAREN ")"
+            PARTITION_ITEM
+              CALL_EXPR
+                NAME_REF
+                  IDENT "tsrange"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
+                    NAME_REF
+                      IDENT "b"
+                  COMMA ","
+                  WHITESPACE " "
+                  ARG
+                    NAME_REF
+                      IDENT "c"
+                  R_PAREN ")"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "

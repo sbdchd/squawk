@@ -205,6 +205,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             | ast::AnyName::ElementTableAlias(_)
             | ast::AnyName::ElementTableRef(_)
             | ast::AnyName::ElementTag(_)
+            | ast::AnyName::ElementVariable(_)
             | ast::AnyName::EventTriggerRef(_)
             | ast::AnyName::ExplainOptionName(_)
             | ast::AnyName::ExtensionRef(_)

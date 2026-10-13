@@ -617,8 +617,9 @@ SOURCE_FILE
           L_PAREN "("
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "a"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "a"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
@@ -632,8 +633,9 @@ SOURCE_FILE
               R_ANGLE ">"
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
-            NAME_REF
-              IDENT "b"
+            PARTITION_ITEM
+              NAME_REF
+                IDENT "b"
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
