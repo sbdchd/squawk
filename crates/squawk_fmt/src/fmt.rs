@@ -15334,7 +15334,7 @@ fn ends_with_inline_bracketed_expr(expr: &ast::Expr) -> bool {
 fn is_single_inline_target_list(target_list: &ast::TargetList) -> bool {
     match target_list.targets().exactly_one() {
         Ok(target) => target.expr().as_ref().is_some_and(|expr| {
-            is_inline_bracketed_expr(expr) || matches!(expr, ast::Expr::CaseExpr(_))
+            ends_with_inline_bracketed_expr(expr) || matches!(expr, ast::Expr::CaseExpr(_))
         }),
         Err(_) => false,
     }

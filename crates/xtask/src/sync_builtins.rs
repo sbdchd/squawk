@@ -39,7 +39,7 @@ from pg_namespace n
   left join pg_depend dep on dep.classid = 'pg_namespace'::regclass and dep.objid = n.oid and dep.objsubid = 0 and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
 where n.nspname not like 'pg_temp%'
-  and n.nspname not like 'pg_toast%'
+  and n.nspname not like 'pg_toast_temp_%'
 order by n.nspname, ext.extname, n.oid;
 ";
 }

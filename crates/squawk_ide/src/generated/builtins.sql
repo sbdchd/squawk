@@ -55,6 +55,8 @@ create schema information_schema;
 -- system catalog schema
 create schema pg_catalog;
 
+create schema pg_toast;
+
 -- standard public schema
 create schema public;
 
