@@ -1525,29 +1525,11 @@ SOURCE_FILE
               WHITESPACE " "
               SET_EXPR
                 BIN_EXPR
-                  FIELD_EXPR
-                    NAME_REF
-                      IDENT "EXCLUDED"
-                    DOT "."
-                    NAME_REF
-                      IDENT "dname"
-                  WHITESPACE " "
-                  CUSTOM_OP
-                    PIPE "|"
-                    PIPE "|"
-                  WHITESPACE " "
                   BIN_EXPR
-                    LITERAL
-                      STRING "' (formerly '"
-                    WHITESPACE " "
-                    CUSTOM_OP
-                      PIPE "|"
-                      PIPE "|"
-                    WHITESPACE " "
                     BIN_EXPR
                       FIELD_EXPR
                         NAME_REF
-                          IDENT "d"
+                          IDENT "EXCLUDED"
                         DOT "."
                         NAME_REF
                           IDENT "dname"
@@ -1557,7 +1539,25 @@ SOURCE_FILE
                         PIPE "|"
                       WHITESPACE " "
                       LITERAL
-                        STRING "')'"
+                        STRING "' (formerly '"
+                    WHITESPACE " "
+                    CUSTOM_OP
+                      PIPE "|"
+                      PIPE "|"
+                    WHITESPACE " "
+                    FIELD_EXPR
+                      NAME_REF
+                        IDENT "d"
+                      DOT "."
+                      NAME_REF
+                        IDENT "dname"
+                  WHITESPACE " "
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "')'"
         WHITESPACE "\n    "
         WHERE_CLAUSE
           WHERE_KW "WHERE"

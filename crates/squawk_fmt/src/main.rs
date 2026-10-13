@@ -17,6 +17,8 @@ struct Cli {
     /// The line length where Squawk tries wrapping
     #[arg(long, default_value_t = FormatOptions::default().width)]
     width: usize,
+    #[arg(long, help = "Skip validation of the formatted output")]
+    skip_output_validation: bool,
     /// File to format; reads from stdin if omitted
     file: Option<PathBuf>,
 }
@@ -63,7 +65,9 @@ fn main() -> Result<ExitCode> {
         width: cli.width,
     };
     let formatted = squawk_fmt::fmt_str(&input, options)?;
-    validate_format(&input, &formatted, options)?;
+    if !cli.skip_output_validation {
+        validate_format(&input, &formatted, options)?;
+    }
 
     write!(io::stdout().lock(), "{formatted}")?;
     Ok(ExitCode::SUCCESS)

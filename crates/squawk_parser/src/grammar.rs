@@ -3152,7 +3152,7 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
         MINUS if p.next_not_joined_op() => (8, MINUS, Left), // symbol
         // ::
         COLON if p.at(COLON_COLON) => (15, COLON_COLON, Left), // symbol
-        _ if p.at_ts(OPERATOR_FIRST) => (7, CUSTOM_OP, Right),
+        _ if p.at_ts(OPERATOR_FIRST) => (7, CUSTOM_OP, Left),
         _ => NOT_AN_OP,
     }
 }

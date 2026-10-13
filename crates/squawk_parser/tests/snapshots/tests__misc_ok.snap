@@ -396,35 +396,35 @@ SOURCE_FILE
             WHITESPACE " "
             ARG
               BIN_EXPR
-                NAME_REF
-                  IDENT "title"
-                WHITESPACE " "
-                CUSTOM_OP
-                  PIPE "|"
-                  PIPE "|"
-                WHITESPACE " "
                 BIN_EXPR
-                  LITERAL
-                    STRING "' '"
+                  NAME_REF
+                    IDENT "title"
                   WHITESPACE " "
                   CUSTOM_OP
                     PIPE "|"
                     PIPE "|"
                   WHITESPACE " "
-                  CALL_EXPR
-                    NAME_REF
-                      COALESCE_KW "COALESCE"
-                    ARG_LIST
-                      L_PAREN "("
-                      ARG
-                        NAME_REF
-                          IDENT "overview"
-                      COMMA ","
-                      WHITESPACE " "
-                      ARG
-                        LITERAL
-                          STRING "''"
-                      R_PAREN ")"
+                  LITERAL
+                    STRING "' '"
+                WHITESPACE " "
+                CUSTOM_OP
+                  PIPE "|"
+                  PIPE "|"
+                WHITESPACE " "
+                CALL_EXPR
+                  NAME_REF
+                    COALESCE_KW "COALESCE"
+                  ARG_LIST
+                    L_PAREN "("
+                    ARG
+                      NAME_REF
+                        IDENT "overview"
+                    COMMA ","
+                    WHITESPACE " "
+                    ARG
+                      LITERAL
+                        STRING "''"
+                    R_PAREN ")"
             R_PAREN ")"
         WHITESPACE " "
         CUSTOM_OP
@@ -459,35 +459,35 @@ SOURCE_FILE
                     WHITESPACE " "
                     ARG
                       BIN_EXPR
-                        NAME_REF
-                          IDENT "title"
-                        WHITESPACE " "
-                        CUSTOM_OP
-                          PIPE "|"
-                          PIPE "|"
-                        WHITESPACE " "
                         BIN_EXPR
-                          LITERAL
-                            STRING "' '"
+                          NAME_REF
+                            IDENT "title"
                           WHITESPACE " "
                           CUSTOM_OP
                             PIPE "|"
                             PIPE "|"
                           WHITESPACE " "
-                          CALL_EXPR
-                            NAME_REF
-                              COALESCE_KW "COALESCE"
-                            ARG_LIST
-                              L_PAREN "("
-                              ARG
-                                NAME_REF
-                                  IDENT "overview"
-                              COMMA ","
-                              WHITESPACE " "
-                              ARG
-                                LITERAL
-                                  STRING "''"
-                              R_PAREN ")"
+                          LITERAL
+                            STRING "' '"
+                        WHITESPACE " "
+                        CUSTOM_OP
+                          PIPE "|"
+                          PIPE "|"
+                        WHITESPACE " "
+                        CALL_EXPR
+                          NAME_REF
+                            COALESCE_KW "COALESCE"
+                          ARG_LIST
+                            L_PAREN "("
+                            ARG
+                              NAME_REF
+                                IDENT "overview"
+                            COMMA ","
+                            WHITESPACE " "
+                            ARG
+                              LITERAL
+                                STRING "''"
+                            R_PAREN ")"
                     R_PAREN ")"
               COMMA ","
               WHITESPACE " "
@@ -2169,23 +2169,23 @@ SOURCE_FILE
                   L_PAREN "("
                   ARG
                     BIN_EXPR
-                      NAME_REF
-                        IDENT "title"
-                      WHITESPACE " "
-                      CUSTOM_OP
-                        PIPE "|"
-                        PIPE "|"
-                      WHITESPACE " "
                       BIN_EXPR
-                        LITERAL
-                          STRING "' -- '"
+                        NAME_REF
+                          IDENT "title"
                         WHITESPACE " "
                         CUSTOM_OP
                           PIPE "|"
                           PIPE "|"
                         WHITESPACE " "
-                        NAME_REF
-                          IDENT "plot"
+                        LITERAL
+                          STRING "' -- '"
+                      WHITESPACE " "
+                      CUSTOM_OP
+                        PIPE "|"
+                        PIPE "|"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "plot"
                   R_PAREN ")"
               COLON_COLON
                 COLON ":"
@@ -3495,20 +3495,20 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           BIN_EXPR
-            NAME_REF
-              IDENT "etg"
-            CUSTOM_OP
-              MINUS "-"
-              R_ANGLE ">"
             BIN_EXPR
-              LITERAL
-                STRING "'profile'"
+              NAME_REF
+                IDENT "etg"
               CUSTOM_OP
                 MINUS "-"
                 R_ANGLE ">"
-                R_ANGLE ">"
               LITERAL
-                STRING "'name'"
+                STRING "'profile'"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'name'"
           WHITESPACE " "
           AS_NAME
             AS_KW "as"
@@ -3693,20 +3693,20 @@ SOURCE_FILE
         WHITESPACE "\n  "
         TARGET
           BIN_EXPR
-            NAME_REF
-              IDENT "bk"
-            CUSTOM_OP
-              MINUS "-"
-              R_ANGLE ">"
             BIN_EXPR
-              LITERAL
-                STRING "'responses'"
+              NAME_REF
+                IDENT "bk"
               CUSTOM_OP
                 MINUS "-"
                 R_ANGLE ">"
-                R_ANGLE ">"
               LITERAL
-                STRING "'name'"
+                STRING "'responses'"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'name'"
           WHITESPACE " "
           AS_NAME
             AS_KW "as"
