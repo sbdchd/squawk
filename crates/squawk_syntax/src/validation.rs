@@ -18,7 +18,16 @@ use squawk_parser::{
     SyntaxKind::*, is_col_name_keyword, is_reserved_keyword, is_type_func_name_keyword,
 };
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
-    for node in root.descendants() {
+    for element in root.descendants_with_tokens() {
+        let node = match element {
+            rowan::NodeOrToken::Node(node) => node,
+            rowan::NodeOrToken::Token(token) => {
+                if token.kind() == IDENT {
+                    validate_unicode_esc_ident(&token, errors);
+                }
+                continue;
+            }
+        };
         match_ast! {
             match node {
                 ast::Aggregate(it) => validate_aggregate_params(it.param_list(), errors),
@@ -92,13 +101,6 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::Type(it) => validate_type_modifiers(&it, errors),
                 _ => (),
             }
-        }
-    }
-    for element in root.descendants_with_tokens() {
-        if let Some(token) = element.into_token()
-            && token.kind() == IDENT
-        {
-            validate_unicode_esc_ident(&token, errors);
         }
     }
 }
