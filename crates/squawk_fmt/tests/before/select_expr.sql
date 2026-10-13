@@ -1,3 +1,16 @@
+select (date '2026-01-01', date '2026-01-02') overlaps (
+  date '2026-01-02', date '2026-01-03'
+);
+
+select (1, 2) overlaps (3, 4);
+
+select /* before left */ (/* left first */ date '2026-01-01' /* left comma */, /* left second */ date '2026-01-02' /* left close */) /* before overlaps */ overlaps /* before right */ (/* right first */ date '2026-01-02' /* right comma */, /* right second */ date '2026-01-03' /* right close */) /* after right */;
+
+select (date '2026-01-01', date '2026-01-02') overlaps ( -- right tuple
+  date '2026-01-02', -- next date
+  date '2026-01-03'
+); -- trailing
+
 select
   -- array expr
   array[1,2],

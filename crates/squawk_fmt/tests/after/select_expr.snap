@@ -2,6 +2,27 @@
 source: crates/squawk_fmt/tests/tests.rs
 input_file: crates/squawk_fmt/tests/before/select_expr.sql
 ---
+select (date '2026-01-01', date '2026-01-02') overlaps (
+  date '2026-01-02', date '2026-01-03'
+);
+
+select (1, 2) overlaps (3, 4);
+
+select /* before left */ (
+  /* left first */ date '2026-01-01' /* left comma */,
+  /* left second */ date '2026-01-02' /* left close */
+) /* before overlaps */
+overlaps /* before right */ (
+  /* right first */ date '2026-01-02' /* right comma */,
+  /* right second */ date '2026-01-03' /* right close */
+) /* after right */;
+
+select (date '2026-01-01', date '2026-01-02') overlaps (
+  -- right tuple
+  date '2026-01-02', -- next date
+  date '2026-01-03'
+); -- trailing
+
 select
   -- array expr
   array[1, 2],
@@ -979,16 +1000,14 @@ select
   ]; -- trailing statement
 -- after comment placement expression
 
-select
-  an_extraordinarily_long_left_operand_name in (
-    select an_extraordinarily_long_column_name
-    from an_extraordinarily_long_table_name
-  );
-select
-  an_extraordinarily_long_left_operand_name not in (
-    select an_extraordinarily_long_column_name
-    from an_extraordinarily_long_table_name
-  );
+select an_extraordinarily_long_left_operand_name in (
+  select an_extraordinarily_long_column_name
+  from an_extraordinarily_long_table_name
+);
+select an_extraordinarily_long_left_operand_name not in (
+  select an_extraordinarily_long_column_name
+  from an_extraordinarily_long_table_name
+);
 
 select treat(
   an_extraordinarily_long_expression_name as an_extraordinarily_long_type_name
