@@ -11651,7 +11651,7 @@ fn alter_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
 
 const VERTEX: TokenSet = TokenSet::new(&[VERTEX_KW, NODE_KW]);
 const EDGE: TokenSet = TokenSet::new(&[EDGE_KW, RELATIONSHIP_KW]);
-const VERTEX_OR_EDGE: TokenSet = VERTEX.union(EDGE);
+const VERTEX_OR_EDGE_FIRST: TokenSet = VERTEX.union(EDGE);
 
 fn alter_property_graph_action(p: &mut Parser<'_>) {
     if p.at(RENAME_KW) {
@@ -11666,7 +11666,7 @@ fn alter_property_graph_action(p: &mut Parser<'_>) {
         drop_vertex_tables(p);
     } else if p.at(DROP_KW) && p.nth_at_ts(1, EDGE) {
         drop_edge_tables(p);
-    } else if p.at(ALTER_KW) && p.nth_at_ts(1, VERTEX_OR_EDGE) {
+    } else if p.at(ALTER_KW) && p.nth_at_ts(1, VERTEX_OR_EDGE_FIRST) {
         alter_vertex_edge_table(p);
     } else {
         p.error("expected alter property graph action");
@@ -11674,10 +11674,12 @@ fn alter_property_graph_action(p: &mut Parser<'_>) {
 }
 
 fn alter_vertex_edge_table(p: &mut Parser<'_>) {
-    assert!(p.at(ALTER_KW) && p.nth_at_ts(1, VERTEX_OR_EDGE));
+    assert!(p.at(ALTER_KW) && p.nth_at_ts(1, VERTEX_OR_EDGE_FIRST));
     let m = p.start();
     p.bump(ALTER_KW);
+    let vertex_or_edge = p.start();
     p.bump_any();
+    vertex_or_edge.complete(p, VERTEX_OR_EDGE);
     p.expect(TABLE_KW);
     element_table_ref(p);
     let kind = alter_element_table_actions(p);
@@ -13900,7 +13902,7 @@ fn op_sig_list(p: &mut Parser<'_>) {
     m.complete(p, OP_SIG_LIST);
 }
 
-// name ( { left_type | NONE } , right_type )
+// name ( { left_type | NONE } , { right_type | NONE } )
 fn operator_sig(p: &mut Parser<'_>) {
     let m = p.start();
     qual_op(p);
@@ -13909,7 +13911,9 @@ fn operator_sig(p: &mut Parser<'_>) {
         type_name(p);
     }
     p.expect(COMMA);
-    type_name(p);
+    if !p.eat(NONE_KW) {
+        type_name(p);
+    }
     p.expect(R_PAREN);
     m.complete(p, OP_SIG);
 }

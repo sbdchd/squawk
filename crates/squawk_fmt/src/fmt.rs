@@ -2805,18 +2805,7 @@ fn build_copy_query<'a>(ctx: &Ctx, query: &ast::CopyQuery) -> Doc<'a> {
 }
 
 fn build_preparable_stmt<'a>(ctx: &Ctx, stmt: ast::PreparableStmt) -> Doc<'a> {
-    match stmt {
-        ast::PreparableStmt::CompoundSelect(stmt) => build_compound_select(ctx, &stmt),
-        ast::PreparableStmt::Delete(stmt) => build_delete(ctx, &stmt),
-        ast::PreparableStmt::Insert(stmt) => build_insert(ctx, &stmt),
-        ast::PreparableStmt::Merge(stmt) => build_merge(ctx, &stmt),
-        ast::PreparableStmt::ParenSelect(stmt) => build_paren_select(ctx, &stmt),
-        ast::PreparableStmt::Select(stmt) => build_select_doc(ctx, &stmt),
-        ast::PreparableStmt::SelectInto(stmt) => build_select_into(ctx, &stmt),
-        ast::PreparableStmt::Table(stmt) => build_table(ctx, &stmt),
-        ast::PreparableStmt::Update(stmt) => build_update(ctx, &stmt),
-        ast::PreparableStmt::Values(stmt) => build_values(ctx, &stmt),
-    }
+    build_stmt(ctx, stmt.into())
 }
 
 fn build_copy_table<'a>(ctx: &Ctx, table: &ast::CopyTable) -> Doc<'a> {
@@ -2854,7 +2843,7 @@ fn build_copy_direction<'a>(direction: ast::CopyDirection) -> Doc<'a> {
             if let Some(target) = to.copy_target() {
                 doc = doc
                     .append(space_before(target.syntax()))
-                    .append(build_copy_target(target));
+                    .append(build_copy_source(target.into()));
             }
             doc
         }
@@ -2866,13 +2855,6 @@ fn build_copy_source<'a>(source: ast::CopySource) -> Doc<'a> {
         ast::CopySource::CopyProgram(program) => build_copy_program(&program),
         ast::CopySource::CopyStdin(_) => Doc::text("stdin"),
         ast::CopySource::CopyStdout(_) => Doc::text("stdout"),
-    }
-}
-
-fn build_copy_target<'a>(target: ast::CopyTarget) -> Doc<'a> {
-    match target {
-        ast::CopyTarget::CopyProgram(program) => build_copy_program(&program),
-        ast::CopyTarget::CopyStdout(_) => Doc::text("stdout"),
     }
 }
 
@@ -3612,9 +3594,7 @@ fn build_create_domain<'a>(ctx: &Ctx, stmt: &ast::CreateDomain) -> Doc<'a> {
                 append_nested_node(ctx, doc, collate, |value| build_collate_expr(ctx, &value))
             }
             ast::DomainQualifier::Constraint(constraint) => {
-                append_nested_node(ctx, doc, constraint, |value| {
-                    build_domain_constraint(ctx, value)
-                })
+                append_nested_node(ctx, doc, constraint, |value| build_constraint(ctx, value))
             }
         };
     }
@@ -4628,33 +4608,7 @@ fn build_create_schema_target<'a>(target: ast::CreateSchemaTarget) -> Doc<'a> {
 }
 
 fn build_schema_element<'a>(ctx: &Ctx, element: ast::SchemaElement) -> Doc<'a> {
-    match element {
-        ast::SchemaElement::CreateAggregate(stmt) => build_create_aggregate(ctx, &stmt),
-        ast::SchemaElement::CreateCollation(stmt) => build_create_collation(ctx, &stmt),
-        ast::SchemaElement::CreateDomain(stmt) => build_create_domain(ctx, &stmt),
-        ast::SchemaElement::CreateFunction(stmt) => build_create_function(ctx, &stmt),
-        ast::SchemaElement::CreateIndex(stmt) => build_create_index(ctx, &stmt),
-        ast::SchemaElement::CreateOperator(stmt) => build_create_operator(ctx, &stmt),
-        ast::SchemaElement::CreateProcedure(stmt) => build_create_procedure(ctx, &stmt),
-        ast::SchemaElement::CreateSequence(stmt) => build_create_sequence(ctx, &stmt),
-        ast::SchemaElement::CreateTable(stmt) => build_create_table(ctx, &stmt),
-        ast::SchemaElement::CreateTextSearchConfiguration(stmt) => {
-            build_create_text_search_configuration(ctx, &stmt)
-        }
-        ast::SchemaElement::CreateTextSearchDictionary(stmt) => {
-            build_create_text_search_dictionary(ctx, &stmt)
-        }
-        ast::SchemaElement::CreateTextSearchParser(stmt) => {
-            build_create_text_search_parser(ctx, &stmt)
-        }
-        ast::SchemaElement::CreateTextSearchTemplate(stmt) => {
-            build_create_text_search_template(ctx, &stmt)
-        }
-        ast::SchemaElement::CreateTrigger(stmt) => build_create_trigger(ctx, &stmt),
-        ast::SchemaElement::CreateType(stmt) => build_create_type(ctx, &stmt),
-        ast::SchemaElement::CreateView(stmt) => build_create_view(ctx, &stmt),
-        ast::SchemaElement::Grant(stmt) => build_grant(ctx, &stmt),
-    }
+    build_stmt(ctx, element.into())
 }
 
 fn build_create_sequence<'a>(ctx: &Ctx, stmt: &ast::CreateSequence) -> Doc<'a> {
@@ -5367,24 +5321,7 @@ fn build_create_materialized_view<'a>(ctx: &Ctx, view: &ast::CreateMaterializedV
 }
 
 fn build_explain_stmt<'a>(ctx: &Ctx, stmt: ast::ExplainStmt) -> Doc<'a> {
-    match stmt {
-        ast::ExplainStmt::CompoundSelect(stmt) => build_compound_select(ctx, &stmt),
-        ast::ExplainStmt::CreateTableAs(stmt) => build_create_table_as(ctx, &stmt),
-        ast::ExplainStmt::Declare(stmt) => build_declare(ctx, &stmt),
-        ast::ExplainStmt::Delete(stmt) => build_delete(ctx, &stmt),
-        ast::ExplainStmt::Execute(stmt) => build_execute(ctx, &stmt),
-        ast::ExplainStmt::Insert(stmt) => build_insert(ctx, &stmt),
-        ast::ExplainStmt::Merge(stmt) => build_merge(ctx, &stmt),
-        ast::ExplainStmt::ParenSelect(stmt) => build_paren_select(ctx, &stmt),
-        ast::ExplainStmt::Select(stmt) => build_select_doc(ctx, &stmt),
-        ast::ExplainStmt::SelectInto(stmt) => build_select_into(ctx, &stmt),
-        ast::ExplainStmt::Table(stmt) => build_table(ctx, &stmt),
-        ast::ExplainStmt::Update(stmt) => build_update(ctx, &stmt),
-        ast::ExplainStmt::Values(stmt) => build_values(ctx, &stmt),
-        ast::ExplainStmt::CreateMaterializedView(stmt) => {
-            build_create_materialized_view(ctx, &stmt)
-        }
-    }
+    build_stmt(ctx, stmt.into())
 }
 
 fn build_role_ref_list<'a>(list: &ast::RoleRefList) -> Doc<'a> {
@@ -7717,7 +7654,7 @@ fn build_table_arg<'a>(ctx: &Ctx, arg: &ast::TableArg) -> Doc<'a> {
         ast::TableArg::Column(column) => build_column(ctx, column),
         ast::TableArg::LikeClause(like_clause) => build_like_clause(ctx, like_clause),
         ast::TableArg::TableConstraint(table_constraint) => {
-            build_table_constraint(ctx, table_constraint.clone())
+            build_constraint(ctx, table_constraint.clone().into())
         }
     }
 }
@@ -7757,7 +7694,7 @@ fn build_column<'a>(ctx: &Ctx, column: &ast::Column) -> Doc<'a> {
             ast::ColumnClause::AlterOptionList(options) => build_alter_option_list(ctx, &options),
             ast::ColumnClause::Collate(collate) => build_collate_expr(ctx, &collate),
             ast::ColumnClause::ColumnConstraint(constraint) => {
-                build_column_constraint(ctx, constraint)
+                build_constraint(ctx, constraint.into())
             }
         };
         let clause = leading_comments(&syntax).append(clause);
@@ -7921,38 +7858,6 @@ fn build_null_constraint<'a>(ctx: &Ctx, constraint: &ast::NullConstraint) -> Doc
     append_constraint_options(doc, constraint.constraint_options())
         .nest(ctx.indent)
         .group()
-}
-
-fn build_column_constraint<'a>(ctx: &Ctx, constraint: ast::ColumnConstraint) -> Doc<'a> {
-    match constraint {
-        ast::ColumnConstraint::CheckConstraint(constraint) => {
-            build_check_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::DefaultConstraint(constraint) => {
-            build_default_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::ExcludeConstraint(constraint) => {
-            build_exclude_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::GeneratedConstraint(constraint) => {
-            build_generated_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::NotNullConstraint(constraint) => {
-            build_not_null_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::NullConstraint(constraint) => {
-            build_null_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::PrimaryKeyConstraint(constraint) => {
-            build_primary_key_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::ReferencesConstraint(constraint) => {
-            build_references_constraint(ctx, &constraint)
-        }
-        ast::ColumnConstraint::UniqueConstraint(constraint) => {
-            build_unique_constraint(ctx, &constraint)
-        }
-    }
 }
 
 fn build_references_constraint<'a>(ctx: &Ctx, constraint: &ast::ReferencesConstraint) -> Doc<'a> {
@@ -8193,29 +8098,6 @@ fn append_optional_literal(doc: Doc<'_>, literal: Option<ast::Literal>) -> Doc<'
         doc.append(space_before(literal.syntax()))
             .append(build_literal(&literal))
     })
-}
-
-fn build_table_constraint<'a>(ctx: &Ctx, constraint: ast::TableConstraint) -> Doc<'a> {
-    match constraint {
-        ast::TableConstraint::CheckConstraint(constraint) => {
-            build_check_constraint(ctx, &constraint)
-        }
-        ast::TableConstraint::ExcludeConstraint(constraint) => {
-            build_exclude_constraint(ctx, &constraint)
-        }
-        ast::TableConstraint::ForeignKeyConstraint(constraint) => {
-            build_foreign_key_constraint(ctx, &constraint)
-        }
-        ast::TableConstraint::NotNullConstraint(constraint) => {
-            build_not_null_constraint(ctx, &constraint)
-        }
-        ast::TableConstraint::PrimaryKeyConstraint(constraint) => {
-            build_primary_key_constraint(ctx, &constraint)
-        }
-        ast::TableConstraint::UniqueConstraint(constraint) => {
-            build_unique_constraint(ctx, &constraint)
-        }
-    }
 }
 
 fn build_constraint_name_clause<'a>(clause: Option<ast::ConstraintNameClause>) -> Doc<'a> {
@@ -9354,17 +9236,7 @@ fn build_cte_column_list<'a>(ctx: &Ctx, columns: &ast::ColumnList) -> Doc<'a> {
 }
 
 fn build_with_query<'a>(ctx: &Ctx, query: ast::WithQuery) -> Doc<'a> {
-    match query {
-        ast::WithQuery::CompoundSelect(select) => build_compound_select(ctx, &select),
-        ast::WithQuery::ParenSelect(select) => build_paren_select(ctx, &select),
-        ast::WithQuery::Select(select) => build_select_doc(ctx, &select),
-        ast::WithQuery::Table(table) => build_table(ctx, &table),
-        ast::WithQuery::Values(values) => build_values(ctx, &values),
-        ast::WithQuery::Delete(delete) => build_delete(ctx, &delete),
-        ast::WithQuery::Insert(insert) => build_insert(ctx, &insert),
-        ast::WithQuery::Merge(merge) => build_merge(ctx, &merge),
-        ast::WithQuery::Update(update) => build_update(ctx, &update),
-    }
+    build_stmt(ctx, query.into())
 }
 
 fn build_distinct_on<'a>(ctx: &Ctx, distinct_on: &ast::DistinctOn) -> Doc<'a> {
@@ -9743,17 +9615,16 @@ fn build_alter_foreign_table_action<'a>(ctx: &Ctx, action: ast::AlterTableAction
                     append_nested_node(ctx, doc, collate, |value| build_collate_expr(ctx, &value));
             }
             for constraint in node.constraints() {
-                doc = append_nested_node(ctx, doc, constraint, |value| {
-                    build_domain_constraint(ctx, value)
-                });
+                doc =
+                    append_nested_node(ctx, doc, constraint, |value| build_constraint(ctx, value));
             }
             doc.group()
         }
         ast::AlterTableAction::AddConstraint(node) => {
             let mut doc = Doc::text("add");
             if let Some(constraint) = node.constraint() {
-                let constraint_doc = leading_comments(constraint.syntax())
-                    .append(build_domain_constraint(ctx, constraint));
+                let constraint_doc =
+                    leading_comments(constraint.syntax()).append(build_constraint(ctx, constraint));
                 doc = doc.append(Doc::space()).append(constraint_doc);
             }
             doc.group()
@@ -10269,41 +10140,11 @@ fn build_alter_column_option<'a>(ctx: &Ctx, option: ast::AlterColumnOption) -> D
         ast::AlterColumnOption::SetGeneratedOptions(n) => {
             let mut doc = Doc::nil();
             for x in n.set_generated_options() {
-                doc =
-                    append_nested_node(ctx, doc, x, |value| build_set_generated_option(ctx, value));
+                doc = append_nested_node(ctx, doc, x, |value| {
+                    build_alter_column_option(ctx, value.into())
+                });
             }
             doc.group()
-        }
-    }
-}
-
-fn build_set_generated_option<'a>(ctx: &Ctx, option: ast::SetGeneratedOption) -> Doc<'a> {
-    match option {
-        ast::SetGeneratedOption::Restart(n) => {
-            let mut doc = Doc::text("restart");
-            if let Some(with) = n.with_token() {
-                doc = doc.append(space_before(&with)).append(Doc::text("with"));
-            }
-            append_optional_literal(doc, n.literal())
-        }
-        ast::SetGeneratedOption::SetGenerated(n) => {
-            let mut doc =
-                build_keyword_tokens([(n.set_token(), "set"), (n.generated_token(), "generated")]);
-            if let Some(when) = n.generated_when() {
-                doc = doc
-                    .append(space_before(when.syntax()))
-                    .append(build_generated_when(when));
-            }
-            doc
-        }
-        ast::SetGeneratedOption::SetSequenceOption(n) => {
-            let mut doc = Doc::text("set");
-            if let Some(x) = n.sequence_option() {
-                doc = doc
-                    .append(space_before(x.syntax()))
-                    .append(build_sequence_option(ctx, x));
-            }
-            doc
         }
     }
 }
@@ -10811,10 +10652,7 @@ fn build_alter_system<'a>(ctx: &Ctx, stmt: &ast::AlterSystem) -> Doc<'a> {
         doc = doc.append(space_before(&token)).append(Doc::text("system"));
     }
     if let Some(action) = stmt.action() {
-        let action_doc = match &action {
-            ast::AlterSystemAction::ResetConfigParam(action) => build_reset_config_param(action),
-            ast::AlterSystemAction::SetConfigParam(action) => build_set_config_param(ctx, action),
-        };
+        let action_doc = build_alter_database_action(ctx, action.clone().into());
         doc = append_nested_clause(ctx, doc, action.syntax(), action_doc);
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -11299,17 +11137,7 @@ fn build_alter_user<'a>(ctx: &Ctx, stmt: &ast::AlterUser) -> Doc<'a> {
         doc = append_nested_clause(ctx, doc, database.syntax(), database_doc);
     }
     if let Some(action) = stmt.action() {
-        let action_doc = match &action {
-            ast::AlterUserAction::ResetConfigParam(action) => build_reset_config_param(action),
-            ast::AlterUserAction::RoleOptionList(action) => build_role_option_list(ctx, action),
-            ast::AlterUserAction::RoleRenameTo(action) => {
-                let target = action
-                    .role()
-                    .map(|role| leading_comments(role.syntax()).append(build_name(role.syntax())));
-                build_rename_to(action.to_token(), target)
-            }
-            ast::AlterUserAction::SetConfigParam(action) => build_set_config_param(ctx, action),
-        };
+        let action_doc = build_alter_role_action(ctx, action.clone().into());
         doc = append_nested_clause(ctx, doc, action.syntax(), action_doc);
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
@@ -11487,20 +11315,24 @@ fn build_alter_role<'a>(ctx: &Ctx, stmt: &ast::AlterRole) -> Doc<'a> {
         doc = append_nested_clause(ctx, doc, db.syntax(), part);
     }
     if let Some(action) = stmt.action() {
-        let action_doc = match &action {
-            ast::AlterRoleAction::ResetConfigParam(n) => build_reset_config_param(n),
-            ast::AlterRoleAction::SetConfigParam(n) => build_set_config_param(ctx, n),
-            ast::AlterRoleAction::RoleOptionList(n) => build_role_option_list(ctx, n),
-            ast::AlterRoleAction::RoleRenameTo(n) => {
-                let target = n
-                    .role()
-                    .map(|x| leading_comments(x.syntax()).append(build_name(x.syntax())));
-                build_rename_to(n.to_token(), target)
-            }
-        };
+        let action_doc = build_alter_role_action(ctx, action.clone());
         doc = append_nested_clause(ctx, doc, action.syntax(), action_doc);
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
+}
+
+fn build_alter_role_action<'a>(ctx: &Ctx, action: ast::AlterRoleAction) -> Doc<'a> {
+    match action {
+        ast::AlterRoleAction::ResetConfigParam(action) => build_reset_config_param(&action),
+        ast::AlterRoleAction::SetConfigParam(action) => build_set_config_param(ctx, &action),
+        ast::AlterRoleAction::RoleOptionList(action) => build_role_option_list(ctx, &action),
+        ast::AlterRoleAction::RoleRenameTo(action) => {
+            let target = action
+                .role()
+                .map(|role| leading_comments(role.syntax()).append(build_name(role.syntax())));
+            build_rename_to(action.to_token(), target)
+        }
+    }
 }
 
 fn build_role_option_list<'a>(ctx: &Ctx, list: &ast::RoleOptionList) -> Doc<'a> {
@@ -11746,6 +11578,23 @@ fn build_element_kind<'a>(
         Doc::nil()
     }
 }
+fn build_vertex_or_edge<'a>(n: Option<ast::VertexOrEdge>) -> Doc<'a> {
+    let Some(n) = n else {
+        return Doc::nil();
+    };
+    let keyword = if n.vertex_token().is_some() {
+        "vertex"
+    } else if n.node_token().is_some() {
+        "node"
+    } else if n.edge_token().is_some() {
+        "edge"
+    } else if n.relationship_token().is_some() {
+        "relationship"
+    } else {
+        return Doc::nil();
+    };
+    leading_comments(n.syntax()).append(Doc::text(keyword))
+}
 fn append_element_ref(mut doc: Doc<'_>, x: Option<ast::ElementTableRef>) -> Doc<'_> {
     if let Some(x) = x {
         doc = doc
@@ -11769,12 +11618,7 @@ fn append_label_ref(mut doc: Doc<'_>, x: Option<ast::LabelRef>) -> Doc<'_> {
 fn build_alter_element_labels<'a>(ctx: &Ctx, n: &ast::AlterVertexEdgeLabels) -> Doc<'a> {
     let mut doc = Doc::text("alter")
         .append(Doc::space())
-        .append(build_element_kind(
-            n.vertex_token(),
-            n.node_token(),
-            n.edge_token(),
-            n.relationship_token(),
-        ));
+        .append(build_vertex_or_edge(n.vertex_or_edge()));
     if let Some(t) = n.table_token() {
         doc = doc.append(space_before(&t)).append(Doc::text("table"));
     }
@@ -11798,12 +11642,7 @@ fn build_alter_element_labels<'a>(ctx: &Ctx, n: &ast::AlterVertexEdgeLabels) -> 
 fn build_add_element_properties<'a>(ctx: &Ctx, n: &ast::AddVertexEdgeLabelProperties) -> Doc<'a> {
     let mut doc = Doc::text("alter")
         .append(Doc::space())
-        .append(build_element_kind(
-            n.vertex_token(),
-            n.node_token(),
-            n.edge_token(),
-            n.relationship_token(),
-        ));
+        .append(build_vertex_or_edge(n.vertex_or_edge()));
     if let Some(t) = n.table_token() {
         doc = doc.append(space_before(&t)).append(Doc::text("table"));
     }
@@ -11828,12 +11667,7 @@ fn build_add_element_properties<'a>(ctx: &Ctx, n: &ast::AddVertexEdgeLabelProper
 fn build_drop_element_label<'a>(n: &ast::DropVertexEdgeLabel) -> Doc<'a> {
     let mut doc = Doc::text("alter")
         .append(Doc::space())
-        .append(build_element_kind(
-            n.vertex_token(),
-            n.node_token(),
-            n.edge_token(),
-            n.relationship_token(),
-        ))
+        .append(build_vertex_or_edge(n.vertex_or_edge()))
         .append(Doc::space());
     if let Some(token) = n.table_token() {
         doc = doc.append(leading_comments(&token));
@@ -11856,12 +11690,7 @@ fn build_drop_element_label<'a>(n: &ast::DropVertexEdgeLabel) -> Doc<'a> {
 fn build_drop_element_properties<'a>(ctx: &Ctx, n: &ast::DropVertexEdgeLabelProperties) -> Doc<'a> {
     let mut doc = Doc::text("alter")
         .append(Doc::space())
-        .append(build_element_kind(
-            n.vertex_token(),
-            n.node_token(),
-            n.edge_token(),
-            n.relationship_token(),
-        ))
+        .append(build_vertex_or_edge(n.vertex_or_edge()))
         .append(Doc::space());
     if let Some(token) = n.table_token() {
         doc = doc.append(leading_comments(&token));
@@ -12573,11 +12402,7 @@ fn build_alter_operator<'a>(ctx: &Ctx, stmt: &ast::AlterOperator) -> Doc<'a> {
         } else {
             Doc::line_or_space()
         };
-        let action_doc = match &action {
-            ast::AlterOperatorAction::OwnerTo(action) => build_owner_to(action),
-            ast::AlterOperatorAction::SetOptions(action) => build_set_options(ctx, action),
-            ast::AlterOperatorAction::SetSchema(action) => build_set_schema(action),
-        };
+        let action_doc = build_alter_view_action(ctx, action.clone().into());
         let action_doc = separator
             .append(leading_comments(action.syntax()))
             .append(action_doc);
@@ -12598,30 +12423,28 @@ fn build_op_sig<'a>(ctx: &Ctx, sig: &ast::OpSig) -> Doc<'a> {
     if let Some(l_paren) = sig.l_paren_token() {
         doc = doc.append(space_before(&l_paren));
     }
-    let has_none = sig.none_token().is_some();
-    let mut body = if let Some(none) = sig.none_token() {
-        leading_comments(&none).append(Doc::text("none"))
-    } else if let Some(lhs) = sig.lhs() {
-        leading_comments(lhs.syntax()).append(build_type(ctx, lhs))
-    } else {
-        Doc::nil()
-    };
+    let mut body = build_op_sig_operand(ctx, sig.lhs());
     if let Some(comma) = sig.comma_token() {
         body = body
             .append(comments_before(&comma))
             .append(Doc::text(","))
             .append(Doc::line_or_space());
     }
-    let rhs = if has_none { sig.lhs() } else { sig.rhs() };
-    if let Some(rhs) = rhs {
-        body = body
-            .append(leading_comments(rhs.syntax()))
-            .append(build_type(ctx, rhs));
-    }
+    body = body.append(build_op_sig_operand(ctx, sig.rhs()));
     doc.append(Doc::text("("))
         .append(wrap_body(ctx, body, sig.r_paren_token().as_ref()))
         .append(Doc::text(")"))
         .group()
+}
+
+fn build_op_sig_operand<'a>(ctx: &Ctx, operand: Option<ast::OpSigOperand>) -> Doc<'a> {
+    match operand {
+        Some(ast::OpSigOperand::None(none)) => leading_comments(&none).append(Doc::text("none")),
+        Some(ast::OpSigOperand::Type(ty)) => {
+            leading_comments(ty.syntax()).append(build_type(ctx, ty))
+        }
+        None => Doc::nil(),
+    }
 }
 
 fn build_ddl_operator<'a>(op: &ast::Op) -> Doc<'a> {
@@ -13567,7 +13390,7 @@ fn build_alter_domain<'a>(ctx: &Ctx, stmt: &ast::AlterDomain) -> Doc<'a> {
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
 
-fn build_domain_constraint<'a>(ctx: &Ctx, constraint: ast::Constraint) -> Doc<'a> {
+fn build_constraint<'a>(ctx: &Ctx, constraint: ast::Constraint) -> Doc<'a> {
     match constraint {
         ast::Constraint::CheckConstraint(node) => build_check_constraint(ctx, &node),
         ast::Constraint::DefaultConstraint(node) => build_default_constraint(ctx, &node),
@@ -13587,9 +13410,8 @@ fn build_alter_domain_action<'a>(ctx: &Ctx, action: ast::AlterDomainAction) -> D
         ast::AlterDomainAction::AddConstraint(node) => {
             let mut doc = Doc::text("add");
             if let Some(constraint) = node.constraint() {
-                doc = append_nested_node(ctx, doc, constraint, |value| {
-                    build_domain_constraint(ctx, value)
-                });
+                doc =
+                    append_nested_node(ctx, doc, constraint, |value| build_constraint(ctx, value));
             }
             doc.group()
         }
@@ -15640,16 +15462,7 @@ fn build_paren_from_item<'a>(ctx: &Ctx, item: &ast::ParenFromItem) -> Doc<'a> {
 }
 
 fn build_select_variant<'a>(ctx: &Ctx, select: ast::SelectVariant) -> Doc<'a> {
-    match select {
-        ast::SelectVariant::CompoundSelect(compound_select) => {
-            build_compound_select(ctx, &compound_select)
-        }
-        ast::SelectVariant::ParenSelect(select) => build_paren_select(ctx, &select),
-        ast::SelectVariant::Select(select) => build_select_doc(ctx, &select),
-        ast::SelectVariant::SelectInto(select_into) => build_select_into(ctx, &select_into),
-        ast::SelectVariant::Table(table) => build_table(ctx, &table),
-        ast::SelectVariant::Values(values) => build_values(ctx, &values),
-    }
+    build_stmt(ctx, select.into())
 }
 
 fn build_compound_select_operand<'a>(ctx: &Ctx, operand: ast::CompoundSelectOperand) -> Doc<'a> {
@@ -16602,7 +16415,7 @@ fn build_group_by<'a>(ctx: &Ctx, group_by: ast::GroupBy) -> Doc<'a> {
 
 fn build_grouping_expr<'a>(ctx: &Ctx, expr: ast::Expr) -> Doc<'a> {
     if let ast::Expr::CallExpr(call) = &expr
-        && let Some(ast::Expr::NameRef(name)) = call.expr()
+        && let Some(name) = call.expr().and_then(|expr| expr.as_name_ref())
         && is_quoted_name_node(name.syntax())
     {
         let name = normalize_name_node(name.syntax());
@@ -16750,25 +16563,23 @@ fn build_expr<'a>(ctx: &Ctx, expr: ast::Expr) -> Doc<'a> {
 }
 
 fn build_expr_name_ref<'a>(name_ref: &ast::NameRef) -> Doc<'a> {
-    let sql_value_function = name_ref
-        .current_catalog_token()
-        .or_else(|| name_ref.current_date_token())
-        .or_else(|| name_ref.current_role_token())
-        .or_else(|| name_ref.current_schema_token())
-        .or_else(|| name_ref.current_time_token())
-        .or_else(|| name_ref.current_timestamp_token())
-        .or_else(|| name_ref.current_user_token())
-        .or_else(|| name_ref.localtime_token())
-        .or_else(|| name_ref.localtimestamp_token())
-        .or_else(|| name_ref.session_user_token())
-        .or_else(|| name_ref.system_user_token())
-        .or_else(|| name_ref.user_token());
-
-    if let Some(token) = sql_value_function {
-        Doc::text(token.text().to_ascii_lowercase())
-    } else {
-        build_name(name_ref.syntax())
-    }
+    let Some(function) = name_ref.sql_value_function() else {
+        return build_name(name_ref.syntax());
+    };
+    Doc::text(match function {
+        ast::SqlValueFunction::CurrentCatalog => "current_catalog",
+        ast::SqlValueFunction::CurrentDate => "current_date",
+        ast::SqlValueFunction::CurrentRole => "current_role",
+        ast::SqlValueFunction::CurrentSchema => "current_schema",
+        ast::SqlValueFunction::CurrentTime => "current_time",
+        ast::SqlValueFunction::CurrentTimestamp => "current_timestamp",
+        ast::SqlValueFunction::CurrentUser => "current_user",
+        ast::SqlValueFunction::Localtime => "localtime",
+        ast::SqlValueFunction::Localtimestamp => "localtimestamp",
+        ast::SqlValueFunction::SessionUser => "session_user",
+        ast::SqlValueFunction::SystemUser => "system_user",
+        ast::SqlValueFunction::User => "user",
+    })
 }
 
 fn build_array_expr<'a>(ctx: &Ctx, array_expr: &ast::ArrayExpr) -> Doc<'a> {
@@ -19328,30 +19139,14 @@ fn build_paren_expr<'a>(ctx: &Ctx, paren_expr: &ast::ParenExpr) -> Doc<'a> {
                 ast::Expr::BinExpr(binary) => build_bin_expr(ctx, &binary),
                 expression => build_expr(ctx, expression),
             });
-    } else if let Some(compound_select) = paren_expr.compound_select() {
+    } else if let Some(select) = paren_expr.select_variant() {
         body = body
-            .append(leading_comments(compound_select.syntax()))
-            .append(build_compound_select(ctx, &compound_select));
+            .append(leading_comments(select.syntax()))
+            .append(build_select_variant(ctx, select));
     } else if let Some(item) = paren_expr.from_list_item() {
         body = body
             .append(leading_comments(item.syntax()))
             .append(build_from_list_item(ctx, item));
-    } else if let Some(select) = paren_expr.select() {
-        body = body
-            .append(leading_comments(select.syntax()))
-            .append(build_select_doc(ctx, &select));
-    } else if let Some(select) = paren_expr.paren_select() {
-        body = body
-            .append(leading_comments(select.syntax()))
-            .append(build_paren_select(ctx, &select));
-    } else if let Some(table) = paren_expr.table() {
-        body = body
-            .append(leading_comments(table.syntax()))
-            .append(build_table(ctx, &table));
-    } else if let Some(values) = paren_expr.values() {
-        body = body
-            .append(leading_comments(values.syntax()))
-            .append(build_values(ctx, &values));
     } else {
         unreachable!("a parenthesized expression should contain a node")
     }

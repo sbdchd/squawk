@@ -14,9 +14,7 @@ pub(super) struct UnnestCall {
 }
 
 pub(super) fn unnest_call(call_expr: &ast::CallExpr) -> Option<UnnestCall> {
-    let ast::Expr::NameRef(name_ref) = call_expr.expr()? else {
-        return None;
-    };
+    let name_ref = call_expr.expr()?.as_name_ref()?;
     if Name::from_node(&name_ref) != "unnest" {
         return None;
     }

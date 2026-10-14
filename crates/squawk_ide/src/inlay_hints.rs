@@ -47,11 +47,9 @@ fn inlay_hint_call_expr(
     let arg_list = call_expr.arg_list()?;
     let expr = call_expr.expr()?;
 
-    let name_ref = if let Some(name_ref) = ast::NameRef::cast(expr.syntax().clone()) {
-        name_ref
-    } else {
-        ast::FieldExpr::cast(expr.syntax().clone())?.field()?
-    };
+    let name_ref = expr
+        .as_name_ref()
+        .or_else(|| expr.as_field_expr()?.field())?;
 
     let location = goto_definition::goto_definition(
         db,

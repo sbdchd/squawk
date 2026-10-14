@@ -123,7 +123,7 @@ pub(crate) fn schema_and_name(name_ref: &impl ast::NameLike) -> (Option<Schema>,
     let table_name = Name::from_node(name_ref);
     let schema = if let Some(parent) = name_ref.syntax().parent()
         && let Some(base) = ast::FieldExpr::cast(parent).and_then(|x| x.base())
-        && let Some(schema_name_ref) = ast::NameRef::cast(base.syntax().clone())
+        && let Some(schema_name_ref) = base.as_name_ref()
     {
         Some(Schema(Name::from_node(&schema_name_ref)))
     } else {
@@ -138,9 +138,7 @@ pub(crate) fn schema_and_func_name(call_expr: &ast::CallExpr) -> Option<(Option<
         ast::Expr::NameRef(name_ref) => Some((None, Name::from_node(&name_ref))),
         ast::Expr::FieldExpr(field_expr) => {
             let function_name = Name::from_node(&field_expr.field()?);
-            let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? else {
-                return None;
-            };
+            let schema_name_ref = field_expr.base()?.as_name_ref()?;
             let schema = Schema(Name::from_node(&schema_name_ref));
             Some((Some(schema), function_name))
         }
@@ -187,9 +185,7 @@ pub(crate) fn schema_and_table_from_field_expr(
         ast::Expr::NameRef(name_ref) => Some((None, Name::from_node(&name_ref))),
         ast::Expr::FieldExpr(field_expr) => {
             let field = field_expr.field()?;
-            let ast::Expr::NameRef(schema) = field_expr.base()? else {
-                return None;
-            };
+            let schema = field_expr.base()?.as_name_ref()?;
             Some((
                 Some(Schema(Name::from_node(&schema))),
                 Name::from_node(&field),

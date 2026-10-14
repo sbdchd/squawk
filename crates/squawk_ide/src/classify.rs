@@ -282,14 +282,8 @@ fn classify_ddl_function_option_value(ty_node: &SyntaxNode) -> Option<NameRefCla
 }
 
 fn is_search_path(config_parameter: Option<ast::ConfigParameterRef>) -> bool {
-    let Some(path) = config_parameter.and_then(|config_parameter| config_parameter.path_ref())
-    else {
-        return false;
-    };
-    if path.qualifier().is_some() {
-        return false;
-    }
-    path.segment()
+    config_parameter
+        .and_then(|config_parameter| config_parameter.path_ref()?.unqualified_segment())
         .is_some_and(|name_ref| Name::from_node(&name_ref) == "search_path")
 }
 
@@ -407,18 +401,12 @@ fn is_prepared_transaction_id(node: &SyntaxNode) -> bool {
     let Some(literal) = ast::Literal::cast(node.clone()) else {
         return false;
     };
-    if !matches!(
-        literal.kind(),
-        Some(
-            LitKind::String(_)
-                | LitKind::BitString(_)
-                | LitKind::ByteString(_)
-                | LitKind::EscString(_)
-                | LitKind::NationalString(_)
-                | LitKind::UnicodeEscString(_)
-                | LitKind::DollarQuotedString(_)
+    if !literal.is_string()
+        && !matches!(
+            literal.kind(),
+            Some(LitKind::BitString(_) | LitKind::ByteString(_))
         )
-    ) {
+    {
         return false;
     }
     let Some(parent) = node.parent() else {
@@ -481,8 +469,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = node.parent()
         && let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
-        && let Some(base) = field_expr.base()
-        && let ast::Expr::NameRef(base_name_ref) = base
+        && let Some(base_name_ref) = field_expr.base().and_then(|base| base.as_name_ref())
         // check that the name_ref we're looking at in the field expr is the
         // base name_ref, i.e., the schema, rather than the item
         && base_name_ref.syntax() == node
@@ -647,7 +634,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             .and_then(ast::FieldExpr::cast)
             .is_some();
 
-        if let Some(ast::Expr::NameRef(base_name_ref)) = field_expr.base()
+        if let Some(base_name_ref) = field_expr.base().and_then(|base| base.as_name_ref())
             && is_rule_old_new_ref(&base_name_ref)
         {
             return Some(NameRefClass::RulePseudoColumn);
@@ -733,7 +720,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
                 }
             }
             if ast::ReturnStmt::can_cast(ancestor.kind()) {
-                if let Some(ast::Expr::NameRef(base)) = field_expr.base()
+                if let Some(base) = field_expr.base().and_then(|base| base.as_name_ref())
                     && ast_nav::enclosing_routine_name(&ancestor)
                         .is_some_and(|(routine_name, _, _)| Name::from_node(&base) == routine_name)
                 {

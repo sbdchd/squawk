@@ -4821,26 +4821,29 @@ DropEdgeTables =
   DropBehavior?
 
 AlterVertexEdgeLabels =
-  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
+  'alter' VertexOrEdge 'table' ElementTableRef
     AddLabel AddLabel*
+
+VertexOrEdge =
+  'vertex' | 'node' | 'edge' | 'relationship'
 
 AddLabel =
   'add' 'label' Label ElementTableProperties
 
 DropVertexEdgeLabel =
-  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
+  'alter' VertexOrEdge 'table' ElementTableRef
     'drop' 'label' LabelRef DropBehavior?
 
 AlterLabel =
   'alter' 'label' LabelRef
 
 AddVertexEdgeLabelProperties =
-  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
+  'alter' VertexOrEdge 'table' ElementTableRef
     AlterLabel
     'add' 'properties' ExprAsPropertyNameList
 
 DropVertexEdgeLabelProperties =
-  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
+  'alter' VertexOrEdge 'table' ElementTableRef
     AlterLabel
     'drop' 'properties' '(' (PropertyNameRef (',' PropertyNameRef)*) ')' DropBehavior?
 
@@ -5431,7 +5434,7 @@ OpSigList =
   (OpSig (',' OpSig)*)
 
 OpSig =
-  Op '(' (lhs:Type | 'none') ',' rhs:Type ')'
+  Op '(' (lhs:Type | 'none') ',' (rhs:Type | 'none') ')'
 
 DropOperatorClass =
   'drop' 'operator' 'class' IfExists? OpClassRef UsingMethod

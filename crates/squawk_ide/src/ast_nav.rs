@@ -298,28 +298,6 @@ pub(crate) fn create_table_args(
     inherits_iter.chain(args_iter)
 }
 
-struct UnwrapParenExpr {
-    current: Option<ast::Expr>,
-}
-
-impl Iterator for UnwrapParenExpr {
-    type Item = ast::Expr;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let expr = self.current.take()?;
-        if let ast::Expr::ParenExpr(paren_expr) = &expr {
-            self.current = paren_expr.expr();
-        }
-        Some(expr)
-    }
-}
-
-pub(crate) fn unwrap_paren_expr(expr: ast::Expr) -> impl Iterator<Item = ast::Expr> {
-    UnwrapParenExpr {
-        current: Some(expr),
-    }
-}
-
 pub(crate) fn iter_from_clause(
     from_clause: &ast::FromClause,
 ) -> impl Iterator<Item = ast::FromItem> {

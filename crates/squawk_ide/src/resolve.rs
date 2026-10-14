@@ -6,7 +6,7 @@ use rowan::TextSize;
 use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
-    SyntaxKind, SyntaxNode, SyntaxNodePtr,
+    SyntaxNode, SyntaxNodePtr,
     ast::{self, AstNode},
 };
 
@@ -1072,7 +1072,7 @@ fn star_target_from_items(
     target: &ast::Target,
     from_clause: &ast::FromClause,
 ) -> Option<Vec<ast::FromItem>> {
-    if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr() {
+    if let Some(field_expr) = target.expr().and_then(|expr| expr.as_field_expr()) {
         let table_name = qualified_star_table_name(&field_expr)?;
         return Some(vec![find_from_item_in_from_clause(
             from_clause,
@@ -1146,12 +1146,12 @@ pub(crate) fn resolve_custom_op(
     let file = custom_op.file_id;
     let custom_op = custom_op.value;
 
-    let operator_name = Name::from_string(custom_op.syntax().text().to_string());
+    let operator_name = Name::from_string(custom_op.operator_text());
     let schema = custom_op
         .syntax()
         .parent()
-        .filter(|parent| parent.kind() == SyntaxKind::OP)
-        .and_then(|op| op.children().find_map(ast::PathRef::cast))
+        .and_then(ast::Op::cast)
+        .and_then(|op| op.path_ref())
         .and_then(|path| name::schema_name(&path));
 
     let position = custom_op.syntax().text_range().start();
@@ -1249,14 +1249,10 @@ fn fallback_type_alias(type_name: &Name) -> Option<Name> {
 
 fn resolve_float_precision(name_ref: &impl ast::NameLike, type_name: Name) -> Name {
     if type_name == "float"
-        && let Some(ast::Expr::Literal(lit)) = name_ref
-            .syntax()
-            .ancestors()
-            .find_map(ast::PathType::cast)
-            .and_then(|x| x.arg_list()?.args().next()?.expr())
+        && let Some(path_type) = name_ref.syntax().ancestors().find_map(ast::PathType::cast)
+        && let Some(name) = path_type.keyword_type_name()
     {
-        let precision: u32 = lit.syntax().text().to_string().parse().unwrap_or(0);
-        return Name::from_string(if precision <= 24 { "float4" } else { "float8" });
+        return Name::from_string(name);
     }
     type_name
 }
@@ -1394,21 +1390,18 @@ fn resolve_special_keyword_as_function(
     db: &dyn Db,
     name_ref: InFile<&impl ast::NameLike>,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let function_name = name_ref
-        .value
-        .syntax()
-        .first_child_or_token()
-        .and_then(|t| match t.kind() {
-            SyntaxKind::CURRENT_CATALOG_KW => Some("current_database"),
-            SyntaxKind::CURRENT_TIMESTAMP_KW => Some("now"),
-            SyntaxKind::CURRENT_ROLE_KW | SyntaxKind::CURRENT_USER_KW | SyntaxKind::USER_KW => {
-                Some("current_user")
-            }
-            SyntaxKind::CURRENT_SCHEMA_KW => Some("current_schema"),
-            SyntaxKind::SESSION_USER_KW => Some("session_user"),
-            SyntaxKind::SYSTEM_USER_KW => Some("system_user"),
-            _ => None,
-        })?;
+    let function = ast::NameRef::cast(name_ref.value.syntax().clone())?.sql_value_function()?;
+    let function_name = match function {
+        ast::SqlValueFunction::CurrentCatalog => "current_database",
+        ast::SqlValueFunction::CurrentTimestamp => "now",
+        ast::SqlValueFunction::CurrentRole
+        | ast::SqlValueFunction::CurrentUser
+        | ast::SqlValueFunction::User => "current_user",
+        ast::SqlValueFunction::CurrentSchema => "current_schema",
+        ast::SqlValueFunction::SessionUser => "session_user",
+        ast::SqlValueFunction::SystemUser => "system_user",
+        _ => return None,
+    };
     let position = name_ref.value.syntax().text_range().start();
     let schemas = bind(db, name_ref.file_id).resolved_schemas(position, None);
     resolve_function(db, function_name, &schemas, None, name_ref.file_id)
@@ -2069,12 +2062,12 @@ fn resolve_select_qualified_column_table_name_ptr(
         .field()
         .is_some_and(|f| f.syntax() == table_name_ref.syntax())
         && field_expr.star_token().is_none()
-        && let Some(ast::Expr::NameRef(schema_name_ref)) = field_expr.base()
+        && let Some(schema_name_ref) = field_expr.base().and_then(|base| base.as_name_ref())
     {
         // `foo.bar` where table_name_ref is `bar`
         Some(Schema(Name::from_node(&schema_name_ref)))
-    } else if let Some(ast::Expr::FieldExpr(inner_field_expr)) = field_expr.base()
-        && let Some(ast::Expr::NameRef(schema_name_ref)) = inner_field_expr.base()
+    } else if let Some(inner_field_expr) = field_expr.base().and_then(|base| base.as_field_expr())
+        && let Some(schema_name_ref) = inner_field_expr.base().and_then(|base| base.as_name_ref())
     {
         // `foo.buzz.bar` where table_name_ref is `buzz`
         Some(Schema(Name::from_node(&schema_name_ref)))
@@ -2675,7 +2668,7 @@ fn resolve_from_item_column_by_name_after_index(
         && from_item.alias().is_none()
         && let ast::FromItem::FunctionFromItem(func) = from_item
         && let Some(call_expr) = func.call_expr()
-        && let Some(ast::Expr::NameRef(func_name_ref)) = call_expr.expr()
+        && let Some(func_name_ref) = call_expr.expr().and_then(|expr| expr.as_name_ref())
         && Name::from_node(&func_name_ref) == *column_name
     {
         return Some(smallvec![Location::new(
@@ -3689,7 +3682,7 @@ fn resolve_column_from_targets(
             }
         }
 
-        if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr()
+        if let Some(field_expr) = target.expr().and_then(|expr| expr.as_field_expr())
             && let Some(table_name) = qualified_star_table_name(&field_expr)
             && let Some(from_clause) = from_clause
             && let Some(result) = resolve_qualified_star(
@@ -4620,7 +4613,7 @@ fn returning_target_kind(
         return ReturningTargetKind::UnqualifiedStar;
     }
 
-    if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr()
+    if let Some(field_expr) = target.expr().and_then(|expr| expr.as_field_expr())
         && let Some(table_name) = qualified_star_table_name(&field_expr)
         && match_table_in_returning_clause(
             target.syntax(),
@@ -4842,7 +4835,7 @@ fn count_columns_for_target_impl(
         return count_columns_for_from_clause(db, InFile::new(file, from_clause), visited);
     }
 
-    if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr()
+    if let Some(field_expr) = target.expr().and_then(|expr| expr.as_field_expr())
         && let Some(table_name) = qualified_star_table_name(&field_expr)
         && let Some(from_item) = find_from_item_in_from_clause(from_clause, &table_name)
     {
@@ -5028,7 +5021,7 @@ fn resolve_column_from_paren_expr_with_skip(
         );
     }
 
-    if let Some(ast::Expr::NameRef(base_name_ref)) = paren_expr.expr() {
+    if let Some(base_name_ref) = paren_expr.expr().and_then(|expr| expr.as_name_ref()) {
         let table_name = Name::from_node(&base_name_ref);
         if let Some(from_item) =
             find_from_item_for_select_qualified_name_ref(&base_name_ref, &table_name)
@@ -5481,11 +5474,10 @@ fn resolve_composite_type_field_ptr(
             return Some(result);
         }
 
-        let base_name_ref = ast_nav::unwrap_paren_expr(base).find_map(|e| match e {
-            ast::Expr::NameRef(nr) => Some(nr),
-            ast::Expr::FieldExpr(field_expr) => field_expr.field(),
-            _ => None,
-        })?;
+        let base = base.unparen();
+        let base_name_ref = base
+            .as_name_ref()
+            .or_else(|| base.as_field_expr()?.field())?;
 
         resolve_select_column_ptr(db, InFile::new(file, &base_name_ref))
             .or_else(|| resolve_name_ref(db, InFile::new(file, &base_name_ref)))?

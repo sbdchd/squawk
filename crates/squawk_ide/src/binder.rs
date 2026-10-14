@@ -697,39 +697,9 @@ fn bind_create_schema(b: &mut Binder, create_schema: &ast::CreateSchema) {
 
     let prev_override = b.default_schema_override.replace(schema);
     for element in create_schema.schema_elements() {
-        bind_schema_element(b, element);
+        bind_stmt(b, element.into());
     }
     b.default_schema_override = prev_override;
-}
-
-fn bind_schema_element(b: &mut Binder, element: ast::SchemaElement) {
-    match element {
-        ast::SchemaElement::CreateAggregate(stmt) => bind_create_aggregate(b, &stmt),
-        ast::SchemaElement::CreateCollation(stmt) => bind_create_collation(b, &stmt),
-        ast::SchemaElement::CreateDomain(stmt) => bind_create_domain(b, &stmt),
-        ast::SchemaElement::CreateFunction(stmt) => bind_create_function(b, &stmt),
-        ast::SchemaElement::CreateIndex(stmt) => bind_create_index(b, &stmt),
-        ast::SchemaElement::CreateOperator(stmt) => bind_create_operator(b, &stmt),
-        ast::SchemaElement::CreateProcedure(stmt) => bind_create_procedure(b, &stmt),
-        ast::SchemaElement::CreateSequence(stmt) => bind_create_sequence(b, &stmt),
-        ast::SchemaElement::CreateTable(stmt) => bind_create_table(b, &stmt),
-        ast::SchemaElement::CreateTextSearchConfiguration(stmt) => {
-            bind_create_text_search_configuration(b, &stmt);
-        }
-        ast::SchemaElement::CreateTextSearchDictionary(stmt) => {
-            bind_create_text_search_dictionary(b, &stmt);
-        }
-        ast::SchemaElement::CreateTextSearchParser(stmt) => {
-            bind_create_text_search_parser(b, &stmt);
-        }
-        ast::SchemaElement::CreateTextSearchTemplate(stmt) => {
-            bind_create_text_search_template(b, &stmt);
-        }
-        ast::SchemaElement::CreateTrigger(stmt) => bind_create_trigger(b, &stmt),
-        ast::SchemaElement::CreateType(stmt) => bind_create_type(b, &stmt),
-        ast::SchemaElement::CreateView(stmt) => bind_create_view(b, &stmt),
-        ast::SchemaElement::Grant(_) => (),
-    }
 }
 
 fn bind_create_type(b: &mut Binder, create_type: &ast::CreateType) {
@@ -1441,7 +1411,7 @@ fn bind_create_operator(b: &mut Binder, create_operator: &ast::CreateOperator) {
         return;
     };
 
-    let operator_name = Name::from_string(custom_op.syntax().text().to_string());
+    let operator_name = Name::from_string(custom_op.operator_text());
 
     let path = op.syntax().children().find_map(ast::Path::cast);
     let schema = match &path {
@@ -1928,12 +1898,12 @@ enum SearchPathOverride {
 fn search_path_from_set_config_param(
     set_config_param: &ast::SetConfigParam,
 ) -> Option<SearchPathOverride> {
-    let path = set_config_param.config_parameter_ref()?.path_ref()?;
-    if path.qualifier().is_some() {
-        return None;
-    }
+    let segment = set_config_param
+        .config_parameter_ref()?
+        .path_ref()?
+        .unqualified_segment()?;
 
-    let param_name = path.segment()?.syntax().text().to_string();
+    let param_name = segment.syntax().text().to_string();
     if !param_name.eq_ignore_ascii_case("search_path") {
         return None;
     }
@@ -1998,18 +1968,10 @@ fn bind_set(b: &mut Binder, set: &ast::Set) {
 }
 
 fn bind_set_config(b: &mut Binder, set_config: &ast::SetConfig, position: TextSize) {
-    let Some(path) = set_config
+    let Some(segment) = set_config
         .config_parameter_ref()
-        .and_then(|config_parameter| config_parameter.path_ref())
+        .and_then(|config_parameter| config_parameter.path_ref()?.unqualified_segment())
     else {
-        return;
-    };
-
-    if path.qualifier().is_some() {
-        return;
-    }
-
-    let Some(segment) = path.segment() else {
         return;
     };
 
@@ -2083,7 +2045,7 @@ fn bind_select_set_config(b: &mut Binder, select: &ast::Select, position: TextSi
 
     let mut args = call_expr.arg_list().into_iter().flat_map(|al| al.args());
 
-    let Some(ast::Expr::Literal(setting_name_literal)) = args.next().and_then(|a| a.expr()) else {
+    let Some(setting_name_literal) = args.next().and_then(|a| a.expr()?.as_literal()) else {
         return;
     };
     let Some(setting_name) = setting_name_literal.string_value() else {
@@ -2093,7 +2055,7 @@ fn bind_select_set_config(b: &mut Binder, select: &ast::Select, position: TextSi
         return;
     }
 
-    let Some(ast::Expr::Literal(new_value_literal)) = args.next().and_then(|a| a.expr()) else {
+    let Some(new_value_literal) = args.next().and_then(|a| a.expr()?.as_literal()) else {
         return;
     };
     let Some(new_value) = new_value_literal.string_value() else {

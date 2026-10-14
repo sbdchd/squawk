@@ -1046,6 +1046,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
 
     let enum_nodes = enums.iter().map(|x| &x.name).collect::<FxHashSet<_>>();
 
+    let enums_src = enums;
     let (enums, enums_boilierplate_impls): (Vec<_>, Vec<_>) = enums
         .iter()
         .map(|e| {
@@ -1132,6 +1133,44 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
         })
         .unzip();
 
+    let enum_subset_impls = enums_src.iter().flat_map(|sub| {
+        let sub_variants = sub
+            .variants
+            .iter()
+            .filter(|x| !enum_nodes.contains(x))
+            .collect::<Vec<_>>();
+        let has_cast_variants = sub_variants.len() != sub.variants.len();
+        enums_src
+            .iter()
+            .filter(move |sup| {
+                !has_cast_variants
+                    && !sub_variants.is_empty()
+                    && sup.name != sub.name
+                    && sub_variants
+                        .iter()
+                        .all(|variant| sup.variants.contains(variant))
+            })
+            .map(move |sup| {
+                let sub_name = format_ident!("{}", sub.name);
+                let sup_name = format_ident!("{}", sup.name);
+                let variants = sub
+                    .variants
+                    .iter()
+                    .map(|x| format_ident!("{}", x))
+                    .collect::<Vec<_>>();
+                quote! {
+                    impl From<#sub_name> for #sup_name {
+                        #[inline]
+                        fn from(node: #sub_name) -> #sup_name {
+                            match node {
+                                #(#sub_name::#variants(it) => #sup_name::#variants(it),)*
+                            }
+                        }
+                    }
+                }
+            })
+    });
+
     let file = quote! {
         use crate::ast::AstNode;
         use crate::syntax_node::SyntaxNode;
@@ -1143,6 +1182,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
 
         #(#node_boilerplate_impls)*
         #(#enums_boilierplate_impls)*
+        #(#enum_subset_impls)*
     };
     let output = reformat(file.to_string()).replace("#[derive", "\n#[derive");
     format!("{PRELUDE}{output}")

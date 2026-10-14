@@ -335,21 +335,16 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
         match stmt {
             ast::Stmt::Set(set) => {
                 if let Some(ast::SetTarget::SetConfig(set_config)) = set.set_target()
-                    && let Some(path) = set_config
-                        .config_parameter_ref()
-                        .and_then(|config_parameter| config_parameter.path_ref())
-                {
                     // only want to check for `set lock_timeout = '1s'`, not `set foo.lock_timeout = '1s'`
-                    if path.qualifier().is_some() {
-                        continue;
-                    }
-                    if let Some(segment) = path.segment() {
-                        let name = segment.text();
-                        if name == "lock_timeout" {
-                            lock_timeout = ReportOnce::Present;
-                        } else if name == "statement_timeout" {
-                            stmt_timeout = ReportOnce::Present;
-                        }
+                    && let Some(segment) = set_config
+                        .config_parameter_ref()
+                        .and_then(|config_parameter| config_parameter.path_ref()?.unqualified_segment())
+                {
+                    let name = segment.text();
+                    if name == "lock_timeout" {
+                        lock_timeout = ReportOnce::Present;
+                    } else if name == "statement_timeout" {
+                        stmt_timeout = ReportOnce::Present;
                     }
                 }
             }

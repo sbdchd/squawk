@@ -271,8 +271,7 @@ fn target_list_columns_with_types_in_file(
             }
         }
 
-        if let Some(expr) = target.expr()
-            && let ast::Expr::FieldExpr(field_expr) = expr
+        if let Some(field_expr) = target.expr().and_then(|expr| expr.as_field_expr())
             && let Some(table_name) = qualified_star_table_name(&field_expr)
             && let Some(from_clause) = from_clause
             && let Some(from_item) = find_from_item_in_from_clause(from_clause, &table_name)
@@ -554,11 +553,10 @@ pub(crate) fn target_expr_type(db: &dyn Db, file: FileId, target: &ast::Target) 
 }
 
 fn column_ref_type(db: &dyn Db, file: FileId, expr: &ast::Expr) -> Option<Type> {
-    let position = match expr {
+    let position = match &expr.unparen() {
         ast::Expr::NameRef(name_ref) => name_ref.syntax().text_range().start(),
         ast::Expr::Collate(collate) => return column_ref_type(db, file, &collate.expr()?),
         ast::Expr::FieldExpr(field_expr) => field_expr.field()?.syntax().text_range().start(),
-        ast::Expr::ParenExpr(paren) => return column_ref_type(db, file, &paren.expr()?),
         _ => return None,
     };
     let defs = goto_definition(db, InFile::new(file, position));

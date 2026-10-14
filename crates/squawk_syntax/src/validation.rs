@@ -221,7 +221,7 @@ fn validate_table_name(table_name: &ast::TableName, acc: &mut Vec<SyntaxError>) 
 
 fn validate_call_expr(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
     validate_sub_type_fn(call_expr, acc);
-    let Some(ast::Expr::NameRef(name_ref)) = call_expr.expr() else {
+    let Some(name_ref) = call_expr.expr().and_then(|expr| expr.as_name_ref()) else {
         return;
     };
     let Some(token) = name_ref.syntax().first_token() else {

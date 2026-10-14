@@ -19,9 +19,7 @@ pub(super) fn rewrite_normalize_as_function_call(
     let token = token_from_offset(db, position)?;
     let (name, normal_form) = token.parent_ancestors().find_map(|node| {
         let call = ast::CallExpr::cast(node)?;
-        let ast::Expr::NameRef(name) = call.expr()? else {
-            return None;
-        };
+        let name = call.expr()?.as_name_ref()?;
         if name.syntax().first_token()?.kind() != SyntaxKind::NORMALIZE_KW {
             return None;
         }
@@ -60,9 +58,7 @@ pub(super) fn rewrite_normalize_as_function_call(
 }
 
 fn normal_form(expr: &ast::Expr) -> Option<(rowan::TextRange, String)> {
-    let ast::Expr::NameRef(name) = expr else {
-        return None;
-    };
+    let name = expr.as_name_ref()?;
     let token = name.syntax().first_token()?;
     if !matches!(
         token.kind(),

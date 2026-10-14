@@ -21,9 +21,7 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
         return None;
     };
 
-    let ast::Expr::Literal(lit) = bin_expr.rhs()? else {
-        return None;
-    };
+    let lit = bin_expr.rhs()?.as_literal()?;
     if !matches!(lit.kind(), Some(ast::LitKind::Null(_))) {
         return None;
     }

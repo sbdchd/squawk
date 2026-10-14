@@ -465,7 +465,8 @@ SOURCE_FILE
     ALTER_VERTEX_EDGE_LABELS
       ALTER_KW "alter"
       WHITESPACE " "
-      VERTEX_KW "vertex"
+      VERTEX_OR_EDGE
+        VERTEX_KW "vertex"
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "
@@ -496,7 +497,8 @@ SOURCE_FILE
     DROP_VERTEX_EDGE_LABEL
       ALTER_KW "alter"
       WHITESPACE " "
-      EDGE_KW "edge"
+      VERTEX_OR_EDGE
+        EDGE_KW "edge"
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "
@@ -526,7 +528,8 @@ SOURCE_FILE
     ADD_VERTEX_EDGE_LABEL_PROPERTIES
       ALTER_KW "alter"
       WHITESPACE " "
-      VERTEX_KW "vertex"
+      VERTEX_OR_EDGE
+        VERTEX_KW "vertex"
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "
@@ -568,7 +571,8 @@ SOURCE_FILE
     DROP_VERTEX_EDGE_LABEL_PROPERTIES
       ALTER_KW "alter"
       WHITESPACE " "
-      RELATIONSHIP_KW "relationship"
+      VERTEX_OR_EDGE
+        RELATIONSHIP_KW "relationship"
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "

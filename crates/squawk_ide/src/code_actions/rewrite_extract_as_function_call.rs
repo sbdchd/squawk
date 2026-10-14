@@ -2,7 +2,7 @@ use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::{
-    ast::{self, AstNode, LitKind},
+    ast::{self, AstNode},
     quote::quote_string_literal,
 };
 
@@ -34,16 +34,7 @@ pub(super) fn rewrite_extract_as_function_call(
 
 fn extract_field_argument(field: &ast::ExtractField) -> Option<String> {
     match field {
-        ast::ExtractField::ExtractFieldLiteral(field)
-            if matches!(
-                field.literal()?.kind()?,
-                LitKind::String(_)
-                    | LitKind::EscString(_)
-                    | LitKind::NationalString(_)
-                    | LitKind::UnicodeEscString(_)
-                    | LitKind::DollarQuotedString(_)
-            ) =>
-        {
+        ast::ExtractField::ExtractFieldLiteral(field) if field.literal()?.is_string() => {
             Some(field.syntax().text().to_string())
         }
         ast::ExtractField::ExtractFieldName(name) => Some(quote_string_literal(&name.text())),
