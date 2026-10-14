@@ -27,18 +27,10 @@ fn smallint_to_bigint(smallint_type: &str) -> &'static str {
 }
 
 fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
-    let name = match ty {
-        ast::Type::ArrayType(array_type) => return create_bigint_fix(&array_type.ty()?),
-        ast::Type::PathType(path_type) => path_type.path_ref()?.segment()?,
-        ast::Type::BitType(_)
-        | ast::Type::BitVaryingType(_)
-        | ast::Type::VarcharType(_)
-        | ast::Type::CharacterType(_)
-        | ast::Type::DoubleType(_)
-        | ast::Type::TimeType(_)
-        | ast::Type::TimestampType(_)
-        | ast::Type::IntervalType(_) => return None,
-    };
+    if let ast::Type::ArrayType(array_type) = ty {
+        return create_bigint_fix(&array_type.ty()?);
+    }
+    let name = ty.path_ref()?.segment()?;
     let i64 = smallint_to_bigint(&name.text());
     let edit = Edit::replace(name.syntax().text_range(), i64);
     Some(Fix::new(

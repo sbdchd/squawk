@@ -6,6 +6,7 @@ drop operator foo.foo.^ (f.smallint, bar.smallint);
 
 -- unary
 drop operator ~ (none, bit);
+drop operator ! (bigint, none);
 
 -- multiple
 drop operator ~ (none, bit), ^ (integer, integer);

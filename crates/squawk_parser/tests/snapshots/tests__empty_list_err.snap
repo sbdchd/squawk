@@ -128,7 +128,8 @@ SOURCE_FILE
     ADD_VERTEX_EDGE_LABEL_PROPERTIES
       ALTER_KW "alter"
       WHITESPACE " "
-      VERTEX_KW "vertex"
+      VERTEX_OR_EDGE
+        VERTEX_KW "vertex"
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "
@@ -167,7 +168,8 @@ SOURCE_FILE
     DROP_VERTEX_EDGE_LABEL_PROPERTIES
       ALTER_KW "alter"
       WHITESPACE " "
-      VERTEX_KW "vertex"
+      VERTEX_OR_EDGE
+        VERTEX_KW "vertex"
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "

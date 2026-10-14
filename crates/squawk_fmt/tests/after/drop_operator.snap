@@ -25,3 +25,5 @@ drop /* operator */ operator /* if */ if /* exists */ exists
   /* behavior */ restrict /* end */;
 
 drop operator - (vector, vector);
+
+drop operator ! (bigint, none);

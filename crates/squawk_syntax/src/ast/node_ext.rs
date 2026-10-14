@@ -38,7 +38,7 @@ use crate::SourceFile;
 use rowan::Direction;
 
 use crate::ast;
-use crate::ast::AstNode;
+use crate::ast::{AstNode, NameLike};
 use crate::decoded_text::DecodedText;
 use crate::quote::{
     dollar_quote_tag, strip_dollar_quotes, strip_prefixed_quotes, strip_quotes,
@@ -91,6 +91,57 @@ pub enum CastKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RuleEventKind {
+    Select,
+    Insert,
+    Update,
+    Delete,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionStrategyKind {
+    Hash,
+    List,
+    Range,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RoleKind {
+    Name,
+    CurrentRole,
+    CurrentUser,
+    SessionUser,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SqlValueFunction {
+    CurrentCatalog,
+    CurrentDate,
+    CurrentRole,
+    CurrentSchema,
+    CurrentTime,
+    CurrentTimestamp,
+    CurrentUser,
+    Localtime,
+    Localtimestamp,
+    SessionUser,
+    SystemUser,
+    User,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RangeBoundKeyword {
+    MinValue,
+    MaxValue,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VertexOrEdgeKind {
+    Vertex,
+    Edge,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegerRadix {
     Binary,
     Decimal,
@@ -127,6 +178,29 @@ pub enum LitKind {
     String(SyntaxToken),
     True(SyntaxToken),
     UnicodeEscString(SyntaxToken),
+}
+
+impl LitKind {
+    pub fn is_string(&self) -> bool {
+        match self {
+            LitKind::String(_)
+            | LitKind::EscString(_)
+            | LitKind::DollarQuotedString(_)
+            | LitKind::UnicodeEscString(_)
+            | LitKind::NationalString(_) => true,
+            LitKind::BitString(_)
+            | LitKind::ByteString(_)
+            | LitKind::Default(_)
+            | LitKind::False(_)
+            | LitKind::IntNumber(_)
+            | LitKind::Null(_)
+            | LitKind::NumericNumber(_)
+            | LitKind::Off(_)
+            | LitKind::On(_)
+            | LitKind::PositionalParam(_)
+            | LitKind::True(_) => false,
+        }
+    }
 }
 
 impl ast::SourceFile {
@@ -166,6 +240,60 @@ impl ast::Type {
             | ast::Type::IntervalType(_)
             | ast::Type::TimeType(_)
             | ast::Type::TimestampType(_) => None,
+        }
+    }
+}
+
+impl ast::FuncArgExpr {
+    pub fn expr(&self) -> Option<ast::Expr> {
+        match self {
+            ast::FuncArgExpr::Expr(expr) => Some(expr.clone()),
+            ast::FuncArgExpr::NamedArg(named_arg) => named_arg.expr(),
+        }
+    }
+}
+
+impl ast::Expr {
+    #[must_use]
+    pub fn unparen(&self) -> ast::Expr {
+        let mut expr = self.clone();
+        while let ast::Expr::ParenExpr(paren) = &expr
+            && let Some(inner) = paren.expr()
+        {
+            expr = inner;
+        }
+        expr
+    }
+
+    pub fn as_literal(&self) -> Option<ast::Literal> {
+        match self {
+            ast::Expr::Literal(literal) => Some(literal.clone()),
+            _ => None,
+        }
+    }
+
+    pub fn as_name_ref(&self) -> Option<ast::NameRef> {
+        match self {
+            ast::Expr::NameRef(name_ref) => Some(name_ref.clone()),
+            _ => None,
+        }
+    }
+
+    pub fn as_field_expr(&self) -> Option<ast::FieldExpr> {
+        match self {
+            ast::Expr::FieldExpr(field_expr) => Some(field_expr.clone()),
+            _ => None,
+        }
+    }
+
+    pub fn is_name_path(&self) -> bool {
+        match self {
+            ast::Expr::NameRef(_) => true,
+            ast::Expr::FieldExpr(field_expr) => {
+                field_expr.field().is_some()
+                    && field_expr.base().is_some_and(|base| base.is_name_path())
+            }
+            _ => false,
         }
     }
 }
@@ -266,6 +394,14 @@ enum StringDecoding {
 }
 
 impl ast::Literal {
+    pub fn is_string(&self) -> bool {
+        self.kind().is_some_and(|kind| kind.is_string())
+    }
+
+    pub fn bool_value(&self) -> Option<bool> {
+        option_bool_value(&self.syntax().first_token()?)
+    }
+
     pub fn string_value(&self) -> Option<String> {
         Some(self.decoded_value()?.into_text())
     }
@@ -1002,17 +1138,52 @@ impl ast::CompoundSelectOperand {
         match self {
             ast::CompoundSelectOperand::SelectVariant(select) => Some(select.clone()),
             ast::CompoundSelectOperand::ParenExpr(paren) => {
-                let mut node = paren.syntax().clone();
+                let mut paren = paren.clone();
                 loop {
-                    let child = node.children().find(|child| {
-                        ast::SelectVariant::can_cast(child.kind())
-                            || ast::ParenExpr::can_cast(child.kind())
-                    })?;
-                    if let Some(select) = ast::SelectVariant::cast(child.clone()) {
+                    if let Some(select) = paren.select_variant() {
                         return Some(select);
                     }
-                    node = child;
+                    let ast::Expr::ParenExpr(inner) = paren.expr()? else {
+                        return None;
+                    };
+                    paren = inner;
                 }
+            }
+        }
+    }
+}
+
+impl ast::ParenExpr {
+    pub fn select_variant(&self) -> Option<ast::SelectVariant> {
+        self.syntax().children().find_map(ast::SelectVariant::cast)
+    }
+}
+
+impl ast::Select {
+    pub fn in_compound(&self) -> bool {
+        self.syntax()
+            .parent()
+            .is_some_and(|parent| ast::CompoundSelect::can_cast(parent.kind()))
+    }
+}
+
+impl ast::CompoundSelect {
+    pub fn is_nested(&self) -> bool {
+        self.syntax()
+            .parent()
+            .is_some_and(|parent| ast::CompoundSelect::can_cast(parent.kind()))
+    }
+
+    pub fn leftmost_with_clause(&self) -> Option<ast::WithClause> {
+        let mut current = self.lhs()?;
+        loop {
+            match current {
+                ast::SelectVariant::CompoundSelect(inner) => current = inner.lhs()?,
+                ast::SelectVariant::Select(select) => return select.with_clause(),
+                ast::SelectVariant::SelectInto(_)
+                | ast::SelectVariant::ParenSelect(_)
+                | ast::SelectVariant::Values(_)
+                | ast::SelectVariant::Table(_) => return None,
             }
         }
     }
@@ -1027,6 +1198,112 @@ impl ast::NameRef {
     #[inline]
     pub fn is_quoted(&self) -> bool {
         is_quoted_name_node(self.syntax())
+    }
+
+    fn first_token_kind(&self) -> Option<SyntaxKind> {
+        self.syntax().first_token().map(|token| token.kind())
+    }
+
+    pub fn sql_value_function(&self) -> Option<SqlValueFunction> {
+        let function = match self.first_token_kind()? {
+            SyntaxKind::CURRENT_CATALOG_KW => SqlValueFunction::CurrentCatalog,
+            SyntaxKind::CURRENT_DATE_KW => SqlValueFunction::CurrentDate,
+            SyntaxKind::CURRENT_ROLE_KW => SqlValueFunction::CurrentRole,
+            SyntaxKind::CURRENT_SCHEMA_KW => SqlValueFunction::CurrentSchema,
+            SyntaxKind::CURRENT_TIME_KW => SqlValueFunction::CurrentTime,
+            SyntaxKind::CURRENT_TIMESTAMP_KW => SqlValueFunction::CurrentTimestamp,
+            SyntaxKind::CURRENT_USER_KW => SqlValueFunction::CurrentUser,
+            SyntaxKind::LOCALTIME_KW => SqlValueFunction::Localtime,
+            SyntaxKind::LOCALTIMESTAMP_KW => SqlValueFunction::Localtimestamp,
+            SyntaxKind::SESSION_USER_KW => SqlValueFunction::SessionUser,
+            SyntaxKind::SYSTEM_USER_KW => SqlValueFunction::SystemUser,
+            SyntaxKind::USER_KW => SqlValueFunction::User,
+            _ => return None,
+        };
+        Some(function)
+    }
+
+    pub fn range_bound_keyword(&self) -> Option<RangeBoundKeyword> {
+        match self.first_token_kind()? {
+            SyntaxKind::MINVALUE_KW => Some(RangeBoundKeyword::MinValue),
+            SyntaxKind::MAXVALUE_KW => Some(RangeBoundKeyword::MaxValue),
+            _ => None,
+        }
+    }
+
+    pub fn is_function_like_keyword(&self) -> bool {
+        matches!(
+            self.first_token_kind(),
+            Some(
+                SyntaxKind::COALESCE_KW
+                    | SyntaxKind::GREATEST_KW
+                    | SyntaxKind::GROUPING_KW
+                    | SyntaxKind::LEAST_KW
+                    | SyntaxKind::MERGE_ACTION_KW
+                    | SyntaxKind::NULLIF_KW
+            )
+        )
+    }
+}
+
+impl ast::RuleEvent {
+    pub fn kind(&self) -> Option<RuleEventKind> {
+        if self.select_token().is_some() {
+            Some(RuleEventKind::Select)
+        } else if self.insert_token().is_some() {
+            Some(RuleEventKind::Insert)
+        } else if self.update_token().is_some() {
+            Some(RuleEventKind::Update)
+        } else if self.delete_token().is_some() {
+            Some(RuleEventKind::Delete)
+        } else {
+            None
+        }
+    }
+}
+
+impl ast::PartitionStrategy {
+    pub fn kind(&self) -> Option<PartitionStrategyKind> {
+        if self.range_token().is_some() {
+            return Some(PartitionStrategyKind::Range);
+        }
+        let ident = self.ident_token()?;
+        let text = ident.text();
+        if text.eq_ignore_ascii_case("hash") {
+            Some(PartitionStrategyKind::Hash)
+        } else if text.eq_ignore_ascii_case("list") {
+            Some(PartitionStrategyKind::List)
+        } else {
+            None
+        }
+    }
+}
+
+impl ast::Role {
+    pub fn kind(&self) -> Option<RoleKind> {
+        if self.current_role_token().is_some() {
+            Some(RoleKind::CurrentRole)
+        } else if self.current_user_token().is_some() {
+            Some(RoleKind::CurrentUser)
+        } else if self.session_user_token().is_some() {
+            Some(RoleKind::SessionUser)
+        } else if self.syntax().first_token().is_some() {
+            Some(RoleKind::Name)
+        } else {
+            None
+        }
+    }
+}
+
+impl ast::VertexOrEdge {
+    pub fn kind(&self) -> Option<VertexOrEdgeKind> {
+        if self.vertex_token().is_some() || self.node_token().is_some() {
+            Some(VertexOrEdgeKind::Vertex)
+        } else if self.edge_token().is_some() || self.relationship_token().is_some() {
+            Some(VertexOrEdgeKind::Edge)
+        } else {
+            None
+        }
     }
 }
 
@@ -1213,25 +1490,137 @@ fn string_literal_contents(token: &SyntaxToken) -> Option<&str> {
     }
 }
 
-fn is_falsey_token(token: &SyntaxToken) -> bool {
+fn option_bool_value(token: &SyntaxToken) -> Option<bool> {
     match token.kind() {
-        SyntaxKind::FALSE_KW | SyntaxKind::NO_KW | SyntaxKind::OFF_KW => true,
-        SyntaxKind::INT_NUMBER => token.text() == "0",
+        SyntaxKind::TRUE_KW | SyntaxKind::ON_KW | SyntaxKind::YES_KW => Some(true),
+        SyntaxKind::FALSE_KW | SyntaxKind::OFF_KW | SyntaxKind::NO_KW => Some(false),
+        SyntaxKind::INT_NUMBER => match token.text() {
+            "1" => Some(true),
+            "0" => Some(false),
+            _ => None,
+        },
         SyntaxKind::STRING
         | SyntaxKind::ESC_STRING
         | SyntaxKind::NATIONAL_STRING
         | SyntaxKind::UNICODE_ESC_STRING
-        | SyntaxKind::DOLLAR_QUOTED_STRING => string_literal_contents(token)
-            .is_some_and(|text| matches!(text.to_ascii_lowercase().as_str(), "false" | "off")),
-        _ => false,
+        | SyntaxKind::DOLLAR_QUOTED_STRING => {
+            let text = string_literal_contents(token)?;
+            if text.eq_ignore_ascii_case("true") || text.eq_ignore_ascii_case("on") {
+                Some(true)
+            } else if text.eq_ignore_ascii_case("false") || text.eq_ignore_ascii_case("off") {
+                Some(false)
+            } else {
+                None
+            }
+        }
+        _ => None,
     }
 }
 
-fn is_falsey_vacuum_option_value(value: &ast::VacuumOptionValue) -> bool {
-    value
-        .syntax()
-        .first_token()
-        .is_some_and(|token| is_falsey_token(&token))
+impl ast::PathRef {
+    pub fn unqualified_segment(&self) -> Option<ast::PathSegmentRef> {
+        if self.qualifier().is_some() {
+            return None;
+        }
+        self.segment()
+    }
+}
+
+impl ast::Type {
+    pub fn path_ref(&self) -> Option<ast::PathRef> {
+        match self {
+            ast::Type::PathType(path_type) => path_type.path_ref(),
+            _ => None,
+        }
+    }
+
+    pub fn serial_type_name(&self) -> Option<&'static str> {
+        let segment = self.path_ref()?.unqualified_segment()?;
+        match segment.text().as_str() {
+            "smallserial" | "serial2" => Some("int2"),
+            "serial" | "serial4" => Some("int4"),
+            "bigserial" | "serial8" => Some("int8"),
+            _ => None,
+        }
+    }
+}
+
+impl ast::PathType {
+    pub fn keyword_type_name(&self) -> Option<&'static str> {
+        let segment = self.path_ref()?.unqualified_segment()?;
+        if segment.ident_token().is_some() {
+            return None;
+        }
+        let name = match segment.text().as_str() {
+            "int" | "integer" => "int4",
+            "smallint" => "int2",
+            "bigint" => "int8",
+            "real" => "float4",
+            "float" => {
+                let precision = self
+                    .arg_list()
+                    .and_then(|args| args.args().next())
+                    .and_then(|arg| u32::try_from(arg.expr()?.as_literal()?.integer_value()?).ok());
+                if precision.is_some_and(|precision| precision <= 24) {
+                    "float4"
+                } else {
+                    "float8"
+                }
+            }
+            "dec" | "decimal" | "numeric" => "numeric",
+            "boolean" => "bool",
+            "json" => "json",
+            _ => return None,
+        };
+        Some(name)
+    }
+}
+
+impl ast::PathPrimary {
+    pub fn where_clause(&self) -> Option<ast::WhereClause> {
+        match self {
+            ast::PathPrimary::VertexPattern(vertex) => vertex.where_clause(),
+            ast::PathPrimary::EdgeAny(edge) => edge.where_clause(),
+            ast::PathPrimary::EdgeLeft(edge) => edge.where_clause(),
+            ast::PathPrimary::EdgeRight(edge) => edge.where_clause(),
+            ast::PathPrimary::ParenGraphPattern(paren) => paren.where_clause(),
+        }
+    }
+}
+
+impl ast::AlterColumn {
+    pub fn is_set_type(&self) -> bool {
+        matches!(self.option(), Some(ast::AlterColumnOption::SetType(_)))
+    }
+}
+
+impl ast::ExplainMode {
+    pub fn is_analyze(&self) -> bool {
+        match self {
+            ast::ExplainMode::ExplainAnalyze(_) => true,
+            ast::ExplainMode::ExplainOptionList(list) => list.explain_options().any(|option| {
+                option
+                    .explain_option_name()
+                    .is_some_and(|name| matches!(name.text().as_str(), "analyze" | "analyse"))
+                    && option
+                        .explain_option_value()
+                        .is_none_or(|value| value.bool_value() != Some(false))
+            }),
+            ast::ExplainMode::ExplainVerbose(_) => false,
+        }
+    }
+}
+
+impl ast::VacuumOptionValue {
+    pub fn bool_value(&self) -> Option<bool> {
+        option_bool_value(&self.syntax().first_token()?)
+    }
+}
+
+impl ast::ExplainOptionValue {
+    pub fn bool_value(&self) -> Option<bool> {
+        option_bool_value(&self.syntax().first_token()?)
+    }
 }
 
 impl ast::ReindexTarget {
@@ -1252,14 +1641,9 @@ impl ast::Reindex {
             .is_some_and(|target| target.concurrently_token().is_some())
             || self.reindex_option_list().is_some_and(|options| {
                 options.reindex_options().any(|option| match option {
-                    ast::ReindexOption::ReindexOptionConcurrently(option) => {
-                        !option.literal().is_some_and(|literal| {
-                            literal
-                                .syntax()
-                                .first_token()
-                                .is_some_and(|token| is_falsey_token(&token))
-                        })
-                    }
+                    ast::ReindexOption::ReindexOptionConcurrently(option) => option
+                        .literal()
+                        .is_none_or(|literal| literal.bool_value() != Some(false)),
                     _ => false,
                 })
             })
@@ -1278,21 +1662,104 @@ impl ast::Vacuum {
                             .is_some_and(|token| token.text().eq_ignore_ascii_case("full"))
                     }) && opt
                         .vacuum_option_value()
-                        .is_none_or(|value| !is_falsey_vacuum_option_value(&value))
+                        .is_none_or(|value| value.bool_value() != Some(false))
                 })
             })
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OpSigOperand {
+    None(SyntaxToken),
+    Type(ast::Type),
+}
+
+impl OpSigOperand {
+    pub fn syntax(&self) -> SyntaxElement {
+        match self {
+            OpSigOperand::None(token) => token.clone().into(),
+            OpSigOperand::Type(ty) => ty.syntax().clone().into(),
+        }
+    }
+}
+
 impl ast::OpSig {
-    #[inline]
-    pub fn lhs(&self) -> Option<ast::Type> {
-        support::children(self.syntax()).next()
+    pub fn lhs(&self) -> Option<OpSigOperand> {
+        self.operand(false)
     }
 
-    #[inline]
-    pub fn rhs(&self) -> Option<ast::Type> {
-        support::children(self.syntax()).nth(1)
+    pub fn rhs(&self) -> Option<OpSigOperand> {
+        self.operand(true)
+    }
+
+    fn operand(&self, right: bool) -> Option<OpSigOperand> {
+        let mut after_comma = false;
+        for element in self.syntax().children_with_tokens() {
+            match element {
+                NodeOrToken::Token(token) if token.kind() == SyntaxKind::COMMA => {
+                    after_comma = true;
+                }
+                NodeOrToken::Token(token)
+                    if token.kind() == SyntaxKind::NONE_KW && after_comma == right =>
+                {
+                    return Some(OpSigOperand::None(token));
+                }
+                NodeOrToken::Node(node) if after_comma == right => {
+                    if let Some(ty) = ast::Type::cast(node) {
+                        return Some(OpSigOperand::Type(ty));
+                    }
+                }
+                NodeOrToken::Token(_) | NodeOrToken::Node(_) => {}
+            }
+        }
+        None
+    }
+}
+
+fn operator_text(tokens: impl Iterator<Item = SyntaxToken>) -> String {
+    let mut text = String::new();
+    for token in tokens.filter(|token| !token.kind().is_trivia()) {
+        text.push_str(token.text());
+    }
+    if text == "!=" {
+        text.replace_range(.., "<>");
+    }
+    text
+}
+
+impl ast::Op {
+    pub fn operator_range(&self) -> TextRange {
+        let range = self.syntax().text_range();
+        match self.path_ref() {
+            Some(path) => TextRange::new(path.syntax().text_range().end(), range.end()),
+            None => range,
+        }
+    }
+
+    pub fn operator_text(&self) -> String {
+        let range = self.operator_range();
+        operator_text(
+            self.syntax()
+                .descendants_with_tokens()
+                .filter_map(|element| element.into_token())
+                .filter(|token| range.contains_range(token.text_range())),
+        )
+    }
+}
+
+impl ast::CustomOp {
+    pub fn operator_text(&self) -> String {
+        operator_text(self.tokens())
+    }
+}
+
+impl ast::AttributeValue {
+    pub fn operator_text(&self) -> String {
+        operator_text(
+            self.syntax()
+                .descendants_with_tokens()
+                .filter_map(|element| element.into_token()),
+        )
     }
 }
 
@@ -2121,8 +2588,27 @@ fn op_sig() {
     let op_sig = alter_op.op_sig().unwrap();
     let lhs = op_sig.lhs().unwrap();
     let rhs = op_sig.rhs().unwrap();
-    assert_snapshot!(lhs.syntax().text(), @"int4");
-    assert_snapshot!(rhs.syntax().text(), @"int8");
+    assert_snapshot!(lhs.syntax(), @"int4");
+    assert_snapshot!(rhs.syntax(), @"int8");
+}
+
+#[test]
+fn op_sig_none() {
+    let source_code = "
+      drop operator - (none, int4), ! (int4, none);
+    ";
+    let parse = SourceFile::parse(source_code);
+    let stmt = parse.tree().stmts().next().unwrap();
+    let ast::Stmt::DropOperator(drop_op) = stmt else {
+        unreachable!()
+    };
+    let mut sigs = drop_op.op_sig_list().unwrap().op_sigs();
+    let prefix = sigs.next().unwrap();
+    assert!(matches!(prefix.lhs(), Some(ast::OpSigOperand::None(_))));
+    assert_snapshot!(prefix.rhs().unwrap().syntax(), @"int4");
+    let postfix = sigs.next().unwrap();
+    assert_snapshot!(postfix.lhs().unwrap().syntax(), @"int4");
+    assert!(matches!(postfix.rhs(), Some(ast::OpSigOperand::None(_))));
 }
 
 #[test]

@@ -199,7 +199,7 @@ fn name_from_name_ref(
                 SyntaxKind::FLOAT_KW => {
                     let precision = arg_list.and_then(|arg| {
                         arg.args().find_map(|arg| {
-                            if let Some(ast::Expr::Literal(lit)) = arg.expr() {
+                            if let Some(lit) = arg.expr().and_then(|expr| expr.as_literal()) {
                                 lit.syntax()
                                     .first_token()
                                     .and_then(|token| token.text().parse::<u32>().ok())

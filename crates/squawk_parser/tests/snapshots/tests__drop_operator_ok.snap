@@ -94,6 +94,28 @@ SOURCE_FILE
           BIT_KW "bit"
         R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR
+    DROP_KW "drop"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP_SIG_LIST
+      OP_SIG
+        OP
+          CUSTOM_OP
+            BANG "!"
+        WHITESPACE " "
+        L_PAREN "("
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              BIGINT_KW "bigint"
+        COMMA ","
+        WHITESPACE " "
+        NONE_KW "none"
+        R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
   WHITESPACE "\n"

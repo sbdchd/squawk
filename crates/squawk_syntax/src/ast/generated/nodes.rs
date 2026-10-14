@@ -417,6 +417,10 @@ impl AddVertexEdgeLabelProperties {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn vertex_or_edge(&self) -> Option<VertexOrEdge> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn add_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ADD_KW)
     }
@@ -425,28 +429,12 @@ impl AddVertexEdgeLabelProperties {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
     #[inline]
-    pub fn edge_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EDGE_KW)
-    }
-    #[inline]
-    pub fn node_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NODE_KW)
-    }
-    #[inline]
     pub fn properties_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PROPERTIES_KW)
     }
     #[inline]
-    pub fn relationship_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
-    }
-    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn vertex_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
     }
 }
 
@@ -2323,28 +2311,16 @@ impl AlterVertexEdgeLabels {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn vertex_or_edge(&self) -> Option<VertexOrEdge> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
     #[inline]
-    pub fn edge_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EDGE_KW)
-    }
-    #[inline]
-    pub fn node_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NODE_KW)
-    }
-    #[inline]
-    pub fn relationship_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
-    }
-    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn vertex_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
     }
 }
 
@@ -9806,6 +9782,10 @@ impl DropVertexEdgeLabel {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn vertex_or_edge(&self) -> Option<VertexOrEdge> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -9814,28 +9794,12 @@ impl DropVertexEdgeLabel {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
-    pub fn edge_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EDGE_KW)
-    }
-    #[inline]
     pub fn label_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LABEL_KW)
     }
     #[inline]
-    pub fn node_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NODE_KW)
-    }
-    #[inline]
-    pub fn relationship_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
-    }
-    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn vertex_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
     }
 }
 
@@ -9861,6 +9825,10 @@ impl DropVertexEdgeLabelProperties {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn vertex_or_edge(&self) -> Option<VertexOrEdge> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -9877,28 +9845,12 @@ impl DropVertexEdgeLabelProperties {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
-    pub fn edge_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EDGE_KW)
-    }
-    #[inline]
-    pub fn node_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NODE_KW)
-    }
-    #[inline]
     pub fn properties_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PROPERTIES_KW)
     }
     #[inline]
-    pub fn relationship_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
-    }
-    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn vertex_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
     }
 }
 
@@ -28839,6 +28791,29 @@ impl VariantList {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VertexOrEdge {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VertexOrEdge {
+    #[inline]
+    pub fn edge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EDGE_KW)
+    }
+    #[inline]
+    pub fn node_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NODE_KW)
+    }
+    #[inline]
+    pub fn relationship_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
+    }
+    #[inline]
+    pub fn vertex_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
     }
 }
 
@@ -57272,6 +57247,24 @@ impl AstNode for VariantList {
         &self.syntax
     }
 }
+impl AstNode for VertexOrEdge {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VERTEX_OR_EDGE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for VertexPattern {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -76572,5 +76565,469 @@ impl From<StripWhitespace> for XmlWhitespace {
     #[inline]
     fn from(node: StripWhitespace) -> XmlWhitespace {
         XmlWhitespace::StripWhitespace(node)
+    }
+}
+impl From<AlterOperatorAction> for AlterTableAction {
+    #[inline]
+    fn from(node: AlterOperatorAction) -> AlterTableAction {
+        match node {
+            AlterOperatorAction::OwnerTo(it) => AlterTableAction::OwnerTo(it),
+            AlterOperatorAction::SetOptions(it) => AlterTableAction::SetOptions(it),
+            AlterOperatorAction::SetSchema(it) => AlterTableAction::SetSchema(it),
+        }
+    }
+}
+impl From<AlterOperatorAction> for AlterTypeAction {
+    #[inline]
+    fn from(node: AlterOperatorAction) -> AlterTypeAction {
+        match node {
+            AlterOperatorAction::OwnerTo(it) => AlterTypeAction::OwnerTo(it),
+            AlterOperatorAction::SetOptions(it) => AlterTypeAction::SetOptions(it),
+            AlterOperatorAction::SetSchema(it) => AlterTypeAction::SetSchema(it),
+        }
+    }
+}
+impl From<AlterOperatorAction> for AlterViewAction {
+    #[inline]
+    fn from(node: AlterOperatorAction) -> AlterViewAction {
+        match node {
+            AlterOperatorAction::OwnerTo(it) => AlterViewAction::OwnerTo(it),
+            AlterOperatorAction::SetOptions(it) => AlterViewAction::SetOptions(it),
+            AlterOperatorAction::SetSchema(it) => AlterViewAction::SetSchema(it),
+        }
+    }
+}
+impl From<AlterRoleAction> for AlterUserAction {
+    #[inline]
+    fn from(node: AlterRoleAction) -> AlterUserAction {
+        match node {
+            AlterRoleAction::ResetConfigParam(it) => AlterUserAction::ResetConfigParam(it),
+            AlterRoleAction::RoleOptionList(it) => AlterUserAction::RoleOptionList(it),
+            AlterRoleAction::RoleRenameTo(it) => AlterUserAction::RoleRenameTo(it),
+            AlterRoleAction::SetConfigParam(it) => AlterUserAction::SetConfigParam(it),
+        }
+    }
+}
+impl From<AlterSystemAction> for AlterDatabaseAction {
+    #[inline]
+    fn from(node: AlterSystemAction) -> AlterDatabaseAction {
+        match node {
+            AlterSystemAction::ResetConfigParam(it) => AlterDatabaseAction::ResetConfigParam(it),
+            AlterSystemAction::SetConfigParam(it) => AlterDatabaseAction::SetConfigParam(it),
+        }
+    }
+}
+impl From<AlterSystemAction> for AlterRoleAction {
+    #[inline]
+    fn from(node: AlterSystemAction) -> AlterRoleAction {
+        match node {
+            AlterSystemAction::ResetConfigParam(it) => AlterRoleAction::ResetConfigParam(it),
+            AlterSystemAction::SetConfigParam(it) => AlterRoleAction::SetConfigParam(it),
+        }
+    }
+}
+impl From<AlterSystemAction> for AlterUserAction {
+    #[inline]
+    fn from(node: AlterSystemAction) -> AlterUserAction {
+        match node {
+            AlterSystemAction::ResetConfigParam(it) => AlterUserAction::ResetConfigParam(it),
+            AlterSystemAction::SetConfigParam(it) => AlterUserAction::SetConfigParam(it),
+        }
+    }
+}
+impl From<AlterUserAction> for AlterRoleAction {
+    #[inline]
+    fn from(node: AlterUserAction) -> AlterRoleAction {
+        match node {
+            AlterUserAction::ResetConfigParam(it) => AlterRoleAction::ResetConfigParam(it),
+            AlterUserAction::RoleOptionList(it) => AlterRoleAction::RoleOptionList(it),
+            AlterUserAction::RoleRenameTo(it) => AlterRoleAction::RoleRenameTo(it),
+            AlterUserAction::SetConfigParam(it) => AlterRoleAction::SetConfigParam(it),
+        }
+    }
+}
+impl From<AlterViewColumnAction> for AlterColumnOption {
+    #[inline]
+    fn from(node: AlterViewColumnAction) -> AlterColumnOption {
+        match node {
+            AlterViewColumnAction::DropDefault(it) => AlterColumnOption::DropDefault(it),
+            AlterViewColumnAction::SetDefault(it) => AlterColumnOption::SetDefault(it),
+        }
+    }
+}
+impl From<AlterViewColumnAction> for AlterDomainAction {
+    #[inline]
+    fn from(node: AlterViewColumnAction) -> AlterDomainAction {
+        match node {
+            AlterViewColumnAction::DropDefault(it) => AlterDomainAction::DropDefault(it),
+            AlterViewColumnAction::SetDefault(it) => AlterDomainAction::SetDefault(it),
+        }
+    }
+}
+impl From<AnyNameRef> for AnyName {
+    #[inline]
+    fn from(node: AnyNameRef) -> AnyName {
+        match node {
+            AnyNameRef::AccessMethodRef(it) => AnyName::AccessMethodRef(it),
+            AnyNameRef::BindParamNameRef(it) => AnyName::BindParamNameRef(it),
+            AnyNameRef::ChannelRef(it) => AnyName::ChannelRef(it),
+            AnyNameRef::ColumnNameRef(it) => AnyName::ColumnNameRef(it),
+            AnyNameRef::CompositeFieldRef(it) => AnyName::CompositeFieldRef(it),
+            AnyNameRef::CursorRef(it) => AnyName::CursorRef(it),
+            AnyNameRef::DatabaseRef(it) => AnyName::DatabaseRef(it),
+            AnyNameRef::ElementTableRef(it) => AnyName::ElementTableRef(it),
+            AnyNameRef::EventTriggerRef(it) => AnyName::EventTriggerRef(it),
+            AnyNameRef::ExtensionRef(it) => AnyName::ExtensionRef(it),
+            AnyNameRef::ForeignDataWrapperRef(it) => AnyName::ForeignDataWrapperRef(it),
+            AnyNameRef::JsonPathNameRef(it) => AnyName::JsonPathNameRef(it),
+            AnyNameRef::LabelRef(it) => AnyName::LabelRef(it),
+            AnyNameRef::LanguageRef(it) => AnyName::LanguageRef(it),
+            AnyNameRef::NameRef(it) => AnyName::NameRef(it),
+            AnyNameRef::ParamNameRef(it) => AnyName::ParamNameRef(it),
+            AnyNameRef::PathSegmentRef(it) => AnyName::PathSegmentRef(it),
+            AnyNameRef::PlpgsqlCursorVariableRef(it) => AnyName::PlpgsqlCursorVariableRef(it),
+            AnyNameRef::PlpgsqlLabelNameRef(it) => AnyName::PlpgsqlLabelNameRef(it),
+            AnyNameRef::PlpgsqlVarNameRef(it) => AnyName::PlpgsqlVarNameRef(it),
+            AnyNameRef::PolicyRef(it) => AnyName::PolicyRef(it),
+            AnyNameRef::PreparedStatementRef(it) => AnyName::PreparedStatementRef(it),
+            AnyNameRef::PropertyNameRef(it) => AnyName::PropertyNameRef(it),
+            AnyNameRef::PublicationRef(it) => AnyName::PublicationRef(it),
+            AnyNameRef::RemoteTableNameRef(it) => AnyName::RemoteTableNameRef(it),
+            AnyNameRef::RoleNameRef(it) => AnyName::RoleNameRef(it),
+            AnyNameRef::RuleRef(it) => AnyName::RuleRef(it),
+            AnyNameRef::SavepointRef(it) => AnyName::SavepointRef(it),
+            AnyNameRef::SchemaRef(it) => AnyName::SchemaRef(it),
+            AnyNameRef::ServerRef(it) => AnyName::ServerRef(it),
+            AnyNameRef::SubscriptionRef(it) => AnyName::SubscriptionRef(it),
+            AnyNameRef::TablespaceRef(it) => AnyName::TablespaceRef(it),
+            AnyNameRef::TriggerRef(it) => AnyName::TriggerRef(it),
+            AnyNameRef::VertexTableRef(it) => AnyName::VertexTableRef(it),
+            AnyNameRef::WindowRef(it) => AnyName::WindowRef(it),
+        }
+    }
+}
+impl From<ColumnConstraint> for Constraint {
+    #[inline]
+    fn from(node: ColumnConstraint) -> Constraint {
+        match node {
+            ColumnConstraint::CheckConstraint(it) => Constraint::CheckConstraint(it),
+            ColumnConstraint::DefaultConstraint(it) => Constraint::DefaultConstraint(it),
+            ColumnConstraint::ExcludeConstraint(it) => Constraint::ExcludeConstraint(it),
+            ColumnConstraint::GeneratedConstraint(it) => Constraint::GeneratedConstraint(it),
+            ColumnConstraint::NotNullConstraint(it) => Constraint::NotNullConstraint(it),
+            ColumnConstraint::NullConstraint(it) => Constraint::NullConstraint(it),
+            ColumnConstraint::PrimaryKeyConstraint(it) => Constraint::PrimaryKeyConstraint(it),
+            ColumnConstraint::ReferencesConstraint(it) => Constraint::ReferencesConstraint(it),
+            ColumnConstraint::UniqueConstraint(it) => Constraint::UniqueConstraint(it),
+        }
+    }
+}
+impl From<CopyTarget> for CopySource {
+    #[inline]
+    fn from(node: CopyTarget) -> CopySource {
+        match node {
+            CopyTarget::CopyProgram(it) => CopySource::CopyProgram(it),
+            CopyTarget::CopyStdout(it) => CopySource::CopyStdout(it),
+        }
+    }
+}
+impl From<DropBehavior> for RefAction {
+    #[inline]
+    fn from(node: DropBehavior) -> RefAction {
+        match node {
+            DropBehavior::Cascade(it) => RefAction::Cascade(it),
+            DropBehavior::Restrict(it) => RefAction::Restrict(it),
+        }
+    }
+}
+impl From<ExplainStmt> for Stmt {
+    #[inline]
+    fn from(node: ExplainStmt) -> Stmt {
+        match node {
+            ExplainStmt::CompoundSelect(it) => Stmt::CompoundSelect(it),
+            ExplainStmt::CreateMaterializedView(it) => Stmt::CreateMaterializedView(it),
+            ExplainStmt::CreateTableAs(it) => Stmt::CreateTableAs(it),
+            ExplainStmt::Declare(it) => Stmt::Declare(it),
+            ExplainStmt::Delete(it) => Stmt::Delete(it),
+            ExplainStmt::Execute(it) => Stmt::Execute(it),
+            ExplainStmt::Insert(it) => Stmt::Insert(it),
+            ExplainStmt::Merge(it) => Stmt::Merge(it),
+            ExplainStmt::ParenSelect(it) => Stmt::ParenSelect(it),
+            ExplainStmt::Select(it) => Stmt::Select(it),
+            ExplainStmt::SelectInto(it) => Stmt::SelectInto(it),
+            ExplainStmt::Table(it) => Stmt::Table(it),
+            ExplainStmt::Update(it) => Stmt::Update(it),
+            ExplainStmt::Values(it) => Stmt::Values(it),
+        }
+    }
+}
+impl From<ExtensionMemberObject> for CommentObject {
+    #[inline]
+    fn from(node: ExtensionMemberObject) -> CommentObject {
+        match node {
+            ExtensionMemberObject::ObjectAccessMethod(it) => CommentObject::ObjectAccessMethod(it),
+            ExtensionMemberObject::ObjectAggregate(it) => CommentObject::ObjectAggregate(it),
+            ExtensionMemberObject::ObjectCast(it) => CommentObject::ObjectCast(it),
+            ExtensionMemberObject::ObjectCollation(it) => CommentObject::ObjectCollation(it),
+            ExtensionMemberObject::ObjectConversion(it) => CommentObject::ObjectConversion(it),
+            ExtensionMemberObject::ObjectDatabase(it) => CommentObject::ObjectDatabase(it),
+            ExtensionMemberObject::ObjectDomain(it) => CommentObject::ObjectDomain(it),
+            ExtensionMemberObject::ObjectEventTrigger(it) => CommentObject::ObjectEventTrigger(it),
+            ExtensionMemberObject::ObjectExtension(it) => CommentObject::ObjectExtension(it),
+            ExtensionMemberObject::ObjectForeignDataWrapper(it) => {
+                CommentObject::ObjectForeignDataWrapper(it)
+            }
+            ExtensionMemberObject::ObjectForeignTable(it) => CommentObject::ObjectForeignTable(it),
+            ExtensionMemberObject::ObjectFunction(it) => CommentObject::ObjectFunction(it),
+            ExtensionMemberObject::ObjectIndex(it) => CommentObject::ObjectIndex(it),
+            ExtensionMemberObject::ObjectLanguage(it) => CommentObject::ObjectLanguage(it),
+            ExtensionMemberObject::ObjectMaterializedView(it) => {
+                CommentObject::ObjectMaterializedView(it)
+            }
+            ExtensionMemberObject::ObjectOperator(it) => CommentObject::ObjectOperator(it),
+            ExtensionMemberObject::ObjectOperatorClass(it) => {
+                CommentObject::ObjectOperatorClass(it)
+            }
+            ExtensionMemberObject::ObjectOperatorFamily(it) => {
+                CommentObject::ObjectOperatorFamily(it)
+            }
+            ExtensionMemberObject::ObjectProcedure(it) => CommentObject::ObjectProcedure(it),
+            ExtensionMemberObject::ObjectPublication(it) => CommentObject::ObjectPublication(it),
+            ExtensionMemberObject::ObjectRole(it) => CommentObject::ObjectRole(it),
+            ExtensionMemberObject::ObjectRoutine(it) => CommentObject::ObjectRoutine(it),
+            ExtensionMemberObject::ObjectSchema(it) => CommentObject::ObjectSchema(it),
+            ExtensionMemberObject::ObjectSequence(it) => CommentObject::ObjectSequence(it),
+            ExtensionMemberObject::ObjectServer(it) => CommentObject::ObjectServer(it),
+            ExtensionMemberObject::ObjectStatistics(it) => CommentObject::ObjectStatistics(it),
+            ExtensionMemberObject::ObjectSubscription(it) => CommentObject::ObjectSubscription(it),
+            ExtensionMemberObject::ObjectTable(it) => CommentObject::ObjectTable(it),
+            ExtensionMemberObject::ObjectTablespace(it) => CommentObject::ObjectTablespace(it),
+            ExtensionMemberObject::ObjectTextSearchConfig(it) => {
+                CommentObject::ObjectTextSearchConfig(it)
+            }
+            ExtensionMemberObject::ObjectTextSearchDict(it) => {
+                CommentObject::ObjectTextSearchDict(it)
+            }
+            ExtensionMemberObject::ObjectTextSearchParser(it) => {
+                CommentObject::ObjectTextSearchParser(it)
+            }
+            ExtensionMemberObject::ObjectTextSearchTemplate(it) => {
+                CommentObject::ObjectTextSearchTemplate(it)
+            }
+            ExtensionMemberObject::ObjectTransform(it) => CommentObject::ObjectTransform(it),
+            ExtensionMemberObject::ObjectType(it) => CommentObject::ObjectType(it),
+            ExtensionMemberObject::ObjectView(it) => CommentObject::ObjectView(it),
+        }
+    }
+}
+impl From<PreparableStmt> for ExplainStmt {
+    #[inline]
+    fn from(node: PreparableStmt) -> ExplainStmt {
+        match node {
+            PreparableStmt::CompoundSelect(it) => ExplainStmt::CompoundSelect(it),
+            PreparableStmt::Delete(it) => ExplainStmt::Delete(it),
+            PreparableStmt::Insert(it) => ExplainStmt::Insert(it),
+            PreparableStmt::Merge(it) => ExplainStmt::Merge(it),
+            PreparableStmt::ParenSelect(it) => ExplainStmt::ParenSelect(it),
+            PreparableStmt::Select(it) => ExplainStmt::Select(it),
+            PreparableStmt::SelectInto(it) => ExplainStmt::SelectInto(it),
+            PreparableStmt::Table(it) => ExplainStmt::Table(it),
+            PreparableStmt::Update(it) => ExplainStmt::Update(it),
+            PreparableStmt::Values(it) => ExplainStmt::Values(it),
+        }
+    }
+}
+impl From<PreparableStmt> for Stmt {
+    #[inline]
+    fn from(node: PreparableStmt) -> Stmt {
+        match node {
+            PreparableStmt::CompoundSelect(it) => Stmt::CompoundSelect(it),
+            PreparableStmt::Delete(it) => Stmt::Delete(it),
+            PreparableStmt::Insert(it) => Stmt::Insert(it),
+            PreparableStmt::Merge(it) => Stmt::Merge(it),
+            PreparableStmt::ParenSelect(it) => Stmt::ParenSelect(it),
+            PreparableStmt::Select(it) => Stmt::Select(it),
+            PreparableStmt::SelectInto(it) => Stmt::SelectInto(it),
+            PreparableStmt::Table(it) => Stmt::Table(it),
+            PreparableStmt::Update(it) => Stmt::Update(it),
+            PreparableStmt::Values(it) => Stmt::Values(it),
+        }
+    }
+}
+impl From<SchemaElement> for Stmt {
+    #[inline]
+    fn from(node: SchemaElement) -> Stmt {
+        match node {
+            SchemaElement::CreateAggregate(it) => Stmt::CreateAggregate(it),
+            SchemaElement::CreateCollation(it) => Stmt::CreateCollation(it),
+            SchemaElement::CreateDomain(it) => Stmt::CreateDomain(it),
+            SchemaElement::CreateFunction(it) => Stmt::CreateFunction(it),
+            SchemaElement::CreateIndex(it) => Stmt::CreateIndex(it),
+            SchemaElement::CreateOperator(it) => Stmt::CreateOperator(it),
+            SchemaElement::CreateProcedure(it) => Stmt::CreateProcedure(it),
+            SchemaElement::CreateSequence(it) => Stmt::CreateSequence(it),
+            SchemaElement::CreateTable(it) => Stmt::CreateTable(it),
+            SchemaElement::CreateTextSearchConfiguration(it) => {
+                Stmt::CreateTextSearchConfiguration(it)
+            }
+            SchemaElement::CreateTextSearchDictionary(it) => Stmt::CreateTextSearchDictionary(it),
+            SchemaElement::CreateTextSearchParser(it) => Stmt::CreateTextSearchParser(it),
+            SchemaElement::CreateTextSearchTemplate(it) => Stmt::CreateTextSearchTemplate(it),
+            SchemaElement::CreateTrigger(it) => Stmt::CreateTrigger(it),
+            SchemaElement::CreateType(it) => Stmt::CreateType(it),
+            SchemaElement::CreateView(it) => Stmt::CreateView(it),
+            SchemaElement::Grant(it) => Stmt::Grant(it),
+        }
+    }
+}
+impl From<SecurityLabelObject> for CommentObject {
+    #[inline]
+    fn from(node: SecurityLabelObject) -> CommentObject {
+        match node {
+            SecurityLabelObject::ObjectAggregate(it) => CommentObject::ObjectAggregate(it),
+            SecurityLabelObject::ObjectColumn(it) => CommentObject::ObjectColumn(it),
+            SecurityLabelObject::ObjectDatabase(it) => CommentObject::ObjectDatabase(it),
+            SecurityLabelObject::ObjectDomain(it) => CommentObject::ObjectDomain(it),
+            SecurityLabelObject::ObjectEventTrigger(it) => CommentObject::ObjectEventTrigger(it),
+            SecurityLabelObject::ObjectForeignTable(it) => CommentObject::ObjectForeignTable(it),
+            SecurityLabelObject::ObjectFunction(it) => CommentObject::ObjectFunction(it),
+            SecurityLabelObject::ObjectLanguage(it) => CommentObject::ObjectLanguage(it),
+            SecurityLabelObject::ObjectLargeObject(it) => CommentObject::ObjectLargeObject(it),
+            SecurityLabelObject::ObjectMaterializedView(it) => {
+                CommentObject::ObjectMaterializedView(it)
+            }
+            SecurityLabelObject::ObjectProcedure(it) => CommentObject::ObjectProcedure(it),
+            SecurityLabelObject::ObjectPublication(it) => CommentObject::ObjectPublication(it),
+            SecurityLabelObject::ObjectRole(it) => CommentObject::ObjectRole(it),
+            SecurityLabelObject::ObjectRoutine(it) => CommentObject::ObjectRoutine(it),
+            SecurityLabelObject::ObjectSchema(it) => CommentObject::ObjectSchema(it),
+            SecurityLabelObject::ObjectSequence(it) => CommentObject::ObjectSequence(it),
+            SecurityLabelObject::ObjectSubscription(it) => CommentObject::ObjectSubscription(it),
+            SecurityLabelObject::ObjectTable(it) => CommentObject::ObjectTable(it),
+            SecurityLabelObject::ObjectTablespace(it) => CommentObject::ObjectTablespace(it),
+            SecurityLabelObject::ObjectType(it) => CommentObject::ObjectType(it),
+            SecurityLabelObject::ObjectView(it) => CommentObject::ObjectView(it),
+        }
+    }
+}
+impl From<SelectVariant> for ExplainStmt {
+    #[inline]
+    fn from(node: SelectVariant) -> ExplainStmt {
+        match node {
+            SelectVariant::CompoundSelect(it) => ExplainStmt::CompoundSelect(it),
+            SelectVariant::ParenSelect(it) => ExplainStmt::ParenSelect(it),
+            SelectVariant::Select(it) => ExplainStmt::Select(it),
+            SelectVariant::SelectInto(it) => ExplainStmt::SelectInto(it),
+            SelectVariant::Table(it) => ExplainStmt::Table(it),
+            SelectVariant::Values(it) => ExplainStmt::Values(it),
+        }
+    }
+}
+impl From<SelectVariant> for PreparableStmt {
+    #[inline]
+    fn from(node: SelectVariant) -> PreparableStmt {
+        match node {
+            SelectVariant::CompoundSelect(it) => PreparableStmt::CompoundSelect(it),
+            SelectVariant::ParenSelect(it) => PreparableStmt::ParenSelect(it),
+            SelectVariant::Select(it) => PreparableStmt::Select(it),
+            SelectVariant::SelectInto(it) => PreparableStmt::SelectInto(it),
+            SelectVariant::Table(it) => PreparableStmt::Table(it),
+            SelectVariant::Values(it) => PreparableStmt::Values(it),
+        }
+    }
+}
+impl From<SelectVariant> for Stmt {
+    #[inline]
+    fn from(node: SelectVariant) -> Stmt {
+        match node {
+            SelectVariant::CompoundSelect(it) => Stmt::CompoundSelect(it),
+            SelectVariant::ParenSelect(it) => Stmt::ParenSelect(it),
+            SelectVariant::Select(it) => Stmt::Select(it),
+            SelectVariant::SelectInto(it) => Stmt::SelectInto(it),
+            SelectVariant::Table(it) => Stmt::Table(it),
+            SelectVariant::Values(it) => Stmt::Values(it),
+        }
+    }
+}
+impl From<SetGeneratedOption> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetGeneratedOption) -> AlterColumnOption {
+        match node {
+            SetGeneratedOption::Restart(it) => AlterColumnOption::Restart(it),
+            SetGeneratedOption::SetGenerated(it) => AlterColumnOption::SetGenerated(it),
+            SetGeneratedOption::SetSequenceOption(it) => AlterColumnOption::SetSequenceOption(it),
+        }
+    }
+}
+impl From<SubscriptionSource> for AlterSubscriptionAction {
+    #[inline]
+    fn from(node: SubscriptionSource) -> AlterSubscriptionAction {
+        match node {
+            SubscriptionSource::ConnectionClause(it) => {
+                AlterSubscriptionAction::ConnectionClause(it)
+            }
+            SubscriptionSource::ServerClause(it) => AlterSubscriptionAction::ServerClause(it),
+        }
+    }
+}
+impl From<TableConstraint> for Constraint {
+    #[inline]
+    fn from(node: TableConstraint) -> Constraint {
+        match node {
+            TableConstraint::CheckConstraint(it) => Constraint::CheckConstraint(it),
+            TableConstraint::ExcludeConstraint(it) => Constraint::ExcludeConstraint(it),
+            TableConstraint::ForeignKeyConstraint(it) => Constraint::ForeignKeyConstraint(it),
+            TableConstraint::NotNullConstraint(it) => Constraint::NotNullConstraint(it),
+            TableConstraint::PrimaryKeyConstraint(it) => Constraint::PrimaryKeyConstraint(it),
+            TableConstraint::UniqueConstraint(it) => Constraint::UniqueConstraint(it),
+        }
+    }
+}
+impl From<WithQuery> for ExplainStmt {
+    #[inline]
+    fn from(node: WithQuery) -> ExplainStmt {
+        match node {
+            WithQuery::CompoundSelect(it) => ExplainStmt::CompoundSelect(it),
+            WithQuery::Delete(it) => ExplainStmt::Delete(it),
+            WithQuery::Insert(it) => ExplainStmt::Insert(it),
+            WithQuery::Merge(it) => ExplainStmt::Merge(it),
+            WithQuery::ParenSelect(it) => ExplainStmt::ParenSelect(it),
+            WithQuery::Select(it) => ExplainStmt::Select(it),
+            WithQuery::Table(it) => ExplainStmt::Table(it),
+            WithQuery::Update(it) => ExplainStmt::Update(it),
+            WithQuery::Values(it) => ExplainStmt::Values(it),
+        }
+    }
+}
+impl From<WithQuery> for PreparableStmt {
+    #[inline]
+    fn from(node: WithQuery) -> PreparableStmt {
+        match node {
+            WithQuery::CompoundSelect(it) => PreparableStmt::CompoundSelect(it),
+            WithQuery::Delete(it) => PreparableStmt::Delete(it),
+            WithQuery::Insert(it) => PreparableStmt::Insert(it),
+            WithQuery::Merge(it) => PreparableStmt::Merge(it),
+            WithQuery::ParenSelect(it) => PreparableStmt::ParenSelect(it),
+            WithQuery::Select(it) => PreparableStmt::Select(it),
+            WithQuery::Table(it) => PreparableStmt::Table(it),
+            WithQuery::Update(it) => PreparableStmt::Update(it),
+            WithQuery::Values(it) => PreparableStmt::Values(it),
+        }
+    }
+}
+impl From<WithQuery> for Stmt {
+    #[inline]
+    fn from(node: WithQuery) -> Stmt {
+        match node {
+            WithQuery::CompoundSelect(it) => Stmt::CompoundSelect(it),
+            WithQuery::Delete(it) => Stmt::Delete(it),
+            WithQuery::Insert(it) => Stmt::Insert(it),
+            WithQuery::Merge(it) => Stmt::Merge(it),
+            WithQuery::ParenSelect(it) => Stmt::ParenSelect(it),
+            WithQuery::Select(it) => Stmt::Select(it),
+            WithQuery::Table(it) => Stmt::Table(it),
+            WithQuery::Update(it) => Stmt::Update(it),
+            WithQuery::Values(it) => Stmt::Values(it),
+        }
     }
 }

@@ -289,16 +289,7 @@ fn hover_select_target(db: &dyn Db, def: Location) -> Option<Hover> {
 fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
     let kind = literal.kind()?;
     // TODO: support all literal types
-    if !matches!(
-        kind,
-        LitKind::String(_)
-            | LitKind::BitString(_)
-            | LitKind::ByteString(_)
-            | LitKind::EscString(_)
-            | LitKind::NationalString(_)
-            | LitKind::UnicodeEscString(_)
-            | LitKind::DollarQuotedString(_)
-    ) {
+    if !kind.is_string() && !matches!(kind, LitKind::BitString(_) | LitKind::ByteString(_)) {
         return None;
     }
 
