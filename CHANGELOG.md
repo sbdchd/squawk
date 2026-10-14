@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.69.0 - 2026-10-14
+
+### Added
+
+- parser: psql command parsing (#1389)
+
+### Changed
+
+- fmt: overlay on one line (#1397)
+- fmt: adjust formatting of unnamed create index (#1401)
+- syntax: perf improvements for syntax validation (#1399)
+
+### Removed
+
+### Fixed
+
+- parser: fix partition item collate bug (#1398)
+- parser: fix custom ops to be left associative (#1400)
+
+### Internal
+
+- syntax: upstream some helpers from new sema (#1402)
+- ide: sync pg_toast in builtins.sql (#1397)
+- ide: sync op family/class & access method to builtins.sql (#1396)
+- ide: sync create type fields to builtins.sql (#1395)
+- ide: sync casts to builtins.sql (#1394)
+- ide: sync tablespaces to builtins.sql (#1392)
+- ide: sync collations to builtins.sql (#1391)
+- internal: upgrade to rust 1.99 (#1393)
+- clippy: enable more lints (#1390)
+
 ## v2.68.0 - 2026-10-07
 
 ### Added
