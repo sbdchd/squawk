@@ -10,7 +10,7 @@ create schema if not exists
   extraordinarily_long_application_reporting_and_data_warehouse_schema
   authorization extraordinarily_long_application_reporting_and_data_warehouse_owner_role;
 
-create schema authorization "current_user";
+create schema authorization current_user;
 
 -- comments in every position
 create /* schema */ schema /* if */ if /* not */ not /* exists */ exists
@@ -43,3 +43,11 @@ create /* schema keyword */ schema
   ) /* return type */ returns integer
     /* language option */ language /* language */ sql
     /* as option */ as /* body */ 'SELECT $1' /* end */;
+
+create schema authorization current_role;
+
+create schema authorization session_user;
+
+create schema
+  authorization current_role
+  create table t (id int);

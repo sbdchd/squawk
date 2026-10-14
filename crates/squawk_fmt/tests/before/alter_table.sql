@@ -83,3 +83,5 @@ ALTER TABLE room_reservations ADD CONSTRAINT room_reservations_no_overlapping_re
 ALTER TABLE warehouse_inventory ADD CONSTRAINT warehouse_inventory_location_product_primary_key PRIMARY KEY (warehouse_location_id, product_catalog_entry_id);
 
 ALTER TABLE customer_accounts ADD CONSTRAINT customer_accounts_tenant_email_unique UNIQUE (tenant_id, normalized_email_address);
+
+alter table t alter column f1 set compression default;

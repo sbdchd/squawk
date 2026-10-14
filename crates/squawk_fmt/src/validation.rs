@@ -4,6 +4,7 @@ use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet};
 use anyhow::{Result, bail, ensure};
 use squawk_lexer::{BOM, LiteralKind, Token, TokenKind, tokenize};
 use squawk_line_index::UniversalNewlines;
+use squawk_syntax::quote::is_reserved_word;
 
 use crate::fmt::{FormatOptions, fmt_str};
 
@@ -278,7 +279,8 @@ fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> boo
             unquote(before_text) == Some(after_text.to_ascii_lowercase().as_str())
         }
         (TokenKind::Ident, TokenKind::QuotedIdent { .. }) => {
-            unquote(after_text) == Some(before_text.to_ascii_lowercase().as_str())
+            let before_text = before_text.to_ascii_lowercase();
+            !is_reserved_word(&before_text) && unquote(after_text) == Some(before_text.as_str())
         }
         _ => false,
     }

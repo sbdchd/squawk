@@ -22,3 +22,9 @@ create schema extraordinarily_long_application_reporting_and_data_warehouse_sche
 create /* schema keyword */ schema /* authorization keyword */ authorization /* role */ schema_owner
   /* schema element */ create /* function keyword */ function /* function name */ app /* separator */ . /* local name */ calculate(/* parameter */ value integer) /* return type */ returns integer
   /* language option */ language /* language */ sql /* as option */ as /* body */ 'SELECT $1' /* end */;
+
+create schema authorization current_role;
+
+create schema authorization session_user;
+
+create schema authorization current_role create table t (id int);

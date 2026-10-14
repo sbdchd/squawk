@@ -197,3 +197,5 @@ alter table customer_accounts
     tenant_id,
     normalized_email_address
   );
+
+alter table t alter column f1 set compression default;
