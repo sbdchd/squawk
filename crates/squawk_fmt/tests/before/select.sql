@@ -56,3 +56,7 @@ x as ( -- after open paren
 ) -- after close paren
 -- above final
 select * from t; -- after statement
+
+select * from user;
+
+select * from current_date as d;

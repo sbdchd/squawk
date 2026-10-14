@@ -7621,6 +7621,10 @@ fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> String) -> Doc<'a> 
         return doc;
     }
 
+    if ident.kind().is_keyword() {
+        return Doc::text(ident.text().to_ascii_lowercase());
+    }
+
     Doc::text(quote(&normalize_name_node(node)))
 }
 
