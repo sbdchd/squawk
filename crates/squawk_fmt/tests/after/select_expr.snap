@@ -8,6 +8,214 @@ select (date '2026-01-01', date '2026-01-02') overlaps (
 
 select (1, 2) overlaps (3, 4);
 
+select fooo(
+  loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong
+    + loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong
+    + 3
+    + 4
+    + 5
+    + 6
+);
+
+select fooo(a + b - c + d), fooo(a * b / c % d), fooo(a ^ b ^ c);
+
+select fooo(a || b || c), fooo(a -> b ->> c);
+
+select json_build_object(
+  'name', a.attname,
+  'data_type', format_type(a.atttypid, a.atttypmod)
+);
+
+select jsonb_build_object(
+  'name', a.attname,
+  'data_type', format_type(a.atttypid, a.atttypmod)
+);
+
+select pg_catalog.json_build_object(
+  'name', a.attname,
+  'data_type', format_type(a.atttypid, a.atttypmod)
+);
+
+select json_build_object(
+  'name', a.attname,
+  'data_type', format_type(a.atttypid, a.atttypmod)
+);
+
+select
+  json_build_object(),
+  json_build_object('key', 1),
+  json_build_object('odd', 1, 'last');
+
+select json_build_object(
+  variadic array[
+    'a_very_long_key',
+    'a_very_long_value',
+    'another_key',
+    'another_value'
+  ]
+);
+
+select json_build_object(
+  'a_very_long_key_that_together_with_its_value_will_not_fit_on_one_line',
+  a_very_long_value_expression,
+  'short', 1
+);
+
+select json_build_object(
+  'nested',
+  jsonb_build_object(
+    'name', a.attname,
+    'data_type', format_type(a.atttypid, a.atttypmod)
+  ),
+  'other', 2
+);
+
+select json_build_object(
+  /* before key */ 'name' /* after key */,
+  /* before value */ a.attname /* after value */,
+  /* before next key */ 'data_type' /* after next key */,
+  /* before next value */ format_type(
+    a.atttypid,
+    a.atttypmod
+  ) /* after next value */
+);
+
+select json_build_object(
+  -- before key
+  'name', -- after key
+  -- before value
+  a.attname, -- after value
+  -- before next key
+  'data_type', -- after next key
+  -- before next value
+  format_type(a.atttypid, a.atttypmod) -- after next value
+);
+
+select fooo(
+  a_very_long_first_operand
+    || a_very_long_second_operand
+    || a_very_long_third_operand
+    || a_very_long_fourth_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    -> a_very_long_second_operand
+    ->> a_very_long_third_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    operator(public.||) a_very_long_second_operand
+    || a_very_long_third_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    at time zone 'America/Los_Angeles'
+    at time zone 'America/New_York'
+);
+
+select fooo(
+  a_very_long_first_operand
+    = a_very_long_second_operand
+    = a_very_long_third_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    is distinct from a_very_long_second_operand
+    is distinct from a_very_long_third_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    || a_very_long_second_operand
+      + a_very_long_third_operand
+      + a_very_long_fourth_operand
+    || 5
+);
+
+select fooo(
+  a_very_long_first_operand || (
+      a_very_long_second_operand || a_very_long_third_operand
+    )
+    || 4
+);
+
+select fooo(
+  a_very_long_first_operand /* before op */
+    || /* after op */ a_very_long_second_operand /* before next op */
+    || /* after next op */ a_very_long_third_operand
+);
+
+select fooo(
+  a_very_long_first_operand -- after first
+    || -- after op
+    a_very_long_second_operand
+    -- before next op
+    || a_very_long_third_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    - a_very_long_second_operand
+    + a_very_long_third_operand
+    - a_very_long_fourth_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    * a_very_long_second_operand
+    / a_very_long_third_operand
+    % a_very_long_fourth_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    ^ a_very_long_second_operand
+    ^ a_very_long_third_operand
+);
+
+select fooo(
+  a_very_long_first_operand
+    + a_very_long_second_operand
+      * a_very_long_third_operand
+      * a_very_long_fourth_operand
+    + 5
+);
+
+select fooo(
+  (a_very_long_first_operand + a_very_long_second_operand)
+    + a_very_long_third_operand
+    + 4
+);
+
+select fooo(
+  a_very_long_first_operand - (
+      a_very_long_second_operand - a_very_long_third_operand
+    )
+    - 4
+);
+
+select fooo(
+  /* before first */ a_very_long_first_operand /* before first op */
+    + /* after first op */ a_very_long_second_operand /* before second op */
+    - /* after second op */ a_very_long_third_operand /* after last */
+);
+
+select fooo(
+  a_very_long_first_operand -- after first
+    -- before first op
+    + -- after first op
+    -- before second
+    a_very_long_second_operand -- after second
+    -- before second op
+    + -- after second op
+    -- before third
+    a_very_long_third_operand -- after third
+);
+
 select /* before left */ (
   /* left first */ date '2026-01-01' /* left comma */,
   /* left second */ date '2026-01-02' /* left close */

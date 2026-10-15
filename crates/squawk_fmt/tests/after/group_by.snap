@@ -68,7 +68,8 @@ group by
 
 select *
 from t
-group by a_very_long_column_name_one + a_very_long_column_name_two
+group by a_very_long_column_name_one
+  + a_very_long_column_name_two
   + a_very_long_column_name_three;
 
 select *

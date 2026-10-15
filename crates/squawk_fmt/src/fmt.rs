@@ -15297,8 +15297,16 @@ fn build_from_list_item<'a>(ctx: &Ctx, item: ast::FromListItem) -> Doc<'a> {
 }
 
 fn build_join_expr<'a>(ctx: &Ctx, join_expr: &ast::JoinExpr) -> Doc<'a> {
+    build_join_expr_chain(ctx, join_expr).group()
+}
+
+fn build_join_expr_chain<'a>(ctx: &Ctx, join_expr: &ast::JoinExpr) -> Doc<'a> {
     let mut doc = if let Some(left) = join_expr.from_list_item() {
-        leading_comments(left.syntax()).append(build_from_list_item(ctx, left))
+        let comments = leading_comments(left.syntax());
+        comments.append(match left {
+            ast::FromListItem::JoinExpr(inner) => build_join_expr_chain(ctx, &inner),
+            ast::FromListItem::FromItem(item) => build_from_item(ctx, item),
+        })
     } else {
         Doc::nil()
     };
@@ -15308,7 +15316,7 @@ fn build_join_expr<'a>(ctx: &Ctx, join_expr: &ast::JoinExpr) -> Doc<'a> {
             .append(line_before(join.syntax()))
             .append(build_join(ctx, &join));
     }
-    doc.group()
+    doc
 }
 
 fn build_join<'a>(ctx: &Ctx, join: &ast::Join) -> Doc<'a> {
@@ -16784,6 +16792,7 @@ fn build_call_expr_with_spacing<'a>(
     space_before_paren: bool,
 ) -> Doc<'a> {
     let doc = if let (Some(expr), Some(arg_list)) = (call_expr.expr(), call_expr.arg_list()) {
+        let paired = is_json_build_object(&expr);
         let mut doc = build_expr(ctx, expr);
         doc = doc
             .append(if space_before_paren {
@@ -16791,7 +16800,7 @@ fn build_call_expr_with_spacing<'a>(
             } else {
                 comments_before(arg_list.syntax())
             })
-            .append(build_call_arg_list(ctx, &arg_list));
+            .append(build_call_arg_list_with_pairs(ctx, &arg_list, paired));
         doc
     } else if let Some(all_fn) = call_expr.all_fn() {
         build_parenthesized_expr_or_select_fn(
@@ -18297,20 +18306,32 @@ enum TrailingComments {
 }
 
 fn join_comma_separated<'a>(
-    mut items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
+    items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
     trailing: TrailingComments,
 ) -> Option<Doc<'a>> {
-    let (first, mut previous_syntax) = items.next()?;
-    let mut docs = vec![first];
-    for (item, syntax) in items {
-        docs.push(
-            trailing_comments(&previous_syntax)
-                .append(Doc::text(","))
-                .append(comment_run_before(&syntax).separator_before(Doc::line_or_space()))
-                .append(item),
-        );
+    join_comma_separated_with_pairs(items, trailing, false)
+}
+
+fn join_comma_separated_with_pairs<'a>(
+    mut items: impl Iterator<Item = (Doc<'a>, SyntaxNode)>,
+    trailing: TrailingComments,
+    paired: bool,
+) -> Option<Doc<'a>> {
+    let (mut current, mut previous_syntax) = items.next()?;
+    let mut docs = Vec::new();
+    for (index, (item, syntax)) in items.enumerate() {
+        let separator = trailing_comments(&previous_syntax)
+            .append(Doc::text(","))
+            .append(comment_run_before(&syntax).separator_before(Doc::line_or_space()));
+        if paired && index.is_multiple_of(2) {
+            current = current.append(separator).append(item).group();
+        } else {
+            docs.push(current.append(separator));
+            current = item;
+        }
         previous_syntax = syntax;
     }
+    docs.push(current);
     match trailing {
         TrailingComments::All => docs.push(trailing_comments(&previous_syntax)),
         TrailingComments::ExceptLast => (),
@@ -18817,7 +18838,31 @@ fn arg_list_has_body(arg_list: &ast::ArgList) -> bool {
         || arg_list.args().next().is_some()
 }
 
+fn is_json_build_object(expr: &ast::Expr) -> bool {
+    let name = match expr {
+        ast::Expr::NameRef(name) => Some(name.clone()),
+        ast::Expr::FieldExpr(field) => field.field(),
+        _ => None,
+    };
+    let Some(token) = name.and_then(|name| name.ident_token()) else {
+        return false;
+    };
+    let name = token.text();
+    name.eq_ignore_ascii_case("json_build_object")
+        || name.eq_ignore_ascii_case("jsonb_build_object")
+        || name == "\"json_build_object\""
+        || name == "\"jsonb_build_object\""
+}
+
 fn build_call_arg_list<'a>(ctx: &Ctx, arg_list: &ast::ArgList) -> Doc<'a> {
+    build_call_arg_list_with_pairs(ctx, arg_list, false)
+}
+
+fn build_call_arg_list_with_pairs<'a>(ctx: &Ctx, arg_list: &ast::ArgList, paired: bool) -> Doc<'a> {
+    let paired = paired
+        && arg_list.all_or_distinct().is_none()
+        && arg_list.args().count().is_multiple_of(2)
+        && arg_list.args().all(|arg| arg.variadic_token().is_none());
     let has_body = arg_list_has_body(arg_list);
     let mut doc = Doc::nil();
     if let Some(l_paren) = arg_list.l_paren_token() {
@@ -18834,11 +18879,15 @@ fn build_call_arg_list<'a>(ctx: &Ctx, arg_list: &ast::ArgList) -> Doc<'a> {
                 ast::AllOrDistinct::Distinct(_) => Doc::text("distinct"),
             })
         });
-        let args = build_comma_separated_docs(arg_list.args().map(|arg| {
-            let syntax = arg.syntax().clone();
-            let doc = leading_comments(arg.syntax()).append(build_call_arg(ctx, &arg));
-            (doc, syntax)
-        }));
+        let args = join_comma_separated_with_pairs(
+            arg_list.args().map(|arg| {
+                let syntax = arg.syntax().clone();
+                let doc = leading_comments(arg.syntax()).append(build_call_arg(ctx, &arg));
+                (doc, syntax)
+            }),
+            TrailingComments::ExceptLast,
+            paired,
+        );
         match (quantifier, args) {
             (Some(quantifier), Some(args)) => quantifier.append(Doc::space()).append(args),
             (Some(quantifier), None) => quantifier,
@@ -19350,6 +19399,54 @@ fn build_logical_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, logical: LogicalOp
         .append(rhs_doc)
 }
 
+fn binary_precedence(op: &ast::BinOp) -> Option<u8> {
+    match op {
+        ast::BinOp::Or(_) => Some(1),
+        ast::BinOp::And(_) => Some(2),
+        ast::BinOp::Is(_)
+        | ast::BinOp::IsNot(_)
+        | ast::BinOp::IsDistinctFrom(_)
+        | ast::BinOp::IsNotDistinctFrom(_) => Some(4),
+        ast::BinOp::Eq(_)
+        | ast::BinOp::Gteq(_)
+        | ast::BinOp::LAngle(_)
+        | ast::BinOp::Lteq(_)
+        | ast::BinOp::Neq(_)
+        | ast::BinOp::Neqb(_)
+        | ast::BinOp::RAngle(_) => Some(5),
+        ast::BinOp::In(_)
+        | ast::BinOp::NotIn(_)
+        | ast::BinOp::Like(_)
+        | ast::BinOp::NotLike(_)
+        | ast::BinOp::Ilike(_)
+        | ast::BinOp::NotIlike(_)
+        | ast::BinOp::SimilarTo(_)
+        | ast::BinOp::NotSimilarTo(_) => Some(6),
+        ast::BinOp::CustomOp(_)
+        | ast::BinOp::OperatorCall(_)
+        | ast::BinOp::Overlaps(_)
+        | ast::BinOp::Escape(_) => Some(7),
+        ast::BinOp::Plus(_) | ast::BinOp::Minus(_) => Some(8),
+        ast::BinOp::Star(_) | ast::BinOp::Slash(_) | ast::BinOp::Percent(_) => Some(9),
+        ast::BinOp::Caret(_) => Some(10),
+        ast::BinOp::AtTimeZone(_) => Some(11),
+        ast::BinOp::ColonColon(_) => Some(15),
+        ast::BinOp::ColonEq(_) | ast::BinOp::FatArrow(_) => None,
+    }
+}
+
+fn build_bin_expr_operand<'a>(ctx: &Ctx, expr: ast::Expr, precedence: Option<u8>) -> Doc<'a> {
+    match expr {
+        ast::Expr::BinExpr(inner)
+            if precedence.is_some()
+                && inner.op().as_ref().and_then(binary_precedence) == precedence =>
+        {
+            build_bin_expr_chain(ctx, &inner, true)
+        }
+        expr => build_expr(ctx, expr),
+    }
+}
+
 fn build_bin_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr) -> Doc<'a> {
     if let Some(logical) = bin_expr.op().as_ref().and_then(logical_op) {
         let lhs_is_inline_bracketed = bin_expr
@@ -19364,6 +19461,10 @@ fn build_bin_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr) -> Doc<'a> {
         };
     }
 
+    build_bin_expr_chain(ctx, bin_expr, false)
+}
+
+fn build_bin_expr_chain<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, flattened: bool) -> Doc<'a> {
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
     let lhs_is_inline_bracketed = is_inline_bracketed_expr(&lhs);
@@ -19377,18 +19478,22 @@ fn build_bin_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr) -> Doc<'a> {
         Doc::line_or_space()
     };
     let before_op = comment_run_after(lhs.syntax()).between_nodes(separator);
+    let precedence = bin_expr.op().as_ref().and_then(binary_precedence);
     let tail = before_op
         .append(build_op(bin_expr.op().unwrap()))
         .append(after_op)
-        .append(build_expr(ctx, rhs));
+        .append(build_bin_expr_operand(ctx, rhs, precedence));
     let tail = if lhs_requires_inline_separator {
         tail.group()
     } else {
         tail
     };
 
-    let doc = build_expr(ctx, lhs).append(tail);
-    if lhs_is_inline_bracketed || rhs_requires_inline_separator {
+    let lhs_doc = build_bin_expr_operand(ctx, lhs, precedence);
+    let doc = lhs_doc.append(tail);
+    if flattened {
+        doc
+    } else if lhs_is_inline_bracketed || rhs_requires_inline_separator {
         doc.group()
     } else {
         doc.nest(ctx.indent).group()

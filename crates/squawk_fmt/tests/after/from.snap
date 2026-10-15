@@ -204,6 +204,45 @@ from only a_very_long_schema_name.a_very_long_first_relation_name * as a_very_lo
 
 select * from users join profiles on users.id = profiles.user_id;
 
+select * from a join b on true join c on true;
+
+select *
+from a
+  join b on true
+  join c on a_very_long_first_condition = a_very_long_second_condition;
+
+select *
+from a
+  /* before first join */ join /* first table */ b on true
+  /* after first condition */ -- before second join
+  left join /* second table */ c on
+    a_very_long_first_condition = a_very_long_second_condition;
+
+select *
+from a
+  join b on true
+  cross join (
+    c
+    join d on true
+    join e on a_very_long_first_condition = a_very_long_second_condition
+  );
+
+select *
+from pg_proc p
+  join pg_namespace n on n.oid = p.pronamespace
+  join pg_language l on l.oid = p.prolang
+  left join pg_description d on
+    d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
+  left join pg_aggregate a on a.aggfnoid = p.oid
+  left join pg_operator so on so.oid = a.aggsortop
+  left join pg_namespace son on son.oid = so.oprnamespace
+  left join pg_depend dep on
+    dep.classid = 'pg_proc'::regclass
+      and dep.objid = p.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid;
+
 select * from users left outer join profiles using (user_id) as matched_users;
 
 select relname, pg_get_indexdef
