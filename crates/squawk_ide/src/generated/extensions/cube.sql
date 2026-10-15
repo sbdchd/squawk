@@ -8,136 +8,271 @@
 create type cube;
 
 create function cube(cube, double precision) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube(cube, double precision, double precision) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube(double precision) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube(double precision, double precision) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube(double precision[]) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube(double precision[], double precision[]) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- btree comparison function
 create function cube_cmp(cube, cube) returns integer
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- contained in
 create function cube_contained(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- contains
 create function cube_contains(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_coord(cube, integer) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_coord_llur(cube, integer) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_dim(cube) returns integer
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_distance(cube, cube) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_enlarge(cube, double precision, integer) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- same as
 create function cube_eq(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- greater than or equal to
 create function cube_ge(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- greater than
 create function cube_gt(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_in(cstring) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_inter(cube, cube) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_is_point(cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- lower than or equal to
 create function cube_le(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_ll_coord(cube, integer) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- lower than
 create function cube_lt(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- different
 create function cube_ne(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_out(cube) returns cstring
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 -- overlaps
 create function cube_overlap(cube, cube) returns boolean
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_recv(internal) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_send(cube) returns bytea
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_size(cube) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_subset(cube, integer[]) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_union(cube, cube) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function cube_ur_coord(cube, integer) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function distance_chebyshev(cube, cube) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function distance_taxicab(cube, cube) returns double precision
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
-create function g_cube_consistent(internal, cube, smallint, oid, internal) returns boolean
-  language c immutable strict parallel safe;
+create function g_cube_consistent(
+  internal,
+  cube,
+  smallint,
+  oid,
+  internal
+) returns boolean
+  language c
+  immutable
+  strict
+  parallel safe;
 
-create function g_cube_distance(internal, cube, smallint, oid, internal) returns double precision
-  language c immutable strict parallel safe;
+create function g_cube_distance(
+  internal,
+  cube,
+  smallint,
+  oid,
+  internal
+) returns double precision
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function g_cube_penalty(internal, internal, internal) returns internal
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function g_cube_picksplit(internal, internal) returns internal
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function g_cube_same(cube, cube, internal) returns internal
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
 create function g_cube_union(internal, internal) returns cube
-  language c immutable strict parallel safe;
+  language c
+  immutable
+  strict
+  parallel safe;
 
-create type cube (input = cube_in, output = cube_out);
+create type cube (
+  input = cube_in,
+  output = cube_out
+);
 
 create operator && (
   leftarg = cube,
@@ -223,11 +358,20 @@ create operator ~> (
   function = cube_coord_llur
 );
 
-create operator family cube_ops using btree;
+create operator family cube_ops
+  using btree;
 
-create operator family gist_cube_ops using gist;
+create operator family gist_cube_ops
+  using gist;
 
-create operator class cube_ops default for type cube using btree family cube_ops as storage cube;
+create operator class cube_ops
+  default for type cube
+  using btree
+  family cube_ops as
+  storage cube;
 
-create operator class gist_cube_ops default for type cube using gist family gist_cube_ops as storage cube;
-
+create operator class gist_cube_ops
+  default for type cube
+  using gist
+  family gist_cube_ops as
+  storage cube;
