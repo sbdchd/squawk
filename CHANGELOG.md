@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.70.0 - 2026-10-15
+
+### Changed
+
+- fmt: group joins, fix long expressions, json_build_object special case (#1405)
+
+### Fixed
+
+- linter: fix table transaction tracking post-commit (#1409)
+- linter: fix adding-pk-constraint and constraint-missing-not-valid (#1408)
+- fmt: fix unnecessary quoting (#1404)
+- ide: update sync builtins to not include schema (#1406)
+
 ## v2.69.0 - 2026-10-14
 
 ### Added
@@ -18,8 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fmt: overlay on one line (#1397)
 - fmt: adjust formatting of unnamed create index (#1401)
 - syntax: perf improvements for syntax validation (#1399)
-
-### Removed
 
 ### Fixed
 
