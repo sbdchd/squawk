@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
-use std::fs::File;
-use std::io::{self, BufWriter, Write};
+use std::fs;
+use std::io::{self, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};
 
@@ -2646,11 +2646,12 @@ fn write_module(
     prefix: &str,
     module: &Module,
 ) -> Result<()> {
-    let file = File::create(path)?;
-    let mut writer = BufWriter::new(file);
-    write!(writer, "{}{}", header(version), prefix)?;
-    module.write_sql(&mut writer)?;
-    writer.flush()?;
+    let mut sql = Vec::new();
+    write!(sql, "{}{}", header(version), prefix)?;
+    module.write_sql(&mut sql)?;
+    let sql = std::str::from_utf8(&sql)?;
+    let sql = squawk_fmt::fmt_str(sql, squawk_fmt::FormatOptions::default())?;
+    fs::write(path, sql)?;
 
     Ok(())
 }

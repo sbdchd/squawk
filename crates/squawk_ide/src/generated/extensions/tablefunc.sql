@@ -24,36 +24,82 @@ create type tablefunc_crosstab_4 as (
   category_4 text
 );
 
-create function connectby(text, text, text, text, integer) returns SETOF record
-  language c stable strict;
+create function connectby(text, text, text, text, integer) returns setof record
+  language c
+  stable
+  strict;
 
-create function connectby(text, text, text, text, integer, text) returns SETOF record
-  language c stable strict;
+create function connectby(
+  text,
+  text,
+  text,
+  text,
+  integer,
+  text
+) returns setof record
+  language c
+  stable
+  strict;
 
-create function connectby(text, text, text, text, text, integer) returns SETOF record
-  language c stable strict;
+create function connectby(
+  text,
+  text,
+  text,
+  text,
+  text,
+  integer
+) returns setof record
+  language c
+  stable
+  strict;
 
-create function connectby(text, text, text, text, text, integer, text) returns SETOF record
-  language c stable strict;
+create function connectby(
+  text,
+  text,
+  text,
+  text,
+  text,
+  integer,
+  text
+) returns setof record
+  language c
+  stable
+  strict;
 
-create function crosstab(text) returns SETOF record
-  language c stable strict;
+create function crosstab(text) returns setof record
+  language c
+  stable
+  strict;
 
-create function crosstab(text, integer) returns SETOF record
-  language c stable strict;
+create function crosstab(text, integer) returns setof record
+  language c
+  stable
+  strict;
 
-create function crosstab(text, text) returns SETOF record
-  language c stable strict;
+create function crosstab(text, text) returns setof record
+  language c
+  stable
+  strict;
 
-create function crosstab2(text) returns SETOF tablefunc_crosstab_2
-  language c stable strict;
+create function crosstab2(text) returns setof tablefunc_crosstab_2
+  language c
+  stable
+  strict;
 
-create function crosstab3(text) returns SETOF tablefunc_crosstab_3
-  language c stable strict;
+create function crosstab3(text) returns setof tablefunc_crosstab_3
+  language c
+  stable
+  strict;
 
-create function crosstab4(text) returns SETOF tablefunc_crosstab_4
-  language c stable strict;
+create function crosstab4(text) returns setof tablefunc_crosstab_4
+  language c
+  stable
+  strict;
 
-create function normal_rand(integer, double precision, double precision) returns SETOF double precision
-  language c strict;
-
+create function normal_rand(
+  integer,
+  double precision,
+  double precision
+) returns setof double precision
+  language c
+  strict;
