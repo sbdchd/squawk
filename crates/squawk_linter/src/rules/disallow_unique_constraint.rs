@@ -3,23 +3,20 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation};
-
-use super::constraint_missing_not_valid::tables_created_in_transaction;
+use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let message = "Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.";
     let help = "Create an index `CONCURRENTLY` and create the constraint using the index.";
     let file = parse.tree();
-    let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
+    let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
+        tables_created.update(&stmt);
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             let Some(table_name) = alter_table
                 .table_relation_name()
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
-                .and_then(|x| x.segment())
-                .map(|x| x.text())
             else {
                 continue;
             };
@@ -68,6 +65,47 @@ mod test {
     use insta::assert_snapshot;
 
     use crate::test_utils::{lint_errors, lint_ok};
+
+    #[test]
+    fn created_table_after_commit_err() {
+        let sql = "begin;
+create table t as select 1 as id;
+commit;
+alter table t add unique (id);";
+        assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint), @"
+        warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
+          ╭▸ 
+        4 │ alter table t add unique (id);
+          │                   ━━━━━━━━━━━
+          │
+          ╰ help: Create an index `CONCURRENTLY` and create the constraint using the index.
+        ");
+    }
+
+    #[test]
+    fn created_table_in_another_schema_err() {
+        let sql = "begin;
+select 1 as id into new.t;
+alter table existing.t add unique (id);
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint), @"
+        warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
+          ╭▸ 
+        3 │ alter table existing.t add unique (id);
+          │                            ━━━━━━━━━━━
+          │
+          ╰ help: Create an index `CONCURRENTLY` and create the constraint using the index.
+        ");
+    }
+
+    #[test]
+    fn created_table_qualified_names_ok() {
+        let sql = r#"begin;
+select 1 as id into new.t;
+alter table NEW . "t" add unique (id);
+commit;"#;
+        lint_ok(sql, Rule::DisallowedUniqueConstraint);
+    }
     use crate::{LinterSettings, Rule};
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {

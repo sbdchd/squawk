@@ -3,23 +3,21 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation};
-
-use super::constraint_missing_not_valid::tables_created_in_transaction;
+use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let message = "Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.";
     let help = "Add the `PRIMARY KEY` constraint `USING` an index.";
     let file = parse.tree();
-    let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
+    let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
+        tables_created.update(&stmt);
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             if let Some(table_name) = alter_table
                 .table_relation_name()
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
-                .and_then(|path| path.segment())
-                && tables_created.contains(&table_name.text())
+                && tables_created.contains(&table_name)
             {
                 continue;
             }
@@ -70,6 +68,65 @@ mod test {
 
     use crate::Rule;
     use crate::test_utils::{lint_errors, lint_ok};
+
+    #[test]
+    fn created_table_after_commit_err() {
+        let sql = "begin;
+create table t (id int);
+create table u as select 1 as id;
+commit;
+alter table t add primary key (id);
+alter table u add column b serial primary key;";
+        assert_snapshot!(lint_errors(sql, Rule::AddingSerialPrimaryKeyField), @"
+        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+          ╭▸ 
+        5 │ alter table t add primary key (id);
+          │                   ━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
+        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+          ╭▸ 
+        6 │ alter table u add column b serial primary key;
+          │                                   ━━━━━━━━━━━
+          │
+          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
+        ");
+    }
+
+    #[test]
+    fn created_table_in_another_schema_err() {
+        let sql = "begin;
+create table new.t (id int);
+select 1 as id into new.u;
+alter table existing.t add primary key (id);
+alter table existing.u add column b serial primary key;
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::AddingSerialPrimaryKeyField), @"
+        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+          ╭▸ 
+        4 │ alter table existing.t add primary key (id);
+          │                            ━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
+        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+          ╭▸ 
+        5 │ alter table existing.u add column b serial primary key;
+          │                                            ━━━━━━━━━━━
+          │
+          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
+        ");
+    }
+
+    #[test]
+    fn created_table_qualified_names_ok() {
+        let sql = r#"begin;
+create table new.t (id int);
+select 1 as id into new.u;
+alter table NEW . "t" add primary key (id);
+alter table new.u add column b serial primary key;
+commit;"#;
+        lint_ok(sql, Rule::AddingSerialPrimaryKeyField);
+    }
 
     #[test]
     fn new_tables_in_explicit_transaction_ok() {
