@@ -20,6 +20,7 @@ pub mod analyze;
 pub mod ignore;
 mod ignore_index;
 mod name;
+mod transactions;
 mod version;
 mod visitors;
 

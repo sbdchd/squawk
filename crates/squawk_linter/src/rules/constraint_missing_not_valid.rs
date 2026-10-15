@@ -5,42 +5,7 @@ use squawk_syntax::{
     ast::{self, AstNode, NameLike},
 };
 
-use crate::{Linter, Rule, Violation};
-
-pub(crate) fn tables_created_in_transaction(
-    assume_in_transaction: bool,
-    file: &ast::SourceFile,
-) -> FxHashSet<String> {
-    let mut created_table_names = FxHashSet::default();
-    let mut inside_transaction = assume_in_transaction;
-    for stmt in file.stmts() {
-        let table_name = match stmt {
-            ast::Stmt::Begin(_) => {
-                inside_transaction = true;
-                None
-            }
-            ast::Stmt::Commit(_) => {
-                inside_transaction = false;
-                None
-            }
-            ast::Stmt::CreateTable(create_table) if inside_transaction => create_table.table_name(),
-            ast::Stmt::CreateTableAs(create_table_as) if inside_transaction => {
-                create_table_as.table_name()
-            }
-            ast::Stmt::SelectInto(select_into) if inside_transaction => {
-                select_into.into_clause().and_then(|into| into.table_name())
-            }
-            _ => None,
-        };
-        if let Some(table_name) = table_name
-            .and_then(|table| table.path())
-            .and_then(|path| path.segment())
-        {
-            created_table_names.insert(table_name.text());
-        }
-    }
-    created_table_names
-}
+use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 fn not_valid_validate_in_transaction(
     ctx: &mut Linter,
@@ -104,16 +69,15 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
 
     not_valid_validate_in_transaction(ctx, assume_in_transaction, &file);
 
-    let tables_created = tables_created_in_transaction(assume_in_transaction, &file);
+    let mut tables_created = TablesCreatedInTransaction::new(assume_in_transaction);
 
     for stmt in file.stmts() {
+        tables_created.update(&stmt);
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             let Some(table_name) = alter_table
                 .table_relation_name()
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
-                .and_then(|x| x.segment())
-                .map(|x| x.text())
             else {
                 continue;
             };
@@ -159,6 +123,165 @@ mod test {
     #[must_use]
     fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
         crate::test_utils::lint_errors_with(sql, settings, Rule::ConstraintMissingNotValid)
+    }
+
+    #[test]
+    fn created_table_after_commit_err() {
+        let sql = "begin;
+create table t (id int);
+commit;
+alter table t add check (id > 0);";
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        4 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
+    }
+
+    #[test]
+    fn created_table_in_another_schema_err() {
+        let sql = "begin;
+create table new.t as select 1 as id;
+alter table existing.t add check (id > 0);
+alter table t add check (id > 0);
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        3 │ alter table existing.t add check (id > 0);
+          │                        ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        4 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
+    }
+
+    #[test]
+    fn created_table_qualified_names_ok() {
+        let sql = r#"begin;
+create table new.t (id int);
+alter table NEW . "t" add check (id > 0);
+create table new.u as select 1 as id;
+alter table new.u add check (id > 0);
+select 1 as id into new.v;
+alter table new.v add check (id > 0);
+commit;"#;
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
+    }
+
+    #[test]
+    fn created_table_after_rollback_err() {
+        let sql = "begin;
+create table t as select 1 as id;
+rollback;
+alter table t add check (id > 0);";
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        4 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
+    }
+
+    #[test]
+    fn created_table_in_previous_transaction_err() {
+        let sql = "begin;
+select 1 as id into t;
+commit;
+begin;
+alter table t add check (id > 0);
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        5 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
+    }
+
+    #[test]
+    fn table_created_later_err() {
+        let sql = "begin;
+alter table t add check (id > 0);
+create table t (id int);
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        2 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
+    }
+
+    #[test]
+    fn assumed_transaction_after_commit_err() {
+        let sql = "create table t (id int);
+commit;
+alter table t add check (id > 0);";
+        assert_snapshot!(lint_errors_with(sql, LinterSettings {
+            assume_in_transaction: true,
+            ..Default::default()
+        }), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        3 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
+    }
+
+    #[test]
+    fn chained_transactions_clear_created_tables_err() {
+        let sql = "begin;
+create table t (id int);
+commit and chain;
+alter table t add check (id > 0);
+create table u (id int);
+rollback and chain;
+alter table u add check (id > 0);
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        4 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        7 │ alter table u add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
+    }
+
+    #[test]
+    fn chained_transactions_track_new_tables_ok() {
+        let sql = "begin;
+commit and chain;
+create table t (id int);
+alter table t add check (id > 0);
+rollback and chain;
+create table u (id int);
+alter table u add check (id > 0);
+commit;";
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
     }
 
     #[test]

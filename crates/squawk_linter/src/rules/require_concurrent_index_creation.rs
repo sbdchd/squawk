@@ -3,9 +3,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation};
-
-use super::constraint_missing_not_valid::tables_created_in_transaction;
+use crate::{Edit, Fix, Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 fn concurrently_fix(create_index: &ast::CreateIndex) -> Option<Fix> {
     let index_token = create_index.index_token()?;
@@ -16,16 +14,16 @@ fn concurrently_fix(create_index: &ast::CreateIndex) -> Option<Fix> {
 
 pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
-    let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
+    let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
+        tables_created.update(&stmt);
         if let ast::Stmt::CreateIndex(create_index) = stmt
             && let Some(table_name) = create_index
                 .table_relation_name()
                 .and_then(|relation| relation.table_name_ref())
                 .and_then(|table| table.path_ref())
-                .and_then(|x| x.segment())
             && create_index.concurrently_token().is_none()
-            && !tables_created.contains(&table_name.text())
+            && !tables_created.contains(&table_name)
         {
             let fix = concurrently_fix(&create_index);
 
@@ -56,6 +54,53 @@ mod test {
     #[must_use]
     fn fix(sql: &str) -> String {
         fix_sql(sql, Rule::RequireConcurrentIndexCreation)
+    }
+
+    #[test]
+    fn created_table_after_commit_err() {
+        let sql = "begin;
+select 1 as id into t;
+commit;
+create index on t (id);";
+        assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexCreation), @"
+        warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
+          ╭▸ 
+        4 │ create index on t (id);
+          │ ━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Use `concurrently` to avoid blocking writes.
+          ╭╴
+        4 │ create index concurrently on t (id);
+          ╰╴             ++++++++++++
+        ");
+    }
+
+    #[test]
+    fn created_table_in_another_schema_err() {
+        let sql = "begin;
+create table new.t (id int);
+create index on existing.t (id);
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexCreation), @"
+        warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
+          ╭▸ 
+        3 │ create index on existing.t (id);
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Use `concurrently` to avoid blocking writes.
+          ╭╴
+        3 │ create index concurrently on existing.t (id);
+          ╰╴             ++++++++++++
+        ");
+    }
+
+    #[test]
+    fn created_table_qualified_names_ok() {
+        let sql = r#"begin;
+create table new.t (id int);
+create index on NEW . "t" (id);
+commit;"#;
+        lint_ok(sql, Rule::RequireConcurrentIndexCreation);
     }
 
     #[test]

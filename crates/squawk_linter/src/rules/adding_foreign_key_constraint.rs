@@ -3,24 +3,22 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{
-    Linter, Rule, Violation, rules::constraint_missing_not_valid::tables_created_in_transaction,
-};
+use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let message = "Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.";
     let help = "Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.";
     let file = parse.tree();
-    let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
+    let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     // TODO: use match_ast! like in #api_walkthrough
     for stmt in file.stmts() {
+        tables_created.update(&stmt);
         match stmt {
             ast::Stmt::AlterTable(alter_table) => {
                 if let Some(table_name) = alter_table
                     .table_relation_name()
                     .and_then(|relation| relation.table_name_ref())
                     .and_then(|table| table.path_ref())
-                    .and_then(|x| x.segment())
                 {
                     for action in alter_table.actions() {
                         match action {
@@ -28,8 +26,7 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 let Some(constraint) = add_constraint.constraint() else {
                                     continue;
                                 };
-                                if constraint.is_not_valid()
-                                    || tables_created.contains(&table_name.text())
+                                if constraint.is_not_valid() || tables_created.contains(&table_name)
                                 {
                                     // Adding foreign key is okay when:
                                     // - NOT VALID is specified.
@@ -88,6 +85,47 @@ mod test {
     use insta::assert_snapshot;
 
     use crate::test_utils::{lint_errors, lint_ok};
+
+    #[test]
+    fn created_table_after_commit_err() {
+        let sql = "begin;
+create table t (id int);
+commit;
+alter table t add foreign key (id) references other_t (id);";
+        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint), @"
+        warning[adding-foreign-key-constraint]: Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.
+          ╭▸ 
+        4 │ alter table t add foreign key (id) references other_t (id);
+          │                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.
+        ");
+    }
+
+    #[test]
+    fn created_table_in_another_schema_err() {
+        let sql = "begin;
+create table new.t as select 1 as id;
+alter table existing.t add foreign key (id) references other_t (id);
+commit;";
+        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint), @"
+        warning[adding-foreign-key-constraint]: Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.
+          ╭▸ 
+        3 │ alter table existing.t add foreign key (id) references other_t (id);
+          │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.
+        ");
+    }
+
+    #[test]
+    fn created_table_qualified_names_ok() {
+        let sql = r#"begin;
+create table new.t as select 1 as id;
+alter table NEW . "t" add foreign key (id) references other_t (id);
+commit;"#;
+        lint_ok(sql, Rule::AddingForeignKeyConstraint);
+    }
     use crate::{LinterSettings, Rule};
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {
