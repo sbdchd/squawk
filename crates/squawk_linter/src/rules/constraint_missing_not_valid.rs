@@ -14,24 +14,29 @@ pub(crate) fn tables_created_in_transaction(
     let mut created_table_names = FxHashSet::default();
     let mut inside_transaction = assume_in_transaction;
     for stmt in file.stmts() {
-        match stmt {
+        let table_name = match stmt {
             ast::Stmt::Begin(_) => {
                 inside_transaction = true;
+                None
             }
             ast::Stmt::Commit(_) => {
                 inside_transaction = false;
+                None
             }
-            ast::Stmt::CreateTable(create_table) if inside_transaction => {
-                let Some(table_name) = create_table
-                    .table_name()
-                    .and_then(|table| table.path())
-                    .and_then(|x| x.segment())
-                else {
-                    continue;
-                };
-                created_table_names.insert(table_name.text());
+            ast::Stmt::CreateTable(create_table) if inside_transaction => create_table.table_name(),
+            ast::Stmt::CreateTableAs(create_table_as) if inside_transaction => {
+                create_table_as.table_name()
             }
-            _ => (),
+            ast::Stmt::SelectInto(select_into) if inside_transaction => {
+                select_into.into_clause().and_then(|into| into.table_name())
+            }
+            _ => None,
+        };
+        if let Some(table_name) = table_name
+            .and_then(|table| table.path())
+            .and_then(|path| path.segment())
+        {
+            created_table_names.insert(table_name.text());
         }
     }
     created_table_names
@@ -154,6 +159,57 @@ mod test {
     #[must_use]
     fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
         crate::test_utils::lint_errors_with(sql, settings, Rule::ConstraintMissingNotValid)
+    }
+
+    #[test]
+    fn new_tables_in_explicit_transaction_ok() {
+        let sql = "begin;
+create table t as
+  select 1 as id;
+alter table t add primary key (id);
+select 1 as id into u;
+alter table u add primary key (id);
+commit;";
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
+    }
+
+    #[test]
+    fn new_tables_in_assumed_transaction_ok() {
+        let sql = "create table t as
+  select 1 as id;
+alter table t add primary key (id);
+select 1 as id into u;
+alter table u add primary key (id);";
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
+    }
+
+    #[test]
+    fn new_tables_without_transaction_err() {
+        let sql = "create table t as
+  select 1 as id;
+alter table t add primary key (id);
+select 1 as id into u;
+alter table u add primary key (id);";
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        3 │ alter table t add primary key (id);
+          │               ━━━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╭▸ 
+        5 │ alter table u add primary key (id);
+          │               ━━━━━━━━━━━━━━━━━━━━
+          │
+          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+        ");
     }
 
     #[test]
