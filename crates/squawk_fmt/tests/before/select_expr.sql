@@ -28,6 +28,28 @@ select json_build_object('a_very_long_key_that_together_with_its_value_will_not_
 
 select json_build_object('nested', jsonb_build_object('name', a.attname, 'data_type', format_type(a.atttypid, a.atttypmod)), 'other', 2);
 
+select coalesce(
+  (
+    select json_agg(
+      json_build_object(
+        'name', quote_ident(option_name),
+        'value', option_value,
+        'is_list', lower(option_name) in (
+          'local_preload_libraries',
+          'oauth_validator_libraries',
+          'search_path',
+          'session_preload_libraries',
+          'shared_preload_libraries',
+          'temp_tablespaces',
+          'unix_socket_directories'
+        )
+      ) order by ordinality
+    )
+    from pg_options_to_table(p.proconfig) with ordinality
+  ),
+  '[]'
+) as settings;
+
 select json_build_object(/* before key */ 'name' /* after key */, /* before value */ a.attname /* after value */, /* before next key */ 'data_type' /* after next key */, /* before next value */ format_type(a.atttypid, a.atttypmod) /* after next value */);
 
 select json_build_object(

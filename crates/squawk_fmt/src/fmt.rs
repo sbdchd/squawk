@@ -18320,9 +18320,14 @@ fn join_comma_separated_with_pairs<'a>(
     let (mut current, mut previous_syntax) = items.next()?;
     let mut docs = Vec::new();
     for (index, (item, syntax)) in items.enumerate() {
+        let separator = if paired && index.is_multiple_of(2) {
+            Doc::space()
+        } else {
+            Doc::line_or_space()
+        };
         let separator = trailing_comments(&previous_syntax)
             .append(Doc::text(","))
-            .append(comment_run_before(&syntax).separator_before(Doc::line_or_space()));
+            .append(comment_run_before(&syntax).separator_before(separator));
         if paired && index.is_multiple_of(2) {
             current = current.append(separator).append(item).group();
         } else {
@@ -20278,10 +20283,10 @@ fn build_targets<'a>(
 }
 
 fn build_target<'a>(ctx: &Ctx, target: &ast::Target) -> Option<Doc<'a>> {
-    let mut doc = leading_comments(target.syntax());
+    let mut doc = Doc::nil();
 
     if target.star_token().is_some() {
-        return Some(doc.append(Doc::text("*")));
+        return Some(leading_comments(target.syntax()).append(Doc::text("*")));
     }
     let expr = target.expr()?;
     doc = doc.append(build_expr(ctx, expr));
@@ -20311,7 +20316,8 @@ fn build_target<'a>(ctx: &Ctx, target: &ast::Target) -> Option<Doc<'a>> {
         }
     }
 
-    Some(doc)
+    let doc = doc.group();
+    Some(leading_comments(target.syntax()).append(doc.clone().union(doc)))
 }
 
 pub fn fmt(

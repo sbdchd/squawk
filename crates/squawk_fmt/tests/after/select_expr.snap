@@ -56,25 +56,43 @@ select json_build_object(
 );
 
 select json_build_object(
-  'a_very_long_key_that_together_with_its_value_will_not_fit_on_one_line',
-  a_very_long_value_expression,
+  'a_very_long_key_that_together_with_its_value_will_not_fit_on_one_line', a_very_long_value_expression,
   'short', 1
 );
 
 select json_build_object(
-  'nested',
-  jsonb_build_object(
+  'nested', jsonb_build_object(
     'name', a.attname,
     'data_type', format_type(a.atttypid, a.atttypmod)
   ),
   'other', 2
 );
 
+select coalesce(
+  (
+    select json_agg(
+      json_build_object(
+        'name', quote_ident(option_name),
+        'value', option_value,
+        'is_list', lower(option_name) in (
+          'local_preload_libraries',
+          'oauth_validator_libraries',
+          'search_path',
+          'session_preload_libraries',
+          'shared_preload_libraries',
+          'temp_tablespaces',
+          'unix_socket_directories'
+        )
+      ) order by ordinality
+    )
+    from pg_options_to_table(p.proconfig) with ordinality
+  ),
+  '[]'
+) as settings;
+
 select json_build_object(
-  /* before key */ 'name' /* after key */,
-  /* before value */ a.attname /* after value */,
-  /* before next key */ 'data_type' /* after next key */,
-  /* before next value */ format_type(
+  /* before key */ 'name' /* after key */, /* before value */ a.attname /* after value */,
+  /* before next key */ 'data_type' /* after next key */, /* before next value */ format_type(
     a.atttypid,
     a.atttypmod
   ) /* after next value */
@@ -319,8 +337,7 @@ select
   1 + 1,
   1 /* before op */ + /* after op */ 1,
   a_very_long_binary_left_expression
-    + a_very_long_binary_middle_expression
-      * a_very_long_binary_right_expression,
+    + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
   2 @@@ 2,
   true and false,
   ts at time zone 'UTC',
@@ -358,8 +375,7 @@ select
   6 / 2,
   2 * 3,
   a_very_long_binary_left_expression
-    + a_very_long_binary_middle_expression
-      * a_very_long_binary_right_expression,
+    + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
   -- call expr
   1 = any(array[1, 2]),
   2 = all(select x from things),
@@ -814,9 +830,7 @@ select
   ) /* after filter */,
   first_value(x) ignore nulls,
   last_value(y) respect nulls,
-  first_value(
-    x
-  ) /* before treatment */ ignore /* before nulls */ nulls /* after nulls */,
+  first_value(x) /* before treatment */ ignore /* before nulls */ nulls /* after nulls */,
   a_very_long_ordered_set_aggregate_name(
     a_very_long_direct_argument_expression
   ) within group (order by a_very_long_ordered_set_expression desc nulls last),
@@ -838,9 +852,7 @@ select
     rows between unbounded preceding and current row exclude ties
   ),
   sum(x) over (range 1 preceding),
-  sum(x) over (
-    groups between current row and unbounded following exclude group
-  ),
+  sum(x) over (groups between current row and unbounded following exclude group),
   sum(x) over (rows between 1 preceding and 2 following exclude no others),
   sum(a_very_long_window_value_expression) over (
     a_very_long_window_reference
@@ -882,12 +894,8 @@ select
     /* before else */ else /* after else */ 3 /* before end */
   end,
   -- cast expr
-  cast(
-    1 as int8
-  ),
-  treat(
-    2 as bigint
-  ),
+  cast(1 as int8),
+  treat(2 as bigint),
   1::int8,
   int8 '1',
   cast(
