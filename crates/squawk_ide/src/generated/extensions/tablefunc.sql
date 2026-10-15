@@ -3,20 +3,20 @@
 -- update via:
 --   cargo xtask sync-builtins
 
-create type public.tablefunc_crosstab_2 as (
+create type tablefunc_crosstab_2 as (
   row_name text,
   category_1 text,
   category_2 text
 );
 
-create type public.tablefunc_crosstab_3 as (
+create type tablefunc_crosstab_3 as (
   row_name text,
   category_1 text,
   category_2 text,
   category_3 text
 );
 
-create type public.tablefunc_crosstab_4 as (
+create type tablefunc_crosstab_4 as (
   row_name text,
   category_1 text,
   category_2 text,
@@ -24,36 +24,36 @@ create type public.tablefunc_crosstab_4 as (
   category_4 text
 );
 
-create function public.connectby(text, text, text, text, integer) returns SETOF record
+create function connectby(text, text, text, text, integer) returns SETOF record
   language c;
 
-create function public.connectby(text, text, text, text, integer, text) returns SETOF record
+create function connectby(text, text, text, text, integer, text) returns SETOF record
   language c;
 
-create function public.connectby(text, text, text, text, text, integer) returns SETOF record
+create function connectby(text, text, text, text, text, integer) returns SETOF record
   language c;
 
-create function public.connectby(text, text, text, text, text, integer, text) returns SETOF record
+create function connectby(text, text, text, text, text, integer, text) returns SETOF record
   language c;
 
-create function public.crosstab(text) returns SETOF record
+create function crosstab(text) returns SETOF record
   language c;
 
-create function public.crosstab(text, integer) returns SETOF record
+create function crosstab(text, integer) returns SETOF record
   language c;
 
-create function public.crosstab(text, text) returns SETOF record
+create function crosstab(text, text) returns SETOF record
   language c;
 
-create function public.crosstab2(text) returns SETOF tablefunc_crosstab_2
+create function crosstab2(text) returns SETOF tablefunc_crosstab_2
   language c;
 
-create function public.crosstab3(text) returns SETOF tablefunc_crosstab_3
+create function crosstab3(text) returns SETOF tablefunc_crosstab_3
   language c;
 
-create function public.crosstab4(text) returns SETOF tablefunc_crosstab_4
+create function crosstab4(text) returns SETOF tablefunc_crosstab_4
   language c;
 
-create function public.normal_rand(integer, double precision, double precision) returns SETOF double precision
+create function normal_rand(integer, double precision, double precision) returns SETOF double precision
   language c;
 

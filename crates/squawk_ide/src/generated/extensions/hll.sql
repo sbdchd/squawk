@@ -4,225 +4,225 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.hll;
+create type hll;
 
 -- size: 8, align: 8
-create type public.hll_hashval;
+create type hll_hashval;
 
-create function public.hll(hll, integer, boolean) returns hll
+create function hll(hll, integer, boolean) returns hll
   language c;
 
-create function public.hll_add(hll, hll_hashval) returns hll
+create function hll_add(hll, hll_hashval) returns hll
   language c;
 
-create function public.hll_add_rev(hll_hashval, hll) returns hll
+create function hll_add_rev(hll_hashval, hll) returns hll
   language c;
 
-create function public.hll_add_trans0(internal, hll_hashval) returns internal
+create function hll_add_trans0(internal, hll_hashval) returns internal
   language c;
 
-create function public.hll_add_trans1(internal, hll_hashval, integer) returns internal
+create function hll_add_trans1(internal, hll_hashval, integer) returns internal
   language c;
 
-create function public.hll_add_trans2(internal, hll_hashval, integer, integer) returns internal
+create function hll_add_trans2(internal, hll_hashval, integer, integer) returns internal
   language c;
 
-create function public.hll_add_trans3(internal, hll_hashval, integer, integer, bigint) returns internal
+create function hll_add_trans3(internal, hll_hashval, integer, integer, bigint) returns internal
   language c;
 
-create function public.hll_add_trans4(internal, hll_hashval, integer, integer, bigint, integer) returns internal
+create function hll_add_trans4(internal, hll_hashval, integer, integer, bigint, integer) returns internal
   language c;
 
-create function public.hll_card_unpacked(internal) returns double precision
+create function hll_card_unpacked(internal) returns double precision
   language c;
 
-create function public.hll_cardinality(hll) returns double precision
+create function hll_cardinality(hll) returns double precision
   language c;
 
-create function public.hll_ceil_card_unpacked(internal) returns bigint
+create function hll_ceil_card_unpacked(internal) returns bigint
   language c;
 
-create function public.hll_deserialize(bytea, internal) returns internal
+create function hll_deserialize(bytea, internal) returns internal
   language c;
 
-create function public.hll_empty() returns hll
+create function hll_empty() returns hll
   language c;
 
-create function public.hll_empty(integer) returns hll
+create function hll_empty(integer) returns hll
   language c;
 
-create function public.hll_empty(integer, integer) returns hll
+create function hll_empty(integer, integer) returns hll
   language c;
 
-create function public.hll_empty(integer, integer, bigint) returns hll
+create function hll_empty(integer, integer, bigint) returns hll
   language c;
 
-create function public.hll_empty(integer, integer, bigint, integer) returns hll
+create function hll_empty(integer, integer, bigint, integer) returns hll
   language c;
 
-create function public.hll_eq(hll, hll) returns boolean
+create function hll_eq(hll, hll) returns boolean
   language c;
 
-create function public.hll_expthresh(hll, OUT specified bigint, OUT effective bigint) returns record
+create function hll_expthresh(hll, OUT specified bigint, OUT effective bigint) returns record
   language c;
 
-create function public.hll_floor_card_unpacked(internal) returns bigint
+create function hll_floor_card_unpacked(internal) returns bigint
   language c;
 
-create function public.hll_hash_any(anyelement, integer DEFAULT 0) returns hll_hashval
+create function hll_hash_any(anyelement, integer DEFAULT 0) returns hll_hashval
   language c;
 
-create function public.hll_hash_bigint(bigint, integer DEFAULT 0) returns hll_hashval
+create function hll_hash_bigint(bigint, integer DEFAULT 0) returns hll_hashval
   language c;
 
-create function public.hll_hash_boolean(boolean, integer DEFAULT 0) returns hll_hashval
+create function hll_hash_boolean(boolean, integer DEFAULT 0) returns hll_hashval
   language c;
 
-create function public.hll_hash_bytea(bytea, integer DEFAULT 0) returns hll_hashval
+create function hll_hash_bytea(bytea, integer DEFAULT 0) returns hll_hashval
   language c;
 
-create function public.hll_hash_integer(integer, integer DEFAULT 0) returns hll_hashval
+create function hll_hash_integer(integer, integer DEFAULT 0) returns hll_hashval
   language c;
 
-create function public.hll_hash_smallint(smallint, integer DEFAULT 0) returns hll_hashval
+create function hll_hash_smallint(smallint, integer DEFAULT 0) returns hll_hashval
   language c;
 
-create function public.hll_hash_text(text, integer DEFAULT 0) returns hll_hashval
+create function hll_hash_text(text, integer DEFAULT 0) returns hll_hashval
   language c;
 
-create function public.hll_hashval(bigint) returns hll_hashval
+create function hll_hashval(bigint) returns hll_hashval
   language c;
 
-create function public.hll_hashval_eq(hll_hashval, hll_hashval) returns boolean
+create function hll_hashval_eq(hll_hashval, hll_hashval) returns boolean
   language c;
 
-create function public.hll_hashval_in(cstring, oid, integer) returns hll_hashval
+create function hll_hashval_in(cstring, oid, integer) returns hll_hashval
   language c;
 
-create function public.hll_hashval_int4(integer) returns hll_hashval
+create function hll_hashval_int4(integer) returns hll_hashval
   language c;
 
-create function public.hll_hashval_ne(hll_hashval, hll_hashval) returns boolean
+create function hll_hashval_ne(hll_hashval, hll_hashval) returns boolean
   language c;
 
-create function public.hll_hashval_out(hll_hashval) returns cstring
+create function hll_hashval_out(hll_hashval) returns cstring
   language c;
 
-create function public.hll_in(cstring, oid, integer) returns hll
+create function hll_in(cstring, oid, integer) returns hll
   language c;
 
-create function public.hll_log2m(hll) returns integer
+create function hll_log2m(hll) returns integer
   language c;
 
-create function public.hll_ne(hll, hll) returns boolean
+create function hll_ne(hll, hll) returns boolean
   language c;
 
-create function public.hll_out(hll) returns cstring
+create function hll_out(hll) returns cstring
   language c;
 
-create function public.hll_pack(internal) returns hll
+create function hll_pack(internal) returns hll
   language c;
 
-create function public.hll_print(hll) returns cstring
+create function hll_print(hll) returns cstring
   language c;
 
-create function public.hll_recv(internal) returns hll
+create function hll_recv(internal) returns hll
   language c;
 
-create function public.hll_regwidth(hll) returns integer
+create function hll_regwidth(hll) returns integer
   language c;
 
-create function public.hll_schema_version(hll) returns integer
+create function hll_schema_version(hll) returns integer
   language c;
 
-create function public.hll_send(hll) returns bytea
+create function hll_send(hll) returns bytea
   language c;
 
-create function public.hll_serialize(internal) returns bytea
+create function hll_serialize(internal) returns bytea
   language c;
 
-create function public.hll_set_defaults(i_log2m integer, i_regwidth integer, i_expthresh bigint, i_sparseon integer, OUT o_log2m integer, OUT o_regwidth integer, OUT o_expthresh bigint, OUT o_sparseon integer) returns record
+create function hll_set_defaults(i_log2m integer, i_regwidth integer, i_expthresh bigint, i_sparseon integer, OUT o_log2m integer, OUT o_regwidth integer, OUT o_expthresh bigint, OUT o_sparseon integer) returns record
   language c;
 
-create function public.hll_set_max_sparse(integer) returns integer
+create function hll_set_max_sparse(integer) returns integer
   language c;
 
-create function public.hll_set_output_version(integer) returns integer
+create function hll_set_output_version(integer) returns integer
   language c;
 
-create function public.hll_sparseon(hll) returns integer
+create function hll_sparseon(hll) returns integer
   language c;
 
-create function public.hll_type(hll) returns integer
+create function hll_type(hll) returns integer
   language c;
 
-create function public.hll_typmod_in(cstring[]) returns integer
+create function hll_typmod_in(cstring[]) returns integer
   language c;
 
-create function public.hll_typmod_out(integer) returns cstring
+create function hll_typmod_out(integer) returns cstring
   language c;
 
-create function public.hll_union(hll, hll) returns hll
+create function hll_union(hll, hll) returns hll
   language c;
 
-create function public.hll_union_internal(internal, internal) returns internal
+create function hll_union_internal(internal, internal) returns internal
   language c;
 
-create function public.hll_union_trans(internal, hll) returns internal
+create function hll_union_trans(internal, hll) returns internal
   language c;
 
-create type public.hll (input = hll_in, output = hll_out);
+create type hll (input = hll_in, output = hll_out);
 
-create type public.hll_hashval (input = hll_hashval_in, output = hll_hashval_out);
+create type hll_hashval (input = hll_hashval_in, output = hll_hashval_out);
 
-create operator public.# (
+create operator # (
   rightarg = hll,
-  function = public.hll_cardinality
+  function = hll_cardinality
 );
 
-create operator public.<> (
+create operator <> (
   leftarg = hll,
   rightarg = hll,
-  function = public.hll_ne
+  function = hll_ne
 );
 
-create operator public.<> (
+create operator <> (
   leftarg = hll_hashval,
   rightarg = hll_hashval,
-  function = public.hll_hashval_ne
+  function = hll_hashval_ne
 );
 
-create operator public.= (
+create operator = (
   leftarg = hll,
   rightarg = hll,
-  function = public.hll_eq
+  function = hll_eq
 );
 
-create operator public.= (
+create operator = (
   leftarg = hll_hashval,
   rightarg = hll_hashval,
-  function = public.hll_hashval_eq
+  function = hll_hashval_eq
 );
 
-create operator public.|| (
+create operator || (
   leftarg = hll,
   rightarg = hll,
-  function = public.hll_union
+  function = hll_union
 );
 
-create operator public.|| (
+create operator || (
   leftarg = hll,
   rightarg = hll_hashval,
-  function = public.hll_add
+  function = hll_add
 );
 
-create operator public.|| (
+create operator || (
   leftarg = hll_hashval,
   rightarg = hll,
-  function = public.hll_add_rev
+  function = hll_add_rev
 );
 
-create aggregate public.hll_add_agg(hll_hashval) (
+create aggregate hll_add_agg(hll_hashval) (
   sfunc = hll_add_trans0,
   stype = internal,
   finalfunc = hll_pack,
@@ -231,7 +231,7 @@ create aggregate public.hll_add_agg(hll_hashval) (
   deserialfunc = hll_deserialize
 );
 
-create aggregate public.hll_add_agg(hll_hashval, integer) (
+create aggregate hll_add_agg(hll_hashval, integer) (
   sfunc = hll_add_trans1,
   stype = internal,
   finalfunc = hll_pack,
@@ -240,7 +240,7 @@ create aggregate public.hll_add_agg(hll_hashval, integer) (
   deserialfunc = hll_deserialize
 );
 
-create aggregate public.hll_add_agg(hll_hashval, integer, integer) (
+create aggregate hll_add_agg(hll_hashval, integer, integer) (
   sfunc = hll_add_trans2,
   stype = internal,
   finalfunc = hll_pack,
@@ -249,7 +249,7 @@ create aggregate public.hll_add_agg(hll_hashval, integer, integer) (
   deserialfunc = hll_deserialize
 );
 
-create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint) (
+create aggregate hll_add_agg(hll_hashval, integer, integer, bigint) (
   sfunc = hll_add_trans3,
   stype = internal,
   finalfunc = hll_pack,
@@ -258,7 +258,7 @@ create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint) (
   deserialfunc = hll_deserialize
 );
 
-create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
+create aggregate hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
   sfunc = hll_add_trans4,
   stype = internal,
   finalfunc = hll_pack,
@@ -267,7 +267,7 @@ create aggregate public.hll_add_agg(hll_hashval, integer, integer, bigint, integ
   deserialfunc = hll_deserialize
 );
 
-create aggregate public.hll_union_agg(hll) (
+create aggregate hll_union_agg(hll) (
   sfunc = hll_union_trans,
   stype = internal,
   finalfunc = hll_pack,
@@ -280,7 +280,7 @@ create cast (bigint as hll_hashval) without function;
 
 create cast (bytea as hll) without function;
 
-create cast (hll as hll) with function public.hll(hll, integer, boolean) as implicit;
+create cast (hll as hll) with function hll(hll, integer, boolean) as implicit;
 
-create cast (integer as hll_hashval) with function public.hll_hashval_int4(integer);
+create cast (integer as hll_hashval) with function hll_hashval_int4(integer);
 

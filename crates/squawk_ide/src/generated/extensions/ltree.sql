@@ -4,572 +4,572 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.lquery;
+create type lquery;
 
 -- size: -1, align: 4
-create type public.ltree;
+create type ltree;
 
 -- size: -1, align: 4
-create type public.ltree_gist;
+create type ltree_gist;
 
 -- size: -1, align: 4
-create type public.ltxtquery;
+create type ltxtquery;
 
-create function public._lt_q_regex(ltree[], lquery[]) returns boolean
+create function _lt_q_regex(ltree[], lquery[]) returns boolean
   language c;
 
-create function public._lt_q_rregex(lquery[], ltree[]) returns boolean
+create function _lt_q_rregex(lquery[], ltree[]) returns boolean
   language c;
 
-create function public._ltq_extract_regex(ltree[], lquery) returns ltree
+create function _ltq_extract_regex(ltree[], lquery) returns ltree
   language c;
 
-create function public._ltq_regex(ltree[], lquery) returns boolean
+create function _ltq_regex(ltree[], lquery) returns boolean
   language c;
 
-create function public._ltq_rregex(lquery, ltree[]) returns boolean
+create function _ltq_rregex(lquery, ltree[]) returns boolean
   language c;
 
-create function public._ltree_compress(internal) returns internal
+create function _ltree_compress(internal) returns internal
   language c;
 
-create function public._ltree_consistent(internal, ltree[], smallint, oid, internal) returns boolean
+create function _ltree_consistent(internal, ltree[], smallint, oid, internal) returns boolean
   language c;
 
-create function public._ltree_extract_isparent(ltree[], ltree) returns ltree
+create function _ltree_extract_isparent(ltree[], ltree) returns ltree
   language c;
 
-create function public._ltree_extract_risparent(ltree[], ltree) returns ltree
+create function _ltree_extract_risparent(ltree[], ltree) returns ltree
   language c;
 
-create function public._ltree_gist_options(internal) returns void
+create function _ltree_gist_options(internal) returns void
   language c;
 
-create function public._ltree_isparent(ltree[], ltree) returns boolean
+create function _ltree_isparent(ltree[], ltree) returns boolean
   language c;
 
-create function public._ltree_penalty(internal, internal, internal) returns internal
+create function _ltree_penalty(internal, internal, internal) returns internal
   language c;
 
-create function public._ltree_picksplit(internal, internal) returns internal
+create function _ltree_picksplit(internal, internal) returns internal
   language c;
 
-create function public._ltree_r_isparent(ltree, ltree[]) returns boolean
+create function _ltree_r_isparent(ltree, ltree[]) returns boolean
   language c;
 
-create function public._ltree_r_risparent(ltree, ltree[]) returns boolean
+create function _ltree_r_risparent(ltree, ltree[]) returns boolean
   language c;
 
-create function public._ltree_risparent(ltree[], ltree) returns boolean
+create function _ltree_risparent(ltree[], ltree) returns boolean
   language c;
 
-create function public._ltree_same(ltree_gist, ltree_gist, internal) returns internal
+create function _ltree_same(ltree_gist, ltree_gist, internal) returns internal
   language c;
 
-create function public._ltree_union(internal, internal) returns ltree_gist
+create function _ltree_union(internal, internal) returns ltree_gist
   language c;
 
-create function public._ltxtq_exec(ltree[], ltxtquery) returns boolean
+create function _ltxtq_exec(ltree[], ltxtquery) returns boolean
   language c;
 
-create function public._ltxtq_extract_exec(ltree[], ltxtquery) returns ltree
+create function _ltxtq_extract_exec(ltree[], ltxtquery) returns ltree
   language c;
 
-create function public._ltxtq_rexec(ltxtquery, ltree[]) returns boolean
+create function _ltxtq_rexec(ltxtquery, ltree[]) returns boolean
   language c;
 
-create function public.hash_ltree(ltree) returns integer
+create function hash_ltree(ltree) returns integer
   language c;
 
-create function public.hash_ltree_extended(ltree, bigint) returns bigint
+create function hash_ltree_extended(ltree, bigint) returns bigint
   language c;
 
-create function public.index(ltree, ltree) returns integer
+create function index(ltree, ltree) returns integer
   language c;
 
-create function public.index(ltree, ltree, integer) returns integer
+create function index(ltree, ltree, integer) returns integer
   language c;
 
-create function public.lca(ltree, ltree) returns ltree
+create function lca(ltree, ltree) returns ltree
   language c;
 
-create function public.lca(ltree, ltree, ltree) returns ltree
+create function lca(ltree, ltree, ltree) returns ltree
   language c;
 
-create function public.lca(ltree, ltree, ltree, ltree) returns ltree
+create function lca(ltree, ltree, ltree, ltree) returns ltree
   language c;
 
-create function public.lca(ltree, ltree, ltree, ltree, ltree) returns ltree
+create function lca(ltree, ltree, ltree, ltree, ltree) returns ltree
   language c;
 
-create function public.lca(ltree, ltree, ltree, ltree, ltree, ltree) returns ltree
+create function lca(ltree, ltree, ltree, ltree, ltree, ltree) returns ltree
   language c;
 
-create function public.lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree) returns ltree
+create function lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree) returns ltree
   language c;
 
-create function public.lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree) returns ltree
+create function lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree) returns ltree
   language c;
 
-create function public.lca(ltree[]) returns ltree
+create function lca(ltree[]) returns ltree
   language c;
 
-create function public.lquery_in(cstring) returns lquery
+create function lquery_in(cstring) returns lquery
   language c;
 
-create function public.lquery_out(lquery) returns cstring
+create function lquery_out(lquery) returns cstring
   language c;
 
-create function public.lquery_recv(internal) returns lquery
+create function lquery_recv(internal) returns lquery
   language c;
 
-create function public.lquery_send(lquery) returns bytea
+create function lquery_send(lquery) returns bytea
   language c;
 
-create function public.lt_q_regex(ltree, lquery[]) returns boolean
+create function lt_q_regex(ltree, lquery[]) returns boolean
   language c;
 
-create function public.lt_q_rregex(lquery[], ltree) returns boolean
+create function lt_q_rregex(lquery[], ltree) returns boolean
   language c;
 
-create function public.ltq_regex(ltree, lquery) returns boolean
+create function ltq_regex(ltree, lquery) returns boolean
   language c;
 
-create function public.ltq_rregex(lquery, ltree) returns boolean
+create function ltq_rregex(lquery, ltree) returns boolean
   language c;
 
-create function public.ltree2text(ltree) returns text
+create function ltree2text(ltree) returns text
   language c;
 
-create function public.ltree_addltree(ltree, ltree) returns ltree
+create function ltree_addltree(ltree, ltree) returns ltree
   language c;
 
-create function public.ltree_addtext(ltree, text) returns ltree
+create function ltree_addtext(ltree, text) returns ltree
   language c;
 
-create function public.ltree_cmp(ltree, ltree) returns integer
+create function ltree_cmp(ltree, ltree) returns integer
   language c;
 
-create function public.ltree_compress(internal) returns internal
+create function ltree_compress(internal) returns internal
   language c;
 
-create function public.ltree_consistent(internal, ltree, smallint, oid, internal) returns boolean
+create function ltree_consistent(internal, ltree, smallint, oid, internal) returns boolean
   language c;
 
-create function public.ltree_decompress(internal) returns internal
+create function ltree_decompress(internal) returns internal
   language c;
 
-create function public.ltree_eq(ltree, ltree) returns boolean
+create function ltree_eq(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_ge(ltree, ltree) returns boolean
+create function ltree_ge(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_gist_in(cstring) returns ltree_gist
+create function ltree_gist_in(cstring) returns ltree_gist
   language c;
 
-create function public.ltree_gist_options(internal) returns void
+create function ltree_gist_options(internal) returns void
   language c;
 
-create function public.ltree_gist_out(ltree_gist) returns cstring
+create function ltree_gist_out(ltree_gist) returns cstring
   language c;
 
-create function public.ltree_gt(ltree, ltree) returns boolean
+create function ltree_gt(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_in(cstring) returns ltree
+create function ltree_in(cstring) returns ltree
   language c;
 
-create function public.ltree_isparent(ltree, ltree) returns boolean
+create function ltree_isparent(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_le(ltree, ltree) returns boolean
+create function ltree_le(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_lt(ltree, ltree) returns boolean
+create function ltree_lt(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_ne(ltree, ltree) returns boolean
+create function ltree_ne(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_out(ltree) returns cstring
+create function ltree_out(ltree) returns cstring
   language c;
 
-create function public.ltree_penalty(internal, internal, internal) returns internal
+create function ltree_penalty(internal, internal, internal) returns internal
   language c;
 
-create function public.ltree_picksplit(internal, internal) returns internal
+create function ltree_picksplit(internal, internal) returns internal
   language c;
 
-create function public.ltree_recv(internal) returns ltree
+create function ltree_recv(internal) returns ltree
   language c;
 
-create function public.ltree_risparent(ltree, ltree) returns boolean
+create function ltree_risparent(ltree, ltree) returns boolean
   language c;
 
-create function public.ltree_same(ltree_gist, ltree_gist, internal) returns internal
+create function ltree_same(ltree_gist, ltree_gist, internal) returns internal
   language c;
 
-create function public.ltree_send(ltree) returns bytea
+create function ltree_send(ltree) returns bytea
   language c;
 
-create function public.ltree_textadd(text, ltree) returns ltree
+create function ltree_textadd(text, ltree) returns ltree
   language c;
 
-create function public.ltree_union(internal, internal) returns ltree_gist
+create function ltree_union(internal, internal) returns ltree_gist
   language c;
 
-create function public.ltreeparentsel(internal, oid, internal, integer) returns double precision
+create function ltreeparentsel(internal, oid, internal, integer) returns double precision
   language c;
 
-create function public.ltxtq_exec(ltree, ltxtquery) returns boolean
+create function ltxtq_exec(ltree, ltxtquery) returns boolean
   language c;
 
-create function public.ltxtq_in(cstring) returns ltxtquery
+create function ltxtq_in(cstring) returns ltxtquery
   language c;
 
-create function public.ltxtq_out(ltxtquery) returns cstring
+create function ltxtq_out(ltxtquery) returns cstring
   language c;
 
-create function public.ltxtq_recv(internal) returns ltxtquery
+create function ltxtq_recv(internal) returns ltxtquery
   language c;
 
-create function public.ltxtq_rexec(ltxtquery, ltree) returns boolean
+create function ltxtq_rexec(ltxtquery, ltree) returns boolean
   language c;
 
-create function public.ltxtq_send(ltxtquery) returns bytea
+create function ltxtq_send(ltxtquery) returns bytea
   language c;
 
-create function public.nlevel(ltree) returns integer
+create function nlevel(ltree) returns integer
   language c;
 
-create function public.subltree(ltree, integer, integer) returns ltree
+create function subltree(ltree, integer, integer) returns ltree
   language c;
 
-create function public.subpath(ltree, integer) returns ltree
+create function subpath(ltree, integer) returns ltree
   language c;
 
-create function public.subpath(ltree, integer, integer) returns ltree
+create function subpath(ltree, integer, integer) returns ltree
   language c;
 
-create function public.text2ltree(text) returns ltree
+create function text2ltree(text) returns ltree
   language c;
 
-create type public.lquery (input = lquery_in, output = lquery_out);
+create type lquery (input = lquery_in, output = lquery_out);
 
-create type public.ltree (input = ltree_in, output = ltree_out);
+create type ltree (input = ltree_in, output = ltree_out);
 
-create type public.ltree_gist (input = ltree_gist_in, output = ltree_gist_out);
+create type ltree_gist (input = ltree_gist_in, output = ltree_gist_out);
 
-create type public.ltxtquery (input = ltxtq_in, output = ltxtq_out);
+create type ltxtquery (input = ltxtq_in, output = ltxtq_out);
 
-create operator public.< (
+create operator < (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_lt
+  function = ltree_lt
 );
 
-create operator public.<= (
+create operator <= (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_le
+  function = ltree_le
 );
 
-create operator public.<> (
+create operator <> (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_ne
+  function = ltree_ne
 );
 
-create operator public.<@ (
+create operator <@ (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_risparent
+  function = ltree_risparent
 );
 
-create operator public.<@ (
+create operator <@ (
   leftarg = ltree,
   rightarg = ltree[],
-  function = public._ltree_r_isparent
+  function = _ltree_r_isparent
 );
 
-create operator public.<@ (
+create operator <@ (
   leftarg = ltree[],
   rightarg = ltree,
-  function = public._ltree_risparent
+  function = _ltree_risparent
 );
 
-create operator public.= (
+create operator = (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_eq
+  function = ltree_eq
 );
 
-create operator public.> (
+create operator > (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_gt
+  function = ltree_gt
 );
 
-create operator public.>= (
+create operator >= (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_ge
+  function = ltree_ge
 );
 
-create operator public.? (
+create operator ? (
   leftarg = lquery[],
   rightarg = ltree,
-  function = public.lt_q_rregex
+  function = lt_q_rregex
 );
 
-create operator public.? (
+create operator ? (
   leftarg = lquery[],
   rightarg = ltree[],
-  function = public._lt_q_rregex
+  function = _lt_q_rregex
 );
 
-create operator public.? (
+create operator ? (
   leftarg = ltree,
   rightarg = lquery[],
-  function = public.lt_q_regex
+  function = lt_q_regex
 );
 
-create operator public.? (
+create operator ? (
   leftarg = ltree[],
   rightarg = lquery[],
-  function = public._lt_q_regex
+  function = _lt_q_regex
 );
 
-create operator public.?<@ (
+create operator ?<@ (
   leftarg = ltree[],
   rightarg = ltree,
-  function = public._ltree_extract_risparent
+  function = _ltree_extract_risparent
 );
 
-create operator public.?@ (
+create operator ?@ (
   leftarg = ltree[],
   rightarg = ltxtquery,
-  function = public._ltxtq_extract_exec
+  function = _ltxtq_extract_exec
 );
 
-create operator public.?@> (
+create operator ?@> (
   leftarg = ltree[],
   rightarg = ltree,
-  function = public._ltree_extract_isparent
+  function = _ltree_extract_isparent
 );
 
-create operator public.?~ (
+create operator ?~ (
   leftarg = ltree[],
   rightarg = lquery,
-  function = public._ltq_extract_regex
+  function = _ltq_extract_regex
 );
 
-create operator public.@ (
+create operator @ (
   leftarg = ltree,
   rightarg = ltxtquery,
-  function = public.ltxtq_exec
+  function = ltxtq_exec
 );
 
-create operator public.@ (
+create operator @ (
   leftarg = ltree[],
   rightarg = ltxtquery,
-  function = public._ltxtq_exec
+  function = _ltxtq_exec
 );
 
-create operator public.@ (
+create operator @ (
   leftarg = ltxtquery,
   rightarg = ltree,
-  function = public.ltxtq_rexec
+  function = ltxtq_rexec
 );
 
-create operator public.@ (
+create operator @ (
   leftarg = ltxtquery,
   rightarg = ltree[],
-  function = public._ltxtq_rexec
+  function = _ltxtq_rexec
 );
 
-create operator public.@> (
+create operator @> (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_isparent
+  function = ltree_isparent
 );
 
-create operator public.@> (
-  leftarg = ltree,
-  rightarg = ltree[],
-  function = public._ltree_r_risparent
-);
-
-create operator public.@> (
-  leftarg = ltree[],
-  rightarg = ltree,
-  function = public._ltree_isparent
-);
-
-create operator public.^<@ (
-  leftarg = ltree,
-  rightarg = ltree,
-  function = public.ltree_risparent
-);
-
-create operator public.^<@ (
+create operator @> (
   leftarg = ltree,
   rightarg = ltree[],
-  function = public._ltree_r_isparent
+  function = _ltree_r_risparent
 );
 
-create operator public.^<@ (
+create operator @> (
   leftarg = ltree[],
   rightarg = ltree,
-  function = public._ltree_risparent
+  function = _ltree_isparent
 );
 
-create operator public.^? (
+create operator ^<@ (
+  leftarg = ltree,
+  rightarg = ltree,
+  function = ltree_risparent
+);
+
+create operator ^<@ (
+  leftarg = ltree,
+  rightarg = ltree[],
+  function = _ltree_r_isparent
+);
+
+create operator ^<@ (
+  leftarg = ltree[],
+  rightarg = ltree,
+  function = _ltree_risparent
+);
+
+create operator ^? (
   leftarg = lquery[],
   rightarg = ltree,
-  function = public.lt_q_rregex
+  function = lt_q_rregex
 );
 
-create operator public.^? (
+create operator ^? (
   leftarg = lquery[],
   rightarg = ltree[],
-  function = public._lt_q_rregex
+  function = _lt_q_rregex
 );
 
-create operator public.^? (
+create operator ^? (
   leftarg = ltree,
   rightarg = lquery[],
-  function = public.lt_q_regex
+  function = lt_q_regex
 );
 
-create operator public.^? (
+create operator ^? (
   leftarg = ltree[],
   rightarg = lquery[],
-  function = public._lt_q_regex
+  function = _lt_q_regex
 );
 
-create operator public.^@ (
+create operator ^@ (
   leftarg = ltree,
   rightarg = ltxtquery,
-  function = public.ltxtq_exec
+  function = ltxtq_exec
 );
 
-create operator public.^@ (
+create operator ^@ (
   leftarg = ltree[],
   rightarg = ltxtquery,
-  function = public._ltxtq_exec
+  function = _ltxtq_exec
 );
 
-create operator public.^@ (
+create operator ^@ (
   leftarg = ltxtquery,
   rightarg = ltree,
-  function = public.ltxtq_rexec
+  function = ltxtq_rexec
 );
 
-create operator public.^@ (
+create operator ^@ (
   leftarg = ltxtquery,
   rightarg = ltree[],
-  function = public._ltxtq_rexec
+  function = _ltxtq_rexec
 );
 
-create operator public.^@> (
+create operator ^@> (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_isparent
+  function = ltree_isparent
 );
 
-create operator public.^@> (
+create operator ^@> (
   leftarg = ltree,
   rightarg = ltree[],
-  function = public._ltree_r_risparent
+  function = _ltree_r_risparent
 );
 
-create operator public.^@> (
+create operator ^@> (
   leftarg = ltree[],
   rightarg = ltree,
-  function = public._ltree_isparent
+  function = _ltree_isparent
 );
 
-create operator public.^~ (
+create operator ^~ (
   leftarg = lquery,
   rightarg = ltree,
-  function = public.ltq_rregex
+  function = ltq_rregex
 );
 
-create operator public.^~ (
+create operator ^~ (
   leftarg = lquery,
   rightarg = ltree[],
-  function = public._ltq_rregex
+  function = _ltq_rregex
 );
 
-create operator public.^~ (
+create operator ^~ (
   leftarg = ltree,
   rightarg = lquery,
-  function = public.ltq_regex
+  function = ltq_regex
 );
 
-create operator public.^~ (
+create operator ^~ (
   leftarg = ltree[],
   rightarg = lquery,
-  function = public._ltq_regex
+  function = _ltq_regex
 );
 
-create operator public.|| (
+create operator || (
   leftarg = ltree,
   rightarg = ltree,
-  function = public.ltree_addltree
+  function = ltree_addltree
 );
 
-create operator public.|| (
+create operator || (
   leftarg = ltree,
   rightarg = text,
-  function = public.ltree_addtext
+  function = ltree_addtext
 );
 
-create operator public.|| (
+create operator || (
   leftarg = text,
   rightarg = ltree,
-  function = public.ltree_textadd
+  function = ltree_textadd
 );
 
-create operator public.~ (
+create operator ~ (
   leftarg = lquery,
   rightarg = ltree,
-  function = public.ltq_rregex
+  function = ltq_rregex
 );
 
-create operator public.~ (
+create operator ~ (
   leftarg = lquery,
   rightarg = ltree[],
-  function = public._ltq_rregex
+  function = _ltq_rregex
 );
 
-create operator public.~ (
+create operator ~ (
   leftarg = ltree,
   rightarg = lquery,
-  function = public.ltq_regex
+  function = ltq_regex
 );
 
-create operator public.~ (
+create operator ~ (
   leftarg = ltree[],
   rightarg = lquery,
-  function = public._ltq_regex
+  function = _ltq_regex
 );
 
-create operator family public.gist__ltree_ops using gist;
+create operator family gist__ltree_ops using gist;
 
-create operator family public.gist_ltree_ops using gist;
+create operator family gist_ltree_ops using gist;
 
-create operator family public.hash_ltree_ops using hash;
+create operator family hash_ltree_ops using hash;
 
-create operator family public.ltree_ops using btree;
+create operator family ltree_ops using btree;
 
-create operator class public.gist__ltree_ops default for type ltree[] using gist family public.gist__ltree_ops as storage ltree_gist;
+create operator class gist__ltree_ops default for type ltree[] using gist family gist__ltree_ops as storage ltree_gist;
 
-create operator class public.gist_ltree_ops default for type ltree using gist family public.gist_ltree_ops as storage ltree_gist;
+create operator class gist_ltree_ops default for type ltree using gist family gist_ltree_ops as storage ltree_gist;
 
-create operator class public.hash_ltree_ops default for type ltree using hash family public.hash_ltree_ops as storage ltree;
+create operator class hash_ltree_ops default for type ltree using hash family hash_ltree_ops as storage ltree;
 
-create operator class public.ltree_ops default for type ltree using btree family public.ltree_ops as storage ltree;
+create operator class ltree_ops default for type ltree using btree family ltree_ops as storage ltree;
 

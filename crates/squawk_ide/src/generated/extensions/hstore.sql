@@ -4,333 +4,333 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.ghstore;
+create type ghstore;
 
 -- size: -1, align: 4
-create type public.hstore;
+create type hstore;
 
-create function public.akeys(hstore) returns text[]
+create function akeys(hstore) returns text[]
   language c;
 
-create function public.avals(hstore) returns text[]
+create function avals(hstore) returns text[]
   language c;
 
-create function public.defined(hstore, text) returns boolean
+create function defined(hstore, text) returns boolean
   language c;
 
-create function public.delete(hstore, hstore) returns hstore
+create function delete(hstore, hstore) returns hstore
   language c;
 
-create function public.delete(hstore, text) returns hstore
+create function delete(hstore, text) returns hstore
   language c;
 
-create function public.delete(hstore, text[]) returns hstore
+create function delete(hstore, text[]) returns hstore
   language c;
 
-create function public.each(hs hstore, OUT key text, OUT value text) returns SETOF record
+create function each(hs hstore, OUT key text, OUT value text) returns SETOF record
   language c;
 
-create function public.exist(hstore, text) returns boolean
+create function exist(hstore, text) returns boolean
   language c;
 
-create function public.exists_all(hstore, text[]) returns boolean
+create function exists_all(hstore, text[]) returns boolean
   language c;
 
-create function public.exists_any(hstore, text[]) returns boolean
+create function exists_any(hstore, text[]) returns boolean
   language c;
 
-create function public.fetchval(hstore, text) returns text
+create function fetchval(hstore, text) returns text
   language c;
 
-create function public.ghstore_compress(internal) returns internal
+create function ghstore_compress(internal) returns internal
   language c;
 
-create function public.ghstore_consistent(internal, hstore, smallint, oid, internal) returns boolean
+create function ghstore_consistent(internal, hstore, smallint, oid, internal) returns boolean
   language c;
 
-create function public.ghstore_decompress(internal) returns internal
+create function ghstore_decompress(internal) returns internal
   language c;
 
-create function public.ghstore_in(cstring) returns ghstore
+create function ghstore_in(cstring) returns ghstore
   language c;
 
-create function public.ghstore_options(internal) returns void
+create function ghstore_options(internal) returns void
   language c;
 
-create function public.ghstore_out(ghstore) returns cstring
+create function ghstore_out(ghstore) returns cstring
   language c;
 
-create function public.ghstore_penalty(internal, internal, internal) returns internal
+create function ghstore_penalty(internal, internal, internal) returns internal
   language c;
 
-create function public.ghstore_picksplit(internal, internal) returns internal
+create function ghstore_picksplit(internal, internal) returns internal
   language c;
 
-create function public.ghstore_same(ghstore, ghstore, internal) returns internal
+create function ghstore_same(ghstore, ghstore, internal) returns internal
   language c;
 
-create function public.ghstore_union(internal, internal) returns ghstore
+create function ghstore_union(internal, internal) returns ghstore
   language c;
 
-create function public.gin_consistent_hstore(internal, smallint, hstore, integer, internal, internal) returns boolean
+create function gin_consistent_hstore(internal, smallint, hstore, integer, internal, internal) returns boolean
   language c;
 
-create function public.gin_extract_hstore(hstore, internal) returns internal
+create function gin_extract_hstore(hstore, internal) returns internal
   language c;
 
-create function public.gin_extract_hstore_query(hstore, internal, smallint, internal, internal) returns internal
+create function gin_extract_hstore_query(hstore, internal, smallint, internal, internal) returns internal
   language c;
 
-create function public.hs_concat(hstore, hstore) returns hstore
+create function hs_concat(hstore, hstore) returns hstore
   language c;
 
-create function public.hs_contained(hstore, hstore) returns boolean
+create function hs_contained(hstore, hstore) returns boolean
   language c;
 
-create function public.hs_contains(hstore, hstore) returns boolean
+create function hs_contains(hstore, hstore) returns boolean
   language c;
 
-create function public.hstore(record) returns hstore
+create function hstore(record) returns hstore
   language c;
 
-create function public.hstore(text, text) returns hstore
+create function hstore(text, text) returns hstore
   language c;
 
-create function public.hstore(text[]) returns hstore
+create function hstore(text[]) returns hstore
   language c;
 
-create function public.hstore(text[], text[]) returns hstore
+create function hstore(text[], text[]) returns hstore
   language c;
 
-create function public.hstore_cmp(hstore, hstore) returns integer
+create function hstore_cmp(hstore, hstore) returns integer
   language c;
 
-create function public.hstore_eq(hstore, hstore) returns boolean
+create function hstore_eq(hstore, hstore) returns boolean
   language c;
 
-create function public.hstore_ge(hstore, hstore) returns boolean
+create function hstore_ge(hstore, hstore) returns boolean
   language c;
 
-create function public.hstore_gt(hstore, hstore) returns boolean
+create function hstore_gt(hstore, hstore) returns boolean
   language c;
 
-create function public.hstore_hash(hstore) returns integer
+create function hstore_hash(hstore) returns integer
   language c;
 
-create function public.hstore_hash_extended(hstore, bigint) returns bigint
+create function hstore_hash_extended(hstore, bigint) returns bigint
   language c;
 
-create function public.hstore_in(cstring) returns hstore
+create function hstore_in(cstring) returns hstore
   language c;
 
-create function public.hstore_le(hstore, hstore) returns boolean
+create function hstore_le(hstore, hstore) returns boolean
   language c;
 
-create function public.hstore_lt(hstore, hstore) returns boolean
+create function hstore_lt(hstore, hstore) returns boolean
   language c;
 
-create function public.hstore_ne(hstore, hstore) returns boolean
+create function hstore_ne(hstore, hstore) returns boolean
   language c;
 
-create function public.hstore_out(hstore) returns cstring
+create function hstore_out(hstore) returns cstring
   language c;
 
-create function public.hstore_recv(internal) returns hstore
+create function hstore_recv(internal) returns hstore
   language c;
 
-create function public.hstore_send(hstore) returns bytea
+create function hstore_send(hstore) returns bytea
   language c;
 
-create function public.hstore_subscript_handler(internal) returns internal
+create function hstore_subscript_handler(internal) returns internal
   language c;
 
-create function public.hstore_to_array(hstore) returns text[]
+create function hstore_to_array(hstore) returns text[]
   language c;
 
-create function public.hstore_to_json(hstore) returns json
+create function hstore_to_json(hstore) returns json
   language c;
 
-create function public.hstore_to_json_loose(hstore) returns json
+create function hstore_to_json_loose(hstore) returns json
   language c;
 
-create function public.hstore_to_jsonb(hstore) returns jsonb
+create function hstore_to_jsonb(hstore) returns jsonb
   language c;
 
-create function public.hstore_to_jsonb_loose(hstore) returns jsonb
+create function hstore_to_jsonb_loose(hstore) returns jsonb
   language c;
 
-create function public.hstore_to_matrix(hstore) returns text[]
+create function hstore_to_matrix(hstore) returns text[]
   language c;
 
-create function public.hstore_version_diag(hstore) returns integer
+create function hstore_version_diag(hstore) returns integer
   language c;
 
-create function public.isdefined(hstore, text) returns boolean
+create function isdefined(hstore, text) returns boolean
   language c;
 
-create function public.isexists(hstore, text) returns boolean
+create function isexists(hstore, text) returns boolean
   language c;
 
-create function public.populate_record(anyelement, hstore) returns anyelement
+create function populate_record(anyelement, hstore) returns anyelement
   language c;
 
-create function public.skeys(hstore) returns SETOF text
+create function skeys(hstore) returns SETOF text
   language c;
 
-create function public.slice(hstore, text[]) returns hstore
+create function slice(hstore, text[]) returns hstore
   language c;
 
-create function public.slice_array(hstore, text[]) returns text[]
+create function slice_array(hstore, text[]) returns text[]
   language c;
 
-create function public.svals(hstore) returns SETOF text
+create function svals(hstore) returns SETOF text
   language c;
 
-create function public.tconvert(text, text) returns hstore
+create function tconvert(text, text) returns hstore
   language c;
 
-create type public.ghstore (input = ghstore_in, output = ghstore_out);
+create type ghstore (input = ghstore_in, output = ghstore_out);
 
 -- subscript: pg_catalog.text
-create type public.hstore (input = hstore_in, output = hstore_out, subscript = hstore_subscript_handler);
+create type hstore (input = hstore_in, output = hstore_out, subscript = hstore_subscript_handler);
 
-create operator public.#<# (
+create operator #<# (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hstore_lt
+  function = hstore_lt
 );
 
-create operator public.#<=# (
+create operator #<=# (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hstore_le
+  function = hstore_le
 );
 
-create operator public.#= (
+create operator #= (
   leftarg = anyelement,
   rightarg = hstore,
-  function = public.populate_record
+  function = populate_record
 );
 
-create operator public.#># (
+create operator #># (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hstore_gt
+  function = hstore_gt
 );
 
-create operator public.#>=# (
+create operator #>=# (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hstore_ge
+  function = hstore_ge
 );
 
-create operator public.%# (
+create operator %# (
   rightarg = hstore,
-  function = public.hstore_to_matrix
+  function = hstore_to_matrix
 );
 
-create operator public.%% (
+create operator %% (
   rightarg = hstore,
-  function = public.hstore_to_array
+  function = hstore_to_array
 );
 
-create operator public.- (
+create operator - (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.delete
+  function = delete
 );
 
-create operator public.- (
+create operator - (
   leftarg = hstore,
   rightarg = text,
-  function = public.delete
+  function = delete
 );
 
-create operator public.- (
+create operator - (
   leftarg = hstore,
   rightarg = text[],
-  function = public.delete
+  function = delete
 );
 
-create operator public.-> (
+create operator -> (
   leftarg = hstore,
   rightarg = text,
-  function = public.fetchval
+  function = fetchval
 );
 
-create operator public.-> (
+create operator -> (
   leftarg = hstore,
   rightarg = text[],
-  function = public.slice_array
+  function = slice_array
 );
 
-create operator public.<> (
+create operator <> (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hstore_ne
+  function = hstore_ne
 );
 
-create operator public.<@ (
+create operator <@ (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hs_contained
+  function = hs_contained
 );
 
-create operator public.= (
+create operator = (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hstore_eq
+  function = hstore_eq
 );
 
-create operator public.? (
+create operator ? (
   leftarg = hstore,
   rightarg = text,
-  function = public.exist
+  function = exist
 );
 
-create operator public.?& (
+create operator ?& (
   leftarg = hstore,
   rightarg = text[],
-  function = public.exists_all
+  function = exists_all
 );
 
-create operator public.?| (
+create operator ?| (
   leftarg = hstore,
   rightarg = text[],
-  function = public.exists_any
+  function = exists_any
 );
 
-create operator public.@> (
+create operator @> (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hs_contains
+  function = hs_contains
 );
 
-create operator public.|| (
+create operator || (
   leftarg = hstore,
   rightarg = hstore,
-  function = public.hs_concat
+  function = hs_concat
 );
 
-create cast (hstore as json) with function public.hstore_to_json(hstore);
+create cast (hstore as json) with function hstore_to_json(hstore);
 
-create cast (hstore as jsonb) with function public.hstore_to_jsonb(hstore);
+create cast (hstore as jsonb) with function hstore_to_jsonb(hstore);
 
-create cast (text[] as hstore) with function public.hstore(text[]);
+create cast (text[] as hstore) with function hstore(text[]);
 
-create operator family public.btree_hstore_ops using btree;
+create operator family btree_hstore_ops using btree;
 
-create operator family public.gin_hstore_ops using gin;
+create operator family gin_hstore_ops using gin;
 
-create operator family public.gist_hstore_ops using gist;
+create operator family gist_hstore_ops using gist;
 
-create operator family public.hash_hstore_ops using hash;
+create operator family hash_hstore_ops using hash;
 
-create operator class public.btree_hstore_ops default for type hstore using btree family public.btree_hstore_ops as storage hstore;
+create operator class btree_hstore_ops default for type hstore using btree family btree_hstore_ops as storage hstore;
 
-create operator class public.gin_hstore_ops default for type hstore using gin family public.gin_hstore_ops as storage text;
+create operator class gin_hstore_ops default for type hstore using gin family gin_hstore_ops as storage text;
 
-create operator class public.gist_hstore_ops default for type hstore using gist family public.gist_hstore_ops as storage ghstore;
+create operator class gist_hstore_ops default for type hstore using gist family gist_hstore_ops as storage ghstore;
 
-create operator class public.hash_hstore_ops default for type hstore using hash family public.hash_hstore_ops as storage hstore;
+create operator class hash_hstore_ops default for type hstore using hash family hash_hstore_ops as storage hstore;
 
