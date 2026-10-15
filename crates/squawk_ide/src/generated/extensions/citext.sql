@@ -4,318 +4,318 @@
 --   cargo xtask sync-builtins
 
 -- size: -1, align: 4
-create type public.citext;
+create type citext;
 
-create function public.citext(boolean) returns citext
+create function citext(boolean) returns citext
   language internal;
 
-create function public.citext(character) returns citext
+create function citext(character) returns citext
   language internal;
 
-create function public.citext(inet) returns citext
+create function citext(inet) returns citext
   language internal;
 
-create function public.citext_cmp(citext, citext) returns integer
+create function citext_cmp(citext, citext) returns integer
   language c;
 
-create function public.citext_eq(citext, citext) returns boolean
+create function citext_eq(citext, citext) returns boolean
   language c;
 
-create function public.citext_ge(citext, citext) returns boolean
+create function citext_ge(citext, citext) returns boolean
   language c;
 
-create function public.citext_gt(citext, citext) returns boolean
+create function citext_gt(citext, citext) returns boolean
   language c;
 
-create function public.citext_hash(citext) returns integer
+create function citext_hash(citext) returns integer
   language c;
 
-create function public.citext_hash_extended(citext, bigint) returns bigint
+create function citext_hash_extended(citext, bigint) returns bigint
   language c;
 
-create function public.citext_larger(citext, citext) returns citext
+create function citext_larger(citext, citext) returns citext
   language c;
 
-create function public.citext_le(citext, citext) returns boolean
+create function citext_le(citext, citext) returns boolean
   language c;
 
-create function public.citext_lt(citext, citext) returns boolean
+create function citext_lt(citext, citext) returns boolean
   language c;
 
-create function public.citext_ne(citext, citext) returns boolean
+create function citext_ne(citext, citext) returns boolean
   language c;
 
-create function public.citext_pattern_cmp(citext, citext) returns integer
+create function citext_pattern_cmp(citext, citext) returns integer
   language c;
 
-create function public.citext_pattern_ge(citext, citext) returns boolean
+create function citext_pattern_ge(citext, citext) returns boolean
   language c;
 
-create function public.citext_pattern_gt(citext, citext) returns boolean
+create function citext_pattern_gt(citext, citext) returns boolean
   language c;
 
-create function public.citext_pattern_le(citext, citext) returns boolean
+create function citext_pattern_le(citext, citext) returns boolean
   language c;
 
-create function public.citext_pattern_lt(citext, citext) returns boolean
+create function citext_pattern_lt(citext, citext) returns boolean
   language c;
 
-create function public.citext_smaller(citext, citext) returns citext
+create function citext_smaller(citext, citext) returns citext
   language c;
 
-create function public.citextin(cstring) returns citext
+create function citextin(cstring) returns citext
   language internal;
 
-create function public.citextout(citext) returns cstring
+create function citextout(citext) returns cstring
   language internal;
 
-create function public.citextrecv(internal) returns citext
+create function citextrecv(internal) returns citext
   language internal;
 
-create function public.citextsend(citext) returns bytea
+create function citextsend(citext) returns bytea
   language internal;
 
-create function public.regexp_match(string citext, pattern citext) returns text[]
+create function regexp_match(string citext, pattern citext) returns text[]
   language sql;
 
-create function public.regexp_match(string citext, pattern citext, flags text) returns text[]
+create function regexp_match(string citext, pattern citext, flags text) returns text[]
   language sql;
 
-create function public.regexp_matches(string citext, pattern citext) returns SETOF text[]
+create function regexp_matches(string citext, pattern citext) returns SETOF text[]
   language sql;
 
-create function public.regexp_matches(string citext, pattern citext, flags text) returns SETOF text[]
+create function regexp_matches(string citext, pattern citext, flags text) returns SETOF text[]
   language sql;
 
-create function public.regexp_replace(string citext, pattern citext, replacement text) returns text
+create function regexp_replace(string citext, pattern citext, replacement text) returns text
   language sql;
 
-create function public.regexp_replace(string citext, pattern citext, replacement text, flags text) returns text
+create function regexp_replace(string citext, pattern citext, replacement text, flags text) returns text
   language sql;
 
-create function public.regexp_split_to_array(string citext, pattern citext) returns text[]
+create function regexp_split_to_array(string citext, pattern citext) returns text[]
   language sql;
 
-create function public.regexp_split_to_array(string citext, pattern citext, flags text) returns text[]
+create function regexp_split_to_array(string citext, pattern citext, flags text) returns text[]
   language sql;
 
-create function public.regexp_split_to_table(string citext, pattern citext) returns SETOF text
+create function regexp_split_to_table(string citext, pattern citext) returns SETOF text
   language sql;
 
-create function public.regexp_split_to_table(string citext, pattern citext, flags text) returns SETOF text
+create function regexp_split_to_table(string citext, pattern citext, flags text) returns SETOF text
   language sql;
 
-create function public.replace(citext, citext, citext) returns text
+create function replace(citext, citext, citext) returns text
   language sql;
 
-create function public.split_part(citext, citext, integer) returns text
+create function split_part(citext, citext, integer) returns text
   language sql;
 
-create function public.strpos(citext, citext) returns integer
+create function strpos(citext, citext) returns integer
   language sql;
 
-create function public.texticlike(citext, citext) returns boolean
+create function texticlike(citext, citext) returns boolean
   language internal;
 
-create function public.texticlike(citext, text) returns boolean
+create function texticlike(citext, text) returns boolean
   language internal;
 
-create function public.texticnlike(citext, citext) returns boolean
+create function texticnlike(citext, citext) returns boolean
   language internal;
 
-create function public.texticnlike(citext, text) returns boolean
+create function texticnlike(citext, text) returns boolean
   language internal;
 
-create function public.texticregexeq(citext, citext) returns boolean
+create function texticregexeq(citext, citext) returns boolean
   language internal;
 
-create function public.texticregexeq(citext, text) returns boolean
+create function texticregexeq(citext, text) returns boolean
   language internal;
 
-create function public.texticregexne(citext, citext) returns boolean
+create function texticregexne(citext, citext) returns boolean
   language internal;
 
-create function public.texticregexne(citext, text) returns boolean
+create function texticregexne(citext, text) returns boolean
   language internal;
 
-create function public.translate(citext, citext, text) returns text
+create function translate(citext, citext, text) returns text
   language sql;
 
-create type public.citext (input = citextin, output = citextout, category = 'S');
+create type citext (input = citextin, output = citextout, category = 'S');
 
-create operator public.!~ (
+create operator !~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticregexne
+  function = texticregexne
 );
 
-create operator public.!~ (
+create operator !~ (
   leftarg = citext,
   rightarg = text,
-  function = public.texticregexne
+  function = texticregexne
 );
 
-create operator public.!~* (
+create operator !~* (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticregexne
+  function = texticregexne
 );
 
-create operator public.!~* (
+create operator !~* (
   leftarg = citext,
   rightarg = text,
-  function = public.texticregexne
+  function = texticregexne
 );
 
-create operator public.!~~ (
+create operator !~~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticnlike
+  function = texticnlike
 );
 
-create operator public.!~~ (
+create operator !~~ (
   leftarg = citext,
   rightarg = text,
-  function = public.texticnlike
+  function = texticnlike
 );
 
-create operator public.!~~* (
+create operator !~~* (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticnlike
+  function = texticnlike
 );
 
-create operator public.!~~* (
+create operator !~~* (
   leftarg = citext,
   rightarg = text,
-  function = public.texticnlike
+  function = texticnlike
 );
 
-create operator public.< (
+create operator < (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_lt
+  function = citext_lt
 );
 
-create operator public.<= (
+create operator <= (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_le
+  function = citext_le
 );
 
-create operator public.<> (
+create operator <> (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_ne
+  function = citext_ne
 );
 
-create operator public.= (
+create operator = (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_eq
+  function = citext_eq
 );
 
-create operator public.> (
+create operator > (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_gt
+  function = citext_gt
 );
 
-create operator public.>= (
+create operator >= (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_ge
+  function = citext_ge
 );
 
-create operator public.~ (
+create operator ~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticregexeq
+  function = texticregexeq
 );
 
-create operator public.~ (
+create operator ~ (
   leftarg = citext,
   rightarg = text,
-  function = public.texticregexeq
+  function = texticregexeq
 );
 
-create operator public.~* (
+create operator ~* (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticregexeq
+  function = texticregexeq
 );
 
-create operator public.~* (
+create operator ~* (
   leftarg = citext,
   rightarg = text,
-  function = public.texticregexeq
+  function = texticregexeq
 );
 
-create operator public.~<=~ (
+create operator ~<=~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_pattern_le
+  function = citext_pattern_le
 );
 
-create operator public.~<~ (
+create operator ~<~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_pattern_lt
+  function = citext_pattern_lt
 );
 
-create operator public.~>=~ (
+create operator ~>=~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_pattern_ge
+  function = citext_pattern_ge
 );
 
-create operator public.~>~ (
+create operator ~>~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.citext_pattern_gt
+  function = citext_pattern_gt
 );
 
-create operator public.~~ (
+create operator ~~ (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticlike
+  function = texticlike
 );
 
-create operator public.~~ (
+create operator ~~ (
   leftarg = citext,
   rightarg = text,
-  function = public.texticlike
+  function = texticlike
 );
 
-create operator public.~~* (
+create operator ~~* (
   leftarg = citext,
   rightarg = citext,
-  function = public.texticlike
+  function = texticlike
 );
 
-create operator public.~~* (
+create operator ~~* (
   leftarg = citext,
   rightarg = text,
-  function = public.texticlike
+  function = texticlike
 );
 
-create aggregate public.max(citext) (
+create aggregate max(citext) (
   sfunc = citext_larger,
   stype = citext,
   combinefunc = citext_larger,
-  sortop = OPERATOR(public.>)
+  sortop = OPERATOR(>)
 );
 
-create aggregate public.min(citext) (
+create aggregate min(citext) (
   sfunc = citext_smaller,
   stype = citext,
   combinefunc = citext_smaller,
-  sortop = OPERATOR(public.<)
+  sortop = OPERATOR(<)
 );
 
-create cast (boolean as citext) with function public.citext(boolean) as assignment;
+create cast (boolean as citext) with function citext(boolean) as assignment;
 
-create cast (character as citext) with function public.citext(character) as assignment;
+create cast (character as citext) with function citext(character) as assignment;
 
 create cast (character varying as citext) without function as assignment;
 
@@ -325,19 +325,19 @@ create cast (citext as character varying) without function as implicit;
 
 create cast (citext as text) without function as implicit;
 
-create cast (inet as citext) with function public.citext(inet) as assignment;
+create cast (inet as citext) with function citext(inet) as assignment;
 
 create cast (text as citext) without function as assignment;
 
-create operator family public.citext_ops using btree;
+create operator family citext_ops using btree;
 
-create operator family public.citext_ops using hash;
+create operator family citext_ops using hash;
 
-create operator family public.citext_pattern_ops using btree;
+create operator family citext_pattern_ops using btree;
 
-create operator class public.citext_ops default for type citext using btree family public.citext_ops as storage citext;
+create operator class citext_ops default for type citext using btree family citext_ops as storage citext;
 
-create operator class public.citext_ops default for type citext using hash family public.citext_ops as storage citext;
+create operator class citext_ops default for type citext using hash family citext_ops as storage citext;
 
-create operator class public.citext_pattern_ops for type citext using btree family public.citext_pattern_ops as storage citext;
+create operator class citext_pattern_ops for type citext using btree family citext_pattern_ops as storage citext;
 

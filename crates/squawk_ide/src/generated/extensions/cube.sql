@@ -5,229 +5,229 @@
 
 -- multi-dimensional cube '(FLOAT-1, FLOAT-2, ..., FLOAT-N), (FLOAT-1, FLOAT-2, ..., FLOAT-N)'
 -- size: -1, align: 8
-create type public.cube;
+create type cube;
 
-create function public.cube(cube, double precision) returns cube
+create function cube(cube, double precision) returns cube
   language c;
 
-create function public.cube(cube, double precision, double precision) returns cube
+create function cube(cube, double precision, double precision) returns cube
   language c;
 
-create function public.cube(double precision) returns cube
+create function cube(double precision) returns cube
   language c;
 
-create function public.cube(double precision, double precision) returns cube
+create function cube(double precision, double precision) returns cube
   language c;
 
-create function public.cube(double precision[]) returns cube
+create function cube(double precision[]) returns cube
   language c;
 
-create function public.cube(double precision[], double precision[]) returns cube
+create function cube(double precision[], double precision[]) returns cube
   language c;
 
 -- btree comparison function
-create function public.cube_cmp(cube, cube) returns integer
+create function cube_cmp(cube, cube) returns integer
   language c;
 
 -- contained in
-create function public.cube_contained(cube, cube) returns boolean
+create function cube_contained(cube, cube) returns boolean
   language c;
 
 -- contains
-create function public.cube_contains(cube, cube) returns boolean
+create function cube_contains(cube, cube) returns boolean
   language c;
 
-create function public.cube_coord(cube, integer) returns double precision
+create function cube_coord(cube, integer) returns double precision
   language c;
 
-create function public.cube_coord_llur(cube, integer) returns double precision
+create function cube_coord_llur(cube, integer) returns double precision
   language c;
 
-create function public.cube_dim(cube) returns integer
+create function cube_dim(cube) returns integer
   language c;
 
-create function public.cube_distance(cube, cube) returns double precision
+create function cube_distance(cube, cube) returns double precision
   language c;
 
-create function public.cube_enlarge(cube, double precision, integer) returns cube
+create function cube_enlarge(cube, double precision, integer) returns cube
   language c;
 
 -- same as
-create function public.cube_eq(cube, cube) returns boolean
+create function cube_eq(cube, cube) returns boolean
   language c;
 
 -- greater than or equal to
-create function public.cube_ge(cube, cube) returns boolean
+create function cube_ge(cube, cube) returns boolean
   language c;
 
 -- greater than
-create function public.cube_gt(cube, cube) returns boolean
+create function cube_gt(cube, cube) returns boolean
   language c;
 
-create function public.cube_in(cstring) returns cube
+create function cube_in(cstring) returns cube
   language c;
 
-create function public.cube_inter(cube, cube) returns cube
+create function cube_inter(cube, cube) returns cube
   language c;
 
-create function public.cube_is_point(cube) returns boolean
+create function cube_is_point(cube) returns boolean
   language c;
 
 -- lower than or equal to
-create function public.cube_le(cube, cube) returns boolean
+create function cube_le(cube, cube) returns boolean
   language c;
 
-create function public.cube_ll_coord(cube, integer) returns double precision
+create function cube_ll_coord(cube, integer) returns double precision
   language c;
 
 -- lower than
-create function public.cube_lt(cube, cube) returns boolean
+create function cube_lt(cube, cube) returns boolean
   language c;
 
 -- different
-create function public.cube_ne(cube, cube) returns boolean
+create function cube_ne(cube, cube) returns boolean
   language c;
 
-create function public.cube_out(cube) returns cstring
+create function cube_out(cube) returns cstring
   language c;
 
 -- overlaps
-create function public.cube_overlap(cube, cube) returns boolean
+create function cube_overlap(cube, cube) returns boolean
   language c;
 
-create function public.cube_recv(internal) returns cube
+create function cube_recv(internal) returns cube
   language c;
 
-create function public.cube_send(cube) returns bytea
+create function cube_send(cube) returns bytea
   language c;
 
-create function public.cube_size(cube) returns double precision
+create function cube_size(cube) returns double precision
   language c;
 
-create function public.cube_subset(cube, integer[]) returns cube
+create function cube_subset(cube, integer[]) returns cube
   language c;
 
-create function public.cube_union(cube, cube) returns cube
+create function cube_union(cube, cube) returns cube
   language c;
 
-create function public.cube_ur_coord(cube, integer) returns double precision
+create function cube_ur_coord(cube, integer) returns double precision
   language c;
 
-create function public.distance_chebyshev(cube, cube) returns double precision
+create function distance_chebyshev(cube, cube) returns double precision
   language c;
 
-create function public.distance_taxicab(cube, cube) returns double precision
+create function distance_taxicab(cube, cube) returns double precision
   language c;
 
-create function public.g_cube_consistent(internal, cube, smallint, oid, internal) returns boolean
+create function g_cube_consistent(internal, cube, smallint, oid, internal) returns boolean
   language c;
 
-create function public.g_cube_distance(internal, cube, smallint, oid, internal) returns double precision
+create function g_cube_distance(internal, cube, smallint, oid, internal) returns double precision
   language c;
 
-create function public.g_cube_penalty(internal, internal, internal) returns internal
+create function g_cube_penalty(internal, internal, internal) returns internal
   language c;
 
-create function public.g_cube_picksplit(internal, internal) returns internal
+create function g_cube_picksplit(internal, internal) returns internal
   language c;
 
-create function public.g_cube_same(cube, cube, internal) returns internal
+create function g_cube_same(cube, cube, internal) returns internal
   language c;
 
-create function public.g_cube_union(internal, internal) returns cube
+create function g_cube_union(internal, internal) returns cube
   language c;
 
-create type public.cube (input = cube_in, output = cube_out);
+create type cube (input = cube_in, output = cube_out);
 
-create operator public.&& (
+create operator && (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_overlap
+  function = cube_overlap
 );
 
-create operator public.-> (
+create operator -> (
   leftarg = cube,
   rightarg = integer,
-  function = public.cube_coord
+  function = cube_coord
 );
 
-create operator public.< (
+create operator < (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_lt
+  function = cube_lt
 );
 
-create operator public.<#> (
+create operator <#> (
   leftarg = cube,
   rightarg = cube,
-  function = public.distance_taxicab
+  function = distance_taxicab
 );
 
-create operator public.<-> (
+create operator <-> (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_distance
+  function = cube_distance
 );
 
-create operator public.<= (
+create operator <= (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_le
+  function = cube_le
 );
 
-create operator public.<=> (
+create operator <=> (
   leftarg = cube,
   rightarg = cube,
-  function = public.distance_chebyshev
+  function = distance_chebyshev
 );
 
-create operator public.<> (
+create operator <> (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_ne
+  function = cube_ne
 );
 
-create operator public.<@ (
+create operator <@ (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_contained
+  function = cube_contained
 );
 
-create operator public.= (
+create operator = (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_eq
+  function = cube_eq
 );
 
-create operator public.> (
+create operator > (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_gt
+  function = cube_gt
 );
 
-create operator public.>= (
+create operator >= (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_ge
+  function = cube_ge
 );
 
-create operator public.@> (
+create operator @> (
   leftarg = cube,
   rightarg = cube,
-  function = public.cube_contains
+  function = cube_contains
 );
 
-create operator public.~> (
+create operator ~> (
   leftarg = cube,
   rightarg = integer,
-  function = public.cube_coord_llur
+  function = cube_coord_llur
 );
 
-create operator family public.cube_ops using btree;
+create operator family cube_ops using btree;
 
-create operator family public.gist_cube_ops using gist;
+create operator family gist_cube_ops using gist;
 
-create operator class public.cube_ops default for type cube using btree family public.cube_ops as storage cube;
+create operator class cube_ops default for type cube using btree family cube_ops as storage cube;
 
-create operator class public.gist_cube_ops default for type cube using gist family public.gist_cube_ops as storage cube;
+create operator class gist_cube_ops default for type cube using gist family gist_cube_ops as storage cube;
 

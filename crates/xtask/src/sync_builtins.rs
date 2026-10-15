@@ -35,11 +35,15 @@ select
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_namespace n
-  left join pg_description d on d.objoid = n.oid and d.classoid = 'pg_namespace'::regclass
-  left join pg_depend dep on dep.classid = 'pg_namespace'::regclass and dep.objid = n.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = n.oid and d.classoid = 'pg_namespace'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_namespace'::regclass
+      and dep.objid = n.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
-  and n.nspname not like 'pg_toast_temp_%'
+where n.nspname not like 'pg_temp%' and n.nspname not like 'pg_toast_temp_%'
 order by n.nspname, ext.extname, n.oid;
 ";
 }
@@ -110,7 +114,8 @@ struct TypeQuery {
 impl Query for TypeQuery {
     const QUERY: &'static str = r"
 create function pg_temp.subscript_result(ty regtype, index text) returns text
-language plpgsql as $$
+  language plpgsql
+  as $$
 declare
   result regtype;
 begin
@@ -128,16 +133,13 @@ exception when others then
   return '';
 end $$;
 with recursive type_depths as (
-  select oid, 0 as depth
-  from pg_type
-  where typelem = 0
+  select oid, 0 as depth from pg_type where typelem = 0
   union all
   select t.oid, d.depth + 1
-  from pg_type t
-    join type_depths d on d.oid = t.typelem
+  from pg_type t join type_depths d on d.oid = t.typelem
 )
 select
-  n.nspname as schema,
+  case when ext.extname is null then n.nspname || '.' else '' end as schema,
   t.typname as name,
   t.typlen as size,
   case t.typalign
@@ -148,29 +150,86 @@ select
   end as align,
   coalesce(format_type(r.rngsubtype, null), '') as subtype,
   case when r.rngtypid is null then 0 else 1 end as is_range,
-  case when t.typtype in ('b', 'p') then t.typinput::text else '' end as input,
-  case when t.typtype in ('b', 'p') then t.typoutput::text else '' end as output,
-  case when t.typtype = 'b' and t.typelem <> 0 then format_type(t.typelem, null) else '' end as element,
-  case when t.typtype = 'b' and t.typsubscript <> 0 then t.typsubscript::text else '' end as subscript,
-  case when t.typtype = 'b' and t.typsubscript <> 0 then pg_temp.subscript_result(t.oid, $$'1'$$) else '' end as subscript_result,
-  case when t.typtype = 'b' and t.typsubscript <> 0 then pg_temp.subscript_result(t.oid, $$'1':'1'$$) else '' end as slice_result,
-  case when t.typtype in ('b', 'p') and t.typcategory <> 'U' then quote_literal(t.typcategory::text) else '' end as category,
-  case when t.typtype in ('b', 'p') and t.typispreferred then 1 else 0 end as is_preferred,
+  case
+    when t.typtype in ('b', 'p') then
+      coalesce(
+        (
+          select quote_ident(proname)
+          from pg_proc
+          where oid = t.typinput and pronamespace = ext.extnamespace
+        ),
+        t.typinput::text
+      )
+    else ''
+  end as input,
+  case
+    when t.typtype in ('b', 'p') then
+      coalesce(
+        (
+          select quote_ident(proname)
+          from pg_proc
+          where oid = t.typoutput and pronamespace = ext.extnamespace
+        ),
+        t.typoutput::text
+      )
+    else ''
+  end as output,
+  case
+    when t.typtype = 'b' and t.typelem <> 0 then format_type(t.typelem, null)
+    else ''
+  end as element,
+  case
+    when t.typtype = 'b' and t.typsubscript <> 0 then
+      coalesce(
+        (
+          select quote_ident(proname)
+          from pg_proc
+          where oid = t.typsubscript and pronamespace = ext.extnamespace
+        ),
+        t.typsubscript::text
+      )
+    else ''
+  end as subscript,
+  case
+    when t.typtype = 'b' and t.typsubscript <> 0 then
+      pg_temp.subscript_result(t.oid, $$'1'$$)
+    else ''
+  end as subscript_result,
+  case
+    when t.typtype = 'b' and t.typsubscript <> 0 then
+      pg_temp.subscript_result(t.oid, $$'1':'1'$$)
+    else ''
+  end as slice_result,
+  case
+    when t.typtype in ('b', 'p') and t.typcategory <> 'U' then
+      quote_literal(t.typcategory::text)
+    else ''
+  end as category,
+  case
+    when t.typtype in ('b', 'p') and t.typispreferred then 1
+    else 0
+  end as is_preferred,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_type t
   join type_depths td on td.oid = t.oid
   join pg_namespace n on n.oid = t.typnamespace
   left join pg_range r on r.rngtypid = t.oid
-  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_type'::regclass
-  left join pg_depend dep on dep.classid = 'pg_type'::regclass and dep.objid = t.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = t.oid and d.classoid = 'pg_type'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_type'::regclass
+      and dep.objid = t.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
   and (
     r.rngtypid is not null
-    or (t.typtype in ('b', 'p', 'd', 'e') and t.typname not like '\_%')
+      or (t.typtype in ('b', 'p', 'd', 'e') and t.typname not like '\_%')
   )
 order by td.depth, n.nspname, t.typname, t.oid;
 ";
@@ -190,7 +249,7 @@ struct RelationQuery {
 impl Query for RelationQuery {
     const QUERY: &'static str = r"
 select
-  n.nspname as schema,
+  case when ext.extname is null then n.nspname || '.' else '' end as schema,
   c.relname as name,
   c.relkind as relkind,
   coalesce(d.description, '') as description,
@@ -199,22 +258,27 @@ select
     json_build_object(
       'name', a.attname,
       'data_type', format_type(a.atttypid, a.atttypmod)
-    )
-    order by a.attnum
+    ) order by a.attnum
   ) as columns
 from pg_class c
   join pg_namespace n on n.oid = c.relnamespace
   join pg_attribute a on a.attrelid = c.oid
-  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_class'::regclass and d.objsubid = 0
-  left join pg_depend dep on dep.classid = 'pg_class'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = c.oid and d.classoid = 'pg_class'::regclass and d.objsubid = 0
+  left join pg_depend dep on
+    dep.classid = 'pg_class'::regclass
+      and dep.objid = c.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
   and c.relkind in ('r', 'v')
   and a.attnum > 0
   and not a.attisdropped
-group by c.oid, schema, name, relkind, description, extension_name
+group by c.oid, n.nspname, schema, name, relkind, description, extension_name
 order by n.nspname, c.relname, c.oid;
 ";
 }
@@ -250,43 +314,125 @@ struct FunctionQuery {
 impl Query for FunctionQuery {
     const QUERY: &'static str = r"
 select
-  n.nspname as schema,
+  case
+    when ext.extname is null or ext.extname = 'plpgsql' then n.nspname || '.'
+    else ''
+  end as schema,
   p.proname as name,
   pg_get_function_arguments(p.oid) as args,
   pg_get_function_result(p.oid) as result,
   l.lanname as language,
   coalesce(d.description, '') as description,
   p.prokind as prokind,
-  a.aggtransfn::regproc::text as trans_fn,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggtransfn and pronamespace = ext.extnamespace
+    ),
+    a.aggtransfn::regproc::text
+  ) as trans_fn,
   format_type(a.aggtranstype, null) as trans_type,
-  a.aggfinalfn::regproc::text as final_fn,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggfinalfn and pronamespace = ext.extnamespace
+    ),
+    a.aggfinalfn::regproc::text
+  ) as final_fn,
   case when a.aggfinalextra then 1 else 0 end as is_final_extra,
-  a.aggcombinefn::regproc::text as combine_fn,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggcombinefn and pronamespace = ext.extnamespace
+    ),
+    a.aggcombinefn::regproc::text
+  ) as combine_fn,
   coalesce(quote_literal(a.agginitval), '') as init_val,
-  coalesce('OPERATOR(' || son.nspname || '.' || so.oprname || ')', '') as sort_op,
-  a.aggmtransfn::regproc::text as moving_trans_fn,
-  a.aggminvtransfn::regproc::text as moving_inv_trans_fn,
-  case when a.aggmtranstype = 0 then '' else format_type(a.aggmtranstype, null) end as moving_trans_type,
-  a.aggmfinalfn::regproc::text as moving_final_fn,
+  coalesce(
+    'OPERATOR('
+      || case
+        when son.oid = ext.extnamespace then ''
+        else son.nspname || '.'
+      end
+      || so.oprname
+      || ')',
+    ''
+  ) as sort_op,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggmtransfn and pronamespace = ext.extnamespace
+    ),
+    a.aggmtransfn::regproc::text
+  ) as moving_trans_fn,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggminvtransfn and pronamespace = ext.extnamespace
+    ),
+    a.aggminvtransfn::regproc::text
+  ) as moving_inv_trans_fn,
+  case
+    when a.aggmtranstype = 0 then ''
+    else format_type(a.aggmtranstype, null)
+  end as moving_trans_type,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggmfinalfn and pronamespace = ext.extnamespace
+    ),
+    a.aggmfinalfn::regproc::text
+  ) as moving_final_fn,
   case when a.aggmfinalextra then 1 else 0 end as is_moving_final_extra,
   coalesce(quote_literal(a.aggminitval), '') as moving_init_val,
-  a.aggserialfn::regproc::text as serial_fn,
-  a.aggdeserialfn::regproc::text as deserial_fn,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggserialfn and pronamespace = ext.extnamespace
+    ),
+    a.aggserialfn::regproc::text
+  ) as serial_fn,
+  coalesce(
+    (
+      select quote_ident(proname)
+      from pg_proc
+      where oid = a.aggdeserialfn and pronamespace = ext.extnamespace
+    ),
+    a.aggdeserialfn::regproc::text
+  ) as deserial_fn,
   case when a.aggkind = 'h' then 1 else 0 end as is_hypothetical,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_proc p
   join pg_namespace n on n.oid = p.pronamespace
   join pg_language l on l.oid = p.prolang
-  left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
+  left join pg_description d on
+    d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
   left join pg_aggregate a on a.aggfnoid = p.oid
   left join pg_operator so on so.oid = a.aggsortop
   left join pg_namespace son on son.oid = so.oprnamespace
-  left join pg_depend dep on dep.classid = 'pg_proc'::regclass and dep.objid = p.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_depend dep on
+    dep.classid = 'pg_proc'::regclass
+      and dep.objid = p.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
-order by n.nspname, p.proname, pg_get_function_arguments(p.oid), pg_get_function_result(p.oid), p.oid;
+order by
+  n.nspname,
+  p.proname,
+  pg_get_function_arguments(p.oid),
+  pg_get_function_result(p.oid),
+  p.oid;
 ";
 }
 
@@ -303,7 +449,7 @@ struct CompositeTypeQuery {
 impl Query for CompositeTypeQuery {
     const QUERY: &'static str = r"
 select
-  n.nspname as schema,
+  case when ext.extname is null then n.nspname || '.' else '' end as schema,
   t.typname as name,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name,
@@ -311,17 +457,22 @@ select
     json_build_object(
       'name', a.attname,
       'data_type', format_type(a.atttypid, a.atttypmod)
-    )
-    order by a.attnum
+    ) order by a.attnum
   ) as columns
 from pg_type t
   join pg_namespace n on n.oid = t.typnamespace
   join pg_class c on c.oid = t.typrelid
   join pg_attribute a on a.attrelid = c.oid
-  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_type'::regclass
-  left join pg_depend dep on dep.classid = 'pg_type'::regclass and dep.objid = t.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = t.oid and d.classoid = 'pg_type'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_type'::regclass
+      and dep.objid = t.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
   and t.typtype = 'c'
@@ -348,11 +499,14 @@ struct OperatorQuery {
 impl Query for OperatorQuery {
     const QUERY: &'static str = r"
 select
-  n.nspname as schema,
+  case when ext.extname is null then n.nspname || '.' else '' end as schema,
   o.oprname as name,
   format_type(o.oprleft, null) as left_type,
   format_type(o.oprright, null) as right_type,
-  pn.nspname as func_schema,
+  case
+    when pn.oid = ext.extnamespace then ''
+    else pn.nspname || '.'
+  end as func_schema,
   p.proname as func_name,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
@@ -360,13 +514,26 @@ from pg_operator o
   join pg_namespace n on n.oid = o.oprnamespace
   join pg_proc p on p.oid = o.oprcode
   join pg_namespace pn on pn.oid = p.pronamespace
-  left join pg_description d on d.objoid = o.oid and d.classoid = 'pg_operator'::regclass
-  left join pg_depend dep on dep.classid = 'pg_operator'::regclass and dep.objid = o.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = o.oid and d.classoid = 'pg_operator'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_operator'::regclass
+      and dep.objid = o.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
-order by n.nspname, o.oprname, format_type(o.oprleft, null), format_type(o.oprright, null), pn.nspname, p.proname, o.oid;
+order by
+  n.nspname,
+  o.oprname,
+  format_type(o.oprleft, null),
+  format_type(o.oprright, null),
+  pn.nspname,
+  p.proname,
+  o.oid;
 ";
 }
 
@@ -388,16 +555,32 @@ select
   format_type(c.casttarget, null) as target,
   c.castcontext as context,
   c.castmethod as method,
-  coalesce(pn.nspname || '.' || quote_ident(p.proname) || '(' || oidvectortypes(p.proargtypes) || ')', '') as function,
+  coalesce(
+    case
+        when pn.oid = ext.extnamespace then ''
+        else pn.nspname || '.'
+      end || quote_ident(p.proname)
+      || '(' || oidvectortypes(p.proargtypes)
+      || ')',
+    ''
+  ) as function,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_cast c
   left join pg_proc p on p.oid = c.castfunc
   left join pg_namespace pn on pn.oid = p.pronamespace
-  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_cast'::regclass
-  left join pg_depend dep on dep.classid = 'pg_cast'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = c.oid and d.classoid = 'pg_cast'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_cast'::regclass
+      and dep.objid = c.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-order by format_type(c.castsource, null), format_type(c.casttarget, null), c.oid;
+order by
+  format_type(c.castsource, null),
+  format_type(c.casttarget, null),
+  c.oid;
 ";
 }
 
@@ -415,7 +598,7 @@ struct CollationQuery {
 impl Query for CollationQuery {
     const QUERY: &'static str = r"
 select
-  n.nspname as schema,
+  case when ext.extname is null then n.nspname || '.' else '' end as schema,
   quote_ident(c.collname) as name,
   c.collprovider as provider,
   coalesce(c.colllocale, c.collcollate, '') as locale,
@@ -424,10 +607,16 @@ select
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_collation c
   join pg_namespace n on n.oid = c.collnamespace
-  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_collation'::regclass
-  left join pg_depend dep on dep.classid = 'pg_collation'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = c.oid and d.classoid = 'pg_collation'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_collation'::regclass
+      and dep.objid = c.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
   and (c.oid < 10000 or ext.extname is not null)
@@ -449,9 +638,27 @@ impl Query for LanguageQuery {
     const QUERY: &'static str = r"
 select
   quote_ident(l.lanname) as name,
-  coalesce(quote_ident(hn.nspname) || '.' || quote_ident(h.proname), '') as handler,
-  coalesce(quote_ident(inn.nspname) || '.' || quote_ident(i.proname), '') as inline,
-  coalesce(quote_ident(vn.nspname) || '.' || quote_ident(v.proname), '') as validator,
+  coalesce(
+    case
+      when hn.oid = ext.extnamespace and ext.extname != 'plpgsql' then ''
+      else quote_ident(hn.nspname) || '.'
+    end || quote_ident(h.proname),
+    ''
+  ) as handler,
+  coalesce(
+    case
+      when inn.oid = ext.extnamespace and ext.extname != 'plpgsql' then ''
+      else quote_ident(inn.nspname) || '.'
+    end || quote_ident(i.proname),
+    ''
+  ) as inline,
+  coalesce(
+    case
+      when vn.oid = ext.extnamespace and ext.extname != 'plpgsql' then ''
+      else quote_ident(vn.nspname) || '.'
+    end || quote_ident(v.proname),
+    ''
+  ) as validator,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_language l
@@ -461,8 +668,13 @@ from pg_language l
   left join pg_namespace inn on inn.oid = i.pronamespace
   left join pg_proc v on v.oid = l.lanvalidator
   left join pg_namespace vn on vn.oid = v.pronamespace
-  left join pg_description d on d.objoid = l.oid and d.classoid = 'pg_language'::regclass
-  left join pg_depend dep on dep.classid = 'pg_language'::regclass and dep.objid = l.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = l.oid and d.classoid = 'pg_language'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_language'::regclass
+      and dep.objid = l.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
 order by l.lanname, l.oid;
 ";
@@ -481,8 +693,20 @@ impl Query for ForeignDataWrapperQuery {
     const QUERY: &'static str = r"
 select
   quote_ident(w.fdwname) as name,
-  coalesce(quote_ident(hn.nspname) || '.' || quote_ident(h.proname), '') as handler,
-  coalesce(quote_ident(vn.nspname) || '.' || quote_ident(v.proname), '') as validator,
+  coalesce(
+    case
+      when hn.oid = ext.extnamespace then ''
+      else quote_ident(hn.nspname) || '.'
+    end || quote_ident(h.proname),
+    ''
+  ) as handler,
+  coalesce(
+    case
+      when vn.oid = ext.extnamespace then ''
+      else quote_ident(vn.nspname) || '.'
+    end || quote_ident(v.proname),
+    ''
+  ) as validator,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_foreign_data_wrapper w
@@ -490,8 +714,13 @@ from pg_foreign_data_wrapper w
   left join pg_namespace hn on hn.oid = h.pronamespace
   left join pg_proc v on v.oid = w.fdwvalidator
   left join pg_namespace vn on vn.oid = v.pronamespace
-  left join pg_description d on d.objoid = w.oid and d.classoid = 'pg_foreign_data_wrapper'::regclass
-  left join pg_depend dep on dep.classid = 'pg_foreign_data_wrapper'::regclass and dep.objid = w.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = w.oid and d.classoid = 'pg_foreign_data_wrapper'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_foreign_data_wrapper'::regclass
+      and dep.objid = w.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
 order by w.fdwname, w.oid;
 ";
@@ -512,11 +741,17 @@ struct ConversionQuery {
 impl Query for ConversionQuery {
     const QUERY: &'static str = r"
 select
-  quote_ident(n.nspname) as schema,
+  case
+    when ext.extname is null then quote_ident(n.nspname) || '.'
+    else ''
+  end as schema,
   quote_ident(c.conname) as name,
   quote_literal(pg_encoding_to_char(c.conforencoding)) as source_encoding,
   quote_literal(pg_encoding_to_char(c.contoencoding)) as target_encoding,
-  quote_ident(pn.nspname) || '.' || quote_ident(p.proname) as function,
+  case
+    when pn.oid = ext.extnamespace then ''
+    else quote_ident(pn.nspname) || '.'
+  end || quote_ident(p.proname) as function,
   case when c.condefault then 1 else 0 end as is_default,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
@@ -524,10 +759,16 @@ from pg_conversion c
   join pg_namespace n on n.oid = c.connamespace
   join pg_proc p on p.oid = c.conproc
   join pg_namespace pn on pn.oid = p.pronamespace
-  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_conversion'::regclass
-  left join pg_depend dep on dep.classid = 'pg_conversion'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = c.oid and d.classoid = 'pg_conversion'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_conversion'::regclass
+      and dep.objid = c.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, c.conname, c.oid;
@@ -546,7 +787,10 @@ struct OperatorFamilyQuery {
 impl Query for OperatorFamilyQuery {
     const QUERY: &'static str = r"
 select
-  quote_ident(n.nspname) as schema,
+  case
+    when ext.extname is null then quote_ident(n.nspname) || '.'
+    else ''
+  end as schema,
   quote_ident(f.opfname) as name,
   quote_ident(a.amname) as access_method,
   coalesce(d.description, '') as description,
@@ -554,10 +798,16 @@ select
 from pg_opfamily f
   join pg_namespace n on n.oid = f.opfnamespace
   join pg_am a on a.oid = f.opfmethod
-  left join pg_description d on d.objoid = f.oid and d.classoid = 'pg_opfamily'::regclass
-  left join pg_depend dep on dep.classid = 'pg_opfamily'::regclass and dep.objid = f.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = f.oid and d.classoid = 'pg_opfamily'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_opfamily'::regclass
+      and dep.objid = f.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, f.opfname, a.amname, f.oid;
@@ -580,13 +830,22 @@ struct OperatorClassQuery {
 impl Query for OperatorClassQuery {
     const QUERY: &'static str = r"
 select
-  quote_ident(n.nspname) as schema,
+  case
+    when ext.extname is null then quote_ident(n.nspname) || '.'
+    else ''
+  end as schema,
   quote_ident(c.opcname) as name,
   case when c.opcdefault then 1 else 0 end as is_default,
   format_type(c.opcintype, null) as data_type,
   quote_ident(a.amname) as access_method,
-  quote_ident(fn.nspname) || '.' || quote_ident(f.opfname) as family,
-  format_type(coalesce(nullif(c.opckeytype, 0), c.opcintype), null) as storage_type,
+  case
+    when fn.oid = ext.extnamespace then ''
+    else quote_ident(fn.nspname) || '.'
+  end || quote_ident(f.opfname) as family,
+  format_type(
+    coalesce(nullif(c.opckeytype, 0), c.opcintype),
+    null
+  ) as storage_type,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_opclass c
@@ -594,10 +853,16 @@ from pg_opclass c
   join pg_am a on a.oid = c.opcmethod
   join pg_opfamily f on f.oid = c.opcfamily
   join pg_namespace fn on fn.oid = f.opfnamespace
-  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_opclass'::regclass
-  left join pg_depend dep on dep.classid = 'pg_opclass'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = c.oid and d.classoid = 'pg_opclass'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_opclass'::regclass
+      and dep.objid = c.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, c.opcname, a.amname, c.oid;
@@ -620,21 +885,80 @@ struct TextSearchParserQuery {
 impl Query for TextSearchParserQuery {
     const QUERY: &'static str = r"
 select
-  quote_ident(n.nspname) as schema,
+  case
+    when ext.extname is null then quote_ident(n.nspname) || '.'
+    else ''
+  end as schema,
   quote_ident(p.prsname) as name,
-  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prsstart), '') as start,
-  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prstoken), '') as gettoken,
-  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prsend), '') as end,
-  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prslextype), '') as lextypes,
-  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = p.prsheadline), '') as headline,
+  coalesce(
+    (
+      select case
+        when pn.oid = ext.extnamespace then ''
+        else quote_ident(pn.nspname) || '.'
+      end || quote_ident(pr.proname)
+      from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace
+      where pr.oid = p.prsstart
+    ),
+    ''
+  ) as start,
+  coalesce(
+    (
+      select case
+        when pn.oid = ext.extnamespace then ''
+        else quote_ident(pn.nspname) || '.'
+      end || quote_ident(pr.proname)
+      from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace
+      where pr.oid = p.prstoken
+    ),
+    ''
+  ) as gettoken,
+  coalesce(
+    (
+      select case
+        when pn.oid = ext.extnamespace then ''
+        else quote_ident(pn.nspname) || '.'
+      end || quote_ident(pr.proname)
+      from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace
+      where pr.oid = p.prsend
+    ),
+    ''
+  ) as end,
+  coalesce(
+    (
+      select case
+        when pn.oid = ext.extnamespace then ''
+        else quote_ident(pn.nspname) || '.'
+      end || quote_ident(pr.proname)
+      from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace
+      where pr.oid = p.prslextype
+    ),
+    ''
+  ) as lextypes,
+  coalesce(
+    (
+      select case
+        when pn.oid = ext.extnamespace then ''
+        else quote_ident(pn.nspname) || '.'
+      end || quote_ident(pr.proname)
+      from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace
+      where pr.oid = p.prsheadline
+    ),
+    ''
+  ) as headline,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_ts_parser p
   join pg_namespace n on n.oid = p.prsnamespace
-  left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_ts_parser'::regclass
-  left join pg_depend dep on dep.classid = 'pg_ts_parser'::regclass and dep.objid = p.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = p.oid and d.classoid = 'pg_ts_parser'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_ts_parser'::regclass
+      and dep.objid = p.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, p.prsname, p.oid;
@@ -654,18 +978,47 @@ struct TextSearchTemplateQuery {
 impl Query for TextSearchTemplateQuery {
     const QUERY: &'static str = r"
 select
-  quote_ident(n.nspname) as schema,
+  case
+    when ext.extname is null then quote_ident(n.nspname) || '.'
+    else ''
+  end as schema,
   quote_ident(t.tmplname) as name,
-  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = t.tmplinit), '') as init,
-  coalesce((select quote_ident(pn.nspname) || '.' || quote_ident(pr.proname) from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace where pr.oid = t.tmpllexize), '') as lexize,
+  coalesce(
+    (
+      select case
+        when pn.oid = ext.extnamespace then ''
+        else quote_ident(pn.nspname) || '.'
+      end || quote_ident(pr.proname)
+      from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace
+      where pr.oid = t.tmplinit
+    ),
+    ''
+  ) as init,
+  coalesce(
+    (
+      select case
+        when pn.oid = ext.extnamespace then ''
+        else quote_ident(pn.nspname) || '.'
+      end || quote_ident(pr.proname)
+      from pg_proc pr join pg_namespace pn on pn.oid = pr.pronamespace
+      where pr.oid = t.tmpllexize
+    ),
+    ''
+  ) as lexize,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_ts_template t
   join pg_namespace n on n.oid = t.tmplnamespace
-  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_ts_template'::regclass
-  left join pg_depend dep on dep.classid = 'pg_ts_template'::regclass and dep.objid = t.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = t.oid and d.classoid = 'pg_ts_template'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_ts_template'::regclass
+      and dep.objid = t.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, t.tmplname, t.oid;
@@ -685,9 +1038,15 @@ struct TextSearchDictionaryQuery {
 impl Query for TextSearchDictionaryQuery {
     const QUERY: &'static str = r"
 select
-  quote_ident(n.nspname) as schema,
+  case
+    when ext.extname is null then quote_ident(n.nspname) || '.'
+    else ''
+  end as schema,
   quote_ident(dc.dictname) as name,
-  quote_ident(tn.nspname) || '.' || quote_ident(t.tmplname) as template,
+  case
+    when tn.oid = ext.extnamespace then ''
+    else quote_ident(tn.nspname) || '.'
+  end || quote_ident(t.tmplname) as template,
   coalesce(dc.dictinitoption, '') as options,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
@@ -695,10 +1054,16 @@ from pg_ts_dict dc
   join pg_namespace n on n.oid = dc.dictnamespace
   join pg_ts_template t on t.oid = dc.dicttemplate
   join pg_namespace tn on tn.oid = t.tmplnamespace
-  left join pg_description d on d.objoid = dc.oid and d.classoid = 'pg_ts_dict'::regclass
-  left join pg_depend dep on dep.classid = 'pg_ts_dict'::regclass and dep.objid = dc.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = dc.oid and d.classoid = 'pg_ts_dict'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_ts_dict'::regclass
+      and dep.objid = dc.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, dc.dictname, dc.oid;
@@ -717,19 +1082,31 @@ struct TextSearchConfigurationQuery {
 impl Query for TextSearchConfigurationQuery {
     const QUERY: &'static str = r"
 select
-  quote_ident(n.nspname) as schema,
+  case
+    when ext.extname is null then quote_ident(n.nspname) || '.'
+    else ''
+  end as schema,
   quote_ident(c.cfgname) as name,
-  quote_ident(pn.nspname) || '.' || quote_ident(p.prsname) as parser,
+  case
+    when pn.oid = ext.extnamespace then ''
+    else quote_ident(pn.nspname) || '.'
+  end || quote_ident(p.prsname) as parser,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_ts_config c
   join pg_namespace n on n.oid = c.cfgnamespace
   join pg_ts_parser p on p.oid = c.cfgparser
   join pg_namespace pn on pn.oid = p.prsnamespace
-  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_ts_config'::regclass
-  left join pg_depend dep on dep.classid = 'pg_ts_config'::regclass and dep.objid = c.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = c.oid and d.classoid = 'pg_ts_config'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_ts_config'::regclass
+      and dep.objid = c.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
-where n.nspname not like 'pg_temp%'
+where
+  n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, c.cfgname, c.oid;
@@ -750,14 +1127,22 @@ impl Query for AccessMethodQuery {
 select
   quote_ident(a.amname) as name,
   case a.amtype when 't' then 'table' when 'i' then 'index' end as kind,
-  quote_ident(n.nspname) || '.' || quote_ident(p.proname) as handler,
+  case
+    when n.oid = ext.extnamespace then ''
+    else quote_ident(n.nspname) || '.'
+  end || quote_ident(p.proname) as handler,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_am a
   join pg_proc p on p.oid = a.amhandler
   join pg_namespace n on n.oid = p.pronamespace
-  left join pg_description d on d.objoid = a.oid and d.classoid = 'pg_am'::regclass
-  left join pg_depend dep on dep.classid = 'pg_am'::regclass and dep.objid = a.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_description d on
+    d.objoid = a.oid and d.classoid = 'pg_am'::regclass
+  left join pg_depend dep on
+    dep.classid = 'pg_am'::regclass
+      and dep.objid = a.oid
+      and dep.objsubid = 0
+      and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid
 order by a.amname, a.oid;
 ";
@@ -775,7 +1160,8 @@ select
   quote_ident(r.rolname) as name,
   coalesce(d.description, '') as description
 from pg_roles r
-  left join pg_shdescription d on d.objoid = r.oid and d.classoid = 'pg_authid'::regclass
+  left join pg_shdescription d on
+    d.objoid = r.oid and d.classoid = 'pg_authid'::regclass
 where r.rolname like 'pg\_%'
 order by r.rolname, r.oid;
 ";
@@ -795,7 +1181,8 @@ select
   quote_literal(pg_tablespace_location(t.oid)) as location,
   coalesce(d.description, '') as description
 from pg_tablespace t
-  left join pg_shdescription d on d.objoid = t.oid and d.classoid = 'pg_tablespace'::regclass
+  left join pg_shdescription d on
+    d.objoid = t.oid and d.classoid = 'pg_tablespace'::regclass
 order by t.spcname, t.oid;
 ";
 }
@@ -812,7 +1199,8 @@ select
   quote_ident(d.datname) as name,
   coalesce(s.description, '') as description
 from pg_database d
-  left join pg_shdescription s on s.objoid = d.oid and s.classoid = 'pg_database'::regclass
+  left join pg_shdescription s on
+    s.objoid = d.oid and s.classoid = 'pg_database'::regclass
 where d.datname in ('postgres', 'template0', 'template1')
 order by d.datname, d.oid;
 ";
@@ -963,7 +1351,7 @@ impl WriteSql for ConversionDef {
         }
         writeln!(
             f,
-            "conversion {}.{} for {} to {} from {};",
+            "conversion {}{} for {} to {} from {};",
             self.schema, self.name, self.source_encoding, self.target_encoding, self.function
         )?;
         writeln!(f)?;
@@ -983,7 +1371,7 @@ impl WriteSql for OperatorFamilyDef {
         write_description(f, &self.description)?;
         writeln!(
             f,
-            "create operator family {}.{} using {};",
+            "create operator family {}{} using {};",
             self.schema, self.name, self.access_method
         )?;
         writeln!(f)?;
@@ -1005,7 +1393,7 @@ struct OperatorClassDef {
 impl WriteSql for OperatorClassDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
-        write!(f, "create operator class {}.{} ", self.schema, self.name)?;
+        write!(f, "create operator class {}{} ", self.schema, self.name)?;
         if self.default {
             write!(f, "default ")?;
         }
@@ -1037,7 +1425,7 @@ impl WriteSql for TextSearchParserDef {
         write_description(f, &self.description)?;
         write!(
             f,
-            "create text search parser {}.{} (start = {}, gettoken = {}, end = {}, lextypes = {}",
+            "create text search parser {}{} (start = {}, gettoken = {}, end = {}, lextypes = {}",
             self.schema, self.name, self.start, self.gettoken, self.end, self.lextypes
         )?;
         if !self.headline.is_empty() {
@@ -1062,7 +1450,7 @@ impl WriteSql for TextSearchTemplateDef {
         write_description(f, &self.description)?;
         write!(
             f,
-            "create text search template {}.{} (",
+            "create text search template {}{} (",
             self.schema, self.name
         )?;
         if !self.init.is_empty() {
@@ -1087,7 +1475,7 @@ impl WriteSql for TextSearchDictionaryDef {
         write_description(f, &self.description)?;
         write!(
             f,
-            "create text search dictionary {}.{} (template = {}",
+            "create text search dictionary {}{} (template = {}",
             self.schema, self.name, self.template
         )?;
         if !self.options.is_empty() {
@@ -1113,7 +1501,7 @@ impl WriteSql for TextSearchConfigurationDef {
         // `alter text search configuration ... add mapping for ... with ...`.
         writeln!(
             f,
-            "create text search configuration {}.{} (parser = {});",
+            "create text search configuration {}{} (parser = {});",
             self.schema, self.name, self.parser
         )?;
         writeln!(f)?;
@@ -1208,7 +1596,7 @@ impl WriteSql for TypeDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
         writeln!(f, "-- size: {}, align: {}", self.size, self.align)?;
-        writeln!(f, "create type {}.{};", self.schema, self.name)?;
+        writeln!(f, "create type {}{};", self.schema, self.name)?;
         writeln!(f)?;
         Ok(())
     }
@@ -1245,7 +1633,7 @@ impl WriteSql for BaseTypeDef<'_> {
         }
         writeln!(
             f,
-            "create type {}.{} ({});",
+            "create type {}{} ({});",
             ty.schema,
             ty.name,
             options.join(", ")
@@ -1270,7 +1658,7 @@ impl WriteSql for RangeTypeDef {
         writeln!(f, "-- size: {}, align: {}", self.size, self.align)?;
         writeln!(
             f,
-            "create type {}.{} as range (subtype = {});",
+            "create type {}{} as range (subtype = {});",
             self.schema, self.name, self.subtype
         )?;
         writeln!(f)?;
@@ -1288,7 +1676,7 @@ struct CompositeTypeDef {
 impl WriteSql for CompositeTypeDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
-        writeln!(f, "create type {}.{} as (", self.schema, self.name)?;
+        writeln!(f, "create type {}{} as (", self.schema, self.name)?;
         for (index, column) in self.columns.iter().enumerate() {
             let comma = if index + 1 < self.columns.len() {
                 ","
@@ -1313,7 +1701,7 @@ struct TableDef {
 impl WriteSql for TableDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
-        writeln!(f, "create table {}.{} (", self.schema, self.name)?;
+        writeln!(f, "create table {}{} (", self.schema, self.name)?;
         for (index, column) in self.columns.iter().enumerate() {
             let comma = if index + 1 < self.columns.len() {
                 ","
@@ -1345,7 +1733,7 @@ impl WriteSql for ViewDef {
             .collect();
         writeln!(
             f,
-            "create view {}.{}({}) as",
+            "create view {}{}({}) as",
             self.schema,
             self.name,
             col_names.join(", ")
@@ -1379,7 +1767,7 @@ impl WriteSql for RegularFunctionDef {
         write_description(f, &self.description)?;
         writeln!(
             f,
-            "create function {}.{}({}) returns {}",
+            "create function {}{}({}) returns {}",
             self.schema, self.name, self.args, self.result
         )?;
         writeln!(f, "  language {};", self.language)?;
@@ -1423,7 +1811,7 @@ impl WriteSql for AggregateDef {
 
         writeln!(
             f,
-            "create aggregate {}.{}({}) (",
+            "create aggregate {}{}({}) (",
             self.schema, self.name, args
         )?;
         writeln!(f, "  sfunc = {},", self.trans_fn)?;
@@ -1518,7 +1906,7 @@ struct OperatorDef {
 impl WriteSql for OperatorDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
-        writeln!(f, "create operator {}.{} (", self.schema, self.name)?;
+        writeln!(f, "create operator {}{} (", self.schema, self.name)?;
         let args = match (self.left_type.as_str(), self.right_type.as_str()) {
             ("-", right_type) => format!("  rightarg = {right_type},"),
             (left_type, "-") => format!("  leftarg = {left_type},"),
@@ -1529,7 +1917,7 @@ impl WriteSql for OperatorDef {
         writeln!(f, "{args}")?;
         writeln!(
             f,
-            "  function = {}.{}",
+            "  function = {}{}",
             self.function_schema, self.function_name
         )?;
         writeln!(f, ");")?;
@@ -1613,7 +2001,7 @@ impl WriteSql for CollationDef {
         }
         writeln!(
             f,
-            "create collation {}.{} ({});",
+            "create collation {}{} ({});",
             self.schema,
             self.name,
             options.join(", ")
@@ -1853,7 +2241,7 @@ fn query_schemas(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in TypeQuery::run()? {
         if row.align.is_empty() {
-            bail!("unexpected type alignment for {}.{}", row.schema, row.name);
+            bail!("unexpected type alignment for {}{}", row.schema, row.name);
         }
 
         let module = modules.entry(module_name(row.extension_name)).or_default();
