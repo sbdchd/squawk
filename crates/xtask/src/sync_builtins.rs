@@ -98,7 +98,13 @@ struct TypeQuery {
     size: String,
     align: String,
     subtype: String,
+    multirange: String,
     is_range: i32,
+    domain_base: String,
+    domain_default: String,
+    domain_not_null: i32,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    domain_constraints: Vec<String>,
     input: String,
     output: String,
     element: String,
@@ -107,6 +113,10 @@ struct TypeQuery {
     slice_result: String,
     category: String,
     is_preferred: i32,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    options: Vec<String>,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    range_options: Vec<String>,
     description: String,
     extension_name: String,
 }
@@ -149,7 +159,35 @@ select
     when 'd' then 8
   end as align,
   coalesce(format_type(r.rngsubtype, null), '') as subtype,
+  coalesce(
+    (
+      select case
+        when mt.typnamespace = ext.extnamespace then quote_ident(mt.typname)
+        else format('%I.%I', mn.nspname, mt.typname)
+      end
+      from pg_type mt join pg_namespace mn on mn.oid = mt.typnamespace
+      where mt.oid = r.rngmultitypid
+    ),
+    ''
+  ) as multirange,
   case when r.rngtypid is null then 0 else 1 end as is_range,
+  case
+    when t.typtype = 'd' then format_type(t.typbasetype, t.typtypmod)
+    else ''
+  end as domain_base,
+  coalesce(pg_get_expr(t.typdefaultbin, 0), '') as domain_default,
+  case when t.typnotnull then 1 else 0 end as domain_not_null,
+  coalesce(
+    (
+      select json_agg(
+        format('constraint %I %s', conname, pg_get_constraintdef(oid)) order by
+          conname
+      )
+      from pg_constraint
+      where contypid = t.oid and contype = 'c'
+    ),
+    '[]'
+  ) as domain_constraints,
   case
     when t.typtype in ('b', 'p') then
       coalesce(
@@ -209,6 +247,45 @@ select
     when t.typtype in ('b', 'p') and t.typispreferred then 1
     else 0
   end as is_preferred,
+  array_to_json(
+    array_remove(
+      array[
+        case when t.typcollation <> 0 then 'collatable = true' end,
+        case
+          when t.typmodin <> 0 then 'typmod_in = ' || t.typmodin::regproc::text
+        end,
+        case
+          when t.typmodout <> 0 then
+            'typmod_out = ' || t.typmodout::regproc::text
+        end
+      ],
+      null
+    )
+  ) as options,
+  array_to_json(
+    array_remove(
+      array[
+        case
+          when r.rngcollation <> 0 then
+            'collation = ' || r.rngcollation::regcollation::text
+        end,
+        (
+          select 'subtype_opclass = ' || format('%I.%I', ns.nspname, op.opcname)
+          from pg_opclass op join pg_namespace ns on ns.oid = op.opcnamespace
+          where op.oid = r.rngsubopc
+        ),
+        case
+          when r.rngcanonical <> 0 then
+            'canonical = ' || r.rngcanonical::regproc::text
+        end,
+        case
+          when r.rngsubdiff <> 0 then
+            'subtype_diff = ' || r.rngsubdiff::regproc::text
+        end
+      ],
+      null
+    )
+  ) as range_options,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_type t
@@ -244,6 +321,8 @@ struct RelationQuery {
     extension_name: String,
     #[serde(deserialize_with = "deserialize_json_string")]
     columns: Vec<Column>,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    constraints: Vec<String>,
 }
 
 impl Query for RelationQuery {
@@ -257,12 +336,28 @@ select
   json_agg(
     json_build_object(
       'name', a.attname,
-      'data_type', format_type(a.atttypid, a.atttypmod)
+      'data_type', format_type(a.atttypid, a.atttypmod),
+      'not_null', a.attnotnull,
+      'default', coalesce(pg_get_expr(ad.adbin, ad.adrelid), ''),
+      'identity', a.attidentity,
+      'generated', a.attgenerated
     ) order by a.attnum
-  ) as columns
+  ) as columns,
+  coalesce(
+    (
+      select json_agg(
+        format('constraint %I %s', conname, pg_get_constraintdef(oid)) order by
+          conname
+      )
+      from pg_constraint
+      where conrelid = c.oid and contype in ('p', 'u', 'f', 'c', 'x')
+    ),
+    '[]'
+  ) as constraints
 from pg_class c
   join pg_namespace n on n.oid = c.relnamespace
   join pg_attribute a on a.attrelid = c.oid
+  left join pg_attrdef ad on ad.adrelid = c.oid and ad.adnum = a.attnum
   left join pg_description d on
     d.objoid = c.oid and d.classoid = 'pg_class'::regclass and d.objsubid = 0
   left join pg_depend dep on
@@ -292,6 +387,16 @@ struct FunctionQuery {
     language: String,
     description: String,
     prokind: String,
+    volatility: String,
+    strict: i32,
+    support_depth: Option<i32>,
+    needs_range_definition: i32,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    options: Vec<String>,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    settings: Vec<FunctionSetting>,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    aggregate_options: Vec<String>,
     trans_fn: String,
     trans_type: String,
     final_fn: String,
@@ -313,6 +418,12 @@ struct FunctionQuery {
 
 impl Query for FunctionQuery {
     const QUERY: &'static str = r"
+with recursive function_depths as (
+  select oid, 0 as depth from pg_proc where prosupport = 0
+  union all
+  select p.oid, d.depth + 1
+  from pg_proc p join function_depths d on d.oid = p.prosupport
+)
 select
   case
     when ext.extname is null or ext.extname = 'plpgsql' then n.nspname || '.'
@@ -320,10 +431,105 @@ select
   end as schema,
   p.proname as name,
   pg_get_function_arguments(p.oid) as args,
-  pg_get_function_result(p.oid) as result,
+  coalesce(pg_get_function_result(p.oid), '') as result,
   l.lanname as language,
   coalesce(d.description, '') as description,
   p.prokind as prokind,
+  p.provolatile as volatility,
+  case when p.proisstrict then 1 else 0 end as strict,
+  fd.depth as support_depth,
+  case
+    when exists(
+      select 1
+      from pg_type t left join pg_type e on e.oid = t.typelem
+      where
+        t.oid = any(
+          coalesce(p.proallargtypes, p.proargtypes::oid[]) || p.prorettype
+        )
+        and (
+          t.typtype = 'm'
+            or e.typtype in ('r', 'm')
+            or (l.lanname not in ('internal', 'c') and t.typtype = 'r')
+        )
+    ) then
+      1
+    else 0
+  end as needs_range_definition,
+  array_to_json(
+    array_remove(
+      array[
+        case when p.prosecdef then 'security definer' end,
+        case when p.proleakproof then 'leakproof' end,
+        case p.proparallel
+          when 's' then 'parallel safe'
+          when 'r' then 'parallel restricted'
+        end,
+        case
+          when p.prosupport <> 0 then 'support ' || p.prosupport::regproc::text
+        end,
+        case
+          when p.procost <> (
+            case when l.lanname in ('internal', 'c') then 1 else 100 end
+          ) then
+            'cost ' || p.procost::text
+        end,
+        case
+          when p.proretset and p.prorows <> 1000 then 'rows ' || p.prorows::text
+        end
+      ],
+      null
+    )
+  ) as options,
+  coalesce(
+    (
+      select json_agg(
+        json_build_object(
+          'name', quote_ident(option_name),
+          'value', option_value,
+          'is_list', lower(option_name) in (
+            'local_preload_libraries',
+            'oauth_validator_libraries',
+            'search_path',
+            'session_preload_libraries',
+            'shared_preload_libraries',
+            'temp_tablespaces',
+            'unix_socket_directories'
+          )
+        ) order by ordinality
+      )
+      from pg_options_to_table(p.proconfig) with ordinality
+    ),
+    '[]'
+  ) as settings,
+  array_to_json(
+    array_remove(
+      array[
+        case a.aggfinalmodify
+          when 'r' then
+            case when a.aggkind <> 'n' then 'finalfunc_modify = read_only' end
+          when 's' then 'finalfunc_modify = shareable'
+          when 'w' then 'finalfunc_modify = read_write'
+        end,
+        case a.aggmfinalmodify
+          when 'r' then
+            case when a.aggkind <> 'n' then 'mfinalfunc_modify = read_only' end
+          when 's' then 'mfinalfunc_modify = shareable'
+          when 'w' then 'mfinalfunc_modify = read_write'
+        end,
+        case p.proparallel
+          when 's' then 'parallel = safe'
+          when 'r' then 'parallel = restricted'
+        end,
+        case
+          when a.aggtransspace <> 0 then 'sspace = ' || a.aggtransspace::text
+        end,
+        case
+          when a.aggmtransspace <> 0 then 'msspace = ' || a.aggmtransspace::text
+        end
+      ],
+      null
+    )
+  ) as aggregate_options,
   coalesce(
     (
       select quote_ident(proname)
@@ -410,6 +616,7 @@ select
   case when a.aggkind = 'h' then 1 else 0 end as is_hypothetical,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_proc p
+  left join function_depths fd on fd.oid = p.oid
   join pg_namespace n on n.oid = p.pronamespace
   join pg_language l on l.oid = p.prolang
   left join pg_description d on
@@ -428,6 +635,7 @@ where
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by
+  fd.depth,
   n.nspname,
   p.proname,
   pg_get_function_arguments(p.oid),
@@ -1266,6 +1474,14 @@ trait WriteSql {
 struct Column {
     name: String,
     data_type: String,
+    #[serde(default)]
+    not_null: bool,
+    #[serde(default)]
+    default: String,
+    #[serde(default)]
+    identity: String,
+    #[serde(default)]
+    generated: String,
 }
 
 struct SchemaDef {
@@ -1589,6 +1805,7 @@ struct TypeDef {
     slice_result: String,
     category: String,
     preferred: bool,
+    options: Vec<String>,
     description: String,
 }
 
@@ -1631,14 +1848,68 @@ impl WriteSql for BaseTypeDef<'_> {
         if !ty.slice_result.is_empty() {
             writeln!(f, "-- subscript slice: {}", ty.slice_result)?;
         }
-        writeln!(
+        write!(
             f,
-            "create type {}{} ({});",
+            "create type {}{} ({}",
             ty.schema,
             ty.name,
             options.join(", ")
         )?;
+        for option in &ty.options {
+            write!(f, ", {option}")?;
+        }
+        writeln!(f, ");")?;
         writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct DomainDef {
+    schema: String,
+    name: String,
+    description: String,
+    base: String,
+    default: String,
+    not_null: bool,
+    constraints: Vec<String>,
+}
+
+impl WriteSql for DomainDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        write!(
+            f,
+            "create domain {}{} as {}",
+            self.schema, self.name, self.base
+        )?;
+        if self.not_null {
+            write!(f, " not null")?;
+        }
+        writeln!(f, ";")?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+impl DomainDef {
+    fn write_qualifiers<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        if !self.default.is_empty() {
+            writeln!(
+                f,
+                "alter domain {}{} set default {};",
+                self.schema, self.name, self.default
+            )?;
+        }
+        for constraint in &self.constraints {
+            writeln!(
+                f,
+                "alter domain {}{} add {constraint};",
+                self.schema, self.name
+            )?;
+        }
+        if !self.default.is_empty() || !self.constraints.is_empty() {
+            writeln!(f)?;
+        }
         Ok(())
     }
 }
@@ -1649,18 +1920,35 @@ struct RangeTypeDef {
     size: String,
     align: String,
     subtype: String,
+    multirange: String,
+    options: Vec<String>,
     description: String,
+}
+
+struct RangeTypeShell<'a>(&'a RangeTypeDef);
+
+impl WriteSql for RangeTypeShell<'_> {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        let ty = self.0;
+        write_description(f, &ty.description)?;
+        writeln!(f, "-- size: {}, align: {}", ty.size, ty.align)?;
+        writeln!(f, "create type {}{};", ty.schema, ty.name)?;
+        writeln!(f)?;
+        Ok(())
+    }
 }
 
 impl WriteSql for RangeTypeDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
-        write_description(f, &self.description)?;
-        writeln!(f, "-- size: {}, align: {}", self.size, self.align)?;
-        writeln!(
+        write!(
             f,
-            "create type {}{} as range (subtype = {});",
-            self.schema, self.name, self.subtype
+            "create type {}{} as range (subtype = {}, multirange_type_name = {}",
+            self.schema, self.name, self.subtype, self.multirange
         )?;
+        for option in &self.options {
+            write!(f, ", {option}")?;
+        }
+        writeln!(f, ");")?;
         writeln!(f)?;
         Ok(())
     }
@@ -1696,6 +1984,7 @@ struct TableDef {
     name: String,
     description: String,
     columns: Vec<Column>,
+    constraints: Vec<String>,
 }
 
 impl WriteSql for TableDef {
@@ -1703,12 +1992,41 @@ impl WriteSql for TableDef {
         write_description(f, &self.description)?;
         writeln!(f, "create table {}{} (", self.schema, self.name)?;
         for (index, column) in self.columns.iter().enumerate() {
-            let comma = if index + 1 < self.columns.len() {
+            write!(f, "  {} {}", column.name, column.data_type)?;
+            if !column.identity.is_empty() {
+                let mode = if column.identity == "a" {
+                    "always"
+                } else {
+                    "by default"
+                };
+                write!(f, " generated {mode} as identity")?;
+            } else if !column.generated.is_empty() {
+                let storage = if column.generated == "s" {
+                    "stored"
+                } else {
+                    "virtual"
+                };
+                write!(f, " generated always as ({}) {storage}", column.default)?;
+            } else if !column.default.is_empty() {
+                write!(f, " default {}", column.default)?;
+            }
+            if column.not_null {
+                write!(f, " not null")?;
+            }
+            let comma = if index + 1 < self.columns.len() || !self.constraints.is_empty() {
                 ","
             } else {
                 ""
             };
-            writeln!(f, "  {} {}{comma}", column.name, column.data_type)?;
+            writeln!(f, "{comma}")?;
+        }
+        for (index, constraint) in self.constraints.iter().enumerate() {
+            let comma = if index + 1 < self.constraints.len() {
+                ","
+            } else {
+                ""
+            };
+            writeln!(f, "  {constraint}{comma}")?;
         }
         writeln!(f, ");")?;
         writeln!(f)?;
@@ -1753,7 +2071,102 @@ impl WriteSql for ViewDef {
     }
 }
 
+enum RoutineKind {
+    Function,
+    Procedure,
+    Window,
+}
+
+enum Volatility {
+    Immutable,
+    Stable,
+    Volatile,
+}
+
+#[derive(Deserialize)]
+struct FunctionSetting {
+    name: String,
+    value: String,
+    is_list: bool,
+}
+
+impl WriteSql for FunctionSetting {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write!(f, "SET {} TO ", self.name)?;
+        if !self.is_list {
+            return write_setting_literal(f, &self.value, false);
+        }
+        let mut remaining = self.value.trim_ascii_start();
+        if remaining.is_empty() {
+            return write!(f, "NULL");
+        }
+        loop {
+            let (value, rest, quoted) = if let Some(remaining) = remaining.strip_prefix('"') {
+                let mut offset = 0;
+                let end = loop {
+                    let end = remaining[offset..]
+                        .find('"')
+                        .map(|end| offset + end)
+                        .ok_or_else(|| io::Error::other("unterminated quoted setting value"))?;
+                    if remaining.as_bytes().get(end + 1) != Some(&b'"') {
+                        break end;
+                    }
+                    offset = end + 2;
+                };
+                (&remaining[..end], &remaining[end + 1..], true)
+            } else {
+                let end = remaining
+                    .find(|c: char| c == ',' || c.is_ascii_whitespace())
+                    .unwrap_or(remaining.len());
+                if end == 0 {
+                    return Err(io::Error::other("empty unquoted setting value"));
+                }
+                (&remaining[..end], &remaining[end..], false)
+            };
+            write_setting_literal(f, value, quoted)?;
+            let rest = rest.trim_ascii_start();
+            if rest.is_empty() {
+                return Ok(());
+            }
+            remaining = rest
+                .strip_prefix(',')
+                .ok_or_else(|| io::Error::other("expected comma in setting value"))?
+                .trim_ascii_start();
+            if remaining.is_empty() {
+                return Err(io::Error::other("missing setting value after comma"));
+            }
+            write!(f, ", ")?;
+        }
+    }
+}
+
+fn write_setting_literal<W: Write>(f: &mut W, value: &str, quoted: bool) -> io::Result<()> {
+    if value.contains('\\') {
+        write!(f, "E")?;
+    }
+    write!(f, "'")?;
+    let mut chars = value.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            '\'' => write!(f, "''")?,
+            '\\' => write!(f, "\\\\")?,
+            '"' if quoted && chars.peek() == Some(&'"') => {
+                chars.next();
+                write!(f, "\"")?;
+            }
+            c => write!(f, "{c}")?,
+        }
+    }
+    write!(f, "'")
+}
+
 struct RegularFunctionDef {
+    kind: RoutineKind,
+    needs_range_definition: bool,
+    volatility: Volatility,
+    strict: bool,
+    options: Vec<String>,
+    settings: Vec<FunctionSetting>,
     schema: String,
     name: String,
     args: String,
@@ -1765,12 +2178,39 @@ struct RegularFunctionDef {
 impl WriteSql for RegularFunctionDef {
     fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
         write_description(f, &self.description)?;
-        writeln!(
-            f,
-            "create function {}{}({}) returns {}",
-            self.schema, self.name, self.args, self.result
-        )?;
-        writeln!(f, "  language {};", self.language)?;
+        if matches!(self.kind, RoutineKind::Procedure) {
+            writeln!(
+                f,
+                "create procedure {}{}({})",
+                self.schema, self.name, self.args
+            )?;
+        } else {
+            writeln!(
+                f,
+                "create function {}{}({}) returns {}",
+                self.schema, self.name, self.args, self.result
+            )?;
+        }
+        write!(f, "  language {}", self.language)?;
+        if matches!(self.kind, RoutineKind::Window) {
+            write!(f, " window")?;
+        }
+        match self.volatility {
+            Volatility::Immutable => write!(f, " immutable")?,
+            Volatility::Stable => write!(f, " stable")?,
+            Volatility::Volatile => (),
+        }
+        if self.strict {
+            write!(f, " strict")?;
+        }
+        for option in &self.options {
+            write!(f, " {option}")?;
+        }
+        for setting in &self.settings {
+            write!(f, " ")?;
+            setting.write_sql(f)?;
+        }
+        writeln!(f, ";")?;
         writeln!(f)?;
         Ok(())
     }
@@ -1796,6 +2236,7 @@ struct AggregateDef {
     serial_fn: String,
     deserial_fn: String,
     hypothetical: bool,
+    options: Vec<String>,
     description: String,
 }
 
@@ -1873,6 +2314,9 @@ impl WriteSql for AggregateDef {
             write!(f, ",\n  hypothetical")?;
         }
 
+        for option in &self.options {
+            write!(f, ",\n  {option}")?;
+        }
         write!(f, "\n);\n\n")?;
 
         Ok(())
@@ -2022,6 +2466,7 @@ struct Module {
     schemas: Vec<SchemaDef>,
     types: Vec<TypeDef>,
     range_types: Vec<RangeTypeDef>,
+    domains: Vec<DomainDef>,
     composite_types: Vec<CompositeTypeDef>,
     tables: Vec<TableDef>,
     views: Vec<ViewDef>,
@@ -2064,7 +2509,11 @@ impl Module {
         }
 
         for range_type in &self.range_types {
-            range_type.write_sql(f)?;
+            RangeTypeShell(range_type).write_sql(f)?;
+        }
+
+        for domain in &self.domains {
+            domain.write_sql(f)?;
         }
 
         for composite_type in &self.composite_types {
@@ -2086,7 +2535,7 @@ impl Module {
         for function in self
             .functions
             .iter()
-            .filter(|function| matches!(function, FunctionDef::Regular(_)))
+            .filter(|function| matches!(function, FunctionDef::Regular(function) if !function.needs_range_definition))
         {
             function.write_sql(f)?;
         }
@@ -2105,18 +2554,6 @@ impl Module {
 
         for operator in &self.operators {
             operator.write_sql(f)?;
-        }
-
-        for function in self
-            .functions
-            .iter()
-            .filter(|function| matches!(function, FunctionDef::Aggregate(_)))
-        {
-            function.write_sql(f)?;
-        }
-
-        for cast in &self.casts {
-            cast.write_sql(f)?;
         }
 
         for collation in &self.collations {
@@ -2141,6 +2578,34 @@ impl Module {
 
         for operator_class in &self.operator_classes {
             operator_class.write_sql(f)?;
+        }
+
+        for range_type in &self.range_types {
+            range_type.write_sql(f)?;
+        }
+
+        for function in self
+            .functions
+            .iter()
+            .filter(|function| matches!(function, FunctionDef::Regular(function) if function.needs_range_definition))
+        {
+            function.write_sql(f)?;
+        }
+
+        for function in self
+            .functions
+            .iter()
+            .filter(|function| matches!(function, FunctionDef::Aggregate(_)))
+        {
+            function.write_sql(f)?;
+        }
+
+        for cast in &self.casts {
+            cast.write_sql(f)?;
+        }
+
+        for domain in &self.domains {
+            domain.write_qualifiers(f)?;
         }
 
         for parser in &self.text_search_parsers {
@@ -2245,7 +2710,17 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
         }
 
         let module = modules.entry(module_name(row.extension_name)).or_default();
-        if row.is_range == 1 {
+        if !row.domain_base.is_empty() {
+            module.domains.push(DomainDef {
+                schema: row.schema,
+                name: row.name,
+                description: row.description,
+                base: row.domain_base,
+                default: row.domain_default,
+                not_null: row.domain_not_null == 1,
+                constraints: row.domain_constraints,
+            });
+        } else if row.is_range == 1 {
             module.range_types.push(RangeTypeDef {
                 align: row.align,
                 description: row.description,
@@ -2253,6 +2728,8 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
                 schema: row.schema,
                 size: row.size,
                 subtype: row.subtype,
+                multirange: row.multirange,
+                options: row.range_options,
             });
         } else {
             module.types.push(TypeDef {
@@ -2269,6 +2746,7 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
                 slice_result: row.slice_result,
                 category: row.category,
                 preferred: row.is_preferred == 1,
+                options: row.options,
             });
         }
     }
@@ -2299,6 +2777,7 @@ fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
         match row.relkind.as_str() {
             "r" => module.tables.push(TableDef {
                 columns: row.columns,
+                constraints: row.constraints,
                 description: row.description,
                 name: row.name,
                 schema: row.schema,
@@ -2318,6 +2797,13 @@ fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 
 fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in FunctionQuery::run()? {
+        if row.support_depth.is_none() {
+            bail!(
+                "cyclic function support dependency for {}{}",
+                row.schema,
+                row.name
+            );
+        }
         let function = if row.prokind == "a" {
             FunctionDef::Aggregate(Box::new(AggregateDef {
                 args: row.args,
@@ -2340,9 +2826,26 @@ fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
                 serial_fn: row.serial_fn,
                 deserial_fn: row.deserial_fn,
                 hypothetical: row.is_hypothetical == 1,
+                options: row.aggregate_options,
             }))
         } else {
             FunctionDef::Regular(RegularFunctionDef {
+                kind: match row.prokind.as_str() {
+                    "f" => RoutineKind::Function,
+                    "p" => RoutineKind::Procedure,
+                    "w" => RoutineKind::Window,
+                    kind => bail!("unexpected routine kind: {kind}"),
+                },
+                needs_range_definition: row.needs_range_definition == 1,
+                volatility: match row.volatility.as_str() {
+                    "i" => Volatility::Immutable,
+                    "s" => Volatility::Stable,
+                    "v" => Volatility::Volatile,
+                    volatility => bail!("unexpected function volatility: {volatility}"),
+                },
+                strict: row.strict == 1,
+                options: row.options,
+                settings: row.settings,
                 args: row.args,
                 description: row.description,
                 language: row.language,
