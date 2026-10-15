@@ -7,97 +7,97 @@
 create type gtrgm;
 
 create function gin_extract_query_trgm(text, internal, smallint, internal, internal, internal, internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function gin_extract_value_trgm(text, internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function gin_trgm_consistent(internal, smallint, text, integer, internal, internal, internal, internal) returns boolean
-  language c;
+  language c immutable strict parallel safe;
 
 create function gin_trgm_triconsistent(internal, smallint, text, integer, internal, internal, internal) returns "char"
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_compress(internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_consistent(internal, text, smallint, oid, internal) returns boolean
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_decompress(internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_distance(internal, text, smallint, oid, internal) returns double precision
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_in(cstring) returns gtrgm
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_options(internal) returns void
-  language c;
+  language c immutable parallel safe;
 
 create function gtrgm_out(gtrgm) returns cstring
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_penalty(internal, internal, internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_picksplit(internal, internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_same(gtrgm, gtrgm, internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function gtrgm_union(internal, internal) returns gtrgm
-  language c;
+  language c immutable strict parallel safe;
 
 create function set_limit(real) returns real
-  language c;
+  language c strict;
 
 create function show_limit() returns real
-  language c;
+  language c stable strict parallel safe;
 
 create function show_trgm(text) returns text[]
-  language c;
+  language c immutable strict parallel safe;
 
 create function similarity(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function similarity_dist(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function similarity_op(text, text) returns boolean
-  language c;
+  language c stable strict parallel safe;
 
 create function strict_word_similarity(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function strict_word_similarity_commutator_op(text, text) returns boolean
-  language c;
+  language c stable strict parallel safe;
 
 create function strict_word_similarity_dist_commutator_op(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function strict_word_similarity_dist_op(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function strict_word_similarity_op(text, text) returns boolean
-  language c;
+  language c stable strict parallel safe;
 
 create function word_similarity(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function word_similarity_commutator_op(text, text) returns boolean
-  language c;
+  language c stable strict parallel safe;
 
 create function word_similarity_dist_commutator_op(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function word_similarity_dist_op(text, text) returns real
-  language c;
+  language c immutable strict parallel safe;
 
 create function word_similarity_op(text, text) returns boolean
-  language c;
+  language c stable strict parallel safe;
 
 create type gtrgm (input = gtrgm_in, output = gtrgm_out);
 

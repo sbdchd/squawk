@@ -1407,15 +1407,9 @@ fn bind_create_operator(b: &mut Binder, create_operator: &ast::CreateOperator) {
         return;
     };
 
-    let Some(custom_op) = op.custom_op() else {
-        return;
-    };
-
-    let operator_name = Name::from_string(custom_op.operator_text());
-
-    let path = op.syntax().children().find_map(ast::Path::cast);
-    let schema = match &path {
-        Some(path) => schema_name(b, path, false),
+    let operator_name = Name::from_string(op.operator_text());
+    let schema = match op.path_ref() {
+        Some(path) => schema_name_ref(b, &path, false),
         None => b.default_schema(),
     };
 

@@ -10,168 +10,168 @@ create type hll;
 create type hll_hashval;
 
 create function hll(hll, integer, boolean) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_add(hll, hll_hashval) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_add_rev(hll_hashval, hll) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_add_trans0(internal, hll_hashval) returns internal
-  language c;
+  language c parallel safe;
 
 create function hll_add_trans1(internal, hll_hashval, integer) returns internal
-  language c;
+  language c parallel safe;
 
 create function hll_add_trans2(internal, hll_hashval, integer, integer) returns internal
-  language c;
+  language c parallel safe;
 
 create function hll_add_trans3(internal, hll_hashval, integer, integer, bigint) returns internal
-  language c;
+  language c parallel safe;
 
 create function hll_add_trans4(internal, hll_hashval, integer, integer, bigint, integer) returns internal
-  language c;
+  language c parallel safe;
 
 create function hll_card_unpacked(internal) returns double precision
-  language c;
+  language c parallel safe;
 
 create function hll_cardinality(hll) returns double precision
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_ceil_card_unpacked(internal) returns bigint
-  language c;
+  language c parallel safe;
 
 create function hll_deserialize(bytea, internal) returns internal
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_empty() returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_empty(integer) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_empty(integer, integer) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_empty(integer, integer, bigint) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_empty(integer, integer, bigint, integer) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_eq(hll, hll) returns boolean
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_expthresh(hll, OUT specified bigint, OUT effective bigint) returns record
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_floor_card_unpacked(internal) returns bigint
-  language c;
+  language c parallel safe;
 
 create function hll_hash_any(anyelement, integer DEFAULT 0) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hash_bigint(bigint, integer DEFAULT 0) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hash_boolean(boolean, integer DEFAULT 0) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hash_bytea(bytea, integer DEFAULT 0) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hash_integer(integer, integer DEFAULT 0) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hash_smallint(smallint, integer DEFAULT 0) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hash_text(text, integer DEFAULT 0) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hashval(bigint) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hashval_eq(hll_hashval, hll_hashval) returns boolean
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hashval_in(cstring, oid, integer) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hashval_int4(integer) returns hll_hashval
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hashval_ne(hll_hashval, hll_hashval) returns boolean
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_hashval_out(hll_hashval) returns cstring
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_in(cstring, oid, integer) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_log2m(hll) returns integer
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_ne(hll, hll) returns boolean
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_out(hll) returns cstring
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_pack(internal) returns hll
-  language c;
+  language c parallel safe;
 
 create function hll_print(hll) returns cstring
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_recv(internal) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_regwidth(hll) returns integer
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_schema_version(hll) returns integer
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_send(hll) returns bytea
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_serialize(internal) returns bytea
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_set_defaults(i_log2m integer, i_regwidth integer, i_expthresh bigint, i_sparseon integer, OUT o_log2m integer, OUT o_regwidth integer, OUT o_expthresh bigint, OUT o_sparseon integer) returns record
-  language c;
+  language c immutable strict;
 
 create function hll_set_max_sparse(integer) returns integer
-  language c;
+  language c immutable strict;
 
 create function hll_set_output_version(integer) returns integer
-  language c;
+  language c immutable strict;
 
 create function hll_sparseon(hll) returns integer
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_type(hll) returns integer
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_typmod_in(cstring[]) returns integer
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_typmod_out(integer) returns cstring
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_union(hll, hll) returns hll
-  language c;
+  language c immutable strict parallel safe;
 
 create function hll_union_internal(internal, internal) returns internal
-  language c;
+  language c parallel safe;
 
 create function hll_union_trans(internal, hll) returns internal
-  language c;
+  language c parallel safe;
 
-create type hll (input = hll_in, output = hll_out);
+create type hll (input = hll_in, output = hll_out, typmod_in = hll_typmod_in, typmod_out = hll_typmod_out);
 
 create type hll_hashval (input = hll_hashval_in, output = hll_hashval_out);
 
@@ -228,7 +228,9 @@ create aggregate hll_add_agg(hll_hashval) (
   finalfunc = hll_pack,
   combinefunc = hll_union_internal,
   serialfunc = hll_serialize,
-  deserialfunc = hll_deserialize
+  deserialfunc = hll_deserialize,
+  parallel = safe,
+  sspace = 131120
 );
 
 create aggregate hll_add_agg(hll_hashval, integer) (
@@ -237,7 +239,9 @@ create aggregate hll_add_agg(hll_hashval, integer) (
   finalfunc = hll_pack,
   combinefunc = hll_union_internal,
   serialfunc = hll_serialize,
-  deserialfunc = hll_deserialize
+  deserialfunc = hll_deserialize,
+  parallel = safe,
+  sspace = 131120
 );
 
 create aggregate hll_add_agg(hll_hashval, integer, integer) (
@@ -246,7 +250,9 @@ create aggregate hll_add_agg(hll_hashval, integer, integer) (
   finalfunc = hll_pack,
   combinefunc = hll_union_internal,
   serialfunc = hll_serialize,
-  deserialfunc = hll_deserialize
+  deserialfunc = hll_deserialize,
+  parallel = safe,
+  sspace = 131120
 );
 
 create aggregate hll_add_agg(hll_hashval, integer, integer, bigint) (
@@ -255,7 +261,9 @@ create aggregate hll_add_agg(hll_hashval, integer, integer, bigint) (
   finalfunc = hll_pack,
   combinefunc = hll_union_internal,
   serialfunc = hll_serialize,
-  deserialfunc = hll_deserialize
+  deserialfunc = hll_deserialize,
+  parallel = safe,
+  sspace = 131120
 );
 
 create aggregate hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
@@ -264,7 +272,9 @@ create aggregate hll_add_agg(hll_hashval, integer, integer, bigint, integer) (
   finalfunc = hll_pack,
   combinefunc = hll_union_internal,
   serialfunc = hll_serialize,
-  deserialfunc = hll_deserialize
+  deserialfunc = hll_deserialize,
+  parallel = safe,
+  sspace = 131120
 );
 
 create aggregate hll_union_agg(hll) (
@@ -273,7 +283,8 @@ create aggregate hll_union_agg(hll) (
   finalfunc = hll_pack,
   combinefunc = hll_union_internal,
   serialfunc = hll_serialize,
-  deserialfunc = hll_deserialize
+  deserialfunc = hll_deserialize,
+  parallel = safe
 );
 
 create cast (bigint as hll_hashval) without function;

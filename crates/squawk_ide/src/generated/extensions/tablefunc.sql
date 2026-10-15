@@ -25,35 +25,35 @@ create type tablefunc_crosstab_4 as (
 );
 
 create function connectby(text, text, text, text, integer) returns SETOF record
-  language c;
+  language c stable strict;
 
 create function connectby(text, text, text, text, integer, text) returns SETOF record
-  language c;
+  language c stable strict;
 
 create function connectby(text, text, text, text, text, integer) returns SETOF record
-  language c;
+  language c stable strict;
 
 create function connectby(text, text, text, text, text, integer, text) returns SETOF record
-  language c;
+  language c stable strict;
 
 create function crosstab(text) returns SETOF record
-  language c;
+  language c stable strict;
 
 create function crosstab(text, integer) returns SETOF record
-  language c;
+  language c stable strict;
 
 create function crosstab(text, text) returns SETOF record
-  language c;
+  language c stable strict;
 
 create function crosstab2(text) returns SETOF tablefunc_crosstab_2
-  language c;
+  language c stable strict;
 
 create function crosstab3(text) returns SETOF tablefunc_crosstab_3
-  language c;
+  language c stable strict;
 
 create function crosstab4(text) returns SETOF tablefunc_crosstab_4
-  language c;
+  language c stable strict;
 
 create function normal_rand(integer, double precision, double precision) returns SETOF double precision
-  language c;
+  language c strict;
 
