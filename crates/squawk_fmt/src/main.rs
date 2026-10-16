@@ -6,7 +6,11 @@ use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::Deco
 use anyhow::Result;
 use clap::Parser;
 use squawk_fmt::{FormatOptions, validation::validate_format};
+use squawk_line_index::find_newline;
 use squawk_syntax::SourceFile;
+
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 #[derive(Parser)]
 #[command(name = "squawk-fmt")]
@@ -17,8 +21,8 @@ struct Cli {
     /// The line length where Squawk tries wrapping
     #[arg(long, default_value_t = FormatOptions::default().width)]
     width: usize,
-    #[arg(long, help = "Skip validation of the formatted output")]
-    skip_output_validation: bool,
+    #[arg(long, help = "Validate the formatted output")]
+    output_validation: bool,
     /// File to format; reads from stdin if omitted
     file: Option<PathBuf>,
 }
@@ -64,8 +68,11 @@ fn main() -> Result<ExitCode> {
         indent: cli.indent,
         width: cli.width,
     };
-    let formatted = squawk_fmt::fmt_str(&input, options)?;
-    if !cli.skip_output_validation {
+    let line_ending = find_newline(&input)
+        .map(|(_, ending)| ending)
+        .unwrap_or_default();
+    let formatted = squawk_fmt::fmt(&parse.tree(), line_ending, options)?;
+    if cli.output_validation {
         validate_format(&input, &formatted, options)?;
     }
 

@@ -8091,17 +8091,21 @@ fn build_sequence_option<'a>(ctx: &Ctx, option: ast::SequenceOption) -> Doc<'a> 
 }
 
 fn append_optional_expr<'a>(ctx: &Ctx, doc: Doc<'a>, expr: Option<ast::Expr>) -> Doc<'a> {
-    expr.map_or(doc.clone(), |expr| {
-        doc.append(space_before(expr.syntax()))
-            .append(build_expr(ctx, expr))
-    })
+    match expr {
+        Some(expr) => doc
+            .append(space_before(expr.syntax()))
+            .append(build_expr(ctx, expr)),
+        None => doc,
+    }
 }
 
 fn append_optional_literal(doc: Doc<'_>, literal: Option<ast::Literal>) -> Doc<'_> {
-    literal.map_or(doc.clone(), |literal| {
-        doc.append(space_before(literal.syntax()))
-            .append(build_literal(&literal))
-    })
+    match literal {
+        Some(literal) => doc
+            .append(space_before(literal.syntax()))
+            .append(build_literal(&literal)),
+        None => doc,
+    }
 }
 
 fn build_constraint_name_clause<'a>(clause: Option<ast::ConstraintNameClause>) -> Doc<'a> {
@@ -20316,8 +20320,7 @@ fn build_target<'a>(ctx: &Ctx, target: &ast::Target) -> Option<Doc<'a>> {
         }
     }
 
-    let doc = doc.group();
-    Some(leading_comments(target.syntax()).append(doc.clone().union(doc)))
+    Some(leading_comments(target.syntax()).append(doc.group()))
 }
 
 pub fn fmt(

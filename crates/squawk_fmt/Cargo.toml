@@ -28,6 +28,7 @@ clap.workspace = true
 anyhow.workspace = true
 either.workspace = true
 annotate-snippets.workspace = true
+mimalloc.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

@@ -218,7 +218,7 @@ impl<'t> Parser<'t> {
             inp,
             pos: 0,
             limit: usize::MAX,
-            events: vec![],
+            events: Vec::with_capacity(inp.len() * 4),
             steps: Cell::new(0),
         }
     }

@@ -337,7 +337,8 @@ select
   1 + 1,
   1 /* before op */ + /* after op */ 1,
   a_very_long_binary_left_expression
-    + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
+    + a_very_long_binary_middle_expression
+      * a_very_long_binary_right_expression,
   2 @@@ 2,
   true and false,
   ts at time zone 'UTC',
@@ -375,7 +376,8 @@ select
   6 / 2,
   2 * 3,
   a_very_long_binary_left_expression
-    + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
+    + a_very_long_binary_middle_expression
+      * a_very_long_binary_right_expression,
   -- call expr
   1 = any(array[1, 2]),
   2 = all(select x from things),
@@ -830,7 +832,9 @@ select
   ) /* after filter */,
   first_value(x) ignore nulls,
   last_value(y) respect nulls,
-  first_value(x) /* before treatment */ ignore /* before nulls */ nulls /* after nulls */,
+  first_value(
+    x
+  ) /* before treatment */ ignore /* before nulls */ nulls /* after nulls */,
   a_very_long_ordered_set_aggregate_name(
     a_very_long_direct_argument_expression
   ) within group (order by a_very_long_ordered_set_expression desc nulls last),
@@ -852,7 +856,9 @@ select
     rows between unbounded preceding and current row exclude ties
   ),
   sum(x) over (range 1 preceding),
-  sum(x) over (groups between current row and unbounded following exclude group),
+  sum(x) over (
+    groups between current row and unbounded following exclude group
+  ),
   sum(x) over (rows between 1 preceding and 2 following exclude no others),
   sum(a_very_long_window_value_expression) over (
     a_very_long_window_reference
