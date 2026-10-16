@@ -24,11 +24,17 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+use rowan::{Language, TextRange, TextSize};
+
 use super::{AstChildren, AstNode, SyntaxKind, SyntaxNode, SyntaxToken};
+use crate::SyntaxElement;
+use crate::syntax_node::Sql;
 
 #[inline]
 pub(super) fn child<N: AstNode>(parent: &SyntaxNode) -> Option<N> {
-    parent.children().find_map(N::cast)
+    first_child_or_token(parent, ElementKind::Node, N::can_cast)?
+        .into_node()
+        .and_then(N::cast)
 }
 
 #[inline]
@@ -38,8 +44,38 @@ pub(super) fn children<N: AstNode>(parent: &SyntaxNode) -> AstChildren<N> {
 
 #[inline]
 pub(super) fn token(parent: &SyntaxNode, kind: SyntaxKind) -> Option<SyntaxToken> {
-    parent
-        .children_with_tokens()
-        .filter_map(|it| it.into_token())
-        .find(|it| it.kind() == kind)
+    first_child_or_token(parent, ElementKind::Token, |it| it == kind)?.into_token()
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ElementKind {
+    Node,
+    Token,
+}
+
+// avoid allocation compared to:
+//    parent
+//        .children_with_tokens()
+//        .filter_map(|it| it.into_token())
+//        .find(|it| it.kind() == kind)
+fn first_child_or_token(
+    parent: &SyntaxNode,
+    element_kind: ElementKind,
+    kind_matches: impl Fn(SyntaxKind) -> bool,
+) -> Option<SyntaxElement> {
+    let is_node = element_kind == ElementKind::Node;
+    let mut offset = parent.text_range().start();
+    for child in parent.green().children() {
+        let len = child.text_len();
+        if child.as_node().is_some() == is_node && kind_matches(Sql::kind_from_raw(child.kind())) {
+            if len == TextSize::new(0) {
+                return parent
+                    .children_with_tokens()
+                    .find(|it| it.as_node().is_some() == is_node && kind_matches(it.kind()));
+            }
+            return parent.child_or_token_at_range(TextRange::at(offset, len));
+        }
+        offset += len;
+    }
+    None
 }
