@@ -6,6 +6,7 @@ use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::Deco
 use anyhow::Result;
 use clap::Parser;
 use squawk_fmt::{FormatOptions, validation::validate_format};
+use squawk_line_index::find_newline;
 use squawk_syntax::SourceFile;
 
 #[derive(Parser)]
@@ -64,7 +65,10 @@ fn main() -> Result<ExitCode> {
         indent: cli.indent,
         width: cli.width,
     };
-    let formatted = squawk_fmt::fmt_str(&input, options)?;
+    let line_ending = find_newline(&input)
+        .map(|(_, ending)| ending)
+        .unwrap_or_default();
+    let formatted = squawk_fmt::fmt(&parse.tree(), line_ending, options)?;
     if !cli.skip_output_validation {
         validate_format(&input, &formatted, options)?;
     }
