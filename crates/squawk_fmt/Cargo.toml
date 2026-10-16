@@ -28,6 +28,8 @@ clap.workspace = true
 anyhow.workspace = true
 either.workspace = true
 annotate-snippets.workspace = true
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
 mimalloc.workspace = true
 
 [dev-dependencies]
