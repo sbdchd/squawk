@@ -9,6 +9,9 @@ use squawk_fmt::{FormatOptions, validation::validate_format};
 use squawk_line_index::find_newline;
 use squawk_syntax::SourceFile;
 
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 #[derive(Parser)]
 #[command(name = "squawk-fmt")]
 struct Cli {
