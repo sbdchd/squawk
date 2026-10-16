@@ -23,6 +23,8 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+use std::collections::BTreeMap;
+
 use rustc_hash::{FxHashMap, FxHashSet};
 
 use anyhow::{Context, Result};
@@ -303,33 +305,37 @@ fn generate_keyword_arrays(keyword_kinds: &KeywordKinds) -> String {
     format!("{PRELUDE}{}", output.trim_start())
 }
 
-fn keyword_lookup_conditions(keywords: &[&str]) -> Vec<proc_macro2::TokenStream> {
-    keywords
-        .iter()
-        .enumerate()
-        .map(|(i, keyword)| {
-            let kind_ident = format_ident!("{}_KW", keyword.to_case(Case::UpperSnake));
-            if i == 0 {
-                quote! {
-                    if ident.eq_ignore_ascii_case(#keyword) {
-                        SyntaxKind::#kind_ident
-                    }
-                }
-            } else {
-                quote! {
-                    else if ident.eq_ignore_ascii_case(#keyword) {
-                        SyntaxKind::#kind_ident
-                    }
-                }
-            }
-        })
-        .collect()
+fn keyword_lookup_body(keywords: &[&str]) -> proc_macro2::TokenStream {
+    let mut by_len: BTreeMap<usize, Vec<&str>> = BTreeMap::new();
+    for keyword in keywords {
+        by_len.entry(keyword.len()).or_default().push(keyword);
+    }
+    let arms = by_len.iter().map(|(len, keywords)| {
+        let len = proc_macro2::Literal::usize_unsuffixed(*len);
+        let kind_idents = keywords
+            .iter()
+            .map(|keyword| format_ident!("{}_KW", keyword.to_case(Case::UpperSnake)));
+        quote! {
+            #len => #(if ident.eq_ignore_ascii_case(#keywords) {
+                SyntaxKind::#kind_idents
+            } else)* {
+                return None;
+            },
+        }
+    });
+    quote! {
+        let kw = match ident.len() {
+            #(#arms)*
+            _ => return None,
+        };
+        Some(kw)
+    }
 }
 
 fn generate_syntax_kinds(grammar: KindsSrc) -> String {
     // TODO: we should have a check to make sure each keyword is used in the grammar once the grammar is ready
-    let conditions = keyword_lookup_conditions(grammar.keywords);
-    let contextual_conditions = keyword_lookup_conditions(grammar.contextual_keywords);
+    let keyword_lookup = keyword_lookup_body(grammar.keywords);
+    let contextual_keyword_lookup = keyword_lookup_body(grammar.contextual_keywords);
 
     let punctuation = grammar
         .punct
@@ -396,18 +402,12 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
             #[space_hack]
             impl SyntaxKind {
                 pub(crate) fn from_keyword(ident: &str) -> Option<SyntaxKind> {
-                    let kw = #(#conditions)* else {
-                        return None;
-                    };
-                    Some(kw)
+                    #keyword_lookup
                 }
 
                 #[doc = r"PL/pgSQL keywords that aren't SQL keywords. These stay `IDENT` in the token stream so SQL is unaffected; the PL/pgSQL grammar matches on the contextual kind instead."]
                 pub(crate) fn from_contextual_keyword(ident: &str) -> Option<SyntaxKind> {
-                    let kw = #(#contextual_conditions)* else {
-                        return None;
-                    };
-                    Some(kw)
+                    #contextual_keyword_lookup
                 }
             }
         }

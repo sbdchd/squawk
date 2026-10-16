@@ -106,25 +106,41 @@ pub fn needs_quoting(text: &str) -> bool {
 
 pub fn is_reserved_word(text: &str) -> bool {
     RESERVED_KEYWORDS
-        .binary_search(&text.to_ascii_lowercase().as_str())
+        .binary_search_by(|keyword| {
+            keyword
+                .bytes()
+                .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
+        })
         .is_ok()
 }
 
 pub(crate) fn is_col_name_word(text: &str) -> bool {
     COL_NAME_KEYWORDS
-        .binary_search(&text.to_ascii_lowercase().as_str())
+        .binary_search_by(|keyword| {
+            keyword
+                .bytes()
+                .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
+        })
         .is_ok()
 }
 
 pub(crate) fn is_type_func_name_word(text: &str) -> bool {
     TYPE_FUNC_NAME_KEYWORDS
-        .binary_search(&text.to_ascii_lowercase().as_str())
+        .binary_search_by(|keyword| {
+            keyword
+                .bytes()
+                .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
+        })
         .is_ok()
 }
 
 fn is_as_label_word(text: &str) -> bool {
     AS_LABEL_KEYWORDS
-        .binary_search(&text.to_ascii_lowercase().as_str())
+        .binary_search_by(|keyword| {
+            keyword
+                .bytes()
+                .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
+        })
         .is_ok()
 }
 
@@ -156,6 +172,27 @@ mod tests {
     use insta::assert_snapshot;
 
     use super::*;
+
+    #[test]
+    fn keyword_checks_are_ascii_case_insensitive() {
+        for (keywords, check) in [
+            (RESERVED_KEYWORDS, is_reserved_word as fn(&str) -> bool),
+            (COL_NAME_KEYWORDS, is_col_name_word),
+            (TYPE_FUNC_NAME_KEYWORDS, is_type_func_name_word),
+            (AS_LABEL_KEYWORDS, is_as_label_word),
+        ] {
+            for keyword in keywords {
+                assert!(check(keyword));
+                assert!(check(&keyword.to_ascii_uppercase()));
+                let mut mixed = keyword.to_string();
+                mixed[..1].make_ascii_uppercase();
+                assert!(check(&mixed));
+            }
+            for text in ["", "col_name", "تست", "sélect", "SELECTx", " select"] {
+                assert!(!check(text));
+            }
+        }
+    }
 
     #[test]
     fn quote_string_literal_escapes_apostrophes() {
