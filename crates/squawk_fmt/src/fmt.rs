@@ -20316,8 +20316,7 @@ fn build_target<'a>(ctx: &Ctx, target: &ast::Target) -> Option<Doc<'a>> {
         }
     }
 
-    let doc = doc.group();
-    Some(leading_comments(target.syntax()).append(doc.clone().union(doc)))
+    Some(leading_comments(target.syntax()).append(doc.group()))
 }
 
 pub fn fmt(
