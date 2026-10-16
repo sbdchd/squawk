@@ -38,8 +38,18 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                     validate_aggregate_params(it.param_list(), errors);
                     validate_aggregate_variadic_params(it.param_list(), errors);
                 },
-                ast::CreateFunction(it) => validate_create_function(&it, errors),
-                ast::CreateProcedure(it) => validate_create_procedure(&it, errors),
+                ast::CreateFunction(it) => {
+                    validate_create_function(&it, errors);
+                    if let Some(body) = it.sql_body() {
+                        errors.extend(body.errors());
+                    }
+                },
+                ast::CreateProcedure(it) => {
+                    validate_create_procedure(&it, errors);
+                    if let Some(body) = it.sql_body() {
+                        errors.extend(body.errors());
+                    }
+                },
                 ast::CreateTable(it) => validate_create_table(&it, errors),
                 ast::CustomOp(it) => validate_custom_op_length(&it, errors),
                 ast::Do(it) => validate_do(&it, errors),

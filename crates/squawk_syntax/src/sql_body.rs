@@ -18,22 +18,6 @@ impl BodyLanguage for ast::SourceFile {
     }
 }
 
-impl ast::SourceFile {
-    pub fn sql_body_errors(&self) -> Vec<SyntaxError> {
-        self.syntax()
-            .descendants()
-            .filter_map(|node| {
-                ast::CreateFunction::cast(node.clone())
-                    .and_then(|function| function.sql_body())
-                    .or_else(|| {
-                        ast::CreateProcedure::cast(node).and_then(|procedure| procedure.sql_body())
-                    })
-            })
-            .flat_map(|body| body.errors())
-            .collect()
-    }
-}
-
 impl ast::Literal {
     pub fn sql_body(&self) -> Option<SqlBody> {
         let definition = ast::AsDefinition::cast(self.syntax().parent()?)?;

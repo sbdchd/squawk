@@ -100,8 +100,6 @@ impl<T> Parse<T> {
             vec![]
         };
         validation::validate(&self.syntax_node(), &mut errors);
-        let file = SourceFile::cast(self.syntax_node()).expect("parse root is always a SourceFile");
-        errors.extend(file.sql_body_errors());
         errors.sort_by_key(|error| error.range().start());
         errors
     }
