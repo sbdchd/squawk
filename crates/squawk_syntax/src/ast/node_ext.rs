@@ -24,8 +24,6 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use std::borrow::Cow;
-
 use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
@@ -48,7 +46,7 @@ use crate::unescape::{
     decode_esc_string, decode_plain_string, decode_unicode_esc_string, escape_unicode_esc_str,
     uescape_char,
 };
-use crate::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
+use crate::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 
 use super::support;
 
@@ -1460,14 +1458,14 @@ impl ast::PlpgsqlOptionValue {
 
 impl ast::VarcharType {
     #[inline]
-    pub fn text(&self) -> TokenText<'_> {
+    pub fn text(&self) -> &str {
         text_of_first_token(self.syntax())
     }
 }
 
 impl ast::CharacterType {
     #[inline]
-    pub fn text(&self) -> TokenText<'_> {
+    pub fn text(&self) -> &str {
         text_of_first_token(self.syntax())
     }
 }
@@ -2102,7 +2100,7 @@ impl ast::TableConstraint {
     }
 }
 
-pub(crate) fn text_of_first_token(node: &SyntaxNode) -> TokenText<'_> {
+pub(crate) fn text_of_first_token(node: &SyntaxNode) -> &str {
     fn first_token(green_ref: &GreenNodeData) -> &GreenTokenData {
         green_ref
             .children()
@@ -2111,10 +2109,7 @@ pub(crate) fn text_of_first_token(node: &SyntaxNode) -> TokenText<'_> {
             .unwrap()
     }
 
-    match node.green() {
-        Cow::Borrowed(green_ref) => TokenText::borrowed(first_token(green_ref).text()),
-        Cow::Owned(green) => TokenText::owned(first_token(&green).to_owned()),
-    }
+    first_token(node.green()).text()
 }
 
 impl ast::WithQuery {

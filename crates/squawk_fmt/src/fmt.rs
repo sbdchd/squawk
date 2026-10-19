@@ -5079,20 +5079,7 @@ fn build_create_operator_class<'a>(ctx: &Ctx, stmt: &ast::CreateOperatorClass) -
         doc = doc.append(space_before(&as_token)).append(Doc::text("as"));
     }
     if let Some(options) = stmt.operator_class_option_list() {
-        let option_docs = options.op_class_options().map(|option| {
-            let syntax = option.syntax().clone();
-            (
-                leading_comments(&syntax).append(build_op_class_option(ctx, option)),
-                syntax,
-            )
-        });
-        if let Some(options_doc) = build_comma_separated_docs(option_docs) {
-            doc = doc.append(
-                hard_line_before(options.syntax())
-                    .append(options_doc)
-                    .nest(ctx.indent),
-            );
-        }
+        doc = doc.append(build_operator_class_option_list(ctx, &options).nest(ctx.indent));
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -12568,18 +12555,26 @@ fn build_alter_operator_family<'a>(ctx: &Ctx, stmt: &ast::AlterOperatorFamily) -
 fn build_add_op_class_options<'a>(ctx: &Ctx, action: &ast::AddOpClassOptions) -> Doc<'a> {
     let mut doc = Doc::text("add");
     if let Some(list) = action.operator_class_option_list() {
-        let options = list.op_class_options().map(|option| {
-            let syntax = option.syntax().clone();
-            (
-                leading_comments(&syntax).append(build_op_class_option(ctx, option)),
-                syntax,
-            )
-        });
-        if let Some(options) = build_comma_separated_docs(options) {
-            doc = append_nested_clause(ctx, doc, list.syntax(), options);
-        }
+        doc = doc.append(build_operator_class_option_list(ctx, &list));
     }
     doc.group()
+}
+
+fn build_operator_class_option_list<'a>(ctx: &Ctx, list: &ast::OperatorClassOptionList) -> Doc<'a> {
+    let options = list.op_class_options().map(|option| {
+        let syntax = option.syntax().clone();
+        (
+            leading_comments(&syntax).append(build_op_class_option(ctx, option)),
+            syntax,
+        )
+    });
+    build_comma_separated_docs(options)
+        .map(|options| {
+            hard_line_before(list.syntax())
+                .append(options)
+                .nest(ctx.indent)
+        })
+        .unwrap_or_else(Doc::nil)
 }
 
 fn build_op_class_option<'a>(ctx: &Ctx, option: ast::OpClassOption) -> Doc<'a> {
