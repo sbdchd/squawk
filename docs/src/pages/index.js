@@ -300,6 +300,11 @@ const rules = [
   { name: "ban-alter-sequence-values", tags: ["backwards compatibility"], description: "Detect changes to sequence values (opt-in)." },
   { name: "ban-alter-system-options", tags: ["backwards compatibility"], description: "Review server configuration changes (opt-in)." },
   { name: "ban-alter-extension", tags: ["backwards compatibility"], description: "Review extension updates and member removals (opt-in)." },
+  {
+    name: "ban-set-null-on-not-null-column",
+    tags: ["schema"],
+    description: "Prevent foreign keys that SET NULL a NOT NULL column.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
