@@ -152,8 +152,7 @@ impl GlobalState {
     }
 
     pub(crate) fn run(&mut self, inbox: &Receiver<Message>) -> anyhow::Result<()> {
-        let outbox = &self.task_pool.receiver.clone();
-        while let Ok(event) = Self::next_event(inbox, outbox) {
+        while let Ok(event) = Self::next_event(inbox, &self.task_pool.receiver) {
             let loop_start = Instant::now();
             match event {
                 Event::Inbox(msg) => match msg {
