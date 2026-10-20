@@ -808,14 +808,15 @@ impl Linter {
     }
 
     pub fn from(rules: impl IntoIterator<Item = Rule>) -> Self {
-        let mut rules: FxHashSet<Rule> = rules.into_iter().collect();
-        for rule in rules.clone() {
-            rules.extend(rule.expands_to());
+        let mut expanded = FxHashSet::default();
+        for rule in rules {
+            expanded.insert(rule);
+            expanded.extend(rule.expands_to());
         }
         Self {
             errors: vec![],
             ignores: vec![],
-            rules,
+            rules: expanded,
             settings: LinterSettings::default(),
         }
     }

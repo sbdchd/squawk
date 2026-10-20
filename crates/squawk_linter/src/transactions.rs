@@ -1,14 +1,15 @@
 use rustc_hash::FxHashSet;
+use smallvec::SmallVec;
 use squawk_syntax::ast;
 
 use crate::name::Name;
 
 pub(crate) struct TablesCreatedInTransaction {
-    names: FxHashSet<Box<[Name]>>,
+    names: FxHashSet<SmallVec<[Name; 2]>>,
     inside_transaction: bool,
 }
 
-fn table_name_ref(path: ast::PathRef) -> Box<[Name]> {
+fn table_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
     std::iter::successors(Some(path), |path| path.qualifier())
         .filter_map(|path| path.segment())
         .map(|segment| Name::from_node(&segment))

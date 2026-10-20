@@ -6,11 +6,12 @@ mod ban_detach_inheritance;
 mod ban_new_write_restriction;
 
 use rustc_hash::FxHashSet;
+use smallvec::SmallVec;
 use squawk_syntax::{Parse, SourceFile, ast};
 
 use crate::{Linter, Rule, name::Name};
 
-fn object_name(path: &ast::Path) -> Vec<Name> {
+fn object_name(path: &ast::Path) -> SmallVec<[Name; 2]> {
     let mut name = path.qualifier().map(object_name_ref).unwrap_or_default();
     if let Some(segment) = path.segment() {
         name.push(Name::from_node(&segment));
@@ -18,11 +19,11 @@ fn object_name(path: &ast::Path) -> Vec<Name> {
     name
 }
 
-fn object_name_ref(path: ast::PathRef) -> Vec<Name> {
+fn object_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
     let mut name = std::iter::successors(Some(path), |path| path.qualifier())
         .filter_map(|path| path.segment())
         .map(|segment| Name::from_node(&segment))
-        .collect::<Vec<_>>();
+        .collect::<SmallVec<[Name; 2]>>();
     name.reverse();
     name
 }
