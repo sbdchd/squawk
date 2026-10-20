@@ -85,7 +85,7 @@ fn select_completions(
     }));
 
     if schema.is_none() {
-        completions.extend(schema_completions(&binder));
+        completions.extend(schema_completions(binder));
     }
 
     if let Some(parent) = select_clause.syntax().parent()

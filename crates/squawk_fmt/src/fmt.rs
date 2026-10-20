@@ -5893,13 +5893,16 @@ fn build_revoke<'a>(ctx: &Ctx, revoke: &ast::Revoke) -> Doc<'a> {
 }
 
 fn build_import_table_filter<'a>(ctx: &Ctx, filter: ast::ImportTableFilter) -> Doc<'a> {
-    let (mut doc, names, l_paren, r_paren) = match filter {
+    let (mut doc, body, l_paren, r_paren) = match filter {
         ast::ImportTableFilter::ExceptTables(filter) => (
             Doc::text("except"),
-            filter
-                .remote_table_name_refs()
-                .map(|name| (name.syntax().clone(), build_name(name.syntax())))
-                .collect::<Vec<_>>(),
+            build_comma_separated_docs(filter.remote_table_name_refs().map(|name| {
+                let syntax = name.syntax();
+                (
+                    leading_comments(syntax).append(build_name(syntax)),
+                    syntax.clone(),
+                )
+            })),
             filter.l_paren_token(),
             filter.r_paren_token(),
         ),
@@ -5910,21 +5913,19 @@ fn build_import_table_filter<'a>(ctx: &Ctx, filter: ast::ImportTableFilter) -> D
             }
             (
                 doc,
-                filter
-                    .remote_table_name_refs()
-                    .map(|name| (name.syntax().clone(), build_name(name.syntax())))
-                    .collect::<Vec<_>>(),
+                build_comma_separated_docs(filter.remote_table_name_refs().map(|name| {
+                    let syntax = name.syntax();
+                    (
+                        leading_comments(syntax).append(build_name(syntax)),
+                        syntax.clone(),
+                    )
+                })),
                 filter.l_paren_token(),
                 filter.r_paren_token(),
             )
         }
     };
-    let body = build_comma_separated_docs(
-        names
-            .into_iter()
-            .map(|(syntax, name)| (leading_comments(&syntax).append(name), syntax)),
-    )
-    .unwrap_or_else(Doc::nil);
+    let body = body.unwrap_or_else(Doc::nil);
     doc = doc
         .append(
             l_paren

@@ -40,7 +40,7 @@ impl IgnoreIndex {
                     if ignore.ignore_all {
                         ignore_all = true;
                     } else {
-                        file_ignored.extend(ignore.violation_names.clone());
+                        file_ignored.extend(ignore.violation_names.iter().copied());
                     }
                 }
                 IgnoreKind::Line => {

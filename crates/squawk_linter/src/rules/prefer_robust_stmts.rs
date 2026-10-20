@@ -156,21 +156,25 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         continue;
                     }
 
-                    let message =  match message_type {
+                    let message = match message_type {
                         ActionErrorMessage::IfExists => {
-                            "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".to_string()
-                        },
+                            "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through."
+                        }
                         ActionErrorMessage::IfNotExists => {
-                            "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".to_string()
-                        },
+                            "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through."
+                        }
                         ActionErrorMessage::None => {
-                            "Missing transaction, the migration can't be rerun if it fails part way through.".to_string()
-                        },
+                            "Missing transaction, the migration can't be rerun if it fails part way through."
+                        }
                     };
 
                     ctx.report(
-                        Violation::for_node(Rule::PreferRobustStmts, message, action.syntax())
-                            .fix(fix),
+                        Violation::for_node(
+                            Rule::PreferRobustStmts,
+                            message.into(),
+                            action.syntax(),
+                        )
+                        .fix(fix),
                     );
                 }
             }

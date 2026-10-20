@@ -453,31 +453,23 @@ pub(crate) fn view_like_columns_with_types(
     file: FileId,
     create_view: &ast::CreateViewLike,
 ) -> Vec<(Name, Option<Type>)> {
-    let alias_columns: Vec<Name> = create_view
+    let alias_columns = create_view
         .column_list()
         .into_iter()
         .flat_map(|column_list| column_list.column_names())
-        .map(|name| Name::from_node(&name))
-        .collect();
+        .map(|name| Name::from_node(&name));
 
-    let base_columns = select_columns_with_types(db, file, create_view.query().as_ref());
+    let mut columns = select_columns_with_types(db, file, create_view.query().as_ref());
 
-    if alias_columns.is_empty() {
-        return base_columns;
+    for (idx, alias_name) in alias_columns.enumerate() {
+        if let Some((name, _)) = columns.get_mut(idx) {
+            *name = alias_name;
+        } else {
+            columns.push((alias_name, None));
+        }
     }
 
-    let mut results = vec![];
-
-    for (idx, alias_name) in alias_columns.iter().enumerate() {
-        results.push((
-            alias_name.clone(),
-            base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
-        ));
-    }
-
-    results.extend(base_columns.into_iter().skip(alias_columns.len()));
-
-    results
+    columns
 }
 
 pub(crate) fn with_table_columns_with_types(
@@ -485,31 +477,23 @@ pub(crate) fn with_table_columns_with_types(
     file: FileId,
     with_table: &ast::WithTable,
 ) -> Vec<(Name, Option<Type>)> {
-    let alias_columns: Vec<Name> = with_table
+    let alias_columns = with_table
         .column_list()
         .into_iter()
         .flat_map(|column_list| column_list.column_names())
-        .map(|name| Name::from_node(&name))
-        .collect();
+        .map(|name| Name::from_node(&name));
 
-    let base_columns = with_table_query_columns_with_types(db, file, with_table);
+    let mut columns = with_table_query_columns_with_types(db, file, with_table);
 
-    if alias_columns.is_empty() {
-        return base_columns;
+    for (idx, alias_name) in alias_columns.enumerate() {
+        if let Some((name, _)) = columns.get_mut(idx) {
+            *name = alias_name;
+        } else {
+            columns.push((alias_name, None));
+        }
     }
 
-    let mut results = vec![];
-
-    for (idx, alias_name) in alias_columns.iter().enumerate() {
-        results.push((
-            alias_name.clone(),
-            base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
-        ));
-    }
-
-    results.extend(base_columns.into_iter().skip(alias_columns.len()));
-
-    results
+    columns
 }
 
 fn with_table_query_columns_with_types(
@@ -678,30 +662,27 @@ pub(crate) fn columns_for_star_from_alias(
     from_item: &ast::FromItem,
     alias: &ast::FromAlias,
 ) -> Vec<(Name, Option<Type>)> {
-    let alias_columns: Vec<Name> = alias
+    let alias_columns = alias
         .columns()
         .into_iter()
         .flat_map(|columns| columns.column_names())
-        .map(|name| Name::from_node(&name))
-        .collect();
+        .map(|name| Name::from_node(&name));
 
     let Some(table_ptr) = table_ptr_from_from_item(db, InFile::new(file, from_item)) else {
         return vec![];
     };
 
-    let base_columns = columns_for_star_from_table_ptr(db, table_ptr);
-    let mut results = vec![];
+    let mut columns = columns_for_star_from_table_ptr(db, table_ptr);
 
-    for (idx, alias_name) in alias_columns.iter().enumerate() {
-        results.push((
-            alias_name.clone(),
-            base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
-        ));
+    for (idx, alias_name) in alias_columns.enumerate() {
+        if let Some((name, _)) = columns.get_mut(idx) {
+            *name = alias_name;
+        } else {
+            columns.push((alias_name, None));
+        }
     }
 
-    results.extend(base_columns.into_iter().skip(alias_columns.len()));
-
-    results
+    columns
 }
 
 fn columns_for_star_from_table_ptr(

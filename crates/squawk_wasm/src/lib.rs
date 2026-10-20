@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fmt::Write as _;
 
 use log::info;
@@ -260,7 +261,7 @@ impl SquawkDatabase {
             LintError {
                 severity: Severity::Error,
                 code: "syntax-error".to_string(),
-                message: x.message().to_string(),
+                message: x.message().to_owned().into(),
                 start_line_number: start.line,
                 start_column: start.col,
                 end_line_number: end.line,
@@ -422,7 +423,7 @@ impl SquawkDatabase {
 
         let converted: Vec<WasmDocumentSymbol> = symbols
             .into_iter()
-            .map(|s| convert_document_symbol(&line_index, s))
+            .map(|s| convert_document_symbol(line_index, s))
             .collect();
 
         serde_wasm_bindgen::to_value(&converted).map_err(into_error)
@@ -776,20 +777,20 @@ enum Severity {
 struct LintError {
     severity: Severity,
     code: String,
-    message: String,
+    message: Cow<'static, str>,
     start_line_number: u32,
     start_column: u32,
     end_line_number: u32,
     end_column: u32,
     range_start: usize,
     range_end: usize,
-    messages: Vec<String>,
+    messages: Vec<Cow<'static, str>>,
     fix: Option<Fix>,
 }
 
 #[derive(Serialize)]
 struct Fix {
-    title: String,
+    title: Cow<'static, str>,
     edits: Vec<TextEdit>,
 }
 
@@ -799,7 +800,7 @@ struct TextEdit {
     start_column: u32,
     end_line_number: u32,
     end_column: u32,
-    text: String,
+    text: Cow<'static, str>,
 }
 
 #[derive(Serialize)]

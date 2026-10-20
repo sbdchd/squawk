@@ -51,7 +51,7 @@ pub(crate) struct Symbol {
     pub(crate) kind: SymbolKind,
     pub(crate) ptr: SyntaxNodePtr,
     pub(crate) schema: Option<Schema>,
-    pub(crate) params: Option<Vec<Name>>,
+    pub(crate) params: Option<Box<[Name]>>,
     pub(crate) table: Option<Name>,
 }
 

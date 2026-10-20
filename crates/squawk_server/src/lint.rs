@@ -19,7 +19,10 @@ fn to_text_edit(edit: Edit, line_index: &LineIndex) -> Option<TextEdit> {
         Position::new(start_line.line, start_line.col),
         Position::new(end_line.line, end_line.col),
     );
-    Some(TextEdit::new(range, edit.text.unwrap_or_default()))
+    Some(TextEdit::new(
+        range,
+        edit.text.unwrap_or_default().into_owned(),
+    ))
 }
 
 #[salsa::tracked]
@@ -73,20 +76,20 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
             end_line_col.col += 1;
         }
 
-        let ignore_line_edit = ignore_line_edit(&violation, &line_index, &parse, line_ending)
-            .and_then(|e| to_text_edit(e, &line_index));
-        let ignore_file_edit = ignore_file_edit(&violation, &line_index, &parse, line_ending)
-            .and_then(|e| to_text_edit(e, &line_index));
+        let ignore_line_edit = ignore_line_edit(&violation, line_index, &parse, line_ending)
+            .and_then(|e| to_text_edit(e, line_index));
+        let ignore_file_edit = ignore_file_edit(&violation, line_index, &parse, line_ending)
+            .and_then(|e| to_text_edit(e, line_index));
 
         let (title, fix_edits) = if let Some(fix) = violation.fix {
-            (fix.title, fix.edits)
+            (fix.title.into_owned(), fix.edits)
         } else {
             (String::new(), vec![])
         };
 
         let edits = fix_edits
             .into_iter()
-            .filter_map(|x| to_text_edit(x, &line_index))
+            .filter_map(|x| to_text_edit(x, line_index))
             .collect();
 
         let data = AssociatedDiagnosticData {
@@ -107,7 +110,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
                 href: Url::parse(&format!("https://squawkhq.com/docs/{}", violation.code)).unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: Message::String(violation.message),
+            message: Message::String(violation.message.into_owned()),
             data: Some(serde_json::to_value(data).unwrap()),
             ..Default::default()
         };

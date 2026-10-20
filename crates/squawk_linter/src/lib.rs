@@ -1,4 +1,5 @@
 use rustc_hash::FxHashSet;
+use std::borrow::Cow;
 use std::fmt;
 
 use enum_iterator::Sequence;
@@ -423,12 +424,12 @@ impl<'de> Deserialize<'de> for Rule {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Fix {
-    pub title: String,
+    pub title: Cow<'static, str>,
     pub edits: Vec<Edit>,
 }
 
 impl Fix {
-    fn new<T: Into<String>>(title: T, edits: Vec<Edit>) -> Fix {
+    fn new<T: Into<Cow<'static, str>>>(title: T, edits: Vec<Edit>) -> Fix {
         Fix {
             title: title.into(),
             edits,
@@ -440,16 +441,16 @@ impl Fix {
 pub struct Edit {
     pub text_range: TextRange,
     // TODO: does this need to be an Option?
-    pub text: Option<String>,
+    pub text: Option<Cow<'static, str>>,
 }
 impl Edit {
-    pub fn insert<T: Into<String>>(text: T, at: TextSize) -> Self {
+    pub fn insert<T: Into<Cow<'static, str>>>(text: T, at: TextSize) -> Self {
         Self {
             text_range: TextRange::new(at, at),
             text: Some(text.into()),
         }
     }
-    pub fn replace<T: Into<String>>(text_range: TextRange, text: T) -> Self {
+    pub fn replace<T: Into<Cow<'static, str>>>(text_range: TextRange, text: T) -> Self {
         Self {
             text_range,
             text: Some(text.into()),
@@ -467,15 +468,15 @@ impl Edit {
 pub struct Violation {
     // TODO: should this be String instead?
     pub code: Rule,
-    pub message: String,
+    pub message: Cow<'static, str>,
     pub text_range: TextRange,
-    pub help: Option<String>,
+    pub help: Option<Cow<'static, str>>,
     pub fix: Option<Fix>,
 }
 
 impl Violation {
     #[must_use]
-    pub fn for_node(code: Rule, message: String, node: &SyntaxNode) -> Self {
+    pub fn for_node(code: Rule, message: Cow<'static, str>, node: &SyntaxNode) -> Self {
         let range = node.text_range();
 
         let start = node
@@ -495,7 +496,7 @@ impl Violation {
     }
 
     #[must_use]
-    pub fn for_range(code: Rule, message: String, text_range: TextRange) -> Self {
+    pub fn for_range(code: Rule, message: Cow<'static, str>, text_range: TextRange) -> Self {
         Self {
             code,
             text_range,
@@ -509,7 +510,7 @@ impl Violation {
         self.fix = fix.into();
         self
     }
-    fn help(mut self, help: impl Into<String>) -> Violation {
+    fn help(mut self, help: impl Into<Cow<'static, str>>) -> Violation {
         self.help = Some(help.into());
         self
     }
@@ -765,14 +766,9 @@ impl Linter {
 
     fn errors(&mut self, text: &str) -> Vec<Violation> {
         let ignore_index = IgnoreIndex::new(text, &self.ignores);
-        let mut errors: Vec<Violation> = self
-            .errors
-            .iter()
-            // TODO: we should have errors for when there was an ignore but that
-            // ignore didn't actually ignore anything
-            .filter(|err| !ignore_index.contains(err.text_range, err.code))
-            .cloned()
-            .collect::<Vec<_>>();
+        let mut errors = std::mem::take(&mut self.errors);
+        errors.retain(|err| !ignore_index.contains(err.text_range, err.code));
+        self.ignores.clear();
         // ensure we order them by where they appear in the file
         errors.sort_by_key(|x| x.text_range.start());
         errors
@@ -812,14 +808,15 @@ impl Linter {
     }
 
     pub fn from(rules: impl IntoIterator<Item = Rule>) -> Self {
-        let mut rules: FxHashSet<Rule> = rules.into_iter().collect();
-        for rule in rules.clone() {
-            rules.extend(rule.expands_to());
+        let mut expanded = FxHashSet::default();
+        for rule in rules {
+            expanded.insert(rule);
+            expanded.extend(rule.expands_to());
         }
         Self {
             errors: vec![],
             ignores: vec![],
-            rules,
+            rules: expanded,
             settings: LinterSettings::default(),
         }
     }
@@ -830,6 +827,27 @@ mod tests {
     use insta::assert_debug_snapshot;
 
     use super::*;
+
+    #[test]
+    fn reuse_linter_does_not_retain_violations_or_ignores() {
+        let mut linter = Linter::from([Rule::BanDropTable]);
+        for (sql, expected) in [
+            ("-- squawk-ignore-file ban-drop-table\ndrop table t;", 0),
+            ("drop table t;", 1),
+            ("select 1;", 0),
+            ("-- squawk-ignore ban-drop-table\ndrop table t;", 0),
+            ("drop table t;", 1),
+            ("drop table t;", 1),
+        ] {
+            let parse = SourceFile::parse(sql);
+            assert!(parse.errors().is_empty());
+            let violations = linter.lint(&parse, sql);
+            assert_eq!(violations.len(), expected, "{sql}");
+            assert!(violations.iter().all(|v| v.code == Rule::BanDropTable));
+            assert!(linter.errors.is_empty());
+            assert!(linter.ignores.is_empty());
+        }
+    }
 
     #[test]
     fn prefer_timestamp_aliases() {

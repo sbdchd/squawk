@@ -714,9 +714,8 @@ fn lower(grammar: &Grammar) -> AstSrc {
         ..Default::default()
     };
 
-    let grammar_nodes = grammar.iter().collect::<Vec<_>>();
     let mut name_like_nodes = Vec::new();
-    for node in grammar_nodes {
+    for node in grammar.iter() {
         let name = grammar[node].name.clone();
         let rule = &grammar[node].rule;
         if contains_token(grammar, rule, NAME_TOKEN) {
@@ -751,14 +750,17 @@ fn lower(grammar: &Grammar) -> AstSrc {
 
     deduplicate_fields(&mut res);
     drop_ambiguous_fields(&mut res);
-    res.nodes.sort_by_key(|it| it.name.clone());
-    res.enums.sort_by_key(|it| it.name.clone());
+    res.nodes.sort_by(|a, b| a.name.cmp(&b.name));
+    res.enums.sort_by(|a, b| a.name.cmp(&b.name));
     res.tokens.sort_unstable();
     res.nodes.iter_mut().for_each(|it| {
-        it.fields.sort_by_key(|it| match it {
-            Field::Token(name) => (true, name.clone()),
-            Field::Node { name, .. } => (false, name.clone()),
-        });
+        fn key(field: &Field) -> (bool, &str) {
+            match field {
+                Field::Token(name) => (true, name.as_str()),
+                Field::Node { name, .. } => (false, name.as_str()),
+            }
+        }
+        it.fields.sort_by(|a, b| key(a).cmp(&key(b)));
     });
     res.enums.iter_mut().for_each(|it| {
         it.variants.sort();

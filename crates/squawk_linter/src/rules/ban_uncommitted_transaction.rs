@@ -38,7 +38,7 @@ pub(crate) fn ban_uncommitted_transaction(ctx: &mut Linter, parse: &Parse<Source
         ctx.report(
             Violation::for_node(
                 Rule::BanUncommittedTransaction,
-                "Transaction never committed or rolled back.".to_string(),
+                "Transaction never committed or rolled back.".into(),
                 begin.syntax(),
             )
             .help("Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.")

@@ -238,7 +238,7 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
     }
 }
 
-fn report(ctx: &mut Linter, rule: Rule, message: &str, node: &squawk_syntax::SyntaxNode) {
+fn report(ctx: &mut Linter, rule: Rule, message: &'static str, node: &squawk_syntax::SyntaxNode) {
     if ctx.rules.contains(&rule) {
         ctx.report(Violation::for_node(rule, message.into(), node));
     }

@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fmt;
 
 use rowan::TextSize;
@@ -272,11 +273,12 @@ impl LockKind {
         }
     }
 
-    fn violation_message(self) -> String {
+    fn violation_message(self) -> Cow<'static, str> {
         if self == LockKind::Unknown {
-            "Missing `set lock_timeout` before potentially slow operations".to_string()
+            "Missing `set lock_timeout` before potentially slow operations".into()
         } else {
             format!("Missing `set lock_timeout` before potentially slow {self} lock operations")
+                .into()
         }
     }
 
@@ -296,17 +298,17 @@ impl LockKind {
         }
     }
 
-    fn help(self) -> String {
+    fn help(self) -> Cow<'static, str> {
         let help = "Configure a `lock_timeout` before this statement.";
         let Some(impact) = self.impact() else {
-            return help.to_string();
+            return help.into();
         };
 
         let blocked = impact.blocked();
         if blocked.is_empty() {
-            format!("{help} Statement requires: {self} lock.")
+            format!("{help} Statement requires: {self} lock.").into()
         } else {
-            format!("{help} Statement requires: {self} lock; blocking: {blocked}.")
+            format!("{help} Statement requires: {self} lock; blocking: {blocked}.").into()
         }
     }
 }
@@ -367,10 +369,10 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                         Violation::for_node(
                             Rule::RequireStatementTimeout,
                             "Missing `set statement_timeout` before potentially slow operations"
-                                .to_string(),
+                                .into(),
                             stmt.syntax(),
                         )
-                        .help("Configure a `statement_timeout` before this statement".to_string())
+                        .help("Configure a `statement_timeout` before this statement")
                         .fix(create_stmt_timeout_fix(&file)),
                     );
                     stmt_timeout = ReportOnce::Reported;

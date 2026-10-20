@@ -40,12 +40,12 @@ pub(crate) fn handle_selection_range(
         }
 
         let mut range = gen_lsp_types::SelectionRange {
-            range: lsp_utils::range(&line_index, *ranges.last().unwrap()),
+            range: lsp_utils::range(line_index, *ranges.last().unwrap()),
             parent: None,
         };
         for &r in ranges.iter().rev().skip(1) {
             range = gen_lsp_types::SelectionRange {
-                range: lsp_utils::range(&line_index, r),
+                range: lsp_utils::range(line_index, r),
                 parent: Some(Box::new(range)),
             }
         }

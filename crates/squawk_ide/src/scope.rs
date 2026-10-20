@@ -1,11 +1,12 @@
 use rustc_hash::FxHashMap;
+use smallvec::SmallVec;
 
 use crate::name::AsName;
 use crate::symbols::{Name, SymbolId};
 
 #[derive(Default, Debug, Clone, PartialEq)]
 pub(crate) struct Scope {
-    pub(crate) entries: FxHashMap<Name, Vec<SymbolId>>,
+    pub(crate) entries: FxHashMap<Name, SmallVec<[SymbolId; 2]>>,
 }
 
 impl Scope {

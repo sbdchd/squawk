@@ -38,7 +38,8 @@ fn check_name(ctx: &mut Linter, name_like: &impl ast::NameLike) {
     ctx.report(
         Violation::for_node(
             Rule::IdentifierTooLong,
-            format!("`{ident}` is too long and will be truncated to {MAX_IDENT_BYTES} bytes."),
+            format!("`{ident}` is too long and will be truncated to {MAX_IDENT_BYTES} bytes.")
+                .into(),
             name_like.syntax(),
         )
         .fix(fix),

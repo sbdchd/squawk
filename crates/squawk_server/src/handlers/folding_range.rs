@@ -17,7 +17,7 @@ pub(crate) fn handle_folding_range(
 
     let lsp_folds: Vec<FoldingRange> = folding_ranges(db, file)
         .into_iter()
-        .map(|fold| lsp_utils::folding_range(&line_idx, &fold))
+        .map(|fold| lsp_utils::folding_range(line_idx, &fold))
         .collect();
 
     lsp_folds

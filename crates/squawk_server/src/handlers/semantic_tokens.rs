@@ -18,7 +18,7 @@ pub(crate) fn handle_semantic_tokens_full(
     let tokens = semantic_tokens(db, file, None);
     SemanticTokens {
         result_id: None,
-        data: lsp_utils::to_semantic_tokens(text, &line_index, &tokens),
+        data: lsp_utils::to_semantic_tokens(text, line_index, &tokens),
     }
 }
 
@@ -30,11 +30,11 @@ pub(crate) fn handle_semantic_tokens_range(
     let db = snapshot.db();
     let file = snapshot.file(&uri).unwrap();
     let line_index = line_index(db, file);
-    let range_to_highlight = lsp_utils::text_range(&line_index, params.range);
+    let range_to_highlight = lsp_utils::text_range(line_index, params.range);
     let tokens = semantic_tokens(db, file, range_to_highlight);
     let text = file.content(db);
     SemanticTokens {
         result_id: None,
-        data: lsp_utils::to_semantic_tokens(text, &line_index, &tokens),
+        data: lsp_utils::to_semantic_tokens(text, line_index, &tokens),
     }
 }
