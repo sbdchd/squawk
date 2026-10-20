@@ -114,7 +114,7 @@ pub(crate) fn embedded_body(db: &dyn Db, embedded: EmbeddedFile) -> Option<SqlBo
     embedded_literal(db, embedded)?.sql_body()
 }
 
-#[salsa::tracked]
+#[salsa::tracked(returns(ref))]
 pub fn line_index(db: &dyn Db, file: File) -> LineIndex {
     LineIndex::new(file.content(db))
 }
@@ -170,7 +170,7 @@ impl Binders<'_> {
 
     pub(crate) fn find<T>(&self, lookup: impl Fn(&Binder) -> Option<T>) -> Option<InFile<T>> {
         list_files(self.db, self.file)
-            .find_map(|file| lookup(&bind(self.db, file)).map(|value| InFile::new(file, value)))
+            .find_map(|file| lookup(bind(self.db, file)).map(|value| InFile::new(file, value)))
     }
 
     pub(crate) fn lookup<N: AsName + ?Sized>(
@@ -221,7 +221,7 @@ impl Binders<'_> {
     }
 }
 
-pub(crate) fn bind(db: &dyn Db, file: impl Into<FileId>) -> Binder {
+pub(crate) fn bind(db: &dyn Db, file: impl Into<FileId>) -> &Binder {
     match file.into() {
         FileId::File(file) => bind_file(db, file),
         FileId::Embedded(embedded) => bind_embedded(db, embedded),
@@ -229,23 +229,23 @@ pub(crate) fn bind(db: &dyn Db, file: impl Into<FileId>) -> Binder {
     }
 }
 
-#[salsa::tracked]
+#[salsa::tracked(returns(ref))]
 fn bind_file(db: &dyn Db, file: File) -> Binder {
     let result = parse(db, file);
     let source_file = result.tree();
     binder::bind(&source_file)
 }
 
-#[salsa::tracked]
+#[salsa::tracked(returns(ref))]
 fn bind_completion_file(db: &dyn Db, completion: CompletionFile) -> Binder {
     let source_file = parse(db, FileId::Completion(completion)).tree();
     binder::bind(&source_file)
 }
 
-#[salsa::tracked]
+#[salsa::tracked(returns(ref))]
 fn bind_embedded(db: &dyn Db, embedded: EmbeddedFile) -> Binder {
     let parent = bind(db, embedded.parent(db));
-    let search_path = parent.search_path_at(embedded.literal(db).start()).to_vec();
+    let search_path = parent.search_path_at(embedded.literal(db).start()).into();
     let source_file = parse(db, FileId::Embedded(embedded)).tree();
     binder::bind_with_search_path(&source_file, search_path)
 }

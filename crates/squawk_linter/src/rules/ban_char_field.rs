@@ -24,10 +24,10 @@ fn create_fix(range: TextRange, args: Option<ast::ArgList>) -> Fix {
     if let Some(args_list) = args {
         let end = args_list.syntax().text_range().start();
         let edit = Edit::replace(TextRange::new(range.start(), end), "varchar");
-        Fix::new("Replace with `varchar`".to_string(), vec![edit])
+        Fix::new("Replace with `varchar`", vec![edit])
     } else {
         let edit = Edit::replace(range, "text");
-        Fix::new("Replace with `text`".to_string(), vec![edit])
+        Fix::new("Replace with `text`", vec![edit])
     }
 }
 

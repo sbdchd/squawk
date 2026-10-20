@@ -37,7 +37,7 @@ impl ResolvedSchemas {
 #[derive(Clone, PartialEq)]
 struct SearchPathChange {
     position: TextSize,
-    search_path: Vec<Schema>,
+    search_path: Box<[Schema]>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -64,11 +64,7 @@ impl Binder {
             symbols: Arena::new(),
             search_path_changes: vec![SearchPathChange {
                 position: TextSize::from(0),
-                search_path: vec![
-                    Schema::new("public"),
-                    Schema::new("pg_temp"),
-                    Schema::new("pg_catalog"),
-                ],
+                search_path: default_search_path(),
             }],
             default_schema_override: None,
             schema_regions: vec![],
@@ -172,7 +168,7 @@ impl Binder {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &self.symbols[*id];
                 let params_match = match (&symbol.params, params) {
-                    (Some(sym_params), Some(req_params)) => sym_params.as_slice() == req_params,
+                    (Some(sym_params), Some(req_params)) => sym_params.as_ref() == req_params,
                     (None, None) => true,
                     (_, None) => true,
                     _ => false,
@@ -300,7 +296,7 @@ pub(crate) fn bind(file: &ast::SourceFile) -> Binder {
     binder
 }
 
-pub(crate) fn bind_with_search_path(file: &ast::SourceFile, search_path: Vec<Schema>) -> Binder {
+pub(crate) fn bind_with_search_path(file: &ast::SourceFile, search_path: Box<[Schema]>) -> Binder {
     let mut binder = Binder::new();
     binder.search_path_changes[0].search_path = search_path;
 
@@ -313,6 +309,10 @@ fn bind_file(b: &mut Binder, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         bind_stmt(b, stmt);
     }
+    b.symbols.shrink_to_fit();
+    b.search_path_changes.shrink_to_fit();
+    b.schema_regions.shrink_to_fit();
+    b.savepoint_stack.shrink_to_fit();
 }
 
 fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
@@ -1869,7 +1869,7 @@ fn bind_routine_body_search_path(
         return;
     };
 
-    let previous_search_path = b.current_search_path().to_vec();
+    let previous_search_path: Box<[Schema]> = b.current_search_path().into();
     let search_path = match search_path {
         SearchPathOverride::Explicit(search_path) => search_path,
         SearchPathOverride::FromCurrent => previous_search_path.clone(),
@@ -1885,7 +1885,7 @@ fn bind_routine_body_search_path(
 }
 
 enum SearchPathOverride {
-    Explicit(Vec<Schema>),
+    Explicit(Box<[Schema]>),
     FromCurrent,
 }
 
@@ -1910,15 +1910,15 @@ fn search_path_from_set_config_param(
     }
 }
 
-fn default_search_path() -> Vec<Schema> {
-    vec![
+fn default_search_path() -> Box<[Schema]> {
+    Box::new([
         Schema::new("public"),
         Schema::new("pg_temp"),
         Schema::new("pg_catalog"),
-    ]
+    ])
 }
 
-fn search_path_from_config_value(to_config_value: &ast::ToConfigValue) -> Vec<Schema> {
+fn search_path_from_config_value(to_config_value: &ast::ToConfigValue) -> Box<[Schema]> {
     if to_config_value.default_token().is_some() {
         return default_search_path();
     }
@@ -1938,7 +1938,7 @@ fn search_path_from_config_value(to_config_value: &ast::ToConfigValue) -> Vec<Sc
             ast::ConfigValue::PrefixExpr(_) => {}
         }
     }
-    search_path
+    search_path.into_boxed_slice()
 }
 
 fn bind_set(b: &mut Binder, set: &ast::Set) {
@@ -1952,7 +1952,7 @@ fn bind_set(b: &mut Binder, set: &ast::Set) {
             {
                 b.search_path_changes.push(SearchPathChange {
                     position,
-                    search_path: vec![Schema::new(string_value)],
+                    search_path: Box::new([Schema::new(string_value)]),
                 });
             }
         }
@@ -2079,7 +2079,7 @@ pub(crate) fn extract_string_literal(literal: &ast::Literal) -> Option<String> {
     }
 }
 
-fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Name>> {
+fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Box<[Name]>> {
     let param_list = param_list?;
     let mut params = vec![];
     for param in param_list.all_params() {
@@ -2090,5 +2090,5 @@ fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Nam
             params.push(Name::from_node(&segment));
         }
     }
-    (!params.is_empty()).then_some(params)
+    (!params.is_empty()).then(|| params.into_boxed_slice())
 }

@@ -31,7 +31,7 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                             ctx.report(
                                 Violation::for_node(
                                     Rule::DisallowedUniqueConstraint,
-                                    message.to_string(),
+                                    message.into(),
                                     unique_constraint.syntax(),
                                 )
                                 .help(help),
@@ -45,7 +45,7 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                                 ctx.report(
                                     Violation::for_node(
                                         Rule::DisallowedUniqueConstraint,
-                                        message.to_string(),
+                                        message.into(),
                                         unique_constraint.syntax(),
                                     )
                                     .help(help),

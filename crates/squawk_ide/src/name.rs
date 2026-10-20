@@ -1,4 +1,4 @@
-use smol_str::SmolStr;
+use smol_str::{SmolStr, StrExt};
 use squawk_syntax::ast::{self, AstNode};
 use std::borrow::Borrow;
 use std::fmt;
@@ -26,12 +26,14 @@ impl Name {
     // normalized idents.
     pub(crate) fn from_string(text: impl Into<SmolStr>) -> Self {
         let text = text.into();
-        let text = text
-            .strip_prefix('"')
-            .and_then(|t| t.strip_suffix('"'))
-            .map(|x| x.replace(r#""""#, "\""))
-            .unwrap_or(text.to_ascii_lowercase());
-        Name(text.into())
+        let text = if let Some(quoted) = text.strip_prefix('"').and_then(|t| t.strip_suffix('"')) {
+            quoted.replace_smolstr(r#""""#, "\"")
+        } else if text.bytes().any(|b| b.is_ascii_uppercase()) {
+            text.to_ascii_lowercase_smolstr()
+        } else {
+            text
+        };
+        Name(text)
     }
     pub(crate) fn from_node(node: &impl ast::NameLike) -> Self {
         let text = node.text();

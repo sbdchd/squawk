@@ -35,7 +35,7 @@ pub(crate) fn handle_inlay_hints(snapshot: &Snapshot, params: InlayHintParams) -
                     value: hint.label,
                     location: Some(Location {
                         uri: target_uri,
-                        range: lsp_utils::range(&target_line_index, target.value),
+                        range: lsp_utils::range(target_line_index, target.value),
                     }),
                     tooltip: None,
                     command: None,

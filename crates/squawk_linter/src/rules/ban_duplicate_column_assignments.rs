@@ -1,4 +1,5 @@
 use rustc_hash::FxHashMap;
+use smallvec::SmallVec;
 use squawk_syntax::{
     Parse, SourceFile, SyntaxKind, SyntaxNode,
     ast::{self, AstNode},
@@ -90,7 +91,7 @@ fn check_defined_columns(ctx: &mut Linter, columns: impl Iterator<Item = ast::Co
 }
 
 fn check_defined_nodes(ctx: &mut Linter, columns: impl Iterator<Item = (Name, SyntaxNode)>) {
-    let mut defined_columns: FxHashMap<Name, Vec<SyntaxNode>> = FxHashMap::default();
+    let mut defined_columns: FxHashMap<Name, SmallVec<[SyntaxNode; 1]>> = FxHashMap::default();
 
     for (name, column) in columns {
         defined_columns.entry(name).or_default().push(column);
@@ -104,7 +105,7 @@ fn check_defined_nodes(ctx: &mut Linter, columns: impl Iterator<Item = (Name, Sy
         for column in columns {
             ctx.report(Violation::for_node(
                 Rule::BanDuplicateColumnAssignments,
-                format!("Column `{}` is specified more than once.", name.as_str()),
+                format!("Column `{}` is specified more than once.", name.as_str()).into(),
                 &column,
             ));
         }
@@ -112,7 +113,8 @@ fn check_defined_nodes(ctx: &mut Linter, columns: impl Iterator<Item = (Name, Sy
 }
 
 fn check_insert_column_target_list(ctx: &mut Linter, column_target_list: &ast::ColumnTargetList) {
-    let mut assigned_columns: FxHashMap<Name, Vec<InsertAssignment>> = FxHashMap::default();
+    let mut assigned_columns: FxHashMap<Name, SmallVec<[InsertAssignment; 1]>> =
+        FxHashMap::default();
 
     for target in column_target_list.column_targets() {
         let Some(column) = target.name() else {
@@ -138,7 +140,8 @@ fn check_insert_column_target_list(ctx: &mut Linter, column_target_list: &ast::C
                 format!(
                     "Multiple assignments to the same column `{}`.",
                     name.as_str()
-                ),
+                )
+                .into(),
                 assignment.column.syntax(),
             ));
         }
@@ -149,7 +152,7 @@ fn check_set_clause(ctx: &mut Linter, set_clause: &ast::SetClause) {
     let Some(set_column_list) = set_clause.set_column_list() else {
         return;
     };
-    let mut assigned_columns: FxHashMap<Name, Vec<Assignment>> = FxHashMap::default();
+    let mut assigned_columns: FxHashMap<Name, SmallVec<[Assignment; 1]>> = FxHashMap::default();
 
     for set_column in set_column_list.set_columns() {
         match &set_column {
@@ -182,7 +185,8 @@ fn check_set_clause(ctx: &mut Linter, set_clause: &ast::SetClause) {
                 format!(
                     "Multiple assignments to the same column `{}`.",
                     name.as_str()
-                ),
+                )
+                .into(),
                 assignment.column.syntax(),
             );
             ctx.report(if index == last_index {
@@ -195,7 +199,7 @@ fn check_set_clause(ctx: &mut Linter, set_clause: &ast::SetClause) {
 }
 
 fn add_assignment(
-    assigned_columns: &mut FxHashMap<Name, Vec<Assignment>>,
+    assigned_columns: &mut FxHashMap<Name, SmallVec<[Assignment; 1]>>,
     set_column: ast::SetColumn,
     target: &ast::ColumnTarget,
 ) {

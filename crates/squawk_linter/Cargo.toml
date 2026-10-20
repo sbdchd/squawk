@@ -23,6 +23,7 @@ squawk-line-index.workspace = true
 serde_plain.workspace = true
 annotate-snippets.workspace = true
 rustc-hash.workspace = true
+smallvec.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

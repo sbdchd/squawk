@@ -124,7 +124,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
 
                             ctx.report(Violation::for_range(
                                 Rule::UnusedIgnore,
-                                format!("unknown name {trimmed}"),
+                                format!("unknown name {trimmed}").into(),
                                 range,
                             ));
                         }

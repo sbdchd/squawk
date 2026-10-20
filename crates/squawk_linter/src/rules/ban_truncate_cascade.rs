@@ -14,7 +14,7 @@ pub(crate) fn ban_truncate_cascade(ctx: &mut Linter, parse: &Parse<SourceFile>) 
             // foreign keys.
             ctx.report(Violation::for_range(
                     Rule::BanTruncateCascade,
-                    "Using `CASCADE` will recursively truncate any tables that foreign key to the referenced tables! So if you had foreign keys setup as `a <- b <- c` and truncated `a`, then `b` & `c` would also be truncated!".to_string(),
+                    "Using `CASCADE` will recursively truncate any tables that foreign key to the referenced tables! So if you had foreign keys setup as `a <- b <- c` and truncated `a`, then `b` & `c` would also be truncated!".into(),
                     cascade.syntax().text_range(),
                 ).help("Remove the `CASCADE` and specify exactly which tables you want to truncate."));
         }

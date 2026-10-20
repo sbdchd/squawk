@@ -16,14 +16,14 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if ctx.settings.assume_in_transaction {
                     ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
-                        "There is an existing transaction already in progress, managed by your migration tool.".to_string(),
+                        "There is an existing transaction already in progress, managed by your migration tool.".into(),
                         stmt.syntax(),
                     ).help(assume_in_transaction_help));
                 } else if in_explicit_transaction {
                     ctx.report(
                         Violation::for_node(
                             Rule::TransactionNesting,
-                            "There is an existing transaction already in progress.".to_string(),
+                            "There is an existing transaction already in progress.".into(),
                             stmt.syntax(),
                         )
                         .help(assume_in_transaction_help),
@@ -36,13 +36,13 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
                         "Attempting to end the transaction that is managed by your migration tool"
-                            .to_string(),
+                            .into(),
                         stmt.syntax(),
                     ).help(assume_in_transaction_help));
                 } else if !in_explicit_transaction {
                     ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
-                        "There is no transaction to `COMMIT` or `ROLLBACK`.".to_string(),
+                        "There is no transaction to `COMMIT` or `ROLLBACK`.".into(),
                         stmt.syntax(),
                     ).help("`BEGIN` a transaction at an earlier point in the migration or remove this statement."));
                 }

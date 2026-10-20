@@ -58,7 +58,7 @@ pub(crate) fn offset(
     position: gen_lsp_types::Position,
 ) -> Option<InFile<TextSize>> {
     let line_index = line_index(db, file);
-    let offset = text_size(&line_index, position)?;
+    let offset = text_size(line_index, position)?;
     Some(InFile::new(file, offset))
 }
 
@@ -83,7 +83,7 @@ pub(crate) fn code_action(
                     .into_iter()
                     .map(|edit| gen_lsp_types::TextEdit {
                         range: range(line_index, edit.text_range),
-                        new_text: edit.text.unwrap_or_default(),
+                        new_text: edit.text.unwrap_or_default().into_owned(),
                     })
                     .collect();
                 changes.insert(uri, edits);
@@ -247,7 +247,7 @@ pub(crate) fn to_location(
     let uri = snapshot.uri(file)?;
 
     let line_index = line_index(db, file);
-    let range = range(&line_index, loc.range);
+    let range = range(line_index, loc.range);
     Some(Location { uri, range })
 }
 

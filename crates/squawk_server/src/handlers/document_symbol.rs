@@ -78,7 +78,7 @@ pub(crate) fn handle_document_symbol(
 
     let lsp_symbols: Vec<DocumentSymbol> = symbols
         .into_iter()
-        .map(|sym| convert_symbol(sym, &line_index))
+        .map(|sym| convert_symbol(sym, line_index))
         .collect();
 
     DocumentSymbolResponse::DocumentSymbolList(lsp_symbols)

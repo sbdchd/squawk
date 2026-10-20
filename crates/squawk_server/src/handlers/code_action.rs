@@ -26,7 +26,7 @@ pub(crate) fn handle_code_action(
     let ide_actions = code_actions(db, position).unwrap_or_default();
 
     for action in ide_actions {
-        let lsp_action = lsp_utils::code_action(&line_index, uri.clone(), action);
+        let lsp_action = lsp_utils::code_action(line_index, uri.clone(), action);
         actions.push(CodeActionResponse::CodeAction(lsp_action));
     }
 

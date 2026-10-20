@@ -8,11 +8,13 @@ use squawk_line_index::LineIndex;
 use squawk_line_index::TextRange;
 use squawk_linter::{Fix, Linter, Rule, Version};
 use squawk_syntax::SourceFile;
+use std::borrow::Cow;
 use std::hash::DefaultHasher;
 use std::hash::Hash;
 use std::hash::Hasher;
 use std::io;
 use std::process::ExitCode;
+use std::sync::Arc;
 
 use crate::cmd::Input;
 use crate::{
@@ -36,6 +38,7 @@ fn check_sql(
     let parse = SourceFile::parse(sql);
     let parse_errors = parse.errors();
     let line_index = LineIndex::new(sql);
+    let path: Arc<str> = path.into();
 
     if !parse_errors.is_empty() {
         let violations = parse_errors
@@ -46,7 +49,7 @@ fn check_sql(
                 let range_end = e.range().end();
                 let line_end = line_index.line_col(range_end);
                 ReportViolation {
-                    file: path.to_string(),
+                    file: path.clone(),
                     line: line_col.line as usize,
                     line_end: line_end.line as usize,
                     column: line_col.col as usize,
@@ -54,14 +57,14 @@ fn check_sql(
                     level: ViolationLevel::Error,
                     help: None,
                     range: e.range(),
-                    message: e.message().to_string(),
+                    message: e.message().to_owned().into(),
                     rule_name: "syntax-error".to_string(),
                     fix: None,
                 }
             })
             .collect();
         return CheckReport {
-            path: path.into(),
+            path,
             sql: sql.into(),
             violations,
         };
@@ -76,7 +79,7 @@ fn check_sql(
             let range_end = e.text_range.end();
             let line_end = line_index.line_col(range_end);
             ReportViolation {
-                file: path.to_string(),
+                file: path.clone(),
                 line: line_col.line as usize,
                 line_end: line_end.line as usize,
                 column: line_col.col as usize,
@@ -92,7 +95,7 @@ fn check_sql(
         .collect();
 
     CheckReport {
-        path: path.into(),
+        path,
         sql: sql.into(),
         violations,
     }
@@ -121,7 +124,7 @@ fn render_lint_error<W: std::io::Write>(
         .fold(true)
         .annotation(AnnotationKind::Primary.span(err.range.into()));
 
-    let mut title = level.primary_title(&err.message).id(&err.rule_name);
+    let mut title = level.primary_title(err.message.as_ref()).id(&err.rule_name);
     // annotate-snippets emits OSC 8 hyperlinks even with the plain renderer
     if styled {
         title = title.id_url(format!("https://squawkhq.com/docs/{}", err.rule_name));
@@ -129,7 +132,7 @@ fn render_lint_error<W: std::io::Write>(
     let mut group = title.element(snippet);
 
     if let Some(help) = &err.help {
-        group = group.element(Level::HELP.message(help));
+        group = group.element(Level::HELP.message(help.as_ref()));
     }
 
     if let Some(fix) = &err.fix {
@@ -308,14 +311,14 @@ impl std::fmt::Display for ViolationLevel {
 // TODO: don't use this for json dumps
 #[derive(Debug, Serialize)]
 pub(crate) struct ReportViolation {
-    pub file: String,
+    pub file: Arc<str>,
     pub line: usize,
     pub column: usize,
     #[serde(skip_serializing)]
     pub range: TextRange,
     pub level: ViolationLevel,
-    pub message: String,
-    pub help: Option<String>,
+    pub message: Cow<'static, str>,
+    pub help: Option<Cow<'static, str>>,
     pub rule_name: String,
     pub column_end: usize,
     pub line_end: usize,
@@ -364,12 +367,10 @@ pub(crate) fn fmt_tty<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Resul
 }
 
 fn fmt_json<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> {
-    let violations = reports
-        .into_iter()
-        .flat_map(|x| x.violations)
-        .collect::<Vec<_>>();
-    let json_str = serde_json::to_string(&violations)?;
-    writeln!(f, "{json_str}")?;
+    let violations = reports.into_iter().flat_map(|report| report.violations);
+    let mut serializer = serde_json::Serializer::new(&mut *f);
+    serde::Serializer::collect_seq(&mut serializer, violations)?;
+    writeln!(f)?;
     Ok(())
 }
 
@@ -408,7 +409,7 @@ struct GitLabLines {
 
 #[derive(Serialize)]
 struct GitLabLocation {
-    path: String,
+    path: Arc<str>,
     lines: GitLabLines,
 }
 
@@ -441,7 +442,7 @@ fn make_fingerprint(v: &ReportViolation) -> String {
 }
 
 fn to_gitlab_issue(v: &ReportViolation) -> GitLabIssue {
-    let mut desc = v.message.clone();
+    let mut desc = v.message.to_string();
     if let Some(help) = &v.help
         && !help.trim().is_empty()
     {
@@ -482,7 +483,7 @@ fn fmt_gitlab<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> 
 
 #[derive(Debug)]
 pub(crate) struct CheckReport {
-    pub path: String,
+    pub path: Arc<str>,
     pub sql: String,
     pub violations: Vec<ReportViolation>,
 }

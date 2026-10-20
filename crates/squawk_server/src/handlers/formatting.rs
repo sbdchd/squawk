@@ -32,7 +32,7 @@ pub(crate) fn handle_formatting(
     }
 
     let range = TextRange::new(TextSize::default(), TextSize::try_from(content.len())?);
-    let range = lsp_utils::range(&line_index(db, file), range);
+    let range = lsp_utils::range(line_index(db, file), range);
 
     Ok(Some(vec![TextEdit {
         range,

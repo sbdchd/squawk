@@ -1,6 +1,6 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/lexed_str.rs
 
-use std::{num::IntErrorKind, ops};
+use std::{borrow::Cow, num::IntErrorKind, ops};
 
 use squawk_lexer::tokenize;
 
@@ -14,7 +14,7 @@ pub struct LexedStr<'a> {
 }
 
 struct LexError {
-    msg: String,
+    msg: Cow<'static, str>,
     range: ops::Range<u32>,
 }
 
@@ -106,7 +106,7 @@ impl<'a> LexedStr<'a> {
     // }
 
     pub fn errors(&self) -> impl Iterator<Item = (&ops::Range<u32>, &str)> + '_ {
-        self.error.iter().map(|it| (&it.range, it.msg.as_str()))
+        self.error.iter().map(|it| (&it.range, it.msg.as_ref()))
     }
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
@@ -158,14 +158,19 @@ impl<'a> Converter<'a> {
         self.res
     }
 
-    fn push(&mut self, kind: SyntaxKind, len: usize, err: Option<(&str, ops::Range<u32>)>) {
+    fn push(
+        &mut self,
+        kind: SyntaxKind,
+        len: usize,
+        err: Option<(Cow<'static, str>, ops::Range<u32>)>,
+    ) {
         let token_start = u32::try_from(self.offset).unwrap();
         self.res.push(kind, self.offset);
         self.offset += len;
 
         if let Some((msg, err_range)) = err {
             self.res.error.push(LexError {
-                msg: msg.to_owned(),
+                msg,
                 range: token_start + err_range.start..token_start + err_range.end,
             });
         }
@@ -280,7 +285,7 @@ impl<'a> Converter<'a> {
         let err = if err.is_empty() { None } else { Some(err) };
         let err = err.map(|msg| {
             (
-                msg,
+                msg.into(),
                 err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
             )
         });
@@ -288,7 +293,7 @@ impl<'a> Converter<'a> {
     }
 
     fn extend_literal(&mut self, token_text: &str, kind: &squawk_lexer::LiteralKind) {
-        let mut err: Option<String> = None;
+        let mut err: Option<Cow<'static, str>> = None;
         let mut err_range: Option<ops::Range<u32>> = None;
         let continuation = self.prefixed_string_continuation.take();
 
@@ -311,7 +316,7 @@ impl<'a> Converter<'a> {
                                 let start = token_start + prefix_len + u32::try_from(i).unwrap();
                                 let end = start + u32::try_from(c.len_utf8()).unwrap();
                                 self.res.error.push(LexError {
-                                    msg: format!("invalid digit for a base {base} literal"),
+                                    msg: format!("invalid digit for a base {base} literal").into(),
                                     range: start..end,
                                 });
                             }
@@ -414,7 +419,7 @@ impl<'a> Converter<'a> {
             }
         };
 
-        let err = err.as_deref().map(|msg| {
+        let err = err.map(|msg| {
             (
                 msg,
                 err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
@@ -497,7 +502,7 @@ impl<'a> Converter<'a> {
         let token_start = u32::try_from(self.offset).unwrap();
         let start = token_start + u32::try_from(start).unwrap();
         self.res.error.push(LexError {
-            msg,
+            msg: msg.into(),
             range: start..start + u32::try_from(len).unwrap(),
         });
     }

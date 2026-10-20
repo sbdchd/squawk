@@ -31,7 +31,7 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                             ctx.report(
                                 Violation::for_node(
                                     Rule::AddingSerialPrimaryKeyField,
-                                    message.to_string(),
+                                    message.into(),
                                     primary_key_constraint.syntax(),
                                 )
                                 .help(help),
@@ -47,7 +47,7 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 ctx.report(
                                     Violation::for_node(
                                         Rule::AddingSerialPrimaryKeyField,
-                                        message.to_string(),
+                                        message.into(),
                                         primary_key_constraint.syntax(),
                                     )
                                     .help(help),

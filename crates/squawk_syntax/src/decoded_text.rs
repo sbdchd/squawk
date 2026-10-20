@@ -1,9 +1,10 @@
 use rowan::{TextRange, TextSize};
+use smallvec::{SmallVec, smallvec};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DecodedText {
     text: String,
-    marks: Vec<Mark>,
+    marks: SmallVec<[Mark; 1]>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -16,7 +17,7 @@ impl DecodedText {
     pub fn new(pos: TextSize) -> Self {
         Self {
             text: String::new(),
-            marks: vec![Mark {
+            marks: smallvec![Mark {
                 decoded: 0,
                 pos: pos.into(),
             }],
