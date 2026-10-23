@@ -61,6 +61,9 @@ impl SemanticIndexBuilder {
         index
             .items
             .sort_by_key(|item| (item.file_id, item.value.range.start()));
+        index
+            .search_paths
+            .sort_by_key(|change| (change.file_id, change.value.start));
         shrink_to_fit(&mut index);
         SemanticIndex::from(index)
     }
@@ -127,6 +130,7 @@ impl IndexData {
             star_columns: LayeredArena::default(),
             builtins: None,
             items: vec![],
+            search_paths: vec![],
             errors: Errors::default(),
             renames: FxHashMap::default(),
             param_functions: FxHashMap::default(),
@@ -197,6 +201,7 @@ impl IndexData {
             star_columns: LayeredArena::on_top_of(&base.star_columns),
             builtins: Some(base),
             items: vec![],
+            search_paths: vec![],
             errors: Errors::default(),
             renames: FxHashMap::default(),
             param_functions: FxHashMap::default(),
@@ -266,6 +271,7 @@ fn shrink_to_fit(index: &mut IndexData) {
         star_columns,
         builtins: _,
         items,
+        search_paths,
         errors,
         renames,
         param_functions,
@@ -335,6 +341,7 @@ fn shrink_to_fit(index: &mut IndexData) {
     stars.shrink_to_fit();
     star_columns.shrink_to_fit();
     items.shrink_to_fit();
+    search_paths.shrink_to_fit();
     errors.shrink_to_fit();
     for versions in renames.values_mut() {
         versions.shrink_to_fit();

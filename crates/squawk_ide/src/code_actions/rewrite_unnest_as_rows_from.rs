@@ -3,7 +3,7 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{file::InFile, offsets::token_from_offset};
+use crate::{db::semantic_index, file::InFile, ir::FunctionKind, offsets::token_from_offset};
 
 use super::unnest::unnest_call;
 use super::{ActionKind, CodeAction};
@@ -32,7 +32,25 @@ pub(super) fn rewrite_unnest_as_rows_from(
         return None;
     }
 
-    // TODO: check for shadowed unnest
+    let index = semantic_index(db, position.file_id);
+    let range = position.with_value(call_expr.syntax().text_range());
+    if let Some(unnest) = index.names.lookup("unnest")
+        && index.search_path_at(range)?.iter().any(|&schema| {
+            !matches!(
+                index.names.resolve(schema),
+                "pg_catalog" | "pg_temp" | "$user"
+            ) && index.functions.named(schema, unnest).any(|function| {
+                let function = &index.functions[function];
+                let defined = index.range(function.ptr.file_range());
+                function.kind != FunctionKind::Procedure
+                    && (defined.file_id != range.file_id
+                        || defined.value.start() < range.value.start())
+            })
+        })
+    {
+        return None;
+    }
+
     let call_range = call_expr.syntax().text_range();
 
     let name = call.name.syntax().text();
@@ -239,7 +257,6 @@ mod test {
     }
 
     #[test]
-    #[should_panic(expected = "assertion failed: code_action_not_applicable")]
     fn rewrite_unnest_as_rows_from_not_applicable_shadowed() {
         assert!(code_action_not_applicable(
             rewrite_unnest_as_rows_from,
@@ -265,7 +282,6 @@ select * from rows from (unnest(a), unnest(b));"
     }
 
     #[test]
-    #[should_panic(expected = "assertion failed: code_action_not_applicable")]
     fn rewrite_unnest_as_rows_from_not_applicable_shadowed_via_search_path() {
         assert!(code_action_not_applicable(
             rewrite_unnest_as_rows_from,
@@ -288,6 +304,21 @@ select * from unn$0est(a, b);"
             @"
 create function f(x text) returns setof text as $$ select 1 $$ language sql;
 select * from rows from (unnest(a), unnest(b));"
+        );
+    }
+
+    #[test]
+    fn rewrite_unnest_as_rows_from_shadow_defined_later() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_unnest_as_rows_from,
+                "
+select * from unn$0est(a, b);
+create function unnest(x text) returns setof text as $$ select 1 $$ language sql;"
+            ),
+            @"
+select * from rows from (unnest(a), unnest(b));
+create function unnest(x text) returns setof text as $$ select 1 $$ language sql;"
         );
     }
 
