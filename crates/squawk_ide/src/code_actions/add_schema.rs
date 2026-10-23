@@ -78,12 +78,17 @@ mod test {
     }
 
     #[test]
-    #[should_panic(expected = "We should always have actions")]
     fn add_schema_alter_table() {
-        assert_snapshot!(apply_code_action(
-            add_schema,
-            "alter table t$0 add column c text;"),
-            @"alter table public.t add column c text;"
+        assert_snapshot!(
+            apply_code_action(
+                add_schema,
+                "
+create table t ();
+alter table t$0 add column c text;"
+            ),
+            @"
+create table t ();
+alter table public.t add column c text;"
         );
     }
 
@@ -117,12 +122,17 @@ mod test {
     }
 
     #[test]
-    #[should_panic(expected = "We should always have actions")]
     fn add_schema_table_stmt() {
-        assert_snapshot!(apply_code_action(
-            add_schema,
-            "table t$0;"),
-            @"table public.t;"
+        assert_snapshot!(
+            apply_code_action(
+                add_schema,
+                "
+create table t ();
+table t$0;"
+            ),
+            @"
+create table t ();
+table public.t;"
         );
     }
 
@@ -186,42 +196,104 @@ create table myschema.t(a text, b int);"
     }
 
     #[test]
-    #[should_panic(expected = "We should always have actions")]
     fn add_schema_before_search_path_change() {
-        assert_snapshot!(apply_code_action(
-            add_schema,
-            "set search_path to app; select * from t$0; set search_path to other;"),
-            @"set search_path to app; select * from app.t; set search_path to other;"
+        assert_snapshot!(
+            apply_code_action(
+                add_schema,
+                "
+create table app.t ();
+create table other.t ();
+set search_path to app;
+select * from t$0;
+set search_path to other;"
+            ),
+            @"
+create table app.t ();
+create table other.t ();
+set search_path to app;
+select * from app.t;
+set search_path to other;"
         );
     }
 
     #[test]
-    #[should_panic(expected = "We should always have actions")]
     fn add_schema_after_reset() {
-        assert_snapshot!(apply_code_action(
-            add_schema,
-            "set search_path to app; reset search_path; select * from t$0;"),
-            @"set search_path to app; reset search_path; select * from public.t;"
+        assert_snapshot!(
+            apply_code_action(
+                add_schema,
+                "
+create table app.t ();
+create table public.t ();
+set search_path to app;
+reset search_path;
+select * from t$0;"
+            ),
+            @"
+create table app.t ();
+create table public.t ();
+set search_path to app;
+reset search_path;
+select * from public.t;"
         );
     }
 
     #[test]
-    #[should_panic(expected = "We should always have actions")]
     fn add_schema_after_local_search_path() {
-        assert_snapshot!(apply_code_action(
-            add_schema,
-            "set search_path to app; begin; set local search_path to other; commit; select * from t$0;"),
-            @"set search_path to app; begin; set local search_path to other; commit; select * from app.t;"
+        assert_snapshot!(
+            apply_code_action(
+                add_schema,
+                "
+create table app.t ();
+create table other.t ();
+set search_path to app;
+begin;
+set local search_path to other;
+commit;
+select * from t$0;"
+            ),
+            @"
+create table app.t ();
+create table other.t ();
+set search_path to app;
+begin;
+set local search_path to other;
+commit;
+select * from app.t;"
         );
     }
 
     #[test]
-    #[should_panic(expected = "We should always have actions")]
     fn add_schema_in_routine() {
-        assert_snapshot!(apply_code_action(
-            add_schema,
-            "create function f() returns int language sql set search_path to app begin atomic select t$0(); end;"),
-            @"create function f() returns int language sql set search_path to app begin atomic select app.t(); end;"
+        assert_snapshot!(
+            apply_code_action(
+                add_schema,
+                "
+create function app.t() returns int
+  language sql
+  return 1;
+create function public.t() returns int
+  language sql
+  return 1;
+create function f() returns int
+  language sql
+  set search_path to app
+  begin atomic
+    select t$0();
+  end;"
+            ),
+            @"
+create function app.t() returns int
+  language sql
+  return 1;
+create function public.t() returns int
+  language sql
+  return 1;
+create function f() returns int
+  language sql
+  set search_path to app
+  begin atomic
+    select app.t();
+  end;"
         );
     }
 

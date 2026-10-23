@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::hash_map::Entry, range::Range};
 
 use la_arena::Idx;
-use rowan::TextRange;
+use rowan::{TextRange, TextSize};
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
@@ -33,12 +33,12 @@ use crate::{
         ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId, PreparedTransaction,
         PreparedTransactionId, Publication, PublicationId, Query, QueryId, QueryKind, RefId,
         Reference, ReferenceKind, Resolution, Role, RoleId, RoutineKind, Rule, RuleEvent, RuleId,
-        Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId, SequenceOwner, Server, ServerId,
-        Source, SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript, Subscription,
-        SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId, TextSearch,
-        TextSearchId, TextSearchKind, Transaction, TransactionId, Transform, TransformId,
-        TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind, Window,
-        WindowId,
+        Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner,
+        Server, ServerId, Source, SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript,
+        Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
+        TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
+        TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
+        Window, WindowId,
     },
     semantic_index::{Diagnostic, DiagnosticKind, IndexData, NameVersion},
 };
@@ -1048,6 +1048,7 @@ struct SelectParts {
 
 impl Lowerer {
     fn lower_stmt(&mut self, stmt: &ast::Stmt) {
+        self.record_search_path(stmt.syntax().text_range().start());
         match stmt {
             ast::Stmt::CreateTable(create_table) => self.lower_create_table(
                 create_table,
@@ -8105,14 +8106,20 @@ impl Lowerer {
         let Some(name) = name else {
             return;
         };
-        if create_schema.schema_elements().next().is_none() {
+        let Some(first) = create_schema.schema_elements().next() else {
             return;
-        }
-        self.search_path.insert(0, name);
-        for element in create_schema.schema_elements() {
-            self.lower_stmt(&element.into());
-        }
-        self.search_path.remove(0);
+        };
+        let range = TextRange::new(
+            first.syntax().text_range().start(),
+            create_schema.syntax().text_range().end(),
+        );
+        let mut search_path = self.search_path.clone();
+        search_path.insert(0, name);
+        self.with_search_path(&search_path, range, |this| {
+            for element in create_schema.schema_elements() {
+                this.lower_stmt(&element.into());
+            }
+        });
     }
 
     fn lower_alter_schema(&mut self, alter_schema: &ast::AlterSchema) {
@@ -8582,13 +8589,14 @@ impl Lowerer {
     ) {
         let file_id = bundled.file_id().into();
         let snapshot = self.snapshot();
+        let tree = bundled.parse().tree();
         let outer_file = std::mem::replace(&mut self.file_id, file_id);
-        let outer_search_path = std::mem::replace(&mut self.search_path, smallvec![schema]);
-        for stmt in bundled.parse().tree().stmts() {
-            self.lower_stmt(&stmt);
-        }
+        self.with_search_path(&[schema], tree.syntax().text_range(), |this| {
+            for stmt in tree.stmts() {
+                this.lower_stmt(&stmt);
+            }
+        });
         self.file_id = outer_file;
-        self.search_path = outer_search_path;
         let members = self.objects_since(&snapshot);
         for member in members {
             self.dependencies
@@ -12116,29 +12124,45 @@ impl Lowerer {
         let search_path = options
             .and_then(|options| self.lower_func_options(&options))
             .unwrap_or_else(|| self.search_path.clone());
-        let outer_search_path = std::mem::replace(&mut self.search_path, search_path);
         let outer = self.function.replace(id);
         let has_body = body.is_some();
-        match body {
-            Some(ast::RoutineBody::ReturnStmt(return_stmt)) => self.lower_return_stmt(&return_stmt),
-            Some(ast::RoutineBody::AtomicBody(body)) => {
-                for stmt in body.routine_body_stmts() {
-                    match stmt {
-                        ast::RoutineBodyStmt::ReturnStmt(return_stmt) => {
-                            self.lower_return_stmt(&return_stmt);
+        if let Some(body) = body {
+            let range = body.syntax().text_range();
+            self.with_search_path(&search_path, range, |this| match body {
+                ast::RoutineBody::ReturnStmt(return_stmt) => this.lower_return_stmt(&return_stmt),
+                ast::RoutineBody::AtomicBody(body) => {
+                    for stmt in body.routine_body_stmts() {
+                        match stmt {
+                            ast::RoutineBodyStmt::ReturnStmt(return_stmt) => {
+                                this.lower_return_stmt(&return_stmt);
+                            }
+                            ast::RoutineBodyStmt::Stmt(stmt) => this.lower_stmt(&stmt),
                         }
-                        ast::RoutineBodyStmt::Stmt(stmt) => self.lower_stmt(&stmt),
                     }
                 }
-            }
-            None => {}
+            });
         }
         self.depend_on_refs(refs, IdxRange::single(id), Object::Function);
         if !has_body && let Some(sql_body) = sql_body {
-            self.lower_sql_body(sql_body);
+            let range = sql_body.source_range(TextRange::up_to(TextSize::of(sql_body.text())));
+            self.with_search_path(&search_path, range, |this| this.lower_sql_body(sql_body));
         }
         self.function = outer;
-        self.search_path = outer_search_path;
+    }
+
+    fn with_search_path(
+        &mut self,
+        search_path: &[Name],
+        range: TextRange,
+        f: impl FnOnce(&mut Self),
+    ) {
+        let outer_session = std::mem::replace(&mut self.session_search_path, search_path.into());
+        let outer = std::mem::replace(&mut self.search_path, search_path.into());
+        self.record_search_path(range.start());
+        f(self);
+        self.search_path = outer;
+        self.session_search_path = outer_session;
+        self.record_search_path(range.end());
     }
 
     fn lower_sql_body(&mut self, sql: SqlBody) {
@@ -13668,16 +13692,21 @@ impl Lowerer {
                 }
             }
             ast::FromItem::FunctionFromItem(function_item) => {
+                let alias_columns = from_item.alias().and_then(|alias| alias.columns());
                 let scalar_alias = from_item
                     .alias()
-                    .filter(|alias| alias.columns().is_none())
+                    .filter(|_| alias_columns.is_none())
                     .and_then(|alias| alias.name());
+                let has_column_defs =
+                    matches!(alias_columns, Some(ast::FromAliasColumns::ColumnDefList(_)));
                 let FunctionSource {
                     callee,
                     function,
                     columns,
                 } = match function_item.call_expr() {
-                    Some(call) => self.lower_function_source(&call, scalar_alias.as_ref()),
+                    Some(call) => {
+                        self.lower_function_source(&call, scalar_alias.as_ref(), has_column_defs)
+                    }
                     None => FunctionSource {
                         callee: None,
                         function: None,
@@ -14145,7 +14174,7 @@ impl Lowerer {
                     self.with_lateral_sources(|this| this.lower_call(&call));
                     self.column_def_list_columns(&list)
                 }
-                (Some(call), None) => self.lower_function_source(&call, None).columns,
+                (Some(call), None) => self.lower_function_source(&call, None, false).columns,
                 (None, Some(list)) => self.column_def_list_columns(&list),
                 (None, None) => self.unknown_columns(),
             };
@@ -14164,7 +14193,11 @@ impl Lowerer {
         &mut self,
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
+        has_column_defs: bool,
     ) -> FunctionSource {
+        if !has_column_defs && let Some(name_ref) = expanded_unnest(call) {
+            return self.lower_expanded_unnest(call, &name_ref);
+        }
         let LoweredCall { args, callee } =
             self.with_lateral_sources(|this| this.lower_call_with_args(call));
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
@@ -14175,11 +14208,60 @@ impl Lowerer {
             };
         };
         let columns = self
-            .function_row_columns(function)
+            .function_row_columns(function, &args)
             .unwrap_or_else(|| self.scalar_function_columns(function, &args, call, scalar_alias));
         FunctionSource {
             callee,
             function: Some(function),
+            columns,
+        }
+    }
+
+    fn lower_expanded_unnest(
+        &mut self,
+        call: &ast::CallExpr,
+        name_ref: &ast::NameRef,
+    ) -> FunctionSource {
+        let CallArgs { args, .. } =
+            self.with_lateral_sources(|this| this.lower_call_args(call.arg_list()));
+        let name = self.intern("unnest");
+        let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
+        let mut items: SmallVec<[Columns; 4]> = smallvec![];
+        for arg in &args {
+            let arg = std::slice::from_ref(arg);
+            let resolution =
+                self.find_routine(Some(self.pg_catalog), name, arg, FunctionKind::Function);
+            let columns = match resolution {
+                Resolution::Function(function) => self
+                    .function_row_columns(function, arg)
+                    .unwrap_or_else(|| self.scalar_function_columns(function, arg, call, None)),
+                _ => self.unknown_columns(),
+            };
+            resolutions.push(resolution);
+            items.push(columns);
+        }
+        let resolution = resolutions
+            .iter()
+            .copied()
+            .find(|resolution| !matches!(resolution, Resolution::Function(_)))
+            .or_else(|| resolutions.first().copied())
+            .unwrap_or(Resolution::Unknown);
+        self.add_ref(
+            name,
+            ReferenceKind::Function(RoutineKind::Function),
+            name_ref.syntax(),
+            resolution,
+        );
+        let columns = Columns {
+            range: self
+                .index
+                .columns
+                .alloc_copies(items.iter().flat_map(|columns| columns.range)),
+            complete: items.iter().all(|columns| columns.complete),
+        };
+        FunctionSource {
+            callee: Some(Callee { name, resolution }),
+            function: None,
             columns,
         }
     }
@@ -14214,11 +14296,11 @@ impl Lowerer {
         }
     }
 
-    fn function_row_columns(&self, function: FunctionId) -> Option<Columns> {
-        let function = &self.index.functions[function];
-        function
-            .columns
-            .or_else(|| function.ret.and_then(|ret| self.ty_columns(ret).copied()))
+    fn function_row_columns(&self, function: FunctionId, args: &[CallArg]) -> Option<Columns> {
+        self.index.functions[function].columns.or_else(|| {
+            self.call_type(function, args)
+                .and_then(|ty| self.ty_columns(ty).copied())
+        })
     }
 
     fn with_ordinality_column(
@@ -20762,6 +20844,23 @@ impl Lowerer {
         self.add_item_range(InIrFile::new(self.file_id, token.text_range()), item);
     }
 
+    fn record_search_path(&mut self, offset: TextSize) {
+        let range = self
+            .index
+            .range(InIrFile::new(self.file_id, TextRange::empty(offset)));
+        if self.index.search_paths.last().is_some_and(|change| {
+            change.file_id == range.file_id && *change.value.path == *self.search_path
+        }) {
+            return;
+        }
+        self.index
+            .search_paths
+            .push(range.map(|range| SearchPathChange {
+                start: range.start(),
+                path: self.search_path.as_slice().into(),
+            }));
+    }
+
     fn add_item_range(&mut self, range: IrFileRange, item: Item) {
         let range = self.index.range(range);
         self.index
@@ -20902,6 +21001,33 @@ fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
                 | ast::LitKind::Null(_)
         )
     )
+}
+
+fn expanded_unnest(call: &ast::CallExpr) -> Option<ast::NameRef> {
+    let name_ref = call.expr()?.as_name_ref()?;
+    let arg_list = call.arg_list()?;
+    if call.over_clause().is_some()
+        || call.filter_clause().is_some()
+        || call.within_clause().is_some()
+        || arg_list.star_token().is_some()
+        || matches!(
+            arg_list.all_or_distinct(),
+            Some(ast::AllOrDistinct::Distinct(_))
+        )
+    {
+        return None;
+    }
+    let mut count = 0;
+    for arg in arg_list.args() {
+        if arg.variadic_token().is_some()
+            || arg.order_by_clause().is_some()
+            || matches!(arg.func_arg_expr(), Some(ast::FuncArgExpr::NamedArg(_)))
+        {
+            return None;
+        }
+        count += 1;
+    }
+    (count > 1 && name_ref.text() == "unnest").then_some(name_ref)
 }
 
 fn is_regclass(ty: &ast::Type) -> bool {

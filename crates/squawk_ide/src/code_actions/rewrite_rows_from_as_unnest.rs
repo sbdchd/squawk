@@ -3,7 +3,12 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{file::InFile, offsets::token_from_offset};
+use crate::{
+    db::semantic_index,
+    file::InFile,
+    ir::{Item, Resolution},
+    offsets::token_from_offset,
+};
 
 use super::unnest::unnest_call;
 use super::{ActionKind, CodeAction};
@@ -31,9 +36,23 @@ pub(super) fn rewrite_rows_from_as_unnest(
         }
         calls.push(unnest_call(&rows_from_arg.call_expr()?)?);
     }
+    if calls.len() > 1 {
+        let index = semantic_index(db, position.file_id);
+        for call in calls.iter().filter(|call| call.args.len() == 1) {
+            let range = position.with_value(call.name.syntax().text_range());
+            let Item::Reference(reference) = index.item_at_range(range)?.value.item else {
+                return None;
+            };
+            let Resolution::Function(function) = index.references[reference].resolution else {
+                return None;
+            };
+            if index.names.resolve(index.functions[function].schema) != "pg_catalog" {
+                return None;
+            }
+        }
+    }
     let first = calls.first()?;
 
-    // TODO: check for shadowed unnset
     let rows_from_range = TextRange::new(
         rows_from.rows_token()?.text_range().start(),
         rows_from.r_paren_token()?.text_range().end(),
@@ -71,9 +90,21 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from rows f$0rom (unnest(a), unnest(b));"
+                "
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, rows f$0rom (unnest(a), unnest(b));"
             ),
-            @"select * from unnest(a, b);"
+            @"
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, unnest(a, b);"
         );
     }
 
@@ -82,9 +113,21 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from rows f$0rom (unnest(a));"
+                "
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, rows f$0rom (unnest(a));"
             ),
-            @"select * from unnest(a);"
+            @"
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, unnest(a);"
         );
     }
 
@@ -93,9 +136,21 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from rows f$0rom (unnest(a, b), unnest(c));"
+                "
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, rows f$0rom (unnest(a, b), unnest(c));"
             ),
-            @"select * from unnest(a, b, c);"
+            @"
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, unnest(a, b, c);"
         );
     }
 
@@ -104,9 +159,21 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from rows f$0rom (unnest(a), unnest(b)) as z(x, y);"
+                "
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, rows f$0rom (unnest(a), unnest(b)) as z (x, y);"
             ),
-            @"select * from unnest(a, b) as z(x, y);"
+            @"
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, unnest(a, b) as z (x, y);"
         );
     }
 
@@ -115,9 +182,25 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from rows f$0rom (unnest(a), unnest(b)) with ordinality as z(x, y, n);"
+                "
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select *
+from t,
+  rows f$0rom (unnest(a), unnest(b)) with ordinality as z (x, y, n);"
             ),
-            @"select * from unnest(a, b) with ordinality as z(x, y, n);"
+            @"
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select *
+from t,
+  unnest(a, b) with ordinality as z (x, y, n);"
         );
     }
 
@@ -126,9 +209,21 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from t, lateral rows f$0rom (unnest(t.a), unnest(t.b));"
+                "
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, lateral rows f$0rom (unnest(t.a), unnest(t.b));"
             ),
-            @"select * from t, lateral unnest(t.a, t.b);"
+            @"
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, lateral unnest(t.a, t.b);"
         );
     }
 
@@ -148,9 +243,13 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from ROWS F$0ROM (UNNEST(a), UNNEST(b));"
+                "
+create table t(a int[], b text[], c int[]);
+select * from t, ROWS F$0ROM (UNNEST(a), UNNEST(b));"
             ),
-            @"select * from UNNEST(a, b);"
+            @"
+create table t(a int[], b text[], c int[]);
+select * from t, UNNEST(a, b);"
         );
     }
 
@@ -200,9 +299,21 @@ mod test {
         assert_snapshot!(
             apply_code_action(
                 rewrite_rows_from_as_unnest,
-                "select * from rows f$0rom (unnest(all a), unnest(b));"
+                "
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, rows f$0rom (unnest(all a), unnest(b));"
             ),
-            @"select * from unnest(a, b);"
+            @"
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, unnest(a, b);"
         );
     }
 
@@ -263,13 +374,18 @@ mod test {
     }
 
     #[test]
-    #[should_panic(expected = "assertion failed: code_action_not_applicable")]
     fn rewrite_rows_from_as_unnest_not_applicable_shadowed() {
         assert!(code_action_not_applicable(
             rewrite_rows_from_as_unnest,
             "
-create function unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from rows f$0rom (unnest(a), unnest(b));"
+create function unnest(x text) returns setof text
+  as $$ select 1 $$
+  language sql;
+create table t (
+  a text,
+  b text
+);
+select * from t, rows f$0rom (unnest(a), unnest(b));"
         ));
     }
 
@@ -279,12 +395,26 @@ select * from rows f$0rom (unnest(a), unnest(b));"
             apply_code_action(
                 rewrite_rows_from_as_unnest,
                 "
-create function other.unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from rows f$0rom (unnest(a), unnest(b));"
+create function other.unnest(x text) returns setof text
+  as $$ select 1 $$
+  language sql;
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, rows f$0rom (unnest(a), unnest(b));"
             ),
             @"
-create function other.unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from unnest(a, b);"
+create function other.unnest(x text) returns setof text
+  as $$ select 1 $$
+  language sql;
+create table t (
+  a int[],
+  b text[],
+  c int[]
+);
+select * from t, unnest(a, b);"
         );
     }
 
@@ -294,12 +424,24 @@ select * from unnest(a, b);"
             apply_code_action(
                 rewrite_rows_from_as_unnest,
                 "
-create function unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from rows f$0rom (unnest(a));"
+create function unnest(x text) returns setof text
+  as $$ select 1 $$
+  language sql;
+create table t (
+  a text,
+  b text
+);
+select * from t, rows f$0rom (unnest(a));"
             ),
             @"
-create function unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from unnest(a);"
+create function unnest(x text) returns setof text
+  as $$ select 1 $$
+  language sql;
+create table t (
+  a text,
+  b text
+);
+select * from t, unnest(a);"
         );
     }
 
@@ -309,12 +451,24 @@ select * from unnest(a);"
             apply_code_action(
                 rewrite_rows_from_as_unnest,
                 "
-create function unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from rows f$0rom (unnest(a, b));"
+create function unnest(x text) returns setof text
+  as $$ select 1 $$
+  language sql;
+create table t (
+  a text,
+  b text
+);
+select * from t, rows f$0rom (unnest(a, b));"
             ),
             @"
-create function unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from unnest(a, b);"
+create function unnest(x text) returns setof text
+  as $$ select 1 $$
+  language sql;
+create table t (
+  a text,
+  b text
+);
+select * from t, unnest(a, b);"
         );
     }
 

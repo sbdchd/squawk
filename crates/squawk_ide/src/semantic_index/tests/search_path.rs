@@ -1,6 +1,8 @@
 use insta::assert_snapshot;
+use rowan::{TextRange, TextSize};
 
-use super::check;
+use super::{build_index, check};
+use crate::file::InFile;
 
 #[test]
 fn pg_catalog_before_public() {
@@ -357,4 +359,123 @@ set search_path to "$user", missing, 'also_missing';
 alter role current_user set search_path = missing;
 create function f() returns int language sql set search_path = missing as $$ select 1 $$;
 "#), @"no diagnostics");
+}
+
+#[track_caller]
+fn search_path_at(sql: &str) -> String {
+    let offset = sql.find("$0").unwrap();
+    let sql = sql.replacen("$0", "", 1);
+    let (file, index) = build_index(&sql);
+    let range = InFile::new(
+        file,
+        TextRange::empty(TextSize::new(u32::try_from(offset).unwrap())),
+    );
+    index
+        .search_path_at(range)
+        .unwrap()
+        .iter()
+        .map(|&schema| index.names.resolve(schema))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+#[test]
+fn search_path_at_function_body() {
+    assert_snapshot!(search_path_at("
+create function f() returns int
+  set search_path = other
+  as $$ select $01 $$
+  language sql;
+"), @"other");
+}
+
+#[test]
+fn search_path_at_after_function_body() {
+    assert_snapshot!(search_path_at("
+create function f() returns int
+  set search_path = other
+  as $$ select 1 $$
+  language s$0ql;
+"), @"$user, public");
+}
+
+#[test]
+fn search_path_at_return_body() {
+    assert_snapshot!(search_path_at("
+create function f() returns int
+  set search_path = other
+  return $01;
+"), @"other");
+}
+
+#[test]
+fn search_path_at_create_schema_element() {
+    assert_snapshot!(search_path_at("
+create schema s
+  create table t (a int)
+  create view v as select $01;
+"), @"s, $user, public");
+}
+
+#[test]
+fn search_path_at_after_create_schema() {
+    assert_snapshot!(search_path_at("
+create schema s
+  create table t (a int);
+select $01;
+"), @"$user, public");
+}
+
+#[test]
+fn search_path_at_atomic_body() {
+    assert_snapshot!(search_path_at("
+create function f() returns int
+  set search_path = other
+  begin atomic
+    select $01;
+  end;
+"), @"other");
+}
+
+#[test]
+fn search_path_at_after_atomic_body() {
+    assert_snapshot!(search_path_at("
+create function f() returns int
+  set search_path = other
+  begin atomic
+    select 1;
+  end;
+select $01;
+"), @"$user, public");
+}
+
+#[test]
+fn search_path_at_set_in_body() {
+    assert_snapshot!(search_path_at("
+create function f() returns void
+  as $$ set search_path = other; select $01 $$
+  language sql;
+"), @"other");
+}
+
+#[test]
+fn search_path_at_after_set_in_body() {
+    assert_snapshot!(search_path_at("
+create function f() returns void
+  as $$ set search_path = other; select 1 $$
+  language sql;
+select $01;
+"), @"$user, public");
+}
+
+#[test]
+fn search_path_at_after_set_in_body_and_commit() {
+    assert_snapshot!(search_path_at("
+create function f() returns void
+  as $$ set search_path = other; select 1 $$
+  language sql;
+begin;
+commit;
+select $01;
+"), @"$user, public");
 }

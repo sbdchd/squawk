@@ -1,7 +1,7 @@
 use std::range::Range;
 
 use la_arena::Idx;
-use rowan::TextRange;
+use rowan::{TextRange, TextSize};
 use squawk_syntax::{AstPtr, SyntaxNodePtr, ast, sql_body::SqlBody};
 
 use crate::arena::{IdxRange, LayeredArena};
@@ -1132,4 +1132,10 @@ pub(crate) enum Item {
 pub(crate) struct ItemRange {
     pub(crate) range: TextRange,
     pub(crate) item: Item,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct SearchPathChange {
+    pub(crate) start: TextSize,
+    pub(crate) path: Box<[Name]>,
 }

@@ -63,18 +63,24 @@ mod windows;
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use squawk_syntax::SourceFile;
 
-use crate::file::InFile;
+use crate::file::{FileId, InFile};
+use crate::semantic_index::SemanticIndex;
 use crate::semantic_index_builder::SemanticIndexBuilder;
 
 #[track_caller]
-fn check(sql: &str) -> String {
+fn build_index(sql: &str) -> (FileId, SemanticIndex) {
     let parse = SourceFile::parse(sql);
     assert_eq!(parse.errors(), vec![]);
     let mut builder = SemanticIndexBuilder::new();
     let db = crate::db::Database::default();
-    let file = crate::db::File::new(&db, sql.into());
+    let file: FileId = crate::db::File::new(&db, sql.into()).into();
     builder.add_file(InFile::new(file, &parse.tree()));
-    let index = builder.build();
+    (file, builder.build())
+}
+
+#[track_caller]
+fn check(sql: &str) -> String {
+    let (_, index) = build_index(sql);
 
     let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
     let diagnostics = index.diagnostics();

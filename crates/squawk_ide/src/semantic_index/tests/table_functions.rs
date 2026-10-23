@@ -56,3 +56,86 @@ from json_table(
       ╰╴                   ━━━━━━━
     ");
 }
+
+#[test]
+fn unnest_multiple_args() {
+    assert_snapshot!(check("
+create table t (a int[], b text[]);
+select x, y, nope
+from t,
+  unnest(a, b) as u (x, y)
+where x > 0 and y = 'a';
+"), @"
+    error: column `nope` does not exist
+      ╭▸ 
+    3 │ select x, y, nope
+      ╰╴             ━━━━
+    ");
+}
+
+#[test]
+fn unnest_multiple_args_rows_from() {
+    assert_snapshot!(check("
+create table t (a int[], b text[], c int[]);
+select x, y, z
+from t,
+  rows from (unnest(a, b), unnest(c)) as u (x, y, z);
+"), @"no diagnostics");
+}
+
+#[test]
+fn unnest_multiple_args_with_ordinality() {
+    assert_snapshot!(check("
+select x, y, n
+from unnest(array[1], array['a']) with ordinality as u (x, y, n);
+"), @"no diagnostics");
+}
+
+#[test]
+fn unnest_multiple_args_non_array() {
+    assert_snapshot!(check("
+select * from unnest(1, array[2]);
+"), @"
+    error: function `unnest` does not exist
+      ╭▸ 
+    2 │ select * from unnest(1, array[2]);
+      ╰╴              ━━━━━━
+    ");
+}
+
+#[test]
+fn unnest_multiple_args_select_list() {
+    assert_snapshot!(check("
+select unnest(array[1], array[2]);
+"), @"
+    error: function `unnest` does not exist
+      ╭▸ 
+    2 │ select unnest(array[1], array[2]);
+      ╰╴       ━━━━━━
+    ");
+}
+
+#[test]
+fn unnest_multiple_args_column_def_list() {
+    assert_snapshot!(check("
+create table t (a int[], b text[]);
+select x, y
+from t,
+  unnest(a, b) as u (x int, y text);
+"), @"
+    error: function `unnest` does not exist
+      ╭▸ 
+    5 │   unnest(a, b) as u (x int, y text);
+      ╰╴  ━━━━━━
+    ");
+}
+
+#[test]
+fn unnest_multiple_args_composite_array() {
+    assert_snapshot!(check("
+create type pair as (x int, y text);
+create table t (ps pair[], b int[]);
+select x, y, unnest from t, unnest(ps, b);
+select x, y from t, unnest(ps);
+"), @"no diagnostics");
+}

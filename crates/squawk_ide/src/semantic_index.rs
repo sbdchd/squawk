@@ -8,13 +8,13 @@ use crate::constraint_index::ConstraintIndex;
 use crate::extension_index::ExtensionIndex;
 use crate::file::{FileId, FileRange, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::index_index::IndexIndex;
-use crate::interner::Interner;
+use crate::interner::{Interner, Name};
 use crate::ir::{
     Body, Case, Channel, Column, ColumnId, ColumnOwner, Cte, Cursor, ElementTy, EnumLabel,
     EnumLabelId, FunctionId, Item, ItemRange, JsonPath, Merge, Param, ParamId, PreparedStatement,
     PreparedTransaction, Query, RefId, Reference, ReferenceKind, Resolution, Savepoint, Scope,
-    Source, SourceId, SourceKind, Star, Subscript, Transaction, Transform, Ty, TypeId, TypeKind,
-    Window,
+    SearchPathChange, Source, SourceId, SourceKind, Star, Subscript, Transaction, Transform, Ty,
+    TypeId, TypeKind, Window,
 };
 use crate::keyed_index::{
     AccessMethodIndex, CastIndex, DatabaseIndex, EventTriggerIndex, ForeignDataWrapperIndex,
@@ -252,6 +252,7 @@ pub struct IndexData {
     pub(crate) star_columns: LayeredArena<ColumnId>,
     pub(crate) builtins: Option<&'static SemanticIndex>,
     pub(crate) items: Vec<InFile<ItemRange>>,
+    pub(crate) search_paths: Vec<InFile<SearchPathChange>>,
     pub(crate) errors: Errors,
     pub(crate) renames: FxHashMap<Item, SmallVec<[NameVersion; 1]>>,
     pub(crate) param_functions: FxHashMap<ParamId, FunctionId>,
@@ -327,6 +328,14 @@ impl IndexData {
         let item = *self.items.get(idx.checked_sub(1)?)?;
         (item.file_id == range.file_id && item.value.range.contains_range(range.value))
             .then_some(item)
+    }
+
+    pub(crate) fn search_path_at(&self, range: FileRange) -> Option<&[Name]> {
+        let idx = self.search_paths.partition_point(|change| {
+            (change.file_id, change.value.start) <= (range.file_id, range.value.start())
+        });
+        let change = self.search_paths.get(idx.checked_sub(1)?)?;
+        (change.file_id == range.file_id).then_some(&*change.value.path)
     }
 
     pub(crate) fn items_at_range(&self, range: FileRange) -> impl Iterator<Item = Item> + '_ {
