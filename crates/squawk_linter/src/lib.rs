@@ -48,6 +48,7 @@ use rules::ban_drop_trigger;
 use rules::ban_drop_type;
 use rules::ban_drop_view;
 use rules::ban_duplicate_column_assignments;
+use rules::ban_set_null_on_not_null_column;
 use rules::ban_truncate_cascade;
 use rules::ban_uncommitted_transaction;
 use rules::changing_column_type;
@@ -160,6 +161,7 @@ pub enum Rule {
     BanAlterSequenceValues,
     BanAlterSystemOptions,
     BanAlterExtension,
+    BanSetNullOnNotNullColumn,
     // xtask:new-rule:error-name
 }
 
@@ -297,6 +299,7 @@ impl TryFrom<&str> for Rule {
             "ban-alter-sequence-values" => Ok(Rule::BanAlterSequenceValues),
             "ban-alter-system-options" => Ok(Rule::BanAlterSystemOptions),
             "ban-alter-extension" => Ok(Rule::BanAlterExtension),
+            "ban-set-null-on-not-null-column" => Ok(Rule::BanSetNullOnNotNullColumn),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -406,6 +409,7 @@ impl fmt::Display for Rule {
             Rule::BanAlterSequenceValues => "ban-alter-sequence-values",
             Rule::BanAlterSystemOptions => "ban-alter-system-options",
             Rule::BanAlterExtension => "ban-alter-extension",
+            Rule::BanSetNullOnNotNullColumn => "ban-set-null-on-not-null-column",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -755,6 +759,9 @@ impl Linter {
         .any(|rule| self.rules.contains(rule))
         {
             existing_object_compatibility(self, file);
+        }
+        if self.rules.contains(&Rule::BanSetNullOnNotNullColumn) {
+            ban_set_null_on_not_null_column(self, file);
         }
         // xtask:new-rule:rule-call
 
