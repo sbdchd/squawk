@@ -1,12 +1,6 @@
-use rowan::TextSize;
-use salsa::Database as Db;
 use squawk_syntax::ast;
 
-use crate::{
-    db::{FileId, bind},
-    name::Name,
-    symbols::SymbolKind,
-};
+use crate::code_actions::name::Name;
 
 pub(super) struct UnnestCall {
     pub(super) name: ast::NameRef,
@@ -51,12 +45,4 @@ pub(super) fn unnest_call(call_expr: &ast::CallExpr) -> Option<UnnestCall> {
         name: name_ref,
         args,
     })
-}
-
-pub(super) fn unnest_shadowed(db: &dyn Db, file: FileId, position: TextSize) -> bool {
-    let binder = bind(db, file);
-    let schemas = binder.resolved_schemas(position, None);
-    binder
-        .lookup_with("unnest", SymbolKind::Function, &schemas)
-        .is_some()
 }

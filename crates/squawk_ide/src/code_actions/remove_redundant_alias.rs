@@ -3,7 +3,7 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{file::InFile, offsets::token_from_offset, symbols::Name};
+use crate::{code_actions::name::Name, file::InFile, offsets::token_from_offset};
 use squawk_syntax::column_name::ColumnName;
 
 use super::{ActionKind, CodeAction};

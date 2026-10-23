@@ -1,29 +1,21 @@
-use std::fmt::Write as _;
+use std::fmt::{self, Write as _};
 
-use crate::ast_nav;
-use crate::collect;
-use crate::comments::preceding_comment;
-use crate::db::{FileId, bind};
-use crate::file::InFile;
-use crate::infer::{infer_type_from_expr, infer_type_from_literal};
-use crate::literals::binary_digits_to_hex;
-use crate::literals::hex_digits_to_binary;
-use crate::location::{Location, LocationKind};
-use crate::name;
-use crate::offsets::token_from_offset;
-use crate::symbols::{Name, Schema};
-use crate::{goto_definition, resolve};
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_line_index::find_newline;
-use squawk_syntax::SyntaxNode;
-use squawk_syntax::SyntaxNodePtr;
-use squawk_syntax::ast::LitKind;
-use squawk_syntax::column_name::ColumnName;
-use squawk_syntax::{
-    SyntaxKind,
-    ast::{self, AstNode},
+use squawk_syntax::ast::{self, AstNode};
+
+use crate::arena::IdxRange;
+use crate::db::{parse, semantic_index};
+use crate::file::{FilePosition, FileRange, InFile};
+use crate::hover_literal::{LiteralHover, hover_literal};
+use crate::interner::Name;
+use crate::ir::{
+    Column, ColumnId, ColumnOwner, ConstraintOwner, FunctionId, FunctionKind, GraphElementKind,
+    Item, Operand, ParamId, ParamMode, SourceId, SourceKind, StarId, TableId, TableKind, TypeId,
+    TypeKind,
 };
+use crate::offsets::{TokenAt, item_at_token};
+use crate::semantic_index::SemanticIndex;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Hover {
@@ -32,20 +24,6 @@ pub struct Hover {
 }
 
 impl Hover {
-    fn snippet(snippet: impl Into<String>) -> Hover {
-        Hover {
-            snippet: snippet.into(),
-            comment: None,
-        }
-    }
-
-    fn new(snippet: impl Into<String>, comment: impl Into<String>) -> Hover {
-        Hover {
-            snippet: snippet.into(),
-            comment: Some(comment.into()),
-        }
-    }
-
     pub fn markdown(&self) -> String {
         let snippet = &self.snippet;
         let mut out = format!(
@@ -64,6373 +42,695 @@ impl Hover {
     }
 }
 
-fn merge_hovers(hovers: Vec<Hover>) -> Option<Hover> {
-    if hovers.is_empty() {
-        return None;
-    }
-
-    if hovers.len() == 1 {
-        return Some(hovers[0].clone());
-    }
-
-    Some(Hover::snippet(
-        hovers
-            .into_iter()
-            .map(|hover| hover.snippet)
-            .collect::<Vec<_>>()
-            .join("\n"),
-    ))
-}
-
-fn hover_with_preceding_comment(snippet: impl Into<String>, node: &SyntaxNode) -> Hover {
-    let snippet = snippet.into();
-    if let Some(comment) = preceding_comment(node) {
-        return Hover::new(snippet, comment);
-    }
-    Hover::snippet(snippet)
-}
-
-fn hover_column_with_preceding_comment(snippet: impl Into<String>, def_node: &SyntaxNode) -> Hover {
-    let snippet = snippet.into();
-    if let Some(definition_node) = def_node.ancestors().find_map(ast::Column::cast) {
-        return hover_with_preceding_comment(snippet, definition_node.syntax());
-    }
-    Hover::snippet(snippet)
-}
-
 pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
     let file = position.file_id;
-    let token = token_from_offset(db, position)?;
-    let parent = token.parent()?;
-
-    if token.kind() == SyntaxKind::STAR {
-        if let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
-            && field_expr.star_token().is_some()
-            && let Some(result) = hover_qualified_star(db, InFile::new(file, field_expr))
-        {
-            return Some(result);
-        }
-
-        if let Some(arg_list) = ast::ArgList::cast(parent.clone())
-            && let Some(result) =
-                hover_unqualified_star_in_arg_list(db, &InFile::new(file, arg_list))
-        {
-            return Some(result);
-        }
-
-        if let Some(target) = ast::Target::cast(parent)
-            && target.star_token().is_some()
-            && let Some(result) = hover_unqualified_star(db, &InFile::new(file, target))
-        {
-            return Some(result);
-        }
-        return None;
-    }
-
-    if ast::AnyNameRef::can_cast(parent.kind()) {
-        return hover_position(db, position);
-    }
-
-    if let Some(name) = ast::AnyName::cast(parent.clone()) {
-        match name {
-            ast::AnyName::ColumnName(_)
-            | ast::AnyName::CompositeField(_)
-            | ast::AnyName::ConstraintName(_)
-            | ast::AnyName::CteName(_)
-            | ast::AnyName::Database(_)
-            | ast::AnyName::ParamName(_)
-            | ast::AnyName::Publication(_)
-            | ast::AnyName::Role(_)
-            | ast::AnyName::Rule(_)
-            | ast::AnyName::Schema(_)
-            | ast::AnyName::Server(_)
-            | ast::AnyName::Subscription(_)
-            | ast::AnyName::TableAlias(_)
-            | ast::AnyName::Tablespace(_)
-            | ast::AnyName::TransitionRelationName(_) => return hover_position(db, position),
-            ast::AnyName::PathSegment(_) => {
-                return hover_name(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::AccessMethod(_) => {
-                return hover_access_method(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Channel(_) => {
-                return hover_channel(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Cursor(_) => {
-                return hover_cursor(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::EventTrigger(_) => {
-                return hover_event_trigger(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Extension(_) => {
-                return hover_extension(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::ForeignDataWrapper(_) => {
-                return hover_foreign_data_wrapper(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::JsonPathName(_) => {
-                return hover_json_path(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Language(_) => {
-                return hover_language(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Policy(_) => {
-                return hover_policy(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::PreparedStatement(_) => {
-                return hover_prepared_statement(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Savepoint(_) => {
-                return hover_savepoint(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Trigger(_) => {
-                return hover_trigger(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::Window(_) => {
-                return hover_window(db, Location::from_node(file, &parent)?);
-            }
-            ast::AnyName::AccessMethodRef(_)
-            | ast::AnyName::AttributeName(_)
-            | ast::AnyName::AttributeNamespace(_)
-            | ast::AnyName::BindParamNameRef(_)
-            | ast::AnyName::ChannelRef(_)
-            | ast::AnyName::ColumnNameRef(_)
-            | ast::AnyName::CompositeFieldRef(_)
-            | ast::AnyName::ConfigValueName(_)
-            | ast::AnyName::CopyOptionKey(_)
-            | ast::AnyName::CopyOptionValueName(_)
-            | ast::AnyName::CursorRef(_)
-            | ast::AnyName::DatabaseRef(_)
-            | ast::AnyName::ElementTableAlias(_)
-            | ast::AnyName::ElementTableRef(_)
-            | ast::AnyName::ElementTag(_)
-            | ast::AnyName::ElementVariable(_)
-            | ast::AnyName::EventTriggerRef(_)
-            | ast::AnyName::ExplainOptionName(_)
-            | ast::AnyName::ExtensionRef(_)
-            | ast::AnyName::ExtensionVersion(_)
-            | ast::AnyName::ForeignDataWrapperRef(_)
-            | ast::AnyName::ForeignOptionName(_)
-            | ast::AnyName::GrantRoleOptionName(_)
-            | ast::AnyName::JsonPathNameRef(_)
-            | ast::AnyName::JsonVariableName(_)
-            | ast::AnyName::Label(_)
-            | ast::AnyName::LabelRef(_)
-            | ast::AnyName::LanguageRef(_)
-            | ast::AnyName::NameRef(_)
-            | ast::AnyName::OptionItemKey(_)
-            | ast::AnyName::OptionItemValueName(_)
-            | ast::AnyName::ParamNameRef(_)
-            | ast::AnyName::PathSegmentRef(_)
-            | ast::AnyName::PlpgsqlCondition(_)
-            | ast::AnyName::PlpgsqlCursorVariableRef(_)
-            | ast::AnyName::PlpgsqlLabelName(_)
-            | ast::AnyName::PlpgsqlLabelNameRef(_)
-            | ast::AnyName::PlpgsqlOptionValue(_)
-            | ast::AnyName::PlpgsqlVarName(_)
-            | ast::AnyName::PlpgsqlVarNameRef(_)
-            | ast::AnyName::PolicyRef(_)
-            | ast::AnyName::PreparedStatementRef(_)
-            | ast::AnyName::PropertyName(_)
-            | ast::AnyName::PropertyNameRef(_)
-            | ast::AnyName::PublicationRef(_)
-            | ast::AnyName::RemoteTableNameRef(_)
-            | ast::AnyName::RoleNameRef(_)
-            | ast::AnyName::RuleRef(_)
-            | ast::AnyName::SavepointRef(_)
-            | ast::AnyName::SchemaRef(_)
-            | ast::AnyName::ServerRef(_)
-            | ast::AnyName::SubscriptionRef(_)
-            | ast::AnyName::TablespaceRef(_)
-            | ast::AnyName::TriggerRef(_)
-            | ast::AnyName::VacuumOptionName(_)
-            | ast::AnyName::VacuumOptionValueName(_)
-            | ast::AnyName::VertexTableRef(_)
-            | ast::AnyName::WindowRef(_)
-            | ast::AnyName::XmlAttr(_)
-            | ast::AnyName::XmlNamespacePrefix(_)
-            | ast::AnyName::XmlPiTarget(_) => (),
-        }
-    }
-
-    if let Some(literal) = ast::Literal::cast(parent) {
-        if literal.integer_value().is_some() {
-            return hover_select_target_ordinal(db, position);
-        }
-        return hover_literal(&literal);
-    }
-
-    None
+    let hover = hover_with_index(semantic_index(db, file), &parse(db, file).tree(), position)?;
+    Some(Hover {
+        snippet: hover.snippet,
+        comment: hover.comment,
+    })
 }
 
-fn hover_select_target_ordinal(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
-    let def = *goto_definition::goto_definition(db, position).first()?;
-    if let Some(target) = def.to_node(db)?.ancestors().find_map(ast::Target::cast)
-        && let Some((_, node)) = ColumnName::from_target(&target)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HoverInfo {
+    pub snippet: String,
+    pub comment: Option<String>,
+    pub range: FileRange,
+}
+
+pub(crate) fn hover_with_index(
+    index: &SemanticIndex,
+    file: &ast::SourceFile,
+    position: FilePosition,
+) -> Option<HoverInfo> {
+    let token = TokenAt::new(file, position.value)?;
+    if let Some(item) = item_at_token(index, position, &token)
+        && let Some(snippet) = item_hover(index, item.value.item)
     {
-        return hover(db, InFile::new(def.file, node.text_range().start()));
+        return Some(HoverInfo {
+            snippet,
+            comment: item_comment(index, item.value.item).map(str::to_string),
+            range: item.map(|item| item.range),
+        });
     }
-    hover_position(db, position)
+    let literal = token.token.parent().and_then(ast::Literal::cast)?;
+    let LiteralHover { snippet, comment } = hover_literal(&literal)?;
+    Some(HoverInfo {
+        snippet: snippet.to_string(),
+        comment: Some(comment),
+        range: position.with_value(token.original_range(literal.syntax().text_range())),
+    })
 }
 
-fn hover_select_target(db: &dyn Db, def: Location) -> Option<Hover> {
-    let target = def.to_node(db)?.ancestors().find_map(ast::Target::cast)?;
-    let (column_name, _) = ColumnName::from_target(&target)?;
-    let column_name = column_name.to_string()?;
-    Some(Hover::snippet(
-        match collect::target_expr_type(db, def.file, &target) {
-            Some(ty) => ColumnHover::anon_column_type(&column_name, &ty.to_string()),
-            None => ColumnHover::anon_column(&column_name),
+pub(crate) fn function_signature(index: &SemanticIndex, function: FunctionId) -> String {
+    Hovers { index }.function_signature(function)
+}
+
+fn item_comment(index: &SemanticIndex, item: Item) -> Option<&str> {
+    match item {
+        Item::Reference(reference) => {
+            item_comment(index, index.references[reference].resolution.item()?)
+        }
+        Item::Source(source) => match index.sources[source].kind {
+            SourceKind::Table(table) => index.comment(Item::Table(table)),
+            SourceKind::Function(function) => index.comment(Item::Function(function)),
+            SourceKind::Returning(target)
+            | SourceKind::Excluded(target)
+            | SourceKind::RuleRelation(target) => item_comment(index, Item::Source(target)),
+            SourceKind::Cte(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::ElementVariable
+            | SourceKind::Other => None,
         },
-    ))
+        Item::Column(column) if index.merged_columns(column).len() > 1 => None,
+        Item::Column(_)
+        | Item::Cte(_)
+        | Item::Table(_)
+        | Item::Function(_)
+        | Item::Param(_)
+        | Item::Type(_)
+        | Item::Window(_)
+        | Item::JsonPath(_)
+        | Item::Index(_)
+        | Item::Constraint(_)
+        | Item::Trigger(_)
+        | Item::Rule(_)
+        | Item::Role(_)
+        | Item::Policy(_)
+        | Item::AccessMethod(_)
+        | Item::EventTrigger(_)
+        | Item::Language(_)
+        | Item::ForeignDataWrapper(_)
+        | Item::Server(_)
+        | Item::Conversion(_)
+        | Item::OperatorFamily(_)
+        | Item::OperatorClass(_)
+        | Item::Statistics(_)
+        | Item::TextSearch(_)
+        | Item::Publication(_)
+        | Item::Subscription(_)
+        | Item::GraphElement(_)
+        | Item::GraphLabel(_)
+        | Item::EnumLabel(_)
+        | Item::GraphProperty(_)
+        | Item::Collation(_)
+        | Item::Schema(_)
+        | Item::Tablespace(_)
+        | Item::Database(_)
+        | Item::Extension(_)
+        | Item::Operator(_)
+        | Item::Savepoint(_)
+        | Item::Cursor(_)
+        | Item::PreparedTransaction(_)
+        | Item::PreparedStatement(_)
+        | Item::Channel(_)
+        | Item::TransactionBegin(_)
+        | Item::TransactionEnd(_)
+        | Item::CaseKeyword(_) => index.comment(item),
+        Item::Star(_) => None,
+    }
 }
 
-fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
-    let kind = literal.kind()?;
-    // TODO: support all literal types
-    if !kind.is_string() && !matches!(kind, LitKind::BitString(_) | LitKind::ByteString(_)) {
-        return None;
+fn item_hover(index: &SemanticIndex, item: Item) -> Option<String> {
+    let hover = Hovers { index };
+    Some(match item {
+        Item::Reference(reference) => {
+            return item_hover(index, index.references[reference].resolution.item()?);
+        }
+        Item::Column(column) => hover.columns(column),
+        Item::Star(star) => return hover.star(star),
+        Item::Source(source) => return hover.source(source),
+        Item::Cte(cte) => {
+            let cte = &index.ctes[cte];
+            format!(
+                "with {}{}",
+                hover.name(cte.name),
+                hover.column_list(cte.columns.range)
+            )
+        }
+        Item::Table(table) => hover.table(table),
+        Item::Function(function) => hover.function(function),
+        Item::Param(param) => hover.param(param)?,
+        Item::Type(ty) => hover.ty(ty),
+        Item::Window(window) => format!("window {}", hover.name(index.windows[window].name)),
+        Item::JsonPath(path) => format!("json path {}", hover.name(index.json_paths[path].name)),
+        Item::Index(idx) => {
+            let idx = &index.indexes[idx];
+            let mut snippet = format!("index {}", hover.qualified(idx.schema, idx.name));
+            if let Some(table) = idx.table {
+                write!(snippet, " on {}", hover.table_name(table)).unwrap();
+            }
+            snippet
+        }
+        Item::Constraint(constraint) => {
+            let constraint = &index.constraints[constraint];
+            let name = hover.name(constraint.name);
+            match constraint.owner {
+                ConstraintOwner::Table(table) => {
+                    format!("constraint {name} on {}", hover.table_name(table))
+                }
+                ConstraintOwner::Domain(ty) => {
+                    let ty = &index.types[ty];
+                    format!(
+                        "constraint {name} on domain {}",
+                        hover.qualified(ty.schema, ty.name)
+                    )
+                }
+            }
+        }
+        Item::Trigger(trigger) => {
+            let trigger = &index.triggers[trigger];
+            let kind = if trigger.constraint {
+                "constraint trigger"
+            } else {
+                "trigger"
+            };
+            format!(
+                "{kind} {} on {}",
+                hover.name(trigger.name),
+                hover.table_name(trigger.table)
+            )
+        }
+        Item::Rule(rule) => {
+            let rule = &index.rules[rule];
+            format!(
+                "rule {} on {}",
+                hover.name(rule.name),
+                hover.table_name(rule.table)
+            )
+        }
+        Item::Role(role) => format!("role {}", hover.name(index.roles[role].name)),
+        Item::Policy(policy) => {
+            let policy = &index.policies[policy];
+            format!(
+                "policy {} on {}",
+                hover.name(policy.name),
+                hover.table_name(policy.table)
+            )
+        }
+        Item::AccessMethod(access_method) => format!(
+            "access method {}",
+            hover.name(index.access_methods[access_method].name)
+        ),
+        Item::EventTrigger(event_trigger) => format!(
+            "event trigger {}",
+            hover.name(index.event_triggers[event_trigger].name)
+        ),
+        Item::Language(language) => {
+            format!("language {}", hover.name(index.languages[language].name))
+        }
+        Item::ForeignDataWrapper(wrapper) => format!(
+            "foreign data wrapper {}",
+            hover.name(index.foreign_data_wrappers[wrapper].name)
+        ),
+        Item::Server(server) => format!("server {}", hover.name(index.servers[server].name)),
+        Item::Conversion(conversion) => {
+            let conversion = &index.conversions[conversion];
+            format!(
+                "conversion {}",
+                hover.qualified(conversion.schema, conversion.name)
+            )
+        }
+        Item::OperatorFamily(family) => {
+            let family = &index.operator_families[family];
+            let mut snippet = format!(
+                "operator family {}",
+                hover.qualified(family.schema, family.name)
+            );
+            if let Some(access_method) = family.access_method {
+                snippet.push_str(" using ");
+                snippet.push_str(hover.name(index.access_methods[access_method].name));
+            }
+            snippet
+        }
+        Item::OperatorClass(class) => {
+            let class = &index.operator_classes[class];
+            let mut snippet = format!(
+                "operator class {}",
+                hover.qualified(class.schema, class.name)
+            );
+            if let Some(access_method) = class.access_method {
+                snippet.push_str(" using ");
+                snippet.push_str(hover.name(index.access_methods[access_method].name));
+            }
+            snippet
+        }
+        Item::Statistics(statistics) => {
+            let statistics = &index.statistics[statistics];
+            let mut snippet = format!(
+                "statistics {}",
+                hover.qualified(statistics.schema, statistics.name)
+            );
+            if let Some(table) = statistics.table {
+                write!(snippet, " on {}", hover.table_name(table)).unwrap();
+            }
+            snippet
+        }
+        Item::TextSearch(text_search) => {
+            let text_search = &index.text_search[text_search];
+            format!(
+                "{} {}",
+                text_search.kind.label(),
+                hover.qualified(text_search.schema, text_search.name)
+            )
+        }
+        Item::Publication(publication) => format!(
+            "publication {}",
+            hover.name(index.publications[publication].name)
+        ),
+        Item::Subscription(subscription) => format!(
+            "subscription {}",
+            hover.name(index.subscriptions[subscription].name)
+        ),
+        Item::GraphElement(element) => {
+            let element = &index.graph_elements[element];
+            let kind = match element.kind {
+                GraphElementKind::Vertex => "vertex",
+                GraphElementKind::Edge => "edge",
+            };
+            format!(
+                "{kind} table {}.{}",
+                hover.table_name(element.graph),
+                hover.name(element.alias)
+            )
+        }
+        Item::GraphLabel(label) => format!("label {}", hover.name(index.graph_labels[label].name)),
+        Item::EnumLabel(label) => {
+            let label = &index.enum_labels[label];
+            let ty = &index.types[label.ty];
+            format!(
+                "enum label '{}' of {}",
+                hover.name(label.name),
+                hover.qualified(ty.schema, ty.name)
+            )
+        }
+        Item::GraphProperty(property) => {
+            let property = &index.graph_properties[property];
+            let mut snippet = format!("property {}", hover.name(property.name));
+            if let Some(ty) = index.columns[property.column].ty {
+                write!(snippet, " {}", index.type_name(ty)).unwrap();
+            }
+            snippet
+        }
+        Item::Collation(collation) => {
+            let collation = &index.collations[collation];
+            format!(
+                "collation {}",
+                hover.qualified(collation.schema, collation.name)
+            )
+        }
+        Item::Schema(schema) => format!("schema {}", hover.name(index.schemas[schema].name)),
+        Item::Tablespace(tablespace) => format!(
+            "tablespace {}",
+            hover.name(index.tablespaces[tablespace].name)
+        ),
+        Item::Database(database) => {
+            format!("database {}", hover.name(index.databases[database].name))
+        }
+        Item::Extension(extension) => {
+            format!("extension {}", hover.name(index.extensions[extension].name))
+        }
+        Item::Operator(operator) => {
+            let operator = &index.operators[operator];
+            let mut snippet = format!(
+                "operator {}({}, {})",
+                hover.qualified(operator.schema, operator.name),
+                hover.operand(operator.left),
+                hover.operand(operator.right)
+            );
+            if let Some(ret) = operator
+                .function
+                .and_then(|function| index.functions[function].ret)
+            {
+                write!(snippet, " returns {}", index.type_name(ret)).unwrap();
+            }
+            snippet
+        }
+        Item::Savepoint(savepoint) => {
+            format!("savepoint {}", hover.name(index.savepoints[savepoint].name))
+        }
+        Item::Cursor(cursor) => {
+            let cursor = &index.cursors[cursor];
+            let hold = if cursor.hold { " with hold" } else { "" };
+            format!("cursor {}{hold}", hover.name(cursor.name))
+        }
+        Item::PreparedTransaction(prepared) => format!(
+            "prepared transaction '{}'",
+            hover.name(index.prepared_transactions[prepared].name)
+        ),
+        Item::PreparedStatement(prepared) => {
+            let prepared = &index.prepared_statements[prepared];
+            format!(
+                "prepare {}{}",
+                hover.name(prepared.name),
+                hover.column_list(prepared.columns.range)
+            )
+        }
+        Item::Channel(channel) => format!("channel {}", hover.name(index.channels[channel].name)),
+        Item::TransactionBegin(_) | Item::TransactionEnd(_) | Item::CaseKeyword(_) => return None,
+    })
+}
+
+#[derive(Clone, Copy)]
+struct Hovers<'a> {
+    index: &'a SemanticIndex,
+}
+
+impl<'a> Hovers<'a> {
+    fn name(self, name: Name) -> &'a str {
+        self.index.names.resolve(name)
     }
 
-    let value = literal.string_value()?;
-    let ty = infer_type_from_literal(literal)?.to_string();
+    fn qualified(self, schema: Name, name: Name) -> QualifiedName<'a> {
+        QualifiedName {
+            index: self.index,
+            schema,
+            name,
+        }
+    }
 
-    let comment = match kind {
-        LitKind::BitString(_) => format_bit_value_comment(&value, 2),
-        LitKind::ByteString(_) => format_bit_value_comment(&value, 16),
-        LitKind::String(_)
-        | LitKind::EscString(_)
-        | LitKind::NationalString(_)
-        | LitKind::UnicodeEscString(_)
-        | LitKind::DollarQuotedString(_) => match find_newline(&value) {
-            Some((idx, _)) => {
-                let truncated = &value[..idx];
-                format!(
-                    "value of literal (truncated up to newline): {}",
-                    markdown_inline_code(truncated)
+    fn table_name(self, table: TableId) -> QualifiedName<'a> {
+        let table = &self.index.tables[table];
+        self.qualified(table.schema, table.name)
+    }
+
+    fn column_list(self, columns: IdxRange<Column>) -> ColumnList<'a> {
+        ColumnList {
+            index: self.index,
+            columns,
+        }
+    }
+
+    fn operand(self, operand: Operand) -> OperandName<'a> {
+        OperandName {
+            index: self.index,
+            operand,
+        }
+    }
+
+    fn table(self, table: TableId) -> String {
+        let data = &self.index.tables[table];
+        let kind = data.kind.label();
+        let name = self.table_name(table);
+        match data.kind {
+            TableKind::Table
+            | TableKind::ForeignTable
+            | TableKind::View
+            | TableKind::MaterializedView => {
+                format!("{kind} {name}{}", self.column_list(data.columns.range))
+            }
+            TableKind::Sequence | TableKind::PropertyGraph => format!("{kind} {name}"),
+        }
+    }
+
+    fn function(self, function: FunctionId) -> String {
+        let data = &self.index.functions[function];
+        let kind = match data.kind {
+            FunctionKind::Function => "function",
+            FunctionKind::Aggregate => "aggregate",
+            FunctionKind::Procedure => "procedure",
+        };
+        format!("{kind} {}", self.function_signature(function))
+    }
+
+    fn function_signature(self, function: FunctionId) -> String {
+        let data = &self.index.functions[function];
+        let mut snippet = format!(
+            "{}{}",
+            self.qualified(data.schema, data.name),
+            ParamList {
+                index: self.index,
+                function,
+            }
+        );
+        let has_out_params = data.params.iter().any(|param| {
+            matches!(
+                self.index.params[param].mode,
+                ParamMode::Out | ParamMode::InOut
+            )
+        });
+        match (data.ret, data.columns) {
+            (_, Some(columns)) if !has_out_params => {
+                write!(snippet, " returns table{}", self.column_list(columns.range)).unwrap();
+            }
+            (Some(ret), _) => {
+                write!(snippet, " returns {}", self.index.type_name(ret)).unwrap();
+            }
+            (None, _) => {}
+        }
+        snippet
+    }
+
+    fn param(self, param: ParamId) -> Option<String> {
+        let function = &self.index.functions[self.index.param_function(param)?];
+        let position = param.into_raw().into_u32() - function.params.start().into_raw().into_u32();
+        let data = &self.index.params[param];
+        let mut snippet = format!(
+            "parameter {}.",
+            self.qualified(function.schema, function.name)
+        );
+        match data.name {
+            Some(name) => snippet.push_str(self.name(name)),
+            None => write!(snippet, "${}", position + 1).unwrap(),
+        }
+        if let Some(ty) = data.ty {
+            write!(snippet, " {}", self.index.type_name(ty)).unwrap();
+        }
+        Some(snippet)
+    }
+
+    fn ty(self, ty: TypeId) -> String {
+        let data = &self.index.types[ty];
+        let name = self.qualified(data.schema, data.name);
+        match data.kind {
+            TypeKind::Shell => format!("shell type {name}"),
+            TypeKind::Type => match data.columns {
+                Some(columns) => format!("type {name} as {}", self.column_list(columns.range)),
+                None => format!("type {name}"),
+            },
+            TypeKind::Domain => match data.base {
+                Some(base) => format!("domain {name} as {}", self.index.type_name(base)),
+                None => format!("domain {name}"),
+            },
+            TypeKind::Enum => {
+                let mut snippet = format!("type {name} as enum (");
+                for (i, label) in self.index.enum_labels(ty).enumerate() {
+                    if i > 0 {
+                        snippet.push_str(", ");
+                    }
+                    snippet.push('\'');
+                    snippet.push_str(self.name(self.index.enum_labels[label].name));
+                    snippet.push('\'');
+                }
+                snippet.push(')');
+                snippet
+            }
+            TypeKind::Range => match data.subtype {
+                Some(subtype) => format!(
+                    "type {name} as range (subtype = {})",
+                    self.index.type_name(subtype)
+                ),
+                None => format!("type {name} as range"),
+            },
+            TypeKind::Multirange => format!("multirange type {name}"),
+        }
+    }
+
+    fn source(self, source: SourceId) -> Option<String> {
+        let data = &self.index.sources[source];
+        match data.kind {
+            SourceKind::Table(table) => Some(self.table(table)),
+            SourceKind::Cte(cte) => item_hover(self.index, Item::Cte(cte)),
+            SourceKind::Function(function) => Some(self.function(function)),
+            SourceKind::Returning(target)
+            | SourceKind::Excluded(target)
+            | SourceKind::RuleRelation(target) => self.source(target),
+            SourceKind::Subquery(_) => Some(match data.name {
+                Some(name) => format!(
+                    "subquery {}{}",
+                    self.name(name),
+                    self.column_list(data.columns.range)
+                ),
+                None => format!("subquery{}", self.column_list(data.columns.range)),
+            }),
+            SourceKind::External
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::ElementVariable
+            | SourceKind::Other => None,
+        }
+    }
+
+    fn columns(self, column: ColumnId) -> String {
+        let mut snippet = String::new();
+        for (i, column) in self.index.merged_columns(column).iter().enumerate() {
+            if i > 0 {
+                snippet.push('\n');
+            }
+            self.write_column(&mut snippet, column);
+        }
+        snippet
+    }
+
+    fn star(self, star: StarId) -> Option<String> {
+        let columns = self.index.stars[star].columns;
+        if columns.is_empty() {
+            return None;
+        }
+        let mut snippet = String::new();
+        for column in columns {
+            for column in self.index.merged_columns(self.index.star_columns[column]) {
+                if !snippet.is_empty() {
+                    snippet.push('\n');
+                }
+                self.write_column(&mut snippet, column);
+            }
+        }
+        Some(snippet)
+    }
+
+    fn write_column(self, out: &mut String, column: ColumnId) {
+        let index = self.index;
+        match index.column_owner(column) {
+            ColumnOwner::Table(table) => write!(out, "column {}.", self.table_name(table)),
+            ColumnOwner::Type(ty) => {
+                let ty = &index.types[ty];
+                write!(out, "field {}.", self.qualified(ty.schema, ty.name))
+            }
+            ColumnOwner::Function(function) => {
+                let function = &index.functions[function];
+                write!(
+                    out,
+                    "column {}.",
+                    self.qualified(function.schema, function.name)
                 )
             }
-            None => format!("value of literal: {}", markdown_inline_code(&value)),
-        },
-        LitKind::Default(_) => return None,
-        LitKind::False(_) => return None,
-        LitKind::IntNumber(_) => return None,
-        LitKind::Null(_) => return None,
-        LitKind::NumericNumber(_) => return None,
-        LitKind::Off(_) => return None,
-        LitKind::On(_) => return None,
-        LitKind::PositionalParam(_) => return None,
-        LitKind::True(_) => return None,
-    };
-
-    Some(Hover::new(ty, comment))
-}
-
-fn format_bit_value_comment(digits: &str, radix: u32) -> String {
-    let patterns = match radix {
-        2 => bit_string_patterns(digits),
-        16 => byte_string_patterns(digits),
-        _ => None,
-    };
-
-    if let Some((hex, binary)) = patterns {
-        let formatted = format!("x'{hex}'|b'{binary}'");
-        return format!("value of literal: {}", markdown_inline_code(&formatted));
-    }
-
-    format!("value of literal: {}", markdown_inline_code(digits))
-}
-
-fn bit_string_patterns(digits: &str) -> Option<(String, String)> {
-    Some((binary_digits_to_hex(digits)?, digits.to_string()))
-}
-
-fn byte_string_patterns(digits: &str) -> Option<(String, String)> {
-    Some((digits.to_string(), hex_digits_to_binary(digits)?))
-}
-
-// escape backticks that exist in the text
-fn markdown_inline_code(text: &str) -> String {
-    let mut max_run = 0;
-    let mut run = 0;
-
-    for ch in text.chars() {
-        if ch == '`' {
-            run += 1;
-            max_run = max_run.max(run);
-        } else {
-            run = 0;
-        }
-    }
-
-    let fence = "`".repeat(max_run + 1);
-    format!("{fence} {text} {fence}")
-}
-
-fn hover_name(db: &dyn Db, def: Location) -> Option<Hover> {
-    match def.kind {
-        LocationKind::AccessMethod => hover_access_method(db, def),
-        LocationKind::Aggregate => hover_aggregate(db, def),
-        LocationKind::CaseExpr
-        | LocationKind::CommitBegin
-        | LocationKind::CommitEnd
-        | LocationKind::ElementTable
-        | LocationKind::Label
-        | LocationKind::PreparedTransaction
-        | LocationKind::Property => None,
-        LocationKind::Channel => hover_channel(db, def),
-        LocationKind::Column => hover_name_column(db, def),
-        LocationKind::Constraint => hover_constraint(db, def),
-        LocationKind::Conversion => hover_conversion(db, def),
-        LocationKind::Cursor => hover_cursor(db, def),
-        LocationKind::Collation => hover_collation(db, def),
-        LocationKind::Database => hover_database(db, def),
-        LocationKind::EventTrigger => hover_event_trigger(db, def),
-        LocationKind::Extension => hover_extension(db, def),
-        LocationKind::ForeignDataWrapper => hover_foreign_data_wrapper(db, def),
-        LocationKind::Function => hover_function(db, def),
-        LocationKind::Index => hover_index(db, def),
-        LocationKind::JsonPath => hover_json_path(db, def),
-        LocationKind::Language => hover_language(db, def),
-        LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
-        LocationKind::Operator => hover_operator(db, def),
-        LocationKind::OperatorFamily => hover_operator_family(db, def),
-        LocationKind::OperatorClass => hover_operator_class(db, def),
-        LocationKind::Policy => hover_policy(db, def),
-        LocationKind::PreparedStatement => hover_prepared_statement(db, def),
-        LocationKind::Procedure => hover_procedure(db, def),
-        LocationKind::PropertyGraph => hover_property_graph(db, def),
-        LocationKind::Publication => hover_publication(db, def),
-        LocationKind::Role => hover_role(db, def),
-        LocationKind::Rule => hover_rule(db, def),
-        LocationKind::Savepoint => hover_savepoint(db, def),
-        LocationKind::Schema => hover_schema(db, def),
-        LocationKind::Sequence => hover_sequence(db, def),
-        LocationKind::Server => hover_server(db, def),
-        LocationKind::Statistics => hover_statistics(db, def),
-        LocationKind::Subscription => hover_subscription(db, def),
-        LocationKind::Table => hover_table(db, def),
-        LocationKind::Tablespace => hover_tablespace(db, def),
-        LocationKind::TextSearchDictionary => hover_text_search_dictionary(db, def),
-        LocationKind::TextSearchConfiguration => hover_text_search_configuration(db, def),
-        LocationKind::TextSearchParser => hover_text_search_parser(db, def),
-        LocationKind::TextSearchTemplate => hover_text_search_template(db, def),
-        LocationKind::View => {
-            if let Some(hover) = format_create_view(db, def) {
-                return Some(hover);
-            }
-            hover_table(db, def)
-        }
-        LocationKind::Trigger => hover_trigger(db, def),
-        LocationKind::Type => hover_type(db, def),
-        LocationKind::Window => hover_window(db, def),
-    }
-}
-
-fn hover_name_column(db: &dyn Db, def: Location) -> Option<Hover> {
-    if let Some(result) = hover_composite_type_field(db, def) {
-        return Some(result);
-    }
-
-    let def_node = def.to_node(db)?;
-    if let Some(column) = def_node.parent().and_then(ast::Column::cast)
-        && let Some(create_table) = def_node.ancestors().find_map(ast::CreateTableLike::cast)
-    {
-        return hover_column_definition(db, InFile::new(def.file, create_table), &column);
-    }
-
-    if def_node
-        .ancestors()
-        .any(|ancestor| ast::ColumnList::can_cast(ancestor.kind()))
-        && let Some(create_view) = def_node.ancestors().find_map(ast::CreateViewLike::cast)
-    {
-        return format_view_column(db, InFile::new(def.file, &create_view), &def_node);
-    }
-
-    None
-}
-
-fn hover_position(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
-    // We can get multiple in the case of using
-    //
-    // select * from t join u using (id);
-    //
-    let definitions = goto_definition::goto_definition(db, position);
-    let def = *definitions.first()?;
-    match def.kind {
-        LocationKind::AccessMethod => hover_access_method(db, def),
-        LocationKind::Aggregate => hover_aggregate(db, def),
-        LocationKind::CaseExpr
-        | LocationKind::CommitBegin
-        | LocationKind::CommitEnd
-        | LocationKind::ElementTable
-        | LocationKind::Label
-        | LocationKind::PreparedTransaction
-        | LocationKind::Property => None,
-        LocationKind::Channel => hover_channel(db, def),
-        LocationKind::Column => {
-            if let Some(result) = hover_composite_type_field(db, def) {
-                return Some(result);
-            }
-            if let Some(result) = hover_column(db, &definitions) {
-                return Some(result);
-            }
-            // If no column, try as function (handles field-style function calls like `t.b`)
-            if let Some(result) = hover_function(db, def) {
-                return Some(result);
-            }
-            // Finally try as table (handles case like `select t from t;` where t is the table)
-            if let Some(result) = hover_table(db, def) {
-                return Some(result);
-            }
-            hover_select_target(db, def)
-        }
-        LocationKind::Collation => hover_collation(db, def),
-        LocationKind::Constraint => hover_constraint(db, def),
-        LocationKind::Conversion => hover_conversion(db, def),
-        LocationKind::Cursor => hover_cursor(db, def),
-        LocationKind::Database => hover_database(db, def),
-        LocationKind::EventTrigger => hover_event_trigger(db, def),
-        LocationKind::Extension => hover_extension(db, def),
-        LocationKind::ForeignDataWrapper => hover_foreign_data_wrapper(db, def),
-        LocationKind::Function => {
-            if let Some(result) = hover_function(db, def) {
-                return Some(result);
-            }
-            if let Some(result) = hover_routine(db, def) {
-                return Some(result);
-            }
-            hover_column(db, &definitions)
-        }
-        LocationKind::Index => hover_index(db, def),
-        LocationKind::JsonPath => hover_json_path(db, def),
-        LocationKind::Language => hover_language(db, def),
-        LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
-        LocationKind::Operator => hover_operator(db, def),
-        LocationKind::OperatorFamily => hover_operator_family(db, def),
-        LocationKind::OperatorClass => hover_operator_class(db, def),
-        LocationKind::Policy => hover_policy(db, def),
-        LocationKind::PreparedStatement => hover_prepared_statement(db, def),
-        LocationKind::Procedure => hover_procedure(db, def),
-        LocationKind::PropertyGraph => hover_property_graph(db, def),
-        LocationKind::Publication => hover_publication(db, def),
-        LocationKind::Role => hover_role(db, def),
-        LocationKind::Rule => hover_rule(db, def),
-        LocationKind::Savepoint => hover_savepoint(db, def),
-        LocationKind::Schema => hover_schema(db, def),
-        LocationKind::Sequence => hover_sequence(db, def),
-        LocationKind::Server => hover_server(db, def),
-        LocationKind::Statistics => hover_statistics(db, def),
-        LocationKind::Subscription => hover_subscription(db, def),
-        LocationKind::Table | LocationKind::View => hover_table(db, def),
-        LocationKind::Tablespace => hover_tablespace(db, def),
-        LocationKind::TextSearchDictionary => hover_text_search_dictionary(db, def),
-        LocationKind::TextSearchConfiguration => hover_text_search_configuration(db, def),
-        LocationKind::TextSearchParser => hover_text_search_parser(db, def),
-        LocationKind::TextSearchTemplate => hover_text_search_template(db, def),
-        LocationKind::Trigger => hover_trigger(db, def),
-        LocationKind::Type => hover_type(db, def),
-        LocationKind::Window => hover_window(db, def),
-    }
-}
-
-struct ColumnHover;
-impl ColumnHover {
-    fn table_column(table_name: &str, column_name: &str) -> String {
-        format!("column {table_name}.{column_name}")
-    }
-
-    fn table_column_type(table_name: &str, column_name: &str, ty: &str) -> String {
-        format!("column {table_name}.{column_name} {ty}")
-    }
-
-    fn schema_table_column_type(
-        schema: &str,
-        table_name: &str,
-        column_name: &str,
-        ty: &str,
-    ) -> String {
-        format!("column {schema}.{table_name}.{column_name} {ty}")
-    }
-    fn schema_table_column(schema: &str, table_name: &str, column_name: &str) -> String {
-        format!("column {schema}.{table_name}.{column_name}")
-    }
-
-    fn anon_column(col_name: &str) -> String {
-        format!("column {col_name}")
-    }
-    fn anon_column_type(col_name: &str, ty: &str) -> String {
-        format!("column {col_name} {ty}")
-    }
-}
-
-fn hover_column(db: &dyn Db, definitions: &[Location]) -> Option<Hover> {
-    let results: Vec<Hover> = definitions
-        .iter()
-        .filter_map(|def| format_hover_for_column_ptr(db, *def))
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = &def.to_node(db)?;
-    match ast_nav::parent_source(def_node)? {
-        ast_nav::ParentSouce::WithTable(with_table) => {
-            let cte_name = with_table.name()?;
-            let column_name = collect::column_name_from_node(def_node)?;
-            let table_name = Name::from_node(&cte_name);
-            let ty = collect::with_table_columns_with_types(db, def.file, &with_table)
-                .into_iter()
-                .find(|(name, _)| *name == column_name)
-                .and_then(|(_, ty)| ty);
-            return Some(hover_column_with_preceding_comment(
-                match ty {
-                    Some(ty) => ColumnHover::table_column_type(
-                        &table_name.to_string(),
-                        &column_name.to_string(),
-                        &ty.to_string(),
-                    ),
-                    None => {
-                        ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
-                    }
-                },
-                def_node,
-            ));
-        }
-        ast_nav::ParentSouce::ParenSelect(paren_select) => {
-            // Qualified access like `t.a`
-            let table_name = subquery_alias_name(&paren_select);
-
-            // Unqualified access like `a` from `select a from (select 1 a)`
-            let column_name = collect::column_name_from_node(def_node)?;
-
-            let ty = collect::paren_select_columns_with_types(db, def.file, &paren_select)
-                .into_iter()
-                .find(|(name, _)| *name == column_name)
-                .and_then(|(_, ty)| ty)?;
-            if let Some(table_name) = table_name {
-                Some(hover_column_with_preceding_comment(
-                    ColumnHover::table_column_type(
-                        &table_name.to_string(),
-                        &column_name.to_string(),
-                        &ty.to_string(),
-                    ),
-                    def_node,
-                ))
-            } else {
-                Some(hover_column_with_preceding_comment(
-                    ColumnHover::anon_column_type(&column_name.to_string(), &ty.to_string()),
-                    def_node,
-                ))
-            }
-        }
-        // create view v(a) as select 1;
-        // select a from v;
-        //        ^
-        ast_nav::ParentSouce::CreateView(create_view) => {
-            let column_name = collect::column_name_from_node(def_node)?;
-            let path = create_view.view()?.path()?;
-            let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(def.file, &path))?;
-            let ty = collect::view_like_columns_with_types(db, def.file, &create_view)
-                .into_iter()
-                .find(|(name, _)| *name == column_name)
-                .and_then(|(_, ty)| ty);
-            return Some(hover_column_with_preceding_comment(
-                match ty {
-                    Some(ty) => ColumnHover::schema_table_column_type(
-                        &schema.to_string(),
-                        &view_name,
-                        &column_name.to_string(),
-                        &ty.to_string(),
-                    ),
-                    None => ColumnHover::schema_table_column(
-                        &schema.to_string(),
-                        &view_name,
-                        &column_name.to_string(),
-                    ),
-                },
-                def_node,
-            ));
-        }
-        ast_nav::ParentSouce::Alias(alias) => {
-            let alias_name = alias.name()?;
-            alias.columns()?;
-            let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
-            let table_name = Name::from_node(&alias_name);
-            let column_name = Name::from_string(def_node.text().to_string());
-            let ty = collect::columns_for_star_from_alias(db, def.file, &from_item, &alias)
-                .into_iter()
-                .find(|(name, _)| *name == column_name)
-                .and_then(|(_, ty)| ty);
-            return Some(hover_column_with_preceding_comment(
-                match ty {
-                    Some(ty) => ColumnHover::table_column_type(
-                        &table_name.to_string(),
-                        &column_name.to_string(),
-                        &ty.to_string(),
-                    ),
-                    None => {
-                        ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
-                    }
-                },
-                def_node,
-            ));
-        }
-        ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
-            let column_name = collect::column_name_from_node(def_node)?;
-            let path = create_table_as.table_name()?.path()?;
-            let (schema, table_name) =
-                resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
-            let ty = collect::create_table_as_columns_with_types(db, def.file, &create_table_as)
-                .into_iter()
-                .find(|(name, _)| *name == column_name)
-                .and_then(|(_, ty)| ty);
-            return Some(hover_column_with_preceding_comment(
-                match ty {
-                    Some(ty) => ColumnHover::schema_table_column_type(
-                        &schema.to_string(),
-                        &table_name,
-                        &column_name.to_string(),
-                        &ty.to_string(),
-                    ),
-                    None => ColumnHover::schema_table_column(
-                        &schema.to_string(),
-                        &table_name,
-                        &column_name.to_string(),
-                    ),
-                },
-                def_node,
-            ));
-        }
-        ast_nav::ParentSouce::SelectInto(select_into) => {
-            let column_name = collect::column_name_from_node(def_node)?;
-            let path = select_into.into_clause()?.table_name()?.path()?;
-            let (schema, table_name) =
-                resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
-            let ty = collect::select_into_columns_with_types(db, def.file, &select_into)
-                .into_iter()
-                .find(|(name, _)| *name == column_name)
-                .and_then(|(_, ty)| ty);
-            return Some(hover_column_with_preceding_comment(
-                match ty {
-                    Some(ty) => ColumnHover::schema_table_column_type(
-                        &schema.to_string(),
-                        &table_name,
-                        &column_name.to_string(),
-                        &ty.to_string(),
-                    ),
-                    None => ColumnHover::schema_table_column(
-                        &schema.to_string(),
-                        &table_name,
-                        &column_name.to_string(),
-                    ),
-                },
-                def_node,
-            ));
-        }
-        ast_nav::ParentSouce::CreateTable(create_table) => {
-            let column = def_node.ancestors().find_map(ast::Column::cast)?;
-            let column_name = column.name()?;
-            let ty = column.ty()?;
-            let path = create_table.table_name()?.path()?;
-            let (schema, table_name) =
-                resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
-
-            return Some(hover_column_with_preceding_comment(
-                ColumnHover::schema_table_column_type(
-                    &schema.to_string(),
-                    &table_name,
-                    &Name::from_node(&column_name).to_string(),
-                    &ty.syntax().text().to_string(),
-                ),
-                def_node,
-            ));
-        }
-    }
-}
-
-fn hover_composite_type_field(db: &dyn Db, def: Location) -> Option<Hover> {
-    let field = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CompositeFieldDef::cast)?;
-    let field_name = field.name()?.syntax().text().to_string();
-    let ty = field.ty()?;
-
-    let create_type = field.syntax().ancestors().find_map(ast::CreateType::cast)?;
-    let type_path = create_type.type_name()?.path()?;
-    let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(def.file, &type_path))?;
-
-    Some(hover_with_preceding_comment(
-        format!(
-            "field {}.{}.{} {}",
-            schema,
-            type_name,
-            field_name,
-            ty.syntax().text()
-        ),
-        field.syntax(),
-    ))
-}
-
-fn hover_column_definition(
-    db: &dyn Db,
-    create_table: InFile<impl ast::HasCreateTable>,
-    column: &ast::Column,
-) -> Option<Hover> {
-    let file = create_table.file_id;
-    let create_table = create_table.value;
-    let column_name = column.name()?.syntax().text().to_string();
-    let ty = column.ty()?;
-    let path = create_table.table_name()?.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
-    let ty = ty.syntax().text().to_string();
-    Some(hover_with_preceding_comment(
-        ColumnHover::schema_table_column_type(&schema.to_string(), &table_name, &column_name, &ty),
-        column.syntax(),
-    ))
-}
-
-fn format_table_source(db: &dyn Db, source: InFile<ast_nav::ParentSouce>) -> Option<Hover> {
-    let file = source.file_id;
-    match source.value {
-        ast_nav::ParentSouce::Alias(alias) => {
-            format_alias_with_column_list(db, InFile::new(file, alias))
-        }
-        ast_nav::ParentSouce::WithTable(with_table) => format_with_table(&with_table),
-        ast_nav::ParentSouce::CreateView(create_view) => {
-            format_create_view_like(db, InFile::new(file, create_view))
-        }
-        ast_nav::ParentSouce::CreateTable(create_table) => {
-            format_create_table(db, InFile::new(file, create_table))
-        }
-        ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
-            format_create_table_as(db, InFile::new(file, create_table_as))
-        }
-        ast_nav::ParentSouce::ParenSelect(paren_select) => format_paren_select(&paren_select),
-        ast_nav::ParentSouce::SelectInto(select_into) => {
-            format_select_into(db, InFile::new(file, select_into))
-        }
-    }
-}
-
-fn hover_table(db: &dyn Db, def: Location) -> Option<Hover> {
-    let source = ast_nav::parent_source(&def.to_node(db)?)?;
-    format_table_source(db, InFile::new(def.file, source))
-}
-
-fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::FromAlias>) -> Option<Hover> {
-    let file = alias.file_id;
-    let alias = alias.value;
-    let alias_name = alias.name()?;
-    let name = Name::from_node(&alias_name);
-
-    let Some(alias_columns) = alias.columns() else {
-        let name = Name::from_node(&alias.name()?);
-        let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
-        let ast::FromItem::ParenFromItem(paren) = from_item else {
-            return None;
-        };
-        let paren_select = paren.paren_select()?;
-        return Some(format_subquery_table(&name, &paren_select));
-    };
-
-    let mut columns: Vec<Name> = alias_columns
-        .column_names()
-        .map(|column_name| Name::from_node(&column_name))
-        .collect();
-
-    if let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast)
-        && let Some(table_ptr) =
-            resolve::table_ptr_from_from_item(db, InFile::new(file, &from_item))
-    {
-        let base_columns = collect::star_column_names(db, table_ptr);
-        for column in base_columns.iter().skip(columns.len()) {
-            columns.push(column.clone());
-        }
-    }
-
-    let columns = columns
-        .iter()
-        .map(|column| column.to_string())
-        .collect::<Vec<_>>()
-        .join(", ");
-    Some(Hover::snippet(format!("table {name}({columns})")))
-}
-
-fn hover_qualified_star(db: &dyn Db, field_expr: InFile<ast::FieldExpr>) -> Option<Hover> {
-    let table_ptr = qualified_star_table_ptr(db, field_expr)?;
-    hover_qualified_star_columns(db, table_ptr)
-}
-
-fn hover_unqualified_star(db: &dyn Db, target: &InFile<ast::Target>) -> Option<Hover> {
-    let mut results = vec![];
-    if let Some(table_ptrs) =
-        unqualified_star_table_ptrs(db, InFile::new(target.file_id, &target.value))
-    {
-        for table_ptr in table_ptrs {
-            if let Some(columns) = hover_qualified_star_columns(db, table_ptr) {
-                results.push(columns);
-            }
-        }
-    }
-    merge_hovers(results)
-}
-
-fn hover_unqualified_star_in_arg_list(
-    db: &dyn Db,
-    arg_list: &InFile<ast::ArgList>,
-) -> Option<Hover> {
-    let file = arg_list.file_id;
-    let table_ptrs = unqualified_star_in_arg_list_ptrs(db, InFile::new(file, &arg_list.value))?;
-    let mut results = vec![];
-    for table_ptr in table_ptrs {
-        if let Some(columns) = hover_qualified_star_columns(db, table_ptr) {
-            results.push(columns);
-        }
-    }
-
-    merge_hovers(results)
-}
-
-fn format_subquery_table(name: &Name, paren_select: &ast::ParenSelect) -> Hover {
-    let name = name.to_string();
-    let query = paren_select.syntax().text().to_string();
-    Hover::snippet(format!("subquery {name} as {query}"))
-}
-
-fn hover_qualified_star_columns(db: &dyn Db, table_ptr: InFile<SyntaxNodePtr>) -> Option<Hover> {
-    let file = table_ptr.file_id;
-    let table_name_node = table_ptr.to_node(db);
-
-    match ast_nav::parent_source(&table_name_node)? {
-        ast_nav::ParentSouce::Alias(alias) => {
-            hover_qualified_star_columns_from_alias(db, InFile::new(file, &alias))
-        }
-        ast_nav::ParentSouce::WithTable(with_table) => {
-            hover_qualified_star_columns_from_cte(db, InFile::new(file, with_table))
-        }
-        ast_nav::ParentSouce::CreateTable(create_table) => {
-            hover_qualified_star_columns_from_table(db, InFile::new(file, create_table))
-        }
-        ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
-            hover_qualified_star_columns_from_table_as(db, InFile::new(file, &create_table_as))
-        }
-        ast_nav::ParentSouce::CreateView(create_view) => {
-            hover_qualified_star_columns_from_view_like(db, InFile::new(file, &create_view))
-        }
-        ast_nav::ParentSouce::ParenSelect(paren_select) => {
-            hover_qualified_star_columns_from_subquery(db, InFile::new(file, &paren_select))
-        }
-        ast_nav::ParentSouce::SelectInto(select_into) => {
-            hover_qualified_star_columns_from_select_into(db, InFile::new(file, &select_into))
-        }
-    }
-}
-
-fn hover_qualified_star_columns_from_alias(
-    db: &dyn Db,
-    alias: InFile<&ast::FromAlias>,
-) -> Option<Hover> {
-    let file = alias.file_id;
-    let alias = alias.value;
-    let alias_name = Name::from_node(&alias.name()?);
-    alias.columns()?;
-    let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
-    let columns = collect::columns_for_star_from_alias(db, file, &from_item, alias);
-
-    if columns.is_empty() {
-        return None;
-    }
-
-    let results: Vec<Hover> = columns
-        .into_iter()
-        .map(|(column_name, ty)| {
-            Hover::snippet(match ty {
-                Some(ty) => ColumnHover::table_column_type(
-                    &alias_name.to_string(),
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ),
-                None => {
-                    ColumnHover::table_column(&alias_name.to_string(), &column_name.to_string())
-                }
-            })
-        })
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn hover_qualified_star_columns_from_table(
-    db: &dyn Db,
-    create_table: InFile<impl ast::HasCreateTable>,
-) -> Option<Hover> {
-    let file = create_table.file_id;
-    let create_table = create_table.value;
-    let path = create_table.table_name()?.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
-    let schema = schema.to_string();
-    let results: Vec<Hover> = collect::table_columns(db, file, &create_table)
-        .into_iter()
-        .filter_map(|(column_name, ty)| {
-            let ty = ty?;
-            Some(Hover::snippet(ColumnHover::schema_table_column_type(
-                &schema,
-                &table_name,
-                &column_name.to_string(),
-                &ty.to_string(),
-            )))
-        })
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn hover_qualified_star_columns_from_table_as(
-    db: &dyn Db,
-    create_table_as: InFile<&ast::CreateTableAs>,
-) -> Option<Hover> {
-    let file = create_table_as.file_id;
-    let create_table_as = create_table_as.value;
-    let path = create_table_as.table_name()?.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
-    let schema_str = schema.to_string();
-
-    let columns = collect::create_table_as_columns_with_types(db, file, create_table_as);
-    let results: Vec<Hover> = columns
-        .into_iter()
-        .map(|(column_name, ty)| {
-            if let Some(ty) = ty {
-                return Hover::snippet(ColumnHover::schema_table_column_type(
-                    &schema_str,
-                    &table_name,
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ));
-            }
-            Hover::snippet(ColumnHover::schema_table_column(
-                &schema_str,
-                &table_name,
-                &column_name.to_string(),
-            ))
-        })
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn hover_qualified_star_columns_from_select_into(
-    db: &dyn Db,
-    select_into: InFile<&ast::SelectInto>,
-) -> Option<Hover> {
-    let file = select_into.file_id;
-    let select_into = select_into.value;
-    let path = select_into.into_clause()?.table_name()?.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
-    let schema_str = schema.to_string();
-
-    let columns = collect::select_into_columns_with_types(db, file, select_into);
-    let results: Vec<Hover> = columns
-        .into_iter()
-        .map(|(column_name, ty)| {
-            if let Some(ty) = ty {
-                return Hover::snippet(ColumnHover::schema_table_column_type(
-                    &schema_str,
-                    &table_name,
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ));
-            }
-            Hover::snippet(ColumnHover::schema_table_column(
-                &schema_str,
-                &table_name,
-                &column_name.to_string(),
-            ))
-        })
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn hover_qualified_star_columns_from_cte(
-    db: &dyn Db,
-    with_table: InFile<ast::WithTable>,
-) -> Option<Hover> {
-    let file = with_table.file_id;
-    let with_table = with_table.value;
-    let cte_name = Name::from_node(&with_table.name()?);
-    let cte_name = cte_name.to_string();
-    let columns = collect::with_table_columns_with_types(db, file, &with_table);
-    let results: Vec<Hover> = columns
-        .into_iter()
-        .map(|(column_name, ty)| {
-            let column_name = column_name.to_string();
-            if let Some(ty) = ty {
-                return Hover::snippet(ColumnHover::table_column_type(
-                    &cte_name,
-                    &column_name,
-                    &ty.to_string(),
-                ));
-            }
-
-            Hover::snippet(ColumnHover::table_column(&cte_name, &column_name))
-        })
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn hover_qualified_star_columns_from_view_like(
-    db: &dyn Db,
-    create_view: InFile<&ast::CreateViewLike>,
-) -> Option<Hover> {
-    let file = create_view.file_id;
-    let create_view = create_view.value;
-    let path = create_view.view()?.path()?;
-    let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
-
-    let schema_str = schema.to_string();
-    let columns = collect::view_like_columns_with_types(db, file, create_view);
-    let results: Vec<Hover> = columns
-        .into_iter()
-        .map(|(column_name, ty)| {
-            if let Some(ty) = ty {
-                return Hover::snippet(ColumnHover::schema_table_column_type(
-                    &schema_str,
-                    &view_name,
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ));
-            }
-
-            Hover::snippet(ColumnHover::schema_table_column(
-                &schema_str,
-                &view_name,
-                &column_name.to_string(),
-            ))
-        })
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn hover_qualified_star_columns_from_subquery(
-    db: &dyn Db,
-    paren_select: InFile<&ast::ParenSelect>,
-) -> Option<Hover> {
-    let file = paren_select.file_id;
-    let paren_select = paren_select.value;
-    let select_variant = paren_select.select()?;
-
-    if let Some(select) = ast_nav::select_from_variant(select_variant) {
-        let target_list = select.select_clause()?.target_list()?;
-
-        let mut results = vec![];
-        let subquery_alias = subquery_alias_name(paren_select);
-
-        for target in target_list.targets() {
-            if target.star_token().is_some() {
-                let table_ptrs = unqualified_star_table_ptrs(db, InFile::new(file, &target))?;
-                for table_ptr in table_ptrs {
-                    if let Some(columns) = hover_qualified_star_columns(db, table_ptr) {
-                        results.push(columns);
-                    }
-                }
-                continue;
-            }
-
-            if let Some(result) = hover_subquery_target_column(
-                db,
-                InFile::new(file, &target),
-                subquery_alias.as_ref(),
-            ) {
-                results.push(result);
-            }
-        }
-
-        return merge_hovers(results);
-    }
-
-    let subquery_alias = subquery_alias_name(paren_select);
-    let results: Vec<Hover> = collect::paren_select_columns_with_types(db, file, paren_select)
-        .into_iter()
-        .map(|(column_name, ty)| {
-            if let Some(alias) = &subquery_alias {
-                return Hover::snippet(ColumnHover::table_column(
-                    &alias.to_string(),
-                    &column_name.to_string(),
-                ));
-            }
-            if let Some(ty) = ty {
-                return Hover::snippet(ColumnHover::anon_column_type(
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ));
-            }
-            Hover::snippet(ColumnHover::anon_column(&column_name.to_string()))
-        })
-        .collect();
-
-    merge_hovers(results)
-}
-
-fn subquery_alias_name(paren_select: &ast::ParenSelect) -> Option<Name> {
-    let from_item = paren_select
-        .syntax()
-        .ancestors()
-        .find_map(ast::FromItem::cast)?;
-    let alias_name = from_item.alias()?.name()?;
-    Some(Name::from_node(&alias_name))
-}
-
-fn hover_subquery_target_column(
-    db: &dyn Db,
-    target: InFile<&ast::Target>,
-    subquery_alias: Option<&Name>,
-) -> Option<Hover> {
-    let file = target.file_id;
-    let target = target.value;
-    if let Some(alias) = subquery_alias
-        && let Some((col_name, _node)) = ColumnName::from_target(&target.clone())
-        && let Some(col_name) = col_name.to_string()
-    {
-        let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
-        return Some(Hover::snippet(match ty {
-            Some(ty) => {
-                ColumnHover::table_column_type(&alias.to_string(), &col_name, &ty.to_string())
-            }
-            None => ColumnHover::table_column(&alias.to_string(), &col_name),
-        }));
-    }
-
-    let result = match target.expr()? {
-        ast::Expr::NameRef(name_ref) => hover(
-            db,
-            InFile::new(file, name_ref.syntax().text_range().start()),
-        ),
-        ast::Expr::FieldExpr(field_expr) => {
-            let field = field_expr.field()?;
-            hover(db, InFile::new(file, field.syntax().text_range().start()))
-        }
-        _ => None,
-    };
-
-    if result.is_some() {
-        return result;
-    }
-
-    if let Some((col_name, _node)) = ColumnName::from_target(&target.clone())
-        && let Some(col_name) = col_name.to_string()
-    {
-        let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
-        return Some(Hover::snippet(match ty {
-            Some(ty) => ColumnHover::anon_column_type(&col_name, &ty.to_string()),
-            None => ColumnHover::anon_column(&col_name),
-        }));
-    }
-
-    None
-}
-
-fn hover_index(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_index = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateIndex::cast)?;
-    format_create_index(db, InFile::new(def.file, create_index))
-}
-
-fn hover_constraint(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    let name = ast::AnyName::cast(def_node.clone())
-        .map(|name| Name::from_node(&name).to_string())
-        .unwrap_or_else(|| def_node.text().to_string());
-    Some(hover_with_preceding_comment(
-        format!("constraint {name}"),
-        &def_node,
-    ))
-}
-
-fn hover_sequence(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_sequence = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateSequence::cast)?;
-    format_create_sequence(db, InFile::new(def.file, create_sequence))
-}
-
-fn hover_statistics(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_statistics = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateStatistics::cast)?;
-    format_create_statistics(db, InFile::new(def.file, create_statistics))
-}
-
-fn hover_trigger(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_trigger = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateTrigger::cast)?;
-    format_create_trigger(db, InFile::new(def.file, create_trigger))
-}
-
-fn hover_policy(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_policy = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreatePolicy::cast)?;
-    format_create_policy(db, InFile::new(def.file, create_policy))
-}
-
-fn hover_rule(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_rule = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateRule::cast)?;
-    format_create_rule(db, InFile::new(def.file, create_rule))
-}
-
-fn hover_property_graph(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_property_graph = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreatePropertyGraph::cast)?;
-    format_create_property_graph(db, InFile::new(def.file, create_property_graph))
-}
-
-fn hover_event_trigger(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_event_trigger = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateEventTrigger::cast)?;
-
-    format_create_event_trigger(&create_event_trigger)
-}
-
-fn hover_tablespace(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    if let Some(create_tablespace) = def_node.ancestors().find_map(ast::CreateTablespace::cast) {
-        return format_create_tablespace(&create_tablespace);
-    }
-    Some(Hover::snippet(format!("tablespace {}", def_node.text())))
-}
-
-fn hover_database(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    if let Some(create_database) = def_node.ancestors().find_map(ast::CreateDatabase::cast) {
-        return format_create_database(&create_database);
-    }
-    Some(Hover::snippet(format!("database {}", def_node.text())))
-}
-
-fn hover_server(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    if let Some(create_server) = def_node.ancestors().find_map(ast::CreateServer::cast) {
-        return format_create_server(&create_server);
-    }
-    Some(Hover::snippet(format!("server {}", def_node.text())))
-}
-
-fn hover_extension(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    if let Some(create_extension) = def_node.ancestors().find_map(ast::CreateExtension::cast) {
-        return format_create_extension(&create_extension);
-    }
-    Some(Hover::snippet(format!("extension {}", def_node.text())))
-}
-
-fn hover_foreign_data_wrapper(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!(
-        "foreign data wrapper {}",
-        def_node.text()
-    )))
-}
-
-fn hover_publication(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!("publication {}", def_node.text())))
-}
-
-fn hover_subscription(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!("subscription {}", def_node.text())))
-}
-
-fn hover_language(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!("language {}", def_node.text())))
-}
-
-fn hover_collation(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!("collation {}", def_node.text())))
-}
-
-fn hover_conversion(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!("conversion {}", def_node.text())))
-}
-
-fn hover_access_method(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!("access method {}", def_node.text())))
-}
-
-fn hover_operator(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!("operator {}", def_node.text())))
-}
-
-fn hover_operator_family(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!(
-        "operator family {}",
-        def_node.text()
-    )))
-}
-
-fn hover_operator_class(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!(
-        "operator class {}",
-        def_node.text()
-    )))
-}
-
-fn hover_text_search_dictionary(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!(
-        "text search dictionary {}",
-        def_node.text()
-    )))
-}
-
-fn hover_text_search_configuration(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!(
-        "text search configuration {}",
-        def_node.text()
-    )))
-}
-
-fn hover_text_search_parser(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!(
-        "text search parser {}",
-        def_node.text()
-    )))
-}
-
-fn hover_text_search_template(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    Some(Hover::snippet(format!(
-        "text search template {}",
-        def_node.text()
-    )))
-}
-
-fn hover_role(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    if let Some(create_role) = def_node.ancestors().find_map(ast::CreateRole::cast) {
-        return format_create_role(&create_role);
-    }
-    Some(Hover::snippet(format!("role {}", def_node.text())))
-}
-
-fn hover_cursor(db: &dyn Db, def: Location) -> Option<Hover> {
-    let declare = def.to_node(db)?.ancestors().find_map(ast::Declare::cast)?;
-    format_declare_cursor(&declare)
-}
-
-fn hover_prepared_statement(db: &dyn Db, def: Location) -> Option<Hover> {
-    let prepare = def.to_node(db)?.ancestors().find_map(ast::Prepare::cast)?;
-    format_prepare(&prepare)
-}
-
-fn hover_channel(db: &dyn Db, def: Location) -> Option<Hover> {
-    let listen = def.to_node(db)?.ancestors().find_map(ast::Listen::cast)?;
-    format_listen(&listen)
-}
-
-fn hover_savepoint(db: &dyn Db, def: Location) -> Option<Hover> {
-    let savepoint = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::SavepointCreate::cast)?;
-    format_savepoint(&savepoint)
-}
-
-fn hover_json_path(db: &dyn Db, def: Location) -> Option<Hover> {
-    let name = ast::JsonPathName::cast(def.to_node(db)?)?;
-    Some(Hover::snippet(format!(
-        "json path {}",
-        name.syntax().text()
-    )))
-}
-
-fn hover_window(db: &dyn Db, def: Location) -> Option<Hover> {
-    let window_def = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::WindowDef::cast)?;
-
-    Some(Hover::snippet(format!(
-        "window {}",
-        window_def.syntax().text()
-    )))
-}
-
-fn hover_type(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_type = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateType::cast)?;
-    format_create_type(db, InFile::new(def.file, create_type))
-}
-
-fn format_declare_cursor(declare: &ast::Declare) -> Option<Hover> {
-    let name = declare.cursor()?;
-    let query = declare.query()?;
-    Some(Hover::snippet(format!(
-        "cursor {} for {}",
-        name.syntax().text(),
-        query.syntax().text()
-    )))
-}
-
-fn format_prepare(prepare: &ast::Prepare) -> Option<Hover> {
-    let name = prepare.name()?;
-    let stmt = prepare.stmt()?;
-    Some(Hover::snippet(format!(
-        "prepare {} as {}",
-        name.syntax().text(),
-        stmt.syntax().text()
-    )))
-}
-
-fn format_listen(listen: &ast::Listen) -> Option<Hover> {
-    let name = listen.channel()?;
-    Some(Hover::snippet(format!("listen {}", name.syntax().text())))
-}
-
-fn format_savepoint(savepoint: &ast::SavepointCreate) -> Option<Hover> {
-    let name = savepoint.savepoint()?;
-    Some(Hover::snippet(format!(
-        "savepoint {}",
-        name.syntax().text()
-    )))
-}
-
-fn format_create_table(
-    db: &dyn Db,
-    create_table: InFile<impl ast::HasCreateTable>,
-) -> Option<Hover> {
-    let file = create_table.file_id;
-    let create_table = create_table.value;
-    let path = create_table.table_name()?.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
-    let schema = schema.to_string();
-    let args = create_table.table_arg_list()?.syntax().text().to_string();
-
-    let foreign = if create_table.syntax().kind() == SyntaxKind::CREATE_FOREIGN_TABLE {
-        "foreign "
-    } else {
-        ""
-    };
-
-    Some(Hover::snippet(format!(
-        "{foreign}table {schema}.{table_name}{args}"
-    )))
-}
-
-fn format_create_table_as(
-    db: &dyn Db,
-    create_table_as: InFile<ast::CreateTableAs>,
-) -> Option<Hover> {
-    let file = create_table_as.file_id;
-    let create_table_as = create_table_as.value;
-    let path = create_table_as.table_name()?.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
-    let query = create_table_as.query()?.syntax().text().to_string();
-    Some(Hover::snippet(format!(
-        "table {schema}.{table_name} as {query}"
-    )))
-}
-
-fn format_select_into(db: &dyn Db, select_into: InFile<ast::SelectInto>) -> Option<Hover> {
-    let file = select_into.file_id;
-    let select_into = select_into.value;
-    let path = select_into.into_clause()?.table_name()?.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
-    Some(Hover::snippet(format!("table {schema}.{table_name}")))
-}
-
-fn format_create_view(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_view = ast::CreateViewLike::cast(def.to_node(db)?)?;
-    format_create_view_like(db, InFile::new(def.file, create_view))
-}
-
-fn format_create_view_like(db: &dyn Db, create_view: InFile<ast::CreateViewLike>) -> Option<Hover> {
-    let file = create_view.file_id;
-    let create_view = create_view.value;
-    let path = create_view.view()?.path()?;
-    // TODO: we use this to infer the schema, we should either rename this or
-    // create a different function
-    let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
-    let schema = schema.to_string();
-
-    let column_list = create_view
-        .column_list()
-        .map(|cl| cl.syntax().text().to_string())
-        .unwrap_or_default();
-
-    let query = create_view.query()?.syntax().text().to_string();
-
-    let view_kind = if create_view.syntax().kind() == SyntaxKind::CREATE_MATERIALIZED_VIEW {
-        "materialized view"
-    } else {
-        "view"
-    };
-
-    Some(Hover::snippet(format!(
-        "{view_kind} {schema}.{view_name}{column_list} as {query}",
-    )))
-}
-
-fn format_view_column(
-    db: &dyn Db,
-    create_view: InFile<&ast::CreateViewLike>,
-    def_node: &SyntaxNode,
-) -> Option<Hover> {
-    let file = create_view.file_id;
-    let create_view = create_view.value;
-    let path = create_view.view()?.path()?;
-    let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
-    let column_name = Name::from_string(def_node.to_string());
-    let ty = collect::view_like_columns_with_types(db, file, create_view)
-        .into_iter()
-        .find(|(name, _)| *name == column_name)
-        .and_then(|(_, ty)| ty);
-    Some(hover_column_with_preceding_comment(
-        match ty {
-            Some(ty) => ColumnHover::schema_table_column_type(
-                &schema.to_string(),
-                &view_name,
-                &column_name.to_string(),
-                &ty.to_string(),
+            ColumnOwner::Cte(cte) => write!(out, "column {}.", self.name(index.ctes[cte].name)),
+            ColumnOwner::PreparedStatement(prepared) => write!(
+                out,
+                "column {}.",
+                self.name(index.prepared_statements[prepared].name)
             ),
-            None => ColumnHover::schema_table_column(
-                &schema.to_string(),
-                &view_name,
-                &column_name.to_string(),
-            ),
-        },
-        def_node,
-    ))
-}
-
-fn format_with_table(with_table: &ast::WithTable) -> Option<Hover> {
-    let name = with_table.name()?.syntax().text().to_string();
-    let query = with_table.query()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("with {name} as ({query})")))
-}
-
-fn format_paren_select(paren_select: &ast::ParenSelect) -> Option<Hover> {
-    let query = paren_select.select()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("({query})")))
-}
-
-fn format_create_index(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> Option<Hover> {
-    let file = create_index.file_id;
-    let create_index = create_index.value;
-    let index_name = create_index
-        .index()?
-        .path()?
-        .segment()?
-        .syntax()
-        .text()
-        .to_string();
-
-    let index_schema = index_schema(db, &InFile::new(file, create_index.clone()))?;
-
-    let path = create_index
-        .table_relation_name()?
-        .table_name_ref()?
-        .path_ref()?;
-    let (table_schema, table_name) = resolve::resolve_table_ref_info(db, InFile::new(file, &path))?;
-
-    let partition_item_list = create_index.partition_item_list()?;
-    let columns = partition_item_list.syntax().text().to_string();
-
-    Some(Hover::snippet(format!(
-        "index {index_schema}.{index_name} on {table_schema}.{table_name}{columns}"
-    )))
-}
-
-fn format_create_sequence(
-    db: &dyn Db,
-    create_sequence: InFile<ast::CreateSequence>,
-) -> Option<Hover> {
-    let file = create_sequence.file_id;
-    let create_sequence = create_sequence.value;
-    let path = create_sequence.sequence()?.path()?;
-    let (schema, sequence_name) = resolve::resolve_sequence_info(db, InFile::new(file, &path))?;
-
-    Some(Hover::snippet(format!("sequence {schema}.{sequence_name}")))
-}
-
-fn format_create_statistics(
-    db: &dyn Db,
-    create_statistics: InFile<ast::CreateStatistics>,
-) -> Option<Hover> {
-    let file = create_statistics.file_id;
-    let create_statistics = create_statistics.value;
-    let path = create_statistics.statistics()?.path()?;
-    let (schema, statistics_name) = resolve::resolve_statistics_info(db, InFile::new(file, &path))?;
-    let table_path = create_statistics
-        .from_table()?
-        .table_name_ref()?
-        .path_ref()?;
-    let (table_schema, table_name) =
-        resolve::resolve_table_ref_info(db, InFile::new(file, &table_path))?;
-
-    Some(hover_with_preceding_comment(
-        format!("statistics {schema}.{statistics_name} on {table_schema}.{table_name}"),
-        create_statistics.syntax(),
-    ))
-}
-
-fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>) -> Option<Hover> {
-    let file = create_trigger.file_id;
-    let create_trigger = create_trigger.value;
-    let trigger_name = create_trigger.trigger()?.syntax().text().to_string();
-    let on_table_path = create_trigger
-        .on_relation()?
-        .relation_name_ref()?
-        .path_ref()?;
-
-    let (schema, table_name) =
-        resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
-    Some(Hover::snippet(format!(
-        "trigger {schema}.{trigger_name} on {schema}.{table_name}"
-    )))
-}
-
-fn format_create_policy(db: &dyn Db, create_policy: InFile<ast::CreatePolicy>) -> Option<Hover> {
-    let file = create_policy.file_id;
-    let create_policy = create_policy.value;
-    let policy_name = create_policy.policy()?.syntax().text().to_string();
-    let on_table_path = create_policy.on_table()?.table_name_ref()?.path_ref()?;
-
-    let (schema, table_name) =
-        resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
-    Some(Hover::snippet(format!(
-        "policy {schema}.{policy_name} on {schema}.{table_name}"
-    )))
-}
-
-fn format_create_rule(db: &dyn Db, create_rule: InFile<ast::CreateRule>) -> Option<Hover> {
-    let file = create_rule.file_id;
-    let create_rule = create_rule.value;
-    let rule_name = create_rule.rule()?.syntax().text().to_string();
-    let on_table_path = create_rule.rule_on()?.relation_name_ref()?.path_ref()?;
-
-    let (schema, table_name) =
-        resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
-    Some(Hover::snippet(format!(
-        "rule {rule_name} on {schema}.{table_name}"
-    )))
-}
-
-fn format_create_property_graph(
-    db: &dyn Db,
-    create_property_graph: InFile<ast::CreatePropertyGraph>,
-) -> Option<Hover> {
-    let file = create_property_graph.file_id;
-    let create_property_graph = create_property_graph.value;
-    let path = create_property_graph.property_graph()?.path()?;
-    let (schema, name) = resolve::resolve_property_graph_info(db, InFile::new(file, &path))?;
-    Some(Hover::snippet(format!("property graph {schema}.{name}")))
-}
-
-fn format_create_event_trigger(create_event_trigger: &ast::CreateEventTrigger) -> Option<Hover> {
-    let name = create_event_trigger
-        .event_trigger()?
-        .syntax()
-        .text()
-        .to_string();
-    Some(Hover::snippet(format!("event trigger {name}")))
-}
-
-fn format_create_tablespace(create_tablespace: &ast::CreateTablespace) -> Option<Hover> {
-    let name = create_tablespace.tablespace()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("tablespace {name}")))
-}
-
-fn format_create_database(create_database: &ast::CreateDatabase) -> Option<Hover> {
-    let name = create_database.database()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("database {name}")))
-}
-
-fn format_create_server(create_server: &ast::CreateServer) -> Option<Hover> {
-    let name = create_server.server()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("server {name}")))
-}
-
-fn format_create_extension(create_extension: &ast::CreateExtension) -> Option<Hover> {
-    let name = create_extension.extension()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("extension {name}")))
-}
-
-fn format_create_role(create_role: &ast::CreateRole) -> Option<Hover> {
-    let name = create_role.role()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("role {name}")))
-}
-
-fn index_schema(db: &dyn Db, create_index: &InFile<ast::CreateIndex>) -> Option<String> {
-    let position = create_index.value.syntax().text_range().start();
-    bind(db, create_index.file_id)
-        .search_path_at(position)
-        .first()
-        .map(|s| s.to_string())
-}
-
-fn format_create_type(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Option<Hover> {
-    let file = create_type.file_id;
-    let create_type = create_type.value;
-    let path = create_type.type_name()?.path()?;
-    let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(file, &path))?;
-
-    let snippet = match create_type.kind() {
-        Some(ast::CreateTypeKind::EnumType(enum_type)) => {
-            let variants = enum_type.variant_list()?.syntax().text().to_string();
-            format!("type {schema}.{type_name} as enum {variants}")
+            ColumnOwner::Anonymous => write!(out, "column "),
         }
-        Some(ast::CreateTypeKind::CompositeType(composite_type)) => {
-            let columns = composite_type
-                .composite_field_list()?
-                .syntax()
-                .text()
-                .to_string();
-            format!("type {schema}.{type_name} as {columns}")
-        }
-        Some(ast::CreateTypeKind::RangeType(range_type)) => {
-            let attributes = range_type.attribute_list()?.syntax().text().to_string();
-            format!("type {schema}.{type_name} {attributes}")
-        }
-        Some(ast::CreateTypeKind::BaseType(base_type)) => {
-            let attributes = base_type.attribute_list()?.syntax().text().to_string();
-            format!("type {schema}.{type_name} {attributes}")
-        }
-        None => format!("type {schema}.{type_name}"),
-    };
-
-    Some(hover_with_preceding_comment(snippet, create_type.syntax()))
-}
-
-fn hover_schema(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_schema = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateSchema::cast)?;
-    format_create_schema(&create_schema)
-}
-
-fn create_schema_name(create_schema: &ast::CreateSchema) -> Option<String> {
-    create_schema
-        .schema_name()
-        .map(|name| name.text().to_string())
-}
-
-fn format_create_schema(create_schema: &ast::CreateSchema) -> Option<Hover> {
-    let schema_name = create_schema_name(create_schema)?;
-    Some(Hover::snippet(format!("schema {schema_name}")))
-}
-
-fn hover_function(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_function = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateFunction::cast)?;
-    format_create_function(db, InFile::new(def.file, create_function))
-}
-
-fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
-    let def_node = def.to_node(db)?;
-    let param = def_node.ancestors().find_map(ast::Param::cast)?;
-    let param_name = param.name().map(|name| Name::from_node(&name))?;
-    let param_type = param
-        .func_type()
-        .map(|func_type| func_type.syntax().text().to_string());
-
-    for ancestor in def_node.ancestors() {
-        if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
-            let path = create_function.name()?.path()?;
-            let (schema, function_name) =
-                resolve::resolve_function_info(db, InFile::new(def.file, &path))?;
-            return Some(format_param_hover(
-                &schema,
-                &function_name,
-                &param_name,
-                param_type,
-            ));
-        }
-        if let Some(create_procedure) = ast::CreateProcedure::cast(ancestor.clone()) {
-            let path = create_procedure.name()?.path()?;
-            let (schema, procedure_name) =
-                resolve::resolve_procedure_info(db, InFile::new(def.file, &path))?;
-            return Some(format_param_hover(
-                &schema,
-                &procedure_name,
-                &param_name,
-                param_type,
-            ));
-        }
-        if let Some(create_aggregate) = ast::CreateAggregate::cast(ancestor) {
-            let path = create_aggregate.aggregate_name()?.path()?;
-            let (schema, aggregate_name) =
-                resolve::resolve_aggregate_info(db, InFile::new(def.file, &path))?;
-            return Some(format_param_hover(
-                &schema,
-                &aggregate_name,
-                &param_name,
-                param_type,
-            ));
+        .unwrap();
+        let data = &index.columns[column];
+        out.push_str(data.name.map_or("?column?", |name| self.name(name)));
+        if let Some(ty) = data.ty {
+            write!(out, " {}", index.type_name(ty)).unwrap();
         }
     }
-
-    None
 }
 
-fn format_param_hover(
-    schema: &Schema,
-    routine_name: &str,
-    param_name: &Name,
-    param_type: Option<String>,
-) -> Hover {
-    if let Some(param_type) = param_type {
-        return Hover::snippet(format!(
-            "parameter {schema}.{routine_name}.{param_name} {param_type}"
-        ));
+struct QualifiedName<'a> {
+    index: &'a SemanticIndex,
+    schema: Name,
+    name: Name,
+}
+
+impl fmt::Display for QualifiedName<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let names = &self.index.names;
+        write!(
+            f,
+            "{}.{}",
+            names.resolve(self.schema),
+            names.resolve(self.name)
+        )
     }
-
-    Hover::snippet(format!("parameter {schema}.{routine_name}.{param_name}"))
 }
 
-fn format_create_function(
-    db: &dyn Db,
-    create_function: InFile<ast::CreateFunction>,
-) -> Option<Hover> {
-    let file = create_function.file_id;
-    let create_function = create_function.value;
-    let path = create_function.name()?.path()?;
-    let (schema, function_name) = resolve::resolve_function_info(db, InFile::new(file, &path))?;
-
-    let params = create_function.param_list()?.syntax().text().to_string();
-    let return_type = create_function.ret_type()?.syntax().text().to_string();
-    let snippet = format!("function {schema}.{function_name}{params} {return_type}");
-
-    Some(hover_with_preceding_comment(
-        snippet,
-        create_function.syntax(),
-    ))
+struct OperandName<'a> {
+    index: &'a SemanticIndex,
+    operand: Operand,
 }
 
-fn hover_aggregate(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_aggregate = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateAggregate::cast)?;
-    format_create_aggregate(db, InFile::new(def.file, create_aggregate))
-}
-
-fn format_create_aggregate(
-    db: &dyn Db,
-    create_aggregate: InFile<ast::CreateAggregate>,
-) -> Option<Hover> {
-    let file = create_aggregate.file_id;
-    let create_aggregate = create_aggregate.value;
-    let path = create_aggregate.aggregate_name()?.path()?;
-    let (schema, aggregate_name) = resolve::resolve_aggregate_info(db, InFile::new(file, &path))?;
-
-    let param_list = create_aggregate.param_list()?;
-    let params = param_list.syntax().text().to_string();
-
-    Some(Hover::snippet(format!(
-        "aggregate {schema}.{aggregate_name}{params}"
-    )))
-}
-
-fn hover_procedure(db: &dyn Db, def: Location) -> Option<Hover> {
-    let create_procedure = def
-        .to_node(db)?
-        .ancestors()
-        .find_map(ast::CreateProcedure::cast)?;
-    format_create_procedure(db, InFile::new(def.file, create_procedure))
-}
-
-fn format_create_procedure(
-    db: &dyn Db,
-    create_procedure: InFile<ast::CreateProcedure>,
-) -> Option<Hover> {
-    let file = create_procedure.file_id;
-    let create_procedure = create_procedure.value;
-    let path = create_procedure.name()?.path()?;
-    let (schema, procedure_name) = resolve::resolve_procedure_info(db, InFile::new(file, &path))?;
-
-    let param_list = create_procedure.param_list()?;
-    let params = param_list.syntax().text().to_string();
-
-    Some(Hover::snippet(format!(
-        "procedure {schema}.{procedure_name}{params}"
-    )))
-}
-
-fn hover_routine(db: &dyn Db, def: Location) -> Option<Hover> {
-    for ancestor in def.to_node(db)?.ancestors() {
-        if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
-            return format_create_function(db, InFile::new(def.file, create_function));
-        }
-        if let Some(create_aggregate) = ast::CreateAggregate::cast(ancestor.clone()) {
-            return format_create_aggregate(db, InFile::new(def.file, create_aggregate));
-        }
-        if let Some(create_procedure) = ast::CreateProcedure::cast(ancestor) {
-            return format_create_procedure(db, InFile::new(def.file, create_procedure));
+impl fmt::Display for OperandName<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.operand {
+            Operand::None => f.write_str("none"),
+            Operand::Unknown => f.write_str("unknown"),
+            Operand::Ty(ty) => write!(f, "{}", self.index.type_name(ty)),
         }
     }
-
-    None
 }
 
-fn qualified_star_from_clause_table_ptr(
-    db: &dyn Db,
-    file: FileId,
-    position: TextSize,
-    from_clause: &ast::FromClause,
-    table_name: &Name,
-) -> Option<InFile<SyntaxNodePtr>> {
-    let from_item = resolve::find_from_item_in_from_clause(from_clause, table_name)?;
-
-    if let Some(alias) = from_item.alias()
-        && alias.columns().is_some()
-    {
-        return Some(InFile::new(file, SyntaxNodePtr::new(alias.syntax())));
-    }
-
-    let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
-
-    let name_ref = match &from_item {
-        ast::FromItem::RelationFromItem(relation) => relation.name_ref(),
-        _ => None,
-    };
-    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
-    resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
-        .map(|(table_like_ptr, _kind)| table_like_ptr)
+struct ColumnList<'a> {
+    index: &'a SemanticIndex,
+    columns: IdxRange<Column>,
 }
 
-fn qualified_star_table_ptr(
-    db: &dyn Db,
-    field_expr: InFile<ast::FieldExpr>,
-) -> Option<InFile<SyntaxNodePtr>> {
-    let file = field_expr.file_id;
-    let field_expr = field_expr.value;
-    let table_name = resolve::qualified_star_table_name(&field_expr)?;
-    let position = field_expr.syntax().text_range().start();
-    let target = field_expr
-        .syntax()
-        .ancestors()
-        .find_map(ast::Target::cast)?;
-
-    let path = match ast_nav::target_parent_query(&target)? {
-        ast_nav::ParentQuery::Select(select) => {
-            return qualified_star_from_clause_table_ptr(
-                db,
-                file,
-                position,
-                &select.from_clause()?,
-                &table_name,
-            );
-        }
-        ast_nav::ParentQuery::SelectInto(select_into) => {
-            return qualified_star_from_clause_table_ptr(
-                db,
-                file,
-                position,
-                &select_into.from_clause()?,
-                &table_name,
-            );
-        }
-        ast_nav::ParentQuery::Update(update) => {
-            update.relation_name()?.relation_name_ref()?.path_ref()?
-        }
-        ast_nav::ParentQuery::Delete(delete) => {
-            delete.relation_name()?.relation_name_ref()?.path_ref()?
-        }
-        ast_nav::ParentQuery::Insert(insert) => insert.relation_name_ref()?.path_ref()?,
-        ast_nav::ParentQuery::Merge(merge) => {
-            merge.table_relation_name()?.table_name_ref()?.path_ref()?
-        }
-    };
-
-    table_or_view_or_cte_ptrs(db, InFile::new(file, &path), position)?
-        .into_iter()
-        .next()
-}
-
-fn table_or_view_or_cte_ptrs(
-    db: &dyn Db,
-    path: InFile<&ast::PathRef>,
-    position: TextSize,
-) -> Option<Vec<InFile<SyntaxNodePtr>>> {
-    let file = path.file_id;
-    let path = path.value;
-    let (schema, table_name) = name::schema_and_name_path(path)?;
-    let mut results = vec![];
-    let name_ref = path.segment();
-    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
-
-    if let Some((table_like_ptr, _kind)) =
-        resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
-    {
-        results.push(table_like_ptr);
-    }
-
-    if results.is_empty() {
-        return None;
-    }
-    Some(results)
-}
-
-fn unqualified_star_table_ptrs(
-    db: &dyn Db,
-    target: InFile<&ast::Target>,
-) -> Option<Vec<InFile<SyntaxNodePtr>>> {
-    let file = target.file_id;
-    let target = target.value;
-    target.star_token()?;
-
-    let path = match ast_nav::target_parent_query(&target.clone())? {
-        ast_nav::ParentQuery::Select(select) => {
-            let from_clause = select.from_clause()?;
-            let results = resolve::table_ptrs_from_clause(db, InFile::new(file, &from_clause));
-            if results.is_empty() {
-                return None;
+impl fmt::Display for ColumnList<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("(")?;
+        for (i, column) in self.columns.iter().enumerate() {
+            if i > 0 {
+                f.write_str(", ")?;
             }
-            return Some(results);
-        }
-        ast_nav::ParentQuery::SelectInto(select_into) => {
-            let from_clause = select_into.from_clause()?;
-            let results = resolve::table_ptrs_from_clause(db, InFile::new(file, &from_clause));
-            if results.is_empty() {
-                return None;
+            let column = &self.index.columns[column];
+            let name = column
+                .name
+                .map_or("?column?", |name| self.index.names.resolve(name));
+            f.write_str(name)?;
+            if let Some(ty) = column.ty {
+                write!(f, " {}", self.index.type_name(ty))?;
             }
-            return Some(results);
         }
-        ast_nav::ParentQuery::Update(update) => {
-            update.relation_name()?.relation_name_ref()?.path_ref()
-        }
-        ast_nav::ParentQuery::Insert(insert) => insert.relation_name_ref()?.path_ref(),
-        ast_nav::ParentQuery::Delete(delete) => {
-            delete.relation_name()?.relation_name_ref()?.path_ref()
-        }
-        ast_nav::ParentQuery::Merge(merge) => {
-            merge.table_relation_name()?.table_name_ref()?.path_ref()
-        }
-    }?;
-
-    let position = target.syntax().text_range().start();
-    table_or_view_or_cte_ptrs(db, InFile::new(file, &path), position)
+        f.write_str(")")
+    }
 }
 
-fn unqualified_star_in_arg_list_ptrs(
-    db: &dyn Db,
-    arg_list: InFile<&ast::ArgList>,
-) -> Option<Vec<InFile<SyntaxNodePtr>>> {
-    let file = arg_list.file_id;
-    let arg_list = arg_list.value;
-    let from_clause = arg_list
-        .syntax()
-        .ancestors()
-        .find_map(ast::Select::cast)?
-        .from_clause()?;
-    let results = resolve::table_ptrs_from_clause(db, InFile::new(file, &from_clause));
+struct ParamList<'a> {
+    index: &'a SemanticIndex,
+    function: FunctionId,
+}
 
-    if results.is_empty() {
-        return None;
+impl fmt::Display for ParamList<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let index = self.index;
+        let function = &index.functions[self.function];
+        f.write_str("(")?;
+        for (i, param) in function.params.iter().enumerate() {
+            match (i, function.direct_args == Some(i)) {
+                (0, true) => f.write_str("order by ")?,
+                (_, true) => f.write_str(" order by ")?,
+                (0, false) => {}
+                (_, false) => f.write_str(", ")?,
+            }
+            let param = &index.params[param];
+            let mut parts = 0;
+            let mode = match param.mode {
+                ParamMode::In => None,
+                ParamMode::Out => Some("out"),
+                ParamMode::InOut => Some("inout"),
+                ParamMode::Variadic => Some("variadic"),
+            };
+            for part in [mode, param.name.map(|name| index.names.resolve(name))]
+                .into_iter()
+                .flatten()
+            {
+                if parts > 0 {
+                    f.write_str(" ")?;
+                }
+                f.write_str(part)?;
+                parts += 1;
+            }
+            if let Some(ty) = param.ty {
+                if parts > 0 {
+                    f.write_str(" ")?;
+                }
+                write!(f, "{}", index.type_name(ty))?;
+            }
+            if param.has_default {
+                f.write_str(" default")?;
+            }
+        }
+        f.write_str(")")
     }
-
-    Some(results)
 }
 
 #[cfg(test)]
-mod test {
-
-    use crate::hover::hover;
-    use crate::test_utils::Fixture;
-    use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
-    use insta::assert_snapshot;
-
-    #[must_use]
-    #[track_caller]
-    fn check_hover(sql: &str) -> String {
-        check_hover_(sql).expect("should find hover information")
-    }
-
-    #[track_caller]
-    fn check_hover_(sql: &str) -> Option<String> {
-        let fixture = Fixture::new(sql);
-        let marker = fixture.marker();
-        let offset = marker.offset_before();
-        let db = fixture.db();
-        if let Some(type_info) = hover(db, offset) {
-            let title = format!("hover: {}", type_info.snippet);
-            let group = Level::INFO.primary_title(&title).element(
-                Snippet::source(offset.file_id.original_file(db).content(db).as_ref())
-                    .fold(true)
-                    .annotation(AnnotationKind::Context.span(marker.range()).label("hover")),
-            );
-            let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
-            return Some(
-                renderer
-                    .render(&[group])
-                    // neater
-                    .replace("info: hover:", "hover:"),
-            );
-        }
-        None
-    }
-
-    #[track_caller]
-    fn hover_not_found(sql: &str) {
-        if let Some(hover) = check_hover_(sql) {
-            panic!("expected no hover, found:\n{hover}");
-        }
-    }
-
-    #[must_use]
-    #[track_caller]
-    fn check_hover_info(sql: &str) -> super::Hover {
-        let fixture = Fixture::new(sql);
-        let offset = fixture.marker().offset_before();
-
-        hover(fixture.db(), offset).expect("should find hover information")
-    }
-
-    #[test]
-    fn hover_select_target_ordinal_in_order_by() {
-        assert_snapshot!(check_hover("
-create table t(a int, b text);
-select a, b from t order by 2$0;
-"), @"
-        hover: column public.t.b text
-          ╭▸ 
-        3 │ select a, b from t order by 2;
-          ╰╴                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_target_ordinal_in_group_by() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b)
-select a, max(b) from t group by 1$0;
-"), @"
-        hover: column t.a integer
-          ╭▸ 
-        3 │ select a, max(b) from t group by 1;
-          ╰╴                                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_target_ordinal_aliased_expr() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-select a, max(b) as maximum from t order by 2$0;
-"), @"
-        hover: column maximum
-          ╭▸ 
-        3 │ select a, max(b) as maximum from t order by 2;
-          ╰╴                                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_target_ordinal_aliased_cast() {
-        assert_snapshot!(check_hover("
-create table t(a int);
-select a::text as label from t order by 1$0;
-"), @"
-        hover: column label text
-          ╭▸ 
-        3 │ select a::text as label from t order by 1;
-          ╰╴                                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_window_order_by_integer_is_not_a_target_ordinal() {
-        hover_not_found("select a, row_number() over (order by 1$0) from t");
-    }
-
-    #[test]
-    fn hover_select_target_alias() {
-        assert_snapshot!(check_hover("
-create table t(a int);
-select a::text as label$0 from t;
-"), @"
-        hover: column label text
-          ╭▸ 
-        3 │ select a::text as label from t;
-          ╰╴                      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_target_ordinal_in_star() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b)
-select *, a from t order by 2$0;
-"), @"
-        hover: column t.b integer
-          ╭▸ 
-        3 │ select *, a from t order by 2;
-          ╰╴                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_target_ordinal_in_qualified_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b text);
-create table u(c bigint);
-select u.*, t.* from t, u order by 3$0;
-"), @"
-        hover: column public.t.b text
-          ╭▸ 
-        4 │ select u.*, t.* from t, u order by 3;
-          ╰╴                                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_target_ordinal_in_paren_select() {
-        assert_snapshot!(check_hover("
-create table t(a int, b text);
-(select a, b from t) order by 2$0;
-"), @"
-        hover: column public.t.b text
-          ╭▸ 
-        3 │ (select a, b from t) order by 2;
-          ╰╴                              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_in_create_index() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-create index idx_email on users(email$0);
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ create index idx_email on users(email);
-          ╰╴                                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_drop_statistics() {
-        assert_snapshot!(check_hover("
-create table t(a int);
-create statistics s on a from t;
-drop statistics s$0;
-"), @"
-        hover: statistics public.s on public.t
-          ╭▸ 
-        4 │ drop statistics s;
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_int_type() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-create index idx_id on users(id$0);
-"), @r"
-        hover: column public.users.id int
-          ╭▸ 
-        3 │ create index idx_id on users(id);
-          ╰╴                              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-create index idx_email on public.users(email$0);
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ create index idx_email on public.users(email);
-          ╰╴                                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_temp_table() {
-        assert_snapshot!(check_hover("
-create temp table users(id int, email text);
-create index idx_email on users(email$0);
-"), @r"
-        hover: column pg_temp.users.email text
-          ╭▸ 
-        3 │ create index idx_email on users(email);
-          ╰╴                                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_multiple_columns() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text, name varchar(100));
-create index idx_users on users(id, email$0, name);
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ create index idx_users on users(id, email, name);
-          ╰╴                                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_varchar() {
-        assert_snapshot!(check_hover("
-create table users(id int, name varchar(100));
-create index idx_name on users(name$0);
-"), @r"
-        hover: column public.users.name varchar(100)
-          ╭▸ 
-        3 │ create index idx_name on users(name);
-          ╰╴                                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_bigint() {
-        assert_snapshot!(check_hover("
-create table metrics(value bigint);
-create index idx_value on metrics(value$0);
-"), @r"
-        hover: column public.metrics.value bigint
-          ╭▸ 
-        3 │ create index idx_value on metrics(value);
-          ╰╴                                      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_timestamp() {
-        assert_snapshot!(check_hover("
-create table events(created_at timestamp with time zone);
-create index idx_created on events(created_at$0);
-"), @r"
-        hover: column public.events.created_at timestamp with time zone
-          ╭▸ 
-        3 │ create index idx_created on events(created_at);
-          ╰╴                                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create table myschema.users(id int, email text);
-create index idx_email on users(email$0);
-"#), @r"
-        hover: column myschema.users.email text
-          ╭▸ 
-        4 │ create index idx_email on users(email);
-          ╰╴                                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_column_explicit_schema_overrides_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create table public.users(id int, email text);
-create table myschema.users(value bigint);
-create index idx_email on public.users(email$0);
-"#), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        5 │ create index idx_email on public.users(email);
-          ╰╴                                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_table_name() {
-        assert_snapshot!(check_hover("
-create table t(id int);
-create index idx on t$0(id);
-"), @r"
-        hover: table public.t(id int)
-          ╭▸ 
-        3 │ create index idx on t(id);
-          ╰╴                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_index_name_in_create() {
-        assert_snapshot!(check_hover("
-create table users(id int);
-create index idx$0 on users(id);
-"), @r"
-        hover: index public.idx on public.users(id)
-          ╭▸ 
-        3 │ create index idx on users(id);
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_table_in_create_index() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-create index idx_email on users$0(email);
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ create index idx_email on users(email);
-          ╰╴                              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-create index idx on public.users$0(id);
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ create index idx on public.users(id);
-          ╰╴                               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_table_temp() {
-        assert_snapshot!(check_hover("
-create temp table users(id int, email text);
-create index idx on users$0(id);
-"), @r"
-        hover: table pg_temp.users(id int, email text)
-          ╭▸ 
-        3 │ create index idx on users(id);
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_table_multiline() {
-        assert_snapshot!(check_hover("
-create table users(
-    id int,
-    email text,
-    name varchar(100)
-);
-create index idx on users$0(id);
-"), @r"
-        hover: table public.users(
-                  id int,
-                  email text,
-                  name varchar(100)
-              )
-          ╭▸ 
-        7 │ create index idx on users(id);
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_table_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create table users(id int, email text);
-create index idx on users$0(id);
-"#), @r"
-        hover: table myschema.users(id int, email text)
-          ╭▸ 
-        4 │ create index idx on users(id);
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_table_search_path_at_definition() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create table users(id int, email text);
-set search_path to myschema, otherschema;
-create index idx on users$0(id);
-"#), @r"
-        hover: table myschema.users(id int, email text)
-          ╭▸ 
-        5 │ create index idx on users(id);
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_table_definition() {
-        assert_snapshot!(check_hover("
-create table t$0(x bigint);
-"), @r"
-        hover: table public.t(x bigint)
-          ╭▸ 
-        2 │ create table t(x bigint);
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_table_definition_with_schema() {
-        assert_snapshot!(check_hover("
-create table myschema.users$0(id int);
-"), @r"
-        hover: table myschema.users(id int)
-          ╭▸ 
-        2 │ create table myschema.users(id int);
-          ╰╴                          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_temp_table_definition() {
-        assert_snapshot!(check_hover("
-create temp table t$0(x bigint);
-"), @r"
-        hover: table pg_temp.t(x bigint)
-          ╭▸ 
-        2 │ create temp table t(x bigint);
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_column_in_create_table() {
-        assert_snapshot!(check_hover("
-create table t(id$0 int);
-"), @r"
-        hover: column public.t.id int
-          ╭▸ 
-        2 │ create table t(id int);
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_column_in_create_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table myschema.users(id$0 int, name text);
-"), @r"
-        hover: column myschema.users.id int
-          ╭▸ 
-        2 │ create table myschema.users(id int, name text);
-          ╰╴                             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_column_in_temp_table() {
-        assert_snapshot!(check_hover("
-create temp table t(x$0 bigint);
-"), @r"
-        hover: column pg_temp.t.x bigint
-          ╭▸ 
-        2 │ create temp table t(x bigint);
-          ╰╴                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_multiple_columns() {
-        assert_snapshot!(check_hover("
-create table t(id int, email$0 text, name varchar(100));
-"), @r"
-        hover: column public.t.email text
-          ╭▸ 
-        2 │ create table t(id int, email text, name varchar(100));
-          ╰╴                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-drop table users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ drop table users;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table myschema.users(id int);
-drop table myschema.users$0;
-"), @r"
-        hover: table myschema.users(id int)
-          ╭▸ 
-        3 │ drop table myschema.users;
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_temp_table() {
-        assert_snapshot!(check_hover("
-create temp table t(x bigint);
-drop table t$0;
-"), @r"
-        hover: table pg_temp.t(x bigint)
-          ╭▸ 
-        3 │ drop table t;
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_index_definition() {
-        assert_snapshot!(check_hover("
-create table t(x bigint);
-create index idx$0 on t(x);
-"), @r"
-        hover: index public.idx on public.t(x)
-          ╭▸ 
-        3 │ create index idx on t(x);
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_index() {
-        assert_snapshot!(check_hover("
-create table t(x bigint);
-create index idx_x on t(x);
-drop index idx_x$0;
-"), @r"
-        hover: index public.idx_x on public.t(x)
-          ╭▸ 
-        4 │ drop index idx_x;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_type_definition() {
-        assert_snapshot!(check_hover("
-create type status$0 as enum ('active', 'inactive');
-"), @r"
-        hover: type public.status as enum ('active', 'inactive')
-          ╭▸ 
-        2 │ create type status as enum ('active', 'inactive');
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_type_definition_with_schema() {
-        assert_snapshot!(check_hover("
-create type myschema.status$0 as enum ('active', 'inactive');
-"), @r"
-        hover: type myschema.status as enum ('active', 'inactive')
-          ╭▸ 
-        2 │ create type myschema.status as enum ('active', 'inactive');
-          ╰╴                          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_type() {
-        assert_snapshot!(check_hover("
-create type status as enum ('active', 'inactive');
-drop type status$0;
-"), @r"
-        hover: type public.status as enum ('active', 'inactive')
-          ╭▸ 
-        3 │ drop type status;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_type_with_schema() {
-        assert_snapshot!(check_hover("
-create type myschema.status as enum ('active', 'inactive');
-drop type myschema.status$0;
-"), @r"
-        hover: type myschema.status as enum ('active', 'inactive')
-          ╭▸ 
-        3 │ drop type myschema.status;
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_type_composite() {
-        assert_snapshot!(check_hover("
-create type person$0 as (name text, age int);
-"), @r"
-        hover: type public.person as (name text, age int)
-          ╭▸ 
-        2 │ create type person as (name text, age int);
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_type_composite() {
-        assert_snapshot!(check_hover("
-create type person as (name text, age int);
-drop type person$0;
-"), @r"
-        hover: type public.person as (name text, age int)
-          ╭▸ 
-        3 │ drop type person;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_type_range() {
-        assert_snapshot!(check_hover("
-create type int4_range$0 as range (subtype = int4);
-"), @r"
-        hover: type public.int4_range (subtype = int4)
-          ╭▸ 
-        2 │ create type int4_range as range (subtype = int4);
-          ╰╴                     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_type_range() {
-        assert_snapshot!(check_hover("
-create type int4_range as range (subtype = int4);
-drop type int4_range$0;
-"), @r"
-        hover: type public.int4_range (subtype = int4)
-          ╭▸ 
-        3 │ drop type int4_range;
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cast_operator() {
-        assert_snapshot!(check_hover("
-create type foo as enum ('a', 'b');
-select x::foo$0;
-"), @r"
-        hover: type public.foo as enum ('a', 'b')
-          ╭▸ 
-        3 │ select x::foo;
-          ╰╴            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cast_function() {
-        assert_snapshot!(check_hover("
-create type bar as enum ('x', 'y');
-select cast(x as bar$0);
-"), @r"
-        hover: type public.bar as enum ('x', 'y')
-          ╭▸ 
-        3 │ select cast(x as bar);
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cast_with_schema() {
-        assert_snapshot!(check_hover("
-create type myschema.baz as enum ('m', 'n');
-select x::myschema.baz$0;
-"), @r"
-        hover: type myschema.baz as enum ('m', 'n')
-          ╭▸ 
-        3 │ select x::myschema.baz;
-          ╰╴                     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_function() {
-        assert_snapshot!(check_hover("
-create function foo() returns int as $$ select 1 $$ language sql;
-drop function foo$0();
-"), @r"
-        hover: function public.foo() returns int
-          ╭▸ 
-        3 │ drop function foo();
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_function_with_schema() {
-        assert_snapshot!(check_hover("
-create function myschema.foo() returns int as $$ select 1 $$ language sql;
-drop function myschema.foo$0();
-"), @r"
-        hover: function myschema.foo() returns int
-          ╭▸ 
-        3 │ drop function myschema.foo();
-          ╰╴                         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_function_definition() {
-        assert_snapshot!(check_hover("
-create function foo$0() returns int as $$ select 1 $$ language sql;
-"), @r"
-        hover: function public.foo() returns int
-          ╭▸ 
-        2 │ create function foo() returns int as $$ select 1 $$ language sql;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_function_with_explicit_schema() {
-        assert_snapshot!(check_hover("
-create function myschema.foo$0() returns int as $$ select 1 $$ language sql;
-"), @r"
-        hover: function myschema.foo() returns int
-          ╭▸ 
-        2 │ create function myschema.foo() returns int as $$ select 1 $$ language sql;
-          ╰╴                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_function_extracts_preceding_comment() {
-        let hover = check_hover_info(
-            "
--- this is a doc comment
--- for foo
-create function foo() returns int as $$ select 1 $$ language sql;
-select foo$0();
-",
-        );
-        assert_snapshot!(hover.markdown(), @"
-        ```sql
-        function public.foo() returns int
-        ```
-        ---
-        this is a doc comment
-        for foo
-        ");
-    }
-
-    #[test]
-    fn hover_type_extracts_preceding_comment() {
-        let hover = check_hover_info(
-            "
--- this is a doc comment
--- for foo
-create type foo as enum ('a', 'b');
-select 1::foo$0;
-",
-        );
-        assert_snapshot!(hover.markdown(), @"
-        ```sql
-        type public.foo as enum ('a', 'b')
-        ```
-        ---
-        this is a doc comment
-        for foo
-        ");
-    }
-
-    #[test]
-    fn hover_bigint_extracts_preceding_comment_from_int8_definition() {
-        let hover = check_hover_info(
-            "
--- 64-bit integer
-create type pg_catalog.int8;
-select 1::bigint$0;
-",
-        );
-        assert_snapshot!(hover.markdown(), @"
-        ```sql
-        type pg_catalog.int8
-        ```
-        ---
-        64-bit integer
-        ");
-    }
-
-    #[test]
-    fn hover_text_type() {
-        let hover = check_hover_info(
-            "
--- variable-length string, no limit specified
---
--- size: -1, align: 4
-create type pg_catalog.text;
-select '1'::text$0;
-",
-        );
-        assert_snapshot!(hover.markdown(), @"
-        ```sql
-        type pg_catalog.text
-        ```
-        ---
-        variable-length string, no limit specified
-        size: -1, align: 4
-        ");
-    }
-
-    #[test]
-    fn hover_column_extracts_preceding_comment() {
-        let hover = check_hover_info(
-            "
-create table users(
-  -- email address
-  email text
-);
-select email$0 from users;
-",
-        );
-        assert_snapshot!(hover.markdown(), @"
-        ```sql
-        column public.users.email text
-        ```
-        ---
-        email address
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_column_extracts_preceding_comment() {
-        let hover = check_hover_info(
-            "
-create table users(
-  -- email address
-  email$0 text
-);
-",
-        );
-        assert_snapshot!(hover.markdown(), @"
-        ```sql
-        column public.users.email text
-        ```
-        ---
-        email address
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_function_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create function foo() returns int as $$ select 1 $$ language sql;
-drop function foo$0();
-"#), @r"
-        hover: function myschema.foo() returns int
-          ╭▸ 
-        4 │ drop function foo();
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_function_overloaded() {
-        assert_snapshot!(check_hover("
-create function add(complex) returns complex as $$ select null $$ language sql;
-create function add(bigint) returns bigint as $$ select 1 $$ language sql;
-drop function add$0(complex);
-"), @r"
-        hover: function public.add(complex) returns complex
-          ╭▸ 
-        4 │ drop function add(complex);
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_function_second_overload() {
-        assert_snapshot!(check_hover("
-create function add(complex) returns complex as $$ select null $$ language sql;
-create function add(bigint) returns bigint as $$ select 1 $$ language sql;
-drop function add$0(bigint);
-"), @r"
-        hover: function public.add(bigint) returns bigint
-          ╭▸ 
-        4 │ drop function add(bigint);
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_aggregate() {
-        assert_snapshot!(check_hover("
-create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-drop aggregate myavg$0(int);
-"), @r"
-        hover: aggregate public.myavg(int)
-          ╭▸ 
-        3 │ drop aggregate myavg(int);
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_aggregate_with_schema() {
-        assert_snapshot!(check_hover("
-create aggregate myschema.myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-drop aggregate myschema.myavg$0(int);
-"), @r"
-        hover: aggregate myschema.myavg(int)
-          ╭▸ 
-        3 │ drop aggregate myschema.myavg(int);
-          ╰╴                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_aggregate_definition() {
-        assert_snapshot!(check_hover("
-create aggregate myavg$0(int) (sfunc = int4_avg_accum, stype = _int8);
-"), @r"
-        hover: aggregate public.myavg(int)
-          ╭▸ 
-        2 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-          ╰╴                     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_aggregate_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-drop aggregate myavg$0(int);
-"#), @r"
-        hover: aggregate myschema.myavg(int)
-          ╭▸ 
-        4 │ drop aggregate myavg(int);
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_aggregate_overloaded() {
-        assert_snapshot!(check_hover("
-create aggregate sum(complex) (sfunc = complex_add, stype = complex, initcond = '(0,0)');
-create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
-drop aggregate sum$0(complex);
-"), @r"
-        hover: aggregate public.sum(complex)
-          ╭▸ 
-        4 │ drop aggregate sum(complex);
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_aggregate_second_overload() {
-        assert_snapshot!(check_hover("
-create aggregate sum(complex) (sfunc = complex_add, stype = complex, initcond = '(0,0)');
-create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
-drop aggregate sum$0(bigint);
-"), @r"
-        hover: aggregate public.sum(bigint)
-          ╭▸ 
-        4 │ drop aggregate sum(bigint);
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_function_call() {
-        assert_snapshot!(check_hover("
-create function foo() returns int as $$ select 1 $$ language sql;
-select foo$0();
-"), @r"
-        hover: function public.foo() returns int
-          ╭▸ 
-        3 │ select foo();
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_function_call_with_schema() {
-        assert_snapshot!(check_hover("
-create function public.foo() returns int as $$ select 1 $$ language sql;
-select public.foo$0();
-"), @r"
-        hover: function public.foo() returns int
-          ╭▸ 
-        3 │ select public.foo();
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_function_call_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create function foo() returns int as $$ select 1 $$ language sql;
-select foo$0();
-"#), @r"
-        hover: function myschema.foo() returns int
-          ╭▸ 
-        4 │ select foo();
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_function_call_with_params() {
-        assert_snapshot!(check_hover("
-create function add(a int, b int) returns int as $$ select a + b $$ language sql;
-select add$0(1, 2);
-"), @r"
-        hover: function public.add(a int, b int) returns int
-          ╭▸ 
-        3 │ select add(1, 2);
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_builtin_function_call() {
-        assert_snapshot!(check_hover("
--- include-builtins
-select now$0();
-"), @"
-        hover: function pg_catalog.now() returns timestamp with time zone
-          ╭▸ 
-        3 │ select now();
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_named_arg_param() {
-        assert_snapshot!(check_hover("
-create function foo(bar_param int) returns int as $$ select 1 $$ language sql;
-select foo(bar_param$0 := 5);
-"), @r"
-        hover: parameter public.foo.bar_param int
-          ╭▸ 
-        3 │ select foo(bar_param := 5);
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_named_arg_param_schema_qualified() {
-        assert_snapshot!(check_hover("
-create schema s;
-create function s.foo(my_param int) returns int as $$ select 1 $$ language sql;
-select s.foo(my_param$0 := 10);
-"), @r"
-        hover: parameter s.foo.my_param int
-          ╭▸ 
-        4 │ select s.foo(my_param := 10);
-          ╰╴                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_named_arg_param_procedure() {
-        assert_snapshot!(check_hover("
-create procedure proc(param_x int) as 'select 1' language sql;
-call proc(param_x$0 := 42);
-"), @r"
-        hover: parameter public.proc.param_x int
-          ╭▸ 
-        3 │ call proc(param_x := 42);
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_function_call_style_column_access() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-select a$0(t) from t;
-"), @r"
-        hover: column public.t.a int
-          ╭▸ 
-        3 │ select a(t) from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_function_call_style_column_access_with_function_precedence() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-create function b(t) returns int as 'select 1' LANGUAGE sql;
-select b$0(t) from t;
-"), @r"
-        hover: function public.b(t) returns int
-          ╭▸ 
-        4 │ select b(t) from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_function_call_style_table_arg() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-select a(t$0) from t;
-"), @r"
-        hover: table public.t(a int, b int)
-          ╭▸ 
-        3 │ select a(t) from t;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_function_call_style_table_arg_with_function() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-create function b(t) returns int as 'select 1' LANGUAGE sql;
-select b(t$0) from t;
-"), @r"
-        hover: table public.t(a int, b int)
-          ╭▸ 
-        4 │ select b(t) from t;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_function_call_style_table_arg_in_where() {
-        assert_snapshot!(check_hover("
-create table t(a int);
-select * from t where a(t$0) > 2;
-"), @r"
-        hover: table public.t(a int)
-          ╭▸ 
-        3 │ select * from t where a(t) > 2;
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_qualified_table_ref_in_where() {
-        assert_snapshot!(check_hover("
-create table t(a int);
-create function b(t) returns int as 'select 1' language sql;
-select * from t where t$0.b > 2;
-"), @r"
-        hover: table public.t(a int)
-          ╭▸ 
-        4 │ select * from t where t.b > 2;
-          ╰╴                      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_field_style_function_call() {
-        assert_snapshot!(check_hover("
-create table t(a int);
-create function b(t) returns int as 'select 1' language sql;
-select t.b$0 from t;
-"), @r"
-        hover: function public.b(t) returns int
-          ╭▸ 
-        4 │ select t.b from t;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_field_style_function_call_column_precedence() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-create function b(t) returns int as 'select 1' language sql;
-select t.b$0 from t;
-"), @r"
-        hover: column public.t.b int
-          ╭▸ 
-        4 │ select t.b from t;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_field_style_function_call_table_ref() {
-        assert_snapshot!(check_hover("
-create table t(a int);
-create function b(t) returns int as 'select 1' language sql;
-select t$0.b from t;
-"), @r"
-        hover: table public.t(a int)
-          ╭▸ 
-        4 │ select t.b from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_from_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-select * from users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ select * from users;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_subquery_qualified_table_ref() {
-        assert_snapshot!(check_hover("
-select t$0.a from (select 1 a) t;
-"), @r"
-        hover: subquery t as (select 1 a)
-          ╭▸ 
-        2 │ select t.a from (select 1 a) t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_subquery_qualified_column_ref() {
-        assert_snapshot!(check_hover("
-select t.a$0 from (select 1 a) t;
-"), @"
-        hover: column t.a integer
-          ╭▸ 
-        2 │ select t.a from (select 1 a) t;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_subquery_unqualified_column_ref_with_alias() {
-        assert_snapshot!(check_hover("
-select a$0 from (select 1 a) t;
-"), @"
-        hover: column t.a integer
-          ╭▸ 
-        2 │ select a from (select 1 a) t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_from_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-select * from public.users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ select * from public.users;
-          ╰╴                         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_from_table_with_search_path() {
-        assert_snapshot!(check_hover("
-set search_path to foo;
-create table foo.users(id int, email text);
-select * from users$0;
-"), @r"
-        hover: table foo.users(id int, email text)
-          ╭▸ 
-        4 │ select * from users;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_from_temp_table() {
-        assert_snapshot!(check_hover("
-create temp table users(id int, email text);
-select * from users$0;
-"), @r"
-        hover: table pg_temp.users(id int, email text)
-          ╭▸ 
-        3 │ select * from users;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_from_multiline_table() {
-        assert_snapshot!(check_hover("
-create table users(
-    id int,
-    email text,
-    name varchar(100)
-);
-select * from users$0;
-"), @r"
-        hover: table public.users(
-                  id int,
-                  email text,
-                  name varchar(100)
-              )
-          ╭▸ 
-        7 │ select * from users;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-select id$0 from users;
-"), @r"
-        hover: column public.users.id int
-          ╭▸ 
-        3 │ select id from users;
-          ╰╴        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column_second() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-select id, email$0 from users;
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ select id, email from users;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-select email$0 from public.users;
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ select email from public.users;
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column_with_search_path() {
-        assert_snapshot!(check_hover("
-set search_path to foo;
-create table foo.users(id int, email text);
-select id$0 from users;
-"), @r"
-        hover: column foo.users.id int
-          ╭▸ 
-        4 │ select id from users;
-          ╰╴        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_qualified_star() {
-        assert_snapshot!(check_hover("
-create table u(id int, b int);
-select u.*$0 from u;
-"), @r"
-        hover: column public.u.id int
-              column public.u.b int
-          ╭▸ 
-        3 │ select u.* from u;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_unqualified_star() {
-        assert_snapshot!(check_hover("
-create table u(id int, b int);
-select *$0 from u;
-"), @r"
-        hover: column public.u.id int
-              column public.u.b int
-          ╭▸ 
-        3 │ select * from u;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_count_star() {
-        assert_snapshot!(check_hover("
-create table u(id int, b int);
-select count(*$0) from u;
-"), @r"
-        hover: column public.u.id int
-              column public.u.b int
-          ╭▸ 
-        3 │ select count(*) from u;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_insert_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-insert into users$0(id, email) values (1, 'test');
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ insert into users(id, email) values (1, 'test');
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_insert_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-insert into public.users$0(id, email) values (1, 'test');
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ insert into public.users(id, email) values (1, 'test');
-          ╰╴                       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_insert_column() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-insert into users(id$0, email) values (1, 'test');
-"), @r"
-        hover: column public.users.id int
-          ╭▸ 
-        3 │ insert into users(id, email) values (1, 'test');
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_insert_column_second() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-insert into users(id, email$0) values (1, 'test');
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ insert into users(id, email) values (1, 'test');
-          ╰╴                          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_insert_column_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-insert into public.users(email$0) values ('test');
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ insert into public.users(email) values ('test');
-          ╰╴                             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_delete_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-delete from users$0 where id = 1;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ delete from users where id = 1;
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_delete_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-delete from public.users$0 where id = 1;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ delete from public.users where id = 1;
-          ╰╴                       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_delete_where_column() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-delete from users where id$0 = 1;
-"), @r"
-        hover: column public.users.id int
-          ╭▸ 
-        3 │ delete from users where id = 1;
-          ╰╴                         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_delete_where_column_second() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text, active boolean);
-delete from users where id = 1 and email$0 = 'test';
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ delete from users where id = 1 and email = 'test';
-          ╰╴                                       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_delete_where_column_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-delete from public.users where email$0 = 'test';
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ delete from public.users where email = 'test';
-          ╰╴                                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_table_as_column() {
-        assert_snapshot!(check_hover("
-create table t(x bigint, y bigint);
-select t$0 from t;
-"), @r"
-        hover: table public.t(x bigint, y bigint)
-          ╭▸ 
-        3 │ select t from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_table_as_column_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.t(x bigint, y bigint);
-select t$0 from public.t;
-"), @r"
-        hover: table public.t(x bigint, y bigint)
-          ╭▸ 
-        3 │ select t from public.t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_table_as_column_with_search_path() {
-        assert_snapshot!(check_hover("
-set search_path to foo;
-create table foo.users(id int, email text);
-select users$0 from users;
-"), @r"
-        hover: table foo.users(id int, email text)
-          ╭▸ 
-        4 │ select users from users;
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column_with_same_name_as_table() {
-        assert_snapshot!(check_hover("
-create table t(t int);
-select t$0 from t;
-"), @r"
-        hover: column public.t.t int
-          ╭▸ 
-        3 │ select t from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_schema() {
-        assert_snapshot!(check_hover("
-create schema foo$0;
-"), @r"
-        hover: schema foo
-          ╭▸ 
-        2 │ create schema foo;
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_schema_authorization() {
-        assert_snapshot!(check_hover("
-create schema authorization foo$0;
-"), @r"
-        hover: schema foo
-          ╭▸ 
-        2 │ create schema authorization foo;
-          ╰╴                              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_schema_authorization() {
-        assert_snapshot!(check_hover("
-create schema authorization foo;
-drop schema foo$0;
-"), @r"
-        hover: schema foo
-          ╭▸ 
-        3 │ drop schema foo;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_schema() {
-        assert_snapshot!(check_hover("
-create schema foo;
-drop schema foo$0;
-"), @r"
-        hover: schema foo
-          ╭▸ 
-        3 │ drop schema foo;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_schema_after_definition() {
-        assert_snapshot!(check_hover("
-drop schema foo$0;
-create schema foo;
-"), @r"
-        hover: schema foo
-          ╭▸ 
-        2 │ drop schema foo;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_table() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a)
-select a from t$0;
-"), @r"
-        hover: with t as (select 1 a)
-          ╭▸ 
-        3 │ select a from t;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_cte_table_as_column() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select t$0 from t;
-"), @r"
-        hover: with t as (select 1 a, 2 b, 3 c)
-          ╭▸ 
-        3 │ select t from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_column() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a)
-select a$0 from t;
-"), @"
-        hover: column t.a integer
-          ╭▸ 
-        3 │ select a from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_with_multiple_columns() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b)
-select b$0 from t;
-"), @"
-        hover: column t.b integer
-          ╭▸ 
-        3 │ select b from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_with_column_list() {
-        assert_snapshot!(check_hover("
-with t(a) as (select 1)
-select a$0 from t;
-"), @"
-        hover: column t.a integer
-          ╭▸ 
-        3 │ select a from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_nested_cte() {
-        assert_snapshot!(check_hover("
-with x as (select 1 a),
-     y as (select a from x)
-select a$0 from y;
-"), @"
-        hover: column y.a integer
-          ╭▸ 
-        4 │ select a from y;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_shadowing_table_with_star() {
-        assert_snapshot!(check_hover("
-create table t(a bigint);
-with t as (select * from t)
-select a$0 from t;
-"), @r"
-        hover: column public.t.a bigint
-          ╭▸ 
-        4 │ select a from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_definition() {
-        assert_snapshot!(check_hover("
-with t$0 as (select 1 a)
-select a from t;
-"), @r"
-        hover: with t as (select 1 a)
-          ╭▸ 
-        2 │ with t as (select 1 a)
-          ╰╴     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_values_column1() {
-        assert_snapshot!(check_hover("
-with t as (
-    values (1, 2), (3, 4)
-)
-select column1$0, column2 from t;
-"), @"
-        hover: column t.column1 integer
-          ╭▸ 
-        5 │ select column1, column2 from t;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_values_column2() {
-        assert_snapshot!(check_hover("
-with t as (
-    values (1, 2), (3, 4)
-)
-select column1, column2$0 from t;
-"), @"
-        hover: column t.column2 integer
-          ╭▸ 
-        5 │ select column1, column2 from t;
-          ╰╴                      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_values_single_column() {
-        assert_snapshot!(check_hover("
-with t as (
-    values (1), (2), (3)
-)
-select column1$0 from t;
-"), @"
-        hover: column t.column1 integer
-          ╭▸ 
-        5 │ select column1 from t;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_values_uppercase_column_names() {
-        assert_snapshot!(check_hover("
-with t as (
-    values (1, 2), (3, 4)
-)
-select COLUMN1$0, COLUMN2 from t;
-"), @"
-        hover: column t.column1 integer
-          ╭▸ 
-        5 │ select COLUMN1, COLUMN2 from t;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_subquery_column() {
-        assert_snapshot!(check_hover("
-select a$0 from (select 1 a);
-"), @r"
-        hover: column a integer
-          ╭▸ 
-        2 │ select a from (select 1 a);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_subquery_values_column() {
-        assert_snapshot!(check_hover("
-select column1$0 from (values (1, 'foo'));
-"), @r"
-        hover: column column1 integer
-          ╭▸ 
-        2 │ select column1 from (values (1, 'foo'));
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_qualified_star() {
-        assert_snapshot!(check_hover("
-with u as (select 1 id, 2 b)
-select u.*$0 from u;
-"), @"
-        hover: column u.id integer
-              column u.b integer
-          ╭▸ 
-        3 │ select u.* from u;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_values_qualified_star() {
-        assert_snapshot!(check_hover("
-with t as (values (1, 2), (3, 4))
-select t.*$0 from t;
-"), @"
-        hover: column t.column1 integer
-              column t.column2 integer
-          ╭▸ 
-        3 │ select t.* from t;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_table_alias_with_column_list() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select u$0.x, u.y from t as u(x, y);
-"), @"
-        hover: table u(x, y, c)
-          ╭▸ 
-        3 │ select u.x, u.y from t as u(x, y);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_table_alias_with_column_list_column_ref() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select u.x$0 from t as u(x, y);
-"), @"
-        hover: column u.x integer
-          ╭▸ 
-        3 │ select u.x from t as u(x, y);
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_table_alias_with_column_list_table_ref() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select u$0 from t as u(x, y);
-"), @"
-        hover: table u(x, y, c)
-          ╭▸ 
-        3 │ select u from t as u(x, y);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_subquery_alias_with_column_list_table_ref() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select z$0 from (select * from t) as z(x, y);
-"), @"
-        hover: table z(x, y, c)
-          ╭▸ 
-        3 │ select z from (select * from t) as z(x, y);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_subquery_nested_paren_alias_with_column_list_table_ref() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select z$0 from ((select * from t)) as z(x, y);
-"), @"
-        hover: table z(x, y, c)
-          ╭▸ 
-        3 │ select z from ((select * from t)) as z(x, y);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_table_alias_with_partial_column_list_star() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select *$0 from t u(x, y);
-"), @"
-        hover: column u.x integer
-              column u.y integer
-              column u.c integer
-          ╭▸ 
-        3 │ select * from t u(x, y);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_table_alias_with_partial_column_list_star_from_information_schema() {
-        assert_snapshot!(check_hover("
--- include-builtins
-with t as (select * from information_schema.sql_features)
-select *$0 from t u(x);
-"), @"
-        hover: column u.x character_data
-              column u.feature_name character_data
-              column u.sub_feature_id character_data
-              column u.sub_feature_name character_data
-              column u.is_supported yes_or_no
-              column u.is_verified_by character_data
-              column u.comments character_data
-          ╭▸ 
-        4 │ select * from t u(x);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_cte_builtin_information_schema() {
-        assert_snapshot!(check_hover("
--- include-builtins
-with t as (select * from information_schema.sql_features) 
-select *$0 from t;
-"), @"
-        hover: column t.feature_id character_data
-              column t.feature_name character_data
-              column t.sub_feature_id character_data
-              column t.sub_feature_name character_data
-              column t.is_supported yes_or_no
-              column t.is_verified_by character_data
-              column t.comments character_data
-          ╭▸ 
-        4 │ select * from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_cte_table_alias_with_partial_column_list_qualified_star() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b, 3 c)
-select u.*$0 from t u(x, y);
-"), @"
-        hover: column u.x integer
-              column u.y integer
-              column u.c integer
-          ╭▸ 
-        3 │ select u.* from t u(x, y);
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_star_from_cte_empty_select() {
-        hover_not_found(
-            "
-with t as (select)
-select *$0 from t;
-",
-        );
-    }
-
-    #[test]
-    fn hover_on_star_with_subquery_from_cte() {
-        assert_snapshot!(check_hover("
-with u as (select 1 id, 2 b)
-select *$0 from (select *, *, * from u);
-"), @"
-        hover: column u.id integer
-              column u.b integer
-              column u.id integer
-              column u.b integer
-              column u.id integer
-              column u.b integer
-          ╭▸ 
-        3 │ select * from (select *, *, * from u);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_star_with_subquery_from_table() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-select *$0 from (select a from t);
-"), @r"
-        hover: column public.t.a int
-          ╭▸ 
-        3 │ select * from (select a from t);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_star_with_subquery_from_table_statement() {
-        assert_snapshot!(check_hover("
-with t as (select 1 a, 2 b)
-select *$0 from (table t);
-"), @"
-        hover: column a integer
-              column b integer
-          ╭▸ 
-        3 │ select * from (table t);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_star_from_information_schema_table() {
-        assert_snapshot!(check_hover("
--- include-builtins
-select *$0 from information_schema.sql_features;
-"), @"
-        hover: column information_schema.sql_features.feature_id character_data
-              column information_schema.sql_features.feature_name character_data
-              column information_schema.sql_features.sub_feature_id character_data
-              column information_schema.sql_features.sub_feature_name character_data
-              column information_schema.sql_features.is_supported yes_or_no
-              column information_schema.sql_features.is_verified_by character_data
-              column information_schema.sql_features.comments character_data
-          ╭▸ 
-        3 │ select * from information_schema.sql_features;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_star_with_subquery_literal() {
-        assert_snapshot!(check_hover("
-select *$0 from (select 1);
-"), @"
-        hover: column ?column? integer
-          ╭▸ 
-        2 │ select * from (select 1);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_star_with_subquery_literal_with_alias() {
-        assert_snapshot!(check_hover("
-select *$0 from (select 1) as sub;
-"), @"
-        hover: column sub.?column? integer
-          ╭▸ 
-        2 │ select * from (select 1) as sub;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_view_inferred_column_name() {
-        assert_snapshot!(check_hover(r#"
-create view v as select 1;
-select "?column?"$0 from v;
-"#), @r#"
-        hover: column public.v.?column? integer
-          ╭▸ 
-        3 │ select "?column?" from v;
-          ╰╴                ─ hover
-        "#);
-    }
-
-    #[test]
-    fn hover_on_cte_inferred_column_name() {
-        assert_snapshot!(check_hover(r#"
-with x as (select 1)
-select "?column?"$0 from x;
-"#), @r#"
-        hover: column x.?column? integer
-          ╭▸ 
-        3 │ select "?column?" from x;
-          ╰╴                ─ hover
-        "#);
-    }
-
-    #[test]
-    fn hover_on_create_table_as_inferred_column_name() {
-        assert_snapshot!(check_hover(r#"
-create table t as select 1;
-select "?column?"$0 from t;
-"#), @r#"
-        hover: column public.t.?column? integer
-          ╭▸ 
-        3 │ select "?column?" from t;
-          ╰╴                ─ hover
-        "#);
-    }
-
-    #[test]
-    fn hover_on_paren_select_inferred_column_name() {
-        assert_snapshot!(check_hover(r#"
-select "?column?"$0 from (select 1);
-"#), @r#"
-        hover: column ?column? integer
-          ╭▸ 
-        2 │ select "?column?" from (select 1);
-          ╰╴                ─ hover
-        "#);
-    }
-
-    #[test]
-    fn hover_on_paren_select_aliased_inferred_column_name() {
-        assert_snapshot!(check_hover(r#"
-select sub."?column?"$0 from (select 1) sub;
-"#), @r#"
-        hover: column sub.?column? integer
-          ╭▸ 
-        2 │ select sub."?column?" from (select 1) sub;
-          ╰╴                    ─ hover
-        "#);
-    }
-
-    #[test]
-    fn hover_on_view_qualified_star() {
-        assert_snapshot!(check_hover("
-create view v as select 1 id, 2 b;
-select v.*$0 from v;
-"), @"
-        hover: column public.v.id integer
-              column public.v.b integer
-          ╭▸ 
-        3 │ select v.* from v;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_materialized_view_qualified_star() {
-        assert_snapshot!(check_hover("
-  create materialized view v as select 1 id, 2 b;
-  select v.*$0 from v;
-  "), @"
-        hover: column public.v.id integer
-              column public.v.b integer
-          ╭▸ 
-        3 │   select v.* from v;
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_view_qualified_star_with_column_list() {
-        assert_snapshot!(check_hover("
-create view v (x, y) as select 1, 2, 3;
-select v.*$0 from v;
-"), @"
-        hover: column public.v.x integer
-              column public.v.y integer
-              column public.v.?column? integer
-          ╭▸ 
-        3 │ select v.* from v;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_materialized_view_qualified_star_with_column_list() {
-        assert_snapshot!(check_hover("
-create materialized view mv (x, y) as select 1, 2, 3;
-select mv.*$0 from mv;
-"), @"
-        hover: column public.mv.x integer
-              column public.mv.y integer
-              column public.mv.?column? integer
-          ╭▸ 
-        3 │ select mv.* from mv;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_procedure() {
-        assert_snapshot!(check_hover("
-create procedure foo() language sql as $$ select 1 $$;
-drop procedure foo$0();
-"), @r"
-        hover: procedure public.foo()
-          ╭▸ 
-        3 │ drop procedure foo();
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_procedure_with_schema() {
-        assert_snapshot!(check_hover("
-create procedure myschema.foo() language sql as $$ select 1 $$;
-drop procedure myschema.foo$0();
-"), @r"
-        hover: procedure myschema.foo()
-          ╭▸ 
-        3 │ drop procedure myschema.foo();
-          ╰╴                          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_procedure_definition() {
-        assert_snapshot!(check_hover("
-create procedure foo$0() language sql as $$ select 1 $$;
-"), @r"
-        hover: procedure public.foo()
-          ╭▸ 
-        2 │ create procedure foo() language sql as $$ select 1 $$;
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_procedure_qualified_parameter_qualifier() {
-        assert_snapshot!(check_hover("
-create procedure p(x int) language sql begin atomic select p$0.x; end;
-"), @r"
-        hover: procedure public.p(x int)
-          ╭▸ 
-        2 │ create procedure p(x int) language sql begin atomic select p.x; end;
-          ╰╴                                                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_procedure_with_explicit_schema() {
-        assert_snapshot!(check_hover("
-create procedure myschema.foo$0() language sql as $$ select 1 $$;
-"), @r"
-        hover: procedure myschema.foo()
-          ╭▸ 
-        2 │ create procedure myschema.foo() language sql as $$ select 1 $$;
-          ╰╴                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_procedure_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create procedure foo() language sql as $$ select 1 $$;
-drop procedure foo$0();
-"#), @r"
-        hover: procedure myschema.foo()
-          ╭▸ 
-        4 │ drop procedure foo();
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_procedure_overloaded() {
-        assert_snapshot!(check_hover("
-create procedure add(complex) language sql as $$ select null $$;
-create procedure add(bigint) language sql as $$ select 1 $$;
-drop procedure add$0(complex);
-"), @r"
-        hover: procedure public.add(complex)
-          ╭▸ 
-        4 │ drop procedure add(complex);
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_procedure_second_overload() {
-        assert_snapshot!(check_hover("
-create procedure add(complex) language sql as $$ select null $$;
-create procedure add(bigint) language sql as $$ select 1 $$;
-drop procedure add$0(bigint);
-"), @r"
-        hover: procedure public.add(bigint)
-          ╭▸ 
-        4 │ drop procedure add(bigint);
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_call_procedure() {
-        assert_snapshot!(check_hover("
-create procedure foo() language sql as $$ select 1 $$;
-call foo$0();
-"), @r"
-        hover: procedure public.foo()
-          ╭▸ 
-        3 │ call foo();
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_call_procedure_with_schema() {
-        assert_snapshot!(check_hover("
-create procedure public.foo() language sql as $$ select 1 $$;
-call public.foo$0();
-"), @r"
-        hover: procedure public.foo()
-          ╭▸ 
-        3 │ call public.foo();
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_call_procedure_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create procedure foo() language sql as $$ select 1 $$;
-call foo$0();
-"#), @r"
-        hover: procedure myschema.foo()
-          ╭▸ 
-        4 │ call foo();
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_call_procedure_with_params() {
-        assert_snapshot!(check_hover("
-create procedure add(a int, b int) language sql as $$ select a + b $$;
-call add$0(1, 2);
-"), @r"
-        hover: procedure public.add(a int, b int)
-          ╭▸ 
-        3 │ call add(1, 2);
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_function() {
-        assert_snapshot!(check_hover("
-create function foo() returns int as $$ select 1 $$ language sql;
-drop routine foo$0();
-"), @r"
-        hover: function public.foo() returns int
-          ╭▸ 
-        3 │ drop routine foo();
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_aggregate() {
-        assert_snapshot!(check_hover("
-create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-drop routine myavg$0(int);
-"), @r"
-        hover: aggregate public.myavg(int)
-          ╭▸ 
-        3 │ drop routine myavg(int);
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_procedure() {
-        assert_snapshot!(check_hover("
-create procedure foo() language sql as $$ select 1 $$;
-drop routine foo$0();
-"), @r"
-        hover: procedure public.foo()
-          ╭▸ 
-        3 │ drop routine foo();
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_with_schema() {
-        assert_snapshot!(check_hover("
-set search_path to public;
-create function foo() returns int as $$ select 1 $$ language sql;
-drop routine public.foo$0();
-"), @r"
-        hover: function public.foo() returns int
-          ╭▸ 
-        4 │ drop routine public.foo();
-          ╰╴                      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_with_search_path() {
-        assert_snapshot!(check_hover(r#"
-set search_path to myschema;
-create function foo() returns int as $$ select 1 $$ language sql;
-drop routine foo$0();
-"#), @r"
-        hover: function myschema.foo() returns int
-          ╭▸ 
-        4 │ drop routine foo();
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_overloaded() {
-        assert_snapshot!(check_hover("
-create function add(complex) returns complex as $$ select null $$ language sql;
-create function add(bigint) returns bigint as $$ select 1 $$ language sql;
-drop routine add$0(complex);
-"), @r"
-        hover: function public.add(complex) returns complex
-          ╭▸ 
-        4 │ drop routine add(complex);
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_prefers_function_over_procedure() {
-        assert_snapshot!(check_hover("
-create function foo() returns int as $$ select 1 $$ language sql;
-create procedure foo() language sql as $$ select 1 $$;
-drop routine foo$0();
-"), @r"
-        hover: function public.foo() returns int
-          ╭▸ 
-        4 │ drop routine foo();
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_routine_prefers_aggregate_over_procedure() {
-        assert_snapshot!(check_hover("
-create aggregate foo(int) (sfunc = int4_avg_accum, stype = _int8);
-create procedure foo(int) language sql as $$ select 1 $$;
-drop routine foo$0(int);
-"), @r"
-        hover: aggregate public.foo(int)
-          ╭▸ 
-        4 │ drop routine foo(int);
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-update users$0 set email = 'new@example.com';
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ update users set email = 'new@example.com';
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-update public.users$0 set email = 'new@example.com';
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ update public.users set email = 'new@example.com';
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_set_column() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-update users set email$0 = 'new@example.com' where id = 1;
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ update users set email = 'new@example.com' where id = 1;
-          ╰╴                     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_set_column_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-update public.users set email$0 = 'new@example.com' where id = 1;
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ update public.users set email = 'new@example.com' where id = 1;
-          ╰╴                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_where_column() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-update users set email = 'new@example.com' where id$0 = 1;
-"), @r"
-        hover: column public.users.id int
-          ╭▸ 
-        3 │ update users set email = 'new@example.com' where id = 1;
-          ╰╴                                                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_where_column_with_schema() {
-        assert_snapshot!(check_hover("
-create table public.users(id int, email text);
-update public.users set email = 'new@example.com' where id$0 = 1;
-"), @r"
-        hover: column public.users.id int
-          ╭▸ 
-        3 │ update public.users set email = 'new@example.com' where id = 1;
-          ╰╴                                                         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_from_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-create table messages(id int, user_id int, email text);
-update users set email = messages.email from messages$0 where users.id = messages.user_id;
-"), @r"
-        hover: table public.messages(id int, user_id int, email text)
-          ╭▸ 
-        4 │ update users set email = messages.email from messages where users.id = messages.user_id;
-          ╰╴                                                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_from_table_with_schema() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-create table public.messages(id int, user_id int, email text);
-update users set email = messages.email from public.messages$0 where users.id = messages.user_id;
-"), @r"
-        hover: table public.messages(id int, user_id int, email text)
-          ╭▸ 
-        4 │ update users set email = messages.email from public.messages where users.id = messages.user_id;
-          ╰╴                                                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_with_cte_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-with new_data as (
-    select 1 as id, 'new@example.com' as email
-)
-update users set email = new_data.email from new_data$0 where users.id = new_data.id;
-"), @r"
-        hover: with new_data as (select 1 as id, 'new@example.com' as email)
-          ╭▸ 
-        6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
-          ╰╴                                                    ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_with_cte_column_in_set() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-with new_data as (
-    select 1 as id, 'new@example.com' as email
-)
-update users set email = new_data.email$0 from new_data where users.id = new_data.id;
-"), @"
-        hover: column new_data.email text
-          ╭▸ 
-        6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
-          ╰╴                                      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_update_with_cte_column_in_where() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-with new_data as (
-    select 1 as id, 'new@example.com' as email
-)
-update users set email = new_data.email from new_data where new_data.id$0 = users.id;
-"), @"
-        hover: column new_data.id integer
-          ╭▸ 
-        6 │ update users set email = new_data.email from new_data where new_data.id = users.id;
-          ╰╴                                                                      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_view_definition() {
-        assert_snapshot!(check_hover("
-create view v$0 as select 1;
-"), @"
-        hover: view public.v as select 1
-          ╭▸ 
-        2 │ create view v as select 1;
-          ╰╴            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_view_definition_with_schema() {
-        assert_snapshot!(check_hover("
-create view myschema.v$0 as select 1;
-"), @"
-        hover: view myschema.v as select 1
-          ╭▸ 
-        2 │ create view myschema.v as select 1;
-          ╰╴                     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_temp_view_definition() {
-        assert_snapshot!(check_hover("
-create temp view v$0 as select 1;
-"), @"
-        hover: view pg_temp.v as select 1
-          ╭▸ 
-        2 │ create temp view v as select 1;
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_view_with_column_list() {
-        assert_snapshot!(check_hover("
-create view v(col1$0) as select 1;
-"), @"
-        hover: column public.v.col1 integer
-          ╭▸ 
-        2 │ create view v(col1) as select 1;
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_view_create_table_select_col() {
-        assert_snapshot!(check_hover("
-create table t(a bigint); 
-create view v as
-  select a from t;
-select a$0 from v;
-"), @"
-        hover: column public.v.a bigint
-          ╭▸ 
-        5 │ select a from v;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_from_view() {
-        assert_snapshot!(check_hover("
-create view v as select 1;
-select * from v$0;
-"), @"
-        hover: view public.v as select 1
-          ╭▸ 
-        3 │ select * from v;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column_from_view_column_list() {
-        assert_snapshot!(check_hover("
-create view v(a) as select 1;
-select a$0 from v;
-"), @"
-        hover: column public.v.a integer
-          ╭▸ 
-        3 │ select a from v;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column_from_view_column_list_overrides_target() {
-        assert_snapshot!(check_hover("
-create view v(a) as select 1, 2 b;
-select a, b$0 from v;
-"), @"
-        hover: column public.v.b integer
-          ╭▸ 
-        3 │ select a, b from v;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_column_from_view_target_list() {
-        assert_snapshot!(check_hover("
-create view v as select 1 a, 2 b;
-select a$0, b from v;
-"), @"
-        hover: column public.v.a integer
-          ╭▸ 
-        3 │ select a, b from v;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_table_as_column() {
-        assert_snapshot!(check_hover("
-create table t as select 1 a;
-select a$0 from t;
-"), @"
-        hover: column public.t.a integer
-          ╭▸ 
-        3 │ select a from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_create_table_as_table() {
-        assert_snapshot!(check_hover("
-create table t as select 1 a;
-select a from t$0;
-"), @"
-        hover: table public.t as select 1 a
-          ╭▸ 
-        3 │ select a from t;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_select_from_view_with_schema() {
-        assert_snapshot!(check_hover("
-create view myschema.v as select 1;
-select * from myschema.v$0;
-"), @"
-        hover: view myschema.v as select 1
-          ╭▸ 
-        3 │ select * from myschema.v;
-          ╰╴                       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_drop_view() {
-        assert_snapshot!(check_hover("
-create view v as select 1;
-drop view v$0;
-"), @"
-        hover: view public.v as select 1
-          ╭▸ 
-        3 │ drop view v;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_composite_type_field() {
-        assert_snapshot!(check_hover("
-create type person_info as (name varchar(50), age int);
-with team as (
-    select 1 as id, ('Alice', 30)::person_info as member
-)
-select (member).name$0, (member).age from team;
-"), @r"
-        hover: field public.person_info.name varchar(50)
-          ╭▸ 
-        6 │ select (member).name, (member).age from team;
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_composite_type_field_age() {
-        assert_snapshot!(check_hover("
-create type person_info as (name varchar(50), age int);
-with team as (
-    select 1 as id, ('Alice', 30)::person_info as member
-)
-select (member).name, (member).age$0 from team;
-"), @r"
-        hover: field public.person_info.age int
-          ╭▸ 
-        6 │ select (member).name, (member).age from team;
-          ╰╴                                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_composite_type_field_nested_parens() {
-        assert_snapshot!(check_hover("
-create type person_info as (name varchar(50), age int);
-with team as (
-    select 1 as id, ('Alice', 30)::person_info as member
-)
-select ((((member))).name$0) from team;
-"), @r"
-        hover: field public.person_info.name varchar(50)
-          ╭▸ 
-        6 │ select ((((member))).name) from team;
-          ╰╴                        ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_join_using_column() {
-        assert_snapshot!(check_hover("
-create table t(id int);
-create table u(id int);
-select * from t join u using (id$0);
-"), @r"
-        hover: column public.t.id int
-              column public.u.id int
-          ╭▸ 
-        4 │ select * from t join u using (id);
-          ╰╴                               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_truncate_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-truncate table users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ truncate table users;
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_truncate_table_without_table_keyword() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-truncate users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ truncate users;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_lock_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-lock table users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ lock table users;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_lock_table_without_table_keyword() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-lock users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ lock users;
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_vacuum_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-vacuum users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ vacuum users;
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_vacuum_with_analyze() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-vacuum analyze users$0;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ vacuum analyze users;
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_alter_table() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-alter table users$0 alter email set not null;
-"), @r"
-        hover: table public.users(id int, email text)
-          ╭▸ 
-        3 │ alter table users alter email set not null;
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_alter_table_column() {
-        assert_snapshot!(check_hover("
-create table users(id int, email text);
-alter table users alter email$0 set not null;
-"), @r"
-        hover: column public.users.email text
-          ╭▸ 
-        3 │ alter table users alter email set not null;
-          ╰╴                            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_refresh_materialized_view() {
-        assert_snapshot!(check_hover("
-create materialized view mv as select 1;
-refresh materialized view mv$0;
-"), @"
-        hover: materialized view public.mv as select 1
-          ╭▸ 
-        3 │ refresh materialized view mv;
-          ╰╴                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_reindex_table() {
-        assert_snapshot!(check_hover("
-create table users(id int);
-reindex table users$0;
-"), @r"
-        hover: table public.users(id int)
-          ╭▸ 
-        3 │ reindex table users;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_reindex_index() {
-        assert_snapshot!(check_hover("
-create table t(c int);
-create index idx on t(c);
-reindex index idx$0;
-"), @r"
-        hover: index public.idx on public.t(c)
-          ╭▸ 
-        4 │ reindex index idx;
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_star_from_cte() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-with u(x, y) as (
-  select 1, 2
-),
-merged as (
-  merge into t
-    using u
-      on t.a = u.x
-  when matched then
-    do nothing
-  when not matched then
-    do nothing
-  returning a as x, b as y
-)
-select *$0 from merged;
-"), @"
-        hover: column merged.x int
-              column merged.y int
-           ╭▸ 
-        16 │ select * from merged;
-           ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_cte_insert_returning_aliased_column() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-with inserted as (
-  insert into t values (1, 2)
-  returning a as x, b as y
-)
-select x$0 from inserted;
-"), @"
-        hover: column inserted.x int
-          ╭▸ 
-        7 │ select x from inserted;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_cte_update_returning_aliased_column() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-with updated as (
-  update t set a = 42
-  returning a as x, b as y
-)
-select x$0 from updated;
-"), @r"
-        hover: column updated.x int
-          ╭▸ 
-        7 │ select x from updated;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_cte_delete_returning_aliased_column() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-with deleted as (
-  delete from t
-  returning a as x, b as y
-)
-select x$0 from deleted;
-"), @r"
-        hover: column deleted.x int
-          ╭▸ 
-        7 │ select x from deleted;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_update_returning_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-update t set a = 1
-returning *$0;
-"), @r"
-        hover: column public.t.a int
-              column public.t.b int
-          ╭▸ 
-        4 │ returning *;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_insert_returning_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-insert into t values (1, 2)
-returning *$0;
-"), @r"
-        hover: column public.t.a int
-              column public.t.b int
-          ╭▸ 
-        4 │ returning *;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_delete_returning_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-delete from t
-returning *$0;
-"), @r"
-        hover: column public.t.a int
-              column public.t.b int
-          ╭▸ 
-        4 │ returning *;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-merge into t
-  using (select 1 as x, 2 as y) u
-    on t.a = u.x
-  when matched then
-    do nothing
-returning *$0;
-"), @r"
-        hover: column public.t.a int
-              column public.t.b int
-          ╭▸ 
-        8 │ returning *;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_qualified_star_old() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-merge into t
-  using (select 1 as x, 2 as y) u
-    on t.a = u.x
-  when matched then
-    update set a = 99
-returning old$0.*;
-"), @r"
-        hover: table public.t(a int, b int)
-          ╭▸ 
-        8 │ returning old.*;
-          ╰╴            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_qualified_star_new() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-merge into t
-  using (select 1 as x, 2 as y) u
-    on t.a = u.x
-  when matched then
-    update set a = 99
-returning new$0.*;
-"), @r"
-        hover: table public.t(a int, b int)
-          ╭▸ 
-        8 │ returning new.*;
-          ╰╴            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_qualified_star_table() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-merge into t
-  using (select 1 as x, 2 as y) u
-    on t.a = u.x
-  when matched then
-    update set a = 99
-returning t$0.*;
-"), @r"
-        hover: table public.t(a int, b int)
-          ╭▸ 
-        8 │ returning t.*;
-          ╰╴          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_qualified_star_old_on_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-merge into t
-  using (select 1 as x, 2 as y) u
-    on t.a = u.x
-  when matched then
-    update set a = 99
-returning old.*$0;
-"), @r"
-        hover: column public.t.a int
-              column public.t.b int
-          ╭▸ 
-        8 │ returning old.*;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_qualified_star_new_on_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-merge into t
-  using (select 1 as x, 2 as y) u
-    on t.a = u.x
-  when matched then
-    update set a = 99
-returning new.*$0;
-"), @r"
-        hover: column public.t.a int
-              column public.t.b int
-          ╭▸ 
-        8 │ returning new.*;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_merge_returning_qualified_star_table_on_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-merge into t
-  using (select 1 as x, 2 as y) u
-    on t.a = u.x
-  when matched then
-    update set a = 99
-returning t.*$0;
-"), @r"
-        hover: column public.t.a int
-              column public.t.b int
-          ╭▸ 
-        8 │ returning t.*;
-          ╰╴            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_partition_table_column() {
-        assert_snapshot!(check_hover("
-create table part (
-  a int,
-  inserted_at timestamptz not null default now()
-) partition by range (inserted_at);
-create table part_2026_01_02 partition of part
-    for values from ('2026-01-02') to ('2026-01-03');
-select a$0 from part_2026_01_02;
-"), @r"
-        hover: column public.part.a int
-          ╭▸ 
-        8 │ select a from part_2026_01_02;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_window_def_reuse() {
-        assert_snapshot!(check_hover("
-create table tbl (
-  id bigint primary key,
-  group_col text not null,
-  update_date date not null,
-  value text
-);
-select
-  id,
-  group_col,
-  row_number() over w as rn,
-  lag(value) over w$0 as prev_value
-from tbl
-window w as (
-  partition by group_col
-  order by update_date desc
-);
-"), @r"
-hover: window w as (
-        partition by group_col
-        order by update_date desc
-      )
-   ╭▸ 
-12 │   lag(value) over w as prev_value
-   ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_like_multi_star() {
-        assert_snapshot!(check_hover("
-create table t(a int, b int);
-create table u(x int, y int);
-create table k(like t, like u, c int);
-select *$0 from k;
-"), @r"
-        hover: column public.k.a int
-              column public.k.b int
-              column public.k.x int
-              column public.k.y int
-              column public.k.c int
-          ╭▸ 
-        5 │ select * from k;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_inherits_star() {
-        assert_snapshot!(check_hover("
-create table t (
-  a int, b text
-);
-create table u (
-  c int
-) inherits (t);
-select *$0 from u;
-"), @r"
-        hover: column public.u.a int
-              column public.u.b text
-              column public.u.c int
-          ╭▸ 
-        8 │ select * from u;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_inherits_builtin_star() {
-        assert_snapshot!(check_hover_info("
--- include-builtins
-create table t ()
-inherits (information_schema.sql_features);
-select *$0 from t;
-").snippet, @"
-        column public.t.feature_id character_data
-        column public.t.feature_name character_data
-        column public.t.sub_feature_id character_data
-        column public.t.sub_feature_name character_data
-        column public.t.is_supported yes_or_no
-        column public.t.is_verified_by character_data
-        column public.t.comments character_data
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_like_builtin_star() {
-        assert_snapshot!(check_hover_info("
--- include-builtins
-create table t (like information_schema.sql_features);
-select *$0 from t;
-").snippet, @"
-        column public.t.feature_id character_data
-        column public.t.feature_name character_data
-        column public.t.sub_feature_id character_data
-        column public.t.sub_feature_name character_data
-        column public.t.is_supported yes_or_no
-        column public.t.is_verified_by character_data
-        column public.t.comments character_data
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_inherits_create_table_as_star() {
-        assert_snapshot!(check_hover_info("
-create table parent as select 1 a, 'x'::text b;
-create table child (c int) inherits (parent);
-select *$0 from child;
-").snippet, @"
-        column public.child.a integer
-        column public.child.b text
-        column public.child.c int
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_like_select_into_star() {
-        assert_snapshot!(check_hover_info("
-select 1 a, 'x'::text b into parent;
-create table child (like parent);
-select *$0 from child;
-").snippet, @"
-        column public.child.a integer
-        column public.child.b text
-        ");
-    }
-
-    #[test]
-    fn hover_select_into_column() {
-        assert_snapshot!(check_hover("
-select 1 a into t;
-select a$0 from t;
-"), @"
-        hover: column public.t.a integer
-          ╭▸ 
-        3 │ select a from t;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_into_star() {
-        assert_snapshot!(check_hover_info("
-select 1 a, 'x'::text b into t;
-select *$0 from t;
-").snippet, @"
-        column public.t.a integer
-        column public.t.b text
-        ");
-    }
-
-    #[test]
-    fn hover_select_into_table() {
-        assert_snapshot!(check_hover("
-select 1 a into t;
-select a from t$0;
-"), @"
-        hover: table public.t
-          ╭▸ 
-        3 │ select a from t;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_select_into_table_definition() {
-        assert_snapshot!(check_hover("
-select 1 a into t$0;
-"), @"
-        hover: table public.t
-          ╭▸ 
-        2 │ select 1 a into t;
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_like_view_star() {
-        assert_snapshot!(check_hover_info("
-create view parent as select 1 a, 'x'::text b;
-create table child (like parent);
-select *$0 from child;
-").snippet, @"
-        column public.child.a integer
-        column public.child.b text
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_inherits_column() {
-        assert_snapshot!(check_hover("
-create table t (
-  a int, b text
-);
-create table u (
-  c int
-) inherits (t);
-select a$0 from u;
-"), @r"
-        hover: column public.t.a int
-          ╭▸ 
-        8 │ select a from u;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_inherits_builtin_column() {
-        assert_snapshot!(check_hover("
--- include-builtins
-create table t ()
-inherits (information_schema.sql_features);
-select feature_name$0 from t;
-"), @"
-        hover: column information_schema.sql_features.feature_name information_schema.character_data
-          ╭▸ 
-        5 │ select feature_name from t;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_inherits_local_column() {
-        assert_snapshot!(check_hover("
-create table t (
-  a int, b text
-);
-create table u (
-  c int
-) inherits (t);
-select c$0 from u;
-"), @r"
-        hover: column public.u.c int
-          ╭▸ 
-        8 │ select c from u;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_table_inherits_multiple_parents() {
-        assert_snapshot!(check_hover("
-create table t1 (
-  a int
-);
-create table t2 (
-  b text
-);
-create table u (
-  c int
-) inherits (t1, t2);
-select b$0 from u;
-"), @r"
-        hover: column public.t2.b text
-           ╭▸ 
-        11 │ select b from u;
-           ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_create_foreign_table_inherits_column() {
-        assert_snapshot!(check_hover("
-create server myserver foreign data wrapper postgres_fdw;
-create table t (
-  a int, b text
-);
-create foreign table u (
-  c int
-) inherits (t) server myserver;
-select a$0 from u;
-"), @r"
-        hover: column public.t.a int
-          ╭▸ 
-        9 │ select a from u;
-          ╰╴       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_extension_on_create() {
-        assert_snapshot!(check_hover("
-create extension my$0ext;
-"), @r"
-        hover: extension myext
-          ╭▸ 
-        2 │ create extension myext;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_extension_on_drop() {
-        assert_snapshot!(check_hover("
-create extension myext;
-drop extension my$0ext;
-"), @r"
-        hover: extension myext
-          ╭▸ 
-        3 │ drop extension myext;
-          ╰╴                ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_extension_on_alter() {
-        assert_snapshot!(check_hover("
-create extension myext;
-alter extension my$0ext update to '2.0';
-"), @r"
-        hover: extension myext
-          ╭▸ 
-        3 │ alter extension myext update to '2.0';
-          ╰╴                 ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_publication_on_alter() {
-        assert_snapshot!(check_hover("
-create table t(id int);
-create publication pub for table t;
-alter publication p$0ub add table t;
-"), @"
-        hover: publication pub
-          ╭▸ 
-        4 │ alter publication pub add table t;
-          ╰╴                  ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_subscription_on_alter() {
-        assert_snapshot!(check_hover("
-create subscription sub connection $$host=localhost$$ publication pub;
-alter subscription s$0ub refresh publication;
-"), @"
-        hover: subscription sub
-          ╭▸ 
-        3 │ alter subscription sub refresh publication;
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_language_on_drop() {
-        assert_snapshot!(check_hover("
-create language plpythonu;
-drop language plpyth$0onu;
-"), @"
-        hover: language plpythonu
-          ╭▸ 
-        3 │ drop language plpythonu;
-          ╰╴                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_collation_on_collate() {
-        assert_snapshot!(check_hover("
-create collation mycoll (locale = 'C');
-create table t(name text collate myc$0oll);
-"), @"
-        hover: collation mycoll
-          ╭▸ 
-        3 │ create table t(name text collate mycoll);
-          ╰╴                                   ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_foreign_data_wrapper_on_create_server() {
-        assert_snapshot!(check_hover("
-create foreign data wrapper fdw;
-create server srv foreign data wrapper f$0dw;
-"), @"
-        hover: foreign data wrapper fdw
-          ╭▸ 
-        3 │ create server srv foreign data wrapper fdw;
-          ╰╴                                       ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_role_on_create() {
-        assert_snapshot!(check_hover("
-create role read$0er;
-"), @"
-        hover: role reader
-          ╭▸ 
-        2 │ create role reader;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_role_on_alter() {
-        assert_snapshot!(check_hover("
-create role reader;
-alter role read$0er rename to writer;
-"), @r"
-        hover: role reader
-          ╭▸ 
-        3 │ alter role reader rename to writer;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_role_on_drop() {
-        assert_snapshot!(check_hover("
-create role reader;
-drop role read$0er;
-"), @r"
-        hover: role reader
-          ╭▸ 
-        3 │ drop role reader;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_role_on_set() {
-        assert_snapshot!(check_hover("
-create role reader;
-set role read$0er;
-"), @r"
-        hover: role reader
-          ╭▸ 
-        3 │ set role reader;
-          ╰╴            ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_role_on_create_tablespace_owner() {
-        assert_snapshot!(check_hover("
-create role reader;
-create tablespace t owner read$0er location 'foo';
-"), @r"
-        hover: role reader
-          ╭▸ 
-        3 │ create tablespace t owner reader location 'foo';
-          ╰╴                             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_fetch_cursor() {
-        assert_snapshot!(check_hover("
-declare c scroll cursor for select * from t;
-fetch forward 5 from c$0;
-"), @"
-        hover: cursor c for select * from t
-          ╭▸ 
-        3 │ fetch forward 5 from c;
-          ╰╴                     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_close_cursor() {
-        assert_snapshot!(check_hover("
-declare c scroll cursor for select * from t;
-close c$0;
-"), @"
-        hover: cursor c for select * from t
-          ╭▸ 
-        3 │ close c;
-          ╰╴      ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_move_cursor() {
-        assert_snapshot!(check_hover("
-declare c scroll cursor for select * from t;
-move forward 10 from c$0;
-"), @"
-        hover: cursor c for select * from t
-          ╭▸ 
-        3 │ move forward 10 from c;
-          ╰╴                     ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_prepare_statement() {
-        assert_snapshot!(check_hover("
-prepare stmt$0 as select 1;
-"), @"
-        hover: prepare stmt as select 1
-          ╭▸ 
-        2 │ prepare stmt as select 1;
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_execute_prepared_statement() {
-        assert_snapshot!(check_hover("
-prepare stmt as select 1;
-execute stmt$0;
-"), @"
-        hover: prepare stmt as select 1
-          ╭▸ 
-        3 │ execute stmt;
-          ╰╴           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_deallocate_prepared_statement() {
-        assert_snapshot!(check_hover("
-prepare stmt as select 1;
-deallocate stmt$0;
-"), @"
-        hover: prepare stmt as select 1
-          ╭▸ 
-        3 │ deallocate stmt;
-          ╰╴              ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_listen_definition() {
-        assert_snapshot!(check_hover("
-listen updates$0;
-"), @r"
-        hover: listen updates
-          ╭▸ 
-        2 │ listen updates;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_notify_channel() {
-        assert_snapshot!(check_hover("
-listen updates;
-notify updates$0;
-"), @r"
-        hover: listen updates
-          ╭▸ 
-        3 │ notify updates;
-          ╰╴             ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_on_unlisten_channel() {
-        assert_snapshot!(check_hover("
-listen updates;
-unlisten updates$0;
-"), @"
-        hover: listen updates
-          ╭▸ 
-        3 │ unlisten updates;
-          ╰╴               ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_property_graph_on_create() {
-        assert_snapshot!(check_hover("
-create property graph foo.ba$0r vertex tables (t key (a) no properties);
-"), @"
-        hover: property graph foo.bar
-          ╭▸ 
-        2 │ create property graph foo.bar vertex tables (t key (a) no properties);
-          ╰╴                           ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_property_graph_on_drop() {
-        assert_snapshot!(check_hover("
-create property graph foo.bar vertex tables (t key (a) no properties);
-drop property graph foo.ba$0r;
-"), @"
-        hover: property graph foo.bar
-          ╭▸ 
-        3 │ drop property graph foo.bar;
-          ╰╴                         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_property_graph_on_alter() {
-        assert_snapshot!(check_hover("
-create property graph foo.bar vertex tables (t key (a) no properties);
-alter property graph foo.ba$0r rename to baz;
-"), @"
-        hover: property graph foo.bar
-          ╭▸ 
-        3 │ alter property graph foo.bar rename to baz;
-          ╰╴                          ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_json_table_plan_path() {
-        assert_snapshot!(check_hover("
-select * from json_table(
-  '{}'::jsonb, '$' as root
-  columns (value text path '$')
-  plan (ro$0ot)
-);
-"), @"
-        hover: json path root
-          ╭▸ 
-        5 │   plan (root)
-          ╰╴         ─ hover
-        ");
-    }
-
-    #[test]
-    fn hover_esc_string() {
-        assert_snapshot!(check_hover_info(r"
-select e'fo$0o\nbar';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal (truncated up to newline): ` foo `
-        ");
-    }
-
-    #[test]
-    fn hover_esc_string_with_cr() {
-        assert_snapshot!(check_hover_info(r"
-select e'fo$0o\rbar';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal (truncated up to newline): ` foo `
-        ");
-    }
-
-    #[test]
-    fn hover_esc_string_with_tab() {
-        assert_snapshot!(check_hover_info(r"
-select e'a\tb$0';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` a	b `
-        ");
-    }
-
-    #[test]
-    fn hover_esc_string_hex_byte_sequence_utf8() {
-        assert_snapshot!(check_hover_info(r"
-select e'\xC3\xA$09';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` é `
-        ");
-    }
-
-    #[test]
-    fn hover_unicode_esc_string() {
-        assert_snapshot!(check_hover_info(r"
-select U&'\0061\0308b$0c';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` a\u{0308}bc `
-        ");
-    }
-
-    #[test]
-    fn hover_unicode_esc_string_with_uescape() {
-        assert_snapshot!(check_hover_info(r"
-select U&'!0061!0062$0' uescape '!';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` ab `
-        ");
-    }
-
-    #[test]
-    fn hover_string_continuation() {
-        assert_snapshot!(check_hover_info(r"
-select e'foo$0'
-'\nbar';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal (truncated up to newline): ` foo `
-        ");
-    }
-
-    #[test]
-    fn hover_unicode_esc_string_continuation() {
-        assert_snapshot!(check_hover_info(r"
-select U&'\0061'
-'\006$02';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` ab `
-        ");
-    }
-
-    #[test]
-    fn hover_plain_string_no_escape() {
-        assert_snapshot!(check_hover_info(r"
-select 'foo$0';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` foo `
-        ");
-    }
-
-    #[test]
-    fn hover_national_string() {
-        assert_snapshot!(check_hover_info(r"
-select N'fo$0o';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` foo `
-        ");
-    }
-
-    #[test]
-    fn hover_plain_string_escaped_quotes() {
-        assert_snapshot!(check_hover_info(r"
-select '''$0';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` ' `
-        ");
-    }
-
-    #[test]
-    fn hover_plain_string_with_doubled_quote() {
-        assert_snapshot!(check_hover_info(r"
-select 'it''$0s';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` it's `
-        ");
-    }
-
-    #[test]
-    fn hover_plain_string_with_backtick() {
-        assert_snapshot!(check_hover_info(r"
-select 'a`$0b';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: `` a`b ``
-        ");
-    }
-
-    #[test]
-    fn hover_plain_string_with_leading_backtick() {
-        assert_snapshot!(check_hover_info(r"
-select '`$0hello';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: `` `hello ``
-        ");
-    }
-
-    #[test]
-    fn hover_plain_string_with_backticks() {
-        assert_snapshot!(check_hover_info(r"
-select '`foo`$0';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: `` `foo` ``
-        ");
-    }
-
-    #[test]
-    fn hover_plain_string_with_consecutive_backticks() {
-        assert_snapshot!(check_hover_info(r"
-select 'a``$0b';
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ``` a``b ```
-        ");
-    }
-
-    #[test]
-    fn hover_dollar_quoted_string() {
-        assert_snapshot!(check_hover_info(r"
-select $$he$0llo$$;
-").markdown(), @"
-        ```sql
-        text
-        ```
-        ---
-        value of literal: ` hello `
-        ");
-    }
-
-    #[test]
-    fn hover_bit_string() {
-        assert_snapshot!(check_hover_info(r"
-select b'10$010';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x'A'|b'1010' `
-        ");
-    }
-
-    #[test]
-    fn hover_byte_string() {
-        assert_snapshot!(check_hover_info(r"
-select x'1A$03F';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x'1A3F'|b'0001101000111111' `
-        ");
-    }
-
-    #[test]
-    fn hover_byte_string_empty() {
-        assert_snapshot!(check_hover_info(r"
-select x'$0';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x''|b'' `
-        ");
-    }
-
-    #[test]
-    fn hover_bit_string_empty() {
-        assert_snapshot!(check_hover_info(r"
-select b'$0';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x''|b'' `
-        ");
-    }
-
-    #[test]
-    fn hover_byte_string_short() {
-        assert_snapshot!(check_hover_info(r"
-select x'F$0F';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x'FF'|b'11111111' `
-        ");
-    }
-
-    #[test]
-    fn hover_byte_string_preserves_hex_width() {
-        assert_snapshot!(check_hover_info(r"
-select x'0F$0F';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x'0FF'|b'000011111111' `
-        ");
-    }
-
-    #[test]
-    fn hover_bit_string_preserves_binary_width() {
-        assert_snapshot!(check_hover_info(r"
-select b'0$00';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x'0'|b'00' `
-        ");
-    }
-
-    #[test]
-    fn hover_byte_string_large() {
-        assert_snapshot!(check_hover_info(r"
-select x'10000000000000000000000000000000$00';
-").markdown(), @"
-        ```sql
-        bit
-        ```
-        ---
-        value of literal: ` x'100000000000000000000000000000000'|b'000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' `
-        ");
-    }
-}
+mod tests;

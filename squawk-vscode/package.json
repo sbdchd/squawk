@@ -102,6 +102,22 @@
         "configuration": "./sql-language-configuration.json"
       }
     ],
+    "semanticTokenTypes": [
+      {
+        "id": "punctuation",
+        "description": "Punctuation such as commas, semicolons, and parentheses"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "punctuation": [
+            "punctuation.section.pgsql",
+            "meta.embedded"
+          ]
+        }
+      }
+    ],
     "configuration": {
       "title": "Squawk",
       "properties": {

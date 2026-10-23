@@ -28,6 +28,7 @@ const SEMANTIC_TOKEN_TYPES: &[&str] = &[
     "struct",
     "type",
     "variable",
+    "punctuation",
 ];
 
 const SEMANTIC_TOKEN_MODIFIERS: &[&str] = &["declaration", "definition", "readonly"];
@@ -35,12 +36,43 @@ const SEMANTIC_TOKEN_MODIFIERS: &[&str] = &["declaration", "definition", "readon
 fn semantic_token_type_name(ty: SemanticTokenType) -> &'static str {
     match ty {
         SemanticTokenType::Bool | SemanticTokenType::Keyword => "keyword",
-        SemanticTokenType::Column => "variable",
+        SemanticTokenType::Column
+        | SemanticTokenType::Window
+        | SemanticTokenType::JsonPath
+        | SemanticTokenType::Index
+        | SemanticTokenType::Constraint
+        | SemanticTokenType::Trigger
+        | SemanticTokenType::Rule
+        | SemanticTokenType::Role
+        | SemanticTokenType::Policy
+        | SemanticTokenType::AccessMethod
+        | SemanticTokenType::EventTrigger
+        | SemanticTokenType::Language
+        | SemanticTokenType::ForeignDataWrapper
+        | SemanticTokenType::Server
+        | SemanticTokenType::Conversion
+        | SemanticTokenType::OperatorFamily
+        | SemanticTokenType::OperatorClass
+        | SemanticTokenType::Statistics
+        | SemanticTokenType::TextSearch
+        | SemanticTokenType::Publication
+        | SemanticTokenType::Subscription
+        | SemanticTokenType::Collation
+        | SemanticTokenType::Tablespace
+        | SemanticTokenType::Database
+        | SemanticTokenType::Extension
+        | SemanticTokenType::Savepoint
+        | SemanticTokenType::Cursor
+        | SemanticTokenType::PreparedTransaction
+        | SemanticTokenType::PreparedStatement
+        | SemanticTokenType::Channel
+        | SemanticTokenType::EnumMember => "variable",
         SemanticTokenType::Comment => "comment",
         SemanticTokenType::Function => "function",
         SemanticTokenType::Name | SemanticTokenType::NameRef => "variable",
         SemanticTokenType::Number => "number",
-        SemanticTokenType::Operator | SemanticTokenType::Punctuation => "operator",
+        SemanticTokenType::Operator => "operator",
+        SemanticTokenType::Punctuation => "punctuation",
         SemanticTokenType::Parameter | SemanticTokenType::PositionalParam => "parameter",
         SemanticTokenType::Schema => "namespace",
         SemanticTokenType::String => "string",
@@ -345,8 +377,8 @@ impl SquawkDatabase {
         let response: Vec<LocationRange> = result
             .into_iter()
             .map(|loc| {
-                let range = loc.range;
-                let file = loc.file.original_file(&self.db);
+                let range = loc.value;
+                let file = loc.file_id.original_file(&self.db);
                 let line_index = db::line_index(&self.db, file);
                 let file = file_string(&self.db, file);
                 let start = line_index.line_col(range.start());
@@ -391,11 +423,11 @@ impl SquawkDatabase {
         let locations: Vec<LocationRange> = references
             .iter()
             .map(|loc| {
-                let file = loc.file.original_file(&self.db);
+                let file = loc.file_id.original_file(&self.db);
                 let line_index = db::line_index(&self.db, file);
                 let file = file_string(&self.db, file);
-                let start = line_index.line_col(loc.range.start());
-                let end = line_index.line_col(loc.range.end());
+                let start = line_index.line_col(loc.value.start());
+                let end = line_index.line_col(loc.value.end());
                 let start_wide = line_index
                     .to_wide(squawk_line_index::WideEncoding::Utf16, start)
                     .unwrap();
@@ -738,6 +770,11 @@ fn convert_document_symbol(
             squawk_ide::document_symbols::DocumentSymbolKind::Database => "database",
             squawk_ide::document_symbols::DocumentSymbolKind::Server => "server",
             squawk_ide::document_symbols::DocumentSymbolKind::Extension => "extension",
+            squawk_ide::document_symbols::DocumentSymbolKind::OperatorClass => "operator_class",
+            squawk_ide::document_symbols::DocumentSymbolKind::OperatorFamily => "operator_family",
+            squawk_ide::document_symbols::DocumentSymbolKind::Operator => "operator",
+            squawk_ide::document_symbols::DocumentSymbolKind::Publication => "publication",
+            squawk_ide::document_symbols::DocumentSymbolKind::Subscription => "subscription",
             squawk_ide::document_symbols::DocumentSymbolKind::Column => "column",
             squawk_ide::document_symbols::DocumentSymbolKind::Variant => "variant",
             squawk_ide::document_symbols::DocumentSymbolKind::Cursor => "cursor",

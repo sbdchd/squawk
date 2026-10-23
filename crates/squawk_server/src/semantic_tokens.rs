@@ -1,4 +1,9 @@
+use std::borrow::Cow;
+
 use gen_lsp_types::{SemanticTokenModifiers, SemanticTokenTypes};
+
+pub(crate) const PUNCTUATION: SemanticTokenTypes =
+    SemanticTokenTypes::Custom(Cow::Borrowed("punctuation"));
 
 pub(crate) const SUPPORTED_TYPES: &[SemanticTokenTypes] = &[
     SemanticTokenTypes::Comment,
@@ -13,6 +18,7 @@ pub(crate) const SUPPORTED_TYPES: &[SemanticTokenTypes] = &[
     SemanticTokenTypes::Struct,
     SemanticTokenTypes::Type,
     SemanticTokenTypes::Variable,
+    PUNCTUATION,
 ];
 
 pub(crate) const SUPPORTED_MODIFIERS: &[SemanticTokenModifiers] = &[
