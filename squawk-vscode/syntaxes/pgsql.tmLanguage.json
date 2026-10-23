@@ -198,12 +198,26 @@
         {
           "match": "[+\\-*/<>=~!@#%\\^&|`?\\.]",
           "name": "keyword.operator.pgsql"
+        },
+        {
+          "match": "[,;\\[\\]]",
+          "name": "punctuation.section.pgsql"
         }
       ]
     },
     "parens": {
       "begin": "\\(",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.pgsql"
+        }
+      },
       "end": "\\)",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.pgsql"
+        }
+      },
       "patterns": [
         {
           "include": "#parens"

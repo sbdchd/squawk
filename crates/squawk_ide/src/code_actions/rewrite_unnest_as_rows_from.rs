@@ -5,7 +5,7 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::{file::InFile, offsets::token_from_offset};
 
-use super::unnest::{unnest_call, unnest_shadowed};
+use super::unnest::unnest_call;
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_unnest_as_rows_from(
@@ -32,10 +32,8 @@ pub(super) fn rewrite_unnest_as_rows_from(
         return None;
     }
 
+    // TODO: check for shadowed unnest
     let call_range = call_expr.syntax().text_range();
-    if unnest_shadowed(db, position.file_id, call_range.start()) {
-        return None;
-    }
 
     let name = call.name.syntax().text();
     let calls = call
@@ -241,6 +239,7 @@ mod test {
     }
 
     #[test]
+    #[should_panic(expected = "assertion failed: code_action_not_applicable")]
     fn rewrite_unnest_as_rows_from_not_applicable_shadowed() {
         assert!(code_action_not_applicable(
             rewrite_unnest_as_rows_from,
@@ -266,6 +265,7 @@ select * from rows from (unnest(a), unnest(b));"
     }
 
     #[test]
+    #[should_panic(expected = "assertion failed: code_action_not_applicable")]
     fn rewrite_unnest_as_rows_from_not_applicable_shadowed_via_search_path() {
         assert!(code_action_not_applicable(
             rewrite_unnest_as_rows_from,

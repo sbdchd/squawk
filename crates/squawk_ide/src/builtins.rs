@@ -6,7 +6,7 @@ use url::Url;
 
 use crate::db::File;
 
-const BUILTINS_SQL: &str = include_str!("generated/builtins.sql");
+pub(crate) const BUILTINS_SQL: &str = include_str!("generated/builtins.sql");
 
 #[salsa::tracked]
 pub fn builtins_file(db: &dyn Db) -> File {

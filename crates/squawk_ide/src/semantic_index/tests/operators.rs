@@ -1,0 +1,298 @@
+use insta::assert_snapshot;
+
+use super::check;
+
+#[test]
+fn operator_created_and_dropped() {
+    assert_snapshot!(check("
+create function f(int, int) returns bool as 'select true' language sql;
+create function neg(int) returns int as 'select 1' language sql;
+create operator === (leftarg = int, rightarg = int, function = f, commutator = ===, negator = !==, restrict = eqsel, join = eqjoinsel);
+create operator - (rightarg = int, procedure = neg);
+alter operator === (int, int) set (restrict = eqsel, join = eqjoinsel);
+drop operator ===(int, int), -(none, int);
+drop operator ===(int, int);
+drop operator if exists ===(int, int);
+"), @"
+    error: operator `===` does not exist
+      ╭▸ 
+    8 │ drop operator ===(int, int);
+      ╰╴              ━━━
+    ");
+}
+
+#[test]
+fn prefix_operator() {
+    assert_snapshot!(check("
+create function neg(int) returns int as 'select 1' language sql;
+create function sub(int, int) returns int as 'select 1' language sql;
+create operator ~~~ (rightarg = int, function = neg);
+create operator ~~~ (rightarg = int, function = sub);
+create operator ~~~ (leftarg = int, rightarg = int, function = neg);
+drop operator ~~~ (int, int);
+drop operator ~~~ (none, int);
+drop operator ~~~ (none, int);
+"), @"
+    error: function `sub` does not exist
+      ╭▸ 
+    5 │ create operator ~~~ (rightarg = int, function = sub);
+      ╰╴                                                ━━━
+    error: function `neg` does not exist
+      ╭▸ 
+    6 │ create operator ~~~ (leftarg = int, rightarg = int, function = neg);
+      ╰╴                                                               ━━━
+    error: operator `~~~` already exists
+      ╭▸ 
+    5 │ create operator ~~~ (rightarg = int, function = sub);
+      ╰╴                ━━━
+    ");
+}
+
+#[test]
+fn prefix_and_infix_operator() {
+    assert_snapshot!(check("
+create operator ~~~ (leftarg = int, rightarg = int, function = int4mi);
+drop operator ~~~ (none, int);
+create operator ~~~ (rightarg = int, function = int4um);
+drop operator ~~~ (int, int);
+drop operator ~~~ (int, int);
+drop operator ~~~ (none, int);
+"), @"
+    error: operator `~~~` does not exist
+      ╭▸ 
+    3 │ drop operator ~~~ (none, int);
+      ╰╴              ━━━
+    error: operator `~~~` does not exist
+      ╭▸ 
+    6 │ drop operator ~~~ (int, int);
+      ╰╴              ━━━
+    ");
+}
+
+#[test]
+fn operator_missing() {
+    assert_snapshot!(check("
+create operator === (leftarg = nope, rightarg = int, function = f, restrict = nope_sel);
+create operator s.=== (leftarg = int, rightarg = int, function = int4eq);
+alter operator !== (int, int) set (restrict = eqsel);
+drop operator === (int, text);
+"), @"
+    error: type `nope` does not exist
+      ╭▸ 
+    2 │ create operator === (leftarg = nope, rightarg = int, function = f, restrict = nope_sel);
+      ╰╴                               ━━━━
+    error: function `f` does not exist
+      ╭▸ 
+    2 │ create operator === (leftarg = nope, rightarg = int, function = f, restrict = nope_sel);
+      ╰╴                                                                ━
+    error: function `nope_sel` does not exist
+      ╭▸ 
+    2 │ create operator === (leftarg = nope, rightarg = int, function = f, restrict = nope_sel);
+      ╰╴                                                                              ━━━━━━━━
+    error: schema `s` does not exist
+      ╭▸ 
+    3 │ create operator s.=== (leftarg = int, rightarg = int, function = int4eq);
+      ╰╴                ━
+    error: operator `!==` does not exist
+      ╭▸ 
+    4 │ alter operator !== (int, int) set (restrict = eqsel);
+      ╰╴               ━━━
+    error: operator `===` does not exist
+      ╭▸ 
+    5 │ drop operator === (int, text);
+      ╰╴              ━━━
+    ");
+}
+
+#[test]
+fn operator_schema() {
+    assert_snapshot!(check("
+create schema s;
+create function s.f(int, int) returns bool as 'select true' language sql;
+create operator s.=== (leftarg = int, rightarg = int, function = s.f, negator = operator(s.!==));
+drop operator === (int, int);
+drop operator s.=== (int, int);
+"), @"
+    error: operator `===` does not exist
+      ╭▸ 
+    5 │ drop operator === (int, int);
+      ╰╴              ━━━
+    ");
+}
+
+#[test]
+fn operator_rollback() {
+    assert_snapshot!(check("
+create operator === (leftarg = int, rightarg = int, function = int4eq);
+begin;
+create operator !== (leftarg = int, rightarg = int, function = int4ne);
+drop operator === (int, int);
+rollback;
+drop operator === (int, int);
+drop operator !== (int, int);
+"), @"
+    error: operator `!==` does not exist
+      ╭▸ 
+    8 │ drop operator !== (int, int);
+      ╰╴              ━━━
+    ");
+}
+
+#[test]
+fn duplicate_operator() {
+    assert_snapshot!(check("
+create operator === (leftarg = int, rightarg = int, function = int4eq);
+create operator === (leftarg = int, rightarg = text, function = int4eq);
+create operator === (leftarg = int, rightarg = int, function = int4eq);
+"), @"
+    error: function `int4eq` does not exist
+      ╭▸ 
+    3 │ create operator === (leftarg = int, rightarg = text, function = int4eq);
+      ╰╴                                                                ━━━━━━
+    error: operator `===` already exists
+      ╭▸ 
+    4 │ create operator === (leftarg = int, rightarg = int, function = int4eq);
+      ╰╴                ━━━
+    ");
+}
+
+#[test]
+fn builtin_operator() {
+    assert_snapshot!(check("
+alter operator = (int, int) set (restrict = eqsel);
+drop operator if exists pg_catalog.!= (int, int);
+"), @"no diagnostics");
+}
+
+#[test]
+fn alter_operator_set_schema() {
+    assert_snapshot!(check("
+create schema s;
+create schema s2;
+create operator === (leftarg = int, rightarg = int, function = int4eq);
+create operator s2.=== (leftarg = int, rightarg = int, function = int4eq);
+alter operator === (int, int) set schema s;
+alter operator public.=== (int, int) owner to current_user;
+alter operator s.=== (int, int) owner to current_user;
+alter operator s.=== (int, int) set schema s2;
+alter operator s.=== (int, int) set schema nope;
+begin;
+alter operator s.=== (int, int) set schema public;
+rollback;
+drop operator public.=== (int, int);
+drop operator s.=== (int, int);
+"), @"
+    error: operator `===` does not exist
+      ╭▸ 
+    7 │ alter operator public.=== (int, int) owner to current_user;
+      ╰╴                      ━━━
+    error: schema `nope` does not exist
+       ╭▸ 
+    10 │ alter operator s.=== (int, int) set schema nope;
+       ╰╴                                           ━━━━
+    error: operator `===` does not exist
+       ╭▸ 
+    14 │ drop operator public.=== (int, int);
+       ╰╴                     ━━━
+    error: operator `===` already exists in schema `s2`
+      ╭▸ 
+    9 │ alter operator s.=== (int, int) set schema s2;
+      ╰╴                                           ━━
+    ");
+}
+
+#[test]
+fn operator_bin_expr_unresolved() {
+    assert_snapshot!(check("
+create operator === (leftarg = int, rightarg = int, function = int4eq);
+select 1 === 2, 'a'::text === 'b'::text, 1 operator(===) 2;
+"), @"
+    error: operator `===` does not exist
+      ╭▸ 
+    3 │ select 1 === 2, 'a'::text === 'b'::text, 1 operator(===) 2;
+      ╰╴                          ━━━
+    ");
+}
+
+#[test]
+fn operator_prefix_expr_unknown_literal() {
+    assert_snapshot!(check("
+select @ '-4.5', -'1';
+"), @"
+    error: operator `-` is not unique
+      ╭▸ 
+    2 │ select @ '-4.5', -'1';
+      ╰╴                 ━
+    ");
+}
+
+#[test]
+fn operator_call_unknown_schema() {
+    assert_snapshot!(check("
+select 1 operator(nope.+) 2, nope.f(1);
+"), @"
+    error: schema `nope` does not exist
+      ╭▸ 
+    2 │ select 1 operator(nope.+) 2, nope.f(1);
+      ╰╴                  ━━━━
+    error: operator `+` does not exist
+      ╭▸ 
+    2 │ select 1 operator(nope.+) 2, nope.f(1);
+      ╰╴                       ━
+    error: schema `nope` does not exist
+      ╭▸ 
+    2 │ select 1 operator(nope.+) 2, nope.f(1);
+      ╰╴                             ━━━━
+    error: function `f` does not exist
+      ╭▸ 
+    2 │ select 1 operator(nope.+) 2, nope.f(1);
+      ╰╴                                  ━
+    ");
+}
+
+#[test]
+fn custom_operator_chain_is_left_associative() {
+    assert_eq!(
+        check(
+            "
+create table t (j jsonb);
+select j -> 'a' ->> 'b' from t;
+"
+        ),
+        "no diagnostics"
+    );
+}
+
+#[test]
+fn keyword_operator_unresolved() {
+    assert_snapshot!(check("
+create type mood as enum ('happy', 'sad');
+create table t (i int, s text, m mood);
+select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
+"), @"
+    error: operator `~~` does not exist
+      ╭▸ 
+    4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
+      ╰╴         ━━━━
+    error: operator `~` does not exist
+      ╭▸ 
+    4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
+      ╰╴                      ━━━━━━━━━━
+    error: operator `!~~*` does not exist
+      ╭▸ 
+    4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
+      ╰╴                                        ━━━━━━━━━
+    error: operator `=` does not exist
+      ╭▸ 
+    4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
+      ╰╴                                                         ━━━━━━━━━━━━━━━━
+    error: operator `=` does not exist
+      ╭▸ 
+    4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
+      ╰╴                                                                               ━━
+    error: operator `<>` does not exist
+      ╭▸ 
+    4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
+      ╰╴                                                                                         ━━━━━━
+    ");
+}

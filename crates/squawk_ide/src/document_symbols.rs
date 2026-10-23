@@ -1,14 +1,24 @@
 use rowan::TextRange;
 use salsa::Database as Db;
-use squawk_syntax::ast::{self, AstNode};
-
-use crate::binder::extract_string_literal;
-use crate::db::{File, parse};
-use crate::file::InFile;
-use crate::resolve::{
-    resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_sequence_info,
-    resolve_statistics_info, resolve_table_info, resolve_type_info, resolve_view_info,
+use squawk_syntax::{
+    SyntaxNode,
+    ast::{self, AstNode, NameLike},
 };
+
+use crate::arena::IdxRange;
+use crate::db::{File, parse, semantic_index};
+use crate::file::{FileId, InFile, IrFileId};
+use crate::interner::Name;
+use crate::ir::{Column, FunctionKind, Item, MemberKind, MemberOwner, TableKind, TypeId, TypeKind};
+use crate::semantic_index::SemanticIndex;
+
+#[salsa::tracked]
+pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
+    document_symbols_with_index(
+        semantic_index(db, file.into()),
+        crate::file::InFile::new(file, &parse(db, file).tree()),
+    )
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DocumentSymbolKind {
@@ -35,6 +45,11 @@ pub enum DocumentSymbolKind {
     Database,
     Server,
     Extension,
+    OperatorClass,
+    OperatorFamily,
+    Operator,
+    Publication,
+    Subscription,
     Column,
     Variant,
     Cursor,
@@ -48,1810 +63,725 @@ pub struct DocumentSymbol {
     pub name: String,
     pub detail: Option<String>,
     pub kind: DocumentSymbolKind,
-    /// Range used for determining when cursor is inside the symbol for showing
-    /// in the UI
     pub full_range: TextRange,
-    /// Range selected when symbol is selected
     pub focus_range: TextRange,
     pub children: Vec<DocumentSymbol>,
 }
 
-#[salsa::tracked]
-pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
-    let mut symbols = vec![];
+pub(crate) fn document_symbols_with_index(
+    index: &SemanticIndex,
+    file: InFile<&ast::SourceFile>,
+) -> Vec<DocumentSymbol> {
+    let symbols = Symbols {
+        index,
+        file_id: file.file_id,
+        root: file.value.syntax(),
+    };
+    let mut result = vec![];
+    for stmt in file.value.stmts() {
+        symbols.stmt(&stmt, &mut result);
+    }
+    result
+}
 
-    for stmt in parse(db, file).tree().stmts() {
-        match stmt {
+struct Symbols<'a> {
+    index: &'a SemanticIndex,
+    file_id: FileId,
+    root: &'a SyntaxNode,
+}
+
+impl Symbols<'_> {
+    fn stmt(&self, stmt: &ast::Stmt, result: &mut Vec<DocumentSymbol>) {
+        let symbol = match stmt {
             ast::Stmt::CreateSchema(create_schema) => {
-                if let Some(symbol) = create_schema_symbol(&create_schema) {
-                    symbols.push(symbol);
+                let mut symbol = create_schema
+                    .schema_name()
+                    .and_then(|name| self.symbol(stmt.syntax(), &name));
+                if let Some(symbol) = &mut symbol {
+                    for element in create_schema.schema_elements() {
+                        self.stmt(&element.into(), &mut symbol.children);
+                    }
                 }
+                symbol
+            }
+            ast::Stmt::CreateOperator(create_operator) => create_operator.op().and_then(|op| {
+                self.symbol_at_range(stmt.syntax().text_range(), op.operator_range())
+            }),
+            ast::Stmt::CreatePublication(create_publication) => {
+                self.node_symbol(stmt, create_publication.publication())
+            }
+            ast::Stmt::CreateSubscription(create_subscription) => {
+                self.node_symbol(stmt, create_subscription.subscription())
             }
             ast::Stmt::CreateTable(create_table) => {
-                if let Some(symbol) = create_table_symbol(db, InFile::new(file, create_table)) {
-                    symbols.push(symbol);
-                }
+                self.path_symbol(stmt, create_table.table_name().and_then(|name| name.path()))
             }
-            ast::Stmt::CreateTableAs(create_table_as) => {
-                if let Some(symbol) = create_table_as_symbol(db, InFile::new(file, create_table_as))
-                {
-                    symbols.push(symbol);
-                }
+            ast::Stmt::CreateForeignTable(create_table) => {
+                self.path_symbol(stmt, create_table.table_name().and_then(|name| name.path()))
             }
-            ast::Stmt::CreateForeignTable(create_foreign_table) => {
-                if let Some(symbol) =
-                    create_table_symbol(db, InFile::new(file, create_foreign_table))
-                {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateFunction(create_function) => {
-                if let Some(symbol) = create_function_symbol(db, InFile::new(file, create_function))
-                {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateAggregate(create_aggregate) => {
-                if let Some(symbol) =
-                    create_aggregate_symbol(db, InFile::new(file, create_aggregate))
-                {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateProcedure(create_procedure) => {
-                if let Some(symbol) =
-                    create_procedure_symbol(db, InFile::new(file, create_procedure))
-                {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateIndex(create_index) => {
-                if let Some(symbol) = create_index_symbol(&create_index) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateDomain(create_domain) => {
-                if let Some(symbol) = create_domain_symbol(db, InFile::new(file, create_domain)) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateSequence(create_sequence) => {
-                if let Some(symbol) = create_sequence_symbol(db, InFile::new(file, create_sequence))
-                {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateStatistics(create_statistics) => {
-                if let Some(symbol) =
-                    create_statistics_symbol(db, InFile::new(file, create_statistics))
-                {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateTrigger(create_trigger) => {
-                if let Some(symbol) = create_trigger_symbol(&create_trigger) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateEventTrigger(create_event_trigger) => {
-                if let Some(symbol) = create_event_trigger_symbol(&create_event_trigger) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateTablespace(create_tablespace) => {
-                if let Some(symbol) = create_tablespace_symbol(&create_tablespace) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateDatabase(create_database) => {
-                if let Some(symbol) = create_database_symbol(&create_database) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateServer(create_server) => {
-                if let Some(symbol) = create_server_symbol(&create_server) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateExtension(create_extension) => {
-                if let Some(symbol) = create_extension_symbol(&create_extension) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateRole(create_role) => {
-                if let Some(symbol) = create_role_symbol(&create_role) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateRule(create_rule) => {
-                if let Some(symbol) = create_rule_symbol(&create_rule) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreatePolicy(create_policy) => {
-                if let Some(symbol) = create_policy_symbol(&create_policy) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreatePropertyGraph(create_property_graph) => {
-                if let Some(symbol) = create_property_graph_symbol(&create_property_graph) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::CreateType(create_type) => {
-                if let Some(symbol) = create_type_symbol(db, InFile::new(file, create_type)) {
-                    symbols.push(symbol);
-                }
-            }
+            ast::Stmt::CreateTableAs(create_table_as) => self.path_symbol(
+                stmt,
+                create_table_as.table_name().and_then(|name| name.path()),
+            ),
             ast::Stmt::CreateView(create_view) => {
-                if let Some(symbol) = create_view_symbol(db, InFile::new(file, create_view)) {
-                    symbols.push(symbol);
-                }
+                self.path_symbol(stmt, create_view.view().and_then(|view| view.path()))
             }
             ast::Stmt::CreateMaterializedView(create_view) => {
-                if let Some(symbol) =
-                    create_materialized_view_symbol(db, InFile::new(file, create_view))
-                {
-                    symbols.push(symbol);
-                }
+                self.path_symbol(stmt, create_view.view().and_then(|view| view.path()))
             }
-            ast::Stmt::Declare(declare) => {
-                if let Some(symbol) = create_declare_cursor_symbol(&declare) {
-                    symbols.push(symbol);
-                }
+            ast::Stmt::CreateFunction(create_function) => {
+                self.path_symbol(stmt, create_function.name().and_then(|name| name.path()))
             }
-            ast::Stmt::Prepare(prepare) => {
-                if let Some(symbol) = create_prepare_symbol(&prepare) {
-                    symbols.push(symbol);
-                }
+            ast::Stmt::CreateAggregate(create_aggregate) => self.path_symbol(
+                stmt,
+                create_aggregate
+                    .aggregate_name()
+                    .and_then(|name| name.path()),
+            ),
+            ast::Stmt::CreateProcedure(create_procedure) => {
+                self.path_symbol(stmt, create_procedure.name().and_then(|name| name.path()))
             }
+            ast::Stmt::CreateOperatorClass(create_class) => self.path_symbol(
+                stmt,
+                create_class.op_class_name().and_then(|name| name.path()),
+            ),
+            ast::Stmt::CreateOperatorFamily(create_family) => self.path_symbol(
+                stmt,
+                create_family.op_family_name().and_then(|name| name.path()),
+            ),
+            ast::Stmt::CreateIndex(create_index) => {
+                self.path_symbol(stmt, create_index.index().and_then(|name| name.path()))
+            }
+            ast::Stmt::CreateDomain(create_domain) => {
+                self.path_symbol(stmt, create_domain.domain().and_then(|name| name.path()))
+            }
+            ast::Stmt::CreateSequence(create_sequence) => self.path_symbol(
+                stmt,
+                create_sequence.sequence().and_then(|name| name.path()),
+            ),
+            ast::Stmt::CreateStatistics(create_statistics) => self.path_symbol(
+                stmt,
+                create_statistics.statistics().and_then(|name| name.path()),
+            ),
+            ast::Stmt::CreatePropertyGraph(create_property_graph) => self.path_symbol(
+                stmt,
+                create_property_graph
+                    .property_graph()
+                    .and_then(|name| name.path()),
+            ),
+            ast::Stmt::CreateType(create_type) => {
+                self.path_symbol(stmt, create_type.type_name().and_then(|name| name.path()))
+            }
+            ast::Stmt::CreateTrigger(create_trigger) => {
+                self.node_symbol(stmt, create_trigger.trigger())
+            }
+            ast::Stmt::CreateEventTrigger(create_event_trigger) => {
+                self.node_symbol(stmt, create_event_trigger.event_trigger())
+            }
+            ast::Stmt::CreateTablespace(create_tablespace) => {
+                self.node_symbol(stmt, create_tablespace.tablespace())
+            }
+            ast::Stmt::CreateDatabase(create_database) => {
+                self.node_symbol(stmt, create_database.database())
+            }
+            ast::Stmt::CreateServer(create_server) => {
+                self.node_symbol(stmt, create_server.server())
+            }
+            ast::Stmt::CreateExtension(create_extension) => {
+                self.node_symbol(stmt, create_extension.extension())
+            }
+            ast::Stmt::CreateRole(create_role) => self.node_symbol(stmt, create_role.role()),
+            ast::Stmt::CreateUser(create_user) => self.node_symbol(stmt, create_user.role()),
+            ast::Stmt::CreateGroup(create_group) => self.node_symbol(stmt, create_group.role()),
+            ast::Stmt::CreateRule(create_rule) => self.node_symbol(stmt, create_rule.rule()),
+            ast::Stmt::CreatePolicy(create_policy) => {
+                self.node_symbol(stmt, create_policy.policy())
+            }
+            ast::Stmt::Declare(declare) => self.node_symbol(stmt, declare.cursor()),
+            ast::Stmt::Prepare(prepare) => self.node_symbol(stmt, prepare.name()),
+            ast::Stmt::SavepointCreate(savepoint) => self.node_symbol(stmt, savepoint.savepoint()),
+            ast::Stmt::Listen(listen) => listen
+                .channel()
+                .map(|channel| channel_symbol(stmt, &channel, "listen")),
+            ast::Stmt::Notify(notify) => notify
+                .channel_ref()
+                .map(|channel| channel_symbol(stmt, &channel, "notify")),
+            ast::Stmt::Unlisten(unlisten) => unlisten
+                .channel_ref()
+                .map(|channel| channel_symbol(stmt, &channel, "unlisten")),
             ast::Stmt::Select(select) => {
-                symbols.extend(cte_table_symbols(&select));
+                self.ctes(select, result);
+                None
             }
             ast::Stmt::SelectInto(select_into) => {
-                symbols.extend(cte_table_symbols(&select_into));
+                self.ctes(select_into, result);
+                self.path_symbol(
+                    stmt,
+                    select_into
+                        .into_clause()
+                        .and_then(|into| into.table_name())
+                        .and_then(|name| name.path()),
+                )
             }
             ast::Stmt::Insert(insert) => {
-                symbols.extend(cte_table_symbols(&insert));
+                self.ctes(insert, result);
+                None
             }
             ast::Stmt::Update(update) => {
-                symbols.extend(cte_table_symbols(&update));
+                self.ctes(update, result);
+                None
             }
             ast::Stmt::Delete(delete) => {
-                symbols.extend(cte_table_symbols(&delete));
+                self.ctes(delete, result);
+                None
             }
-            ast::Stmt::Listen(listen) => {
-                if let Some(symbol) = create_listen_symbol(&listen) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::SavepointCreate(savepoint) => {
-                if let Some(symbol) = create_savepoint_symbol(&savepoint) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::Notify(notify) => {
-                if let Some(symbol) = create_notify_symbol(&notify) {
-                    symbols.push(symbol);
-                }
-            }
-            ast::Stmt::Unlisten(unlisten) => {
-                if let Some(symbol) = create_unlisten_symbol(&unlisten) {
-                    symbols.push(symbol);
-                }
-            }
+            ast::Stmt::AlterAggregate(_)
+            | ast::Stmt::AlterCollation(_)
+            | ast::Stmt::AlterConversion(_)
+            | ast::Stmt::AlterDatabase(_)
+            | ast::Stmt::AlterDefaultPrivileges(_)
+            | ast::Stmt::AlterDomain(_)
+            | ast::Stmt::AlterEventTrigger(_)
+            | ast::Stmt::AlterExtension(_)
+            | ast::Stmt::AlterForeignDataWrapper(_)
+            | ast::Stmt::AlterForeignTable(_)
+            | ast::Stmt::AlterFunction(_)
+            | ast::Stmt::AlterGroup(_)
+            | ast::Stmt::AlterIndex(_)
+            | ast::Stmt::AlterLanguage(_)
+            | ast::Stmt::AlterLargeObject(_)
+            | ast::Stmt::AlterMaterializedView(_)
+            | ast::Stmt::AlterOperator(_)
+            | ast::Stmt::AlterOperatorClass(_)
+            | ast::Stmt::AlterOperatorFamily(_)
+            | ast::Stmt::AlterPolicy(_)
+            | ast::Stmt::AlterProcedure(_)
+            | ast::Stmt::AlterPropertyGraph(_)
+            | ast::Stmt::AlterPublication(_)
+            | ast::Stmt::AlterRole(_)
+            | ast::Stmt::AlterRoutine(_)
+            | ast::Stmt::AlterRule(_)
+            | ast::Stmt::AlterSchema(_)
+            | ast::Stmt::AlterSequence(_)
+            | ast::Stmt::AlterServer(_)
+            | ast::Stmt::AlterStatistics(_)
+            | ast::Stmt::AlterSubscription(_)
+            | ast::Stmt::AlterSystem(_)
+            | ast::Stmt::AlterTable(_)
+            | ast::Stmt::AlterTablespace(_)
+            | ast::Stmt::AlterTextSearchConfiguration(_)
+            | ast::Stmt::AlterTextSearchDictionary(_)
+            | ast::Stmt::AlterTextSearchParser(_)
+            | ast::Stmt::AlterTextSearchTemplate(_)
+            | ast::Stmt::AlterTrigger(_)
+            | ast::Stmt::AlterType(_)
+            | ast::Stmt::AlterUser(_)
+            | ast::Stmt::AlterUserMapping(_)
+            | ast::Stmt::AlterView(_)
+            | ast::Stmt::Analyze(_)
+            | ast::Stmt::Begin(_)
+            | ast::Stmt::Call(_)
+            | ast::Stmt::Checkpoint(_)
+            | ast::Stmt::Close(_)
+            | ast::Stmt::Cluster(_)
+            | ast::Stmt::CommentOn(_)
+            | ast::Stmt::CompoundSelect(_)
+            | ast::Stmt::Copy(_)
+            | ast::Stmt::CreateAccessMethod(_)
+            | ast::Stmt::CreateCast(_)
+            | ast::Stmt::CreateCollation(_)
+            | ast::Stmt::CreateConversion(_)
+            | ast::Stmt::CreateForeignDataWrapper(_)
+            | ast::Stmt::CreateLanguage(_)
+            | ast::Stmt::CreateTextSearchConfiguration(_)
+            | ast::Stmt::CreateTextSearchDictionary(_)
+            | ast::Stmt::CreateTextSearchParser(_)
+            | ast::Stmt::CreateTextSearchTemplate(_)
+            | ast::Stmt::CreateTransform(_)
+            | ast::Stmt::CreateUserMapping(_)
+            | ast::Stmt::Deallocate(_)
+            | ast::Stmt::Discard(_)
+            | ast::Stmt::Do(_)
+            | ast::Stmt::DropAccessMethod(_)
+            | ast::Stmt::DropAggregate(_)
+            | ast::Stmt::DropCast(_)
+            | ast::Stmt::DropCollation(_)
+            | ast::Stmt::DropConversion(_)
+            | ast::Stmt::DropDatabase(_)
+            | ast::Stmt::DropDomain(_)
+            | ast::Stmt::DropEventTrigger(_)
+            | ast::Stmt::DropExtension(_)
+            | ast::Stmt::DropForeignDataWrapper(_)
+            | ast::Stmt::DropForeignTable(_)
+            | ast::Stmt::DropFunction(_)
+            | ast::Stmt::DropGroup(_)
+            | ast::Stmt::DropIndex(_)
+            | ast::Stmt::DropLanguage(_)
+            | ast::Stmt::DropMaterializedView(_)
+            | ast::Stmt::DropOperator(_)
+            | ast::Stmt::DropOperatorClass(_)
+            | ast::Stmt::DropOperatorFamily(_)
+            | ast::Stmt::DropOwned(_)
+            | ast::Stmt::DropPolicy(_)
+            | ast::Stmt::DropProcedure(_)
+            | ast::Stmt::DropPropertyGraph(_)
+            | ast::Stmt::DropPublication(_)
+            | ast::Stmt::DropRole(_)
+            | ast::Stmt::DropRoutine(_)
+            | ast::Stmt::DropRule(_)
+            | ast::Stmt::DropSchema(_)
+            | ast::Stmt::DropSequence(_)
+            | ast::Stmt::DropServer(_)
+            | ast::Stmt::DropStatistics(_)
+            | ast::Stmt::DropSubscription(_)
+            | ast::Stmt::DropTable(_)
+            | ast::Stmt::DropTablespace(_)
+            | ast::Stmt::DropTextSearchConfig(_)
+            | ast::Stmt::DropTextSearchDict(_)
+            | ast::Stmt::DropTextSearchParser(_)
+            | ast::Stmt::DropTextSearchTemplate(_)
+            | ast::Stmt::DropTransform(_)
+            | ast::Stmt::DropTrigger(_)
+            | ast::Stmt::DropType(_)
+            | ast::Stmt::DropUser(_)
+            | ast::Stmt::DropUserMapping(_)
+            | ast::Stmt::DropView(_)
+            | ast::Stmt::EmptyStmt(_)
+            | ast::Stmt::Execute(_)
+            | ast::Stmt::Explain(_)
+            | ast::Stmt::Fetch(_)
+            | ast::Stmt::Grant(_)
+            | ast::Stmt::ImportForeignSchema(_)
+            | ast::Stmt::Load(_)
+            | ast::Stmt::Lock(_)
+            | ast::Stmt::Merge(_)
+            | ast::Stmt::Move(_)
+            | ast::Stmt::ParenSelect(_)
+            | ast::Stmt::PrepareTransaction(_)
+            | ast::Stmt::Reassign(_)
+            | ast::Stmt::Refresh(_)
+            | ast::Stmt::Reindex(_)
+            | ast::Stmt::ReleaseSavepoint(_)
+            | ast::Stmt::Repack(_)
+            | ast::Stmt::Reset(_)
+            | ast::Stmt::ResetRole(_)
+            | ast::Stmt::ResetSessionAuth(_)
+            | ast::Stmt::Revoke(_)
+            | ast::Stmt::SecurityLabel(_)
+            | ast::Stmt::Set(_)
+            | ast::Stmt::SetConstraints(_)
+            | ast::Stmt::SetRole(_)
+            | ast::Stmt::SetSessionAuth(_)
+            | ast::Stmt::SetTransaction(_)
+            | ast::Stmt::Show(_)
+            | ast::Stmt::Table(_)
+            | ast::Stmt::Truncate(_)
+            | ast::Stmt::Vacuum(_)
+            | ast::Stmt::Values(_)
+            | ast::Stmt::Commit(_)
+            | ast::Stmt::Rollback(_) => None,
+        };
+        result.extend(symbol);
+    }
 
-            _ => (),
+    fn ctes(&self, stmt: &impl ast::HasWithClause, result: &mut Vec<DocumentSymbol>) {
+        let Some(with_clause) = stmt.with_clause() else {
+            return;
+        };
+        for with_table in with_clause.with_tables() {
+            if let Some(name) = with_table.name() {
+                result.extend(self.symbol(with_table.syntax(), name.syntax()));
+            }
         }
     }
 
-    symbols
-}
-
-fn cte_table_symbols(stmt: &impl ast::HasWithClause) -> Vec<DocumentSymbol> {
-    let Some(with_clause) = stmt.with_clause() else {
-        return vec![];
-    };
-
-    with_clause
-        .with_tables()
-        .filter_map(|with_table| create_cte_table_symbol(&with_table))
-        .collect()
-}
-
-fn create_cte_table_symbol(with_table: &ast::WithTable) -> Option<DocumentSymbol> {
-    let name_node = with_table.name()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = with_table.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(symbols_from_column_list(
-        with_table.column_list(),
-        name,
-        full_range,
-        focus_range,
-        DocumentSymbolKind::Table,
-    ))
-}
-
-fn create_schema_symbol(create_schema: &ast::CreateSchema) -> Option<DocumentSymbol> {
-    let name_node = create_schema.schema_name()?;
-    let name = name_node.text().to_string();
-    let focus_range = name_node.text_range();
-
-    let full_range = create_schema.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Schema,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_table_symbol(
-    db: &dyn Db,
-    create_table: InFile<impl ast::HasCreateTable>,
-) -> Option<DocumentSymbol> {
-    let file = create_table.file_id;
-    let create_table = create_table.value;
-    let path = create_table.table_name()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, table_name);
-
-    let full_range = create_table.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    let mut children = vec![];
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(column_symbol) = create_column_symbol(&column)
-        {
-            children.push(column_symbol);
-        }
+    fn path_symbol(&self, stmt: &ast::Stmt, path: Option<ast::Path>) -> Option<DocumentSymbol> {
+        let segment = path?.segment()?;
+        self.symbol(stmt.syntax(), segment.syntax())
     }
 
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Table,
-        full_range,
-        focus_range,
-        children,
-    })
+    fn node_symbol(&self, stmt: &ast::Stmt, name: Option<impl AstNode>) -> Option<DocumentSymbol> {
+        self.symbol(stmt.syntax(), name?.syntax())
+    }
+
+    fn symbol(&self, node: &SyntaxNode, name: &SyntaxNode) -> Option<DocumentSymbol> {
+        self.symbol_at_range(node.text_range(), name.text_range())
+    }
+
+    fn symbol_at_range(
+        &self,
+        full_range: TextRange,
+        focus_range: TextRange,
+    ) -> Option<DocumentSymbol> {
+        let Described {
+            name,
+            kind,
+            children,
+        } = self
+            .index
+            .items_at_range(InFile::new(self.file_id, focus_range))
+            .find_map(|item| self.describe(item, full_range))?;
+        Some(DocumentSymbol {
+            name,
+            detail: None,
+            kind,
+            full_range,
+            focus_range,
+            children,
+        })
+    }
+
+    fn describe(&self, item: Item, full_range: TextRange) -> Option<Described> {
+        let index = self.index;
+        Some(match item {
+            Item::Table(table) => {
+                let table = &index.tables[table];
+                let kind = match table.kind {
+                    TableKind::Table | TableKind::ForeignTable => DocumentSymbolKind::Table,
+                    TableKind::View => DocumentSymbolKind::View,
+                    TableKind::MaterializedView => DocumentSymbolKind::MaterializedView,
+                    TableKind::Sequence => DocumentSymbolKind::Sequence,
+                    TableKind::PropertyGraph => DocumentSymbolKind::PropertyGraph,
+                };
+                let children = match table.kind {
+                    TableKind::Table
+                    | TableKind::ForeignTable
+                    | TableKind::View
+                    | TableKind::MaterializedView => self.columns(table.columns.range, full_range),
+                    TableKind::Sequence | TableKind::PropertyGraph => vec![],
+                };
+                Described {
+                    name: self.qualified(table.schema, table.name),
+                    kind,
+                    children,
+                }
+            }
+            Item::Cte(cte) => {
+                let cte = &index.ctes[cte];
+                Described {
+                    name: self.name(cte.name).to_string(),
+                    kind: DocumentSymbolKind::Table,
+                    children: self.columns(cte.columns.range, full_range),
+                }
+            }
+            Item::Function(function) => {
+                let function = &index.functions[function];
+                let kind = match function.kind {
+                    FunctionKind::Function => DocumentSymbolKind::Function,
+                    FunctionKind::Aggregate => DocumentSymbolKind::Aggregate,
+                    FunctionKind::Procedure => DocumentSymbolKind::Procedure,
+                };
+                Described::leaf(self.qualified(function.schema, function.name), kind)
+            }
+            Item::Type(id) => {
+                let ty = &index.types[id];
+                let (kind, children) = match ty.kind {
+                    TypeKind::Enum => (DocumentSymbolKind::Enum, self.variants(id, full_range)),
+                    TypeKind::Domain => (DocumentSymbolKind::Domain, vec![]),
+                    TypeKind::Shell | TypeKind::Type | TypeKind::Range | TypeKind::Multirange => (
+                        DocumentSymbolKind::Type,
+                        ty.columns
+                            .map(|columns| self.columns(columns.range, full_range))
+                            .unwrap_or_default(),
+                    ),
+                };
+                Described {
+                    name: self.qualified(ty.schema, ty.name),
+                    kind,
+                    children,
+                }
+            }
+            Item::Index(idx) => {
+                let idx = &index.indexes[idx];
+                Described::leaf(
+                    self.qualified(idx.schema, idx.name),
+                    DocumentSymbolKind::Index,
+                )
+            }
+            Item::Statistics(statistics) => {
+                let statistics = &index.statistics[statistics];
+                Described::leaf(
+                    self.qualified(statistics.schema, statistics.name),
+                    DocumentSymbolKind::Statistics,
+                )
+            }
+            Item::Schema(schema) => {
+                self.leaf(index.schemas[schema].name, DocumentSymbolKind::Schema)
+            }
+            Item::Trigger(trigger) => {
+                self.leaf(index.triggers[trigger].name, DocumentSymbolKind::Trigger)
+            }
+            Item::EventTrigger(event_trigger) => self.leaf(
+                index.event_triggers[event_trigger].name,
+                DocumentSymbolKind::EventTrigger,
+            ),
+            Item::Rule(rule) => self.leaf(index.rules[rule].name, DocumentSymbolKind::Rule),
+            Item::Role(role) => self.leaf(index.roles[role].name, DocumentSymbolKind::Role),
+            Item::Policy(policy) => {
+                self.leaf(index.policies[policy].name, DocumentSymbolKind::Policy)
+            }
+            Item::Tablespace(tablespace) => self.leaf(
+                index.tablespaces[tablespace].name,
+                DocumentSymbolKind::Tablespace,
+            ),
+            Item::Database(database) => {
+                self.leaf(index.databases[database].name, DocumentSymbolKind::Database)
+            }
+            Item::Server(server) => {
+                self.leaf(index.servers[server].name, DocumentSymbolKind::Server)
+            }
+            Item::Extension(extension) => self.leaf(
+                index.extensions[extension].name,
+                DocumentSymbolKind::Extension,
+            ),
+            Item::OperatorClass(class) => {
+                let class_data = &index.operator_classes[class];
+                Described {
+                    name: self.qualified(class_data.schema, class_data.name),
+                    kind: DocumentSymbolKind::OperatorClass,
+                    children: self.members(MemberOwner::Class(class), full_range),
+                }
+            }
+            Item::OperatorFamily(family) => {
+                let family_data = &index.operator_families[family];
+                Described {
+                    name: self.qualified(family_data.schema, family_data.name),
+                    kind: DocumentSymbolKind::OperatorFamily,
+                    children: self.members(MemberOwner::Family(family), full_range),
+                }
+            }
+            Item::Cursor(cursor) => {
+                self.leaf(index.cursors[cursor].name, DocumentSymbolKind::Cursor)
+            }
+            Item::PreparedStatement(prepared) => self.leaf(
+                index.prepared_statements[prepared].name,
+                DocumentSymbolKind::PreparedStatement,
+            ),
+            Item::Savepoint(savepoint) => self.leaf(
+                index.savepoints[savepoint].name,
+                DocumentSymbolKind::Savepoint,
+            ),
+            Item::Operator(operator) => {
+                let operator = &index.operators[operator];
+                Described::leaf(
+                    self.qualified(operator.schema, operator.name),
+                    DocumentSymbolKind::Operator,
+                )
+            }
+            Item::Publication(publication) => self.leaf(
+                index.publications[publication].name,
+                DocumentSymbolKind::Publication,
+            ),
+            Item::Subscription(subscription) => self.leaf(
+                index.subscriptions[subscription].name,
+                DocumentSymbolKind::Subscription,
+            ),
+            Item::Reference(_)
+            | Item::Column(_)
+            | Item::Source(_)
+            | Item::Param(_)
+            | Item::Window(_)
+            | Item::JsonPath(_)
+            | Item::Constraint(_)
+            | Item::AccessMethod(_)
+            | Item::Language(_)
+            | Item::ForeignDataWrapper(_)
+            | Item::Conversion(_)
+            | Item::TextSearch(_)
+            | Item::GraphElement(_)
+            | Item::GraphLabel(_)
+            | Item::EnumLabel(_)
+            | Item::GraphProperty(_)
+            | Item::Collation(_)
+            | Item::PreparedTransaction(_)
+            | Item::Channel(_)
+            | Item::TransactionBegin(_)
+            | Item::TransactionEnd(_)
+            | Item::CaseKeyword(_)
+            | Item::Star(_) => return None,
+        })
+    }
+
+    fn columns(&self, columns: IdxRange<Column>, full_range: TextRange) -> Vec<DocumentSymbol> {
+        columns
+            .into_iter()
+            .filter_map(|id| {
+                let column = &self.index.columns[id];
+                let name = self.name(column.name?).to_string();
+                let Some(focus_range) = self.local_range(
+                    column.ptr.file_id,
+                    column.ptr.value.text_range(),
+                    full_range,
+                ) else {
+                    let star_range = self.star_range(column, full_range)?;
+                    return Some(DocumentSymbol {
+                        name,
+                        detail: column.ty.map(|ty| self.index.type_name(ty).to_string()),
+                        kind: DocumentSymbolKind::Column,
+                        full_range: star_range,
+                        focus_range: star_range,
+                        children: vec![],
+                    });
+                };
+                let parent = column.ptr.value.to_node(self.root).parent();
+                let declared = parent.as_ref().and_then(|parent| {
+                    if let Some(column) = ast::Column::cast(parent.clone()) {
+                        Some((parent.text_range(), column.ty()))
+                    } else {
+                        ast::CompositeFieldDef::cast(parent.clone())
+                            .map(|field| (parent.text_range(), field.ty()))
+                    }
+                });
+                let (full_range, detail) = match declared {
+                    Some((range, ty)) => (range, ty.map(|ty| ty.syntax().text().to_string())),
+                    None => (
+                        focus_range,
+                        column.ty.map(|ty| self.index.type_name(ty).to_string()),
+                    ),
+                };
+                Some(DocumentSymbol {
+                    name,
+                    detail,
+                    kind: DocumentSymbolKind::Column,
+                    full_range,
+                    focus_range,
+                    children: vec![],
+                })
+            })
+            .collect()
+    }
+
+    fn star_range(&self, column: &Column, full_range: TextRange) -> Option<TextRange> {
+        let items = self.index.file_items(self.file_id);
+        let start = items.partition_point(|item| item.value.range.start() < full_range.start());
+        items[start..]
+            .iter()
+            .take_while(|item| item.value.range.start() < full_range.end())
+            .find_map(|item| {
+                let Item::Star(star) = item.value.item else {
+                    return None;
+                };
+                self.index.stars[star]
+                    .columns
+                    .into_iter()
+                    .any(|id| self.index.columns[self.index.star_columns[id]].ptr == column.ptr)
+                    .then_some(item.value.range)
+            })
+    }
+
+    fn variants(&self, ty: TypeId, full_range: TextRange) -> Vec<DocumentSymbol> {
+        self.index
+            .enum_labels(ty)
+            .filter_map(|label| {
+                let label = &self.index.enum_labels[label];
+                let range = self.local_range(
+                    label.name_ptr.file_id,
+                    label.name_ptr.value.text_range(),
+                    full_range,
+                )?;
+                Some(DocumentSymbol {
+                    name: self.name(label.name).to_string(),
+                    detail: None,
+                    kind: DocumentSymbolKind::Variant,
+                    full_range: range,
+                    focus_range: range,
+                    children: vec![],
+                })
+            })
+            .collect()
+    }
+
+    fn members(&self, owner: MemberOwner, full_range: TextRange) -> Vec<DocumentSymbol> {
+        self.index
+            .operator_family_members
+            .get(owner)
+            .rev()
+            .filter_map(|member| {
+                let member = &self.index.operator_family_members[member];
+                let range = self.local_range(
+                    member.ptr.file_id,
+                    member.ptr.value.text_range(),
+                    full_range,
+                )?;
+                let option = ast::OpClassOption::cast(member.ptr.value.to_node(self.root))?;
+                let (name, literal) = match option {
+                    ast::OpClassOption::OpClassOptionOperator(operator) => {
+                        (operator.op()?.syntax().clone(), operator.literal())
+                    }
+                    ast::OpClassOption::OpClassOptionFunction(function) => (
+                        function
+                            .function_sig()?
+                            .function_name_ref()?
+                            .syntax()
+                            .clone(),
+                        function.literal(),
+                    ),
+                    ast::OpClassOption::OpClassOptionStorage(_) => return None,
+                };
+                let (kind, number) = match member.kind {
+                    MemberKind::Operator => (DocumentSymbolKind::Operator, "strategy"),
+                    MemberKind::Function => (DocumentSymbolKind::Function, "support"),
+                };
+                Some(DocumentSymbol {
+                    name: name.text().to_string(),
+                    detail: literal.map(|literal| format!("{number} {}", literal.syntax().text())),
+                    kind,
+                    full_range: range,
+                    focus_range: name.text_range(),
+                    children: vec![],
+                })
+            })
+            .collect()
+    }
+
+    fn local_range(
+        &self,
+        file_id: IrFileId,
+        range: TextRange,
+        parent: TextRange,
+    ) -> Option<TextRange> {
+        (file_id == self.file_id.into() && parent.contains_range(range)).then_some(range)
+    }
+
+    fn leaf(&self, name: Name, kind: DocumentSymbolKind) -> Described {
+        Described::leaf(self.name(name).to_string(), kind)
+    }
+
+    fn name(&self, name: Name) -> &str {
+        self.index.names.resolve(name)
+    }
+
+    fn qualified(&self, schema: Name, name: Name) -> String {
+        format!("{}.{}", self.name(schema), self.name(name))
+    }
 }
 
-fn create_table_as_symbol(
-    db: &dyn Db,
-    create_table_as: InFile<ast::CreateTableAs>,
-) -> Option<DocumentSymbol> {
-    let file = create_table_as.file_id;
-    let create_table_as = create_table_as.value;
-    let path = create_table_as.table_name()?.path()?;
-    let name_node = path.segment()?.syntax().clone();
-
-    let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, table_name);
-
-    let full_range = create_table_as.syntax().text_range();
-    let focus_range = name_node.text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Table,
-        full_range,
-        focus_range,
-        // TODO: infer the column names, we need the same for views without
-        // explicit column lists
+fn channel_symbol(stmt: &ast::Stmt, channel: &impl NameLike, detail: &str) -> DocumentSymbol {
+    DocumentSymbol {
+        name: channel.text(),
+        detail: Some(detail.to_string()),
+        kind: DocumentSymbolKind::Channel,
+        full_range: stmt.syntax().text_range(),
+        focus_range: channel.syntax().text_range(),
         children: vec![],
-    })
+    }
 }
 
-fn create_view_symbol(db: &dyn Db, create_view: InFile<ast::CreateView>) -> Option<DocumentSymbol> {
-    let file = create_view.file_id;
-    let create_view = create_view.value;
-    let path = create_view.view()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, view_name);
-
-    let full_range = create_view.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(symbols_from_column_list(
-        create_view.column_list(),
-        name,
-        full_range,
-        focus_range,
-        DocumentSymbolKind::View,
-    ))
-}
-
-fn symbols_from_column_list(
-    column_list: Option<ast::ColumnList>,
+struct Described {
     name: String,
-    full_range: TextRange,
-    focus_range: TextRange,
     kind: DocumentSymbolKind,
-) -> DocumentSymbol {
-    let mut children = vec![];
-    if let Some(column_list) = column_list {
-        for column_name in column_list.column_names() {
-            children.push(create_column_name_symbol(&column_name));
+    children: Vec<DocumentSymbol>,
+}
+
+impl Described {
+    fn leaf(name: String, kind: DocumentSymbolKind) -> Described {
+        Described {
+            name,
+            kind,
+            children: vec![],
         }
     }
-
-    DocumentSymbol {
-        name,
-        detail: None,
-        kind,
-        full_range,
-        focus_range,
-        children,
-    }
-}
-
-// TODO: combine with create_view_symbol
-fn create_materialized_view_symbol(
-    db: &dyn Db,
-    create_view: InFile<ast::CreateMaterializedView>,
-) -> Option<DocumentSymbol> {
-    let file = create_view.file_id;
-    let create_view = create_view.value;
-    let path = create_view.view()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, view_name);
-
-    let full_range = create_view.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(symbols_from_column_list(
-        create_view.column_list(),
-        name,
-        full_range,
-        focus_range,
-        DocumentSymbolKind::MaterializedView,
-    ))
-}
-
-fn create_function_symbol(
-    db: &dyn Db,
-    create_function: InFile<ast::CreateFunction>,
-) -> Option<DocumentSymbol> {
-    let file = create_function.file_id;
-    let create_function = create_function.value;
-    let path = create_function.name()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, function_name) = resolve_function_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, function_name);
-
-    let full_range = create_function.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Function,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_aggregate_symbol(
-    db: &dyn Db,
-    create_aggregate: InFile<ast::CreateAggregate>,
-) -> Option<DocumentSymbol> {
-    let file = create_aggregate.file_id;
-    let create_aggregate = create_aggregate.value;
-    let path = create_aggregate.aggregate_name()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, aggregate_name) = resolve_aggregate_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, aggregate_name);
-
-    let full_range = create_aggregate.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Aggregate,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_procedure_symbol(
-    db: &dyn Db,
-    create_procedure: InFile<ast::CreateProcedure>,
-) -> Option<DocumentSymbol> {
-    let file = create_procedure.file_id;
-    let create_procedure = create_procedure.value;
-    let path = create_procedure.name()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, procedure_name) = resolve_procedure_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, procedure_name);
-
-    let full_range = create_procedure.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Procedure,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_index_symbol(create_index: &ast::CreateIndex) -> Option<DocumentSymbol> {
-    let path = create_index.index()?.path()?;
-    let name_node = path.segment()?;
-    let name = path.syntax().text().to_string();
-
-    let full_range = create_index.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Index,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_domain_symbol(
-    db: &dyn Db,
-    create_domain: InFile<ast::CreateDomain>,
-) -> Option<DocumentSymbol> {
-    let file = create_domain.file_id;
-    let create_domain = create_domain.value;
-    let path = create_domain.domain()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, domain_name) = resolve_type_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, domain_name);
-
-    let full_range = create_domain.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Domain,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_sequence_symbol(
-    db: &dyn Db,
-    create_sequence: InFile<ast::CreateSequence>,
-) -> Option<DocumentSymbol> {
-    let file = create_sequence.file_id;
-    let create_sequence = create_sequence.value;
-    let path = create_sequence.sequence()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, sequence_name) = resolve_sequence_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, sequence_name);
-
-    let full_range = create_sequence.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Sequence,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_statistics_symbol(
-    db: &dyn Db,
-    create_statistics: InFile<ast::CreateStatistics>,
-) -> Option<DocumentSymbol> {
-    let file = create_statistics.file_id;
-    let create_statistics = create_statistics.value;
-    let path = create_statistics.statistics()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, statistics_name) = resolve_statistics_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, statistics_name);
-
-    let full_range = create_statistics.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Statistics,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_trigger_symbol(create_trigger: &ast::CreateTrigger) -> Option<DocumentSymbol> {
-    let name_node = create_trigger.trigger()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_trigger.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Trigger,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_event_trigger_symbol(
-    create_event_trigger: &ast::CreateEventTrigger,
-) -> Option<DocumentSymbol> {
-    let name_node = create_event_trigger.event_trigger()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_event_trigger.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::EventTrigger,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_tablespace_symbol(create_tablespace: &ast::CreateTablespace) -> Option<DocumentSymbol> {
-    let name_node = create_tablespace.tablespace()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_tablespace.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Tablespace,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_database_symbol(create_database: &ast::CreateDatabase) -> Option<DocumentSymbol> {
-    let name_node = create_database.database()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_database.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Database,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_server_symbol(create_server: &ast::CreateServer) -> Option<DocumentSymbol> {
-    let name_node = create_server.server()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_server.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Server,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_extension_symbol(create_extension: &ast::CreateExtension) -> Option<DocumentSymbol> {
-    let name_node = create_extension.extension()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_extension.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Extension,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_role_symbol(create_role: &ast::CreateRole) -> Option<DocumentSymbol> {
-    let role = create_role.role()?;
-    let name = role.syntax().text().to_string();
-
-    let full_range = create_role.syntax().text_range();
-    let focus_range = role.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Role,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_rule_symbol(create_rule: &ast::CreateRule) -> Option<DocumentSymbol> {
-    let name_node = create_rule.rule()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_rule.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Rule,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_policy_symbol(create_policy: &ast::CreatePolicy) -> Option<DocumentSymbol> {
-    let name_node = create_policy.policy()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = create_policy.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Policy,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_property_graph_symbol(
-    create_property_graph: &ast::CreatePropertyGraph,
-) -> Option<DocumentSymbol> {
-    let path = create_property_graph.property_graph()?.path()?;
-    let name_node = path.segment()?;
-
-    let name = path.syntax().text().to_string();
-
-    let full_range = create_property_graph.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::PropertyGraph,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Option<DocumentSymbol> {
-    let file = create_type.file_id;
-    let create_type = create_type.value;
-    let path = create_type.type_name()?.path()?;
-    let name_node = path.segment()?;
-
-    let (schema, type_name) = resolve_type_info(db, InFile::new(file, &path))?;
-    let name = format!("{}.{}", schema.0, type_name);
-
-    let full_range = create_type.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    let mut children = vec![];
-    match create_type.kind() {
-        Some(ast::CreateTypeKind::EnumType(enum_type)) => {
-            if let Some(variant_list) = enum_type.variant_list() {
-                for variant in variant_list.variants() {
-                    if let Some(variant_symbol) = create_variant_symbol(&variant) {
-                        children.push(variant_symbol);
-                    }
-                }
-            }
-        }
-        Some(ast::CreateTypeKind::CompositeType(composite_type)) => {
-            if let Some(field_list) = composite_type.composite_field_list() {
-                for field in field_list.composite_field_defs() {
-                    if let Some(field_symbol) = create_composite_field_symbol(&field) {
-                        children.push(field_symbol);
-                    }
-                }
-            }
-        }
-        _ => (),
-    }
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: if matches!(create_type.kind(), Some(ast::CreateTypeKind::EnumType(_))) {
-            DocumentSymbolKind::Enum
-        } else {
-            DocumentSymbolKind::Type
-        },
-        full_range,
-        focus_range,
-        children,
-    })
-}
-
-fn create_column_name_symbol(column_name: &ast::ColumnName) -> DocumentSymbol {
-    let range = column_name.syntax().text_range();
-
-    DocumentSymbol {
-        name: column_name.syntax().text().to_string(),
-        detail: None,
-        kind: DocumentSymbolKind::Column,
-        full_range: range,
-        focus_range: range,
-        children: vec![],
-    }
-}
-
-fn create_column_symbol(column: &ast::Column) -> Option<DocumentSymbol> {
-    let name_node = column.name()?;
-    let name = name_node.syntax().text().to_string();
-
-    let detail = column.ty().map(|t| t.syntax().text().to_string());
-
-    let full_range = column.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail,
-        kind: DocumentSymbolKind::Column,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_composite_field_symbol(field: &ast::CompositeFieldDef) -> Option<DocumentSymbol> {
-    let name_node = field.name()?;
-    let name = name_node.syntax().text().to_string();
-
-    let detail = field.ty().map(|t| t.syntax().text().to_string());
-
-    let full_range = field.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail,
-        kind: DocumentSymbolKind::Column,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_variant_symbol(variant: &ast::Variant) -> Option<DocumentSymbol> {
-    let literal = variant.literal()?;
-    let name = extract_string_literal(&literal)?;
-
-    let full_range = variant.syntax().text_range();
-    let focus_range = literal.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Variant,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_declare_cursor_symbol(declare: &ast::Declare) -> Option<DocumentSymbol> {
-    let name_node = declare.cursor()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = declare.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Cursor,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_prepare_symbol(prepare: &ast::Prepare) -> Option<DocumentSymbol> {
-    let name_node = prepare.name()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = prepare.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::PreparedStatement,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_listen_symbol(listen: &ast::Listen) -> Option<DocumentSymbol> {
-    let name_node = listen.channel()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = listen.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: Some("listen".to_string()),
-        kind: DocumentSymbolKind::Channel,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_savepoint_symbol(savepoint: &ast::SavepointCreate) -> Option<DocumentSymbol> {
-    let name_node = savepoint.savepoint()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = savepoint.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: None,
-        kind: DocumentSymbolKind::Savepoint,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_notify_symbol(notify: &ast::Notify) -> Option<DocumentSymbol> {
-    let name_node = notify.channel_ref()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = notify.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: Some("notify".to_string()),
-        kind: DocumentSymbolKind::Channel,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
-}
-
-fn create_unlisten_symbol(unlisten: &ast::Unlisten) -> Option<DocumentSymbol> {
-    let name_node = unlisten.channel_ref()?;
-    let name = name_node.syntax().text().to_string();
-
-    let full_range = unlisten.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
-
-    Some(DocumentSymbol {
-        name,
-        detail: Some("unlisten".to_string()),
-        kind: DocumentSymbolKind::Channel,
-        full_range,
-        focus_range,
-        children: vec![],
-    })
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::db::{Database, File};
-    use annotate_snippets::{
-        AnnotationKind, Group, Level, Renderer, Snippet, renderer::DecorStyle,
-    };
-    use insta::assert_snapshot;
-
-    fn symbols_not_found(sql: &str) {
-        let db = Database::default();
-        let file = File::new(&db, sql.to_string().into());
-        let symbols = document_symbols(&db, file);
-        assert!(
-            symbols.is_empty(),
-            "Symbols found. If this is expected, use `symbols` instead."
-        );
-    }
-
-    #[must_use]
-    fn symbols(sql: &str) -> String {
-        let db = Database::default();
-        let file = File::new(&db, sql.to_string().into());
-        let symbols = document_symbols(&db, file);
-        assert!(
-            !symbols.is_empty(),
-            "No symbols found. If this is expected, use `symbols_not_found` instead."
-        );
-
-        let mut output = vec![];
-        for symbol in symbols {
-            let group = symbol_to_group(&symbol, sql);
-            output.push(group);
-        }
-        Renderer::plain()
-            .decor_style(DecorStyle::Unicode)
-            .render(&output)
-    }
-
-    fn symbol_to_group<'a>(symbol: &DocumentSymbol, sql: &'a str) -> Group<'a> {
-        let kind = match symbol.kind {
-            DocumentSymbolKind::Schema => "schema",
-            DocumentSymbolKind::Table => "table",
-            DocumentSymbolKind::View => "view",
-            DocumentSymbolKind::MaterializedView => "materialized view",
-            DocumentSymbolKind::Function => "function",
-            DocumentSymbolKind::Aggregate => "aggregate",
-            DocumentSymbolKind::Procedure => "procedure",
-            DocumentSymbolKind::EventTrigger => "event trigger",
-            DocumentSymbolKind::Role => "role",
-            DocumentSymbolKind::Rule => "rule",
-            DocumentSymbolKind::Policy => "policy",
-            DocumentSymbolKind::PropertyGraph => "property graph",
-            DocumentSymbolKind::Type => "type",
-            DocumentSymbolKind::Enum => "enum",
-            DocumentSymbolKind::Index => "index",
-            DocumentSymbolKind::Domain => "domain",
-            DocumentSymbolKind::Sequence => "sequence",
-            DocumentSymbolKind::Statistics => "statistics",
-            DocumentSymbolKind::Trigger => "trigger",
-            DocumentSymbolKind::Tablespace => "tablespace",
-            DocumentSymbolKind::Database => "database",
-            DocumentSymbolKind::Server => "server",
-            DocumentSymbolKind::Extension => "extension",
-            DocumentSymbolKind::Column => "column",
-            DocumentSymbolKind::Variant => "variant",
-            DocumentSymbolKind::Cursor => "cursor",
-            DocumentSymbolKind::PreparedStatement => "prepared statement",
-            DocumentSymbolKind::Channel => "channel",
-            DocumentSymbolKind::Savepoint => "savepoint",
-        };
-
-        let title = if let Some(detail) = &symbol.detail {
-            format!("{}: {} {}", kind, symbol.name, detail)
-        } else {
-            format!("{}: {}", kind, symbol.name)
-        };
-
-        let snippet = Snippet::source(sql)
-            .fold(true)
-            .annotation(
-                AnnotationKind::Primary
-                    .span(symbol.focus_range.into())
-                    .label("focus range"),
-            )
-            .annotation(
-                AnnotationKind::Context
-                    .span(symbol.full_range.into())
-                    .label("full range"),
-            );
-
-        let mut group = Level::INFO.primary_title(title).element(snippet);
-
-        if !symbol.children.is_empty() {
-            let child_labels: Vec<String> = symbol
-                .children
-                .iter()
-                .map(|child| {
-                    let kind = match child.kind {
-                        DocumentSymbolKind::Column => "column",
-                        DocumentSymbolKind::Variant => "variant",
-                        _ => unreachable!("only columns and variants can be children"),
-                    };
-                    if let Some(detail) = &child.detail {
-                        format!("{}: {} {}", kind, child.name, detail)
-                    } else {
-                        format!("{}: {}", kind, child.name)
-                    }
-                })
-                .collect();
-
-            let mut children_snippet = Snippet::source(sql).fold(true);
-
-            for (i, child) in symbol.children.iter().enumerate() {
-                children_snippet = children_snippet
-                    .annotation(
-                        AnnotationKind::Context
-                            .span(child.full_range.into())
-                            .label(format!("full range for `{}`", child_labels[i].clone())),
-                    )
-                    .annotation(
-                        AnnotationKind::Primary
-                            .span(child.focus_range.into())
-                            .label("focus range"),
-                    );
-            }
-
-            group = group.element(children_snippet);
-        }
-
-        group
-    }
-
-    #[test]
-    fn create_table() {
-        assert_snapshot!(symbols("
-create table users (
-  id int,
-  email citext
-);"), @"
-        info: table: public.users
-          ╭▸ 
-        2 │   create table users (
-          │   │            ━━━━━ focus range
-          │ ┌─┘
-          │ │
-        3 │ │   id int,
-        4 │ │   email citext
-        5 │ │ );
-          │ └──┘ full range
-          │
-          ⸬  
-        3 │     id int,
-          │     ┯━────
-          │     │
-          │     full range for `column: id int`
-          │     focus range
-        4 │     email citext
-          │     ┯━━━━───────
-          │     │
-          │     full range for `column: email citext`
-          ╰╴    focus range
-        ");
-    }
-
-    #[test]
-    fn create_table_as() {
-        assert_snapshot!(symbols("
-create table t as select 1 a;
-"), @"
-        info: table: public.t
-          ╭▸ 
-        2 │ create table t as select 1 a;
-          │ ┬────────────┯───────────────
-          │ │            │
-          │ │            focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_schema() {
-        assert_snapshot!(symbols("
-create schema foo;
-"), @"
-        info: schema: foo
-          ╭▸ 
-        2 │ create schema foo;
-          │ ┬─────────────┯━━─
-          │ │             │
-          │ │             focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_schema_authorization() {
-        assert_snapshot!(symbols("
-create schema authorization foo;
-"), @"
-        info: schema: foo
-          ╭▸ 
-        2 │ create schema authorization foo;
-          │ ┬───────────────────────────┯━━─
-          │ │                           │
-          │ │                           focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn listen_notify_unlisten() {
-        assert_snapshot!(symbols("
-listen updates;
-notify updates;
-unlisten updates;
-unlisten *;
-"), @"
-        info: channel: updates listen
-          ╭▸ 
-        2 │ listen updates;
-          │ ┬──────┯━━━━━━─
-          │ │      │
-          │ │      focus range
-          │ full range
-          ╰╴
-        info: channel: updates notify
-          ╭▸ 
-        3 │ notify updates;
-          │ ┬──────┯━━━━━━─
-          │ │      │
-          │ │      focus range
-          ╰╴full range
-        info: channel: updates unlisten
-          ╭▸ 
-        4 │ unlisten updates;
-          │ ┬────────┯━━━━━━─
-          │ │        │
-          │ │        focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_function() {
-        assert_snapshot!(
-            symbols("create function hello() returns void as $$ select 1; $$ language sql;"),
-            @"
-        info: function: public.hello
-          ╭▸ 
-        1 │ create function hello() returns void as $$ select 1; $$ language sql;
-          │ ┬───────────────┯━━━━────────────────────────────────────────────────
-          │ │               │
-          │ │               focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_materialized_view() {
-        assert_snapshot!(
-            symbols("create materialized view reports as select 1;"),
-            @"
-        info: materialized view: public.reports
-          ╭▸ 
-        1 │ create materialized view reports as select 1;
-          │ ┬────────────────────────┯━━━━━━─────────────
-          │ │                        │
-          │ │                        focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_aggregate() {
-        assert_snapshot!(
-            symbols("create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);"),
-            @"
-        info: aggregate: public.myavg
-          ╭▸ 
-        1 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-          │ ┬────────────────┯━━━━──────────────────────────────────────────────
-          │ │                │
-          │ │                focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_procedure() {
-        assert_snapshot!(
-            symbols("create procedure hello() language sql as $$ select 1; $$;"),
-            @"
-        info: procedure: public.hello
-          ╭▸ 
-        1 │ create procedure hello() language sql as $$ select 1; $$;
-          │ ┬────────────────┯━━━━───────────────────────────────────
-          │ │                │
-          │ │                focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_index() {
-        assert_snapshot!(symbols("
-create index idx_users_email on users (email);
-"), @"
-        info: index: idx_users_email
-          ╭▸ 
-        2 │ create index idx_users_email on users (email);
-          │ ┬────────────┯━━━━━━━━━━━━━━──────────────────
-          │ │            │
-          │ │            focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_domain() {
-        assert_snapshot!(
-            symbols("create domain email_addr as text;"),
-            @"
-        info: domain: public.email_addr
-          ╭▸ 
-        1 │ create domain email_addr as text;
-          │ ┬─────────────┯━━━━━━━━━─────────
-          │ │             │
-          │ │             focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_sequence() {
-        assert_snapshot!(
-            symbols("create sequence user_id_seq;"),
-            @"
-        info: sequence: public.user_id_seq
-          ╭▸ 
-        1 │ create sequence user_id_seq;
-          │ ┬───────────────┯━━━━━━━━━━─
-          │ │               │
-          │ │               focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_trigger() {
-        assert_snapshot!(symbols("
-create trigger update_timestamp
-  before update on users
-  execute function update_modified_column();
-"), @"
-        info: trigger: update_timestamp
-          ╭▸ 
-        2 │   create trigger update_timestamp
-          │   │              ━━━━━━━━━━━━━━━━ focus range
-          │ ┌─┘
-          │ │
-        3 │ │   before update on users
-        4 │ │   execute function update_modified_column();
-          ╰╴└────────────────────────────────────────────┘ full range
-        ");
-    }
-
-    #[test]
-    fn create_event_trigger() {
-        assert_snapshot!(
-            symbols("create event trigger et on ddl_command_start execute function f();"),
-            @"
-        info: event trigger: et
-          ╭▸ 
-        1 │ create event trigger et on ddl_command_start execute function f();
-          │ ┬────────────────────┯━───────────────────────────────────────────
-          │ │                    │
-          │ │                    focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_tablespace() {
-        assert_snapshot!(symbols("
-create tablespace dbspace location '/data/dbs';
-"), @"
-        info: tablespace: dbspace
-          ╭▸ 
-        2 │ create tablespace dbspace location '/data/dbs';
-          │ ┬─────────────────┯━━━━━━──────────────────────
-          │ │                 │
-          │ │                 focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_database() {
-        assert_snapshot!(
-            symbols("create database mydb;"),
-            @"
-        info: database: mydb
-          ╭▸ 
-        1 │ create database mydb;
-          │ ┬───────────────┯━━━─
-          │ │               │
-          │ │               focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_server() {
-        assert_snapshot!(symbols("
-create server myserver foreign data wrapper postgres_fdw;
-"), @"
-        info: server: myserver
-          ╭▸ 
-        2 │ create server myserver foreign data wrapper postgres_fdw;
-          │ ┬─────────────┯━━━━━━━───────────────────────────────────
-          │ │             │
-          │ │             focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_extension() {
-        assert_snapshot!(
-            symbols("create extension pgcrypto;"),
-            @"
-        info: extension: pgcrypto
-          ╭▸ 
-        1 │ create extension pgcrypto;
-          │ ┬────────────────┯━━━━━━━─
-          │ │                │
-          │ │                focus range
-          ╰╴full range
-        "
-        );
-    }
-
-    #[test]
-    fn create_role() {
-        assert_snapshot!(symbols("
-create role reader;
-"), @"
-        info: role: reader
-          ╭▸ 
-        2 │ create role reader;
-          │ ┬───────────┯━━━━━─
-          │ │           │
-          │ │           focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_rule() {
-        assert_snapshot!(symbols("
-create rule r as on select to t do nothing;
-"), @"
-        info: rule: r
-          ╭▸ 
-        2 │ create rule r as on select to t do nothing;
-          │ ┬───────────┯──────────────────────────────
-          │ │           │
-          │ │           focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_rule_or_replace() {
-        assert_snapshot!(symbols("
-create or replace rule notify_me as on update to mytable do also notify mytable;
-"), @"
-        info: rule: notify_me
-          ╭▸ 
-        2 │ create or replace rule notify_me as on update to mytable do also notify mytable;
-          │ ┬──────────────────────┯━━━━━━━━────────────────────────────────────────────────
-          │ │                      │
-          │ │                      focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_policy() {
-        assert_snapshot!(symbols("
-create policy allow_read on t;
-"), @"
-        info: policy: allow_read
-          ╭▸ 
-        2 │ create policy allow_read on t;
-          │ ┬─────────────┯━━━━━━━━━──────
-          │ │             │
-          │ │             focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn multiple_symbols() {
-        assert_snapshot!(symbols("
-create table users (id int);
-create table posts (id int);
-create function get_user(user_id int) returns void as $$ select 1; $$ language sql;
-"), @"
-        info: table: public.users
-          ╭▸ 
-        2 │ create table users (id int);
-          │ ┬────────────┯━━━━──────────
-          │ │            │
-          │ │            focus range
-          │ full range
-          │
-          ⸬  
-        2 │ create table users (id int);
-          │                     ┯━────
-          │                     │
-          │                     full range for `column: id int`
-          │                     focus range
-          ╰╴
-        info: table: public.posts
-          ╭▸ 
-        3 │ create table posts (id int);
-          │ ┬────────────┯━━━━──────────
-          │ │            │
-          │ │            focus range
-          │ full range
-          │
-          ⸬  
-        3 │ create table posts (id int);
-          │                     ┯━────
-          │                     │
-          │                     full range for `column: id int`
-          ╰╴                    focus range
-        info: function: public.get_user
-          ╭▸ 
-        4 │ create function get_user(user_id int) returns void as $$ select 1; $$ language sql;
-          │ ┬───────────────┯━━━━━━━───────────────────────────────────────────────────────────
-          │ │               │
-          │ │               focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn qualified_names() {
-        assert_snapshot!(symbols("
-create table public.users (id int);
-create function my_schema.hello() returns void as $$ select 1; $$ language sql;
-"), @"
-        info: table: public.users
-          ╭▸ 
-        2 │ create table public.users (id int);
-          │ ┬───────────────────┯━━━━──────────
-          │ │                   │
-          │ │                   focus range
-          │ full range
-          │
-          ⸬  
-        2 │ create table public.users (id int);
-          │                            ┯━────
-          │                            │
-          │                            full range for `column: id int`
-          │                            focus range
-          ╰╴
-        info: function: my_schema.hello
-          ╭▸ 
-        3 │ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
-          │ ┬─────────────────────────┯━━━━────────────────────────────────────────────────
-          │ │                         │
-          │ │                         focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn create_property_graph() {
-        assert_snapshot!(symbols("
-create property graph foo.bar
-  vertex tables (t key (a) no properties);
-"), @"
-        info: property graph: foo.bar
-          ╭▸ 
-        2 │   create property graph foo.bar
-          │   │                         ━━━ focus range
-          │ ┌─┘
-          │ │
-        3 │ │   vertex tables (t key (a) no properties);
-          ╰╴└──────────────────────────────────────────┘ full range
-        ");
-    }
-
-    #[test]
-    fn create_type() {
-        assert_snapshot!(
-            symbols("create type status as enum ('active', 'inactive');"),
-            @"
-        info: enum: public.status
-          ╭▸ 
-        1 │ create type status as enum ('active', 'inactive');
-          │ ┬───────────┯━━━━━────────────────────────────────
-          │ │           │
-          │ │           focus range
-          │ full range
-          │
-          ⸬  
-        1 │ create type status as enum ('active', 'inactive');
-          │                             ┯━━━━━━━  ┯━━━━━━━━━
-          │                             │         │
-          │                             │         full range for `variant: inactive`
-          │                             │         focus range
-          │                             full range for `variant: active`
-          ╰╴                            focus range
-        "
-        );
-    }
-
-    #[test]
-    fn create_type_composite() {
-        assert_snapshot!(
-            symbols("create type person as (name text, age int);"),
-            @"
-        info: type: public.person
-          ╭▸ 
-        1 │ create type person as (name text, age int);
-          │ ┬───────────┯━━━━━─────────────────────────
-          │ │           │
-          │ │           focus range
-          │ full range
-          │
-          ⸬  
-        1 │ create type person as (name text, age int);
-          │                        ┯━━━─────  ┯━━────
-          │                        │          │
-          │                        │          full range for `column: age int`
-          │                        │          focus range
-          │                        full range for `column: name text`
-          ╰╴                       focus range
-        "
-        );
-    }
-
-    #[test]
-    fn create_type_composite_multiple_columns() {
-        assert_snapshot!(
-            symbols("create type address as (street text, city text, zip varchar(10));"),
-            @"
-        info: type: public.address
-          ╭▸ 
-        1 │ create type address as (street text, city text, zip varchar(10));
-          │ ┬───────────┯━━━━━━──────────────────────────────────────────────
-          │ │           │
-          │ │           focus range
-          │ full range
-          │
-          ⸬  
-        1 │ create type address as (street text, city text, zip varchar(10));
-          │                         ┯━━━━━─────  ┯━━━─────  ┯━━────────────
-          │                         │            │          │
-          │                         │            │          full range for `column: zip varchar(10)`
-          │                         │            │          focus range
-          │                         │            full range for `column: city text`
-          │                         │            focus range
-          │                         full range for `column: street text`
-          ╰╴                        focus range
-        "
-        );
-    }
-
-    #[test]
-    fn create_type_with_schema() {
-        assert_snapshot!(
-            symbols("create type myschema.status as enum ('active', 'inactive');"),
-            @"
-        info: enum: myschema.status
-          ╭▸ 
-        1 │ create type myschema.status as enum ('active', 'inactive');
-          │ ┬────────────────────┯━━━━━────────────────────────────────
-          │ │                    │
-          │ │                    focus range
-          │ full range
-          │
-          ⸬  
-        1 │ create type myschema.status as enum ('active', 'inactive');
-          │                                      ┯━━━━━━━  ┯━━━━━━━━━
-          │                                      │         │
-          │                                      │         full range for `variant: inactive`
-          │                                      │         focus range
-          │                                      full range for `variant: active`
-          ╰╴                                     focus range
-        "
-        );
-    }
-
-    #[test]
-    fn create_type_enum_multiple_variants() {
-        assert_snapshot!(
-            symbols("create type priority as enum ('low', 'medium', 'high', 'urgent');"),
-            @"
-        info: enum: public.priority
-          ╭▸ 
-        1 │ create type priority as enum ('low', 'medium', 'high', 'urgent');
-          │ ┬───────────┯━━━━━━━─────────────────────────────────────────────
-          │ │           │
-          │ │           focus range
-          │ full range
-          │
-          ⸬  
-        1 │ create type priority as enum ('low', 'medium', 'high', 'urgent');
-          │                               ┯━━━━  ┯━━━━━━━  ┯━━━━━  ┯━━━━━━━
-          │                               │      │         │       │
-          │                               │      │         │       full range for `variant: urgent`
-          │                               │      │         │       focus range
-          │                               │      │         full range for `variant: high`
-          │                               │      │         focus range
-          │                               │      full range for `variant: medium`
-          │                               │      focus range
-          │                               full range for `variant: low`
-          ╰╴                              focus range
-        "
-        );
-    }
-
-    #[test]
-    fn declare_cursor() {
-        assert_snapshot!(symbols("
-declare c scroll cursor for select * from t;
-"), @"
-        info: cursor: c
-          ╭▸ 
-        2 │ declare c scroll cursor for select * from t;
-          │ ┬───────┯───────────────────────────────────
-          │ │       │
-          │ │       focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn prepare_statement() {
-        assert_snapshot!(symbols("
-prepare stmt as select 1;
-"), @"
-        info: prepared statement: stmt
-          ╭▸ 
-        2 │ prepare stmt as select 1;
-          │ ┬───────┯━━━─────────────
-          │ │       │
-          │ │       focus range
-          ╰╴full range
-        ");
-    }
-
-    #[test]
-    fn empty_file() {
-        symbols_not_found("");
-    }
-
-    #[test]
-    fn non_create_statements() {
-        symbols_not_found("select * from users;");
-    }
-
-    #[test]
-    fn cte_table() {
-        assert_snapshot!(
-            symbols("
-with recent_users as (
-  select id, email as user_email
-  from users
-)
-select * from recent_users;
-"),
-            @r"
-        info: table: recent_users
-          ╭▸ 
-        2 │   with recent_users as (
-          │        │━━━━━━━━━━━
-          │        │
-          │ ┌──────focus range
-          │ │
-        3 │ │   select id, email as user_email
-        4 │ │   from users
-        5 │ │ )
-          ╰╴└─┘ full range
-        "
-        );
-    }
-
-    #[test]
-    fn cte_table_with_column_list() {
-        assert_snapshot!(
-            symbols("
-with t(a, b, c) as (
-  select 1, 2, 3
-)
-select * from t;
-"),
-            @r"
-        info: table: t
-          ╭▸ 
-        2 │   with t(a, b, c) as (
-          │        ━ focus range
-          │ ┌──────┘
-          │ │
-        3 │ │   select 1, 2, 3
-        4 │ │ )
-          │ └─┘ full range
-          │
-          ⸬  
-        2 │   with t(a, b, c) as (
-          │          ┯  ┯  ┯
-          │          │  │  │
-          │          │  │  full range for `column: c`
-          │          │  │  focus range
-          │          │  full range for `column: b`
-          │          │  focus range
-          │          full range for `column: a`
-          ╰╴         focus range
-        "
-        );
-    }
-
-    #[test]
-    fn create_foreign_table() {
-        assert_snapshot!(symbols("
-create foreign table films (
-  code char(5),
-  title varchar(40)
-) server film_server;
-"), @"
-        info: table: public.films
-          ╭▸ 
-        2 │   create foreign table films (
-          │   │                    ━━━━━ focus range
-          │ ┌─┘
-          │ │
-        3 │ │   code char(5),
-        4 │ │   title varchar(40)
-        5 │ │ ) server film_server;
-          │ └─────────────────────┘ full range
-          │
-          ⸬  
-        3 │     code char(5),
-          │     ┯━━━────────
-          │     │
-          │     full range for `column: code char(5)`
-          │     focus range
-        4 │     title varchar(40)
-          │     ┯━━━━────────────
-          │     │
-          │     full range for `column: title varchar(40)`
-          ╰╴    focus range
-        ");
-    }
-}
+mod tests;

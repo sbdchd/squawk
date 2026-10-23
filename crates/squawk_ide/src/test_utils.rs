@@ -1,8 +1,17 @@
 use std::ops::Range;
 
-use crate::db::{Database, File, set_include_builtins};
-use crate::file::InFile;
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use rowan::TextSize;
+use squawk_syntax::SourceFile;
+
+use crate::builtins::BUILTINS_SQL;
+use crate::db::{Database, File};
+use crate::extensions::BundledExtension;
+use crate::file::{FileId, FilePosition, FileRange, InFile};
+use crate::hover::hover_with_index as hover;
+use crate::offsets::item_at_position;
+use crate::semantic_index::SemanticIndex;
+use crate::semantic_index_builder::SemanticIndexBuilder;
 
 // TODO: we should probably use something else since `$0` is valid syntax, maybe `%0`?
 const MARKER: &str = "$0";
@@ -33,10 +42,7 @@ impl Fixture {
     pub(crate) fn new_allow_errors(sql: &str) -> Self {
         if let Some(pos) = sql.find(MARKER) {
             let sql = sql.replace(MARKER, "");
-            let mut db = Database::default();
-            if !sql.trim_start().starts_with("-- include-builtins") {
-                set_include_builtins(&mut db, false);
-            }
+            let db = Database::default();
             let file = File::new(&db, sql.as_str().into());
             return Self {
                 marker_offset: TextSize::try_from(pos).unwrap(),
@@ -96,6 +102,169 @@ impl Marker {
     pub(crate) fn range(&self) -> Range<usize> {
         self.range.clone()
     }
+}
+
+#[track_caller]
+pub(crate) fn render_goto<T: IntoIterator<Item = FileRange>>(
+    files: &[&str],
+    title: &str,
+    goto: impl Fn(&SemanticIndex, &SourceFile, FilePosition) -> T,
+) -> Option<String> {
+    render_targets(files, title, "destination", goto)
+}
+
+#[track_caller]
+pub(crate) fn render_hover(files: &[&str]) -> Option<String> {
+    let fixture = SemanticFixture::new(files);
+    let file_index = fixture
+        .sources
+        .iter()
+        .position(|file| file.0 == fixture.position.file_id)
+        .unwrap();
+    let file = &fixture.sources[file_index];
+    let hover = hover(&fixture.index, &file.2, fixture.position)?;
+    let range = hover.range.value;
+    let snippet = Snippet::source(file.1.as_str())
+        .path(format!("file{file_index}.sql"))
+        .fold(true)
+        .annotation(
+            AnnotationKind::Context
+                .span(range.start().into()..range.end().into())
+                .label("hover"),
+        );
+    let title = format!("hover: {}", hover.snippet);
+    let mut group = Level::INFO.primary_title(&title).element(snippet);
+    if let Some(comment) = &hover.comment {
+        group = group.element(Level::NOTE.message(comment));
+    }
+    Some(
+        Renderer::plain()
+            .decor_style(DecorStyle::Unicode)
+            .render(&[group])
+            .replace("info: hover:", "hover:"),
+    )
+}
+
+struct SemanticFixture {
+    _db: Database,
+    sources: Vec<(FileId, String, SourceFile)>,
+    position: FilePosition,
+    index: SemanticIndex,
+}
+
+impl SemanticFixture {
+    #[track_caller]
+    fn new(files: &[&str]) -> SemanticFixture {
+        let db = Database::default();
+        let mut cursor = None;
+        let mut sources = vec![];
+        for sql in files {
+            let file_id = File::new(&db, sql.replace("$0", "").into()).into();
+            if let Some(offset) = sql.find("$0") {
+                let before = sql[..offset]
+                    .char_indices()
+                    .last()
+                    .map_or(0, |(offset, _)| offset);
+                cursor = Some(InFile::new(file_id, TextSize::try_from(before).unwrap()));
+            }
+            let sql = sql.replace("$0", "");
+            let parse = SourceFile::parse(&sql);
+            assert_eq!(parse.errors(), vec![]);
+            sources.push((file_id, sql, parse.tree()));
+        }
+        let position = cursor.expect("missing $0 cursor marker");
+        let mut builder = SemanticIndexBuilder::new();
+        for (file_id, _, tree) in &sources {
+            builder.add_file(InFile::new(*file_id, tree));
+        }
+        let index = builder.build();
+        SemanticFixture {
+            _db: db,
+            sources,
+            position,
+            index,
+        }
+    }
+}
+
+#[track_caller]
+pub(crate) fn render_targets<T: IntoIterator<Item = FileRange>>(
+    files: &[&str],
+    title: &str,
+    target_label: &str,
+    goto: impl Fn(&SemanticIndex, &SourceFile, FilePosition) -> T,
+) -> Option<String> {
+    let SemanticFixture {
+        sources,
+        position,
+        index,
+        _db,
+    } = SemanticFixture::new(files);
+
+    let file = &sources
+        .iter()
+        .find(|file| file.0 == position.file_id)
+        .unwrap()
+        .2;
+    let targets: Vec<FileRange> = goto(&index, file, position).into_iter().collect();
+    if targets.is_empty() {
+        return None;
+    }
+    let source = item_at_position(&index, file, position)
+        .unwrap()
+        .map(|item| item.range);
+
+    let paths: Vec<String> = (0..files.len())
+        .map(|index| format!("file{index}.sql"))
+        .collect();
+    let snippet = |file_id: FileId| {
+        let (source, path) = if file_id == FileId::Builtins {
+            (BUILTINS_SQL, "builtins.sql")
+        } else if let Some(extension) = BundledExtension::from_file(file_id) {
+            (extension.sql(), extension.path())
+        } else {
+            let index = sources.iter().position(|file| file.0 == file_id).unwrap();
+            (sources[index].1.as_str(), paths[index].as_str())
+        };
+        Snippet::source(source).path(path).fold(true)
+    };
+    let labels: Vec<String> = (0..targets.len())
+        .map(|index| format!("{}. {target_label}", index + 2))
+        .collect();
+    let mut file_ids = vec![source.file_id];
+    for target in &targets {
+        if !file_ids.contains(&target.file_id) {
+            file_ids.push(target.file_id);
+        }
+    }
+    let snippets: Vec<_> = file_ids
+        .iter()
+        .map(|&file_id| {
+            let mut snippet = snippet(file_id);
+            if file_id == source.file_id {
+                snippet = snippet.annotation(
+                    AnnotationKind::Context
+                        .span(source.value.start().into()..source.value.end().into())
+                        .label("1. source"),
+                );
+            }
+            for (target, label) in targets.iter().zip(&labels) {
+                if target.file_id == file_id {
+                    snippet = snippet.annotation(
+                        AnnotationKind::Context
+                            .span(target.value.start().into()..target.value.end().into())
+                            .label(label),
+                    );
+                }
+            }
+            snippet
+        })
+        .collect();
+    Some(
+        Renderer::plain()
+            .decor_style(DecorStyle::Unicode)
+            .render(&[Level::INFO.primary_title(title).elements(snippets)]),
+    )
 }
 
 #[cfg(test)]

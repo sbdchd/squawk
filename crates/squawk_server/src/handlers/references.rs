@@ -21,7 +21,7 @@ pub(crate) fn handle_references(snapshot: &Snapshot, params: ReferenceParams) ->
             if include_declaration {
                 return true;
             }
-            if loc.file.original_file(db) == file && !loc.range.contains(position.value) {
+            if loc.file_id.original_file(db) == file && !loc.value.contains(position.value) {
                 return true;
             }
             false

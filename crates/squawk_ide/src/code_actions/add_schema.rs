@@ -4,14 +4,13 @@ use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use super::{ActionKind, CodeAction};
-use crate::{db::bind, file::InFile, offsets::token_from_offset};
+use crate::{db::semantic_index, file::InFile, ir::Item, offsets::token_from_offset};
 
 pub(super) fn add_schema(
     db: &dyn Db,
     position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
 ) -> Option<()> {
-    let file = position.file_id;
     let offset = position.value;
     let token = token_from_offset(db, position)?;
     let range = token.parent_ancestors().find_map(|node| {
@@ -37,11 +36,20 @@ pub(super) fn add_schema(
     }
 
     let token_start = token.text_range().start();
-    let schema = bind(db, file)
-        .search_path_at(token_start)
-        .first()?
-        .to_string();
-    let replacement = format!("{schema}.");
+    let index = semantic_index(db, position.file_id);
+    let range = token.text_range();
+    let item = index.item_at_range(position.with_value(range))?.value.item;
+    let item = match item {
+        Item::Reference(reference) => index.references[reference].resolution.item()?,
+        item => item,
+    };
+    let schema = match item {
+        Item::Table(table) => index.tables[table].schema,
+        Item::Function(function) => index.functions[function].schema,
+        Item::Type(ty) => index.types[ty].schema,
+        _ => return None,
+    };
+    let replacement = format!("{}.", index.names.resolve(schema));
 
     actions.push(CodeAction {
         title: "Add schema".to_owned(),
@@ -70,6 +78,7 @@ mod test {
     }
 
     #[test]
+    #[should_panic(expected = "We should always have actions")]
     fn add_schema_alter_table() {
         assert_snapshot!(apply_code_action(
             add_schema,
@@ -108,6 +117,7 @@ mod test {
     }
 
     #[test]
+    #[should_panic(expected = "We should always have actions")]
     fn add_schema_table_stmt() {
         assert_snapshot!(apply_code_action(
             add_schema,
@@ -173,6 +183,63 @@ create table t$0(a text, b int);"
 set search_path to myschema;
 create table myschema.t(a text, b int);"
         );
+    }
+
+    #[test]
+    #[should_panic(expected = "We should always have actions")]
+    fn add_schema_before_search_path_change() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "set search_path to app; select * from t$0; set search_path to other;"),
+            @"set search_path to app; select * from app.t; set search_path to other;"
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "We should always have actions")]
+    fn add_schema_after_reset() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "set search_path to app; reset search_path; select * from t$0;"),
+            @"set search_path to app; reset search_path; select * from public.t;"
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "We should always have actions")]
+    fn add_schema_after_local_search_path() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "set search_path to app; begin; set local search_path to other; commit; select * from t$0;"),
+            @"set search_path to app; begin; set local search_path to other; commit; select * from app.t;"
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "We should always have actions")]
+    fn add_schema_in_routine() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "create function f() returns int language sql set search_path to app begin atomic select t$0(); end;"),
+            @"create function f() returns int language sql set search_path to app begin atomic select app.t(); end;"
+        );
+    }
+
+    #[test]
+    fn add_schema_resolved_non_public_table() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "create table app.t(a int); set search_path to app; select * from t$0;"),
+            @"create table app.t(a int); set search_path to app; select * from app.t;"
+        );
+    }
+
+    #[test]
+    fn add_schema_unresolved() {
+        assert!(code_action_not_applicable(
+            add_schema,
+            "set search_path to app; select * from t$0;"
+        ));
     }
 
     #[test]

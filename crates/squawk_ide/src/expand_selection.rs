@@ -34,8 +34,6 @@ use squawk_syntax::{
     ast::{self, AstToken},
 };
 
-use crate::tokens::is_string_or_comment;
-
 const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::ALTER_OPTION_LIST,
     SyntaxKind::ALTER_TYPE_ATTRIBUTE_ACTION_LIST,
@@ -325,6 +323,20 @@ fn extend_list_item(node: &SyntaxNode) -> Option<TextRange> {
     }
 
     None
+}
+
+fn is_string_or_comment(kind: SyntaxKind) -> bool {
+    matches!(
+        kind,
+        SyntaxKind::COMMENT
+            | SyntaxKind::STRING
+            | SyntaxKind::BYTE_STRING
+            | SyntaxKind::UNICODE_ESC_STRING
+            | SyntaxKind::BIT_STRING
+            | SyntaxKind::DOLLAR_QUOTED_STRING
+            | SyntaxKind::ESC_STRING
+            | SyntaxKind::NATIONAL_STRING
+    )
 }
 
 #[cfg(test)]

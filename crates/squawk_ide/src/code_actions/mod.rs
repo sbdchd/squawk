@@ -7,6 +7,7 @@ use crate::file::InFile;
 mod add_explicit_alias;
 mod add_schema;
 mod convert_comment;
+mod name;
 mod quote_identifier;
 mod remove_else_clause;
 mod remove_redundant_alias;

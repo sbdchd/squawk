@@ -3,7 +3,8 @@ use gen_lsp_types::{
 };
 use salsa::Database as Db;
 use squawk_ide::db::{File, line_index as file_line_index, parse};
-use squawk_line_index::{LineIndex, find_newline};
+use squawk_ide::diagnostics::diagnostics as semantic_diagnostics;
+use squawk_line_index::{LineIndex, TextRange, find_newline};
 use squawk_linter::{Edit, Linter};
 use url::Url;
 
@@ -25,6 +26,20 @@ fn to_text_edit(edit: Edit, line_index: &LineIndex) -> Option<TextEdit> {
     ))
 }
 
+fn diagnostic_range(line_index: &LineIndex, range: TextRange) -> Range {
+    let start = line_index.line_col(range.start());
+    let mut end = line_index.line_col(range.end());
+
+    if start == end {
+        end.col += 1;
+    }
+
+    Range::new(
+        Position::new(start.line, start.col),
+        Position::new(end.line, end.col),
+    )
+}
+
 #[salsa::tracked]
 pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
     let parse = parse(db, file);
@@ -40,20 +55,8 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
     let mut diagnostics = Vec::with_capacity(violations.len() + parse_errors.len());
 
     for error in parse_errors {
-        let range_start = error.range().start();
-        let range_end = error.range().end();
-        let start_line_col = line_index.line_col(range_start);
-        let mut end_line_col = line_index.line_col(range_end);
-
-        if start_line_col.line == end_line_col.line && start_line_col.col == end_line_col.col {
-            end_line_col.col += 1;
-        }
-
         let diagnostic = Diagnostic {
-            range: Range::new(
-                Position::new(start_line_col.line, start_line_col.col),
-                Position::new(end_line_col.line, end_line_col.col),
-            ),
+            range: diagnostic_range(line_index, error.range()),
             severity: Some(DiagnosticSeverity::Error),
             code: Some(Code::String("syntax-error".to_string())),
             code_description: Some(CodeDescription {
@@ -66,16 +69,23 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
         diagnostics.push(diagnostic);
     }
 
+    for error in semantic_diagnostics(db, file) {
+        let message = match error.hint {
+            Some(hint) => format!("{}\nhint: {hint}", error.message),
+            None => error.message,
+        };
+
+        let diagnostic = Diagnostic {
+            range: diagnostic_range(line_index, error.range.value),
+            severity: Some(DiagnosticSeverity::Error),
+            source: Some(DIAGNOSTIC_NAME.to_string()),
+            message: Message::String(message),
+            ..Default::default()
+        };
+        diagnostics.push(diagnostic);
+    }
+
     for violation in violations {
-        let range_start = violation.text_range.start();
-        let range_end = violation.text_range.end();
-        let start_line_col = line_index.line_col(range_start);
-        let mut end_line_col = line_index.line_col(range_end);
-
-        if start_line_col.line == end_line_col.line && start_line_col.col == end_line_col.col {
-            end_line_col.col += 1;
-        }
-
         let ignore_line_edit = ignore_line_edit(&violation, line_index, &parse, line_ending)
             .and_then(|e| to_text_edit(e, line_index));
         let ignore_file_edit = ignore_file_edit(&violation, line_index, &parse, line_ending)
@@ -100,10 +110,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
         };
 
         let diagnostic = Diagnostic {
-            range: Range::new(
-                Position::new(start_line_col.line, start_line_col.col),
-                Position::new(end_line_col.line, end_line_col.col),
-            ),
+            range: diagnostic_range(line_index, violation.text_range),
             severity: Some(DiagnosticSeverity::Warning),
             code: Some(Code::String(violation.code.to_string())),
             code_description: Some(CodeDescription {
@@ -117,4 +124,81 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
         diagnostics.push(diagnostic);
     }
     diagnostics
+}
+
+#[cfg(test)]
+mod test {
+    use gen_lsp_types::{Code, Message};
+    use insta::assert_snapshot;
+    use squawk_ide::db::{Database, File};
+
+    use super::lint;
+
+    fn check(sql: &str) -> String {
+        let db = Database::default();
+        let file = File::new(&db, sql.into());
+        lint(&db, file)
+            .into_iter()
+            .map(|d| {
+                let code = match d.code {
+                    Some(Code::String(code)) => code,
+                    Some(Code::Int(code)) => code.to_string(),
+                    None => "-".to_string(),
+                };
+                let Message::String(message) = d.message else {
+                    unreachable!()
+                };
+                format!(
+                    "{}:{} {:?} {code}: {message}",
+                    d.range.start.line,
+                    d.range.start.character,
+                    d.severity.unwrap(),
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+
+    #[test]
+    fn syntax_error() {
+        assert_snapshot!(check("select from t where;"), @"
+        0:19 Error syntax-error: expected an expression, found SEMICOLON
+        0:12 Error -: relation `t` does not exist
+        ");
+    }
+
+    #[test]
+    fn semantic_error() {
+        let sql = "
+create table t(a int);
+create table t(b int);
+";
+        assert_snapshot!(check(sql), @"
+        2:13 Error -: relation `t` already exists
+        1:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        1:17 Warning prefer-bigint-over-int: Using 32-bit integer fields can result in hitting the max `int` limit.
+        2:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        2:17 Warning prefer-bigint-over-int: Using 32-bit integer fields can result in hitting the max `int` limit.
+        ");
+    }
+
+    #[test]
+    fn unresolved_cte_column() {
+        let sql = "
+with t as (select 1 a)
+select a, b from t;
+";
+        assert_snapshot!(check(sql), @"2:10 Error -: column `b` does not exist");
+    }
+
+    #[test]
+    fn lint_violation() {
+        let sql = "
+create table t(a varchar(10));
+";
+        assert_snapshot!(check(sql), @"
+        1:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+        1:17 Warning prefer-text-field: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
+        ");
+    }
 }

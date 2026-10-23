@@ -1,897 +1,485 @@
+use std::fmt::Write;
+use std::iter;
+
 use rowan::TextSize;
+use rustc_hash::FxHashSet;
 use salsa::Database as Db;
-use squawk_syntax::ast::{self, AstNode, HasSelectTail};
-use squawk_syntax::{SyntaxKind, SyntaxToken};
+use squawk_syntax::{
+    SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
+    ast::{self, AstNode},
+};
 
-use crate::ast_nav;
-use crate::binder;
-use crate::collect;
-use crate::db::{CompletionFile, FileId, bind, parse};
-use crate::file::InFile;
-use crate::name::{self, Name, Schema};
-use crate::resolve;
-use crate::symbols::SymbolKind;
-use crate::tokens::is_string_or_comment;
+use crate::db::{CompletionFile, FileId, parse, semantic_index};
+use crate::file::{FileRange, InFile, InIrFile, IrFileId};
+use crate::hover::function_signature;
+use crate::interner::Name;
+use crate::ir::{ColumnId, FunctionId, FunctionKind, Item, ParamMode, ScopeId, SourceId, Ty};
+use crate::semantic_index::SemanticIndex;
 
-// In order to make completions, we do something similar to rust analyzer by
-// inserting an ident to make the parse tree parse in more cases.
-// Rust analyzer does fancier things for this, which we can investigate later.
-//
-// This helps us support `select t. from t`, which parses as `select t.from t`.
-// If we insert the ident we get, `select t.c from t`.
 pub(crate) const COMPLETION_MARKER: &str = "squawkCompletionMarker";
 
+const STATEMENTS: &[&str] = &["delete from", "select", "table", "truncate"];
+const SELECT_CLAUSES: &[&str] = &[
+    "except",
+    "fetch",
+    "for",
+    "group by",
+    "having",
+    "intersect",
+    "limit",
+    "offset",
+    "order by",
+    "union",
+    "where",
+    "window",
+];
+const DELETE_CLAUSES: &[&str] = &["returning", "using", "where"];
+
 pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem> {
-    let offset = position.value;
-    let file = FileId::Completion(CompletionFile::new(
-        db,
-        position.file_id.original_file(db),
-        offset,
-    ));
-    let source_file = parse(db, file).tree();
-    let Some(token) = token_at_offset(&source_file, offset) else {
-        // empty file
-        return default_completions();
-    };
-    // We don't support completions inside comments since we don't have doc
-    // comments a la JSDoc.
-    // And we don't support enums aka string literal types yet so we bail out
-    // early for strings as well
-    if is_string_or_comment(token.kind()) {
+    let file = position.file_id.original_file(db);
+    let file_id = FileId::Completion(CompletionFile::new(db, file, position.value));
+    let tree = parse(db, file_id).tree();
+    let Some(token) = tree
+        .syntax()
+        .token_at_offset(position.value)
+        .right_biased()
+        .filter(|token| {
+            token.kind() == SyntaxKind::IDENT && token.text().contains(COMPLETION_MARKER)
+        })
+    else {
         return vec![];
-    }
-
-    match completion_context(&token) {
-        CompletionContext::TableOnly => table_completions(&source_file, &token),
-        CompletionContext::Default => default_completions(),
-        CompletionContext::SelectClause(select_clause) => {
-            select_completions(db, file, &select_clause, &token)
+    };
+    let Some(context) = CompletionContext::new(&token) else {
+        return vec![];
+    };
+    let index = semantic_index(db, file_id);
+    let scope = scope_at(index, InFile::new(file_id, token.text_range()));
+    let mut completions = Completions {
+        db,
+        index,
+        search_path: index.names.lookup("public"),
+        items: vec![],
+    };
+    match context {
+        CompletionContext::Statement => completions.snippets(STATEMENTS),
+        CompletionContext::Table { schema: None } => {
+            completions.tables_in_search_path();
+            completions.schemas();
         }
-        CompletionContext::SelectClauses(select) => select_clauses_completions(&select),
-        CompletionContext::SelectExpr(select) => select_expr_completions(db, file, &select, &token),
-        CompletionContext::LimitClause => limit_completions(db, file, &token),
-        CompletionContext::OffsetClause => offset_completions(db, file, &token),
-        CompletionContext::DeleteClauses(delete) => {
-            delete_clauses_completions(&source_file, &delete, &token)
-        }
-        CompletionContext::DeleteExpr(delete) => {
-            delete_expr_completions(db, file, &source_file, &delete, &token)
-        }
-    }
-}
-
-fn select_completions(
-    db: &dyn Db,
-    file: FileId,
-    select_clause: &ast::SelectClause,
-    token: &SyntaxToken,
-) -> Vec<CompletionItem> {
-    let binder = bind(db, file);
-    let mut completions = vec![];
-    let schema = schema_qualifier_at_token(token);
-    let position = token.text_range().start();
-
-    completions.extend(function_completions(db, file, schema.as_ref(), position));
-
-    let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
-    completions.extend(tables.into_iter().map(|name| CompletionItem {
-        label: name.to_string(),
-        kind: CompletionItemKind::Table,
-        detail: None,
-        insert_text: None,
-        insert_text_format: None,
-        trigger_completion_after_insert: false,
-        sort_text: None,
-    }));
-
-    if schema.is_none() {
-        completions.extend(schema_completions(binder));
-    }
-
-    if let Some(parent) = select_clause.syntax().parent()
-        && let Some(select) = ast::Select::cast(parent)
-    {
-        if let Some(from_clause) = select.from_clause() {
-            completions.push(CompletionItem {
-                label: "*".to_string(),
-                kind: CompletionItemKind::Operator,
-                detail: None,
-                insert_text: None,
-                insert_text_format: None,
-                trigger_completion_after_insert: false,
-                sort_text: None,
-            });
-            completions.extend(column_completions_from_clause(db, file, &from_clause));
-        } else if schema.is_none() {
-            completions.extend(select_clauses_completions(&select));
-        }
-    }
-
-    completions
-}
-
-fn select_clauses_completions(select: &ast::Select) -> Vec<CompletionItem> {
-    let mut completions = vec![];
-
-    if select.from_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "from".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("from $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.where_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "where".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("where $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.group_by_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "group by".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("group by $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.having_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "having".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("having $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.order_by_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "order by".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("order by $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.limit_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "limit".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("limit $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.offset_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "offset".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("offset $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.fetch_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "fetch".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some(
-                "fetch ${1|first,next|} $2 ${3|row,rows|} ${4|only,with ties|}".to_owned(),
-            ),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.locking_clauses().next().is_none() {
-        completions.push(CompletionItem {
-            label: "for".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("for ${1|update,no key update,share,key share|} $2".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if select.window_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "window".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("window $1 as ($0)".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    completions.push(CompletionItem {
-        label: "union".to_owned(),
-        kind: CompletionItemKind::Snippet,
-        detail: None,
-        insert_text: Some("union $0".to_owned()),
-        insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-        trigger_completion_after_insert: true,
-        sort_text: None,
-    });
-    completions.push(CompletionItem {
-        label: "intersect".to_owned(),
-        kind: CompletionItemKind::Snippet,
-        detail: None,
-        insert_text: Some("intersect $0".to_owned()),
-        insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-        trigger_completion_after_insert: true,
-        sort_text: None,
-    });
-    completions.push(CompletionItem {
-        label: "except".to_owned(),
-        kind: CompletionItemKind::Snippet,
-        detail: None,
-        insert_text: Some("except $0".to_owned()),
-        insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-        trigger_completion_after_insert: true,
-        sort_text: None,
-    });
-
-    completions
-}
-
-fn limit_completions(db: &dyn Db, file: FileId, token: &SyntaxToken) -> Vec<CompletionItem> {
-    let schema = schema_qualifier_at_token(token);
-    let position = token.text_range().start();
-
-    let mut completions = vec![CompletionItem {
-        label: "all".to_owned(),
-        kind: CompletionItemKind::Keyword,
-        detail: None,
-        insert_text: None,
-        insert_text_format: None,
-        trigger_completion_after_insert: false,
-        sort_text: None,
-    }];
-
-    completions.extend(function_completions(db, file, schema.as_ref(), position));
-    completions
-}
-
-fn offset_completions(db: &dyn Db, file: FileId, token: &SyntaxToken) -> Vec<CompletionItem> {
-    let schema = schema_qualifier_at_token(token);
-    let position = token.text_range().start();
-
-    function_completions(db, file, schema.as_ref(), position)
-}
-
-fn select_expr_completions(
-    db: &dyn Db,
-    file: FileId,
-    select: &ast::Select,
-    token: &SyntaxToken,
-) -> Vec<CompletionItem> {
-    let mut completions = vec![];
-    let schema = schema_qualifier_at_token(token);
-    let position = token.text_range().start();
-
-    completions.extend(function_completions(db, file, schema.as_ref(), position));
-
-    if let Some(from_clause) = select.from_clause() {
-        for from_item in ast_nav::iter_from_clause(&from_clause) {
-            if let Some(table_name) = table_name_from_from_item(&from_item) {
-                completions.push(CompletionItem {
-                    label: table_name.to_string(),
-                    kind: CompletionItemKind::Table,
-                    detail: None,
-                    insert_text: None,
-                    insert_text_format: None,
-                    trigger_completion_after_insert: false,
-                    sort_text: None,
-                });
+        CompletionContext::Table {
+            schema: Some(schema),
+        } => {
+            if let Some(schema) = index.names.lookup(&schema) {
+                completions.tables_in(schema);
             }
         }
-
-        completions.extend(column_completions_from_clause(db, file, &from_clause));
+        CompletionContext::SelectClause => completions.snippets(SELECT_CLAUSES),
+        CompletionContext::DeleteClause => completions.snippets(DELETE_CLAUSES),
+        CompletionContext::Limit => {
+            completions.keyword("all");
+            completions.functions_in_search_path();
+        }
+        CompletionContext::Offset => completions.functions_in_search_path(),
+        CompletionContext::Expr {
+            qualifier: Some(qualifier),
+            ..
+        } => {
+            let Some(qualifier) = index.names.lookup(&qualifier) else {
+                return vec![];
+            };
+            if let Some(source) = visible_sources(index, scope)
+                .find(|&source| index.sources[source].name == Some(qualifier))
+            {
+                completions.columns(&[source]);
+                completions.field_functions(source);
+            } else {
+                completions.tables_in(qualifier);
+                completions.functions_in(qualifier);
+            }
+        }
+        CompletionContext::Expr {
+            clause,
+            qualifier: None,
+        } => {
+            let sources: Vec<SourceId> = visible_sources(index, scope)
+                .filter(|&source| !index.sources[source].kind.is_qualified_only())
+                .collect();
+            completions.columns(&sources);
+            completions.functions_in_search_path();
+            match clause {
+                Clause::Target { has_from } => {
+                    completions.tables_in_search_path();
+                    if !has_from {
+                        completions.snippets(&["from"]);
+                        completions.snippets(SELECT_CLAUSES);
+                    }
+                    completions.schemas();
+                }
+                Clause::Other => completions.source_names(&sources),
+            }
+        }
     }
-
-    completions
+    completions.items
 }
 
-fn function_completions(
-    db: &dyn Db,
-    file: FileId,
-    schema: Option<&Schema>,
-    position: TextSize,
-) -> Vec<CompletionItem> {
-    let binder = bind(db, file);
-    binder
-        .all_symbols_by_kind(SymbolKind::Function, schema)
-        .into_iter()
-        .map(|name| CompletionItem {
-            label: format!("{name}()"),
-            kind: CompletionItemKind::Function,
-            detail: function_detail(db, file, name, schema, position),
+#[derive(Clone, Copy)]
+enum Clause {
+    Target { has_from: bool },
+    Other,
+}
+
+enum CompletionContext {
+    Statement,
+    Table {
+        schema: Option<String>,
+    },
+    SelectClause,
+    DeleteClause,
+    Limit,
+    Offset,
+    Expr {
+        clause: Clause,
+        qualifier: Option<String>,
+    },
+}
+
+impl CompletionContext {
+    fn new(token: &SyntaxToken) -> Option<CompletionContext> {
+        let parent = token.parent()?;
+        match parent.kind() {
+            SyntaxKind::ERROR if parent.parent()?.kind() == SyntaxKind::SOURCE_FILE => {
+                Some(CompletionContext::Statement)
+            }
+            SyntaxKind::PATH_SEGMENT_REF => Self::table(&parent),
+            SyntaxKind::TABLE_ALIAS => Self::alias(&parent),
+            SyntaxKind::NAME_REF => Self::expr(&ast::NameRef::cast(parent)?),
+            _ => None,
+        }
+    }
+
+    fn table(segment: &SyntaxNode) -> Option<CompletionContext> {
+        let path = ast::PathRef::cast(segment.parent()?)?;
+        let owner = path.syntax().parent()?;
+        if !matches!(
+            owner.kind(),
+            SyntaxKind::TABLE_NAME_REF | SyntaxKind::RELATION_NAME_REF
+        ) {
+            return None;
+        }
+        let Some(qualifier) = path.qualifier() else {
+            let in_parens = owner
+                .parent()
+                .filter(|node| node.kind() == SyntaxKind::RELATION_FROM_ITEM)
+                .and_then(|node| node.parent())
+                .is_some_and(|node| node.kind() == SyntaxKind::PAREN_EXPR);
+            if in_parens {
+                return Some(CompletionContext::Statement);
+            }
+            return Some(CompletionContext::Table { schema: None });
+        };
+        if qualifier.qualifier().is_some() {
+            return None;
+        }
+        Some(CompletionContext::Table {
+            schema: Some(qualifier.segment()?.text()),
+        })
+    }
+
+    fn alias(alias: &SyntaxNode) -> Option<CompletionContext> {
+        let parent = alias.parent()?;
+        let has_as = parent
+            .children_with_tokens()
+            .chain(alias.children_with_tokens())
+            .any(|element| element.kind() == SyntaxKind::AS_KW);
+        if has_as {
+            return None;
+        }
+        match parent.kind() {
+            SyntaxKind::FROM_ALIAS => Some(CompletionContext::SelectClause),
+            SyntaxKind::OPTIONAL_AS_ALIAS if parent.parent()?.kind() == SyntaxKind::DELETE => {
+                Some(CompletionContext::DeleteClause)
+            }
+            _ => None,
+        }
+    }
+
+    fn expr(name_ref: &ast::NameRef) -> Option<CompletionContext> {
+        let mut node = name_ref.syntax().clone();
+        let mut qualifier = None;
+        if let Some(field_expr) = node.parent().and_then(ast::FieldExpr::cast)
+            && field_expr.field().as_ref() == Some(name_ref)
+        {
+            let ast::Expr::NameRef(base) = field_expr.base()? else {
+                return None;
+            };
+            qualifier = Some(base.text());
+            node = field_expr.syntax().clone();
+        }
+        node.ancestors().find_map(|node| {
+            let clause = match node.kind() {
+                SyntaxKind::TARGET_LIST => match node
+                    .parent()
+                    .filter(|node| node.kind() == SyntaxKind::SELECT_CLAUSE)
+                    .and_then(|node| node.parent())
+                    .and_then(ast::Select::cast)
+                {
+                    Some(select) => Clause::Target {
+                        has_from: select.from_clause().is_some(),
+                    },
+                    None => Clause::Other,
+                },
+                SyntaxKind::LIMIT_CLAUSE if qualifier.is_none() => {
+                    return Some(CompletionContext::Limit);
+                }
+                SyntaxKind::OFFSET_CLAUSE if qualifier.is_none() => {
+                    return Some(CompletionContext::Offset);
+                }
+                SyntaxKind::WHERE_CLAUSE
+                | SyntaxKind::GROUP_BY_CLAUSE
+                | SyntaxKind::HAVING_CLAUSE
+                | SyntaxKind::ON_CLAUSE
+                | SyntaxKind::ORDER_BY_CLAUSE
+                | SyntaxKind::LIMIT_CLAUSE
+                | SyntaxKind::OFFSET_CLAUSE => Clause::Other,
+                _ => return None,
+            };
+            Some(CompletionContext::Expr {
+                clause,
+                qualifier: qualifier.clone(),
+            })
+        })
+    }
+}
+
+fn scope_at(index: &SemanticIndex, range: FileRange) -> Option<ScopeId> {
+    index.items_at_range(range).find_map(|item| match item {
+        Item::Reference(reference) => index.references[reference].scope,
+        _ => None,
+    })
+}
+
+fn visible_sources(
+    index: &SemanticIndex,
+    scope: Option<ScopeId>,
+) -> impl Iterator<Item = SourceId> + '_ {
+    iter::successors(scope, |&scope| index.scopes[scope].parent).flat_map(|scope| {
+        let scope = &index.scopes[scope];
+        let sources = &index.queries[scope.query].sources;
+        scope.visible_indices().map(|index| sources[index])
+    })
+}
+
+struct Completions<'a> {
+    db: &'a dyn Db,
+    index: &'a SemanticIndex,
+    search_path: Option<Name>,
+    items: Vec<CompletionItem>,
+}
+
+impl Completions<'_> {
+    fn push(&mut self, label: String, kind: CompletionItemKind) -> &mut CompletionItem {
+        self.items.push(CompletionItem {
+            label,
+            kind,
+            detail: None,
             insert_text: None,
             insert_text_format: None,
             trigger_completion_after_insert: false,
-            sort_text: None,
-        })
-        .collect()
-}
+            sort_key: None,
+        });
+        self.items.last_mut().unwrap()
+    }
 
-fn column_completions_from_clause(
-    db: &dyn Db,
-    file: FileId,
-    from_clause: &ast::FromClause,
-) -> Vec<CompletionItem> {
-    let mut completions = vec![];
-    for table_ptr in resolve::table_ptrs_from_clause(db, InFile::new(file, from_clause)) {
-        let table_node = table_ptr.to_node(db);
-        let file = table_ptr.file_id;
-        match ast_nav::parent_source(&table_node) {
-            Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
-                let columns = collect::table_columns(db, file, &create_table);
-                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
-                    label: name.to_string(),
-                    kind: CompletionItemKind::Column,
-                    detail: ty.map(|t| t.to_string()),
-                    insert_text: None,
-                    insert_text_format: None,
-                    trigger_completion_after_insert: false,
-                    sort_text: None,
-                }));
-            }
-            Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-                let columns = collect::with_table_columns_with_types(db, file, &with_table);
-                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
-                    label: name.to_string(),
-                    kind: CompletionItemKind::Column,
-                    detail: ty.map(|t| t.to_string()),
-                    insert_text: None,
-                    insert_text_format: None,
-                    trigger_completion_after_insert: false,
-                    sort_text: None,
-                }));
-            }
-            Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
-                let columns =
-                    collect::create_table_as_columns_with_types(db, file, &create_table_as);
-                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
-                    label: name.to_string(),
-                    kind: CompletionItemKind::Column,
-                    detail: ty.map(|t| t.to_string()),
-                    insert_text: None,
-                    insert_text_format: None,
-                    trigger_completion_after_insert: false,
-                    sort_text: None,
-                }));
-            }
-            Some(ast_nav::ParentSouce::CreateView(create_view)) => {
-                let columns = collect::view_like_columns_with_types(db, file, &create_view);
-                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
-                    label: name.to_string(),
-                    kind: CompletionItemKind::Column,
-                    detail: ty.map(|t| t.to_string()),
-                    insert_text: None,
-                    insert_text_format: None,
-                    trigger_completion_after_insert: false,
-                    sort_text: None,
-                }));
-            }
-            Some(ast_nav::ParentSouce::Alias(alias)) => {
-                let alias_columns: Vec<Name> = alias
-                    .columns()
-                    .into_iter()
-                    .flat_map(|columns| columns.column_names())
-                    .map(|name| Name::from_node(&name))
-                    .collect();
+    fn snippets(&mut self, labels: &[&str]) {
+        for label in labels {
+            let item = self.push(label.to_string(), CompletionItemKind::Snippet);
+            item.insert_text = Some(format!("{label} $0"));
+            item.insert_text_format = Some(CompletionInsertTextFormat::Snippet);
+            item.trigger_completion_after_insert = true;
+        }
+    }
 
-                let base_columns = alias_base_columns_with_types(db, file, &alias);
+    fn keyword(&mut self, keyword: &str) {
+        self.push(keyword.to_string(), CompletionItemKind::Keyword);
+    }
 
-                for (idx, alias_column) in alias_columns.iter().enumerate() {
-                    completions.push(CompletionItem {
-                        label: alias_column.to_string(),
-                        kind: CompletionItemKind::Column,
-                        detail: base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
-                        insert_text: None,
-                        insert_text_format: None,
-                        trigger_completion_after_insert: false,
-                        sort_text: Some(format!("{idx:04}")),
-                    });
-                }
+    fn schemas(&mut self) {
+        let index = self.index;
+        for (_, schema) in index.schemas.iter() {
+            let name = index.names.resolve(schema.name);
+            let rank = match name {
+                "public" => 0,
+                "information_schema" => 3,
+                name if name.starts_with("pg_") => 2,
+                _ => 1,
+            };
+            let item = self.push(name.to_string(), CompletionItemKind::Schema);
+            item.sort_key = Some(format!("{rank}_{name}"));
+        }
+    }
 
-                completions.extend(
-                    base_columns
-                        .into_iter()
-                        .skip(alias_columns.len())
-                        .enumerate()
-                        .map(|(idx, (name, ty))| CompletionItem {
-                            label: name.to_string(),
-                            kind: CompletionItemKind::Column,
-                            detail: ty,
-                            insert_text: None,
-                            insert_text_format: None,
-                            trigger_completion_after_insert: false,
-                            sort_text: Some(format!("{:04}", idx + alias_columns.len())),
-                        }),
+    fn tables_in_search_path(&mut self) {
+        if let Some(schema) = self.search_path {
+            self.tables_in(schema);
+        }
+    }
+
+    fn tables_in(&mut self, schema: Name) {
+        let index = self.index;
+        for table in index.tables.in_schema(schema) {
+            let name = index.names.resolve(index.tables[table].name);
+            self.push(name.to_string(), CompletionItemKind::Table);
+        }
+    }
+
+    fn functions_in_search_path(&mut self) {
+        if let Some(schema) = self.search_path {
+            self.functions_in(schema);
+        }
+    }
+
+    fn functions_in(&mut self, schema: Name) {
+        let index = self.index;
+        for function in index.functions.in_schema(schema) {
+            let data = &index.functions[function];
+            if data.kind == FunctionKind::Procedure {
+                continue;
+            }
+            let name = index.names.resolve(data.name);
+            let has_args = data.params.iter().any(|param| {
+                matches!(
+                    index.params[param].mode,
+                    ParamMode::In | ParamMode::InOut | ParamMode::Variadic
+                )
+            });
+            let detail = self.function_detail(function);
+            let item = self.push(format!("{name}()"), CompletionItemKind::Function);
+            item.detail = Some(detail);
+            if has_args {
+                item.insert_text = Some(format!("{name}($0)"));
+                item.insert_text_format = Some(CompletionInsertTextFormat::Snippet);
+            }
+        }
+    }
+
+    fn field_functions(&mut self, source: SourceId) {
+        let index = self.index;
+        let Some(ty) = index.source_type(source) else {
+            return;
+        };
+        let Some(schema) = self.search_path else {
+            return;
+        };
+        for function in index.functions.in_schema(schema) {
+            if takes_only(index, function, ty) {
+                let name = index.names.resolve(index.functions[function].name);
+                self.push(name.to_string(), CompletionItemKind::Function);
+            }
+        }
+    }
+
+    fn source_names(&mut self, sources: &[SourceId]) {
+        let index = self.index;
+        let mut seen = FxHashSet::default();
+        for &source in sources {
+            if let Some(name) = index.sources[source].name
+                && seen.insert(name)
+            {
+                self.push(
+                    index.names.resolve(name).to_string(),
+                    CompletionItemKind::Table,
                 );
             }
-            Some(ast_nav::ParentSouce::ParenSelect(paren_select)) => {
-                let columns = collect::paren_select_columns_with_types(db, file, &paren_select);
-                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
-                    label: name.to_string(),
-                    kind: CompletionItemKind::Column,
-                    detail: ty.map(|t| t.to_string()),
-                    insert_text: None,
-                    insert_text_format: None,
-                    trigger_completion_after_insert: false,
-                    sort_text: None,
-                }));
-            }
-            Some(ast_nav::ParentSouce::SelectInto(select_into)) => {
-                let columns = collect::select_into_columns_with_types(db, file, &select_into);
-                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
-                    label: name.to_string(),
-                    kind: CompletionItemKind::Column,
-                    detail: ty.map(|t| t.to_string()),
-                    insert_text: None,
-                    insert_text_format: None,
-                    trigger_completion_after_insert: false,
-                    sort_text: None,
-                }));
-            }
-            None => {}
         }
     }
-    completions
-}
 
-fn alias_base_columns_with_types(
-    db: &dyn Db,
-    file: FileId,
-    alias: &ast::FromAlias,
-) -> Vec<(Name, Option<String>)> {
-    let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
-        return vec![];
-    };
-    let Some(table_ptr) = resolve::table_ptr_from_from_item(db, InFile::new(file, &from_item))
-    else {
-        return vec![];
-    };
-
-    let table_node = table_ptr.to_node(db);
-    let file = table_ptr.file_id;
-
-    match ast_nav::parent_source(&table_node) {
-        Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
-            collect::table_columns(db, file, &create_table)
-                .into_iter()
-                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
-                .collect()
-        }
-        Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            collect::with_table_columns_with_types(db, file, &with_table)
-                .into_iter()
-                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
-                .collect()
-        }
-        Some(ast_nav::ParentSouce::CreateView(create_view)) => {
-            collect::view_like_columns_with_types(db, file, &create_view)
-                .into_iter()
-                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
-                .collect()
-        }
-        Some(ast_nav::ParentSouce::ParenSelect(paren_select)) => {
-            collect::paren_select_columns_with_types(db, file, &paren_select)
-                .into_iter()
-                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
-                .collect()
-        }
-        Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
-            collect::create_table_as_columns_with_types(db, file, &create_table_as)
-                .into_iter()
-                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
-                .collect()
-        }
-        Some(ast_nav::ParentSouce::SelectInto(select_into)) => {
-            collect::select_into_columns_with_types(db, file, &select_into)
-                .into_iter()
-                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
-                .collect()
-        }
-        Some(ast_nav::ParentSouce::Alias(_)) | None => vec![],
-    }
-}
-
-fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
-    let builtin_schemas = [
-        "public",
-        "pg_catalog",
-        "pg_temp",
-        "pg_toast",
-        "information_schema",
-    ];
-    let mut completions: Vec<CompletionItem> = builtin_schemas
-        .into_iter()
-        .enumerate()
-        .map(|(i, name)| CompletionItem {
-            label: name.to_string(),
-            kind: CompletionItemKind::Schema,
-            detail: None,
-            insert_text: None,
-            insert_text_format: None,
-            trigger_completion_after_insert: false,
-            sort_text: Some(format!("{i}")),
-        })
-        .collect();
-
-    for name in binder.all_symbols_by_kind(SymbolKind::Schema, None) {
-        completions.push(CompletionItem {
-            label: name.to_string(),
-            kind: CompletionItemKind::Schema,
-            detail: None,
-            insert_text: None,
-            insert_text_format: None,
-            trigger_completion_after_insert: false,
-            sort_text: None,
-        });
-    }
-
-    completions
-}
-
-fn table_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
-    let binder = binder::bind(file);
-    let schema = schema_qualifier_at_token(token);
-    let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
-    let mut completions: Vec<CompletionItem> = tables
-        .into_iter()
-        .map(|name| CompletionItem {
-            label: name.to_string(),
-            kind: CompletionItemKind::Table,
-            detail: None,
-            insert_text: None,
-            insert_text_format: None,
-            trigger_completion_after_insert: false,
-            sort_text: None,
-        })
-        .collect();
-
-    if schema.is_none() {
-        completions.extend(schema_completions(&binder));
-    }
-
-    completions
-}
-
-fn delete_clauses_completions(
-    file: &ast::SourceFile,
-    delete: &ast::Delete,
-    token: &SyntaxToken,
-) -> Vec<CompletionItem> {
-    let mut completions = vec![];
-
-    // `delete from $0`
-    if token.kind() == SyntaxKind::FROM_KW {
-        return table_completions(file, token);
-    }
-
-    if delete.using_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "using".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("using $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if delete.where_clause_or_current_of().is_none() {
-        completions.push(CompletionItem {
-            label: "where".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("where $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    if delete.returning_clause().is_none() {
-        completions.push(CompletionItem {
-            label: "returning".to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some("returning $0".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        });
-    }
-
-    completions
-}
-
-fn delete_expr_completions(
-    db: &dyn Db,
-    file: FileId,
-    source_file: &ast::SourceFile,
-    delete: &ast::Delete,
-    token: &SyntaxToken,
-) -> Vec<CompletionItem> {
-    let binder = binder::bind(source_file);
-    let mut completions = vec![];
-
-    let Some(path) = delete
-        .relation_name()
-        .and_then(|relation| relation.relation_name_ref())
-        .and_then(|relation| relation.path_ref())
-    else {
-        return completions;
-    };
-
-    let Some(delete_table_name) = name::table_name(&path) else {
-        return completions;
-    };
-
-    let has_table_qualifier = qualifier_at_token(token).is_some_and(|q| q == delete_table_name);
-    let schema = schema_qualifier_at_token(token);
-    let position = token.text_range().start();
-
-    if has_table_qualifier {
-        let functions = binder.functions_with_single_param(&delete_table_name);
-        completions.extend(functions.into_iter().map(|name| CompletionItem {
-            label: name.to_string(),
-            kind: CompletionItemKind::Function,
-            detail: function_detail(db, file, name, schema.as_ref(), position),
-            insert_text: None,
-            insert_text_format: None,
-            trigger_completion_after_insert: false,
-            sort_text: None,
-        }));
-    } else {
-        let functions = binder.all_symbols_by_kind(SymbolKind::Function, None);
-        completions.extend(functions.into_iter().map(|name| CompletionItem {
-            label: format!("{name}()"),
-            kind: CompletionItemKind::Function,
-            detail: function_detail(db, file, name, schema.as_ref(), position),
-            insert_text: None,
-            insert_text_format: None,
-            trigger_completion_after_insert: false,
-            sort_text: None,
-        }));
-
-        completions.push(CompletionItem {
-            label: delete_table_name.to_string(),
-            kind: CompletionItemKind::Table,
-            detail: None,
-            insert_text: None,
-            insert_text_format: None,
-            trigger_completion_after_insert: false,
-            sort_text: None,
-        });
-    }
-
-    let schema = name::schema_name(&path);
-    let schemas = binder.resolved_schemas(position, schema.as_ref());
-    if let Some(table_ptr) = binder.lookup_with(&delete_table_name, SymbolKind::Table, &schemas)
-        && let Some(create_table) = table_ptr
-            .to_node(source_file.syntax())
-            .ancestors()
-            .find_map(ast::CreateTableLike::cast)
-    {
-        let columns = collect::table_columns(db, file, &create_table);
-        completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
-            label: name.to_string(),
-            kind: CompletionItemKind::Column,
-            detail: ty.map(|t| t.to_string()),
-            insert_text: None,
-            insert_text_format: None,
-            trigger_completion_after_insert: false,
-            sort_text: None,
-        }));
-    }
-
-    completions
-}
-
-fn table_name_from_from_item(from_item: &ast::FromItem) -> Option<Name> {
-    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.name()) {
-        return Some(Name::from_node(&alias_name));
-    }
-    if let ast::FromItem::RelationFromItem(relation) = from_item
-        && let Some(name_ref) = relation.name_ref()
-    {
-        return Some(Name::from_node(&name_ref));
-    }
-    None
-}
-
-fn qualifier_at_token(token: &SyntaxToken) -> Option<Name> {
-    let qualifier_token = if token.kind() == SyntaxKind::DOT {
-        token.prev_token()
-    } else if token.kind() == SyntaxKind::IDENT
-        && let Some(prev) = token.prev_token()
-        && prev.kind() == SyntaxKind::DOT
-    {
-        prev.prev_token()
-    } else {
-        None
-    };
-
-    qualifier_token
-        .filter(|tk| tk.kind() == SyntaxKind::IDENT)
-        .map(|tk| Name::from_string(tk.text().to_string()))
-}
-
-#[derive(Debug)]
-enum CompletionContext {
-    TableOnly,
-    Default,
-    SelectClause(ast::SelectClause),
-    SelectClauses(ast::Select),
-    SelectExpr(ast::Select),
-    LimitClause,
-    OffsetClause,
-    DeleteClauses(ast::Delete),
-    DeleteExpr(ast::Delete),
-}
-
-fn completion_context(token: &SyntaxToken) -> CompletionContext {
-    if let Some(node) = token.parent() {
-        let mut inside_delete_clause = false;
-        let mut inside_from_item = false;
-        let mut inside_paren_expr = false;
-        let mut inside_select_expr_clause = false;
-        let mut inside_limit_clause = false;
-        let mut inside_offset_clause = false;
-        for a in node.ancestors() {
-            if ast::Truncate::can_cast(a.kind()) || ast::Table::can_cast(a.kind()) {
-                return CompletionContext::TableOnly;
-            }
-            if ast::WhereClause::can_cast(a.kind())
-                || ast::UsingClause::can_cast(a.kind())
-                || ast::ReturningClause::can_cast(a.kind())
-            {
-                inside_delete_clause = true;
-            }
-            if ast::LimitClause::can_cast(a.kind()) {
-                inside_limit_clause = true;
-            }
-            if ast::OffsetClause::can_cast(a.kind()) {
-                inside_offset_clause = true;
-            }
-            if ast::WhereClause::can_cast(a.kind())
-                || ast::GroupByClause::can_cast(a.kind())
-                || ast::HavingClause::can_cast(a.kind())
-                || ast::OrderByClause::can_cast(a.kind())
-            {
-                inside_select_expr_clause = true;
-            }
-            if ast::FromItem::can_cast(a.kind()) {
-                inside_from_item = true;
-            }
-            if ast::ParenExpr::can_cast(a.kind()) {
-                inside_paren_expr = true;
-            }
-            if let Some(delete) = ast::Delete::cast(a.clone()) {
-                if inside_delete_clause {
-                    return CompletionContext::DeleteExpr(delete);
+    fn columns(&mut self, sources: &[SourceId]) {
+        let index = self.index;
+        let mut seen = FxHashSet::default();
+        let mut position = 0;
+        for &source in sources {
+            for column in index.sources[source].columns.range {
+                let Some(name) = index.columns[column].name else {
+                    continue;
+                };
+                if !seen.insert(name) {
+                    continue;
                 }
-                if delete.relation_name().is_some() {
-                    return CompletionContext::DeleteClauses(delete);
+                let detail = self.column_type(column);
+                let builtin = matches!(
+                    index.file(index.columns[column].ptr.file_id),
+                    FileId::Builtins | FileId::Extension(_)
+                );
+                let item = self.push(
+                    index.names.resolve(name).to_string(),
+                    CompletionItemKind::Column,
+                );
+                item.detail = detail;
+                if !builtin {
+                    item.sort_key = Some(format!("{position:04}"));
                 }
-                return CompletionContext::TableOnly;
-            }
-            if let Some(select) = ast::Select::cast(a.clone()) {
-                if inside_limit_clause {
-                    return CompletionContext::LimitClause;
-                }
-                if inside_offset_clause {
-                    return CompletionContext::OffsetClause;
-                }
-                if inside_select_expr_clause {
-                    return CompletionContext::SelectExpr(select);
-                }
-                if inside_from_item && !inside_paren_expr && select.from_clause().is_some() {
-                    return CompletionContext::SelectClauses(select);
-                }
-            }
-            if let Some(select_clause) = ast::SelectClause::cast(a.clone()) {
-                return CompletionContext::SelectClause(select_clause);
+                position += 1;
             }
         }
     }
-    CompletionContext::Default
-}
 
-fn token_at_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxToken> {
-    let Some(mut token) = file.syntax().token_at_offset(offset).left_biased() else {
-        // empty file - definitely at top level
-        return None;
-    };
-    while token.kind() == SyntaxKind::WHITESPACE {
-        if let Some(tk) = token.prev_token() {
-            token = tk;
-        }
+    fn node(&self, ptr: InIrFile<SyntaxNodePtr>) -> Option<SyntaxNode> {
+        let IrFileId::File(file_id) = ptr.file_id else {
+            return None;
+        };
+        ptr.value
+            .try_to_node(parse(self.db, file_id).tree().syntax())
     }
-    Some(token)
+
+    fn function_detail(&self, function: FunctionId) -> String {
+        let index = self.index;
+        let data = &index.functions[function];
+        let Some(create) = self.node(data.ptr).and_then(ast::CreateFunction::cast) else {
+            return function_signature(index, function);
+        };
+        let mut detail = format!(
+            "{}.{}",
+            index.names.resolve(data.schema),
+            index.names.resolve(data.name)
+        );
+        match create.param_list() {
+            Some(params) => write!(detail, "{}", params.syntax().text()).unwrap(),
+            None => detail.push_str("()"),
+        }
+        if let Some(ret) = create.ret_type() {
+            write!(detail, " {}", ret.syntax().text()).unwrap();
+        }
+        detail
+    }
+
+    fn column_type(&self, column: ColumnId) -> Option<String> {
+        let data = &self.index.columns[column];
+        if let Some(ty) = self
+            .node(data.ptr)
+            .and_then(|node| node.parent())
+            .and_then(ast::Column::cast)
+            .and_then(|column| column.ty())
+        {
+            return Some(match &ty {
+                ast::Type::PathType(path)
+                    if path.arg_list().is_none()
+                        && let Some(segment) = path.path_ref().and_then(|path| path.segment()) =>
+                {
+                    segment.text()
+                }
+                _ => ty.syntax().text().to_string(),
+            });
+        }
+        Some(self.index.type_name(data.ty?).to_string())
+    }
 }
 
-fn schema_qualifier_at_token(token: &SyntaxToken) -> Option<Schema> {
-    qualifier_at_token(token).map(Schema)
-}
-
-fn function_detail(
-    db: &dyn Db,
-    file: FileId,
-    function_name: &Name,
-    schema: Option<&Schema>,
-    position: TextSize,
-) -> Option<String> {
-    let binder = bind(db, file);
-    let source_file = parse(db, file).tree();
-    let schemas = binder.resolved_schemas(position, schema);
-    let create_function = binder
-        .lookup_with(function_name, SymbolKind::Function, &schemas)?
-        .to_node(source_file.syntax())
-        .ancestors()
-        .find_map(ast::CreateFunction::cast)?;
-    let path = create_function.name()?.path()?;
-    let (schema, function_name) = resolve::resolve_function_info(db, InFile::new(file, &path))?;
-
-    let param_list = create_function.param_list()?;
-    let params = param_list.syntax().text().to_string();
-
-    let ret_type = create_function.ret_type()?;
-    let return_type = ret_type.syntax().text().to_string();
-
-    Some(format!("{schema}.{function_name}{params} {return_type}"))
-}
-
-fn default_completions() -> Vec<CompletionItem> {
-    ["delete from", "select", "table", "truncate"]
-        .map(|stmt| CompletionItem {
-            label: stmt.to_owned(),
-            kind: CompletionItemKind::Snippet,
-            detail: None,
-            insert_text: Some(format!("{stmt} $0;")),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-            sort_text: None,
-        })
-        .into_iter()
-        .collect()
+fn takes_only(index: &SemanticIndex, function: FunctionId, ty: Ty) -> bool {
+    let mut params = index.functions[function].params.iter();
+    params
+        .next()
+        .is_some_and(|param| index.params[param].ty == Some(ty))
+        && params.next().is_none()
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -924,7 +512,7 @@ impl CompletionItemKind {
 impl CompletionItem {
     pub fn sort_text(&self) -> String {
         let prefix = self.kind.sort_prefix();
-        let suffix = self.sort_text.as_ref().unwrap_or(&self.label);
+        let suffix = self.sort_key.as_ref().unwrap_or(&self.label);
         format!("{prefix}_{suffix}")
     }
 }
@@ -943,7 +531,7 @@ pub struct CompletionItem {
     pub insert_text: Option<String>,
     pub insert_text_format: Option<CompletionInsertTextFormat>,
     pub trigger_completion_after_insert: bool,
-    pub sort_text: Option<String>,
+    pub sort_key: Option<String>,
 }
 
 #[cfg(test)]
@@ -1058,18 +646,6 @@ truncate $0;
     }
 
     #[test]
-    fn completion_table_at_top_level() {
-        assert_snapshot!(completions("$0"), @r"
-         label       | kind    | detail 
-        -------------+---------+--------
-         delete from | Snippet |        
-         select      | Snippet |        
-         table       | Snippet |        
-         truncate    | Snippet |
-        ");
-    }
-
-    #[test]
     fn completion_table_nested() {
         assert_snapshot!(completions("select * from ($0)"), @r"
          label       | kind    | detail 
@@ -1141,7 +717,6 @@ select $0 from t;
          b                  | Column   | int                     
          t                  | Table    |                         
          f()                | Function | public.f() returns text 
-         *                  | Operator |                         
          public             | Schema   |                         
          pg_catalog         | Schema   |                         
          pg_temp            | Schema   |                         
@@ -1158,22 +733,21 @@ create table t ()
 inherits (information_schema.sql_features);
 select $0 from t;
 "), @"
-         label              | kind     | detail         
-        --------------------+----------+----------------
-         comments           | Column   | character_data 
-         feature_id         | Column   | character_data 
-         feature_name       | Column   | character_data 
-         is_supported       | Column   | yes_or_no      
-         is_verified_by     | Column   | character_data 
-         sub_feature_id     | Column   | character_data 
-         sub_feature_name   | Column   | character_data 
-         t                  | Table    |                
-         *                  | Operator |                
-         public             | Schema   |                
-         pg_catalog         | Schema   |                
-         pg_temp            | Schema   |                
-         pg_toast           | Schema   |                
-         information_schema | Schema   |
+         label              | kind   | detail         
+        --------------------+--------+----------------
+         comments           | Column | character_data 
+         feature_id         | Column | character_data 
+         feature_name       | Column | character_data 
+         is_supported       | Column | yes_or_no      
+         is_verified_by     | Column | character_data 
+         sub_feature_id     | Column | character_data 
+         sub_feature_name   | Column | character_data 
+         t                  | Table  |                
+         public             | Schema |                
+         pg_catalog         | Schema |                
+         pg_temp            | Schema |                
+         pg_toast           | Schema |                
+         information_schema | Schema |
         ");
     }
 
@@ -1184,19 +758,18 @@ create table parent as select 1 a, 'x'::text b;
 create table child (c int) inherits (parent);
 select $0 from child;
 "), @"
-         label              | kind     | detail  
-        --------------------+----------+---------
-         a                  | Column   | integer 
-         b                  | Column   | text    
-         c                  | Column   | int     
-         child              | Table    |         
-         parent             | Table    |         
-         *                  | Operator |         
-         public             | Schema   |         
-         pg_catalog         | Schema   |         
-         pg_temp            | Schema   |         
-         pg_toast           | Schema   |         
-         information_schema | Schema   |
+         label              | kind   | detail 
+        --------------------+--------+--------
+         a                  | Column | int4   
+         b                  | Column | text   
+         c                  | Column | int    
+         child              | Table  |        
+         parent             | Table  |        
+         public             | Schema |        
+         pg_catalog         | Schema |        
+         pg_temp            | Schema |        
+         pg_toast           | Schema |        
+         information_schema | Schema |
         ");
     }
 
@@ -1207,18 +780,17 @@ select 1 a, 'x'::text b into parent;
 create table child (like parent);
 select $0 from child;
 "), @"
-         label              | kind     | detail  
-        --------------------+----------+---------
-         a                  | Column   | integer 
-         b                  | Column   | text    
-         child              | Table    |         
-         parent             | Table    |         
-         *                  | Operator |         
-         public             | Schema   |         
-         pg_catalog         | Schema   |         
-         pg_temp            | Schema   |         
-         pg_toast           | Schema   |         
-         information_schema | Schema   |
+         label              | kind   | detail 
+        --------------------+--------+--------
+         a                  | Column | int4   
+         b                  | Column | text   
+         child              | Table  |        
+         parent             | Table  |        
+         public             | Schema |        
+         pg_catalog         | Schema |        
+         pg_temp            | Schema |        
+         pg_toast           | Schema |        
+         information_schema | Schema |
         ");
     }
 
@@ -1244,17 +816,16 @@ select * from t join u on t.a = u.b where $0;
 select 1 a, 'x'::text b into t;
 select $0 from t;
 "), @"
-         label              | kind     | detail  
-        --------------------+----------+---------
-         a                  | Column   | integer 
-         b                  | Column   | text    
-         t                  | Table    |         
-         *                  | Operator |         
-         public             | Schema   |         
-         pg_catalog         | Schema   |         
-         pg_temp            | Schema   |         
-         pg_toast           | Schema   |         
-         information_schema | Schema   |
+         label              | kind   | detail 
+        --------------------+--------+--------
+         a                  | Column | int4   
+         b                  | Column | text   
+         t                  | Table  |        
+         public             | Schema |        
+         pg_catalog         | Schema |        
+         pg_temp            | Schema |        
+         pg_toast           | Schema |        
+         information_schema | Schema |
         ");
     }
 
@@ -1263,11 +834,10 @@ select $0 from t;
         assert_snapshot!(completions("
 create table t (c int);
 select t.$0 from t;
-"), @r"
-         label | kind     | detail 
-        -------+----------+--------
-         c     | Column   | int    
-         *     | Operator |
+"), @"
+         label | kind   | detail 
+        -------+--------+--------
+         c     | Column | int
         ");
     }
 
@@ -1276,16 +846,15 @@ select t.$0 from t;
         assert_snapshot!(completions("
 with t as (select 1 a)
 select $0 from t;
-"), @r"
-         label              | kind     | detail  
-        --------------------+----------+---------
-         a                  | Column   | integer 
-         *                  | Operator |         
-         public             | Schema   |         
-         pg_catalog         | Schema   |         
-         pg_temp            | Schema   |         
-         pg_toast           | Schema   |         
-         information_schema | Schema   |
+"), @"
+         label              | kind   | detail 
+        --------------------+--------+--------
+         a                  | Column | int4   
+         public             | Schema |        
+         pg_catalog         | Schema |        
+         pg_temp            | Schema |        
+         pg_toast           | Schema |        
+         information_schema | Schema |
         ");
     }
 
@@ -1294,18 +863,17 @@ select $0 from t;
         assert_snapshot!(completions("
 with t as (select 1 a, 2 b, 3 c)
 select $0 from t as u(x, y);
-"), @r"
-         label              | kind     | detail  
-        --------------------+----------+---------
-         x                  | Column   | integer 
-         y                  | Column   | integer 
-         c                  | Column   | integer 
-         *                  | Operator |         
-         public             | Schema   |         
-         pg_catalog         | Schema   |         
-         pg_temp            | Schema   |         
-         pg_toast           | Schema   |         
-         information_schema | Schema   |
+"), @"
+         label              | kind   | detail 
+        --------------------+--------+--------
+         x                  | Column | int4   
+         y                  | Column | int4   
+         c                  | Column | int4   
+         public             | Schema |        
+         pg_catalog         | Schema |        
+         pg_temp            | Schema |        
+         pg_toast           | Schema |        
+         information_schema | Schema |
         ");
     }
 
@@ -1314,18 +882,17 @@ select $0 from t as u(x, y);
         assert_snapshot!(completions("
 with t as (values (1, 'foo', false))
 select $0 from t;
-"), @r"
-         label              | kind     | detail  
-        --------------------+----------+---------
-         column1            | Column   | integer 
-         column2            | Column   | text    
-         column3            | Column   | boolean 
-         *                  | Operator |         
-         public             | Schema   |         
-         pg_catalog         | Schema   |         
-         pg_temp            | Schema   |         
-         pg_toast           | Schema   |         
-         information_schema | Schema   |
+"), @"
+         label              | kind   | detail 
+        --------------------+--------+--------
+         column1            | Column | int4   
+         column2            | Column | text   
+         column3            | Column | bool   
+         public             | Schema |        
+         pg_catalog         | Schema |        
+         pg_temp            | Schema |        
+         pg_toast           | Schema |        
+         information_schema | Schema |
         ");
     }
 
@@ -1333,19 +900,18 @@ select $0 from t;
     fn completion_values_subquery() {
         assert_snapshot!(completions("
 select $0 from (values (1, 'foo', 1.5, false));
-"), @r"
-         label              | kind     | detail  
-        --------------------+----------+---------
-         column1            | Column   | integer 
-         column2            | Column   | text    
-         column3            | Column   | numeric 
-         column4            | Column   | boolean 
-         *                  | Operator |         
-         public             | Schema   |         
-         pg_catalog         | Schema   |         
-         pg_temp            | Schema   |         
-         pg_toast           | Schema   |         
-         information_schema | Schema   |
+"), @"
+         label              | kind   | detail  
+        --------------------+--------+---------
+         column1            | Column | int4    
+         column2            | Column | text    
+         column3            | Column | numeric 
+         column4            | Column | bool    
+         public             | Schema |         
+         pg_catalog         | Schema |         
+         pg_temp            | Schema |         
+         pg_toast           | Schema |         
+         information_schema | Schema |
         ");
     }
 
@@ -1353,6 +919,7 @@ select $0 from (values (1, 'foo', 1.5, false));
     fn completion_with_schema_qualifier() {
         assert_snapshot!(completions("
 create function f() returns int8 as 'select 1' language sql;
+create schema foo;
 create function foo.b() returns int8 as 'select 2' language sql;
 select public.$0;
 "), @r"
@@ -1438,6 +1005,8 @@ delete from t returning $0;
     #[test]
     fn completion_delete_where_qualified() {
         assert_snapshot!(completions("
+create table t (a int, b text);
+create type diff_type as (x int);
 -- different type than the table, so we shouldn't show this
 create function b(diff_type) returns int8
   as 'select 1'
@@ -1445,7 +1014,6 @@ create function b(diff_type) returns int8
 create function f(t) returns int8
   as 'select 1'
   language sql;
-create table t (a int, b text);
 delete from t where t.$0;
 "), @r"
          label | kind     | detail 
@@ -1482,6 +1050,7 @@ select a from t $0;
     #[test]
     fn completion_select_clauses_simple() {
         assert_snapshot!(completions("
+create table t (a int);
 select 1 from t $0;
 "), @r"
          label     | kind    | detail 
@@ -1506,10 +1075,10 @@ select 1 from t $0;
         assert_snapshot!(completions("
 with t as (select 1 a)
 select a from t group by $0;
-"), @r"
-         label | kind   | detail  
-        -------+--------+---------
-         a     | Column | integer 
+"), @"
+         label | kind   | detail 
+        -------+--------+--------
+         a     | Column | int4   
          t     | Table  |
         ");
     }
@@ -1531,6 +1100,7 @@ select * from t where $0;
     #[test]
     fn completion_select_limit() {
         assert_snapshot!(completions("
+create table t (a int);
 create function get_limit() returns int as 'select 10' language sql;
 select 1 from t limit $0;
 "), @r"
@@ -1544,12 +1114,143 @@ select 1 from t limit $0;
     #[test]
     fn completion_select_offset() {
         assert_snapshot!(completions("
+create table t (a int);
 create function get_offset() returns int as 'select 10' language sql;
 select 1 from t offset $0;
 "), @r"
          label        | kind     | detail                          
         --------------+----------+---------------------------------
          get_offset() | Function | public.get_offset() returns int
+        ");
+    }
+
+    #[test]
+    fn completion_lateral_subquery_target() {
+        assert_snapshot!(completions("
+create table t (a int);
+select * from t, lateral (select $0) s;
+"), @"
+         label              | kind    | detail 
+        --------------------+---------+--------
+         a                  | Column  | int    
+         except             | Snippet |        
+         fetch              | Snippet |        
+         for                | Snippet |        
+         from               | Snippet |        
+         group by           | Snippet |        
+         having             | Snippet |        
+         intersect          | Snippet |        
+         limit              | Snippet |        
+         offset             | Snippet |        
+         order by           | Snippet |        
+         t                  | Table   |        
+         union              | Snippet |        
+         where              | Snippet |        
+         window             | Snippet |        
+         public             | Schema  |        
+         pg_catalog         | Schema  |        
+         pg_temp            | Schema  |        
+         pg_toast           | Schema  |        
+         information_schema | Schema  |
+        ");
+    }
+
+    #[test]
+    fn completion_from_subquery_target() {
+        assert_snapshot!(completions("
+create table t (a int);
+select * from t, (select $0) s;
+"), @"
+         label              | kind    | detail 
+        --------------------+---------+--------
+         except             | Snippet |        
+         fetch              | Snippet |        
+         for                | Snippet |        
+         from               | Snippet |        
+         group by           | Snippet |        
+         having             | Snippet |        
+         intersect          | Snippet |        
+         limit              | Snippet |        
+         offset             | Snippet |        
+         order by           | Snippet |        
+         t                  | Table   |        
+         union              | Snippet |        
+         where              | Snippet |        
+         window             | Snippet |        
+         public             | Schema  |        
+         pg_catalog         | Schema  |        
+         pg_temp            | Schema  |        
+         pg_toast           | Schema  |        
+         information_schema | Schema  |
+        ");
+    }
+
+    #[test]
+    fn completion_correlated_subquery_target() {
+        assert_snapshot!(completions("
+create table t (a int);
+select * from t where exists (select $0);
+"), @"
+         label              | kind    | detail 
+        --------------------+---------+--------
+         a                  | Column  | int    
+         except             | Snippet |        
+         fetch              | Snippet |        
+         for                | Snippet |        
+         from               | Snippet |        
+         group by           | Snippet |        
+         having             | Snippet |        
+         intersect          | Snippet |        
+         limit              | Snippet |        
+         offset             | Snippet |        
+         order by           | Snippet |        
+         t                  | Table   |        
+         union              | Snippet |        
+         where              | Snippet |        
+         window             | Snippet |        
+         public             | Schema  |        
+         pg_catalog         | Schema  |        
+         pg_temp            | Schema  |        
+         pg_toast           | Schema  |        
+         information_schema | Schema  |
+        ");
+    }
+
+    #[test]
+    fn completion_lateral_subquery_later_source() {
+        assert_snapshot!(completions("
+create table t (a int);
+create table u (b int);
+select * from t, lateral (select $0 from u) s, u v;
+"), @"
+         label              | kind   | detail 
+        --------------------+--------+--------
+         b                  | Column | int    
+         a                  | Column | int    
+         t                  | Table  |        
+         u                  | Table  |        
+         public             | Schema |        
+         pg_catalog         | Schema |        
+         pg_temp            | Schema |        
+         pg_toast           | Schema |        
+         information_schema | Schema |
+        ");
+    }
+
+    #[test]
+    fn completion_join_on_later_source() {
+        assert_snapshot!(completions("
+create table t (a int);
+create table u (b int);
+create table v (c int);
+select * from t join u on $0 join v on true;
+"), @"
+         label | kind   | detail 
+        -------+--------+--------
+         a     | Column | int    
+         b     | Column | int    
+         t     | Table  |        
+         u     | Table  |
         ");
     }
 }

@@ -19,7 +19,7 @@ pub(crate) fn handle_goto_definition(
         .into_iter()
         .filter_map(|location| {
             debug_assert!(
-                !location.range.contains(position.value),
+                !location.value.contains(position.value),
                 "Our target destination range must not include the source range otherwise go to def won't work in vscode."
             );
             to_location(snapshot, location)

@@ -575,7 +575,10 @@ function registerMonacoProvidersOnce() {
   monaco.editor.defineTheme("squawk-dark", {
     base: "vs-dark",
     inherit: true,
-    rules: [{ token: "variable", foreground: "D4D4D4" }],
+    rules: [
+      { token: "variable", foreground: "D4D4D4" },
+      { token: "punctuation", foreground: "D4D4D4" },
+    ],
     colors: {},
   })
   const languageConfig = monaco.languages.setLanguageConfiguration(
