@@ -18864,6 +18864,13 @@ impl Lowerer {
                 continue;
             };
             let name = self.intern(&window.text());
+            if self.find_window(name).is_some() {
+                let message = format!(
+                    "window `{}` is already defined",
+                    self.index.names.resolve(name)
+                );
+                self.push_error(DiagnosticKind::DuplicateWindow, window.syntax(), message);
+            }
             let id = self.index.windows.alloc(Window {
                 name,
                 ptr: self.ast_ptr(&window_def),
