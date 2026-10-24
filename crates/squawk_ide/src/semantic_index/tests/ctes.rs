@@ -131,3 +131,26 @@ select n, ord, is_cycle, path, z from t;
       ╰╴                               ━
     ");
 }
+
+#[test]
+fn duplicate_column_names_are_ambiguous() {
+    assert_snapshot!(check("
+with t as (select 1 a, 2 a)
+select a from t;
+with t as (select 1 a, 2 a)
+select t.a from t;
+with t as (select 1 a, 2 a)
+select * from t;
+with a as (select 1 id), b as (select 2 id)
+select id from (select * from a join b using (id)) s;
+"), @"
+    error: column reference `a` is ambiguous
+      ╭▸ 
+    3 │ select a from t;
+      ╰╴       ━
+    error: column reference `a` is ambiguous
+      ╭▸ 
+    5 │ select t.a from t;
+      ╰╴         ━
+    ");
+}

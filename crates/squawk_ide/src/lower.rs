@@ -10085,6 +10085,20 @@ impl Lowerer {
                             ty,
                             ..self.column_def(&column_name)
                         };
+                        if let Some(name) = def.name
+                            && self.find_column_from(inherited_end, name).is_some()
+                        {
+                            let message = format!(
+                                "column `{}` specified more than once",
+                                self.index.names.resolve(name)
+                            );
+                            self.push_error(
+                                DiagnosticKind::DuplicateColumn,
+                                column_name.syntax(),
+                                message,
+                            );
+                            continue;
+                        }
                         let id = self.add_table_column(start, inherited_end, def);
                         self.record_comment(column.syntax(), Item::Column(id));
                         self.add_item_range(def.ptr.file_range(), Item::Column(id));
@@ -10105,6 +10119,20 @@ impl Lowerer {
                     complete &= source_columns.complete;
                     for id in source_columns.range {
                         let column = self.index.columns[id];
+                        if let Some(name) = column.name
+                            && self.find_column_from(inherited_end, name).is_some()
+                        {
+                            let message = format!(
+                                "column `{}` specified more than once",
+                                self.index.names.resolve(name)
+                            );
+                            self.push_error(
+                                DiagnosticKind::DuplicateColumn,
+                                like.syntax(),
+                                message,
+                            );
+                            continue;
+                        }
                         self.add_table_column(start, inherited_end, column);
                     }
                 }
@@ -11185,6 +11213,14 @@ impl Lowerer {
         range
             .iter()
             .find(|id| self.index.columns[*id].name == Some(name))
+    }
+
+    fn has_duplicate_column(&self, range: IdxRange<Column>, name: Name) -> bool {
+        range
+            .iter()
+            .filter(|id| self.index.columns[*id].name == Some(name))
+            .nth(1)
+            .is_some()
     }
 
     fn find_table_column(&self, table: TableId, name: Name) -> Option<ColumnId> {
@@ -19880,6 +19916,11 @@ impl Lowerer {
         let field = field_expr.field()?;
         let name = self.name_ref_name(&field)?;
         let (kind, resolution) = match self.find_source_column(source, name) {
+            Some(_)
+                if self.has_duplicate_column(self.index.sources[source].columns.range, name) =>
+            {
+                (ReferenceKind::Column, Resolution::Ambiguous)
+            }
             Some(column) => (
                 ReferenceKind::Column,
                 Resolution::Column {
@@ -20059,6 +20100,9 @@ impl Lowerer {
             let column = self.find_column_in(source.columns.range, name);
             match column {
                 Some(column) => {
+                    if self.has_duplicate_column(source.columns.range, name) {
+                        return ColumnLookup::Ambiguous;
+                    }
                     if found.is_none() {
                         found = Some((index, sources[index], column));
                     }
