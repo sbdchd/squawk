@@ -13001,11 +13001,23 @@ impl Lowerer {
             )
         });
         if let Some(target) = target {
+            let mut seen = smallvec![];
             for column_target in insert
                 .column_target_list()
                 .into_iter()
                 .flat_map(|list| list.column_targets())
             {
+                if let Some(name) = self.duplicate_target(&mut seen, &column_target) {
+                    let message = format!(
+                        "column `{}` specified more than once",
+                        self.index.names.resolve(name)
+                    );
+                    self.push_error(
+                        DiagnosticKind::DuplicateColumn,
+                        column_target.syntax(),
+                        message,
+                    );
+                }
                 self.lower_column_target(target, &column_target);
             }
         }
@@ -13156,6 +13168,20 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn duplicate_target(
+        &mut self,
+        seen: &mut SmallVec<[(Name, bool); 8]>,
+        column_target: &ast::ColumnTarget,
+    ) -> Option<Name> {
+        let name = self.intern(&column_target.name()?.text());
+        let partial = column_target.accessors().next().is_some();
+        let duplicate = seen
+            .iter()
+            .any(|&(prev, prev_partial)| prev == name && !(partial && prev_partial));
+        seen.push((name, partial));
+        duplicate.then_some(name)
     }
 
     fn lower_for_portion_of(
