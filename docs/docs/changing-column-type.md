@@ -11,7 +11,6 @@ Changing the type of a table or foreign table column or a composite type attribu
 
 <https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES>
 
-
 ## solution
 
 Some "binary coercible" types can be converted without a table rewrite.
@@ -19,7 +18,6 @@ Some "binary coercible" types can be converted without a table rewrite.
 `VARCHAR` can safely be converted to `TEXT` and shorter `VARCHAR(5)` can be converted to longer `VARCHAR(10)` because they have the same binary representation on disk.
 
 An `INT` (4 bytes wide) cannot be converted to a `BIGINT` (8 bytes wide) without rewriting the table.
-
 
 ### convert an `INT` column to a `BIGINT` column
 

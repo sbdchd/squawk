@@ -1,6 +1,14 @@
 module.exports = {
   someSidebar: {
-    General: ["quick_start", "safe_migrations", "cli", "github_app", "web-frameworks", "postgres-locks", "troubleshooting"],
+    General: [
+      "quick_start",
+      "safe_migrations",
+      "cli",
+      "github_app",
+      "web-frameworks",
+      "postgres-locks",
+      "troubleshooting",
+    ],
     Rules: [
       "rules",
       "adding-field-with-default",

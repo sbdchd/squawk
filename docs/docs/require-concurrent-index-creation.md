@@ -31,7 +31,6 @@ Use:
 CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
 ```
 
-
 ## solution for alembic and sqlalchemy
 
 Instead of:
@@ -83,5 +82,5 @@ def schema_downgrades():
 
 **Notes:**
 
-In a concurrent index build, the index is actually entered as an “invalid” 
+In a concurrent index build, the index is actually entered as an “invalid”
 ([details](https://www.postgresql.org/docs/current/sql-createindex.html#:~:text=In%20a%20concurrent%20index%20build,modified%20the%20table%20to%20terminate.))

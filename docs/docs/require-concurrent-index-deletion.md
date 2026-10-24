@@ -5,7 +5,7 @@ title: require-concurrent-index-deletion
 
 ## problem
 
-A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can be completed. 
+A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can be completed.
 
 ## solution
 
@@ -28,7 +28,6 @@ Use:
 -- allows reads and writes to table while Postgres waits for conflicting transactions to finish
 DROP INDEX CONCURRENTLY "app"."email_idx";
 ```
-
 
 ## solution for alembic and sqlalchemy
 

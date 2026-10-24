@@ -25,9 +25,8 @@ And:
 > compared to native types like varchar(12); partly because the system
 > can’t reason very well about arbitrary check constraints as compared
 > to simple length constraints, and partly because the whole feature
-> just isn’t implemented very completely or efficiently.  So you’ll be
-> paying *a lot* for some hypothetical future savings.
-
+> just isn’t implemented very completely or efficiently. So you’ll be
+> paying _a lot_ for some hypothetical future savings.
 
 ## solution
 

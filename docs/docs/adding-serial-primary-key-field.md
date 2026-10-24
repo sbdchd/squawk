@@ -33,4 +33,4 @@ ALTER TABLE account ADD CONSTRAINT account_pk PRIMARY KEY USING INDEX account_pk
 ## further reading
 
 [Citus' 2018 post on tips for Postgres
-locking](https://www.citusdata.com/blog/2018/02/22/seven-tips-for-dealing-with-postgres-locks/) and [the Postgres "ALTER TABLE" docs](https://www.postgresql.org/docs/current/sql-altertable.html). 
+locking](https://www.citusdata.com/blog/2018/02/22/seven-tips-for-dealing-with-postgres-locks/) and [the Postgres "ALTER TABLE" docs](https://www.postgresql.org/docs/current/sql-altertable.html).

@@ -7,7 +7,6 @@ title: disallowed-unique-constraint
 
 Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
 
-
 ## solution
 
 Instead create an index `CONCURRENTLY` and create the `CONSTRAINT` `USING` the index.
@@ -29,7 +28,6 @@ CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
 -- add constraint using the built index
 ALTER TABLE distributors ADD CONSTRAINT distributors_dist_id_key UNIQUE USING INDEX dist_id_uniq;
 ```
-
 
 Instead of:
 
