@@ -89,6 +89,7 @@ pub enum DiagnosticKind {
     DuplicateCte,
     DuplicateSource,
     DuplicateWindow,
+    DuplicateParam,
     DuplicateFunction,
     DuplicateConstraint,
     DuplicateTrigger,

@@ -20724,12 +20724,12 @@ impl Lowerer {
             .and_then(|list| list.aggregate_order_by());
         let mut direct_args = None;
         for param in param_list.into_iter().flat_map(|list| list.params()) {
-            self.alloc_param_def(&param);
+            self.alloc_param_def(start, &param);
         }
         if let Some(order_by) = order_by {
             direct_args = Some(self.index.params.range_from(start).len());
             for param in order_by.params() {
-                self.alloc_param_def(&param);
+                self.alloc_param_def(start, &param);
             }
         }
         FunctionParams {
@@ -20764,8 +20764,21 @@ impl Lowerer {
         self.index.params.range_from(start)
     }
 
-    fn alloc_param_def(&mut self, param_node: &ast::Param) {
+    fn alloc_param_def(&mut self, start: ParamId, param_node: &ast::Param) {
         let param = self.param_def(param_node);
+        if let Some(name) = param.name
+            && let Some(param_name) = param_node.name()
+            && self.index.params.range_from(start).iter().any(|id| {
+                let prev = &self.index.params[id];
+                prev.name == Some(name) && params_conflict(prev.mode, param.mode)
+            })
+        {
+            let message = format!(
+                "parameter name `{}` used more than once",
+                self.index.names.resolve(name)
+            );
+            self.push_error(DiagnosticKind::DuplicateParam, param_name.syntax(), message);
+        }
         let name_ptr = param.name_ptr;
         let id = self.index.params.alloc(param);
         self.record_comment(param_node.syntax(), Item::Param(id));
@@ -21089,6 +21102,11 @@ struct BaseTypeOptions {
     subscript: SubscriptOption,
     category: TypeCategory,
     preferred: bool,
+}
+
+fn params_conflict(a: ParamMode, b: ParamMode) -> bool {
+    let input_only = |mode| matches!(mode, ParamMode::In | ParamMode::Variadic);
+    !(input_only(a) && b == ParamMode::Out || a == ParamMode::Out && input_only(b))
 }
 
 fn split_ident(text: &str) -> Option<IdentPart<'_>> {
