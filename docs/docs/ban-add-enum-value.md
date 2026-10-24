@@ -8,7 +8,7 @@ title: ban-add-enum-value
 A new enum value can reach existing clients that do not handle it. This rule is opt-in. An unconditional CREATE earlier in the file suppresses a warning for that new object.
 
 ```sql
-ALTER TYPE mood ADD VALUE 'happy';
+alter type mood add value 'happy';
 ```
 
 ## solution

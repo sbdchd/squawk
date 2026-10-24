@@ -15,20 +15,20 @@ max length. See the [`constraint-missing-not-valid` rule](./constraint-missing-n
 Instead of:
 
 ```sql
-CREATE TABLE "app_user" (
-    "id" serial NOT NULL PRIMARY KEY,
-    "email" varchar(100) NOT NULL
+create table app_user (
+  id serial not null primary key,
+  email varchar(100) not null
 );
 ```
 
 Use:
 
 ```sql
-CREATE TABLE "app_user" (
-    "id" serial NOT NULL PRIMARY KEY,
-    "email" TEXT NOT NULL
+create table app_user (
+  id serial not null primary key,
+  email text not null
 );
-ALTER TABLE "app_user" ADD CONSTRAINT "text_size" CHECK (LENGTH("email") <= 100);
+alter table app_user add constraint text_size check (length(email) <= 100);
 ```
 
 ## solution for alembic and sqlalchemy

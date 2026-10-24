@@ -8,7 +8,7 @@ title: ban-set-schema
 Moving an object to another schema may break existing clients that use its old schema-qualified name. For example, an earlier application revision may still query `public.t` after a migration moves the table to `s`. Rolling back the application does not move the table back, so that query fails. This also applies to foreign tables, procedures, and routines.
 
 ```sql
-ALTER TABLE t SET SCHEMA s;
+alter table t set schema s;
 ```
 
 ## solution

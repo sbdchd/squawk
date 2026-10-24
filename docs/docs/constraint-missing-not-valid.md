@@ -19,14 +19,15 @@ call prevents the table scan and results in the validation step only requiring a
 Instead of:
 
 ```sql
-ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
+alter table accounts add constraint positive_balance check (balance >= 0);
 ```
 
 Use:
 
 ```sql
-ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) NOT VALID;
-ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
+alter table accounts
+  add constraint positive_balance check (balance >= 0) not valid;
+alter table accounts validate constraint positive_balance;
 ```
 
 ## solution for alembic and sqlalchemy
@@ -91,7 +92,7 @@ def schema_upgrades():
 When we add this constraint, writes to the `accounts` table will be blocked while the table is scanned to verify all `positive_balance` column entries match the check constraint `"balance" >= 0`.
 
 ```sql
-ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
+alter table accounts add constraint positive_balance check (balance >= 0);
 ```
 
 By adding the check constraint as `NOT VALID`, existing columns are not checked against the constraint, only new rows or updates to existing rows. This constraint can be applied without blocking writes.

@@ -8,7 +8,7 @@ title: ban-drop-index
 Dropping an index can remove a unique or exclusion guarantee or change query plans for existing clients. This rule is opt-in.
 
 ```sql
-DROP INDEX CONCURRENTLY IF EXISTS i;
+drop index concurrently if exists i;
 ```
 
 ## solution

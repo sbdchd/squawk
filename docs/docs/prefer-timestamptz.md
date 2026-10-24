@@ -16,20 +16,18 @@ Use a `timestamptz` field to ensure Postgres returns your timestamp with the cor
 Instead of:
 
 ```sql
-create table app.users
-(
-    created_ts   timestamp,
-    modified_ts  timestamp without time zone
+create table app.users (
+  created_ts timestamp,
+  modified_ts timestamp without time zone
 )
 ```
 
 Use:
 
 ```sql
-create table app.users
-(
-    created_ts   timestamptz,
-    modified_ts  timestamptz
+create table app.users (
+  created_ts timestamptz,
+  modified_ts timestamptz
 )
 ```
 
@@ -39,16 +37,16 @@ Instead of:
 
 ```sql
 alter table app.users
-    alter column created_ts type timestamp,
-    alter column modified_ts type timestamp without time zone
+  alter column created_ts type timestamp,
+  alter column modified_ts type timestamp without time zone
 ```
 
 Use:
 
 ```sql
 alter table app.users
-    alter column created_ts type timestamptz,
-    alter column modified_ts type timestamptz
+  alter column created_ts type timestamptz,
+  alter column modified_ts type timestamptz
 ```
 
 ## solution for alembic and sqlalchemy

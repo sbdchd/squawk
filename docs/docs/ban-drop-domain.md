@@ -8,7 +8,7 @@ title: ban-drop-domain
 Clients that use a dropped domain in casts or parameters fail.
 
 ```sql
-DROP DOMAIN IF EXISTS d CASCADE;
+drop domain if exists d cascade;
 ```
 
 ## solution

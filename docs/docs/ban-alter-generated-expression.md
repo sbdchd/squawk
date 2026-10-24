@@ -8,7 +8,7 @@ title: ban-alter-generated-expression
 Adding a generated column changes the result shape for strict `SELECT *` decoders and can affect positional inserts. Inserts with explicit column lists do not inherently fail. `SET EXPRESSION` changes values returned to existing clients. For stored generated columns, PostgreSQL rewrites stored values; assess that rewrite separately as an availability concern. This rule is opt-in because compatibility depends on how clients use the column.
 
 ```sql
-ALTER TABLE t ALTER COLUMN c SET EXPRESSION AS (id + 1);
+alter table t alter column c set expression as(id + 1);
 ```
 
 ## solution

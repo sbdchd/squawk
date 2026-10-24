@@ -8,8 +8,8 @@ title: ban-alter-system-options
 `ALTER SYSTEM SET` and `ALTER SYSTEM RESET` change server configuration for every database and every client. Parameters such as `search_path`, `timezone`, `DateStyle`, `IntervalStyle`, `bytea_output`, and `standard_conforming_strings` change name resolution or result formats for existing clients. This rule is opt-in.
 
 ```sql
-ALTER SYSTEM SET timezone = 'UTC';
-ALTER SYSTEM RESET search_path;
+alter system set timezone = 'UTC';
+alter system reset search_path;
 ```
 
 ## solution

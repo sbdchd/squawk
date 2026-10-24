@@ -37,17 +37,17 @@ statements in a transaction.
 
 ```sql
 -- instead of:
-CREATE TABLE "foo_tbl" (
-    "id" serial NOT NULL PRIMARY KEY,
-    "modified" timestamp with time zone NOT NULL,
-    "created" timestamp with time zone NOT NULL
+create table foo_tbl (
+  id serial not null primary key,
+  modified timestamp with time zone not null,
+  created timestamp with time zone not null
 );
 
 -- use:
-CREATE TABLE IF NOT EXISTS "foo_tbl" (
-    "id" serial NOT NULL PRIMARY KEY,
-    "modified" timestamp with time zone NOT NULL,
-    "created" timestamp with time zone NOT NULL
+create table if not exists foo_tbl (
+  id serial not null primary key,
+  modified timestamp with time zone not null,
+  created timestamp with time zone not null
 );
 ```
 
@@ -76,10 +76,10 @@ ALTER TABLE "app_user" ADD "email_constraint";
 
 ```sql
 -- instead of:
-CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
+create index concurrently email_idx on app_user (email);
 
 -- use:
-CREATE INDEX CONCURRENTLY IF NOT EXISTS "email_idx" ON "app_user" ("email");
+create index concurrently if not exists email_idx on app_user (email);
 ```
 
 `CREATE INDEX CONCURRENTLY` failing will leave behind [`INVALID` index objects](https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY)
@@ -95,48 +95,48 @@ Thus:
 
 ```sql
 -- instead of:
-CREATE INDEX CONCURRENTLY ON "app_user" ("email");
+create index concurrently on app_user (email);
 
 -- use:
-CREATE INDEX CONCURRENTLY IF NOT EXISTS "email_idx" ON "app_user" ("email");
+create index concurrently if not exists email_idx on app_user (email);
 ```
 
 ### remove table
 
 ```sql
 -- instead of:
-DROP TABLE "foo_tbl";
+drop table foo_tbl;
 
 -- use:
-DROP TABLE IF EXISTS "foo_tbl";
+drop table if exists foo_tbl;
 ```
 
 ### remove column
 
 ```sql
 -- instead of:
-ALTER TABLE "app_user" DROP COLUMN "col_name";
+alter table app_user drop column col_name;
 
 -- use:
-ALTER TABLE "app_user" DROP COLUMN IF EXISTS "col_name";
+alter table app_user drop column if exists col_name;
 ```
 
 ### remove constraint
 
 ```sql
 -- instead of:
-ALTER TABLE "foo_tbl" DROP CONSTRAINT "foo_constraint";
+alter table foo_tbl drop constraint foo_constraint;
 
 -- use:
-ALTER TABLE "foo_tbl" DROP CONSTRAINT IF EXISTS "foo_constraint";
+alter table foo_tbl drop constraint if exists foo_constraint;
 ```
 
 ### remove index
 
 ```sql
 -- instead of:
-DROP INDEX "foo_idx";
+drop index foo_idx;
 
 -- use:
-DROP INDEX IF EXISTS "foo_idx";
+drop index if exists foo_idx;
 ```

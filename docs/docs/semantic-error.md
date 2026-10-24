@@ -12,7 +12,9 @@ The syntax is valid, but there was an error identified while checking the SQL.
 undefined column
 
 ```sql
-with t as (select 1 a)
+with t as (
+  select 1 a
+)
 select a, b from t;
 -- error[semantic-error]: column `b` does not exist
 ```
@@ -20,8 +22,8 @@ select a, b from t;
 duplicate table
 
 ```sql
-create table t(a int);
-create table t(b int);
+create table t (a int);
+create table t (b int);
 -- error[semantic-error]: relation `t` already exists
 ```
 

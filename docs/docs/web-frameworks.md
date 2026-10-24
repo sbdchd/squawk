@@ -44,45 +44,47 @@ We cannot use the auto generated SQL from Django's migration system. We must use
 2. Create trigger to set default value `false` for inserts `published` is `null`.
 
    ```sql
-   CREATE FUNCTION null_published_trigger()
-   RETURNS trigger AS '
+   create function null_published_trigger() returns trigger
+     as '
    BEGIN
    IF NEW.published IS NULL THEN
        NEW.published := false;
    END IF;
    RETURN NEW;
-   END' LANGUAGE 'plpgsql';
+   END'
+     language 'plpgsql';
 
-   CREATE TRIGGER published_default_trigger
-   BEFORE INSERT ON post
-   FOR EACH ROW
-   EXECUTE PROCEDURE null_published_trigger();
+   create trigger published_default_trigger
+     before insert
+     on post
+     for each row
+     execute procedure null_published_trigger();
    ```
 
 3. Set a default value for existing objects.
 
    ```sql
-   UPDATE "post" SET "published" = false WHERE "published" IS NULL;
+   update post set published = false where published is null;
    ```
 
 4. Create a not null constraint.
 
    ```sql
-   ALTER TABLE "post" ADD CONSTRAINT published_not_null
-       CHECK ("published" IS NOT NULL) NOT VALID;
+   alter table post
+     add constraint published_not_null check (published is not null) not valid;
    ```
 
 5. Validate constraint.
 
    ```sql
-   ALTER TABLE "post" VALIDATE CONSTRAINT published_not_null;
+   alter table post validate constraint published_not_null;
    ```
 
 6. Remove trigger.
 
    ```sql
-   DROP TRIGGER IF EXISTS published_default_trigger on post;
-   DROP FUNCTION IF EXISTS null_published_trigger;
+   drop trigger if exists published_default_trigger on post;
+   drop function if exists null_published_trigger;
    ```
 
 ## Alembic and SQLAlchemy

@@ -15,16 +15,16 @@ Instead of:
 
 ```sql
 -- blocks reads and writes
-REINDEX TABLE foo;
-REINDEX INDEX foo_idx;
+reindex table foo;
+reindex index foo_idx;
 ```
 
 Use:
 
 ```sql
 -- avoids blocking reads and writes
-REINDEX TABLE CONCURRENTLY foo;
-REINDEX INDEX CONCURRENTLY foo_idx;
+reindex table concurrently foo;
+reindex index concurrently foo_idx;
 ```
 
 ## links

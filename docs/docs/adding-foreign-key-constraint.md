@@ -24,18 +24,18 @@ Instead of:
 
 ```sql
 -- blocks writes to "email" and "user" while Postgres checks rows in "email" have user_id mapping to "user".id (slow)
-ALTER TABLE "email" ADD CONSTRAINT "fk_user"
-    FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+alter table email
+  add constraint fk_user foreign key (user_id) references "user" (id);
 ```
 
 Use:
 
 ```sql
 -- blocks writes to "email" and "user" while Postgres updates table schema (fast)
-ALTER TABLE "email" ADD CONSTRAINT "fk_user"
-    FOREIGN KEY ("user_id") REFERENCES "user" ("id") NOT VALID;
+alter table email
+  add constraint fk_user foreign key (user_id) references "user" (id) not valid;
 -- non-blocking while existing rows are checked.
-ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
+alter table email validate constraint fk_user;
 ```
 
 Add the foreign key constraint as `NOT VALID` to prevent locking the `"email"` and `"user"` tables while "email" rows are checked against "user".
@@ -50,14 +50,12 @@ Adding foreign key constraint in `create table` statement.
 
 ```sql
 -- blocks writes to "user" while Postgres updates table schema.
-CREATE TABLE email (
-    id BIGINT GENERATED ALWAYS AS IDENTITY,
-    user_id BIGINT,
-    email TEXT,
-    PRIMARY KEY(id),
-    CONSTRAINT fk_user
-        FOREIGN KEY ("user_id")
-        REFERENCES "user" ("id")
+create table email (
+  id bigint generated always as identity,
+  user_id bigint,
+  email text,
+  primary key (id),
+  constraint fk_user foreign key (user_id) references "user" (id)
 );
 ```
 
@@ -65,18 +63,18 @@ Using `not valid...validate`:
 
 ```sql
 -- no references to lock.
-CREATE TABLE email (
-    id BIGINT GENERATED ALWAYS AS IDENTITY,
-    user_id BIGINT,
-    email TEXT,
-    PRIMARY KEY(id)
+create table email (
+  id bigint generated always as identity,
+  user_id bigint,
+  email text,
+  primary key (id)
 );
 
 -- blocks writes to "email" and "user" while Postgres updates table schema (fast)
-ALTER TABLE "email" ADD CONSTRAINT "fk_user"
-    FOREIGN KEY ("user_id") REFERENCES "user" ("id") NOT VALID;
+alter table email
+  add constraint fk_user foreign key (user_id) references "user" (id) not valid;
 -- non-blocking while existing rows are checked.
-ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
+alter table email validate constraint fk_user;
 ```
 
 ## solution for alembic and sqlalchemy

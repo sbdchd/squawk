@@ -22,7 +22,8 @@ We have a table with the name `user_stars` that we want to rename to `user_favor
 1. Create a view with the name of your desired table using our original table
 
 ```sql
-CREATE VIEW user_favorites as SELECT * FROM user_stars;
+create view user_favorites as
+  select * from user_stars;
 ```
 
 2. Deploy your new code that references `user_favorites` and remove your old deployment that references `user_stars`
@@ -30,10 +31,10 @@ CREATE VIEW user_favorites as SELECT * FROM user_stars;
 3. Delete our view and rename the table now that `user_stars` is no longer queried directly.
 
 ```sql
-BEGIN;
-DROP VIEW user_favorites;
-ALTER TABLE user_stars RENAME TO user_favorites;
-COMMIT;
+begin;
+drop view user_favorites;
+alter table user_stars rename to user_favorites;
+commit;
 ```
 
 This transaction will acquire an `ACCESS EXCLUSIVE` lock on the `user_stars` table, blocking all reads and writes to the table while the table is renamed. This should effectively be instantaneous.

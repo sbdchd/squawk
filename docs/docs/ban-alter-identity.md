@@ -8,7 +8,7 @@ title: ban-alter-identity
 Changing identity can make inserts with explicit or omitted values fail. This rule is enabled by default. Check how the old application inserts values before changing identity.
 
 ```sql
-ALTER TABLE t ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY;
+alter table t alter column id add generated always as identity;
 ```
 
 ## solution

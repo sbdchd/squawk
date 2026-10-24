@@ -15,14 +15,14 @@ Instead of:
 
 ```sql
 -- blocks reads and writes
-ALTER TABLE t DETACH PARTITION p;
+alter table t detach partition p;
 ```
 
 Use:
 
 ```sql
 -- allows reads and writes while detaching
-ALTER TABLE t DETACH PARTITION p CONCURRENTLY;
+alter table t detach partition p concurrently;
 ```
 
 ## links

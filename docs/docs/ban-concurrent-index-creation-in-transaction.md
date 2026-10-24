@@ -17,20 +17,20 @@ For migrations that are implicitly wrapped in a transaction, ensure that the `CR
 Instead of:
 
 ```sql
-BEGIN;
+begin;
 -- <any other commands being run transactionally>
-CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
-COMMIT;
+create index concurrently email_idx on app_user (email);
+commit;
 ```
 
 Use:
 
 ```sql
-BEGIN;
+begin;
 -- <any other commands being run transactionally>
-COMMIT;
+commit;
 
-CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
+create index concurrently email_idx on app_user (email);
 ```
 
 If you use a migration tool, it may be configured to automatically wrap commands in transactions; if that's the case, check if it supports running commands in a non-transactional context.

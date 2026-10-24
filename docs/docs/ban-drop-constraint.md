@@ -8,7 +8,7 @@ title: ban-drop-constraint
 Dropping a table, foreign table, or domain constraint, or setting a table constraint to `NOT ENFORCED`, removes a guarantee that clients can depend on. If an old application uses `INSERT ... ON CONFLICT ON CONSTRAINT c` or infers a dropped unique constraint as its conflict arbiter, its inserts fail immediately. This rule is enabled by default.
 
 ```sql
-ALTER TABLE t DROP CONSTRAINT IF EXISTS c;
+alter table t drop constraint if exists c;
 ```
 
 ## solution

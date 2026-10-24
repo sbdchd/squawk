@@ -68,7 +68,7 @@ If you have `assume_in_transaction = true` set globally (via config or CLI flag)
 
 ```sql
 -- squawk-disable-assume-in-transaction
-CREATE INDEX CONCURRENTLY IF NOT EXISTS my_idx ON my_table (col);
+create index concurrently if not exists my_idx on my_table (col);
 ```
 
 ## Files

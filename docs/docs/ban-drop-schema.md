@@ -8,7 +8,7 @@ title: ban-drop-schema
 Dropping a schema may break existing clients. For example, an earlier application revision may still query `s.orders` after a database migration drops `s`. Rolling back the application does not restore the schema, so that query fails. `CASCADE` also drops objects in the schema.
 
 ```sql
-DROP SCHEMA IF EXISTS s CASCADE;
+drop schema if exists s cascade;
 ```
 
 ## solution

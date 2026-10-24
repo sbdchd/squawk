@@ -16,5 +16,5 @@ Adding a generated column and replacing an expression have different risks. The 
 ## Example
 
 ```sql
-ALTER TABLE line_items ALTER COLUMN total DROP EXPRESSION;
+alter table line_items alter column total drop expression;
 ```

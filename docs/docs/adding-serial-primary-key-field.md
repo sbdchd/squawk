@@ -18,16 +18,17 @@ Instead of:
 
 ```sql
 -- blocks reads and writes to "account" table while constraint is added.
-ALTER TABLE account ADD PRIMARY KEY (id);
+alter table account add primary key (id);
 ```
 
 Use:
 
 ```sql
 -- allows reads and writes while index is built
-CREATE UNIQUE INDEX CONCURRENTLY account_pk_idx ON account (id);
+create unique index concurrently account_pk_idx on account (id);
 -- blocks reads and writes while table schema is updated (fast)
-ALTER TABLE account ADD CONSTRAINT account_pk PRIMARY KEY USING INDEX account_pk_idx;
+alter table account
+  add constraint account_pk primary key using index account_pk_idx;
 ```
 
 ## further reading
