@@ -17202,6 +17202,17 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
+        if self.find_primary_key(table).is_some() {
+            let message = format!(
+                "multiple primary keys for table `{}` are not allowed",
+                self.index.names.resolve(self.index.tables[table].name)
+            );
+            self.push_error(
+                DiagnosticKind::MultiplePrimaryKeys,
+                primary_key.syntax(),
+                message,
+            );
+        }
         let name = primary_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
@@ -17217,6 +17228,16 @@ impl Lowerer {
         for column in &columns[..key_len] {
             self.add_not_null_constraint(table, *column, primary_key.syntax(), None);
         }
+    }
+
+    fn find_primary_key(&self, table: TableId) -> Option<ConstraintId> {
+        self.index
+            .constraints
+            .owned_by(ConstraintOwner::Table(table))
+            .find(|id| {
+                self.index.constraints[*id].kind == ConstraintKind::PrimaryKey
+                    && !self.dropped_constraints.contains(id)
+            })
     }
 
     fn lower_unique_constraint(

@@ -90,6 +90,7 @@ pub enum DiagnosticKind {
     DuplicateSource,
     DuplicateWindow,
     DuplicateParam,
+    MultiplePrimaryKeys,
     DuplicateFunction,
     DuplicateConstraint,
     DuplicateTrigger,
