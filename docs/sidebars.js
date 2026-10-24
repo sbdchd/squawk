@@ -37,6 +37,7 @@ module.exports = {
       "ban-alter-domain-with-add-constraint",
       "ban-truncate-cascade",
       "syntax-error",
+      "semantic-error",
       "require-timeout-settings",
       "require-lock-timeout",
       "require-statement-timeout",

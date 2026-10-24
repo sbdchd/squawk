@@ -6,6 +6,7 @@ import {
   find_references,
   folding_ranges,
   goto_definition,
+  goto_type_definition,
   hover,
   inlay_hints,
   selection_ranges,
@@ -13,6 +14,7 @@ import {
   semantic_tokens_legend,
   formatted_semantic_tokens,
   DocumentSymbol,
+  LocationRange,
 } from "./squawk"
 
 export async function provideInlayHints(
@@ -199,22 +201,48 @@ export async function provideDefinition(
 
     if (!results) return null
 
-    return results.map((result) => {
-      const uri = result.file === "current" ? currentUri : builtinsUri
-      return {
-        uri,
-        file: result.file,
-        range: {
-          startLineNumber: result.start_line + 1,
-          startColumn: result.start_column + 1,
-          endLineNumber: result.end_line + 1,
-          endColumn: result.end_column + 1,
-        },
-      }
-    })
+    return results.map(toLocation)
   } catch (e) {
     console.error("Error in provideDefinition:", e)
     return null
+  }
+}
+
+export async function provideTypeDefinition(
+  model: monaco.editor.ITextModel,
+  position: monaco.Position,
+): Promise<monaco.languages.Location | null> {
+  const content = model.getValue()
+  const version = model.getVersionId()
+  if (!content) return null
+
+  try {
+    const result = goto_type_definition(
+      content,
+      version,
+      position.lineNumber - 1,
+      position.column - 1,
+    )
+
+    if (!result) return null
+
+    return toLocation(result)
+  } catch (e) {
+    console.error("Error in provideTypeDefinition:", e)
+    return null
+  }
+}
+
+function toLocation(result: LocationRange): monaco.languages.Location {
+  const uri = result.file === "current" ? currentUri : builtinsUri
+  return {
+    uri,
+    range: {
+      startLineNumber: result.start_line + 1,
+      startColumn: result.start_column + 1,
+      endLineNumber: result.end_line + 1,
+      endColumn: result.end_column + 1,
+    },
   }
 }
 

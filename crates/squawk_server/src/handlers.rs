@@ -5,6 +5,7 @@ mod document_symbol;
 mod folding_range;
 mod formatting;
 mod goto_definition;
+mod goto_type_definition;
 mod hover;
 mod inlay_hints;
 mod notifications;
@@ -22,6 +23,7 @@ pub(crate) use document_symbol::handle_document_symbol;
 pub(crate) use folding_range::handle_folding_range;
 pub(crate) use formatting::handle_formatting;
 pub(crate) use goto_definition::handle_goto_definition;
+pub(crate) use goto_type_definition::handle_goto_type_definition;
 pub(crate) use hover::handle_hover;
 pub(crate) use inlay_hints::handle_inlay_hints;
 pub(crate) use notifications::{

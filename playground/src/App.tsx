@@ -26,6 +26,7 @@ import {
   provideInlayHints,
   provideHover,
   provideDefinition,
+  provideTypeDefinition,
   provideReferences,
   provideDocumentSymbols,
   provideFoldingRanges,
@@ -680,6 +681,11 @@ function registerMonacoProvidersOnce() {
     },
   )
 
+  const typeDefinitionProvider =
+    monaco.languages.registerTypeDefinitionProvider("pgsql", {
+      provideTypeDefinition,
+    })
+
   const referencesProvider = monaco.languages.registerReferenceProvider(
     "pgsql",
     {
@@ -733,6 +739,7 @@ function registerMonacoProvidersOnce() {
     codeActionProvider.dispose()
     hoverProvider.dispose()
     definitionProvider.dispose()
+    typeDefinitionProvider.dispose()
     referencesProvider.dispose()
     documentSymbolProvider.dispose()
     foldingRangeProvider.dispose()

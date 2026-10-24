@@ -376,29 +376,17 @@ impl SquawkDatabase {
 
         let response: Vec<LocationRange> = result
             .into_iter()
-            .map(|loc| {
-                let range = loc.value;
-                let file = loc.file_id.original_file(&self.db);
-                let line_index = db::line_index(&self.db, file);
-                let file = file_string(&self.db, file);
-                let start = line_index.line_col(range.start());
-                let end = line_index.line_col(range.end());
-                let start_wide = line_index
-                    .to_wide(squawk_line_index::WideEncoding::Utf16, start)
-                    .unwrap();
-                let end_wide = line_index
-                    .to_wide(squawk_line_index::WideEncoding::Utf16, end)
-                    .unwrap();
-
-                LocationRange {
-                    file: file.to_string(),
-                    start_line: start_wide.line,
-                    start_column: start_wide.col,
-                    end_line: end_wide.line,
-                    end_column: end_wide.col,
-                }
-            })
+            .map(|loc| location_range(&self.db, loc))
             .collect();
+
+        serde_wasm_bindgen::to_value(&response).map_err(into_error)
+    }
+
+    pub fn goto_type_definition(&self, line: u32, col: u32) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let position = position_to_offset(&self.db, file, line, col)?;
+        let response = squawk_ide::goto_type_definition::goto_type_definition(&self.db, position)
+            .map(|loc| location_range(&self.db, loc));
 
         serde_wasm_bindgen::to_value(&response).map_err(into_error)
     }
@@ -422,27 +410,7 @@ impl SquawkDatabase {
         let references = squawk_ide::find_references::find_references(&self.db, position);
         let locations: Vec<LocationRange> = references
             .iter()
-            .map(|loc| {
-                let file = loc.file_id.original_file(&self.db);
-                let line_index = db::line_index(&self.db, file);
-                let file = file_string(&self.db, file);
-                let start = line_index.line_col(loc.value.start());
-                let end = line_index.line_col(loc.value.end());
-                let start_wide = line_index
-                    .to_wide(squawk_line_index::WideEncoding::Utf16, start)
-                    .unwrap();
-                let end_wide = line_index
-                    .to_wide(squawk_line_index::WideEncoding::Utf16, end)
-                    .unwrap();
-
-                LocationRange {
-                    file: file.to_string(),
-                    start_line: start_wide.line,
-                    start_column: start_wide.col,
-                    end_line: end_wide.line,
-                    end_column: end_wide.col,
-                }
-            })
+            .map(|loc| location_range(&self.db, *loc))
             .collect();
 
         serde_wasm_bindgen::to_value(&locations).map_err(into_error)
@@ -698,6 +666,27 @@ fn file_string(db: &Database, file: File) -> &'static str {
 
 fn into_error<E: std::fmt::Display>(err: E) -> Error {
     Error::new(&err.to_string())
+}
+
+fn location_range(db: &Database, loc: InFile<TextRange>) -> LocationRange {
+    let file = loc.file_id.original_file(db);
+    let line_index = db::line_index(db, file);
+    let start = line_index.line_col(loc.value.start());
+    let end = line_index.line_col(loc.value.end());
+    let start_wide = line_index
+        .to_wide(squawk_line_index::WideEncoding::Utf16, start)
+        .unwrap();
+    let end_wide = line_index
+        .to_wide(squawk_line_index::WideEncoding::Utf16, end)
+        .unwrap();
+
+    LocationRange {
+        file: file_string(db, file).to_string(),
+        start_line: start_wide.line,
+        start_column: start_wide.col,
+        end_line: end_wide.line,
+        end_column: end_wide.col,
+    }
 }
 
 fn position_to_offset(

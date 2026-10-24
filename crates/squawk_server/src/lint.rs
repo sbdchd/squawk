@@ -78,6 +78,10 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
         let diagnostic = Diagnostic {
             range: diagnostic_range(line_index, error.range.value),
             severity: Some(DiagnosticSeverity::Error),
+            code: Some(Code::String("semantic-error".to_string())),
+            code_description: Some(CodeDescription {
+                href: Url::parse("https://squawkhq.com/docs/semantic-error").unwrap(),
+            }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
             message: Message::String(message),
             ..Default::default()
@@ -163,7 +167,7 @@ mod test {
     fn syntax_error() {
         assert_snapshot!(check("select from t where;"), @"
         0:19 Error syntax-error: expected an expression, found SEMICOLON
-        0:12 Error -: relation `t` does not exist
+        0:12 Error semantic-error: relation `t` does not exist
         ");
     }
 
@@ -174,7 +178,7 @@ create table t(a int);
 create table t(b int);
 ";
         assert_snapshot!(check(sql), @"
-        2:13 Error -: relation `t` already exists
+        2:13 Error semantic-error: relation `t` already exists
         1:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
         1:17 Warning prefer-bigint-over-int: Using 32-bit integer fields can result in hitting the max `int` limit.
         2:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
@@ -188,7 +192,7 @@ create table t(b int);
 with t as (select 1 a)
 select a, b from t;
 ";
-        assert_snapshot!(check(sql), @"2:10 Error -: column `b` does not exist");
+        assert_snapshot!(check(sql), @"2:10 Error semantic-error: column `b` does not exist");
     }
 
     #[test]

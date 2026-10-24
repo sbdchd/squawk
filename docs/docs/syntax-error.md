@@ -39,3 +39,7 @@ Fix the syntax error.
 :::note
 Squawk might be mistaken, if you think that's the case, please [open an issue](https://github.com/sbdchd/squawk/issues/new)!
 :::
+
+## related
+
+[`semantic-error`](./semantic-error.md)
