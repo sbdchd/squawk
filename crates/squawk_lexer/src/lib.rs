@@ -1,6 +1,6 @@
 mod cursor;
 mod token;
-use cursor::{Cursor, EOF_CHAR};
+use cursor::Cursor;
 pub use token::{Base, LiteralKind, Token, TokenKind};
 
 // via: https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L346
@@ -241,7 +241,7 @@ impl Cursor<'_> {
         ) || command.eq_ignore_ascii_case("copy")
             || (takes_pipe && self.first() == '|');
         if reads_whole_line {
-            self.eat_while(|c| !matches!(c, '\n' | '\r'));
+            self.eat_until2(b'\n', b'\r');
             return TokenKind::PsqlCommand { ends_query };
         }
         while !self.at_psql_args_end() {
@@ -307,7 +307,7 @@ impl Cursor<'_> {
     pub(crate) fn line_comment(&mut self) -> TokenKind {
         self.bump();
 
-        self.eat_while(|c| c != '\n' && c != '\r');
+        self.eat_until2(b'\n', b'\r');
         TokenKind::LineComment
     }
 
@@ -316,7 +316,11 @@ impl Cursor<'_> {
         self.bump();
 
         let mut depth = 1usize;
-        while let Some(c) = self.bump() {
+        loop {
+            self.eat_until2(b'/', b'*');
+            let Some(c) = self.bump() else {
+                break;
+            };
             match c {
                 '/' if self.first() == '*' => {
                     self.bump();
@@ -450,57 +454,42 @@ impl Cursor<'_> {
     }
 
     fn single_quoted_string(&mut self, backslash_escapes: bool) -> bool {
-        // Parse until either quotes are terminated or error is detected.
         loop {
-            match self.first() {
-                '\\' if backslash_escapes => {
-                    // backslash
-                    self.bump();
-                    // escaped char
+            if backslash_escapes {
+                self.eat_until2(b'\'', b'\\');
+            } else {
+                self.eat_until(b'\'');
+            }
+            match self.bump() {
+                Some('\\') if backslash_escapes => {
                     self.bump();
                 }
-                // Quotes might be terminated.
-                '\'' => {
-                    self.bump();
-
-                    match self.first() {
-                        // encountered an escaped quote ''
-                        '\'' => {
-                            self.bump();
-                        }
-                        // encountered terminating quote
-                        _ => return true,
+                Some('\'') => {
+                    if self.first() == '\'' {
+                        self.bump();
+                    } else {
+                        return true;
                     }
                 }
-                // End of file, stop parsing.
-                EOF_CHAR if self.is_eof() => break,
-                // Skip the character.
-                _ => {
-                    self.bump();
-                }
+                _ => return false,
             }
         }
-        // String was not terminated.
-        false
     }
 
     /// Eats double-quoted string and returns true
     /// if string is terminated.
     fn double_quoted_string(&mut self) -> bool {
-        while let Some(c) = self.bump() {
-            match c {
-                '"' if self.first() == '"' => {
-                    // Bump again to skip escaped character.
-                    self.bump();
-                }
-                '"' => {
-                    return true;
-                }
-                _ => (),
+        loop {
+            self.eat_until(b'"');
+            if self.bump().is_none() {
+                return false;
+            }
+            if self.first() == '"' {
+                self.bump();
+            } else {
+                return true;
             }
         }
-        // End of file reached.
-        false
     }
 
     /// Check for `$$` and `$tag$`
@@ -544,7 +533,7 @@ impl Cursor<'_> {
         // we have a dollar quoted string deliminated with `$$`
         if start.is_empty() {
             loop {
-                self.eat_while(|c| c != '$');
+                self.eat_until(b'$');
                 if self.is_eof() {
                     return TokenKind::Literal {
                         kind: LiteralKind::DollarQuotedString { terminated: false },
@@ -561,7 +550,7 @@ impl Cursor<'_> {
             }
         } else {
             loop {
-                self.eat_while(|c| c != '$');
+                self.eat_until(b'$');
                 if self.is_eof() {
                     return TokenKind::Literal {
                         kind: LiteralKind::DollarQuotedString { terminated: false },
@@ -1184,6 +1173,128 @@ e'\uAAAA \UFFFFFFFF'
         assert_debug_snapshot!(lex(r"E'foo\\'"), @r#"
         [
             "E'foo\\\\'" @ Literal { kind: EscStr { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn string_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select 'é\0漢𐐷''尾';"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "'é\0漢𐐷''尾'" @ Literal { kind: Str { terminated: true } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn unterminated_string_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select 'é\0漢𐐷"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "'é\0漢𐐷" @ Literal { kind: Str { terminated: false } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select E'\\é\\𐐷\0''尾';"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "E'\\é\\𐐷\0''尾'" @ Literal { kind: EscStr { terminated: true } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_with_unicode_and_trailing_backslash() {
+        assert_debug_snapshot!(lex("select E'漢\\"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "E'漢\\" @ Literal { kind: EscStr { terminated: false } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn quoted_ident_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select \"é\0漢𐐷\"\"尾\";"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "\"é\0漢𐐷\"\"尾\"" @ QuotedIdent { terminated: true, uescape: false },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn unterminated_quoted_ident_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select \"é\0漢𐐷"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "\"é\0漢𐐷" @ QuotedIdent { terminated: false, uescape: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn line_comment_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select 1; --é\0漢𐐷\r\nselect 2;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            " " @ Whitespace,
+            "--é\0漢𐐷" @ LineComment,
+            "\r\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn line_comment_with_unicode_and_nul_at_eof() {
+        assert_debug_snapshot!(lex("--é\0漢𐐷"), @r#"
+        [
+            "--é\0漢𐐷" @ LineComment,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn nested_block_comment_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select /*é\0/*漢𐐷*/*/ 1;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "/*é\0/*漢𐐷*/*/" @ BlockComment { terminated: true },
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn unterminated_nested_block_comment_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select /*é\0/*漢𐐷*/"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "/*é\0/*漢𐐷*/" @ BlockComment { terminated: false },
         ]
         "#);
     }

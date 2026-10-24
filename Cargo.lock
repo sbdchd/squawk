@@ -2518,6 +2518,7 @@ name = "squawk-lexer"
 version = "2.70.0"
 dependencies = [
  "insta",
+ "memchr",
 ]
 
 [[package]]
