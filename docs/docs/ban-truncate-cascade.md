@@ -26,18 +26,16 @@ You'd end up with `a`, `b`, & `c` all being truncated!
 Setup:
 
 ```sql
-create table a (
-  a_id int primary key
-);
+create table a (a_id int primary key);
 create table b (
   b_id int primary key,
   a_id int,
-  foreign key (a_id) references a(a_id)
+  foreign key (a_id) references a (a_id)
 );
 create table c (
   c_id int primary key,
   b_id int,
-  foreign key (b_id) references b(b_id)
+  foreign key (b_id) references b (b_id)
 );
 insert into a (a_id) values (1), (2), (3);
 insert into b (b_id, a_id) values (101, 1), (102, 2), (103, 3);

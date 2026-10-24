@@ -8,7 +8,7 @@ title: ban-set-default
 A changed default can make existing clients write different values when they omit a column of a table, foreign table, or view, or a domain value. This rule is opt-in.
 
 ```sql
-ALTER TABLE t ALTER COLUMN c SET DEFAULT 1;
+alter table t alter column c set default 1;
 ```
 
 ## solution

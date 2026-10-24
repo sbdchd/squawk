@@ -17,16 +17,17 @@ Instead of:
 
 ```sql
 -- blocks reads and writes to table_name while constraint is validated.
-ALTER TABLE distributors ADD CONSTRAINT dist_id_uniq UNIQUE (dist_id);
+alter table distributors add constraint dist_id_uniq unique (dist_id);
 ```
 
 Use:
 
 ```sql
 -- allows reads and writes while index is built
-CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
+create unique index concurrently dist_id_uniq on distributors (dist_id);
 -- add constraint using the built index
-ALTER TABLE distributors ADD CONSTRAINT distributors_dist_id_key UNIQUE USING INDEX dist_id_uniq;
+alter table distributors
+  add constraint distributors_dist_id_key unique using index dist_id_uniq;
 ```
 
 Instead of:
@@ -41,11 +42,12 @@ Use:
 
 ```sql
 -- add nullable column separately to prevent blocking read/writes.
-ALTER TABLE distributors ADD COLUMN dist_id text;
+alter table distributors add column dist_id text;
 -- allows reads and writes while index is built
-CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
+create unique index concurrently dist_id_uniq on distributors (dist_id);
 -- add constraint using the built index
-ALTER TABLE distributors ADD CONSTRAINT distributors_dist_id_key UNIQUE USING INDEX dist_id_uniq;
+alter table distributors
+  add constraint distributors_dist_id_key unique using index dist_id_uniq;
 ```
 
 ## solution for alembic and sqlalchemy

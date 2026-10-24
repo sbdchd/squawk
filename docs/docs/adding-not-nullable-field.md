@@ -20,22 +20,22 @@ Modifying a column to be `NOT NULL` may fail if the column contains records with
 Instead of:
 
 ```sql
-ALTER TABLE "recipe" ALTER COLUMN "view_count" SET NOT NULL;
+alter table recipe alter column view_count set not null;
 ```
 
 Use:
 
 ```sql
-ALTER TABLE "recipe" ADD CONSTRAINT view_count_not_null
-    CHECK ("view_count" IS NOT NULL) NOT VALID;
+alter table recipe
+  add constraint view_count_not_null check (view_count is not null) not valid;
 
 -- Backfill column so it's not null
 -- Update ...
 
-ALTER TABLE "recipe" VALIDATE CONSTRAINT view_count_not_null;
+alter table recipe validate constraint view_count_not_null;
 
 -- If pg version >= 12, set not null without doing a table scan
-ALTER TABLE table_name ALTER COLUMN column_name SET NOT NULL;
+alter table table_name alter column column_name set not null;
 ```
 
 For each step, note that:

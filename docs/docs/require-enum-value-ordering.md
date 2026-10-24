@@ -11,7 +11,7 @@ This can lead to unexpected ordering, especially when enum values have a meaning
 
 ```sql
 -- existing type
-CREATE TYPE status AS ENUM (
+create type status as enum (
   'draft',
   'submitted',
   'approved',
@@ -21,7 +21,7 @@ CREATE TYPE status AS ENUM (
 select * from papers where status < 'approved';
 
 -- bad
-ALTER TYPE status ADD VALUE 'pending_review';
+alter type status add value 'pending_review';
 
 -- now our query isn't including any of the 'pending_review' items!
 ```
@@ -32,7 +32,7 @@ Explicitly specify where the new value should be inserted using `BEFORE` or `AFT
 
 ```sql
 -- existing type
-CREATE TYPE status AS ENUM (
+create type status as enum (
   'draft',
   'submitted',
   'approved',
@@ -43,9 +43,9 @@ CREATE TYPE status AS ENUM (
 select * from papers where status < 'approved';
 
 -- good
-ALTER TYPE status ADD VALUE 'pending_review' BEFORE 'approved';
+alter type status add value 'pending_review' before 'approved';
 -- or
-ALTER TYPE status ADD VALUE 'pending_review' AFTER 'submitted';
+alter type status add value 'pending_review' after 'submitted';
 ```
 
 ## links

@@ -19,14 +19,14 @@ Instead of:
 
 ```sql
 -- blocks reads and writes to table
-DROP INDEX "app"."email_idx";
+drop index app.email_idx;
 ```
 
 Use:
 
 ```sql
 -- allows reads and writes to table while Postgres waits for conflicting transactions to finish
-DROP INDEX CONCURRENTLY "app"."email_idx";
+drop index concurrently app.email_idx;
 ```
 
 ## solution for alembic and sqlalchemy

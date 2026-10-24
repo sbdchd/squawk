@@ -16,17 +16,13 @@ Use 64 bit integer field instead, like `BIGSERIAL` or `BIGINT`.
 Instead of:
 
 ```sql
-CREATE TABLE posts (
-  id smallserial primary key
-)
+create table posts (id smallserial primary key)
 ```
 
 Use:
 
 ```sql
-CREATE TABLE posts (
-  id bigserial primary key
-)
+create table posts (id bigserial primary key)
 ```
 
 ### smallint
@@ -34,17 +30,13 @@ CREATE TABLE posts (
 Instead of:
 
 ```sql
-CREATE TABLE posts (
-  id smallint primary key
-)
+create table posts (id smallint primary key)
 ```
 
 Use:
 
 ```sql
-CREATE TABLE posts (
-  id bigint primary key
-)
+create table posts (id bigint primary key)
 ```
 
 ## related

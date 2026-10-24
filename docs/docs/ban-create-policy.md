@@ -8,7 +8,7 @@ title: ban-create-policy
 `CREATE POLICY` can change access for existing clients when row level security is enabled. This rule is opt-in.
 
 ```sql
-CREATE POLICY p ON accounts TO app_user USING (owner_id = current_user_id());
+create policy p on accounts to app_user using (owner_id = current_user_id());
 ```
 
 ## solution

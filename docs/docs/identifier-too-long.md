@@ -29,9 +29,7 @@ Query 1 OK: CREATE TABLE
 Shorten the identifier!
 
 ```sql
-create table a_shorter_table_name (
-  a_shorter_column_name bigint
-);
+create table a_shorter_table_name (a_shorter_column_name bigint);
 ```
 
 ## links

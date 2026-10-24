@@ -8,7 +8,8 @@ title: ban-replace-view-function
 `CREATE OR REPLACE` on a view, function, procedure, trigger, rule, or aggregate can change returned values or side effects for existing clients without changing their SQL. This rule is opt-in.
 
 ```sql
-CREATE OR REPLACE VIEW v AS SELECT 1 AS id;
+create or replace view v as
+  select 1 as id;
 ```
 
 ## solution

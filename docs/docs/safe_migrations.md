@@ -26,7 +26,7 @@ You can set this timeout in a few ways:
 
 ```sql
 -- set the global Postgres lock timeout to 1 second
-SET lock_timeout = '1s';
+set lock_timeout = '1s';
 ```
 
 ```bash
@@ -53,7 +53,8 @@ set statement_timeout = '5s';
 This statement requires an `AccessExclusiveLock` lock on `"accounts"`. Reads and writes to `"accounts"` will be blocked while this statement is running.
 
 ```sql
-ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) NOT VALID
+alter table accounts
+  add constraint positive_balance check (balance >= 0) not valid
 ```
 
 If there is a long running query or open transaction, this `ALTER TABLE` statement could be blocked while it waits for an `AccessExclusiveLock` lock. While the statement waits for a lock, all other reads and writes sent after will wait for this statement too, bringing your application to a halt.

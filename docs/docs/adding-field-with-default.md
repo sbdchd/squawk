@@ -21,7 +21,7 @@ This statement is only safe when your default is non-volatile.
 :::
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
+alter table core_recipe add column foo integer default 10 not null;
 ```
 
 ### adding a volatile default
@@ -31,16 +31,16 @@ Add the field as nullable, then set a default, backfill, and remove nullabilty.
 Instead of:
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
+alter table core_recipe add column foo integer default 10 not null;
 ```
 
 Use:
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
-ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
+alter table core_recipe add column foo integer;
+alter table core_recipe alter column foo set default 10;
 -- backfill column in batches
-ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
+alter table core_recipe alter column foo set not null;
 ```
 
 We add our column as nullable, set a default for new rows, backfill our column (ideally done in batches to limit locking), and finally remove nullability.
@@ -56,28 +56,31 @@ Instead of using a generated column, use a trigger.
 Instead of:
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer GENERATED ALWAYS as ("bar" + "baz") STORED;
+alter table core_recipe
+  add column foo integer generated always as (bar + baz) stored;
 ```
 
 Use:
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
+alter table core_recipe add column foo integer;
 
 -- backfill column in batches
 
 -- add a trigger to match the generated column behavior
-CREATE FUNCTION foo_update_trigger()
-RETURNS trigger AS '
+create function foo_update_trigger() returns trigger
+  as '
 BEGIN
 NEW.foo := NEW.bar + NEW.baz;
 RETURN NEW;
-END' LANGUAGE 'plpgsql';
+END'
+  language 'plpgsql';
 
-CREATE TRIGGER update_foo_column
-BEFORE INSERT ON core_recipe
-FOR EACH ROW
-EXECUTE PROCEDURE foo_update_trigger();
+create trigger update_foo_column
+  before insert
+  on core_recipe
+  for each row
+  execute procedure foo_update_trigger();
 ```
 
 ## solution for alembic and sqlalchemy

@@ -8,7 +8,7 @@ title: ban-drop-policy
 Dropping a policy or rule changes access or rewrite behaviour for existing clients. This rule is opt-in.
 
 ```sql
-DROP POLICY IF EXISTS p ON t;
+drop policy if exists p on t;
 ```
 
 ## solution

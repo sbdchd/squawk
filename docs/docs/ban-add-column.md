@@ -8,7 +8,7 @@ title: ban-add-column
 Adding a column to an existing table or foreign table changes the shape of `SELECT *` results and can break positional inserts from existing clients. This rule is opt-in. An unconditional `CREATE TABLE` earlier in the file suppresses a warning for that new table.
 
 ```sql
-ALTER TABLE accounts ADD COLUMN status text;
+alter table accounts add column status text;
 ```
 
 ## solution

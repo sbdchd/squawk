@@ -8,7 +8,7 @@ title: ban-alter-row-level-security
 `ALTER TABLE` with `ENABLE`, `DISABLE`, `FORCE`, or `NO FORCE ROW LEVEL SECURITY` changes access for existing clients. This rule is opt-in.
 
 ```sql
-ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
+alter table accounts enable row level security;
 ```
 
 ## solution
