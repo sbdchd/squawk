@@ -13426,6 +13426,7 @@ impl Lowerer {
     }
 
     fn lower_with(&mut self, with_clause: &ast::WithClause) {
+        self.check_duplicate_ctes(with_clause);
         if with_clause.recursive_token().is_some() {
             self.lower_recursive_with(with_clause);
             return;
@@ -13462,6 +13463,24 @@ impl Lowerer {
         while self.pending_ctes.len() > mark {
             let pending = self.pending_ctes.remove(mark);
             self.lower_pending_cte(&pending);
+        }
+    }
+
+    fn check_duplicate_ctes(&mut self, with_clause: &ast::WithClause) {
+        let mut seen: SmallVec<[Name; 8]> = smallvec![];
+        for cte_name in with_clause
+            .with_tables()
+            .filter_map(|with_table| with_table.name())
+        {
+            let name = self.intern(&cte_name.text());
+            if seen.contains(&name) {
+                let message = format!(
+                    "WITH query name `{}` specified more than once",
+                    self.index.names.resolve(name)
+                );
+                self.push_error(DiagnosticKind::DuplicateCte, cte_name.syntax(), message);
+            }
+            seen.push(name);
         }
     }
 

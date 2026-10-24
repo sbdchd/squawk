@@ -154,3 +154,21 @@ select id from (select * from a join b using (id)) s;
       ╰╴         ━
     ");
 }
+
+#[test]
+fn duplicate_cte_name() {
+    assert_snapshot!(check("
+with x as (select 1), x as (select 2) select 1;
+with recursive x as (select 1), x as (select 2) select 1;
+with x as (select 1) select 1 from (with x as (select 2) select 1) s;
+"), @"
+    error: WITH query name `x` specified more than once
+      ╭▸ 
+    2 │ with x as (select 1), x as (select 2) select 1;
+      ╰╴                      ━
+    error: WITH query name `x` specified more than once
+      ╭▸ 
+    3 │ with recursive x as (select 1), x as (select 2) select 1;
+      ╰╴                                ━
+    ");
+}
