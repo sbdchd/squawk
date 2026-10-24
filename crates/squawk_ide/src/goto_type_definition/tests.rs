@@ -2,12 +2,16 @@ use insta::assert_snapshot;
 
 use crate::test_utils::render_goto;
 
-use crate::goto_type_definition::goto_type_definition;
+use crate::goto_type_definition::goto_type_definition_with_index;
 
 #[track_caller]
 fn goto(sql: &str) -> String {
-    render_goto(&[sql], "goto type definition", goto_type_definition)
-        .unwrap_or_else(|| "no type definition".to_string())
+    render_goto(
+        &[sql],
+        "goto type definition",
+        goto_type_definition_with_index,
+    )
+    .unwrap_or_else(|| "no type definition".to_string())
 }
 
 #[test]

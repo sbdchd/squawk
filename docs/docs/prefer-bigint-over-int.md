@@ -3,7 +3,6 @@ id: prefer-bigint-over-int
 title: prefer-bigint-over-int
 ---
 
-
 ## problem
 
 Using 32 bit integer fields can result in hitting the max int limit.
@@ -11,7 +10,6 @@ Using 32 bit integer fields can result in hitting the max int limit.
 ## solution
 
 Use 64 bit integer field instead, like `BIGSERIAL` or `BIGINT`.
-
 
 ### serial
 
@@ -30,7 +28,6 @@ CREATE TABLE posts (
   id bigserial primary key
 )
 ```
-
 
 ### int
 

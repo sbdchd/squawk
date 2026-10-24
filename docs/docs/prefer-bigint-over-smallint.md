@@ -3,7 +3,6 @@ id: prefer-bigint-over-smallint
 title: prefer-bigint-over-smallint
 ---
 
-
 ## problem
 
 Using 16 bit integer fields can result in hitting the max int limit.
@@ -11,7 +10,6 @@ Using 16 bit integer fields can result in hitting the max int limit.
 ## solution
 
 Use 64 bit integer field instead, like `BIGSERIAL` or `BIGINT`.
-
 
 ### smallserial
 
@@ -30,7 +28,6 @@ CREATE TABLE posts (
   id bigserial primary key
 )
 ```
-
 
 ### smallint
 

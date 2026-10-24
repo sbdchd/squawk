@@ -53,7 +53,7 @@ def schema_upgrades():
             unique=False,
             postgresql_concurrently=True,
         )
-    
+
     # <any other commands being run transactionally>
 
 def schema_downgrades():

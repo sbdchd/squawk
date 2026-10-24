@@ -19,7 +19,7 @@ use gen_lsp_types::{
     CodeActionRequest, CompletionRequest, DefinitionRequest, DocumentDiagnosticRequest,
     DocumentFormattingRequest, DocumentSymbolRequest, FoldingRangeRequest, HoverRequest,
     InlayHintRequest, ReferencesRequest, SelectionRangeRequest, SemanticTokensRangeRequest,
-    SemanticTokensRequest, ShutdownRequest,
+    SemanticTokensRequest, ShutdownRequest, TypeDefinitionRequest,
 };
 
 use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
@@ -27,9 +27,9 @@ use crate::handlers::{
     SyntaxTreeRequest, TokensRequest, handle_cancel, handle_code_action, handle_completion,
     handle_did_change, handle_did_close, handle_did_open, handle_document_diagnostic,
     handle_document_symbol, handle_folding_range, handle_formatting, handle_goto_definition,
-    handle_hover, handle_inlay_hints, handle_references, handle_selection_range,
-    handle_semantic_tokens_full, handle_semantic_tokens_range, handle_shutdown, handle_syntax_tree,
-    handle_tokens,
+    handle_goto_type_definition, handle_hover, handle_inlay_hints, handle_references,
+    handle_selection_range, handle_semantic_tokens_full, handle_semantic_tokens_range,
+    handle_shutdown, handle_syntax_tree, handle_tokens,
 };
 
 type ReqQueue = lsp_server::ReqQueue<(String, Instant), ()>;
@@ -256,6 +256,9 @@ impl GlobalState {
             .on::<NO_RETRY, DefinitionRequest>(|snapshot, params| {
                 Ok(Some(handle_goto_definition(snapshot, params)))
             })
+            .on::<NO_RETRY, TypeDefinitionRequest>(|snapshot, params| {
+                Ok(handle_goto_type_definition(snapshot, params))
+            })
             .on::<NO_RETRY, HoverRequest>(|snapshot, params| Ok(handle_hover(snapshot, params)))
             .on::<NO_RETRY, CodeActionRequest>(handle_code_action)
             .on::<NO_RETRY, InlayHintRequest>(|snapshot, params| {
@@ -307,6 +310,10 @@ impl Snapshot {
 
     pub(crate) fn uri(&self, file: File) -> Option<Url> {
         self.uris.get(&file).cloned()
+    }
+
+    pub(crate) fn is_builtins(&self, uri: &Url) -> bool {
+        self.uris.get(&builtins_file(&self.db)) == Some(uri)
     }
 }
 

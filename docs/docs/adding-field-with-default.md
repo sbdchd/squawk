@@ -12,7 +12,6 @@ Adding a field with a default can cause table rewrites, which will take an [`ACC
 In Postgres version 11 and later, adding a field with a non-`VOLATILE` `DEFAULT` will not require a table rewrite. Adding a field with a [`VOLATILE` `DEFAULT` will cause a table rewrite](https://www.postgresql.org/docs/14/sql-altertable.html#SQL-ALTERTABLE-NOTES).
 :::
 
-
 ## solutions
 
 ### adding a non-volatile default in Postgres 11+
@@ -48,13 +47,11 @@ We add our column as nullable, set a default for new rows, backfill our column (
 
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
 
-
 ### Adding a generated column
 
 Adding a generated column in Postgres will cause a table rewrite, locking the table while the update completes.
 
 Instead of using a generated column, use a trigger.
-
 
 Instead of:
 
@@ -127,7 +124,7 @@ def schema_upgrades():
     op.execute(
         sa.text("""UPDATE core_recipe SET foo = 10"""),
     )
-    
+
 
 def schema_downgrades():
     op.drop_column("core_recipe", "foo")

@@ -44,7 +44,7 @@ Run `VALIDATE CONSTRAINT` to scan the `"email"` table in the background while re
 
 ### adding constraint to new table
 
-Both of these examples have the same amount of locking. Since the newly created table has no rows, you don't need to add a foreign key with `NOT VALID`. 
+Both of these examples have the same amount of locking. Since the newly created table has no rows, you don't need to add a foreign key with `NOT VALID`.
 
 Adding foreign key constraint in `create table` statement.
 
@@ -79,10 +79,9 @@ ALTER TABLE "email" ADD CONSTRAINT "fk_user"
 ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 ```
 
-
 ## solution for alembic and sqlalchemy
 
-### adding constraint to existing table ###
+### adding constraint to existing table
 
 Instead of:
 
@@ -152,19 +151,19 @@ from alembic import op
 def schema_upgrades():
     op.add_column("email", sa.Column("user_id", sa.BigInteger(), nullable=True))
     op.create_foreign_key(
-        "fk_user", 
-        "email", 
-        "user", 
-        ["user_id"], 
-        ["id"], 
+        "fk_user",
+        "email",
+        "user",
+        ["user_id"],
+        ["id"],
         postgresql_not_valid=True
     )
 
 
 def schema_downgrades():
     op.drop_constraint(
-        "fk_user", 
-        "email", 
+        "fk_user",
+        "email",
         type_="foreignkey"
     )
     op.drop_column("email", "user_id")
@@ -184,7 +183,6 @@ def schema_upgrades():
         ),
     )
 ```
-
 
 ### adding constraint to new table
 

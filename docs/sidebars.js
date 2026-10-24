@@ -1,6 +1,14 @@
 module.exports = {
   someSidebar: {
-    General: ["quick_start", "safe_migrations", "cli", "github_app", "web-frameworks", "postgres-locks", "troubleshooting"],
+    General: [
+      "quick_start",
+      "safe_migrations",
+      "cli",
+      "github_app",
+      "web-frameworks",
+      "postgres-locks",
+      "troubleshooting",
+    ],
     Rules: [
       "rules",
       "adding-field-with-default",
@@ -37,6 +45,7 @@ module.exports = {
       "ban-alter-domain-with-add-constraint",
       "ban-truncate-cascade",
       "syntax-error",
+      "semantic-error",
       "require-timeout-settings",
       "require-lock-timeout",
       "require-statement-timeout",

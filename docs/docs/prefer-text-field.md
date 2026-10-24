@@ -31,7 +31,6 @@ CREATE TABLE "app_user" (
 ALTER TABLE "app_user" ADD CONSTRAINT "text_size" CHECK (LENGTH("email") <= 100);
 ```
 
-
 ## solution for alembic and sqlalchemy
 
 Instead of:

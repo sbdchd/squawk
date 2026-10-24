@@ -172,7 +172,7 @@ impl std::fmt::Display for TypeName<'_> {
 }
 
 #[derive(Debug)]
-pub struct SemanticIndex {
+pub(crate) struct SemanticIndex {
     // Wrap IndexData so we don't expose a mutable version of the SemanticIndex.
     // All mutation of it happens during lowering.
     data: IndexData,
@@ -193,7 +193,7 @@ impl Deref for SemanticIndex {
 }
 
 #[derive(Debug)]
-pub struct IndexData {
+pub(crate) struct IndexData {
     pub(crate) names: Interner,
     pub(crate) tables: TableIndex,
     pub(crate) types: TypeIndex,
@@ -450,7 +450,7 @@ impl IndexData {
             .copied()
     }
 
-    pub fn diagnostics(&self) -> Vec<Diagnostic> {
+    pub(crate) fn diagnostics(&self) -> Vec<Diagnostic> {
         self.references
             .iter_local()
             .filter_map(|(_, reference)| {

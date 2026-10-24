@@ -51,7 +51,6 @@ alter table app.users
     alter column modified_ts type timestamptz
 ```
 
-
 ## solution for alembic and sqlalchemy
 
 Instead of:
@@ -75,7 +74,6 @@ class User(BaseModel):
     created_ts = sa.Column(sa.DateTime(timezone=True))
     modified_ts = sa.Column(sa.DateTime(timezone=True))
 ```
-
 
 ## links
 

@@ -13,6 +13,7 @@ pub(crate) fn handle_document_diagnostic(
 
     let diagnostics = snapshot
         .file(&uri)
+        .filter(|_| !snapshot.is_builtins(&uri))
         .map(|file| crate::lint::lint(snapshot.db(), file))
         .unwrap_or_default();
 

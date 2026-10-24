@@ -5,7 +5,7 @@ use gen_lsp_types::{
     FoldingRangeProvider, Full, HoverProvider, InitializeParams, InlayHintProvider,
     ReferencesProvider, SelectionRangeProvider, SemanticTokensLegend, SemanticTokensOptions,
     SemanticTokensOptionsRange, SemanticTokensProvider, ServerCapabilities, TextDocumentSync,
-    TextDocumentSyncKind, WorkDoneProgressOptions,
+    TextDocumentSyncKind, TypeDefinitionProvider, WorkDoneProgressOptions,
 };
 use log::info;
 use lsp_server::Connection;
@@ -36,6 +36,7 @@ pub fn run() -> Result<()> {
         selection_range_provider: Some(SelectionRangeProvider::Bool(true)),
         references_provider: Some(ReferencesProvider::Bool(true)),
         definition_provider: Some(DefinitionProvider::Bool(true)),
+        type_definition_provider: Some(TypeDefinitionProvider::Bool(true)),
         hover_provider: Some(HoverProvider::Bool(true)),
         inlay_hint_provider: Some(InlayHintProvider::Bool(true)),
         diagnostic_provider: Some(DiagnosticProvider::DiagnosticOptions(DiagnosticOptions {

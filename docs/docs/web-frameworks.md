@@ -30,63 +30,60 @@ class Post(Model):
     published = models.BooleanField(null=False, default=False)
 ```
 
-
 #### migration steps
 
 We cannot use the auto generated SQL from Django's migration system. We must use [`django.db.migrations.operations.SeparateDatabaseAndState`](https://docs.djangoproject.com/en/3.2/ref/migration-operations/#django.db.migrations.operations.SeparateDatabaseAndState) to make changes to our Django models while using custom SQL.
 
 1. Update the model with a default so newly created objects in Django get assigned a default value. This change must be deployed before making the SQL migrations.
 
-    ```python
-    class Post(Model):
-        published = models.BooleanField(default=False)
-    ```
+   ```python
+   class Post(Model):
+       published = models.BooleanField(default=False)
+   ```
 
 2. Create trigger to set default value `false` for inserts `published` is `null`.
 
-    ```sql
-    CREATE FUNCTION null_published_trigger()
-    RETURNS trigger AS '
-    BEGIN
-    IF NEW.published IS NULL THEN
-        NEW.published := false;
-    END IF;
-    RETURN NEW;
-    END' LANGUAGE 'plpgsql';
+   ```sql
+   CREATE FUNCTION null_published_trigger()
+   RETURNS trigger AS '
+   BEGIN
+   IF NEW.published IS NULL THEN
+       NEW.published := false;
+   END IF;
+   RETURN NEW;
+   END' LANGUAGE 'plpgsql';
 
-    CREATE TRIGGER published_default_trigger
-    BEFORE INSERT ON post
-    FOR EACH ROW
-    EXECUTE PROCEDURE null_published_trigger();
-    ```
+   CREATE TRIGGER published_default_trigger
+   BEFORE INSERT ON post
+   FOR EACH ROW
+   EXECUTE PROCEDURE null_published_trigger();
+   ```
 
 3. Set a default value for existing objects.
 
-    ```sql
-    UPDATE "post" SET "published" = false WHERE "published" IS NULL;
-    ```
-
+   ```sql
+   UPDATE "post" SET "published" = false WHERE "published" IS NULL;
+   ```
 
 4. Create a not null constraint.
 
-    ```sql
-    ALTER TABLE "post" ADD CONSTRAINT published_not_null
-        CHECK ("published" IS NOT NULL) NOT VALID;
-    ```
+   ```sql
+   ALTER TABLE "post" ADD CONSTRAINT published_not_null
+       CHECK ("published" IS NOT NULL) NOT VALID;
+   ```
 
 5. Validate constraint.
 
-    ```sql
-    ALTER TABLE "post" VALIDATE CONSTRAINT published_not_null;
-    ```
+   ```sql
+   ALTER TABLE "post" VALIDATE CONSTRAINT published_not_null;
+   ```
 
 6. Remove trigger.
 
-    ```sql
-    DROP TRIGGER IF EXISTS published_default_trigger on post;
-    DROP FUNCTION IF EXISTS null_published_trigger;
-    ```
-
+   ```sql
+   DROP TRIGGER IF EXISTS published_default_trigger on post;
+   DROP FUNCTION IF EXISTS null_published_trigger;
+   ```
 
 ## Alembic and SQLAlchemy
 
@@ -95,14 +92,16 @@ We cannot use the auto generated SQL from Django's migration system. We must use
 ```shell
 alembic upgrade head --sql | squawk
 ```
+
 or you can choose revisions
+
 ```shell
 alembic upgrade first_revision:last_revision --sql | squawk
 ```
 
 ### settings
 
-Use `transaction_per_migration = True` 
+Use `transaction_per_migration = True`
 in [configure](https://alembic.sqlalchemy.org/en/latest/api/runtime.html#alembic.runtime.environment.EnvironmentContext.configure.params.transaction_per_migration)
 
 ```python

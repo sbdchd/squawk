@@ -65,7 +65,6 @@ If you use Squawk outside of a GitHub Actions, we recommend configuring Squawk a
 To use Squawk as a GitHub App, Squawk needs a corresponding GitHub App so it can talk to GitHub.
 
 1. Create the app
-
    - head over to <https://github.com/settings/apps/new>
 
    - add an app name & homepage url
@@ -160,4 +159,3 @@ To use Squawk as a GitHub App, Squawk needs a corresponding GitHub App so it can
    which creates a comment like the following:
 
    <https://github.com/sbdchd/squawk/pull/14#issuecomment-647009446>
-

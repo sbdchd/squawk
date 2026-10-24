@@ -98,6 +98,15 @@ export function goto_definition(
   return getDb(content, version).goto_definition(line, column)
 }
 
+export function goto_type_definition(
+  content: string,
+  version: number,
+  line: number,
+  column: number,
+): LocationRange | null {
+  return getDb(content, version).goto_type_definition(line, column) ?? null
+}
+
 export function find_references(
   content: string,
   version: number,
@@ -219,7 +228,7 @@ function useWasmStatus() {
   return isReady
 }
 
-interface LocationRange {
+export interface LocationRange {
   file: "current" | "builtins"
   start_line: number
   start_column: number
