@@ -10,8 +10,21 @@ const fn is_ident_start(c: char) -> bool {
 }
 
 // ident_cont		[A-Za-z\200-\377_0-9\$]
-const fn is_ident_cont(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '$' | '\u{80}'..)
+const fn is_ident_cont(c: u8) -> bool {
+    const TABLE: [bool; 256] = {
+        let mut table = [false; 256];
+        let mut c = 0;
+        loop {
+            table[c as usize] =
+                matches!(c, b'a'..=b'z' | b'A'..=b'Z' | b'_' | b'0'..=b'9' | b'$' | 0x80..);
+            if c == u8::MAX {
+                break;
+            }
+            c += 1;
+        }
+        table
+    };
+    TABLE[c as usize]
 }
 
 pub const BOM: &str = "\u{feff}";
@@ -293,7 +306,7 @@ impl Cursor<'_> {
     }
 
     pub(crate) fn ident(&mut self) -> TokenKind {
-        self.eat_while(is_ident_cont);
+        self.eat_ident_cont();
         TokenKind::Ident
     }
 
@@ -494,14 +507,12 @@ impl Cursor<'_> {
 
     /// Check for `$$` and `$tag$`
     fn is_dollar_quote_start(&self) -> bool {
-        let mut chars = self.chars();
-        match chars.next() {
-            // `$$...` -- empty tag
-            Some('$') => true,
-            // `$tag$...` -- tag chars terminated by `$`
-            Some(c) if is_ident_start(c) => {
-                for c in chars {
-                    if c == '$' {
+        let mut bytes = self.as_str().bytes();
+        match bytes.next() {
+            Some(b'$') => true,
+            Some(c) if is_ident_start(char::from(c)) => {
+                for c in bytes {
+                    if c == b'$' {
                         return true;
                     }
                     if !is_ident_cont(c) {
@@ -639,9 +650,18 @@ impl Cursor<'_> {
         self.eat_decimal_digits()
     }
 
+    fn eat_ident_cont(&mut self) {
+        let remaining = self.as_str().as_bytes();
+        let len = remaining
+            .iter()
+            .position(|&c| !is_ident_cont(c))
+            .unwrap_or(remaining.len());
+        self.advance_bytes(len);
+    }
+
     fn eat_identifier(&mut self) {
         if is_ident_start(self.first()) {
-            self.eat_while(is_ident_cont);
+            self.eat_ident_cont();
         }
     }
 
@@ -1396,6 +1416,127 @@ U&"d!0061t!+000061" UESCAPE '!'
             "\u{feff}select" @ Ident,
             " " @ Whitespace,
             "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_ascii_continuation() {
+        assert_debug_snapshot!(lex("select azAZ_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "azAZ_09$" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_unicode_continuation() {
+        assert_debug_snapshot!(lex("select aé漢𐐷_09$, tail;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "aé漢𐐷_09$" @ Ident,
+            "," @ Comma,
+            " " @ Whitespace,
+            "tail" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_non_ascii_boundary() {
+        assert_debug_snapshot!(lex("select a\u{7f}tail, a\u{80}tail;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "a" @ Ident,
+            "\u{7f}" @ Unknown,
+            "tail" @ Ident,
+            "," @ Comma,
+            " " @ Whitespace,
+            "a\u{80}tail" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_nul_boundary() {
+        assert_debug_snapshot!(lex("select aé漢𐐷\0tail;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "aé漢𐐷" @ Ident,
+            "\0" @ Unknown,
+            "tail" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_unicode_delimiters() {
+        assert_debug_snapshot!(lex("select aé漢𐐷.tail + aé漢𐐷::text;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "aé漢𐐷" @ Ident,
+            "." @ Dot,
+            "tail" @ Ident,
+            " " @ Whitespace,
+            "+" @ Plus,
+            " " @ Whitespace,
+            "aé漢𐐷" @ Ident,
+            ":" @ Colon,
+            ":" @ Colon,
+            "text" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn numeric_unicode_trailing_junk() {
+        assert_debug_snapshot!(lex("select 1é漢𐐷_09$, 1.0é漢𐐷_09$, 0xé漢𐐷_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1é漢𐐷_09$" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            "," @ Comma,
+            " " @ Whitespace,
+            "1.0é漢𐐷_09$" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 3 } },
+            "," @ Comma,
+            " " @ Whitespace,
+            "0xé漢𐐷_09$" @ Literal { kind: Int { base: Hexadecimal, empty_int: false, trailing_junk_start: 2 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn positional_param_unicode_trailing_junk() {
+        assert_debug_snapshot!(lex("select $1é漢𐐷_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "$1é漢𐐷_09$" @ PositionalParam { trailing_junk_start: 2 },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn dollar_quote_unicode_tag_with_digits() {
+        assert_debug_snapshot!(lex("select $é漢𐐷_09$body$é漢𐐷_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "$é漢𐐷_09$body$é漢𐐷_09$" @ Literal { kind: DollarQuotedString { terminated: true } },
             ";" @ Semi,
         ]
         "#);
