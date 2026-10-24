@@ -13130,6 +13130,7 @@ impl Lowerer {
     }
 
     fn lower_set_clause(&mut self, target: Option<SourceId>, set_clause: &ast::SetClause) {
+        let mut seen = smallvec![];
         for set_column in set_clause
             .set_column_list()
             .into_iter()
@@ -13137,20 +13138,24 @@ impl Lowerer {
         {
             match set_column {
                 ast::SetColumn::SetSingleColumn(single) => {
-                    if let (Some(target), Some(column_target)) = (target, single.column_target()) {
-                        self.lower_column_target(target, &column_target);
+                    if let Some(column_target) = single.column_target() {
+                        self.check_duplicate_assignment(&mut seen, &column_target);
+                        if let Some(target) = target {
+                            self.lower_column_target(target, &column_target);
+                        }
                     }
                     if let Some(expr) = single.set_expr().and_then(|set_expr| set_expr.expr()) {
                         self.lower_expr(&expr);
                     }
                 }
                 ast::SetColumn::SetMultipleColumns(multiple) => {
-                    if let Some(target) = target {
-                        for column_target in multiple
-                            .column_target_list()
-                            .into_iter()
-                            .flat_map(|list| list.column_targets())
-                        {
+                    for column_target in multiple
+                        .column_target_list()
+                        .into_iter()
+                        .flat_map(|list| list.column_targets())
+                    {
+                        self.check_duplicate_assignment(&mut seen, &column_target);
+                        if let Some(target) = target {
                             self.lower_column_target(target, &column_target);
                         }
                     }
@@ -13167,6 +13172,24 @@ impl Lowerer {
                     }
                 }
             }
+        }
+    }
+
+    fn check_duplicate_assignment(
+        &mut self,
+        seen: &mut SmallVec<[(Name, bool); 8]>,
+        column_target: &ast::ColumnTarget,
+    ) {
+        if let Some(name) = self.duplicate_target(seen, column_target) {
+            let message = format!(
+                "multiple assignments to same column `{}`",
+                self.index.names.resolve(name)
+            );
+            self.push_error(
+                DiagnosticKind::DuplicateAssignment,
+                column_target.syntax(),
+                message,
+            );
         }
     }
 

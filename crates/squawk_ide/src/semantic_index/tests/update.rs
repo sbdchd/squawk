@@ -172,3 +172,27 @@ update t set a[1].x = 1, a[1].z = 2, a[1:2].x = 3, a[1][1:2].y = 4, a.x = 5;
       ╰╴                                                                      ━
     ");
 }
+
+#[test]
+fn duplicate_assignment() {
+    assert_snapshot!(check("
+create table t (a int[], b int);
+update t set b = 1, b = 2;
+update t set (a, b) = (null, 1), b = 2;
+update t set a[1] = 1, a[2] = 2;
+insert into t values ('{1}', 2) on conflict do update set b = 1, b = 2;
+"), @"
+    error: multiple assignments to same column `b`
+      ╭▸ 
+    3 │ update t set b = 1, b = 2;
+      ╰╴                    ━
+    error: multiple assignments to same column `b`
+      ╭▸ 
+    4 │ update t set (a, b) = (null, 1), b = 2;
+      ╰╴                                 ━
+    error: multiple assignments to same column `b`
+      ╭▸ 
+    6 │ insert into t values ('{1}', 2) on conflict do update set b = 1, b = 2;
+      ╰╴                                                                 ━
+    ");
+}
