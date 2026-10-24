@@ -42,3 +42,16 @@ select * from t where false union select count(*) over w, 1 from t window w as (
       ╰╴                             ━
     ");
 }
+
+#[test]
+fn duplicate_window() {
+    assert_snapshot!(check("
+select 1 window w as (), w as ();
+select 1 window w as (), x as (w);
+"), @"
+    error: window `w` is already defined
+      ╭▸ 
+    2 │ select 1 window w as (), w as ();
+      ╰╴                         ━
+    ");
+}

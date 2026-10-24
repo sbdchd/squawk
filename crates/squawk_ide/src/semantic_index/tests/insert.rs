@@ -158,3 +158,22 @@ insert into t values (1) on conflict (a) do select for update of excluded;
       ╰╴                                                                 ━━━━━━━━
     ");
 }
+
+#[test]
+fn duplicate_target_column() {
+    assert_snapshot!(check("
+create table t (a int[], b int);
+insert into t (a, a) values (1, 2);
+insert into t (a, a[2]) values ('{1}', 2);
+insert into t (a[1], a[2]) values (1, 2);
+"), @"
+    error: column `a` specified more than once
+      ╭▸ 
+    3 │ insert into t (a, a) values (1, 2);
+      ╰╴                  ━
+    error: column `a` specified more than once
+      ╭▸ 
+    4 │ insert into t (a, a[2]) values ('{1}', 2);
+      ╰╴                  ━━━━
+    ");
+}

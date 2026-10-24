@@ -131,3 +131,44 @@ select n, ord, is_cycle, path, z from t;
       ╰╴                               ━
     ");
 }
+
+#[test]
+fn duplicate_column_names_are_ambiguous() {
+    assert_snapshot!(check("
+with t as (select 1 a, 2 a)
+select a from t;
+with t as (select 1 a, 2 a)
+select t.a from t;
+with t as (select 1 a, 2 a)
+select * from t;
+with a as (select 1 id), b as (select 2 id)
+select id from (select * from a join b using (id)) s;
+"), @"
+    error: column reference `a` is ambiguous
+      ╭▸ 
+    3 │ select a from t;
+      ╰╴       ━
+    error: column reference `a` is ambiguous
+      ╭▸ 
+    5 │ select t.a from t;
+      ╰╴         ━
+    ");
+}
+
+#[test]
+fn duplicate_cte_name() {
+    assert_snapshot!(check("
+with x as (select 1), x as (select 2) select 1;
+with recursive x as (select 1), x as (select 2) select 1;
+with x as (select 1) select 1 from (with x as (select 2) select 1) s;
+"), @"
+    error: WITH query name `x` specified more than once
+      ╭▸ 
+    2 │ with x as (select 1), x as (select 2) select 1;
+      ╰╴                      ━
+    error: WITH query name `x` specified more than once
+      ╭▸ 
+    3 │ with recursive x as (select 1), x as (select 2) select 1;
+      ╰╴                                ━
+    ");
+}

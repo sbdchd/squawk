@@ -245,3 +245,33 @@ create table t (
        ╰╴                             ━━
     ");
 }
+
+#[test]
+fn multiple_primary_keys() {
+    assert_snapshot!(check("
+create table t (a int primary key, b int primary key);
+create table u (a int, b int, primary key (a), primary key (b));
+create table v (a int primary key, b int);
+alter table v add primary key (b);
+create table w (a int primary key, b int);
+alter table w drop constraint w_pkey, add primary key (b);
+create table x (a int primary key, b int);
+alter table x drop constraint x_pkey;
+alter table x add primary key (b);
+create table p (a int primary key);
+create table c (b int primary key) inherits (p);
+"), @"
+    error: multiple primary keys for table `t` are not allowed
+      ╭▸ 
+    2 │ create table t (a int primary key, b int primary key);
+      ╰╴                                         ━━━━━━━━━━━
+    error: multiple primary keys for table `u` are not allowed
+      ╭▸ 
+    3 │ create table u (a int, b int, primary key (a), primary key (b));
+      ╰╴                                               ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `v` are not allowed
+      ╭▸ 
+    5 │ alter table v add primary key (b);
+      ╰╴                  ━━━━━━━━━━━━━━━
+    ");
+}

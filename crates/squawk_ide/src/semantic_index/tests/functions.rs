@@ -720,3 +720,29 @@ drop function add(complex);
       ╰╴                  ━━━━━━━
     ");
 }
+
+#[test]
+fn duplicate_param_name() {
+    assert_snapshot!(check("
+create function f(a int, a int) returns int language sql as 'select 1';
+create function g(inout a int, out a int) language sql as 'select 1';
+create function h(a int, out a int) language sql as 'select 1';
+create function i(variadic a int[], out a int) language sql as 'select 1';
+create function j(a int) returns table (a int) language sql as 'select 1';
+create function sfn(int, int, int) returns int language sql as 'select 1';
+create aggregate k(a int, a int) (sfunc = sfn, stype = int);
+"), @"
+    error: parameter name `a` used more than once
+      ╭▸ 
+    2 │ create function f(a int, a int) returns int language sql as 'select 1';
+      ╰╴                         ━
+    error: parameter name `a` used more than once
+      ╭▸ 
+    3 │ create function g(inout a int, out a int) language sql as 'select 1';
+      ╰╴                                   ━
+    error: parameter name `a` used more than once
+      ╭▸ 
+    8 │ create aggregate k(a int, a int) (sfunc = sfn, stype = int);
+      ╰╴                          ━
+    ");
+}

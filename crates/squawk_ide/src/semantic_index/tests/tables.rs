@@ -565,3 +565,28 @@ alter table t alter column a type text, add column b int, alter column b set def
       ╰╴                                          ━
     ");
 }
+
+#[test]
+fn duplicate_column() {
+    assert_snapshot!(check("
+create table p (a int);
+create table l (b int);
+create table t (a int, a int);
+create table c (a int, b int) inherits (p);
+create table m (b int, like l);
+create table n (like l, b int);
+"), @"
+    error: column `a` specified more than once
+      ╭▸ 
+    4 │ create table t (a int, a int);
+      ╰╴                       ━
+    error: column `b` specified more than once
+      ╭▸ 
+    6 │ create table m (b int, like l);
+      ╰╴                       ━━━━━━
+    error: column `b` specified more than once
+      ╭▸ 
+    7 │ create table n (like l, b int);
+      ╰╴                        ━
+    ");
+}
