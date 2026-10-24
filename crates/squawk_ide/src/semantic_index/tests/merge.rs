@@ -163,3 +163,21 @@ select a, b from m;
       ╰╴          ━
     ");
 }
+
+#[test]
+fn duplicate_assignment_and_source() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+merge into t using t x on true when matched then update set a = 1, a = 2;
+merge into t using t on true when matched then do nothing;
+"), @"
+    error: multiple assignments to same column `a`
+      ╭▸ 
+    3 │ merge into t using t x on true when matched then update set a = 1, a = 2;
+      ╰╴                                                                   ━
+    error: table name `t` specified more than once
+      ╭▸ 
+    4 │ merge into t using t on true when matched then do nothing;
+      ╰╴                   ━
+    ");
+}

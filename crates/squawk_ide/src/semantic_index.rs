@@ -87,6 +87,7 @@ pub enum DiagnosticKind {
     DuplicateColumn,
     DuplicateAssignment,
     DuplicateCte,
+    DuplicateSource,
     DuplicateFunction,
     DuplicateConstraint,
     DuplicateTrigger,

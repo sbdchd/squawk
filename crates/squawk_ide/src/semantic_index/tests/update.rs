@@ -196,3 +196,17 @@ insert into t values ('{1}', 2) on conflict do update set b = 1, b = 2;
       ╰╴                                                                 ━
     ");
 }
+
+#[test]
+fn duplicate_from_source() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+update t set a = 1 from t;
+update t x set a = 1 from t;
+"), @"
+    error: table name `t` specified more than once
+      ╭▸ 
+    3 │ update t set a = 1 from t;
+      ╰╴                        ━
+    ");
+}

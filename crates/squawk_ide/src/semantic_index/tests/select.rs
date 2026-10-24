@@ -228,3 +228,54 @@ select (select b from u for update of t) from t;
       ╰╴                                      ━
     ");
 }
+
+#[test]
+fn duplicate_from_source() {
+    assert_snapshot!(check("
+create schema s1;
+create schema s2;
+create table s1.t (a int);
+create table s2.t (a int);
+create table t (a int, b int);
+select 1 from t, t;
+select 1 from t x, t x;
+select 1 from t join t using (a);
+select 1 from s1.t, s2.t;
+select 1 from (select 1) s, (select 2) s;
+select 1 from (select 1), (select 2);
+select 1 from generate_series(1, 2), generate_series(1, 2);
+select 1 from (t x join t y using (a)) j, t j;
+select 1 from (t x join t y using (a)) j, t x;
+select 1 from t, lateral (select 1 from t) s;
+with c as (select 1) select 1 from c, c;
+"), @"
+    error: table name `t` specified more than once
+      ╭▸ 
+    7 │ select 1 from t, t;
+      ╰╴                 ━
+    error: table name `x` specified more than once
+      ╭▸ 
+    8 │ select 1 from t x, t x;
+      ╰╴                     ━
+    error: table name `t` specified more than once
+      ╭▸ 
+    9 │ select 1 from t join t using (a);
+      ╰╴                     ━
+    error: table name `s` specified more than once
+       ╭▸ 
+    11 │ select 1 from (select 1) s, (select 2) s;
+       ╰╴                                       ━
+    error: table name `generate_series` specified more than once
+       ╭▸ 
+    13 │ select 1 from generate_series(1, 2), generate_series(1, 2);
+       ╰╴                                     ━━━━━━━━━━━━━━━━━━━━━
+    error: table name `j` specified more than once
+       ╭▸ 
+    14 │ select 1 from (t x join t y using (a)) j, t j;
+       ╰╴                                            ━
+    error: table name `c` specified more than once
+       ╭▸ 
+    17 │ with c as (select 1) select 1 from c, c;
+       ╰╴                                      ━
+    ");
+}

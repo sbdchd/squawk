@@ -13921,6 +13921,7 @@ impl Lowerer {
             }
         }
 
+        self.check_duplicate_source(name, kind, alias_ptr.is_some(), from_item);
         self.push_source(Source {
             name,
             kind,
@@ -13928,6 +13929,44 @@ impl Lowerer {
             alias_ptr,
             columns,
         });
+    }
+
+    fn check_duplicate_source(
+        &mut self,
+        name: Option<Name>,
+        kind: SourceKind,
+        aliased: bool,
+        from_item: &ast::FromItem,
+    ) {
+        let Some(name) = name else {
+            return;
+        };
+        let query = self.scope().query;
+        let sources = &self.index.queries[query].sources;
+        let duplicate = sources.iter().any(|id| {
+            let prev = &self.index.sources[*id];
+            if prev.name != Some(name) || prev.kind.is_qualified_only() {
+                return false;
+            }
+            let different_unaliased_tables = match (prev.kind, kind) {
+                (SourceKind::Table(a), SourceKind::Table(b)) => {
+                    a != b && prev.alias_ptr.is_none() && !aliased
+                }
+                _ => false,
+            };
+            !different_unaliased_tables
+        });
+        if duplicate {
+            let message = format!(
+                "table name `{}` specified more than once",
+                self.index.names.resolve(name)
+            );
+            let node = match from_item.alias().and_then(|alias| alias.name()) {
+                Some(alias) => alias.syntax().clone(),
+                None => from_item.syntax().clone(),
+            };
+            self.push_error(DiagnosticKind::DuplicateSource, &node, message);
+        }
     }
 
     fn lower_from_query(&mut self, query: ast::SelectVariant, lateral: bool) -> QueryId {
@@ -13975,10 +14014,12 @@ impl Lowerer {
             columns = self.rename_columns(alias_columns.column_names(), &columns);
         }
         let table_alias = alias.name();
+        let name = table_alias
+            .as_ref()
+            .map(|table_alias| self.intern(&table_alias.text()));
+        self.check_duplicate_source(name, SourceKind::Join, true, from_item);
         let source = Source {
-            name: table_alias
-                .as_ref()
-                .map(|table_alias| self.intern(&table_alias.text())),
+            name,
             kind: SourceKind::Join,
             ptr: self.ptr(from_item.syntax()),
             alias_ptr: table_alias.map(|table_alias| self.ast_ptr(&table_alias)),
