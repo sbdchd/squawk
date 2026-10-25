@@ -19717,36 +19717,61 @@ impl Lowerer {
         refs: RefId,
         aggregate_calls: usize,
     ) {
-        if call.over_clause().is_some() {
-            self.aggregate_calls.truncate(aggregate_calls);
-            return;
-        }
-        if !function
+        let kind = if call.over_clause().is_some() {
+            AggregateCallKind::Window
+        } else if function
             .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
-            || !self.aggregate_is_local(refs)
         {
+            AggregateCallKind::Aggregate
+        } else {
+            return;
+        };
+        if kind == AggregateCallKind::Aggregate && !self.aggregate_is_local(refs) {
             return;
         }
         let ptr = self.ptr(call.syntax());
+        let (diagnostic, message) = match kind {
+            AggregateCallKind::Aggregate => (
+                DiagnosticKind::GroupingError,
+                self.expr_context.aggregate_error(),
+            ),
+            AggregateCallKind::Window => (
+                DiagnosticKind::WindowingError,
+                self.expr_context.window_error(),
+            ),
+        };
         let depth = self.scopes.len();
-        if let Some(message) = self.expr_context.aggregate_error() {
-            self.push_error_ptr(DiagnosticKind::GroupingError, ptr, message.to_owned(), None);
+        if let Some(message) = message {
+            self.push_error_ptr(diagnostic, ptr, message.to_owned(), None);
         } else {
             for index in aggregate_calls..self.aggregate_calls.len() {
                 let inner = self.aggregate_calls[index];
                 if inner.depth != depth {
                     continue;
                 }
-                self.push_error_ptr(
-                    DiagnosticKind::GroupingError,
-                    inner.ptr,
-                    "aggregate function calls cannot be nested".to_owned(),
-                    None,
-                );
+                let (diagnostic, message) = match (kind, inner.kind) {
+                    (AggregateCallKind::Aggregate, AggregateCallKind::Aggregate) => (
+                        DiagnosticKind::GroupingError,
+                        "aggregate function calls cannot be nested",
+                    ),
+                    (AggregateCallKind::Aggregate, AggregateCallKind::Window) => (
+                        DiagnosticKind::GroupingError,
+                        "aggregate function calls cannot contain window function calls",
+                    ),
+                    (AggregateCallKind::Window, AggregateCallKind::Window) => (
+                        DiagnosticKind::WindowingError,
+                        "window function calls cannot be nested",
+                    ),
+                    (AggregateCallKind::Window, AggregateCallKind::Aggregate) => continue,
+                };
+                self.push_error_ptr(diagnostic, inner.ptr, message.to_owned(), None);
+                self.aggregate_calls.truncate(aggregate_calls);
+                return;
             }
         }
         self.aggregate_calls.truncate(aggregate_calls);
-        self.aggregate_calls.push(AggregateCall { depth, ptr });
+        self.aggregate_calls
+            .push(AggregateCall { kind, depth, ptr });
     }
 
     fn aggregate_is_local(&self, refs: RefId) -> bool {
@@ -21522,10 +21547,66 @@ impl ExprContext {
             }
         })
     }
+
+    fn window_error(self) -> Option<&'static str> {
+        Some(match self {
+            ExprContext::Unrestricted => return None,
+            ExprContext::Where => "window functions are not allowed in WHERE",
+            ExprContext::JoinCondition => "window functions are not allowed in JOIN conditions",
+            ExprContext::GroupBy => "window functions are not allowed in GROUP BY",
+            ExprContext::Having => "window functions are not allowed in HAVING",
+            ExprContext::Filter => "window functions are not allowed in FILTER",
+            ExprContext::WindowDefinition
+            | ExprContext::WindowRange
+            | ExprContext::WindowRows
+            | ExprContext::WindowGroups => "window functions are not allowed in window definitions",
+            ExprContext::Limit => "window functions are not allowed in LIMIT",
+            ExprContext::Offset => "window functions are not allowed in OFFSET",
+            ExprContext::Values => "window functions are not allowed in VALUES",
+            ExprContext::Returning => "window functions are not allowed in RETURNING",
+            ExprContext::Insert => "window functions are not allowed in INSERT",
+            ExprContext::Update => "window functions are not allowed in UPDATE",
+            ExprContext::FromFunction => "window functions are not allowed in functions in FROM",
+            ExprContext::MergeWhen => "window functions are not allowed in MERGE WHEN conditions",
+            ExprContext::CheckConstraint => "window functions are not allowed in check constraints",
+            ExprContext::Default => "window functions are not allowed in DEFAULT expressions",
+            ExprContext::GeneratedColumn => {
+                "window functions are not allowed in column generation expressions"
+            }
+            ExprContext::IndexExpression => "window functions are not allowed in index expressions",
+            ExprContext::IndexPredicate => "window functions are not allowed in index predicates",
+            ExprContext::StatisticsExpression => {
+                "window functions are not allowed in statistics expressions"
+            }
+            ExprContext::PartitionKey => {
+                "window functions are not allowed in partition key expressions"
+            }
+            ExprContext::PartitionBound => "window functions are not allowed in partition bound",
+            ExprContext::Policy => "window functions are not allowed in policy expressions",
+            ExprContext::TriggerWhen => {
+                "window functions are not allowed in trigger WHEN conditions"
+            }
+            ExprContext::CallArgument => "window functions are not allowed in CALL arguments",
+            ExprContext::Transform => "window functions are not allowed in transform expressions",
+            ExprContext::CopyWhere => {
+                "window functions are not allowed in COPY FROM WHERE conditions"
+            }
+            ExprContext::ExecuteParameter => {
+                "window functions are not allowed in EXECUTE parameters"
+            }
+        })
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum AggregateCallKind {
+    Aggregate,
+    Window,
 }
 
 #[derive(Clone, Copy)]
 struct AggregateCall {
+    kind: AggregateCallKind,
     depth: usize,
     ptr: InIrFile<SyntaxNodePtr>,
 }

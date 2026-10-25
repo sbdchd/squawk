@@ -347,8 +347,12 @@ create table t (a int);
 select sum(sum(1)) from t;
 select string_agg(a::text, ',' order by count(*)) from t;
 select percentile_cont(0.5) within group (order by count(*)) from t;
+select sum(row_number() over ()) from t;
+select max(sum(count(*)) over ()) from t;
 select sum(abs(sum(1))) from t;
 select 1 from t having sum(sum(1)) > 1;
+select sum(sum(sum(1))) from t;
+select sum(sum(1) + sum(2)) from t;
 "), @"
     error: aggregate function calls cannot be nested
       ╭▸ 
@@ -362,14 +366,30 @@ select 1 from t having sum(sum(1)) > 1;
       ╭▸ 
     5 │ select percentile_cont(0.5) within group (order by count(*)) from t;
       ╰╴                                                   ━━━━━━━━
+    error: aggregate function calls cannot contain window function calls
+      ╭▸ 
+    6 │ select sum(row_number() over ()) from t;
+      ╰╴           ━━━━━━━━━━━━━━━━━━━━
+    error: aggregate function calls cannot contain window function calls
+      ╭▸ 
+    7 │ select max(sum(count(*)) over ()) from t;
+      ╰╴           ━━━━━━━━━━━━━━━━━━━━━
     error: aggregate function calls cannot be nested
       ╭▸ 
-    6 │ select sum(abs(sum(1))) from t;
+    8 │ select sum(abs(sum(1))) from t;
       ╰╴               ━━━━━━
     error: aggregate function calls cannot be nested
       ╭▸ 
-    7 │ select 1 from t having sum(sum(1)) > 1;
+    9 │ select 1 from t having sum(sum(1)) > 1;
       ╰╴                           ━━━━━━
+    error: aggregate function calls cannot be nested
+       ╭▸ 
+    10 │ select sum(sum(sum(1))) from t;
+       ╰╴               ━━━━━━
+    error: aggregate function calls cannot be nested
+       ╭▸ 
+    11 │ select sum(sum(1) + sum(2)) from t;
+       ╰╴           ━━━━━━
     ");
 }
 
