@@ -40,7 +40,8 @@ use crate::{
         TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
         Window, WindowId,
     },
-    semantic_index::{Diagnostic, DiagnosticKind, IndexData, NameVersion},
+    sema_error::{ObjectKind, SemaError},
+    semantic_index::{IndexData, NameVersion},
 };
 use crate::{
     overload::{ArgType, BuiltinTypes, CallArg, Overloads},
@@ -874,8 +875,8 @@ impl Lookup {
     }
 }
 
-#[derive(Clone, Copy)]
-enum TableLookup {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TableLookup {
     Table,
     ForeignTable,
     TableOrForeignTable,
@@ -913,35 +914,6 @@ impl TableLookup {
                 matches!(kind, TableKind::Table | TableKind::ForeignTable)
             }
         }
-    }
-
-    fn label(self) -> &'static str {
-        match self {
-            TableLookup::Table => "table",
-            TableLookup::ForeignTable => "foreign table",
-            TableLookup::TableOrForeignTable => "table or foreign table",
-            TableLookup::TableOrView => "table or view",
-            TableLookup::TableOrMaterializedView => "table or materialized view",
-            TableLookup::Any => "relation",
-            TableLookup::View => "view",
-            TableLookup::MaterializedView => "materialized view",
-            TableLookup::Sequence => "sequence",
-            TableLookup::PropertyGraph => "property graph",
-            TableLookup::CopyTo => "table or materialized view",
-            TableLookup::CopyFrom => "table or foreign table",
-            TableLookup::Truncate => "table",
-        }
-    }
-}
-
-fn drop_hint(kind: TableKind) -> &'static str {
-    match kind {
-        TableKind::Table => "Use DROP TABLE to remove a table.",
-        TableKind::ForeignTable => "Use DROP FOREIGN TABLE to remove a foreign table.",
-        TableKind::View => "Use DROP VIEW to remove a view.",
-        TableKind::MaterializedView => "Use DROP MATERIALIZED VIEW to remove a materialized view.",
-        TableKind::Sequence => "Use DROP SEQUENCE to remove a sequence.",
-        TableKind::PropertyGraph => "Use DROP PROPERTY GRAPH to remove a property graph.",
     }
 }
 
@@ -1022,21 +994,11 @@ enum SearchPathScope {
     Transaction,
 }
 
-#[derive(Clone, Copy)]
-enum OutputClause {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum OutputClause {
     OrderBy,
     GroupBy,
     DistinctOn,
-}
-
-impl OutputClause {
-    fn label(self) -> &'static str {
-        match self {
-            OutputClause::OrderBy => "ORDER BY",
-            OutputClause::GroupBy => "GROUP BY",
-            OutputClause::DistinctOn => "DISTINCT ON",
-        }
-    }
 }
 
 struct SelectParts {
@@ -1506,14 +1468,12 @@ impl Lowerer {
                                 TypedColumnOwner::Table(_) => true,
                             });
                 if blocked {
-                    let message = format!(
-                        "cannot drop type `{}` because other objects depend on it",
-                        self.index.names.resolve(self.index.types[*ty].name)
-                    );
                     self.push_error(
-                        DiagnosticKind::DependentObjectsStillExist,
                         path.syntax(),
-                        message,
+                        SemaError::DependentObjects {
+                            object: ObjectKind::Type,
+                            name: self.index.types[*ty].name,
+                        },
                     );
                     return;
                 }
@@ -1828,10 +1788,10 @@ impl Lowerer {
 
     fn report_relation_name_taken(&mut self, schema: Name, name: Name, node: &SyntaxNode) -> bool {
         if self.relation_exists(schema, name) {
-            self.report_duplicate(DiagnosticKind::DuplicateRelation, "relation", node, name);
+            self.report_duplicate(ObjectKind::Relation, node, name);
             true
         } else if self.find_type_in(schema, name).is_some() {
-            self.report_duplicate(DiagnosticKind::DuplicateType, "type", node, name);
+            self.report_duplicate(ObjectKind::Type, node, name);
             true
         } else {
             false
@@ -3514,16 +3474,11 @@ impl Lowerer {
             let is_target = |owner: TableId| targets.iter().any(|(_, target)| *target == owner);
             if self.drop_blocked(*table, &is_target) {
                 let table = &self.index.tables[*table];
-                let message = format!(
-                    "cannot drop {} `{}` because other objects depend on it",
-                    table.kind.label(),
-                    self.index.names.resolve(table.name)
-                );
-                self.push_error(
-                    DiagnosticKind::DependentObjectsStillExist,
-                    path.syntax(),
-                    message,
-                );
+                let error = SemaError::DependentObjects {
+                    object: ObjectKind::Table(table.kind),
+                    name: table.name,
+                };
+                self.push_error(path.syntax(), error);
                 return;
             }
         }
@@ -3838,15 +3793,7 @@ impl Lowerer {
         if let Entry::Vacant(entry) = self.prepared_statements.entry(name) {
             entry.insert(id);
         } else {
-            let message = format!(
-                "prepared statement `{}` already exists",
-                self.index.names.resolve(name)
-            );
-            self.push_error(
-                DiagnosticKind::DuplicatePreparedStatement,
-                prepared.syntax(),
-                message,
-            );
+            self.report_duplicate(ObjectKind::PreparedStatement, prepared.syntax(), name);
         }
     }
 
@@ -4173,12 +4120,7 @@ impl Lowerer {
         }
         let new_name = self.intern(&new_role.text());
         if self.find_role(new_name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateRole,
-                "role",
-                new_role.syntax(),
-                new_name,
-            );
+            self.report_duplicate(ObjectKind::Role, new_role.syntax(), new_name);
             return;
         }
         self.drop_role(role);
@@ -4304,12 +4246,7 @@ impl Lowerer {
     fn alloc_role(&mut self, node: &SyntaxNode, name_node: &impl NameLike) -> RoleId {
         let name = self.intern(&name_node.text());
         if self.find_role(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateRole,
-                "role",
-                name_node.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Role, name_node.syntax(), name);
         }
         let id = self.index.roles.alloc(Role {
             name,
@@ -4475,12 +4412,8 @@ impl Lowerer {
     }
 
     fn report_duplicate_policy(&mut self, name_node: &SyntaxNode, name: Name, table: TableId) {
-        let message = format!(
-            "policy `{}` for table `{}` already exists",
-            self.index.names.resolve(name),
-            self.index.names.resolve(self.index.tables[table].name),
-        );
-        self.push_error(DiagnosticKind::DuplicatePolicy, name_node, message);
+        let table = self.index.tables[table].name;
+        self.push_error(name_node, SemaError::DuplicatePolicy { name, table });
     }
 
     fn lower_policy_ref(
@@ -4529,12 +4462,7 @@ impl Lowerer {
         let name_node = access_method.syntax();
         let name = self.intern(&access_method.text());
         if self.find_access_method(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateAccessMethod,
-                "access method",
-                name_node,
-                name,
-            );
+            self.report_duplicate(ObjectKind::AccessMethod, name_node, name);
         }
         let id = self.index.access_methods.alloc(AccessMethod {
             name,
@@ -4594,18 +4522,12 @@ impl Lowerer {
         if let (Some(access_method), Some(kind)) = (access_method, kind)
             && self.index.access_methods[access_method].kind != kind
         {
-            let expected = match kind {
-                AccessMethodKind::Table => "TABLE",
-                AccessMethodKind::Index => "INDEX",
-            };
-            let message = format!(
-                "access method `{}` is not of type {expected}",
-                self.index.names.resolve(name),
-            );
             self.push_error(
-                DiagnosticKind::AccessMethodKindMismatch,
                 access_method_ref.syntax(),
-                message,
+                SemaError::AccessMethodKindMismatch {
+                    name,
+                    expected: kind,
+                },
             );
         }
         access_method
@@ -4689,8 +4611,7 @@ impl Lowerer {
                     let new_name = self.intern(&new_wrapper.text());
                     if self.find_foreign_data_wrapper(new_name).is_some() {
                         self.report_duplicate(
-                            DiagnosticKind::DuplicateForeignDataWrapper,
-                            "foreign-data wrapper",
+                            ObjectKind::ForeignDataWrapper,
                             new_wrapper.syntax(),
                             new_name,
                         );
@@ -4753,12 +4674,7 @@ impl Lowerer {
     fn alloc_foreign_data_wrapper(&mut self, node: &SyntaxNode, name_node: &impl NameLike) {
         let name = self.intern(&name_node.text());
         if self.find_foreign_data_wrapper(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateForeignDataWrapper,
-                "foreign-data wrapper",
-                name_node.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::ForeignDataWrapper, name_node.syntax(), name);
         }
         let id = self.index.foreign_data_wrappers.alloc(ForeignDataWrapper {
             name,
@@ -4810,7 +4726,7 @@ impl Lowerer {
             if create_server.if_not_exists().is_some() {
                 return;
             }
-            self.report_duplicate(DiagnosticKind::DuplicateServer, "server", name_node, name);
+            self.report_duplicate(ObjectKind::Server, name_node, name);
         }
         self.alloc_server(create_server.syntax(), name_node, name);
     }
@@ -4828,12 +4744,7 @@ impl Lowerer {
                         let name_node = new_server.syntax();
                         let new_name = self.intern(&new_server.text());
                         if self.find_server(new_name).is_some() {
-                            self.report_duplicate(
-                                DiagnosticKind::DuplicateServer,
-                                "server",
-                                name_node,
-                                new_name,
-                            );
+                            self.report_duplicate(ObjectKind::Server, name_node, new_name);
                             continue;
                         }
                         self.drop_server(server);
@@ -4947,7 +4858,12 @@ impl Lowerer {
         let schema = self.creation_schema(&path);
         let name = self.intern(&segment.text());
         if self.has_operator_family(schema, name, access_method) {
-            self.report_duplicate_operator_family(segment.syntax(), name, access_method);
+            self.report_duplicate_for_access_method(
+                ObjectKind::OperatorFamily,
+                segment.syntax(),
+                name,
+                access_method,
+            );
         }
         let id = self.alloc_operator_family(
             create_family.syntax(),
@@ -5022,7 +4938,8 @@ impl Lowerer {
                     } = self.index.operator_families[family];
                     let name = self.intern(&segment.text());
                     if self.has_operator_family(schema, name, access_method) {
-                        self.report_duplicate_operator_family(
+                        self.report_duplicate_for_access_method(
+                            ObjectKind::OperatorFamily,
                             segment.syntax(),
                             name,
                             access_method,
@@ -5060,7 +4977,8 @@ impl Lowerer {
                         ..
                     } = self.index.operator_families[family];
                     if self.has_operator_family(schema, name, access_method) {
-                        self.report_duplicate_operator_family(
+                        self.report_duplicate_for_access_method(
+                            ObjectKind::OperatorFamily,
                             schema_ref.syntax(),
                             name,
                             access_method,
@@ -5148,7 +5066,12 @@ impl Lowerer {
             );
         }
         if self.has_operator_class(schema, name, access_method) {
-            self.report_duplicate_operator_class(segment.syntax(), name, access_method);
+            self.report_duplicate_for_access_method(
+                ObjectKind::OperatorClass,
+                segment.syntax(),
+                name,
+                access_method,
+            );
         }
         Some(self.alloc_operator_class(
             create_class.syntax(),
@@ -5353,7 +5276,12 @@ impl Lowerer {
                     } = self.index.operator_classes[class];
                     let name = self.intern(&segment.text());
                     if self.has_operator_class(schema, name, access_method) {
-                        self.report_duplicate_operator_class(segment.syntax(), name, access_method);
+                        self.report_duplicate_for_access_method(
+                            ObjectKind::OperatorClass,
+                            segment.syntax(),
+                            name,
+                            access_method,
+                        );
                         return;
                     }
                     self.drop_operator_class(class);
@@ -5386,7 +5314,8 @@ impl Lowerer {
                         ..
                     } = self.index.operator_classes[class];
                     if self.has_operator_class(schema, name, access_method) {
-                        self.report_duplicate_operator_class(
+                        self.report_duplicate_for_access_method(
+                            ObjectKind::OperatorClass,
                             schema_ref.syntax(),
                             name,
                             access_method,
@@ -5468,43 +5397,20 @@ impl Lowerer {
         id
     }
 
-    fn access_method_suffix(&self, access_method: Option<AccessMethodId>) -> String {
-        access_method.map_or_else(String::new, |access_method| {
-            format!(
-                " for access method `{}`",
-                self.index
-                    .names
-                    .resolve(self.index.access_methods[access_method].name)
-            )
-        })
-    }
-
-    fn report_duplicate_operator_family(
+    fn report_duplicate_for_access_method(
         &mut self,
+        object: ObjectKind,
         node: &SyntaxNode,
         name: Name,
         access_method: Option<AccessMethodId>,
     ) {
-        let message = format!(
-            "operator family `{}`{} already exists",
-            self.index.names.resolve(name),
-            self.access_method_suffix(access_method),
-        );
-        self.push_error(DiagnosticKind::DuplicateOperatorFamily, node, message);
-    }
-
-    fn report_duplicate_operator_class(
-        &mut self,
-        node: &SyntaxNode,
-        name: Name,
-        access_method: Option<AccessMethodId>,
-    ) {
-        let message = format!(
-            "operator class `{}`{} already exists",
-            self.index.names.resolve(name),
-            self.access_method_suffix(access_method),
-        );
-        self.push_error(DiagnosticKind::DuplicateOperatorClass, node, message);
+        let access_method = access_method.map(|id| self.index.access_methods[id].name);
+        let error = SemaError::DuplicateForAccessMethod {
+            object,
+            name,
+            access_method,
+        };
+        self.push_error(node, error);
     }
 
     fn lower_operator_family_ref(
@@ -5653,12 +5559,7 @@ impl Lowerer {
                     if if_not_exists {
                         return;
                     }
-                    self.report_duplicate(
-                        DiagnosticKind::DuplicateStatistics,
-                        "statistics object",
-                        segment.syntax(),
-                        name,
-                    );
+                    self.report_duplicate(ObjectKind::Statistics, segment.syntax(), name);
                 }
                 let id = self.alloc_statistics(
                     create_statistics.syntax(),
@@ -5733,12 +5634,7 @@ impl Lowerer {
                     let Statistics { schema, table, .. } = self.index.statistics[statistics];
                     let name = self.intern(&segment.text());
                     if self.find_statistics_in(schema, name).is_some() {
-                        self.report_duplicate(
-                            DiagnosticKind::DuplicateStatistics,
-                            "statistics object",
-                            segment.syntax(),
-                            name,
-                        );
+                        self.report_duplicate(ObjectKind::Statistics, segment.syntax(), name);
                         return;
                     }
                     self.drop_statistics(statistics);
@@ -5768,16 +5664,12 @@ impl Lowerer {
                         ..
                     } = self.index.statistics[statistics];
                     if self.find_statistics_in(schema, name).is_some() {
-                        let message = format!(
-                            "statistics object `{}` already exists in schema `{}`",
-                            self.index.names.resolve(name),
-                            self.index.names.resolve(schema),
-                        );
-                        self.push_error(
-                            DiagnosticKind::DuplicateStatistics,
-                            schema_ref.syntax(),
-                            message,
-                        );
+                        let error = SemaError::DuplicateInSchema {
+                            object: ObjectKind::Statistics,
+                            name,
+                            schema,
+                        };
+                        self.push_error(schema_ref.syntax(), error);
                         return;
                     }
                     self.drop_statistics(statistics);
@@ -6189,12 +6081,7 @@ impl Lowerer {
         let TextSearch { kind, schema, .. } = self.index.text_search[text_search];
         let name = self.intern(&segment.text());
         if self.find_text_search_in(kind, schema, name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateTextSearch,
-                kind.label(),
-                segment.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::TextSearch(kind), segment.syntax(), name);
             return;
         }
         let moved = self.index.text_search.next_idx();
@@ -6229,17 +6116,12 @@ impl Lowerer {
             ..
         } = self.index.text_search[text_search];
         if self.find_text_search_in(kind, schema, name).is_some() {
-            let message = format!(
-                "{} `{}` already exists in schema `{}`",
-                kind.label(),
-                self.index.names.resolve(name),
-                self.index.names.resolve(schema),
-            );
-            self.push_error(
-                DiagnosticKind::DuplicateTextSearch,
-                schema_ref.syntax(),
-                message,
-            );
+            let error = SemaError::DuplicateInSchema {
+                object: ObjectKind::TextSearch(kind),
+                name,
+                schema,
+            };
+            self.push_error(schema_ref.syntax(), error);
             return;
         }
         let moved = self.index.text_search.next_idx();
@@ -6285,12 +6167,7 @@ impl Lowerer {
         name: Name,
     ) {
         if self.find_text_search_in(kind, schema, name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateTextSearch,
-                kind.label(),
-                name_node,
-                name,
-            );
+            self.report_duplicate(ObjectKind::TextSearch(kind), name_node, name);
         }
         let id = self.index.text_search.alloc(TextSearch {
             kind,
@@ -6394,8 +6271,7 @@ impl Lowerer {
                     let name = self.intern(&new_publication.text());
                     if self.find_publication(name).is_some() {
                         self.report_duplicate(
-                            DiagnosticKind::DuplicatePublication,
-                            "publication",
+                            ObjectKind::Publication,
                             new_publication.syntax(),
                             name,
                         );
@@ -6488,12 +6364,7 @@ impl Lowerer {
     fn alloc_publication(&mut self, node: &SyntaxNode, name_node: &impl NameLike) -> PublicationId {
         let name = self.intern(&name_node.text());
         if self.find_publication(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicatePublication,
-                "publication",
-                name_node.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Publication, name_node.syntax(), name);
         }
         let id = self.index.publications.alloc(Publication {
             name,
@@ -6564,8 +6435,7 @@ impl Lowerer {
                     let name = self.intern(&new_subscription.text());
                     if self.find_subscription(name).is_some() {
                         self.report_duplicate(
-                            DiagnosticKind::DuplicateSubscription,
-                            "subscription",
+                            ObjectKind::Subscription,
                             new_subscription.syntax(),
                             name,
                         );
@@ -6610,12 +6480,7 @@ impl Lowerer {
     ) -> SubscriptionId {
         let name = self.intern(&name_node.text());
         if self.find_subscription(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateSubscription,
-                "subscription",
-                name_node.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Subscription, name_node.syntax(), name);
         }
         let id = self.index.subscriptions.alloc(Subscription {
             name,
@@ -6941,12 +6806,7 @@ impl Lowerer {
         };
         let alias = self.intern(&alias);
         if self.find_graph_element(graph, None, alias).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateGraphElement,
-                "element table",
-                &name_node,
-                alias,
-            );
+            self.report_duplicate(ObjectKind::GraphElement, &name_node, alias);
         }
         let element = self.index.graph_elements.alloc(GraphElement {
             graph,
@@ -7080,12 +6940,7 @@ impl Lowerer {
         name_node: &SyntaxNode,
     ) -> Option<GraphPropertyId> {
         if self.find_graph_property(label, name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateGraphProperty,
-                "property",
-                name_node,
-                name,
-            );
+            self.report_duplicate(ObjectKind::GraphProperty, name_node, name);
             return None;
         }
         Some(self.index.graph_properties.alloc(GraphProperty {
@@ -7179,12 +7034,7 @@ impl Lowerer {
         name_node: &SyntaxNode,
     ) -> GraphLabelId {
         if self.find_graph_label(element, name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateGraphLabel,
-                "label",
-                name_node,
-                name,
-            );
+            self.report_duplicate(ObjectKind::GraphLabel, name_node, name);
         }
         self.index.graph_labels.alloc(GraphLabel {
             element,
@@ -7618,16 +7468,12 @@ impl Lowerer {
                 if let Some(conversion) = conversion {
                     let Conversion { name, name_ptr, .. } = self.index.conversions[conversion];
                     if self.find_conversion_in(schema, name).is_some() {
-                        let message = format!(
-                            "conversion `{}` already exists in schema `{}`",
-                            self.index.names.resolve(name),
-                            self.index.names.resolve(schema),
-                        );
-                        self.push_error(
-                            DiagnosticKind::DuplicateConversion,
-                            schema_ref.syntax(),
-                            message,
-                        );
+                        let error = SemaError::DuplicateInSchema {
+                            object: ObjectKind::Conversion,
+                            name,
+                            schema,
+                        };
+                        self.push_error(schema_ref.syntax(), error);
                         return;
                     }
                     let moved = self.index.conversions.next_idx();
@@ -7670,12 +7516,7 @@ impl Lowerer {
         name: Name,
     ) {
         if self.find_conversion_in(schema, name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateConversion,
-                "conversion",
-                name_node,
-                name,
-            );
+            self.report_duplicate(ObjectKind::Conversion, name_node, name);
             return;
         }
         let moved = self.index.conversions.next_idx();
@@ -7696,12 +7537,7 @@ impl Lowerer {
         name: Name,
     ) {
         if self.find_conversion_in(schema, name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateConversion,
-                "conversion",
-                name_node,
-                name,
-            );
+            self.report_duplicate(ObjectKind::Conversion, name_node, name);
         }
         let id = self.index.conversions.alloc(Conversion {
             schema,
@@ -7798,8 +7634,7 @@ impl Lowerer {
                     let new_name = self.intern(&new_language.text());
                     if self.find_language(new_name).is_some() {
                         self.report_duplicate(
-                            DiagnosticKind::DuplicateLanguage,
-                            "language",
+                            ObjectKind::Language,
                             new_language.syntax(),
                             new_name,
                         );
@@ -7906,12 +7741,7 @@ impl Lowerer {
         if let Some(existing) = self.find_language(name) {
             match if_exists {
                 IfExists::Error | IfExists::Ignore => {
-                    self.report_duplicate(
-                        DiagnosticKind::DuplicateLanguage,
-                        "language",
-                        name_node.syntax(),
-                        name,
-                    );
+                    self.report_duplicate(ObjectKind::Language, name_node.syntax(), name);
                 }
                 IfExists::Replace => self.drop_language(existing),
             }
@@ -7997,8 +7827,7 @@ impl Lowerer {
                     let new_name = self.intern(&new_event_trigger.text());
                     if self.find_event_trigger(new_name).is_some() {
                         self.report_duplicate(
-                            DiagnosticKind::DuplicateEventTrigger,
-                            "event trigger",
+                            ObjectKind::EventTrigger,
                             new_event_trigger.syntax(),
                             new_name,
                         );
@@ -8038,12 +7867,7 @@ impl Lowerer {
     fn alloc_event_trigger(&mut self, node: &SyntaxNode, name_node: &impl NameLike) {
         let name = self.intern(&name_node.text());
         if self.find_event_trigger(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateEventTrigger,
-                "event trigger",
-                name_node.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::EventTrigger, name_node.syntax(), name);
         }
         let id = self.index.event_triggers.alloc(EventTrigger {
             name,
@@ -8154,12 +7978,7 @@ impl Lowerer {
     fn rename_schema(&mut self, schema: SchemaId, name_node: &impl NameLike) {
         let name = self.intern_schema(&name_node.text());
         if self.find_schema(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateSchema,
-                "schema",
-                name_node.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Schema, name_node.syntax(), name);
             return;
         }
         let Schema {
@@ -8191,14 +8010,9 @@ impl Lowerer {
             };
             let name = self.index.schemas[schema].name;
             if name == self.pg_catalog {
-                let message = format!(
-                    "cannot drop schema `{}` because it is required by the database system",
-                    self.index.names.resolve(name)
-                );
                 self.push_error(
-                    DiagnosticKind::RequiredBySystem,
                     schema_ref.syntax(),
-                    message,
+                    SemaError::RequiredBySystem { schema: name },
                 );
                 continue;
             }
@@ -8208,14 +8022,12 @@ impl Lowerer {
                 .indexed_schema_objects(name)
                 .any(|object| self.in_schema(object, name))
             {
-                let message = format!(
-                    "cannot drop schema `{}` because other objects depend on it",
-                    self.index.names.resolve(name)
-                );
                 self.push_error(
-                    DiagnosticKind::DependentObjectsStillExist,
                     schema_ref.syntax(),
-                    message,
+                    SemaError::DependentObjects {
+                        object: ObjectKind::Schema,
+                        name,
+                    },
                 );
             } else {
                 self.drop_schema(schema);
@@ -8411,12 +8223,7 @@ impl Lowerer {
     fn rename_tablespace(&mut self, tablespace: TablespaceId, new_name: &ast::Tablespace) {
         let name = self.intern(&new_name.text());
         if self.find_tablespace(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateTablespace,
-                "tablespace",
-                new_name.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Tablespace, new_name.syntax(), name);
             return;
         }
         let ptr = self.index.tablespaces[tablespace].ptr;
@@ -8545,12 +8352,7 @@ impl Lowerer {
     fn rename_database(&mut self, database: DatabaseId, new_name: &ast::Database) {
         let name = self.intern(&new_name.text());
         if self.find_database(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateDatabase,
-                "database",
-                new_name.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Database, new_name.syntax(), name);
             return;
         }
         let ptr = self.index.databases[database].ptr;
@@ -9017,12 +8819,7 @@ impl Lowerer {
             .find_operator(Some(schema), name, left, right)
             .is_some()
         {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateOperator,
-                "operator",
-                op.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Operator, op.syntax(), name);
         }
         let id = self.index.operators.alloc(Operator {
             schema,
@@ -9091,16 +8888,12 @@ impl Lowerer {
             .find_operator(Some(schema), name, left, right)
             .is_some()
         {
-            let message = format!(
-                "operator `{}` already exists in schema `{}`",
-                self.index.names.resolve(name),
-                self.index.names.resolve(schema),
-            );
-            self.push_error(
-                DiagnosticKind::DuplicateOperator,
-                schema_ref.syntax(),
-                message,
-            );
+            let error = SemaError::DuplicateInSchema {
+                object: ObjectKind::Operator,
+                name,
+                schema,
+            };
+            self.push_error(schema_ref.syntax(), error);
             return;
         }
         let moved = self.index.operators.next_idx();
@@ -9144,14 +8937,12 @@ impl Lowerer {
             } else if self.dependents(Object::Operator(id)).is_empty() {
                 self.drop_operator(id);
             } else {
-                let message = format!(
-                    "cannot drop operator `{}` because other objects depend on it",
-                    self.index.names.resolve(self.index.operators[id].name)
-                );
                 self.push_error(
-                    DiagnosticKind::DependentObjectsStillExist,
                     op.syntax(),
-                    message,
+                    SemaError::DependentObjects {
+                        object: ObjectKind::Operator,
+                        name: self.index.operators[id].name,
+                    },
                 );
             }
         }
@@ -9363,12 +9154,11 @@ impl Lowerer {
         match self.find_cast(types) {
             Some(cast) => self.drop_cast(cast),
             None if matches!(if_missing, IfMissing::Error) => {
-                let message = format!(
-                    "cast from type `{}` to type `{}` does not exist",
-                    self.index.type_name(types.source),
-                    self.index.type_name(types.target),
-                );
-                self.push_error(DiagnosticKind::UnresolvedCast, cast_sig.syntax(), message);
+                let error = SemaError::UnresolvedCast {
+                    source: self.index.ty_name(types.source),
+                    target: self.index.ty_name(types.target),
+                };
+                self.push_error(cast_sig.syntax(), error);
             }
             None => {}
         }
@@ -9396,14 +9186,11 @@ impl Lowerer {
         let transform = match self.transforms.get(&key) {
             Some(&transform) if create_transform.or_replace().is_some() => transform,
             Some(_) => {
-                let message = format!(
-                    "transform for type `{}` language `{}` already exists",
-                    self.index.type_name(key.ty),
-                    self.index
-                        .names
-                        .resolve(self.index.languages[key.language].name),
-                );
-                self.push_error(DiagnosticKind::DuplicateTransform, ty.syntax(), message);
+                let error = SemaError::DuplicateTransform {
+                    ty: self.index.ty_name(key.ty),
+                    language: self.index.languages[key.language].name,
+                };
+                self.push_error(ty.syntax(), error);
                 return;
             }
             None => {
@@ -9458,14 +9245,11 @@ impl Lowerer {
         let key = self.lower_transform_key(ty, language_ref, if_missing)?;
         let transform = self.transforms.get(&key).copied();
         if transform.is_none() && matches!(if_missing, IfMissing::Error) {
-            let message = format!(
-                "transform for type `{}` language `{}` does not exist",
-                self.index.type_name(key.ty),
-                self.index
-                    .names
-                    .resolve(self.index.languages[key.language].name),
-            );
-            self.push_error(DiagnosticKind::UnresolvedTransform, node, message);
+            let error = SemaError::UnresolvedTransform {
+                ty: self.index.ty_name(key.ty),
+                language: self.index.languages[key.language].name,
+            };
+            self.push_error(node, error);
         }
         transform
     }
@@ -9655,16 +9439,12 @@ impl Lowerer {
                 if self.dependents(Object::Function(function)).is_empty() {
                     self.drop_function(function);
                 } else {
-                    let message = format!(
-                        "cannot drop function `{}` because other objects depend on it",
-                        self.index
-                            .names
-                            .resolve(self.index.functions[function].name)
-                    );
                     self.push_error(
-                        DiagnosticKind::DependentObjectsStillExist,
                         path.syntax(),
-                        message,
+                        SemaError::DependentObjects {
+                            object: ObjectKind::Function,
+                            name: self.index.functions[function].name,
+                        },
                     );
                 }
             }
@@ -9846,12 +9626,11 @@ impl Lowerer {
             })
             .is_some()
         {
-            let message = format!(
-                "function `{}` already exists with same argument types in schema `{}`",
-                self.index.names.resolve(name),
-                self.index.names.resolve(schema),
-            );
-            self.push_error(DiagnosticKind::DuplicateFunction, name_node, message);
+            let error = SemaError::DuplicateFunction {
+                name,
+                schema: Some(schema),
+            };
+            self.push_error(name_node, error);
             return None;
         }
         self.drop_function(function);
@@ -10102,15 +9881,8 @@ impl Lowerer {
                         if let Some(name) = def.name
                             && self.find_column_from(inherited_end, name).is_some()
                         {
-                            let message = format!(
-                                "column `{}` specified more than once",
-                                self.index.names.resolve(name)
-                            );
-                            self.push_error(
-                                DiagnosticKind::DuplicateColumn,
-                                column_name.syntax(),
-                                message,
-                            );
+                            let error = SemaError::ColumnSpecifiedMoreThanOnce { name };
+                            self.push_error(column_name.syntax(), error);
                             continue;
                         }
                         let id = self.add_table_column(start, inherited_end, def);
@@ -10136,15 +9908,8 @@ impl Lowerer {
                         if let Some(name) = column.name
                             && self.find_column_from(inherited_end, name).is_some()
                         {
-                            let message = format!(
-                                "column `{}` specified more than once",
-                                self.index.names.resolve(name)
-                            );
-                            self.push_error(
-                                DiagnosticKind::DuplicateColumn,
-                                like.syntax(),
-                                message,
-                            );
+                            let error = SemaError::ColumnSpecifiedMoreThanOnce { name };
+                            self.push_error(like.syntax(), error);
                             continue;
                         }
                         self.add_table_column(start, inherited_end, column);
@@ -10598,13 +10363,7 @@ impl Lowerer {
                         Some(shell) => {
                             self.lower_function_path_ref(&path, Some(&[Some(Ty::Type(shell))]));
                         }
-                        None => self.push_error_with_hint(
-                            DiagnosticKind::MissingShellType,
-                            path.syntax(),
-                            "cannot specify a canonical function without a pre-created shell type"
-                                .to_string(),
-                            Some("Create the type as a shell type, then create its canonicalization function, then do a full CREATE TYPE."),
-                        ),
+                        None => self.push_error(path.syntax(), SemaError::MissingShellType),
                     }
                 }
                 if let Some(path) = subtype_diff {
@@ -10779,11 +10538,8 @@ impl Lowerer {
             return true;
         }
         if let Some(segment) = path.segment() {
-            let message = format!(
-                "`{}` is not an enum",
-                self.index.names.resolve(self.index.types[ty].name)
-            );
-            self.push_error(DiagnosticKind::WrongTypeKind, segment.syntax(), message);
+            let name = self.index.types[ty].name;
+            self.push_error(segment.syntax(), SemaError::NotEnum { name });
         }
         false
     }
@@ -10894,15 +10650,11 @@ impl Lowerer {
         let resolution = label.map_or(Resolution::Unknown, Resolution::EnumLabel);
         self.add_ref(name, ReferenceKind::EnumLabel, literal.syntax(), resolution);
         if label.is_none() {
-            let message = format!(
-                "invalid input value for enum `{}`: `{value}`",
-                self.index.names.resolve(self.index.types[ty].name)
-            );
-            self.push_error(
-                DiagnosticKind::UnresolvedEnumLabel,
-                literal.syntax(),
-                message,
-            );
+            let error = SemaError::InvalidEnumValue {
+                ty: self.index.types[ty].name,
+                value: name,
+            };
+            self.push_error(literal.syntax(), error);
         }
     }
 
@@ -10925,11 +10677,7 @@ impl Lowerer {
     }
 
     fn report_duplicate_enum_label(&mut self, node: &SyntaxNode, name: Name) {
-        let message = format!(
-            "enum label `{}` already exists",
-            self.index.names.resolve(name)
-        );
-        self.push_error(DiagnosticKind::DuplicateEnumLabel, node, message);
+        self.report_duplicate(ObjectKind::EnumLabel, node, name);
     }
 
     fn require_composite_type(&mut self, ty: TypeId, path: &ast::PathRef) -> bool {
@@ -10937,11 +10685,8 @@ impl Lowerer {
             return true;
         }
         if let Some(segment) = path.segment() {
-            let message = format!(
-                "`{}` is not a composite type",
-                self.index.names.resolve(self.index.types[ty].name)
-            );
-            self.push_error(DiagnosticKind::WrongTypeKind, segment.syntax(), message);
+            let name = self.index.types[ty].name;
+            self.push_error(segment.syntax(), SemaError::NotComposite { name });
         }
         false
     }
@@ -11138,16 +10883,8 @@ impl Lowerer {
     ) -> Option<SmallVec<[TableId; 4]>> {
         let tables: SmallVec<[TableId; 4]> = self.typed_tables(ty).collect();
         if !tables.is_empty() && !matches!(drop_behavior, Some(ast::DropBehavior::Cascade(_))) {
-            let message = format!(
-                "cannot alter type `{}` because it is the type of a typed table",
-                self.index.names.resolve(self.index.types[ty].name)
-            );
-            self.push_error_with_hint(
-                DiagnosticKind::TypedTableAlter,
-                node,
-                message,
-                Some("Use ALTER ... CASCADE to alter the typed tables too."),
-            );
+            let name = self.index.types[ty].name;
+            self.push_error(node, SemaError::TypedTableAlter { name });
             return None;
         }
         Some(tables)
@@ -11251,12 +10988,7 @@ impl Lowerer {
     }
 
     fn report_duplicate_column(&mut self, relation: Name, name_node: &SyntaxNode, name: Name) {
-        let message = format!(
-            "column `{}` of relation `{}` already exists",
-            self.index.names.resolve(name),
-            self.index.names.resolve(relation),
-        );
-        self.push_error(DiagnosticKind::DuplicateColumn, name_node, message);
+        self.push_error(name_node, SemaError::DuplicateColumn { name, relation });
     }
 
     fn add_type_attribute(&mut self, ty: TypeId, name_node: &impl NameLike, column_ty: Option<Ty>) {
@@ -11593,9 +11325,8 @@ impl Lowerer {
             ast::Constraint::GeneratedConstraint(_) => "generated columns",
         };
         self.push_error(
-            DiagnosticKind::InvalidDomainConstraint,
             constraint.syntax(),
-            format!("{what} not possible for domains"),
+            SemaError::InvalidDomainConstraint { what },
         );
     }
 
@@ -11786,12 +11517,7 @@ impl Lowerer {
         let name = self.intern(&segment.text());
         let schema = self.index.types[ty].schema;
         if self.type_name_taken(schema, name) {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateType,
-                "type",
-                segment.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Type, segment.syntax(), name);
             return;
         }
         let name_ptr = self.ast_ptr(&segment);
@@ -11811,12 +11537,12 @@ impl Lowerer {
         };
         let name = self.index.types[ty].name;
         if self.type_name_taken(schema, name) {
-            let message = format!(
-                "type `{}` already exists in schema `{}`",
-                self.index.names.resolve(name),
-                self.index.names.resolve(schema),
-            );
-            self.push_error(DiagnosticKind::DuplicateType, schema_ref.syntax(), message);
+            let error = SemaError::DuplicateInSchema {
+                object: ObjectKind::Type,
+                name,
+                schema,
+            };
+            self.push_error(schema_ref.syntax(), error);
             return;
         }
         let Type { name, name_ptr, .. } = self.index.types[ty];
@@ -12083,12 +11809,11 @@ impl Lowerer {
         if let Some(kind) = kind
             && self.index.types[ty].kind != kind
         {
-            let message = format!(
-                "`{}` is not a {}",
-                self.index.names.resolve(name),
-                kind.label()
-            );
-            self.push_error(DiagnosticKind::WrongTypeKind, segment.syntax(), message);
+            let error = SemaError::WrongTypeKind {
+                name,
+                expected: kind,
+            };
+            self.push_error(segment.syntax(), error);
             return None;
         }
         Some(ty)
@@ -12273,11 +11998,7 @@ impl Lowerer {
                 ])
             }),
             Some(ast::SetTarget::SetCatalog(catalog)) => {
-                self.push_error(
-                    DiagnosticKind::CannotChangeDatabase,
-                    catalog.syntax(),
-                    "current database cannot be changed",
-                );
+                self.push_error(catalog.syntax(), SemaError::CannotChangeDatabase);
                 None
             }
             Some(
@@ -12741,11 +12462,7 @@ impl Lowerer {
             Some(ast::CompoundOp::Except(_)) => "EXCEPT",
             None => return,
         };
-        self.push_error(
-            DiagnosticKind::ColumnCountMismatch,
-            rhs_node.syntax(),
-            format!("each {op} query must have the same number of columns"),
-        );
+        self.push_error(rhs_node.syntax(), SemaError::CompoundColumnCount { op });
     }
 
     fn lower_values(&mut self, values: &ast::Values) -> QueryId {
@@ -12765,11 +12482,7 @@ impl Lowerer {
             .enumerate()
         {
             if row_index > 0 && row.exprs().count() != first_len {
-                self.push_error(
-                    DiagnosticKind::ColumnCountMismatch,
-                    row.syntax(),
-                    "VALUES lists must all be the same length",
-                );
+                self.push_error(row.syntax(), SemaError::ValuesLengthMismatch);
             }
             for (column_index, expr) in row.exprs().enumerate() {
                 let ty = self.lower_expr_in(ExprContext::Values, &expr);
@@ -13080,15 +12793,8 @@ impl Lowerer {
                 .flat_map(|list| list.column_targets())
             {
                 if let Some(name) = self.duplicate_target(&mut seen, &column_target) {
-                    let message = format!(
-                        "column `{}` specified more than once",
-                        self.index.names.resolve(name)
-                    );
-                    self.push_error(
-                        DiagnosticKind::DuplicateColumn,
-                        column_target.syntax(),
-                        message,
-                    );
+                    let error = SemaError::ColumnSpecifiedMoreThanOnce { name };
+                    self.push_error(column_target.syntax(), error);
                 }
                 self.lower_column_target(ExprContext::Insert, target, &column_target);
             }
@@ -13149,28 +12855,18 @@ impl Lowerer {
                         && source_range.contains_range(ptr.value.text_range())
                 })
                 .unwrap_or_else(|| self.ptr(source.syntax()));
-            self.push_error_ptr(
-                DiagnosticKind::ColumnCountMismatch,
-                ptr,
-                "INSERT has more expressions than target columns",
-                None,
-            );
+            self.push_error_ptr(ptr, SemaError::InsertMoreExpressionsThanTargets);
         } else if source_len < target_len
             && let Some(column_target) =
                 column_targets.and_then(|list| list.column_targets().nth(source_len))
         {
-            let hint = (source_len == 1
+            let row_hint = source_len == 1
                 && single_source_expr(source).is_some_and(|expr| {
                     matches!(expr, ast::Expr::TupleExpr(tuple) if tuple.exprs().count() == target_len)
-                }))
-            .then_some(
-                "The insertion source is a row expression containing the same number of columns expected by the INSERT. Did you accidentally use extra parentheses?",
-            );
-            self.push_error_with_hint(
-                DiagnosticKind::ColumnCountMismatch,
+                });
+            self.push_error(
                 column_target.syntax(),
-                "INSERT has more target columns than expressions",
-                hint,
+                SemaError::InsertMoreTargetsThanExpressions { row_hint },
             );
         }
     }
@@ -13320,14 +13016,9 @@ impl Lowerer {
         column_target: &ast::ColumnTarget,
     ) {
         if let Some(name) = self.duplicate_target(seen, column_target) {
-            let message = format!(
-                "multiple assignments to same column `{}`",
-                self.index.names.resolve(name)
-            );
             self.push_error(
-                DiagnosticKind::DuplicateAssignment,
                 column_target.syntax(),
-                message,
+                SemaError::DuplicateAssignment { name },
             );
         }
     }
@@ -13620,11 +13311,8 @@ impl Lowerer {
         {
             let name = self.intern(&cte_name.text());
             if seen.contains(&name) {
-                let message = format!(
-                    "WITH query name `{}` specified more than once",
-                    self.index.names.resolve(name)
-                );
-                self.push_error(DiagnosticKind::DuplicateCte, cte_name.syntax(), message);
+                let error = SemaError::DuplicateCte { name };
+                self.push_error(cte_name.syntax(), error);
             }
             seen.push(name);
         }
@@ -14123,15 +13811,12 @@ impl Lowerer {
             !different_unaliased_tables
         });
         if duplicate {
-            let message = format!(
-                "table name `{}` specified more than once",
-                self.index.names.resolve(name)
-            );
             let node = match from_item.alias().and_then(|alias| alias.name()) {
                 Some(alias) => alias.syntax().clone(),
                 None => from_item.syntax().clone(),
             };
-            self.push_error(DiagnosticKind::DuplicateSource, &node, message);
+            let error = SemaError::DuplicateSource { name };
+            self.push_error(&node, error);
         }
     }
 
@@ -14417,34 +14102,22 @@ impl Lowerer {
         let Some(extra) = list.range.iter().nth(available) else {
             return;
         };
-        let names = &self.index.names;
-        let message = match owner {
-            ColumnListOwner::Cte(name) => format!(
-                "WITH query `{}` has {available} {} available but {specified} {} specified",
-                names.resolve(name),
-                plural_columns(available),
-                plural_columns(specified),
-            ),
-            ColumnListOwner::Table(Some(name)) => format!(
-                "table `{}` has {available} {} available but {specified} {} specified",
-                names.resolve(name),
-                plural_columns(available),
-                plural_columns(specified),
-            ),
-            ColumnListOwner::Join(Some(name)) => format!(
-                "join expression `{}` has {available} {} available but {specified} {} specified",
-                names.resolve(name),
-                plural_columns(available),
-                plural_columns(specified),
-            ),
+        let too_long = |what, name| SemaError::ColumnListTooLong {
+            what,
+            name,
+            available,
+            specified,
+        };
+        let error = match owner {
+            ColumnListOwner::Cte(name) => too_long("WITH query", name),
+            ColumnListOwner::Table(Some(name)) => too_long("table", name),
+            ColumnListOwner::Join(Some(name)) => too_long("join expression", name),
             ColumnListOwner::Table(None) | ColumnListOwner::Join(None) => return,
-            ColumnListOwner::View => {
-                "CREATE VIEW specifies more column names than columns".to_owned()
-            }
-            ColumnListOwner::CreateAs => "too many column names were specified".to_owned(),
+            ColumnListOwner::View => SemaError::ViewTooManyColumnNames,
+            ColumnListOwner::CreateAs => SemaError::CreateAsTooManyColumnNames,
         };
         let ptr = self.index.columns[extra].ptr;
-        self.push_error_ptr(DiagnosticKind::ColumnCountMismatch, ptr, message, None);
+        self.push_error_ptr(ptr, error);
     }
 
     fn rename_columns(
@@ -14755,66 +14428,31 @@ impl Lowerer {
         node: &SyntaxNode,
         drop: bool,
     ) {
-        const COPY_SELECT_HINT: &str = "Try the COPY (SELECT ...) TO variant.";
         let Table { kind, name, .. } = self.index.tables[table];
-        let name = self.index.names.resolve(name);
-        let (message, hint) = match (lookup, kind) {
-            (TableLookup::CopyTo, TableKind::View) => (
-                format!("cannot copy from view `{name}`"),
-                Some(COPY_SELECT_HINT),
-            ),
-            (TableLookup::CopyTo, TableKind::ForeignTable) => (
-                format!("cannot copy from foreign table `{name}`"),
-                Some(COPY_SELECT_HINT),
-            ),
-            (TableLookup::CopyTo, TableKind::Sequence) => {
-                (format!("cannot copy from sequence `{name}`"), None)
-            }
-            (
-                TableLookup::CopyTo,
-                TableKind::Table | TableKind::MaterializedView | TableKind::PropertyGraph,
-            ) => (
-                format!("cannot copy from non-table relation `{name}`"),
-                None,
-            ),
-            (TableLookup::CopyFrom, TableKind::View) => (
-                format!("cannot copy to view `{name}`"),
-                Some("To enable copying to a view, provide an INSTEAD OF INSERT trigger."),
-            ),
-            (TableLookup::CopyFrom, TableKind::MaterializedView) => {
-                (format!("cannot copy to materialized view `{name}`"), None)
-            }
-            (TableLookup::CopyFrom, TableKind::Sequence) => {
-                (format!("cannot copy to sequence `{name}`"), None)
-            }
-            (
-                TableLookup::CopyFrom,
-                TableKind::Table | TableKind::ForeignTable | TableKind::PropertyGraph,
-            ) => (format!("cannot copy to non-table relation `{name}`"), None),
-            (
-                TableLookup::Table
-                | TableLookup::ForeignTable
-                | TableLookup::TableOrForeignTable
-                | TableLookup::TableOrView
-                | TableLookup::TableOrMaterializedView
-                | TableLookup::Any
-                | TableLookup::View
-                | TableLookup::MaterializedView
-                | TableLookup::Sequence
-                | TableLookup::PropertyGraph
-                | TableLookup::Truncate,
-                TableKind::Table
-                | TableKind::ForeignTable
-                | TableKind::View
-                | TableKind::MaterializedView
-                | TableKind::Sequence
-                | TableKind::PropertyGraph,
-            ) => (
-                format!("`{name}` is not a {}", lookup.label()),
-                drop.then(|| drop_hint(kind)),
-            ),
+        let error = match lookup {
+            TableLookup::CopyTo | TableLookup::CopyFrom => SemaError::CannotCopy {
+                name,
+                copy_from: matches!(lookup, TableLookup::CopyTo),
+                kind,
+            },
+            TableLookup::Table
+            | TableLookup::ForeignTable
+            | TableLookup::TableOrForeignTable
+            | TableLookup::TableOrView
+            | TableLookup::TableOrMaterializedView
+            | TableLookup::Any
+            | TableLookup::View
+            | TableLookup::MaterializedView
+            | TableLookup::Sequence
+            | TableLookup::PropertyGraph
+            | TableLookup::Truncate => SemaError::WrongRelationKind {
+                name,
+                expected: lookup,
+                kind,
+                drop,
+            },
         };
-        self.push_error_with_hint(DiagnosticKind::WrongRelationKind, node, message, hint);
+        self.push_error(node, error);
     }
 
     fn lower_alter_table(&mut self, alter_table: &ast::AlterTable) {
@@ -15421,16 +15059,11 @@ impl Lowerer {
                         && self.index.tables[table].constraints_complete
                         && self.columns_contain(self.index.tables[table].columns.range, column) =>
                     {
-                        let message = format!(
-                            "column `{}` of relation `{}` is not an identity column",
-                            self.index.names.resolve(column),
-                            self.index.names.resolve(self.index.tables[table].name),
-                        );
-                        self.push_error(
-                            DiagnosticKind::NotIdentityColumn,
-                            column_ref.syntax(),
-                            message,
-                        );
+                        let error = SemaError::NotIdentityColumn {
+                            column,
+                            relation: self.index.tables[table].name,
+                        };
+                        self.push_error(column_ref.syntax(), error);
                     }
                     None => {}
                 }
@@ -15686,15 +15319,9 @@ impl Lowerer {
                 | TableKind::View
                 | TableKind::Sequence
                 | TableKind::PropertyGraph => {
-                    let message = format!(
-                        "cannot create index on {} `{}`",
-                        kind.label(),
-                        self.index.names.resolve(name)
-                    );
                     self.push_error(
-                        DiagnosticKind::WrongRelationKind,
                         table_segment.syntax(),
-                        message,
+                        SemaError::CannotCreateIndex { name, kind },
                     );
                     return;
                 }
@@ -15789,11 +15416,7 @@ impl Lowerer {
 
         let constraint = create_trigger.constraint_token().is_some();
         if constraint && let Some(or_replace) = create_trigger.or_replace() {
-            self.push_error(
-                DiagnosticKind::ReplaceConstraintTrigger,
-                or_replace.syntax(),
-                "CREATE OR REPLACE CONSTRAINT TRIGGER is not supported",
-            );
+            self.push_error(or_replace.syntax(), SemaError::ReplaceConstraintTrigger);
         }
         if let (Some(table), Some(name)) = (table, create_trigger.trigger()) {
             self.alloc_trigger(
@@ -15822,16 +15445,11 @@ impl Lowerer {
                     self.report_duplicate_trigger(name_node.syntax(), name, table);
                 }
                 IfExists::Replace if self.index.triggers[existing].constraint => {
-                    let message = format!(
-                        "trigger `{}` for relation `{}` is a constraint trigger",
-                        self.index.names.resolve(name),
-                        self.index.names.resolve(self.index.tables[table].name),
-                    );
-                    self.push_error(
-                        DiagnosticKind::ReplaceConstraintTrigger,
-                        name_node.syntax(),
-                        message,
-                    );
+                    let error = SemaError::ConstraintTrigger {
+                        name,
+                        relation: self.index.tables[table].name,
+                    };
+                    self.push_error(name_node.syntax(), error);
                 }
                 IfExists::Replace => self.drop_trigger(existing),
             }
@@ -15848,12 +15466,8 @@ impl Lowerer {
     }
 
     fn report_duplicate_trigger(&mut self, name_node: &SyntaxNode, name: Name, table: TableId) {
-        let message = format!(
-            "trigger `{}` for relation `{}` already exists",
-            self.index.names.resolve(name),
-            self.index.names.resolve(self.index.tables[table].name),
-        );
-        self.push_error(DiagnosticKind::DuplicateTrigger, name_node, message);
+        let table = self.index.tables[table].name;
+        self.push_error(name_node, SemaError::DuplicateTrigger { name, table });
     }
 
     fn lower_on_relation(
@@ -16110,12 +15724,8 @@ impl Lowerer {
     }
 
     fn report_duplicate_rule(&mut self, name_node: &SyntaxNode, name: Name, table: TableId) {
-        let message = format!(
-            "rule `{}` for relation `{}` already exists",
-            self.index.names.resolve(name),
-            self.index.names.resolve(self.index.tables[table].name),
-        );
-        self.push_error(DiagnosticKind::DuplicateRule, name_node, message);
+        let table = self.index.tables[table].name;
+        self.push_error(name_node, SemaError::DuplicateRule { name, table });
     }
 
     fn lower_rule_ref(
@@ -16149,24 +15759,14 @@ impl Lowerer {
         let Rule {
             name, table, event, ..
         } = self.index.rules[rule];
-        let table_def = &self.index.tables[table];
-        let kind = match table_def.kind {
-            TableKind::View => Some("view"),
-            TableKind::MaterializedView => Some("materialized view"),
-            TableKind::Table
-            | TableKind::ForeignTable
-            | TableKind::Sequence
-            | TableKind::PropertyGraph => None,
-        };
+        let Table {
+            kind, name: table, ..
+        } = self.index.tables[table];
         if event == RuleEvent::Select
-            && let Some(kind) = kind
+            && matches!(kind, TableKind::View | TableKind::MaterializedView)
         {
-            let table_name = self.index.names.resolve(table_def.name);
-            let message = format!(
-                "cannot drop rule `{}` on {kind} `{table_name}` because {kind} `{table_name}` requires it",
-                self.index.names.resolve(name),
-            );
-            self.push_error(DiagnosticKind::DropReturnRule, rule_ref.syntax(), message);
+            let error = SemaError::DropReturnRule { name, kind, table };
+            self.push_error(rule_ref.syntax(), error);
             return;
         }
         self.drop_rule(rule);
@@ -16184,11 +15784,7 @@ impl Lowerer {
         {
             let Rule { table, event, .. } = self.index.rules[rule];
             if event == RuleEvent::Select {
-                self.push_error(
-                    DiagnosticKind::RenameSelectRule,
-                    name.syntax(),
-                    "renaming an ON SELECT rule is not allowed",
-                );
+                self.push_error(name.syntax(), SemaError::RenameSelectRule);
                 return;
             }
             let new_name = self.intern(&name.text());
@@ -17116,12 +16712,7 @@ impl Lowerer {
                     let schema = self.index.collations[collation].schema;
                     let name = self.intern(&segment.text());
                     if self.find_collation_in(schema, name).is_some() {
-                        self.report_duplicate(
-                            DiagnosticKind::DuplicateCollation,
-                            "collation",
-                            segment.syntax(),
-                            name,
-                        );
+                        self.report_duplicate(ObjectKind::Collation, segment.syntax(), name);
                         return;
                     }
                     let name_ptr = self.ast_ptr(&segment);
@@ -17139,16 +16730,12 @@ impl Lowerer {
                 if let Some(collation) = collation {
                     let Collation { name, name_ptr, .. } = self.index.collations[collation];
                     if self.find_collation_in(schema, name).is_some() {
-                        let message = format!(
-                            "collation `{}` already exists in schema `{}`",
-                            self.index.names.resolve(name),
-                            self.index.names.resolve(schema),
-                        );
-                        self.push_error(
-                            DiagnosticKind::DuplicateCollation,
-                            schema_ref.syntax(),
-                            message,
-                        );
+                        let error = SemaError::DuplicateInSchema {
+                            object: ObjectKind::Collation,
+                            name,
+                            schema,
+                        };
+                        self.push_error(schema_ref.syntax(), error);
                         return;
                     }
                     self.move_collation(collation, node, schema, name, name_ptr);
@@ -17423,14 +17010,10 @@ impl Lowerer {
             return;
         };
         if self.find_primary_key(table).is_some() {
-            let message = format!(
-                "multiple primary keys for table `{}` are not allowed",
-                self.index.names.resolve(self.index.tables[table].name)
-            );
+            let table = self.index.tables[table].name;
             self.push_error(
-                DiagnosticKind::MultiplePrimaryKeys,
                 primary_key.syntax(),
-                message,
+                SemaError::MultiplePrimaryKeys { table },
             );
         }
         let name = primary_key
@@ -18740,14 +18323,8 @@ impl Lowerer {
             .checked_sub(1)
             .and_then(|index| outputs.range.iter().nth(index))
         else {
-            self.push_error(
-                DiagnosticKind::InvalidOrdinal,
-                literal.syntax(),
-                format!(
-                    "{} position {position} is not in select list",
-                    clause.label()
-                ),
-            );
+            let error = SemaError::InvalidOrdinal { clause, position };
+            self.push_error(literal.syntax(), error);
             return;
         };
         let name = self.intern(token.text());
@@ -19106,11 +18683,7 @@ impl Lowerer {
             };
             let name = self.intern(&window.text());
             if self.find_window(name).is_some() {
-                let message = format!(
-                    "window `{}` is already defined",
-                    self.index.names.resolve(name)
-                );
-                self.push_error(DiagnosticKind::DuplicateWindow, window.syntax(), message);
+                self.push_error(window.syntax(), SemaError::DuplicateWindow { name });
             }
             let id = self.index.windows.alloc(Window {
                 name,
@@ -19669,11 +19242,8 @@ impl Lowerer {
                 .overloads()
                 .missing_array_type(&self.index.functions[function], &args)
         {
-            let message = format!(
-                "could not find array type for data type `{}`",
-                self.index.type_name(element)
-            );
-            self.push_error(DiagnosticKind::MissingArrayType, callee.syntax(), message);
+            let ty = self.index.ty_name(element);
+            self.push_error(callee.syntax(), SemaError::MissingArrayType { ty });
         }
         if self.function.is_none()
             && let Some(function) = function
@@ -19730,41 +19300,37 @@ impl Lowerer {
             return;
         }
         let ptr = self.ptr(call.syntax());
-        let (diagnostic, message) = match kind {
-            AggregateCallKind::Aggregate => (
-                DiagnosticKind::GroupingError,
-                self.expr_context.aggregate_error(),
-            ),
-            AggregateCallKind::Window => (
-                DiagnosticKind::WindowingError,
-                self.expr_context.window_error(),
-            ),
+        let context = self.expr_context;
+        let misplaced = match kind {
+            AggregateCallKind::Aggregate => {
+                (!context.allows_aggregates()).then_some(SemaError::MisplacedAggregate { context })
+            }
+            AggregateCallKind::Window => {
+                (!context.allows_windows()).then_some(SemaError::MisplacedWindow { context })
+            }
         };
         let depth = self.scopes.len();
-        if let Some(message) = message {
-            self.push_error_ptr(diagnostic, ptr, message, None);
+        if let Some(error) = misplaced {
+            self.push_error_ptr(ptr, error);
         } else {
             for index in aggregate_calls..self.aggregate_calls.len() {
                 let inner = self.aggregate_calls[index];
                 if inner.depth != depth {
                     continue;
                 }
-                let (diagnostic, message) = match (kind, inner.kind) {
-                    (AggregateCallKind::Aggregate, AggregateCallKind::Aggregate) => (
-                        DiagnosticKind::GroupingError,
-                        "aggregate function calls cannot be nested",
-                    ),
-                    (AggregateCallKind::Aggregate, AggregateCallKind::Window) => (
-                        DiagnosticKind::GroupingError,
-                        "aggregate function calls cannot contain window function calls",
-                    ),
-                    (AggregateCallKind::Window, AggregateCallKind::Window) => (
-                        DiagnosticKind::WindowingError,
-                        "window function calls cannot be nested",
-                    ),
+                let error = match (kind, inner.kind) {
+                    (AggregateCallKind::Aggregate, AggregateCallKind::Aggregate) => {
+                        SemaError::NestedAggregate
+                    }
+                    (AggregateCallKind::Aggregate, AggregateCallKind::Window) => {
+                        SemaError::AggregateContainsWindow
+                    }
+                    (AggregateCallKind::Window, AggregateCallKind::Window) => {
+                        SemaError::NestedWindow
+                    }
                     (AggregateCallKind::Window, AggregateCallKind::Aggregate) => continue,
                 };
-                self.push_error_ptr(diagnostic, inner.ptr, message, None);
+                self.push_error_ptr(inner.ptr, error);
                 self.aggregate_calls.truncate(aggregate_calls);
                 return;
             }
@@ -20639,7 +20205,7 @@ impl Lowerer {
             if if_exists == IfExists::Ignore {
                 return None;
             }
-            self.report_duplicate(DiagnosticKind::DuplicateSchema, "schema", name_node, name);
+            self.report_duplicate(ObjectKind::Schema, name_node, name);
         }
         let id = self.index.schemas.alloc(Schema {
             name,
@@ -20658,12 +20224,7 @@ impl Lowerer {
     ) -> TablespaceId {
         let name = self.intern(&tablespace.text());
         if self.find_tablespace(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateTablespace,
-                "tablespace",
-                tablespace.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Tablespace, tablespace.syntax(), name);
         }
         let id = self.index.tablespaces.alloc(Tablespace {
             name,
@@ -20682,12 +20243,7 @@ impl Lowerer {
     ) -> DatabaseId {
         let name = self.intern(&database.text());
         if self.find_database(name).is_some() {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateDatabase,
-                "database",
-                database.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Database, database.syntax(), name);
         }
         let id = self.index.databases.alloc(Database {
             name,
@@ -20711,12 +20267,7 @@ impl Lowerer {
             if if_exists == IfExists::Ignore {
                 return None;
             }
-            self.report_duplicate(
-                DiagnosticKind::DuplicateExtension,
-                "extension",
-                extension.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Extension, extension.syntax(), name);
         }
         let id = self.index.extensions.alloc(Extension {
             schema,
@@ -20742,12 +20293,7 @@ impl Lowerer {
             if if_exists == IfExists::Ignore {
                 return None;
             }
-            self.report_duplicate(
-                DiagnosticKind::DuplicateRelation,
-                "relation",
-                segment.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Relation, segment.syntax(), name);
         }
         let id = self.index.indexes.alloc(Index {
             schema,
@@ -20774,12 +20320,7 @@ impl Lowerer {
             if if_exists == IfExists::Ignore {
                 return None;
             }
-            self.report_duplicate(
-                DiagnosticKind::DuplicateCollation,
-                "collation",
-                segment.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Collation, segment.syntax(), name);
         }
         let id = self.index.collations.alloc(Collation {
             schema,
@@ -20833,14 +20374,9 @@ impl Lowerer {
         });
         if if_exists != IfExists::Ignore && replaced.is_none() {
             if self.relation_exists(schema, name) {
-                self.report_duplicate(
-                    DiagnosticKind::DuplicateRelation,
-                    "relation",
-                    name_node,
-                    name,
-                );
+                self.report_duplicate(ObjectKind::Relation, name_node, name);
             } else if self.find_type_in(schema, name).is_some() {
-                self.report_duplicate(DiagnosticKind::DuplicateType, "type", name_node, name);
+                self.report_duplicate(ObjectKind::Type, name_node, name);
             }
         }
         let id = self.index.tables.alloc(
@@ -20945,12 +20481,7 @@ impl Lowerer {
         if self.find_type_in(schema, name).is_some()
             || self.find_table(Some(schema), name).is_some()
         {
-            self.report_duplicate(
-                DiagnosticKind::DuplicateType,
-                "type",
-                segment.syntax(),
-                name,
-            );
+            self.report_duplicate(ObjectKind::Type, segment.syntax(), name);
         }
         let id = self.index.types.alloc(
             Type {
@@ -21026,11 +20557,8 @@ impl Lowerer {
         }) {
             match if_exists {
                 IfExists::Error => {
-                    let message = format!(
-                        "function `{}` already exists with same argument types",
-                        self.index.names.resolve(name)
-                    );
-                    self.push_error(DiagnosticKind::DuplicateFunction, segment.syntax(), message);
+                    let error = SemaError::DuplicateFunction { name, schema: None };
+                    self.push_error(segment.syntax(), error);
                 }
                 IfExists::Ignore => {}
                 IfExists::Replace => {
@@ -21134,11 +20662,7 @@ impl Lowerer {
                 prev.name == Some(name) && params_conflict(prev.mode, param.mode)
             })
         {
-            let message = format!(
-                "parameter name `{}` used more than once",
-                self.index.names.resolve(name)
-            );
-            self.push_error(DiagnosticKind::DuplicateParam, param_name.syntax(), message);
+            self.push_error(param_name.syntax(), SemaError::DuplicateParam { name });
         }
         let name_ptr = param.name_ptr;
         let id = self.index.params.alloc(param);
@@ -21176,12 +20700,7 @@ impl Lowerer {
                 .is_none()
                 && self.relation_exists(schema, name_id)
             {
-                self.report_duplicate(
-                    DiagnosticKind::DuplicateRelation,
-                    "relation",
-                    name.syntax(),
-                    name_id,
-                );
+                self.report_duplicate(ObjectKind::Relation, name.syntax(), name_id);
             }
         }
         let name = match (name, using_index) {
@@ -21221,16 +20740,12 @@ impl Lowerer {
         name_node: &SyntaxNode,
         name: Name,
     ) {
-        let what = match owner {
-            ConstraintOwner::Table(_) => "relation",
-            ConstraintOwner::Domain(_) => "domain",
+        let error = SemaError::DuplicateConstraint {
+            name,
+            owner: self.constraint_owner_name(owner),
+            domain: matches!(owner, ConstraintOwner::Domain(_)),
         };
-        let message = format!(
-            "constraint `{}` for {what} `{}` already exists",
-            self.index.names.resolve(name),
-            self.index.names.resolve(self.constraint_owner_name(owner)),
-        );
-        self.push_error(DiagnosticKind::DuplicateConstraint, name_node, message);
+        self.push_error(name_node, error);
     }
 
     fn alloc_constraint(
@@ -21402,50 +20917,17 @@ impl Lowerer {
             .push(range.map(|range| ItemRange { range, item }));
     }
 
-    fn report_duplicate(
-        &mut self,
-        kind: DiagnosticKind,
-        what: &str,
-        node: &SyntaxNode,
-        name: Name,
-    ) {
-        let message = format!("{what} `{}` already exists", self.index.names.resolve(name));
-        self.push_error(kind, node, message);
+    fn report_duplicate(&mut self, object: ObjectKind, node: &SyntaxNode, name: Name) {
+        self.push_error(node, SemaError::Duplicate { object, name });
     }
 
-    fn push_error(
-        &mut self,
-        kind: DiagnosticKind,
-        node: &SyntaxNode,
-        message: impl Into<Cow<'static, str>>,
-    ) {
-        self.push_error_with_hint(kind, node, message, None);
+    fn push_error(&mut self, node: &SyntaxNode, error: SemaError) {
+        self.push_error_ptr(self.ptr(node), error);
     }
 
-    fn push_error_with_hint(
-        &mut self,
-        kind: DiagnosticKind,
-        node: &SyntaxNode,
-        message: impl Into<Cow<'static, str>>,
-        hint: Option<&'static str>,
-    ) {
-        self.push_error_ptr(kind, self.ptr(node), message, hint);
-    }
-
-    fn push_error_ptr(
-        &mut self,
-        kind: DiagnosticKind,
-        ptr: InIrFile<SyntaxNodePtr>,
-        message: impl Into<Cow<'static, str>>,
-        hint: Option<&'static str>,
-    ) {
+    fn push_error_ptr(&mut self, ptr: InIrFile<SyntaxNodePtr>, error: SemaError) {
         let range = self.index.range(ptr.file_range());
-        self.index.errors.push(Diagnostic {
-            kind,
-            range,
-            message: message.into(),
-            hint,
-        });
+        self.index.errors.push(range, error);
     }
 
     fn ptr(&self, node: &SyntaxNode) -> InIrFile<SyntaxNodePtr> {
@@ -21457,8 +20939,8 @@ impl Lowerer {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ExprContext {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ExprContext {
     Unrestricted,
     Where,
     JoinCondition,
@@ -21494,112 +20976,15 @@ enum ExprContext {
 }
 
 impl ExprContext {
-    fn aggregate_error(self) -> Option<&'static str> {
-        Some(match self {
-            ExprContext::Unrestricted | ExprContext::Having | ExprContext::WindowDefinition => {
-                return None;
-            }
-            ExprContext::Where => "aggregate functions are not allowed in WHERE",
-            ExprContext::JoinCondition => "aggregate functions are not allowed in JOIN conditions",
-            ExprContext::GroupBy => "aggregate functions are not allowed in GROUP BY",
-            ExprContext::Filter => "aggregate functions are not allowed in FILTER",
-            ExprContext::WindowRange => "aggregate functions are not allowed in window RANGE",
-            ExprContext::WindowRows => "aggregate functions are not allowed in window ROWS",
-            ExprContext::WindowGroups => "aggregate functions are not allowed in window GROUPS",
-            ExprContext::Limit => "aggregate functions are not allowed in LIMIT",
-            ExprContext::Offset => "aggregate functions are not allowed in OFFSET",
-            ExprContext::Values => "aggregate functions are not allowed in VALUES",
-            ExprContext::Returning => "aggregate functions are not allowed in RETURNING",
-            ExprContext::Insert => "aggregate functions are not allowed in INSERT",
-            ExprContext::Update => "aggregate functions are not allowed in UPDATE",
-            ExprContext::FromFunction => "aggregate functions are not allowed in functions in FROM",
-            ExprContext::MergeWhen => {
-                "aggregate functions are not allowed in MERGE WHEN conditions"
-            }
-            ExprContext::CheckConstraint => {
-                "aggregate functions are not allowed in check constraints"
-            }
-            ExprContext::Default => "aggregate functions are not allowed in DEFAULT expressions",
-            ExprContext::GeneratedColumn => {
-                "aggregate functions are not allowed in column generation expressions"
-            }
-            ExprContext::IndexExpression => {
-                "aggregate functions are not allowed in index expressions"
-            }
-            ExprContext::IndexPredicate => {
-                "aggregate functions are not allowed in index predicates"
-            }
-            ExprContext::StatisticsExpression => {
-                "aggregate functions are not allowed in statistics expressions"
-            }
-            ExprContext::PartitionKey => {
-                "aggregate functions are not allowed in partition key expressions"
-            }
-            ExprContext::PartitionBound => "aggregate functions are not allowed in partition bound",
-            ExprContext::Policy => "aggregate functions are not allowed in policy expressions",
-            ExprContext::TriggerWhen => {
-                "aggregate functions are not allowed in trigger WHEN conditions"
-            }
-            ExprContext::CallArgument => "aggregate functions are not allowed in CALL arguments",
-            ExprContext::Transform => {
-                "aggregate functions are not allowed in transform expressions"
-            }
-            ExprContext::CopyWhere => {
-                "aggregate functions are not allowed in COPY FROM WHERE conditions"
-            }
-            ExprContext::ExecuteParameter => {
-                "aggregate functions are not allowed in EXECUTE parameters"
-            }
-        })
+    fn allows_aggregates(self) -> bool {
+        matches!(
+            self,
+            ExprContext::Unrestricted | ExprContext::Having | ExprContext::WindowDefinition
+        )
     }
 
-    fn window_error(self) -> Option<&'static str> {
-        Some(match self {
-            ExprContext::Unrestricted => return None,
-            ExprContext::Where => "window functions are not allowed in WHERE",
-            ExprContext::JoinCondition => "window functions are not allowed in JOIN conditions",
-            ExprContext::GroupBy => "window functions are not allowed in GROUP BY",
-            ExprContext::Having => "window functions are not allowed in HAVING",
-            ExprContext::Filter => "window functions are not allowed in FILTER",
-            ExprContext::WindowDefinition
-            | ExprContext::WindowRange
-            | ExprContext::WindowRows
-            | ExprContext::WindowGroups => "window functions are not allowed in window definitions",
-            ExprContext::Limit => "window functions are not allowed in LIMIT",
-            ExprContext::Offset => "window functions are not allowed in OFFSET",
-            ExprContext::Values => "window functions are not allowed in VALUES",
-            ExprContext::Returning => "window functions are not allowed in RETURNING",
-            ExprContext::Insert => "window functions are not allowed in INSERT",
-            ExprContext::Update => "window functions are not allowed in UPDATE",
-            ExprContext::FromFunction => "window functions are not allowed in functions in FROM",
-            ExprContext::MergeWhen => "window functions are not allowed in MERGE WHEN conditions",
-            ExprContext::CheckConstraint => "window functions are not allowed in check constraints",
-            ExprContext::Default => "window functions are not allowed in DEFAULT expressions",
-            ExprContext::GeneratedColumn => {
-                "window functions are not allowed in column generation expressions"
-            }
-            ExprContext::IndexExpression => "window functions are not allowed in index expressions",
-            ExprContext::IndexPredicate => "window functions are not allowed in index predicates",
-            ExprContext::StatisticsExpression => {
-                "window functions are not allowed in statistics expressions"
-            }
-            ExprContext::PartitionKey => {
-                "window functions are not allowed in partition key expressions"
-            }
-            ExprContext::PartitionBound => "window functions are not allowed in partition bound",
-            ExprContext::Policy => "window functions are not allowed in policy expressions",
-            ExprContext::TriggerWhen => {
-                "window functions are not allowed in trigger WHEN conditions"
-            }
-            ExprContext::CallArgument => "window functions are not allowed in CALL arguments",
-            ExprContext::Transform => "window functions are not allowed in transform expressions",
-            ExprContext::CopyWhere => {
-                "window functions are not allowed in COPY FROM WHERE conditions"
-            }
-            ExprContext::ExecuteParameter => {
-                "window functions are not allowed in EXECUTE parameters"
-            }
-        })
+    fn allows_windows(self) -> bool {
+        self == ExprContext::Unrestricted
     }
 }
 
@@ -21981,10 +21366,6 @@ fn call_field_base(base: &ast::Expr) -> Option<ast::CallExpr> {
     } else {
         None
     }
-}
-
-fn plural_columns(count: usize) -> &'static str {
-    if count == 1 { "column" } else { "columns" }
 }
 
 fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {

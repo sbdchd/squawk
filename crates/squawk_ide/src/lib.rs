@@ -27,6 +27,7 @@ mod offsets;
 mod overload;
 mod postgres;
 mod qualified_index;
+mod sema_error;
 mod semantic_index;
 mod semantic_index_builder;
 pub mod semantic_tokens;
