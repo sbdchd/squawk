@@ -662,6 +662,7 @@ impl RoutineKind {
 #[derive(Debug)]
 pub(crate) struct Function {
     pub(crate) kind: FunctionKind,
+    pub(crate) window: bool,
     pub(crate) schema: Name,
     pub(crate) name: Name,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
@@ -712,6 +713,14 @@ pub(crate) struct Window {
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::WindowDef>>,
     pub(crate) name_ptr: InIrFile<AstPtr<ast::Window>>,
+    pub(crate) clauses: WindowClauses,
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub(crate) struct WindowClauses {
+    pub(crate) partition_by: bool,
+    pub(crate) order_by: bool,
+    pub(crate) frame: bool,
 }
 
 #[derive(Debug)]

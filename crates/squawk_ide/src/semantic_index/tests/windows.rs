@@ -142,3 +142,126 @@ execute pp(row_number() over ());
        ╰╴           ━━━━━━━━━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn window_function_without_over() {
+    assert_snapshot!(check("
+create table t (a int);
+select rank() from t;
+select rank() over () from t;
+select lag(a) from t;
+create function w(int) returns int window language c as 'w';
+select w(a) from t;
+select w(a) over () from t;
+select count(*) from t;
+"), @"
+    error: window function `rank` requires an OVER clause
+      ╭▸ 
+    3 │ select rank() from t;
+      ╰╴       ━━━━━━
+    error: window function `lag` requires an OVER clause
+      ╭▸ 
+    5 │ select lag(a) from t;
+      ╰╴       ━━━━━━
+    error: window function `w` requires an OVER clause
+      ╭▸ 
+    7 │ select w(a) from t;
+      ╰╴       ━━━━
+    ");
+}
+
+#[test]
+fn window_override() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int
+);
+select count(*) over w2
+from t
+window w as (partition by a), w2 as (w partition by b);
+select count(*) over w2 from t window w as (order by a), w2 as (w order by b);
+select count(*) over w3
+from t
+window w as (partition by a), w2 as (w order by b), w3 as (w2 partition by a);
+select count(*) over w2
+from t
+window w as (order by a rows unbounded preceding), w2 as (w);
+select count(*) over (w)
+from t
+window w as (order by a rows unbounded preceding);
+select count(*) over (w rows unbounded preceding)
+from t
+window w as (order by a rows unbounded preceding);
+select count(*) over (w order by b)
+from t
+window w as (partition by a order by a);
+select count(*) over (w partition by b) from t window w as ();
+select count(*) over w from t window w as (order by a rows unbounded preceding);
+select count(*) over (w order by b rows unbounded preceding)
+from t
+window w as (partition by a);
+"), @"
+    error: cannot override PARTITION BY clause of window `w`
+      ╭▸ 
+    8 │ window w as (partition by a), w2 as (w partition by b);
+      ╰╴                                     ━
+    error: cannot override ORDER BY clause of window `w`
+      ╭▸ 
+    9 │ select count(*) over w2 from t window w as (order by a), w2 as (w order by b);
+      ╰╴                                                                ━
+    error: cannot override PARTITION BY clause of window `w2`
+       ╭▸ 
+    12 │ window w as (partition by a), w2 as (w order by b), w3 as (w2 partition by a);
+       ╰╴                                                           ━━
+    error: cannot copy window `w` because it has a frame clause
+       ╭▸ 
+    15 │ window w as (order by a rows unbounded preceding), w2 as (w);
+       ╰╴                                                          ━
+    error: cannot copy window `w` because it has a frame clause
+       ╭▸ 
+    16 │ select count(*) over (w)
+       │                       ━
+       │
+       ╰ hint: Omit the parentheses in this OVER clause.
+    error: cannot copy window `w` because it has a frame clause
+       ╭▸ 
+    19 │ select count(*) over (w rows unbounded preceding)
+       ╰╴                      ━
+    error: cannot override ORDER BY clause of window `w`
+       ╭▸ 
+    22 │ select count(*) over (w order by b)
+       ╰╴                      ━
+    error: cannot override PARTITION BY clause of window `w`
+       ╭▸ 
+    25 │ select count(*) over (w partition by b) from t window w as ();
+       ╰╴                      ━
+    ");
+}
+
+#[test]
+fn window_aggregate_order_by_and_distinct() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int
+);
+select array_agg(a order by b) over () from t;
+select string_agg(a::text, ',' order by b) over () from t;
+select count(distinct a) over () from t;
+select array_agg(a order by b), count(distinct a) from t;
+"), @"
+    error: aggregate ORDER BY is not implemented for window functions
+      ╭▸ 
+    6 │ select array_agg(a order by b) over () from t;
+      ╰╴                   ━━━━━━━━━━
+    error: aggregate ORDER BY is not implemented for window functions
+      ╭▸ 
+    7 │ select string_agg(a::text, ',' order by b) over () from t;
+      ╰╴                               ━━━━━━━━━━
+    error: DISTINCT is not implemented for window functions
+      ╭▸ 
+    8 │ select count(distinct a) over () from t;
+      ╰╴             ━━━━━━━━
+    ");
+}

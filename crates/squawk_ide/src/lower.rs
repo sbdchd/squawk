@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::hash_map::Entry, range::Range};
+use std::{borrow::Cow, cmp::Ordering, collections::hash_map::Entry, range::Range};
 
 use la_arena::Idx;
 use rowan::{TextRange, TextSize};
@@ -38,9 +38,9 @@ use crate::{
         Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
         TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
         TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
-        Window, WindowId,
+        Window, WindowClauses, WindowId,
     },
-    sema_error::{ObjectKind, SemaError},
+    sema_error::{ObjectKind, SemaError, TriggerFunctionKind, WindowClause},
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
@@ -66,6 +66,7 @@ impl Lowerer {
             json_paths: vec![],
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
+            generated_refs: vec![],
             function: None,
             public,
             pg_catalog,
@@ -82,8 +83,8 @@ impl Lowerer {
             prepare_params: None,
             dependencies: DependencyGraph::default(),
             inheritances: InheritanceGraph::default(),
-            column_expressions: ColumnExpressions::default(),
-            next_column_expression: 0,
+            column_exprs: ColumnExprs::default(),
+            next_column_expr: 0,
             dropped_operator_family_members: FxHashSet::default(),
             undo: vec![],
             dropped_types: FxHashSet::default(),
@@ -178,6 +179,18 @@ enum LabelPosition {
     End,
     Before(EnumLabelId),
     After(EnumLabelId),
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum CalleeKind {
+    Plain,
+    OrderedSet,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum WindowSpecKind {
+    WindowClause,
+    OverClause,
 }
 
 #[derive(Clone, Copy)]
@@ -305,6 +318,7 @@ pub(crate) struct Lowerer {
     json_paths: Vec<JsonPathId>,
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
+    generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
     public: Name,
     pg_catalog: Name,
@@ -321,8 +335,8 @@ pub(crate) struct Lowerer {
     prepare_params: Option<IdxRange<Param>>,
     dependencies: DependencyGraph,
     inheritances: InheritanceGraph,
-    column_expressions: ColumnExpressions,
-    next_column_expression: u32,
+    column_exprs: ColumnExprs,
+    next_column_expr: u32,
     dropped_operator_family_members: FxHashSet<OperatorFamilyMemberId>,
     undo: Vec<Undo>,
     dropped_types: FxHashSet<TypeId>,
@@ -412,12 +426,18 @@ struct Snapshot {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct ColumnExpressionId(u32);
+struct ColumnExprId(u32);
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-struct ColumnExpression {
-    id: ColumnExpressionId,
-    generated: bool,
+enum ColumnExprKind {
+    Default,
+    Generated,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct ColumnExpr {
+    id: ColumnExprId,
+    kind: ColumnExprKind,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -427,25 +447,21 @@ struct ColumnKey {
 }
 
 #[derive(Default)]
-struct ColumnExpressions {
-    by_column: FxHashMap<ColumnKey, ColumnExpression>,
-    by_id: FxHashMap<ColumnExpressionId, ColumnKey>,
+struct ColumnExprs {
+    by_column: FxHashMap<ColumnKey, ColumnExpr>,
+    by_id: FxHashMap<ColumnExprId, ColumnKey>,
 }
 
-impl ColumnExpressions {
-    fn get(&self, key: ColumnKey) -> Option<ColumnExpression> {
+impl ColumnExprs {
+    fn get(&self, key: ColumnKey) -> Option<ColumnExpr> {
         self.by_column.get(&key).copied()
     }
 
-    fn column_of(&self, id: ColumnExpressionId) -> Option<ColumnKey> {
+    fn column_of(&self, id: ColumnExprId) -> Option<ColumnKey> {
         self.by_id.get(&id).copied()
     }
 
-    fn set(
-        &mut self,
-        key: ColumnKey,
-        expression: Option<ColumnExpression>,
-    ) -> Option<ColumnExpression> {
+    fn set(&mut self, key: ColumnKey, expression: Option<ColumnExpr>) -> Option<ColumnExpr> {
         let previous = match expression {
             Some(expression) => self.by_column.insert(key, expression),
             None => self.by_column.remove(&key),
@@ -482,6 +498,11 @@ struct FunctionParams {
 struct QualifiedColumn {
     table: Option<TableId>,
     column: Option<ColumnId>,
+}
+
+struct GeneratedRefs {
+    table: TableId,
+    refs: IdxRange<Reference>,
 }
 
 struct PendingCte {
@@ -638,7 +659,7 @@ impl InheritanceGraph {
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum Object {
     Function(FunctionId),
-    ColumnExpression(ColumnExpressionId),
+    ColumnExpr(ColumnExprId),
     OperatorFamilyMember(OperatorFamilyMemberId),
     Table(TableId),
     Type(TypeId),
@@ -774,7 +795,7 @@ impl Object {
             Object::Schema(id) => Some(Item::Schema(id)),
             Object::Server(id) => Some(Item::Server(id)),
             Object::Publication(id) => Some(Item::Publication(id)),
-            Object::ColumnExpression(_)
+            Object::ColumnExpr(_)
             | Object::OperatorFamilyMember(_)
             | Object::Cast(_)
             | Object::Transform(_) => None,
@@ -817,7 +838,7 @@ enum Undo {
     DropCast(CastId),
     DropTransform(TransformKey, TransformId),
     TableColumns(TableId, Columns),
-    ColumnExpression(ColumnKey, Option<ColumnExpression>),
+    ColumnExpr(ColumnKey, Option<ColumnExpr>),
     DropOperatorFamilyMember(OperatorFamilyMemberId),
     MemberOwner(OperatorFamilyMemberId, MemberOwner),
     MoveTable(TableId, Name, Name, InIrFile<SyntaxNodePtr>),
@@ -1381,6 +1402,35 @@ impl Lowerer {
             | ast::Stmt::SetTransaction(_)
             | ast::Stmt::Show(_) => {}
         }
+        self.check_generated_refs();
+    }
+
+    fn check_generated_refs(&mut self) {
+        let mut generated_refs = std::mem::take(&mut self.generated_refs);
+        for GeneratedRefs { table, refs } in generated_refs.drain(..) {
+            for reference in refs {
+                let Reference {
+                    range,
+                    resolution: Resolution::Column { column, .. },
+                    ..
+                } = self.index.references[reference]
+                else {
+                    continue;
+                };
+                if let Some(column) = self.index.columns[column].name
+                    && self
+                        .column_exprs
+                        .get(ColumnKey { table, column })
+                        .is_some_and(|expression| expression.kind == ColumnExprKind::Generated)
+                {
+                    let range = self.index.range(range);
+                    self.index
+                        .errors
+                        .push(range, SemaError::GeneratedColumnReference { column });
+                }
+            }
+        }
+        self.generated_refs = generated_refs;
     }
 
     fn lower_drop_type(&mut self, drop_type: &ast::DropType) {
@@ -1435,7 +1485,7 @@ impl Lowerer {
                                 ConstraintOwner::Domain(domain) if is_target(domain)
                             ),
                             Object::Function(_)
-                            | Object::ColumnExpression(_)
+                            | Object::ColumnExpr(_)
                             | Object::OperatorFamilyMember(_)
                             | Object::Table(_)
                             | Object::Trigger(_)
@@ -1593,12 +1643,12 @@ impl Lowerer {
                 match alter_column.alter_view_column_action() {
                     Some(ast::AlterViewColumnAction::SetDefault(set_default)) => {
                         if let Some(expr) = set_default.expr() {
-                            self.lower_column_expression(view, column, &expr, false);
+                            self.lower_column_expr(view, column, &expr, ColumnExprKind::Default);
                         }
                     }
                     Some(ast::AlterViewColumnAction::DropDefault(_)) => {
                         if let (Some(view), Some(column)) = (view, column) {
-                            self.set_column_expression(view, column, None);
+                            self.set_column_expr(view, column, None);
                         }
                     }
                     None => {}
@@ -1657,12 +1707,12 @@ impl Lowerer {
     }
 
     fn rename_column_dependents(&mut self, table: TableId, from: Name, to: Name) {
-        if let Some(expression) = self.column_expressions.get(ColumnKey {
+        if let Some(expression) = self.column_exprs.get(ColumnKey {
             table,
             column: from,
         }) {
-            self.set_column_expression(table, from, None);
-            self.set_column_expression(table, to, Some(expression));
+            self.set_column_expr(table, from, None);
+            self.set_column_expr(table, to, Some(expression));
         }
         let in_transaction = self.in_transaction();
         for id in self.index.tables.owned_sequences(table) {
@@ -2667,8 +2717,8 @@ impl Lowerer {
                 Undo::MemberOwner(member, owner) => {
                     self.index.operator_family_members.set_owner(member, owner);
                 }
-                Undo::ColumnExpression(key, expression) => {
-                    self.column_expressions.set(key, expression);
+                Undo::ColumnExpr(key, expression) => {
+                    self.column_exprs.set(key, expression);
                 }
                 Undo::MoveTable(id, schema, name, name_ptr) => {
                     let current = self.index.tables[id].name_ptr.file_range();
@@ -2976,7 +3026,7 @@ impl Lowerer {
             }
             Object::Server(server) => self.drop_server(server),
             Object::Publication(publication) => self.drop_publication(publication),
-            Object::ColumnExpression(id) => self.drop_column_expression(id),
+            Object::ColumnExpr(id) => self.drop_column_expr(id),
             Object::OperatorFamilyMember(member) => self.drop_operator_family_member(member),
         }
     }
@@ -2998,22 +3048,22 @@ impl Lowerer {
         }
     }
 
-    fn drop_column_expression(&mut self, id: ColumnExpressionId) {
-        let Some(key) = self.column_expressions.column_of(id) else {
+    fn drop_column_expr(&mut self, id: ColumnExprId) {
+        let Some(key) = self.column_exprs.column_of(id) else {
             return;
         };
         let generated = self
-            .column_expressions
+            .column_exprs
             .get(key)
-            .is_some_and(|expression| expression.generated);
-        self.set_column_expression(key.table, key.column, None);
+            .is_some_and(|expression| expression.kind == ColumnExprKind::Generated);
+        self.set_column_expr(key.table, key.column, None);
         if generated {
             self.drop_table_column(key.table, key.column);
         }
     }
 
     fn drop_table_column(&mut self, table: TableId, column: Name) {
-        self.set_column_expression(table, column, None);
+        self.set_column_expr(table, column, None);
         self.drop_column_sequences(table, column);
         if !self.index.tables.is_local(table) {
             return;
@@ -3036,43 +3086,43 @@ impl Lowerer {
         }
     }
 
-    fn set_column_expression(
-        &mut self,
-        table: TableId,
-        column: Name,
-        expression: Option<ColumnExpression>,
-    ) {
+    fn set_column_expr(&mut self, table: TableId, column: Name, expression: Option<ColumnExpr>) {
         let key = ColumnKey { table, column };
-        let previous = self.column_expressions.set(key, expression);
+        let previous = self.column_exprs.set(key, expression);
         if previous != expression && self.in_transaction() {
-            self.undo.push(Undo::ColumnExpression(key, previous));
+            self.undo.push(Undo::ColumnExpr(key, previous));
         }
     }
 
-    fn lower_column_expression(
+    fn lower_column_expr(
         &mut self,
         table: Option<TableId>,
         column: Option<Name>,
         expr: &ast::Expr,
-        generated: bool,
+        kind: ColumnExprKind,
     ) {
         let refs = self.index.references.next_idx();
-        let context = if generated {
-            ExprContext::GeneratedColumn
-        } else {
-            ExprContext::Default
+        let context = match kind {
+            ColumnExprKind::Default => ExprContext::Default,
+            ColumnExprKind::Generated => ExprContext::GeneratedColumn,
         };
         self.lower_expr_in(context, expr);
         let (Some(table), Some(column)) = (table, column) else {
             return;
         };
-        let id = ColumnExpressionId(self.next_column_expression);
-        self.next_column_expression += 1;
-        self.set_column_expression(table, column, Some(ColumnExpression { id, generated }));
+        let id = ColumnExprId(self.next_column_expr);
+        self.next_column_expr += 1;
+        self.set_column_expr(table, column, Some(ColumnExpr { id, kind }));
+        if kind == ColumnExprKind::Generated {
+            self.generated_refs.push(GeneratedRefs {
+                table,
+                refs: self.index.references.range_from(refs),
+            });
+        }
         for reference in self.index.references.range_from(refs) {
             if let Resolution::Function(function) = self.index.references[reference].resolution {
                 self.dependencies
-                    .add_dependency(Object::ColumnExpression(id), Object::Function(function));
+                    .add_dependency(Object::ColumnExpr(id), Object::Function(function));
             }
         }
     }
@@ -3113,8 +3163,8 @@ impl Lowerer {
             Object::Schema(schema) => self.dropped_schemas.contains(&schema),
             Object::Server(server) => self.dropped_servers.contains(&server),
             Object::Publication(publication) => self.dropped_publications.contains(&publication),
-            Object::ColumnExpression(id) => self
-                .column_expressions
+            Object::ColumnExpr(id) => self
+                .column_exprs
                 .column_of(id)
                 .is_none_or(|key| self.dropped_tables.contains(&key.table)),
             Object::OperatorFamilyMember(member) => {
@@ -3249,9 +3299,7 @@ impl Lowerer {
                 ConstraintOwner::Table(table) => Some(table),
                 ConstraintOwner::Domain(_) => None,
             },
-            Object::ColumnExpression(id) => {
-                self.column_expressions.column_of(id).map(|key| key.table)
-            }
+            Object::ColumnExpr(id) => self.column_exprs.column_of(id).map(|key| key.table),
             Object::Function(_)
             | Object::OperatorFamilyMember(_)
             | Object::Type(_)
@@ -7801,7 +7849,7 @@ impl Lowerer {
             .call_expr()
             .and_then(|call| call.expr())
         {
-            self.lower_callee(&callee, &[], None, false);
+            self.lower_trigger_function(&callee, TriggerFunctionKind::EventTrigger);
         }
         if let Some(event_trigger) = create_event_trigger.event_trigger() {
             self.alloc_event_trigger(create_event_trigger.syntax(), &event_trigger);
@@ -8143,7 +8191,7 @@ impl Lowerer {
             | Object::AccessMethod(_)
             | Object::Language(_)
             | Object::ForeignDataWrapper(_)
-            | Object::ColumnExpression(_)
+            | Object::ColumnExpr(_)
             | Object::OperatorFamilyMember(_)
             | Object::Schema(_)
             | Object::Server(_)
@@ -9614,6 +9662,7 @@ impl Lowerer {
     ) -> Option<FunctionId> {
         let Function {
             kind,
+            window,
             params,
             direct_args,
             ret,
@@ -9636,6 +9685,7 @@ impl Lowerer {
         self.drop_function(function);
         let id = self.index.functions.alloc(Function {
             kind,
+            window,
             schema,
             name,
             ptr: self.ptr(node),
@@ -9865,6 +9915,7 @@ impl Lowerer {
             }
         }
         let inherited_end = self.index.columns.next_idx();
+        let mut like_primary_keys: SmallVec<[ast::LikeClause; 1]> = SmallVec::new();
         for arg in create_table
             .table_arg_list()
             .into_iter()
@@ -9901,6 +9952,9 @@ impl Lowerer {
                         complete = false;
                         continue;
                     };
+                    if like_includes_indexes(&like) && self.has_primary_key(source) {
+                        like_primary_keys.push(like.clone());
+                    }
                     let source_columns = &self.index.tables[source].columns;
                     complete &= source_columns.complete;
                     for id in source_columns.range {
@@ -9936,6 +9990,24 @@ impl Lowerer {
         for parent in parents {
             self.add_inheritance(parent, table, inheritance_kind);
         }
+        for like in like_primary_keys {
+            if self.has_primary_key(table) {
+                let name = self.index.tables[table].name;
+                self.push_error(
+                    like.syntax(),
+                    SemaError::MultiplePrimaryKeys { table: name },
+                );
+            }
+            self.alloc_index_constraint(
+                ConstraintKind::PrimaryKey,
+                table,
+                like.syntax(),
+                None,
+                None,
+                None,
+                "pkey",
+            );
+        }
         self.index
             .tables
             .set_constraints_complete(table, constraints_complete);
@@ -9959,6 +10031,20 @@ impl Lowerer {
                                 && let Some(ty) = column.ty()
                             {
                                 this.lower_serial_column(table, column_name, &ty, column.syntax());
+                            }
+                            if let Some(column_name) = column_name {
+                                let constraints =
+                                    column.clauses().filter_map(|clause| match clause {
+                                        ast::ColumnClause::ColumnConstraint(constraint) => {
+                                            Some(constraint.into())
+                                        }
+                                        ast::ColumnClause::Collate(_)
+                                        | ast::ColumnClause::AlterOptionList(_)
+                                        | ast::ColumnClause::CompressionMethod(_)
+                                        | ast::ColumnClause::Storage(_)
+                                        | ast::ColumnClause::WithOptions(_) => None,
+                                    });
+                                this.check_column_nullability(table, column_name, constraints);
                             }
                             for clause in column.clauses() {
                                 match clause {
@@ -11863,6 +11949,13 @@ impl Lowerer {
         ) else {
             return;
         };
+        if create_function.option_list().is_some_and(|options| {
+            options
+                .options()
+                .any(|option| matches!(option, ast::FuncOption::WindowFuncOption(_)))
+        }) {
+            self.index.functions.set_window(id);
+        }
         self.lower_routine_body(
             id,
             refs,
@@ -14802,7 +14895,7 @@ impl Lowerer {
             if let Some(table) = table
                 && column.is_some()
             {
-                self.set_column_expression(table, name, None);
+                self.set_column_expr(table, name, None);
                 self.drop_column_sequences(table, name);
             }
             dropped.extend(column);
@@ -14972,13 +15065,18 @@ impl Lowerer {
             }
             Some(ast::AlterColumnOption::SetDefault(set_default)) => {
                 if let Some(expr) = set_default.expr() {
-                    self.lower_column_expression(table, Some(column), &expr, false);
+                    self.lower_column_expr(table, Some(column), &expr, ColumnExprKind::Default);
                 }
             }
             Some(ast::AlterColumnOption::SetExpression(set_expression)) => {
                 if let Some(expr) = set_expression.expr() {
                     self.with_table_scope(QueryKind::Constraint, table, node, |this| {
-                        this.lower_column_expression(table, Some(column), &expr, true);
+                        this.lower_column_expr(
+                            table,
+                            Some(column),
+                            &expr,
+                            ColumnExprKind::Generated,
+                        );
                     });
                 }
             }
@@ -14986,7 +15084,7 @@ impl Lowerer {
                 ast::AlterColumnOption::DropDefault(_) | ast::AlterColumnOption::DropExpression(_),
             ) => {
                 if let Some(table) = table {
-                    self.set_column_expression(table, column, None);
+                    self.set_column_expr(table, column, None);
                 }
             }
             Some(ast::AlterColumnOption::SetNotNull(set_not_null)) => {
@@ -15130,6 +15228,9 @@ impl Lowerer {
         if add_column.constraints().next().is_none() {
             return;
         }
+        if let (Some(table), Some(column_name)) = (table, name) {
+            self.check_column_nullability(table, column_name, add_column.constraints());
+        }
         self.with_table_scope(QueryKind::Constraint, table, node, |this| {
             for constraint in add_column.constraints() {
                 this.lower_constraint(table, name, &constraint);
@@ -15192,7 +15293,7 @@ impl Lowerer {
                 .columns
                 .alloc_copies(columns.range.iter().filter(|id| *id != inherited));
             self.set_table_columns(child, range);
-            self.set_column_expression(child, name, None);
+            self.set_column_expr(child, name, None);
             self.drop_column_sequences(child, name);
             self.drop_inherited_column(child, column);
         }
@@ -15350,6 +15451,19 @@ impl Lowerer {
         self.depend_on_refs(refs, self.index.indexes.range_from(start), Object::Index);
     }
 
+    fn lower_trigger_function(&mut self, callee: &ast::Expr, kind: TriggerFunctionKind) {
+        if let Some(Callee {
+            name,
+            resolution: Resolution::Function(function),
+        }) = self.lower_callee(callee, &[], None, CalleeKind::Plain)
+            && let Some(ret) = self.index.functions[function].ret
+            && let Some(expected) = self.builtin_type(kind.return_type())
+            && ret != expected
+        {
+            self.push_error(callee.syntax(), SemaError::TriggerReturnType { name, kind });
+        }
+    }
+
     fn lower_create_trigger(&mut self, create_trigger: &ast::CreateTrigger) {
         let refs = self.index.references.next_idx();
         let start = self.index.triggers.next_idx();
@@ -15411,7 +15525,7 @@ impl Lowerer {
             self.lower_relation_path(&path, RelationLookup::OnlyTable);
         }
         if let Some(callee) = create_trigger.call_expr().and_then(|call| call.expr()) {
-            self.lower_callee(&callee, &[], None, false);
+            self.lower_trigger_function(&callee, TriggerFunctionKind::Trigger);
         }
 
         let constraint = create_trigger.constraint_token().is_some();
@@ -16828,6 +16942,62 @@ impl Lowerer {
         self.scopes.pop();
     }
 
+    fn check_column_nullability(
+        &mut self,
+        table: TableId,
+        column: Name,
+        constraints: impl Iterator<Item = ast::Constraint>,
+    ) {
+        let mut seen_nullable = false;
+        let mut not_null = false;
+        let mut needs_not_null = false;
+        for constraint in constraints {
+            let conflict = match &constraint {
+                ast::Constraint::NullConstraint(_) => {
+                    let conflict = seen_nullable && not_null || needs_not_null;
+                    seen_nullable = true;
+                    not_null = false;
+                    conflict
+                }
+                ast::Constraint::NotNullConstraint(_) => {
+                    let conflict = seen_nullable && !not_null;
+                    if !not_null {
+                        seen_nullable = true;
+                        not_null = true;
+                        needs_not_null = false;
+                    }
+                    conflict
+                }
+                ast::Constraint::PrimaryKeyConstraint(_) => {
+                    needs_not_null = true;
+                    seen_nullable && !not_null
+                }
+                ast::Constraint::GeneratedConstraint(generated) => {
+                    let identity = matches!(
+                        generated.generated_as(),
+                        Some(ast::GeneratedAs::GeneratedIdentity(_))
+                    );
+                    needs_not_null |= identity && !seen_nullable;
+                    identity && seen_nullable && !not_null
+                }
+                ast::Constraint::CheckConstraint(_)
+                | ast::Constraint::DefaultConstraint(_)
+                | ast::Constraint::ExcludeConstraint(_)
+                | ast::Constraint::ForeignKeyConstraint(_)
+                | ast::Constraint::ReferencesConstraint(_)
+                | ast::Constraint::UniqueConstraint(_) => false,
+            };
+            if conflict {
+                let table = self.index.tables[table].name;
+                self.push_error(
+                    constraint.syntax(),
+                    SemaError::ConflictingNullability { column, table },
+                );
+                return;
+            }
+        }
+    }
+
     fn lower_constraint(
         &mut self,
         table: Option<TableId>,
@@ -16916,7 +17086,7 @@ impl Lowerer {
         default: &ast::DefaultConstraint,
     ) {
         if let Some(expr) = default.expr() {
-            self.lower_column_expression(table, column, &expr, false);
+            self.lower_column_expr(table, column, &expr, ColumnExprKind::Default);
         }
     }
 
@@ -16929,7 +17099,7 @@ impl Lowerer {
         match generated.generated_as() {
             Some(ast::GeneratedAs::GeneratedStored(stored)) => {
                 if let Some(expr) = stored.expr() {
-                    self.lower_column_expression(table, column, &expr, true);
+                    self.lower_column_expr(table, column, &expr, ColumnExprKind::Generated);
                 }
             }
             Some(ast::GeneratedAs::GeneratedIdentity(identity)) => {
@@ -17009,7 +17179,7 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        if self.find_primary_key(table).is_some() {
+        if self.has_primary_key(table) {
             let table = self.index.tables[table].name;
             self.push_error(
                 primary_key.syntax(),
@@ -17031,6 +17201,14 @@ impl Lowerer {
         for column in &columns[..key_len] {
             self.add_not_null_constraint(table, *column, primary_key.syntax(), None);
         }
+    }
+
+    fn has_primary_key(&self, table: TableId) -> bool {
+        self.find_primary_key(table).is_some()
+            || self.inheritances.parents(table).iter().any(|inheritance| {
+                inheritance.kind == InheritanceKind::Partition
+                    && self.has_primary_key(inheritance.parent)
+            })
     }
 
     fn find_primary_key(&self, table: TableId) -> Option<ConstraintId> {
@@ -17167,6 +17345,7 @@ impl Lowerer {
     fn lower_bin_rhs(
         &mut self,
         op: Option<&ast::BinOp>,
+        lhs: Option<&ast::Expr>,
         rhs: &ast::Expr,
         left: ArgType,
     ) -> ArgType {
@@ -17206,9 +17385,16 @@ impl Lowerer {
             return self.lower_in_list(tuple, left);
         }
         if let ast::Expr::CallExpr(call) = rhs
-            && let Some(operand) = self.lower_quantified_operand(call)
+            && let Some(operand) = self.lower_quantified_operand(call, row_width(lhs).unwrap_or(1))
         {
             return operand;
+        }
+        if let ast::Expr::ParenExpr(paren) = rhs
+            && let Some(query) = paren.select_variant()
+            && let Some(width) = sublink_width(op, lhs)
+        {
+            let query = self.lower_compared_sublink(query, width);
+            return expr_arg_type(Some(rhs), self.single_column_type(query));
         }
         let arg = expr_arg_type(Some(rhs), self.lower_expr(rhs));
         if similar {
@@ -17217,6 +17403,63 @@ impl Lowerer {
                 .map_or(ArgType::Untyped, ArgType::Known);
         }
         arg
+    }
+
+    fn check_row_lengths(&mut self, op: &ast::BinOp, lhs: &ast::TupleExpr, rhs: &ast::Expr) {
+        match op {
+            ast::BinOp::In(_) | ast::BinOp::NotIn(_) => {
+                if let ast::Expr::TupleExpr(list) = rhs {
+                    for expr in list.exprs() {
+                        if let ast::Expr::TupleExpr(row) = expr {
+                            self.check_row_length(lhs, &row);
+                        }
+                    }
+                }
+            }
+            ast::BinOp::Caret(_)
+            | ast::BinOp::CustomOp(_)
+            | ast::BinOp::Eq(_)
+            | ast::BinOp::Gteq(_)
+            | ast::BinOp::Ilike(_)
+            | ast::BinOp::IsDistinctFrom(_)
+            | ast::BinOp::IsNotDistinctFrom(_)
+            | ast::BinOp::LAngle(_)
+            | ast::BinOp::Like(_)
+            | ast::BinOp::Lteq(_)
+            | ast::BinOp::Minus(_)
+            | ast::BinOp::Neq(_)
+            | ast::BinOp::Neqb(_)
+            | ast::BinOp::NotIlike(_)
+            | ast::BinOp::NotLike(_)
+            | ast::BinOp::NotSimilarTo(_)
+            | ast::BinOp::OperatorCall(_)
+            | ast::BinOp::Percent(_)
+            | ast::BinOp::Plus(_)
+            | ast::BinOp::RAngle(_)
+            | ast::BinOp::SimilarTo(_)
+            | ast::BinOp::Slash(_)
+            | ast::BinOp::Star(_) => {
+                if let ast::Expr::TupleExpr(rhs) = rhs {
+                    self.check_row_length(lhs, rhs);
+                }
+            }
+            ast::BinOp::And(_)
+            | ast::BinOp::AtTimeZone(_)
+            | ast::BinOp::ColonColon(_)
+            | ast::BinOp::ColonEq(_)
+            | ast::BinOp::Escape(_)
+            | ast::BinOp::FatArrow(_)
+            | ast::BinOp::Is(_)
+            | ast::BinOp::IsNot(_)
+            | ast::BinOp::Or(_)
+            | ast::BinOp::Overlaps(_) => {}
+        }
+    }
+
+    fn check_row_length(&mut self, lhs: &ast::TupleExpr, rhs: &ast::TupleExpr) {
+        if lhs.exprs().count() != rhs.exprs().count() {
+            self.push_error(rhs.syntax(), SemaError::RowLengthMismatch);
+        }
     }
 
     fn lower_in_list(&mut self, tuple: &ast::TupleExpr, left: ArgType) -> ArgType {
@@ -17254,7 +17497,7 @@ impl Lowerer {
         common.map_or(ArgType::Untyped, ArgType::Known)
     }
 
-    fn lower_quantified_operand(&mut self, call: &ast::CallExpr) -> Option<ArgType> {
+    fn lower_quantified_operand(&mut self, call: &ast::CallExpr, width: usize) -> Option<ArgType> {
         let (expr, query) = if let Some(any_fn) = call.any_fn() {
             (any_fn.expr(), any_fn.select_variant())
         } else if let Some(some_fn) = call.some_fn() {
@@ -17264,7 +17507,7 @@ impl Lowerer {
             (all_fn.expr(), all_fn.select_variant())
         };
         if let Some(query) = query {
-            let query = self.lower_query(query);
+            let query = self.lower_compared_sublink(query, width);
             return Some(
                 self.single_column_type(query)
                     .map_or(ArgType::Untyped, ArgType::Known),
@@ -18387,6 +18630,7 @@ impl Lowerer {
                 let name = self.name_ref_name(name_ref)?;
                 let NameResolution { kind, resolution } = self.resolve_name(name);
                 self.add_ref(name, kind, name_ref.syntax(), resolution);
+                self.check_default_column_ref(name_ref.syntax(), resolution);
                 return self.resolution_type(resolution);
             }
             ast::Expr::FieldExpr(field_expr) => {
@@ -18418,7 +18662,7 @@ impl Lowerer {
                     element = element.or(ty);
                 }
                 if let Some(query) = array.select_variant() {
-                    let query = self.lower_query(query);
+                    let query = self.lower_scalar_sublink(query);
                     element = element.or_else(|| {
                         let columns = self.index.queries[query].columns;
                         columns
@@ -18436,6 +18680,13 @@ impl Lowerer {
                         .into_iter()
                         .flatten(),
                 );
+                if let Some(ast::Expr::TupleExpr(target)) = between.target() {
+                    for bound in [between.start(), between.end()].into_iter().flatten() {
+                        if let ast::Expr::TupleExpr(bound) = bound {
+                            self.check_row_length(&target, &bound);
+                        }
+                    }
+                }
             }
             ast::Expr::BinExpr(bin) => {
                 let op = bin.op();
@@ -18456,13 +18707,16 @@ impl Lowerer {
                 let lhs_ty = lhs.as_ref().and_then(|lhs| self.lower_expr(lhs));
                 let left = expr_arg_type(lhs.as_ref(), lhs_ty);
                 let right = match &rhs {
-                    Some(rhs) => self.lower_bin_rhs(op.as_ref(), rhs, left),
+                    Some(rhs) => self.lower_bin_rhs(op.as_ref(), lhs.as_ref(), rhs, left),
                     None => ArgType::Untyped,
                 };
                 let rhs_ty = match right {
                     ArgType::Known(ty) => Some(ty),
                     ArgType::UnknownLiteral | ArgType::Untyped => None,
                 };
+                if let (Some(op), Some(ast::Expr::TupleExpr(lhs)), Some(rhs)) = (&op, &lhs, &rhs) {
+                    self.check_row_lengths(op, lhs, rhs);
+                }
                 let ty = op
                     .as_ref()
                     .and_then(|op| self.lower_bin_operator(op, left, right));
@@ -18515,7 +18769,7 @@ impl Lowerer {
             ast::Expr::ParenExpr(paren) => {
                 let ty = paren.expr().and_then(|expr| self.lower_expr(&expr));
                 if let Some(query) = paren.select_variant() {
-                    let query = self.lower_query(query);
+                    let query = self.lower_scalar_sublink(query);
                     return self.single_column_type(query);
                 }
                 return ty;
@@ -18675,9 +18929,12 @@ impl Lowerer {
 
     fn lower_window_clause(&mut self, window_clause: &ast::WindowClause) {
         for window_def in window_clause.window_defs() {
-            if let Some(window_spec) = window_def.window_spec() {
-                self.lower_window_spec(&window_spec);
-            }
+            let clauses = window_def
+                .window_spec()
+                .map(|window_spec| {
+                    self.lower_window_spec(&window_spec, WindowSpecKind::WindowClause)
+                })
+                .unwrap_or_default();
             let Some(window) = window_def.window() else {
                 continue;
             };
@@ -18689,6 +18946,7 @@ impl Lowerer {
                 name,
                 ptr: self.ast_ptr(&window_def),
                 name_ptr: self.ast_ptr(&window),
+                clauses,
             });
             self.record_comment(window_def.syntax(), Item::Window(id));
             self.add_item(window.syntax(), Item::Window(id));
@@ -18705,17 +18963,55 @@ impl Lowerer {
             .find(|&window| self.index.windows[window].name == name)
     }
 
-    fn lower_window_ref(&mut self, window_ref: &ast::WindowRef) {
+    fn lower_window_ref(&mut self, window_ref: &ast::WindowRef) -> Option<WindowId> {
         let name = self.intern(&window_ref.text());
-        let resolution = self
-            .find_window(name)
-            .map_or(Resolution::Unresolved, Resolution::Window);
+        let window = self.find_window(name);
+        let resolution = window.map_or(Resolution::Unresolved, Resolution::Window);
         self.add_ref(name, ReferenceKind::Window, window_ref.syntax(), resolution);
+        window
     }
 
-    fn lower_window_spec(&mut self, window_spec: &ast::WindowSpec) {
-        if let Some(window_ref) = window_spec.window_ref() {
-            self.lower_window_ref(&window_ref);
+    fn lower_window_spec(
+        &mut self,
+        window_spec: &ast::WindowSpec,
+        kind: WindowSpecKind,
+    ) -> WindowClauses {
+        let mut clauses = WindowClauses {
+            partition_by: window_spec.partition_by_clause().is_some(),
+            order_by: window_spec.order_by_clause().is_some(),
+            frame: window_spec.frame_clause().is_some(),
+        };
+        if let Some(window_ref) = window_spec.window_ref()
+            && let Some(base) = self.lower_window_ref(&window_ref)
+        {
+            let Window {
+                name,
+                clauses: base_clauses,
+                ..
+            } = self.index.windows[base];
+            let error = if clauses.partition_by {
+                Some(SemaError::WindowOverride {
+                    name,
+                    clause: WindowClause::PartitionBy,
+                })
+            } else if clauses.order_by && base_clauses.order_by {
+                Some(SemaError::WindowOverride {
+                    name,
+                    clause: WindowClause::OrderBy,
+                })
+            } else if base_clauses.frame {
+                Some(SemaError::WindowFrameCopy {
+                    name,
+                    hint: kind == WindowSpecKind::OverClause && !clauses.order_by && !clauses.frame,
+                })
+            } else {
+                None
+            };
+            if let Some(error) = error {
+                self.push_error(window_ref.syntax(), error);
+            }
+            clauses.partition_by |= base_clauses.partition_by;
+            clauses.order_by |= base_clauses.order_by;
         }
         self.with_expr_context(ExprContext::WindowDefinition, |this| {
             if let Some(partition_by) = window_spec.partition_by_clause() {
@@ -18724,7 +19020,7 @@ impl Lowerer {
             this.lower_order_by(window_spec.order_by_clause());
         });
         let Some(frame_clause) = window_spec.frame_clause() else {
-            return;
+            return clauses;
         };
         let context = match frame_clause.frame_units() {
             Some(ast::FrameUnits::FrameRange(_)) => ExprContext::WindowRange,
@@ -18741,6 +19037,7 @@ impl Lowerer {
             Some(ast::FrameExtent::FrameBound(bound)) => this.lower_frame_bound(&bound),
             None => {}
         });
+        clauses
     }
 
     fn lower_frame_bound(&mut self, bound: &ast::FrameBound) {
@@ -18759,18 +19056,18 @@ impl Lowerer {
         }
         if let Some(all_fn) = call.all_fn() {
             self.lower_exprs(all_fn.expr());
-            self.lower_opt_query(all_fn.select_variant());
+            self.lower_opt_sublink(all_fn.select_variant());
         }
         if let Some(any_fn) = call.any_fn() {
             self.lower_exprs(any_fn.expr());
-            self.lower_opt_query(any_fn.select_variant());
+            self.lower_opt_sublink(any_fn.select_variant());
         }
         if let Some(some_fn) = call.some_fn() {
             self.lower_exprs(some_fn.expr());
-            self.lower_opt_query(some_fn.select_variant());
+            self.lower_opt_sublink(some_fn.select_variant());
         }
         if let Some(exists_fn) = call.exists_fn() {
-            self.lower_opt_query(exists_fn.select_variant());
+            self.lower_opt_sublink(exists_fn.select_variant());
         }
         if let Some(collation_for_fn) = call.collation_for_fn() {
             let arg = self.lower_positional_arg(collation_for_fn.expr());
@@ -18911,7 +19208,7 @@ impl Lowerer {
                 self.lower_exprs(format.expr());
             }
             for format in json_array.json_select_formats() {
-                self.lower_opt_query(format.select_variant());
+                self.lower_opt_sublink(format.select_variant());
             }
             if let Some(returning) = json_array.json_returning_clause() {
                 self.lower_json_returning(&returning);
@@ -19062,10 +19359,46 @@ impl Lowerer {
         }
     }
 
-    fn lower_opt_query(&mut self, query: Option<ast::SelectVariant>) {
+    fn lower_opt_sublink(&mut self, query: Option<ast::SelectVariant>) {
         if let Some(query) = query {
-            self.lower_query(query);
+            self.lower_sublink(query);
         }
+    }
+
+    fn lower_scalar_sublink(&mut self, query: ast::SelectVariant) -> QueryId {
+        let ptr = self.ptr(query.syntax());
+        let query = self.lower_sublink(query);
+        let columns = self.index.queries[query].columns;
+        if columns.complete && columns.range.len() != 1 {
+            self.push_error_ptr(ptr, SemaError::SubqueryNotSingleColumn);
+        }
+        query
+    }
+
+    fn lower_compared_sublink(&mut self, query: ast::SelectVariant, width: usize) -> QueryId {
+        let ptr = self.ptr(query.syntax());
+        let query = self.lower_sublink(query);
+        let columns = self.index.queries[query].columns;
+        if !columns.complete {
+            return query;
+        }
+        let error = match columns.range.len().cmp(&width) {
+            Ordering::Greater => Some(SemaError::SubqueryTooManyColumns),
+            Ordering::Less => Some(SemaError::SubqueryTooFewColumns),
+            Ordering::Equal => None,
+        };
+        if let Some(error) = error {
+            self.push_error_ptr(ptr, error);
+        }
+        query
+    }
+
+    fn lower_sublink(&mut self, query: ast::SelectVariant) -> QueryId {
+        let context = self.expr_context;
+        if context.subquery_label().is_some() {
+            self.push_error(query.syntax(), SemaError::MisplacedSubquery { context });
+        }
+        self.lower_query(query)
     }
 
     fn lower_json_key_value(&mut self, key_value: &ast::JsonKeyValue) {
@@ -19182,9 +19515,14 @@ impl Lowerer {
                 variadic: false,
             });
         }
+        let kind = if within.is_some() {
+            CalleeKind::OrderedSet
+        } else {
+            CalleeKind::Plain
+        };
         let target = callee
             .as_ref()
-            .and_then(|callee| self.lower_callee(callee, &args, row_source, within.is_some()));
+            .and_then(|callee| self.lower_callee(callee, &args, row_source, kind));
         args.truncate(direct_args);
         let function = match target.map(|target| target.resolution) {
             Some(Resolution::Function(function)) => Some(function),
@@ -19265,13 +19603,24 @@ impl Lowerer {
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
             self.lower_expr_in(ExprContext::Filter, &expr);
         }
+        if call.over_clause().is_some()
+            && let Some(arg_list) = call.arg_list()
+        {
+            if let Some(ast::AllOrDistinct::Distinct(distinct)) = arg_list.all_or_distinct() {
+                self.push_error(distinct.syntax(), SemaError::WindowDistinct);
+            } else if let Some(order_by) = arg_list.args().find_map(|arg| arg.order_by_clause()) {
+                self.push_error(order_by.syntax(), SemaError::WindowAggregateOrderBy);
+            }
+        }
         match call.over_clause().and_then(|clause| clause.over_target()) {
             Some(ast::OverTarget::OverWindowSpec(spec)) => {
                 if let Some(window_spec) = spec.window_spec() {
-                    self.lower_window_spec(&window_spec);
+                    self.lower_window_spec(&window_spec, WindowSpecKind::OverClause);
                 }
             }
-            Some(ast::OverTarget::WindowRef(window_ref)) => self.lower_window_ref(&window_ref),
+            Some(ast::OverTarget::WindowRef(window_ref)) => {
+                self.lower_window_ref(&window_ref);
+            }
             None => {}
         }
         self.lower_special_fn(call).unwrap_or(LoweredCall {
@@ -19287,6 +19636,14 @@ impl Lowerer {
         refs: RefId,
         aggregate_calls: usize,
     ) {
+        if call.over_clause().is_none()
+            && let Some(function) = function
+            && let Function {
+                window: true, name, ..
+            } = self.index.functions[function]
+        {
+            self.push_error(call.syntax(), SemaError::WindowWithoutOver { name });
+        }
         let kind = if call.over_clause().is_some() {
             AggregateCallKind::Window
         } else if function
@@ -19449,7 +19806,7 @@ impl Lowerer {
         callee: &ast::Expr,
         args: &[CallArg],
         row_source: Option<SourceId>,
-        ordered_set: bool,
+        kind: CalleeKind,
     ) -> Option<Callee> {
         let (schema, name_ref) = match callee {
             ast::Expr::NameRef(name_ref) => (None, name_ref.clone()),
@@ -19527,7 +19884,9 @@ impl Lowerer {
                     row_source.is_some_and(|source| !self.index.sources[source].columns.complete);
                 let resolution = match self.find_routine(schema, name, args, FunctionKind::Function)
                 {
-                    Resolution::Unresolved if ordered_set || incomplete_row => Resolution::Unknown,
+                    Resolution::Unresolved if kind == CalleeKind::OrderedSet || incomplete_row => {
+                        Resolution::Unknown
+                    }
                     resolution => resolution,
                 };
                 (ReferenceKind::Function(RoutineKind::Function), resolution)
@@ -19983,7 +20342,19 @@ impl Lowerer {
             },
         };
         self.add_ref(name, kind, field.syntax(), resolution);
+        self.check_default_column_ref(field_expr.syntax(), resolution);
         self.resolution_type(resolution)
+    }
+
+    fn check_default_column_ref(&mut self, node: &SyntaxNode, resolution: Resolution) {
+        if self.expr_context == ExprContext::Default
+            && matches!(
+                resolution,
+                Resolution::Column { .. } | Resolution::Source(_)
+            )
+        {
+            self.push_error(node, SemaError::DefaultColumnReference);
+        }
     }
 
     fn lower_field_base(&mut self, field_expr: &ast::FieldExpr) -> Option<FieldBase> {
@@ -20584,6 +20955,7 @@ impl Lowerer {
 
         let id = self.index.functions.alloc(Function {
             kind,
+            window: false,
             schema,
             name,
             ptr: self.ptr(node),
@@ -21227,7 +21599,7 @@ fn set_object_schema(index: &mut IndexData, object: Object, schema: Name) -> boo
         | Object::AccessMethod(_)
         | Object::Language(_)
         | Object::ForeignDataWrapper(_)
-        | Object::ColumnExpression(_)
+        | Object::ColumnExpr(_)
         | Object::OperatorFamilyMember(_)
         | Object::Schema(_)
         | Object::Server(_)
@@ -21297,6 +21669,52 @@ fn nth_idx<T>(index: usize) -> la_arena::Idx<T> {
 
 fn member_number(literal: Option<&ast::Literal>) -> Option<u16> {
     u16::try_from(literal?.integer_value()?).ok()
+}
+
+fn row_width(expr: Option<&ast::Expr>) -> Option<usize> {
+    match expr {
+        Some(ast::Expr::TupleExpr(tuple)) => Some(tuple.exprs().count()),
+        _ => None,
+    }
+}
+
+fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usize> {
+    match op? {
+        ast::BinOp::In(_) | ast::BinOp::NotIn(_) => Some(row_width(lhs).unwrap_or(1)),
+        ast::BinOp::Caret(_)
+        | ast::BinOp::CustomOp(_)
+        | ast::BinOp::Eq(_)
+        | ast::BinOp::Gteq(_)
+        | ast::BinOp::Ilike(_)
+        | ast::BinOp::LAngle(_)
+        | ast::BinOp::Like(_)
+        | ast::BinOp::Lteq(_)
+        | ast::BinOp::Minus(_)
+        | ast::BinOp::Neq(_)
+        | ast::BinOp::Neqb(_)
+        | ast::BinOp::NotIlike(_)
+        | ast::BinOp::NotLike(_)
+        | ast::BinOp::NotSimilarTo(_)
+        | ast::BinOp::OperatorCall(_)
+        | ast::BinOp::Percent(_)
+        | ast::BinOp::Plus(_)
+        | ast::BinOp::RAngle(_)
+        | ast::BinOp::SimilarTo(_)
+        | ast::BinOp::Slash(_)
+        | ast::BinOp::Star(_) => row_width(lhs),
+        ast::BinOp::And(_)
+        | ast::BinOp::AtTimeZone(_)
+        | ast::BinOp::ColonColon(_)
+        | ast::BinOp::ColonEq(_)
+        | ast::BinOp::Escape(_)
+        | ast::BinOp::FatArrow(_)
+        | ast::BinOp::Is(_)
+        | ast::BinOp::IsDistinctFrom(_)
+        | ast::BinOp::IsNot(_)
+        | ast::BinOp::IsNotDistinctFrom(_)
+        | ast::BinOp::Or(_)
+        | ast::BinOp::Overlaps(_) => None,
+    }
 }
 
 fn is_comparison(op: &ast::BinOp) -> bool {
@@ -21382,4 +21800,31 @@ fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {
         | ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::Table(_) => None,
     }
+}
+
+fn like_includes_indexes(like: &ast::LikeClause) -> bool {
+    let mut includes = false;
+    for option in like.like_options() {
+        let (property, including) = match option {
+            ast::LikeOption::IncludingProperty(property) => (property.table_property(), true),
+            ast::LikeOption::ExcludingProperty(property) => (property.table_property(), false),
+        };
+        match property {
+            Some(ast::TableProperty::PropertyAll(_) | ast::TableProperty::PropertyIndexes(_)) => {
+                includes = including;
+            }
+            Some(
+                ast::TableProperty::PropertyComments(_)
+                | ast::TableProperty::PropertyCompression(_)
+                | ast::TableProperty::PropertyConstraints(_)
+                | ast::TableProperty::PropertyDefaults(_)
+                | ast::TableProperty::PropertyGenerated(_)
+                | ast::TableProperty::PropertyIdentity(_)
+                | ast::TableProperty::PropertyStatistics(_)
+                | ast::TableProperty::PropertyStorage(_),
+            )
+            | None => {}
+        }
+    }
+    includes
 }

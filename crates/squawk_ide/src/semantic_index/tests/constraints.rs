@@ -249,29 +249,305 @@ create table t (
 #[test]
 fn multiple_primary_keys() {
     assert_snapshot!(check("
-create table t (a int primary key, b int primary key);
-create table u (a int, b int, primary key (a), primary key (b));
-create table v (a int primary key, b int);
+create table t (
+  a int primary key,
+  b int primary key
+);
+create table u (
+  a int,
+  b int,
+  primary key (a),
+  primary key (b)
+);
+
+create table v (
+  a int primary key,
+  b int
+);
 alter table v add primary key (b);
-create table w (a int primary key, b int);
+
+create table w (
+  a int primary key,
+  b int
+);
 alter table w drop constraint w_pkey, add primary key (b);
-create table x (a int primary key, b int);
+
+create table x (
+  a int primary key,
+  b int
+);
 alter table x drop constraint x_pkey;
 alter table x add primary key (b);
+
 create table p (a int primary key);
 create table c (b int primary key) inherits (p);
+
+create table l1 (
+  like v including all excluding indexes,
+  primary key (b)
+);
+create table l2 (
+  like v including all,
+  primary key (b)
+);
+create table l3 (
+  primary key (b),
+  like v including indexes
+);
+
+create table l4 (like v including indexes);
+alter table l4 add primary key (b);
+
+create table l5 (like v including indexes);
+alter table l5 drop constraint l5_pkey;
+alter table l5 add primary key (b);
+
+create table pp (
+  a int,
+  b int,
+  primary key (a)
+)
+  partition by range (a);
+create table pc
+  partition of pp (primary key (b))
+  for values from (1) to (2);
+
+create table pd
+  partition of pp
+  for values from (2) to (3);
+alter table pd add primary key (b);
+
+create table pm
+  partition of pp
+  for values from (3) to (4)
+  partition by range (a);
+create table pg
+  partition of pm (primary key (b))
+  for values from (3) to (4);
+
+create table l6 (
+  like pd including indexes,
+  primary key (b)
+);
 "), @"
     error: multiple primary keys for table `t` are not allowed
       ╭▸ 
-    2 │ create table t (a int primary key, b int primary key);
-      ╰╴                                         ━━━━━━━━━━━
+    4 │     b int primary key
+      │ ┏━━━━━━━━━┛
+    5 │ ┃ );
+      ╰╴┗━┛
     error: multiple primary keys for table `u` are not allowed
-      ╭▸ 
-    3 │ create table u (a int, b int, primary key (a), primary key (b));
-      ╰╴                                               ━━━━━━━━━━━━━━━
+       ╭▸ 
+    10 │   primary key (b)
+       ╰╴  ━━━━━━━━━━━━━━━
     error: multiple primary keys for table `v` are not allowed
+       ╭▸ 
+    17 │ alter table v add primary key (b);
+       ╰╴                  ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l2` are not allowed
+       ╭▸ 
+    41 │   primary key (b)
+       ╰╴  ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l3` are not allowed
+       ╭▸ 
+    44 │   primary key (b),
+       ╰╴  ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l4` are not allowed
+       ╭▸ 
+    49 │ alter table l4 add primary key (b);
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `pc` are not allowed
+       ╭▸ 
+    62 │   partition of pp (primary key (b))
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `pd` are not allowed
+       ╭▸ 
+    68 │ alter table pd add primary key (b);
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `pg` are not allowed
+       ╭▸ 
+    75 │   partition of pm (primary key (b))
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l6` are not allowed
+       ╭▸ 
+    80 │   primary key (b)
+       ╰╴  ━━━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn conflicting_nullability() {
+    assert_snapshot!(check("
+create table n1 (a int primary key null);
+create table n2 (a int null primary key);
+create table n3 (a int null not null);
+create table n4 (a int not null null);
+create table n5 (a int generated always as identity null);
+create table n6 (a int null generated always as identity);
+create table n7 (
+  a int null null,
+  b int not null not null,
+  c int primary key not null,
+  d int not null unique
+);
+alter table n7 add column e int not null null;
+"), @"
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n1`
       ╭▸ 
-    5 │ alter table v add primary key (b);
-      ╰╴                  ━━━━━━━━━━━━━━━
+    2 │ create table n1 (a int primary key null);
+      ╰╴                                   ━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n2`
+      ╭▸ 
+    3 │ create table n2 (a int null primary key);
+      ╰╴                            ━━━━━━━━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n3`
+      ╭▸ 
+    4 │ create table n3 (a int null not null);
+      ╰╴                            ━━━━━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n4`
+      ╭▸ 
+    5 │ create table n4 (a int not null null);
+      ╰╴                                ━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n5`
+      ╭▸ 
+    6 │ create table n5 (a int generated always as identity null);
+      ╰╴                                                    ━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n6`
+      ╭▸ 
+    7 │ create table n6 (a int null generated always as identity);
+      ╰╴                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: conflicting NULL/NOT NULL declarations for column `e` of table `n7`
+       ╭▸ 
+    14 │ alter table n7 add column e int not null null;
+       ╰╴                                         ━━━━
+    ");
+}
+
+#[test]
+fn default_column_reference() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int default a,
+  c int default t.a,
+  d int default (t).a,
+  e int default t
+);
+alter table t add column f int default b + 1;
+alter table t alter column a set default c;
+create view v as
+  select a from t;
+alter view v alter column a set default a;
+create function f(x int, y int default x) returns int
+  language sql
+  as 'select 1';
+create domain dm as int default 1;
+create table ok (
+  a int default 1,
+  b timestamptz default now(),
+  c text default current_user
+);
+create table pt (a int) partition by range (a);
+create table pt_1
+  partition of pt
+  for values from (a) to (10);
+"), @"
+    error: column `c` does not exist
+       ╭▸ 
+    10 │ alter table t alter column a set default c;
+       ╰╴                                         ━
+    error: column `a` does not exist
+       ╭▸ 
+    13 │ alter view v alter column a set default a;
+       ╰╴                                        ━
+    error: column `x` does not exist
+       ╭▸ 
+    14 │ create function f(x int, y int default x) returns int
+       ╰╴                                       ━
+    error: column `a` does not exist
+       ╭▸ 
+    26 │   for values from (a) to (10);
+       ╰╴                   ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    4 │   b int default a,
+      ╰╴                ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    5 │   c int default t.a,
+      ╰╴                ━━━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    6 │   d int default (t).a,
+      ╰╴                 ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    7 │   e int default t
+      ╰╴                ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    9 │ alter table t add column f int default b + 1;
+      ╰╴                                       ━
+    ");
+}
+
+#[test]
+fn generated_column_reference() {
+    assert_snapshot!(check("
+create table g1 (
+  a int,
+  b int generated always as (a + 1) stored,
+  c int generated always as (b + 1) stored
+);
+create table g2 (
+  a int,
+  c int generated always as (b + 1) stored,
+  b int generated always as (a + 1) stored
+);
+create table g3 (a int generated always as (a + 1) stored);
+create table g4 (
+  a int,
+  b int generated always as (a + 1) virtual,
+  c int generated always as (g4.b + 1) stored
+);
+create table g5 (
+  a int,
+  b int generated always as (a + 1) stored,
+  c int generated always as (a + 2) stored
+);
+alter table g5 add column d int generated always as (b * 2) stored;
+alter table g5 alter column c set expression as(b + 2);
+create table g6 (
+  a int,
+  b int generated always as identity,
+  c int generated always as (a + b) stored,
+  d int default 1,
+  e int generated always as (d + 1) stored
+);
+"), @"
+    error: cannot use generated column `b` in column generation expression
+      ╭▸ 
+    5 │   c int generated always as (b + 1) stored
+      ╰╴                             ━
+    error: cannot use generated column `b` in column generation expression
+      ╭▸ 
+    9 │   c int generated always as (b + 1) stored,
+      ╰╴                             ━
+    error: cannot use generated column `a` in column generation expression
+       ╭▸ 
+    12 │ create table g3 (a int generated always as (a + 1) stored);
+       ╰╴                                            ━
+    error: cannot use generated column `b` in column generation expression
+       ╭▸ 
+    16 │   c int generated always as (g4.b + 1) stored
+       ╰╴                                ━
+    error: cannot use generated column `b` in column generation expression
+       ╭▸ 
+    23 │ alter table g5 add column d int generated always as (b * 2) stored;
+       ╰╴                                                     ━
+    error: cannot use generated column `b` in column generation expression
+       ╭▸ 
+    24 │ alter table g5 alter column c set expression as(b + 2);
+       ╰╴                                                ━
     ");
 }

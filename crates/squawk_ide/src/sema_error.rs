@@ -126,12 +126,25 @@ pub(crate) enum SemaError {
     NestedAggregate,
     AggregateContainsWindow,
     NestedWindow,
+    WindowWithoutOver {
+        name: Name,
+    },
     MisplacedAggregate {
         context: ExprContext,
     },
     MisplacedWindow {
         context: ExprContext,
     },
+    MisplacedSubquery {
+        context: ExprContext,
+    },
+    DefaultColumnReference,
+    GeneratedColumnReference {
+        column: Name,
+    },
+    SubqueryNotSingleColumn,
+    SubqueryTooManyColumns,
+    SubqueryTooFewColumns,
     Duplicate {
         object: ObjectKind,
         name: Name,
@@ -283,6 +296,55 @@ pub(crate) enum SemaError {
     MissingArrayType {
         ty: TyName,
     },
+    WindowOverride {
+        name: Name,
+        clause: WindowClause,
+    },
+    WindowFrameCopy {
+        name: Name,
+        hint: bool,
+    },
+    WindowAggregateOrderBy,
+    WindowDistinct,
+    TriggerReturnType {
+        name: Name,
+        kind: TriggerFunctionKind,
+    },
+    ConflictingNullability {
+        column: Name,
+        table: Name,
+    },
+    RowLengthMismatch,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum WindowClause {
+    PartitionBy,
+    OrderBy,
+}
+
+impl WindowClause {
+    fn label(self) -> &'static str {
+        match self {
+            WindowClause::PartitionBy => "PARTITION BY",
+            WindowClause::OrderBy => "ORDER BY",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TriggerFunctionKind {
+    Trigger,
+    EventTrigger,
+}
+
+impl TriggerFunctionKind {
+    pub(crate) fn return_type(self) -> &'static str {
+        match self {
+            TriggerFunctionKind::Trigger => "trigger",
+            TriggerFunctionKind::EventTrigger => "event_trigger",
+        }
+    }
 }
 
 const COPY_SELECT_HINT: &str = "Try the COPY (SELECT ...) TO variant.";
@@ -583,6 +645,43 @@ impl ExprContext {
             ExprContext::ExecuteParameter => "EXECUTE parameters",
         }
     }
+
+    pub(crate) fn subquery_label(self) -> Option<&'static str> {
+        match self {
+            ExprContext::CheckConstraint => Some("check constraint"),
+            ExprContext::Default => Some("DEFAULT expression"),
+            ExprContext::GeneratedColumn => Some("column generation expression"),
+            ExprContext::IndexExpression => Some("index expression"),
+            ExprContext::IndexPredicate => Some("index predicate"),
+            ExprContext::StatisticsExpression => Some("statistics expression"),
+            ExprContext::PartitionKey => Some("partition key expression"),
+            ExprContext::PartitionBound => Some("partition bound"),
+            ExprContext::TriggerWhen => Some("trigger WHEN condition"),
+            ExprContext::CallArgument => Some("CALL argument"),
+            ExprContext::Transform => Some("transform expression"),
+            ExprContext::CopyWhere => Some("COPY FROM WHERE condition"),
+            ExprContext::ExecuteParameter => Some("EXECUTE parameter"),
+            ExprContext::Unrestricted
+            | ExprContext::Where
+            | ExprContext::JoinCondition
+            | ExprContext::GroupBy
+            | ExprContext::Having
+            | ExprContext::Filter
+            | ExprContext::WindowDefinition
+            | ExprContext::WindowRange
+            | ExprContext::WindowRows
+            | ExprContext::WindowGroups
+            | ExprContext::Limit
+            | ExprContext::Offset
+            | ExprContext::Values
+            | ExprContext::Returning
+            | ExprContext::Insert
+            | ExprContext::Update
+            | ExprContext::FromFunction
+            | ExprContext::MergeWhen
+            | ExprContext::Policy => None,
+        }
+    }
 }
 
 impl TypeKind {
@@ -656,9 +755,17 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
-            SemaError::NestedWindow | SemaError::MisplacedWindow { .. } => {
-                DiagnosticKind::WindowingError
+            SemaError::MisplacedSubquery { .. } | SemaError::DefaultColumnReference => {
+                DiagnosticKind::FeatureNotSupported
             }
+            SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
+            SemaError::NestedWindow
+            | SemaError::WindowWithoutOver { .. }
+            | SemaError::MisplacedWindow { .. }
+            | SemaError::WindowOverride { .. }
+            | SemaError::WindowFrameCopy { .. }
+            | SemaError::WindowAggregateOrderBy
+            | SemaError::WindowDistinct => DiagnosticKind::WindowingError,
             SemaError::Duplicate { object, .. }
             | SemaError::DuplicateInSchema { object, .. }
             | SemaError::DuplicateForAccessMethod { object, .. } => object.duplicate_kind(),
@@ -688,9 +795,11 @@ impl SemaError {
             SemaError::InvalidDomainConstraint { .. } => DiagnosticKind::InvalidDomainConstraint,
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
-            | SemaError::InsertMoreTargetsThanExpressions { .. } => {
-                DiagnosticKind::ColumnCountMismatch
-            }
+            | SemaError::InsertMoreTargetsThanExpressions { .. }
+            | SemaError::RowLengthMismatch
+            | SemaError::SubqueryNotSingleColumn
+            | SemaError::SubqueryTooManyColumns
+            | SemaError::SubqueryTooFewColumns => DiagnosticKind::ColumnCountMismatch,
             SemaError::MissingShellType => DiagnosticKind::MissingShellType,
             SemaError::WrongRelationKind { .. }
             | SemaError::CannotCopy { .. }
@@ -701,6 +810,8 @@ impl SemaError {
             SemaError::MultiplePrimaryKeys { .. } => DiagnosticKind::MultiplePrimaryKeys,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
+            SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
+            SemaError::ConflictingNullability { .. } => DiagnosticKind::ConflictingNullability,
         }
     }
 
@@ -719,6 +830,9 @@ impl SemaError {
             SemaError::CannotCopy {
                 copy_from, kind, ..
             } => copy_target(copy_from, kind).1,
+            SemaError::WindowFrameCopy { hint, .. } => {
+                hint.then_some("Omit the parentheses in this OVER clause.")
+            }
             _ => None,
         }
     }
@@ -749,6 +863,17 @@ impl SemaError {
             SemaError::MissingShellType => {
                 Some("cannot specify a canonical function without a pre-created shell type")
             }
+            SemaError::WindowAggregateOrderBy => {
+                Some("aggregate ORDER BY is not implemented for window functions")
+            }
+            SemaError::WindowDistinct => Some("DISTINCT is not implemented for window functions"),
+            SemaError::RowLengthMismatch => Some("unequal number of entries in row expressions"),
+            SemaError::DefaultColumnReference => {
+                Some("cannot use column reference in DEFAULT expression")
+            }
+            SemaError::SubqueryNotSingleColumn => Some("subquery must return only one column"),
+            SemaError::SubqueryTooManyColumns => Some("subquery has too many columns"),
+            SemaError::SubqueryTooFewColumns => Some("subquery has too few columns"),
             _ => None,
         }
     }
@@ -790,7 +915,14 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::AggregateContainsWindow
             | SemaError::NestedWindow
             | SemaError::InsertMoreTargetsThanExpressions { .. }
-            | SemaError::MissingShellType => {
+            | SemaError::MissingShellType
+            | SemaError::WindowAggregateOrderBy
+            | SemaError::WindowDistinct
+            | SemaError::RowLengthMismatch
+            | SemaError::DefaultColumnReference
+            | SemaError::SubqueryNotSingleColumn
+            | SemaError::SubqueryTooManyColumns
+            | SemaError::SubqueryTooFewColumns => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MisplacedAggregate { context } => write!(
@@ -806,6 +938,19 @@ impl fmt::Display for ErrorMessage<'_> {
                     context => context.label(),
                 };
                 write!(f, "window functions are not allowed in {label}")
+            }
+            SemaError::MisplacedSubquery { context } => write!(
+                f,
+                "cannot use subquery in {}",
+                context.subquery_label().unwrap_or_default()
+            ),
+            SemaError::GeneratedColumnReference { column } => write!(
+                f,
+                "cannot use generated column `{}` in column generation expression",
+                n(column)
+            ),
+            SemaError::WindowWithoutOver { name } => {
+                write!(f, "window function `{}` requires an OVER clause", n(name))
             }
             SemaError::Duplicate { object, name } => {
                 write!(f, "{} `{}` already exists", object.label(), n(name))
@@ -1020,6 +1165,29 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "could not find array type for data type `{}`",
                 self.ty(ty)
+            ),
+            SemaError::WindowOverride { name, clause } => write!(
+                f,
+                "cannot override {} clause of window `{}`",
+                clause.label(),
+                n(name)
+            ),
+            SemaError::WindowFrameCopy { name, .. } => write!(
+                f,
+                "cannot copy window `{}` because it has a frame clause",
+                n(name)
+            ),
+            SemaError::TriggerReturnType { name, kind } => write!(
+                f,
+                "function `{}` must return type {}",
+                n(name),
+                kind.return_type()
+            ),
+            SemaError::ConflictingNullability { column, table } => write!(
+                f,
+                "conflicting NULL/NOT NULL declarations for column `{}` of table `{}`",
+                n(column),
+                n(table)
             ),
         }
     }

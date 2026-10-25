@@ -120,6 +120,10 @@ impl QualifiedIndex<Function> {
     pub(crate) fn set_ret(&mut self, id: FunctionId, ret: Option<Ty>) {
         self.arena[id].ret = ret;
     }
+
+    pub(crate) fn set_window(&mut self, id: FunctionId) {
+        self.arena[id].window = true;
+    }
 }
 
 impl QualifiedIndex<Operator> {

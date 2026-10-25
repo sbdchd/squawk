@@ -135,6 +135,10 @@ pub enum DiagnosticKind {
     MissingArrayType,
     MissingShellType,
     InvalidOrdinal,
+    WrongReturnType,
+    ConflictingNullability,
+    FeatureNotSupported,
+    InvalidColumnReference,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
