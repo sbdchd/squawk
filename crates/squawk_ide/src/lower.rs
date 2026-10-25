@@ -83,8 +83,8 @@ impl Lowerer {
             prepare_params: None,
             dependencies: DependencyGraph::default(),
             inheritances: InheritanceGraph::default(),
-            column_expressions: ColumnExpressions::default(),
-            next_column_expression: 0,
+            column_exprs: ColumnExprs::default(),
+            next_column_expr: 0,
             dropped_operator_family_members: FxHashSet::default(),
             undo: vec![],
             dropped_types: FxHashSet::default(),
@@ -335,8 +335,8 @@ pub(crate) struct Lowerer {
     prepare_params: Option<IdxRange<Param>>,
     dependencies: DependencyGraph,
     inheritances: InheritanceGraph,
-    column_expressions: ColumnExpressions,
-    next_column_expression: u32,
+    column_exprs: ColumnExprs,
+    next_column_expr: u32,
     dropped_operator_family_members: FxHashSet<OperatorFamilyMemberId>,
     undo: Vec<Undo>,
     dropped_types: FxHashSet<TypeId>,
@@ -426,12 +426,18 @@ struct Snapshot {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct ColumnExpressionId(u32);
+struct ColumnExprId(u32);
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-struct ColumnExpression {
-    id: ColumnExpressionId,
-    generated: bool,
+enum ColumnExprKind {
+    Default,
+    Generated,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct ColumnExpr {
+    id: ColumnExprId,
+    kind: ColumnExprKind,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -441,25 +447,21 @@ struct ColumnKey {
 }
 
 #[derive(Default)]
-struct ColumnExpressions {
-    by_column: FxHashMap<ColumnKey, ColumnExpression>,
-    by_id: FxHashMap<ColumnExpressionId, ColumnKey>,
+struct ColumnExprs {
+    by_column: FxHashMap<ColumnKey, ColumnExpr>,
+    by_id: FxHashMap<ColumnExprId, ColumnKey>,
 }
 
-impl ColumnExpressions {
-    fn get(&self, key: ColumnKey) -> Option<ColumnExpression> {
+impl ColumnExprs {
+    fn get(&self, key: ColumnKey) -> Option<ColumnExpr> {
         self.by_column.get(&key).copied()
     }
 
-    fn column_of(&self, id: ColumnExpressionId) -> Option<ColumnKey> {
+    fn column_of(&self, id: ColumnExprId) -> Option<ColumnKey> {
         self.by_id.get(&id).copied()
     }
 
-    fn set(
-        &mut self,
-        key: ColumnKey,
-        expression: Option<ColumnExpression>,
-    ) -> Option<ColumnExpression> {
+    fn set(&mut self, key: ColumnKey, expression: Option<ColumnExpr>) -> Option<ColumnExpr> {
         let previous = match expression {
             Some(expression) => self.by_column.insert(key, expression),
             None => self.by_column.remove(&key),
@@ -657,7 +659,7 @@ impl InheritanceGraph {
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum Object {
     Function(FunctionId),
-    ColumnExpression(ColumnExpressionId),
+    ColumnExpr(ColumnExprId),
     OperatorFamilyMember(OperatorFamilyMemberId),
     Table(TableId),
     Type(TypeId),
@@ -793,7 +795,7 @@ impl Object {
             Object::Schema(id) => Some(Item::Schema(id)),
             Object::Server(id) => Some(Item::Server(id)),
             Object::Publication(id) => Some(Item::Publication(id)),
-            Object::ColumnExpression(_)
+            Object::ColumnExpr(_)
             | Object::OperatorFamilyMember(_)
             | Object::Cast(_)
             | Object::Transform(_) => None,
@@ -836,7 +838,7 @@ enum Undo {
     DropCast(CastId),
     DropTransform(TransformKey, TransformId),
     TableColumns(TableId, Columns),
-    ColumnExpression(ColumnKey, Option<ColumnExpression>),
+    ColumnExpr(ColumnKey, Option<ColumnExpr>),
     DropOperatorFamilyMember(OperatorFamilyMemberId),
     MemberOwner(OperatorFamilyMemberId, MemberOwner),
     MoveTable(TableId, Name, Name, InIrFile<SyntaxNodePtr>),
@@ -1417,9 +1419,9 @@ impl Lowerer {
                 };
                 if let Some(column) = self.index.columns[column].name
                     && self
-                        .column_expressions
+                        .column_exprs
                         .get(ColumnKey { table, column })
-                        .is_some_and(|expression| expression.generated)
+                        .is_some_and(|expression| expression.kind == ColumnExprKind::Generated)
                 {
                     let range = self.index.range(range);
                     self.index
@@ -1483,7 +1485,7 @@ impl Lowerer {
                                 ConstraintOwner::Domain(domain) if is_target(domain)
                             ),
                             Object::Function(_)
-                            | Object::ColumnExpression(_)
+                            | Object::ColumnExpr(_)
                             | Object::OperatorFamilyMember(_)
                             | Object::Table(_)
                             | Object::Trigger(_)
@@ -1641,12 +1643,12 @@ impl Lowerer {
                 match alter_column.alter_view_column_action() {
                     Some(ast::AlterViewColumnAction::SetDefault(set_default)) => {
                         if let Some(expr) = set_default.expr() {
-                            self.lower_column_expression(view, column, &expr, false);
+                            self.lower_column_expr(view, column, &expr, ColumnExprKind::Default);
                         }
                     }
                     Some(ast::AlterViewColumnAction::DropDefault(_)) => {
                         if let (Some(view), Some(column)) = (view, column) {
-                            self.set_column_expression(view, column, None);
+                            self.set_column_expr(view, column, None);
                         }
                     }
                     None => {}
@@ -1705,12 +1707,12 @@ impl Lowerer {
     }
 
     fn rename_column_dependents(&mut self, table: TableId, from: Name, to: Name) {
-        if let Some(expression) = self.column_expressions.get(ColumnKey {
+        if let Some(expression) = self.column_exprs.get(ColumnKey {
             table,
             column: from,
         }) {
-            self.set_column_expression(table, from, None);
-            self.set_column_expression(table, to, Some(expression));
+            self.set_column_expr(table, from, None);
+            self.set_column_expr(table, to, Some(expression));
         }
         let in_transaction = self.in_transaction();
         for id in self.index.tables.owned_sequences(table) {
@@ -2715,8 +2717,8 @@ impl Lowerer {
                 Undo::MemberOwner(member, owner) => {
                     self.index.operator_family_members.set_owner(member, owner);
                 }
-                Undo::ColumnExpression(key, expression) => {
-                    self.column_expressions.set(key, expression);
+                Undo::ColumnExpr(key, expression) => {
+                    self.column_exprs.set(key, expression);
                 }
                 Undo::MoveTable(id, schema, name, name_ptr) => {
                     let current = self.index.tables[id].name_ptr.file_range();
@@ -3024,7 +3026,7 @@ impl Lowerer {
             }
             Object::Server(server) => self.drop_server(server),
             Object::Publication(publication) => self.drop_publication(publication),
-            Object::ColumnExpression(id) => self.drop_column_expression(id),
+            Object::ColumnExpr(id) => self.drop_column_expr(id),
             Object::OperatorFamilyMember(member) => self.drop_operator_family_member(member),
         }
     }
@@ -3046,22 +3048,22 @@ impl Lowerer {
         }
     }
 
-    fn drop_column_expression(&mut self, id: ColumnExpressionId) {
-        let Some(key) = self.column_expressions.column_of(id) else {
+    fn drop_column_expr(&mut self, id: ColumnExprId) {
+        let Some(key) = self.column_exprs.column_of(id) else {
             return;
         };
         let generated = self
-            .column_expressions
+            .column_exprs
             .get(key)
-            .is_some_and(|expression| expression.generated);
-        self.set_column_expression(key.table, key.column, None);
+            .is_some_and(|expression| expression.kind == ColumnExprKind::Generated);
+        self.set_column_expr(key.table, key.column, None);
         if generated {
             self.drop_table_column(key.table, key.column);
         }
     }
 
     fn drop_table_column(&mut self, table: TableId, column: Name) {
-        self.set_column_expression(table, column, None);
+        self.set_column_expr(table, column, None);
         self.drop_column_sequences(table, column);
         if !self.index.tables.is_local(table) {
             return;
@@ -3084,40 +3086,34 @@ impl Lowerer {
         }
     }
 
-    fn set_column_expression(
-        &mut self,
-        table: TableId,
-        column: Name,
-        expression: Option<ColumnExpression>,
-    ) {
+    fn set_column_expr(&mut self, table: TableId, column: Name, expression: Option<ColumnExpr>) {
         let key = ColumnKey { table, column };
-        let previous = self.column_expressions.set(key, expression);
+        let previous = self.column_exprs.set(key, expression);
         if previous != expression && self.in_transaction() {
-            self.undo.push(Undo::ColumnExpression(key, previous));
+            self.undo.push(Undo::ColumnExpr(key, previous));
         }
     }
 
-    fn lower_column_expression(
+    fn lower_column_expr(
         &mut self,
         table: Option<TableId>,
         column: Option<Name>,
         expr: &ast::Expr,
-        generated: bool,
+        kind: ColumnExprKind,
     ) {
         let refs = self.index.references.next_idx();
-        let context = if generated {
-            ExprContext::GeneratedColumn
-        } else {
-            ExprContext::Default
+        let context = match kind {
+            ColumnExprKind::Default => ExprContext::Default,
+            ColumnExprKind::Generated => ExprContext::GeneratedColumn,
         };
         self.lower_expr_in(context, expr);
         let (Some(table), Some(column)) = (table, column) else {
             return;
         };
-        let id = ColumnExpressionId(self.next_column_expression);
-        self.next_column_expression += 1;
-        self.set_column_expression(table, column, Some(ColumnExpression { id, generated }));
-        if generated {
+        let id = ColumnExprId(self.next_column_expr);
+        self.next_column_expr += 1;
+        self.set_column_expr(table, column, Some(ColumnExpr { id, kind }));
+        if kind == ColumnExprKind::Generated {
             self.generated_refs.push(GeneratedRefs {
                 table,
                 refs: self.index.references.range_from(refs),
@@ -3126,7 +3122,7 @@ impl Lowerer {
         for reference in self.index.references.range_from(refs) {
             if let Resolution::Function(function) = self.index.references[reference].resolution {
                 self.dependencies
-                    .add_dependency(Object::ColumnExpression(id), Object::Function(function));
+                    .add_dependency(Object::ColumnExpr(id), Object::Function(function));
             }
         }
     }
@@ -3167,8 +3163,8 @@ impl Lowerer {
             Object::Schema(schema) => self.dropped_schemas.contains(&schema),
             Object::Server(server) => self.dropped_servers.contains(&server),
             Object::Publication(publication) => self.dropped_publications.contains(&publication),
-            Object::ColumnExpression(id) => self
-                .column_expressions
+            Object::ColumnExpr(id) => self
+                .column_exprs
                 .column_of(id)
                 .is_none_or(|key| self.dropped_tables.contains(&key.table)),
             Object::OperatorFamilyMember(member) => {
@@ -3303,9 +3299,7 @@ impl Lowerer {
                 ConstraintOwner::Table(table) => Some(table),
                 ConstraintOwner::Domain(_) => None,
             },
-            Object::ColumnExpression(id) => {
-                self.column_expressions.column_of(id).map(|key| key.table)
-            }
+            Object::ColumnExpr(id) => self.column_exprs.column_of(id).map(|key| key.table),
             Object::Function(_)
             | Object::OperatorFamilyMember(_)
             | Object::Type(_)
@@ -8197,7 +8191,7 @@ impl Lowerer {
             | Object::AccessMethod(_)
             | Object::Language(_)
             | Object::ForeignDataWrapper(_)
-            | Object::ColumnExpression(_)
+            | Object::ColumnExpr(_)
             | Object::OperatorFamilyMember(_)
             | Object::Schema(_)
             | Object::Server(_)
@@ -14901,7 +14895,7 @@ impl Lowerer {
             if let Some(table) = table
                 && column.is_some()
             {
-                self.set_column_expression(table, name, None);
+                self.set_column_expr(table, name, None);
                 self.drop_column_sequences(table, name);
             }
             dropped.extend(column);
@@ -15071,13 +15065,18 @@ impl Lowerer {
             }
             Some(ast::AlterColumnOption::SetDefault(set_default)) => {
                 if let Some(expr) = set_default.expr() {
-                    self.lower_column_expression(table, Some(column), &expr, false);
+                    self.lower_column_expr(table, Some(column), &expr, ColumnExprKind::Default);
                 }
             }
             Some(ast::AlterColumnOption::SetExpression(set_expression)) => {
                 if let Some(expr) = set_expression.expr() {
                     self.with_table_scope(QueryKind::Constraint, table, node, |this| {
-                        this.lower_column_expression(table, Some(column), &expr, true);
+                        this.lower_column_expr(
+                            table,
+                            Some(column),
+                            &expr,
+                            ColumnExprKind::Generated,
+                        );
                     });
                 }
             }
@@ -15085,7 +15084,7 @@ impl Lowerer {
                 ast::AlterColumnOption::DropDefault(_) | ast::AlterColumnOption::DropExpression(_),
             ) => {
                 if let Some(table) = table {
-                    self.set_column_expression(table, column, None);
+                    self.set_column_expr(table, column, None);
                 }
             }
             Some(ast::AlterColumnOption::SetNotNull(set_not_null)) => {
@@ -15294,7 +15293,7 @@ impl Lowerer {
                 .columns
                 .alloc_copies(columns.range.iter().filter(|id| *id != inherited));
             self.set_table_columns(child, range);
-            self.set_column_expression(child, name, None);
+            self.set_column_expr(child, name, None);
             self.drop_column_sequences(child, name);
             self.drop_inherited_column(child, column);
         }
@@ -17087,7 +17086,7 @@ impl Lowerer {
         default: &ast::DefaultConstraint,
     ) {
         if let Some(expr) = default.expr() {
-            self.lower_column_expression(table, column, &expr, false);
+            self.lower_column_expr(table, column, &expr, ColumnExprKind::Default);
         }
     }
 
@@ -17100,7 +17099,7 @@ impl Lowerer {
         match generated.generated_as() {
             Some(ast::GeneratedAs::GeneratedStored(stored)) => {
                 if let Some(expr) = stored.expr() {
-                    self.lower_column_expression(table, column, &expr, true);
+                    self.lower_column_expr(table, column, &expr, ColumnExprKind::Generated);
                 }
             }
             Some(ast::GeneratedAs::GeneratedIdentity(identity)) => {
@@ -21600,7 +21599,7 @@ fn set_object_schema(index: &mut IndexData, object: Object, schema: Name) -> boo
         | Object::AccessMethod(_)
         | Object::Language(_)
         | Object::ForeignDataWrapper(_)
-        | Object::ColumnExpression(_)
+        | Object::ColumnExpr(_)
         | Object::OperatorFamilyMember(_)
         | Object::Schema(_)
         | Object::Server(_)
