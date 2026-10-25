@@ -126,6 +126,9 @@ pub(crate) enum SemaError {
     NestedAggregate,
     AggregateContainsWindow,
     NestedWindow,
+    WindowWithoutOver {
+        name: Name,
+    },
     MisplacedAggregate {
         context: ExprContext,
     },
@@ -656,9 +659,9 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
-            SemaError::NestedWindow | SemaError::MisplacedWindow { .. } => {
-                DiagnosticKind::WindowingError
-            }
+            SemaError::NestedWindow
+            | SemaError::WindowWithoutOver { .. }
+            | SemaError::MisplacedWindow { .. } => DiagnosticKind::WindowingError,
             SemaError::Duplicate { object, .. }
             | SemaError::DuplicateInSchema { object, .. }
             | SemaError::DuplicateForAccessMethod { object, .. } => object.duplicate_kind(),
@@ -806,6 +809,9 @@ impl fmt::Display for ErrorMessage<'_> {
                     context => context.label(),
                 };
                 write!(f, "window functions are not allowed in {label}")
+            }
+            SemaError::WindowWithoutOver { name } => {
+                write!(f, "window function `{}` requires an OVER clause", n(name))
             }
             SemaError::Duplicate { object, name } => {
                 write!(f, "{} `{}` already exists", object.label(), n(name))

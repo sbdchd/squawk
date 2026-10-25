@@ -142,3 +142,30 @@ execute pp(row_number() over ());
        ╰╴           ━━━━━━━━━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn window_function_without_over() {
+    assert_snapshot!(check("
+create table t (a int);
+select rank() from t;
+select rank() over () from t;
+select lag(a) from t;
+create function w(int) returns int window language c as 'w';
+select w(a) from t;
+select w(a) over () from t;
+select count(*) from t;
+"), @"
+    error: window function `rank` requires an OVER clause
+      ╭▸ 
+    3 │ select rank() from t;
+      ╰╴       ━━━━━━
+    error: window function `lag` requires an OVER clause
+      ╭▸ 
+    5 │ select lag(a) from t;
+      ╰╴       ━━━━━━
+    error: window function `w` requires an OVER clause
+      ╭▸ 
+    7 │ select w(a) from t;
+      ╰╴       ━━━━
+    ");
+}

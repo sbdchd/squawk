@@ -249,29 +249,128 @@ create table t (
 #[test]
 fn multiple_primary_keys() {
     assert_snapshot!(check("
-create table t (a int primary key, b int primary key);
-create table u (a int, b int, primary key (a), primary key (b));
-create table v (a int primary key, b int);
+create table t (
+  a int primary key,
+  b int primary key
+);
+create table u (
+  a int,
+  b int,
+  primary key (a),
+  primary key (b)
+);
+
+create table v (
+  a int primary key,
+  b int
+);
 alter table v add primary key (b);
-create table w (a int primary key, b int);
+
+create table w (
+  a int primary key,
+  b int
+);
 alter table w drop constraint w_pkey, add primary key (b);
-create table x (a int primary key, b int);
+
+create table x (
+  a int primary key,
+  b int
+);
 alter table x drop constraint x_pkey;
 alter table x add primary key (b);
+
 create table p (a int primary key);
 create table c (b int primary key) inherits (p);
+
+create table l1 (
+  like v including all excluding indexes,
+  primary key (b)
+);
+create table l2 (
+  like v including all,
+  primary key (b)
+);
+create table l3 (
+  primary key (b),
+  like v including indexes
+);
+
+create table l4 (like v including indexes);
+alter table l4 add primary key (b);
+
+create table l5 (like v including indexes);
+alter table l5 drop constraint l5_pkey;
+alter table l5 add primary key (b);
+
+create table pp (
+  a int,
+  b int,
+  primary key (a)
+)
+  partition by range (a);
+create table pc
+  partition of pp (primary key (b))
+  for values from (1) to (2);
+
+create table pd
+  partition of pp
+  for values from (2) to (3);
+alter table pd add primary key (b);
+
+create table pm
+  partition of pp
+  for values from (3) to (4)
+  partition by range (a);
+create table pg
+  partition of pm (primary key (b))
+  for values from (3) to (4);
+
+create table l6 (
+  like pd including indexes,
+  primary key (b)
+);
 "), @"
     error: multiple primary keys for table `t` are not allowed
       ╭▸ 
-    2 │ create table t (a int primary key, b int primary key);
-      ╰╴                                         ━━━━━━━━━━━
+    4 │     b int primary key
+      │ ┏━━━━━━━━━┛
+    5 │ ┃ );
+      ╰╴┗━┛
     error: multiple primary keys for table `u` are not allowed
-      ╭▸ 
-    3 │ create table u (a int, b int, primary key (a), primary key (b));
-      ╰╴                                               ━━━━━━━━━━━━━━━
+       ╭▸ 
+    10 │   primary key (b)
+       ╰╴  ━━━━━━━━━━━━━━━
     error: multiple primary keys for table `v` are not allowed
-      ╭▸ 
-    5 │ alter table v add primary key (b);
-      ╰╴                  ━━━━━━━━━━━━━━━
+       ╭▸ 
+    17 │ alter table v add primary key (b);
+       ╰╴                  ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l2` are not allowed
+       ╭▸ 
+    41 │   primary key (b)
+       ╰╴  ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l3` are not allowed
+       ╭▸ 
+    44 │   primary key (b),
+       ╰╴  ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l4` are not allowed
+       ╭▸ 
+    49 │ alter table l4 add primary key (b);
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `pc` are not allowed
+       ╭▸ 
+    62 │   partition of pp (primary key (b))
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `pd` are not allowed
+       ╭▸ 
+    68 │ alter table pd add primary key (b);
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `pg` are not allowed
+       ╭▸ 
+    75 │   partition of pm (primary key (b))
+       ╰╴                   ━━━━━━━━━━━━━━━
+    error: multiple primary keys for table `l6` are not allowed
+       ╭▸ 
+    80 │   primary key (b)
+       ╰╴  ━━━━━━━━━━━━━━━
     ");
 }

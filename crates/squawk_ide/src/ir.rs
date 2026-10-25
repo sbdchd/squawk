@@ -662,6 +662,7 @@ impl RoutineKind {
 #[derive(Debug)]
 pub(crate) struct Function {
     pub(crate) kind: FunctionKind,
+    pub(crate) window: bool,
     pub(crate) schema: Name,
     pub(crate) name: Name,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,

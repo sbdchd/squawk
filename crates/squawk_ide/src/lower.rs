@@ -9614,6 +9614,7 @@ impl Lowerer {
     ) -> Option<FunctionId> {
         let Function {
             kind,
+            window,
             params,
             direct_args,
             ret,
@@ -9636,6 +9637,7 @@ impl Lowerer {
         self.drop_function(function);
         let id = self.index.functions.alloc(Function {
             kind,
+            window,
             schema,
             name,
             ptr: self.ptr(node),
@@ -9865,6 +9867,7 @@ impl Lowerer {
             }
         }
         let inherited_end = self.index.columns.next_idx();
+        let mut like_primary_keys: SmallVec<[ast::LikeClause; 1]> = SmallVec::new();
         for arg in create_table
             .table_arg_list()
             .into_iter()
@@ -9901,6 +9904,9 @@ impl Lowerer {
                         complete = false;
                         continue;
                     };
+                    if like_includes_indexes(&like) && self.has_primary_key(source) {
+                        like_primary_keys.push(like.clone());
+                    }
                     let source_columns = &self.index.tables[source].columns;
                     complete &= source_columns.complete;
                     for id in source_columns.range {
@@ -9935,6 +9941,24 @@ impl Lowerer {
         };
         for parent in parents {
             self.add_inheritance(parent, table, inheritance_kind);
+        }
+        for like in like_primary_keys {
+            if self.has_primary_key(table) {
+                let name = self.index.tables[table].name;
+                self.push_error(
+                    like.syntax(),
+                    SemaError::MultiplePrimaryKeys { table: name },
+                );
+            }
+            self.alloc_index_constraint(
+                ConstraintKind::PrimaryKey,
+                table,
+                like.syntax(),
+                None,
+                None,
+                None,
+                "pkey",
+            );
         }
         self.index
             .tables
@@ -11863,6 +11887,13 @@ impl Lowerer {
         ) else {
             return;
         };
+        if create_function.option_list().is_some_and(|options| {
+            options
+                .options()
+                .any(|option| matches!(option, ast::FuncOption::WindowFuncOption(_)))
+        }) {
+            self.index.functions.set_window(id);
+        }
         self.lower_routine_body(
             id,
             refs,
@@ -17009,7 +17040,7 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        if self.find_primary_key(table).is_some() {
+        if self.has_primary_key(table) {
             let table = self.index.tables[table].name;
             self.push_error(
                 primary_key.syntax(),
@@ -17031,6 +17062,14 @@ impl Lowerer {
         for column in &columns[..key_len] {
             self.add_not_null_constraint(table, *column, primary_key.syntax(), None);
         }
+    }
+
+    fn has_primary_key(&self, table: TableId) -> bool {
+        self.find_primary_key(table).is_some()
+            || self.inheritances.parents(table).iter().any(|inheritance| {
+                inheritance.kind == InheritanceKind::Partition
+                    && self.has_primary_key(inheritance.parent)
+            })
     }
 
     fn find_primary_key(&self, table: TableId) -> Option<ConstraintId> {
@@ -19287,6 +19326,14 @@ impl Lowerer {
         refs: RefId,
         aggregate_calls: usize,
     ) {
+        if call.over_clause().is_none()
+            && let Some(function) = function
+            && let Function {
+                window: true, name, ..
+            } = self.index.functions[function]
+        {
+            self.push_error(call.syntax(), SemaError::WindowWithoutOver { name });
+        }
         let kind = if call.over_clause().is_some() {
             AggregateCallKind::Window
         } else if function
@@ -20584,6 +20631,7 @@ impl Lowerer {
 
         let id = self.index.functions.alloc(Function {
             kind,
+            window: false,
             schema,
             name,
             ptr: self.ptr(node),
@@ -21382,4 +21430,31 @@ fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {
         | ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::Table(_) => None,
     }
+}
+
+fn like_includes_indexes(like: &ast::LikeClause) -> bool {
+    let mut includes = false;
+    for option in like.like_options() {
+        let (property, including) = match option {
+            ast::LikeOption::IncludingProperty(property) => (property.table_property(), true),
+            ast::LikeOption::ExcludingProperty(property) => (property.table_property(), false),
+        };
+        match property {
+            Some(ast::TableProperty::PropertyAll(_) | ast::TableProperty::PropertyIndexes(_)) => {
+                includes = including;
+            }
+            Some(
+                ast::TableProperty::PropertyComments(_)
+                | ast::TableProperty::PropertyCompression(_)
+                | ast::TableProperty::PropertyConstraints(_)
+                | ast::TableProperty::PropertyDefaults(_)
+                | ast::TableProperty::PropertyGenerated(_)
+                | ast::TableProperty::PropertyIdentity(_)
+                | ast::TableProperty::PropertyStatistics(_)
+                | ast::TableProperty::PropertyStorage(_),
+            )
+            | None => {}
+        }
+    }
+    includes
 }
