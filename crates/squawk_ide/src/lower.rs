@@ -9990,6 +9990,20 @@ impl Lowerer {
                             {
                                 this.lower_serial_column(table, column_name, &ty, column.syntax());
                             }
+                            if let Some(column_name) = column_name {
+                                let constraints =
+                                    column.clauses().filter_map(|clause| match clause {
+                                        ast::ColumnClause::ColumnConstraint(constraint) => {
+                                            Some(constraint.into())
+                                        }
+                                        ast::ColumnClause::Collate(_)
+                                        | ast::ColumnClause::AlterOptionList(_)
+                                        | ast::ColumnClause::CompressionMethod(_)
+                                        | ast::ColumnClause::Storage(_)
+                                        | ast::ColumnClause::WithOptions(_) => None,
+                                    });
+                                this.check_column_nullability(table, column_name, constraints);
+                            }
                             for clause in column.clauses() {
                                 match clause {
                                     ast::ColumnClause::ColumnConstraint(constraint) => {
@@ -15167,6 +15181,9 @@ impl Lowerer {
         if add_column.constraints().next().is_none() {
             return;
         }
+        if let (Some(table), Some(column_name)) = (table, name) {
+            self.check_column_nullability(table, column_name, add_column.constraints());
+        }
         self.with_table_scope(QueryKind::Constraint, table, node, |this| {
             for constraint in add_column.constraints() {
                 this.lower_constraint(table, name, &constraint);
@@ -16876,6 +16893,62 @@ impl Lowerer {
         self.set_visible((0..1).into());
         f(self);
         self.scopes.pop();
+    }
+
+    fn check_column_nullability(
+        &mut self,
+        table: TableId,
+        column: Name,
+        constraints: impl Iterator<Item = ast::Constraint>,
+    ) {
+        let mut seen_nullable = false;
+        let mut not_null = false;
+        let mut needs_not_null = false;
+        for constraint in constraints {
+            let conflict = match &constraint {
+                ast::Constraint::NullConstraint(_) => {
+                    let conflict = seen_nullable && not_null || needs_not_null;
+                    seen_nullable = true;
+                    not_null = false;
+                    conflict
+                }
+                ast::Constraint::NotNullConstraint(_) => {
+                    let conflict = seen_nullable && !not_null;
+                    if !not_null {
+                        seen_nullable = true;
+                        not_null = true;
+                        needs_not_null = false;
+                    }
+                    conflict
+                }
+                ast::Constraint::PrimaryKeyConstraint(_) => {
+                    needs_not_null = true;
+                    seen_nullable && !not_null
+                }
+                ast::Constraint::GeneratedConstraint(generated) => {
+                    let identity = matches!(
+                        generated.generated_as(),
+                        Some(ast::GeneratedAs::GeneratedIdentity(_))
+                    );
+                    needs_not_null |= identity && !seen_nullable;
+                    identity && seen_nullable && !not_null
+                }
+                ast::Constraint::CheckConstraint(_)
+                | ast::Constraint::DefaultConstraint(_)
+                | ast::Constraint::ExcludeConstraint(_)
+                | ast::Constraint::ForeignKeyConstraint(_)
+                | ast::Constraint::ReferencesConstraint(_)
+                | ast::Constraint::UniqueConstraint(_) => false,
+            };
+            if conflict {
+                let table = self.index.tables[table].name;
+                self.push_error(
+                    constraint.syntax(),
+                    SemaError::ConflictingNullability { column, table },
+                );
+                return;
+            }
+        }
     }
 
     fn lower_constraint(

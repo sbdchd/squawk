@@ -374,3 +374,51 @@ create table l6 (
        ╰╴  ━━━━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn conflicting_nullability() {
+    assert_snapshot!(check("
+create table n1 (a int primary key null);
+create table n2 (a int null primary key);
+create table n3 (a int null not null);
+create table n4 (a int not null null);
+create table n5 (a int generated always as identity null);
+create table n6 (a int null generated always as identity);
+create table n7 (
+  a int null null,
+  b int not null not null,
+  c int primary key not null,
+  d int not null unique
+);
+alter table n7 add column e int not null null;
+"), @"
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n1`
+      ╭▸ 
+    2 │ create table n1 (a int primary key null);
+      ╰╴                                   ━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n2`
+      ╭▸ 
+    3 │ create table n2 (a int null primary key);
+      ╰╴                            ━━━━━━━━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n3`
+      ╭▸ 
+    4 │ create table n3 (a int null not null);
+      ╰╴                            ━━━━━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n4`
+      ╭▸ 
+    5 │ create table n4 (a int not null null);
+      ╰╴                                ━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n5`
+      ╭▸ 
+    6 │ create table n5 (a int generated always as identity null);
+      ╰╴                                                    ━━━━
+    error: conflicting NULL/NOT NULL declarations for column `a` of table `n6`
+      ╭▸ 
+    7 │ create table n6 (a int null generated always as identity);
+      ╰╴                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: conflicting NULL/NOT NULL declarations for column `e` of table `n7`
+       ╭▸ 
+    14 │ alter table n7 add column e int not null null;
+       ╰╴                                         ━━━━
+    ");
+}

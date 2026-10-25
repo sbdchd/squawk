@@ -300,6 +300,10 @@ pub(crate) enum SemaError {
         name: Name,
         kind: TriggerFunctionKind,
     },
+    ConflictingNullability {
+        column: Name,
+        table: Name,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -753,6 +757,7 @@ impl SemaError {
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
+            SemaError::ConflictingNullability { .. } => DiagnosticKind::ConflictingNullability,
         }
     }
 
@@ -1101,6 +1106,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 "function `{}` must return type {}",
                 n(name),
                 kind.return_type()
+            ),
+            SemaError::ConflictingNullability { column, table } => write!(
+                f,
+                "conflicting NULL/NOT NULL declarations for column `{}` of table `{}`",
+                n(column),
+                n(table)
             ),
         }
     }
