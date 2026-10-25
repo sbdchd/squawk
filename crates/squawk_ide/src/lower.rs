@@ -12276,7 +12276,7 @@ impl Lowerer {
                 self.push_error(
                     DiagnosticKind::CannotChangeDatabase,
                     catalog.syntax(),
-                    "current database cannot be changed".to_string(),
+                    "current database cannot be changed",
                 );
                 None
             }
@@ -12768,7 +12768,7 @@ impl Lowerer {
                 self.push_error(
                     DiagnosticKind::ColumnCountMismatch,
                     row.syntax(),
-                    "VALUES lists must all be the same length".to_owned(),
+                    "VALUES lists must all be the same length",
                 );
             }
             for (column_index, expr) in row.exprs().enumerate() {
@@ -13152,7 +13152,7 @@ impl Lowerer {
             self.push_error_ptr(
                 DiagnosticKind::ColumnCountMismatch,
                 ptr,
-                "INSERT has more expressions than target columns".to_owned(),
+                "INSERT has more expressions than target columns",
                 None,
             );
         } else if source_len < target_len
@@ -13169,7 +13169,7 @@ impl Lowerer {
             self.push_error_with_hint(
                 DiagnosticKind::ColumnCountMismatch,
                 column_target.syntax(),
-                "INSERT has more target columns than expressions".to_owned(),
+                "INSERT has more target columns than expressions",
                 hint,
             );
         }
@@ -15792,7 +15792,7 @@ impl Lowerer {
             self.push_error(
                 DiagnosticKind::ReplaceConstraintTrigger,
                 or_replace.syntax(),
-                "CREATE OR REPLACE CONSTRAINT TRIGGER is not supported".to_string(),
+                "CREATE OR REPLACE CONSTRAINT TRIGGER is not supported",
             );
         }
         if let (Some(table), Some(name)) = (table, create_trigger.trigger()) {
@@ -16187,7 +16187,7 @@ impl Lowerer {
                 self.push_error(
                     DiagnosticKind::RenameSelectRule,
                     name.syntax(),
-                    "renaming an ON SELECT rule is not allowed".to_string(),
+                    "renaming an ON SELECT rule is not allowed",
                 );
                 return;
             }
@@ -19742,7 +19742,7 @@ impl Lowerer {
         };
         let depth = self.scopes.len();
         if let Some(message) = message {
-            self.push_error_ptr(diagnostic, ptr, message.to_owned(), None);
+            self.push_error_ptr(diagnostic, ptr, message, None);
         } else {
             for index in aggregate_calls..self.aggregate_calls.len() {
                 let inner = self.aggregate_calls[index];
@@ -19764,7 +19764,7 @@ impl Lowerer {
                     ),
                     (AggregateCallKind::Window, AggregateCallKind::Aggregate) => continue,
                 };
-                self.push_error_ptr(diagnostic, inner.ptr, message.to_owned(), None);
+                self.push_error_ptr(diagnostic, inner.ptr, message, None);
                 self.aggregate_calls.truncate(aggregate_calls);
                 return;
             }
@@ -21413,7 +21413,12 @@ impl Lowerer {
         self.push_error(kind, node, message);
     }
 
-    fn push_error(&mut self, kind: DiagnosticKind, node: &SyntaxNode, message: String) {
+    fn push_error(
+        &mut self,
+        kind: DiagnosticKind,
+        node: &SyntaxNode,
+        message: impl Into<Cow<'static, str>>,
+    ) {
         self.push_error_with_hint(kind, node, message, None);
     }
 
@@ -21421,7 +21426,7 @@ impl Lowerer {
         &mut self,
         kind: DiagnosticKind,
         node: &SyntaxNode,
-        message: String,
+        message: impl Into<Cow<'static, str>>,
         hint: Option<&'static str>,
     ) {
         self.push_error_ptr(kind, self.ptr(node), message, hint);
@@ -21431,14 +21436,14 @@ impl Lowerer {
         &mut self,
         kind: DiagnosticKind,
         ptr: InIrFile<SyntaxNodePtr>,
-        message: String,
+        message: impl Into<Cow<'static, str>>,
         hint: Option<&'static str>,
     ) {
         let range = self.index.range(ptr.file_range());
         self.index.errors.push(Diagnostic {
             kind,
             range,
-            message,
+            message: message.into(),
             hint,
         });
     }

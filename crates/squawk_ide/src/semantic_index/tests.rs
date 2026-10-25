@@ -95,7 +95,7 @@ fn check(sql: &str) -> String {
                 .fold(true)
                 .annotation(AnnotationKind::Primary.span(range));
             let mut group = Level::ERROR
-                .primary_title(diagnostic.message.as_str())
+                .primary_title(diagnostic.message.as_ref())
                 .element(snippet);
             if let Some(hint) = diagnostic.hint {
                 group = group.element(Level::HELP.with_name("hint").message(hint));

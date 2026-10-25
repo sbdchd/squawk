@@ -72,7 +72,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
     for error in semantic_diagnostics(db, file) {
         let message = match error.hint {
             Some(hint) => format!("{}\nhint: {hint}", error.message),
-            None => error.message,
+            None => error.message.into_owned(),
         };
 
         let diagnostic = Diagnostic {
