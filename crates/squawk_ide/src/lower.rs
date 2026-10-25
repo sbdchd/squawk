@@ -10085,6 +10085,20 @@ impl Lowerer {
                             ty,
                             ..self.column_def(&column_name)
                         };
+                        if let Some(name) = def.name
+                            && self.find_column_from(inherited_end, name).is_some()
+                        {
+                            let message = format!(
+                                "column `{}` specified more than once",
+                                self.index.names.resolve(name)
+                            );
+                            self.push_error(
+                                DiagnosticKind::DuplicateColumn,
+                                column_name.syntax(),
+                                message,
+                            );
+                            continue;
+                        }
                         let id = self.add_table_column(start, inherited_end, def);
                         self.record_comment(column.syntax(), Item::Column(id));
                         self.add_item_range(def.ptr.file_range(), Item::Column(id));
@@ -10105,6 +10119,20 @@ impl Lowerer {
                     complete &= source_columns.complete;
                     for id in source_columns.range {
                         let column = self.index.columns[id];
+                        if let Some(name) = column.name
+                            && self.find_column_from(inherited_end, name).is_some()
+                        {
+                            let message = format!(
+                                "column `{}` specified more than once",
+                                self.index.names.resolve(name)
+                            );
+                            self.push_error(
+                                DiagnosticKind::DuplicateColumn,
+                                like.syntax(),
+                                message,
+                            );
+                            continue;
+                        }
                         self.add_table_column(start, inherited_end, column);
                     }
                 }
@@ -11185,6 +11213,14 @@ impl Lowerer {
         range
             .iter()
             .find(|id| self.index.columns[*id].name == Some(name))
+    }
+
+    fn has_duplicate_column(&self, range: IdxRange<Column>, name: Name) -> bool {
+        range
+            .iter()
+            .filter(|id| self.index.columns[*id].name == Some(name))
+            .nth(1)
+            .is_some()
     }
 
     fn find_table_column(&self, table: TableId, name: Name) -> Option<ColumnId> {
@@ -12965,11 +13001,23 @@ impl Lowerer {
             )
         });
         if let Some(target) = target {
+            let mut seen = smallvec![];
             for column_target in insert
                 .column_target_list()
                 .into_iter()
                 .flat_map(|list| list.column_targets())
             {
+                if let Some(name) = self.duplicate_target(&mut seen, &column_target) {
+                    let message = format!(
+                        "column `{}` specified more than once",
+                        self.index.names.resolve(name)
+                    );
+                    self.push_error(
+                        DiagnosticKind::DuplicateColumn,
+                        column_target.syntax(),
+                        message,
+                    );
+                }
                 self.lower_column_target(target, &column_target);
             }
         }
@@ -13082,6 +13130,7 @@ impl Lowerer {
     }
 
     fn lower_set_clause(&mut self, target: Option<SourceId>, set_clause: &ast::SetClause) {
+        let mut seen = smallvec![];
         for set_column in set_clause
             .set_column_list()
             .into_iter()
@@ -13089,20 +13138,24 @@ impl Lowerer {
         {
             match set_column {
                 ast::SetColumn::SetSingleColumn(single) => {
-                    if let (Some(target), Some(column_target)) = (target, single.column_target()) {
-                        self.lower_column_target(target, &column_target);
+                    if let Some(column_target) = single.column_target() {
+                        self.check_duplicate_assignment(&mut seen, &column_target);
+                        if let Some(target) = target {
+                            self.lower_column_target(target, &column_target);
+                        }
                     }
                     if let Some(expr) = single.set_expr().and_then(|set_expr| set_expr.expr()) {
                         self.lower_expr(&expr);
                     }
                 }
                 ast::SetColumn::SetMultipleColumns(multiple) => {
-                    if let Some(target) = target {
-                        for column_target in multiple
-                            .column_target_list()
-                            .into_iter()
-                            .flat_map(|list| list.column_targets())
-                        {
+                    for column_target in multiple
+                        .column_target_list()
+                        .into_iter()
+                        .flat_map(|list| list.column_targets())
+                    {
+                        self.check_duplicate_assignment(&mut seen, &column_target);
+                        if let Some(target) = target {
                             self.lower_column_target(target, &column_target);
                         }
                     }
@@ -13120,6 +13173,38 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn check_duplicate_assignment(
+        &mut self,
+        seen: &mut SmallVec<[(Name, bool); 8]>,
+        column_target: &ast::ColumnTarget,
+    ) {
+        if let Some(name) = self.duplicate_target(seen, column_target) {
+            let message = format!(
+                "multiple assignments to same column `{}`",
+                self.index.names.resolve(name)
+            );
+            self.push_error(
+                DiagnosticKind::DuplicateAssignment,
+                column_target.syntax(),
+                message,
+            );
+        }
+    }
+
+    fn duplicate_target(
+        &mut self,
+        seen: &mut SmallVec<[(Name, bool); 8]>,
+        column_target: &ast::ColumnTarget,
+    ) -> Option<Name> {
+        let name = self.intern(&column_target.name()?.text());
+        let partial = column_target.accessors().next().is_some();
+        let duplicate = seen
+            .iter()
+            .any(|&(prev, prev_partial)| prev == name && !(partial && prev_partial));
+        seen.push((name, partial));
+        duplicate.then_some(name)
     }
 
     fn lower_for_portion_of(
@@ -13341,6 +13426,7 @@ impl Lowerer {
     }
 
     fn lower_with(&mut self, with_clause: &ast::WithClause) {
+        self.check_duplicate_ctes(with_clause);
         if with_clause.recursive_token().is_some() {
             self.lower_recursive_with(with_clause);
             return;
@@ -13377,6 +13463,24 @@ impl Lowerer {
         while self.pending_ctes.len() > mark {
             let pending = self.pending_ctes.remove(mark);
             self.lower_pending_cte(&pending);
+        }
+    }
+
+    fn check_duplicate_ctes(&mut self, with_clause: &ast::WithClause) {
+        let mut seen: SmallVec<[Name; 8]> = smallvec![];
+        for cte_name in with_clause
+            .with_tables()
+            .filter_map(|with_table| with_table.name())
+        {
+            let name = self.intern(&cte_name.text());
+            if seen.contains(&name) {
+                let message = format!(
+                    "WITH query name `{}` specified more than once",
+                    self.index.names.resolve(name)
+                );
+                self.push_error(DiagnosticKind::DuplicateCte, cte_name.syntax(), message);
+            }
+            seen.push(name);
         }
     }
 
@@ -13817,6 +13921,7 @@ impl Lowerer {
             }
         }
 
+        self.check_duplicate_source(name, kind, alias_ptr.is_some(), from_item);
         self.push_source(Source {
             name,
             kind,
@@ -13824,6 +13929,44 @@ impl Lowerer {
             alias_ptr,
             columns,
         });
+    }
+
+    fn check_duplicate_source(
+        &mut self,
+        name: Option<Name>,
+        kind: SourceKind,
+        aliased: bool,
+        from_item: &ast::FromItem,
+    ) {
+        let Some(name) = name else {
+            return;
+        };
+        let query = self.scope().query;
+        let sources = &self.index.queries[query].sources;
+        let duplicate = sources.iter().any(|id| {
+            let prev = &self.index.sources[*id];
+            if prev.name != Some(name) || prev.kind.is_qualified_only() {
+                return false;
+            }
+            let different_unaliased_tables = match (prev.kind, kind) {
+                (SourceKind::Table(a), SourceKind::Table(b)) => {
+                    a != b && prev.alias_ptr.is_none() && !aliased
+                }
+                _ => false,
+            };
+            !different_unaliased_tables
+        });
+        if duplicate {
+            let message = format!(
+                "table name `{}` specified more than once",
+                self.index.names.resolve(name)
+            );
+            let node = match from_item.alias().and_then(|alias| alias.name()) {
+                Some(alias) => alias.syntax().clone(),
+                None => from_item.syntax().clone(),
+            };
+            self.push_error(DiagnosticKind::DuplicateSource, &node, message);
+        }
     }
 
     fn lower_from_query(&mut self, query: ast::SelectVariant, lateral: bool) -> QueryId {
@@ -13871,10 +14014,12 @@ impl Lowerer {
             columns = self.rename_columns(alias_columns.column_names(), &columns);
         }
         let table_alias = alias.name();
+        let name = table_alias
+            .as_ref()
+            .map(|table_alias| self.intern(&table_alias.text()));
+        self.check_duplicate_source(name, SourceKind::Join, true, from_item);
         let source = Source {
-            name: table_alias
-                .as_ref()
-                .map(|table_alias| self.intern(&table_alias.text())),
+            name,
             kind: SourceKind::Join,
             ptr: self.ptr(from_item.syntax()),
             alias_ptr: table_alias.map(|table_alias| self.ast_ptr(&table_alias)),
@@ -17057,6 +17202,17 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
+        if self.find_primary_key(table).is_some() {
+            let message = format!(
+                "multiple primary keys for table `{}` are not allowed",
+                self.index.names.resolve(self.index.tables[table].name)
+            );
+            self.push_error(
+                DiagnosticKind::MultiplePrimaryKeys,
+                primary_key.syntax(),
+                message,
+            );
+        }
         let name = primary_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
@@ -17072,6 +17228,16 @@ impl Lowerer {
         for column in &columns[..key_len] {
             self.add_not_null_constraint(table, *column, primary_key.syntax(), None);
         }
+    }
+
+    fn find_primary_key(&self, table: TableId) -> Option<ConstraintId> {
+        self.index
+            .constraints
+            .owned_by(ConstraintOwner::Table(table))
+            .find(|id| {
+                self.index.constraints[*id].kind == ConstraintKind::PrimaryKey
+                    && !self.dropped_constraints.contains(id)
+            })
     }
 
     fn lower_unique_constraint(
@@ -18719,6 +18885,13 @@ impl Lowerer {
                 continue;
             };
             let name = self.intern(&window.text());
+            if self.find_window(name).is_some() {
+                let message = format!(
+                    "window `{}` is already defined",
+                    self.index.names.resolve(name)
+                );
+                self.push_error(DiagnosticKind::DuplicateWindow, window.syntax(), message);
+            }
             let id = self.index.windows.alloc(Window {
                 name,
                 ptr: self.ast_ptr(&window_def),
@@ -19880,6 +20053,11 @@ impl Lowerer {
         let field = field_expr.field()?;
         let name = self.name_ref_name(&field)?;
         let (kind, resolution) = match self.find_source_column(source, name) {
+            Some(_)
+                if self.has_duplicate_column(self.index.sources[source].columns.range, name) =>
+            {
+                (ReferenceKind::Column, Resolution::Ambiguous)
+            }
             Some(column) => (
                 ReferenceKind::Column,
                 Resolution::Column {
@@ -20059,6 +20237,9 @@ impl Lowerer {
             let column = self.find_column_in(source.columns.range, name);
             match column {
                 Some(column) => {
+                    if self.has_duplicate_column(source.columns.range, name) {
+                        return ColumnLookup::Ambiguous;
+                    }
                     if found.is_none() {
                         found = Some((index, sources[index], column));
                     }
@@ -20564,12 +20745,12 @@ impl Lowerer {
             .and_then(|list| list.aggregate_order_by());
         let mut direct_args = None;
         for param in param_list.into_iter().flat_map(|list| list.params()) {
-            self.alloc_param_def(&param);
+            self.alloc_param_def(start, &param);
         }
         if let Some(order_by) = order_by {
             direct_args = Some(self.index.params.range_from(start).len());
             for param in order_by.params() {
-                self.alloc_param_def(&param);
+                self.alloc_param_def(start, &param);
             }
         }
         FunctionParams {
@@ -20604,8 +20785,21 @@ impl Lowerer {
         self.index.params.range_from(start)
     }
 
-    fn alloc_param_def(&mut self, param_node: &ast::Param) {
+    fn alloc_param_def(&mut self, start: ParamId, param_node: &ast::Param) {
         let param = self.param_def(param_node);
+        if let Some(name) = param.name
+            && let Some(param_name) = param_node.name()
+            && self.index.params.range_from(start).iter().any(|id| {
+                let prev = &self.index.params[id];
+                prev.name == Some(name) && params_conflict(prev.mode, param.mode)
+            })
+        {
+            let message = format!(
+                "parameter name `{}` used more than once",
+                self.index.names.resolve(name)
+            );
+            self.push_error(DiagnosticKind::DuplicateParam, param_name.syntax(), message);
+        }
         let name_ptr = param.name_ptr;
         let id = self.index.params.alloc(param);
         self.record_comment(param_node.syntax(), Item::Param(id));
@@ -20929,6 +21123,11 @@ struct BaseTypeOptions {
     subscript: SubscriptOption,
     category: TypeCategory,
     preferred: bool,
+}
+
+fn params_conflict(a: ParamMode, b: ParamMode) -> bool {
+    let input_only = |mode| matches!(mode, ParamMode::In | ParamMode::Variadic);
+    !(input_only(a) && b == ParamMode::Out || a == ParamMode::Out && input_only(b))
 }
 
 fn split_ident(text: &str) -> Option<IdentPart<'_>> {

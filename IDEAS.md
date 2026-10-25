@@ -113,42 +113,17 @@ select (data).id from t;
 squawk format
 ```
 
-example:
-
-```sql
--- some query comment
-SELECT name username, "email",
-        "weird-column-name"
-    FROM    bar
-```
-
-becomes
-
-```sql
--- some query comment
-select name username, email, "weird-column-name" from bar
-```
-
 - autofix trailing commas
   - http://peter.eisentraut.org/blog/2025/02/11/how-about-trailing-commas-in-sql
   - clickhouse & duckdb support them
-- comments maintained
 
 - disable for sections / files with special comment
 
 config ideas:
 
 - lower / upper case keywords (default lowercase)
-- indent (default 2)
 - quoted idents (default avoid)
 - aliases (include `as` or not)
-
-links:
-
-- https://mcyoung.xyz/2025/03/11/formatters/
-- https://archive.jlongster.com/A-Prettier-Formatter
-- https://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf
-- [datagrip code formatting](https://blog.jetbrains.com/datagrip/2019/03/11/top-9-sql-features-of-datagrip-you-have-to-know/#code_formatting)
 
 ### LSIF/SCIP
 
@@ -465,12 +440,6 @@ select (
 
 https://blog.jooq.org/when-sql-meets-lambda-expressions/
 
-### Rule: friendly sql
-
-https://duckdb.org/docs/stable/sql/dialect/friendly_sql
-
-Parse friendly sql syntax, like leading `from` clause, and warn with an autofix to convert to valid postgres syntax.
-
 ### Rule: values to scalars
 
 ```sql
@@ -603,6 +572,8 @@ group by 1, 2, 3;
 
 ### Rule: missing column in group by
 
+suggest using an aggregate or grouping by
+
 ```sql
 select a, b from t
 --        ^ b must appear in group by, quick fix:
@@ -612,15 +583,6 @@ group by a;
 
 select a, b from t
 group by a, b;
-```
-
-### Rule: unresolved column
-
-```sql
-create function foo(a int, b int) returns int
-as 'select $0'
---         ^^ unresolved column, did you mean `a` or `b`?
-language sql;
 ```
 
 ### Rule: unused column
@@ -713,14 +675,6 @@ select sum(case when x > 1 then 1 else 0 end) from t;
 ```
 
 rel: <https://duckdb.org/2025/03/06/gems-of-duckdb-1-2.html>
-
-### Rule: missing column in group by
-
-suggest using an aggregate or grouping by
-
-### Rule: field does not exist
-
-### Rule: table does not exist
 
 ### Rule: ambiguous column name
 
@@ -818,23 +772,6 @@ via: https://www.postgresql.org/docs/17/sql-createview.html
 
 https://www.postgresql.org/docs/17/sql-dropgroup.html
 
-### Rule: `select into` to `create table as`
-
-```sql
-SELECT * INTO films_recent FROM films WHERE date_prod >= '2002-01-01';
-
--- becomes
-
-CREATE TABLE films_recent AS
-SELECT * FROM films WHERE date_prod >= '2002-01-01';
-```
-
-> CREATE TABLE AS is functionally similar to SELECT INTO. CREATE TABLE AS is the recommended syntax, since this form of SELECT INTO is not available in ECPG or PL/pgSQL, because they interpret the INTO clause differently. Furthermore, CREATE TABLE AS offers a superset of the functionality provided by SELECT INTO.
->
-> In contrast to CREATE TABLE AS, SELECT INTO does not allow specifying properties like a table's access method with USING method or the table's tablespace with TABLESPACE tablespace_name. Use CREATE TABLE AS if necessary. Therefore, the default table access method is chosen for the new table. See default_table_access_method for more information.
-
-via https://www.postgresql.org/docs/17/sql-selectinto.html
-
 ### Rule: delete without a where clause
 
 ### Rule: overflow warnings
@@ -854,87 +791,7 @@ select 256::int8 * 256 * 256 * 256;
 
 ## IDE
 
-### Find References
-
-https://rust-analyzer.github.io/blog/2019/11/13/find-usages.html
-
 ### Go to Definition
-
-#### Column / table
-
-```sql
-select name username, email, "weird-column-name" from bar
---      ^$ option+click
-```
-
-navigates to schema definition file or if setup, navigates to the the source code from a user provided command
-
-#### Function
-
-```sql
-select json_array_length('["foo", "bar", "buzz"]');
---      ^$ option+click
-```
-
-for builtins, we return the same stuff as:
-
-```sql
-select pg_get_functiondef('pg_catalog.json_array_length'::regproc)
-```
-
-so in this case, we'd get:
-
-```sql
-CREATE OR REPLACE FUNCTION pg_catalog.json_array_length(json)
- RETURNS integer
- LANGUAGE internal
- IMMUTABLE PARALLEL SAFE STRICT
-AS $function$json_array_length$function$
-```
-
-maybe simplify to:
-
-```sql
-create function pg_catalog.json_array_length(
-  json
-) returns integer
-  language internal immutable parallel safe strict
-  as $$json_array_length$$
-```
-
-non-builtin:
-
-```sql
-select inc(10)
---     ^$ option+click
-```
-
-gives:
-
-```sql
-create function inc(int) returns int
-  language sql immutable
-  as 'select $1 + 1';
-```
-
-if we call that postgres function to get the def we get:
-
-```sql
-CREATE OR REPLACE FUNCTION public.inc(integer)
- RETURNS integer
- LANGUAGE sql
- IMMUTABLE
-AS $function$SELECT $1 + 1$function$
-```
-
-```sql
-create function pg_catalog.jsonb_extract_path(
-  from_json jsonb,
-  variadic path_elems text[]
-) returns jsonb
-  language internal immutable parallel safe strict
-  as $$jsonb_extract_path$$
-```
 
 #### Json path expressions
 
@@ -950,18 +807,6 @@ select * from json_table(
   --      references json_table arg ^
   --          also references passing clause ^^
 );
-```
-
-#### `nextval`
-
-```sql
--- via https://www.postgresql.org/docs/current/datatype-oid.html
-nextval('foo')              -- operates on sequence foo
-nextval('FOO')              -- same as above
-nextval('"Foo"')            -- operates on sequence Foo
-nextval('myschema.foo')     -- operates on myschema.foo
-nextval('"myschema".foo')   -- same as above
-nextval('foo')              -- searches search path for foo
 ```
 
 ### Autocomplete
@@ -1072,113 +917,7 @@ create table user (
 Users of the platform.
 ```
 
-#### Function
-
-another example:
-
-```sql
-SELECT customer_id, SUM(amount) AS total_amount, min(created_at)
---                  ^$ hover
-FROM orders
-```
-
-```sql
--- sum of expression across all input values
-sum(expression smallint | int) -> bigint
-sum(expression bigint) -> numeric
-sum(expression double precision) -> double precision
-sum(expression real) -> real
-sum(expression interval) -> interval
-sum(expression numeric) -> numeric
-```
-
-unnset
-
-```sql
-select * from unnest(ARRAY[1,2], ARRAY['foo','bar','baz']);
---            ^$ hover
-```
-
-```sql
--- Expands multiple arrays (possibly of different data types) into a set of rows. If the arrays are not all the same length then the shorter ones are padded with NULLs. This form is only allowed in a query's FROM clause;
-unnest(anyarray, anyarray [, ... ] ) -> setof anyelement, anyelement [, ... ]
-```
-
-```sql
-select * from unnest(ARRAY[1,2]);
---            ^$ hover
-```
-
-```sql
--- Expands an array into a set of rows. The array's elements are read out in storage order.
-unnest(anyarray) -> setof anyelement
-```
-
-#### Column Number
-
-another example:
-
-```sql
-SELECT customer_id, sum(cost) from cpus
-group by 1;
---       ^$ hover
-```
-
-```
-field: cpus.customer_id
-type: string
--- id of the customer that rents the CPU
-```
-
-#### Star
-
-case expr
-
-```sql
-select * from (select case
---     ^$ hover
-  when random() > 0.5 then
-  	true
-  else
-    false
-  end)
-```
-
-```
-case  boolean
-```
-
-unnest
-
-```sql
-select * from unnest(ARRAY[1,2], ARRAY['foo','bar','baz']);
---     ^$ hover
-```
-
-```
-unnest integer,
-unnest text
-```
-
-### Semantic Syntax Highlighting
-
-https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
-
-### VSCode Syntax Highlighting
-
-Aka a non-semantic version
-
-### Monaco Support
-
-- Monaco Syntax Highlighting
-
 ### Codemirror Support
-
-### Show Syntax Tree Command
-
-replicate what we have in WASM in IDE
-
-also show lex command
 
 ### Snippets
 
@@ -1277,16 +1016,6 @@ select * from t join u using (g_id);
 select * from t join u on t.g_id = u.g_id;
 ```
 
-### Quick Fix: table to select
-
-```sql
-table t;
--- ^$ action: convert to select
-
-select * from t;
--- ^$ action: convert to table
-```
-
 ### Quick Fix: wrap side-effect explain analyze in a transaction
 
 ```sql
@@ -1380,62 +1109,6 @@ select foo, "a" from t;
 select foo, 'a' from t;
 ```
 
-### Quick Fix: Quote and Unquote columns, tables, etc.
-
-```sql
-select "x" from "t";
---     ^ Quick Fix: unquote
-```
-
-gives
-
-```sql
-select x from "t";
-```
-
-and vice versa:
-
-```sql
-select x from "t";
---     ^ Quick Fix: quote
-```
-
-gives:
-
-```sql
-select "x" from "t";
-```
-
-Note: there's some gotchas with this that we need to handle:
-
-```sql
--- okay
-with t("X") as (select 1)
-select "X" from t;
-
--- err
-with t("X") as (select 1)
-select X from t;
-
--- err
-with t("X") as (select 1)
-select x from t;
-```
-
-or invalid column names:
-
-```sql
--- ok
-with t("a-b") as (select 1)
-select "a-b" from t;
-
--- err
-with t("a-b") as (select 1)
-select a-b from t;
--- Query 1 ERROR at Line 2: ERROR:  column "a" does not exist
--- LINE 2: select a-b from t;
-```
-
 ### Quick Fix: in array
 
 ```sql
@@ -1493,14 +1166,6 @@ select a from t;
 select t.a from t;
 ```
 
-```sql
-create table t(a int);
-select a from t;
---            ^?
--- becomes
-select a from public.t;
-```
-
 ### Quick Fix: convert to subquery
 
 ```sql
@@ -1519,10 +1184,6 @@ select * from (
 [datagrip has good support](https://www.jetbrains.com/help/datagrip/inlay-hints.html) for these.
 
 Column Names
-
-```sql
-insert into t values (/* column_a: */ 1, /* column_c: */ 'foo');
-```
 
 ```sql
 create view v(a, b) as select /* a: */ 1, /* b: */ 'foo';
@@ -1546,15 +1207,6 @@ create table u(id int, a text, b int);
 select * from t
 union
 select /* id: */ 1, /* a: */ 'x', /* b: */ 'y' from u;
-```
-
-Function param names
-
-```sql
-create function foo(x int) returns text
-as $$select 'foo'$$ language sql;
-
-select foo(/* x: */ 'foo');
 ```
 
 Join cardinality
