@@ -490,3 +490,64 @@ create table pt_1
       ╰╴                                       ━
     ");
 }
+
+#[test]
+fn generated_column_reference() {
+    assert_snapshot!(check("
+create table g1 (
+  a int,
+  b int generated always as (a + 1) stored,
+  c int generated always as (b + 1) stored
+);
+create table g2 (
+  a int,
+  c int generated always as (b + 1) stored,
+  b int generated always as (a + 1) stored
+);
+create table g3 (a int generated always as (a + 1) stored);
+create table g4 (
+  a int,
+  b int generated always as (a + 1) virtual,
+  c int generated always as (g4.b + 1) stored
+);
+create table g5 (
+  a int,
+  b int generated always as (a + 1) stored,
+  c int generated always as (a + 2) stored
+);
+alter table g5 add column d int generated always as (b * 2) stored;
+alter table g5 alter column c set expression as(b + 2);
+create table g6 (
+  a int,
+  b int generated always as identity,
+  c int generated always as (a + b) stored,
+  d int default 1,
+  e int generated always as (d + 1) stored
+);
+"), @"
+    error: cannot use generated column `b` in column generation expression
+      ╭▸ 
+    5 │   c int generated always as (b + 1) stored
+      ╰╴                             ━
+    error: cannot use generated column `b` in column generation expression
+      ╭▸ 
+    9 │   c int generated always as (b + 1) stored,
+      ╰╴                             ━
+    error: cannot use generated column `a` in column generation expression
+       ╭▸ 
+    12 │ create table g3 (a int generated always as (a + 1) stored);
+       ╰╴                                            ━
+    error: cannot use generated column `b` in column generation expression
+       ╭▸ 
+    16 │   c int generated always as (g4.b + 1) stored
+       ╰╴                                ━
+    error: cannot use generated column `b` in column generation expression
+       ╭▸ 
+    23 │ alter table g5 add column d int generated always as (b * 2) stored;
+       ╰╴                                                     ━
+    error: cannot use generated column `b` in column generation expression
+       ╭▸ 
+    24 │ alter table g5 alter column c set expression as(b + 2);
+       ╰╴                                                ━
+    ");
+}

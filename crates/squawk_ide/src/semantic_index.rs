@@ -138,6 +138,7 @@ pub enum DiagnosticKind {
     WrongReturnType,
     ConflictingNullability,
     FeatureNotSupported,
+    InvalidColumnReference,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

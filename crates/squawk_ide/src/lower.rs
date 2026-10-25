@@ -66,6 +66,7 @@ impl Lowerer {
             json_paths: vec![],
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
+            generated_refs: vec![],
             function: None,
             public,
             pg_catalog,
@@ -311,6 +312,7 @@ pub(crate) struct Lowerer {
     json_paths: Vec<JsonPathId>,
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
+    generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
     public: Name,
     pg_catalog: Name,
@@ -488,6 +490,11 @@ struct FunctionParams {
 struct QualifiedColumn {
     table: Option<TableId>,
     column: Option<ColumnId>,
+}
+
+struct GeneratedRefs {
+    table: TableId,
+    refs: IdxRange<Reference>,
 }
 
 struct PendingCte {
@@ -1387,6 +1394,35 @@ impl Lowerer {
             | ast::Stmt::SetTransaction(_)
             | ast::Stmt::Show(_) => {}
         }
+        self.check_generated_refs();
+    }
+
+    fn check_generated_refs(&mut self) {
+        let mut generated_refs = std::mem::take(&mut self.generated_refs);
+        for GeneratedRefs { table, refs } in generated_refs.drain(..) {
+            for reference in refs {
+                let Reference {
+                    range,
+                    resolution: Resolution::Column { column, .. },
+                    ..
+                } = self.index.references[reference]
+                else {
+                    continue;
+                };
+                if let Some(column) = self.index.columns[column].name
+                    && self
+                        .column_expressions
+                        .get(ColumnKey { table, column })
+                        .is_some_and(|expression| expression.generated)
+                {
+                    let range = self.index.range(range);
+                    self.index
+                        .errors
+                        .push(range, SemaError::GeneratedColumnReference { column });
+                }
+            }
+        }
+        self.generated_refs = generated_refs;
     }
 
     fn lower_drop_type(&mut self, drop_type: &ast::DropType) {
@@ -3075,6 +3111,12 @@ impl Lowerer {
         let id = ColumnExpressionId(self.next_column_expression);
         self.next_column_expression += 1;
         self.set_column_expression(table, column, Some(ColumnExpression { id, generated }));
+        if generated {
+            self.generated_refs.push(GeneratedRefs {
+                table,
+                refs: self.index.references.range_from(refs),
+            });
+        }
         for reference in self.index.references.range_from(refs) {
             if let Resolution::Function(function) = self.index.references[reference].resolution {
                 self.dependencies

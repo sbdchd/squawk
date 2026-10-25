@@ -139,6 +139,9 @@ pub(crate) enum SemaError {
         context: ExprContext,
     },
     DefaultColumnReference,
+    GeneratedColumnReference {
+        column: Name,
+    },
     Duplicate {
         object: ObjectKind,
         name: Name,
@@ -752,6 +755,7 @@ impl SemaError {
             SemaError::MisplacedSubquery { .. } | SemaError::DefaultColumnReference => {
                 DiagnosticKind::FeatureNotSupported
             }
+            SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -927,6 +931,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "cannot use subquery in {}",
                 context.subquery_label().unwrap_or_default()
+            ),
+            SemaError::GeneratedColumnReference { column } => write!(
+                f,
+                "cannot use generated column `{}` in column generation expression",
+                n(column)
             ),
             SemaError::WindowWithoutOver { name } => {
                 write!(f, "window function `{}` requires an OVER clause", n(name))
