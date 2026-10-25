@@ -644,6 +644,10 @@ call p((select x from nope));
        ╭▸ 
     10 │ call p((select x from nope));
        ╰╴                      ━━━━
+    error: cannot use subquery in CALL argument
+       ╭▸ 
+    10 │ call p((select x from nope));
+       ╰╴        ━━━━━━━━━━━━━━━━━━
     ");
 }
 

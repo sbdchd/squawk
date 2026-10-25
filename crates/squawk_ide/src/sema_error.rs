@@ -135,6 +135,9 @@ pub(crate) enum SemaError {
     MisplacedWindow {
         context: ExprContext,
     },
+    MisplacedSubquery {
+        context: ExprContext,
+    },
     Duplicate {
         object: ObjectKind,
         name: Name,
@@ -635,6 +638,43 @@ impl ExprContext {
             ExprContext::ExecuteParameter => "EXECUTE parameters",
         }
     }
+
+    pub(crate) fn subquery_label(self) -> Option<&'static str> {
+        match self {
+            ExprContext::CheckConstraint => Some("check constraint"),
+            ExprContext::Default => Some("DEFAULT expression"),
+            ExprContext::GeneratedColumn => Some("column generation expression"),
+            ExprContext::IndexExpression => Some("index expression"),
+            ExprContext::IndexPredicate => Some("index predicate"),
+            ExprContext::StatisticsExpression => Some("statistics expression"),
+            ExprContext::PartitionKey => Some("partition key expression"),
+            ExprContext::PartitionBound => Some("partition bound"),
+            ExprContext::TriggerWhen => Some("trigger WHEN condition"),
+            ExprContext::CallArgument => Some("CALL argument"),
+            ExprContext::Transform => Some("transform expression"),
+            ExprContext::CopyWhere => Some("COPY FROM WHERE condition"),
+            ExprContext::ExecuteParameter => Some("EXECUTE parameter"),
+            ExprContext::Unrestricted
+            | ExprContext::Where
+            | ExprContext::JoinCondition
+            | ExprContext::GroupBy
+            | ExprContext::Having
+            | ExprContext::Filter
+            | ExprContext::WindowDefinition
+            | ExprContext::WindowRange
+            | ExprContext::WindowRows
+            | ExprContext::WindowGroups
+            | ExprContext::Limit
+            | ExprContext::Offset
+            | ExprContext::Values
+            | ExprContext::Returning
+            | ExprContext::Insert
+            | ExprContext::Update
+            | ExprContext::FromFunction
+            | ExprContext::MergeWhen
+            | ExprContext::Policy => None,
+        }
+    }
 }
 
 impl TypeKind {
@@ -708,6 +748,7 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
+            SemaError::MisplacedSubquery { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -875,6 +916,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 };
                 write!(f, "window functions are not allowed in {label}")
             }
+            SemaError::MisplacedSubquery { context } => write!(
+                f,
+                "cannot use subquery in {}",
+                context.subquery_label().unwrap_or_default()
+            ),
             SemaError::WindowWithoutOver { name } => {
                 write!(f, "window function `{}` requires an OVER clause", n(name))
             }

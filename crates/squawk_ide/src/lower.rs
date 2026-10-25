@@ -17452,7 +17452,7 @@ impl Lowerer {
             (all_fn.expr(), all_fn.select_variant())
         };
         if let Some(query) = query {
-            let query = self.lower_query(query);
+            let query = self.lower_sublink(query);
             return Some(
                 self.single_column_type(query)
                     .map_or(ArgType::Untyped, ArgType::Known),
@@ -18606,7 +18606,7 @@ impl Lowerer {
                     element = element.or(ty);
                 }
                 if let Some(query) = array.select_variant() {
-                    let query = self.lower_query(query);
+                    let query = self.lower_sublink(query);
                     element = element.or_else(|| {
                         let columns = self.index.queries[query].columns;
                         columns
@@ -18713,7 +18713,7 @@ impl Lowerer {
             ast::Expr::ParenExpr(paren) => {
                 let ty = paren.expr().and_then(|expr| self.lower_expr(&expr));
                 if let Some(query) = paren.select_variant() {
-                    let query = self.lower_query(query);
+                    let query = self.lower_sublink(query);
                     return self.single_column_type(query);
                 }
                 return ty;
@@ -19000,18 +19000,18 @@ impl Lowerer {
         }
         if let Some(all_fn) = call.all_fn() {
             self.lower_exprs(all_fn.expr());
-            self.lower_opt_query(all_fn.select_variant());
+            self.lower_opt_sublink(all_fn.select_variant());
         }
         if let Some(any_fn) = call.any_fn() {
             self.lower_exprs(any_fn.expr());
-            self.lower_opt_query(any_fn.select_variant());
+            self.lower_opt_sublink(any_fn.select_variant());
         }
         if let Some(some_fn) = call.some_fn() {
             self.lower_exprs(some_fn.expr());
-            self.lower_opt_query(some_fn.select_variant());
+            self.lower_opt_sublink(some_fn.select_variant());
         }
         if let Some(exists_fn) = call.exists_fn() {
-            self.lower_opt_query(exists_fn.select_variant());
+            self.lower_opt_sublink(exists_fn.select_variant());
         }
         if let Some(collation_for_fn) = call.collation_for_fn() {
             let arg = self.lower_positional_arg(collation_for_fn.expr());
@@ -19152,7 +19152,7 @@ impl Lowerer {
                 self.lower_exprs(format.expr());
             }
             for format in json_array.json_select_formats() {
-                self.lower_opt_query(format.select_variant());
+                self.lower_opt_sublink(format.select_variant());
             }
             if let Some(returning) = json_array.json_returning_clause() {
                 self.lower_json_returning(&returning);
@@ -19303,10 +19303,18 @@ impl Lowerer {
         }
     }
 
-    fn lower_opt_query(&mut self, query: Option<ast::SelectVariant>) {
+    fn lower_opt_sublink(&mut self, query: Option<ast::SelectVariant>) {
         if let Some(query) = query {
-            self.lower_query(query);
+            self.lower_sublink(query);
         }
+    }
+
+    fn lower_sublink(&mut self, query: ast::SelectVariant) -> QueryId {
+        let context = self.expr_context;
+        if context.subquery_label().is_some() {
+            self.push_error(query.syntax(), SemaError::MisplacedSubquery { context });
+        }
+        self.lower_query(query)
     }
 
     fn lower_json_key_value(&mut self, key_value: &ast::JsonKeyValue) {

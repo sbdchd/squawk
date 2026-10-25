@@ -137,6 +137,7 @@ pub enum DiagnosticKind {
     InvalidOrdinal,
     WrongReturnType,
     ConflictingNullability,
+    FeatureNotSupported,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

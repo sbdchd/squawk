@@ -47,6 +47,7 @@ mod search_path;
 mod select;
 mod sequences;
 mod statistics;
+mod subqueries;
 mod subscripts;
 mod table_functions;
 mod tables;
