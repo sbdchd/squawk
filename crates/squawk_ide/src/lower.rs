@@ -182,6 +182,12 @@ enum LabelPosition {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
+enum CalleeKind {
+    Plain,
+    OrderedSet,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
 enum WindowSpecKind {
     WindowClause,
     OverClause,
@@ -15450,7 +15456,7 @@ impl Lowerer {
         if let Some(Callee {
             name,
             resolution: Resolution::Function(function),
-        }) = self.lower_callee(callee, &[], None, false)
+        }) = self.lower_callee(callee, &[], None, CalleeKind::Plain)
             && let Some(ret) = self.index.functions[function].ret
             && let Some(expected) = self.builtin_type(kind.return_type())
             && ret != expected
@@ -19510,9 +19516,14 @@ impl Lowerer {
                 variadic: false,
             });
         }
+        let kind = if within.is_some() {
+            CalleeKind::OrderedSet
+        } else {
+            CalleeKind::Plain
+        };
         let target = callee
             .as_ref()
-            .and_then(|callee| self.lower_callee(callee, &args, row_source, within.is_some()));
+            .and_then(|callee| self.lower_callee(callee, &args, row_source, kind));
         args.truncate(direct_args);
         let function = match target.map(|target| target.resolution) {
             Some(Resolution::Function(function)) => Some(function),
@@ -19796,7 +19807,7 @@ impl Lowerer {
         callee: &ast::Expr,
         args: &[CallArg],
         row_source: Option<SourceId>,
-        ordered_set: bool,
+        kind: CalleeKind,
     ) -> Option<Callee> {
         let (schema, name_ref) = match callee {
             ast::Expr::NameRef(name_ref) => (None, name_ref.clone()),
@@ -19874,7 +19885,9 @@ impl Lowerer {
                     row_source.is_some_and(|source| !self.index.sources[source].columns.complete);
                 let resolution = match self.find_routine(schema, name, args, FunctionKind::Function)
                 {
-                    Resolution::Unresolved if ordered_set || incomplete_row => Resolution::Unknown,
+                    Resolution::Unresolved if kind == CalleeKind::OrderedSet || incomplete_row => {
+                        Resolution::Unknown
+                    }
                     resolution => resolution,
                 };
                 (ReferenceKind::Function(RoutineKind::Function), resolution)
