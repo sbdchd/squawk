@@ -233,3 +233,59 @@ alter table t enable always trigger nope2;
        ╰╴                                    ━━━━━
     ");
 }
+
+#[test]
+fn trigger_function_return_type() {
+    assert_snapshot!(check("
+create table t (a int);
+create function f() returns int
+  language sql
+  as 'select 1';
+create function tf() returns trigger
+  language plpgsql
+  as 'begin return new; end';
+create function etf() returns event_trigger
+  language plpgsql
+  as 'begin end';
+create trigger tr
+  before insert
+  on t
+  for each row
+  execute function f();
+create trigger tr2
+  before insert
+  on t
+  for each row
+  execute function tf();
+create trigger tr3
+  before insert
+  on t
+  for each row
+  execute function etf();
+create trigger tr4
+  before update
+  on t
+  for each row
+  execute function suppress_redundant_updates_trigger();
+create event trigger et on ddl_command_start execute function f();
+create event trigger et2 on ddl_command_start execute function tf();
+create event trigger et3 on ddl_command_start execute function etf();
+"), @"
+    error: function `f` must return type trigger
+       ╭▸ 
+    16 │   execute function f();
+       ╰╴                   ━
+    error: function `etf` must return type trigger
+       ╭▸ 
+    26 │   execute function etf();
+       ╰╴                   ━━━
+    error: function `f` must return type event_trigger
+       ╭▸ 
+    32 │ create event trigger et on ddl_command_start execute function f();
+       ╰╴                                                              ━
+    error: function `tf` must return type event_trigger
+       ╭▸ 
+    33 │ create event trigger et2 on ddl_command_start execute function tf();
+       ╰╴                                                               ━━
+    ");
+}

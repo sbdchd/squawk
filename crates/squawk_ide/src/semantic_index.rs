@@ -135,6 +135,7 @@ pub enum DiagnosticKind {
     MissingArrayType,
     MissingShellType,
     InvalidOrdinal,
+    WrongReturnType,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

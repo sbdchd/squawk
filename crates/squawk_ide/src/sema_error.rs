@@ -296,6 +296,10 @@ pub(crate) enum SemaError {
     },
     WindowAggregateOrderBy,
     WindowDistinct,
+    TriggerReturnType {
+        name: Name,
+        kind: TriggerFunctionKind,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -309,6 +313,21 @@ impl WindowClause {
         match self {
             WindowClause::PartitionBy => "PARTITION BY",
             WindowClause::OrderBy => "ORDER BY",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TriggerFunctionKind {
+    Trigger,
+    EventTrigger,
+}
+
+impl TriggerFunctionKind {
+    pub(crate) fn return_type(self) -> &'static str {
+        match self {
+            TriggerFunctionKind::Trigger => "trigger",
+            TriggerFunctionKind::EventTrigger => "event_trigger",
         }
     }
 }
@@ -733,6 +752,7 @@ impl SemaError {
             SemaError::MultiplePrimaryKeys { .. } => DiagnosticKind::MultiplePrimaryKeys,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
+            SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
         }
     }
 
@@ -1075,6 +1095,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "cannot copy window `{}` because it has a frame clause",
                 n(name)
+            ),
+            SemaError::TriggerReturnType { name, kind } => write!(
+                f,
+                "function `{}` must return type {}",
+                n(name),
+                kind.return_type()
             ),
         }
     }

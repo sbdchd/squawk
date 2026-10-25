@@ -40,7 +40,7 @@ use crate::{
         TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
         Window, WindowClauses, WindowId,
     },
-    sema_error::{ObjectKind, SemaError, WindowClause},
+    sema_error::{ObjectKind, SemaError, TriggerFunctionKind, WindowClause},
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
@@ -7807,7 +7807,7 @@ impl Lowerer {
             .call_expr()
             .and_then(|call| call.expr())
         {
-            self.lower_callee(&callee, &[], None, false);
+            self.lower_trigger_function(&callee, TriggerFunctionKind::EventTrigger);
         }
         if let Some(event_trigger) = create_event_trigger.event_trigger() {
             self.alloc_event_trigger(create_event_trigger.syntax(), &event_trigger);
@@ -15387,6 +15387,19 @@ impl Lowerer {
         self.depend_on_refs(refs, self.index.indexes.range_from(start), Object::Index);
     }
 
+    fn lower_trigger_function(&mut self, callee: &ast::Expr, kind: TriggerFunctionKind) {
+        if let Some(Callee {
+            name,
+            resolution: Resolution::Function(function),
+        }) = self.lower_callee(callee, &[], None, false)
+            && let Some(ret) = self.index.functions[function].ret
+            && let Some(expected) = self.builtin_type(kind.return_type())
+            && ret != expected
+        {
+            self.push_error(callee.syntax(), SemaError::TriggerReturnType { name, kind });
+        }
+    }
+
     fn lower_create_trigger(&mut self, create_trigger: &ast::CreateTrigger) {
         let refs = self.index.references.next_idx();
         let start = self.index.triggers.next_idx();
@@ -15448,7 +15461,7 @@ impl Lowerer {
             self.lower_relation_path(&path, RelationLookup::OnlyTable);
         }
         if let Some(callee) = create_trigger.call_expr().and_then(|call| call.expr()) {
-            self.lower_callee(&callee, &[], None, false);
+            self.lower_trigger_function(&callee, TriggerFunctionKind::Trigger);
         }
 
         let constraint = create_trigger.constraint_token().is_some();
