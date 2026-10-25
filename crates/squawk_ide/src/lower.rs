@@ -38,9 +38,9 @@ use crate::{
         Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
         TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
         TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
-        Window, WindowId,
+        Window, WindowClauses, WindowId,
     },
-    sema_error::{ObjectKind, SemaError},
+    sema_error::{ObjectKind, SemaError, WindowClause},
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
@@ -178,6 +178,12 @@ enum LabelPosition {
     End,
     Before(EnumLabelId),
     After(EnumLabelId),
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum WindowSpecKind {
+    WindowClause,
+    OverClause,
 }
 
 #[derive(Clone, Copy)]
@@ -18714,9 +18720,12 @@ impl Lowerer {
 
     fn lower_window_clause(&mut self, window_clause: &ast::WindowClause) {
         for window_def in window_clause.window_defs() {
-            if let Some(window_spec) = window_def.window_spec() {
-                self.lower_window_spec(&window_spec);
-            }
+            let clauses = window_def
+                .window_spec()
+                .map(|window_spec| {
+                    self.lower_window_spec(&window_spec, WindowSpecKind::WindowClause)
+                })
+                .unwrap_or_default();
             let Some(window) = window_def.window() else {
                 continue;
             };
@@ -18728,6 +18737,7 @@ impl Lowerer {
                 name,
                 ptr: self.ast_ptr(&window_def),
                 name_ptr: self.ast_ptr(&window),
+                clauses,
             });
             self.record_comment(window_def.syntax(), Item::Window(id));
             self.add_item(window.syntax(), Item::Window(id));
@@ -18744,17 +18754,55 @@ impl Lowerer {
             .find(|&window| self.index.windows[window].name == name)
     }
 
-    fn lower_window_ref(&mut self, window_ref: &ast::WindowRef) {
+    fn lower_window_ref(&mut self, window_ref: &ast::WindowRef) -> Option<WindowId> {
         let name = self.intern(&window_ref.text());
-        let resolution = self
-            .find_window(name)
-            .map_or(Resolution::Unresolved, Resolution::Window);
+        let window = self.find_window(name);
+        let resolution = window.map_or(Resolution::Unresolved, Resolution::Window);
         self.add_ref(name, ReferenceKind::Window, window_ref.syntax(), resolution);
+        window
     }
 
-    fn lower_window_spec(&mut self, window_spec: &ast::WindowSpec) {
-        if let Some(window_ref) = window_spec.window_ref() {
-            self.lower_window_ref(&window_ref);
+    fn lower_window_spec(
+        &mut self,
+        window_spec: &ast::WindowSpec,
+        kind: WindowSpecKind,
+    ) -> WindowClauses {
+        let mut clauses = WindowClauses {
+            partition_by: window_spec.partition_by_clause().is_some(),
+            order_by: window_spec.order_by_clause().is_some(),
+            frame: window_spec.frame_clause().is_some(),
+        };
+        if let Some(window_ref) = window_spec.window_ref()
+            && let Some(base) = self.lower_window_ref(&window_ref)
+        {
+            let Window {
+                name,
+                clauses: base_clauses,
+                ..
+            } = self.index.windows[base];
+            let error = if clauses.partition_by {
+                Some(SemaError::WindowOverride {
+                    name,
+                    clause: WindowClause::PartitionBy,
+                })
+            } else if clauses.order_by && base_clauses.order_by {
+                Some(SemaError::WindowOverride {
+                    name,
+                    clause: WindowClause::OrderBy,
+                })
+            } else if base_clauses.frame {
+                Some(SemaError::WindowFrameCopy {
+                    name,
+                    hint: kind == WindowSpecKind::OverClause && !clauses.order_by && !clauses.frame,
+                })
+            } else {
+                None
+            };
+            if let Some(error) = error {
+                self.push_error(window_ref.syntax(), error);
+            }
+            clauses.partition_by |= base_clauses.partition_by;
+            clauses.order_by |= base_clauses.order_by;
         }
         self.with_expr_context(ExprContext::WindowDefinition, |this| {
             if let Some(partition_by) = window_spec.partition_by_clause() {
@@ -18763,7 +18811,7 @@ impl Lowerer {
             this.lower_order_by(window_spec.order_by_clause());
         });
         let Some(frame_clause) = window_spec.frame_clause() else {
-            return;
+            return clauses;
         };
         let context = match frame_clause.frame_units() {
             Some(ast::FrameUnits::FrameRange(_)) => ExprContext::WindowRange,
@@ -18780,6 +18828,7 @@ impl Lowerer {
             Some(ast::FrameExtent::FrameBound(bound)) => this.lower_frame_bound(&bound),
             None => {}
         });
+        clauses
     }
 
     fn lower_frame_bound(&mut self, bound: &ast::FrameBound) {
@@ -19304,13 +19353,24 @@ impl Lowerer {
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
             self.lower_expr_in(ExprContext::Filter, &expr);
         }
+        if call.over_clause().is_some()
+            && let Some(arg_list) = call.arg_list()
+        {
+            if let Some(ast::AllOrDistinct::Distinct(distinct)) = arg_list.all_or_distinct() {
+                self.push_error(distinct.syntax(), SemaError::WindowDistinct);
+            } else if let Some(order_by) = arg_list.args().find_map(|arg| arg.order_by_clause()) {
+                self.push_error(order_by.syntax(), SemaError::WindowAggregateOrderBy);
+            }
+        }
         match call.over_clause().and_then(|clause| clause.over_target()) {
             Some(ast::OverTarget::OverWindowSpec(spec)) => {
                 if let Some(window_spec) = spec.window_spec() {
-                    self.lower_window_spec(&window_spec);
+                    self.lower_window_spec(&window_spec, WindowSpecKind::OverClause);
                 }
             }
-            Some(ast::OverTarget::WindowRef(window_ref)) => self.lower_window_ref(&window_ref),
+            Some(ast::OverTarget::WindowRef(window_ref)) => {
+                self.lower_window_ref(&window_ref);
+            }
             None => {}
         }
         self.lower_special_fn(call).unwrap_or(LoweredCall {

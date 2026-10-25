@@ -286,6 +286,31 @@ pub(crate) enum SemaError {
     MissingArrayType {
         ty: TyName,
     },
+    WindowOverride {
+        name: Name,
+        clause: WindowClause,
+    },
+    WindowFrameCopy {
+        name: Name,
+        hint: bool,
+    },
+    WindowAggregateOrderBy,
+    WindowDistinct,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum WindowClause {
+    PartitionBy,
+    OrderBy,
+}
+
+impl WindowClause {
+    fn label(self) -> &'static str {
+        match self {
+            WindowClause::PartitionBy => "PARTITION BY",
+            WindowClause::OrderBy => "ORDER BY",
+        }
+    }
 }
 
 const COPY_SELECT_HINT: &str = "Try the COPY (SELECT ...) TO variant.";
@@ -661,7 +686,11 @@ impl SemaError {
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
-            | SemaError::MisplacedWindow { .. } => DiagnosticKind::WindowingError,
+            | SemaError::MisplacedWindow { .. }
+            | SemaError::WindowOverride { .. }
+            | SemaError::WindowFrameCopy { .. }
+            | SemaError::WindowAggregateOrderBy
+            | SemaError::WindowDistinct => DiagnosticKind::WindowingError,
             SemaError::Duplicate { object, .. }
             | SemaError::DuplicateInSchema { object, .. }
             | SemaError::DuplicateForAccessMethod { object, .. } => object.duplicate_kind(),
@@ -722,6 +751,9 @@ impl SemaError {
             SemaError::CannotCopy {
                 copy_from, kind, ..
             } => copy_target(copy_from, kind).1,
+            SemaError::WindowFrameCopy { hint, .. } => {
+                hint.then_some("Omit the parentheses in this OVER clause.")
+            }
             _ => None,
         }
     }
@@ -752,6 +784,10 @@ impl SemaError {
             SemaError::MissingShellType => {
                 Some("cannot specify a canonical function without a pre-created shell type")
             }
+            SemaError::WindowAggregateOrderBy => {
+                Some("aggregate ORDER BY is not implemented for window functions")
+            }
+            SemaError::WindowDistinct => Some("DISTINCT is not implemented for window functions"),
             _ => None,
         }
     }
@@ -793,7 +829,9 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::AggregateContainsWindow
             | SemaError::NestedWindow
             | SemaError::InsertMoreTargetsThanExpressions { .. }
-            | SemaError::MissingShellType => {
+            | SemaError::MissingShellType
+            | SemaError::WindowAggregateOrderBy
+            | SemaError::WindowDistinct => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MisplacedAggregate { context } => write!(
@@ -1026,6 +1064,17 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "could not find array type for data type `{}`",
                 self.ty(ty)
+            ),
+            SemaError::WindowOverride { name, clause } => write!(
+                f,
+                "cannot override {} clause of window `{}`",
+                clause.label(),
+                n(name)
+            ),
+            SemaError::WindowFrameCopy { name, .. } => write!(
+                f,
+                "cannot copy window `{}` because it has a frame clause",
+                n(name)
             ),
         }
     }
