@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::hash_map::Entry, range::Range};
+use std::{borrow::Cow, cmp::Ordering, collections::hash_map::Entry, range::Range};
 
 use la_arena::Idx;
 use rowan::{TextRange, TextSize};
@@ -17340,6 +17340,7 @@ impl Lowerer {
     fn lower_bin_rhs(
         &mut self,
         op: Option<&ast::BinOp>,
+        lhs: Option<&ast::Expr>,
         rhs: &ast::Expr,
         left: ArgType,
     ) -> ArgType {
@@ -17379,9 +17380,16 @@ impl Lowerer {
             return self.lower_in_list(tuple, left);
         }
         if let ast::Expr::CallExpr(call) = rhs
-            && let Some(operand) = self.lower_quantified_operand(call)
+            && let Some(operand) = self.lower_quantified_operand(call, row_width(lhs).unwrap_or(1))
         {
             return operand;
+        }
+        if let ast::Expr::ParenExpr(paren) = rhs
+            && let Some(query) = paren.select_variant()
+            && let Some(width) = sublink_width(op, lhs)
+        {
+            let query = self.lower_compared_sublink(query, width);
+            return expr_arg_type(Some(rhs), self.single_column_type(query));
         }
         let arg = expr_arg_type(Some(rhs), self.lower_expr(rhs));
         if similar {
@@ -17484,7 +17492,7 @@ impl Lowerer {
         common.map_or(ArgType::Untyped, ArgType::Known)
     }
 
-    fn lower_quantified_operand(&mut self, call: &ast::CallExpr) -> Option<ArgType> {
+    fn lower_quantified_operand(&mut self, call: &ast::CallExpr, width: usize) -> Option<ArgType> {
         let (expr, query) = if let Some(any_fn) = call.any_fn() {
             (any_fn.expr(), any_fn.select_variant())
         } else if let Some(some_fn) = call.some_fn() {
@@ -17494,7 +17502,7 @@ impl Lowerer {
             (all_fn.expr(), all_fn.select_variant())
         };
         if let Some(query) = query {
-            let query = self.lower_sublink(query);
+            let query = self.lower_compared_sublink(query, width);
             return Some(
                 self.single_column_type(query)
                     .map_or(ArgType::Untyped, ArgType::Known),
@@ -18649,7 +18657,7 @@ impl Lowerer {
                     element = element.or(ty);
                 }
                 if let Some(query) = array.select_variant() {
-                    let query = self.lower_sublink(query);
+                    let query = self.lower_scalar_sublink(query);
                     element = element.or_else(|| {
                         let columns = self.index.queries[query].columns;
                         columns
@@ -18694,7 +18702,7 @@ impl Lowerer {
                 let lhs_ty = lhs.as_ref().and_then(|lhs| self.lower_expr(lhs));
                 let left = expr_arg_type(lhs.as_ref(), lhs_ty);
                 let right = match &rhs {
-                    Some(rhs) => self.lower_bin_rhs(op.as_ref(), rhs, left),
+                    Some(rhs) => self.lower_bin_rhs(op.as_ref(), lhs.as_ref(), rhs, left),
                     None => ArgType::Untyped,
                 };
                 let rhs_ty = match right {
@@ -18756,7 +18764,7 @@ impl Lowerer {
             ast::Expr::ParenExpr(paren) => {
                 let ty = paren.expr().and_then(|expr| self.lower_expr(&expr));
                 if let Some(query) = paren.select_variant() {
-                    let query = self.lower_sublink(query);
+                    let query = self.lower_scalar_sublink(query);
                     return self.single_column_type(query);
                 }
                 return ty;
@@ -19350,6 +19358,34 @@ impl Lowerer {
         if let Some(query) = query {
             self.lower_sublink(query);
         }
+    }
+
+    fn lower_scalar_sublink(&mut self, query: ast::SelectVariant) -> QueryId {
+        let ptr = self.ptr(query.syntax());
+        let query = self.lower_sublink(query);
+        let columns = self.index.queries[query].columns;
+        if columns.complete && columns.range.len() != 1 {
+            self.push_error_ptr(ptr, SemaError::SubqueryNotSingleColumn);
+        }
+        query
+    }
+
+    fn lower_compared_sublink(&mut self, query: ast::SelectVariant, width: usize) -> QueryId {
+        let ptr = self.ptr(query.syntax());
+        let query = self.lower_sublink(query);
+        let columns = self.index.queries[query].columns;
+        if !columns.complete {
+            return query;
+        }
+        let error = match columns.range.len().cmp(&width) {
+            Ordering::Greater => Some(SemaError::SubqueryTooManyColumns),
+            Ordering::Less => Some(SemaError::SubqueryTooFewColumns),
+            Ordering::Equal => None,
+        };
+        if let Some(error) = error {
+            self.push_error_ptr(ptr, error);
+        }
+        query
     }
 
     fn lower_sublink(&mut self, query: ast::SelectVariant) -> QueryId {
@@ -21621,6 +21657,52 @@ fn nth_idx<T>(index: usize) -> la_arena::Idx<T> {
 
 fn member_number(literal: Option<&ast::Literal>) -> Option<u16> {
     u16::try_from(literal?.integer_value()?).ok()
+}
+
+fn row_width(expr: Option<&ast::Expr>) -> Option<usize> {
+    match expr {
+        Some(ast::Expr::TupleExpr(tuple)) => Some(tuple.exprs().count()),
+        _ => None,
+    }
+}
+
+fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usize> {
+    match op? {
+        ast::BinOp::In(_) | ast::BinOp::NotIn(_) => Some(row_width(lhs).unwrap_or(1)),
+        ast::BinOp::Caret(_)
+        | ast::BinOp::CustomOp(_)
+        | ast::BinOp::Eq(_)
+        | ast::BinOp::Gteq(_)
+        | ast::BinOp::Ilike(_)
+        | ast::BinOp::LAngle(_)
+        | ast::BinOp::Like(_)
+        | ast::BinOp::Lteq(_)
+        | ast::BinOp::Minus(_)
+        | ast::BinOp::Neq(_)
+        | ast::BinOp::Neqb(_)
+        | ast::BinOp::NotIlike(_)
+        | ast::BinOp::NotLike(_)
+        | ast::BinOp::NotSimilarTo(_)
+        | ast::BinOp::OperatorCall(_)
+        | ast::BinOp::Percent(_)
+        | ast::BinOp::Plus(_)
+        | ast::BinOp::RAngle(_)
+        | ast::BinOp::SimilarTo(_)
+        | ast::BinOp::Slash(_)
+        | ast::BinOp::Star(_) => row_width(lhs),
+        ast::BinOp::And(_)
+        | ast::BinOp::AtTimeZone(_)
+        | ast::BinOp::ColonColon(_)
+        | ast::BinOp::ColonEq(_)
+        | ast::BinOp::Escape(_)
+        | ast::BinOp::FatArrow(_)
+        | ast::BinOp::Is(_)
+        | ast::BinOp::IsDistinctFrom(_)
+        | ast::BinOp::IsNot(_)
+        | ast::BinOp::IsNotDistinctFrom(_)
+        | ast::BinOp::Or(_)
+        | ast::BinOp::Overlaps(_) => None,
+    }
 }
 
 fn is_comparison(op: &ast::BinOp) -> bool {

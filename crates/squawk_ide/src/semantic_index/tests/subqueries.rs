@@ -104,3 +104,107 @@ create policy pol on t using (a in (select 1));
        ╰╴                             ━━━━━━━━
     ");
 }
+
+#[test]
+fn subquery_column_count() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int
+);
+select (select 1, 2);
+select 1 in (select 1, 2);
+select 1 not in (select 1, 2);
+select 1 = any(select 1, 2);
+select 1 < all(select 1, 2);
+select (1, 2) in (select 1, 2, 3);
+select (1, 2, 3) in (select 1, 2);
+select (1, 2) = (select 1, 2, 3);
+select (1, 2) = any(select 1);
+select array(select 1, 2);
+select (select 1, 2) = (1, 2);
+select 1 = (select 1, 2);
+select (1, 2) is distinct from (select 1, 2);
+select row(1) = (select 1, 2);
+select 1 in ((select 1, 2), 3);
+select a
+from t
+where
+  (a, b) in (select * from t)
+  and (a, b) = (select a, b from t)
+  and (a, b) < any(select * from t)
+  and a in (select a from t);
+select (select a from t), array(select b from t), exists(select a, b from t);
+update t set (a, b) = (select 1, 2);
+select (select * from nope), 1 in (select * from nope);
+"), @"
+    error: relation `nope` does not exist
+       ╭▸ 
+    30 │ select (select * from nope), 1 in (select * from nope);
+       ╰╴                      ━━━━
+    error: relation `nope` does not exist
+       ╭▸ 
+    30 │ select (select * from nope), 1 in (select * from nope);
+       ╰╴                                                 ━━━━
+    error: subquery must return only one column
+      ╭▸ 
+    6 │ select (select 1, 2);
+      ╰╴        ━━━━━━━━━━━
+    error: subquery has too many columns
+      ╭▸ 
+    7 │ select 1 in (select 1, 2);
+      ╰╴             ━━━━━━━━━━━
+    error: subquery has too many columns
+      ╭▸ 
+    8 │ select 1 not in (select 1, 2);
+      ╰╴                 ━━━━━━━━━━━
+    error: subquery has too many columns
+      ╭▸ 
+    9 │ select 1 = any(select 1, 2);
+      ╰╴               ━━━━━━━━━━━
+    error: subquery has too many columns
+       ╭▸ 
+    10 │ select 1 < all(select 1, 2);
+       ╰╴               ━━━━━━━━━━━
+    error: subquery has too many columns
+       ╭▸ 
+    11 │ select (1, 2) in (select 1, 2, 3);
+       ╰╴                  ━━━━━━━━━━━━━━
+    error: subquery has too few columns
+       ╭▸ 
+    12 │ select (1, 2, 3) in (select 1, 2);
+       ╰╴                     ━━━━━━━━━━━
+    error: subquery has too many columns
+       ╭▸ 
+    13 │ select (1, 2) = (select 1, 2, 3);
+       ╰╴                 ━━━━━━━━━━━━━━
+    error: subquery has too few columns
+       ╭▸ 
+    14 │ select (1, 2) = any(select 1);
+       ╰╴                    ━━━━━━━━
+    error: subquery must return only one column
+       ╭▸ 
+    15 │ select array(select 1, 2);
+       ╰╴             ━━━━━━━━━━━
+    error: subquery must return only one column
+       ╭▸ 
+    16 │ select (select 1, 2) = (1, 2);
+       ╰╴        ━━━━━━━━━━━
+    error: subquery must return only one column
+       ╭▸ 
+    17 │ select 1 = (select 1, 2);
+       ╰╴            ━━━━━━━━━━━
+    error: subquery must return only one column
+       ╭▸ 
+    18 │ select (1, 2) is distinct from (select 1, 2);
+       ╰╴                                ━━━━━━━━━━━
+    error: subquery has too many columns
+       ╭▸ 
+    19 │ select row(1) = (select 1, 2);
+       ╰╴                 ━━━━━━━━━━━
+    error: subquery must return only one column
+       ╭▸ 
+    20 │ select 1 in ((select 1, 2), 3);
+       ╰╴              ━━━━━━━━━━━
+    ");
+}

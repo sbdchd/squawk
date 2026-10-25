@@ -142,6 +142,9 @@ pub(crate) enum SemaError {
     GeneratedColumnReference {
         column: Name,
     },
+    SubqueryNotSingleColumn,
+    SubqueryTooManyColumns,
+    SubqueryTooFewColumns,
     Duplicate {
         object: ObjectKind,
         name: Name,
@@ -793,7 +796,10 @@ impl SemaError {
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
-            | SemaError::RowLengthMismatch => DiagnosticKind::ColumnCountMismatch,
+            | SemaError::RowLengthMismatch
+            | SemaError::SubqueryNotSingleColumn
+            | SemaError::SubqueryTooManyColumns
+            | SemaError::SubqueryTooFewColumns => DiagnosticKind::ColumnCountMismatch,
             SemaError::MissingShellType => DiagnosticKind::MissingShellType,
             SemaError::WrongRelationKind { .. }
             | SemaError::CannotCopy { .. }
@@ -865,6 +871,9 @@ impl SemaError {
             SemaError::DefaultColumnReference => {
                 Some("cannot use column reference in DEFAULT expression")
             }
+            SemaError::SubqueryNotSingleColumn => Some("subquery must return only one column"),
+            SemaError::SubqueryTooManyColumns => Some("subquery has too many columns"),
+            SemaError::SubqueryTooFewColumns => Some("subquery has too few columns"),
             _ => None,
         }
     }
@@ -910,7 +919,10 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::WindowAggregateOrderBy
             | SemaError::WindowDistinct
             | SemaError::RowLengthMismatch
-            | SemaError::DefaultColumnReference => {
+            | SemaError::DefaultColumnReference
+            | SemaError::SubqueryNotSingleColumn
+            | SemaError::SubqueryTooManyColumns
+            | SemaError::SubqueryTooFewColumns => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MisplacedAggregate { context } => write!(
