@@ -86,6 +86,7 @@ pub enum DiagnosticKind {
     DuplicateType,
     DuplicateColumn,
     ColumnCountMismatch,
+    GroupingError,
     DuplicateAssignment,
     DuplicateCte,
     DuplicateSource,

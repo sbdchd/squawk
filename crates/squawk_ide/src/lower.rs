@@ -63,6 +63,8 @@ impl Lowerer {
             scopes: vec![],
             windows: vec![],
             json_paths: vec![],
+            expr_context: ExprContext::Unrestricted,
+            aggregate_calls: vec![],
             function: None,
             public,
             pg_catalog,
@@ -300,6 +302,8 @@ pub(crate) struct Lowerer {
     scopes: Vec<QueryScope>,
     windows: Vec<WindowId>,
     json_paths: Vec<JsonPathId>,
+    expr_context: ExprContext,
+    aggregate_calls: Vec<AggregateCall>,
     function: Option<FunctionId>,
     public: Name,
     pg_catalog: Name,
@@ -1049,6 +1053,7 @@ struct SelectParts {
 impl Lowerer {
     fn lower_stmt(&mut self, stmt: &ast::Stmt) {
         self.record_search_path(stmt.syntax().text_range().start());
+        self.aggregate_calls.clear();
         match stmt {
             ast::Stmt::CreateTable(create_table) => self.lower_create_table(
                 create_table,
@@ -3092,7 +3097,12 @@ impl Lowerer {
         generated: bool,
     ) {
         let refs = self.index.references.next_idx();
-        self.lower_expr(expr);
+        let context = if generated {
+            ExprContext::GeneratedColumn
+        } else {
+            ExprContext::Default
+        };
+        self.lower_expr_in(context, expr);
         let (Some(table), Some(column)) = (table, column) else {
             return;
         };
@@ -3858,7 +3868,9 @@ impl Lowerer {
     fn lower_execute(&mut self, execute: &ast::Execute) -> Option<PreparedStatementId> {
         for arg in execute.arg_list().into_iter().flat_map(|list| list.args()) {
             if let Some(expr) = arg.func_arg_expr() {
-                self.lower_func_arg_expr(&expr);
+                self.with_expr_context(ExprContext::ExecuteParameter, |this| {
+                    this.lower_func_arg_expr(&expr);
+                });
             }
         }
         self.lower_prepared_statement_ref(&execute.prepared_statement_ref()?)
@@ -4437,10 +4449,10 @@ impl Lowerer {
         }
         self.with_table_scope(QueryKind::Policy, table, node, |this| {
             if let Some(expr) = using.and_then(|clause| clause.expr()) {
-                this.lower_expr(&expr);
+                this.lower_expr_in(ExprContext::Policy, &expr);
             }
             if let Some(expr) = with_check.and_then(|clause| clause.expr()) {
-                this.lower_expr(&expr);
+                this.lower_expr_in(ExprContext::Policy, &expr);
             }
         });
     }
@@ -5621,7 +5633,7 @@ impl Lowerer {
                 create_statistics.syntax(),
                 |this| {
                     for expr in on_clause.exprs() {
-                        this.lower_expr(&expr);
+                        this.lower_expr_in(ExprContext::StatisticsExpression, &expr);
                     }
                 },
             );
@@ -9869,7 +9881,9 @@ impl Lowerer {
         let CallArgs {
             args,
             named: named_args,
-        } = self.lower_call_args(call.arg_list());
+        } = self.with_expr_context(ExprContext::CallArgument, |this| {
+            this.lower_call_args(call.arg_list())
+        });
         let procedure = call
             .procedure_name_ref()
             .and_then(|name| name.path_ref())
@@ -10229,7 +10243,7 @@ impl Lowerer {
                 .flat_map(|list| list.partition_items())
             {
                 if let Some(expr) = item.expr() {
-                    this.lower_expr(&expr);
+                    this.lower_expr_in(ExprContext::PartitionKey, &expr);
                 }
                 if let Some(path) = item.op_class_ref().and_then(|op_class| op_class.path_ref()) {
                     this.lower_operator_class_ref(&path, access_method, IfMissing::Error);
@@ -10239,6 +10253,12 @@ impl Lowerer {
     }
 
     fn lower_partition_type(&mut self, partition_type: &ast::PartitionType) {
+        self.with_expr_context(ExprContext::PartitionBound, |this| {
+            this.lower_partition_bound(partition_type);
+        });
+    }
+
+    fn lower_partition_bound(&mut self, partition_type: &ast::PartitionType) {
         match partition_type {
             ast::PartitionType::PartitionForValuesFrom(from_to) => {
                 for expr in from_to
@@ -11514,7 +11534,7 @@ impl Lowerer {
             }
             Some(ast::AlterDomainAction::SetDefault(set_default)) => {
                 if let Some(expr) = set_default.expr() {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::Default, &expr);
                 }
             }
             Some(ast::AlterDomainAction::SetNotNull(_)) => {
@@ -11587,7 +11607,7 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
             self.with_domain_scope(domain, check.syntax(), |this| {
-                this.lower_expr(&expr);
+                this.lower_expr_in(ExprContext::CheckConstraint, &expr);
             });
         }
         let Some(domain) = domain else {
@@ -12485,7 +12505,7 @@ impl Lowerer {
         let ty = self.lower_func_type(param.func_type());
         let default = param.param_default();
         if let Some(expr) = default.as_ref().and_then(|default| default.expr()) {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::Default, &expr);
         }
         Param {
             name: param_name.as_ref().map(|name| self.intern(&name.text())),
@@ -12523,6 +12543,16 @@ impl Lowerer {
     }
 
     fn lower_cte_query(
+        &mut self,
+        query: ast::SelectVariant,
+        recursive_cte: Option<CteId>,
+    ) -> QueryId {
+        self.with_expr_context(ExprContext::Unrestricted, |this| {
+            this.lower_cte_query_inner(query, recursive_cte)
+        })
+    }
+
+    fn lower_cte_query_inner(
         &mut self,
         query: ast::SelectVariant,
         recursive_cte: Option<CteId>,
@@ -12631,18 +12661,20 @@ impl Lowerer {
         }
 
         if let Some(expr) = parts.where_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::Where, &expr);
         }
         if let Some(list) = parts
             .group_by_clause
             .and_then(|clause| clause.group_by_list())
         {
-            for group_by in list.group_bys() {
-                self.lower_group_by(&group_by, &columns);
-            }
+            self.with_expr_context(ExprContext::GroupBy, |this| {
+                for group_by in list.group_bys() {
+                    this.lower_group_by(&group_by, &columns);
+                }
+            });
         }
         if let Some(expr) = parts.having_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::Having, &expr);
         }
         for clause in parts.tail_clauses {
             self.lower_tail_clause(clause, &columns);
@@ -12740,7 +12772,7 @@ impl Lowerer {
                 );
             }
             for (column_index, expr) in row.exprs().enumerate() {
-                let ty = self.lower_expr(&expr);
+                let ty = self.lower_expr_in(ExprContext::Values, &expr);
                 if row_index == 0 {
                     let name = self.intern(&format!("column{}", column_index + 1));
                     columns.push(Column {
@@ -12827,7 +12859,7 @@ impl Lowerer {
         match delete.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -12886,7 +12918,7 @@ impl Lowerer {
         match update.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -12942,7 +12974,7 @@ impl Lowerer {
             .and_then(|using_on| using_on.on_clause())
             .and_then(|on_clause| on_clause.expr())
         {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::JoinCondition, &expr);
         }
 
         for when_clause in merge.merge_when_clauses() {
@@ -12965,7 +12997,7 @@ impl Lowerer {
                 self.push_hidden(hidden);
             }
             if let Some(expr) = condition.and_then(|condition| condition.expr()) {
-                self.lower_expr(&expr);
+                self.lower_expr_in(ExprContext::MergeWhen, &expr);
             }
             if let Some(action) = action {
                 self.lower_merge_action(target, &action);
@@ -12994,7 +13026,7 @@ impl Lowerer {
                         .into_iter()
                         .flat_map(|list| list.column_targets())
                     {
-                        self.lower_column_target(target, &column_target);
+                        self.lower_column_target(ExprContext::Insert, target, &column_target);
                     }
                 }
                 for expr in insert
@@ -13004,7 +13036,7 @@ impl Lowerer {
                     .flat_map(|list| list.rows())
                     .flat_map(|row| row.exprs())
                 {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::Values, &expr);
                 }
             }
             ast::MergeAction::MergeUpdate(update) => {
@@ -13058,7 +13090,7 @@ impl Lowerer {
                         message,
                     );
                 }
-                self.lower_column_target(target, &column_target);
+                self.lower_column_target(ExprContext::Insert, target, &column_target);
             }
         }
         if let Some((query, source)) = &source {
@@ -13157,7 +13189,7 @@ impl Lowerer {
                     .flat_map(|list| list.conflict_index_items())
                 {
                     if let Some(expr) = item.expr() {
-                        self.lower_expr(&expr);
+                        self.lower_expr_in(ExprContext::IndexExpression, &expr);
                     }
                     if let Some(path) = item.op_class_ref().and_then(|op_class| op_class.path_ref())
                     {
@@ -13165,7 +13197,7 @@ impl Lowerer {
                     }
                 }
                 if let Some(expr) = on_index.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::IndexPredicate, &expr);
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
@@ -13230,7 +13262,7 @@ impl Lowerer {
             }
         };
         if let Some(expr) = where_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::Where, &expr);
         }
         self.index.queries[query].sources.truncate(len);
         self.set_visible((0..len).into());
@@ -13248,11 +13280,11 @@ impl Lowerer {
                     if let Some(column_target) = single.column_target() {
                         self.check_duplicate_assignment(&mut seen, &column_target);
                         if let Some(target) = target {
-                            self.lower_column_target(target, &column_target);
+                            self.lower_column_target(ExprContext::Update, target, &column_target);
                         }
                     }
                     if let Some(expr) = single.set_expr().and_then(|set_expr| set_expr.expr()) {
-                        self.lower_expr(&expr);
+                        self.lower_expr_in(ExprContext::Update, &expr);
                     }
                 }
                 ast::SetColumn::SetMultipleColumns(multiple) => {
@@ -13263,7 +13295,7 @@ impl Lowerer {
                     {
                         self.check_duplicate_assignment(&mut seen, &column_target);
                         if let Some(target) = target {
-                            self.lower_column_target(target, &column_target);
+                            self.lower_column_target(ExprContext::Update, target, &column_target);
                         }
                     }
                     if let Some(paren_select) = multiple.paren_select() {
@@ -13275,7 +13307,7 @@ impl Lowerer {
                         .flat_map(|list| list.set_exprs())
                         .filter_map(|set_expr| set_expr.expr())
                     {
-                        self.lower_expr(&expr);
+                        self.lower_expr_in(ExprContext::Update, &expr);
                     }
                 }
             }
@@ -13358,7 +13390,12 @@ impl Lowerer {
         ty
     }
 
-    fn lower_column_target(&mut self, target: SourceId, column_target: &ast::ColumnTarget) {
+    fn lower_column_target(
+        &mut self,
+        context: ExprContext,
+        target: SourceId,
+        column_target: &ast::ColumnTarget,
+    ) {
         let Some(column_ref) = column_target.name() else {
             return;
         };
@@ -13369,13 +13406,13 @@ impl Lowerer {
                 ast::Accessor::IndexAccessor(index) => {
                     subscript.get_or_insert(false);
                     if let Some(expr) = index.index() {
-                        self.lower_expr(&expr);
+                        self.lower_expr_in(context, &expr);
                     }
                 }
                 ast::Accessor::SliceAccessor(slice) => {
                     subscript = Some(true);
                     for expr in slice.start().into_iter().chain(slice.end()) {
-                        self.lower_expr(&expr);
+                        self.lower_expr_in(context, &expr);
                     }
                 }
                 ast::Accessor::FieldAccessor(field) => {
@@ -13500,7 +13537,9 @@ impl Lowerer {
             self.push_returning_source(target, returning_clause, new, "new");
             self.set_visible((0..self.index.queries[query].sources.len()).into());
         }
-        self.lower_target_list(query, returning_clause.target_list())
+        self.with_expr_context(ExprContext::Returning, |this| {
+            this.lower_target_list(query, returning_clause.target_list())
+        })
     }
 
     fn push_returning_source(
@@ -13721,6 +13760,16 @@ impl Lowerer {
         query: &ast::WithQuery,
         recursive_cte: Option<CteId>,
     ) -> QueryId {
+        self.with_expr_context(ExprContext::Unrestricted, |this| {
+            this.lower_with_query_inner(query, recursive_cte)
+        })
+    }
+
+    fn lower_with_query_inner(
+        &mut self,
+        query: &ast::WithQuery,
+        recursive_cte: Option<CteId>,
+    ) -> QueryId {
         let select = match query.clone() {
             ast::WithQuery::Delete(delete) => return self.lower_delete(&delete),
             ast::WithQuery::Select(select) => ast::SelectVariant::Select(select),
@@ -13792,7 +13841,9 @@ impl Lowerer {
                     self.lower_natural_join(start, mid, kind);
                 }
                 if let Some(condition) = join.join_condition() {
-                    self.lower_join_condition(condition, start, mid, kind);
+                    self.with_expr_context(ExprContext::JoinCondition, |this| {
+                        this.lower_join_condition(condition, start, mid, kind);
+                    });
                 }
             }
         }
@@ -13804,14 +13855,14 @@ impl Lowerer {
         };
         for arg in call.arg_list().iter().flat_map(|list| list.args()) {
             if let Some(expr) = arg.func_arg_expr().and_then(|expr| expr.expr()) {
-                self.lower_expr(&expr);
+                self.lower_expr_in(ExprContext::FromFunction, &expr);
             }
         }
         if let Some(expr) = tablesample
             .repeatable_clause()
             .and_then(|repeatable| repeatable.expr())
         {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::FromFunction, &expr);
         }
         let (schema, name_ref) = match call.expr() {
             Some(ast::Expr::NameRef(name_ref)) => (None, name_ref),
@@ -13937,7 +13988,7 @@ impl Lowerer {
             ast::FromItem::JsonTableFromItem(json_table_item) => {
                 let mut columns = vec![];
                 if let Some(json_table) = json_table_item.json_table() {
-                    self.with_lateral_sources(|this| {
+                    self.with_from_function(|this| {
                         if let Some(expr) = json_table.expr() {
                             this.lower_expr(&expr);
                         }
@@ -13968,7 +14019,7 @@ impl Lowerer {
                 }
             }
             ast::FromItem::ExprFromItem(expr_item) => {
-                self.with_lateral_sources(|this| {
+                self.with_from_function(|this| {
                     if let Some(call) = expr_item.call_expr() {
                         this.lower_call(&call);
                     }
@@ -13999,7 +14050,7 @@ impl Lowerer {
             ast::FromItem::XmlTableFromItem(xml_table_item) => {
                 let columns = match xml_table_item.xml_table() {
                     Some(xml_table) => {
-                        self.with_lateral_sources(|this| this.lower_xml_table(&xml_table))
+                        self.with_from_function(|this| this.lower_xml_table(&xml_table))
                     }
                     None => self.unknown_columns(),
                 };
@@ -14186,6 +14237,10 @@ impl Lowerer {
 
     fn scope_sources_len(&self) -> usize {
         self.index.queries[self.scope().query].sources.len()
+    }
+
+    fn with_from_function<R>(&mut self, f: impl FnOnce(&mut Self) -> R) -> R {
+        self.with_lateral_sources(|this| this.with_expr_context(ExprContext::FromFunction, f))
     }
 
     fn with_lateral_sources<R>(&mut self, f: impl FnOnce(&mut Self) -> R) -> R {
@@ -14481,7 +14536,7 @@ impl Lowerer {
         for arg in rows_from_item.rows_from_args() {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
                 (Some(call), Some(list)) => {
-                    self.with_lateral_sources(|this| this.lower_call(&call));
+                    self.with_from_function(|this| this.lower_call(&call));
                     self.column_def_list_columns(&list)
                 }
                 (Some(call), None) => self.lower_function_source(&call, None, false).columns,
@@ -14509,7 +14564,7 @@ impl Lowerer {
             return self.lower_expanded_unnest(call, &name_ref);
         }
         let LoweredCall { args, callee } =
-            self.with_lateral_sources(|this| this.lower_call_with_args(call));
+            self.with_from_function(|this| this.lower_call_with_args(call));
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return FunctionSource {
                 callee,
@@ -14533,7 +14588,7 @@ impl Lowerer {
         name_ref: &ast::NameRef,
     ) -> FunctionSource {
         let CallArgs { args, .. } =
-            self.with_lateral_sources(|this| this.lower_call_args(call.arg_list()));
+            self.with_from_function(|this| this.lower_call_args(call.arg_list()));
         let name = self.intern("unnest");
         let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
         let mut items: SmallVec<[Columns; 4]> = smallvec![];
@@ -15267,7 +15322,7 @@ impl Lowerer {
                 }
                 if let Some(expr) = set_type.using_expr().and_then(|using| using.expr()) {
                     self.with_table_scope(QueryKind::Constraint, table, node, |this| {
-                        this.lower_expr(&expr);
+                        this.lower_expr_in(ExprContext::Transform, &expr);
                     });
                 }
                 if let Some(table) = table
@@ -15612,12 +15667,12 @@ impl Lowerer {
                     self.lower_operator_class_ref(&path, access_method, IfMissing::Error);
                 }
                 if let Some(expr) = item.expr() {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::IndexExpression, &expr);
                 }
             }
         }
         if let Some(expr) = create_index.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::IndexPredicate, &expr);
         }
         self.scopes.pop();
 
@@ -15717,7 +15772,7 @@ impl Lowerer {
             .when_condition()
             .and_then(|condition| condition.expr())
         {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::TriggerWhen, &expr);
         }
         self.scopes.pop();
 
@@ -15946,7 +16001,7 @@ impl Lowerer {
             }
             self.set_visible((0..2).into());
             if let Some(expr) = rule_on.where_clause().and_then(|clause| clause.expr()) {
-                self.lower_expr(&expr);
+                self.lower_expr_in(ExprContext::Where, &expr);
             }
             for (index, name) in names.into_iter().enumerate() {
                 let target = self.index.queries[query].sources[index];
@@ -16880,7 +16935,7 @@ impl Lowerer {
         }
         if let Some(expr) = copy.where_clause().and_then(|clause| clause.expr()) {
             self.with_table_scope(QueryKind::Copy, table, copy.syntax(), |this| {
-                this.lower_expr(&expr);
+                this.lower_expr_in(ExprContext::CopyWhere, &expr);
             });
         }
     }
@@ -17227,7 +17282,7 @@ impl Lowerer {
     fn lower_check_constraint(&mut self, table: Option<TableId>, check: &ast::CheckConstraint) {
         let start = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::CheckConstraint, &expr);
         }
         let Some(table) = table else {
             return;
@@ -17757,7 +17812,7 @@ impl Lowerer {
             let Some(expr) = item.expr() else {
                 continue;
             };
-            let ty = self.lower_expr(&expr);
+            let ty = self.lower_expr_in(ExprContext::IndexExpression, &expr);
             let op = exclusion
                 .op()
                 .or_else(|| exclusion.operator_call().and_then(|call| call.op()));
@@ -17794,7 +17849,7 @@ impl Lowerer {
             .where_condition_clause()
             .and_then(|clause| clause.expr())
         {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::IndexPredicate, &expr);
         }
         let Some(table) = table else {
             return;
@@ -18604,17 +18659,17 @@ impl Lowerer {
             }
             ast::SelectTailClause::LimitClause(limit) => {
                 if let Some(ast::LimitValue::Expr(expr)) = limit.limit_value() {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::Limit, &expr);
                 }
             }
             ast::SelectTailClause::OffsetClause(offset) => {
                 if let Some(expr) = offset.expr() {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::Offset, &expr);
                 }
             }
             ast::SelectTailClause::FetchClause(fetch) => {
                 if let Some(expr) = fetch.expr() {
-                    self.lower_expr(&expr);
+                    self.lower_expr_in(ExprContext::Limit, &expr);
                 }
             }
             ast::SelectTailClause::LockingClause(locking) => {
@@ -19089,22 +19144,30 @@ impl Lowerer {
         if let Some(window_ref) = window_spec.window_ref() {
             self.lower_window_ref(&window_ref);
         }
-        if let Some(partition_by) = window_spec.partition_by_clause() {
-            self.lower_exprs(partition_by.exprs());
-        }
-        self.lower_order_by(window_spec.order_by_clause());
-        match window_spec
-            .frame_clause()
-            .and_then(|clause| clause.frame_extent())
-        {
+        self.with_expr_context(ExprContext::WindowDefinition, |this| {
+            if let Some(partition_by) = window_spec.partition_by_clause() {
+                this.lower_exprs(partition_by.exprs());
+            }
+            this.lower_order_by(window_spec.order_by_clause());
+        });
+        let Some(frame_clause) = window_spec.frame_clause() else {
+            return;
+        };
+        let context = match frame_clause.frame_units() {
+            Some(ast::FrameUnits::FrameRange(_)) => ExprContext::WindowRange,
+            Some(ast::FrameUnits::FrameRows(_)) => ExprContext::WindowRows,
+            Some(ast::FrameUnits::FrameGroups(_)) => ExprContext::WindowGroups,
+            None => ExprContext::WindowDefinition,
+        };
+        self.with_expr_context(context, |this| match frame_clause.frame_extent() {
             Some(ast::FrameExtent::FrameBetween(between)) => {
                 for bound in [between.start(), between.end()].into_iter().flatten() {
-                    self.lower_frame_bound(&bound);
+                    this.lower_frame_bound(&bound);
                 }
             }
-            Some(ast::FrameExtent::FrameBound(bound)) => self.lower_frame_bound(&bound),
+            Some(ast::FrameExtent::FrameBound(bound)) => this.lower_frame_bound(&bound),
             None => {}
-        }
+        });
     }
 
     fn lower_frame_bound(&mut self, bound: &ast::FrameBound) {
@@ -19512,6 +19575,8 @@ impl Lowerer {
     }
 
     fn lower_call_with_args(&mut self, call: &ast::CallExpr) -> LoweredCall {
+        let refs = self.index.references.next_idx();
+        let aggregate_calls = self.aggregate_calls.len();
         let callee = call.expr();
         let row_source = self.row_source_arg(call);
         let CallArgs {
@@ -19626,8 +19691,9 @@ impl Lowerer {
             self.lower_sequence_arg(&arg);
         }
         self.lower_named_args(function, named_args);
+        self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr(&expr);
+            self.lower_expr_in(ExprContext::Filter, &expr);
         }
         match call.over_clause().and_then(|clause| clause.over_target()) {
             Some(ast::OverTarget::OverWindowSpec(spec)) => {
@@ -19642,6 +19708,90 @@ impl Lowerer {
             args,
             callee: target,
         })
+    }
+
+    fn check_aggregate_call(
+        &mut self,
+        call: &ast::CallExpr,
+        function: Option<FunctionId>,
+        refs: RefId,
+        aggregate_calls: usize,
+    ) {
+        if call.over_clause().is_some() {
+            self.aggregate_calls.truncate(aggregate_calls);
+            return;
+        }
+        if !function
+            .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
+            || !self.aggregate_is_local(refs)
+        {
+            return;
+        }
+        let ptr = self.ptr(call.syntax());
+        let depth = self.scopes.len();
+        if let Some(message) = self.expr_context.aggregate_error() {
+            self.push_error_ptr(DiagnosticKind::GroupingError, ptr, message.to_owned(), None);
+        } else {
+            for index in aggregate_calls..self.aggregate_calls.len() {
+                let inner = self.aggregate_calls[index];
+                if inner.depth != depth {
+                    continue;
+                }
+                self.push_error_ptr(
+                    DiagnosticKind::GroupingError,
+                    inner.ptr,
+                    "aggregate function calls cannot be nested".to_owned(),
+                    None,
+                );
+            }
+        }
+        self.aggregate_calls.truncate(aggregate_calls);
+        self.aggregate_calls.push(AggregateCall { depth, ptr });
+    }
+
+    fn aggregate_is_local(&self, refs: RefId) -> bool {
+        let Some(scope) = self.scopes.last() else {
+            return true;
+        };
+        let sources = &self.index.queries[scope.query].sources;
+        let mut outer = false;
+        for id in self.index.references.range_from(refs) {
+            let reference = &self.index.references[id];
+            if reference.scope != Some(scope.scope) {
+                continue;
+            }
+            match reference.resolution {
+                Resolution::Column {
+                    source: Some(source),
+                    ..
+                }
+                | Resolution::Source(source) => {
+                    if sources.contains(&source) {
+                        return true;
+                    }
+                    outer = true;
+                }
+                Resolution::Column { source: None, .. } => return true,
+                Resolution::Unresolved | Resolution::Unknown | Resolution::Ambiguous
+                    if reference.kind == ReferenceKind::Column =>
+                {
+                    outer = true;
+                }
+                _ => {}
+            }
+        }
+        !outer
+    }
+
+    fn with_expr_context<T>(&mut self, context: ExprContext, f: impl FnOnce(&mut Self) -> T) -> T {
+        let prev = std::mem::replace(&mut self.expr_context, context);
+        let result = f(self);
+        self.expr_context = prev;
+        result
+    }
+
+    fn lower_expr_in(&mut self, context: ExprContext, expr: &ast::Expr) -> Option<Ty> {
+        self.with_expr_context(context, |this| this.lower_expr(expr))
     }
 
     fn lower_call_args(&mut self, arg_list: Option<ast::ArgList>) -> CallArgs {
@@ -21275,6 +21425,109 @@ impl Lowerer {
     fn ast_ptr<N: AstNode>(&self, node: &N) -> InIrFile<AstPtr<N>> {
         InIrFile::new(self.file_id, AstPtr::new(node))
     }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ExprContext {
+    Unrestricted,
+    Where,
+    JoinCondition,
+    GroupBy,
+    Having,
+    Filter,
+    WindowDefinition,
+    WindowRange,
+    WindowRows,
+    WindowGroups,
+    Limit,
+    Offset,
+    Values,
+    Returning,
+    Insert,
+    Update,
+    FromFunction,
+    MergeWhen,
+    CheckConstraint,
+    Default,
+    GeneratedColumn,
+    IndexExpression,
+    IndexPredicate,
+    StatisticsExpression,
+    PartitionKey,
+    PartitionBound,
+    Policy,
+    TriggerWhen,
+    CallArgument,
+    Transform,
+    CopyWhere,
+    ExecuteParameter,
+}
+
+impl ExprContext {
+    fn aggregate_error(self) -> Option<&'static str> {
+        Some(match self {
+            ExprContext::Unrestricted | ExprContext::Having | ExprContext::WindowDefinition => {
+                return None;
+            }
+            ExprContext::Where => "aggregate functions are not allowed in WHERE",
+            ExprContext::JoinCondition => "aggregate functions are not allowed in JOIN conditions",
+            ExprContext::GroupBy => "aggregate functions are not allowed in GROUP BY",
+            ExprContext::Filter => "aggregate functions are not allowed in FILTER",
+            ExprContext::WindowRange => "aggregate functions are not allowed in window RANGE",
+            ExprContext::WindowRows => "aggregate functions are not allowed in window ROWS",
+            ExprContext::WindowGroups => "aggregate functions are not allowed in window GROUPS",
+            ExprContext::Limit => "aggregate functions are not allowed in LIMIT",
+            ExprContext::Offset => "aggregate functions are not allowed in OFFSET",
+            ExprContext::Values => "aggregate functions are not allowed in VALUES",
+            ExprContext::Returning => "aggregate functions are not allowed in RETURNING",
+            ExprContext::Insert => "aggregate functions are not allowed in INSERT",
+            ExprContext::Update => "aggregate functions are not allowed in UPDATE",
+            ExprContext::FromFunction => "aggregate functions are not allowed in functions in FROM",
+            ExprContext::MergeWhen => {
+                "aggregate functions are not allowed in MERGE WHEN conditions"
+            }
+            ExprContext::CheckConstraint => {
+                "aggregate functions are not allowed in check constraints"
+            }
+            ExprContext::Default => "aggregate functions are not allowed in DEFAULT expressions",
+            ExprContext::GeneratedColumn => {
+                "aggregate functions are not allowed in column generation expressions"
+            }
+            ExprContext::IndexExpression => {
+                "aggregate functions are not allowed in index expressions"
+            }
+            ExprContext::IndexPredicate => {
+                "aggregate functions are not allowed in index predicates"
+            }
+            ExprContext::StatisticsExpression => {
+                "aggregate functions are not allowed in statistics expressions"
+            }
+            ExprContext::PartitionKey => {
+                "aggregate functions are not allowed in partition key expressions"
+            }
+            ExprContext::PartitionBound => "aggregate functions are not allowed in partition bound",
+            ExprContext::Policy => "aggregate functions are not allowed in policy expressions",
+            ExprContext::TriggerWhen => {
+                "aggregate functions are not allowed in trigger WHEN conditions"
+            }
+            ExprContext::CallArgument => "aggregate functions are not allowed in CALL arguments",
+            ExprContext::Transform => {
+                "aggregate functions are not allowed in transform expressions"
+            }
+            ExprContext::CopyWhere => {
+                "aggregate functions are not allowed in COPY FROM WHERE conditions"
+            }
+            ExprContext::ExecuteParameter => {
+                "aggregate functions are not allowed in EXECUTE parameters"
+            }
+        })
+    }
+}
+
+#[derive(Clone, Copy)]
+struct AggregateCall {
+    depth: usize,
+    ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Clone, Copy)]
