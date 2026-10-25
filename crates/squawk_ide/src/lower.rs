@@ -10360,7 +10360,7 @@ impl Lowerer {
             None => self.unknown_columns(),
         };
         let columns = match create_view.column_list() {
-            Some(list) => self.rename_columns(list.column_names(), &columns),
+            Some(list) => self.rename_columns(list.column_names(), &columns, ColumnListOwner::View),
             None => columns,
         };
         let persistence = Persistence::from_ast(create_view.persistence().as_ref());
@@ -10395,7 +10395,9 @@ impl Lowerer {
             None => self.unknown_columns(),
         };
         let columns = match create_view.column_list() {
-            Some(list) => self.rename_columns(list.column_names(), &columns),
+            Some(list) => {
+                self.rename_columns(list.column_names(), &columns, ColumnListOwner::CreateAs)
+            }
             None => columns,
         };
         if let Some(table) = self.alloc_table(
@@ -10435,6 +10437,7 @@ impl Lowerer {
                     ast::TableArg::LikeClause(_) | ast::TableArg::TableConstraint(_) => None,
                 }),
                 &columns,
+                ColumnListOwner::CreateAs,
             ),
             None => columns,
         };
@@ -12672,7 +12675,10 @@ impl Lowerer {
                 .set_column_owner(columns.range, ColumnOwner::Cte(cte));
         }
         if let Some(rhs) = compound.rhs() {
-            self.lower_query(rhs);
+            let rhs_query = self.lower_query(rhs.clone());
+            if let Some(lhs) = lhs {
+                self.check_compound_arity(compound, lhs, rhs_query, &rhs);
+            }
         }
         let id = self.alloc_query(QueryKind::Compound, compound.syntax());
         if let Some(lhs) = lhs {
@@ -12685,23 +12691,54 @@ impl Lowerer {
         id
     }
 
+    fn check_compound_arity(
+        &mut self,
+        compound: &ast::CompoundSelect,
+        lhs: QueryId,
+        rhs: QueryId,
+        rhs_node: &ast::SelectVariant,
+    ) {
+        let lhs = self.index.queries[lhs].columns;
+        let rhs = self.index.queries[rhs].columns;
+        if !lhs.complete || !rhs.complete || lhs.range.len() == rhs.range.len() {
+            return;
+        }
+        let op = match compound.op() {
+            Some(ast::CompoundOp::Union(_)) => "UNION",
+            Some(ast::CompoundOp::Intersect(_)) => "INTERSECT",
+            Some(ast::CompoundOp::Except(_)) => "EXCEPT",
+            None => return,
+        };
+        self.push_error(
+            DiagnosticKind::ColumnCountMismatch,
+            rhs_node.syntax(),
+            format!("each {op} query must have the same number of columns"),
+        );
+    }
+
     fn lower_values(&mut self, values: &ast::Values) -> QueryId {
         let mark = self.ctes.len();
         if let Some(with_clause) = values.with_clause() {
             self.lower_with(&with_clause);
         }
-        let mut columns = Vec::with_capacity(
-            values
-                .row_list()
-                .and_then(|list| list.rows().next())
-                .map_or(0, |row| row.exprs().count()),
-        );
+        let first_len = values
+            .row_list()
+            .and_then(|list| list.rows().next())
+            .map_or(0, |row| row.exprs().count());
+        let mut columns = Vec::with_capacity(first_len);
         for (row_index, row) in values
             .row_list()
             .into_iter()
             .flat_map(|list| list.rows())
             .enumerate()
         {
+            if row_index > 0 && row.exprs().count() != first_len {
+                self.push_error(
+                    DiagnosticKind::ColumnCountMismatch,
+                    row.syntax(),
+                    "VALUES lists must all be the same length".to_owned(),
+                );
+            }
             for (column_index, expr) in row.exprs().enumerate() {
                 let ty = self.lower_expr(&expr);
                 if row_index == 0 {
@@ -12988,9 +13025,12 @@ impl Lowerer {
         let id = self.alloc_query(QueryKind::Insert, insert.syntax());
         self.push_scope(id);
 
-        if let Some(ast::InsertSource::SelectVariant(query)) = insert.insert_source() {
-            self.lower_query(query);
-        }
+        let source = match insert.insert_source() {
+            Some(ast::InsertSource::SelectVariant(query)) => {
+                Some((self.lower_query(query.clone()), query))
+            }
+            Some(ast::InsertSource::DefaultValues(_)) | None => None,
+        };
 
         let target = insert.relation_name_ref().map(|relation_name_ref| {
             let node = relation_name_ref.syntax().clone();
@@ -13021,6 +13061,9 @@ impl Lowerer {
                 self.lower_column_target(target, &column_target);
             }
         }
+        if let Some((query, source)) = &source {
+            self.check_insert_arity(insert, target, *query, source);
+        }
         self.set_visible((0..self.index.queries[id].sources.len()).into());
 
         if let Some(on_conflict) = insert.on_conflict_clause() {
@@ -13034,6 +13077,70 @@ impl Lowerer {
         self.scopes.pop();
         self.ctes.truncate(mark);
         id
+    }
+
+    fn check_insert_arity(
+        &mut self,
+        insert: &ast::Insert,
+        target: Option<SourceId>,
+        query: QueryId,
+        source: &ast::SelectVariant,
+    ) {
+        let column_targets = insert.column_target_list();
+        let target_len = match &column_targets {
+            Some(list) => list.column_targets().count(),
+            None => {
+                let Some(target) = target else {
+                    return;
+                };
+                let columns = self.index.sources[target].columns;
+                if !columns.complete {
+                    return;
+                }
+                columns.range.len()
+            }
+        };
+        let columns = self.index.queries[query].columns;
+        if !columns.complete {
+            return;
+        }
+        let source_len = columns.range.len();
+        if source_len > target_len {
+            let source_range = source.syntax().text_range();
+            let ptr = columns
+                .range
+                .iter()
+                .nth(target_len)
+                .map(|id| self.index.columns[id].ptr)
+                .filter(|ptr| {
+                    ptr.file_id == self.file_id
+                        && source_range.contains_range(ptr.value.text_range())
+                })
+                .unwrap_or_else(|| self.ptr(source.syntax()));
+            self.push_error_ptr(
+                DiagnosticKind::ColumnCountMismatch,
+                ptr,
+                "INSERT has more expressions than target columns".to_owned(),
+                None,
+            );
+        } else if source_len < target_len
+            && let Some(column_target) =
+                column_targets.and_then(|list| list.column_targets().nth(source_len))
+        {
+            let hint = (source_len == 1
+                && single_source_expr(source).is_some_and(|expr| {
+                    matches!(expr, ast::Expr::TupleExpr(tuple) if tuple.exprs().count() == target_len)
+                }))
+            .then_some(
+                "The insertion source is a row expression containing the same number of columns expected by the INSERT. Did you accidentally use extra parentheses?",
+            );
+            self.push_error_with_hint(
+                DiagnosticKind::ColumnCountMismatch,
+                column_target.syntax(),
+                "INSERT has more target columns than expressions".to_owned(),
+                hint,
+            );
+        }
     }
 
     fn lower_on_conflict(
@@ -13526,7 +13633,11 @@ impl Lowerer {
             let query = self.lower_with_query(&query, recursive_cte);
             let query_columns = self.index.queries[query].columns;
             let columns = match &column_list {
-                Some(list) => self.apply_column_list(list, &query_columns),
+                Some(list) => self.apply_column_list(
+                    list,
+                    &query_columns,
+                    ColumnListOwner::Cte(self.index.ctes[id].name),
+                ),
                 None => query_columns,
             };
             let cte = &mut self.index.ctes[id];
@@ -13912,7 +14023,11 @@ impl Lowerer {
             }
             match alias.columns() {
                 Some(ast::FromAliasColumns::ColumnList(list)) => {
-                    columns = self.rename_columns(list.column_names(), &columns);
+                    columns = self.rename_columns(
+                        list.column_names(),
+                        &columns,
+                        ColumnListOwner::Table(name),
+                    );
                 }
                 Some(ast::FromAliasColumns::ColumnDefList(list)) => {
                     columns = self.column_def_list_columns(&list);
@@ -14010,13 +14125,17 @@ impl Lowerer {
             range: self.index.columns.range_from(columns_start),
             complete,
         };
-        if let Some(alias_columns) = alias.columns() {
-            columns = self.rename_columns(alias_columns.column_names(), &columns);
-        }
         let table_alias = alias.name();
         let name = table_alias
             .as_ref()
             .map(|table_alias| self.intern(&table_alias.text()));
+        if let Some(alias_columns) = alias.columns() {
+            columns = self.rename_columns(
+                alias_columns.column_names(),
+                &columns,
+                ColumnListOwner::Join(name),
+            );
+        }
         self.check_duplicate_source(name, SourceKind::Join, true, from_item);
         let source = Source {
             name,
@@ -14234,16 +14353,62 @@ impl Lowerer {
         }
     }
 
+    fn check_column_list_len(&mut self, list: &Columns, columns: &Columns, owner: ColumnListOwner) {
+        let available = columns.range.len();
+        let specified = list.range.len();
+        if !columns.complete || specified <= available {
+            return;
+        }
+        let Some(extra) = list.range.iter().nth(available) else {
+            return;
+        };
+        let names = &self.index.names;
+        let message = match owner {
+            ColumnListOwner::Cte(name) => format!(
+                "WITH query `{}` has {available} {} available but {specified} {} specified",
+                names.resolve(name),
+                plural_columns(available),
+                plural_columns(specified),
+            ),
+            ColumnListOwner::Table(Some(name)) => format!(
+                "table `{}` has {available} {} available but {specified} {} specified",
+                names.resolve(name),
+                plural_columns(available),
+                plural_columns(specified),
+            ),
+            ColumnListOwner::Join(Some(name)) => format!(
+                "join expression `{}` has {available} {} available but {specified} {} specified",
+                names.resolve(name),
+                plural_columns(available),
+                plural_columns(specified),
+            ),
+            ColumnListOwner::Table(None) | ColumnListOwner::Join(None) => return,
+            ColumnListOwner::View => {
+                "CREATE VIEW specifies more column names than columns".to_owned()
+            }
+            ColumnListOwner::CreateAs => "too many column names were specified".to_owned(),
+        };
+        let ptr = self.index.columns[extra].ptr;
+        self.push_error_ptr(DiagnosticKind::ColumnCountMismatch, ptr, message, None);
+    }
+
     fn rename_columns(
         &mut self,
         column_names: impl Iterator<Item = ast::ColumnName>,
         columns: &Columns,
+        owner: ColumnListOwner,
     ) -> Columns {
         let list = self.lower_column_names(column_names);
-        self.apply_column_list(&list, columns)
+        self.apply_column_list(&list, columns, owner)
     }
 
-    fn apply_column_list(&mut self, list: &Columns, columns: &Columns) -> Columns {
+    fn apply_column_list(
+        &mut self,
+        list: &Columns,
+        columns: &Columns,
+        owner: ColumnListOwner,
+    ) -> Columns {
+        self.check_column_list_len(list, columns, owner);
         for (column, query_column) in list.range.iter().zip(columns.range) {
             self.index.columns[column].ty = self.index.columns[query_column].ty;
         }
@@ -21084,7 +21249,17 @@ impl Lowerer {
         message: String,
         hint: Option<&'static str>,
     ) {
-        let range = self.index.range(self.ptr(node).file_range());
+        self.push_error_ptr(kind, self.ptr(node), message, hint);
+    }
+
+    fn push_error_ptr(
+        &mut self,
+        kind: DiagnosticKind,
+        ptr: InIrFile<SyntaxNodePtr>,
+        message: String,
+        hint: Option<&'static str>,
+    ) {
+        let range = self.index.range(ptr.file_range());
         self.index.errors.push(Diagnostic {
             kind,
             range,
@@ -21100,6 +21275,15 @@ impl Lowerer {
     fn ast_ptr<N: AstNode>(&self, node: &N) -> InIrFile<AstPtr<N>> {
         InIrFile::new(self.file_id, AstPtr::new(node))
     }
+}
+
+#[derive(Clone, Copy)]
+enum ColumnListOwner {
+    Cte(Name),
+    Table(Option<Name>),
+    Join(Option<Name>),
+    View,
+    CreateAs,
 }
 
 #[derive(Clone, Copy)]
@@ -21457,5 +21641,25 @@ fn call_field_base(base: &ast::Expr) -> Option<ast::CallExpr> {
         Some(call)
     } else {
         None
+    }
+}
+
+fn plural_columns(count: usize) -> &'static str {
+    if count == 1 { "column" } else { "columns" }
+}
+
+fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {
+    match source {
+        ast::SelectVariant::Values(values) => values.row_list()?.rows().next()?.exprs().next(),
+        ast::SelectVariant::Select(select) => select
+            .select_clause()?
+            .target_list()?
+            .targets()
+            .next()?
+            .expr(),
+        ast::SelectVariant::SelectInto(_)
+        | ast::SelectVariant::ParenSelect(_)
+        | ast::SelectVariant::CompoundSelect(_)
+        | ast::SelectVariant::Table(_) => None,
     }
 }

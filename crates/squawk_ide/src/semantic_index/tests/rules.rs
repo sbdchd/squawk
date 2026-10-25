@@ -27,6 +27,10 @@ create rule r3 as on delete to t do instead delete from log where a = old.a;
       ╭▸ 
     7 │     insert into log values (new.a, old.zz);
       ╰╴                                       ━━
+    error: INSERT has more expressions than target columns
+      ╭▸ 
+    7 │     insert into log values (new.a, old.zz);
+      ╰╴                                   ━━━━━━
     ");
 }
 

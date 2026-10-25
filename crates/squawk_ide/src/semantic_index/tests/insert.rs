@@ -88,6 +88,10 @@ insert into t select x, y from v;
       ╭▸ 
     4 │ insert into t select x, y from v;
       ╰╴                        ━
+    error: INSERT has more expressions than target columns
+      ╭▸ 
+    4 │ insert into t select x, y from v;
+      ╰╴                        ━
     ");
 }
 
@@ -175,5 +179,80 @@ insert into t (a[1], a[2]) values (1, 2);
       ╭▸ 
     4 │ insert into t (a, a[2]) values ('{1}', 2);
       ╰╴                  ━━━━
+    ");
+}
+
+#[test]
+fn insert_column_count_mismatch() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+create table u (a int, b int, c int);
+insert into t (a) values (1, 2);
+insert into t (a, b) values (1);
+insert into t values (1, 2, 3);
+insert into t values (default, default, default);
+insert into t select 1, 2, 3;
+insert into t (a, b) select 1;
+insert into t (a, b) values ((1, 2));
+insert into t select * from u;
+insert into t values (1);
+insert into t (a, b) values (1, 2), (3, 4);
+insert into t select * from t;
+insert into t (a, b) select * from t;
+insert into t default values;
+insert into t select * from missing;
+insert into missing values (1, 2, 3);
+insert into missing (a) values (1, 2);
+"), @"
+    error: relation `missing` does not exist
+       ╭▸ 
+    17 │ insert into t select * from missing;
+       ╰╴                            ━━━━━━━
+    error: relation `missing` does not exist
+       ╭▸ 
+    18 │ insert into missing values (1, 2, 3);
+       ╰╴            ━━━━━━━
+    error: relation `missing` does not exist
+       ╭▸ 
+    19 │ insert into missing (a) values (1, 2);
+       ╰╴            ━━━━━━━
+    error: INSERT has more expressions than target columns
+      ╭▸ 
+    4 │ insert into t (a) values (1, 2);
+      ╰╴                             ━
+    error: INSERT has more target columns than expressions
+      ╭▸ 
+    5 │ insert into t (a, b) values (1);
+      ╰╴                  ━
+    error: INSERT has more expressions than target columns
+      ╭▸ 
+    6 │ insert into t values (1, 2, 3);
+      ╰╴                            ━
+    error: INSERT has more expressions than target columns
+      ╭▸ 
+    7 │ insert into t values (default, default, default);
+      ╰╴                                        ━━━━━━━
+    error: INSERT has more expressions than target columns
+      ╭▸ 
+    8 │ insert into t select 1, 2, 3;
+      ╰╴                           ━
+    error: INSERT has more target columns than expressions
+      ╭▸ 
+    9 │ insert into t (a, b) select 1;
+      ╰╴                  ━
+    error: INSERT has more target columns than expressions
+       ╭▸ 
+    10 │ insert into t (a, b) values ((1, 2));
+       │                   ━
+       │
+       ╰ hint: The insertion source is a row expression containing the same number of columns expected by the INSERT. Did you accidentally use extra parentheses?
+    error: INSERT has more expressions than target columns
+       ╭▸ 
+    11 │ insert into t select * from u;
+       ╰╴              ━━━━━━━━━━━━━━━
+    error: INSERT has more expressions than target columns
+       ╭▸ 
+    19 │ insert into missing (a) values (1, 2);
+       ╰╴                                   ━
     ");
 }

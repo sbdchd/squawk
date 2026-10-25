@@ -189,6 +189,10 @@ select y from u;
        ╭▸ 
     13 │ select y from u;
        ╰╴       ━
+    error: CREATE VIEW specifies more column names than columns
+       ╭▸ 
+    10 │ create view v (p, q, r, s) as select * from a join b using (x) as k;
+       ╰╴                        ━
     ");
 }
 
