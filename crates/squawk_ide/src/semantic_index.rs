@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::ops::Deref;
 
 use rustc_hash::FxHashMap;
@@ -85,6 +86,9 @@ pub enum DiagnosticKind {
     DuplicateRelation,
     DuplicateType,
     DuplicateColumn,
+    ColumnCountMismatch,
+    GroupingError,
+    WindowingError,
     DuplicateAssignment,
     DuplicateCte,
     DuplicateSource,
@@ -137,7 +141,7 @@ pub enum DiagnosticKind {
 pub struct Diagnostic {
     pub kind: DiagnosticKind,
     pub range: FileRange,
-    pub message: String,
+    pub message: Cow<'static, str>,
     pub hint: Option<&'static str>,
 }
 
@@ -685,7 +689,7 @@ impl IndexData {
                 Some(Diagnostic {
                     kind,
                     range: self.range(reference.range),
-                    message,
+                    message: message.into(),
                     hint: None,
                 })
             })

@@ -207,3 +207,336 @@ alter aggregate add(int, int) rename to y;
        ╰╴                ━━━
     ");
 }
+
+#[test]
+fn aggregate_not_allowed() {
+    assert_snapshot!(check("
+create table t (a int);
+select 1 from t where count(*) > 1;
+select 1 from t join t u on count(*) > 1;
+select 1 from t group by count(*);
+select count(*) filter (where count(*) > 1) from t;
+select sum(1) over (rows between count(*) preceding and current row) from t;
+select 1 from t limit count(*);
+select 1 from t offset count(*);
+values (count(*));
+insert into t values (count(*));
+insert into t values (1) returning count(*);
+update t set a = count(*);
+delete from t where count(*) > 1;
+select * from t, generate_series(1, count(*));
+merge into t using t u on t.a = u.a when matched and count(*) > 1 then do nothing;
+merge into t using t u on count(*) > 1 when matched then do nothing;
+merge into t using t u on t.a = u.a when matched then update set a = count(*);
+merge into t using t u on t.a = u.a when not matched then insert values (count(*));
+select 1 from t where exists (select 1 from t u where count(u.a) > 1);
+select * from t tablesample bernoulli (count(*));
+select * from t tablesample bernoulli (1) repeatable (count(*));
+prepare pp(bigint) as select $1;
+execute pp(count(*));
+"), @"
+    error: aggregate functions are not allowed in WHERE
+      ╭▸ 
+    3 │ select 1 from t where count(*) > 1;
+      ╰╴                      ━━━━━━━━
+    error: aggregate functions are not allowed in JOIN conditions
+      ╭▸ 
+    4 │ select 1 from t join t u on count(*) > 1;
+      ╰╴                            ━━━━━━━━
+    error: aggregate functions are not allowed in GROUP BY
+      ╭▸ 
+    5 │ select 1 from t group by count(*);
+      ╰╴                         ━━━━━━━━
+    error: aggregate functions are not allowed in FILTER
+      ╭▸ 
+    6 │ select count(*) filter (where count(*) > 1) from t;
+      ╰╴                              ━━━━━━━━
+    error: aggregate functions are not allowed in window ROWS
+      ╭▸ 
+    7 │ select sum(1) over (rows between count(*) preceding and current row) from t;
+      ╰╴                                 ━━━━━━━━
+    error: aggregate functions are not allowed in LIMIT
+      ╭▸ 
+    8 │ select 1 from t limit count(*);
+      ╰╴                      ━━━━━━━━
+    error: aggregate functions are not allowed in OFFSET
+      ╭▸ 
+    9 │ select 1 from t offset count(*);
+      ╰╴                       ━━━━━━━━
+    error: aggregate functions are not allowed in VALUES
+       ╭▸ 
+    10 │ values (count(*));
+       ╰╴        ━━━━━━━━
+    error: aggregate functions are not allowed in VALUES
+       ╭▸ 
+    11 │ insert into t values (count(*));
+       ╰╴                      ━━━━━━━━
+    error: aggregate functions are not allowed in RETURNING
+       ╭▸ 
+    12 │ insert into t values (1) returning count(*);
+       ╰╴                                   ━━━━━━━━
+    error: aggregate functions are not allowed in UPDATE
+       ╭▸ 
+    13 │ update t set a = count(*);
+       ╰╴                 ━━━━━━━━
+    error: aggregate functions are not allowed in WHERE
+       ╭▸ 
+    14 │ delete from t where count(*) > 1;
+       ╰╴                    ━━━━━━━━
+    error: aggregate functions are not allowed in functions in FROM
+       ╭▸ 
+    15 │ select * from t, generate_series(1, count(*));
+       ╰╴                                    ━━━━━━━━
+    error: aggregate functions are not allowed in MERGE WHEN conditions
+       ╭▸ 
+    16 │ merge into t using t u on t.a = u.a when matched and count(*) > 1 then do nothing;
+       ╰╴                                                     ━━━━━━━━
+    error: aggregate functions are not allowed in JOIN conditions
+       ╭▸ 
+    17 │ merge into t using t u on count(*) > 1 when matched then do nothing;
+       ╰╴                          ━━━━━━━━
+    error: aggregate functions are not allowed in UPDATE
+       ╭▸ 
+    18 │ merge into t using t u on t.a = u.a when matched then update set a = count(*);
+       ╰╴                                                                     ━━━━━━━━
+    error: aggregate functions are not allowed in VALUES
+       ╭▸ 
+    19 │ merge into t using t u on t.a = u.a when not matched then insert values (count(*));
+       ╰╴                                                                         ━━━━━━━━
+    error: aggregate functions are not allowed in WHERE
+       ╭▸ 
+    20 │ select 1 from t where exists (select 1 from t u where count(u.a) > 1);
+       ╰╴                                                      ━━━━━━━━━━
+    error: aggregate functions are not allowed in functions in FROM
+       ╭▸ 
+    21 │ select * from t tablesample bernoulli (count(*));
+       ╰╴                                       ━━━━━━━━
+    error: aggregate functions are not allowed in functions in FROM
+       ╭▸ 
+    22 │ select * from t tablesample bernoulli (1) repeatable (count(*));
+       ╰╴                                                      ━━━━━━━━
+    error: aggregate functions are not allowed in EXECUTE parameters
+       ╭▸ 
+    24 │ execute pp(count(*));
+       ╰╴           ━━━━━━━━
+    ");
+}
+
+#[test]
+fn aggregate_allowed() {
+    assert_snapshot!(check("
+create table t (a int);
+select count(*) from t having count(*) > 1;
+select count(*) from t order by count(*);
+select distinct on (count(*)) 1 from t;
+select row_number() over (partition by count(*)) from t;
+select 1 from t where (select count(*) from t u) > 1;
+select 1 from t where t.a in (select count(*) from t u);
+insert into t select count(*) from t;
+select array_agg(a) filter (where a > 1) from t;
+select 1 from t group by a having exists (select 1 from t u where count(t.a) > 1);
+select sum(count(*)) over () from t;
+select sum((select sum(a) from t u)) from t;
+"), @"no diagnostics");
+}
+
+#[test]
+fn nested_aggregate() {
+    assert_snapshot!(check("
+create table t (a int);
+select sum(sum(1)) from t;
+select string_agg(a::text, ',' order by count(*)) from t;
+select percentile_cont(0.5) within group (order by count(*)) from t;
+select sum(row_number() over ()) from t;
+select max(sum(count(*)) over ()) from t;
+select sum(abs(sum(1))) from t;
+select 1 from t having sum(sum(1)) > 1;
+select sum(sum(sum(1))) from t;
+select sum(sum(1) + sum(2)) from t;
+"), @"
+    error: aggregate function calls cannot be nested
+      ╭▸ 
+    3 │ select sum(sum(1)) from t;
+      ╰╴           ━━━━━━
+    error: aggregate function calls cannot be nested
+      ╭▸ 
+    4 │ select string_agg(a::text, ',' order by count(*)) from t;
+      ╰╴                                        ━━━━━━━━
+    error: aggregate function calls cannot be nested
+      ╭▸ 
+    5 │ select percentile_cont(0.5) within group (order by count(*)) from t;
+      ╰╴                                                   ━━━━━━━━
+    error: aggregate function calls cannot contain window function calls
+      ╭▸ 
+    6 │ select sum(row_number() over ()) from t;
+      ╰╴           ━━━━━━━━━━━━━━━━━━━━
+    error: aggregate function calls cannot contain window function calls
+      ╭▸ 
+    7 │ select max(sum(count(*)) over ()) from t;
+      ╰╴           ━━━━━━━━━━━━━━━━━━━━━
+    error: aggregate function calls cannot be nested
+      ╭▸ 
+    8 │ select sum(abs(sum(1))) from t;
+      ╰╴               ━━━━━━
+    error: aggregate function calls cannot be nested
+      ╭▸ 
+    9 │ select 1 from t having sum(sum(1)) > 1;
+      ╰╴                           ━━━━━━
+    error: aggregate function calls cannot be nested
+       ╭▸ 
+    10 │ select sum(sum(sum(1))) from t;
+       ╰╴               ━━━━━━
+    error: aggregate function calls cannot be nested
+       ╭▸ 
+    11 │ select sum(sum(1) + sum(2)) from t;
+       ╰╴           ━━━━━━
+    ");
+}
+
+#[test]
+fn aggregate_not_allowed_in_targets() {
+    assert_snapshot!(check("
+create table t (a int primary key, b int[]);
+insert into t (b[count(*)]) values (array[1]);
+update t set b[count(*)] = array[1];
+merge into t using t u on t.a = u.a when matched then update set b[count(*)] = 1;
+merge into t using t u on t.a = u.a when not matched then insert (b[count(*)]) values (1);
+insert into t values (1) on conflict (a) do update set b[count(*)] = 1;
+insert into t values (1) on conflict ((a + count(*))) do nothing;
+insert into t values (1) on conflict (a) where count(*) > 1 do nothing;
+"), @"
+    error: aggregate functions are not allowed in INSERT
+      ╭▸ 
+    3 │ insert into t (b[count(*)]) values (array[1]);
+      ╰╴                 ━━━━━━━━
+    error: aggregate functions are not allowed in UPDATE
+      ╭▸ 
+    4 │ update t set b[count(*)] = array[1];
+      ╰╴               ━━━━━━━━
+    error: aggregate functions are not allowed in UPDATE
+      ╭▸ 
+    5 │ merge into t using t u on t.a = u.a when matched then update set b[count(*)] = 1;
+      ╰╴                                                                   ━━━━━━━━
+    error: aggregate functions are not allowed in INSERT
+      ╭▸ 
+    6 │ merge into t using t u on t.a = u.a when not matched then insert (b[count(*)]) values (1);
+      ╰╴                                                                    ━━━━━━━━
+    error: aggregate functions are not allowed in UPDATE
+      ╭▸ 
+    7 │ insert into t values (1) on conflict (a) do update set b[count(*)] = 1;
+      ╰╴                                                         ━━━━━━━━
+    error: aggregate functions are not allowed in index expressions
+      ╭▸ 
+    8 │ insert into t values (1) on conflict ((a + count(*))) do nothing;
+      ╰╴                                           ━━━━━━━━
+    error: aggregate functions are not allowed in index predicates
+      ╭▸ 
+    9 │ insert into t values (1) on conflict (a) where count(*) > 1 do nothing;
+      ╰╴                                               ━━━━━━━━
+    ");
+}
+
+#[test]
+fn aggregate_not_allowed_in_ddl() {
+    assert_snapshot!(check("
+create table t (a int);
+create table c1 (a int check (count(*) > 1));
+create table c2 (a int default count(*));
+create table c3 (a int generated always as (count(*)) stored);
+create index on t ((count(*)));
+create index on t (a) where count(*) > 1;
+create table p (a int) partition by range ((count(*)));
+create table p2 partition of p for values from (count(*)) to (2);
+create policy pol on t using (count(*) > 1);
+create domain d as int check (count(*) > 1);
+alter table t alter column a type bigint using count(*);
+create statistics s on (count(*)) from t;
+copy t from stdin where count(*) > 1;
+create procedure pr(bigint) language sql as 'select 1';
+call pr(count(*));
+create function tf() returns trigger language plpgsql as 'begin return new; end';
+create trigger tr before insert on t for each row when (count(*) > 1) execute function tf();
+create function fd(x bigint default count(*)) returns int language sql as 'select 1';
+alter domain d set default count(*);
+create table e (a int, exclude ((count(*)) with =));
+alter table t add constraint ex exclude (a with =) where (count(*) > 1);
+create rule r as on insert to t where count(*) > 1 do nothing;
+"), @"
+    error: aggregate functions are not allowed in check constraints
+      ╭▸ 
+    3 │ create table c1 (a int check (count(*) > 1));
+      ╰╴                              ━━━━━━━━
+    error: aggregate functions are not allowed in DEFAULT expressions
+      ╭▸ 
+    4 │ create table c2 (a int default count(*));
+      ╰╴                               ━━━━━━━━
+    error: aggregate functions are not allowed in column generation expressions
+      ╭▸ 
+    5 │ create table c3 (a int generated always as (count(*)) stored);
+      ╰╴                                            ━━━━━━━━
+    error: aggregate functions are not allowed in index expressions
+      ╭▸ 
+    6 │ create index on t ((count(*)));
+      ╰╴                    ━━━━━━━━
+    error: aggregate functions are not allowed in index predicates
+      ╭▸ 
+    7 │ create index on t (a) where count(*) > 1;
+      ╰╴                            ━━━━━━━━
+    error: aggregate functions are not allowed in partition key expressions
+      ╭▸ 
+    8 │ create table p (a int) partition by range ((count(*)));
+      ╰╴                                            ━━━━━━━━
+    error: aggregate functions are not allowed in partition bound
+      ╭▸ 
+    9 │ create table p2 partition of p for values from (count(*)) to (2);
+      ╰╴                                                ━━━━━━━━
+    error: aggregate functions are not allowed in policy expressions
+       ╭▸ 
+    10 │ create policy pol on t using (count(*) > 1);
+       ╰╴                              ━━━━━━━━
+    error: aggregate functions are not allowed in check constraints
+       ╭▸ 
+    11 │ create domain d as int check (count(*) > 1);
+       ╰╴                              ━━━━━━━━
+    error: aggregate functions are not allowed in transform expressions
+       ╭▸ 
+    12 │ alter table t alter column a type bigint using count(*);
+       ╰╴                                               ━━━━━━━━
+    error: aggregate functions are not allowed in statistics expressions
+       ╭▸ 
+    13 │ create statistics s on (count(*)) from t;
+       ╰╴                        ━━━━━━━━
+    error: aggregate functions are not allowed in COPY FROM WHERE conditions
+       ╭▸ 
+    14 │ copy t from stdin where count(*) > 1;
+       ╰╴                        ━━━━━━━━
+    error: aggregate functions are not allowed in CALL arguments
+       ╭▸ 
+    16 │ call pr(count(*));
+       ╰╴        ━━━━━━━━
+    error: aggregate functions are not allowed in trigger WHEN conditions
+       ╭▸ 
+    18 │ create trigger tr before insert on t for each row when (count(*) > 1) execute function tf();
+       ╰╴                                                        ━━━━━━━━
+    error: aggregate functions are not allowed in DEFAULT expressions
+       ╭▸ 
+    19 │ create function fd(x bigint default count(*)) returns int language sql as 'select 1';
+       ╰╴                                    ━━━━━━━━
+    error: aggregate functions are not allowed in DEFAULT expressions
+       ╭▸ 
+    20 │ alter domain d set default count(*);
+       ╰╴                           ━━━━━━━━
+    error: aggregate functions are not allowed in index expressions
+       ╭▸ 
+    21 │ create table e (a int, exclude ((count(*)) with =));
+       ╰╴                                 ━━━━━━━━
+    error: aggregate functions are not allowed in index predicates
+       ╭▸ 
+    22 │ alter table t add constraint ex exclude (a with =) where (count(*) > 1);
+       ╰╴                                                          ━━━━━━━━
+    error: aggregate functions are not allowed in WHERE
+       ╭▸ 
+    23 │ create rule r as on insert to t where count(*) > 1 do nothing;
+       ╰╴                                      ━━━━━━━━
+    ");
+}

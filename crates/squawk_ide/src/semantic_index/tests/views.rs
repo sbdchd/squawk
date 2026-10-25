@@ -313,3 +313,26 @@ select b from w;
       ╰╴              ━
     ");
 }
+
+#[test]
+fn view_column_count_mismatch() {
+    assert_snapshot!(check("
+create view v (a, b) as select 1;
+create materialized view m (a, b) as select 1;
+create view w (a) as select 1, 2;
+create view z (a, b) as select * from missing;
+"), @"
+    error: relation `missing` does not exist
+      ╭▸ 
+    5 │ create view z (a, b) as select * from missing;
+      ╰╴                                      ━━━━━━━
+    error: CREATE VIEW specifies more column names than columns
+      ╭▸ 
+    2 │ create view v (a, b) as select 1;
+      ╰╴                  ━
+    error: too many column names were specified
+      ╭▸ 
+    3 │ create materialized view m (a, b) as select 1;
+      ╰╴                               ━
+    ");
+}

@@ -279,3 +279,107 @@ with c as (select 1) select 1 from c, c;
        ╰╴                                      ━
     ");
 }
+
+#[test]
+fn values_lists_different_lengths() {
+    assert_snapshot!(check("
+values (1), (1, 2), (3);
+values (1, 2), (3, 4);
+"), @"
+    error: VALUES lists must all be the same length
+      ╭▸ 
+    2 │ values (1), (1, 2), (3);
+      ╰╴            ━━━━━━
+    ");
+}
+
+#[test]
+fn compound_column_count_mismatch() {
+    assert_snapshot!(check("
+select 1 union select 1, 2;
+select 1 intersect select 1, 2;
+select 1, 2 except select 1;
+select 1 union select 1 union all select 1, 2;
+select 1 union (select 1, 2);
+select 1 union values (1, 2);
+select 1 union select 2;
+select * from missing union select 1, 2;
+"), @"
+    error: relation `missing` does not exist
+      ╭▸ 
+    9 │ select * from missing union select 1, 2;
+      ╰╴              ━━━━━━━
+    error: each UNION query must have the same number of columns
+      ╭▸ 
+    2 │ select 1 union select 1, 2;
+      ╰╴               ━━━━━━━━━━━
+    error: each INTERSECT query must have the same number of columns
+      ╭▸ 
+    3 │ select 1 intersect select 1, 2;
+      ╰╴                   ━━━━━━━━━━━
+    error: each EXCEPT query must have the same number of columns
+      ╭▸ 
+    4 │ select 1, 2 except select 1;
+      ╰╴                   ━━━━━━━━
+    error: each UNION query must have the same number of columns
+      ╭▸ 
+    5 │ select 1 union select 1 union all select 1, 2;
+      ╰╴                                  ━━━━━━━━━━━
+    error: each UNION query must have the same number of columns
+      ╭▸ 
+    6 │ select 1 union (select 1, 2);
+      ╰╴               ━━━━━━━━━━━━━
+    error: each UNION query must have the same number of columns
+      ╭▸ 
+    7 │ select 1 union values (1, 2);
+      ╰╴               ━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn from_alias_column_count_mismatch() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select * from t x (p, q, r);
+select * from (select 1) x (p, q);
+select * from (values (1)) x (p, q);
+select * from (t join t u using (a)) j (p, q, r, s);
+select * from generate_series(1, 2) g (a, b);
+select * from json_each('{}') j (k, v, extra);
+select * from t x (p, q);
+select * from t x (p);
+select * from generate_series(1, 2) with ordinality g (a, b);
+select * from unnest(array[1], array[2]) u (a, b);
+select * from (t join t u using (a)) j (p, q, r);
+select * from missing x (p, q, r);
+"), @"
+    error: relation `missing` does not exist
+       ╭▸ 
+    14 │ select * from missing x (p, q, r);
+       ╰╴              ━━━━━━━
+    error: table `x` has 2 columns available but 3 columns specified
+      ╭▸ 
+    3 │ select * from t x (p, q, r);
+      ╰╴                         ━
+    error: table `x` has 1 column available but 2 columns specified
+      ╭▸ 
+    4 │ select * from (select 1) x (p, q);
+      ╰╴                               ━
+    error: table `x` has 1 column available but 2 columns specified
+      ╭▸ 
+    5 │ select * from (values (1)) x (p, q);
+      ╰╴                                 ━
+    error: join expression `j` has 3 columns available but 4 columns specified
+      ╭▸ 
+    6 │ select * from (t join t u using (a)) j (p, q, r, s);
+      ╰╴                                                 ━
+    error: table `g` has 1 column available but 2 columns specified
+      ╭▸ 
+    7 │ select * from generate_series(1, 2) g (a, b);
+      ╰╴                                          ━
+    error: table `j` has 2 columns available but 3 columns specified
+      ╭▸ 
+    8 │ select * from json_each('{}') j (k, v, extra);
+      ╰╴                                       ━━━━━
+    ");
+}

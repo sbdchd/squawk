@@ -53,3 +53,16 @@ select a, nope2 from pg_temp.w;
        ╰╴          ━━━━━
     ");
 }
+
+#[test]
+fn create_table_as_column_count_mismatch() {
+    assert_snapshot!(check("
+create table t (a, b) as select 1;
+create table u (a) as select 1, 2;
+"), @"
+    error: too many column names were specified
+      ╭▸ 
+    2 │ create table t (a, b) as select 1;
+      ╰╴                   ━
+    ");
+}
