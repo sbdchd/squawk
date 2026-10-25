@@ -422,3 +422,71 @@ alter table n7 add column e int not null null;
        ╰╴                                         ━━━━
     ");
 }
+
+#[test]
+fn default_column_reference() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int default a,
+  c int default t.a,
+  d int default (t).a,
+  e int default t
+);
+alter table t add column f int default b + 1;
+alter table t alter column a set default c;
+create view v as
+  select a from t;
+alter view v alter column a set default a;
+create function f(x int, y int default x) returns int
+  language sql
+  as 'select 1';
+create domain dm as int default 1;
+create table ok (
+  a int default 1,
+  b timestamptz default now(),
+  c text default current_user
+);
+create table pt (a int) partition by range (a);
+create table pt_1
+  partition of pt
+  for values from (a) to (10);
+"), @"
+    error: column `c` does not exist
+       ╭▸ 
+    10 │ alter table t alter column a set default c;
+       ╰╴                                         ━
+    error: column `a` does not exist
+       ╭▸ 
+    13 │ alter view v alter column a set default a;
+       ╰╴                                        ━
+    error: column `x` does not exist
+       ╭▸ 
+    14 │ create function f(x int, y int default x) returns int
+       ╰╴                                       ━
+    error: column `a` does not exist
+       ╭▸ 
+    26 │   for values from (a) to (10);
+       ╰╴                   ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    4 │   b int default a,
+      ╰╴                ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    5 │   c int default t.a,
+      ╰╴                ━━━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    6 │   d int default (t).a,
+      ╰╴                 ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    7 │   e int default t
+      ╰╴                ━
+    error: cannot use column reference in DEFAULT expression
+      ╭▸ 
+    9 │ alter table t add column f int default b + 1;
+      ╰╴                                       ━
+    ");
+}

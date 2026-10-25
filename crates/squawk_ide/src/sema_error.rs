@@ -138,6 +138,7 @@ pub(crate) enum SemaError {
     MisplacedSubquery {
         context: ExprContext,
     },
+    DefaultColumnReference,
     Duplicate {
         object: ObjectKind,
         name: Name,
@@ -748,7 +749,9 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
-            SemaError::MisplacedSubquery { .. } => DiagnosticKind::FeatureNotSupported,
+            SemaError::MisplacedSubquery { .. } | SemaError::DefaultColumnReference => {
+                DiagnosticKind::FeatureNotSupported
+            }
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -855,6 +858,9 @@ impl SemaError {
             }
             SemaError::WindowDistinct => Some("DISTINCT is not implemented for window functions"),
             SemaError::RowLengthMismatch => Some("unequal number of entries in row expressions"),
+            SemaError::DefaultColumnReference => {
+                Some("cannot use column reference in DEFAULT expression")
+            }
             _ => None,
         }
     }
@@ -899,7 +905,8 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::MissingShellType
             | SemaError::WindowAggregateOrderBy
             | SemaError::WindowDistinct
-            | SemaError::RowLengthMismatch => {
+            | SemaError::RowLengthMismatch
+            | SemaError::DefaultColumnReference => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MisplacedAggregate { context } => write!(

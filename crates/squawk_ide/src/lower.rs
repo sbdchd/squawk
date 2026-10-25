@@ -18575,6 +18575,7 @@ impl Lowerer {
                 let name = self.name_ref_name(name_ref)?;
                 let NameResolution { kind, resolution } = self.resolve_name(name);
                 self.add_ref(name, kind, name_ref.syntax(), resolution);
+                self.check_default_column_ref(name_ref.syntax(), resolution);
                 return self.resolution_type(resolution);
             }
             ast::Expr::FieldExpr(field_expr) => {
@@ -20251,7 +20252,19 @@ impl Lowerer {
             },
         };
         self.add_ref(name, kind, field.syntax(), resolution);
+        self.check_default_column_ref(field_expr.syntax(), resolution);
         self.resolution_type(resolution)
+    }
+
+    fn check_default_column_ref(&mut self, node: &SyntaxNode, resolution: Resolution) {
+        if self.expr_context == ExprContext::Default
+            && matches!(
+                resolution,
+                Resolution::Column { .. } | Resolution::Source(_)
+            )
+        {
+            self.push_error(node, SemaError::DefaultColumnReference);
+        }
     }
 
     fn lower_field_base(&mut self, field_expr: &ast::FieldExpr) -> Option<FieldBase> {
