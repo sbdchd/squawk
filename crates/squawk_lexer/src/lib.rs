@@ -1,6 +1,6 @@
 mod cursor;
 mod token;
-use cursor::{Cursor, EOF_CHAR};
+use cursor::Cursor;
 pub use token::{Base, LiteralKind, Token, TokenKind};
 
 // via: https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L346
@@ -10,8 +10,21 @@ const fn is_ident_start(c: char) -> bool {
 }
 
 // ident_cont		[A-Za-z\200-\377_0-9\$]
-const fn is_ident_cont(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '$' | '\u{80}'..)
+const fn is_ident_cont(c: u8) -> bool {
+    const TABLE: [bool; 256] = {
+        let mut table = [false; 256];
+        let mut c = 0;
+        loop {
+            table[c as usize] =
+                matches!(c, b'a'..=b'z' | b'A'..=b'Z' | b'_' | b'0'..=b'9' | b'$' | 0x80..);
+            if c == u8::MAX {
+                break;
+            }
+            c += 1;
+        }
+        table
+    };
+    TABLE[c as usize]
 }
 
 pub const BOM: &str = "\u{feff}";
@@ -241,7 +254,7 @@ impl Cursor<'_> {
         ) || command.eq_ignore_ascii_case("copy")
             || (takes_pipe && self.first() == '|');
         if reads_whole_line {
-            self.eat_while(|c| !matches!(c, '\n' | '\r'));
+            self.eat_until2(b'\n', b'\r');
             return TokenKind::PsqlCommand { ends_query };
         }
         while !self.at_psql_args_end() {
@@ -261,39 +274,73 @@ impl Cursor<'_> {
 
     fn psql_arg(&mut self) -> Option<char> {
         let mut last = None;
-        let mut quote = None;
+        while !self.at_psql_args_end() && !is_whitespace(self.first()) {
+            let c = self.bump().unwrap();
+            last = match c {
+                '\'' | '"' | '`' => self.psql_quoted_arg(c, last),
+                _ => Some(c),
+            };
+        }
+        last
+    }
+
+    fn psql_quoted_arg(&mut self, quote: char, mut last: Option<char>) -> Option<char> {
+        if quote == '"' {
+            last = Some(quote);
+        }
         while !self.is_eof() {
-            let c = self.first();
-            if matches!(c, '\n' | '\r') || (quote.is_none() && (c == '\\' || is_whitespace(c))) {
-                break;
+            if let Some(c) = self.eat_psql_quoted_text(quote)
+                && quote != '`'
+            {
+                last = Some(c);
             }
-            self.bump();
-            match (quote, c) {
-                (Some('\''), '\\') if !matches!(self.first(), '\n' | '\r') => {
-                    last = self.bump();
+            match self.first() {
+                c if c == quote => {
+                    self.bump();
+                    return match quote {
+                        '"' => Some(quote),
+                        '`' => None,
+                        _ => last,
+                    };
                 }
-                (Some(q), c) if q == c => {
-                    quote = None;
-                    match q {
-                        '"' => last = Some(c),
-                        '`' => last = None,
-                        _ => {}
-                    }
+                '\\' if quote == '\'' => {
+                    self.bump();
+                    last = if matches!(self.first(), '\n' | '\r') {
+                        Some('\\')
+                    } else {
+                        self.bump()
+                    };
                 }
-                (None, '\'' | '`') => quote = Some(c),
-                (None, '"') => {
-                    quote = Some(c);
-                    last = Some(c);
-                }
-                (Some('`'), _) => {}
-                _ => last = Some(c),
+                _ => return last,
             }
         }
         last
     }
 
+    fn eat_psql_quoted_text(&mut self, quote: char) -> Option<char> {
+        let input = self.as_str();
+        let bytes = input.as_bytes();
+        let quote = quote as u8;
+        let len = bytes
+            .iter()
+            .take(4)
+            .position(|&c| {
+                c == quote || matches!(c, b'\n' | b'\r') || (quote == b'\'' && c == b'\\')
+            })
+            .unwrap_or_else(|| {
+                if quote == b'\'' {
+                    let end = memchr::memchr3(quote, b'\\', b'\n', bytes).unwrap_or(bytes.len());
+                    memchr::memchr(b'\r', &bytes[..end]).unwrap_or(end)
+                } else {
+                    memchr::memchr3(quote, b'\n', b'\r', bytes).unwrap_or(bytes.len())
+                }
+            });
+        self.advance_bytes(len);
+        input[..len].chars().next_back()
+    }
+
     pub(crate) fn ident(&mut self) -> TokenKind {
-        self.eat_while(is_ident_cont);
+        self.eat_ident_cont();
         TokenKind::Ident
     }
 
@@ -307,7 +354,7 @@ impl Cursor<'_> {
     pub(crate) fn line_comment(&mut self) -> TokenKind {
         self.bump();
 
-        self.eat_while(|c| c != '\n' && c != '\r');
+        self.eat_until2(b'\n', b'\r');
         TokenKind::LineComment
     }
 
@@ -316,7 +363,11 @@ impl Cursor<'_> {
         self.bump();
 
         let mut depth = 1usize;
-        while let Some(c) = self.bump() {
+        loop {
+            self.eat_until2(b'/', b'*');
+            let Some(c) = self.bump() else {
+                break;
+            };
             match c {
                 '/' if self.first() == '*' => {
                     self.bump();
@@ -450,69 +501,52 @@ impl Cursor<'_> {
     }
 
     fn single_quoted_string(&mut self, backslash_escapes: bool) -> bool {
-        // Parse until either quotes are terminated or error is detected.
         loop {
-            match self.first() {
-                '\\' if backslash_escapes => {
-                    // backslash
-                    self.bump();
-                    // escaped char
+            if backslash_escapes {
+                self.eat_until2(b'\'', b'\\');
+            } else {
+                self.eat_until(b'\'');
+            }
+            match self.bump() {
+                Some('\\') if backslash_escapes => {
                     self.bump();
                 }
-                // Quotes might be terminated.
-                '\'' => {
-                    self.bump();
-
-                    match self.first() {
-                        // encountered an escaped quote ''
-                        '\'' => {
-                            self.bump();
-                        }
-                        // encountered terminating quote
-                        _ => return true,
+                Some('\'') => {
+                    if self.first() == '\'' {
+                        self.bump();
+                    } else {
+                        return true;
                     }
                 }
-                // End of file, stop parsing.
-                EOF_CHAR if self.is_eof() => break,
-                // Skip the character.
-                _ => {
-                    self.bump();
-                }
+                _ => return false,
             }
         }
-        // String was not terminated.
-        false
     }
 
     /// Eats double-quoted string and returns true
     /// if string is terminated.
     fn double_quoted_string(&mut self) -> bool {
-        while let Some(c) = self.bump() {
-            match c {
-                '"' if self.first() == '"' => {
-                    // Bump again to skip escaped character.
-                    self.bump();
-                }
-                '"' => {
-                    return true;
-                }
-                _ => (),
+        loop {
+            self.eat_until(b'"');
+            if self.bump().is_none() {
+                return false;
+            }
+            if self.first() == '"' {
+                self.bump();
+            } else {
+                return true;
             }
         }
-        // End of file reached.
-        false
     }
 
     /// Check for `$$` and `$tag$`
     fn is_dollar_quote_start(&self) -> bool {
-        let mut chars = self.chars();
-        match chars.next() {
-            // `$$...` -- empty tag
-            Some('$') => true,
-            // `$tag$...` -- tag chars terminated by `$`
-            Some(c) if is_ident_start(c) => {
-                for c in chars {
-                    if c == '$' {
+        let mut bytes = self.as_str().bytes();
+        match bytes.next() {
+            Some(b'$') => true,
+            Some(c) if is_ident_start(char::from(c)) => {
+                for c in bytes {
+                    if c == b'$' {
                         return true;
                     }
                     if !is_ident_cont(c) {
@@ -544,7 +578,7 @@ impl Cursor<'_> {
         // we have a dollar quoted string deliminated with `$$`
         if start.is_empty() {
             loop {
-                self.eat_while(|c| c != '$');
+                self.eat_until(b'$');
                 if self.is_eof() {
                     return TokenKind::Literal {
                         kind: LiteralKind::DollarQuotedString { terminated: false },
@@ -561,7 +595,7 @@ impl Cursor<'_> {
             }
         } else {
             loop {
-                self.eat_while(|c| c != '$');
+                self.eat_until(b'$');
                 if self.is_eof() {
                     return TokenKind::Literal {
                         kind: LiteralKind::DollarQuotedString { terminated: false },
@@ -650,9 +684,18 @@ impl Cursor<'_> {
         self.eat_decimal_digits()
     }
 
+    fn eat_ident_cont(&mut self) {
+        let remaining = self.as_str().as_bytes();
+        let len = remaining
+            .iter()
+            .position(|&c| !is_ident_cont(c))
+            .unwrap_or(remaining.len());
+        self.advance_bytes(len);
+    }
+
     fn eat_identifier(&mut self) {
         if is_ident_start(self.first()) {
-            self.eat_while(is_ident_cont);
+            self.eat_ident_cont();
         }
     }
 
@@ -791,6 +834,192 @@ mod tests {
     }
 
     #[test]
+    fn psql_quoted_unicode_arguments() {
+        assert_debug_snapshot!(lex("\\echo 'é漢𐐷' \"é漢𐐷\" `é漢𐐷` abc'漢'尾\nselect 1;"), @r#"
+        [
+            "\\echo 'é漢𐐷' \"é漢𐐷\" `é漢𐐷` abc'漢'尾" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_single_quote_escaped_unicode() {
+        assert_debug_snapshot!(lex("\\echo 'a\\𐐷' tail\nselect 1;"), @r#"
+        [
+            "\\echo 'a\\𐐷' tail" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_single_quote_backslash_before_newline() {
+        assert_debug_snapshot!(lex("\\echo 'a\\\nselect 1;\n\\echo 'a\\\rselect 2;"), @r#"
+        [
+            "\\echo 'a\\" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            "\n" @ Whitespace,
+            "\\echo 'a\\" @ PsqlCommand { ends_query: false },
+            "\r" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_single_quote_trailing_backslash() {
+        assert_debug_snapshot!(lex("\\echo 'a\\"), @r#"
+        [
+            "\\echo 'a\\" @ PsqlCommand { ends_query: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_unterminated_double_quoted_unicode() {
+        assert_debug_snapshot!(lex("\\echo \"unterminated漢"), @r#"
+        [
+            "\\echo \"unterminated漢" @ PsqlCommand { ends_query: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_unterminated_backtick_unicode() {
+        assert_debug_snapshot!(lex("\\echo abc`unterminated漢"), @r#"
+        [
+            "\\echo abc`unterminated漢" @ PsqlCommand { ends_query: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_quoted_nul() {
+        assert_debug_snapshot!(lex("\\echo 'a\0漢'\nselect 1;"), @r#"
+        [
+            "\\echo 'a\0漢'" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_short_quoted_arguments() {
+        assert_debug_snapshot!(lex("\\echo '' 'a' 'abc' 'abcd' \"\" \"abc\" `` `abc`\nselect 1;"), @r#"
+        [
+            "\\echo '' 'a' 'abc' 'abcd' \"\" \"abc\" `` `abc`" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_long_quoted_arguments() {
+        assert_debug_snapshot!(lex("\\echo 'A long single-quoted message with é漢𐐷' \"A long double-quoted message with é漢𐐷\" `printf 'A long backtick message with é漢𐐷'`\nselect 1;"), @r#"
+        [
+            "\\echo 'A long single-quoted message with é漢𐐷' \"A long double-quoted message with é漢𐐷\" `printf 'A long backtick message with é漢𐐷'`" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_unterminated_long_quoted_arguments() {
+        assert_debug_snapshot!(lex("\\echo 'A long single-quoted message with é漢𐐷\nselect 1;\n\\echo \"A long double-quoted message with é漢𐐷\rselect 2;\r\\echo `A long backtick message with é漢𐐷"), @r#"
+        [
+            "\\echo 'A long single-quoted message with é漢𐐷" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            "\n" @ Whitespace,
+            "\\echo \"A long double-quoted message with é漢𐐷" @ PsqlCommand { ends_query: false },
+            "\r" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            "\r" @ Whitespace,
+            "\\echo `A long backtick message with é漢𐐷" @ PsqlCommand { ends_query: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_single_quoted_parenthesis_closes_options() {
+        assert_debug_snapshot!(lex(r"\g (fieldsep=')' |cat \echo done"), @r#"
+        [
+            "\\g (fieldsep=')' |cat \\echo done" @ PsqlCommand { ends_query: true },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_double_quoted_parenthesis_does_not_close_options() {
+        assert_debug_snapshot!(lex(r#"\g (fieldsep=")" |cat \echo done"#), @r#"
+        [
+            "\\g (fieldsep=\")\" |cat " @ PsqlCommand { ends_query: true },
+            "\\echo done" @ PsqlCommand { ends_query: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_backtick_parenthesis_does_not_close_options() {
+        assert_debug_snapshot!(lex(r"\g (fieldsep=`printf ')'` |cat \echo done"), @r#"
+        [
+            "\\g (fieldsep=`printf ')'` |cat " @ PsqlCommand { ends_query: true },
+            "\\echo done" @ PsqlCommand { ends_query: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_quoted_argument_followed_by_parenthesis() {
+        assert_debug_snapshot!(lex("\\g (fieldsep='abc') |cat \\echo done\n\\g (fieldsep=`printf abc`) |cat \\echo done\nselect 1;"), @r#"
+        [
+            "\\g (fieldsep='abc') |cat \\echo done" @ PsqlCommand { ends_query: true },
+            "\n" @ Whitespace,
+            "\\g (fieldsep=`printf abc`) |cat \\echo done" @ PsqlCommand { ends_query: true },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
     fn psql_commands_ending_query() {
         assert_debug_snapshot!(lex(r"select 1 \echo x \gset x_
 select $1 \parse stmt
@@ -846,6 +1075,74 @@ select 2 \r"));
             "select" @ Ident,
             " " @ Whitespace,
             "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn empty_input() {
+        assert_debug_snapshot!(lex(""), @"[]");
+    }
+
+    #[test]
+    fn whitespace_at_eof() {
+        assert_debug_snapshot!(lex(" \t\n\r\u{b}\u{c}"), @r#"
+        [
+            " \t\n\r\u{b}\u{c}" @ Whitespace,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn whitespace_preserves_next_token() {
+        assert_debug_snapshot!(lex(" \té漢𐐷\t1;\n"), @r#"
+        [
+            " \t" @ Whitespace,
+            "é漢𐐷" @ Ident,
+            "\t" @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            "\n" @ Whitespace,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn whitespace_stops_at_nul() {
+        assert_debug_snapshot!(lex(" \t\0é漢𐐷"), @r#"
+        [
+            " \t" @ Whitespace,
+            "\0" @ Unknown,
+            "é漢𐐷" @ Ident,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_argument_whitespace() {
+        assert_debug_snapshot!(lex("\\echo \t\u{b}\u{c}hello\nselect 1;"), @r#"
+        [
+            "\\echo \t\u{b}\u{c}hello" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn psql_command_name_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("\\echo\0é漢𐐷\\echo done\nselect 1;"), @r#"
+        [
+            "\\echo\0é漢𐐷" @ PsqlCommand { ends_query: false },
+            "\\echo done" @ PsqlCommand { ends_query: false },
+            "\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
             ";" @ Semi,
         ]
         "#);
@@ -1189,6 +1486,128 @@ e'\uAAAA \UFFFFFFFF'
     }
 
     #[test]
+    fn string_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select 'é\0漢𐐷''尾';"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "'é\0漢𐐷''尾'" @ Literal { kind: Str { terminated: true } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn unterminated_string_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select 'é\0漢𐐷"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "'é\0漢𐐷" @ Literal { kind: Str { terminated: false } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select E'\\é\\𐐷\0''尾';"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "E'\\é\\𐐷\0''尾'" @ Literal { kind: EscStr { terminated: true } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_with_unicode_and_trailing_backslash() {
+        assert_debug_snapshot!(lex("select E'漢\\"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "E'漢\\" @ Literal { kind: EscStr { terminated: false } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn quoted_ident_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select \"é\0漢𐐷\"\"尾\";"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "\"é\0漢𐐷\"\"尾\"" @ QuotedIdent { terminated: true, uescape: false },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn unterminated_quoted_ident_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select \"é\0漢𐐷"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "\"é\0漢𐐷" @ QuotedIdent { terminated: false, uescape: false },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn line_comment_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select 1; --é\0漢𐐷\r\nselect 2;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            " " @ Whitespace,
+            "--é\0漢𐐷" @ LineComment,
+            "\r\n" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn line_comment_with_unicode_and_nul_at_eof() {
+        assert_debug_snapshot!(lex("--é\0漢𐐷"), @r#"
+        [
+            "--é\0漢𐐷" @ LineComment,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn nested_block_comment_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select /*é\0/*漢𐐷*/*/ 1;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "/*é\0/*漢𐐷*/*/" @ BlockComment { terminated: true },
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn unterminated_nested_block_comment_with_unicode_and_nul() {
+        assert_debug_snapshot!(lex("select /*é\0/*漢𐐷*/"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "/*é\0/*漢𐐷*/" @ BlockComment { terminated: false },
+        ]
+        "#);
+    }
+
+    #[test]
     fn string_unicode_escape() {
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE
 
@@ -1285,6 +1704,127 @@ U&"d!0061t!+000061" UESCAPE '!'
             "\u{feff}select" @ Ident,
             " " @ Whitespace,
             "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_ascii_continuation() {
+        assert_debug_snapshot!(lex("select azAZ_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "azAZ_09$" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_unicode_continuation() {
+        assert_debug_snapshot!(lex("select aé漢𐐷_09$, tail;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "aé漢𐐷_09$" @ Ident,
+            "," @ Comma,
+            " " @ Whitespace,
+            "tail" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_non_ascii_boundary() {
+        assert_debug_snapshot!(lex("select a\u{7f}tail, a\u{80}tail;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "a" @ Ident,
+            "\u{7f}" @ Unknown,
+            "tail" @ Ident,
+            "," @ Comma,
+            " " @ Whitespace,
+            "a\u{80}tail" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_nul_boundary() {
+        assert_debug_snapshot!(lex("select aé漢𐐷\0tail;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "aé漢𐐷" @ Ident,
+            "\0" @ Unknown,
+            "tail" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn identifier_unicode_delimiters() {
+        assert_debug_snapshot!(lex("select aé漢𐐷.tail + aé漢𐐷::text;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "aé漢𐐷" @ Ident,
+            "." @ Dot,
+            "tail" @ Ident,
+            " " @ Whitespace,
+            "+" @ Plus,
+            " " @ Whitespace,
+            "aé漢𐐷" @ Ident,
+            ":" @ Colon,
+            ":" @ Colon,
+            "text" @ Ident,
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn numeric_unicode_trailing_junk() {
+        assert_debug_snapshot!(lex("select 1é漢𐐷_09$, 1.0é漢𐐷_09$, 0xé漢𐐷_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1é漢𐐷_09$" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            "," @ Comma,
+            " " @ Whitespace,
+            "1.0é漢𐐷_09$" @ Literal { kind: Numeric { empty_exponent_start: None, trailing_junk_start: 3 } },
+            "," @ Comma,
+            " " @ Whitespace,
+            "0xé漢𐐷_09$" @ Literal { kind: Int { base: Hexadecimal, empty_int: false, trailing_junk_start: 2 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn positional_param_unicode_trailing_junk() {
+        assert_debug_snapshot!(lex("select $1é漢𐐷_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "$1é漢𐐷_09$" @ PositionalParam { trailing_junk_start: 2 },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn dollar_quote_unicode_tag_with_digits() {
+        assert_debug_snapshot!(lex("select $é漢𐐷_09$body$é漢𐐷_09$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "$é漢𐐷_09$body$é漢𐐷_09$" @ Literal { kind: DollarQuotedString { terminated: true } },
             ";" @ Semi,
         ]
         "#);

@@ -58,6 +58,28 @@ impl<'a> Cursor<'a> {
         self.len_remaining = self.chars.as_str().len();
     }
 
+    pub(crate) fn as_str(&self) -> &'a str {
+        self.chars.as_str()
+    }
+
+    pub(crate) fn advance_bytes(&mut self, len: usize) {
+        self.chars = self.chars.as_str()[len..].chars();
+    }
+
+    pub(crate) fn eat_until(&mut self, byte: u8) {
+        debug_assert!(byte.is_ascii());
+        let remaining = self.as_str().as_bytes();
+        let len = memchr::memchr(byte, remaining).unwrap_or(remaining.len());
+        self.advance_bytes(len);
+    }
+
+    pub(crate) fn eat_until2(&mut self, first: u8, second: u8) {
+        debug_assert!(first.is_ascii() && second.is_ascii());
+        let remaining = self.as_str().as_bytes();
+        let len = memchr::memchr2(first, second, remaining).unwrap_or(remaining.len());
+        self.advance_bytes(len);
+    }
+
     /// Moves to the next character.
     pub(crate) fn bump(&mut self) -> Option<char> {
         self.chars.next()
