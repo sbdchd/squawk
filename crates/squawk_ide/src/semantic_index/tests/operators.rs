@@ -296,3 +296,36 @@ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i i
       ╰╴                                                                                         ━━━━━━
     ");
 }
+
+#[test]
+fn row_length_mismatch() {
+    assert_snapshot!(check("
+select row(1, 2) = row(1);
+select (1, 2) < (1, 2, 3);
+select (1, 2) is distinct from (1, 2, 3);
+select (1, 2) in ((1, 2), (1, 2, 3));
+select (1, 2) between (1, 2) and (1, 2, 3);
+select row(1) = row(1), (1, 2) = (1, 2), (1, 2) in ((1, 2), (3, 4));
+"), @"
+    error: unequal number of entries in row expressions
+      ╭▸ 
+    2 │ select row(1, 2) = row(1);
+      ╰╴                   ━━━━━━
+    error: unequal number of entries in row expressions
+      ╭▸ 
+    3 │ select (1, 2) < (1, 2, 3);
+      ╰╴                ━━━━━━━━━
+    error: unequal number of entries in row expressions
+      ╭▸ 
+    4 │ select (1, 2) is distinct from (1, 2, 3);
+      ╰╴                               ━━━━━━━━━
+    error: unequal number of entries in row expressions
+      ╭▸ 
+    5 │ select (1, 2) in ((1, 2), (1, 2, 3));
+      ╰╴                          ━━━━━━━━━
+    error: unequal number of entries in row expressions
+      ╭▸ 
+    6 │ select (1, 2) between (1, 2) and (1, 2, 3);
+      ╰╴                                 ━━━━━━━━━
+    ");
+}

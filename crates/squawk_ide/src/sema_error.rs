@@ -304,6 +304,7 @@ pub(crate) enum SemaError {
         column: Name,
         table: Name,
     },
+    RowLengthMismatch,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -743,9 +744,8 @@ impl SemaError {
             SemaError::InvalidDomainConstraint { .. } => DiagnosticKind::InvalidDomainConstraint,
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
-            | SemaError::InsertMoreTargetsThanExpressions { .. } => {
-                DiagnosticKind::ColumnCountMismatch
-            }
+            | SemaError::InsertMoreTargetsThanExpressions { .. }
+            | SemaError::RowLengthMismatch => DiagnosticKind::ColumnCountMismatch,
             SemaError::MissingShellType => DiagnosticKind::MissingShellType,
             SemaError::WrongRelationKind { .. }
             | SemaError::CannotCopy { .. }
@@ -813,6 +813,7 @@ impl SemaError {
                 Some("aggregate ORDER BY is not implemented for window functions")
             }
             SemaError::WindowDistinct => Some("DISTINCT is not implemented for window functions"),
+            SemaError::RowLengthMismatch => Some("unequal number of entries in row expressions"),
             _ => None,
         }
     }
@@ -856,7 +857,8 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::InsertMoreTargetsThanExpressions { .. }
             | SemaError::MissingShellType
             | SemaError::WindowAggregateOrderBy
-            | SemaError::WindowDistinct => {
+            | SemaError::WindowDistinct
+            | SemaError::RowLengthMismatch => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MisplacedAggregate { context } => write!(

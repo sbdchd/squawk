@@ -17350,6 +17350,63 @@ impl Lowerer {
         arg
     }
 
+    fn check_row_lengths(&mut self, op: &ast::BinOp, lhs: &ast::TupleExpr, rhs: &ast::Expr) {
+        match op {
+            ast::BinOp::In(_) | ast::BinOp::NotIn(_) => {
+                if let ast::Expr::TupleExpr(list) = rhs {
+                    for expr in list.exprs() {
+                        if let ast::Expr::TupleExpr(row) = expr {
+                            self.check_row_length(lhs, &row);
+                        }
+                    }
+                }
+            }
+            ast::BinOp::Caret(_)
+            | ast::BinOp::CustomOp(_)
+            | ast::BinOp::Eq(_)
+            | ast::BinOp::Gteq(_)
+            | ast::BinOp::Ilike(_)
+            | ast::BinOp::IsDistinctFrom(_)
+            | ast::BinOp::IsNotDistinctFrom(_)
+            | ast::BinOp::LAngle(_)
+            | ast::BinOp::Like(_)
+            | ast::BinOp::Lteq(_)
+            | ast::BinOp::Minus(_)
+            | ast::BinOp::Neq(_)
+            | ast::BinOp::Neqb(_)
+            | ast::BinOp::NotIlike(_)
+            | ast::BinOp::NotLike(_)
+            | ast::BinOp::NotSimilarTo(_)
+            | ast::BinOp::OperatorCall(_)
+            | ast::BinOp::Percent(_)
+            | ast::BinOp::Plus(_)
+            | ast::BinOp::RAngle(_)
+            | ast::BinOp::SimilarTo(_)
+            | ast::BinOp::Slash(_)
+            | ast::BinOp::Star(_) => {
+                if let ast::Expr::TupleExpr(rhs) = rhs {
+                    self.check_row_length(lhs, rhs);
+                }
+            }
+            ast::BinOp::And(_)
+            | ast::BinOp::AtTimeZone(_)
+            | ast::BinOp::ColonColon(_)
+            | ast::BinOp::ColonEq(_)
+            | ast::BinOp::Escape(_)
+            | ast::BinOp::FatArrow(_)
+            | ast::BinOp::Is(_)
+            | ast::BinOp::IsNot(_)
+            | ast::BinOp::Or(_)
+            | ast::BinOp::Overlaps(_) => {}
+        }
+    }
+
+    fn check_row_length(&mut self, lhs: &ast::TupleExpr, rhs: &ast::TupleExpr) {
+        if lhs.exprs().count() != rhs.exprs().count() {
+            self.push_error(rhs.syntax(), SemaError::RowLengthMismatch);
+        }
+    }
+
     fn lower_in_list(&mut self, tuple: &ast::TupleExpr, left: ArgType) -> ArgType {
         let mut common = match left {
             ArgType::Known(ty) => Some(ty),
@@ -18567,6 +18624,13 @@ impl Lowerer {
                         .into_iter()
                         .flatten(),
                 );
+                if let Some(ast::Expr::TupleExpr(target)) = between.target() {
+                    for bound in [between.start(), between.end()].into_iter().flatten() {
+                        if let ast::Expr::TupleExpr(bound) = bound {
+                            self.check_row_length(&target, &bound);
+                        }
+                    }
+                }
             }
             ast::Expr::BinExpr(bin) => {
                 let op = bin.op();
@@ -18594,6 +18658,9 @@ impl Lowerer {
                     ArgType::Known(ty) => Some(ty),
                     ArgType::UnknownLiteral | ArgType::Untyped => None,
                 };
+                if let (Some(op), Some(ast::Expr::TupleExpr(lhs)), Some(rhs)) = (&op, &lhs, &rhs) {
+                    self.check_row_lengths(op, lhs, rhs);
+                }
                 let ty = op
                     .as_ref()
                     .and_then(|op| self.lower_bin_operator(op, left, right));
