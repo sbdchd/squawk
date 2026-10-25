@@ -491,19 +491,6 @@ pub(crate) enum TypeKind {
     Multirange,
 }
 
-impl TypeKind {
-    pub(crate) fn label(self) -> &'static str {
-        match self {
-            TypeKind::Shell => "shell type",
-            TypeKind::Type => "type",
-            TypeKind::Domain => "domain",
-            TypeKind::Enum => "enum",
-            TypeKind::Range => "range type",
-            TypeKind::Multirange => "multirange type",
-        }
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Subscript {
     Array,
@@ -662,15 +649,6 @@ pub(crate) enum RoutineKind {
 }
 
 impl RoutineKind {
-    pub(crate) fn label(self) -> &'static str {
-        match self {
-            RoutineKind::Function => "function",
-            RoutineKind::Aggregate => "aggregate",
-            RoutineKind::Procedure => "procedure",
-            RoutineKind::Routine => "routine",
-        }
-    }
-
     pub(crate) fn matches(self, kind: FunctionKind) -> bool {
         match self {
             RoutineKind::Function => kind == FunctionKind::Function,
