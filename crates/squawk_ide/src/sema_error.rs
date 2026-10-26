@@ -289,6 +289,12 @@ pub(crate) enum SemaError {
     MultiplePrimaryKeys {
         table: Name,
     },
+    NoPrimaryKeyForReferencedTable {
+        table: Name,
+    },
+    NoUniqueConstraintForReferencedTable {
+        table: Name,
+    },
     InvalidOrdinal {
         clause: OutputClause,
         position: usize,
@@ -808,6 +814,10 @@ impl SemaError {
             SemaError::ConstraintTrigger { .. } => DiagnosticKind::ReplaceConstraintTrigger,
             SemaError::DropReturnRule { .. } => DiagnosticKind::DropReturnRule,
             SemaError::MultiplePrimaryKeys { .. } => DiagnosticKind::MultiplePrimaryKeys,
+            SemaError::NoPrimaryKeyForReferencedTable { .. }
+            | SemaError::NoUniqueConstraintForReferencedTable { .. } => {
+                DiagnosticKind::InvalidForeignKey
+            }
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
@@ -1152,6 +1162,16 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::MultiplePrimaryKeys { table } => write!(
                 f,
                 "multiple primary keys for table `{}` are not allowed",
+                n(table)
+            ),
+            SemaError::NoPrimaryKeyForReferencedTable { table } => write!(
+                f,
+                "there is no primary key for referenced table `{}`",
+                n(table)
+            ),
+            SemaError::NoUniqueConstraintForReferencedTable { table } => write!(
+                f,
+                "there is no unique constraint matching given keys for referenced table `{}`",
                 n(table)
             ),
             SemaError::InvalidOrdinal { clause, position } => {
