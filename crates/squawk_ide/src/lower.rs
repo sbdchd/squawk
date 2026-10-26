@@ -7,7 +7,7 @@ use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode, NameLike},
-    column_name::ColumnName,
+    column_name::{ColumnName, ColumnNameValue},
     sql_body::SqlBody,
 };
 
@@ -15480,30 +15480,55 @@ impl Lowerer {
                 }
             }
         }
-        let Some(segment) = create_index
-            .index()
-            .and_then(|index| index.path())
-            .and_then(|path| path.segment())
-        else {
-            return;
-        };
-        let schema = match table {
-            Some(table) => self.index.tables[table].schema,
-            None => self
-                .lower_schema_qualifier(path.and_then(|path| path.qualifier()))
-                .unwrap_or_else(|| self.default_creation_schema()),
-        };
         let key = create_index
             .partition_item_list()
             .and_then(|items| self.lower_index_key(&items));
-        self.alloc_index(
-            IfExists::from_if_not_exists(create_index.if_not_exists().as_ref()),
-            create_index.syntax(),
-            &segment,
-            schema,
-            table,
-            key,
-        );
+        match create_index.index() {
+            Some(index) => {
+                let Some(segment) = index.path().and_then(|path| path.segment()) else {
+                    return;
+                };
+                let schema = match table {
+                    Some(table) => self.index.tables[table].schema,
+                    None => self
+                        .lower_schema_qualifier(path.and_then(|path| path.qualifier()))
+                        .unwrap_or_else(|| self.default_creation_schema()),
+                };
+                self.alloc_index(
+                    IfExists::from_if_not_exists(create_index.if_not_exists().as_ref()),
+                    create_index.syntax(),
+                    &segment,
+                    schema,
+                    table,
+                    key,
+                );
+            }
+            None => {
+                let Some(table) = table else {
+                    return;
+                };
+                let Table { schema, name, .. } = self.index.tables[table];
+                let addition = index_column_names(create_index);
+                let name = postgres::choose_relation_name(
+                    self.index.names.resolve(name),
+                    Some(&addition),
+                    "idx",
+                    |name| self.relation_name_exists(schema, name),
+                    |_| false,
+                );
+                let name = self.intern(&name);
+                let ptr = self.ptr(create_index.syntax());
+                let id = self.index.indexes.alloc(Index {
+                    schema,
+                    name,
+                    table: Some(table),
+                    key,
+                    ptr,
+                    name_ptr: ptr,
+                });
+                self.record_comment(create_index.syntax(), Item::Index(id));
+            }
+        }
         self.depend_on_refs(refs, self.index.indexes.range_from(start), Object::Index);
     }
 
@@ -21898,6 +21923,26 @@ fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {
         | ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::Table(_) => None,
     }
+}
+
+fn index_column_names(create_index: &ast::CreateIndex) -> String {
+    let items = create_index
+        .partition_item_list()
+        .into_iter()
+        .chain(
+            create_index
+                .index_include_clause()
+                .and_then(|include| include.partition_item_list()),
+        )
+        .flat_map(|list| list.partition_items());
+    postgres::join_names(items.map(
+        |item| match item.expr().and_then(ColumnName::inferred_from_expr) {
+            Some(ColumnName::Column(name) | ColumnName::UnknownColumn(Some(name))) => name,
+            Some(ColumnName::UnknownColumn(None) | ColumnName::Star) | None => {
+                ColumnNameValue::Static("expr")
+            }
+        },
+    ))
 }
 
 fn like_includes_indexes(like: &ast::LikeClause) -> bool {

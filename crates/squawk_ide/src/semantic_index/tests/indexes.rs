@@ -235,3 +235,28 @@ drop index im;
       ╰╴                    ━
     ");
 }
+
+#[test]
+fn unnamed_index_generated_name() {
+    assert_snapshot!(check("
+create table ti (a int, b int);
+create index on ti (a);
+create unique index on ti (a);
+create index on ti (lower(b::text)) include (b);
+drop index ti_a_idx;
+drop index ti_a_idx1;
+drop index ti_expr_b_idx;
+drop index ti_lower_b_idx;
+create index on ti (a);
+create index ti_a_idx on ti (b);
+"), @"
+    error: index `ti_expr_b_idx` does not exist
+      ╭▸ 
+    8 │ drop index ti_expr_b_idx;
+      ╰╴           ━━━━━━━━━━━━━
+    error: relation `ti_a_idx` already exists
+       ╭▸ 
+    11 │ create index ti_a_idx on ti (b);
+       ╰╴             ━━━━━━━━
+    ");
+}
