@@ -110,6 +110,7 @@ pub(crate) struct Index {
     pub(crate) schema: Name,
     pub(crate) name: Name,
     pub(crate) table: Option<TableId>,
+    pub(crate) key: Option<IdxRange<Name>>,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
 }

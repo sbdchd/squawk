@@ -376,6 +376,82 @@ create table l6 (
 }
 
 #[test]
+fn drop_key_column_drops_constraint() {
+    assert_snapshot!(check("
+create table d (
+  a int primary key,
+  b int
+);
+alter table d drop column a;
+alter table d add primary key (b);
+
+create table r (
+  a int primary key,
+  b int,
+  c int
+);
+alter table r rename column a to x;
+alter table r drop column x;
+alter table r add primary key (b);
+
+create table l (
+  like r including indexes,
+  z int
+);
+alter table l drop column b;
+alter table l add primary key (c);
+
+create table u (
+  a int,
+  b int,
+  primary key (a, b)
+);
+alter table u drop column a;
+alter table u add primary key (b);
+
+create table k (
+  a int primary key,
+  b int
+);
+begin;
+alter table k rename column a to x;
+rollback;
+alter table k drop column a;
+alter table k add primary key (b);
+
+create table w (
+  a int,
+  b int
+);
+create unique index w_a on w (a);
+alter table w add primary key using index w_a;
+alter table w rename column a to x;
+alter table w drop column x;
+alter table w add primary key (b);
+
+create table pp (
+  a int primary key,
+  b int
+)
+  partition by range (a);
+create table pc
+  partition of pp
+  for values from (1) to (2);
+create table lp (like pc including indexes);
+alter table lp drop column a;
+alter table lp add primary key (b);
+"), @"no diagnostics");
+}
+
+#[test]
+fn rename_builtin_table_column() {
+    assert_snapshot!(check("
+create index on pg_class (relname);
+alter table pg_class rename column relname to x;
+"), @"no diagnostics");
+}
+
+#[test]
 fn conflicting_nullability() {
     assert_snapshot!(check("
 create table n1 (a int primary key null);

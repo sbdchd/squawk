@@ -9,6 +9,7 @@ use crate::ir::{Index, IndexId, TableId};
 #[derive(Debug, Default)]
 pub(crate) struct IndexIndex {
     arena: LayeredArena<Index>,
+    keys: LayeredArena<Name>,
     by_name: LayeredMultimap<QualifiedName, IndexId>,
     by_schema: LayeredMultimap<Name, IndexId>,
     by_table: LayeredMultimap<TableId, IndexId>,
@@ -18,6 +19,7 @@ impl IndexIndex {
     pub(crate) fn on_top_of(base: &'static IndexIndex) -> Self {
         IndexIndex {
             arena: LayeredArena::on_top_of(&base.arena),
+            keys: LayeredArena::on_top_of(&base.keys),
             by_name: LayeredMultimap::on_top_of(&base.by_name),
             by_schema: LayeredMultimap::on_top_of(&base.by_schema),
             by_table: LayeredMultimap::on_top_of(&base.by_table),
@@ -38,6 +40,37 @@ impl IndexIndex {
             self.by_table.insert(table, id);
         }
         id
+    }
+
+    pub(crate) fn alloc_key(&mut self, columns: impl IntoIterator<Item = Name>) -> IdxRange<Name> {
+        self.keys.alloc_many(columns)
+    }
+
+    pub(crate) fn alloc_key_copies(&mut self, key: IdxRange<Name>) -> IdxRange<Name> {
+        self.keys.alloc_copies(key)
+    }
+
+    pub(crate) fn alloc_renamed_key(
+        &mut self,
+        key: IdxRange<Name>,
+        from: Name,
+        to: Name,
+    ) -> IdxRange<Name> {
+        self.keys
+            .alloc_mapped_copies(key, |column| if column == from { to } else { column })
+    }
+
+    pub(crate) fn key(&self, id: IndexId) -> Option<impl Iterator<Item = Name> + '_> {
+        let key = self.arena[id].key?;
+        Some(key.iter().map(|column| self.keys[column]))
+    }
+
+    pub(crate) fn set_key(
+        &mut self,
+        id: IndexId,
+        key: Option<IdxRange<Name>>,
+    ) -> Option<IdxRange<Name>> {
+        std::mem::replace(&mut self.local_mut(id).key, key)
     }
 
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = IndexId> + '_ {
@@ -116,6 +149,7 @@ impl IndexIndex {
 
     pub(crate) fn shrink_to_fit(&mut self) {
         self.arena.shrink_to_fit();
+        self.keys.shrink_to_fit();
         self.by_name.shrink_to_fit();
         self.by_schema.shrink_to_fit();
         self.by_table.shrink_to_fit();
