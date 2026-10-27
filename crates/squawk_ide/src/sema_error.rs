@@ -295,6 +295,12 @@ pub(crate) enum SemaError {
     NoUniqueConstraintForReferencedTable {
         table: Name,
     },
+    DeferrablePrimaryKeyForReferencedTable {
+        table: Name,
+    },
+    DeferrableUniqueConstraintForReferencedTable {
+        table: Name,
+    },
     InvalidOrdinal {
         clause: OutputClause,
         position: usize,
@@ -815,7 +821,9 @@ impl SemaError {
             SemaError::DropReturnRule { .. } => DiagnosticKind::DropReturnRule,
             SemaError::MultiplePrimaryKeys { .. } => DiagnosticKind::MultiplePrimaryKeys,
             SemaError::NoPrimaryKeyForReferencedTable { .. }
-            | SemaError::NoUniqueConstraintForReferencedTable { .. } => {
+            | SemaError::NoUniqueConstraintForReferencedTable { .. }
+            | SemaError::DeferrablePrimaryKeyForReferencedTable { .. }
+            | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
                 DiagnosticKind::InvalidForeignKey
             }
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
@@ -1172,6 +1180,16 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::NoUniqueConstraintForReferencedTable { table } => write!(
                 f,
                 "there is no unique constraint matching given keys for referenced table `{}`",
+                n(table)
+            ),
+            SemaError::DeferrablePrimaryKeyForReferencedTable { table } => write!(
+                f,
+                "cannot use a deferrable primary key for referenced table `{}`",
+                n(table)
+            ),
+            SemaError::DeferrableUniqueConstraintForReferencedTable { table } => write!(
+                f,
+                "cannot use a deferrable unique constraint for referenced table `{}`",
                 n(table)
             ),
             SemaError::InvalidOrdinal { clause, position } => {

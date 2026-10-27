@@ -752,3 +752,50 @@ create table ok6 (
        ╰╴                                     ━
     ");
 }
+
+#[test]
+fn foreign_key_deferrable_key() {
+    assert_snapshot!(check("
+create table p (
+  id int primary key deferrable,
+  u int unique deferrable initially deferred,
+  v int unique not deferrable,
+  w int,
+  x int,
+  unique (w) deferrable
+);
+create unique index p_w on p (w);
+create table c1 (pid int references p);
+create table c2 (u int references p (u));
+create table c3 (w int references p (w));
+create table ok1 (v int references p (v));
+create table p2 (
+  id int,
+  primary key (id) initially deferred
+);
+create table c4 (
+  id int,
+  foreign key (id) references p2
+);
+create table pa (id int primary key) partition by range (id);
+create table pa1 (id int not null);
+alter table pa attach partition pa1 for values from (0) to (10);
+create table ok2 (id int references pa1 (id));
+create table pe (a int);
+create unique index on pe ((a));
+create table ok3 (a int references pe (a));
+"), @"
+    error: cannot use a deferrable primary key for referenced table `p`
+       ╭▸ 
+    11 │ create table c1 (pid int references p);
+       ╰╴                                    ━
+    error: cannot use a deferrable unique constraint for referenced table `p`
+       ╭▸ 
+    12 │ create table c2 (u int references p (u));
+       ╰╴                                     ━
+    error: cannot use a deferrable primary key for referenced table `p2`
+       ╭▸ 
+    21 │   foreign key (id) references p2
+       ╰╴                              ━━
+    ");
+}
