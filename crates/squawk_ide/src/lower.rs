@@ -11911,28 +11911,7 @@ impl Lowerer {
     }
 
     fn literal_type(&mut self, literal: &ast::Literal) -> Option<Ty> {
-        let name = match literal.kind()? {
-            ast::LitKind::IntNumber(_) => match literal.integer_value() {
-                Some(value) if i32::try_from(&value).is_ok() => "int4",
-                Some(value) if i64::try_from(&value).is_ok() => "int8",
-                Some(_) => "numeric",
-                None => "int4",
-            },
-            ast::LitKind::NumericNumber(_) => "numeric",
-            ast::LitKind::String(_)
-            | ast::LitKind::DollarQuotedString(_)
-            | ast::LitKind::EscString(_)
-            | ast::LitKind::NationalString(_)
-            | ast::LitKind::UnicodeEscString(_) => "text",
-            ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => "bit",
-            ast::LitKind::True(_) | ast::LitKind::False(_) => "bool",
-            ast::LitKind::Default(_)
-            | ast::LitKind::Null(_)
-            | ast::LitKind::Off(_)
-            | ast::LitKind::On(_)
-            | ast::LitKind::PositionalParam(_) => return None,
-        };
-        self.builtin_type(name)
+        self.builtin_type(literal_type_name(literal)?)
     }
 
     fn lower_func_type(&mut self, func_type: Option<ast::FuncType>) -> Option<Ty> {
@@ -18950,7 +18929,7 @@ impl Lowerer {
         clause: OutputClause,
     ) {
         let Some(position) = literal
-            .integer_value()
+            .integer_value_u64()
             .and_then(|value| usize::try_from(value).ok())
         else {
             return;
@@ -22085,7 +22064,7 @@ fn nth_idx<T>(index: usize) -> la_arena::Idx<T> {
 }
 
 fn member_number(literal: Option<&ast::Literal>) -> Option<u16> {
-    u16::try_from(literal?.integer_value()?).ok()
+    u16::try_from(literal?.integer_value_u64()?).ok()
 }
 
 fn row_width(expr: Option<&ast::Expr>) -> Option<usize> {
@@ -22278,4 +22257,28 @@ fn like_includes_indexes(like: &ast::LikeClause) -> bool {
         }
     }
     includes
+}
+
+pub(crate) fn literal_type_name(literal: &ast::Literal) -> Option<&'static str> {
+    let name = match literal.kind()? {
+        ast::LitKind::IntNumber(_) => match literal.integer_value_u64() {
+            Some(value) if i32::try_from(value).is_ok() => "int4",
+            Some(value) if i64::try_from(value).is_ok() => "int8",
+            Some(_) | None => "numeric",
+        },
+        ast::LitKind::NumericNumber(_) => "numeric",
+        ast::LitKind::String(_)
+        | ast::LitKind::DollarQuotedString(_)
+        | ast::LitKind::EscString(_)
+        | ast::LitKind::NationalString(_)
+        | ast::LitKind::UnicodeEscString(_) => "text",
+        ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => "bit",
+        ast::LitKind::True(_) | ast::LitKind::False(_) => "bool",
+        ast::LitKind::Default(_)
+        | ast::LitKind::Null(_)
+        | ast::LitKind::Off(_)
+        | ast::LitKind::On(_)
+        | ast::LitKind::PositionalParam(_) => return None,
+    };
+    Some(name)
 }
