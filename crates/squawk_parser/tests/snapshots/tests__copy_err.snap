@@ -131,11 +131,11 @@ error[syntax-error]: expected `,`
   ╭▸ 
 2 │ copy x (i y) from '/tmp/input.file' (on_error ignore  log_verbosity verbose);
   ╰╴                                                    ━
-error[syntax-error]: expected NOT, QUOTE, or NULL
+error[syntax-error]: expected `not`, `quote`, or `null`
   ╭▸ 
 5 │ copy t from 's' with force;
   ╰╴                          ━
-error[syntax-error]: expected NOT, QUOTE, or NULL
+error[syntax-error]: expected `not`, `quote`, or `null`
   ╭▸ 
 7 │ copy t from 's' with force zzz;
   ╰╴                          ━

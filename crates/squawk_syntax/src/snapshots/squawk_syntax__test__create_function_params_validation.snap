@@ -131,7 +131,7 @@ SOURCE_FILE@0..271
     SEMICOLON@269..270 ";"
   WHITESPACE@270..271 "\n"
 
-error[syntax-error]: VARIADIC param must be last input param
+error[syntax-error]: `variadic` param must be last input param
   ╭▸ 
 1 │ create function invalid_variadic(variadic items int[], following int)
   ╰╴                                                       ━━━━━━━━━━━━━

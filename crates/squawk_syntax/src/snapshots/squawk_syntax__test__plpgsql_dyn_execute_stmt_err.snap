@@ -261,7 +261,7 @@ error[syntax-error]: expected an expression
    ╭▸ 
 20 │   execute using 1;
    ╰╴         ━
-error[syntax-error]: expected an INTO target, found `;`
+error[syntax-error]: expected an `into` target, found `;`
    ╭▸ 
 29 │   execute q into;
    ╰╴                ━

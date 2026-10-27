@@ -486,7 +486,7 @@ error[syntax-error]: expected `,`
    ╭▸ 
 13 │ search depth first by a, b c set ordercol
    ╰╴                          ━
-error[syntax-error]: unexpected WITH
+error[syntax-error]: unexpected `with`
    ╭▸ 
 18 │ with f as (select 2)
    ╰╴━
@@ -502,7 +502,7 @@ error[syntax-error]: unexpected comma
    ╭▸ 
 43 │    ), -- <-- extra comma
    ╰╴    ━
-error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+error[syntax-error]: `without overlaps` is only allowed in `primary key` and `unique` constraints
    ╭▸ 
 47 │ with t (a without overlaps) as (select 1) select * from t;
    ╰╴          ━

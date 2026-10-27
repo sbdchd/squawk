@@ -107,15 +107,15 @@ SOURCE_FILE@0..166
     SEMICOLON@164..165 ";"
   WHITESPACE@165..166 "\n"
 
-error[syntax-error]: OUT params are not allowed with aggregates
+error[syntax-error]: `out` params are not allowed with aggregates
   ╭▸ 
 2 │ alter aggregate a (in t, out u, inout v, in out w)
   ╰╴                         ━━━
-error[syntax-error]: INOUT params are not allowed with aggregates
+error[syntax-error]: `inout` params are not allowed with aggregates
   ╭▸ 
 2 │ alter aggregate a (in t, out u, inout v, in out w)
   ╰╴                                ━━━━━
-error[syntax-error]: INOUT params are not allowed with aggregates
+error[syntax-error]: `inout` params are not allowed with aggregates
   ╭▸ 
 2 │ alter aggregate a (in t, out u, inout v, in out w)
   ╰╴                                         ━━━━━━

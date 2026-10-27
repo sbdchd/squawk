@@ -775,7 +775,7 @@ error[syntax-error]: expected operator, found `and`
    ╭▸ 
 24 │ select 1 from t order by a using and;
    ╰╴                                 ━
-error[syntax-error]: qualified operator requires OPERATOR(...)
+error[syntax-error]: qualified operator requires `operator(...)`
    ╭▸ 
 25 │ select 1 from t order by a using pg_catalog.<;
    ╰╴                                            ━

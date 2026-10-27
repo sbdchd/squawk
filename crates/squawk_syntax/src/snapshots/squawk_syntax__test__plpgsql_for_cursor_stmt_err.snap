@@ -170,7 +170,7 @@ PLPGSQL@0..112
     END_KW@108..111 "end"
   WHITESPACE@111..112 "\n"
 
-error[syntax-error]: cursor FOR loop takes one variable
+error[syntax-error]: cursor `for` loop takes one variable
   ╭▸ 
 8 │   for a, b in c loop
   ╰╴         ━

@@ -155,7 +155,7 @@ error[syntax-error]: expected a query
   ╭▸ 
 5 │   for r in loop
   ╰╴          ━
-error[syntax-error]: cannot specify REVERSE in query FOR loop
+error[syntax-error]: cannot specify `reverse` in query `for` loop
    ╭▸ 
 15 │   for r in reverse select 1 loop
    ╰╴           ━━━━━━━

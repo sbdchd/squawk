@@ -203,7 +203,7 @@ error[syntax-error]: expected function option
    ╭▸ 
 16 │ create function f() returns int language sql as '' transform for type int,
    ╰╴━
-error[syntax-error]: expected FOR TYPE entry after comma
+error[syntax-error]: expected `for type` entry after comma
    ╭▸ 
 16 │   create function f() returns int language sql as '' transform for type int,
    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛

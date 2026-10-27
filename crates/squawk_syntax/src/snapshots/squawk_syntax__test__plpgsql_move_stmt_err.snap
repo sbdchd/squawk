@@ -105,7 +105,7 @@ error[syntax-error]: expected a cursor variable, found `;`
   ╭▸ 
 7 │   move;
   ╰╴      ━
-error[syntax-error]: expected FROM or IN
+error[syntax-error]: expected `from` or `in`
   ╭▸ 
 8 │   move next c;
   ╰╴           ━

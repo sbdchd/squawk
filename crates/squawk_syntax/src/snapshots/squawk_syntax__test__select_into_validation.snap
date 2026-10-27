@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_syntax/src/test.rs
-assertion_line: 126
 input_file: crates/squawk_syntax/test_data/validation/select_into.sql
 ---
 SOURCE_FILE@0..858
@@ -660,51 +659,51 @@ SOURCE_FILE@0..858
     SEMICOLON@856..857 ";"
   WHITESPACE@857..858 "\n"
 
-error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+error[syntax-error]: `into` is only allowed on first `select` of `union`/`intersect`/`except`
   ╭▸ 
 9 │ select 1 a union select 2 a into t union select 3 a;
   ╰╴                 ━━━━━━━━━━━━━━━━━
-error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+error[syntax-error]: `into` is only allowed on first `select` of `union`/`intersect`/`except`
    ╭▸ 
 10 │ select 4 a union select 5 a into t;
    ╰╴                 ━━━━━━━━━━━━━━━━━
-error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+error[syntax-error]: `into` is only allowed on first `select` of `union`/`intersect`/`except`
    ╭▸ 
 11 │ select 1 a union (((select 2 a into t)));
    ╰╴                    ━━━━━━━━━━━━━━━━━
-error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+error[syntax-error]: `into` is only allowed on first `select` of `union`/`intersect`/`except`
    ╭▸ 
 12 │ select 1 union ((select 2 into x) union select 3);
    ╰╴                 ━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 15 │ with t as (select 1 a into t) select * from t;
    ╰╴           ━━━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 16 │ with t as (select 1 into x union select 2) select * from t;
    ╰╴           ━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 20 │   where a in (select 1 a into t);
    ╰╴              ━━━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 21 │ select json_array(select into t from u);
    ╰╴                  ━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 24 │ insert into x select 1 into t;
    ╰╴              ━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 27 │ declare c cursor for select 1 into t;
    ╰╴                     ━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 30 │ create table k as select 1 into t;
    ╰╴                  ━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
    ╭▸ 
 33 │ create view k as select 1 into t;
    ╰╴                 ━━━━━━━━━━━━━━━

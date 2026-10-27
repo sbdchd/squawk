@@ -52,7 +52,7 @@ error[syntax-error]: expected path name
   ╭▸ 
 4 │   insert;
   ╰╴        ━
-error[syntax-error]: expected a SELECT statement
+error[syntax-error]: expected a `select` statement
   ╭▸ 
 4 │   insert;
   ╰╴        ━

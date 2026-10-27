@@ -186,11 +186,11 @@ error[syntax-error]: expected `;`, found integer literal
    ╭▸ 
 11 │   elsif 1 = 2 then
    ╰╴        ━
-error[syntax-error]: CASE expression must be parenthesized
+error[syntax-error]: `case` expression must be parenthesized
    ╭▸ 
 15 │   if case when true then 1 end = 1 then
    ╰╴     ━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: CASE expression must be parenthesized
+error[syntax-error]: `case` expression must be parenthesized
    ╭▸ 
 17 │   elsif 1 = case when true then 1 end then
    ╰╴            ━━━━━━━━━━━━━━━━━━━━━━━━━

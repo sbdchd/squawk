@@ -65,7 +65,7 @@ PLPGSQL@0..121
     END_KW@117..120 "end"
   WHITESPACE@120..121 "\n"
 
-error[syntax-error]: array missing ARRAY keyword
+error[syntax-error]: array missing `array` keyword
   ╭▸ 
 3 │   return next[1];
   ╰╴             ━

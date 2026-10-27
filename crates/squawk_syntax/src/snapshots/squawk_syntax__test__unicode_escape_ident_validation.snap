@@ -319,7 +319,7 @@ error[syntax-error]: invalid unicode escape character
    ╭▸ 
 20 │ select U&"error" UESCAPE 'foo';
    ╰╴                         ━━━━━
-error[syntax-error]: UESCAPE can only follow a Unicode escape identifier
+error[syntax-error]: `uescape` can only follow a unicode escape identifier
    ╭▸ 
 21 │ select 2::U&"!"&"0"UESCAPE'';
    ╰╴                   ━━━━━━━

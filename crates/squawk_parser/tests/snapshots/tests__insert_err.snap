@@ -244,7 +244,7 @@ error[syntax-error]: unexpected trailing comma
    ╭▸ 
 13 │   values (4, 5  6,)
    ╰╴                 ━
-error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+error[syntax-error]: `without overlaps` is only allowed in `primary key` and `unique` constraints
    ╭▸ 
 17 │ insert into t (a without overlaps) values (1);
    ╰╴                 ━

@@ -45,11 +45,11 @@ SOURCE_FILE@0..42
     SEMICOLON@40..41 ";"
   WHITESPACE@41..42 "\n"
 
-error[syntax-error]: array missing ARRAY keyword
+error[syntax-error]: array missing `array` keyword
   ╭▸ 
 1 │ select ['a', 'b', 'c'];
   ╰╴       ━
-error[syntax-error]: array missing ARRAY keyword
+error[syntax-error]: array missing `array` keyword
   ╭▸ 
 3 │ select [[1, 2]];
   ╰╴       ━

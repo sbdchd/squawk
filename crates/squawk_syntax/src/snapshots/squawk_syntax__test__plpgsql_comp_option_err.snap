@@ -163,7 +163,7 @@ error[syntax-error]: expected a block, found identifier
   ╭▸ 
 2 │ #option dumpp
   ╰╴        ━
-error[syntax-error]: expected OPTION, PRINT_STRICT_PARAMS, or VARIABLE_CONFLICT
+error[syntax-error]: expected `option`, `print_strict_params`, or `variable_conflict`
   ╭▸ 
 6 │ #foo bar
   ╰╴ ━
@@ -171,11 +171,11 @@ error[syntax-error]: expected a block, found identifier
   ╭▸ 
 6 │ #foo bar
   ╰╴ ━
-error[syntax-error]: expected ERROR, USE_VARIABLE, or USE_COLUMN
+error[syntax-error]: expected `error`, `use_variable`, or `use_column`
    ╭▸ 
 10 │ #variable_conflict
    ╰╴                  ━
-error[syntax-error]: expected ERROR, USE_VARIABLE, or USE_COLUMN
+error[syntax-error]: expected `error`, `use_variable`, or `use_column`
    ╭▸ 
 14 │ #variable_conflict use_default
    ╰╴                  ━

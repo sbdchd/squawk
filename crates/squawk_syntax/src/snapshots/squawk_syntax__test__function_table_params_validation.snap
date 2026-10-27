@@ -174,15 +174,15 @@ SOURCE_FILE@0..256
     SEMICOLON@254..255 ";"
   WHITESPACE@255..256 "\n"
 
-error[syntax-error]: OUT and INOUT arguments aren't allowed in TABLE functions
+error[syntax-error]: `out` and `inout` arguments aren't allowed in `table` functions
   ╭▸ 
 1 │ create function f(out x int) returns table (y int) language sql as $$ select 1 $$;
   ╰╴                  ━━━
-error[syntax-error]: OUT and INOUT arguments aren't allowed in TABLE functions
+error[syntax-error]: `out` and `inout` arguments aren't allowed in `table` functions
   ╭▸ 
 3 │ create function f(inout x int) returns table (y int) language sql as $$ select x $$;
   ╰╴                  ━━━━━
-error[syntax-error]: OUT and INOUT arguments aren't allowed in TABLE functions
+error[syntax-error]: `out` and `inout` arguments aren't allowed in `table` functions
   ╭▸ 
 5 │ create function f(in out x int) returns table (y int) language sql as $$ select x $$;
   ╰╴                  ━━━━━━

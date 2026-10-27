@@ -75,7 +75,7 @@ error[syntax-error]: expected `inherit`
   ╭▸ 
 2 │ create domain d as int check (v > 0) no;
   ╰╴                                       ━
-error[syntax-error]: expected NOT NULL or CHECK constraint
+error[syntax-error]: expected `not null` or `check` constraint
   ╭▸ 
 5 │ alter domain d add constraint c deferrable initially deferred;
   ╰╴                               ━

@@ -143,11 +143,11 @@ error[syntax-error]: expected a table, subquery, or function call, found `;`
   ╭▸ 
 3 │   perform from;
   ╰╴              ━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
   ╭▸ 
 4 │   perform 1 into x;
   ╰╴  ━━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
   ╭▸ 
 5 │   perform 1 into strict x;
   ╰╴  ━━━━━━━━━━━━━━━━━━━━━

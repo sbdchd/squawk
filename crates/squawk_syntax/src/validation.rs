@@ -73,7 +73,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PercentType(it) => validate_plpgsql_percent_type(
                     it.syntax(),
                     it.percent_type_clause().and_then(|it| it.percent_token()),
-                    "%TYPE",
+                    "`%type`",
                     errors,
                 ),
                 ast::PlpgsqlBlock(it) => validate_plpgsql_block(&it, errors),
@@ -94,7 +94,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PlpgsqlPercentRowtype(it) => validate_plpgsql_percent_type(
                     it.syntax(),
                     it.percent_token(),
-                    "%ROWTYPE",
+                    "`%rowtype`",
                     errors,
                 ),
                 ast::RelationFromItem(it) => validate_relation_from_item(&it, errors),
@@ -118,7 +118,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
 fn validate_distinct_on(distinct_on: &ast::DistinctOn, acc: &mut Vec<SyntaxError>) {
     if distinct_on.exprs().next().is_none() {
         acc.push(SyntaxError::new(
-            "expected at least one expression in DISTINCT ON list",
+            "expected at least one expression in `distinct on` list",
             distinct_on.syntax().text_range(),
         ));
     }
@@ -131,7 +131,7 @@ fn validate_except_table_clause(clause: &ast::ExceptTableClause, acc: &mut Vec<S
     };
     if first.table_token().is_none() {
         acc.push(SyntaxError::new(
-            "the first table in an EXCEPT list must use the TABLE keyword",
+            "the first table in an `except` list must use the `table` keyword",
             first.syntax().text_range(),
         ));
     }
@@ -148,7 +148,7 @@ fn validate_except_table_clause(clause: &ast::ExceptTableClause, acc: &mut Vec<S
 fn validate_function_from_item(item: &ast::FunctionFromItem, acc: &mut Vec<SyntaxError>) {
     if let Some(only) = item.only_token() {
         acc.push(SyntaxError::new(
-            "ONLY cannot be used with a function call",
+            "`only` cannot be used with a function call",
             only.text_range(),
         ));
     }
@@ -290,7 +290,7 @@ fn validate_sub_type_fn(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
 fn validate_relation_from_item(item: &ast::RelationFromItem, acc: &mut Vec<SyntaxError>) {
     if let Some(lateral) = item.lateral_token() {
         acc.push(SyntaxError::new(
-            "LATERAL cannot be used with a bare relation",
+            "`lateral` cannot be used with a bare relation",
             lateral.text_range(),
         ));
     }
@@ -301,7 +301,7 @@ fn validate_paren_from_item(item: &ast::ParenFromItem, acc: &mut Vec<SyntaxError
         && let Some(lateral) = item.lateral_token()
     {
         acc.push(SyntaxError::new(
-            "LATERAL cannot be used with a bare relation",
+            "`lateral` cannot be used with a bare relation",
             lateral.text_range(),
         ));
     }
@@ -409,7 +409,7 @@ fn validate_plpgsql_percent_type(
         return;
     };
     acc.push(SyntaxError::new(
-        format!("UESCAPE is not allowed before {percent_type}"),
+        format!("`uescape` is not allowed before {percent_type}"),
         percent.text_range(),
     ));
 }
@@ -462,7 +462,7 @@ fn validate_fetch_single_row(it: &ast::PlpgsqlFetchStmt, acc: &mut Vec<SyntaxErr
     };
     if multiple_rows {
         acc.push(SyntaxError::new(
-            "FETCH statement cannot return multiple rows",
+            "`fetch` statement cannot return multiple rows",
             direction.syntax().text_range(),
         ));
     }
@@ -477,7 +477,7 @@ fn validate_fetch_no_strict(it: Option<ast::PlpgsqlIntoClause>, acc: &mut Vec<Sy
         return;
     };
     acc.push(SyntaxError::new(
-        "FETCH does not support STRICT",
+        "`fetch` does not support `strict`",
         strict.text_range(),
     ));
 }
@@ -489,7 +489,7 @@ fn validate_fetch_no_strict(it: Option<ast::PlpgsqlIntoClause>, acc: &mut Vec<Sy
 fn validate_for_i_single_var(it: &ast::PlpgsqlForIStmt, acc: &mut Vec<SyntaxError>) {
     for var in it.vars().skip(1) {
         acc.push(SyntaxError::new(
-            "integer FOR loop takes one variable",
+            "integer `for` loop takes one variable",
             var.syntax().text_range(),
         ));
     }
@@ -502,7 +502,7 @@ fn validate_for_i_single_var(it: &ast::PlpgsqlForIStmt, acc: &mut Vec<SyntaxErro
 fn validate_for_cursor_single_var(it: &ast::PlpgsqlForCursorStmt, acc: &mut Vec<SyntaxError>) {
     for var in it.vars().skip(1) {
         acc.push(SyntaxError::new(
-            "cursor FOR loop takes one variable",
+            "cursor `for` loop takes one variable",
             var.syntax().text_range(),
         ));
     }
@@ -517,7 +517,7 @@ fn validate_for_query_no_reverse(it: &ast::PlpgsqlForQueryStmt, acc: &mut Vec<Sy
         return;
     };
     acc.push(SyntaxError::new(
-        "cannot specify REVERSE in query FOR loop",
+        "cannot specify `reverse` in query `for` loop",
         reverse.text_range(),
     ));
 }
@@ -541,7 +541,7 @@ fn validate_no_bare_case(cond: Option<ast::PlpgsqlExpr>, acc: &mut Vec<SyntaxErr
             R_PAREN | R_BRACK => depth -= 1,
             CASE_EXPR if depth == 0 => {
                 acc.push(SyntaxError::new(
-                    "CASE expression must be parenthesized",
+                    "`case` expression must be parenthesized",
                     element.text_range(),
                 ));
                 preorder.skip_subtree();
@@ -602,7 +602,7 @@ fn validate_select_clause(clause: &ast::SelectClause, acc: &mut Vec<SyntaxError>
     };
     if clause.target_list().is_none() {
         acc.push(SyntaxError::new(
-            "expected a target after SELECT DISTINCT",
+            "expected a target after `select distinct`",
             distinct.syntax().text_range(),
         ));
     }
@@ -615,7 +615,7 @@ fn validate_select(it: &ast::Select, acc: &mut Vec<SyntaxError>) {
             .select_clause()
             .is_some_and(|clause| clause.target_list().is_none())
         {
-            "expected a target after SELECT"
+            "expected a target after `select`"
         } else {
             "subqueries in tuple expressions must be parenthesized"
         };
@@ -628,7 +628,7 @@ fn validate_select(it: &ast::Select, acc: &mut Vec<SyntaxError>) {
             .is_none_or(|clause| clause.target_list().is_none())
     {
         acc.push(SyntaxError::new(
-            "expected a target after SELECT",
+            "expected a target after `select`",
             it.syntax().text_range(),
         ));
     }
@@ -663,7 +663,7 @@ fn validate_storage_mode(mode: &ast::StorageMode, acc: &mut Vec<SyntaxError>) {
         .any(|valid_mode| mode_name.eq_ignore_ascii_case(valid_mode))
     {
         acc.push(SyntaxError::new(
-            "expected PLAIN, EXTERNAL, EXTENDED, MAIN, or DEFAULT",
+            "expected `plain`, `external`, `extended`, `main`, or `default`",
             mode.syntax().text_range(),
         ));
     }
@@ -692,7 +692,7 @@ fn validate_type_modifiers(ty: &ast::Type, acc: &mut Vec<SyntaxError>) {
         }
         if let Some(order_by) = arg.order_by_clause() {
             acc.push(SyntaxError::new(
-                "type modifier cannot have ORDER BY",
+                "type modifier cannot have `order by`",
                 order_by.syntax().text_range(),
             ));
             continue;
@@ -765,7 +765,7 @@ fn validate_select_into(it: &ast::SelectInto, acc: &mut Vec<SyntaxError>) {
                 continue;
             }
             acc.push(SyntaxError::new(
-                "INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT",
+                "`into` is only allowed on first `select` of `union`/`intersect`/`except`",
                 it.syntax().text_range(),
             ));
             return;
@@ -777,7 +777,7 @@ fn validate_select_into(it: &ast::SelectInto, acc: &mut Vec<SyntaxError>) {
         }
 
         acc.push(SyntaxError::new(
-            "SELECT ... INTO is not allowed here",
+            "`select ... into` is not allowed here",
             it.syntax().text_range(),
         ));
         return;
@@ -890,7 +890,7 @@ fn validate_default_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
         return;
     }
     acc.push(SyntaxError::new(
-        "DEFAULT is not allowed in this context",
+        "`default` is not allowed in this context",
         node.text_range(),
     ));
 }
@@ -921,7 +921,7 @@ fn is_row_in_insert_values(row: &SyntaxNode) -> bool {
 fn validate_set_column_list(list: &ast::SetColumnList, acc: &mut Vec<SyntaxError>) {
     if list.set_columns().next().is_none() {
         acc.push(SyntaxError::new(
-            "expected at least one column assignment after SET",
+            "expected at least one column assignment after `set`",
             list.syntax().text_range(),
         ));
     }
@@ -930,7 +930,7 @@ fn validate_set_column_list(list: &ast::SetColumnList, acc: &mut Vec<SyntaxError
 fn validate_to_config_value(it: &ast::ToConfigValue, acc: &mut Vec<SyntaxError>) {
     if it.default_token().is_none() && it.config_values().next().is_none() {
         acc.push(SyntaxError::new(
-            "expected DEFAULT, string, identifier, number, or list of values",
+            "expected `default`, string, identifier, number, or list of values",
             it.syntax().text_range(),
         ));
     }
@@ -950,9 +950,9 @@ fn validate_set_single_column(it: &ast::SetSingleColumn, acc: &mut Vec<SyntaxErr
         return;
     };
     let message = match accessor {
-        ast::Accessor::FieldAccessor(_) => "cannot set a subfield to DEFAULT",
+        ast::Accessor::FieldAccessor(_) => "cannot set a subfield to `default`",
         ast::Accessor::IndexAccessor(_) | ast::Accessor::SliceAccessor(_) => {
-            "cannot set an array element to DEFAULT"
+            "cannot set an array element to `default`"
         }
     };
     acc.push(SyntaxError::new(
@@ -1064,7 +1064,7 @@ fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
     let Some(inner) = inner else {
         if let Some(uescape_token) = uescape_token {
             acc.push(SyntaxError::new(
-                "UESCAPE can only follow a Unicode escape identifier",
+                "`uescape` can only follow a unicode escape identifier",
                 uescape_token.text_range(),
             ));
         }
@@ -1108,7 +1108,7 @@ fn validate_in_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
         Some(ast::Expr::TupleExpr(tuple)) if tuple.row_token().is_none() => {
             if tuple.exprs().next().is_none() {
                 acc.push(SyntaxError::new(
-                    "expected at least one expression in IN list",
+                    "expected at least one expression in `in` list",
                     tuple.syntax().text_range(),
                 ));
             }
@@ -1130,7 +1130,7 @@ fn validate_overlaps_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
             ),
             ast::Expr::TupleExpr(_) => (),
             operand => acc.push(SyntaxError::new(
-                "OVERLAPS operand must be a row expression",
+                "`overlaps` operand must be a row expression",
                 operand.syntax().text_range(),
             )),
         }
@@ -1237,7 +1237,7 @@ fn validate_array_expr(array_expr: &ast::ArrayExpr, acc: &mut Vec<SyntaxError>) 
         }
         let expr_range = array_expr.syntax().text_range();
         let range = TextRange::new(expr_range.start(), expr_range.start());
-        acc.push(SyntaxError::new("array missing ARRAY keyword", range));
+        acc.push(SyntaxError::new("array missing `array` keyword", range));
     }
     if array_expr.l_paren_token().is_some() && !has_select_variant(array_expr.syntax()) {
         let range = match array_expr.exprs().next() {
@@ -1324,7 +1324,7 @@ fn validate_create_function(function: &ast::CreateFunction, acc: &mut Vec<Syntax
         };
         if let Some(range) = invalid_mode {
             acc.push(SyntaxError::new(
-                "OUT and INOUT arguments aren't allowed in TABLE functions",
+                "`out` and `inout` arguments aren't allowed in `table` functions",
                 range,
             ));
         }
@@ -1380,13 +1380,13 @@ fn validate_variadic_param_iter(
                 continue;
             }
             acc.push(SyntaxError::new(
-                "VARIADIC param must be last",
+                "`variadic` param must be last",
                 param.syntax().text_range(),
             ));
             continue;
         }
         acc.push(SyntaxError::new(
-            "VARIADIC param must be last input param",
+            "`variadic` param must be last input param",
             param.syntax().text_range(),
         ));
     }
@@ -1413,11 +1413,11 @@ fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut
             if let Some(mode) = p.mode() {
                 match mode {
                     ast::ParamMode::ParamOut(param_out) => acc.push(SyntaxError::new(
-                        "OUT params are not allowed with aggregates",
+                        "`out` params are not allowed with aggregates",
                         param_out.syntax().text_range(),
                     )),
                     ast::ParamMode::ParamInOut(param_in_out) => acc.push(SyntaxError::new(
-                        "INOUT params are not allowed with aggregates",
+                        "`inout` params are not allowed with aggregates",
                         param_in_out.syntax().text_range(),
                     )),
                     ast::ParamMode::ParamIn(_) | ast::ParamMode::ParamVariadic(_) => (),
@@ -1523,7 +1523,7 @@ fn validate_do(do_: &ast::Do, acc: &mut Vec<SyntaxError>) {
                     && language_name.name == SqlBody::LANGUAGE
                 {
                     acc.push(SyntaxError::new(
-                        "SQL is not a valid language for DO statements",
+                        "`sql` is not a valid language for `do` statements",
                         language_name.range,
                     ));
                 }

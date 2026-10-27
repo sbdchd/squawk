@@ -103,11 +103,11 @@ PLPGSQL@0..178
     END_KW@174..177 "end"
   WHITESPACE@177..178 "\n"
 
-error[syntax-error]: unrecognized GET DIAGNOSTICS item
+error[syntax-error]: unrecognized `get diagnostics` item
   ╭▸ 
 5 │   get diagnostics x = bogus;
   ╰╴                      ━
-error[syntax-error]: unrecognized GET DIAGNOSTICS item
+error[syntax-error]: unrecognized `get diagnostics` item
   ╭▸ 
 6 │   get diagnostics x = "row_count";
   ╰╴                      ━

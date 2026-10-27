@@ -658,7 +658,7 @@ error[syntax-error]: type modifier cannot have parameter name
    ╭▸ 
 13 │ select foo(a => 1) 'x';
    ╰╴           ━━━━━━
-error[syntax-error]: type modifier cannot have ORDER BY
+error[syntax-error]: type modifier cannot have `order by`
    ╭▸ 
 14 │ select foo(1 order by 2) 'x';
    ╰╴             ━━━━━━━━━━

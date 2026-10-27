@@ -91,11 +91,11 @@ SOURCE_FILE
         COMMA ","
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected FOR TYPE entry after comma
+error[syntax-error]: expected `for type` entry after comma
   ╭▸ 
 5 │ transform for type int,;
   ╰╴                       ━
-error[syntax-error]: expected FOR TYPE entry after comma
+error[syntax-error]: expected `for type` entry after comma
   ╭▸ 
 8 │ create procedure p() language sql as '' transform for type int,
   ╰╴                                                               ━

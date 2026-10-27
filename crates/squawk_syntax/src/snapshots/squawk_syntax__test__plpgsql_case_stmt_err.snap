@@ -294,23 +294,23 @@ error[syntax-error]: expected `;`
    ╭▸ 
 13 │   end case
    ╰╴          ━
-error[syntax-error]: CASE expression must be parenthesized
+error[syntax-error]: `case` expression must be parenthesized
    ╭▸ 
 15 │   case case when x = 1 then 1 end
    ╰╴       ━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: CASE expression must be parenthesized
+error[syntax-error]: `case` expression must be parenthesized
    ╭▸ 
 21 │     when case when x = 1 then true end then
    ╰╴         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: CASE expression must be parenthesized
+error[syntax-error]: `case` expression must be parenthesized
    ╭▸ 
 23 │     when x = 2, case when x = 3 then true end then
    ╰╴                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: CASE expression must be parenthesized
+error[syntax-error]: `case` expression must be parenthesized
    ╭▸ 
 25 │     when case when x = 4 then true end, case when x = 5 then true end then
    ╰╴         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: CASE expression must be parenthesized
+error[syntax-error]: `case` expression must be parenthesized
    ╭▸ 
 25 │     when case when x = 4 then true end, case when x = 5 then true end then
    ╰╴                                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

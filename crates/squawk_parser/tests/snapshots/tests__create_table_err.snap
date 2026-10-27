@@ -1079,11 +1079,11 @@ error[syntax-error]: expected `,`
    ╭▸ 
 64 │   exclude using btree ( a with buzz.> b with <) 
    ╰╴                                     ━
-error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+error[syntax-error]: `without overlaps` is only allowed in `primary key` and `unique` constraints
    ╭▸ 
 78 │ create table t (a int, foreign key (a without overlaps) references u (c));
    ╰╴                                      ━
-error[syntax-error]: PERIOD must be the last column in the list
+error[syntax-error]: `period` must be the last column in the list
    ╭▸ 
 81 │ create table t (a int, b daterange, foreign key (period b, a) references u (c, period d));
    ╰╴                                                          ━

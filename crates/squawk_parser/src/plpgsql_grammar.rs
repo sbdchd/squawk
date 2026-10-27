@@ -40,7 +40,7 @@ fn comp_option(p: &mut Parser) {
         option_value(p);
         PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS
     } else {
-        p.error("expected OPTION, PRINT_STRICT_PARAMS, or VARIABLE_CONFLICT");
+        p.error("expected `option`, `print_strict_params`, or `variable_conflict`");
         ERROR
     };
     m.complete(p, kind);
@@ -54,7 +54,7 @@ fn variable_conflict_value(p: &mut Parser) {
         .find(|&kw| at_maybe_contextual_kw(p, kw))
     {
         Some(kw) => bump_maybe_contextual_kw(p, kw),
-        None => p.error("expected ERROR, USE_VARIABLE, or USE_COLUMN"),
+        None => p.error("expected `error`, `use_variable`, or `use_column`"),
     }
 }
 
@@ -292,7 +292,7 @@ fn exception_handler(p: &mut Parser) {
     grammar::separated(
         p,
         OR_KW,
-        || "unexpected OR".to_string(),
+        || "unexpected `or`".to_string(),
         grammar::NAME_FIRST,
         THEN_TERMINATOR,
         opt_condition,
@@ -526,7 +526,7 @@ fn call_stmt(p: &mut Parser) {
     match grammar::stmt(p, &grammar::StmtRestrictions::default()).map(|x| x.kind()) {
         Some(CALL) => (),
         _ => {
-            p.error("expected a CALL statement");
+            p.error("expected a `call` statement");
         }
     }
     p.expect(SEMICOLON);
@@ -539,7 +539,7 @@ fn do_stmt(p: &mut Parser) {
     match grammar::stmt(p, &grammar::StmtRestrictions::default()).map(|x| x.kind()) {
         Some(DO) => (),
         _ => {
-            p.error("expected a DO statement");
+            p.error("expected a `do` statement");
         }
     }
     p.expect(SEMICOLON);
@@ -552,7 +552,7 @@ fn perform_stmt(p: &mut Parser) {
     match grammar::perform_select(p).kind() {
         SELECT | SELECT_INTO | COMPOUND_SELECT => (),
         _ => {
-            p.error("expected a SELECT statement");
+            p.error("expected a `select` statement");
         }
     }
     p.expect(SEMICOLON);
@@ -717,7 +717,7 @@ fn raise_option(p: &mut Parser) {
             kind
         }
         None => {
-            p.error("unrecognized RAISE statement option");
+            p.error("unrecognized `raise` statement option");
             ERROR
         }
     };
@@ -837,7 +837,7 @@ fn diag_kind(p: &mut Parser) {
     {
         Some(kw) => p.bump_remap(kw),
         None => {
-            p.error("unrecognized GET DIAGNOSTICS item");
+            p.error("unrecognized `get diagnostics` item");
             if at_name(p) {
                 p.bump_any();
             }
@@ -899,7 +899,7 @@ fn fetch_direction(p: &mut Parser) {
     let direction = grammar::opt_direction(p);
     let from_or_in = p.eat(FROM_KW) || p.eat(IN_KW);
     if direction && !from_or_in {
-        p.error("expected FROM or IN");
+        p.error("expected `from` or `in`");
     }
 }
 
@@ -950,7 +950,7 @@ fn dyn_execute_stmt(p: &mut Parser) {
 
 fn into_clause(p: &mut Parser) {
     if !p.at(INTO_KW) {
-        p.error(format!("expected INTO, found {}", p.current()));
+        p.error(format!("expected `into`, found {}", p.current()));
         return;
     }
     let m = p.start();
@@ -965,7 +965,7 @@ const INTO_TARGET_FOLLOW: TokenSet = TokenSet::new(&[USING_KW]);
 fn into_target_list(p: &mut Parser) {
     let m = p.start();
     if !at_name(p) {
-        p.error(format!("expected an INTO target, found {}", p.current()));
+        p.error(format!("expected an `into` target, found {}", p.current()));
     }
     grammar::separated(
         p,

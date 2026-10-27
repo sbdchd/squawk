@@ -285,23 +285,23 @@ SOURCE_FILE@0..488
     SEMICOLON@486..487 ";"
   WHITESPACE@487..488 "\n"
 
-error[syntax-error]: OUT params are not allowed with aggregates
+error[syntax-error]: `out` params are not allowed with aggregates
   ╭▸ 
 9 │         out bar integer,
   ╰╴        ━━━
-error[syntax-error]: INOUT params are not allowed with aggregates
+error[syntax-error]: `inout` params are not allowed with aggregates
    ╭▸ 
 10 │         inout baz integer,
    ╰╴        ━━━━━
-error[syntax-error]: INOUT params are not allowed with aggregates
+error[syntax-error]: `inout` params are not allowed with aggregates
    ╭▸ 
 11 │         in out qux integer,
    ╰╴        ━━━━━━
-error[syntax-error]: OUT params are not allowed with aggregates
+error[syntax-error]: `out` params are not allowed with aggregates
    ╭▸ 
 24 │     out b numeric,
    ╰╴    ━━━
-error[syntax-error]: OUT params are not allowed with aggregates
+error[syntax-error]: `out` params are not allowed with aggregates
    ╭▸ 
 31 │     out b numeric,
    ╰╴    ━━━

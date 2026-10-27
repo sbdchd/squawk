@@ -89,7 +89,7 @@ PLPGSQL@0..155
     END_KW@151..154 "end"
   WHITESPACE@154..155 "\n"
 
-error[syntax-error]: unrecognized RAISE statement option
+error[syntax-error]: unrecognized `raise` statement option
   ╭▸ 
 3 │   raise notice 'x' using bogus = 1;
   ╰╴                         ━

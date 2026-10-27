@@ -69,7 +69,7 @@ SOURCE_FILE@0..66
     SEMICOLON@64..65 ";"
   WHITESPACE@65..66 "\n"
 
-error[syntax-error]: expected at least one expression in IN list
+error[syntax-error]: expected at least one expression in `in` list
   ╭▸ 
 1 │ SELECT * FROM t WHERE a IN ();
   ╰╴                           ━━
@@ -77,7 +77,7 @@ error[syntax-error]: expected at least one expression
   ╭▸ 
 1 │ SELECT * FROM t WHERE a IN ();
   ╰╴                            ━
-error[syntax-error]: expected at least one expression in IN list
+error[syntax-error]: expected at least one expression in `in` list
   ╭▸ 
 2 │ SELECT * FROM t WHERE a NOT IN ();
   ╰╴                               ━━

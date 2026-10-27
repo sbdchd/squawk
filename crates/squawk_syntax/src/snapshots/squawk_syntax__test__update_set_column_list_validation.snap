@@ -17,7 +17,7 @@ SOURCE_FILE@0..14
       COMMENT@12..14 "--"
       SET_COLUMN_LIST@14..14
 
-error[syntax-error]: expected at least one column assignment after SET
+error[syntax-error]: expected at least one column assignment after `set`
   ╭▸ 
 1 │ update t set--
   ╰╴              ━

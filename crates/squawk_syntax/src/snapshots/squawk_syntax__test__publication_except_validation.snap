@@ -68,7 +68,7 @@ SOURCE_FILE@0..111
     SEMICOLON@109..110 ";"
   WHITESPACE@110..111 "\n"
 
-error[syntax-error]: the first table in an EXCEPT list must use the TABLE keyword
+error[syntax-error]: the first table in an `except` list must use the `table` keyword
   ╭▸ 
 1 │ create publication p for all tables except (t1, table t2);
   ╰╴                                            ━━

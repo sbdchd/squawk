@@ -94,11 +94,11 @@ SOURCE_FILE@0..286
     SEMICOLON@284..285 ";"
   WHITESPACE@285..286 "\n"
 
-error[syntax-error]: OVERLAPS operand must be a row expression
+error[syntax-error]: `overlaps` operand must be a row expression
   ╭▸ 
 2 │ SELECT 1 OVERLAPS 2;
   ╰╴       ━
-error[syntax-error]: OVERLAPS operand must be a row expression
+error[syntax-error]: `overlaps` operand must be a row expression
   ╭▸ 
 2 │ SELECT 1 OVERLAPS 2;
   ╰╴                  ━

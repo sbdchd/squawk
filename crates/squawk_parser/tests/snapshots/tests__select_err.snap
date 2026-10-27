@@ -2531,11 +2531,11 @@ error[syntax-error]: expected expression, found `or`
    ╭▸ 
 91 │ select from t join u on or true;
    ╰╴                        ━
-error[syntax-error]: JOINs must appear before WHERE
+error[syntax-error]: joins must appear before `where`
    ╭▸ 
 96 │ join k on true;
    ╰╴━
-error[syntax-error]: HAVING must appear before ORDER BY
+error[syntax-error]: `having` must appear before `order by`
     ╭▸ 
 103 │ having a > 10;
     ╰╴━
@@ -2567,35 +2567,35 @@ error[syntax-error]: expected select before compound select operator
     ╭▸ 
 134 │ select * from (foo union select 1);
     ╰╴                  ━
-error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+error[syntax-error]: `union`, `intersect`, `except` must come before `order by`, `limit`, `offset`, `fetch`, and locking clauses
     ╭▸ 
 137 │ select 1 limit 1 union select 2;
     ╰╴                ━
-error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+error[syntax-error]: `union`, `intersect`, `except` must come before `order by`, `limit`, `offset`, `fetch`, and locking clauses
     ╭▸ 
 138 │ select 1 order by 1 intersect select 2;
     ╰╴                   ━
-error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+error[syntax-error]: `union`, `intersect`, `except` must come before `order by`, `limit`, `offset`, `fetch`, and locking clauses
     ╭▸ 
 139 │ select 1 offset 1 except select 2;
     ╰╴                 ━
-error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+error[syntax-error]: `union`, `intersect`, `except` must come before `order by`, `limit`, `offset`, `fetch`, and locking clauses
     ╭▸ 
 140 │ select 1 fetch first 1 row only union select 2;
     ╰╴                               ━
-error[syntax-error]: UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses
+error[syntax-error]: `union`, `intersect`, `except` must come before `order by`, `limit`, `offset`, `fetch`, and locking clauses
     ╭▸ 
 141 │ select 1 for update union select 2;
     ╰╴                   ━
-error[syntax-error]: a WITH clause is only allowed at the start of a select statement
+error[syntax-error]: a `with` clause is only allowed at the start of a select statement
     ╭▸ 
 144 │ select 1 union with x as (select 2) select * from x;
     ╰╴              ━
-error[syntax-error]: ALL or DISTINCT is only allowed before the first argument
+error[syntax-error]: `all` or `distinct` is only allowed before the first argument
     ╭▸ 
 147 │ select f(1, all 2);
     ╰╴            ━
-error[syntax-error]: ALL or DISTINCT is only allowed before the first argument
+error[syntax-error]: `all` or `distinct` is only allowed before the first argument
     ╭▸ 
 148 │ select f(1, distinct 2);
     ╰╴            ━
@@ -2655,35 +2655,35 @@ error[syntax-error]: expected at least one expression
     ╭▸ 
 170 │ select distinct on () 1;
     ╰╴                    ━
-error[syntax-error]: expected at least one GROUP BY item
+error[syntax-error]: expected at least one `group by` item
     ╭▸ 
 173 │ select 1 group by;
     ╰╴                 ━
-error[syntax-error]: expected at least one GROUP BY item
+error[syntax-error]: expected at least one `group by` item
     ╭▸ 
 174 │ select 1 group by distinct;
     ╰╴                          ━
-error[syntax-error]: expected a GROUP BY item after comma
+error[syntax-error]: expected a `group by` item after comma
     ╭▸ 
 177 │ select 1 group by a, order by b;
     ╰╴                    ━
-error[syntax-error]: expected a GROUP BY item after comma
+error[syntax-error]: expected a `group by` item after comma
     ╭▸ 
 178 │ with x as (select 1 group by a,)
     ╰╴                               ━
-error[syntax-error]: expected at least one ORDER BY item
+error[syntax-error]: expected at least one `order by` item
     ╭▸ 
 182 │ select 1 order by;
     ╰╴                 ━
-error[syntax-error]: expected an ORDER BY item after comma
+error[syntax-error]: expected an `order by` item after comma
     ╭▸ 
 183 │ select 1 order by a, limit 1;
     ╰╴                    ━
-error[syntax-error]: expected at least one ORDER BY item
+error[syntax-error]: expected at least one `order by` item
     ╭▸ 
 184 │ select array_agg(a order by);
     ╰╴                           ━
-error[syntax-error]: expected an ORDER BY item after comma
+error[syntax-error]: expected an `order by` item after comma
     ╭▸ 
 185 │ select array_agg(a order by a,);
     ╰╴                              ━

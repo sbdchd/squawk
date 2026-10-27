@@ -89,7 +89,7 @@ error[syntax-error]: missing semicolon after block
    ╭▸ 
 14 │   end inner
    ╰╴           ━
-error[syntax-error]: unexpected OR
+error[syntax-error]: unexpected `or`
    ╭▸ 
 22 │   when division_by_zero or then
    ╰╴                        ━
