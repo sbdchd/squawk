@@ -129,13 +129,13 @@ create aggregate old(int) (sfunc = add, stype = int);
     6 │ select old(1, 2);
       │        ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `old(int4)` does not exist
       ╭▸ 
     9 │ select old(1), cnt(*);
       │        ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `cnt()` does not exist
       ╭▸ 
     9 │ select old(1), cnt(*);
@@ -169,7 +169,7 @@ drop aggregate add(int, int);
     7 │ select s(1), c();
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `c()` does not exist
       ╭▸ 
     7 │ select s(1), c();
@@ -204,7 +204,7 @@ alter aggregate add(int, int) rename to y;
     6 │ select s(1);
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: role `nope` does not exist
        ╭▸ 
     10 │ alter aggregate x.t(int) owner to nope;
@@ -243,87 +243,87 @@ select * from t tablesample bernoulli (1) repeatable (count(*));
 prepare pp(bigint) as select $1;
 execute pp(count(*));
 "), @"
-    error: aggregate functions are not allowed in WHERE
+    error: aggregate functions are not allowed in `where`
       ╭▸ 
     3 │ select 1 from t where count(*) > 1;
       ╰╴                      ━━━━━━━━
-    error: aggregate functions are not allowed in JOIN conditions
+    error: aggregate functions are not allowed in `join` conditions
       ╭▸ 
     4 │ select 1 from t join t u on count(*) > 1;
       ╰╴                            ━━━━━━━━
-    error: aggregate functions are not allowed in GROUP BY
+    error: aggregate functions are not allowed in `group by`
       ╭▸ 
     5 │ select 1 from t group by count(*);
       ╰╴                         ━━━━━━━━
-    error: aggregate functions are not allowed in FILTER
+    error: aggregate functions are not allowed in `filter`
       ╭▸ 
     6 │ select count(*) filter (where count(*) > 1) from t;
       ╰╴                              ━━━━━━━━
-    error: aggregate functions are not allowed in window ROWS
+    error: aggregate functions are not allowed in window `rows`
       ╭▸ 
     7 │ select sum(1) over (rows between count(*) preceding and current row) from t;
       ╰╴                                 ━━━━━━━━
-    error: aggregate functions are not allowed in LIMIT
+    error: aggregate functions are not allowed in `limit`
       ╭▸ 
     8 │ select 1 from t limit count(*);
       ╰╴                      ━━━━━━━━
-    error: aggregate functions are not allowed in OFFSET
+    error: aggregate functions are not allowed in `offset`
       ╭▸ 
     9 │ select 1 from t offset count(*);
       ╰╴                       ━━━━━━━━
-    error: aggregate functions are not allowed in VALUES
+    error: aggregate functions are not allowed in `values`
        ╭▸ 
     10 │ values (count(*));
        ╰╴        ━━━━━━━━
-    error: aggregate functions are not allowed in VALUES
+    error: aggregate functions are not allowed in `values`
        ╭▸ 
     11 │ insert into t values (count(*));
        ╰╴                      ━━━━━━━━
-    error: aggregate functions are not allowed in RETURNING
+    error: aggregate functions are not allowed in `returning`
        ╭▸ 
     12 │ insert into t values (1) returning count(*);
        ╰╴                                   ━━━━━━━━
-    error: aggregate functions are not allowed in UPDATE
+    error: aggregate functions are not allowed in `update`
        ╭▸ 
     13 │ update t set a = count(*);
        ╰╴                 ━━━━━━━━
-    error: aggregate functions are not allowed in WHERE
+    error: aggregate functions are not allowed in `where`
        ╭▸ 
     14 │ delete from t where count(*) > 1;
        ╰╴                    ━━━━━━━━
-    error: aggregate functions are not allowed in functions in FROM
+    error: aggregate functions are not allowed in functions in `from`
        ╭▸ 
     15 │ select * from t, generate_series(1, count(*));
        ╰╴                                    ━━━━━━━━
-    error: aggregate functions are not allowed in MERGE WHEN conditions
+    error: aggregate functions are not allowed in `merge when` conditions
        ╭▸ 
     16 │ merge into t using t u on t.a = u.a when matched and count(*) > 1 then do nothing;
        ╰╴                                                     ━━━━━━━━
-    error: aggregate functions are not allowed in JOIN conditions
+    error: aggregate functions are not allowed in `join` conditions
        ╭▸ 
     17 │ merge into t using t u on count(*) > 1 when matched then do nothing;
        ╰╴                          ━━━━━━━━
-    error: aggregate functions are not allowed in UPDATE
+    error: aggregate functions are not allowed in `update`
        ╭▸ 
     18 │ merge into t using t u on t.a = u.a when matched then update set a = count(*);
        ╰╴                                                                     ━━━━━━━━
-    error: aggregate functions are not allowed in VALUES
+    error: aggregate functions are not allowed in `values`
        ╭▸ 
     19 │ merge into t using t u on t.a = u.a when not matched then insert values (count(*));
        ╰╴                                                                         ━━━━━━━━
-    error: aggregate functions are not allowed in WHERE
+    error: aggregate functions are not allowed in `where`
        ╭▸ 
     20 │ select 1 from t where exists (select 1 from t u where count(u.a) > 1);
        ╰╴                                                      ━━━━━━━━━━
-    error: aggregate functions are not allowed in functions in FROM
+    error: aggregate functions are not allowed in functions in `from`
        ╭▸ 
     21 │ select * from t tablesample bernoulli (count(*));
        ╰╴                                       ━━━━━━━━
-    error: aggregate functions are not allowed in functions in FROM
+    error: aggregate functions are not allowed in functions in `from`
        ╭▸ 
     22 │ select * from t tablesample bernoulli (1) repeatable (count(*));
        ╰╴                                                      ━━━━━━━━
-    error: aggregate functions are not allowed in EXECUTE parameters
+    error: aggregate functions are not allowed in `execute` parameters
        ╭▸ 
     24 │ execute pp(count(*));
        ╰╴           ━━━━━━━━
@@ -413,23 +413,23 @@ insert into t values (1) on conflict (a) do update set b[count(*)] = 1;
 insert into t values (1) on conflict ((a + count(*))) do nothing;
 insert into t values (1) on conflict (a) where count(*) > 1 do nothing;
 "), @"
-    error: aggregate functions are not allowed in INSERT
+    error: aggregate functions are not allowed in `insert`
       ╭▸ 
     3 │ insert into t (b[count(*)]) values (array[1]);
       ╰╴                 ━━━━━━━━
-    error: aggregate functions are not allowed in UPDATE
+    error: aggregate functions are not allowed in `update`
       ╭▸ 
     4 │ update t set b[count(*)] = array[1];
       ╰╴               ━━━━━━━━
-    error: aggregate functions are not allowed in UPDATE
+    error: aggregate functions are not allowed in `update`
       ╭▸ 
     5 │ merge into t using t u on t.a = u.a when matched then update set b[count(*)] = 1;
       ╰╴                                                                   ━━━━━━━━
-    error: aggregate functions are not allowed in INSERT
+    error: aggregate functions are not allowed in `insert`
       ╭▸ 
     6 │ merge into t using t u on t.a = u.a when not matched then insert (b[count(*)]) values (1);
       ╰╴                                                                    ━━━━━━━━
-    error: aggregate functions are not allowed in UPDATE
+    error: aggregate functions are not allowed in `update`
       ╭▸ 
     7 │ insert into t values (1) on conflict (a) do update set b[count(*)] = 1;
       ╰╴                                                         ━━━━━━━━
@@ -474,7 +474,7 @@ create rule r as on insert to t where count(*) > 1 do nothing;
       ╭▸ 
     3 │ create table c1 (a int check (count(*) > 1));
       ╰╴                              ━━━━━━━━
-    error: aggregate functions are not allowed in DEFAULT expressions
+    error: aggregate functions are not allowed in `default` expressions
       ╭▸ 
     4 │ create table c2 (a int default count(*));
       ╰╴                               ━━━━━━━━
@@ -514,23 +514,23 @@ create rule r as on insert to t where count(*) > 1 do nothing;
        ╭▸ 
     13 │ create statistics s on (count(*)) from t;
        ╰╴                        ━━━━━━━━
-    error: aggregate functions are not allowed in COPY FROM WHERE conditions
+    error: aggregate functions are not allowed in `copy from where` conditions
        ╭▸ 
     14 │ copy t from stdin where count(*) > 1;
        ╰╴                        ━━━━━━━━
-    error: aggregate functions are not allowed in CALL arguments
+    error: aggregate functions are not allowed in `call` arguments
        ╭▸ 
     16 │ call pr(count(*));
        ╰╴        ━━━━━━━━
-    error: aggregate functions are not allowed in trigger WHEN conditions
+    error: aggregate functions are not allowed in trigger `when` conditions
        ╭▸ 
     18 │ create trigger tr before insert on t for each row when (count(*) > 1) execute function tf();
        ╰╴                                                        ━━━━━━━━
-    error: aggregate functions are not allowed in DEFAULT expressions
+    error: aggregate functions are not allowed in `default` expressions
        ╭▸ 
     19 │ create function fd(x bigint default count(*)) returns int language sql as 'select 1';
        ╰╴                                    ━━━━━━━━
-    error: aggregate functions are not allowed in DEFAULT expressions
+    error: aggregate functions are not allowed in `default` expressions
        ╭▸ 
     20 │ alter domain d set default count(*);
        ╰╴                           ━━━━━━━━
@@ -542,7 +542,7 @@ create rule r as on insert to t where count(*) > 1 do nothing;
        ╭▸ 
     22 │ alter table t add constraint ex exclude (a with =) where (count(*) > 1);
        ╰╴                                                          ━━━━━━━━
-    error: aggregate functions are not allowed in WHERE
+    error: aggregate functions are not allowed in `where`
        ╭▸ 
     23 │ create rule r as on insert to t where count(*) > 1 do nothing;
        ╰╴                                      ━━━━━━━━

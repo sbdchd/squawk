@@ -39,13 +39,13 @@ select 'x'::t;
     7 │ drop table v;
       │            ━
       │
-      ╰ hint: Use DROP VIEW to remove a view.
+      ╰ hint: use `drop view` to remove a view
     error: `u` is not a view
       ╭▸ 
     9 │ drop view u;
       │           ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: relation `t` does not exist
        ╭▸ 
     10 │ select * from t;
@@ -88,7 +88,13 @@ select t.a from t;
     error: column `a` does not exist
       ╭▸ 
     8 │ select a, b, c from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select a, b, c from t;
+    8 + select b, b, c from t;
+      ╰╴
     error: column `t.a` does not exist
       ╭▸ 
     9 │ select t.a from t;
@@ -154,7 +160,13 @@ select a, b from t;
     error: column `a` does not exist
       ╭▸ 
     5 │ select a from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select a from t;
+    5 + select b from t;
+      ╰╴
     ");
 }
 
@@ -405,7 +417,13 @@ select c from t;
     error: column `a` does not exist
       ╭▸ 
     4 │ select a from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a from t;
+    4 + select c from t;
+      ╰╴
     error: column `t.b` already exists
       ╭▸ 
     6 │ alter table t rename c to b;
@@ -417,7 +435,13 @@ select c from t;
     error: column `d` does not exist
        ╭▸ 
     12 │ select d from t;
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    12 - select d from t;
+    12 + select c from t;
+       ╰╴
     ");
 }
 
@@ -462,7 +486,13 @@ select h from t;
     error: column `h` does not exist
        ╭▸ 
     19 │ select h from t;
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    19 - select h from t;
+    19 + select a from t;
+       ╰╴
     ");
 }
 
@@ -544,7 +574,7 @@ select f(a) from t;
     4 │ select f(a) from t;
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

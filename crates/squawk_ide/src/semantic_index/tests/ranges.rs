@@ -52,7 +52,7 @@ create type r6 as range (subtype = int, canonical = canon);
     11 │ create type r6 as range (subtype = int, canonical = canon);
        │                                                     ━━━━━
        │
-       ╰ hint: Create the type as a shell type, then create its canonicalization function, then do a full CREATE TYPE.
+       ╰ hint: create the type as a shell type, then create its canonicalization function, then do a full `create type`
     ");
 }
 

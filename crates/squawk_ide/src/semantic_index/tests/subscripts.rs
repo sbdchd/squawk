@@ -20,7 +20,13 @@ insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, 
     error: column `y` does not exist
       ╭▸ 
     4 │ insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, d[1:y] = 2;
-      ╰╴                                                                                    ━
+      │                                                                                     ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, d[1:y] = 2;
+    4 + insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, d[1:t.a] = 2;
+      ╰╴
     ");
 }
 
@@ -33,7 +39,13 @@ update t set d[a] = 1, d[x:1] = 2;
     error: column `x` does not exist
       ╭▸ 
     3 │ update t set d[a] = 1, d[x:1] = 2;
-      ╰╴                         ━
+      │                          ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - update t set d[a] = 1, d[x:1] = 2;
+    3 + update t set d[a] = 1, d[a:1] = 2;
+      ╰╴
     ");
 }
 
@@ -50,13 +62,13 @@ select f(a), f(b), g(a), g(b) from t;
     5 │ select f(a), f(b), g(a), g(b) from t;
       │                    ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g(oidvector)` does not exist
       ╭▸ 
     5 │ select f(a), f(b), g(a), g(b) from t;
       │                          ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -76,13 +88,13 @@ select f(a), g(a), h(b), i(c), j(d) from t;
     8 │ select f(a), g(a), h(b), i(c), j(d) from t;
       │                          ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `j(oid[])` does not exist
       ╭▸ 
     8 │ select f(a), g(a), h(b), i(c), j(d) from t;
       │                                ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -100,7 +112,7 @@ select f(p[0]), f(l[0]), g(b[0]), g(s[0]), h(n[0]), f(n[0]) from t;
     6 │ select f(p[0]), f(l[0]), g(b[0]), g(s[0]), h(n[0]), f(n[0]) from t;
       │                                                     ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -116,7 +128,7 @@ select f(p) from t;
     4 │ select f(p) from t;
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -133,7 +145,7 @@ select f(p[0:1]), g(p[0:1]) from t;
     5 │ select f(p[0:1]), g(p[0:1]) from t;
       │                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -150,7 +162,7 @@ select f(a[0:1]), g(a[0:1]) from t;
     5 │ select f(a[0:1]), g(a[0:1]) from t;
       │                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -169,7 +181,7 @@ select f(a[1]), f(b[1]), g(a[1:2]), g(b[1:2]), g(a[1]) from t;
     7 │ select f(a[1]), f(b[1]), g(a[1:2]), g(b[1:2]), g(a[1]) from t;
       │                                                ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -186,7 +198,7 @@ select f(j['a']), f(j['a']['b']), g(j['a']), f(j['a':'b']) from t;
     5 │ select f(j['a']), f(j['a']['b']), g(j['a']), f(j['a':'b']) from t;
       │                                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -209,7 +221,7 @@ select f(h['k']), g(h['k']) from t;
     11 │ select f(h['k']), g(h['k']) from t;
        │                   ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -233,7 +245,7 @@ select f(a[1]), g(a[1:2]), f(a[1:2]) from u;
     12 │ select f(a[1]), g(a[1:2]), f(a[1:2]) from u;
        │                            ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -252,7 +264,7 @@ select f(a), g(a[0]) from u;
     7 │ select f(a), g(a[0]) from u;
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -268,7 +280,7 @@ select f(a[0]), f(b[0]) from t;
     4 │ select f(a[0]), f(b[0]) from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -297,18 +309,18 @@ select g(v[1]) from x;
     10 │ select g(v[1]), g(v[1:2]) from x;
        │        ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: function `g(int4[])` does not exist
        ╭▸ 
     10 │ select g(v[1]), g(v[1:2]) from x;
        │                 ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: function `g(int4)` does not exist
        ╭▸ 
     15 │ select g(v[1]) from x;
        │        ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }

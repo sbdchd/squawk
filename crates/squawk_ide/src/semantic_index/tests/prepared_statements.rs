@@ -93,7 +93,13 @@ create table u as execute q;
     error: column `c` does not exist
       ╭▸ 
     4 │ select a, b, c from t;
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a, b, c from t;
+    4 + select a, b, a from t;
+      ╰╴
     error: prepared statement `q` does not exist
       ╭▸ 
     5 │ create table u as execute q;

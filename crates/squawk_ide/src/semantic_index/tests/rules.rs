@@ -23,7 +23,7 @@ create rule r3 as on delete to t do instead delete from log where a = old.a;
       ╭▸ 
     5 │   where new.a > old.b and new.zz = 1
       ╰╴                              ━━
-    error: INSERT has more expressions than target columns
+    error: `insert` has more expressions than target columns
       ╭▸ 
     7 │     insert into log values (new.a, old.zz);
       ╰╴                                   ━━━━━━
@@ -245,11 +245,11 @@ alter rule "_RETURN" on m rename to r;
        ╭▸ 
     10 │ drop rule "_RETURN" on t;
        ╰╴          ━━━━━━━━━
-    error: renaming an ON SELECT rule is not allowed
+    error: renaming an `on select` rule is not allowed
        ╭▸ 
     11 │ alter rule "_RETURN" on v rename to r;
        ╰╴                                    ━
-    error: renaming an ON SELECT rule is not allowed
+    error: renaming an `on select` rule is not allowed
        ╭▸ 
     12 │ alter rule "_RETURN" on m rename to r;
        ╰╴                                    ━

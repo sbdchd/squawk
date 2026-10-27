@@ -17,13 +17,13 @@ select f(a), f(b), g(a), g(b) from t;
     7 │ select f(a), f(b), g(a), g(b) from t;
       │              ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g(ints)` does not exist
       ╭▸ 
     7 │ select f(a), f(b), g(a), g(b) from t;
       │                    ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -50,13 +50,13 @@ select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
     5 │ select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `f(int4, posint)` does not exist
       ╭▸ 
     5 │ select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
       │                                     ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -72,13 +72,13 @@ select f(a, b), f(a, c), f(d, e), f(d, b) from t;
     4 │ select f(a, b), f(a, c), f(d, e), f(d, b) from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `f(int2vector, int4)` does not exist
       ╭▸ 
     4 │ select f(a, b), f(a, c), f(d, e), f(d, b) from t;
       │                                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -96,7 +96,7 @@ select f(a, b), g(m, m), g(m, a) from t;
     6 │ select f(a, b), g(m, m), g(m, a) from t;
       │                          ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -113,13 +113,13 @@ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g(nummultirange, int4range)` does not exist
       ╭▸ 
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
       │                                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -135,7 +135,7 @@ select f(a, a), f(a, b), f(a, 'x') from t;
     4 │ select f(a, a), f(a, b), f(a, 'x') from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -153,19 +153,19 @@ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
     6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g(int4[], text)` does not exist
       ╭▸ 
     6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
       │                                              ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `h(int4[], int4[])` does not exist
       ╭▸ 
     6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
       │                                                                ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -182,13 +182,13 @@ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g(nummultirange, int4range)` does not exist
       ╭▸ 
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
       │                                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -204,7 +204,7 @@ select f(a, b), f(a, c) from t;
     4 │ select f(a, b), f(a, c) from t;
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -228,19 +228,19 @@ select is_int(id(a)), is_ints(wrap(a)), is_int(first(d)), is_bigint(pick(a, b)),
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
        │   ━━━━━━━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: function `is_text(int4)` does not exist
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
        │                   ━━━━━━━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: function `is_int(int8)` does not exist
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
        │                                      ━━━━━━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -258,7 +258,7 @@ select is_int(lower(r)), is_mr(multirange(r)), is_text(lower(r)) from t;
     6 │ select is_int(lower(r)), is_mr(multirange(r)), is_text(lower(r)) from t;
       │                                                ━━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -275,7 +275,7 @@ select is_text(pick('a', 'b')), is_int(pick('a', 'b'));
     5 │ select is_text(pick('a', 'b')), is_int(pick('a', 'b'));
       │                                 ━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -293,7 +293,7 @@ select is_ints(f(a, a)), is_int(f(a, a)) from t;
     6 │ select is_ints(f(a, a)), is_int(f(a, a)) from t;
       │                          ━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

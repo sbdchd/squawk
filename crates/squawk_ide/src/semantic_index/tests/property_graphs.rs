@@ -137,7 +137,7 @@ drop property graph g2;
     7 │ drop property graph t;
       │                     ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: relation `g2` does not exist
        ╭▸ 
     11 │ drop property graph g2;
@@ -214,7 +214,7 @@ select * from graph_table(missing_graph match (a) columns (a.name as n));
        ╭▸ 
     14 │   where a.id = 1 and e.since is not null and z.name = 'y'
        ╰╴          ━━
-    error: missing FROM-clause entry for table `z`
+    error: missing `from` clause entry for table `z`
        ╭▸ 
     14 │   where a.id = 1 and e.since is not null and z.name = 'y'
        ╰╴                                             ━

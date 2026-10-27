@@ -14,11 +14,23 @@ delete from missing;
     error: column `z` does not exist
       ╭▸ 
     4 │ delete from t where a = 1 and z = 2;
-      ╰╴                              ━
+      │                               ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - delete from t where a = 1 and z = 2;
+    4 + delete from t where a = 1 and a = 2;
+      ╰╴
     error: column `y` does not exist
       ╭▸ 
     5 │ delete from t using u where t.a = u.c returning a, c, y;
-      ╰╴                                                      ━
+      │                                                       ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - delete from t using u where t.a = u.c returning a, c, y;
+    5 + delete from t using u where t.a = u.c returning a, c, a;
+      ╰╴
     error: relation `missing` does not exist
       ╭▸ 
     6 │ delete from missing;
@@ -32,7 +44,7 @@ fn delete_alias_hides_table_name() {
 create table t(a int);
 delete from t as x where x.a = 1 and t.a = 1;
 "), @"
-    error: missing FROM-clause entry for table `t`
+    error: missing `from` clause entry for table `t`
       ╭▸ 
     3 │ delete from t as x where x.a = 1 and t.a = 1;
       ╰╴                                     ━
@@ -62,7 +74,13 @@ select a, b from d;
     error: column `b` does not exist
       ╭▸ 
     4 │ select a, b from d;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a, b from d;
+    4 + select a, a from d;
+      ╰╴
     ");
 }
 
@@ -77,7 +95,7 @@ delete from t where old.a = 1;
       ╭▸ 
     3 │ delete from t returning a, old.a, new.a, old.z, old.*;
       ╰╴                                             ━
-    error: missing FROM-clause entry for table `old`
+    error: missing `from` clause entry for table `old`
       ╭▸ 
     4 │ delete from t where old.a = 1;
       ╰╴                    ━━━
@@ -90,7 +108,7 @@ fn delete_returning_old_new_renamed() {
 create table t(a int);
 delete from t returning with (old as o, new as n) o.a, n.a, old.a;
 "), @"
-    error: missing FROM-clause entry for table `old`
+    error: missing `from` clause entry for table `old`
       ╭▸ 
     3 │ delete from t returning with (old as o, new as n) o.a, n.a, old.a;
       ╰╴                                                            ━━━

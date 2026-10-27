@@ -202,7 +202,7 @@ create or replace constraint trigger tr2 after insert on t for each row execute 
       ╭▸ 
     5 │ create or replace trigger tr after insert on t for each row execute function f();
       ╰╴                          ━━
-    error: CREATE OR REPLACE CONSTRAINT TRIGGER is not supported
+    error: `create or replace constraint trigger` is not supported
       ╭▸ 
     6 │ create or replace constraint trigger tr2 after insert on t for each row execute function f();
       ╰╴       ━━━━━━━━━━
@@ -271,19 +271,19 @@ create event trigger et on ddl_command_start execute function f();
 create event trigger et2 on ddl_command_start execute function tf();
 create event trigger et3 on ddl_command_start execute function etf();
 "), @"
-    error: function `f` must return type trigger
+    error: function `f` must return type `trigger`
        ╭▸ 
     16 │   execute function f();
        ╰╴                   ━
-    error: function `etf` must return type trigger
+    error: function `etf` must return type `trigger`
        ╭▸ 
     26 │   execute function etf();
        ╰╴                   ━━━
-    error: function `f` must return type event_trigger
+    error: function `f` must return type `event_trigger`
        ╭▸ 
     32 │ create event trigger et on ddl_command_start execute function f();
        ╰╴                                                              ━
-    error: function `tf` must return type event_trigger
+    error: function `tf` must return type `event_trigger`
        ╭▸ 
     33 │ create event trigger et2 on ddl_command_start execute function tf();
        ╰╴                                                               ━━

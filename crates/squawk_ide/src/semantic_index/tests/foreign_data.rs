@@ -295,13 +295,13 @@ select a from t;
     6 │ drop table ft;
       │            ━━
       │
-      ╰ hint: Use DROP FOREIGN TABLE to remove a foreign table.
+      ╰ hint: use `drop foreign table` to remove a foreign table
     error: `t` is not a foreign table
       ╭▸ 
     7 │ drop foreign table t;
       │                    ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: relation `ft` does not exist
       ╭▸ 
     9 │ select a from ft;

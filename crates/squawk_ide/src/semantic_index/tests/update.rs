@@ -19,15 +19,33 @@ update missing set a = 1;
     error: column `y` does not exist
       ╭▸ 
     4 │ update t set a = 1, z = 2 where b = 1 and y = 2;
-      ╰╴                                          ━
+      │                                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - update t set a = 1, z = 2 where b = 1 and y = 2;
+    4 + update t set a = 1, z = 2 where b = 1 and a = 2;
+      ╰╴
     error: column `x` does not exist
       ╭▸ 
     5 │ update t set a = c from u where t.b = u.c returning a, c, x;
-      ╰╴                                                          ━
+      │                                                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - update t set a = c from u where t.b = u.c returning a, c, x;
+    5 + update t set a = c from u where t.b = u.c returning a, c, a;
+      ╰╴
     error: column `w` does not exist
       ╭▸ 
     6 │ update t set (a, b) = (1, w), (v) = (select c from u);
-      ╰╴                          ━
+      │                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - update t set (a, b) = (1, w), (v) = (select c from u);
+    6 + update t set (a, b) = (1, a), (v) = (select c from u);
+      ╰╴
     error: column `t.v` does not exist
       ╭▸ 
     6 │ update t set (a, b) = (1, w), (v) = (select c from u);
@@ -45,7 +63,7 @@ fn update_alias_hides_table_name() {
 create table t(a int);
 update t as x set a = x.a + t.a;
 "), @"
-    error: missing FROM-clause entry for table `t`
+    error: missing `from` clause entry for table `t`
       ╭▸ 
     3 │ update t as x set a = x.a + t.a;
       ╰╴                            ━
@@ -89,7 +107,13 @@ select a, b from i;
     error: column `b` does not exist
       ╭▸ 
     4 │ select a, b from i;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a, b from i;
+    4 + select a, a from i;
+      ╰╴
     ");
 }
 

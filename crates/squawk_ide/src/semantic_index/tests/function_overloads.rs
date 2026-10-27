@@ -13,7 +13,7 @@ select lower('A'), lower(1, 2), lower(1, 2, 3);
     3 │ select lower('A'), lower(1, 2), lower(1, 2, 3);
       │                                 ━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

@@ -33,19 +33,19 @@ alter sequence if exists s restart;
     7 │ drop sequence s;
       │               ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a sequence
       ╭▸ 
     8 │ drop sequence s;
       │               ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a sequence
       ╭▸ 
     9 │ drop sequence if exists s;
       │                         ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a sequence
        ╭▸ 
     10 │ alter sequence s restart;
@@ -101,19 +101,19 @@ drop view s;
     4 │ drop table s;
       │            ━
       │
-      ╰ hint: Use DROP SEQUENCE to remove a sequence.
+      ╰ hint: use `drop sequence` to remove a sequence
     error: `t` is not a sequence
       ╭▸ 
     5 │ drop sequence t;
       │               ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a view
       ╭▸ 
     6 │ drop view s;
       │           ━
       │
-      ╰ hint: Use DROP SEQUENCE to remove a sequence.
+      ╰ hint: use `drop sequence` to remove a sequence
     ");
 }
 

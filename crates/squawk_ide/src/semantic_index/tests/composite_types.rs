@@ -44,37 +44,54 @@ select a, b from x;
     4 │ alter type t add attribute c int;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     5 │ alter type t drop attribute b;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     6 │ alter type t rename attribute a to a2;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     7 │ alter type t alter attribute a type bigint;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: column `c` does not exist
       ╭▸ 
     9 │ select c from x;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select c from x;
+    9 + select a from x;
+      ╰╴
     error: column `a` does not exist
        ╭▸ 
     14 │ select a, b from x;
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    14 │ select a2, b from x;
+       ╰╴        +
     error: column `b` does not exist
        ╭▸ 
     14 │ select a, b from x;
-       ╰╴          ━
+       │           ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    14 - select a, b from x;
+    14 + select a, c from x;
+       ╰╴
     ");
 }
 
@@ -98,11 +115,17 @@ alter type t add attribute c int;
     5 │ alter type t add attribute b int;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: column `b` does not exist
       ╭▸ 
     8 │ select b from y;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select b from y;
+    8 + select a from y;
+      ╰╴
     ");
 }
 
@@ -121,7 +144,7 @@ select g(a) from x;
     7 │ select g(a) from x;
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -175,7 +198,7 @@ select g((null::t).a);
     4 │ select g((null::t).a);
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

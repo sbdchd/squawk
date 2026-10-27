@@ -19,7 +19,7 @@ select t.nope, nope(t), t from t;
     5 │ select t.nope, nope(t), t from t;
       │                ━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -83,7 +83,7 @@ from t;
     19 │   (-p).x,
        │    ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 

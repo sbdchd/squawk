@@ -333,7 +333,7 @@ drop operator === (int, int);
     2 │ create table t (a int check (f(a) > 0));
       │                              ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: cannot drop function `to_text` because other objects depend on it
        ╭▸ 
     12 │ drop function to_text;
@@ -393,11 +393,23 @@ select d from t;
     error: column `b` does not exist
       ╭▸ 
     8 │ select b from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select b from t;
+    8 + select a from t;
+      ╰╴
     error: column `d` does not exist
       ╭▸ 
     9 │ select d from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select d from t;
+    9 + select a from t;
+      ╰╴
     ");
 }
 
@@ -441,7 +453,13 @@ select c from u;
     error: column `c` does not exist
       ╭▸ 
     9 │ select c from u;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select c from u;
+    9 + select a from u;
+      ╰╴
     ");
 }
 
@@ -759,7 +777,13 @@ select (v).m from u;
     error: column `m` does not exist
       ╭▸ 
     9 │ select m from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select m from t;
+    9 + select a from t;
+      ╰╴
     error: column `ms` does not exist
        ╭▸ 
     10 │ select ms from t;
@@ -800,11 +824,17 @@ select to_text(null);
     11 │ select f(null);
        │        ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: column `a` does not exist
        ╭▸ 
     12 │ select a from t;
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    12 - select a from t;
+    12 + select b from t;
+       ╰╴
     error: type `d` does not exist
        ╭▸ 
     14 │ select null::d;
@@ -822,7 +852,7 @@ select to_text(null);
     17 │ select to_text(null);
        │        ━━━━━━━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -848,7 +878,13 @@ select null::pos3;
     error: column `a` does not exist
        ╭▸ 
     10 │ select a from t;
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    10 - select a from t;
+    10 + select b from t;
+       ╰╴
     error: type `pos3` does not exist
        ╭▸ 
     12 │ select null::pos3;
@@ -878,7 +914,13 @@ select (c).z from v;
     error: column `x` does not exist
       ╭▸ 
     9 │ select x from u;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select x from u;
+    9 + select y from u;
+      ╰╴
     error: column `xs` does not exist
        ╭▸ 
     10 │ select xs from u;
@@ -939,13 +981,19 @@ select t_out(null);
     error: column `a` does not exist
        ╭▸ 
     12 │ select a from u;
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    12 - select a from u;
+    12 + select b from u;
+       ╰╴
     error: function `t_out(unknown)` does not exist
        ╭▸ 
     13 │ select t_out(null);
        │        ━━━━━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -971,7 +1019,13 @@ select (v).m from u;
     error: column `m` does not exist
        ╭▸ 
     11 │ select m from t;
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    11 - select m from t;
+    11 + select a from t;
+       ╰╴
     error: column `m` does not exist
        ╭▸ 
     12 │ select (v).m from u;
@@ -1017,7 +1071,7 @@ select s(1);
     6 │ select s(1);
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

@@ -20,19 +20,19 @@ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
        │                    ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: function `g(small)` does not exist
        ╭▸ 
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
        │                          ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: function `h(text)` does not exist
        ╭▸ 
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
        │                                            ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -51,7 +51,7 @@ select f('x'), g(a), g(b), g(c) from t;
     7 │ select f('x'), g(a), g(b), g(c) from t;
       │                ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

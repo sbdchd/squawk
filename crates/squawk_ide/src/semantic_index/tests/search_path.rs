@@ -48,7 +48,13 @@ select y, x from t;
     error: column `x` does not exist
       ╭▸ 
     7 │ select y, x from t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - select y, x from t;
+    7 + select y, y from t;
+      ╰╴
     ");
 }
 
@@ -250,7 +256,13 @@ select b from pg_temp.t;
     error: column `a` does not exist
       ╭▸ 
     5 │ select a from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select a from t;
+    5 + select b from t;
+      ╰╴
     ");
 }
 
@@ -301,7 +313,13 @@ select b from t;
     error: column `b` does not exist
       ╭▸ 
     6 │ select b from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - select b from t;
+    6 + select a from t;
+      ╰╴
     ");
 }
 

@@ -113,7 +113,7 @@ select unnest(array[1], array[2]);
     2 │ select unnest(array[1], array[2]);
       │        ━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -130,7 +130,7 @@ from t,
     5 │   unnest(a, b) as u (x int, y text);
       │   ━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

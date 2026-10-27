@@ -16,7 +16,13 @@ create table t(
     error: column `b` does not exist
       ╭▸ 
     4 │   a int check (b > 0),
-      ╰╴               ━
+      │                ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 -   a int check (b > 0),
+    4 +   a int check (a > 0),
+      ╰╴
     error: column `c` does not exist
       ╭▸ 
     5 │   primary key (c),
@@ -468,31 +474,31 @@ create table n7 (
 );
 alter table n7 add column e int not null null;
 "), @"
-    error: conflicting NULL/NOT NULL declarations for column `a` of table `n1`
+    error: conflicting `null`/`not null` declarations for column `a` of table `n1`
       ╭▸ 
     2 │ create table n1 (a int primary key null);
       ╰╴                                   ━━━━
-    error: conflicting NULL/NOT NULL declarations for column `a` of table `n2`
+    error: conflicting `null`/`not null` declarations for column `a` of table `n2`
       ╭▸ 
     3 │ create table n2 (a int null primary key);
       ╰╴                            ━━━━━━━━━━━
-    error: conflicting NULL/NOT NULL declarations for column `a` of table `n3`
+    error: conflicting `null`/`not null` declarations for column `a` of table `n3`
       ╭▸ 
     4 │ create table n3 (a int null not null);
       ╰╴                            ━━━━━━━━
-    error: conflicting NULL/NOT NULL declarations for column `a` of table `n4`
+    error: conflicting `null`/`not null` declarations for column `a` of table `n4`
       ╭▸ 
     5 │ create table n4 (a int not null null);
       ╰╴                                ━━━━
-    error: conflicting NULL/NOT NULL declarations for column `a` of table `n5`
+    error: conflicting `null`/`not null` declarations for column `a` of table `n5`
       ╭▸ 
     6 │ create table n5 (a int generated always as identity null);
       ╰╴                                                    ━━━━
-    error: conflicting NULL/NOT NULL declarations for column `a` of table `n6`
+    error: conflicting `null`/`not null` declarations for column `a` of table `n6`
       ╭▸ 
     7 │ create table n6 (a int null generated always as identity);
       ╰╴                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    error: conflicting NULL/NOT NULL declarations for column `e` of table `n7`
+    error: conflicting `null`/`not null` declarations for column `e` of table `n7`
        ╭▸ 
     14 │ alter table n7 add column e int not null null;
        ╰╴                                         ━━━━
@@ -528,23 +534,23 @@ create table pt_1
   partition of pt
   for values from (a) to (10);
 "), @"
-    error: cannot use column reference in DEFAULT expression
+    error: cannot use column reference in `default` expression
       ╭▸ 
     4 │   b int default a,
       ╰╴                ━
-    error: cannot use column reference in DEFAULT expression
+    error: cannot use column reference in `default` expression
       ╭▸ 
     5 │   c int default t.a,
       ╰╴                ━━━
-    error: cannot use column reference in DEFAULT expression
+    error: cannot use column reference in `default` expression
       ╭▸ 
     6 │   d int default (t).a,
       ╰╴                 ━
-    error: cannot use column reference in DEFAULT expression
+    error: cannot use column reference in `default` expression
       ╭▸ 
     7 │   e int default t
       ╰╴                ━
-    error: cannot use column reference in DEFAULT expression
+    error: cannot use column reference in `default` expression
       ╭▸ 
     9 │ alter table t add column f int default b + 1;
       ╰╴                                       ━

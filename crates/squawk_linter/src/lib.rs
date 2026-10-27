@@ -1,5 +1,6 @@
 use rustc_hash::FxHashSet;
 use std::borrow::Cow;
+use std::cmp::Ordering;
 use std::fmt;
 
 use enum_iterator::Sequence;
@@ -422,7 +423,7 @@ impl<'de> Deserialize<'de> for Rule {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Fix {
     pub title: Cow<'static, str>,
     pub edits: Vec<Edit>,
@@ -443,6 +444,22 @@ pub struct Edit {
     // TODO: does this need to be an Option?
     pub text: Option<Cow<'static, str>>,
 }
+impl Ord for Edit {
+    fn cmp(&self, other: &Self) -> Ordering {
+        (self.text_range.start(), self.text_range.end(), &self.text).cmp(&(
+            other.text_range.start(),
+            other.text_range.end(),
+            &other.text,
+        ))
+    }
+}
+
+impl PartialOrd for Edit {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 impl Edit {
     pub fn insert<T: Into<Cow<'static, str>>>(text: T, at: TextSize) -> Self {
         Self {

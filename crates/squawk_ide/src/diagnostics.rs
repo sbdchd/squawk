@@ -2,7 +2,7 @@ use salsa::Database as Db;
 
 use crate::db::{File, semantic_index};
 use crate::file::FileId;
-pub use crate::semantic_index::{Diagnostic, DiagnosticKind};
+pub use crate::semantic_index::{Diagnostic, DiagnosticKind, Suggestion};
 
 pub fn diagnostics(db: &dyn Db, file: File) -> Vec<Diagnostic> {
     let file_id = FileId::from(file);

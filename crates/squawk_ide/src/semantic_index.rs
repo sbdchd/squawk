@@ -3,6 +3,8 @@ use std::ops::Deref;
 
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
+use squawk_linter::{Edit, Fix};
+use squawk_syntax::quote::quote_ident;
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::constraint_index::ConstraintIndex;
@@ -150,23 +152,38 @@ pub struct Diagnostic {
     pub range: FileRange,
     pub kind: DiagnosticKind,
     pub message: Cow<'static, str>,
-    pub hint: Option<&'static str>,
+    pub hint: Option<Cow<'static, str>>,
+    pub suggestion: Option<Suggestion>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Suggestion {
+    pub message: Cow<'static, str>,
+    pub fix: Fix,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SimilarColumn {
+    pub(crate) qualifier: Option<Name>,
+    pub(crate) column: Name,
 }
 
 #[derive(Debug, Default)]
 pub(crate) struct Errors {
-    errors: Vec<(FileRange, SemaError)>,
+    entries: Vec<(FileRange, SemaError)>,
     pub(crate) args: LayeredArena<ErrorArg>,
+    pub(crate) similar_columns: FxHashMap<RefId, SimilarColumn>,
 }
 
 impl Errors {
     pub(crate) fn push(&mut self, range: FileRange, error: SemaError) {
-        self.errors.push((range, error));
+        self.entries.push((range, error));
     }
 
     pub(crate) fn shrink_to_fit(&mut self) {
-        self.errors.shrink_to_fit();
+        self.entries.shrink_to_fit();
         self.args.shrink_to_fit();
+        self.similar_columns.shrink_to_fit();
     }
 }
 
@@ -481,22 +498,46 @@ impl IndexData {
         let mut diagnostics: Vec<Diagnostic> = self
             .references
             .iter_local()
-            .filter_map(|(_, reference)| {
+            .filter_map(|(id, reference)| {
                 let name = self.names.resolve(reference.name);
                 let (kind, message) = reference_error(reference.kind, reference.resolution, name)?;
+                let range = self.range(reference.range);
+                let suggestion = self.errors.similar_columns.get(&id).map(|similar| {
+                    let column = quote_ident(self.names.resolve(similar.column));
+                    let replacement = match similar.qualifier {
+                        Some(qualifier) => {
+                            format!("{}.{column}", quote_ident(self.names.resolve(qualifier)))
+                        }
+                        None => column,
+                    };
+                    Suggestion {
+                        message: "a column with a similar name exists".into(),
+                        fix: Fix {
+                            title: format!("Replace with `{replacement}`").into(),
+                            edits: vec![Edit::replace(range.value, replacement)],
+                        },
+                    }
+                });
                 Some(Diagnostic {
                     kind,
-                    range: self.range(reference.range),
+                    range,
                     message: message.into(),
                     hint: None,
+                    suggestion,
                 })
             })
-            .chain(self.errors.errors.iter().map(|&(range, error)| Diagnostic {
-                kind: error.kind(),
-                range,
-                message: error.message(&self.names, &self.errors.args),
-                hint: error.hint(),
-            }))
+            .chain(
+                self.errors
+                    .entries
+                    .iter()
+                    .map(|&(range, error)| Diagnostic {
+                        kind: error.kind(),
+                        range,
+                        message: error.message(&self.names, &self.errors.args),
+                        hint: error.hint().map(Cow::Borrowed),
+                        suggestion: None,
+                    }),
+            )
             .collect();
         diagnostics.sort();
         diagnostics

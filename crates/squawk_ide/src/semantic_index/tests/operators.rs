@@ -212,7 +212,7 @@ select 1 === 2, 'a'::text === 'b'::text, 1 operator(===) 2;
     3 │ select 1 === 2, 'a'::text === 'b'::text, 1 operator(===) 2;
       │                           ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -242,7 +242,7 @@ select 1 operator(nope.+) 2, nope.f(1);
     2 │ select 1 operator(nope.+) 2, nope.f(1);
       │                        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: schema `nope` does not exist
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);
@@ -252,7 +252,7 @@ select 1 operator(nope.+) 2, nope.f(1);
     2 │ select 1 operator(nope.+) 2, nope.f(1);
       │                                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -281,37 +281,37 @@ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i i
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
       │          ━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `int4 ~ text`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
       │                       ━━━━━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `int4 !~~* unknown`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
       │                                         ━━━━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `mood = int4`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
       │                                                          ━━━━━━━━━━━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `int4 = text`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
       │                                                                                ━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `text <> int4`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
       │                                                                                          ━━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -362,24 +362,24 @@ select a === 1 from t;
     3 │ select 1 = true;
       │          ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `int4 + text[]`
       ╭▸ 
     4 │ select a + b from t;
       │          ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `- bool`
       ╭▸ 
     5 │ select - true;
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: operator does not exist: `int4 === int4`
       ╭▸ 
     6 │ select a === 1 from t;
       │          ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }

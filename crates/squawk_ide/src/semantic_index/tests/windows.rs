@@ -80,23 +80,23 @@ insert into t (a[row_number() over ()]) values (1);
 prepare pp(bigint) as select $1;
 execute pp(row_number() over ());
 "), @"
-    error: window functions are not allowed in WHERE
+    error: window functions are not allowed in `where`
       ╭▸ 
     3 │ select 1 from t where row_number() over () > 1;
       ╰╴                      ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in JOIN conditions
+    error: window functions are not allowed in `join` conditions
       ╭▸ 
     4 │ select 1 from t join t u on row_number() over () > 1;
       ╰╴                            ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in GROUP BY
+    error: window functions are not allowed in `group by`
       ╭▸ 
     5 │ select 1 from t group by row_number() over ();
       ╰╴                         ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in HAVING
+    error: window functions are not allowed in `having`
       ╭▸ 
     6 │ select 1 from t having row_number() over () > 1;
       ╰╴                       ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in FILTER
+    error: window functions are not allowed in `filter`
       ╭▸ 
     7 │ select count(*) filter (where row_number() over () > 1) from t;
       ╰╴                              ━━━━━━━━━━━━━━━━━━━━
@@ -104,23 +104,23 @@ execute pp(row_number() over ());
       ╭▸ 
     8 │ select row_number() over (order by row_number() over ()) from t;
       ╰╴                                   ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in LIMIT
+    error: window functions are not allowed in `limit`
       ╭▸ 
     9 │ select 1 from t limit row_number() over ();
       ╰╴                      ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in VALUES
+    error: window functions are not allowed in `values`
        ╭▸ 
     10 │ values (row_number() over ());
        ╰╴        ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in UPDATE
+    error: window functions are not allowed in `update`
        ╭▸ 
     11 │ update t set a = row_number() over ();
        ╰╴                 ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in RETURNING
+    error: window functions are not allowed in `returning`
        ╭▸ 
     12 │ update t set a = 1 returning row_number() over ();
        ╰╴                             ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in functions in FROM
+    error: window functions are not allowed in functions in `from`
        ╭▸ 
     13 │ select * from t, generate_series(1, row_number() over ());
        ╰╴                                    ━━━━━━━━━━━━━━━━━━━━
@@ -132,11 +132,11 @@ execute pp(row_number() over ());
        ╭▸ 
     15 │ select lag(lag(a) over ()) over () from t;
        ╰╴           ━━━━━━━━━━━━━━
-    error: window functions are not allowed in INSERT
+    error: window functions are not allowed in `insert`
        ╭▸ 
     19 │ insert into t (a[row_number() over ()]) values (1);
        ╰╴                 ━━━━━━━━━━━━━━━━━━━━
-    error: window functions are not allowed in EXECUTE parameters
+    error: window functions are not allowed in `execute` parameters
        ╭▸ 
     21 │ execute pp(row_number() over ());
        ╰╴           ━━━━━━━━━━━━━━━━━━━━
@@ -155,15 +155,15 @@ select w(a) from t;
 select w(a) over () from t;
 select count(*) from t;
 "), @"
-    error: window function `rank` requires an OVER clause
+    error: window function `rank` requires an `over` clause
       ╭▸ 
     3 │ select rank() from t;
       ╰╴       ━━━━━━
-    error: window function `lag` requires an OVER clause
+    error: window function `lag` requires an `over` clause
       ╭▸ 
     5 │ select lag(a) from t;
       ╰╴       ━━━━━━
-    error: window function `w` requires an OVER clause
+    error: window function `w` requires an `over` clause
       ╭▸ 
     7 │ select w(a) from t;
       ╰╴       ━━━━
@@ -202,15 +202,15 @@ select count(*) over (w order by b rows unbounded preceding)
 from t
 window w as (partition by a);
 "), @"
-    error: cannot override PARTITION BY clause of window `w`
+    error: cannot override `partition by` clause of window `w`
       ╭▸ 
     8 │ window w as (partition by a), w2 as (w partition by b);
       ╰╴                                     ━
-    error: cannot override ORDER BY clause of window `w`
+    error: cannot override `order by` clause of window `w`
       ╭▸ 
     9 │ select count(*) over w2 from t window w as (order by a), w2 as (w order by b);
       ╰╴                                                                ━
-    error: cannot override PARTITION BY clause of window `w2`
+    error: cannot override `partition by` clause of window `w2`
        ╭▸ 
     12 │ window w as (partition by a), w2 as (w order by b), w3 as (w2 partition by a);
        ╰╴                                                           ━━
@@ -223,16 +223,16 @@ window w as (partition by a);
     16 │ select count(*) over (w)
        │                       ━
        │
-       ╰ hint: Omit the parentheses in this OVER clause.
+       ╰ hint: omit the parentheses in this `over` clause
     error: cannot copy window `w` because it has a frame clause
        ╭▸ 
     19 │ select count(*) over (w rows unbounded preceding)
        ╰╴                      ━
-    error: cannot override ORDER BY clause of window `w`
+    error: cannot override `order by` clause of window `w`
        ╭▸ 
     22 │ select count(*) over (w order by b)
        ╰╴                      ━
-    error: cannot override PARTITION BY clause of window `w`
+    error: cannot override `partition by` clause of window `w`
        ╭▸ 
     25 │ select count(*) over (w partition by b) from t window w as ();
        ╰╴                      ━
@@ -251,15 +251,15 @@ select string_agg(a::text, ',' order by b) over () from t;
 select count(distinct a) over () from t;
 select array_agg(a order by b), count(distinct a) from t;
 "), @"
-    error: aggregate ORDER BY is not implemented for window functions
+    error: aggregate `order by` is not implemented for window functions
       ╭▸ 
     6 │ select array_agg(a order by b) over () from t;
       ╰╴                   ━━━━━━━━━━
-    error: aggregate ORDER BY is not implemented for window functions
+    error: aggregate `order by` is not implemented for window functions
       ╭▸ 
     7 │ select string_agg(a::text, ',' order by b) over () from t;
       ╰╴                               ━━━━━━━━━━
-    error: DISTINCT is not implemented for window functions
+    error: `distinct` is not implemented for window functions
       ╭▸ 
     8 │ select count(distinct a) over () from t;
       ╰╴             ━━━━━━━━

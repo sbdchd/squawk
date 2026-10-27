@@ -13,6 +13,7 @@ use squawk_syntax::{
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::comments::preceding_comment;
+use crate::edit_distance::find_best_match_for_name_with_substrings;
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
@@ -45,7 +46,7 @@ use crate::{
         ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, TriggerFunctionKind,
         WindowClause,
     },
-    semantic_index::{IndexData, NameVersion},
+    semantic_index::{IndexData, NameVersion, SimilarColumn},
 };
 use crate::{
     overload::{ArgType, BuiltinTypes, CallArg, Overloads},
@@ -12695,9 +12696,9 @@ impl Lowerer {
             return;
         }
         let op = match compound.op() {
-            Some(ast::CompoundOp::Union(_)) => "UNION",
-            Some(ast::CompoundOp::Intersect(_)) => "INTERSECT",
-            Some(ast::CompoundOp::Except(_)) => "EXCEPT",
+            Some(ast::CompoundOp::Union(_)) => "union",
+            Some(ast::CompoundOp::Intersect(_)) => "intersect",
+            Some(ast::CompoundOp::Except(_)) => "except",
             None => return,
         };
         self.push_error(rhs_node.syntax(), SemaError::CompoundColumnCount { op });
@@ -14379,7 +14380,7 @@ impl Lowerer {
             specified,
         };
         let error = match owner {
-            ColumnListOwner::Cte(name) => too_long("WITH query", name),
+            ColumnListOwner::Cte(name) => too_long("`with` query", name),
             ColumnListOwner::Table(Some(name)) => too_long("table", name),
             ColumnListOwner::Join(Some(name)) => too_long("join expression", name),
             ColumnListOwner::Table(None) | ColumnListOwner::Join(None) => return,
@@ -19161,7 +19162,10 @@ impl Lowerer {
             },
             (_, None) => {
                 let NameResolution { kind, resolution } = self.resolve_name(name);
-                self.add_ref(name, kind, name_ref.syntax(), resolution);
+                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
+                if matches!(resolution, Resolution::Unresolved) {
+                    self.suggest_column(reference, name);
+                }
                 return;
             }
         };
@@ -19179,7 +19183,10 @@ impl Lowerer {
                 }
                 let name = self.name_ref_name(name_ref)?;
                 let NameResolution { kind, resolution } = self.resolve_name(name);
-                self.add_ref(name, kind, name_ref.syntax(), resolution);
+                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
+                if matches!(resolution, Resolution::Unresolved) {
+                    self.suggest_column(reference, name);
+                }
                 self.check_default_column_ref(name_ref.syntax(), resolution);
                 return self.resolution_type(resolution);
             }
@@ -21023,6 +21030,43 @@ impl Lowerer {
             .iter()
             .copied()
             .find(|id| self.index.sources[*id].name == Some(name))
+    }
+
+    fn suggest_column(&mut self, reference: RefId, name: Name) {
+        let mut candidates: Vec<SimilarColumn> = vec![];
+        for scope in self.scopes.iter().rev() {
+            for source in self.visible_sources(scope) {
+                let source = &self.index.sources[source];
+                if source.kind.is_qualified_only() {
+                    continue;
+                }
+                candidates.extend(source.columns.range.iter().filter_map(|column| {
+                    let column = self.index.columns[column].name?;
+                    (column != name).then_some(SimilarColumn {
+                        qualifier: source.name,
+                        column,
+                    })
+                }));
+            }
+        }
+        let lookup = self.index.names.resolve(name);
+        let Some(mut similar) = find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate.column),
+            lookup,
+            None,
+        ) else {
+            return;
+        };
+        if candidates
+            .iter()
+            .filter(|candidate| candidate.column == similar.column)
+            .count()
+            == 1
+        {
+            similar.qualifier = None;
+        }
+        self.index.errors.similar_columns.insert(reference, similar);
     }
 
     fn resolve_source(&self, name: Name) -> Option<SourceId> {

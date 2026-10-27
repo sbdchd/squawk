@@ -23,7 +23,7 @@ create function f(int, int) returns int
   language sql
   return $1 + $2 + $3;
 "), @"
-    error: there is no parameter $3
+    error: there is no parameter `$3`
       ╭▸ 
     4 │   return $1 + $2 + $3;
       ╰╴                   ━━
@@ -54,7 +54,7 @@ create function f(a int) returns int
   language sql
   return f.a + f.b;
 "), @"
-    error: there is no parameter b
+    error: there is no parameter `b`
       ╭▸ 
     4 │   return f.a + f.b;
       ╰╴                 ━
@@ -85,7 +85,13 @@ select t.x, t.z from f() as t;
     error: column `z` does not exist
       ╭▸ 
     5 │ select x, y, z from f();
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select x, y, z from f();
+    5 + select x, y, x from f();
+      ╰╴
     error: column `t.z` does not exist
       ╭▸ 
     6 │ select t.x, t.z from f() as t;
@@ -104,7 +110,13 @@ select x, y, a from f(1, 2);
     error: column `a` does not exist
       ╭▸ 
     5 │ select x, y, a from f(1, 2);
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select x, y, a from f(1, 2);
+    5 + select x, y, x from f(1, 2);
+      ╰╴
     ");
 }
 
@@ -118,13 +130,13 @@ select foo(1), x from bar(2);
     2 │ select foo(1), x from bar(2);
       │        ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `bar(int4)` does not exist
       ╭▸ 
     2 │ select foo(1), x from bar(2);
       │                       ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -143,13 +155,13 @@ select f(a => 1, b => x), g(y => 1), f(zz => 1);
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       │                           ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `f(zz => int4)` does not exist
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       │                                      ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -165,13 +177,13 @@ select f(z => 1), g(a => 1);
     4 │ select f(z => 1), g(a => 1);
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g(a => int4)` does not exist
       ╭▸ 
     4 │ select f(z => 1), g(a => 1);
       │                   ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -189,7 +201,7 @@ select myschema.f(1), pg_catalog.nope();
     2 │ select myschema.f(1), pg_catalog.nope();
       │                 ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `pg_catalog.nope()` does not exist
       ╭▸ 
     2 │ select myschema.f(1), pg_catalog.nope();
@@ -214,7 +226,7 @@ create function f(a int) returns int
       ╭▸ 
     6 │     select name from users where id = user_id and email = $1 and id = $2;
       ╰╴                                                  ━━━━━
-    error: there is no parameter $2
+    error: there is no parameter `$2`
       ╭▸ 
     6 │     select name from users where id = user_id and email = $1 and id = $2;
       ╰╴                                                                      ━━
@@ -222,7 +234,7 @@ create function f(a int) returns int
       ╭▸ 
     9 │   as 'select a + b + f.c'
       ╰╴                 ━
-    error: there is no parameter c
+    error: there is no parameter `c`
       ╭▸ 
     9 │   as 'select a + b + f.c'
       ╰╴                       ━
@@ -243,7 +255,13 @@ create function g() returns text
     error: column `b` does not exist
       ╭▸ 
     4 │   as 'select ''x'' || a || b from t'
-      ╰╴                           ━
+      │                            ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 -   as 'select ''x'' || a || b from t'
+    4 +   as 'select ''x'' || a || a from t'
+      ╰╴
     error: column `nope` does not exist
       ╭▸ 
     7 │   as E'select\n''x'' || nope'
@@ -268,7 +286,13 @@ create function f() returns int
     error: column `b` does not exist
       ╭▸ 
     6 │     with t as (select 1 a) select a, b from t;
-      ╰╴                                     ━
+      │                                      ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 -     with t as (select 1 a) select a, b from t;
+    6 +     with t as (select 1 a) select a, a from t;
+      ╰╴
     ");
 }
 
@@ -433,7 +457,7 @@ drop function nope;
     6 │ select f(1), g();
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g()` does not exist
       ╭▸ 
     6 │ select f(1), g();
@@ -483,7 +507,7 @@ select f(1);
     7 │ select f(1);
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -509,7 +533,7 @@ drop procedure if exists p;
     6 │ call p(1);
       │      ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `f()` does not exist
       ╭▸ 
     8 │ select f();
@@ -548,7 +572,7 @@ alter function nope(int) rename to x;
     5 │ select f(1);
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `g` already exists with same argument types in schema `public`
       ╭▸ 
     7 │ alter function h rename to g;
@@ -655,7 +679,7 @@ call p((select x from nope));
     7 │ call p(c => 1);
       │      ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: procedure `f()` does not exist
       ╭▸ 
     8 │ call f();
@@ -664,7 +688,7 @@ call p((select x from nope));
       ╭▸ 
     9 │ call nope();
       ╰╴     ━━━━
-    error: cannot use subquery in CALL argument
+    error: cannot use subquery in `call` argument
        ╭▸ 
     10 │ call p((select x from nope));
        ╰╴        ━━━━━━━━━━━━━━━━━━
@@ -687,7 +711,7 @@ call p(1);
     4 │ call p(1);
       │      ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -795,25 +819,25 @@ call p('a'::text);
     4 │ select foo(1.5::float8);
       │        ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `foo(int4, unknown)` does not exist
       ╭▸ 
     5 │ select foo(1, 'a');
       │        ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `foo(y => int4)` does not exist
       ╭▸ 
     6 │ select foo(y => 1);
       │        ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
-    error: function `public.foo(VARIADIC int4[])` does not exist
+      ╰ hint: consider adding explicit type casts
+    error: function `public.foo(variadic int4[])` does not exist
       ╭▸ 
     7 │ select public.foo(variadic array[1]);
       │               ━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `nope()` does not exist
       ╭▸ 
     8 │ select nope();
@@ -823,13 +847,13 @@ call p('a'::text);
     9 │ select lower(1);
       │        ━━━━━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: procedure `p(text)` does not exist
        ╭▸ 
     10 │ call p('a'::text);
        │      ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 

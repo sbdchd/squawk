@@ -25,7 +25,13 @@ select x, b, a from v;
     error: column `a` does not exist
       ╭▸ 
     3 │ select x, b, a from v;
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select x, b, a from v;
+    3 + select x, b, x from v;
+      ╰╴
     ");
 }
 
@@ -126,13 +132,13 @@ select * from m;
     10 │ drop materialized view v;
        │                        ━
        │
-       ╰ hint: Use DROP VIEW to remove a view.
+       ╰ hint: use `drop view` to remove a view
     error: `m` is not a view
        ╭▸ 
     11 │ drop view m;
        │           ━
        │
-       ╰ hint: Use DROP MATERIALIZED VIEW to remove a materialized view.
+       ╰ hint: use `drop materialized view` to remove a materialized view
     error: relation `nope` does not exist
        ╭▸ 
     12 │ drop materialized view m, nope;
@@ -164,7 +170,13 @@ select b from v;
     error: column `a` does not exist
       ╭▸ 
     8 │ select a from v;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select a from v;
+    8 + select b from v;
+      ╰╴
     error: relation `v` does not exist
        ╭▸ 
     10 │ select b from v;
@@ -264,7 +276,13 @@ alter view v rename column nope to d;
     error: column `a` does not exist
       ╭▸ 
     5 │ select a from v;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select a from v;
+    5 + select c from v;
+      ╰╴
     error: column `v.b` already exists
       ╭▸ 
     6 │ alter view v rename column c to b;
@@ -322,7 +340,7 @@ create materialized view m (a, b) as select 1;
 create view w (a) as select 1, 2;
 create view z (a, b) as select * from missing;
 "), @"
-    error: CREATE VIEW specifies more column names than columns
+    error: `create view` specifies more column names than columns
       ╭▸ 
     2 │ create view v (a, b) as select 1;
       ╰╴                  ━
@@ -363,18 +381,18 @@ refresh materialized view concurrently mv;
     8 │ refresh materialized view concurrently mv;
       │                                        ━━
       │
-      ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+      ╰ hint: create a unique index with no `where` clause on one or more columns of the materialized view
     error: cannot refresh materialized view `mv` concurrently
        ╭▸ 
     11 │ refresh materialized view concurrently mv;
        │                                        ━━
        │
-       ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+       ╰ hint: create a unique index with no `where` clause on one or more columns of the materialized view
     error: cannot refresh materialized view `mv` concurrently
        ╭▸ 
     16 │ refresh materialized view concurrently mv;
        │                                        ━━
        │
-       ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+       ╰ hint: create a unique index with no `where` clause on one or more columns of the materialized view
     ");
 }

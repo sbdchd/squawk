@@ -27,7 +27,7 @@ copy s from stdin;
     11 │ copy ft to stdout;
        │      ━━
        │
-       ╰ hint: Try the COPY (SELECT ...) TO variant.
+       ╰ hint: try the `copy (select ...) to` variant
     error: cannot copy from sequence `s`
        ╭▸ 
     12 │ copy s to stdout;
@@ -37,7 +37,7 @@ copy s from stdin;
     15 │ copy v from stdin;
        │      ━
        │
-       ╰ hint: To enable copying to a view, provide an INSTEAD OF INSERT trigger.
+       ╰ hint: to enable copying to a view, provide an `instead of insert` trigger
     error: cannot copy to materialized view `m`
        ╭▸ 
     16 │ copy m from stdin;
@@ -82,7 +82,7 @@ copy t from stdin csv force not null nope;
     8 │ copy v to stdout;
       │      ━
       │
-      ╰ hint: Try the COPY (SELECT ...) TO variant.
+      ╰ hint: try the `copy (select ...) to` variant
     error: column `nope` does not exist
        ╭▸ 
     10 │ copy (select nope from t) to stdout;

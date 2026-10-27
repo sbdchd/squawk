@@ -22,7 +22,7 @@ create operator family pg_catalog.integer_ops using btree;
       ╭▸ 
     4 │ create operator family f3 using missing;
       ╰╴                                ━━━━━━━
-    error: access method `heap` is not of type INDEX
+    error: access method `heap` is not of type `index`
       ╭▸ 
     5 │ create operator family f3 using heap;
       ╰╴                                ━━━━

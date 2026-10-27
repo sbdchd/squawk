@@ -23,15 +23,33 @@ create index idx on t(a, b) include (c) where d > 0;
     error: column `b` does not exist
       ╭▸ 
     3 │ create index idx on t(a, b) include (c) where d > 0;
-      ╰╴                         ━
+      │                          ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - create index idx on t(a, b) include (c) where d > 0;
+    3 + create index idx on t(a, a) include (c) where d > 0;
+      ╰╴
     error: column `c` does not exist
       ╭▸ 
     3 │ create index idx on t(a, b) include (c) where d > 0;
-      ╰╴                                     ━
+      │                                      ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - create index idx on t(a, b) include (c) where d > 0;
+    3 + create index idx on t(a, b) include (a) where d > 0;
+      ╰╴
     error: column `d` does not exist
       ╭▸ 
     3 │ create index idx on t(a, b) include (c) where d > 0;
-      ╰╴                                              ━
+      │                                               ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - create index idx on t(a, b) include (c) where d > 0;
+    3 + create index idx on t(a, b) include (c) where a > 0;
+      ╰╴
     ");
 }
 

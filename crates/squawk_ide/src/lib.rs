@@ -7,6 +7,7 @@ mod constraint_index;
 pub mod db;
 pub mod diagnostics;
 pub mod document_symbols;
+mod edit_distance;
 pub mod expand_selection;
 mod extension_index;
 pub(crate) mod extensions;

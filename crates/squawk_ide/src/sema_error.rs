@@ -390,8 +390,8 @@ pub(crate) enum WindowClause {
 impl WindowClause {
     fn label(self) -> &'static str {
         match self {
-            WindowClause::PartitionBy => "PARTITION BY",
-            WindowClause::OrderBy => "ORDER BY",
+            WindowClause::PartitionBy => "`partition by`",
+            WindowClause::OrderBy => "`order by`",
         }
     }
 }
@@ -411,7 +411,7 @@ impl TriggerFunctionKind {
     }
 }
 
-const COPY_SELECT_HINT: &str = "Try the COPY (SELECT ...) TO variant.";
+const COPY_SELECT_HINT: &str = "try the `copy (select ...) to` variant";
 
 fn copy_target(copy_from: bool, kind: TableKind) -> (&'static str, Option<&'static str>) {
     match (copy_from, kind) {
@@ -423,7 +423,7 @@ fn copy_target(copy_from: bool, kind: TableKind) -> (&'static str, Option<&'stat
         }
         (false, TableKind::View) => (
             "view",
-            Some("To enable copying to a view, provide an INSTEAD OF INSERT trigger."),
+            Some("to enable copying to a view, provide an `instead of insert` trigger"),
         ),
         (false, TableKind::MaterializedView) => ("materialized view", None),
         (false, TableKind::Sequence) => ("sequence", None),
@@ -441,7 +441,7 @@ pub(crate) fn reference_error(
     Some(match (kind, resolution) {
         (ReferenceKind::Relation, Resolution::Unresolved) => (
             DiagnosticKind::UnresolvedRelation,
-            format!("missing FROM-clause entry for table `{name}`"),
+            format!("missing `from` clause entry for table `{name}`"),
         ),
         (ReferenceKind::Table, Resolution::Unresolved) => (
             DiagnosticKind::UnresolvedTable,
@@ -598,7 +598,7 @@ pub(crate) fn reference_error(
         (ReferenceKind::Channel, Resolution::Unresolved) => return None,
         (ReferenceKind::Param, Resolution::Unresolved) => (
             DiagnosticKind::UnresolvedParam,
-            format!("there is no parameter {name}"),
+            format!("there is no parameter `{name}`"),
         ),
         (ReferenceKind::Function(kind), Resolution::Ambiguous) => (
             DiagnosticKind::AmbiguousFunction,
@@ -676,25 +676,25 @@ impl ExprContext {
     fn label(self) -> &'static str {
         match self {
             ExprContext::Unrestricted => "",
-            ExprContext::Where => "WHERE",
-            ExprContext::JoinCondition => "JOIN conditions",
-            ExprContext::GroupBy => "GROUP BY",
-            ExprContext::Having => "HAVING",
-            ExprContext::Filter => "FILTER",
+            ExprContext::Where => "`where`",
+            ExprContext::JoinCondition => "`join` conditions",
+            ExprContext::GroupBy => "`group by`",
+            ExprContext::Having => "`having`",
+            ExprContext::Filter => "`filter`",
             ExprContext::WindowDefinition => "window definitions",
-            ExprContext::WindowRange => "window RANGE",
-            ExprContext::WindowRows => "window ROWS",
-            ExprContext::WindowGroups => "window GROUPS",
-            ExprContext::Limit => "LIMIT",
-            ExprContext::Offset => "OFFSET",
-            ExprContext::Values => "VALUES",
-            ExprContext::Returning => "RETURNING",
-            ExprContext::Insert => "INSERT",
-            ExprContext::Update => "UPDATE",
-            ExprContext::FromFunction => "functions in FROM",
-            ExprContext::MergeWhen => "MERGE WHEN conditions",
+            ExprContext::WindowRange => "window `range`",
+            ExprContext::WindowRows => "window `rows`",
+            ExprContext::WindowGroups => "window `groups`",
+            ExprContext::Limit => "`limit`",
+            ExprContext::Offset => "`offset`",
+            ExprContext::Values => "`values`",
+            ExprContext::Returning => "`returning`",
+            ExprContext::Insert => "`insert`",
+            ExprContext::Update => "`update`",
+            ExprContext::FromFunction => "functions in `from`",
+            ExprContext::MergeWhen => "`merge when` conditions",
             ExprContext::CheckConstraint => "check constraints",
-            ExprContext::Default => "DEFAULT expressions",
+            ExprContext::Default => "`default` expressions",
             ExprContext::GeneratedColumn => "column generation expressions",
             ExprContext::IndexExpression => "index expressions",
             ExprContext::IndexPredicate => "index predicates",
@@ -702,29 +702,29 @@ impl ExprContext {
             ExprContext::PartitionKey => "partition key expressions",
             ExprContext::PartitionBound => "partition bound",
             ExprContext::Policy => "policy expressions",
-            ExprContext::TriggerWhen => "trigger WHEN conditions",
-            ExprContext::CallArgument => "CALL arguments",
+            ExprContext::TriggerWhen => "trigger `when` conditions",
+            ExprContext::CallArgument => "`call` arguments",
             ExprContext::Transform => "transform expressions",
-            ExprContext::CopyWhere => "COPY FROM WHERE conditions",
-            ExprContext::ExecuteParameter => "EXECUTE parameters",
+            ExprContext::CopyWhere => "`copy from where` conditions",
+            ExprContext::ExecuteParameter => "`execute` parameters",
         }
     }
 
     pub(crate) fn subquery_label(self) -> Option<&'static str> {
         match self {
             ExprContext::CheckConstraint => Some("check constraint"),
-            ExprContext::Default => Some("DEFAULT expression"),
+            ExprContext::Default => Some("`default` expression"),
             ExprContext::GeneratedColumn => Some("column generation expression"),
             ExprContext::IndexExpression => Some("index expression"),
             ExprContext::IndexPredicate => Some("index predicate"),
             ExprContext::StatisticsExpression => Some("statistics expression"),
             ExprContext::PartitionKey => Some("partition key expression"),
             ExprContext::PartitionBound => Some("partition bound"),
-            ExprContext::TriggerWhen => Some("trigger WHEN condition"),
-            ExprContext::CallArgument => Some("CALL argument"),
+            ExprContext::TriggerWhen => Some("trigger `when` condition"),
+            ExprContext::CallArgument => Some("`call` argument"),
             ExprContext::Transform => Some("transform expression"),
-            ExprContext::CopyWhere => Some("COPY FROM WHERE condition"),
-            ExprContext::ExecuteParameter => Some("EXECUTE parameter"),
+            ExprContext::CopyWhere => Some("`copy from where` condition"),
+            ExprContext::ExecuteParameter => Some("`execute` parameter"),
             ExprContext::Unrestricted
             | ExprContext::Where
             | ExprContext::JoinCondition
@@ -784,21 +784,21 @@ impl TableLookup {
 impl OutputClause {
     fn label(self) -> &'static str {
         match self {
-            OutputClause::OrderBy => "ORDER BY",
-            OutputClause::GroupBy => "GROUP BY",
-            OutputClause::DistinctOn => "DISTINCT ON",
+            OutputClause::OrderBy => "`order by`",
+            OutputClause::GroupBy => "`group by`",
+            OutputClause::DistinctOn => "`distinct on`",
         }
     }
 }
 
 fn drop_hint(kind: TableKind) -> &'static str {
     match kind {
-        TableKind::Table => "Use DROP TABLE to remove a table.",
-        TableKind::ForeignTable => "Use DROP FOREIGN TABLE to remove a foreign table.",
-        TableKind::View => "Use DROP VIEW to remove a view.",
-        TableKind::MaterializedView => "Use DROP MATERIALIZED VIEW to remove a materialized view.",
-        TableKind::Sequence => "Use DROP SEQUENCE to remove a sequence.",
-        TableKind::PropertyGraph => "Use DROP PROPERTY GRAPH to remove a property graph.",
+        TableKind::Table => "use `drop table` to remove a table",
+        TableKind::ForeignTable => "use `drop foreign table` to remove a foreign table",
+        TableKind::View => "use `drop view` to remove a view",
+        TableKind::MaterializedView => "use `drop materialized view` to remove a materialized view",
+        TableKind::Sequence => "use `drop sequence` to remove a sequence",
+        TableKind::PropertyGraph => "use `drop property graph` to remove a property graph",
     }
 }
 
@@ -898,34 +898,34 @@ impl SemaError {
     pub(crate) fn hint(&self) -> Option<&'static str> {
         match *self {
             SemaError::TypedTableAlter { .. } => {
-                Some("Use ALTER ... CASCADE to alter the typed tables too.")
+                Some("use `alter ... cascade` to alter the typed tables too")
             }
             SemaError::InsertMoreTargetsThanExpressions { row_hint } => row_hint.then_some(
-                "The insertion source is a row expression containing the same number of columns expected by the INSERT. Did you accidentally use extra parentheses?",
+                "the insertion source is a row expression containing the same number of columns expected by the `insert`; consider removing the extra parentheses",
             ),
             SemaError::MissingShellType => Some(
-                "Create the type as a shell type, then create its canonicalization function, then do a full CREATE TYPE.",
+                "create the type as a shell type, then create its canonicalization function, then do a full `create type`",
             ),
             SemaError::WrongRelationKind { kind, drop, .. } => drop.then(|| drop_hint(kind)),
             SemaError::CannotCopy {
                 copy_from, kind, ..
             } => copy_target(copy_from, kind).1,
             SemaError::WindowFrameCopy { hint, .. } => {
-                hint.then_some("Omit the parentheses in this OVER clause.")
+                hint.then_some("omit the parentheses in this `over` clause")
             }
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => Some(
-                "Create a unique index with no WHERE clause on one or more columns of the materialized view.",
+                "create a unique index with no `where` clause on one or more columns of the materialized view",
             ),
             SemaError::UnresolvedRoutine { args, lookup, .. } => match (lookup, args) {
                 (LookupKind::Call, ErrorArgs::List(args)) if !args.is_empty() => {
-                    Some("You might need to add explicit type casts.")
+                    Some("consider adding explicit type casts")
                 }
                 (LookupKind::Call | LookupKind::Signature, ErrorArgs::List(_) | ErrorArgs::Star) => {
                     None
                 }
             },
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
-                LookupKind::Call => Some("You might need to add explicit type casts."),
+                LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
             },
             _ => None,
@@ -936,41 +936,41 @@ impl SemaError {
         match *self {
             SemaError::CannotChangeDatabase => Some("current database cannot be changed"),
             SemaError::NoConflictArbiter => Some(
-                "there is no unique or exclusion constraint matching the ON CONFLICT specification",
+                "there is no unique or exclusion constraint matching the `on conflict` specification",
             ),
             SemaError::DeferrableConflictArbiter => Some(
-                "ON CONFLICT does not support deferrable unique constraints/exclusion constraints as arbiters",
+                "`on conflict` does not support deferrable unique constraints/exclusion constraints as arbiters",
             ),
-            SemaError::ValuesLengthMismatch => Some("VALUES lists must all be the same length"),
+            SemaError::ValuesLengthMismatch => Some("`values` lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
-                Some("INSERT has more expressions than target columns")
+                Some("`insert` has more expressions than target columns")
             }
             SemaError::ViewTooManyColumnNames => {
-                Some("CREATE VIEW specifies more column names than columns")
+                Some("`create view` specifies more column names than columns")
             }
             SemaError::CreateAsTooManyColumnNames => Some("too many column names were specified"),
             SemaError::ReplaceConstraintTrigger => {
-                Some("CREATE OR REPLACE CONSTRAINT TRIGGER is not supported")
+                Some("`create or replace constraint trigger` is not supported")
             }
-            SemaError::RenameSelectRule => Some("renaming an ON SELECT rule is not allowed"),
+            SemaError::RenameSelectRule => Some("renaming an `on select` rule is not allowed"),
             SemaError::NestedAggregate => Some("aggregate function calls cannot be nested"),
             SemaError::AggregateContainsWindow => {
                 Some("aggregate function calls cannot contain window function calls")
             }
             SemaError::NestedWindow => Some("window function calls cannot be nested"),
             SemaError::InsertMoreTargetsThanExpressions { .. } => {
-                Some("INSERT has more target columns than expressions")
+                Some("`insert` has more target columns than expressions")
             }
             SemaError::MissingShellType => {
                 Some("cannot specify a canonical function without a pre-created shell type")
             }
             SemaError::WindowAggregateOrderBy => {
-                Some("aggregate ORDER BY is not implemented for window functions")
+                Some("aggregate `order by` is not implemented for window functions")
             }
-            SemaError::WindowDistinct => Some("DISTINCT is not implemented for window functions"),
+            SemaError::WindowDistinct => Some("`distinct` is not implemented for window functions"),
             SemaError::RowLengthMismatch => Some("unequal number of entries in row expressions"),
             SemaError::DefaultColumnReference => {
-                Some("cannot use column reference in DEFAULT expression")
+                Some("cannot use column reference in `default` expression")
             }
             SemaError::SubqueryNotSingleColumn => Some("subquery must return only one column"),
             SemaError::SubqueryTooManyColumns => Some("subquery has too many columns"),
@@ -1072,7 +1072,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(column)
             ),
             SemaError::WindowWithoutOver { name } => {
-                write!(f, "window function `{}` requires an OVER clause", n(name))
+                write!(f, "window function `{}` requires an `over` clause", n(name))
             }
             SemaError::Duplicate { object, name } => {
                 write!(f, "{} `{}` already exists", object.label(), n(name))
@@ -1154,7 +1154,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 write!(f, "column `{}` specified more than once", n(name))
             }
             SemaError::DuplicateCte { name } => {
-                write!(f, "WITH query name `{}` specified more than once", n(name))
+                write!(
+                    f,
+                    "`with` query name `{}` specified more than once",
+                    n(name)
+                )
             }
             SemaError::DuplicateSource { name } => {
                 write!(f, "table name `{}` specified more than once", n(name))
@@ -1181,8 +1185,8 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::AccessMethodKindMismatch { name, expected } => {
                 let expected = match expected {
-                    AccessMethodKind::Table => "TABLE",
-                    AccessMethodKind::Index => "INDEX",
+                    AccessMethodKind::Table => "`table`",
+                    AccessMethodKind::Index => "`index`",
                 };
                 write!(f, "access method `{}` is not of type {expected}", n(name))
             }
@@ -1223,7 +1227,7 @@ impl fmt::Display for ErrorMessage<'_> {
                         f.write_str(", ")?;
                     }
                     if arg.variadic {
-                        f.write_str("VARIADIC ")?;
+                        f.write_str("variadic ")?;
                     }
                     if let Some(name) = arg.name {
                         write!(f, "{} => ", n(name))?;
@@ -1274,7 +1278,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 write!(f, "{what} not possible for domains")
             }
             SemaError::CompoundColumnCount { op } => {
-                write!(f, "each {op} query must have the same number of columns")
+                write!(f, "each `{op}` query must have the same number of columns")
             }
             SemaError::ColumnListTooLong {
                 what,
@@ -1384,13 +1388,13 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::TriggerReturnType { name, kind } => write!(
                 f,
-                "function `{}` must return type {}",
+                "function `{}` must return type `{}`",
                 n(name),
                 kind.return_type()
             ),
             SemaError::ConflictingNullability { column, table } => write!(
                 f,
-                "conflicting NULL/NOT NULL declarations for column `{}` of table `{}`",
+                "conflicting `null`/`not null` declarations for column `{}` of table `{}`",
                 n(column),
                 n(table)
             ),

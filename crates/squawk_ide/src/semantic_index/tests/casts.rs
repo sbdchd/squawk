@@ -13,7 +13,7 @@ select f(1), f(1.5);
     3 │ select f(1), f(1.5);
       │              ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -39,19 +39,19 @@ select f(x) from t;
     7 │ select f(x) from t;
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `f(a)` does not exist
       ╭▸ 
     9 │ select f(x) from t;
       │        ━
       │
-      ╰ hint: You might need to add explicit type casts.
+      ╰ hint: consider adding explicit type casts
     error: function `f(a)` does not exist
        ╭▸ 
     14 │ select f(x) from t;
        │        ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -80,13 +80,13 @@ select f(x) from t;
     11 │ select f(x) from t;
        │        ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     error: function `f(a)` does not exist
        ╭▸ 
     15 │ select f(x) from t;
        │        ━
        │
-       ╰ hint: You might need to add explicit type casts.
+       ╰ hint: consider adding explicit type casts
     ");
 }
 

@@ -84,7 +84,7 @@ alter table t set access method gin;
 create table t5 (a int, exclude using gist (a with =));
 create table t6 (a int, exclude using missing (a with =));
 "), @"
-    error: access method `btree` is not of type TABLE
+    error: access method `btree` is not of type `table`
       ╭▸ 
     3 │ create table t2 (a int) using btree;
       ╰╴                              ━━━━━
@@ -92,11 +92,11 @@ create table t6 (a int, exclude using missing (a with =));
       ╭▸ 
     4 │ create table t3 (a int) using missing;
       ╰╴                              ━━━━━━━
-    error: access method `gist` is not of type TABLE
+    error: access method `gist` is not of type `table`
       ╭▸ 
     7 │ create materialized view m2 using gist as select 1 as a;
       ╰╴                                  ━━━━
-    error: access method `heap` is not of type INDEX
+    error: access method `heap` is not of type `index`
        ╭▸ 
     10 │ create index on t using heap (a);
        ╰╴                        ━━━━
@@ -104,7 +104,7 @@ create table t6 (a int, exclude using missing (a with =));
        ╭▸ 
     11 │ create index on t using missing (a);
        ╰╴                        ━━━━━━━
-    error: access method `gin` is not of type TABLE
+    error: access method `gin` is not of type `table`
        ╭▸ 
     13 │ alter table t set access method gin;
        ╰╴                                ━━━
