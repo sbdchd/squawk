@@ -10,7 +10,7 @@ pub(crate) fn ban_drop_policy(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropPolicy(node) => {
                 ctx.report(Violation::for_node(
                     Rule::BanDropPolicy,
-                    "Dropping a policy or rule may silently change behaviour for existing clients."
+                    "Dropping a policy or rule may silently change behavior for existing clients."
                         .into(),
                     node.syntax(),
                 ));
@@ -18,7 +18,7 @@ pub(crate) fn ban_drop_policy(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropRule(node) => {
                 ctx.report(Violation::for_node(
                     Rule::BanDropPolicy,
-                    "Dropping a policy or rule may silently change behaviour for existing clients."
+                    "Dropping a policy or rule may silently change behavior for existing clients."
                         .into(),
                     node.syntax(),
                 ));

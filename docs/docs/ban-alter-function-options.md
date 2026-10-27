@@ -5,7 +5,7 @@ title: ban-alter-function-options
 
 ## problem
 
-`ALTER FUNCTION`, `ALTER PROCEDURE`, and `ALTER ROUTINE` options can change execution behaviour or security for existing clients that call them. This includes security modes and `SET` or `RESET` configuration options, such as `search_path`. This rule is opt-in. It does not report renames, ownership changes, or schema moves.
+`ALTER FUNCTION`, `ALTER PROCEDURE`, and `ALTER ROUTINE` options can change execution behavior or security for existing clients that call them. This includes security modes and `SET` or `RESET` configuration options, such as `search_path`. This rule is opt-in. It does not report renames, ownership changes, or schema moves.
 
 ```sql
 alter function f() security definer;

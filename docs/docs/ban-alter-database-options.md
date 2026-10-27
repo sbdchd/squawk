@@ -5,7 +5,7 @@ title: ban-alter-database-options
 
 ## problem
 
-`ALTER DATABASE` options and configuration changes can change connection behaviour, name resolution, or results for existing clients in the database. This rule is opt-in. It does not report database renames, owner changes, or tablespace changes.
+`ALTER DATABASE` options and configuration changes can change connection behavior, name resolution, or results for existing clients in the database. This rule is opt-in. It does not report database renames, owner changes, or tablespace changes.
 
 ```sql
 alter database app set search_path to public;

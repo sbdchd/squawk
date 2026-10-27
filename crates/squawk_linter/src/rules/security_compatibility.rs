@@ -46,7 +46,7 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                     report(
                         ctx,
                         Rule::BanAlterFunctionOptions,
-                        "Changing function options may change behaviour for existing clients.",
+                        "Changing function options may change behavior for existing clients.",
                         options.syntax(),
                     );
                 }
@@ -56,7 +56,7 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                     report(
                         ctx,
                         Rule::BanAlterFunctionOptions,
-                        "Changing procedure options may change behaviour for existing clients.",
+                        "Changing procedure options may change behavior for existing clients.",
                         options.syntax(),
                     );
                 }
@@ -66,7 +66,7 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                     report(
                         ctx,
                         Rule::BanAlterFunctionOptions,
-                        "Changing routine options may change behaviour for existing clients.",
+                        "Changing routine options may change behavior for existing clients.",
                         options.syntax(),
                     );
                 }
@@ -77,13 +77,13 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                         ast::AlterViewAction::SetOptions(options) => report(
                             ctx,
                             Rule::BanAlterViewOptions,
-                            "Changing view options may change behaviour for existing clients.",
+                            "Changing view options may change behavior for existing clients.",
                             options.syntax(),
                         ),
                         ast::AlterViewAction::ResetOptions(options) => report(
                             ctx,
                             Rule::BanAlterViewOptions,
-                            "Changing view options may change behaviour for existing clients.",
+                            "Changing view options may change behavior for existing clients.",
                             options.syntax(),
                         ),
                         _ => {}
@@ -102,13 +102,13 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                         ast::AlterRoleAction::SetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterRoleOptions,
-                            "Changing role configuration may change behaviour for existing clients.",
+                            "Changing role configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                         ast::AlterRoleAction::ResetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterRoleOptions,
-                            "Changing role configuration may change behaviour for existing clients.",
+                            "Changing role configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                         ast::AlterRoleAction::RoleRenameTo(_) => {}
@@ -127,13 +127,13 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                         ast::AlterUserAction::SetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterRoleOptions,
-                            "Changing role configuration may change behaviour for existing clients.",
+                            "Changing role configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                         ast::AlterUserAction::ResetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterRoleOptions,
-                            "Changing role configuration may change behaviour for existing clients.",
+                            "Changing role configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                         ast::AlterUserAction::RoleRenameTo(_) => {}
@@ -146,19 +146,19 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                         ast::AlterDatabaseAction::DatabaseOptionList(options) => report(
                             ctx,
                             Rule::BanAlterDatabaseOptions,
-                            "Changing database options may change behaviour for existing clients.",
+                            "Changing database options may change behavior for existing clients.",
                             options.syntax(),
                         ),
                         ast::AlterDatabaseAction::SetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterDatabaseOptions,
-                            "Changing database configuration may change behaviour for existing clients.",
+                            "Changing database configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                         ast::AlterDatabaseAction::ResetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterDatabaseOptions,
-                            "Changing database configuration may change behaviour for existing clients.",
+                            "Changing database configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                         _ => {}
@@ -171,13 +171,13 @@ pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>
                         ast::AlterSystemAction::SetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterSystemOptions,
-                            "Changing server configuration may change behaviour for existing clients.",
+                            "Changing server configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                         ast::AlterSystemAction::ResetConfigParam(config) => report(
                             ctx,
                             Rule::BanAlterSystemOptions,
-                            "Changing server configuration may change behaviour for existing clients.",
+                            "Changing server configuration may change behavior for existing clients.",
                             config.syntax(),
                         ),
                     }

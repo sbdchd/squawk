@@ -192,7 +192,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     create_index.syntax(),
-                ).help("Use an explicit name for a concurrently created index").fix(fix));
+                ).fix(fix));
             }
             ast::Stmt::CreateTable(create_table)
                 if create_table.if_not_exists().is_none() && !in_robust_tx =>

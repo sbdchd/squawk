@@ -5,7 +5,7 @@ title: ban-drop-policy
 
 ## problem
 
-Dropping a policy or rule changes access or rewrite behaviour for existing clients. This rule is opt-in.
+Dropping a policy or rule changes access or rewrite behavior for existing clients. This rule is opt-in.
 
 ```sql
 drop policy if exists p on t;
