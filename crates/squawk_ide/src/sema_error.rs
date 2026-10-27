@@ -303,6 +303,9 @@ pub(crate) enum SemaError {
     },
     NoConflictArbiter,
     DeferrableConflictArbiter,
+    RefreshConcurrentlyWithoutUniqueIndex {
+        name: Name,
+    },
     InvalidOrdinal {
         clause: OutputClause,
         position: usize,
@@ -831,6 +834,9 @@ impl SemaError {
             SemaError::NoConflictArbiter | SemaError::DeferrableConflictArbiter => {
                 DiagnosticKind::InvalidConflictArbiter
             }
+            SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
+                DiagnosticKind::MissingUniqueIndex
+            }
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
@@ -856,6 +862,9 @@ impl SemaError {
             SemaError::WindowFrameCopy { hint, .. } => {
                 hint.then_some("Omit the parentheses in this OVER clause.")
             }
+            SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => Some(
+                "Create a unique index with no WHERE clause on one or more columns of the materialized view.",
+            ),
             _ => None,
         }
     }
@@ -1204,6 +1213,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "cannot use a deferrable unique constraint for referenced table `{}`",
                 n(table)
+            ),
+            SemaError::RefreshConcurrentlyWithoutUniqueIndex { name } => write!(
+                f,
+                "cannot refresh materialized view `{}` concurrently",
+                n(name)
             ),
             SemaError::InvalidOrdinal { clause, position } => {
                 write!(

@@ -1921,8 +1921,24 @@ impl Lowerer {
     }
 
     fn lower_refresh(&mut self, refresh: &ast::Refresh) {
-        if let Some(path) = refresh.view_ref().and_then(|view| view.path_ref()) {
-            self.lower_table_ref(&path, IfMissing::Error, TableLookup::MaterializedView);
+        let Some(path) = refresh.view_ref().and_then(|view| view.path_ref()) else {
+            return;
+        };
+        let view = self.lower_table_ref(&path, IfMissing::Error, TableLookup::MaterializedView);
+        if refresh.concurrently_token().is_some()
+            && let Some(view) = view
+            && self.index.tables[view].kind == TableKind::MaterializedView
+            && self.index.tables.is_local(view)
+            && !self.dropped_tables.contains(&view)
+            && self
+                .find_unique_index(view, &|_, index| !index.partial && index.key.is_some())
+                .is_none()
+        {
+            let name = self.index.tables[view].name;
+            self.push_error(
+                path.syntax(),
+                SemaError::RefreshConcurrentlyWithoutUniqueIndex { name },
+            );
         }
     }
 
