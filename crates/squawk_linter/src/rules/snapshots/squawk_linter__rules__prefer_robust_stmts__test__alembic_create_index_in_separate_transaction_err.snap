@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
 expression: lint_errors(sql)
 ---
-warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+warning[prefer-robust-stmts]: missing `if not exists`, the migration can't be rerun if it fails part way through
   ╭▸ 
 3 │ CREATE INDEX foo_idx ON bar (baz);
   │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

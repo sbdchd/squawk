@@ -105,7 +105,7 @@ fn check_defined_nodes(ctx: &mut Linter, columns: impl Iterator<Item = (Name, Sy
         for column in columns {
             ctx.report(Violation::for_node(
                 Rule::BanDuplicateColumnAssignments,
-                format!("Column `{}` is specified more than once.", name.as_str()).into(),
+                format!("column `{}` is specified more than once", name.as_str()).into(),
                 &column,
             ));
         }
@@ -138,7 +138,7 @@ fn check_insert_column_target_list(ctx: &mut Linter, column_target_list: &ast::C
             ctx.report(Violation::for_node(
                 Rule::BanDuplicateColumnAssignments,
                 format!(
-                    "Multiple assignments to the same column `{}`.",
+                    "multiple assignments to the same column `{}`",
                     name.as_str()
                 )
                 .into(),
@@ -183,7 +183,7 @@ fn check_set_clause(ctx: &mut Linter, set_clause: &ast::SetClause) {
             let violation = Violation::for_node(
                 Rule::BanDuplicateColumnAssignments,
                 format!(
-                    "Multiple assignments to the same column `{}`.",
+                    "multiple assignments to the same column `{}`",
                     name.as_str()
                 )
                 .into(),
@@ -286,11 +286,11 @@ set
   c = 3;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
            ╭▸ 
         10 │   a = 1,
            ╰╴  ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
            ╭▸ 
         11 │   a = 1,
            │   ━
@@ -348,11 +348,11 @@ set
   a = 3;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         4 │   (a, b) = (1, 2),
           ╰╴   ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         5 │   a = 3;
           ╰╴  ━
@@ -377,11 +377,11 @@ set
   a.x = 1;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
            ╭▸ 
         13 │   a = row(1, 2),
            ╰╴  ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
            ╭▸ 
         14 │   a.x = 1;
            │   ━
@@ -404,22 +404,22 @@ set
   a = 2;
 "#;
         assert_snapshot!(lint(sql), @r#"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         4 │   a = 1,
           ╰╴  ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         5 │   A = 2;
           │   ━
           ╭╴
         4 -   a = 1,
           ╰╴
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         8 │   "a" = 1,
           ╰╴  ━━━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         9 │   a = 2;
           │   ━
@@ -435,11 +435,11 @@ set
         let sql = format!("update k set {prefix}x = 1, {prefix}y = 2;");
 
         assert_snapshot!(lint(&sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
           ╭▸ 
         1 │ update k set aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaax = 1, aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa…
           ╰╴             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
           ╭▸ 
         1 │ …aaaaaaaaaaaaaaaaaaaaaaaaaaaax = 1, aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaay = 2;
           │                                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -457,11 +457,11 @@ insert into t (a, a)
 values (1, 2);
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         2 │ insert into t (a, a)
           ╰╴               ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         2 │ insert into t (a, a)
           ╰╴                  ━
@@ -478,11 +478,11 @@ when not matched then
   values (1, 2);
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         5 │   insert (a, a)
           ╰╴          ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         5 │   insert (a, a)
           ╰╴             ━
@@ -498,11 +498,11 @@ create table t (
 );
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         3 │   a int,
           ╰╴  ━
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         4 │   a text
           ╰╴  ━
@@ -518,11 +518,11 @@ create foreign table t (
 ) server s;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         3 │   a int,
           ╰╴  ━
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         4 │   a text
           ╰╴  ━
@@ -536,11 +536,11 @@ create view v (a, a) as
 select 1, 2;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         2 │ create view v (a, a) as
           ╰╴               ━
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         2 │ create view v (a, a) as
           ╰╴                  ━
@@ -554,11 +554,11 @@ create view v as
 select 1 a, 2 a;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         3 │ select 1 a, 2 a;
           ╰╴         ━
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         3 │ select 1 a, 2 a;
           ╰╴              ━
@@ -572,11 +572,11 @@ create view v as
 select 1, 2;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Column `?column?` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `?column?` is specified more than once
           ╭▸ 
         3 │ select 1, 2;
           ╰╴       ━
-        warning[ban-duplicate-column-assignments]: Column `?column?` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `?column?` is specified more than once
           ╭▸ 
         3 │ select 1, 2;
           ╰╴          ━
@@ -587,11 +587,11 @@ select 1, 2;
     fn select_into_err() {
         let sql = "select 1 a, 2 a into z;";
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         1 │ select 1 a, 2 a into z;
           ╰╴         ━
-        warning[ban-duplicate-column-assignments]: Column `a` is specified more than once.
+        warning[ban-duplicate-column-assignments]: column `a` is specified more than once
           ╭▸ 
         1 │ select 1 a, 2 a into z;
           ╰╴              ━
@@ -610,11 +610,11 @@ set
   a = 2;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         7 │   a = 1,
           ╰╴  ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         8 │   a = 2;
           │   ━
@@ -636,11 +636,11 @@ when matched then
     a = 2;
 "#;
         assert_snapshot!(lint(sql), @"
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         7 │     a = 1,
           ╰╴    ━
-        warning[ban-duplicate-column-assignments]: Multiple assignments to the same column `a`.
+        warning[ban-duplicate-column-assignments]: multiple assignments to the same column `a`
           ╭▸ 
         8 │     a = 2;
           │     ━

@@ -10,13 +10,13 @@ pub(crate) fn ban_replica_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) 
             ast::Stmt::AlterTable(table) => {
                 for action in table.actions() {
                     if let ast::AlterTableAction::ReplicaIdentity(node) = action {
-                        ctx.report(Violation::for_node(Rule::BanReplicaIdentity, "Changing replica identity may silently change replication for existing clients.".into(), node.syntax()));
+                        ctx.report(Violation::for_node(Rule::BanReplicaIdentity, "changing replica identity may silently change replication for existing clients".into(), node.syntax()));
                     }
                 }
             }
             ast::Stmt::DropPublication(node) => ctx.report(Violation::for_node(
                 Rule::BanReplicaIdentity,
-                "Dropping a publication stops replication for existing consumers.".into(),
+                "dropping a publication stops replication for existing consumers".into(),
                 node.syntax(),
             )),
             ast::Stmt::AlterPublication(publication) => {
@@ -31,7 +31,7 @@ pub(crate) fn ban_replica_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) 
                 {
                     ctx.report(Violation::for_node(
                             Rule::BanReplicaIdentity,
-                            "Changing publication tables or options can stop or change replication for existing consumers.".into(),
+                            "changing publication tables or options can stop or change replication for existing consumers".into(),
                             action.syntax(),
                         ));
                 }

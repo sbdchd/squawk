@@ -38,7 +38,7 @@ fn check_name(ctx: &mut Linter, name_like: &impl ast::NameLike) {
     ctx.report(
         Violation::for_node(
             Rule::IdentifierTooLong,
-            format!("`{ident}` is too long and will be truncated to {MAX_IDENT_BYTES} bytes.")
+            format!("`{ident}` is too long and will be truncated to {MAX_IDENT_BYTES} bytes")
                 .into(),
             name_like.syntax(),
         )
@@ -81,7 +81,7 @@ mod test {
 create table table_very_long_very_long_very_long_very_long_very_long_very_long (column_very_long_very_long_very_long_very_long_very_long_very_long bigint);
         "#;
         assert_snapshot!(lint_errors(sql, Rule::IdentifierTooLong), @"
-        warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes
           ╭▸ 
         2 │ create table table_very_long_very_long_very_long_very_long_very_long_very_long (column_very_long_very_long_very_long_very_long_very_lon…
           │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -89,7 +89,7 @@ create table table_very_long_very_long_very_long_very_long_very_long_very_long (
         2 - create table table_very_long_very_long_very_long_very_long_very_long_very_long (column_very_long_very_long_very_long_very_long_very_long_very_long bigint);
         2 + create table table_very_long_very_long_very_long_very_long_very_long_very_lo (column_very_long_very_long_very_long_very_long_very_long_very_long bigint);
           ╰╴
-        warning[identifier-too-long]: `column_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `column_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes
           ╭▸ 
         2 │ …ng_very_long_very_long_very_long (column_very_long_very_long_very_long_very_long_very_long_very_long bigint);
           │                                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -114,7 +114,7 @@ create table short_name (col bigint);
 create index index_very_long_very_long_very_long_very_long_very_long_very_long on t (col);
         "#;
         assert_snapshot!(lint_errors(sql, Rule::IdentifierTooLong), @"
-        warning[identifier-too-long]: `index_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `index_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes
           ╭▸ 
         2 │ create index index_very_long_very_long_very_long_very_long_very_long_very_long on t (col);
           │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -131,7 +131,7 @@ create index index_very_long_very_long_very_long_very_long_very_long_very_long o
 drop table table_very_long_very_long_very_long_very_long_very_long_very_long;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::IdentifierTooLong), @"
-        warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes
           ╭▸ 
         2 │ drop table table_very_long_very_long_very_long_very_long_very_long_very_long;
           │            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -148,7 +148,7 @@ drop table table_very_long_very_long_very_long_very_long_very_long_very_long;
 alter table t add column column_very_long_very_long_very_long_very_long_very_long_very_long bigint;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::IdentifierTooLong), @"
-        warning[identifier-too-long]: `column_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `column_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes
           ╭▸ 
         2 │ alter table t add column column_very_long_very_long_very_long_very_long_very_long_very_long bigint;
           │                          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -165,7 +165,7 @@ alter table t add column column_very_long_very_long_very_long_very_long_very_lon
 create table "table_very_long_very_long_very_long_very_long_very_long_very_long" (id bigint);
         "#;
         assert_snapshot!(lint_errors(sql, Rule::IdentifierTooLong), @r#"
-        warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes
           ╭▸ 
         2 │ create table "table_very_long_very_long_very_long_very_long_very_long_very_long" (id bigint);
           │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -181,7 +181,7 @@ create table "table_very_long_very_long_very_long_very_long_very_long_very_long"
         // postgres ends up slicing the emoji in two
         let sql = r#"create table "👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦" (id bigint);"#;
         assert_snapshot!(lint_errors(sql, Rule::IdentifierTooLong), @r#"
-        warning[identifier-too-long]: `👨👩👧👦👨👩👧👦👨👩👧👦` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `👨👩👧👦👨👩👧👦👨👩👧👦` is too long and will be truncated to 63 bytes
           ╭▸ 
         1 │ create table "👨👩👧👦👨👩👧👦👨👩👧👦" (id bigint);
           │              ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -199,7 +199,7 @@ create table "table_very_long_very_long_very_long_very_long_very_long_very_long"
         let sql = format!("create table {identifier} (id bigint);");
         // quoting is complicated so we don't add a fix
         assert_snapshot!(lint_errors(&sql, Rule::IdentifierTooLong), @r#"
-        warning[identifier-too-long]: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"b` is too long and will be truncated to 63 bytes.
+        warning[identifier-too-long]: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"b` is too long and will be truncated to 63 bytes
           ╭▸ 
         1 │ create table "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa""b" (id bigint);
           ╰╴             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

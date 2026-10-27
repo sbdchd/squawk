@@ -13,7 +13,7 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterTypeAction::RenameAttribute(node)) = ty.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingColumn,
-                        "Renaming an attribute may break existing clients.".into(),
+                        "renaming an attribute may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -23,7 +23,7 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterTableAction::RenameColumn(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::RenamingColumn,
-                            "Renaming a column may break existing clients.".into(),
+                            "renaming a column may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -34,7 +34,7 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterTableAction::RenameColumn(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::RenamingColumn,
-                            "Renaming a column may break existing clients.".into(),
+                            "renaming a column may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -44,7 +44,7 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterViewAction::RenameColumn(node)) = view.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingColumn,
-                        "Renaming a column may break existing clients.".into(),
+                        "renaming a column may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -54,7 +54,7 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterMaterializedViewAction::RenameColumn(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::RenamingColumn,
-                            "Renaming a column may break existing clients.".into(),
+                            "renaming a column may break existing clients".into(),
                             node.syntax(),
                         ));
                     }

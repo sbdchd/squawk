@@ -8,4 +8,4 @@ warning[adding-field-with-default]: adding a column with a volatile default rewr
   │                                                            ━━
   │
   ├ note: in Postgres 11+, non-volatile defaults can be added without a rewrite
-  ╰ help: Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.
+  ╰ help: add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead

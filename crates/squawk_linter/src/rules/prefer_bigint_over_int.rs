@@ -48,10 +48,10 @@ fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
         ctx.report(
             Violation::for_node(
                 Rule::PreferBigintOverInt,
-                "Using 32-bit integer fields can result in hitting the max `int` limit.".into(),
+                "using 32-bit integer fields can result in hitting the max `int` limit".into(),
                 ty.syntax(),
             )
-            .help("Use 64-bit integer values instead to prevent hitting this limit.")
+            .help("use 64-bit integer values instead to prevent hitting this limit")
             .fix(fix),
         );
     }

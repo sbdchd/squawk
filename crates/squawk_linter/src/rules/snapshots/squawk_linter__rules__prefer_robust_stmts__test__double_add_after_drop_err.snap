@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
 expression: "lint_errors(r#\"\nALTER TABLE \"app_email\" DROP CONSTRAINT IF EXISTS \"email_uniq\";\nALTER TABLE \"app_email\" ADD CONSTRAINT \"email_uniq\" UNIQUE USING INDEX \"email_idx\";\n-- this second add constraint should error because it's not robust\nALTER TABLE \"app_email\" ADD CONSTRAINT \"email_uniq\" UNIQUE USING INDEX \"email_idx\";\n        \"#)"
 ---
-warning[prefer-robust-stmts]: Missing transaction, the migration can't be rerun if it fails part way through.
+warning[prefer-robust-stmts]: missing transaction, the migration can't be rerun if it fails part way through
   ╭▸ 
 5 │ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
   ╰╴                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

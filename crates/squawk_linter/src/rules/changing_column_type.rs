@@ -18,7 +18,7 @@ pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) 
                         if let ast::AlterTypeAttributeAction::AlterAttribute(node) = action {
                             ctx.report(Violation::for_node(
                                 Rule::ChangingColumnType,
-                                "Changing an attribute type may break existing clients.".into(),
+                                "changing an attribute type may break existing clients".into(),
                                 node.syntax(),
                             ));
                         }

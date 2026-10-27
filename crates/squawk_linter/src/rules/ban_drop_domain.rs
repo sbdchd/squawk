@@ -9,7 +9,7 @@ pub(crate) fn ban_drop_domain(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::DropDomain(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropDomain,
-                "Dropping a domain may break existing clients.".into(),
+                "dropping a domain may break existing clients".into(),
                 node.syntax(),
             ));
         }

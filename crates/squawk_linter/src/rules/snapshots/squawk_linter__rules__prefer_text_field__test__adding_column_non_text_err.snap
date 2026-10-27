@@ -2,12 +2,12 @@
 source: crates/squawk_linter/src/rules/prefer_text_field.rs
 expression: "lint_errors(sql, Rule::PreferTextField)"
 ---
-warning[prefer-text-field]: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
+warning[prefer-text-field]: changing the size of a `varchar` field requires an `access exclusive` lock, that will prevent all reads and writes to the table
   ╭▸ 
 3 │ ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
   │                                                 ━━━━━━━━━━━━
   │
-  ├ help: Use a `TEXT` field with a `CHECK` constraint.
+  ├ help: use a `text` field with a `check` constraint
   ╭╴
 3 - ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
 3 + ALTER TABLE "foo_table" ADD COLUMN "foo_column" text NULL;

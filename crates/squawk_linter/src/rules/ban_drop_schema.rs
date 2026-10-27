@@ -9,7 +9,7 @@ pub(crate) fn ban_drop_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::DropSchema(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropSchema,
-                "Dropping a schema may break existing clients.".into(),
+                "dropping a schema may break existing clients".into(),
                 node.syntax(),
             ));
         }

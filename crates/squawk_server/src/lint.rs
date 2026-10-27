@@ -216,12 +216,12 @@ create table t(b int);
 ";
         assert_snapshot!(check(sql), @"
         2:13 Error semantic-error: relation `t` already exists
-        1:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
-        1:17 Warning prefer-bigint-over-int: Using 32-bit integer fields can result in hitting the max `int` limit.
-        help: Use 64-bit integer values instead to prevent hitting this limit.
-        2:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
-        2:17 Warning prefer-bigint-over-int: Using 32-bit integer fields can result in hitting the max `int` limit.
-        help: Use 64-bit integer values instead to prevent hitting this limit.
+        1:0 Warning prefer-robust-stmts: missing `if not exists`, the migration can't be rerun if it fails part way through
+        1:17 Warning prefer-bigint-over-int: using 32-bit integer fields can result in hitting the max `int` limit
+        help: use 64-bit integer values instead to prevent hitting this limit
+        2:0 Warning prefer-robust-stmts: missing `if not exists`, the migration can't be rerun if it fails part way through
+        2:17 Warning prefer-bigint-over-int: using 32-bit integer fields can result in hitting the max `int` limit
+        help: use 64-bit integer values instead to prevent hitting this limit
         ");
     }
 
@@ -243,9 +243,9 @@ select a, b from t;
 create table t(a varchar(10));
 ";
         assert_snapshot!(check(sql), @"
-        1:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
-        1:17 Warning prefer-text-field: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
-        help: Use a `TEXT` field with a `CHECK` constraint.
+        1:0 Warning prefer-robust-stmts: missing `if not exists`, the migration can't be rerun if it fails part way through
+        1:17 Warning prefer-text-field: changing the size of a `varchar` field requires an `access exclusive` lock, that will prevent all reads and writes to the table
+        help: use a `text` field with a `check` constraint
         ");
     }
 }

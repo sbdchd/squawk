@@ -41,7 +41,7 @@ fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
     let name = ty.path_ref()?.segment()?;
     let text = replace_serial(&name.text());
     let edit = Edit::replace(name.syntax().text_range(), text);
-    Some(Fix::new("Replace with IDENTITY column", vec![edit]))
+    Some(Fix::new("Replace with `identity` column", vec![edit]))
 }
 
 fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
@@ -53,10 +53,10 @@ fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
         ctx.report(
             Violation::for_node(
                 Rule::PreferIdentity,
-                "Serial types make schema, dependency, and permission management difficult.".into(),
+                "serial types make schema, dependency, and permission management difficult".into(),
                 ty.syntax(),
             )
-            .help("Use an `IDENTITY` column instead.")
+            .help("use an `identity` column instead")
             .fix(fix),
         );
     }

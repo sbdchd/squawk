@@ -10,31 +10,31 @@ pub(crate) fn ban_drop_type(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::DropOperator(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropType,
-                "Dropping an operator may break existing clients.".into(),
+                "dropping an operator may break existing clients".into(),
                 node.syntax(),
             ));
         } else if let ast::Stmt::DropOperatorClass(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropType,
-                "Dropping an operator class may break existing clients.".into(),
+                "dropping an operator class may break existing clients".into(),
                 node.syntax(),
             ));
         } else if let ast::Stmt::DropOperatorFamily(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropType,
-                "Dropping an operator family may break existing clients.".into(),
+                "dropping an operator family may break existing clients".into(),
                 node.syntax(),
             ));
         } else if let ast::Stmt::DropCast(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropType,
-                "Dropping a cast may break existing clients.".into(),
+                "dropping a cast may break existing clients".into(),
                 node.syntax(),
             ));
         } else if let ast::Stmt::DropType(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropType,
-                "Dropping a type may break existing clients.".into(),
+                "dropping a type may break existing clients".into(),
                 node.syntax(),
             ));
         }

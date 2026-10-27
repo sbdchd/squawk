@@ -12,7 +12,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterTableAction::SetSchema(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
+                            "moving an object to another schema may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -23,7 +23,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterTableAction::SetSchema(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
+                            "moving an object to another schema may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -35,7 +35,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -45,7 +45,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterMaterializedViewAction::SetSchema(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
+                            "moving an object to another schema may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -55,7 +55,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterAggregateAction::SetSchema(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -64,7 +64,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterExtensionAction::SetSchema(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -73,7 +73,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterProcedureAction::SetSchema(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -82,7 +82,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterRoutineAction::SetSchema(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -93,7 +93,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -104,7 +104,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -114,7 +114,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterSequenceAction::SetSchema(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::BanSetSchema,
-                            "Moving an object to another schema may break existing clients.".into(),
+                            "moving an object to another schema may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -126,7 +126,7 @@ pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::BanSetSchema,
-                        "Moving an object to another schema may break existing clients.".into(),
+                        "moving an object to another schema may break existing clients".into(),
                         node.syntax(),
                     ));
                 }

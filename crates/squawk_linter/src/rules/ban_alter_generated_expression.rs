@@ -11,13 +11,13 @@ pub(crate) fn ban_alter_generated_expression(ctx: &mut Linter, parse: &Parse<Sou
                 match action {
                     ast::AlterTableAction::AlterColumn(column) => {
                         if let Some(ast::AlterColumnOption::SetExpression(node)) = column.option() {
-                            ctx.report(Violation::for_node(Rule::BanAlterGeneratedExpression, "Changing a generated column expression may change values read by existing clients.".into(), node.syntax()));
+                            ctx.report(Violation::for_node(Rule::BanAlterGeneratedExpression, "changing a generated column expression may change values read by existing clients".into(), node.syntax()));
                         }
                     }
                     ast::AlterTableAction::AddColumn(column) => {
                         for constraint in column.constraints() {
                             if let ast::Constraint::GeneratedConstraint(node) = constraint {
-                                ctx.report(Violation::for_node(Rule::BanAlterGeneratedExpression, "Adding a generated column may break inserts from existing clients.".into(), node.syntax()));
+                                ctx.report(Violation::for_node(Rule::BanAlterGeneratedExpression, "adding a generated column may break inserts from existing clients".into(), node.syntax()));
                             }
                         }
                     }

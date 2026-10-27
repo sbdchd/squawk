@@ -48,11 +48,10 @@ fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
         ctx.report(
             Violation::for_node(
                 Rule::PreferBigintOverSmallint,
-                "Using 16-bit integer fields can result in hitting the max `smallint` limit."
-                    .into(),
+                "using 16-bit integer fields can result in hitting the max `smallint` limit".into(),
                 ty.syntax(),
             )
-            .help("Use 64-bit integer values instead to prevent hitting this limit.")
+            .help("use 64-bit integer values instead to prevent hitting this limit")
             .fix(fix),
         );
     }

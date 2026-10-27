@@ -9,7 +9,7 @@ fn create_fix(add_value: &ast::AddValue) -> Option<Fix> {
     let literal = add_value.literal()?;
     let insert_at = literal.syntax().text_range().end();
     let edit = Edit::insert(" BEFORE 'existing_value'", insert_at);
-    Some(Fix::new("Insert `BEFORE` clause", vec![edit]))
+    Some(Fix::new("Insert `before` clause", vec![edit]))
 }
 
 pub(crate) fn require_enum_value_ordering(ctx: &mut Linter, parse: &Parse<SourceFile>) {
@@ -23,10 +23,10 @@ pub(crate) fn require_enum_value_ordering(ctx: &mut Linter, parse: &Parse<Source
             ctx.report(
                     Violation::for_node(
                         Rule::RequireEnumValueOrdering,
-                        "ADD VALUE without BEFORE or AFTER appends the value to the end of the enum, which may result in unexpected ordering.".into(),
+                        "`add value` without `before` or `after` appends the value to the end of the enum, which may result in unexpected ordering".into(),
                         add_value.syntax(),
                     )
-                    .help("Add `BEFORE` or `AFTER` to specify the position of the new enum value.")
+                    .help("add `before` or `after` to specify the position of the new enum value")
                     .fix(fix),
                 );
         }

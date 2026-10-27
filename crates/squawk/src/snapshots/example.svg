@@ -1,4 +1,4 @@
-<svg width="1465px" height="1478px" xmlns="http://www.w3.org/2000/svg">
+<svg width="1457px" height="1478px" xmlns="http://www.w3.org/2000/svg">
   <style>
     .fg { fill: #AAAAAA }
     .bg { fill: #000000 }
@@ -22,7 +22,7 @@
   <rect width="100%" height="100%" y="0" rx="4.5" class="bg" />
 
   <text xml:space="preserve" class="container fg">
-    <tspan x="10px" y="28px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/prefer-bigint-over-int">prefer-bigint-over-int</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Using 32-bit integer fields can result in hitting the max `int` limit.</tspan>
+    <tspan x="10px" y="28px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/prefer-bigint-over-int">prefer-bigint-over-int</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: using 32-bit integer fields can result in hitting the max `int` limit</tspan>
 </tspan>
     <tspan x="10px" y="46px"><tspan> </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:6:10</tspan>
 </tspan>
@@ -34,7 +34,7 @@
 </tspan>
     <tspan x="10px" y="118px"><tspan>  </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="136px"><tspan>  </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Use 64-bit integer values instead to prevent hitting this limit.</tspan>
+    <tspan x="10px" y="136px"><tspan>  </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: use 64-bit integer values instead to prevent hitting this limit</tspan>
 </tspan>
     <tspan x="10px" y="154px"><tspan>  </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
 </tspan>
@@ -42,7 +42,7 @@
 </tspan>
     <tspan x="10px" y="190px"><tspan>  </tspan><tspan class="fg-bright-blue bold">╰╴</tspan><tspan>         </tspan><tspan class="fg-bright-green">+++</tspan>
 </tspan>
-    <tspan x="10px" y="208px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/prefer-identity">prefer-identity</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Serial types make schema, dependency, and permission management difficult.</tspan>
+    <tspan x="10px" y="208px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/prefer-identity">prefer-identity</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: serial types make schema, dependency, and permission management difficult</tspan>
 </tspan>
     <tspan x="10px" y="226px"><tspan> </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:6:10</tspan>
 </tspan>
@@ -54,7 +54,7 @@
 </tspan>
     <tspan x="10px" y="298px"><tspan>  </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="316px"><tspan>  </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Use an `IDENTITY` column instead.</tspan>
+    <tspan x="10px" y="316px"><tspan>  </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: use an `identity` column instead</tspan>
 </tspan>
     <tspan x="10px" y="334px"><tspan>  </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
 </tspan>
@@ -64,7 +64,7 @@
 </tspan>
     <tspan x="10px" y="388px"><tspan>  </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="406px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/prefer-text-field">prefer-text-field</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.</tspan>
+    <tspan x="10px" y="406px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/prefer-text-field">prefer-text-field</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: changing the size of a `varchar` field requires an `access exclusive` lock, that will prevent all reads and writes to the table</tspan>
 </tspan>
     <tspan x="10px" y="424px"><tspan> </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:7:13</tspan>
 </tspan>
@@ -76,7 +76,7 @@
 </tspan>
     <tspan x="10px" y="496px"><tspan>  </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="514px"><tspan>  </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Use a `TEXT` field with a `CHECK` constraint.</tspan>
+    <tspan x="10px" y="514px"><tspan>  </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: use a `text` field with a `check` constraint</tspan>
 </tspan>
     <tspan x="10px" y="532px"><tspan>  </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
 </tspan>
@@ -86,7 +86,7 @@
 </tspan>
     <tspan x="10px" y="586px"><tspan>  </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="604px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-concurrent-index-creation">require-concurrent-index-creation</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: During normal index creation, table updates are blocked, but reads are still allowed.</tspan>
+    <tspan x="10px" y="604px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-concurrent-index-creation">require-concurrent-index-creation</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: during normal index creation, table updates are blocked, but reads are still allowed</tspan>
 </tspan>
     <tspan x="10px" y="622px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:10:1</tspan>
 </tspan>
@@ -98,7 +98,7 @@
 </tspan>
     <tspan x="10px" y="694px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="712px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Use `concurrently` to avoid blocking writes.</tspan>
+    <tspan x="10px" y="712px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: use `concurrently` to avoid blocking writes</tspan>
 </tspan>
     <tspan x="10px" y="730px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
 </tspan>
@@ -106,7 +106,7 @@
 </tspan>
     <tspan x="10px" y="766px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan><tspan>             </tspan><tspan class="fg-bright-green">++++++++++++</tspan>
 </tspan>
-    <tspan x="10px" y="784px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-lock-timeout">require-lock-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set lock_timeout` before potentially slow SHARE lock operations</tspan>
+    <tspan x="10px" y="784px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-lock-timeout">require-lock-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: missing `set lock_timeout` before potentially slow `share` lock operations</tspan>
 </tspan>
     <tspan x="10px" y="802px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:10:1</tspan>
 </tspan>
@@ -118,7 +118,7 @@
 </tspan>
     <tspan x="10px" y="874px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="892px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">note</tspan><tspan>: statement requires: SHARE lock; blocking: writes, schema changes</tspan>
+    <tspan x="10px" y="892px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">note</tspan><tspan>: statement requires: `share` lock; blocking: writes, schema changes</tspan>
 </tspan>
     <tspan x="10px" y="910px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: configure a `lock_timeout` before this statement</tspan>
 </tspan>
@@ -128,7 +128,7 @@
 </tspan>
     <tspan x="10px" y="964px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="982px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-statement-timeout">require-statement-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set statement_timeout` before potentially slow operations</tspan>
+    <tspan x="10px" y="982px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-statement-timeout">require-statement-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: missing `set statement_timeout` before potentially slow operations</tspan>
 </tspan>
     <tspan x="10px" y="1000px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:10:1</tspan>
 </tspan>
@@ -140,7 +140,7 @@
 </tspan>
     <tspan x="10px" y="1072px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1090px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Configure a `statement_timeout` before this statement</tspan>
+    <tspan x="10px" y="1090px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: configure a `statement_timeout` before this statement</tspan>
 </tspan>
     <tspan x="10px" y="1108px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
 </tspan>
@@ -148,7 +148,7 @@
 </tspan>
     <tspan x="10px" y="1144px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="1162px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/constraint-missing-not-valid">constraint-missing-not-valid</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: By default new constraints require a table scan and block writes to the table while that scan occurs.</tspan>
+    <tspan x="10px" y="1162px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/constraint-missing-not-valid">constraint-missing-not-valid</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: by default new constraints require a table scan and block writes to the table while that scan occurs</tspan>
 </tspan>
     <tspan x="10px" y="1180px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:24</tspan>
 </tspan>
@@ -160,9 +160,9 @@
 </tspan>
     <tspan x="10px" y="1252px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1270px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.</tspan>
+    <tspan x="10px" y="1270px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: use `not valid` with a later `validate constraint` call</tspan>
 </tspan>
-    <tspan x="10px" y="1288px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/disallowed-unique-constraint">disallowed-unique-constraint</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.</tspan>
+    <tspan x="10px" y="1288px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/disallowed-unique-constraint">disallowed-unique-constraint</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: adding a `unique` constraint requires an `access exclusive` lock which blocks reads and writes to the table while the index is built</tspan>
 </tspan>
     <tspan x="10px" y="1306px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:28</tspan>
 </tspan>
@@ -174,7 +174,7 @@
 </tspan>
     <tspan x="10px" y="1378px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1396px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: Create an index `CONCURRENTLY` and create the constraint using the index.</tspan>
+    <tspan x="10px" y="1396px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: create an index `concurrently` and create the constraint using the index</tspan>
 </tspan>
     <tspan x="10px" y="1414px">
 </tspan>

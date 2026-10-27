@@ -17,7 +17,7 @@ pub(super) fn check_table_action(ctx: &mut Linter, action: &ast::AlterTableActio
                 );
                 if restriction {
                     ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
-                        "A new constraint can reject writes from existing clients, even when it is NOT VALID.".into(), add.syntax()));
+                        "a new constraint can reject writes from existing clients, even when it is `not valid`".into(), add.syntax()));
                 }
             }
         }
@@ -25,7 +25,7 @@ pub(super) fn check_table_action(ctx: &mut Linter, action: &ast::AlterTableActio
             if let Some(ast::AlterColumnOption::SetNotNull(node)) = column.option() {
                 ctx.report(Violation::for_node(
                     Rule::BanNewWriteRestriction,
-                    "SET NOT NULL can reject writes from existing clients.".into(),
+                    "`set not null` can reject writes from existing clients".into(),
                     node.syntax(),
                 ));
             }
@@ -44,7 +44,7 @@ pub(super) fn check_table_action(ctx: &mut Linter, action: &ast::AlterTableActio
             }) {
                 ctx.report(Violation::for_node(
                     Rule::BanNewWriteRestriction,
-                    "Changing constraint enforcement or timing can reject existing client writes."
+                    "changing constraint enforcement or timing can reject existing client writes"
                         .into(),
                     node.syntax(),
                 ));
@@ -60,7 +60,7 @@ pub(super) fn check_foreign_table_action(ctx: &mut Linter, action: &ast::AlterTa
         ast::AlterTableAction::AddConstraint(node) => {
             ctx.report(Violation::for_node(
                 Rule::BanNewWriteRestriction,
-                "A foreign table constraint can reject existing client writes.".into(),
+                "a foreign table constraint can reject existing client writes".into(),
                 node.syntax(),
             ));
         }
@@ -68,7 +68,7 @@ pub(super) fn check_foreign_table_action(ctx: &mut Linter, action: &ast::AlterTa
             if let Some(ast::AlterColumnOption::SetNotNull(node)) = column.option() {
                 ctx.report(Violation::for_node(
                     Rule::BanNewWriteRestriction,
-                    "SET NOT NULL can reject existing client writes.".into(),
+                    "`set not null` can reject existing client writes".into(),
                     node.syntax(),
                 ));
             }
@@ -82,10 +82,10 @@ pub(super) fn check_domain(ctx: &mut Linter, domain: &ast::AlterDomain) {
         match action {
             ast::AlterDomainAction::SetNotNull(node) => ctx.report(Violation::for_node(
                 Rule::BanNewWriteRestriction,
-                "A domain NOT NULL requirement can reject writes from existing clients.".into(), node.syntax())),
+                "a domain `not null` requirement can reject writes from existing clients".into(), node.syntax())),
             ast::AlterDomainAction::AddConstraint(node) => ctx.report(Violation::for_node(
                 Rule::BanNewWriteRestriction,
-                "A domain constraint can reject writes from existing clients, even when it is NOT VALID.".into(), node.syntax())),
+                "a domain constraint can reject writes from existing clients, even when it is `not valid`".into(), node.syntax())),
             _ => (),
         }
     }
@@ -94,7 +94,7 @@ pub(super) fn check_domain(ctx: &mut Linter, domain: &ast::AlterDomain) {
 pub(super) fn check_index(ctx: &mut Linter, index: &ast::CreateIndex) {
     if index.unique_token().is_some() {
         ctx.report(Violation::for_node(Rule::BanNewWriteRestriction,
-            "A unique index can reject writes from existing clients, even when created CONCURRENTLY.".into(), index.syntax()));
+            "a unique index can reject writes from existing clients, even when created `concurrently`".into(), index.syntax()));
     }
 }
 
@@ -110,7 +110,7 @@ fn check_column_constraints(ctx: &mut Linter, column: &ast::AddColumn) {
         ) {
             ctx.report(Violation::for_node(
                 Rule::BanNewWriteRestriction,
-                "A new column constraint can reject writes from existing clients.".into(),
+                "a new column constraint can reject writes from existing clients".into(),
                 constraint.syntax(),
             ));
         }

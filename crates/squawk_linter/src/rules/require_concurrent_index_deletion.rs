@@ -22,9 +22,9 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
 
             ctx.report(Violation::for_node(
                     Rule::RequireConcurrentIndexDeletion,
-            "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.".into(),
+            "a normal `drop index` acquires an `access exclusive` lock on the table, blocking other accesses until the index drop can complete".into(),
                     drop_index.syntax(),
-                ).help("Drop the index `CONCURRENTLY`.").fix(fix));
+                ).help("drop the index `concurrently`").fix(fix));
         }
     }
 }

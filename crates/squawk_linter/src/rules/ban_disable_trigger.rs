@@ -11,8 +11,8 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 let (message, note) = match action {
                     ast::AlterTableAction::EnableReplicaTrigger(_)
                     | ast::AlterTableAction::EnableReplicaRule(_) => (
-                        "Making a trigger or rule replica-only stops it firing for normal application writes.",
-                        Some("Earlier application revisions may depend on its side effects."),
+                        "making a trigger or rule replica-only stops it firing for normal application writes",
+                        Some("earlier application revisions may depend on its side effects"),
                     ),
                     ast::AlterTableAction::DisableTrigger(_)
                     | ast::AlterTableAction::EnableTrigger(_)
@@ -20,13 +20,13 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     | ast::AlterTableAction::DisableRule(_)
                     | ast::AlterTableAction::EnableAlwaysTrigger(_)
                     | ast::AlterTableAction::EnableAlwaysRule(_) => (
-                        "Changing trigger or rule firing may change database side effects for existing clients.",
+                        "changing trigger or rule firing may change database side effects for existing clients",
                         None,
                     ),
                     ast::AlterTableAction::DisableRls(_)
                     | ast::AlterTableAction::ForceRls(_)
                     | ast::AlterTableAction::NoForceRls(_) => (
-                        "Changing row level security can change visible rows or reject access for existing clients.",
+                        "changing row level security can change visible rows or reject access for existing clients",
                         None,
                     ),
                     _ => continue,
@@ -82,7 +82,7 @@ mod test {
         assert_eq!(errors.matches("warning[ban-disable-trigger]").count(), 5);
         assert_eq!(
             errors
-                .matches("Earlier application revisions may depend on its side effects.")
+                .matches("earlier application revisions may depend on its side effects")
                 .count(),
             2
         );

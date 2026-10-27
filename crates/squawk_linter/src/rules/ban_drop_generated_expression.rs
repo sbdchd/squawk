@@ -13,7 +13,7 @@ pub(crate) fn ban_drop_generated_expression(ctx: &mut Linter, parse: &Parse<Sour
                 {
                     ctx.report(Violation::for_node(
                         Rule::BanDropGeneratedExpression,
-                        "Dropping a generated expression may break existing clients.".into(),
+                        "dropping a generated expression may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -37,7 +37,7 @@ mod test {
         );
         assert!(errors.contains("ban-drop-generated-expression"), "{errors}");
         assert!(
-            errors.contains("Dropping a generated expression may break existing clients"),
+            errors.contains("dropping a generated expression may break existing clients"),
             "{errors}"
         );
     }

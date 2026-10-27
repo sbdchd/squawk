@@ -65,9 +65,9 @@ fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
         let fix = create_varchar_to_text_fix(&ty);
         ctx.report(Violation::for_node(
                 Rule::PreferTextField,
-               "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.".into(),
+               "changing the size of a `varchar` field requires an `access exclusive` lock, that will prevent all reads and writes to the table".into(),
                 ty.syntax(),
-            ).help("Use a `TEXT` field with a `CHECK` constraint.").fix(fix));
+            ).help("use a `text` field with a `check` constraint").fix(fix));
     }
 }
 

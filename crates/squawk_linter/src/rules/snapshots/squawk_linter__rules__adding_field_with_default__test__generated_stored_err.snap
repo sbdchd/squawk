@@ -7,4 +7,4 @@ warning[adding-field-with-default]: adding a generated column rewrites the table
 3 │ ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
   │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
-  ╰ help: Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.
+  ╰ help: add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead

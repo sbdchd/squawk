@@ -2,50 +2,50 @@
 source: crates/squawk_linter/src/rules/prefer_bigint_over_int.rs
 expression: "lint_errors(sql, Rule::PreferBigintOverInt)"
 ---
-warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: using 32-bit integer fields can result in hitting the max `int` limit
   ╭▸ 
 3 │     id int
   │        ━━━
   │
-  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ├ help: use 64-bit integer values instead to prevent hitting this limit
   ╭╴
 3 │     id bigint
   ╰╴       +++
-warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: using 32-bit integer fields can result in hitting the max `int` limit
   ╭▸ 
 6 │     id integer
   │        ━━━━━━━
   │
-  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ├ help: use 64-bit integer values instead to prevent hitting this limit
   ╭╴
 6 -     id integer
 6 +     id bigint
   ╰╴
-warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: using 32-bit integer fields can result in hitting the max `int` limit
   ╭▸ 
 9 │     id int4
   │        ━━━━
   │
-  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ├ help: use 64-bit integer values instead to prevent hitting this limit
   ╭╴
 9 -     id int4
 9 +     id int8
   ╰╴
-warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: using 32-bit integer fields can result in hitting the max `int` limit
    ╭▸ 
 12 │     id serial
    │        ━━━━━━
    │
-   ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+   ├ help: use 64-bit integer values instead to prevent hitting this limit
    ╭╴
 12 │     id bigserial
    ╰╴       +++
-warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: using 32-bit integer fields can result in hitting the max `int` limit
    ╭▸ 
 15 │     id serial4
    │        ━━━━━━━
    │
-   ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+   ├ help: use 64-bit integer values instead to prevent hitting this limit
    ╭╴
 15 -     id serial4
 15 +     id serial8

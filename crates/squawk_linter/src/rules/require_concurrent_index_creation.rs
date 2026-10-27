@@ -29,10 +29,10 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
 
             ctx.report(Violation::for_node(
                         Rule::RequireConcurrentIndexCreation,
-                "During normal index creation, table updates are blocked, but reads are still allowed.".into(),
+                "during normal index creation, table updates are blocked, but reads are still allowed".into(),
                         create_index.syntax(),
                     )
-                    .help("Use `concurrently` to avoid blocking writes.")
+                    .help("use `concurrently` to avoid blocking writes")
                     .fix(fix));
         }
     }
@@ -63,12 +63,12 @@ select 1 as id into t;
 commit;
 create index on t (id);";
         assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexCreation), @"
-        warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
+        warning[require-concurrent-index-creation]: during normal index creation, table updates are blocked, but reads are still allowed
           ╭▸ 
         4 │ create index on t (id);
           │ ━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `concurrently` to avoid blocking writes.
+          ├ help: use `concurrently` to avoid blocking writes
           ╭╴
         4 │ create index concurrently on t (id);
           ╰╴             ++++++++++++
@@ -82,12 +82,12 @@ create table new.t (id int);
 create index on existing.t (id);
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexCreation), @"
-        warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
+        warning[require-concurrent-index-creation]: during normal index creation, table updates are blocked, but reads are still allowed
           ╭▸ 
         3 │ create index on existing.t (id);
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `concurrently` to avoid blocking writes.
+          ├ help: use `concurrently` to avoid blocking writes
           ╭╴
         3 │ create index concurrently on existing.t (id);
           ╰╴             ++++++++++++

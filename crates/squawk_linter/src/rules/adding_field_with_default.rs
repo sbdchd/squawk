@@ -76,7 +76,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
     let default_note = "in Postgres 11+, non-volatile defaults can be added without a rewrite";
     let generated_message =
         "adding a generated column rewrites the table under an `access exclusive` lock";
-    let help = "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.";
+    let help = "add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
     for stmt in file.stmts() {

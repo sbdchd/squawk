@@ -10,12 +10,12 @@ pub(crate) fn ban_drop_view(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         match stmt {
             ast::Stmt::DropView(node) => ctx.report(Violation::for_node(
                 Rule::BanDropView,
-                "Dropping a view may break existing clients.".into(),
+                "dropping a view may break existing clients".into(),
                 node.syntax(),
             )),
             ast::Stmt::DropMaterializedView(node) => ctx.report(Violation::for_node(
                 Rule::BanDropView,
-                "Dropping a view may break existing clients.".into(),
+                "dropping a view may break existing clients".into(),
                 node.syntax(),
             )),
             _ => (),

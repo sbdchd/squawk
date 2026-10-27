@@ -15,7 +15,7 @@ pub(crate) fn ban_alter_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         ast::AlterColumnOption::AddGenerated(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::BanAlterIdentity,
-                                "Changing column identity may break inserts from existing clients."
+                                "changing column identity may break inserts from existing clients"
                                     .into(),
                                 node.syntax(),
                             ));
@@ -23,7 +23,7 @@ pub(crate) fn ban_alter_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         ast::AlterColumnOption::DropIdentity(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::BanAlterIdentity,
-                                "Changing column identity may break inserts from existing clients."
+                                "changing column identity may break inserts from existing clients"
                                     .into(),
                                 node.syntax(),
                             ));
@@ -36,7 +36,7 @@ pub(crate) fn ban_alter_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         {
                             ctx.report(Violation::for_node(
                                 Rule::BanAlterIdentity,
-                                "Changing column identity may break inserts from existing clients."
+                                "changing column identity may break inserts from existing clients"
                                     .into(),
                                 node.syntax(),
                             ));
@@ -49,7 +49,7 @@ pub(crate) fn ban_alter_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                         Some(ast::GeneratedWhen::GeneratedAlways(_))
                                     )
                                 {
-                                    ctx.report(Violation::for_node(Rule::BanAlterIdentity, "Changing column identity may break inserts from existing clients.".into(), node.syntax()));
+                                    ctx.report(Violation::for_node(Rule::BanAlterIdentity, "changing column identity may break inserts from existing clients".into(), node.syntax()));
                                 }
                             }
                         }

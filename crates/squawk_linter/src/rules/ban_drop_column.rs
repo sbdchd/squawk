@@ -18,7 +18,7 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         if let ast::AlterTypeAttributeAction::DropAttribute(node) = action {
                             ctx.report(Violation::for_node(
                                 Rule::BanDropColumn,
-                                "Dropping an attribute may break existing clients.".into(),
+                                "dropping an attribute may break existing clients".into(),
                                 node.syntax(),
                             ));
                         }
@@ -32,7 +32,7 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             if let ast::AlterTableAction::DropColumn(drop_column) = action {
                 ctx.report(Violation::for_node(
                     Rule::BanDropColumn,
-                    "Dropping a column may break existing clients.".into(),
+                    "dropping a column may break existing clients".into(),
                     drop_column.syntax(),
                 ));
             }

@@ -158,13 +158,13 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
                     let message = match message_type {
                         ActionErrorMessage::IfExists => {
-                            "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through."
+                            "missing `if exists`, the migration can't be rerun if it fails part way through"
                         }
                         ActionErrorMessage::IfNotExists => {
-                            "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through."
+                            "missing `if not exists`, the migration can't be rerun if it fails part way through"
                         }
                         ActionErrorMessage::None => {
-                            "Missing transaction, the migration can't be rerun if it fails part way through."
+                            "missing transaction, the migration can't be rerun if it fails part way through"
                         }
                     };
 
@@ -190,7 +190,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 });
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
-                    "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
+                    "missing `if not exists`, the migration can't be rerun if it fails part way through".into(),
                     create_index.syntax(),
                 ).fix(fix));
             }
@@ -217,7 +217,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
-                    "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
+                    "missing `if not exists`, the migration can't be rerun if it fails part way through".into(),
                     create_table.syntax(),
                 ).fix(fix));
             }
@@ -232,7 +232,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
-                    "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
+                    "missing `if exists`, the migration can't be rerun if it fails part way through".into(),
                     drop_index.syntax(),
                 ).fix(fix));
             }
@@ -246,7 +246,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 });
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
-                    "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
+                    "missing `if exists`, the migration can't be rerun if it fails part way through".into(),
                     drop_table.syntax(),
                 ).fix(fix));
             }
@@ -259,7 +259,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
-                    "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
+                    "missing `if exists`, the migration can't be rerun if it fails part way through".into(),
                     drop_type.syntax(),
                 ).fix(fix));
             }

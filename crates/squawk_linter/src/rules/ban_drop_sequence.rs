@@ -9,7 +9,7 @@ pub(crate) fn ban_drop_sequence(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::DropSequence(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropSequence,
-                "Dropping a sequence may break existing clients.".into(),
+                "dropping a sequence may break existing clients".into(),
                 node.syntax(),
             ));
         }

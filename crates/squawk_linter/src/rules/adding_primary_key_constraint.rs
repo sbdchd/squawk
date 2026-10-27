@@ -6,8 +6,8 @@ use squawk_syntax::{
 use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let message = "Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.";
-    let help = "Add the `PRIMARY KEY` constraint `USING` an index.";
+    let message = "adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built";
+    let help = "add the `primary key` constraint `using` an index";
     let file = parse.tree();
     let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
@@ -78,18 +78,18 @@ commit;
 alter table t add primary key (id);
 alter table u add column b serial primary key;";
         assert_snapshot!(lint_errors(sql, Rule::AddingSerialPrimaryKeyField), @"
-        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+        warning[adding-serial-primary-key-field]: adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built
           ╭▸ 
         5 │ alter table t add primary key (id);
           │                   ━━━━━━━━━━━━━━━━
           │
-          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
-        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+          ╰ help: add the `primary key` constraint `using` an index
+        warning[adding-serial-primary-key-field]: adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built
           ╭▸ 
         6 │ alter table u add column b serial primary key;
           │                                   ━━━━━━━━━━━
           │
-          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
+          ╰ help: add the `primary key` constraint `using` an index
         ");
     }
 
@@ -102,18 +102,18 @@ alter table existing.t add primary key (id);
 alter table existing.u add column b serial primary key;
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::AddingSerialPrimaryKeyField), @"
-        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+        warning[adding-serial-primary-key-field]: adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built
           ╭▸ 
         4 │ alter table existing.t add primary key (id);
           │                            ━━━━━━━━━━━━━━━━
           │
-          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
-        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+          ╰ help: add the `primary key` constraint `using` an index
+        warning[adding-serial-primary-key-field]: adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built
           ╭▸ 
         5 │ alter table existing.u add column b serial primary key;
           │                                            ━━━━━━━━━━━
           │
-          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
+          ╰ help: add the `primary key` constraint `using` an index
         ");
     }
 
@@ -183,18 +183,18 @@ alter table t add primary key (id);
 select 1 as id into u;
 alter table u add column b serial primary key;";
         assert_snapshot!(lint_errors(sql, Rule::AddingSerialPrimaryKeyField), @"
-        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+        warning[adding-serial-primary-key-field]: adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built
           ╭▸ 
         3 │ alter table t add primary key (id);
           │                   ━━━━━━━━━━━━━━━━
           │
-          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
-        warning[adding-serial-primary-key-field]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+          ╰ help: add the `primary key` constraint `using` an index
+        warning[adding-serial-primary-key-field]: adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built
           ╭▸ 
         5 │ alter table u add column b serial primary key;
           │                                   ━━━━━━━━━━━
           │
-          ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.
+          ╰ help: add the `primary key` constraint `using` an index
         ");
     }
 

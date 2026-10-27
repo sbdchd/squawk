@@ -5,7 +5,7 @@ title: prefer-bigint-over-smallint
 
 ## problem
 
-Using 16 bit integer fields can result in hitting the max int limit.
+Using 16 bit integer fields can result in hitting the max `smallint` limit.
 
 ## solution
 
