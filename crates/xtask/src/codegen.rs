@@ -429,14 +429,14 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
             impl std::fmt::Display for SyntaxKind {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                     f.write_str(match self {
-                        SyntaxKind::TOMBSTONE => "tombstone",
+                        SyntaxKind::TOMBSTONE => unreachable!(),
                         SyntaxKind::EOF => "end of file",
                         #(SyntaxKind::#punctuation => #punctuation_display,)*
                         #(SyntaxKind::#all_keywords => #keywords_display,)*
                         #(SyntaxKind::#literals => #literals_display,)*
                         #(SyntaxKind::#tokens => #tokens_display,)*
                         #(SyntaxKind::#nodes => #nodes_display,)*
-                        SyntaxKind::__LAST => "__LAST",
+                        SyntaxKind::__LAST => unreachable!(),
                     })
                 }
             }

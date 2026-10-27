@@ -3374,7 +3374,7 @@ impl SyntaxKind {
 impl std::fmt::Display for SyntaxKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
-            SyntaxKind::TOMBSTONE => "tombstone",
+            SyntaxKind::TOMBSTONE => unreachable!(),
             SyntaxKind::EOF => "end of file",
             SyntaxKind::DOLLAR => "`$`",
             SyntaxKind::SEMICOLON => "`;`",
@@ -5455,7 +5455,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::XML_TABLE_FROM_ITEM => "xml table from item",
             SyntaxKind::XML_VERSION_EXPR => "xml version expr",
             SyntaxKind::XML_VERSION_NO_VALUE => "xml version no value",
-            SyntaxKind::__LAST => "__LAST",
+            SyntaxKind::__LAST => unreachable!(),
         })
     }
 }
