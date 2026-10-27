@@ -260,3 +260,42 @@ create index ti_a_idx on ti (b);
        ╰╴             ━━━━━━━━
     ");
 }
+
+#[test]
+fn unique_index_unsupported_access_method() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  r int4range,
+  v tsvector
+);
+create unique index on t using btree (a);
+create unique index on t using hash (a);
+create unique index on t using gist (r);
+create unique index on t using gin (v);
+create unique index on t using spgist (r);
+create unique index on t using brin (a);
+create index on t using gin (v);
+"), @"
+    error: access method `hash` does not support unique indexes
+      ╭▸ 
+    8 │ create unique index on t using hash (a);
+      ╰╴                               ━━━━
+    error: access method `gist` does not support unique indexes
+      ╭▸ 
+    9 │ create unique index on t using gist (r);
+      ╰╴                               ━━━━
+    error: access method `gin` does not support unique indexes
+       ╭▸ 
+    10 │ create unique index on t using gin (v);
+       ╰╴                               ━━━
+    error: access method `spgist` does not support unique indexes
+       ╭▸ 
+    11 │ create unique index on t using spgist (r);
+       ╰╴                               ━━━━━━
+    error: access method `brin` does not support unique indexes
+       ╭▸ 
+    12 │ create unique index on t using brin (a);
+       ╰╴                               ━━━━
+    ");
+}

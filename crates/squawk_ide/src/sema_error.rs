@@ -306,6 +306,9 @@ pub(crate) enum SemaError {
     RefreshConcurrentlyWithoutUniqueIndex {
         name: Name,
     },
+    UniqueIndexNotSupported {
+        access_method: Name,
+    },
     InvalidOrdinal {
         clause: OutputClause,
         position: usize,
@@ -837,6 +840,7 @@ impl SemaError {
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
+            SemaError::UniqueIndexNotSupported { .. } => DiagnosticKind::UniqueIndexNotSupported,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
@@ -1218,6 +1222,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "cannot refresh materialized view `{}` concurrently",
                 n(name)
+            ),
+            SemaError::UniqueIndexNotSupported { access_method } => write!(
+                f,
+                "access method `{}` does not support unique indexes",
+                n(access_method)
             ),
             SemaError::InvalidOrdinal { clause, position } => {
                 write!(

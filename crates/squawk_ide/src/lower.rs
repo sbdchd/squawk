@@ -15530,6 +15530,23 @@ impl Lowerer {
             .and_then(|items| self.lower_index_key(&items));
         let unique = create_index.unique_token().is_some();
         let partial = create_index.where_clause().is_some();
+        if unique
+            && let Some(access_method) = access_method
+            && let Some(access_method_ref) = create_index
+                .using_method()
+                .and_then(|using_method| using_method.access_method_ref())
+        {
+            let name = self.index.access_methods[access_method].name;
+            match self.index.names.resolve(name) {
+                "hash" | "gist" | "gin" | "spgist" | "brin" => self.push_error(
+                    access_method_ref.syntax(),
+                    SemaError::UniqueIndexNotSupported {
+                        access_method: name,
+                    },
+                ),
+                _ => {}
+            }
+        }
         match create_index.index() {
             Some(index) => {
                 let Some(segment) = index.path().and_then(|path| path.segment()) else {
