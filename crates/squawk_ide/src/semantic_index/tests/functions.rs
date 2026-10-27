@@ -630,7 +630,7 @@ alter routine nope() security definer;
       ╭▸ 
     8 │ alter procedure nope() security definer;
       ╰╴                ━━━━
-    error: routine `nope()` does not exist
+    error: function `nope()` does not exist
       ╭▸ 
     9 │ alter routine nope() security definer;
       ╰╴              ━━━━
@@ -843,6 +843,7 @@ drop function nope(variadic int[]);
 drop procedure nope(int);
 drop aggregate nope(int order by text);
 drop aggregate nope(*);
+drop routine nope(int);
 alter function g(text) rename to h;
 comment on function public.g(text) is 'x';
 drop operator === (int, int);
@@ -864,25 +865,29 @@ drop operator ~~~ (none, int);
       ╭▸ 
     7 │ drop aggregate nope(int order by text);
       ╰╴               ━━━━
-    error: aggregate `nope` does not exist
+    error: aggregate `nope(*)` does not exist
       ╭▸ 
     8 │ drop aggregate nope(*);
       ╰╴               ━━━━
-    error: function `g(text)` does not exist
+    error: function `nope(int4)` does not exist
       ╭▸ 
-    9 │ alter function g(text) rename to h;
-      ╰╴               ━
+    9 │ drop routine nope(int);
+      ╰╴             ━━━━
+    error: function `g(text)` does not exist
+       ╭▸ 
+    10 │ alter function g(text) rename to h;
+       ╰╴               ━
     error: function `public.g(text)` does not exist
        ╭▸ 
-    10 │ comment on function public.g(text) is 'x';
+    11 │ comment on function public.g(text) is 'x';
        ╰╴                           ━
     error: operator does not exist: `int4 === int4`
        ╭▸ 
-    11 │ drop operator === (int, int);
+    12 │ drop operator === (int, int);
        ╰╴              ━━━
     error: operator does not exist: `~~~ int4`
        ╭▸ 
-    12 │ drop operator ~~~ (none, int);
+    13 │ drop operator ~~~ (none, int);
        ╰╴              ━━━
     ");
 }

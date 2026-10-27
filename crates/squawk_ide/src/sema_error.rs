@@ -28,6 +28,12 @@ pub(crate) enum LookupKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ErrorArgs {
+    List(IdxRange<ErrorArg>),
+    Star,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ErrorArg {
     pub(crate) name: Option<Name>,
     pub(crate) ty: OperandName,
@@ -253,7 +259,7 @@ pub(crate) enum SemaError {
         kind: RoutineKind,
         schema: Option<Name>,
         name: Name,
-        args: IdxRange<ErrorArg>,
+        args: ErrorArgs,
         lookup: LookupKind,
     },
     UnresolvedOperator {
@@ -910,10 +916,14 @@ impl SemaError {
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => Some(
                 "Create a unique index with no WHERE clause on one or more columns of the materialized view.",
             ),
-            SemaError::UnresolvedRoutine { args, lookup, .. } => {
-                (lookup == LookupKind::Call && !args.is_empty())
-                    .then_some("You might need to add explicit type casts.")
-            }
+            SemaError::UnresolvedRoutine { args, lookup, .. } => match (lookup, args) {
+                (LookupKind::Call, ErrorArgs::List(args)) if !args.is_empty() => {
+                    Some("You might need to add explicit type casts.")
+                }
+                (LookupKind::Call | LookupKind::Signature, ErrorArgs::List(_) | ErrorArgs::Star) => {
+                    None
+                }
+            },
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("You might need to add explicit type casts."),
                 LookupKind::Signature => None,
@@ -1192,11 +1202,21 @@ impl fmt::Display for ErrorMessage<'_> {
                 args,
                 lookup: _,
             } => {
-                write!(f, "{} `", kind.label())?;
+                let label = match kind {
+                    RoutineKind::Routine => RoutineKind::Function.label(),
+                    RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Procedure => {
+                        kind.label()
+                    }
+                };
+                write!(f, "{label} `")?;
                 if let Some(schema) = schema {
                     write!(f, "{}.", n(schema))?;
                 }
                 write!(f, "{}(", n(name))?;
+                let args = match args {
+                    ErrorArgs::List(args) => args,
+                    ErrorArgs::Star => return f.write_str("*)` does not exist"),
+                };
                 for (i, arg) in args.iter().enumerate() {
                     let arg = self.args[arg];
                     if i > 0 {

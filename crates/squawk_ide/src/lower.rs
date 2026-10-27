@@ -42,7 +42,8 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ErrorArg, LookupKind, ObjectKind, OperandName, SemaError, TriggerFunctionKind, WindowClause,
+        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, TriggerFunctionKind,
+        WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -9488,7 +9489,6 @@ impl Lowerer {
                     }) {
                         Some(function) => Some(Resolution::Function(function)),
                         None if matches!(if_missing, IfMissing::Error)
-                            && param_list.star_token().is_none()
                             && arg_types.iter().all(Option::is_some) =>
                         {
                             let start = self.index.errors.args.next_idx();
@@ -9500,7 +9500,10 @@ impl Lowerer {
                                     variadic: false,
                                 });
                             }
-                            let args = self.index.errors.args.range_from(start);
+                            let args = match param_list.star_token() {
+                                Some(_) => ErrorArgs::Star,
+                                None => ErrorArgs::List(self.index.errors.args.range_from(start)),
+                            };
                             self.push_error(
                                 segment.syntax(),
                                 SemaError::UnresolvedRoutine {
@@ -17919,7 +17922,7 @@ impl Lowerer {
                 variadic: arg.variadic,
             });
         }
-        let args = self.index.errors.args.range_from(start);
+        let args = ErrorArgs::List(self.index.errors.args.range_from(start));
         self.push_error(
             node,
             SemaError::UnresolvedRoutine {
