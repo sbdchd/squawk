@@ -213,14 +213,14 @@ create function g() returns int language sql
 select f(), g(), app.f();
 select a from t;
 "), @"
-    error: relation `t` does not exist
-       ╭▸ 
-    13 │ select a from t;
-       ╰╴              ━
     error: function `app.f()` does not exist
        ╭▸ 
     12 │ select f(), g(), app.f();
        ╰╴                     ━
+    error: relation `t` does not exist
+       ╭▸ 
+    13 │ select a from t;
+       ╰╴              ━
     ");
 }
 

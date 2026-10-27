@@ -129,13 +129,13 @@ create function g() returns int language l as '';
       ╭▸ 
     7 │ alter language missing owner to r;
       ╰╴               ━━━━━━━
-    error: language `l` does not exist
-       ╭▸ 
-    11 │ create function g() returns int language l as '';
-       ╰╴                                         ━
     error: language `l2` already exists
       ╭▸ 
     8 │ alter language l rename to l2;
       ╰╴                           ━━
+    error: language `l` does not exist
+       ╭▸ 
+    11 │ create function g() returns int language l as '';
+       ╰╴                                         ━
     ");
 }

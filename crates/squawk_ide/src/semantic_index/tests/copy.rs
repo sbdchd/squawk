@@ -77,6 +77,12 @@ copy t from stdin csv force not null nope;
       ╭▸ 
     7 │ copy nope from stdin;
       ╰╴     ━━━━
+    error: cannot copy from view `v`
+      ╭▸ 
+    8 │ copy v to stdout;
+      │      ━
+      │
+      ╰ hint: Try the COPY (SELECT ...) TO variant.
     error: column `nope` does not exist
        ╭▸ 
     10 │ copy (select nope from t) to stdout;
@@ -101,11 +107,5 @@ copy t from stdin csv force not null nope;
        ╭▸ 
     17 │ copy t from stdin csv force not null nope;
        ╰╴                                     ━━━━
-    error: cannot copy from view `v`
-      ╭▸ 
-    8 │ copy v to stdout;
-      │      ━
-      │
-      ╰ hint: Try the COPY (SELECT ...) TO variant.
     ");
 }

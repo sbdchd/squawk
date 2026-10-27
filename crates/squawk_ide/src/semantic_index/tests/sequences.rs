@@ -224,14 +224,14 @@ create table u (id int generated always as identity (sequence name app.ids));
 alter sequence app.ids restart;
 alter sequence t_id_seq restart;
 "), @"
-    error: relation `t_id_seq` does not exist
-      ╭▸ 
-    6 │ alter sequence t_id_seq restart;
-      ╰╴               ━━━━━━━━
     error: relation `ids` already exists
       ╭▸ 
     4 │ create table u (id int generated always as identity (sequence name app.ids));
       ╰╴                                                                       ━━━
+    error: relation `t_id_seq` does not exist
+      ╭▸ 
+    6 │ alter sequence t_id_seq restart;
+      ╰╴               ━━━━━━━━
     ");
 }
 
@@ -340,14 +340,14 @@ alter sequence if exists nope rename to x;
       ╭▸ 
     5 │ select last_value from s;
       ╰╴                       ━
-    error: relation `nope` does not exist
-      ╭▸ 
-    8 │ alter sequence nope rename to x;
-      ╰╴               ━━━━
     error: relation `t` already exists
       ╭▸ 
     7 │ alter sequence s2 rename to t;
       ╰╴                            ━
+    error: relation `nope` does not exist
+      ╭▸ 
+    8 │ alter sequence nope rename to x;
+      ╰╴               ━━━━
     ");
 }
 
@@ -413,14 +413,14 @@ alter table u alter column a drop identity;
       ╭▸ 
     5 │ select last_value from t_a_seq;
       ╰╴                       ━━━━━━━
-    error: column `nope` does not exist
-      ╭▸ 
-    8 │ alter table t alter column nope drop identity;
-      ╰╴                           ━━━━
     error: column `a` of relation `t` is not an identity column
       ╭▸ 
     6 │ alter table t alter column a drop identity;
       ╰╴                           ━
+    error: column `nope` does not exist
+      ╭▸ 
+    8 │ alter table t alter column nope drop identity;
+      ╰╴                           ━━━━
     error: column `c` of relation `t` is not an identity column
        ╭▸ 
     15 │ alter table t alter column c drop identity;

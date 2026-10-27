@@ -169,6 +169,10 @@ alter table t drop constraint c3;
       ╭▸ 
     4 │ alter table t drop constraint c;
       ╰╴                              ━
+    error: constraint `d` for relation `t` already exists
+      ╭▸ 
+    5 │ alter table t rename constraint c2 to d;
+      ╰╴                                      ━
     error: constraint `nope` does not exist
       ╭▸ 
     6 │ alter table t rename constraint nope to x;
@@ -177,10 +181,6 @@ alter table t drop constraint c3;
        ╭▸ 
     11 │ alter table t drop constraint c3;
        ╰╴                              ━━
-    error: constraint `d` for relation `t` already exists
-      ╭▸ 
-    5 │ alter table t rename constraint c2 to d;
-      ╰╴                                      ━
     ");
 }
 
@@ -528,22 +528,6 @@ create table pt_1
   partition of pt
   for values from (a) to (10);
 "), @"
-    error: column `c` does not exist
-       ╭▸ 
-    10 │ alter table t alter column a set default c;
-       ╰╴                                         ━
-    error: column `a` does not exist
-       ╭▸ 
-    13 │ alter view v alter column a set default a;
-       ╰╴                                        ━
-    error: column `x` does not exist
-       ╭▸ 
-    14 │ create function f(x int, y int default x) returns int
-       ╰╴                                       ━
-    error: column `a` does not exist
-       ╭▸ 
-    26 │   for values from (a) to (10);
-       ╰╴                   ━
     error: cannot use column reference in DEFAULT expression
       ╭▸ 
     4 │   b int default a,
@@ -564,6 +548,22 @@ create table pt_1
       ╭▸ 
     9 │ alter table t add column f int default b + 1;
       ╰╴                                       ━
+    error: column `c` does not exist
+       ╭▸ 
+    10 │ alter table t alter column a set default c;
+       ╰╴                                         ━
+    error: column `a` does not exist
+       ╭▸ 
+    13 │ alter view v alter column a set default a;
+       ╰╴                                        ━
+    error: column `x` does not exist
+       ╭▸ 
+    14 │ create function f(x int, y int default x) returns int
+       ╰╴                                       ━
+    error: column `a` does not exist
+       ╭▸ 
+    26 │   for values from (a) to (10);
+       ╰╴                   ━
     ");
 }
 

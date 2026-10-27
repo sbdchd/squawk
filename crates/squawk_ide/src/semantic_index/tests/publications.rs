@@ -75,14 +75,14 @@ alter publication p add table t;
        ╭▸ 
     13 │ alter publication missing add table t;
        ╰╴                  ━━━━━━━
-    error: publication `p` does not exist
-       ╭▸ 
-    17 │ alter publication p add table t;
-       ╰╴                  ━
     error: publication `p2` already exists
        ╭▸ 
     14 │ alter publication p rename to p2;
        ╰╴                              ━━
+    error: publication `p` does not exist
+       ╭▸ 
+    17 │ alter publication p add table t;
+       ╰╴                  ━
     ");
 }
 
@@ -142,6 +142,10 @@ drop subscription if exists sub4;
       ╭▸ 
     7 │ create subscription sub3 server missing_server publication remote_pub;
       ╰╴                                ━━━━━━━━━━━━━━
+    error: subscription `sub` already exists
+      ╭▸ 
+    8 │ create subscription sub connection 'host=x' publication remote_pub;
+      ╰╴                    ━━━
     error: server `missing_server` does not exist
        ╭▸ 
     17 │ alter subscription sub server missing_server;
@@ -154,10 +158,6 @@ drop subscription if exists sub4;
        ╭▸ 
     20 │ alter subscription missing enable;
        ╰╴                   ━━━━━━━
-    error: subscription `sub` already exists
-      ╭▸ 
-    8 │ create subscription sub connection 'host=x' publication remote_pub;
-      ╰╴                    ━━━
     error: subscription `sub2` already exists
        ╭▸ 
     21 │ alter subscription sub rename to sub2;

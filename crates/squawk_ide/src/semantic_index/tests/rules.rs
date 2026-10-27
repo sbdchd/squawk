@@ -23,14 +23,14 @@ create rule r3 as on delete to t do instead delete from log where a = old.a;
       ╭▸ 
     5 │   where new.a > old.b and new.zz = 1
       ╰╴                              ━━
-    error: column `zz` does not exist
-      ╭▸ 
-    7 │     insert into log values (new.a, old.zz);
-      ╰╴                                       ━━
     error: INSERT has more expressions than target columns
       ╭▸ 
     7 │     insert into log values (new.a, old.zz);
       ╰╴                                   ━━━━━━
+    error: column `zz` does not exist
+      ╭▸ 
+    7 │     insert into log values (new.a, old.zz);
+      ╰╴                                       ━━
     ");
 }
 
@@ -176,6 +176,10 @@ alter rule missing on t rename to r5;
 alter rule r on missing_table rename to r6;
 drop rule r3 on t;
 "), @"
+    error: rule `r2` for relation `t` already exists
+      ╭▸ 
+    5 │ alter rule r on t rename to r2;
+      ╰╴                            ━━
     error: rule `r` does not exist
       ╭▸ 
     7 │ alter rule r on t rename to r4;
@@ -188,10 +192,6 @@ drop rule r3 on t;
       ╭▸ 
     9 │ alter rule r on missing_table rename to r6;
       ╰╴                ━━━━━━━━━━━━━
-    error: rule `r2` for relation `t` already exists
-      ╭▸ 
-    5 │ alter rule r on t rename to r2;
-      ╰╴                            ━━
     ");
 }
 
@@ -229,10 +229,6 @@ drop rule "_RETURN" on t;
 alter rule "_RETURN" on v rename to r;
 alter rule "_RETURN" on m rename to r;
 "#), @r#"
-    error: rule `_RETURN` does not exist
-       ╭▸ 
-    10 │ drop rule "_RETURN" on t;
-       ╰╴          ━━━━━━━━━
     error: rule `_RETURN` for relation `v` already exists
       ╭▸ 
     5 │ create rule "_RETURN" as on select to v do instead select a from t;
@@ -245,6 +241,10 @@ alter rule "_RETURN" on m rename to r;
       ╭▸ 
     9 │ drop rule "_RETURN" on m;
       ╰╴          ━━━━━━━━━
+    error: rule `_RETURN` does not exist
+       ╭▸ 
+    10 │ drop rule "_RETURN" on t;
+       ╰╴          ━━━━━━━━━
     error: renaming an ON SELECT rule is not allowed
        ╭▸ 
     11 │ alter rule "_RETURN" on v rename to r;

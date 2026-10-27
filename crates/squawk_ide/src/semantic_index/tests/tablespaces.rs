@@ -16,14 +16,14 @@ alter tablespace ts10 set (seq_page_cost = 1);
 drop tablespace ts11;
 drop tablespace if exists ts12;
 "), @"
-    error: tablespace `ts1` does not exist
-      ╭▸ 
-    2 │ create table t (a int, b int, unique (a) using index tablespace ts2) tablespace ts1;
-      ╰╴                                                                                ━━━
     error: tablespace `ts2` does not exist
       ╭▸ 
     2 │ create table t (a int, b int, unique (a) using index tablespace ts2) tablespace ts1;
       ╰╴                                                                ━━━
+    error: tablespace `ts1` does not exist
+      ╭▸ 
+    2 │ create table t (a int, b int, unique (a) using index tablespace ts2) tablespace ts1;
+      ╰╴                                                                                ━━━
     error: tablespace `ts3` does not exist
       ╭▸ 
     3 │ create index i on t (b) tablespace ts3;
@@ -119,6 +119,10 @@ create table w (a int) tablespace ts3;
       ╭▸ 
     5 │ create table t (a int) tablespace ts;
       ╰╴                                  ━━
+    error: tablespace `other` already exists
+      ╭▸ 
+    7 │ alter tablespace ts2 rename to other;
+      ╰╴                               ━━━━━
     error: tablespace `nope` does not exist
       ╭▸ 
     8 │ alter tablespace nope rename to x;
@@ -127,9 +131,5 @@ create table w (a int) tablespace ts3;
        ╭▸ 
     13 │ create table w (a int) tablespace ts3;
        ╰╴                                  ━━━
-    error: tablespace `other` already exists
-      ╭▸ 
-    7 │ alter tablespace ts2 rename to other;
-      ╰╴                               ━━━━━
     ");
 }

@@ -135,6 +135,10 @@ alter extension nope add table t;
       ╭▸ 
     6 │ alter extension e add table nope;
       ╰╴                            ━━━━
+    error: function `f(text)` does not exist
+      ╭▸ 
+    8 │ alter extension e drop function f(text);
+      ╰╴                                ━
     error: schema `nope` does not exist
       ╭▸ 
     9 │ alter extension e add schema nope;
@@ -143,10 +147,6 @@ alter extension nope add table t;
        ╭▸ 
     12 │ alter extension nope add table t;
        ╰╴                ━━━━
-    error: function `f(text)` does not exist
-      ╭▸ 
-    8 │ alter extension e drop function f(text);
-      ╰╴                                ━
     ");
 }
 
@@ -170,14 +170,14 @@ select akeys(null::hstore);
 set search_path = s;
 select akeys(null::hstore);
 "), @"
-    error: type `hstore` does not exist
-      ╭▸ 
-    5 │ select akeys(null::hstore);
-      ╰╴                   ━━━━━━
     error: function `akeys` does not exist
       ╭▸ 
     5 │ select akeys(null::hstore);
       ╰╴       ━━━━━
+    error: type `hstore` does not exist
+      ╭▸ 
+    5 │ select akeys(null::hstore);
+      ╰╴                   ━━━━━━
     ");
 }
 
@@ -187,14 +187,14 @@ fn extension_objects_unknown_before_create() {
 select akeys(null::hstore);
 create extension hstore;
 "), @"
-    error: type `hstore` does not exist
-      ╭▸ 
-    2 │ select akeys(null::hstore);
-      ╰╴                   ━━━━━━
     error: function `akeys` does not exist
       ╭▸ 
     2 │ select akeys(null::hstore);
       ╰╴       ━━━━━
+    error: type `hstore` does not exist
+      ╭▸ 
+    2 │ select akeys(null::hstore);
+      ╰╴                   ━━━━━━
     ");
 }
 
@@ -205,14 +205,14 @@ create extension hstore;
 drop extension hstore;
 select akeys(null::hstore);
 "), @"
-    error: type `hstore` does not exist
-      ╭▸ 
-    4 │ select akeys(null::hstore);
-      ╰╴                   ━━━━━━
     error: function `akeys` does not exist
       ╭▸ 
     4 │ select akeys(null::hstore);
       ╰╴       ━━━━━
+    error: type `hstore` does not exist
+      ╭▸ 
+    4 │ select akeys(null::hstore);
+      ╰╴                   ━━━━━━
     ");
 }
 
@@ -225,14 +225,14 @@ alter extension hstore set schema s;
 select s.akeys(null::s.hstore);
 select akeys(null::hstore);
 "), @"
-    error: type `hstore` does not exist
-      ╭▸ 
-    6 │ select akeys(null::hstore);
-      ╰╴                   ━━━━━━
     error: function `akeys` does not exist
       ╭▸ 
     6 │ select akeys(null::hstore);
       ╰╴       ━━━━━
+    error: type `hstore` does not exist
+      ╭▸ 
+    6 │ select akeys(null::hstore);
+      ╰╴                   ━━━━━━
     ");
 }
 
@@ -247,14 +247,14 @@ rollback;
 select akeys(null::hstore);
 select s.akeys(null::s.hstore);
 "), @"
-    error: type `hstore` does not exist
-      ╭▸ 
-    8 │ select s.akeys(null::s.hstore);
-      ╰╴                       ━━━━━━
     error: function `akeys` does not exist
       ╭▸ 
     8 │ select s.akeys(null::s.hstore);
       ╰╴         ━━━━━
+    error: type `hstore` does not exist
+      ╭▸ 
+    8 │ select s.akeys(null::s.hstore);
+      ╰╴                       ━━━━━━
     ");
 }
 
@@ -266,14 +266,14 @@ create extension hstore;
 rollback;
 select akeys(null::hstore);
 "), @"
-    error: type `hstore` does not exist
-      ╭▸ 
-    5 │ select akeys(null::hstore);
-      ╰╴                   ━━━━━━
     error: function `akeys` does not exist
       ╭▸ 
     5 │ select akeys(null::hstore);
       ╰╴       ━━━━━
+    error: type `hstore` does not exist
+      ╭▸ 
+    5 │ select akeys(null::hstore);
+      ╰╴                   ━━━━━━
     ");
 }
 

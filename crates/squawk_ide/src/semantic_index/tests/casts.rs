@@ -107,10 +107,6 @@ drop cast if exists (int as nope);
       ╭▸ 
     3 │ create cast (nope as text) with inout;
       ╰╴             ━━━━
-    error: type `nope` does not exist
-      ╭▸ 
-    9 │ drop cast (int as nope);
-      ╰╴                  ━━━━
     error: function `f(text)` does not exist
       ╭▸ 
     4 │ create cast (int as text) with function f(text);
@@ -123,6 +119,10 @@ drop cast if exists (int as nope);
       ╭▸ 
     6 │ create cast (int as text) with function f(int, int);
       ╰╴                                        ━
+    error: type `nope` does not exist
+      ╭▸ 
+    9 │ drop cast (int as nope);
+      ╰╴                  ━━━━
     ");
 }
 

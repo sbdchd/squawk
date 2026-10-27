@@ -126,6 +126,10 @@ select table_name from information_schema.tables;
 drop schema information_schema cascade;
 select table_name from information_schema.tables;
 "), @"
+    error: cannot drop schema `information_schema` because other objects depend on it
+      ╭▸ 
+    2 │ drop schema information_schema;
+      ╰╴            ━━━━━━━━━━━━━━━━━━
     error: schema `information_schema` does not exist
       ╭▸ 
     9 │ select table_name from information_schema.tables;
@@ -134,10 +138,6 @@ select table_name from information_schema.tables;
       ╭▸ 
     9 │ select table_name from information_schema.tables;
       ╰╴                                          ━━━━━━
-    error: cannot drop schema `information_schema` because other objects depend on it
-      ╭▸ 
-    2 │ drop schema information_schema;
-      ╰╴            ━━━━━━━━━━━━━━━━━━
     ");
 }
 
@@ -165,6 +165,10 @@ alter schema r owner to nope;
       ╭▸ 
     7 │ select a from s.t;
       ╰╴                ━
+    error: schema `s` already exists
+       ╭▸ 
+    11 │ alter schema r rename to s;
+       ╰╴                         ━
     error: schema `nope` does not exist
        ╭▸ 
     12 │ alter schema nope rename to x;
@@ -173,10 +177,6 @@ alter schema r owner to nope;
        ╭▸ 
     13 │ alter schema r owner to nope;
        ╰╴                        ━━━━
-    error: schema `s` already exists
-       ╭▸ 
-    11 │ alter schema r rename to s;
-       ╰╴                         ━
     ");
 }
 

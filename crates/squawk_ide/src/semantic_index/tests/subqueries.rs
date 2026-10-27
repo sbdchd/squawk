@@ -138,14 +138,6 @@ select (select a from t), array(select b from t), exists(select a, b from t);
 update t set (a, b) = (select 1, 2);
 select (select * from nope), 1 in (select * from nope);
 "), @"
-    error: relation `nope` does not exist
-       ╭▸ 
-    30 │ select (select * from nope), 1 in (select * from nope);
-       ╰╴                      ━━━━
-    error: relation `nope` does not exist
-       ╭▸ 
-    30 │ select (select * from nope), 1 in (select * from nope);
-       ╰╴                                                 ━━━━
     error: subquery must return only one column
       ╭▸ 
     6 │ select (select 1, 2);
@@ -206,5 +198,13 @@ select (select * from nope), 1 in (select * from nope);
        ╭▸ 
     20 │ select 1 in ((select 1, 2), 3);
        ╰╴              ━━━━━━━━━━━
+    error: relation `nope` does not exist
+       ╭▸ 
+    30 │ select (select * from nope), 1 in (select * from nope);
+       ╰╴                      ━━━━
+    error: relation `nope` does not exist
+       ╭▸ 
+    30 │ select (select * from nope), 1 in (select * from nope);
+       ╰╴                                                 ━━━━
     ");
 }

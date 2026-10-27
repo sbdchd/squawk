@@ -181,6 +181,10 @@ select y from u;
       ╭▸ 
     9 │ select * from a join b using (x) as k, c join a as d on k.x = w;
       ╰╴                                                        ━
+    error: CREATE VIEW specifies more column names than columns
+       ╭▸ 
+    10 │ create view v (p, q, r, s) as select * from a join b using (x) as k;
+       ╰╴                        ━
     error: column `x` does not exist
        ╭▸ 
     11 │ select x from v;
@@ -189,10 +193,6 @@ select y from u;
        ╭▸ 
     13 │ select y from u;
        ╰╴       ━
-    error: CREATE VIEW specifies more column names than columns
-       ╭▸ 
-    10 │ create view v (p, q, r, s) as select * from a join b using (x) as k;
-       ╰╴                        ━
     ");
 }
 

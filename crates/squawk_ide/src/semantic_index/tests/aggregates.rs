@@ -12,14 +12,14 @@ create aggregate bad(int) (sfunc = nope, stype = nope_type, finalfunc = add, sor
 create aggregate old (basetype = int, sfunc = add, stype = int);
 select s(1);
 "), @"
-    error: type `nope_type` does not exist
-      ╭▸ 
-    5 │ create aggregate bad(int) (sfunc = nope, stype = nope_type, finalfunc = add, sortop = <);
-      ╰╴                                                 ━━━━━━━━━
     error: function `nope` does not exist
       ╭▸ 
     5 │ create aggregate bad(int) (sfunc = nope, stype = nope_type, finalfunc = add, sortop = <);
       ╰╴                                   ━━━━
+    error: type `nope_type` does not exist
+      ╭▸ 
+    5 │ create aggregate bad(int) (sfunc = nope, stype = nope_type, finalfunc = add, sortop = <);
+      ╰╴                                                 ━━━━━━━━━
     error: function `add` does not exist
       ╭▸ 
     5 │ create aggregate bad(int) (sfunc = nope, stype = nope_type, finalfunc = add, sortop = <);
@@ -199,16 +199,16 @@ select x.t(1);
 alter aggregate x.t(int) owner to nope;
 alter aggregate add(int, int) rename to y;
 "), @"
-    error: role `nope` does not exist
-       ╭▸ 
-    10 │ alter aggregate x.t(int) owner to nope;
-       ╰╴                                  ━━━━
     error: function `s(int4)` does not exist
       ╭▸ 
     6 │ select s(1);
       │        ━
       │
       ╰ hint: You might need to add explicit type casts.
+    error: role `nope` does not exist
+       ╭▸ 
+    10 │ alter aggregate x.t(int) owner to nope;
+       ╰╴                                  ━━━━
     error: aggregate `add(int4, int4)` does not exist
        ╭▸ 
     11 │ alter aggregate add(int, int) rename to y;

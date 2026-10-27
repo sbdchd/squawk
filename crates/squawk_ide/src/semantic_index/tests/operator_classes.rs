@@ -59,22 +59,6 @@ create operator class c2 for type t using btree as storage t;
 drop operator family c2 using btree;
 create operator class c for type t using hash as storage t;
 "), @"
-    error: operator family `missing_family` does not exist
-       ╭▸ 
-    12 │   operator 5 <-> for order by missing_family,
-       ╰╴                              ━━━━━━━━━━━━━━
-    error: type `missing_type` does not exist
-       ╭▸ 
-    15 │   storage missing_type;
-       ╰╴          ━━━━━━━━━━━━
-    error: type `missing_type` does not exist
-       ╭▸ 
-    16 │ create operator class c for type missing_type using btree family missing_family as storage int;
-       ╰╴                                 ━━━━━━━━━━━━
-    error: operator family `missing_family` does not exist
-       ╭▸ 
-    16 │ create operator class c for type missing_type using btree family missing_family as storage int;
-       ╰╴                                                                 ━━━━━━━━━━━━━━
     error: operator does not exist: `t <= t`
       ╭▸ 
     9 │   operator 2 <= (t, t),
@@ -87,14 +71,30 @@ create operator class c for type t using hash as storage t;
        ╭▸ 
     12 │   operator 5 <-> for order by missing_family,
        ╰╴             ━━━
+    error: operator family `missing_family` does not exist
+       ╭▸ 
+    12 │   operator 5 <-> for order by missing_family,
+       ╰╴                              ━━━━━━━━━━━━━━
     error: function `missing_fn(t, t)` does not exist
        ╭▸ 
     14 │   function 2 (t, t) missing_fn(t, t),
        ╰╴                    ━━━━━━━━━━
+    error: type `missing_type` does not exist
+       ╭▸ 
+    15 │   storage missing_type;
+       ╰╴          ━━━━━━━━━━━━
     error: operator class `c` for access method `btree` already exists
        ╭▸ 
     16 │ create operator class c for type missing_type using btree family missing_family as storage int;
        ╰╴                      ━
+    error: type `missing_type` does not exist
+       ╭▸ 
+    16 │ create operator class c for type missing_type using btree family missing_family as storage int;
+       ╰╴                                 ━━━━━━━━━━━━
+    error: operator family `missing_family` does not exist
+       ╭▸ 
+    16 │ create operator class c for type missing_type using btree family missing_family as storage int;
+       ╰╴                                                                 ━━━━━━━━━━━━━━
     ");
 }
 
@@ -124,6 +124,14 @@ alter operator family f3 using btree set schema s;
 alter operator family s.f3 using btree owner to r;
 alter operator family f3 using btree owner to r;
 "), @"
+    error: operator does not exist: `int4 <<< int4`
+      ╭▸ 
+    9 │   operator 2 <<< (int, int),
+      ╰╴             ━━━
+    error: function `missing_fn(int4, int4)` does not exist
+       ╭▸ 
+    11 │   function 2 (int, int) missing_fn(int, int);
+       ╰╴                        ━━━━━━━━━━
     error: type `missing_type` does not exist
        ╭▸ 
     14 │   function 1 (int, missing_type);
@@ -140,22 +148,14 @@ alter operator family f3 using btree owner to r;
        ╭▸ 
     18 │ alter operator family f using hash owner to r;
        ╰╴                      ━
-    error: operator family `f3` does not exist
-       ╭▸ 
-    23 │ alter operator family f3 using btree owner to r;
-       ╰╴                      ━━
-    error: operator does not exist: `int4 <<< int4`
-      ╭▸ 
-    9 │   operator 2 <<< (int, int),
-      ╰╴             ━━━
-    error: function `missing_fn(int4, int4)` does not exist
-       ╭▸ 
-    11 │   function 2 (int, int) missing_fn(int, int);
-       ╰╴                        ━━━━━━━━━━
     error: operator family `f2` for access method `btree` already exists
        ╭▸ 
     19 │ alter operator family f using btree rename to f2;
        ╰╴                                              ━━
+    error: operator family `f3` does not exist
+       ╭▸ 
+    23 │ alter operator family f3 using btree owner to r;
+       ╰╴                      ━━
     ");
 }
 
@@ -183,14 +183,14 @@ alter operator class c3 using btree owner to r;
       ╭▸ 
     8 │ alter operator class missing using btree owner to r;
       ╰╴                     ━━━━━━━
-    error: operator class `c3` does not exist
-       ╭▸ 
-    13 │ alter operator class c3 using btree owner to r;
-       ╰╴                     ━━
     error: operator class `c2` for access method `btree` already exists
       ╭▸ 
     9 │ alter operator class c using btree rename to c2;
       ╰╴                                             ━━
+    error: operator class `c3` does not exist
+       ╭▸ 
+    13 │ alter operator class c3 using btree owner to r;
+       ╰╴                     ━━
     ");
 }
 

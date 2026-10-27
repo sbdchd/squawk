@@ -86,13 +86,13 @@ drop event trigger e3;
        ╭▸ 
     12 │ alter event trigger missing disable;
        ╰╴                    ━━━━━━━
-    error: event trigger `e` does not exist
-       ╭▸ 
-    15 │ alter event trigger e disable;
-       ╰╴                    ━
     error: event trigger `e2` already exists
        ╭▸ 
     13 │ alter event trigger e rename to e2;
        ╰╴                                ━━
+    error: event trigger `e` does not exist
+       ╭▸ 
+    15 │ alter event trigger e disable;
+       ╰╴                    ━
     ");
 }

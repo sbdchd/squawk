@@ -75,10 +75,18 @@ alter conversion c2 set schema missing_schema;
        ╭▸ 
     10 │ alter conversion missing owner to r;
        ╰╴                 ━━━━━━━
+    error: conversion `c2` already exists
+       ╭▸ 
+    11 │ alter conversion c rename to c2;
+       ╰╴                             ━━
     error: conversion `c3` does not exist
        ╭▸ 
     15 │ alter conversion c3 owner to r;
        ╰╴                 ━━
+    error: conversion `c4` already exists in schema `s`
+       ╭▸ 
+    17 │ alter conversion c4 set schema s;
+       ╰╴                               ━
     error: conversion `c2` does not exist
        ╭▸ 
     18 │ alter conversion c2 set schema missing_schema;
@@ -87,14 +95,6 @@ alter conversion c2 set schema missing_schema;
        ╭▸ 
     18 │ alter conversion c2 set schema missing_schema;
        ╰╴                               ━━━━━━━━━━━━━━
-    error: conversion `c2` already exists
-       ╭▸ 
-    11 │ alter conversion c rename to c2;
-       ╰╴                             ━━
-    error: conversion `c4` already exists in schema `s`
-       ╭▸ 
-    17 │ alter conversion c4 set schema s;
-       ╰╴                               ━
     ");
 }
 

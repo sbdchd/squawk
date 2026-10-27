@@ -84,22 +84,14 @@ alter table t set access method gin;
 create table t5 (a int, exclude using gist (a with =));
 create table t6 (a int, exclude using missing (a with =));
 "), @"
-    error: access method `missing` does not exist
-      ╭▸ 
-    4 │ create table t3 (a int) using missing;
-      ╰╴                              ━━━━━━━
-    error: access method `missing` does not exist
-       ╭▸ 
-    11 │ create index on t using missing (a);
-       ╰╴                        ━━━━━━━
-    error: access method `missing` does not exist
-       ╭▸ 
-    15 │ create table t6 (a int, exclude using missing (a with =));
-       ╰╴                                      ━━━━━━━
     error: access method `btree` is not of type TABLE
       ╭▸ 
     3 │ create table t2 (a int) using btree;
       ╰╴                              ━━━━━
+    error: access method `missing` does not exist
+      ╭▸ 
+    4 │ create table t3 (a int) using missing;
+      ╰╴                              ━━━━━━━
     error: access method `gist` is not of type TABLE
       ╭▸ 
     7 │ create materialized view m2 using gist as select 1 as a;
@@ -108,10 +100,18 @@ create table t6 (a int, exclude using missing (a with =));
        ╭▸ 
     10 │ create index on t using heap (a);
        ╰╴                        ━━━━
+    error: access method `missing` does not exist
+       ╭▸ 
+    11 │ create index on t using missing (a);
+       ╰╴                        ━━━━━━━
     error: access method `gin` is not of type TABLE
        ╭▸ 
     13 │ alter table t set access method gin;
        ╰╴                                ━━━
+    error: access method `missing` does not exist
+       ╭▸ 
+    15 │ create table t6 (a int, exclude using missing (a with =));
+       ╰╴                                      ━━━━━━━
     ");
 }
 

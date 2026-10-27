@@ -305,10 +305,6 @@ select 1 union values (1, 2);
 select 1 union select 2;
 select * from missing union select 1, 2;
 "), @"
-    error: relation `missing` does not exist
-      ╭▸ 
-    9 │ select * from missing union select 1, 2;
-      ╰╴              ━━━━━━━
     error: each UNION query must have the same number of columns
       ╭▸ 
     2 │ select 1 union select 1, 2;
@@ -333,6 +329,10 @@ select * from missing union select 1, 2;
       ╭▸ 
     7 │ select 1 union values (1, 2);
       ╰╴               ━━━━━━━━━━━━━
+    error: relation `missing` does not exist
+      ╭▸ 
+    9 │ select * from missing union select 1, 2;
+      ╰╴              ━━━━━━━
     ");
 }
 
@@ -353,10 +353,6 @@ select * from unnest(array[1], array[2]) u (a, b);
 select * from (t join t u using (a)) j (p, q, r);
 select * from missing x (p, q, r);
 "), @"
-    error: relation `missing` does not exist
-       ╭▸ 
-    14 │ select * from missing x (p, q, r);
-       ╰╴              ━━━━━━━
     error: table `x` has 2 columns available but 3 columns specified
       ╭▸ 
     3 │ select * from t x (p, q, r);
@@ -381,5 +377,9 @@ select * from missing x (p, q, r);
       ╭▸ 
     8 │ select * from json_each('{}') j (k, v, extra);
       ╰╴                                       ━━━━━
+    error: relation `missing` does not exist
+       ╭▸ 
+    14 │ select * from missing x (p, q, r);
+       ╰╴              ━━━━━━━
     ");
 }

@@ -73,14 +73,14 @@ create server s2 foreign data wrapper w;
        ╭▸ 
     11 │ alter foreign data wrapper missing owner to r;
        ╰╴                           ━━━━━━━
-    error: foreign-data wrapper `w` does not exist
-       ╭▸ 
-    15 │ create server s2 foreign data wrapper w;
-       ╰╴                                      ━
     error: foreign-data wrapper `w2` already exists
        ╭▸ 
     12 │ alter foreign data wrapper w rename to w2;
        ╰╴                                       ━━
+    error: foreign-data wrapper `w` does not exist
+       ╭▸ 
+    15 │ create server s2 foreign data wrapper w;
+       ╰╴                                      ━
     ");
 }
 
@@ -161,14 +161,14 @@ create foreign table t2 (a int) server s;
       ╭▸ 
     9 │ alter server missing owner to r;
       ╰╴             ━━━━━━━
-    error: server `s` does not exist
-       ╭▸ 
-    13 │ create foreign table t2 (a int) server s;
-       ╰╴                                       ━
     error: server `s2` already exists
        ╭▸ 
     10 │ alter server s rename to s2;
        ╰╴                         ━━
+    error: server `s` does not exist
+       ╭▸ 
+    13 │ create foreign table t2 (a int) server s;
+       ╰╴                                       ━
     ");
 }
 
@@ -290,14 +290,6 @@ drop foreign table ft;
 drop foreign table if exists ft;
 select a from t;
 "), @"
-    error: relation `ft` does not exist
-      ╭▸ 
-    9 │ select a from ft;
-      ╰╴              ━━
-    error: relation `ft` does not exist
-       ╭▸ 
-    10 │ drop foreign table ft;
-       ╰╴                   ━━
     error: `ft` is not a table
       ╭▸ 
     6 │ drop table ft;
@@ -310,6 +302,14 @@ select a from t;
       │                    ━
       │
       ╰ hint: Use DROP TABLE to remove a table.
+    error: relation `ft` does not exist
+      ╭▸ 
+    9 │ select a from ft;
+      ╰╴              ━━
+    error: relation `ft` does not exist
+       ╭▸ 
+    10 │ drop foreign table ft;
+       ╰╴                   ━━
     ");
 }
 
@@ -341,14 +341,14 @@ alter foreign table if exists nope options (add x 'y');
        ╭▸ 
     11 │ alter foreign table ft owner to nope;
        ╰╴                                ━━━━
-    error: role `nope2` does not exist
-       ╭▸ 
-    12 │ alter foreign table t owner to nope2;
-       ╰╴                               ━━━━━
     error: `t` is not a foreign table
        ╭▸ 
     12 │ alter foreign table t owner to nope2;
        ╰╴                    ━
+    error: role `nope2` does not exist
+       ╭▸ 
+    12 │ alter foreign table t owner to nope2;
+       ╰╴                               ━━━━━
     ");
 }
 

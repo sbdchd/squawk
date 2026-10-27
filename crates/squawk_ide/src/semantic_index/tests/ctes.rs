@@ -181,10 +181,6 @@ with recursive r (n, m) as (select 1 union all select n + 1 from r) select * fro
 with x (a) as (select 1, 2) select * from x;
 with x (a, b) as (select * from missing) select * from x;
 "), @"
-    error: relation `missing` does not exist
-      ╭▸ 
-    5 │ with x (a, b) as (select * from missing) select * from x;
-      ╰╴                                ━━━━━━━
     error: WITH query `x` has 1 column available but 2 columns specified
       ╭▸ 
     2 │ with x (a, b) as (select 1) select * from x;
@@ -193,5 +189,9 @@ with x (a, b) as (select * from missing) select * from x;
       ╭▸ 
     3 │ with recursive r (n, m) as (select 1 union all select n + 1 from r) select * from r;
       ╰╴                     ━
+    error: relation `missing` does not exist
+      ╭▸ 
+    5 │ with x (a, b) as (select * from missing) select * from x;
+      ╰╴                                ━━━━━━━
     ");
 }

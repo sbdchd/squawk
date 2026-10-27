@@ -28,14 +28,14 @@ select id, n, e, o, nope, jt.n
     )
   ) as jt;
 "), @"
-    error: column `missing` does not exist
-      ╭▸ 
-    6 │     data.j, '$ ? (@.n > $x)' passing data.lim as x, missing as y
-      ╰╴                                                    ━━━━━━━
     error: column `nope` does not exist
       ╭▸ 
     3 │ select id, n, e, o, nope, jt.n
       ╰╴                    ━━━━
+    error: column `missing` does not exist
+      ╭▸ 
+    6 │     data.j, '$ ? (@.n > $x)' passing data.lim as x, missing as y
+      ╰╴                                                    ━━━━━━━
     ");
 }
 

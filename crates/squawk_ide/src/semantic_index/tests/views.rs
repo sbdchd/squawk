@@ -113,14 +113,6 @@ drop materialized view m, nope;
 drop materialized view if exists nope2;
 select * from m;
 "), @"
-    error: relation `nope` does not exist
-       ╭▸ 
-    12 │ drop materialized view m, nope;
-       ╰╴                          ━━━━
-    error: relation `m` does not exist
-       ╭▸ 
-    14 │ select * from m;
-       ╰╴              ━
     error: `t` is not a materialized view
       ╭▸ 
     6 │ refresh materialized view concurrently t;
@@ -141,6 +133,14 @@ select * from m;
        │           ━
        │
        ╰ hint: Use DROP MATERIALIZED VIEW to remove a materialized view.
+    error: relation `nope` does not exist
+       ╭▸ 
+    12 │ drop materialized view m, nope;
+       ╰╴                          ━━━━
+    error: relation `m` does not exist
+       ╭▸ 
+    14 │ select * from m;
+       ╰╴              ━
     ");
 }
 
@@ -206,10 +206,6 @@ alter view t rename to z;
       ╭▸ 
     5 │ select a from v;
       ╰╴              ━
-    error: relation `nope` does not exist
-       ╭▸ 
-    10 │ alter view nope rename to y;
-       ╰╴           ━━━━
     error: relation `x` already exists
       ╭▸ 
     8 │ alter view w rename to x;
@@ -218,6 +214,10 @@ alter view t rename to z;
       ╭▸ 
     9 │ alter view w rename to t;
       ╰╴                       ━
+    error: relation `nope` does not exist
+       ╭▸ 
+    10 │ alter view nope rename to y;
+       ╰╴           ━━━━
     error: `t` is not a view
        ╭▸ 
     12 │ alter view t rename to z;
@@ -265,14 +265,14 @@ alter view v rename column nope to d;
       ╭▸ 
     5 │ select a from v;
       ╰╴       ━
-    error: column `nope` does not exist
-      ╭▸ 
-    7 │ alter view v rename column nope to d;
-      ╰╴                           ━━━━
     error: column `b` of relation `v` already exists
       ╭▸ 
     6 │ alter view v rename column c to b;
       ╰╴                                ━
+    error: column `nope` does not exist
+      ╭▸ 
+    7 │ alter view v rename column nope to d;
+      ╰╴                           ━━━━
     ");
 }
 
@@ -285,14 +285,14 @@ alter view v alter column nope drop default;
 alter view v set (security_barrier = true);
 alter view v reset (security_barrier);
 "), @"
-    error: column `nope` does not exist
-      ╭▸ 
-    4 │ alter view v alter column nope drop default;
-      ╰╴                          ━━━━
     error: function `nope()` does not exist
       ╭▸ 
     3 │ alter view v alter column a set default nope();
       ╰╴                                        ━━━━
+    error: column `nope` does not exist
+      ╭▸ 
+    4 │ alter view v alter column nope drop default;
+      ╰╴                          ━━━━
     ");
 }
 
@@ -322,10 +322,6 @@ create materialized view m (a, b) as select 1;
 create view w (a) as select 1, 2;
 create view z (a, b) as select * from missing;
 "), @"
-    error: relation `missing` does not exist
-      ╭▸ 
-    5 │ create view z (a, b) as select * from missing;
-      ╰╴                                      ━━━━━━━
     error: CREATE VIEW specifies more column names than columns
       ╭▸ 
     2 │ create view v (a, b) as select 1;
@@ -334,6 +330,10 @@ create view z (a, b) as select * from missing;
       ╭▸ 
     3 │ create materialized view m (a, b) as select 1;
       ╰╴                               ━
+    error: relation `missing` does not exist
+      ╭▸ 
+    5 │ create view z (a, b) as select * from missing;
+      ╰╴                                      ━━━━━━━
     ");
 }
 

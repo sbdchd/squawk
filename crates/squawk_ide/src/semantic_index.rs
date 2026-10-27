@@ -31,7 +31,7 @@ use crate::statistics_index::StatisticsIndex;
 use crate::table_index::TableIndex;
 use crate::type_index::TypeIndex;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DiagnosticKind {
     UnresolvedColumn,
     UnresolvedRelation,
@@ -145,10 +145,10 @@ pub enum DiagnosticKind {
     InvalidColumnReference,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Diagnostic {
-    pub kind: DiagnosticKind,
     pub range: FileRange,
+    pub kind: DiagnosticKind,
     pub message: Cow<'static, str>,
     pub hint: Option<&'static str>,
 }
@@ -478,7 +478,8 @@ impl IndexData {
     }
 
     pub(crate) fn diagnostics(&self) -> Vec<Diagnostic> {
-        self.references
+        let mut diagnostics: Vec<Diagnostic> = self
+            .references
             .iter_local()
             .filter_map(|(_, reference)| {
                 let name = self.names.resolve(reference.name);
@@ -496,7 +497,9 @@ impl IndexData {
                 message: error.message(&self.names, &self.errors.args),
                 hint: error.hint(),
             }))
-            .collect()
+            .collect();
+        diagnostics.sort();
+        diagnostics
     }
 }
 

@@ -33,6 +33,10 @@ drop operator ~~~ (int, int);
 drop operator ~~~ (none, int);
 drop operator ~~~ (none, int);
 "), @"
+    error: operator `~~~` already exists
+      ╭▸ 
+    5 │ create operator ~~~ (rightarg = int, function = sub);
+      ╰╴                ━━━
     error: function `sub` does not exist
       ╭▸ 
     5 │ create operator ~~~ (rightarg = int, function = sub);
@@ -41,10 +45,6 @@ drop operator ~~~ (none, int);
       ╭▸ 
     6 │ create operator ~~~ (leftarg = int, rightarg = int, function = neg);
       ╰╴                                                               ━━━
-    error: operator `~~~` already exists
-      ╭▸ 
-    5 │ create operator ~~~ (rightarg = int, function = sub);
-      ╰╴                ━━━
     ");
 }
 
@@ -182,10 +182,6 @@ rollback;
 drop operator public.=== (int, int);
 drop operator s.=== (int, int);
 "), @"
-    error: schema `nope` does not exist
-       ╭▸ 
-    10 │ alter operator s.=== (int, int) set schema nope;
-       ╰╴                                           ━━━━
     error: operator does not exist: `int4 public.=== int4`
       ╭▸ 
     7 │ alter operator public.=== (int, int) owner to current_user;
@@ -194,6 +190,10 @@ drop operator s.=== (int, int);
       ╭▸ 
     9 │ alter operator s.=== (int, int) set schema s2;
       ╰╴                                           ━━
+    error: schema `nope` does not exist
+       ╭▸ 
+    10 │ alter operator s.=== (int, int) set schema nope;
+       ╰╴                                           ━━━━
     error: operator does not exist: `int4 public.=== int4`
        ╭▸ 
     14 │ drop operator public.=== (int, int);
@@ -237,16 +237,16 @@ select 1 operator(nope.+) 2, nope.f(1);
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);
       ╰╴                  ━━━━
-    error: schema `nope` does not exist
-      ╭▸ 
-    2 │ select 1 operator(nope.+) 2, nope.f(1);
-      ╰╴                             ━━━━
     error: operator does not exist: `int4 nope.+ int4`
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);
       │                        ━
       │
       ╰ hint: You might need to add explicit type casts.
+    error: schema `nope` does not exist
+      ╭▸ 
+    2 │ select 1 operator(nope.+) 2, nope.f(1);
+      ╰╴                             ━━━━
     error: function `nope.f(int4)` does not exist
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);

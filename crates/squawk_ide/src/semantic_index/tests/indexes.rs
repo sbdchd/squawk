@@ -173,14 +173,6 @@ drop index i2;
       ╭▸ 
     6 │ drop index i;
       ╰╴           ━
-    error: index `nope` does not exist
-      ╭▸ 
-    9 │ alter index nope rename to x;
-      ╰╴            ━━━━
-    error: index `i3` does not exist
-       ╭▸ 
-    14 │ drop index i3;
-       ╰╴           ━━
     error: relation `j` already exists
       ╭▸ 
     7 │ alter index i2 rename to j;
@@ -189,6 +181,14 @@ drop index i2;
       ╭▸ 
     8 │ alter index i2 rename to t;
       ╰╴                         ━
+    error: index `nope` does not exist
+      ╭▸ 
+    9 │ alter index nope rename to x;
+      ╰╴            ━━━━
+    error: index `i3` does not exist
+       ╭▸ 
+    14 │ drop index i3;
+       ╰╴           ━━
     ");
 }
 
@@ -221,10 +221,6 @@ create index ip on p (a);
 drop index iv;
 drop index im;
 "), @"
-    error: index `iv` does not exist
-       ╭▸ 
-    10 │ drop index iv;
-       ╰╴           ━━
     error: cannot create index on view `v`
       ╭▸ 
     6 │ create index iv on v (a);
@@ -233,6 +229,10 @@ drop index im;
       ╭▸ 
     7 │ create index is_ on s (last_value);
       ╰╴                    ━
+    error: index `iv` does not exist
+       ╭▸ 
+    10 │ drop index iv;
+       ╰╴           ━━
     ");
 }
 

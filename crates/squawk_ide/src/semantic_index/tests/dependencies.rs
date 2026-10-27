@@ -54,14 +54,14 @@ select * from u;
        ╭▸ 
     13 │ select * from t;
        ╰╴              ━
-    error: type `ty` does not exist
-       ╭▸ 
-    15 │ select null::ty;
-       ╰╴             ━━
     error: function `f()` does not exist
        ╭▸ 
     14 │ select f();
        ╰╴       ━
+    error: type `ty` does not exist
+       ╭▸ 
+    15 │ select null::ty;
+       ╰╴             ━━
     ");
 }
 
@@ -118,14 +118,14 @@ drop extension e;
 drop transform for int language plpython3u;
 alter extension nope add transform for int language plpython3u;
 "), @"
-    error: extension `nope` does not exist
-      ╭▸ 
-    9 │ alter extension nope add transform for int language plpython3u;
-      ╰╴                ━━━━
     error: transform for type `int4` language `plpython3u` does not exist
       ╭▸ 
     8 │ drop transform for int language plpython3u;
       ╰╴                   ━━━
+    error: extension `nope` does not exist
+      ╭▸ 
+    9 │ alter extension nope add transform for int language plpython3u;
+      ╰╴                ━━━━
     error: transform for type `int4` language `plpython3u` does not exist
       ╭▸ 
     9 │ alter extension nope add transform for int language plpython3u;
@@ -238,10 +238,6 @@ select k();
 select * from v;
 select * from w;
 "), @"
-    error: relation `v` does not exist
-       ╭▸ 
-    12 │ select * from v;
-       ╰╴              ━
     error: function `g()` does not exist
       ╭▸ 
     9 │ select g();
@@ -250,6 +246,10 @@ select * from w;
        ╭▸ 
     10 │ select h();
        ╰╴       ━
+    error: relation `v` does not exist
+       ╭▸ 
+    12 │ select * from v;
+       ╰╴              ━
     ");
 }
 
@@ -277,14 +277,14 @@ drop function g;
 drop function g cascade;
 drop trigger tr2 on t;
 "), @"
-    error: trigger `tr2` does not exist
-      ╭▸ 
-    9 │ drop trigger tr2 on t;
-      ╰╴             ━━━
     error: cannot drop function `g` because other objects depend on it
       ╭▸ 
     7 │ drop function g;
       ╰╴              ━
+    error: trigger `tr2` does not exist
+      ╭▸ 
+    9 │ drop trigger tr2 on t;
+      ╰╴             ━━━
     ");
 }
 
@@ -328,6 +328,16 @@ drop index i;
 drop policy p on u;
 drop operator === (int, int);
 "), @"
+    error: function `f(int4)` does not exist
+      ╭▸ 
+    2 │ create table t (a int check (f(a) > 0));
+      │                              ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: cannot drop function `to_text` because other objects depend on it
+       ╭▸ 
+    12 │ drop function to_text;
+       ╰╴              ━━━━━━━
     error: constraint `c` does not exist
        ╭▸ 
     16 │ alter table u drop constraint c;
@@ -340,16 +350,6 @@ drop operator === (int, int);
        ╭▸ 
     18 │ drop policy p on u;
        ╰╴            ━
-    error: function `f(int4)` does not exist
-      ╭▸ 
-    2 │ create table t (a int check (f(a) > 0));
-      │                              ━
-      │
-      ╰ hint: You might need to add explicit type casts.
-    error: cannot drop function `to_text` because other objects depend on it
-       ╭▸ 
-    12 │ drop function to_text;
-       ╰╴              ━━━━━━━
     error: operator does not exist: `int4 === int4`
        ╭▸ 
     19 │ drop operator === (int, int);
@@ -386,6 +386,10 @@ select a, c from t;
 select b from t;
 select d from t;
 "), @"
+    error: cannot drop function `f` because other objects depend on it
+      ╭▸ 
+    5 │ drop function f;
+      ╰╴              ━
     error: column `b` does not exist
       ╭▸ 
     8 │ select b from t;
@@ -394,10 +398,6 @@ select d from t;
       ╭▸ 
     9 │ select d from t;
       ╰╴       ━
-    error: cannot drop function `f` because other objects depend on it
-      ╭▸ 
-    5 │ drop function f;
-      ╰╴              ━
     ");
 }
 
@@ -434,14 +434,14 @@ drop function f cascade;
 select a from u;
 select c from u;
 "), @"
-    error: column `c` does not exist
-      ╭▸ 
-    9 │ select c from u;
-      ╰╴       ━
     error: cannot drop function `f` because other objects depend on it
       ╭▸ 
     6 │ drop function f;
       ╰╴              ━
+    error: column `c` does not exist
+      ╭▸ 
+    9 │ select c from u;
+      ╰╴       ━
     ");
 }
 
@@ -580,14 +580,14 @@ drop table t cascade;
 select a from u;
 alter table u drop constraint fk;
 "), @"
-    error: constraint `fk` does not exist
-      ╭▸ 
-    7 │ alter table u drop constraint fk;
-      ╰╴                              ━━
     error: cannot drop table `t` because other objects depend on it
       ╭▸ 
     4 │ drop table t;
       ╰╴           ━
+    error: constraint `fk` does not exist
+      ╭▸ 
+    7 │ alter table u drop constraint fk;
+      ╰╴                              ━━
     ");
 }
 
@@ -623,10 +623,6 @@ drop view v;
 drop view v cascade;
 select * from w;
 "), @"
-    error: relation `w` does not exist
-      ╭▸ 
-    9 │ select * from w;
-      ╰╴              ━
     error: cannot drop function `f` because other objects depend on it
       ╭▸ 
     6 │ drop function f;
@@ -635,6 +631,10 @@ select * from w;
       ╭▸ 
     7 │ drop view v;
       ╰╴          ━
+    error: relation `w` does not exist
+      ╭▸ 
+    9 │ select * from w;
+      ╰╴              ━
     ");
 }
 
@@ -686,14 +686,14 @@ drop schema public cascade;
 rollback;
 drop extension pg_trgm;
 "), @"
-    error: extension `hstore` does not exist
-      ╭▸ 
-    6 │ drop extension hstore;
-      ╰╴               ━━━━━━
     error: cannot drop schema `s` because other objects depend on it
       ╭▸ 
     4 │ drop schema s;
       ╰╴            ━
+    error: extension `hstore` does not exist
+      ╭▸ 
+    6 │ drop extension hstore;
+      ╰╴               ━━━━━━
     ");
 }
 
@@ -710,14 +710,14 @@ alter schema s3 rename to s4;
 drop schema s4 cascade;
 drop extension citext;
 "), @"
-    error: extension `citext` does not exist
-       ╭▸ 
-    10 │ drop extension citext;
-       ╰╴               ━━━━━━
     error: cannot drop schema `s3` because other objects depend on it
       ╭▸ 
     7 │ drop schema s3;
       ╰╴            ━━
+    error: extension `citext` does not exist
+       ╭▸ 
+    10 │ drop extension citext;
+       ╰╴               ━━━━━━
     ");
 }
 
@@ -752,6 +752,10 @@ select ms from t;
 select (v).x from u;
 select (v).m from u;
 "), @"
+    error: cannot drop type `mood` because other objects depend on it
+      ╭▸ 
+    6 │ drop type mood;
+      ╰╴          ━━━━
     error: column `m` does not exist
       ╭▸ 
     9 │ select m from t;
@@ -764,10 +768,6 @@ select (v).m from u;
        ╭▸ 
     12 │ select (v).m from u;
        ╰╴           ━
-    error: cannot drop type `mood` because other objects depend on it
-      ╭▸ 
-    6 │ drop type mood;
-      ╰╴          ━━━━
     ");
 }
 
@@ -791,6 +791,16 @@ select null::r;
 select null::rmultirange;
 select to_text(null);
 "), @"
+    error: cannot drop type `mood` because other objects depend on it
+      ╭▸ 
+    9 │ drop type mood;
+      ╰╴          ━━━━
+    error: function `f(unknown)` does not exist
+       ╭▸ 
+    11 │ select f(null);
+       │        ━
+       │
+       ╰ hint: You might need to add explicit type casts.
     error: column `a` does not exist
        ╭▸ 
     12 │ select a from t;
@@ -807,16 +817,6 @@ select to_text(null);
        ╭▸ 
     16 │ select null::rmultirange;
        ╰╴             ━━━━━━━━━━━
-    error: cannot drop type `mood` because other objects depend on it
-      ╭▸ 
-    9 │ drop type mood;
-      ╰╴          ━━━━
-    error: function `f(unknown)` does not exist
-       ╭▸ 
-    11 │ select f(null);
-       │        ━
-       │
-       ╰ hint: You might need to add explicit type casts.
     error: function `to_text(unknown)` does not exist
        ╭▸ 
     17 │ select to_text(null);
@@ -841,6 +841,10 @@ select a from t;
 select b from t;
 select null::pos3;
 "), @"
+    error: cannot drop type `pos2` because other objects depend on it
+      ╭▸ 
+    7 │ drop domain pos2;
+      ╰╴            ━━━━
     error: column `a` does not exist
        ╭▸ 
     10 │ select a from t;
@@ -849,10 +853,6 @@ select null::pos3;
        ╭▸ 
     12 │ select null::pos3;
        ╰╴             ━━━━
-    error: cannot drop type `pos2` because other objects depend on it
-      ╭▸ 
-    7 │ drop domain pos2;
-      ╰╴            ━━━━
     ");
 }
 
@@ -871,6 +871,10 @@ select xs from u;
 select (c).w from v;
 select (c).z from v;
 "), @"
+    error: cannot drop table `t` because other objects depend on it
+      ╭▸ 
+    6 │ drop table t;
+      ╰╴           ━
     error: column `x` does not exist
       ╭▸ 
     9 │ select x from u;
@@ -883,10 +887,6 @@ select (c).z from v;
        ╭▸ 
     12 │ select (c).z from v;
        ╰╴           ━
-    error: cannot drop table `t` because other objects depend on it
-      ╭▸ 
-    6 │ drop table t;
-      ╰╴           ━
     ");
 }
 
@@ -924,14 +924,6 @@ select b from u;
 select a from u;
 select t_out(null);
 "), @"
-    error: type `t` does not exist
-       ╭▸ 
-    10 │ select null::t;
-       ╰╴             ━
-    error: column `a` does not exist
-       ╭▸ 
-    12 │ select a from u;
-       ╰╴       ━
     error: cannot drop type `t` because other objects depend on it
       ╭▸ 
     7 │ drop type t;
@@ -940,6 +932,14 @@ select t_out(null);
       ╭▸ 
     8 │ drop function t_in;
       ╰╴              ━━━━
+    error: type `t` does not exist
+       ╭▸ 
+    10 │ select null::t;
+       ╰╴             ━
+    error: column `a` does not exist
+       ╭▸ 
+    12 │ select a from u;
+       ╰╴       ━
     error: function `t_out(unknown)` does not exist
        ╭▸ 
     13 │ select t_out(null);
@@ -988,14 +988,14 @@ drop type t;
 drop type t cascade;
 select * from x;
 "), @"
-    error: relation `x` does not exist
-      ╭▸ 
-    6 │ select * from x;
-      ╰╴              ━
     error: cannot drop type `t` because other objects depend on it
       ╭▸ 
     4 │ drop type t;
       ╰╴          ━
+    error: relation `x` does not exist
+      ╭▸ 
+    6 │ select * from x;
+      ╰╴              ━
     ");
 }
 
@@ -1030,14 +1030,14 @@ drop function f(int);
 drop function f(int) cascade;
 alter domain d drop constraint c;
 "), @"
-    error: constraint `c` does not exist
-      ╭▸ 
-    6 │ alter domain d drop constraint c;
-      ╰╴                               ━
     error: cannot drop function `f` because other objects depend on it
       ╭▸ 
     4 │ drop function f(int);
       ╰╴              ━
+    error: constraint `c` does not exist
+      ╭▸ 
+    6 │ alter domain d drop constraint c;
+      ╰╴                               ━
     ");
 }
 
@@ -1054,10 +1054,6 @@ drop schema e;
 drop schema e;
 drop schema if exists e;
 "), @"
-    error: schema `e` does not exist
-      ╭▸ 
-    9 │ drop schema e;
-      ╰╴            ━
     error: cannot drop schema `s` because other objects depend on it
       ╭▸ 
     4 │ drop schema s;
@@ -1065,6 +1061,10 @@ drop schema if exists e;
     error: cannot drop schema `s` because other objects depend on it
       ╭▸ 
     5 │ drop schema s restrict;
+      ╰╴            ━
+    error: schema `e` does not exist
+      ╭▸ 
+    9 │ drop schema e;
       ╰╴            ━
     ");
 }
@@ -1116,6 +1116,10 @@ select * from s.t;
        ╭▸ 
     12 │ select s.f();
        ╰╴       ━
+    error: function `s.f()` does not exist
+       ╭▸ 
+    12 │ select s.f();
+       ╰╴         ━
     error: relation `v` does not exist
        ╭▸ 
     13 │ select * from v;
@@ -1132,10 +1136,6 @@ select * from s.t;
        ╭▸ 
     16 │ select * from s.t;
        ╰╴                ━
-    error: function `s.f()` does not exist
-       ╭▸ 
-    12 │ select s.f();
-       ╰╴         ━
     ");
 }
 
@@ -1220,6 +1220,10 @@ alter table t drop constraint ex;
 drop index ex;
 alter table u drop constraint ex2;
 "), @"
+    error: cannot drop function `f` because other objects depend on it
+      ╭▸ 
+    5 │ drop function f(int);
+      ╰╴              ━
     error: constraint `ex` does not exist
       ╭▸ 
     7 │ alter table t drop constraint ex;
@@ -1232,10 +1236,6 @@ alter table u drop constraint ex2;
       ╭▸ 
     9 │ alter table u drop constraint ex2;
       ╰╴                              ━━━
-    error: cannot drop function `f` because other objects depend on it
-      ╭▸ 
-    5 │ drop function f(int);
-      ╰╴              ━
     ");
 }
 

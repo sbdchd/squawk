@@ -67,14 +67,14 @@ create domain g as int references t(a);
       ╭▸ 
     3 │ create domain e as int check (nope > 0) default nope() collate nope;
       ╰╴                              ━━━━
-    error: collation `nope` does not exist
-      ╭▸ 
-    3 │ create domain e as int check (nope > 0) default nope() collate nope;
-      ╰╴                                                               ━━━━
     error: function `nope()` does not exist
       ╭▸ 
     3 │ create domain e as int check (nope > 0) default nope() collate nope;
       ╰╴                                                ━━━━
+    error: collation `nope` does not exist
+      ╭▸ 
+    3 │ create domain e as int check (nope > 0) default nope() collate nope;
+      ╰╴                                                               ━━━━
     error: primary key constraints not possible for domains
       ╭▸ 
     4 │ create domain f as int primary key;
@@ -175,6 +175,10 @@ alter domain e drop default;
       ╭▸ 
     5 │ select 1::d;
       ╰╴          ━
+    error: type `f` already exists
+      ╭▸ 
+    8 │ alter domain e rename to f;
+      ╰╴                         ━
     error: schema `nope` does not exist
       ╭▸ 
     9 │ alter domain e set schema nope;
@@ -183,10 +187,6 @@ alter domain e drop default;
        ╭▸ 
     10 │ alter domain e owner to nope;
        ╰╴                        ━━━━
-    error: type `f` already exists
-      ╭▸ 
-    8 │ alter domain e rename to f;
-      ╰╴                         ━
     error: function `nope()` does not exist
        ╭▸ 
     11 │ alter domain e set default nope();

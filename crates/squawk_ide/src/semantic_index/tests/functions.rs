@@ -113,16 +113,16 @@ fn unknown_function() {
     assert_snapshot!(check("
 select foo(1), x from bar(2);
 "), @"
-    error: function `bar(int4)` does not exist
-      ╭▸ 
-    2 │ select foo(1), x from bar(2);
-      │                       ━━━
-      │
-      ╰ hint: You might need to add explicit type casts.
     error: function `foo(int4)` does not exist
       ╭▸ 
     2 │ select foo(1), x from bar(2);
       │        ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `bar(int4)` does not exist
+      ╭▸ 
+    2 │ select foo(1), x from bar(2);
+      │                       ━━━
       │
       ╰ hint: You might need to add explicit type casts.
     ");
@@ -428,10 +428,6 @@ drop function if exists f(int);
 drop function p();
 drop function nope;
 "), @"
-    error: function `nope` does not exist
-       ╭▸ 
-    10 │ drop function nope;
-       ╰╴              ━━━━
     error: function `f(int4)` does not exist
       ╭▸ 
     6 │ select f(1), g();
@@ -450,6 +446,10 @@ drop function nope;
       ╭▸ 
     9 │ drop function p();
       ╰╴              ━
+    error: function `nope` does not exist
+       ╭▸ 
+    10 │ drop function nope;
+       ╰╴              ━━━━
     ");
 }
 
@@ -570,14 +570,14 @@ select f();
 select s.f();
 alter function s.f() set schema nope;
 "), @"
-    error: schema `nope` does not exist
-      ╭▸ 
-    7 │ alter function s.f() set schema nope;
-      ╰╴                                ━━━━
     error: function `f()` does not exist
       ╭▸ 
     5 │ select f();
       ╰╴       ━
+    error: schema `nope` does not exist
+      ╭▸ 
+    7 │ alter function s.f() set schema nope;
+      ╰╴                                ━━━━
     ");
 }
 
@@ -650,10 +650,6 @@ call f();
 call nope();
 call p((select x from nope));
 "), @"
-    error: relation `nope` does not exist
-       ╭▸ 
-    10 │ call p((select x from nope));
-       ╰╴                      ━━━━
     error: procedure `p(c => int4)` does not exist
       ╭▸ 
     7 │ call p(c => 1);
@@ -672,6 +668,10 @@ call p((select x from nope));
        ╭▸ 
     10 │ call p((select x from nope));
        ╰╴        ━━━━━━━━━━━━━━━━━━
+    error: relation `nope` does not exist
+       ╭▸ 
+    10 │ call p((select x from nope));
+       ╰╴                      ━━━━
     ");
 }
 
@@ -848,10 +848,6 @@ comment on function public.g(text) is 'x';
 drop operator === (int, int);
 drop operator ~~~ (none, int);
 "), @"
-    error: aggregate `nope` does not exist
-      ╭▸ 
-    8 │ drop aggregate nope(*);
-      ╰╴               ━━━━
     error: function `g(text)` does not exist
       ╭▸ 
     3 │ drop function g(text);
@@ -867,6 +863,10 @@ drop operator ~~~ (none, int);
     error: aggregate `nope(int4, text)` does not exist
       ╭▸ 
     7 │ drop aggregate nope(int order by text);
+      ╰╴               ━━━━
+    error: aggregate `nope` does not exist
+      ╭▸ 
+    8 │ drop aggregate nope(*);
       ╰╴               ━━━━
     error: function `g(text)` does not exist
       ╭▸ 

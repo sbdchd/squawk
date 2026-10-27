@@ -204,18 +204,6 @@ insert into t select * from missing;
 insert into missing values (1, 2, 3);
 insert into missing (a) values (1, 2);
 "), @"
-    error: relation `missing` does not exist
-       ╭▸ 
-    17 │ insert into t select * from missing;
-       ╰╴                            ━━━━━━━
-    error: relation `missing` does not exist
-       ╭▸ 
-    18 │ insert into missing values (1, 2, 3);
-       ╰╴            ━━━━━━━
-    error: relation `missing` does not exist
-       ╭▸ 
-    19 │ insert into missing (a) values (1, 2);
-       ╰╴            ━━━━━━━
     error: INSERT has more expressions than target columns
       ╭▸ 
     4 │ insert into t (a) values (1, 2);
@@ -250,6 +238,18 @@ insert into missing (a) values (1, 2);
        ╭▸ 
     11 │ insert into t select * from u;
        ╰╴              ━━━━━━━━━━━━━━━
+    error: relation `missing` does not exist
+       ╭▸ 
+    17 │ insert into t select * from missing;
+       ╰╴                            ━━━━━━━
+    error: relation `missing` does not exist
+       ╭▸ 
+    18 │ insert into missing values (1, 2, 3);
+       ╰╴            ━━━━━━━
+    error: relation `missing` does not exist
+       ╭▸ 
+    19 │ insert into missing (a) values (1, 2);
+       ╰╴            ━━━━━━━
     error: INSERT has more expressions than target columns
        ╭▸ 
     19 │ insert into missing (a) values (1, 2);
