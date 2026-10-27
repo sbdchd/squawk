@@ -8,10 +8,12 @@ fn builtin_implicit_casts() {
 create function f(x bigint) returns int language sql return 1;
 select f(1), f(1.5);
 "), @"
-    error: function `f` does not exist
+    error: function `f(numeric)` does not exist
       ╭▸ 
     3 │ select f(1), f(1.5);
-      ╰╴             ━
+      │              ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -32,18 +34,24 @@ select f(x) from t;
 drop cast (a as b);
 select f(x) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(a)` does not exist
       ╭▸ 
     7 │ select f(x) from t;
-      ╰╴       ━
-    error: function `f` does not exist
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `f(a)` does not exist
       ╭▸ 
     9 │ select f(x) from t;
-      ╰╴       ━
-    error: function `f` does not exist
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `f(a)` does not exist
        ╭▸ 
     14 │ select f(x) from t;
-       ╰╴       ━
+       │        ━
+       │
+       ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -67,14 +75,18 @@ select f(x) from t;
 rollback;
 select f(x) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(a)` does not exist
        ╭▸ 
     11 │ select f(x) from t;
-       ╰╴       ━
-    error: function `f` does not exist
+       │        ━
+       │
+       ╰ hint: You might need to add explicit type casts.
+    error: function `f(a)` does not exist
        ╭▸ 
     15 │ select f(x) from t;
-       ╰╴       ━
+       │        ━
+       │
+       ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -95,22 +107,22 @@ drop cast if exists (int as nope);
       ╭▸ 
     3 │ create cast (nope as text) with inout;
       ╰╴             ━━━━
-    error: function `f` does not exist
-      ╭▸ 
-    4 │ create cast (int as text) with function f(text);
-      ╰╴                                        ━
-    error: function `g` does not exist
-      ╭▸ 
-    5 │ create cast (int as text) with function g(int);
-      ╰╴                                        ━
-    error: function `f` does not exist
-      ╭▸ 
-    6 │ create cast (int as text) with function f(int, int);
-      ╰╴                                        ━
     error: type `nope` does not exist
       ╭▸ 
     9 │ drop cast (int as nope);
       ╰╴                  ━━━━
+    error: function `f(text)` does not exist
+      ╭▸ 
+    4 │ create cast (int as text) with function f(text);
+      ╰╴                                        ━
+    error: function `g(int4)` does not exist
+      ╭▸ 
+    5 │ create cast (int as text) with function g(int);
+      ╰╴                                        ━
+    error: function `f(int4, int4)` does not exist
+      ╭▸ 
+    6 │ create cast (int as text) with function f(int, int);
+      ╰╴                                        ━
     ");
 }
 

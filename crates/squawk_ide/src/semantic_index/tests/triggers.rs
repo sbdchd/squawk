@@ -41,15 +41,15 @@ create trigger tr after insert on t
       ╭▸ 
     2 │ create trigger tr after insert on missing_table
       ╰╴                                  ━━━━━━━━━━━━━
-    error: function `missing_fn` does not exist
-      ╭▸ 
-    3 │   for each row execute function missing_fn();
-      ╰╴                                ━━━━━━━━━━
     error: relation `missing_from` does not exist
       ╭▸ 
     7 │   from missing_from
       ╰╴       ━━━━━━━━━━━━
-    error: function `f` does not exist
+    error: function `missing_fn()` does not exist
+      ╭▸ 
+    3 │   for each row execute function missing_fn();
+      ╰╴                                ━━━━━━━━━━
+    error: function `f()` does not exist
       ╭▸ 
     8 │   for each row execute function f();
       ╰╴                                ━

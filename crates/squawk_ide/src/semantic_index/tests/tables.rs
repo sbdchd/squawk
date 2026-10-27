@@ -498,14 +498,14 @@ alter table t drop column c, alter column c set default 1;
       ╭▸ 
     7 │ alter table t alter column nope set default 1;
       ╰╴                           ━━━━
-    error: function `nope` does not exist
-      ╭▸ 
-    8 │ alter table t alter column a set default nope();
-      ╰╴                                         ━━━━
     error: column `c` does not exist
        ╭▸ 
     13 │ alter table t drop column c, alter column c set default 1;
        ╰╴                                          ━
+    error: function `nope()` does not exist
+      ╭▸ 
+    8 │ alter table t alter column a set default nope();
+      ╰╴                                         ━━━━
     ");
 }
 
@@ -539,10 +539,12 @@ alter table t alter column a type int;
 rollback;
 select f(a) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4)` does not exist
       ╭▸ 
     4 │ select f(a) from t;
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 

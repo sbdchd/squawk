@@ -302,10 +302,6 @@ revoke admin option for nope from r2;
        ╭▸ 
     23 │ grant select on all tables in schema sc, nope to r;
        ╰╴                                         ━━━━
-    error: function `f` does not exist
-       ╭▸ 
-    25 │ grant execute on function f(text) to r;
-       ╰╴                          ━
     error: routine `nope` does not exist
        ╭▸ 
     27 │ grant execute on routine nope to r;
@@ -342,6 +338,10 @@ revoke admin option for nope from r2;
        ╭▸ 
     45 │ revoke admin option for nope from r2;
        ╰╴                        ━━━━
+    error: function `f(text)` does not exist
+       ╭▸ 
+    25 │ grant execute on function f(text) to r;
+       ╰╴                          ━
     ");
 }
 

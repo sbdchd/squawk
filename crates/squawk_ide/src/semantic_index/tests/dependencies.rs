@@ -54,14 +54,14 @@ select * from u;
        ╭▸ 
     13 │ select * from t;
        ╰╴              ━
-    error: function `f` does not exist
-       ╭▸ 
-    14 │ select f();
-       ╰╴       ━
     error: type `ty` does not exist
        ╭▸ 
     15 │ select null::ty;
        ╰╴             ━━
+    error: function `f()` does not exist
+       ╭▸ 
+    14 │ select f();
+       ╰╴       ━
     ");
 }
 
@@ -238,18 +238,18 @@ select k();
 select * from v;
 select * from w;
 "), @"
-    error: function `g` does not exist
-      ╭▸ 
-    9 │ select g();
-      ╰╴       ━
-    error: function `h` does not exist
-       ╭▸ 
-    10 │ select h();
-       ╰╴       ━
     error: relation `v` does not exist
        ╭▸ 
     12 │ select * from v;
        ╰╴              ━
+    error: function `g()` does not exist
+      ╭▸ 
+    9 │ select g();
+      ╰╴       ━
+    error: function `h()` does not exist
+       ╭▸ 
+    10 │ select h();
+       ╰╴       ━
     ");
 }
 
@@ -328,10 +328,6 @@ drop index i;
 drop policy p on u;
 drop operator === (int, int);
 "), @"
-    error: function `f` does not exist
-      ╭▸ 
-    2 │ create table t (a int check (f(a) > 0));
-      ╰╴                             ━
     error: constraint `c` does not exist
        ╭▸ 
     16 │ alter table u drop constraint c;
@@ -344,14 +340,20 @@ drop operator === (int, int);
        ╭▸ 
     18 │ drop policy p on u;
        ╰╴            ━
-    error: operator `===` does not exist
-       ╭▸ 
-    19 │ drop operator === (int, int);
-       ╰╴              ━━━
+    error: function `f(int4)` does not exist
+      ╭▸ 
+    2 │ create table t (a int check (f(a) > 0));
+      │                              ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     error: cannot drop function `to_text` because other objects depend on it
        ╭▸ 
     12 │ drop function to_text;
        ╰╴              ━━━━━━━
+    error: operator does not exist: `int4 === int4`
+       ╭▸ 
+    19 │ drop operator === (int, int);
+       ╰╴              ━━━
     ");
 }
 
@@ -598,14 +600,14 @@ drop table t;
 drop table t cascade;
 select f();
 "), @"
-    error: function `f` does not exist
-      ╭▸ 
-    6 │ select f();
-      ╰╴       ━
     error: cannot drop table `t` because other objects depend on it
       ╭▸ 
     4 │ drop table t;
       ╰╴           ━
+    error: function `f()` does not exist
+      ╭▸ 
+    6 │ select f();
+      ╰╴       ━
     ");
 }
 
@@ -789,10 +791,6 @@ select null::r;
 select null::rmultirange;
 select to_text(null);
 "), @"
-    error: function `f` does not exist
-       ╭▸ 
-    11 │ select f(null);
-       ╰╴       ━
     error: column `a` does not exist
        ╭▸ 
     12 │ select a from t;
@@ -809,14 +807,22 @@ select to_text(null);
        ╭▸ 
     16 │ select null::rmultirange;
        ╰╴             ━━━━━━━━━━━
-    error: function `to_text` does not exist
-       ╭▸ 
-    17 │ select to_text(null);
-       ╰╴       ━━━━━━━
     error: cannot drop type `mood` because other objects depend on it
       ╭▸ 
     9 │ drop type mood;
       ╰╴          ━━━━
+    error: function `f(unknown)` does not exist
+       ╭▸ 
+    11 │ select f(null);
+       │        ━
+       │
+       ╰ hint: You might need to add explicit type casts.
+    error: function `to_text(unknown)` does not exist
+       ╭▸ 
+    17 │ select to_text(null);
+       │        ━━━━━━━
+       │
+       ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -926,10 +932,6 @@ select t_out(null);
        ╭▸ 
     12 │ select a from u;
        ╰╴       ━
-    error: function `t_out` does not exist
-       ╭▸ 
-    13 │ select t_out(null);
-       ╰╴       ━━━━━
     error: cannot drop type `t` because other objects depend on it
       ╭▸ 
     7 │ drop type t;
@@ -938,6 +940,12 @@ select t_out(null);
       ╭▸ 
     8 │ drop function t_in;
       ╰╴              ━━━━
+    error: function `t_out(unknown)` does not exist
+       ╭▸ 
+    13 │ select t_out(null);
+       │        ━━━━━
+       │
+       ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -1000,14 +1008,16 @@ drop function add(int, int);
 drop function add(int, int) cascade;
 select s(1);
 "), @"
-    error: function `s` does not exist
-      ╭▸ 
-    6 │ select s(1);
-      ╰╴       ━
     error: cannot drop function `add` because other objects depend on it
       ╭▸ 
     4 │ drop function add(int, int);
       ╰╴              ━━━
+    error: function `s(int4)` does not exist
+      ╭▸ 
+    6 │ select s(1);
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -1106,10 +1116,6 @@ select * from s.t;
        ╭▸ 
     12 │ select s.f();
        ╰╴       ━
-    error: function `f` does not exist
-       ╭▸ 
-    12 │ select s.f();
-       ╰╴         ━
     error: relation `v` does not exist
        ╭▸ 
     13 │ select * from v;
@@ -1126,6 +1132,10 @@ select * from s.t;
        ╭▸ 
     16 │ select * from s.t;
        ╰╴                ━
+    error: function `s.f()` does not exist
+       ╭▸ 
+    12 │ select s.f();
+       ╰╴         ━
     ");
 }
 
@@ -1334,14 +1344,14 @@ drop function eq cascade;
 drop operator === (int, int);
 drop operator class c using btree;
 "), @"
-    error: operator `===` does not exist
-      ╭▸ 
-    7 │ drop operator === (int, int);
-      ╰╴              ━━━
     error: cannot drop function `eq` because other objects depend on it
       ╭▸ 
     5 │ drop function eq;
       ╰╴              ━━
+    error: operator does not exist: `int4 === int4`
+      ╭▸ 
+    7 │ drop operator === (int, int);
+      ╰╴              ━━━
     ");
 }
 

@@ -135,10 +135,6 @@ alter extension nope add table t;
       ╭▸ 
     6 │ alter extension e add table nope;
       ╰╴                            ━━━━
-    error: function `f` does not exist
-      ╭▸ 
-    8 │ alter extension e drop function f(text);
-      ╰╴                                ━
     error: schema `nope` does not exist
       ╭▸ 
     9 │ alter extension e add schema nope;
@@ -147,6 +143,10 @@ alter extension nope add table t;
        ╭▸ 
     12 │ alter extension nope add table t;
        ╰╴                ━━━━
+    error: function `f(text)` does not exist
+      ╭▸ 
+    8 │ alter extension e drop function f(text);
+      ╰╴                                ━
     ");
 }
 

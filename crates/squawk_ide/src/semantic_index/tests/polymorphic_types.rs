@@ -12,14 +12,18 @@ create function g(x anynonarray) returns int language sql return 1;
 create table t (a ints, b posint);
 select f(a), f(b), g(a), g(b) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(posint)` does not exist
       ╭▸ 
     7 │ select f(a), f(b), g(a), g(b) from t;
-      ╰╴             ━
-    error: function `g` does not exist
+      │              ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `g(ints)` does not exist
       ╭▸ 
     7 │ select f(a), f(b), g(a), g(b) from t;
-      ╰╴                   ━
+      │                    ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -41,14 +45,18 @@ create function f(x anyelement, y anyelement) returns int language sql return 1;
 create table t (a int, b text, c posint);
 select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4, text)` does not exist
       ╭▸ 
     5 │ select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
-      ╰╴                ━
-    error: function `f` does not exist
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `f(int4, posint)` does not exist
       ╭▸ 
     5 │ select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
-      ╰╴                                    ━
+      │                                     ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -59,14 +67,18 @@ create function f(x anyarray, y anyelement) returns int language sql return 1;
 create table t (a int[], b int, c text, d int2vector, e smallint);
 select f(a, b), f(a, c), f(d, e), f(d, b) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4[], text)` does not exist
       ╭▸ 
     4 │ select f(a, b), f(a, c), f(d, e), f(d, b) from t;
-      ╰╴                ━
-    error: function `f` does not exist
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `f(int2vector, int4)` does not exist
       ╭▸ 
     4 │ select f(a, b), f(a, c), f(d, e), f(d, b) from t;
-      ╰╴                                  ━
+      │                                   ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -79,10 +91,12 @@ create function g(x anyenum, y anyelement) returns int language sql return 1;
 create table t (a int, b int[], m mood);
 select f(a, b), g(m, m), g(m, a) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(mood, int4)` does not exist
       ╭▸ 
     6 │ select f(a, b), g(m, m), g(m, a) from t;
-      ╰╴                         ━
+      │                          ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -94,14 +108,18 @@ create function g(x anymultirange, y anyrange) returns int language sql return 1
 create table t (r int4range, m int4multirange, n nummultirange, a int, b text);
 select f(r, a), f(r, b), g(m, r), g(n, r) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4range, text)` does not exist
       ╭▸ 
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
-      ╰╴                ━
-    error: function `g` does not exist
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `g(nummultirange, int4range)` does not exist
       ╭▸ 
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
-      ╰╴                                  ━
+      │                                   ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -112,10 +130,12 @@ create function f(variadic x anyarray) returns int language sql return 1;
 create table t (a int, b text);
 select f(a, a), f(a, b), f(a, 'x') from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4, text)` does not exist
       ╭▸ 
     4 │ select f(a, a), f(a, b), f(a, 'x') from t;
-      ╰╴                ━
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -128,18 +148,24 @@ create function h(x anycompatiblenonarray, y anycompatible) returns int language
 create table t (a int, b bigint, c text, d int[], e int[]);
 select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4, text)` does not exist
       ╭▸ 
     6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
-      ╰╴                ━
-    error: function `g` does not exist
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `g(int4[], text)` does not exist
       ╭▸ 
     6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
-      ╰╴                                             ━
-    error: function `h` does not exist
+      │                                              ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `h(int4[], int4[])` does not exist
       ╭▸ 
     6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
-      ╰╴                                                               ━
+      │                                                                ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -151,14 +177,18 @@ create function g(x anycompatiblemultirange, y anycompatiblerange) returns int l
 create table t (r int4range, m int4multirange, n nummultirange, a smallint, b bigint);
 select f(r, a), f(r, b), g(m, r), g(n, r) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4range, int8)` does not exist
       ╭▸ 
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
-      ╰╴                ━
-    error: function `g` does not exist
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `g(nummultirange, int4range)` does not exist
       ╭▸ 
     5 │ select f(r, a), f(r, b), g(m, r), g(n, r) from t;
-      ╰╴                                  ━
+      │                                   ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -169,10 +199,12 @@ create function f(variadic x anycompatiblearray) returns int language sql return
 create table t (a int, b bigint, c text);
 select f(a, b), f(a, c) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4, text)` does not exist
       ╭▸ 
     4 │ select f(a, b), f(a, c) from t;
-      ╰╴                ━
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -191,18 +223,24 @@ create table t (a int, b bigint, d int[]);
 select is_int(id(a)), is_ints(wrap(a)), is_int(first(d)), is_bigint(pick(a, b)),
   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
 "), @"
-    error: function `is_text` does not exist
+    error: function `is_text(int4)` does not exist
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
-       ╰╴  ━━━━━━━
-    error: function `is_text` does not exist
+       │   ━━━━━━━
+       │
+       ╰ hint: You might need to add explicit type casts.
+    error: function `is_text(int4)` does not exist
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
-       ╰╴                  ━━━━━━━
-    error: function `is_int` does not exist
+       │                   ━━━━━━━
+       │
+       ╰ hint: You might need to add explicit type casts.
+    error: function `is_int(int8)` does not exist
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
-       ╰╴                                     ━━━━━━
+       │                                      ━━━━━━
+       │
+       ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -215,10 +253,12 @@ create function is_text(x text) returns int language sql return 1;
 create table t (r int4range);
 select is_int(lower(r)), is_mr(multirange(r)), is_text(lower(r)) from t;
 "), @"
-    error: function `is_text` does not exist
+    error: function `is_text(int4)` does not exist
       ╭▸ 
     6 │ select is_int(lower(r)), is_mr(multirange(r)), is_text(lower(r)) from t;
-      ╰╴                                               ━━━━━━━
+      │                                                ━━━━━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -230,10 +270,12 @@ create function is_text(x text) returns int language sql return 1;
 create function is_int(x int) returns int language sql return 1;
 select is_text(pick('a', 'b')), is_int(pick('a', 'b'));
 "), @"
-    error: function `is_int` does not exist
+    error: function `is_int(text)` does not exist
       ╭▸ 
     5 │ select is_text(pick('a', 'b')), is_int(pick('a', 'b'));
-      ╰╴                                ━━━━━━
+      │                                 ━━━━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -246,10 +288,12 @@ create function is_int(x int) returns int language sql return 1;
 create table t (a int);
 select is_ints(f(a, a)), is_int(f(a, a)) from t;
 "), @"
-    error: function `is_int` does not exist
+    error: function `is_int(int4[])` does not exist
       ╭▸ 
     6 │ select is_ints(f(a, a)), is_int(f(a, a)) from t;
-      ╰╴                         ━━━━━━
+      │                          ━━━━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 

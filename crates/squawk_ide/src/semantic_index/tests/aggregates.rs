@@ -82,11 +82,11 @@ create aggregate pct(float8 order by text) (sfunc = sfn, stype = internal, final
 alter aggregate pct(float8, text) rename to pct2;
 drop aggregate pct2(float8, text);
 "), @"
-    error: aggregate `pct` does not exist
+    error: aggregate `pct(float8)` does not exist
       ╭▸ 
     5 │ drop aggregate pct(float8);
       ╰╴               ━━━
-    error: aggregate `pct` does not exist
+    error: aggregate `pct(float8, text)` does not exist
       ╭▸ 
     7 │ drop aggregate pct(float8 order by text);
       ╰╴               ━━━
@@ -124,15 +124,19 @@ select old(1), cnt(*);
 create aggregate old (basetype = int, sfunc = add, stype = int);
 create aggregate old(int) (sfunc = add, stype = int);
 "#), @"
-    error: function `old` does not exist
+    error: function `old(int4, int4)` does not exist
       ╭▸ 
     6 │ select old(1, 2);
-      ╰╴       ━━━
-    error: function `old` does not exist
+      │        ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `old(int4)` does not exist
       ╭▸ 
     9 │ select old(1), cnt(*);
-      ╰╴       ━━━
-    error: function `cnt` does not exist
+      │        ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `cnt()` does not exist
       ╭▸ 
     9 │ select old(1), cnt(*);
       ╰╴               ━━━
@@ -156,23 +160,25 @@ drop aggregate s(int);
 drop aggregate if exists s(int);
 drop aggregate add(int, int);
 "), @"
-    error: function `s` does not exist
+    error: function `s(int4)` does not exist
       ╭▸ 
     5 │ drop function s(int);
       ╰╴              ━
-    error: function `s` does not exist
+    error: function `s(int4)` does not exist
       ╭▸ 
     7 │ select s(1), c();
-      ╰╴       ━
-    error: function `c` does not exist
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `c()` does not exist
       ╭▸ 
     7 │ select s(1), c();
       ╰╴             ━
-    error: aggregate `s` does not exist
+    error: aggregate `s(int4)` does not exist
       ╭▸ 
     8 │ drop aggregate s(int);
       ╰╴               ━
-    error: aggregate `add` does not exist
+    error: aggregate `add(int4, int4)` does not exist
        ╭▸ 
     10 │ drop aggregate add(int, int);
        ╰╴               ━━━
@@ -193,15 +199,17 @@ select x.t(1);
 alter aggregate x.t(int) owner to nope;
 alter aggregate add(int, int) rename to y;
 "), @"
-    error: function `s` does not exist
-      ╭▸ 
-    6 │ select s(1);
-      ╰╴       ━
     error: role `nope` does not exist
        ╭▸ 
     10 │ alter aggregate x.t(int) owner to nope;
        ╰╴                                  ━━━━
-    error: aggregate `add` does not exist
+    error: function `s(int4)` does not exist
+      ╭▸ 
+    6 │ select s(1);
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: aggregate `add(int4, int4)` does not exist
        ╭▸ 
     11 │ alter aggregate add(int, int) rename to y;
        ╰╴                ━━━

@@ -41,7 +41,9 @@ use crate::{
         TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
         Window, WindowClauses, WindowId,
     },
-    sema_error::{ObjectKind, SemaError, TriggerFunctionKind, WindowClause},
+    sema_error::{
+        ErrorArg, LookupKind, ObjectKind, OperandName, SemaError, TriggerFunctionKind, WindowClause,
+    },
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
@@ -9196,7 +9198,9 @@ impl Lowerer {
             Some(id) => Resolution::Operator(id),
             None => match if_missing {
                 IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
+                IfMissing::Error => {
+                    self.report_unresolved_operator_sig(range, schema, name, left, right)
+                }
             },
         };
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
@@ -9450,10 +9454,23 @@ impl Lowerer {
                 if missing {
                     Some(Resolution::Unknown)
                 } else {
-                    self.find_function_by(schema, name, |function| {
+                    match self.find_function_by(schema, name, |function| {
                         kind.matches(function.kind) && self.has_arg_types(function, &arg_types)
-                    })
-                    .map(Resolution::Function)
+                    }) {
+                        Some(function) => Some(Resolution::Function(function)),
+                        None if matches!(if_missing, IfMissing::Error)
+                            && param_list.star_token().is_none() =>
+                        {
+                            self.report_unresolved_routine_sig(
+                                kind,
+                                schema,
+                                name,
+                                &arg_types,
+                                segment.syntax(),
+                            )
+                        }
+                        None => None,
+                    }
                 }
             }
             None => self.find_unique_function(schema, name, kind),
@@ -9805,6 +9822,14 @@ impl Lowerer {
                 let schema = self.lower_schema_qualifier(path.qualifier());
                 let name = self.intern(&segment.text());
                 let resolution = self.find_routine(schema, name, &args, FunctionKind::Procedure);
+                let resolution = self.report_unresolved_routine(
+                    resolution,
+                    RoutineKind::Procedure,
+                    schema,
+                    name,
+                    &args,
+                    segment.syntax(),
+                );
                 self.add_ref(
                     name,
                     ReferenceKind::Function(RoutineKind::Procedure),
@@ -17752,7 +17777,13 @@ impl Lowerer {
         right: Option<ArgType>,
     ) -> Option<Ty> {
         let name = self.intern(text);
-        let resolution = self.select_operator(schema, name, left, right);
+        let mut resolution = self.select_operator(schema, name, left, right);
+        if matches!(resolution, Resolution::Unresolved)
+            && let Some(error) = self.unresolved_operator(schema, name, left, right)
+        {
+            self.push_error_at(range, error);
+            resolution = Resolution::Unknown;
+        }
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
         let Resolution::Operator(operator) = resolution else {
             return None;
@@ -17767,6 +17798,140 @@ impl Lowerer {
             })
             .collect();
         self.call_type(function, &args)
+    }
+
+    fn report_unresolved_routine(
+        &mut self,
+        resolution: Resolution,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+        node: &SyntaxNode,
+    ) -> Resolution {
+        if !matches!(resolution, Resolution::Unresolved)
+            || args.iter().any(|arg| matches!(arg.ty, ArgType::Untyped))
+        {
+            return resolution;
+        }
+        let start = self.index.errors.args.next_idx();
+        for arg in args {
+            let Some(ty) = self.operand_name(arg.ty) else {
+                continue;
+            };
+            self.index.errors.args.alloc(ErrorArg {
+                name: arg.name,
+                ty,
+                variadic: arg.variadic,
+            });
+        }
+        self.push_unresolved_routine(kind, schema, name, start, LookupKind::Call, node);
+        Resolution::Unknown
+    }
+
+    fn report_unresolved_routine_sig(
+        &mut self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg_types: &[Option<Ty>],
+        node: &SyntaxNode,
+    ) -> Option<Resolution> {
+        if arg_types.iter().any(Option::is_none) {
+            return None;
+        }
+        let start = self.index.errors.args.next_idx();
+        for ty in arg_types.iter().flatten() {
+            let ty = OperandName::Ty(self.index.ty_name(*ty));
+            self.index.errors.args.alloc(ErrorArg {
+                name: None,
+                ty,
+                variadic: false,
+            });
+        }
+        self.push_unresolved_routine(kind, schema, name, start, LookupKind::Signature, node);
+        Some(Resolution::Unknown)
+    }
+
+    fn push_unresolved_routine(
+        &mut self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        start: Idx<ErrorArg>,
+        lookup: LookupKind,
+        node: &SyntaxNode,
+    ) {
+        let args = self.index.errors.args.range_from(start);
+        self.push_error(
+            node,
+            SemaError::UnresolvedRoutine {
+                kind,
+                schema,
+                name,
+                args,
+                lookup,
+            },
+        );
+    }
+
+    fn report_unresolved_operator_sig(
+        &mut self,
+        range: TextRange,
+        schema: Option<Name>,
+        name: Name,
+        left: Operand,
+        right: Operand,
+    ) -> Resolution {
+        let left = match left {
+            Operand::None => None,
+            Operand::Ty(ty) => Some(OperandName::Ty(self.index.ty_name(ty))),
+            Operand::Unknown => return Resolution::Unresolved,
+        };
+        let right = match right {
+            Operand::Ty(ty) => OperandName::Ty(self.index.ty_name(ty)),
+            Operand::None | Operand::Unknown => return Resolution::Unresolved,
+        };
+        self.push_error_at(
+            range,
+            SemaError::UnresolvedOperator {
+                schema,
+                name,
+                left,
+                right,
+                lookup: LookupKind::Signature,
+            },
+        );
+        Resolution::Unknown
+    }
+
+    fn unresolved_operator(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        left: Option<ArgType>,
+        right: Option<ArgType>,
+    ) -> Option<SemaError> {
+        let left = match left {
+            Some(left) => Some(self.operand_name(left)?),
+            None => None,
+        };
+        let right = self.operand_name(right?)?;
+        Some(SemaError::UnresolvedOperator {
+            schema,
+            name,
+            left,
+            right,
+            lookup: LookupKind::Call,
+        })
+    }
+
+    fn operand_name(&self, ty: ArgType) -> Option<OperandName> {
+        match ty {
+            ArgType::Known(ty) => Some(OperandName::Ty(self.index.ty_name(ty))),
+            ArgType::UnknownLiteral => Some(OperandName::Unknown),
+            ArgType::Untyped => None,
+        }
     }
 
     fn lower_exclude_constraint(
@@ -20262,7 +20427,14 @@ impl Lowerer {
                     Resolution::Unresolved if kind == CalleeKind::OrderedSet || incomplete_row => {
                         Resolution::Unknown
                     }
-                    resolution => resolution,
+                    resolution => self.report_unresolved_routine(
+                        resolution,
+                        RoutineKind::Function,
+                        schema,
+                        name,
+                        args,
+                        name_ref.syntax(),
+                    ),
                 };
                 (ReferenceKind::Function(RoutineKind::Function), resolution)
             }
@@ -21691,6 +21863,11 @@ impl Lowerer {
 
     fn push_error(&mut self, node: &SyntaxNode, error: SemaError) {
         self.push_error_ptr(self.ptr(node), error);
+    }
+
+    fn push_error_at(&mut self, range: TextRange, error: SemaError) {
+        let range = self.index.range(InIrFile::new(self.file_id, range));
+        self.index.errors.push(range, error);
     }
 
     fn push_error_ptr(&mut self, ptr: InIrFile<SyntaxNodePtr>, error: SemaError) {

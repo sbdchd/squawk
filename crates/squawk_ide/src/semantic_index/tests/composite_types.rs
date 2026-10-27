@@ -116,10 +116,12 @@ select g(a) from x;
 alter type t alter attribute a type text cascade;
 select g(a) from x;
 "), @"
-    error: function `g` does not exist
+    error: function `g(text)` does not exist
       ╭▸ 
     7 │ select g(a) from x;
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -168,10 +170,12 @@ select g((null::t).a);
 alter type t alter attribute a set data type text;
 select g((null::t).a);
 "), @"
-    error: function `g` does not exist
+    error: function `g(int4)` does not exist
       ╭▸ 
     4 │ select g((null::t).a);
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 

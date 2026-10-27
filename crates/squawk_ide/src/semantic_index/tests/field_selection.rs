@@ -14,10 +14,12 @@ select t.nope, nope(t), t from t;
       ╭▸ 
     5 │ select t.nope, nope(t), t from t;
       ╰╴         ━━━━
-    error: function `nope` does not exist
+    error: function `nope(t)` does not exist
       ╭▸ 
     5 │ select t.nope, nope(t), t from t;
-      ╰╴               ━━━━
+      │                ━━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -72,14 +74,16 @@ from t;
        ╭▸ 
     16 │   (array[p]).x,
        ╰╴             ━
-    error: function `f` does not exist
+    error: function `f()` does not exist
        ╭▸ 
     18 │   (f()).x,
        ╰╴   ━
-    error: operator `-` does not exist
+    error: operator does not exist: `- pair`
        ╭▸ 
     19 │   (-p).x,
-       ╰╴   ━
+       │    ━
+       │
+       ╰ hint: You might need to add explicit type casts.
     ");
 }
 

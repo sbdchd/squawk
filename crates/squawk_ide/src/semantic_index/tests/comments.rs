@@ -116,14 +116,6 @@ comment on text search configuration nope is 'x';
        ╭▸ 
     40 │ comment on domain nope is 'x';
        ╰╴                  ━━━━
-    error: function `f` does not exist
-       ╭▸ 
-    42 │ comment on function f(text) is 'x';
-       ╰╴                    ━
-    error: procedure `nope` does not exist
-       ╭▸ 
-    44 │ comment on procedure nope() is 'x';
-       ╰╴                     ━━━━
     error: schema `nope` does not exist
        ╭▸ 
     47 │ comment on schema nope is 'x';
@@ -172,6 +164,14 @@ comment on text search configuration nope is 'x';
        ╭▸ 
     20 │ comment on table v is 'x';
        ╰╴                 ━
+    error: function `f(text)` does not exist
+       ╭▸ 
+    42 │ comment on function f(text) is 'x';
+       ╰╴                    ━
+    error: procedure `nope()` does not exist
+       ╭▸ 
+    44 │ comment on procedure nope() is 'x';
+       ╰╴                     ━━━━
     ");
 }
 

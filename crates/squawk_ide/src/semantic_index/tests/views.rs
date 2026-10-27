@@ -285,14 +285,14 @@ alter view v alter column nope drop default;
 alter view v set (security_barrier = true);
 alter view v reset (security_barrier);
 "), @"
-    error: function `nope` does not exist
-      ╭▸ 
-    3 │ alter view v alter column a set default nope();
-      ╰╴                                        ━━━━
     error: column `nope` does not exist
       ╭▸ 
     4 │ alter view v alter column nope drop default;
       ╰╴                          ━━━━
+    error: function `nope()` does not exist
+      ╭▸ 
+    3 │ alter view v alter column a set default nope();
+      ╰╴                                        ━━━━
     ");
 }
 

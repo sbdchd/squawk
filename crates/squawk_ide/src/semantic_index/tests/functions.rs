@@ -113,14 +113,18 @@ fn unknown_function() {
     assert_snapshot!(check("
 select foo(1), x from bar(2);
 "), @"
-    error: function `bar` does not exist
+    error: function `bar(int4)` does not exist
       ╭▸ 
     2 │ select foo(1), x from bar(2);
-      ╰╴                      ━━━
-    error: function `foo` does not exist
+      │                       ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `foo(int4)` does not exist
       ╭▸ 
     2 │ select foo(1), x from bar(2);
-      ╰╴       ━━━
+      │        ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -134,14 +138,18 @@ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       ╰╴                      ━
-    error: function `g` does not exist
+    error: function `g(y => int4)` does not exist
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
-      ╰╴                          ━
-    error: function `f` does not exist
+      │                           ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `f(zz => int4)` does not exist
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
-      ╰╴                                     ━
+      │                                      ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -152,14 +160,18 @@ create function f(a int) returns int language sql return a;
 create function g(int) returns int language sql return $1;
 select f(z => 1), g(a => 1);
 "), @"
-    error: function `f` does not exist
+    error: function `f(z => int4)` does not exist
       ╭▸ 
     4 │ select f(z => 1), g(a => 1);
-      ╰╴       ━
-    error: function `g` does not exist
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `g(a => int4)` does not exist
       ╭▸ 
     4 │ select f(z => 1), g(a => 1);
-      ╰╴                  ━
+      │                   ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -172,11 +184,13 @@ select myschema.f(1), pg_catalog.nope();
       ╭▸ 
     2 │ select myschema.f(1), pg_catalog.nope();
       ╰╴       ━━━━━━━━
-    error: function `f` does not exist
+    error: function `myschema.f(int4)` does not exist
       ╭▸ 
     2 │ select myschema.f(1), pg_catalog.nope();
-      ╰╴                ━
-    error: function `nope` does not exist
+      │                 ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `pg_catalog.nope()` does not exist
       ╭▸ 
     2 │ select myschema.f(1), pg_catalog.nope();
       ╰╴                                 ━━━━
@@ -293,7 +307,7 @@ create function f() returns int as 'select 1' language sql;
 rollback;
 select f();
 "), @"
-    error: function `f` does not exist
+    error: function `f()` does not exist
       ╭▸ 
     5 │ select f();
       ╰╴       ━
@@ -305,7 +319,7 @@ fn param_default_missing() {
     assert_snapshot!(check("
 create function f(a int default nope(), b int = 1) returns int language sql return a;
 "), @"
-    error: function `nope` does not exist
+    error: function `nope()` does not exist
       ╭▸ 
     2 │ create function f(a int default nope(), b int = 1) returns int language sql return a;
       ╰╴                                ━━━━
@@ -390,11 +404,11 @@ create procedure p() language sql as 'select 1';
 select p();
 select * from p();
 "), @"
-    error: function `p` does not exist
+    error: function `p()` does not exist
       ╭▸ 
     3 │ select p();
       ╰╴       ━
-    error: function `p` does not exist
+    error: function `p()` does not exist
       ╭▸ 
     4 │ select * from p();
       ╰╴              ━
@@ -414,26 +428,28 @@ drop function if exists f(int);
 drop function p();
 drop function nope;
 "), @"
-    error: function `f` does not exist
-      ╭▸ 
-    6 │ select f(1), g();
-      ╰╴       ━
-    error: function `g` does not exist
-      ╭▸ 
-    6 │ select f(1), g();
-      ╰╴             ━
-    error: function `f` does not exist
-      ╭▸ 
-    7 │ drop function f(int);
-      ╰╴              ━
-    error: function `p` does not exist
-      ╭▸ 
-    9 │ drop function p();
-      ╰╴              ━
     error: function `nope` does not exist
        ╭▸ 
     10 │ drop function nope;
        ╰╴              ━━━━
+    error: function `f(int4)` does not exist
+      ╭▸ 
+    6 │ select f(1), g();
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `g()` does not exist
+      ╭▸ 
+    6 │ select f(1), g();
+      ╰╴             ━
+    error: function `f(int4)` does not exist
+      ╭▸ 
+    7 │ drop function f(int);
+      ╰╴              ━
+    error: function `p()` does not exist
+      ╭▸ 
+    9 │ drop function p();
+      ╰╴              ━
     ");
 }
 
@@ -462,10 +478,12 @@ select f(1);
       ╭▸ 
     4 │ drop function f;
       ╰╴              ━
-    error: function `f` does not exist
+    error: function `f(int4)` does not exist
       ╭▸ 
     7 │ select f(1);
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -482,15 +500,17 @@ select f();
 drop routine if exists f;
 drop procedure if exists p;
 "), @"
-    error: procedure `f` does not exist
+    error: procedure `f()` does not exist
       ╭▸ 
     4 │ drop procedure f();
       ╰╴               ━
-    error: procedure `p` does not exist
+    error: procedure `p(int4)` does not exist
       ╭▸ 
     6 │ call p(1);
-      ╰╴     ━
-    error: function `f` does not exist
+      │      ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `f()` does not exist
       ╭▸ 
     8 │ select f();
       ╰╴       ━
@@ -505,7 +525,7 @@ create or replace function f() returns int language sql return 2;
 drop function f();
 select f();
 "), @"
-    error: function `f` does not exist
+    error: function `f()` does not exist
       ╭▸ 
     5 │ select f();
       ╰╴       ━
@@ -523,18 +543,20 @@ select h(1);
 alter function h rename to g;
 alter function nope(int) rename to x;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4)` does not exist
       ╭▸ 
     5 │ select f(1);
-      ╰╴       ━
-    error: function `nope` does not exist
-      ╭▸ 
-    8 │ alter function nope(int) rename to x;
-      ╰╴               ━━━━
+      │        ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     error: function `g` already exists with same argument types in schema `public`
       ╭▸ 
     7 │ alter function h rename to g;
       ╰╴                           ━
+    error: function `nope(int4)` does not exist
+      ╭▸ 
+    8 │ alter function nope(int) rename to x;
+      ╰╴               ━━━━
     ");
 }
 
@@ -548,14 +570,14 @@ select f();
 select s.f();
 alter function s.f() set schema nope;
 "), @"
-    error: function `f` does not exist
-      ╭▸ 
-    5 │ select f();
-      ╰╴       ━
     error: schema `nope` does not exist
       ╭▸ 
     7 │ alter function s.f() set schema nope;
       ╰╴                                ━━━━
+    error: function `f()` does not exist
+      ╭▸ 
+    5 │ select f();
+      ╰╴       ━
     ");
 }
 
@@ -600,15 +622,15 @@ call r();
 alter procedure nope() security definer;
 alter routine nope() security definer;
 "), @"
-    error: procedure `p` does not exist
+    error: procedure `p()` does not exist
       ╭▸ 
     4 │ call p();
       ╰╴     ━
-    error: procedure `nope` does not exist
+    error: procedure `nope()` does not exist
       ╭▸ 
     8 │ alter procedure nope() security definer;
       ╰╴                ━━━━
-    error: routine `nope` does not exist
+    error: routine `nope()` does not exist
       ╭▸ 
     9 │ alter routine nope() security definer;
       ╰╴              ━━━━
@@ -628,22 +650,24 @@ call f();
 call nope();
 call p((select x from nope));
 "), @"
-    error: procedure `p` does not exist
-      ╭▸ 
-    7 │ call p(c => 1);
-      ╰╴     ━
-    error: procedure `f` does not exist
-      ╭▸ 
-    8 │ call f();
-      ╰╴     ━
-    error: procedure `nope` does not exist
-      ╭▸ 
-    9 │ call nope();
-      ╰╴     ━━━━
     error: relation `nope` does not exist
        ╭▸ 
     10 │ call p((select x from nope));
        ╰╴                      ━━━━
+    error: procedure `p(c => int4)` does not exist
+      ╭▸ 
+    7 │ call p(c => 1);
+      │      ━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: procedure `f()` does not exist
+      ╭▸ 
+    8 │ call f();
+      ╰╴     ━
+    error: procedure `nope()` does not exist
+      ╭▸ 
+    9 │ call nope();
+      ╰╴     ━━━━
     error: cannot use subquery in CALL argument
        ╭▸ 
     10 │ call p((select x from nope));
@@ -658,10 +682,12 @@ create procedure p(a int, out b int) language sql begin atomic select 1; end;
 call p(1, null);
 call p(1);
 "), @"
-    error: procedure `p` does not exist
+    error: procedure `p(int4)` does not exist
       ╭▸ 
     4 │ call p(1);
-      ╰╴     ━
+      │      ━
+      │
+      ╰ hint: You might need to add explicit type casts.
     ");
 }
 
@@ -748,5 +774,115 @@ create aggregate k(a int, a int) (sfunc = sfn, stype = int);
       ╭▸ 
     8 │ create aggregate k(a int, a int) (sfunc = sfn, stype = int);
       ╰╴                          ━
+    ");
+}
+
+#[test]
+fn unresolved_function_arg_types() {
+    assert_snapshot!(check("
+create function foo(x int) returns int as 'select 1' language sql;
+create procedure p(int) as 'select 1' language sql;
+select foo(1.5::float8);
+select foo(1, 'a');
+select foo(y => 1);
+select public.foo(variadic array[1]);
+select nope();
+select lower(1);
+call p('a'::text);
+"), @"
+    error: function `foo(float8)` does not exist
+      ╭▸ 
+    4 │ select foo(1.5::float8);
+      │        ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `foo(int4, unknown)` does not exist
+      ╭▸ 
+    5 │ select foo(1, 'a');
+      │        ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `foo(y => int4)` does not exist
+      ╭▸ 
+    6 │ select foo(y => 1);
+      │        ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `public.foo(VARIADIC int4[])` does not exist
+      ╭▸ 
+    7 │ select public.foo(variadic array[1]);
+      │               ━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: function `nope()` does not exist
+      ╭▸ 
+    8 │ select nope();
+      ╰╴       ━━━━
+    error: function `lower(int4)` does not exist
+      ╭▸ 
+    9 │ select lower(1);
+      │        ━━━━━
+      │
+      ╰ hint: You might need to add explicit type casts.
+    error: procedure `p(text)` does not exist
+       ╭▸ 
+    10 │ call p('a'::text);
+       │      ━
+       │
+       ╰ hint: You might need to add explicit type casts.
+    ");
+}
+
+#[test]
+fn unresolved_function_signature() {
+    assert_snapshot!(check("
+create function g(int) returns int as 'select 1' language sql;
+drop function g(text);
+drop function g(x int, out y int);
+drop function nope(variadic int[]);
+drop procedure nope(int);
+drop aggregate nope(int order by text);
+drop aggregate nope(*);
+alter function g(text) rename to h;
+comment on function public.g(text) is 'x';
+drop operator === (int, int);
+drop operator ~~~ (none, int);
+"), @"
+    error: aggregate `nope` does not exist
+      ╭▸ 
+    8 │ drop aggregate nope(*);
+      ╰╴               ━━━━
+    error: function `g(text)` does not exist
+      ╭▸ 
+    3 │ drop function g(text);
+      ╰╴              ━
+    error: function `nope(int4[])` does not exist
+      ╭▸ 
+    5 │ drop function nope(variadic int[]);
+      ╰╴              ━━━━
+    error: procedure `nope(int4)` does not exist
+      ╭▸ 
+    6 │ drop procedure nope(int);
+      ╰╴               ━━━━
+    error: aggregate `nope(int4, text)` does not exist
+      ╭▸ 
+    7 │ drop aggregate nope(int order by text);
+      ╰╴               ━━━━
+    error: function `g(text)` does not exist
+      ╭▸ 
+    9 │ alter function g(text) rename to h;
+      ╰╴               ━
+    error: function `public.g(text)` does not exist
+       ╭▸ 
+    10 │ comment on function public.g(text) is 'x';
+       ╰╴                           ━
+    error: operator does not exist: `int4 === int4`
+       ╭▸ 
+    11 │ drop operator === (int, int);
+       ╰╴              ━━━
+    error: operator does not exist: `~~~ int4`
+       ╭▸ 
+    12 │ drop operator ~~~ (none, int);
+       ╰╴              ━━━
     ");
 }

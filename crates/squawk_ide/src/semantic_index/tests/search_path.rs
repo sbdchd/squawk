@@ -213,14 +213,14 @@ create function g() returns int language sql
 select f(), g(), app.f();
 select a from t;
 "), @"
-    error: function `f` does not exist
-       ╭▸ 
-    12 │ select f(), g(), app.f();
-       ╰╴                     ━
     error: relation `t` does not exist
        ╭▸ 
     13 │ select a from t;
        ╰╴              ━
+    error: function `app.f()` does not exist
+       ╭▸ 
+    12 │ select f(), g(), app.f();
+       ╰╴                     ━
     ");
 }
 
@@ -312,7 +312,7 @@ create function pg_temp.f() returns int language sql return 1;
 set search_path = pg_temp, public;
 select f(), pg_temp.f(), pg_temp_2.f();
 "), @"
-    error: function `f` does not exist
+    error: function `f()` does not exist
       ╭▸ 
     4 │ select f(), pg_temp.f(), pg_temp_2.f();
       ╰╴       ━

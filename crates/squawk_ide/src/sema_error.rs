@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::fmt;
 
+use crate::arena::{IdxRange, LayeredArena};
 use crate::interner::{Interner, Name};
 use crate::ir::{
     AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
@@ -12,6 +13,25 @@ use crate::semantic_index::DiagnosticKind;
 pub(crate) struct TyName {
     pub(crate) name: Name,
     pub(crate) array: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum OperandName {
+    Ty(TyName),
+    Unknown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LookupKind {
+    Call,
+    Signature,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorArg {
+    pub(crate) name: Option<Name>,
+    pub(crate) ty: OperandName,
+    pub(crate) variadic: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -224,6 +244,20 @@ pub(crate) enum SemaError {
     UnresolvedTransform {
         ty: TyName,
         language: Name,
+    },
+    UnresolvedRoutine {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: IdxRange<ErrorArg>,
+        lookup: LookupKind,
+    },
+    UnresolvedOperator {
+        schema: Option<Name>,
+        name: Name,
+        left: Option<OperandName>,
+        right: OperandName,
+        lookup: LookupKind,
     },
     InvalidEnumValue {
         ty: Name,
@@ -807,6 +841,8 @@ impl SemaError {
             SemaError::AccessMethodKindMismatch { .. } => DiagnosticKind::AccessMethodKindMismatch,
             SemaError::UnresolvedCast { .. } => DiagnosticKind::UnresolvedCast,
             SemaError::UnresolvedTransform { .. } => DiagnosticKind::UnresolvedTransform,
+            SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
+            SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
@@ -869,6 +905,14 @@ impl SemaError {
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => Some(
                 "Create a unique index with no WHERE clause on one or more columns of the materialized view.",
             ),
+            SemaError::UnresolvedRoutine { args, lookup, .. } => {
+                (lookup == LookupKind::Call && !args.is_empty())
+                    .then_some("You might need to add explicit type casts.")
+            }
+            SemaError::UnresolvedOperator { lookup, .. } => match lookup {
+                LookupKind::Call => Some("You might need to add explicit type casts."),
+                LookupKind::Signature => None,
+            },
             _ => None,
         }
     }
@@ -920,10 +964,21 @@ impl SemaError {
         }
     }
 
-    pub(crate) fn message(&self, names: &Interner) -> Cow<'static, str> {
+    pub(crate) fn message(
+        &self,
+        names: &Interner,
+        args: &LayeredArena<ErrorArg>,
+    ) -> Cow<'static, str> {
         match self.static_message() {
             Some(message) => Cow::Borrowed(message),
-            None => Cow::Owned(ErrorMessage { error: self, names }.to_string()),
+            None => Cow::Owned(
+                ErrorMessage {
+                    error: self,
+                    names,
+                    args,
+                }
+                .to_string(),
+            ),
         }
     }
 }
@@ -931,6 +986,7 @@ impl SemaError {
 struct ErrorMessage<'a> {
     error: &'a SemaError,
     names: &'a Interner,
+    args: &'a LayeredArena<ErrorArg>,
 }
 
 impl ErrorMessage<'_> {
@@ -938,6 +994,13 @@ impl ErrorMessage<'_> {
         fmt::from_fn(move |f| {
             let suffix = if ty.array { "[]" } else { "" };
             write!(f, "{}{suffix}", self.names.resolve(ty.name))
+        })
+    }
+
+    fn operand(&self, operand: OperandName) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| match operand {
+            OperandName::Ty(ty) => write!(f, "{}", self.ty(ty)),
+            OperandName::Unknown => f.write_str("unknown"),
         })
     }
 }
@@ -1117,6 +1180,49 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(source),
                 self.ty(target)
             ),
+            SemaError::UnresolvedRoutine {
+                kind,
+                schema,
+                name,
+                args,
+                lookup: _,
+            } => {
+                write!(f, "{} `", kind.label())?;
+                if let Some(schema) = schema {
+                    write!(f, "{}.", n(schema))?;
+                }
+                write!(f, "{}(", n(name))?;
+                for (i, arg) in args.iter().enumerate() {
+                    let arg = self.args[arg];
+                    if i > 0 {
+                        f.write_str(", ")?;
+                    }
+                    if arg.variadic {
+                        f.write_str("VARIADIC ")?;
+                    }
+                    if let Some(name) = arg.name {
+                        write!(f, "{} => ", n(name))?;
+                    }
+                    write!(f, "{}", self.operand(arg.ty))?;
+                }
+                f.write_str(")` does not exist")
+            }
+            SemaError::UnresolvedOperator {
+                schema,
+                name,
+                left,
+                right,
+                lookup: _,
+            } => {
+                f.write_str("operator does not exist: `")?;
+                if let Some(left) = left {
+                    write!(f, "{} ", self.operand(left))?;
+                }
+                if let Some(schema) = schema {
+                    write!(f, "{}.", n(schema))?;
+                }
+                write!(f, "{} {}`", n(name), self.operand(right))
+            }
             SemaError::UnresolvedTransform { ty, language } => write!(
                 f,
                 "transform for type `{}` language `{}` does not exist",

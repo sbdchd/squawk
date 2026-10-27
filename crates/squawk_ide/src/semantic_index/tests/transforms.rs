@@ -25,18 +25,18 @@ drop transform if exists for nope language plpython3u;
        ╭▸ 
     10 │ create transform for nope language plpython3u (
        ╰╴                     ━━━━
-    error: function `nope_from` does not exist
-       ╭▸ 
-    11 │   from sql with function nope_from(internal),
-       ╰╴                         ━━━━━━━━━
-    error: function `to_t` does not exist
-       ╭▸ 
-    12 │   to sql with function to_t(int)
-       ╰╴                       ━━━━
     error: type `nope` does not exist
        ╭▸ 
     15 │ drop transform for nope language plpython3u;
        ╰╴                   ━━━━
+    error: function `nope_from(internal)` does not exist
+       ╭▸ 
+    11 │   from sql with function nope_from(internal),
+       ╰╴                         ━━━━━━━━━
+    error: function `to_t(int4)` does not exist
+       ╭▸ 
+    12 │   to sql with function to_t(int)
+       ╰╴                       ━━━━
     ");
 }
 

@@ -26,7 +26,7 @@ use crate::qualified_index::{
     CollationIndex, ConversionIndex, FunctionIndex, OperatorClassIndex, OperatorFamilyIndex,
     OperatorIndex, TextSearchIndex,
 };
-use crate::sema_error::{SemaError, TyName, reference_error};
+use crate::sema_error::{ErrorArg, SemaError, TyName, reference_error};
 use crate::statistics_index::StatisticsIndex;
 use crate::table_index::TableIndex;
 use crate::type_index::TypeIndex;
@@ -154,15 +154,19 @@ pub struct Diagnostic {
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct Errors(Vec<(FileRange, SemaError)>);
+pub(crate) struct Errors {
+    errors: Vec<(FileRange, SemaError)>,
+    pub(crate) args: LayeredArena<ErrorArg>,
+}
 
 impl Errors {
     pub(crate) fn push(&mut self, range: FileRange, error: SemaError) {
-        self.0.push((range, error));
+        self.errors.push((range, error));
     }
 
     pub(crate) fn shrink_to_fit(&mut self) {
-        self.0.shrink_to_fit();
+        self.errors.shrink_to_fit();
+        self.args.shrink_to_fit();
     }
 }
 
@@ -486,10 +490,10 @@ impl IndexData {
                     hint: None,
                 })
             })
-            .chain(self.errors.0.iter().map(|&(range, error)| Diagnostic {
+            .chain(self.errors.errors.iter().map(|&(range, error)| Diagnostic {
                 kind: error.kind(),
                 range,
-                message: error.message(&self.names),
+                message: error.message(&self.names, &self.errors.args),
                 hint: error.hint(),
             }))
             .collect()
