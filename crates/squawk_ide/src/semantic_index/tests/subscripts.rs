@@ -5,7 +5,7 @@ use super::check;
 #[test]
 fn insert_column_target_subscripts() {
     assert_snapshot!(check("
-create table t(a int, d int[]);
+create table t(a int unique, d int[]);
 insert into t(d[a], d[x:1]) values (1, 2);
 insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, d[1:y] = 2;
 "), @"

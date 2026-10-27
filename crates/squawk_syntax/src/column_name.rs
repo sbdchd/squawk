@@ -64,6 +64,10 @@ impl ColumnName {
         None
     }
 
+    pub fn inferred_from_expr(expr: ast::Expr) -> Option<ColumnName> {
+        name_from_expr(expr, false).map(|(name, _)| name)
+    }
+
     fn new(name: ColumnNameValue, unknown_column: bool) -> ColumnName {
         if unknown_column {
             ColumnName::UnknownColumn(Some(name))

@@ -5,9 +5,11 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 use anyhow::{Context, Result, bail};
+use quote::quote;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Deserializer};
 
+use crate::codegen::reformat;
 use crate::path::project_root;
 
 fn deserialize_json_string<'de, D, T>(deserializer: D) -> Result<T, D::Error>
@@ -1326,6 +1328,7 @@ struct AccessMethodQuery {
     name: String,
     kind: String,
     handler: String,
+    can_unique: i32,
     description: String,
     extension_name: String,
 }
@@ -1339,6 +1342,10 @@ select
     when n.oid = ext.extnamespace then ''
     else quote_ident(n.nspname) || '.'
   end || quote_ident(p.proname) as handler,
+  case
+    when pg_indexam_has_property(a.oid, 'can_unique') then 1
+    else 0
+  end as can_unique,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_am a
@@ -2656,6 +2663,28 @@ fn write_module(
     Ok(())
 }
 
+fn write_non_unique_index_access_methods(
+    path: impl AsRef<Path>,
+    version: &str,
+    names: &[String],
+) -> Result<()> {
+    let output = reformat(
+        quote! {
+            pub(crate) const NON_UNIQUE_INDEX_ACCESS_METHODS: &[&str] = &[
+                #(#names),*
+            ];
+        }
+        .to_string(),
+    );
+    fs::write(
+        path,
+        format!(
+            "// pg version: {version}\n// update via:\n//   cargo xtask sync-builtins\n\n{output}"
+        ),
+    )?;
+    Ok(())
+}
+
 fn query_roles(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     let module = modules.entry("builtins".to_string()).or_default();
     for row in RoleQuery::run()? {
@@ -3078,8 +3107,14 @@ fn module_name(extension_name: String) -> String {
     }
 }
 
-fn query_access_methods(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+fn query_access_methods(
+    modules: &mut BTreeMap<String, Module>,
+    non_unique_index_access_methods: &mut Vec<String>,
+) -> Result<()> {
     for row in AccessMethodQuery::run()? {
+        if row.kind == "index" && row.can_unique == 0 {
+            non_unique_index_access_methods.push(row.name.clone());
+        }
         modules
             .entry(module_name(row.extension_name))
             .or_default()
@@ -3118,7 +3153,8 @@ pub(crate) fn sync_builtins() -> Result<()> {
     query_operators(&mut modules)?;
     query_casts(&mut modules)?;
     query_collations(&mut modules)?;
-    query_access_methods(&mut modules)?;
+    let mut non_unique_index_access_methods = vec![];
+    query_access_methods(&mut modules, &mut non_unique_index_access_methods)?;
     query_languages(&mut modules)?;
     query_foreign_data_wrappers(&mut modules)?;
     query_conversions(&mut modules)?;
@@ -3128,6 +3164,8 @@ pub(crate) fn sync_builtins() -> Result<()> {
 
     let extensions_root = project_root().join("crates/squawk_ide/src/generated/extensions");
     let builtins_path = project_root().join("crates/squawk_ide/src/generated/builtins.sql");
+    let non_unique_index_access_methods_path =
+        project_root().join("crates/squawk_ide/src/generated/non_unique_index_access_methods.rs");
 
     std::fs::create_dir_all(&extensions_root).context("Failed to create builtins directory")?;
     if extensions_root.exists() {
@@ -3137,6 +3175,11 @@ pub(crate) fn sync_builtins() -> Result<()> {
 
     let builtins = modules.remove("builtins").unwrap_or_default();
     write_module(&builtins_path, version, PG_TEMP_SCHEMA_SQL, &builtins)?;
+    write_non_unique_index_access_methods(
+        &non_unique_index_access_methods_path,
+        version,
+        &non_unique_index_access_methods,
+    )?;
 
     for (file_name, module) in &modules {
         let file_path = extensions_root.join(format!("{file_name}.sql"));

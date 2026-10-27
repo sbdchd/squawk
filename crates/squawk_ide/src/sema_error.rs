@@ -289,6 +289,26 @@ pub(crate) enum SemaError {
     MultiplePrimaryKeys {
         table: Name,
     },
+    NoPrimaryKeyForReferencedTable {
+        table: Name,
+    },
+    NoUniqueConstraintForReferencedTable {
+        table: Name,
+    },
+    DeferrablePrimaryKeyForReferencedTable {
+        table: Name,
+    },
+    DeferrableUniqueConstraintForReferencedTable {
+        table: Name,
+    },
+    NoConflictArbiter,
+    DeferrableConflictArbiter,
+    RefreshConcurrentlyWithoutUniqueIndex {
+        name: Name,
+    },
+    UniqueIndexNotSupported {
+        access_method: Name,
+    },
     InvalidOrdinal {
         clause: OutputClause,
         position: usize,
@@ -808,6 +828,19 @@ impl SemaError {
             SemaError::ConstraintTrigger { .. } => DiagnosticKind::ReplaceConstraintTrigger,
             SemaError::DropReturnRule { .. } => DiagnosticKind::DropReturnRule,
             SemaError::MultiplePrimaryKeys { .. } => DiagnosticKind::MultiplePrimaryKeys,
+            SemaError::NoPrimaryKeyForReferencedTable { .. }
+            | SemaError::NoUniqueConstraintForReferencedTable { .. }
+            | SemaError::DeferrablePrimaryKeyForReferencedTable { .. }
+            | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
+                DiagnosticKind::InvalidForeignKey
+            }
+            SemaError::NoConflictArbiter | SemaError::DeferrableConflictArbiter => {
+                DiagnosticKind::InvalidConflictArbiter
+            }
+            SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
+                DiagnosticKind::MissingUniqueIndex
+            }
+            SemaError::UniqueIndexNotSupported { .. } => DiagnosticKind::UniqueIndexNotSupported,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
@@ -833,6 +866,9 @@ impl SemaError {
             SemaError::WindowFrameCopy { hint, .. } => {
                 hint.then_some("Omit the parentheses in this OVER clause.")
             }
+            SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => Some(
+                "Create a unique index with no WHERE clause on one or more columns of the materialized view.",
+            ),
             _ => None,
         }
     }
@@ -840,6 +876,12 @@ impl SemaError {
     fn static_message(&self) -> Option<&'static str> {
         match *self {
             SemaError::CannotChangeDatabase => Some("current database cannot be changed"),
+            SemaError::NoConflictArbiter => Some(
+                "there is no unique or exclusion constraint matching the ON CONFLICT specification",
+            ),
+            SemaError::DeferrableConflictArbiter => Some(
+                "ON CONFLICT does not support deferrable unique constraints/exclusion constraints as arbiters",
+            ),
             SemaError::ValuesLengthMismatch => Some("VALUES lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
                 Some("INSERT has more expressions than target columns")
@@ -922,7 +964,9 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::DefaultColumnReference
             | SemaError::SubqueryNotSingleColumn
             | SemaError::SubqueryTooManyColumns
-            | SemaError::SubqueryTooFewColumns => {
+            | SemaError::SubqueryTooFewColumns
+            | SemaError::NoConflictArbiter
+            | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MisplacedAggregate { context } => write!(
@@ -1153,6 +1197,36 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "multiple primary keys for table `{}` are not allowed",
                 n(table)
+            ),
+            SemaError::NoPrimaryKeyForReferencedTable { table } => write!(
+                f,
+                "there is no primary key for referenced table `{}`",
+                n(table)
+            ),
+            SemaError::NoUniqueConstraintForReferencedTable { table } => write!(
+                f,
+                "there is no unique constraint matching given keys for referenced table `{}`",
+                n(table)
+            ),
+            SemaError::DeferrablePrimaryKeyForReferencedTable { table } => write!(
+                f,
+                "cannot use a deferrable primary key for referenced table `{}`",
+                n(table)
+            ),
+            SemaError::DeferrableUniqueConstraintForReferencedTable { table } => write!(
+                f,
+                "cannot use a deferrable unique constraint for referenced table `{}`",
+                n(table)
+            ),
+            SemaError::RefreshConcurrentlyWithoutUniqueIndex { name } => write!(
+                f,
+                "cannot refresh materialized view `{}` concurrently",
+                n(name)
+            ),
+            SemaError::UniqueIndexNotSupported { access_method } => write!(
+                f,
+                "access method `{}` does not support unique indexes",
+                n(access_method)
             ),
             SemaError::InvalidOrdinal { clause, position } => {
                 write!(

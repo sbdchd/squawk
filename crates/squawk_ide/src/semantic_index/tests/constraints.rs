@@ -376,6 +376,82 @@ create table l6 (
 }
 
 #[test]
+fn drop_key_column_drops_constraint() {
+    assert_snapshot!(check("
+create table d (
+  a int primary key,
+  b int
+);
+alter table d drop column a;
+alter table d add primary key (b);
+
+create table r (
+  a int primary key,
+  b int,
+  c int
+);
+alter table r rename column a to x;
+alter table r drop column x;
+alter table r add primary key (b);
+
+create table l (
+  like r including indexes,
+  z int
+);
+alter table l drop column b;
+alter table l add primary key (c);
+
+create table u (
+  a int,
+  b int,
+  primary key (a, b)
+);
+alter table u drop column a;
+alter table u add primary key (b);
+
+create table k (
+  a int primary key,
+  b int
+);
+begin;
+alter table k rename column a to x;
+rollback;
+alter table k drop column a;
+alter table k add primary key (b);
+
+create table w (
+  a int,
+  b int
+);
+create unique index w_a on w (a);
+alter table w add primary key using index w_a;
+alter table w rename column a to x;
+alter table w drop column x;
+alter table w add primary key (b);
+
+create table pp (
+  a int primary key,
+  b int
+)
+  partition by range (a);
+create table pc
+  partition of pp
+  for values from (1) to (2);
+create table lp (like pc including indexes);
+alter table lp drop column a;
+alter table lp add primary key (b);
+"), @"no diagnostics");
+}
+
+#[test]
+fn rename_builtin_table_column() {
+    assert_snapshot!(check("
+create index on pg_class (relname);
+alter table pg_class rename column relname to x;
+"), @"no diagnostics");
+}
+
+#[test]
 fn conflicting_nullability() {
     assert_snapshot!(check("
 create table n1 (a int primary key null);
@@ -549,5 +625,177 @@ create table g6 (
        ╭▸ 
     24 │ alter table g5 alter column c set expression as(b + 2);
        ╰╴                                                ━
+    ");
+}
+
+#[test]
+fn foreign_key_without_matching_unique_constraint() {
+    assert_snapshot!(check("
+create table p (
+  id int primary key,
+  u int unique,
+  x int,
+  y int,
+  z int,
+  w int
+);
+create unique index on p (y, z);
+create unique index on p (w) where w > 0;
+create table c1 (pid int references p (x));
+create table c2 (
+  pid int,
+  u int,
+  foreign key (pid, u) references p (id, u)
+);
+
+create table t (a int);
+create table c3 (a int references t);
+create table c4 (
+  a int,
+  foreign key (a) references t
+);
+
+create table ok1 (pid int references p);
+create table ok2 (pid int references p (id));
+create table ok3 (pid int references p (u));
+create table ok4 (
+  a int,
+  b int,
+  foreign key (a, b) references p (z, y)
+);
+
+create table c5 (a int references p (w));
+
+create table s (
+  id int,
+  parent int references s (id),
+  primary key (id)
+);
+
+create table s2 (
+  parent int references s2,
+  id int primary key
+);
+
+create table q (id int);
+alter table q
+  add primary key (id),
+  add constraint q_fk foreign key (id) references q;
+
+create table r (
+  id int primary key,
+  u int
+);
+alter table r add constraint r_fk foreign key (u) references r (u);
+alter table r add unique (u);
+alter table r add constraint r_fk2 foreign key (u) references r (u);
+
+create table inc (
+  a int,
+  b int,
+  unique (a) include (b)
+);
+create table c6 (b int references inc (b));
+create table ok5 (a int references inc (a));
+
+create table d (id int primary key);
+alter table d drop constraint d_pkey;
+create table c7 (id int references d);
+
+create table e (
+  a int,
+  b int,
+  primary key (a, b)
+);
+create table c8 (a int references e (a));
+create table ok6 (
+  x int,
+  y int,
+  foreign key (x, y) references e (b, a)
+);
+"), @"
+    error: there is no unique constraint matching given keys for referenced table `p`
+       ╭▸ 
+    12 │ create table c1 (pid int references p (x));
+       ╰╴                                       ━
+    error: there is no unique constraint matching given keys for referenced table `p`
+       ╭▸ 
+    16 │   foreign key (pid, u) references p (id, u)
+       ╰╴                                    ━━━━━━━
+    error: there is no primary key for referenced table `t`
+       ╭▸ 
+    20 │ create table c3 (a int references t);
+       ╰╴                                  ━
+    error: there is no primary key for referenced table `t`
+       ╭▸ 
+    23 │   foreign key (a) references t
+       ╰╴                             ━
+    error: there is no unique constraint matching given keys for referenced table `p`
+       ╭▸ 
+    35 │ create table c5 (a int references p (w));
+       ╰╴                                     ━
+    error: there is no unique constraint matching given keys for referenced table `r`
+       ╭▸ 
+    57 │ alter table r add constraint r_fk foreign key (u) references r (u);
+       ╰╴                                                               ━━━
+    error: there is no unique constraint matching given keys for referenced table `inc`
+       ╭▸ 
+    66 │ create table c6 (b int references inc (b));
+       ╰╴                                       ━
+    error: there is no primary key for referenced table `d`
+       ╭▸ 
+    71 │ create table c7 (id int references d);
+       ╰╴                                   ━
+    error: there is no unique constraint matching given keys for referenced table `e`
+       ╭▸ 
+    78 │ create table c8 (a int references e (a));
+       ╰╴                                     ━
+    ");
+}
+
+#[test]
+fn foreign_key_deferrable_key() {
+    assert_snapshot!(check("
+create table p (
+  id int primary key deferrable,
+  u int unique deferrable initially deferred,
+  v int unique not deferrable,
+  w int,
+  x int,
+  unique (w) deferrable
+);
+create unique index p_w on p (w);
+create table c1 (pid int references p);
+create table c2 (u int references p (u));
+create table c3 (w int references p (w));
+create table ok1 (v int references p (v));
+create table p2 (
+  id int,
+  primary key (id) initially deferred
+);
+create table c4 (
+  id int,
+  foreign key (id) references p2
+);
+create table pa (id int primary key) partition by range (id);
+create table pa1 (id int not null);
+alter table pa attach partition pa1 for values from (0) to (10);
+create table ok2 (id int references pa1 (id));
+create table pe (a int);
+create unique index on pe ((a));
+create table ok3 (a int references pe (a));
+"), @"
+    error: cannot use a deferrable primary key for referenced table `p`
+       ╭▸ 
+    11 │ create table c1 (pid int references p);
+       ╰╴                                    ━
+    error: cannot use a deferrable unique constraint for referenced table `p`
+       ╭▸ 
+    12 │ create table c2 (u int references p (u));
+       ╰╴                                     ━
+    error: cannot use a deferrable primary key for referenced table `p2`
+       ╭▸ 
+    21 │   foreign key (id) references p2
+       ╰╴                              ━━
     ");
 }

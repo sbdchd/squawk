@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt, fmt::Write};
 
 use rowan::{TextRange, TextSize};
 
@@ -81,13 +81,13 @@ fn make_object_name(name1: &str, name2: Option<&str>, label: &str) -> String {
 }
 
 // see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/commands/indexcmds.c#L2767
-pub(crate) fn join_names<'a>(names: impl Iterator<Item = &'a str>) -> String {
+pub(crate) fn join_names(names: impl Iterator<Item = impl fmt::Display>) -> String {
     let mut joined = String::new();
     for name in names {
         if !joined.is_empty() {
             joined.push('_');
         }
-        joined.push_str(name);
+        let _ = write!(joined, "{name}");
     }
     joined
 }

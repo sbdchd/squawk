@@ -7,7 +7,7 @@ use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode, NameLike},
-    column_name::ColumnName,
+    column_name::{ColumnName, ColumnNameValue},
     sql_body::SqlBody,
 };
 
@@ -15,6 +15,7 @@ use crate::arena::{IdxRange, LayeredArena};
 use crate::comments::preceding_comment;
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
+use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
 use crate::interner::Name;
 use crate::keyed_index::GraphElementIndex;
 
@@ -66,6 +67,7 @@ impl Lowerer {
             json_paths: vec![],
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
+            pending_foreign_keys: vec![],
             generated_refs: vec![],
             function: None,
             public,
@@ -134,6 +136,7 @@ impl Lowerer {
         self.undo.clear();
         for stmt in file.value.stmts() {
             self.lower_stmt(&stmt);
+            self.check_foreign_keys();
         }
     }
 
@@ -318,6 +321,7 @@ pub(crate) struct Lowerer {
     json_paths: Vec<JsonPathId>,
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
+    pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
     public: Name,
@@ -516,6 +520,29 @@ struct RelationSource {
     name: Option<Name>,
     kind: SourceKind,
     columns: Columns,
+}
+
+struct PendingForeignKey {
+    table: TableId,
+    columns: Option<SmallVec<[Name; 4]>>,
+    ptr: InIrFile<SyntaxNodePtr>,
+}
+
+#[derive(Clone, Copy)]
+enum UniqueIndexMatch {
+    Immediate,
+    Deferrable,
+}
+
+#[derive(Clone, Copy)]
+enum KeyMatch {
+    Exact,
+    Set,
+}
+
+struct LikePrimaryKey {
+    like: ast::LikeClause,
+    source: TableId,
 }
 
 struct IndexColumns {
@@ -851,6 +878,7 @@ enum Undo {
     RemoveInheritance(Inheritance),
     SequenceOwner(TableId, SequenceOwner),
     ConstraintKind(ConstraintId, ConstraintKind),
+    IndexKey(IndexId, Option<IdxRange<Name>>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
@@ -1707,6 +1735,9 @@ impl Lowerer {
     }
 
     fn rename_column_dependents(&mut self, table: TableId, from: Name, to: Name) {
+        if !self.index.tables.is_local(table) {
+            return;
+        }
         if let Some(expression) = self.column_exprs.get(ColumnKey {
             table,
             column: from,
@@ -1743,19 +1774,39 @@ impl Lowerer {
             .rev()
             .collect();
         for id in constraints {
-            if self.dropped_constraints.contains(&id)
-                || self.index.constraints[id].kind != (ConstraintKind::NotNull { column: from })
-            {
+            if self.dropped_constraints.contains(&id) {
                 continue;
             }
-            let previous = self
-                .index
-                .constraints
-                .set_kind(id, ConstraintKind::NotNull { column: to });
-            if in_transaction {
-                self.undo.push(Undo::ConstraintKind(id, previous));
+            if self.index.constraints[id].kind == (ConstraintKind::NotNull { column: from }) {
+                let previous = self
+                    .index
+                    .constraints
+                    .set_kind(id, ConstraintKind::NotNull { column: to });
+                if in_transaction {
+                    self.undo.push(Undo::ConstraintKind(id, previous));
+                }
             }
         }
+        for id in self.index.indexes.on_table(table) {
+            if self.dropped_indexes.contains(&id) || !self.index_key_contains(id, from) {
+                continue;
+            }
+            let Some(key) = self.index.indexes[id].key else {
+                continue;
+            };
+            let key = self.index.indexes.alloc_renamed_key(key, from, to);
+            let previous = self.index.indexes.set_key(id, Some(key));
+            if in_transaction {
+                self.undo.push(Undo::IndexKey(id, previous));
+            }
+        }
+    }
+
+    fn index_key_contains(&self, index: IndexId, column: Name) -> bool {
+        self.index
+            .indexes
+            .key(index)
+            .is_some_and(|mut key| key.any(|name| name == column))
     }
 
     fn set_table_columns(&mut self, table: TableId, range: IdxRange<Column>) {
@@ -1871,8 +1922,24 @@ impl Lowerer {
     }
 
     fn lower_refresh(&mut self, refresh: &ast::Refresh) {
-        if let Some(path) = refresh.view_ref().and_then(|view| view.path_ref()) {
-            self.lower_table_ref(&path, IfMissing::Error, TableLookup::MaterializedView);
+        let Some(path) = refresh.view_ref().and_then(|view| view.path_ref()) else {
+            return;
+        };
+        let view = self.lower_table_ref(&path, IfMissing::Error, TableLookup::MaterializedView);
+        if refresh.concurrently_token().is_some()
+            && let Some(view) = view
+            && self.index.tables[view].kind == TableKind::MaterializedView
+            && self.index.tables.is_local(view)
+            && !self.dropped_tables.contains(&view)
+            && self
+                .find_unique_index(view, &|_, index| !index.partial && index.key.is_some())
+                .is_none()
+        {
+            let name = self.index.tables[view].name;
+            self.push_error(
+                path.syntax(),
+                SemaError::RefreshConcurrentlyWithoutUniqueIndex { name },
+            );
         }
     }
 
@@ -2761,6 +2828,9 @@ impl Lowerer {
                 Undo::ConstraintKind(id, kind) => {
                     self.index.constraints.set_kind(id, kind);
                 }
+                Undo::IndexKey(id, key) => {
+                    self.index.indexes.set_key(id, key);
+                }
                 Undo::TypeColumns(ty, columns) => {
                     self.index
                         .types
@@ -3073,6 +3143,20 @@ impl Lowerer {
             (columns[id].name != Some(column)).then_some(columns[id])
         });
         self.set_table_columns(table, range);
+    }
+
+    fn drop_column_indexes(&mut self, table: TableId, column: Name) {
+        for index in self.index.indexes.on_table(table) {
+            if self.dropped_indexes.contains(&index) || !self.index_key_contains(index, column) {
+                continue;
+            }
+            self.drop_index(index);
+            let constraints: SmallVec<[ConstraintId; 1]> =
+                self.index.constraints.backed_by(index).collect();
+            for constraint in constraints {
+                self.drop_constraint(constraint);
+            }
+        }
     }
 
     fn drop_column_sequences(&mut self, table: TableId, column: Name) {
@@ -9915,7 +9999,7 @@ impl Lowerer {
             }
         }
         let inherited_end = self.index.columns.next_idx();
-        let mut like_primary_keys: SmallVec<[ast::LikeClause; 1]> = SmallVec::new();
+        let mut like_primary_keys: SmallVec<[LikePrimaryKey; 1]> = SmallVec::new();
         for arg in create_table
             .table_arg_list()
             .into_iter()
@@ -9953,7 +10037,10 @@ impl Lowerer {
                         continue;
                     };
                     if like_includes_indexes(&like) && self.has_primary_key(source) {
-                        like_primary_keys.push(like.clone());
+                        like_primary_keys.push(LikePrimaryKey {
+                            like: like.clone(),
+                            source,
+                        });
                     }
                     let source_columns = &self.index.tables[source].columns;
                     complete &= source_columns.complete;
@@ -9990,7 +10077,12 @@ impl Lowerer {
         for parent in parents {
             self.add_inheritance(parent, table, inheritance_kind);
         }
-        for like in like_primary_keys {
+        for LikePrimaryKey { like, source } in like_primary_keys {
+            let key = self.copy_primary_key(source);
+            let deferrable = self
+                .inherited_primary_key(source)
+                .and_then(|constraint| self.index.constraints[constraint].index)
+                .is_some_and(|index| self.index.indexes[index].deferrable);
             if self.has_primary_key(table) {
                 let name = self.index.tables[table].name;
                 self.push_error(
@@ -10004,6 +10096,8 @@ impl Lowerer {
                 like.syntax(),
                 None,
                 None,
+                key,
+                deferrable,
                 None,
                 "pkey",
             );
@@ -12970,8 +13064,25 @@ impl Lowerer {
         target: Option<SourceId>,
         on_conflict: &ast::OnConflictClause,
     ) {
+        let table = target.and_then(|target| match self.index.sources[target].kind {
+            SourceKind::Table(table) => Some(table),
+            SourceKind::Cte(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::Returning(_)
+            | SourceKind::Excluded(_)
+            | SourceKind::RuleRelation(_)
+            | SourceKind::ElementVariable
+            | SourceKind::Other => None,
+        });
         match on_conflict.conflict_target() {
             Some(ast::ConflictTarget::ConflictOnIndex(on_index)) => {
+                if let Some(table) = table {
+                    self.check_conflict_arbiter(table, &on_index);
+                }
                 for item in on_index
                     .conflict_index_item_list()
                     .into_iter()
@@ -12990,20 +13101,6 @@ impl Lowerer {
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
-                let table = target.and_then(|target| match self.index.sources[target].kind {
-                    SourceKind::Table(table) => Some(table),
-                    SourceKind::Cte(_)
-                    | SourceKind::External
-                    | SourceKind::Subquery(_)
-                    | SourceKind::Function(_)
-                    | SourceKind::Join
-                    | SourceKind::UsingAlias
-                    | SourceKind::Returning(_)
-                    | SourceKind::Excluded(_)
-                    | SourceKind::RuleRelation(_)
-                    | SourceKind::ElementVariable
-                    | SourceKind::Other => None,
-                });
                 if let Some(name_ref) = on_constraint.constraint_name_ref() {
                     self.lower_constraint_ref(
                         table.map(ConstraintOwner::Table),
@@ -14897,6 +14994,7 @@ impl Lowerer {
             {
                 self.set_column_expr(table, name, None);
                 self.drop_column_sequences(table, name);
+                self.drop_column_indexes(table, name);
             }
             dropped.extend(column);
         }
@@ -15428,27 +15526,93 @@ impl Lowerer {
                 }
             }
         }
-        let Some(segment) = create_index
-            .index()
-            .and_then(|index| index.path())
-            .and_then(|path| path.segment())
-        else {
-            return;
-        };
-        let schema = match table {
-            Some(table) => self.index.tables[table].schema,
-            None => self
-                .lower_schema_qualifier(path.and_then(|path| path.qualifier()))
-                .unwrap_or_else(|| self.default_creation_schema()),
-        };
-        self.alloc_index(
-            IfExists::from_if_not_exists(create_index.if_not_exists().as_ref()),
-            create_index.syntax(),
-            &segment,
-            schema,
-            table,
-        );
+        let key = create_index
+            .partition_item_list()
+            .and_then(|items| self.lower_index_key(&items));
+        let unique = create_index.unique_token().is_some();
+        let partial = create_index.where_clause().is_some();
+        if unique
+            && let Some(access_method) = access_method
+            && let Some(access_method_ref) = create_index
+                .using_method()
+                .and_then(|using_method| using_method.access_method_ref())
+        {
+            let name = self.index.access_methods[access_method].name;
+            if NON_UNIQUE_INDEX_ACCESS_METHODS.contains(&self.index.names.resolve(name)) {
+                self.push_error(
+                    access_method_ref.syntax(),
+                    SemaError::UniqueIndexNotSupported {
+                        access_method: name,
+                    },
+                );
+            }
+        }
+        match create_index.index() {
+            Some(index) => {
+                let Some(segment) = index.path().and_then(|path| path.segment()) else {
+                    return;
+                };
+                let schema = match table {
+                    Some(table) => self.index.tables[table].schema,
+                    None => self
+                        .lower_schema_qualifier(path.and_then(|path| path.qualifier()))
+                        .unwrap_or_else(|| self.default_creation_schema()),
+                };
+                self.alloc_index(
+                    IfExists::from_if_not_exists(create_index.if_not_exists().as_ref()),
+                    create_index.syntax(),
+                    &segment,
+                    schema,
+                    table,
+                    key,
+                    unique,
+                    partial,
+                );
+            }
+            None => {
+                let Some(table) = table else {
+                    return;
+                };
+                let Table { schema, name, .. } = self.index.tables[table];
+                let addition = index_column_names(create_index);
+                let name = postgres::choose_relation_name(
+                    self.index.names.resolve(name),
+                    Some(&addition),
+                    "idx",
+                    |name| self.relation_name_exists(schema, name),
+                    |_| false,
+                );
+                let name = self.intern(&name);
+                let ptr = self.ptr(create_index.syntax());
+                let id = self.index.indexes.alloc(Index {
+                    schema,
+                    name,
+                    table: Some(table),
+                    key,
+                    unique,
+                    partial,
+                    deferrable: false,
+                    ptr,
+                    name_ptr: ptr,
+                });
+                self.record_comment(create_index.syntax(), Item::Index(id));
+            }
+        }
         self.depend_on_refs(refs, self.index.indexes.range_from(start), Object::Index);
+    }
+
+    fn lower_index_key(&mut self, items: &ast::PartitionItemList) -> Option<IdxRange<Name>> {
+        let key: Option<SmallVec<[Name; 4]>> = items
+            .partition_items()
+            .map(|item| {
+                let Some(ast::Expr::NameRef(name_ref)) = item.expr().map(|expr| expr.unparen())
+                else {
+                    return None;
+                };
+                self.name_ref_name(&name_ref)
+            })
+            .collect();
+        Some(self.index.indexes.alloc_key(key?))
     }
 
     fn lower_trigger_function(&mut self, callee: &ast::Expr, kind: TriggerFunctionKind) {
@@ -17189,12 +17353,19 @@ impl Lowerer {
         let name = primary_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
+        let key = index.is_none().then(|| {
+            self.index
+                .indexes
+                .alloc_key(columns[..key_len].iter().copied())
+        });
         self.alloc_index_constraint(
             ConstraintKind::PrimaryKey,
             table,
             primary_key.syntax(),
             name,
             index,
+            key,
+            is_deferrable(primary_key.constraint_options()),
             None,
             "pkey",
         );
@@ -17203,12 +17374,24 @@ impl Lowerer {
         }
     }
 
+    fn copy_primary_key(&mut self, table: TableId) -> Option<IdxRange<Name>> {
+        let index = self.index.constraints[self.inherited_primary_key(table)?].index?;
+        let key = self.index.indexes[index].key?;
+        Some(self.index.indexes.alloc_key_copies(key))
+    }
+
     fn has_primary_key(&self, table: TableId) -> bool {
-        self.find_primary_key(table).is_some()
-            || self.inheritances.parents(table).iter().any(|inheritance| {
-                inheritance.kind == InheritanceKind::Partition
-                    && self.has_primary_key(inheritance.parent)
-            })
+        self.inherited_primary_key(table).is_some()
+    }
+
+    fn inherited_primary_key(&self, table: TableId) -> Option<ConstraintId> {
+        self.find_primary_key(table).or_else(|| {
+            self.inheritances
+                .parents(table)
+                .iter()
+                .filter(|inheritance| inheritance.kind == InheritanceKind::Partition)
+                .find_map(|inheritance| self.inherited_primary_key(inheritance.parent))
+        })
     }
 
     fn find_primary_key(&self, table: TableId) -> Option<ConstraintId> {
@@ -17227,7 +17410,7 @@ impl Lowerer {
         column: Option<Name>,
         unique: &ast::UniqueConstraint,
     ) {
-        let IndexColumns { columns, .. } =
+        let IndexColumns { columns, key_len } =
             self.lower_index_parameters(table, column, unique.index_parameters());
         let index = unique
             .using_index()
@@ -17243,12 +17426,19 @@ impl Lowerer {
                 .iter()
                 .map(|column| self.index.names.resolve(*column)),
         );
+        let key = index.is_none().then(|| {
+            self.index
+                .indexes
+                .alloc_key(columns[..key_len].iter().copied())
+        });
         self.alloc_index_constraint(
             ConstraintKind::Unique,
             table,
             unique.syntax(),
             name,
             index,
+            key,
+            is_deferrable(unique.constraint_options()),
             Some(&addition),
             "key",
         );
@@ -17689,6 +17879,8 @@ impl Lowerer {
             exclude.syntax(),
             name,
             None,
+            None,
+            is_deferrable(exclude.constraint_options()),
             Some(&addition),
             "excl",
         );
@@ -17702,15 +17894,34 @@ impl Lowerer {
     ) {
         let refs = self.index.references.next_idx();
         let columns = self.lower_foreign_key_columns(table, foreign_key.from_columns());
-        let referenced = foreign_key
-            .table_name_ref()
+        let table_name_ref = foreign_key.table_name_ref();
+        let referenced = table_name_ref
+            .as_ref()
             .and_then(|name| name.path_ref())
             .and_then(|path| self.lower_table_ref(&path, IfMissing::Error, TableLookup::Table));
-        self.lower_foreign_key_columns(referenced, foreign_key.to_columns());
+        let to_columns = foreign_key.to_columns();
+        let referenced_columns = self.lower_foreign_key_columns(referenced, to_columns.clone());
         self.lower_referential_actions(table, foreign_key.referential_actions());
         let Some(table) = table else {
             return;
         };
+        if let Some(referenced) = referenced
+            && let Some(table_name_ref) = table_name_ref
+        {
+            match to_columns {
+                Some(list) if list.period_column().is_some() => {}
+                Some(list) => self.pending_foreign_keys.push(PendingForeignKey {
+                    table: referenced,
+                    columns: Some(referenced_columns),
+                    ptr: self.ptr(list.syntax()),
+                }),
+                None => self.pending_foreign_keys.push(PendingForeignKey {
+                    table: referenced,
+                    columns: None,
+                    ptr: self.ptr(table_name_ref.syntax()),
+                }),
+            }
+        }
         let name = match foreign_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name())
@@ -17746,17 +17957,31 @@ impl Lowerer {
         references: &ast::ReferencesConstraint,
     ) {
         let refs = self.index.references.next_idx();
-        let referenced = references
-            .table()
+        let table_name_ref = references.table();
+        let referenced = table_name_ref
+            .as_ref()
             .and_then(|name| name.path_ref())
             .and_then(|path| self.lower_table_ref(&path, IfMissing::Error, TableLookup::Table));
-        if let Some(column_ref) = references.column() {
-            self.lower_constraint_column_ref(referenced, &column_ref);
-        }
+        let column_ref = references.column();
+        let referenced_column = column_ref
+            .as_ref()
+            .map(|column_ref| self.lower_constraint_column_ref(referenced, column_ref));
         self.lower_referential_actions(table, references.referential_actions());
         let Some(table) = table else {
             return;
         };
+        if let Some(referenced) = referenced
+            && let Some(node) = column_ref
+                .as_ref()
+                .map(|column_ref| column_ref.syntax())
+                .or_else(|| table_name_ref.as_ref().map(|name| name.syntax()))
+        {
+            self.pending_foreign_keys.push(PendingForeignKey {
+                table: referenced,
+                columns: referenced_column.map(|column| smallvec![column]),
+                ptr: self.ptr(node),
+            });
+        }
         let name = match references
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name())
@@ -17797,6 +18022,177 @@ impl Lowerer {
             columns.push(self.lower_constraint_column_ref(table, &column_ref));
         }
         columns
+    }
+
+    fn check_foreign_keys(&mut self) {
+        let mut pending = std::mem::take(&mut self.pending_foreign_keys);
+        for foreign_key in pending.drain(..) {
+            self.check_foreign_key(foreign_key);
+        }
+        self.pending_foreign_keys = pending;
+    }
+
+    fn check_foreign_key(&mut self, foreign_key: PendingForeignKey) {
+        let PendingForeignKey {
+            table,
+            columns,
+            ptr,
+        } = foreign_key;
+        if !self.keys_known(table) {
+            return;
+        }
+        let Table {
+            name,
+            columns: table_columns,
+            ..
+        } = self.index.tables[table];
+        let error = match columns {
+            None => match self.inherited_primary_key(table) {
+                None => SemaError::NoPrimaryKeyForReferencedTable { table: name },
+                Some(constraint) => {
+                    if self.index.constraints[constraint]
+                        .index
+                        .is_none_or(|index| !self.index.indexes[index].deferrable)
+                    {
+                        return;
+                    }
+                    SemaError::DeferrablePrimaryKeyForReferencedTable { table: name }
+                }
+            },
+            Some(columns) => {
+                if !table_columns.complete
+                    || columns
+                        .iter()
+                        .any(|column| !self.columns_contain(table_columns.range, *column))
+                {
+                    return;
+                }
+                let found = self.find_unique_index(table, &|id, index| {
+                    !index.partial && self.index_key_matches(id, &columns, KeyMatch::Exact)
+                });
+                match found {
+                    Some(UniqueIndexMatch::Immediate) => return,
+                    Some(UniqueIndexMatch::Deferrable) => {
+                        SemaError::DeferrableUniqueConstraintForReferencedTable { table: name }
+                    }
+                    None => SemaError::NoUniqueConstraintForReferencedTable { table: name },
+                }
+            }
+        };
+        self.push_error_ptr(ptr, error);
+    }
+
+    fn check_conflict_arbiter(&mut self, table: TableId, on_index: &ast::ConflictOnIndex) {
+        if self.function.is_some() || !self.keys_known(table) {
+            return;
+        }
+        let table_columns = self.index.tables[table].columns;
+        let Some(list) = on_index.conflict_index_item_list() else {
+            return;
+        };
+        if !table_columns.complete {
+            return;
+        }
+        let columns: Option<SmallVec<[Name; 4]>> = list
+            .conflict_index_items()
+            .map(|item| {
+                if item.collate().is_some() || item.op_class_ref().is_some() {
+                    return None;
+                }
+                let ast::Expr::NameRef(name_ref) = item.expr()?.unparen() else {
+                    return None;
+                };
+                let name = self.name_ref_name(&name_ref)?;
+                self.columns_contain(table_columns.range, name)
+                    .then_some(name)
+            })
+            .collect();
+        let Some(columns) = columns else {
+            return;
+        };
+        if columns.is_empty() {
+            return;
+        }
+        let predicate = on_index.where_clause().is_some();
+        let found = self.find_unique_index(table, &|id, index| {
+            (!index.partial || predicate) && self.index_key_matches(id, &columns, KeyMatch::Set)
+        });
+        let error = match found {
+            Some(UniqueIndexMatch::Immediate) => return,
+            Some(UniqueIndexMatch::Deferrable) => SemaError::DeferrableConflictArbiter,
+            None => SemaError::NoConflictArbiter,
+        };
+        self.push_error(list.syntax(), error);
+    }
+
+    fn keys_known(&self, table: TableId) -> bool {
+        let Table {
+            kind,
+            constraints_complete,
+            ..
+        } = self.index.tables[table];
+        let is_table = match kind {
+            TableKind::Table => true,
+            TableKind::ForeignTable
+            | TableKind::View
+            | TableKind::MaterializedView
+            | TableKind::Sequence
+            | TableKind::PropertyGraph => false,
+        };
+        is_table
+            && constraints_complete
+            && self.index.tables.is_local(table)
+            && !self.dropped_tables.contains(&table)
+    }
+
+    fn find_unique_index(
+        &self,
+        table: TableId,
+        matches: &impl Fn(IndexId, &Index) -> bool,
+    ) -> Option<UniqueIndexMatch> {
+        let mut found = None;
+        for id in self.index.indexes.on_table(table) {
+            let index = &self.index.indexes[id];
+            if !index.unique || self.dropped_indexes.contains(&id) || !matches(id, index) {
+                continue;
+            }
+            if !index.deferrable {
+                return Some(UniqueIndexMatch::Immediate);
+            }
+            found = Some(UniqueIndexMatch::Deferrable);
+        }
+        for inheritance in self.inheritances.parents(table) {
+            if inheritance.kind != InheritanceKind::Partition {
+                continue;
+            }
+            match self.find_unique_index(inheritance.parent, matches) {
+                Some(UniqueIndexMatch::Immediate) => return Some(UniqueIndexMatch::Immediate),
+                Some(UniqueIndexMatch::Deferrable) => found = Some(UniqueIndexMatch::Deferrable),
+                None => {}
+            }
+        }
+        found
+    }
+
+    fn index_key_matches(&self, index: IndexId, columns: &[Name], kind: KeyMatch) -> bool {
+        let Some(key) = self.index.indexes.key(index) else {
+            return false;
+        };
+        let mut len = 0;
+        for column in key {
+            if !columns.contains(&column) {
+                return false;
+            }
+            len += 1;
+        }
+        let len_matches = match kind {
+            KeyMatch::Exact => len == columns.len(),
+            KeyMatch::Set => true,
+        };
+        len_matches
+            && columns
+                .iter()
+                .all(|column| self.index_key_contains(index, *column))
     }
 
     fn lower_referential_actions(
@@ -20658,6 +21054,9 @@ impl Lowerer {
         segment: &ast::PathSegment,
         schema: Name,
         table: Option<TableId>,
+        key: Option<IdxRange<Name>>,
+        unique: bool,
+        partial: bool,
     ) -> Option<IndexId> {
         let name = self.intern(&segment.text());
         if self.relation_exists(schema, name) {
@@ -20670,6 +21069,10 @@ impl Lowerer {
             schema,
             name,
             table,
+            key,
+            unique,
+            partial,
+            deferrable: false,
             ptr: self.ptr(node),
             name_ptr: self.ptr(segment.syntax()),
         });
@@ -21061,6 +21464,8 @@ impl Lowerer {
         node: &SyntaxNode,
         name: Option<ast::ConstraintName>,
         using_index: Option<IndexId>,
+        key: Option<IdxRange<Name>>,
+        deferrable: bool,
         addition: Option<&str>,
         label: &str,
     ) -> ConstraintId {
@@ -21094,11 +21499,23 @@ impl Lowerer {
         if using_index.is_some() {
             return constraint_id;
         }
+        let unique = match kind {
+            ConstraintKind::PrimaryKey | ConstraintKind::Unique => true,
+            ConstraintKind::Check
+            | ConstraintKind::NotNull { .. }
+            | ConstraintKind::ForeignKey
+            | ConstraintKind::Exclude
+            | ConstraintKind::DomainNotNull => false,
+        };
         let constraint = &self.index.constraints[constraint_id];
         let index = self.index.indexes.alloc(Index {
             schema,
             name: constraint.name,
             table: Some(table),
+            key,
+            unique,
+            partial: false,
+            deferrable,
             ptr: constraint.ptr,
             name_ptr: constraint.name_ptr,
         });
@@ -21800,6 +22217,40 @@ fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {
         | ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::Table(_) => None,
     }
+}
+
+fn index_column_names(create_index: &ast::CreateIndex) -> String {
+    let items = create_index
+        .partition_item_list()
+        .into_iter()
+        .chain(
+            create_index
+                .index_include_clause()
+                .and_then(|include| include.partition_item_list()),
+        )
+        .flat_map(|list| list.partition_items());
+    postgres::join_names(items.map(
+        |item| match item.expr().and_then(ColumnName::inferred_from_expr) {
+            Some(ColumnName::Column(name) | ColumnName::UnknownColumn(Some(name))) => name,
+            Some(ColumnName::UnknownColumn(None) | ColumnName::Star) | None => {
+                ColumnNameValue::Static("expr")
+            }
+        },
+    ))
+}
+
+fn is_deferrable(mut options: ast::AstChildren<ast::ConstraintOption>) -> bool {
+    options.any(|option| match option {
+        ast::ConstraintOption::DeferrableConstraintOption(_)
+        | ast::ConstraintOption::InitiallyDeferredConstraintOption(_) => true,
+        ast::ConstraintOption::NotDeferrableConstraintOption(_)
+        | ast::ConstraintOption::InitiallyImmediateConstraintOption(_)
+        | ast::ConstraintOption::NotValid(_)
+        | ast::ConstraintOption::NoInherit(_)
+        | ast::ConstraintOption::Inherit(_)
+        | ast::ConstraintOption::NotEnforced(_)
+        | ast::ConstraintOption::Enforced(_) => false,
+    })
 }
 
 fn like_includes_indexes(like: &ast::LikeClause) -> bool {

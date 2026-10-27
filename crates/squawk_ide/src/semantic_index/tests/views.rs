@@ -336,3 +336,45 @@ create view z (a, b) as select * from missing;
       ╰╴                               ━
     ");
 }
+
+#[test]
+fn refresh_concurrently_without_unique_index() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int
+);
+create materialized view mv as
+  select a, b from t;
+refresh materialized view concurrently mv;
+create unique index mv_lower on mv (lower(b::text));
+create unique index mv_partial on mv (a) where a > 0;
+refresh materialized view concurrently mv;
+refresh materialized view mv;
+create unique index mv_a on mv ((a));
+refresh materialized view concurrently mv;
+drop index mv_a;
+refresh materialized view concurrently mv;
+create unique index on mv (a, b);
+refresh materialized view concurrently mv;
+"), @"
+    error: cannot refresh materialized view `mv` concurrently
+      ╭▸ 
+    8 │ refresh materialized view concurrently mv;
+      │                                        ━━
+      │
+      ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+    error: cannot refresh materialized view `mv` concurrently
+       ╭▸ 
+    11 │ refresh materialized view concurrently mv;
+       │                                        ━━
+       │
+       ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+    error: cannot refresh materialized view `mv` concurrently
+       ╭▸ 
+    16 │ refresh materialized view concurrently mv;
+       │                                        ━━
+       │
+       ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+    ");
+}

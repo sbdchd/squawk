@@ -63,9 +63,20 @@ impl<T> LayeredArena<T> {
     where
         T: Copy,
     {
+        self.alloc_mapped_copies(ids, |value| value)
+    }
+
+    pub(crate) fn alloc_mapped_copies(
+        &mut self,
+        ids: impl IntoIterator<Item = Idx<T>>,
+        f: impl Fn(T) -> T,
+    ) -> IdxRange<T>
+    where
+        T: Copy,
+    {
         let start = idx(self.len());
         for id in ids {
-            let value = self[id];
+            let value = f(self[id]);
             self.local.push(value);
         }
         IdxRange::new(start, self.next_idx())

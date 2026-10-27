@@ -235,3 +235,73 @@ drop index im;
       ╰╴                    ━
     ");
 }
+
+#[test]
+fn unnamed_index_generated_name() {
+    assert_snapshot!(check("
+create table ti (a int, b int);
+create index on ti (a);
+create unique index on ti (a);
+create index on ti (lower(b::text)) include (b);
+drop index ti_a_idx;
+drop index ti_a_idx1;
+drop index ti_expr_b_idx;
+drop index ti_lower_b_idx;
+create index on ti (a);
+create index ti_a_idx on ti (b);
+"), @"
+    error: index `ti_expr_b_idx` does not exist
+      ╭▸ 
+    8 │ drop index ti_expr_b_idx;
+      ╰╴           ━━━━━━━━━━━━━
+    error: relation `ti_a_idx` already exists
+       ╭▸ 
+    11 │ create index ti_a_idx on ti (b);
+       ╰╴             ━━━━━━━━
+    ");
+}
+
+#[test]
+fn unique_index_unsupported_access_method() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  r int4range,
+  v tsvector
+);
+create unique index on t using btree (a);
+create unique index on t using hash (a);
+create unique index on t using gist (r);
+create unique index on t using gin (v);
+create unique index on t using spgist (r);
+create unique index on t using brin (a);
+create index on t using gin (v);
+create extension bloom;
+create unique index on t using bloom (a);
+"), @"
+    error: access method `hash` does not support unique indexes
+      ╭▸ 
+    8 │ create unique index on t using hash (a);
+      ╰╴                               ━━━━
+    error: access method `gist` does not support unique indexes
+      ╭▸ 
+    9 │ create unique index on t using gist (r);
+      ╰╴                               ━━━━
+    error: access method `gin` does not support unique indexes
+       ╭▸ 
+    10 │ create unique index on t using gin (v);
+       ╰╴                               ━━━
+    error: access method `spgist` does not support unique indexes
+       ╭▸ 
+    11 │ create unique index on t using spgist (r);
+       ╰╴                               ━━━━━━
+    error: access method `brin` does not support unique indexes
+       ╭▸ 
+    12 │ create unique index on t using brin (a);
+       ╰╴                               ━━━━
+    error: access method `bloom` does not support unique indexes
+       ╭▸ 
+    15 │ create unique index on t using bloom (a);
+       ╰╴                               ━━━━━
+    ");
+}
