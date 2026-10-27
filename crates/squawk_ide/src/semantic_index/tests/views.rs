@@ -265,7 +265,7 @@ alter view v rename column nope to d;
       ╭▸ 
     5 │ select a from v;
       ╰╴       ━
-    error: column `b` of relation `v` already exists
+    error: column `v.b` already exists
       ╭▸ 
     6 │ alter view v rename column c to b;
       ╰╴                                ━

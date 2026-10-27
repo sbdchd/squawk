@@ -406,7 +406,7 @@ select c from t;
       ╭▸ 
     4 │ select a from t;
       ╰╴       ━
-    error: column `b` of relation `t` already exists
+    error: column `t.b` already exists
       ╭▸ 
     6 │ alter table t rename c to b;
       ╰╴                          ━
@@ -447,7 +447,7 @@ select h from t;
       ╭▸ 
     6 │ alter table t add c int check (c > 0 and nope > 0), add column d int references r (x);
       ╰╴                                         ━━━━
-    error: column `a` of relation `t` already exists
+    error: column `t.a` already exists
       ╭▸ 
     8 │ alter table t add column a int;
       ╰╴                         ━

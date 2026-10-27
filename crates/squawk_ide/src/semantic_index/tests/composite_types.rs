@@ -146,7 +146,7 @@ alter type t add attribute d nope_type;
       ╭▸ 
     6 │ alter type t drop attribute b;
       ╰╴                            ━
-    error: column `a` of relation `t` already exists
+    error: column `t.a` already exists
       ╭▸ 
     8 │ alter type t add attribute a int;
       ╰╴                           ━
@@ -193,7 +193,7 @@ alter type t rename attribute nope to y;
       ╭▸ 
     5 │ select (null::t).a;
       ╰╴                 ━
-    error: column `b` of relation `t` already exists
+    error: column `t.b` already exists
       ╭▸ 
     6 │ alter type t rename attribute x to b;
       ╰╴                                   ━

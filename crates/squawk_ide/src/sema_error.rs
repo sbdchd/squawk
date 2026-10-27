@@ -1120,12 +1120,9 @@ impl fmt::Display for ErrorMessage<'_> {
                     n(owner)
                 )
             }
-            SemaError::DuplicateColumn { name, relation } => write!(
-                f,
-                "column `{}` of relation `{}` already exists",
-                n(name),
-                n(relation)
-            ),
+            SemaError::DuplicateColumn { name, relation } => {
+                write!(f, "column `{}.{}` already exists", n(relation), n(name))
+            }
             SemaError::DuplicateFunction { name, schema } => {
                 write!(
                     f,
@@ -1288,9 +1285,9 @@ impl fmt::Display for ErrorMessage<'_> {
             }
             SemaError::NotIdentityColumn { column, relation } => write!(
                 f,
-                "column `{}` of relation `{}` is not an identity column",
-                n(column),
-                n(relation)
+                "column `{}.{}` is not an identity column",
+                n(relation),
+                n(column)
             ),
             SemaError::ConstraintTrigger { name, relation } => write!(
                 f,

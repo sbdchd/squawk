@@ -413,7 +413,7 @@ alter table u alter column a drop identity;
       ╭▸ 
     5 │ select last_value from t_a_seq;
       ╰╴                       ━━━━━━━
-    error: column `a` of relation `t` is not an identity column
+    error: column `t.a` is not an identity column
       ╭▸ 
     6 │ alter table t alter column a drop identity;
       ╰╴                           ━
@@ -421,7 +421,7 @@ alter table u alter column a drop identity;
       ╭▸ 
     8 │ alter table t alter column nope drop identity;
       ╰╴                           ━━━━
-    error: column `c` of relation `t` is not an identity column
+    error: column `t.c` is not an identity column
        ╭▸ 
     15 │ alter table t alter column c drop identity;
        ╰╴                           ━
