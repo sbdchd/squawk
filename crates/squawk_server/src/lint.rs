@@ -124,6 +124,16 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
             .filter_map(|x| to_text_edit(x, line_index))
             .collect();
 
+        let mut message = violation.message.into_owned();
+        if let Some(note) = violation.note {
+            message.push_str("\nnote: ");
+            message.push_str(&note);
+        }
+        if let Some(help) = violation.help {
+            message.push_str("\nhelp: ");
+            message.push_str(&help);
+        }
+
         let data = AssociatedDiagnosticData {
             title,
             edits,
@@ -139,7 +149,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
                 href: Url::parse(&format!("https://squawkhq.com/docs/{}", violation.code)).unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: Message::String(violation.message.into_owned()),
+            message: Message::String(message),
             data: Some(serde_json::to_value(data).unwrap()),
             ..Default::default()
         };
@@ -208,8 +218,10 @@ create table t(b int);
         2:13 Error semantic-error: relation `t` already exists
         1:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
         1:17 Warning prefer-bigint-over-int: Using 32-bit integer fields can result in hitting the max `int` limit.
+        help: Use 64-bit integer values instead to prevent hitting this limit.
         2:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
         2:17 Warning prefer-bigint-over-int: Using 32-bit integer fields can result in hitting the max `int` limit.
+        help: Use 64-bit integer values instead to prevent hitting this limit.
         ");
     }
 
@@ -233,6 +245,7 @@ create table t(a varchar(10));
         assert_snapshot!(check(sql), @"
         1:0 Warning prefer-robust-stmts: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
         1:17 Warning prefer-text-field: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
+        help: Use a `TEXT` field with a `CHECK` constraint.
         ");
     }
 }

@@ -309,8 +309,11 @@ create table users (
                 code: RequireLockTimeout,
                 message: "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
                 text_range: 0..32,
+                note: Some(
+                    "statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes",
+                ),
                 help: Some(
-                    "Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.",
+                    "configure a `lock_timeout` before this statement",
                 ),
                 fix: Some(
                     Fix {
@@ -330,6 +333,7 @@ create table users (
                 code: RequireStatementTimeout,
                 message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 0..32,
+                note: None,
                 help: Some(
                     "Configure a `statement_timeout` before this statement",
                 ),
@@ -351,6 +355,7 @@ create table users (
                 code: PreferRobustStmts,
                 message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
                 text_range: 14..31,
+                note: None,
                 help: None,
                 fix: Some(
                     Fix {
@@ -370,6 +375,7 @@ create table users (
                 code: BanCharField,
                 message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
                 text_range: 27..31,
+                note: None,
                 help: None,
                 fix: Some(
                     Fix {

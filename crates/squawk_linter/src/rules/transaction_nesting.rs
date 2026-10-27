@@ -8,7 +8,7 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     let mut in_explicit_transaction = false;
-    let assume_in_transaction_help = "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.";
+    let assume_in_transaction_help = "move these statements to a separate migration file, or turn off the `assume-in-transaction` setting";
 
     for stmt in file.stmts() {
         match stmt {

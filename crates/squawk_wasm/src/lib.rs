@@ -320,7 +320,7 @@ impl SquawkDatabase {
                 .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                 .unwrap();
 
-            let messages = x.help.into_iter().collect();
+            let messages = x.note.into_iter().chain(x.help).collect();
 
             let fix = x.fix.map(|fix| {
                 let edits = fix

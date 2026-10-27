@@ -55,6 +55,7 @@ fn check_sql(
                     column: line_col.col as usize,
                     column_end: line_end.col as usize,
                     level: ViolationLevel::Error,
+                    note: None,
                     help: e.hint().map(|hint| hint.to_owned().into()),
                     range: e.range(),
                     message: e.message().to_owned().into(),
@@ -85,6 +86,7 @@ fn check_sql(
                 column: line_col.col as usize,
                 column_end: line_end.col as usize,
                 range: e.text_range,
+                note: e.note,
                 help: e.help,
                 level: ViolationLevel::Warning,
                 message: e.message,
@@ -130,6 +132,10 @@ fn render_lint_error<W: std::io::Write>(
         title = title.id_url(format!("https://squawkhq.com/docs/{}", err.rule_name));
     }
     let mut group = title.element(snippet);
+
+    if let Some(note) = &err.note {
+        group = group.element(Level::NOTE.message(note.as_ref()));
+    }
 
     if let Some(help) = &err.help {
         group = group.element(Level::HELP.message(help.as_ref()));
@@ -318,6 +324,7 @@ pub(crate) struct ReportViolation {
     pub range: TextRange,
     pub level: ViolationLevel,
     pub message: Cow<'static, str>,
+    pub note: Option<Cow<'static, str>>,
     pub help: Option<Cow<'static, str>>,
     pub rule_name: String,
     pub column_end: usize,
@@ -443,6 +450,12 @@ fn make_fingerprint(v: &ReportViolation) -> String {
 
 fn to_gitlab_issue(v: &ReportViolation) -> GitLabIssue {
     let mut desc = v.message.to_string();
+    if let Some(note) = &v.note
+        && !note.trim().is_empty()
+    {
+        desc.push_str(" Note: ");
+        desc.push_str(note.trim());
+    }
     if let Some(help) = &v.help
         && !help.trim().is_empty()
     {
@@ -531,7 +544,7 @@ select (;
         let mut buff = vec![];
         let res = check_sql(error_sql, "test.sql", &[], &[], None, false);
         fmt_json(&mut buff, vec![res]).unwrap();
-        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"test.sql","line":0,"column":36,"level":"Error","message":"missing comma","help":null,"rule_name":"syntax-error","column_end":36,"line_end":0}]"#);
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"test.sql","line":0,"column":36,"level":"Error","message":"missing comma","note":null,"help":null,"rule_name":"syntax-error","column_end":36,"line_end":0}]"#);
     }
 }
 
@@ -655,7 +668,7 @@ SELECT 1;
         );
 
         assert!(res.is_ok());
-        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"main.sql","line":1,"column":3,"level":"Warning","message":"Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations","help":"Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.","rule_name":"require-lock-timeout","column_end":63,"line_end":1},{"file":"main.sql","line":1,"column":3,"level":"Warning","message":"Missing `set statement_timeout` before potentially slow operations","help":"Configure a `statement_timeout` before this statement","rule_name":"require-statement-timeout","column_end":63,"line_end":1},{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":46,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":53,"line_end":1},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":40,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":47,"line_end":2}]"#);
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"main.sql","line":1,"column":3,"level":"Warning","message":"Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations","note":"statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes","help":"configure a `lock_timeout` before this statement","rule_name":"require-lock-timeout","column_end":63,"line_end":1},{"file":"main.sql","line":1,"column":3,"level":"Warning","message":"Missing `set statement_timeout` before potentially slow operations","note":null,"help":"Configure a `statement_timeout` before this statement","rule_name":"require-statement-timeout","column_end":63,"line_end":1},{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","note":null,"help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","note":null,"help":null,"rule_name":"prefer-robust-stmts","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":46,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","note":null,"help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":53,"line_end":1},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","note":null,"help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","note":null,"help":null,"rule_name":"prefer-robust-stmts","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":40,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","note":null,"help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":47,"line_end":2}]"#);
     }
 
     #[test]
@@ -677,7 +690,7 @@ SELECT 1;
 
         assert!(res.is_ok());
 
-        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"description":"Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations Suggestion: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.","severity":"minor","fingerprint":"b88b359e28f6fbbe","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"require-lock-timeout"},{"description":"Missing `set statement_timeout` before potentially slow operations Suggestion: Configure a `statement_timeout` before this statement","severity":"minor","fingerprint":"8b173726eea201aa","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"require-statement-timeout"},{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"87fbb54d93cdb8c9","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"21df0ee3817ad84","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"3d0e81dc13bc8757","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-bigint-over-int"},{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"4bdd655ad8e102ad","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"1b2e8c81e717c442","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"2bed2a431803b811","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-bigint-over-int"}]"#);
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"description":"Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations Note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes Suggestion: configure a `lock_timeout` before this statement","severity":"minor","fingerprint":"b88b359e28f6fbbe","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"require-lock-timeout"},{"description":"Missing `set statement_timeout` before potentially slow operations Suggestion: Configure a `statement_timeout` before this statement","severity":"minor","fingerprint":"8b173726eea201aa","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"require-statement-timeout"},{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"87fbb54d93cdb8c9","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"21df0ee3817ad84","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"3d0e81dc13bc8757","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-bigint-over-int"},{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"4bdd655ad8e102ad","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"1b2e8c81e717c442","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"2bed2a431803b811","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-bigint-over-int"}]"#);
     }
 
     #[test]

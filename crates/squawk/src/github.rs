@@ -380,6 +380,7 @@ mod test_github_comment {
                 range: TextRange::new(TextSize::new(7), TextSize::new(8)),
                 message: "Adding a NOT NULL field requires exclusive locks and table rewrites."
                     .into(),
+                note: None,
                 help: Some("Make the field nullable.".into()),
                 column_end: 9,
                 line_end: 1,
@@ -473,6 +474,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
                 rule_name: "prefer-bigint-over-int".to_string(),
                 range: TextRange::new(TextSize::new(0), TextSize::new(0)),
                 message: "Prefer bigint over int.".into(),
+                note: None,
                 help: Some("Use bigint instead.".into()),
                 column_end: 0,
                 line_end: 1,
@@ -508,6 +510,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
                 rule_name: "prefer-bigint-over-int".to_string(),
                 range: TextRange::new(TextSize::new(0), TextSize::new(0)),
                 message: "Prefer bigint over int.".into(),
+                note: None,
                 help: Some("Use bigint instead.".into()),
                 column_end: 0,
                 line_end: 1,

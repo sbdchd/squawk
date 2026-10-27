@@ -63,9 +63,11 @@ fn check_ty_for_timestamp(ctx: &mut Linter, ty: Option<ast::Type>) {
         let fix = fix_timestamp(&ty);
         ctx.report(Violation::for_node(
                 Rule::PreferTimestampTz,
-            "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.".into(),
+            "`timestamp` drops the UTC offset when storing a datetime".into(),
                 ty.syntax(),
-            ).help("Use `timestamptz` instead of `timestamp` for your column type.").fix(fix));
+            )
+            .note("`2019-10-11 21:11:24+02` and `2019-10-11 21:11:24-06` are both stored as `2019-10-11 21:11:24`, even though they are eight hours apart")
+            .help("use `timestamptz` instead of `timestamp`").fix(fix));
     }
 }
 

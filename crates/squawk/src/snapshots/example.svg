@@ -1,4 +1,4 @@
-<svg width="1465px" height="1460px" xmlns="http://www.w3.org/2000/svg">
+<svg width="1465px" height="1478px" xmlns="http://www.w3.org/2000/svg">
   <style>
     .fg { fill: #AAAAAA }
     .bg { fill: #000000 }
@@ -118,69 +118,71 @@
 </tspan>
     <tspan x="10px" y="874px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="892px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Configure a `lock_timeout` before this statement. Statement requires: SHARE lock; blocking: writes, schema changes.</tspan>
+    <tspan x="10px" y="892px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">note</tspan><tspan>: statement requires: SHARE lock; blocking: writes, schema changes</tspan>
 </tspan>
-    <tspan x="10px" y="910px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
+    <tspan x="10px" y="910px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: configure a `lock_timeout` before this statement</tspan>
 </tspan>
-    <tspan x="10px" y="928px"><tspan class="fg-bright-blue bold"> 1</tspan><tspan> </tspan><tspan class="fg-bright-green">+ set lock_timeout = '1s';</tspan>
+    <tspan x="10px" y="928px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
 </tspan>
-    <tspan x="10px" y="946px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
+    <tspan x="10px" y="946px"><tspan class="fg-bright-blue bold"> 1</tspan><tspan> </tspan><tspan class="fg-bright-green">+ set lock_timeout = '1s';</tspan>
 </tspan>
-    <tspan x="10px" y="964px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-statement-timeout">require-statement-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set statement_timeout` before potentially slow operations</tspan>
+    <tspan x="10px" y="964px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="982px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:10:1</tspan>
+    <tspan x="10px" y="982px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-statement-timeout">require-statement-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set statement_timeout` before potentially slow operations</tspan>
 </tspan>
-    <tspan x="10px" y="1000px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
+    <tspan x="10px" y="1000px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:10:1</tspan>
 </tspan>
-    <tspan x="10px" y="1018px"><tspan class="fg-bright-blue bold">10</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> CREATE INDEX "field_name_idx" ON "table_name" ("field_name");</tspan>
+    <tspan x="10px" y="1018px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1036px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="10px" y="1036px"><tspan class="fg-bright-blue bold">10</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> CREATE INDEX "field_name_idx" ON "table_name" ("field_name");</tspan>
 </tspan>
-    <tspan x="10px" y="1054px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
+    <tspan x="10px" y="1054px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
 </tspan>
-    <tspan x="10px" y="1072px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Configure a `statement_timeout` before this statement</tspan>
+    <tspan x="10px" y="1072px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1090px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
+    <tspan x="10px" y="1090px"><tspan>   </tspan><tspan class="fg-bright-blue bold">├ </tspan><tspan class="bold">help</tspan><tspan>: Configure a `statement_timeout` before this statement</tspan>
 </tspan>
-    <tspan x="10px" y="1108px"><tspan class="fg-bright-blue bold"> 1</tspan><tspan> </tspan><tspan class="fg-bright-green">+ set statement_timeout = '5s';</tspan>
+    <tspan x="10px" y="1108px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╭╴</tspan>
 </tspan>
-    <tspan x="10px" y="1126px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
+    <tspan x="10px" y="1126px"><tspan class="fg-bright-blue bold"> 1</tspan><tspan> </tspan><tspan class="fg-bright-green">+ set statement_timeout = '5s';</tspan>
 </tspan>
-    <tspan x="10px" y="1144px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/constraint-missing-not-valid">constraint-missing-not-valid</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: By default new constraints require a table scan and block writes to the table while that scan occurs.</tspan>
+    <tspan x="10px" y="1144px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="1162px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:24</tspan>
+    <tspan x="10px" y="1162px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/constraint-missing-not-valid">constraint-missing-not-valid</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: By default new constraints require a table scan and block writes to the table while that scan occurs.</tspan>
 </tspan>
-    <tspan x="10px" y="1180px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
+    <tspan x="10px" y="1180px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:24</tspan>
 </tspan>
-    <tspan x="10px" y="1198px"><tspan class="fg-bright-blue bold">12</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);</tspan>
+    <tspan x="10px" y="1198px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1216px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan>                        </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="10px" y="1216px"><tspan class="fg-bright-blue bold">12</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);</tspan>
 </tspan>
-    <tspan x="10px" y="1234px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
+    <tspan x="10px" y="1234px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan>                        </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
 </tspan>
-    <tspan x="10px" y="1252px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.</tspan>
+    <tspan x="10px" y="1252px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1270px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/disallowed-unique-constraint">disallowed-unique-constraint</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.</tspan>
+    <tspan x="10px" y="1270px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.</tspan>
 </tspan>
-    <tspan x="10px" y="1288px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:28</tspan>
+    <tspan x="10px" y="1288px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/disallowed-unique-constraint">disallowed-unique-constraint</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.</tspan>
 </tspan>
-    <tspan x="10px" y="1306px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
+    <tspan x="10px" y="1306px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:28</tspan>
 </tspan>
-    <tspan x="10px" y="1324px"><tspan class="fg-bright-blue bold">12</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);</tspan>
+    <tspan x="10px" y="1324px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1342px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan>                            </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="10px" y="1342px"><tspan class="fg-bright-blue bold">12</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);</tspan>
 </tspan>
-    <tspan x="10px" y="1360px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
+    <tspan x="10px" y="1360px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan>                            </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
 </tspan>
-    <tspan x="10px" y="1378px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: Create an index `CONCURRENTLY` and create the constraint using the index.</tspan>
+    <tspan x="10px" y="1378px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1396px">
+    <tspan x="10px" y="1396px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: Create an index `CONCURRENTLY` and create the constraint using the index.</tspan>
 </tspan>
-    <tspan x="10px" y="1414px"><tspan>Find detailed examples and solutions for each rule at </tspan><tspan class="underline">https://squawkhq.com/docs/rules</tspan>
+    <tspan x="10px" y="1414px">
 </tspan>
-    <tspan x="10px" y="1432px"><tspan>Found 8 issues in 1 file (checked 1 source file)</tspan>
+    <tspan x="10px" y="1432px"><tspan>Find detailed examples and solutions for each rule at </tspan><tspan class="underline">https://squawkhq.com/docs/rules</tspan>
 </tspan>
-    <tspan x="10px" y="1450px">
+    <tspan x="10px" y="1450px"><tspan>Found 8 issues in 1 file (checked 1 source file)</tspan>
+</tspan>
+    <tspan x="10px" y="1468px">
 </tspan>
   </text>
 

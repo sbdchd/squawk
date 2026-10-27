@@ -8,7 +8,8 @@ warning[]8;;https://squawkhq.com/docs/require-lock-timeout\require-lock-timeou
 1 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
   │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
-  ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+  ├ note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes
+  ├ help: configure a `lock_timeout` before this statement
   ╭╴
 1 + set lock_timeout = '1s';
   ╰╴

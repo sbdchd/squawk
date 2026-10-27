@@ -13,8 +13,11 @@ CheckReport {
             range: 5..65,
             level: Warning,
             message: "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
+            note: Some(
+                "statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes",
+            ),
             help: Some(
-                "Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.",
+                "configure a `lock_timeout` before this statement",
             ),
             rule_name: "require-lock-timeout",
             column_end: 63,
@@ -40,6 +43,7 @@ CheckReport {
             range: 5..65,
             level: Warning,
             message: "Missing `set statement_timeout` before potentially slow operations",
+            note: None,
             help: Some(
                 "Configure a `statement_timeout` before this statement",
             ),
@@ -67,6 +71,7 @@ CheckReport {
             range: 31..64,
             level: Warning,
             message: "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.",
+            note: None,
             help: Some(
                 "Make the field nullable or add a non-VOLATILE DEFAULT",
             ),
@@ -82,6 +87,7 @@ CheckReport {
             range: 31..64,
             level: Warning,
             message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+            note: None,
             help: None,
             rule_name: "prefer-robust-stmts",
             column_end: 62,
@@ -107,6 +113,7 @@ CheckReport {
             range: 48..55,
             level: Warning,
             message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+            note: None,
             help: Some(
                 "Use 64-bit integer values instead to prevent hitting this limit.",
             ),
@@ -134,6 +141,7 @@ CheckReport {
             range: 89..122,
             level: Warning,
             message: "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.",
+            note: None,
             help: Some(
                 "Make the field nullable or add a non-VOLATILE DEFAULT",
             ),
@@ -149,6 +157,7 @@ CheckReport {
             range: 89..122,
             level: Warning,
             message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+            note: None,
             help: None,
             rule_name: "prefer-robust-stmts",
             column_end: 56,
@@ -174,6 +183,7 @@ CheckReport {
             range: 106..113,
             level: Warning,
             message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+            note: None,
             help: Some(
                 "Use 64-bit integer values instead to prevent hitting this limit.",
             ),

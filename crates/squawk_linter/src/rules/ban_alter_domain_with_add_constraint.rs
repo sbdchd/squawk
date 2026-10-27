@@ -12,11 +12,14 @@ pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Par
             && let Some(ast::AlterDomainAction::AddConstraint(add_constraint)) =
                 alter_domain.action()
         {
-            ctx.report(Violation::for_node(
+            ctx.report(
+                Violation::for_node(
                     Rule::BanAlterDomainWithAddConstraint,
-                        "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
-                        add_constraint.syntax(),
-                    ));
+                    "domains with constraints have poor support for online migrations".into(),
+                    add_constraint.syntax(),
+                )
+                .help("use table and column constraints instead"),
+            );
         }
     }
 }

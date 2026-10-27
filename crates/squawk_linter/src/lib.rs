@@ -487,6 +487,7 @@ pub struct Violation {
     pub code: Rule,
     pub message: Cow<'static, str>,
     pub text_range: TextRange,
+    pub note: Option<Cow<'static, str>>,
     pub help: Option<Cow<'static, str>>,
     pub fix: Option<Fix>,
 }
@@ -507,6 +508,7 @@ impl Violation {
             code,
             text_range: TextRange::new(start, range.end()),
             message,
+            note: None,
             help: None,
             fix: None,
         }
@@ -518,6 +520,7 @@ impl Violation {
             code,
             text_range,
             message,
+            note: None,
             help: None,
             fix: None,
         }
@@ -525,6 +528,10 @@ impl Violation {
 
     fn fix<F: Into<Option<Fix>>>(mut self, fix: F) -> Violation {
         self.fix = fix.into();
+        self
+    }
+    fn note(mut self, note: impl Into<Cow<'static, str>>) -> Violation {
+        self.note = Some(note.into());
         self
     }
     fn help(mut self, help: impl Into<Cow<'static, str>>) -> Violation {

@@ -298,17 +298,15 @@ impl LockKind {
         }
     }
 
-    fn help(self) -> Cow<'static, str> {
-        let help = "Configure a `lock_timeout` before this statement.";
-        let Some(impact) = self.impact() else {
-            return help.into();
-        };
-
+    fn note(self) -> Option<String> {
+        let impact = self.impact()?;
         let blocked = impact.blocked();
         if blocked.is_empty() {
-            format!("{help} Statement requires: {self} lock.").into()
+            Some(format!("statement requires: {self} lock"))
         } else {
-            format!("{help} Statement requires: {self} lock; blocking: {blocked}.").into()
+            Some(format!(
+                "statement requires: {self} lock; blocking: {blocked}"
+            ))
         }
     }
 }
@@ -353,14 +351,19 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
             _ if analyze::possibly_slow_stmt(&stmt) => {
                 let lock = LockKind::from(&stmt);
                 if lock_timeout == ReportOnce::Missing {
+                    let violation = Violation::for_node(
+                        Rule::RequireLockTimeout,
+                        lock.violation_message(),
+                        stmt.syntax(),
+                    );
+                    let violation = match lock.note() {
+                        Some(note) => violation.note(note),
+                        None => violation,
+                    };
                     ctx.report(
-                        Violation::for_node(
-                            Rule::RequireLockTimeout,
-                            lock.violation_message(),
-                            stmt.syntax(),
-                        )
-                        .help(lock.help())
-                        .fix(create_lock_timeout_fix(&file)),
+                        violation
+                            .help("configure a `lock_timeout` before this statement")
+                            .fix(create_lock_timeout_fix(&file)),
                     );
                     lock_timeout = ReportOnce::Reported;
                 }
@@ -615,7 +618,8 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -643,7 +647,8 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         3 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -680,7 +685,8 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -764,7 +770,8 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         4 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -792,7 +799,8 @@ SET statement_timeout = '5s';
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -819,7 +827,7 @@ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
         2 │ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement.
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -849,7 +857,8 @@ COMMENT ON COLUMN t.c IS 'an opaque id';
         2 │ COMMENT ON COLUMN t.c IS 'an opaque id';
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: SHARE UPDATE EXCLUSIVE lock; blocking: schema changes.
+          ├ note: statement requires: SHARE UPDATE EXCLUSIVE lock; blocking: schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -876,7 +885,8 @@ REINDEX (CONCURRENTLY false) INDEX idx;
         2 │ REINDEX (CONCURRENTLY false) INDEX idx;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -903,7 +913,8 @@ VACUUM (FULL false) t;
         2 │ VACUUM (FULL false) t;
           │ ━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: SHARE UPDATE EXCLUSIVE lock; blocking: schema changes.
+          ├ note: statement requires: SHARE UPDATE EXCLUSIVE lock; blocking: schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -930,7 +941,8 @@ LOCK TABLE t IN ACCESS SHARE MODE;
         2 │ LOCK TABLE t IN ACCESS SHARE MODE;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS SHARE lock; blocking: schema changes.
+          ├ note: statement requires: ACCESS SHARE lock; blocking: schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
