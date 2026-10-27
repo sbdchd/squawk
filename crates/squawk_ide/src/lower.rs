@@ -533,6 +533,12 @@ enum UniqueIndexMatch {
     Deferrable,
 }
 
+#[derive(Clone, Copy)]
+enum KeyMatch {
+    Exact,
+    Set,
+}
+
 struct LikePrimaryKey {
     like: ast::LikeClause,
     source: TableId,
@@ -13041,8 +13047,25 @@ impl Lowerer {
         target: Option<SourceId>,
         on_conflict: &ast::OnConflictClause,
     ) {
+        let table = target.and_then(|target| match self.index.sources[target].kind {
+            SourceKind::Table(table) => Some(table),
+            SourceKind::Cte(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::Returning(_)
+            | SourceKind::Excluded(_)
+            | SourceKind::RuleRelation(_)
+            | SourceKind::ElementVariable
+            | SourceKind::Other => None,
+        });
         match on_conflict.conflict_target() {
             Some(ast::ConflictTarget::ConflictOnIndex(on_index)) => {
+                if let Some(table) = table {
+                    self.check_conflict_arbiter(table, &on_index);
+                }
                 for item in on_index
                     .conflict_index_item_list()
                     .into_iter()
@@ -13061,20 +13084,6 @@ impl Lowerer {
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
-                let table = target.and_then(|target| match self.index.sources[target].kind {
-                    SourceKind::Table(table) => Some(table),
-                    SourceKind::Cte(_)
-                    | SourceKind::External
-                    | SourceKind::Subquery(_)
-                    | SourceKind::Function(_)
-                    | SourceKind::Join
-                    | SourceKind::UsingAlias
-                    | SourceKind::Returning(_)
-                    | SourceKind::Excluded(_)
-                    | SourceKind::RuleRelation(_)
-                    | SourceKind::ElementVariable
-                    | SourceKind::Other => None,
-                });
                 if let Some(name_ref) = on_constraint.constraint_name_ref() {
                     self.lower_constraint_ref(
                         table.map(ConstraintOwner::Table),
@@ -18026,7 +18035,7 @@ impl Lowerer {
                     return;
                 }
                 let found = self.find_unique_index(table, &|id, index| {
-                    !index.partial && self.index_key_matches(id, &columns)
+                    !index.partial && self.index_key_matches(id, &columns, KeyMatch::Exact)
                 });
                 match found {
                     Some(UniqueIndexMatch::Immediate) => return,
@@ -18038,6 +18047,49 @@ impl Lowerer {
             }
         };
         self.push_error_ptr(ptr, error);
+    }
+
+    fn check_conflict_arbiter(&mut self, table: TableId, on_index: &ast::ConflictOnIndex) {
+        if self.function.is_some() || !self.keys_known(table) {
+            return;
+        }
+        let table_columns = self.index.tables[table].columns;
+        let Some(list) = on_index.conflict_index_item_list() else {
+            return;
+        };
+        if !table_columns.complete {
+            return;
+        }
+        let columns: Option<SmallVec<[Name; 4]>> = list
+            .conflict_index_items()
+            .map(|item| {
+                if item.collate().is_some() || item.op_class_ref().is_some() {
+                    return None;
+                }
+                let ast::Expr::NameRef(name_ref) = item.expr()?.unparen() else {
+                    return None;
+                };
+                let name = self.name_ref_name(&name_ref)?;
+                self.columns_contain(table_columns.range, name)
+                    .then_some(name)
+            })
+            .collect();
+        let Some(columns) = columns else {
+            return;
+        };
+        if columns.is_empty() {
+            return;
+        }
+        let predicate = on_index.where_clause().is_some();
+        let found = self.find_unique_index(table, &|id, index| {
+            (!index.partial || predicate) && self.index_key_matches(id, &columns, KeyMatch::Set)
+        });
+        let error = match found {
+            Some(UniqueIndexMatch::Immediate) => return,
+            Some(UniqueIndexMatch::Deferrable) => SemaError::DeferrableConflictArbiter,
+            None => SemaError::NoConflictArbiter,
+        };
+        self.push_error(list.syntax(), error);
     }
 
     fn keys_known(&self, table: TableId) -> bool {
@@ -18089,7 +18141,7 @@ impl Lowerer {
         found
     }
 
-    fn index_key_matches(&self, index: IndexId, columns: &[Name]) -> bool {
+    fn index_key_matches(&self, index: IndexId, columns: &[Name], kind: KeyMatch) -> bool {
         let Some(key) = self.index.indexes.key(index) else {
             return false;
         };
@@ -18100,7 +18152,11 @@ impl Lowerer {
             }
             len += 1;
         }
-        len == columns.len()
+        let len_matches = match kind {
+            KeyMatch::Exact => len == columns.len(),
+            KeyMatch::Set => true,
+        };
+        len_matches
             && columns
                 .iter()
                 .all(|column| self.index_key_contains(index, *column))

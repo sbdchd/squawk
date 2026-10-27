@@ -96,6 +96,7 @@ pub enum DiagnosticKind {
     DuplicateParam,
     MultiplePrimaryKeys,
     InvalidForeignKey,
+    InvalidConflictArbiter,
     DuplicateFunction,
     DuplicateConstraint,
     DuplicateTrigger,

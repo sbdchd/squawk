@@ -301,6 +301,8 @@ pub(crate) enum SemaError {
     DeferrableUniqueConstraintForReferencedTable {
         table: Name,
     },
+    NoConflictArbiter,
+    DeferrableConflictArbiter,
     InvalidOrdinal {
         clause: OutputClause,
         position: usize,
@@ -826,6 +828,9 @@ impl SemaError {
             | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
                 DiagnosticKind::InvalidForeignKey
             }
+            SemaError::NoConflictArbiter | SemaError::DeferrableConflictArbiter => {
+                DiagnosticKind::InvalidConflictArbiter
+            }
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
@@ -858,6 +863,12 @@ impl SemaError {
     fn static_message(&self) -> Option<&'static str> {
         match *self {
             SemaError::CannotChangeDatabase => Some("current database cannot be changed"),
+            SemaError::NoConflictArbiter => Some(
+                "there is no unique or exclusion constraint matching the ON CONFLICT specification",
+            ),
+            SemaError::DeferrableConflictArbiter => Some(
+                "ON CONFLICT does not support deferrable unique constraints/exclusion constraints as arbiters",
+            ),
             SemaError::ValuesLengthMismatch => Some("VALUES lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
                 Some("INSERT has more expressions than target columns")
@@ -940,7 +951,9 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::DefaultColumnReference
             | SemaError::SubqueryNotSingleColumn
             | SemaError::SubqueryTooManyColumns
-            | SemaError::SubqueryTooFewColumns => {
+            | SemaError::SubqueryTooFewColumns
+            | SemaError::NoConflictArbiter
+            | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MisplacedAggregate { context } => write!(
