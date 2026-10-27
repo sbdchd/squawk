@@ -382,6 +382,26 @@ impl ast::Literal {
         };
         BigUint::parse_bytes(digits.replace('_', "").as_bytes(), radix.base())
     }
+
+    pub fn integer_value_u64(&self) -> Option<u64> {
+        let LitKind::IntNumber(token) = self.kind()? else {
+            return None;
+        };
+        let radix = self.integer_radix()?;
+        let text = token.text();
+        let digits = match radix {
+            IntegerRadix::Decimal => text,
+            IntegerRadix::Binary | IntegerRadix::Hexadecimal | IntegerRadix::Octal => &text[2..],
+        };
+        let base = radix.base();
+        let mut value: u64 = 0;
+        for c in digits.chars().filter(|&c| c != '_') {
+            value = value
+                .checked_mul(base.into())?
+                .checked_add(c.to_digit(base)?.into())?;
+        }
+        Some(value)
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -1558,7 +1578,9 @@ impl ast::PathType {
                 let precision = self
                     .arg_list()
                     .and_then(|args| args.args().next())
-                    .and_then(|arg| u32::try_from(arg.expr()?.as_literal()?.integer_value()?).ok());
+                    .and_then(|arg| {
+                        u32::try_from(arg.expr()?.as_literal()?.integer_value_u64()?).ok()
+                    });
                 if precision.is_some_and(|precision| precision <= 24) {
                     "float4"
                 } else {

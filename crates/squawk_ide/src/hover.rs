@@ -77,7 +77,7 @@ pub(crate) fn hover_with_index(
     let LiteralHover { snippet, comment } = hover_literal(&literal)?;
     Some(HoverInfo {
         snippet: snippet.to_string(),
-        comment: Some(comment),
+        comment,
         range: position.with_value(token.original_range(literal.syntax().text_range())),
     })
 }
