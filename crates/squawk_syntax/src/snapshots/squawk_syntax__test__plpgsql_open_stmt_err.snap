@@ -97,7 +97,7 @@ PLPGSQL@0..138
     END_KW@134..137 "end"
   WHITESPACE@137..138 "\n"
 
-error[syntax-error]: expected a cursor variable, got SEMICOLON
+error[syntax-error]: expected a cursor variable, found `;`
   ╭▸ 
 6 │   open;
   ╰╴      ━
@@ -109,7 +109,7 @@ error[syntax-error]: expected an expression
   ╭▸ 
 8 │   open rc for execute;
   ╰╴                     ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 9 │   open rc select 1;
   ╰╴         ━

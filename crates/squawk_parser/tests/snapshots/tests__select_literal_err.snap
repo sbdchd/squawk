@@ -1032,11 +1032,11 @@ error[syntax-error]: missing digits after the exponent symbol
    ╭▸ 
 46 │ select (1) . 0e ;
    ╰╴              ━
-error[syntax-error]: expected field name, got L_ANGLE
+error[syntax-error]: expected field name, found `<`
    ╭▸ 
 48 │ select x.< from t;
    ╰╴         ━
-error[syntax-error]: expected an expression, found FROM_KW
+error[syntax-error]: expected an expression, found `from`
    ╭▸ 
 48 │ select x.< from t;
    ╰╴           ━
@@ -1084,55 +1084,55 @@ error[syntax-error]: expected unsigned integer literal
    ╭▸ 
 63 │ select time() '';
    ╰╴            ━
-error[syntax-error]: expected an expression, found R_PAREN
+error[syntax-error]: expected an expression, found `)`
    ╭▸ 
 63 │ select time() '';
    ╰╴            ━
-error[syntax-error]: expected command, found DOT_DOT
+error[syntax-error]: expected command, found `..`
    ╭▸ 
 66 │ select 1..10;
    ╰╴        ━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
    ╭▸ 
 66 │ select 1..10;
    ╰╴          ━
-error[syntax-error]: expected command, found DOT_DOT
+error[syntax-error]: expected command, found `..`
    ╭▸ 
 67 │ select 1 .. 10;
    ╰╴         ━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
    ╭▸ 
 67 │ select 1 .. 10;
    ╰╴            ━
-error[syntax-error]: expected command, found DOT_DOT
+error[syntax-error]: expected command, found `..`
    ╭▸ 
 68 │ select 1.5..2;
    ╰╴          ━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
    ╭▸ 
 68 │ select 1.5..2;
    ╰╴            ━
-error[syntax-error]: expected command, found DOT_DOT
+error[syntax-error]: expected command, found `..`
    ╭▸ 
 69 │ select 1...2;
    ╰╴        ━
-error[syntax-error]: expected command, found NUMERIC_NUMBER
+error[syntax-error]: expected command, found numeric literal
    ╭▸ 
 69 │ select 1...2;
    ╰╴          ━
-error[syntax-error]: expected R_BRACK
+error[syntax-error]: expected `]`
    ╭▸ 
 70 │ select a[1..2];
    ╰╴          ━
-error[syntax-error]: expected command, found DOT_DOT
+error[syntax-error]: expected command, found `..`
    ╭▸ 
 70 │ select a[1..2];
    ╰╴          ━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
    ╭▸ 
 70 │ select a[1..2];
    ╰╴            ━
-error[syntax-error]: expected command, found R_BRACK
+error[syntax-error]: expected command, found `]`
    ╭▸ 
 70 │ select a[1..2];
    ╰╴             ━

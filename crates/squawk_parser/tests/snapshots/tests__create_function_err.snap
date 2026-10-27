@@ -183,11 +183,11 @@ SOURCE_FILE
         COMMA ","
   WHITESPACE "\n\n"
 ---
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 3 │ returns table (a text  b int)
   ╰╴                     ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 6 │ create function foo(arg float = 1 int4 = 4)
   ╰╴                                 ━

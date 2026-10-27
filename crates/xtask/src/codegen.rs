@@ -375,6 +375,20 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
         .map(|name| format_ident!("{}", name))
         .collect::<Vec<_>>();
 
+    let punctuation_display = grammar
+        .punct
+        .iter()
+        .map(|(token, _name)| format!("`{token}`"));
+    let keywords_display = all_keywords_values
+        .iter()
+        .map(|keyword| format!("`{}`", keyword.to_lowercase()));
+    let literals_display = grammar.literals.iter().map(|name| literal_display(name));
+    let tokens_display = grammar.tokens.iter().map(|name| token_display(name));
+    let nodes_display = grammar
+        .nodes
+        .iter()
+        .map(|name| name.to_lowercase().replace('_', " "));
+
     let output = reformat(reformat(
         quote! {
             #![allow(bad_style, missing_docs, clippy::upper_case_acronyms)]
@@ -410,11 +424,56 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
                     #contextual_keyword_lookup
                 }
             }
+
+            #[space_hack]
+            impl std::fmt::Display for SyntaxKind {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    f.write_str(match self {
+                        SyntaxKind::TOMBSTONE => "tombstone",
+                        SyntaxKind::EOF => "end of file",
+                        #(SyntaxKind::#punctuation => #punctuation_display,)*
+                        #(SyntaxKind::#all_keywords => #keywords_display,)*
+                        #(SyntaxKind::#literals => #literals_display,)*
+                        #(SyntaxKind::#tokens => #tokens_display,)*
+                        #(SyntaxKind::#nodes => #nodes_display,)*
+                        SyntaxKind::__LAST => "__LAST",
+                    })
+                }
+            }
         }
         .to_string(),
     ).replace("#[space_hack]", ""));
 
     format!("{PRELUDE}{output}")
+}
+
+fn literal_display(name: &str) -> &'static str {
+    match name {
+        "BIT_STRING" => "bit string literal",
+        "BYTE_STRING" => "hexadecimal string literal",
+        "DOLLAR_QUOTED_STRING" => "dollar-quoted string literal",
+        "ESC_STRING" => "escape string literal",
+        "INT_NUMBER" => "integer literal",
+        "NATIONAL_STRING" => "national character string literal",
+        "NULL" => "`null`",
+        "NUMERIC_NUMBER" => "numeric literal",
+        "POSITIONAL_PARAM" => "positional parameter",
+        "PSQL_COMMAND_TEXT" => "psql meta-command",
+        "PSQL_TERMINATOR_TEXT" => "psql terminator",
+        "STRING" => "string literal",
+        "UNICODE_ESC_STRING" => "unicode escape string literal",
+        _ => panic!("missing display text for literal {name:?}"),
+    }
+}
+
+fn token_display(name: &str) -> &'static str {
+    match name {
+        "COMMENT" => "comment",
+        "ERROR" => "error",
+        "IDENT" => "identifier",
+        "WHITESPACE" => "whitespace",
+        _ => panic!("missing display text for token {name:?}"),
+    }
 }
 
 fn generate_token_sets(keyword_kinds: &KeywordKinds, contextual_keywords: &[String]) -> String {

@@ -189,7 +189,7 @@ mod test {
     #[test]
     fn syntax_error() {
         assert_snapshot!(check("select from t where;"), @"
-        0:19 Error syntax-error: expected an expression, found SEMICOLON
+        0:19 Error syntax-error: expected an expression, found `;`
         0:12 Error semantic-error: relation `t` does not exist
         ");
     }

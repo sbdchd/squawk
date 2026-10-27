@@ -71,7 +71,7 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected INHERIT_KW
+error[syntax-error]: expected `inherit`
   ╭▸ 
 2 │ create domain d as int check (v > 0) no;
   ╰╴                                       ━

@@ -381,7 +381,7 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected an expression, found R_BRACK
+error[syntax-error]: expected an expression, found `]`
   ╭▸ 
 2 │ select json_object(]);
   ╰╴                   ━
@@ -393,7 +393,7 @@ error[syntax-error]: expected a comma
   ╭▸ 
 2 │ select json_object(]);
   ╰╴                   ━
-error[syntax-error]: expected an expression, found SEMICOLON
+error[syntax-error]: expected an expression, found `;`
   ╭▸ 
 3 │ select json_object(;);
   ╰╴                   ━
@@ -405,7 +405,7 @@ error[syntax-error]: expected a comma
   ╭▸ 
 3 │ select json_object(;);
   ╰╴                   ━
-error[syntax-error]: expected an expression, found R_BRACK
+error[syntax-error]: expected an expression, found `]`
   ╭▸ 
 4 │ select json_object(1, ]);
   ╰╴                     ━

@@ -60,19 +60,19 @@ PLPGSQL@0..83
     END_KW@79..82 "end"
   WHITESPACE@82..83 "\n"
 
-error[syntax-error]: expected a cursor variable, got SEMICOLON
+error[syntax-error]: expected a cursor variable, found `;`
   ╭▸ 
 5 │   close;
   ╰╴       ━
-error[syntax-error]: expected a cursor variable, got ALL_KW
+error[syntax-error]: expected a cursor variable, found `all`
   ╭▸ 
 6 │   close all;
   ╰╴       ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 6 │   close all;
   ╰╴       ━
-error[syntax-error]: expected a statement, got ALL_KW
+error[syntax-error]: expected a statement, found `all`
   ╭▸ 
 6 │   close all;
   ╰╴        ━

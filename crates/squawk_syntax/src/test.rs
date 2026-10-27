@@ -351,6 +351,6 @@ fn parse_errors_are_sorted_by_position() {
 
     assert_snapshot!(rendered, @"
     0..6: leading from clauses are not supported in Postgres
-    17..17: expected an expression, found SEMICOLON
+    17..17: expected an expression, found `;`
     ");
 }

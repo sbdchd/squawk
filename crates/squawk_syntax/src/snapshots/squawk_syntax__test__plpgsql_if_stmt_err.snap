@@ -170,19 +170,19 @@ PLPGSQL@0..248
     END_KW@244..247 "end"
   WHITESPACE@247..248 "\n"
 
-error[syntax-error]: expected THEN_KW
+error[syntax-error]: expected `then`
   ╭▸ 
 4 │     null;
   ╰╴        ━
-error[syntax-error]: expected a statement, got SEMICOLON
+error[syntax-error]: expected a statement, found `;`
   ╭▸ 
 4 │     null;
   ╰╴        ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
    ╭▸ 
 11 │   elsif 1 = 2 then
    ╰╴  ━
-error[syntax-error]: expected SEMICOLON, got INT_NUMBER
+error[syntax-error]: expected `;`, found integer literal
    ╭▸ 
 11 │   elsif 1 = 2 then
    ╰╴        ━

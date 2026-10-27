@@ -1051,31 +1051,31 @@ error[syntax-error]: unexpected comma
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                    ━
-error[syntax-error]: expected INHERIT_KW
+error[syntax-error]: expected `inherit`
    ╭▸ 
 16 │ create table t ( c int check (c > 10) no;
    ╰╴                                        ━
-error[syntax-error]: expected R_PAREN
+error[syntax-error]: expected `)`
    ╭▸ 
 16 │ create table t ( c int check (c > 10) no;
    ╰╴                                        ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 54 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
    ╰╴                                 ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 54 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
    ╰╴                                                      ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 58 │     for values in (1  2  3);
    ╰╴                    ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 58 │     for values in (1  2  3);
    ╰╴                       ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 64 │   exclude using btree ( a with buzz.> b with <) 
    ╰╴                                     ━

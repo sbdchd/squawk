@@ -217,7 +217,7 @@ mod tests {
           WHITESPACE@21..22 " "
         ---
         source 5..27 " begin null null; end "
-        error[syntax-error]: expected a statement, got NULL_KW
+        error[syntax-error]: expected a statement, found `null`
           ╭▸ 
         1 │ do $$ begin null null; end $$;
           ╰╴            ━
@@ -241,7 +241,7 @@ mod tests {
             END_KW@19..22 "end"
         ---
         source 5..29 "begin\\n null null;\\n end"
-        error[syntax-error]: expected a statement, got NULL_KW
+        error[syntax-error]: expected a statement, found `null`
           ╭▸ 
         1 │ do E'begin\n null null;\n end';
           ╰╴             ━

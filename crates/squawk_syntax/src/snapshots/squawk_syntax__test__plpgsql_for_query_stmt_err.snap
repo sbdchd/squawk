@@ -159,11 +159,11 @@ error[syntax-error]: cannot specify REVERSE in query FOR loop
    ╭▸ 
 15 │   for r in reverse select 1 loop
    ╰╴           ━━━━━━━
-error[syntax-error]: expected LOOP_KW
+error[syntax-error]: expected `loop`
    ╭▸ 
 26 │     null;
    ╰╴        ━
-error[syntax-error]: expected a statement, got SEMICOLON
+error[syntax-error]: expected a statement, found `;`
    ╭▸ 
 26 │     null;
    ╰╴        ━

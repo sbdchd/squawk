@@ -31,11 +31,11 @@ error[syntax-error]: expected string literal
   ╭▸ 
 3 │   do := 1;
   ╰╴    ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 3 │   do := 1;
   ╰╴    ━
-error[syntax-error]: expected a statement, got COLON
+error[syntax-error]: expected a statement, found `:`
   ╭▸ 
 3 │   do := 1;
   ╰╴     ━

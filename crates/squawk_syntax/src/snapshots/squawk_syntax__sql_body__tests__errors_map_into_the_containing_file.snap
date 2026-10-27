@@ -1,6 +1,6 @@
 ---
 source: crates/squawk_syntax/src/sql_body.rs
-expression: "body(\"create function f() returns int\n  language sql\n  as $$ select from $$;\")"
+expression: "body(\"\\\ncreate function f() returns int\n  language sql\n  as $$ select from $$;\")"
 ---
 SOURCE_FILE@0..13
   WHITESPACE@0..1 " "
@@ -13,7 +13,7 @@ SOURCE_FILE@0..13
   WHITESPACE@12..13 " "
 ---
 source 54..67 " select from "
-error[syntax-error]: expected from item, got EOF
+error[syntax-error]: expected from item, found end of file
   ╭▸ 
 3 │   as $$ select from $$;
   ╰╴                   ━

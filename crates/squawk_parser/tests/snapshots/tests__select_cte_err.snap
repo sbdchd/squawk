@@ -482,7 +482,7 @@ error[syntax-error]: unexpected comma, expected a column name
   ╭▸ 
 8 │ search depth first by a, , c set ordercol
   ╰╴                         ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 13 │ search depth first by a, b c set ordercol
    ╰╴                          ━

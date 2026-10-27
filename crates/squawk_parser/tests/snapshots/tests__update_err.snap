@@ -286,11 +286,11 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 1 │ update t set (j k) = (1, 2);
   ╰╴               ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 4 │ update t set a = 1 b = 2;
   ╰╴                  ━

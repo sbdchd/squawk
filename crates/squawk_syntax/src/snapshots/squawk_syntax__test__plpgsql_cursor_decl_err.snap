@@ -182,11 +182,11 @@ error[syntax-error]: expected at least one item
   ╭▸ 
 3 │   a cursor () for select 1;
   ╰╴            ━
-error[syntax-error]: expected SCROLL_KW
+error[syntax-error]: expected `scroll`
   ╭▸ 
 4 │   b no cursor for select 1;
   ╰╴      ━
-error[syntax-error]: expected FOR_KW
+error[syntax-error]: expected `for`
   ╭▸ 
 5 │   c cursor select 1;
   ╰╴          ━

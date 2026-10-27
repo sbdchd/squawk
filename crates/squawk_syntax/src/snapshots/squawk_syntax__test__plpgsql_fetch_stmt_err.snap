@@ -203,7 +203,7 @@ PLPGSQL@0..350
     END_KW@346..349 "end"
   WHITESPACE@349..350 "\n"
 
-error[syntax-error]: expected INTO, got SEMICOLON
+error[syntax-error]: expected INTO, found `;`
   ╭▸ 
 6 │   fetch c;
   ╰╴         ━
@@ -211,7 +211,7 @@ error[syntax-error]: expected FROM or IN
   ╭▸ 
 7 │   fetch next c into x;
   ╰╴            ━
-error[syntax-error]: expected an INTO target, got SEMICOLON
+error[syntax-error]: expected an INTO target, found `;`
   ╭▸ 
 8 │   fetch c into;
   ╰╴              ━

@@ -261,15 +261,15 @@ error[syntax-error]: expected an expression
    ╭▸ 
 20 │   execute using 1;
    ╰╴         ━
-error[syntax-error]: expected an INTO target, got SEMICOLON
+error[syntax-error]: expected an INTO target, found `;`
    ╭▸ 
 29 │   execute q into;
    ╰╴                ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
    ╭▸ 
 40 │   execute q into x into y;
    ╰╴                  ━
-error[syntax-error]: expected a statement, got INTO_KW
+error[syntax-error]: expected a statement, found `into`
    ╭▸ 
 40 │   execute q into x into y;
    ╰╴                   ━

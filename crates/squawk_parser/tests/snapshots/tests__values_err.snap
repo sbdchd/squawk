@@ -76,11 +76,11 @@ error[syntax-error]: unexpected trailing comma
   ╭▸ 
 3 │ values (1,) (1);
   ╰╴         ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 3 │ values (1,) (1);
   ╰╴           ━
-error[syntax-error]: expected L_PAREN
+error[syntax-error]: expected `(`
   ╭▸ 
 6 │ values (1),, (2);
   ╰╴           ━

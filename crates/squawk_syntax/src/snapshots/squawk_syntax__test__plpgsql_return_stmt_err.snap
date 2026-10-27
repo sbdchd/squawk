@@ -81,7 +81,7 @@ error[syntax-error]: expected an expression
   ╭▸ 
 6 │   return query execute 'select 1' using;
   ╰╴                                       ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 7 │   return 1
   ╰╴          ━

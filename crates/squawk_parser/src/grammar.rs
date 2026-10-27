@@ -308,7 +308,7 @@ fn extract_arg(p: &mut Parser<'_>) {
         m.complete(p, EXTRACT_FIELD_NAME);
     } else {
         p.error(format!(
-            "expected ident, year, month, day, hour, minute, second, or string, got {:?}",
+            "expected ident, year, month, day, hour, minute, second, or string, found {}",
             p.current()
         ));
     }
@@ -2172,7 +2172,7 @@ pub(crate) fn delimited(
         }
         if !p.eat(delim) {
             if p.at_ts(first_set) {
-                p.error(format!("expected {delim:?}"));
+                p.error(format!("expected {delim}"));
             } else {
                 break;
             }
@@ -2215,7 +2215,7 @@ pub(crate) fn separated(
         }
         if !p.eat(delim) {
             if p.at_ts(first_set) && !p.at_ts(follow_set) {
-                p.error(format!("expected {delim:?}"));
+                p.error(format!("expected {delim}"));
             } else {
                 break;
             }
@@ -2248,7 +2248,7 @@ fn path_segment(p: &mut Parser<'_>, kind: PathSegmentKind) {
     } else if p.at_ts(COL_LABEL_FIRST) {
         pg_name(p);
     } else {
-        p.error(format!("expected name, got {:?}", p.current()));
+        p.error(format!("expected name, found {}", p.current()));
         m.abandon(p);
         return;
     }
@@ -2999,7 +2999,7 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     } else if p.eat(STAR) {
         //
     } else {
-        p.error(format!("expected field name, got {:?}", p.current()));
+        p.error(format!("expected field name, found {}", p.current()));
     }
     m.complete(p, FIELD_EXPR)
 }
@@ -3182,7 +3182,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: Restrictions) -> Option<(CompletedMark
     let m = p.start();
     if !p.at_ts(EXPR_FIRST) {
         p.err_recover(
-            &format!("expected an expression, found {:?}", p.current()),
+            &format!("expected an expression, found {}", p.current()),
             EXPR_RECOVERY_SET,
         );
         m.abandon(p);
@@ -3896,7 +3896,7 @@ fn opt_from_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     if opt_from_item(p).is_none() {
-        p.error(format!("expected from item, got {:?}", p.current()));
+        p.error(format!("expected from item, found {}", p.current()));
     }
     while !p.at(EOF) && p.eat(COMMA) {
         if opt_from_item(p).is_none() {
@@ -4016,7 +4016,7 @@ fn from_item_name(p: &mut Parser<'_>) -> SyntaxKind {
                 FUNCTION_FROM_ITEM
             }
             Some(got) => {
-                p.error(format!("expected a function call, got {:?}", got.kind()));
+                p.error(format!("expected a function call, found {}", got.kind()));
                 FUNCTION_FROM_ITEM
             }
             None => {
@@ -4750,7 +4750,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, mut kind: ColumnDefKind) -> bool {
         }
         if !p.eat(COMMA) {
             if p.at_ts(COLUMN_FIRST) && !(p.at(WITHOUT_KW) && p.nth_at(1, OVERLAPS_KW)) {
-                p.error("expected COMMA");
+                p.error("expected `,`");
             } else {
                 break;
             }
@@ -4864,7 +4864,7 @@ pub(crate) fn field_accessor(p: &mut Parser<'_>) {
     } else if p.at(INT_NUMBER) || p.at(NUMERIC_NUMBER) {
         p.err_and_bump("expected field name");
     } else if !p.eat(STAR) {
-        p.error(format!("expected field name, got {:?}", p.current()));
+        p.error(format!("expected field name, found {}", p.current()));
     }
     m.complete(p, FIELD_ACCESSOR);
 }
@@ -5355,7 +5355,7 @@ fn table_property(p: &mut Parser<'_>) {
         }
         _ => {
             m.abandon(p);
-            p.err_and_bump(&format!("expected like option, got {:?}", p.current()));
+            p.err_and_bump(&format!("expected like option, found {}", p.current()));
             return;
         }
     };
@@ -5393,7 +5393,7 @@ fn op(p: &mut Parser<'_>) {
     if opt_op(p) {
         return;
     }
-    let message = format!("expected operator, got {:?}", p.current());
+    let message = format!("expected operator, found {}", p.current());
     if p.at(EOF) || p.at_ts(OP_RECOVERY) {
         p.error(message);
         return;
@@ -5924,7 +5924,7 @@ fn opt_repeatable_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 fn clause_expr(p: &mut Parser<'_>) {
     if p.at(AND_KW) || p.at(OR_KW) {
-        p.err_and_bump(&format!("expected expression but got {:?}", p.current()));
+        p.err_and_bump(&format!("expected expression, found {}", p.current()));
     }
     expr(p);
 }
@@ -6467,7 +6467,7 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
     } else {
         m.abandon(p);
         p.error(format!(
-            "expected an expression in target_el, found {:?}",
+            "expected an expression in target_el, found {}",
             p.current()
         ));
         return None;
@@ -6482,7 +6482,7 @@ fn opt_as_col_label(p: &mut Parser<'_>) {
             column_name(p);
             m.complete(p, AS_NAME);
         } else {
-            p.err_and_bump(&format!("expected column label, got {:?}", p.current()));
+            p.err_and_bump(&format!("expected column label, found {}", p.current()));
             m.abandon(p);
         }
     } else if p.at(FORMAT_KW) && p.nth_at(1, JSON_KW) {
@@ -8329,7 +8329,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
             // commands are outlined in:
             // https://www.postgresql.org/docs/17/sql-commands.html
             // TODO: see error recovery in rust-analyzer's expr_bp
-            p.err_and_bump(&format!("expected command, found {command:?}"));
+            p.err_and_bump(&format!("expected command, found {command}"));
             // m.abandon(p);
             None
         }
@@ -10702,7 +10702,7 @@ fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
         if p.at(NO_KW) || p.at(DEPENDS_KW) {
             depends_on_extension(p);
         } else {
-            p.error(format!("expected NO or DEPENDS, found {:?}", p.current()));
+            p.error(format!("expected NO or DEPENDS, found {}", p.current()));
         }
     }
     p.eat(SEMICOLON);
@@ -12655,7 +12655,7 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | PAREN_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
             p.error(format!(
-                "expected SELECT, TABLE, or VALUES statement, got {kind:?}"
+                "expected SELECT, TABLE, or VALUES statement, found {kind}"
             ));
         }
         None => {
@@ -13065,7 +13065,7 @@ fn select_insert_delete_update_or_notify(p: &mut Parser<'_>, semi_allowed: bool)
             | NOTIFY => (),
             kind => {
                 p.error(format!(
-                    "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, got {kind:?}"
+                    "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, found {kind}"
                 ));
             }
         }
@@ -14258,7 +14258,7 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
             | PAREN_SELECT => (),
             kind => {
                 p.error(format!(
-                    "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {kind:?}",
+                    "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, found {kind}",
                 ));
             }
         }
@@ -15118,7 +15118,7 @@ fn revoke_command(p: &mut Parser<'_>) {
         } else if p.at_ts(REVOKE_COMMAND_FIRST) {
             p.bump_any();
         } else {
-            p.error(format!("expected command name, got {:?}", p.current()));
+            p.error(format!("expected command name, found {}", p.current()));
         }
     }
     // [ ( column_name [, ...] ) ]
@@ -15134,7 +15134,7 @@ fn revoke_command(p: &mut Parser<'_>) {
 //  | SESSION_USER
 fn role_ref(p: &mut Parser<'_>) {
     if !opt_role_ref(p) {
-        p.error(format!("expected role, got {:?}", p.current()));
+        p.error(format!("expected role, found {}", p.current()));
     }
 }
 
@@ -15154,7 +15154,7 @@ fn opt_role_ref(p: &mut Parser<'_>) -> bool {
 
 fn role(p: &mut Parser<'_>) {
     if !opt_role_(p, ROLE) {
-        p.error(format!("expected role, got {:?}", p.current()));
+        p.error(format!("expected role, found {}", p.current()));
     }
 }
 
@@ -15638,21 +15638,21 @@ fn row_list(p: &mut Parser<'_>) {
     let mut found_row = false;
     while !p.at(EOF) {
         if !p.at(L_PAREN) {
-            p.err_and_bump("expected L_PAREN");
+            p.err_and_bump("expected `(`");
             continue;
         }
         row(p);
         found_row = true;
         if p.eat(COMMA) {
             while p.at(COMMA) {
-                p.err_and_bump("expected L_PAREN");
+                p.err_and_bump("expected `(`");
             }
             if !p.at(L_PAREN) {
                 p.error("expected row after comma");
                 break;
             }
         } else if p.at(L_PAREN) {
-            p.error("expected COMMA");
+            p.error("expected `,`");
         } else {
             break;
         }
@@ -15839,7 +15839,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     match stmt(p, &StmtRestrictions::default()) {
         Some(statement) => match statement.kind() {
             SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | TABLE | PAREN_SELECT => (),
-            kind => p.error(format!("expected SELECT, got {kind:?}")),
+            kind => p.error(format!("expected SELECT, found {kind}")),
         },
         None => p.error("expected SELECT"),
     }
@@ -16137,7 +16137,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES | PAREN_SELECT) => (),
         Some(kind) => {
             p.error(format!(
-                "expected SELECT, TABLE, or VALUES statement, got {kind:?}",
+                "expected SELECT, TABLE, or VALUES statement, found {kind}",
             ));
         }
         None => {
@@ -16782,7 +16782,7 @@ fn preparable_stmt(p: &mut Parser<'_>) {
         ) => (),
         Some(kind) => {
             p.error(format!(
-                    "expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement, got {kind:?}"
+                    "expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement, found {kind}"
                 ));
         }
         None => {
@@ -16801,7 +16801,7 @@ fn call(p: &mut Parser<'_>, semi_allowed: bool) -> CompletedMarker {
     if p.at(L_PAREN) {
         arg_list(p);
     } else {
-        p.error("expected L_PAREN");
+        p.error("expected `(`");
     }
     if semi_allowed {
         p.eat(SEMICOLON);
@@ -17522,7 +17522,7 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>, r: &SelectRestrictions) -> Option
         _ => {
             m.abandon(p);
             p.error(format!(
-                "expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: {:?}",
+                "expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, found {}",
                 p.current()
             ));
             None
@@ -18012,7 +18012,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
                 if p.at_ts(UNRESERVED_KEYWORDS) || p.at(IDENT) {
                     language_ref(p);
                 } else {
-                    p.error(format!("expected a language name, got {:?}", p.current()));
+                    p.error(format!("expected a language name, found {}", p.current()));
                 }
             }
             LANGUAGE_FUNC_OPTION
@@ -18515,7 +18515,7 @@ fn create_extension(p: &mut Parser<'_>) -> CompletedMarker {
             if p.at(IDENT) {
                 extension_version(p);
             } else {
-                p.error("expected string literal or IDENT");
+                p.error("expected string literal or identifier");
             }
         }
         m.complete(p, EXTENSION_VERSION_CLAUSE);
@@ -18572,7 +18572,7 @@ fn config_assignment(p: &mut Parser<'_>) {
     } else {
         let _ = p.eat(TO_KW) || p.expect(EQ);
         if !config_value(p) {
-            p.error(format!("expected config value, got {:?}", p.current()));
+            p.error(format!("expected config value, found {}", p.current()));
         }
         m.complete(p, TO_CONFIG_VALUE);
     }
@@ -18662,7 +18662,7 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
         p.bump(TIME_KW);
         p.expect(ZONE_KW);
         if !zone_value(p) {
-            p.error(format!("expected time zone value, got {:?}", p.current()));
+            p.error(format!("expected time zone value, found {}", p.current()));
         }
         m.complete(p, SET_TIME_ZONE);
     } else if p.at(CATALOG_KW) || p.at(SCHEMA_KW) {
@@ -19390,7 +19390,7 @@ fn def_arg(p: &mut Parser<'_>) {
         qual_op(p);
         p.expect(R_PAREN);
     } else if !opt_type_name(p) {
-        let message = format!("expected attribute value, got {:?}", p.current());
+        let message = format!("expected attribute value, found {}", p.current());
         err_recover_run(p, message, ATTRIBUTE_VALUE_RECOVERY);
     }
     m.complete(p, ATTRIBUTE_VALUE);

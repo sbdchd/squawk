@@ -290,7 +290,7 @@ error[syntax-error]: expected `when`
   ╭▸ 
 5 │   case x
   ╰╴        ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
    ╭▸ 
 13 │   end case
    ╰╴          ━

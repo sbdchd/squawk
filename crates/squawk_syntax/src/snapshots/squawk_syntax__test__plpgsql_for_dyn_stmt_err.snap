@@ -217,11 +217,11 @@ error[syntax-error]: expected an expression
   ╭▸ 
 5 │   for r in execute loop
   ╰╴                  ━
-error[syntax-error]: expected LOOP_KW
+error[syntax-error]: expected `loop`
    ╭▸ 
 16 │     null;
    ╰╴        ━
-error[syntax-error]: expected a statement, got SEMICOLON
+error[syntax-error]: expected a statement, found `;`
    ╭▸ 
 16 │     null;
    ╰╴        ━

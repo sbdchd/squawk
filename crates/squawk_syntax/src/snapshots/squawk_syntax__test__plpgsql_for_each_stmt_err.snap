@@ -245,7 +245,7 @@ PLPGSQL@0..94
     END_KW@90..93 "end"
   WHITESPACE@93..94 "\n"
 
-error[syntax-error]: expected ARRAY_KW
+error[syntax-error]: expected `array`
   ╭▸ 
 7 │   foreach x in arr loop
   ╰╴              ━
@@ -253,7 +253,7 @@ error[syntax-error]: expected unsigned integer literal
    ╭▸ 
 20 │   foreach x slice n in array arr loop
    ╰╴                  ━
-error[syntax-error]: expected a loop variable, got IN_KW
+error[syntax-error]: expected a loop variable, found `in`
    ╭▸ 
 31 │   foreach in array arr loop
    ╰╴         ━

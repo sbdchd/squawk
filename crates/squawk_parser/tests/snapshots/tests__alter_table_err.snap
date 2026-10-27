@@ -302,19 +302,19 @@ SOURCE_FILE
       COMMA ","
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected command, found ADD_KW
+error[syntax-error]: expected command, found `add`
   ╭▸ 
 2 │ add column foo boolean;
   ╰╴━
-error[syntax-error]: expected command, found COLUMN_KW
+error[syntax-error]: expected command, found `column`
   ╭▸ 
 2 │ add column foo boolean;
   ╰╴    ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 2 │ add column foo boolean;
   ╰╴           ━
-error[syntax-error]: expected command, found BOOLEAN_KW
+error[syntax-error]: expected command, found `boolean`
   ╭▸ 
 2 │ add column foo boolean;
   ╰╴               ━
@@ -322,7 +322,7 @@ error[syntax-error]: missing comma
   ╭▸ 
 8 │ validate constraint foo validate constraint b ;
   ╰╴                       ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 16 │   alter c set (a b = 1);
    ╰╴                ━

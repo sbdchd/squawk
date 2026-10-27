@@ -2411,31 +2411,31 @@ error[syntax-error]: missing comma
    ╭▸ 
 12 │ select a, b c  d, e from t;
    ╰╴             ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 17 │ SELECT DISTINCT ON (a b) a, b, c
    ╰╴                     ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 22 │ select * from t group by rollup (1 2 3);
    ╰╴                                  ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 22 │ select * from t group by rollup (1 2 3);
    ╰╴                                    ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 23 │ select * from t group by cube (1 2 3);
    ╰╴                                ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 23 │ select * from t group by cube (1 2 3);
    ╰╴                                  ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 25 │   group by grouping sets((1 2) grouping sets((), grouping sets(())));
    ╰╴                           ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 25 │   group by grouping sets((1 2) grouping sets((), grouping sets(())));
    ╰╴                              ━
@@ -2463,7 +2463,7 @@ error[syntax-error]: missing comma
    ╭▸ 
 37 │ select numeric 1234;
    ╰╴              ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 40 │ select array[1 2,3];
    ╰╴              ━
@@ -2479,7 +2479,7 @@ error[syntax-error]: expected expression in atom_expr
    ╭▸ 
 47 │ select * from t group by all order by all;
    ╰╴                                      ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 50 │ select cast(x as varchar(100 200));
    ╰╴                            ━
@@ -2495,39 +2495,39 @@ error[syntax-error]: unexpected trailing comma
    ╭▸ 
 59 │ select a, from t;
    ╰╴        ━
-error[syntax-error]: expected an expression, found END_KW
+error[syntax-error]: expected an expression, found `end`
    ╭▸ 
 62 │ select case when 1 then end;
    ╰╴                       ━
-error[syntax-error]: expected an expression, found THEN_KW
+error[syntax-error]: expected an expression, found `then`
    ╭▸ 
 65 │ select case when then x end;
    ╰╴                ━
-error[syntax-error]: expected an expression, found END_KW
+error[syntax-error]: expected an expression, found `end`
    ╭▸ 
 68 │ select case when 1 then 2 else end;
    ╰╴                              ━
-error[syntax-error]: expected expression but got AND_KW
+error[syntax-error]: expected expression, found `and`
    ╭▸ 
 84 │ select from t where and c > 10;
    ╰╴                    ━
-error[syntax-error]: expected expression but got OR_KW
+error[syntax-error]: expected expression, found `or`
    ╭▸ 
 85 │ select from t where or c != 'b';
    ╰╴                    ━
-error[syntax-error]: expected expression but got AND_KW
+error[syntax-error]: expected expression, found `and`
    ╭▸ 
 87 │ select having and c > 10;
    ╰╴              ━
-error[syntax-error]: expected expression but got OR_KW
+error[syntax-error]: expected expression, found `or`
    ╭▸ 
 88 │ select having or c != 'b';
    ╰╴              ━
-error[syntax-error]: expected expression but got AND_KW
+error[syntax-error]: expected expression, found `and`
    ╭▸ 
 90 │ select from t join u on and true;
    ╰╴                        ━
-error[syntax-error]: expected expression but got OR_KW
+error[syntax-error]: expected expression, found `or`
    ╭▸ 
 91 │ select from t join u on or true;
    ╰╴                        ━
@@ -2539,11 +2539,11 @@ error[syntax-error]: HAVING must appear before ORDER BY
     ╭▸ 
 103 │ having a > 10;
     ╰╴━
-error[syntax-error]: expected R_PAREN
+error[syntax-error]: expected `)`
     ╭▸ 
 123 │ (select 1;);
     ╰╴         ━
-error[syntax-error]: expected command, found R_PAREN
+error[syntax-error]: expected command, found `)`
     ╭▸ 
 123 │ (select 1;);
     ╰╴          ━
@@ -2599,7 +2599,7 @@ error[syntax-error]: ALL or DISTINCT is only allowed before the first argument
     ╭▸ 
 148 │ select f(1, distinct 2);
     ╰╴            ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
     ╭▸ 
 151 │ select * from rows from (f() t);
     ╰╴                            ━
@@ -2611,11 +2611,11 @@ error[syntax-error]: expected column definition list
     ╭▸ 
 152 │ select * from rows from (f() as t(a int));
     ╰╴                               ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
     ╭▸ 
 152 │ select * from rows from (f() as t(a int));
     ╰╴                               ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
     ╭▸ 
 152 │ select * from rows from (f() as t(a int));
     ╰╴                                   ━
@@ -2623,11 +2623,11 @@ error[syntax-error]: expected a type
     ╭▸ 
 155 │ select * from rows from (f() as (a));
     ╰╴                                  ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
     ╭▸ 
 158 │ select f(1 + (a => 2));
     ╰╴               ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
     ╭▸ 
 159 │ select f((a) => 2);
     ╰╴            ━
@@ -2635,11 +2635,11 @@ error[syntax-error]: unexpected trailing comma
     ╭▸ 
 162 │ select 1,
     ╰╴        ━
-error[syntax-error]: expected R_PAREN
+error[syntax-error]: expected `)`
     ╭▸ 
 165 │ select cast('42' as text collate "C");
     ╰╴                        ━
-error[syntax-error]: expected command, found R_PAREN
+error[syntax-error]: expected command, found `)`
     ╭▸ 
 165 │ select cast('42' as text collate "C");
     ╰╴                                    ━
@@ -2715,11 +2715,11 @@ error[syntax-error]: expected function name before argument list
     ╭▸ 
 193 │ select (f).g();
     ╰╴            ━
-error[syntax-error]: expected an expression, found COMMA
+error[syntax-error]: expected an expression, found `,`
     ╭▸ 
 197 │   (1 AND p[] = ''::r) OR,
     ╰╴                        ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
     ╭▸ 
 197 │     (1 AND p[] = ''::r) OR,
     │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┛

@@ -111,7 +111,7 @@ error[syntax-error]: unrecognized GET DIAGNOSTICS item
   ╭▸ 
 6 │   get diagnostics x = "row_count";
   ╰╴                      ━
-error[syntax-error]: expected EQ
+error[syntax-error]: expected `=`
   ╭▸ 
 7 │   get diagnostics x row_count;
   ╰╴                   ━
@@ -119,7 +119,7 @@ error[syntax-error]: subscript not allowed
   ╭▸ 
 8 │   get diagnostics x[1] = row_count;
   ╰╴                   ━
-error[syntax-error]: expected a diagnostics target, got SEMICOLON
+error[syntax-error]: expected a diagnostics target, found `;`
   ╭▸ 
 9 │   get diagnostics;
   ╰╴                 ━

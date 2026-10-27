@@ -94,7 +94,7 @@ error[syntax-error]: expected on clause
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
-error[syntax-error]: expected WHEN_KW
+error[syntax-error]: expected `when`
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
@@ -102,7 +102,7 @@ error[syntax-error]: expected MATCHED or NOT MATCHED
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
-error[syntax-error]: expected THEN_KW
+error[syntax-error]: expected `then`
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━

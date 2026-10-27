@@ -72,11 +72,11 @@ error[syntax-error]: invalid operator
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴       ━
-error[syntax-error]: expected R_BRACK
+error[syntax-error]: expected `]`
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴          ━
-error[syntax-error]: expected EQ
+error[syntax-error]: expected `=`
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴          ━
@@ -84,19 +84,19 @@ error[syntax-error]: expected an expression
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴          ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 5 │   x 1;
   ╰╴  ━
-error[syntax-error]: expected SEMICOLON, got INT_NUMBER
+error[syntax-error]: expected `;`, found integer literal
   ╭▸ 
 5 │   x 1;
   ╰╴    ━
-error[syntax-error]: expected a statement, got ALL_KW
+error[syntax-error]: expected a statement, found `all`
   ╭▸ 
 6 │   all := 1;
   ╰╴  ━
-error[syntax-error]: expected a statement, got SELECT_KW
+error[syntax-error]: expected a statement, found `select`
   ╭▸ 
 7 │   select := 1;
   ╰╴  ━

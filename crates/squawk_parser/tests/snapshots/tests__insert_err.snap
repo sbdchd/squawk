@@ -224,7 +224,7 @@ SOURCE_FILE
       VALUES_KW "values"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 2 │ insert into t (a, b c)
   ╰╴                   ━
@@ -236,7 +236,7 @@ error[syntax-error]: unexpected trailing comma
   ╭▸ 
 7 │ insert into t (a,,c,)
   ╰╴                   ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 13 │   values (4, 5  6,)
    ╰╴              ━
