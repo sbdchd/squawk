@@ -81,11 +81,11 @@ PLPGSQL@0..71
     END_KW@67..70 "end"
   WHITESPACE@70..71 "\n"
 
-error[syntax-error]: Missing semicolon after block
+error[syntax-error]: missing semicolon after block
   ╭▸ 
 5 │   end
   ╰╴     ━
-error[syntax-error]: Missing semicolon after block
+error[syntax-error]: missing semicolon after block
    ╭▸ 
 14 │   end inner
    ╰╴           ━

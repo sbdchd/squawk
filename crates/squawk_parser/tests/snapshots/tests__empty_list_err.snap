@@ -2005,303 +2005,303 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
   ╭▸ 
 1 │ select * from json_table('[]', '$' columns ()) x;
   ╰╴                                            ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
   ╭▸ 
 3 │ select xmlelement(name foo, xmlattributes());
   ╰╴                                          ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
   ╭▸ 
 5 │ select xmlforest();
   ╰╴                 ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
   ╭▸ 
 7 │ select * from graph_table(g match (a) columns ());
   ╰╴                                               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
   ╭▸ 
 9 │ alter property graph g alter vertex table t alter label l add properties ();
   ╰╴                                                                          ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 11 │ alter property graph g alter vertex table t drop properties ();
    ╰╴                                                             ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 13 │ select 1::numeric();
    ╰╴                  ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 15 │ select * from rows from ();
    ╰╴                         ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 17 │ select * from xmltable(xmlnamespaces(), '/a' passing x columns b text);
    ╰╴                                     ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 19 │ create table t (a int, exclude using gist ());
    ╰╴                                           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 21 │ select 1 group by grouping sets ();
    ╰╴                                 ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 23 │ select 1 group by rollup ();
    ╰╴                          ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 25 │ select 1 group by cube ();
    ╰╴                        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 27 │ select distinct on () 1;
    ╰╴                    ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 29 │ create table p partition of t for values in ();
    ╰╴                                             ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 31 │ create table p partition of t for values from () to ();
    ╰╴                                               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 31 │ create table p partition of t for values from () to ();
    ╰╴                                                     ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 33 │ alter table t merge partitions () into p;
    ╰╴                                ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 35 │ alter table t split partition p into ();
    ╰╴                                      ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 37 │ analyze ();
    ╰╴         ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 39 │ cluster ();
    ╰╴         ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 41 │ repack ();
    ╰╴        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 43 │ create property graph g vertex tables ();
    ╰╴                                       ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 45 │ create property graph g vertex tables (a) edge tables ();
    ╰╴                                                       ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 47 │ alter property graph g drop edge tables ();
    ╰╴                                         ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 49 │ alter property graph g drop vertex tables ();
    ╰╴                                           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 51 │ create publication p for all tables except ();
    ╰╴                                            ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 53 │ create statistics s () on a, b from t;
    ╰╴                     ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 55 │ explain () select 1;
    ╰╴         ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 57 │ alter server s options ();
    ╰╴                        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 59 │ reindex () index i;
    ╰╴         ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 61 │ checkpoint ();
    ╰╴            ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 63 │ vacuum ();
    ╰╴        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 65 │ copy t to stdout ();
    ╰╴                  ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 67 │ copy t to stdout (force_quote ());
    ╰╴                               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 69 │ insert into t values (1) on conflict () do nothing;
    ╰╴                                      ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 71 │ insert into t values (1) returning with () *;
    ╰╴                                         ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 73 │ update t set (a) = ();
    ╰╴                    ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 75 │ drop database d with ();
    ╰╴                      ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 77 │ create table t (a int) partition by range ();
    ╰╴                                           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 79 │ create index on t ();
    ╰╴                   ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 81 │ create index on t (a) include ();
    ╰╴                               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 83 │ create index on t (a int4_ops ());
    ╰╴                               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 85 │ create function f() returns table () as $$ $$ language sql;
    ╰╴                                   ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 87 │ create table t (a int) with ();
    ╰╴                             ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 89 │ alter table t reset ();
    ╰╴                     ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 91 │ alter table t alter column a set ();
    ╰╴                                  ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 93 │ create collation c ();
    ╰╴                    ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 95 │ create operator @@@ ();
    ╰╴                     ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 97 │ create type x as range ();
    ╰╴                        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
    ╭▸ 
 99 │ create type x ();
    ╰╴               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 101 │ create text search parser p ();
     ╰╴                             ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 103 │ alter subscription s skip ();
     ╰╴                           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 105 │ with t () as (select 1) select * from t;
     ╰╴        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 107 │ create view v () as select 1;
     ╰╴               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 109 │ create materialized view mv () as select 1;
     ╰╴                             ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 111 │ select * from t x ();
     ╰╴                   ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 113 │ select * from rows from (generate_series(1, 2) as ());
     ╰╴                                                   ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 115 │ select * from a join b using ();
     ╰╴                              ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 117 │ create table t (a int, unique ());
     ╰╴                               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 119 │ create table t (a int, unique (a) include ());
     ╰╴                                           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 121 │ create table t (a int, foreign key (a) references u ());
     ╰╴                                                     ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 123 │ create table t (a int references u (a) on delete set null ());
     ╰╴                                                           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 125 │ create table t (a int references u (a) on delete set default ());
     ╰╴                                                              ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 127 │ insert into t () values (1);
     ╰╴               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 129 │ update t set () = (1);
     ╰╴              ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 131 │ alter publication p add table t ();
     ╰╴                                 ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 133 │ grant all () on t to public;
     ╰╴           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 135 │ grant select () on t to public;
     ╰╴              ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 137 │ revoke select () on t from public;
     ╰╴               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 139 │ vacuum t ();
     ╰╴          ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 141 │ copy t () from stdin;
     ╰╴        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 143 │ create property graph g vertex tables (t key ());
     ╰╴                                              ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 145 │ create property graph g edge tables (e source key () references v (a) destination w);
     ╰╴                                                   ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 147 │ create property graph g edge tables (e source key (a) references v () destination w);
     ╰╴                                                                    ━

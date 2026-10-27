@@ -118,7 +118,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
 fn validate_distinct_on(distinct_on: &ast::DistinctOn, acc: &mut Vec<SyntaxError>) {
     if distinct_on.exprs().next().is_none() {
         acc.push(SyntaxError::new(
-            "Expected at least one expression in DISTINCT ON list.",
+            "expected at least one expression in DISTINCT ON list",
             distinct_on.syntax().text_range(),
         ));
     }
@@ -131,14 +131,14 @@ fn validate_except_table_clause(clause: &ast::ExceptTableClause, acc: &mut Vec<S
     };
     if first.table_token().is_none() {
         acc.push(SyntaxError::new(
-            "The first table in an EXCEPT list must use the TABLE keyword",
+            "the first table in an EXCEPT list must use the TABLE keyword",
             first.syntax().text_range(),
         ));
     }
     for name in std::iter::once(first).chain(names) {
         if name.table_relation_name().is_none() {
             acc.push(SyntaxError::new(
-                "Expected a table relation name",
+                "expected a table relation name",
                 name.syntax().text_range(),
             ));
         }
@@ -173,9 +173,9 @@ fn validate_hash_partition_bounds(it: &ast::PartitionForValuesWith, acc: &mut Ve
             }
             _ => {
                 let message = if !seen_modulus {
-                    format!("Expected modulus but found {actual}")
+                    format!("expected modulus but found {actual}")
                 } else if !seen_remainder {
-                    format!("Expected remainder but found {actual}")
+                    format!("expected remainder but found {actual}")
                 } else {
                     format!(r#"unrecognized hash partition bound specification "{actual}""#)
                 };
@@ -186,7 +186,7 @@ fn validate_hash_partition_bounds(it: &ast::PartitionForValuesWith, acc: &mut Ve
     }
     if !seen_modulus || !seen_remainder {
         acc.push(SyntaxError::new(
-            "Expected remainder and modulus",
+            "expected remainder and modulus",
             it.syntax().text_range(),
         ));
     }
@@ -327,7 +327,7 @@ fn validate_paren_from_item(item: &ast::ParenFromItem, acc: &mut Vec<SyntaxError
     };
     if invalid_parenthesized_table_ref {
         acc.push(SyntaxError::new(
-            "Parentheses are not allowed",
+            "parentheses are not allowed",
             item.syntax().text_range(),
         ));
     }
@@ -378,7 +378,7 @@ fn validate_atomic_body(it: &ast::AtomicBody, acc: &mut Vec<SyntaxError>) {
         }
         let end = syntax.text_range().end();
         acc.push(SyntaxError::new(
-            "Missing semicolon after statement",
+            "missing semicolon after statement",
             TextRange::empty(end),
         ));
     }
@@ -424,7 +424,7 @@ fn validate_plpgsql_block(it: &ast::PlpgsqlBlock, acc: &mut Vec<SyntaxError>) {
         return;
     }
     acc.push(SyntaxError::new(
-        "Missing semicolon after block",
+        "missing semicolon after block",
         TextRange::empty(it.syntax().text_range().end()),
     ));
 }
@@ -564,7 +564,7 @@ fn validate_rule_stmt_list(it: &ast::RuleStmtList, acc: &mut Vec<SyntaxError>) {
         }
         let end = syntax.text_range().end();
         acc.push(SyntaxError::new(
-            "Missing semicolon between statements",
+            "missing semicolon between statements",
             TextRange::empty(end),
         ));
     }
@@ -590,7 +590,7 @@ fn validate_source_file(it: &ast::SourceFile, acc: &mut Vec<SyntaxError>) {
         }
         let end = syntax.text_range().end();
         acc.push(SyntaxError::new(
-            "Missing semicolon between statements",
+            "missing semicolon between statements",
             TextRange::empty(end),
         ));
     }
@@ -602,7 +602,7 @@ fn validate_select_clause(clause: &ast::SelectClause, acc: &mut Vec<SyntaxError>
     };
     if clause.target_list().is_none() {
         acc.push(SyntaxError::new(
-            "Expected a target after SELECT DISTINCT",
+            "expected a target after SELECT DISTINCT",
             distinct.syntax().text_range(),
         ));
     }
@@ -615,9 +615,9 @@ fn validate_select(it: &ast::Select, acc: &mut Vec<SyntaxError>) {
             .select_clause()
             .is_some_and(|clause| clause.target_list().is_none())
         {
-            "Expected a target after SELECT"
+            "expected a target after SELECT"
         } else {
-            "Subqueries in tuple expressions must be parenthesized"
+            "subqueries in tuple expressions must be parenthesized"
         };
         acc.push(SyntaxError::new(message, it.syntax().text_range()));
     }
@@ -628,7 +628,7 @@ fn validate_select(it: &ast::Select, acc: &mut Vec<SyntaxError>) {
             .is_none_or(|clause| clause.target_list().is_none())
     {
         acc.push(SyntaxError::new(
-            "Expected a target after SELECT",
+            "expected a target after SELECT",
             it.syntax().text_range(),
         ));
     }
@@ -640,14 +640,14 @@ fn validate_select(it: &ast::Select, acc: &mut Vec<SyntaxError>) {
         if from_clause.syntax().text_range().end() <= select_clause.syntax().text_range().start() {
             // Postgres dialect doesn't support leading from clauses, e.g., `from t select c`
             acc.push(SyntaxError::new(
-                "Leading from clauses are not supported in Postgres",
+                "leading from clauses are not supported in Postgres",
                 from_clause.syntax().text_range(),
             ));
         }
     } else {
         // Postgres dialect doesn't support missing select clauses, e.g., `from t`
         acc.push(SyntaxError::new(
-            "Missing select clause",
+            "missing select clause",
             TextRange::empty(from_clause.syntax().text_range().start()),
         ));
     }
@@ -660,7 +660,7 @@ fn validate_storage_mode(mode: &ast::StorageMode, acc: &mut Vec<SyntaxError>) {
         .any(|valid_mode| mode_name.eq_ignore_ascii_case(valid_mode))
     {
         acc.push(SyntaxError::new(
-            "Expected PLAIN, EXTERNAL, EXTENDED, MAIN, or DEFAULT",
+            "expected PLAIN, EXTERNAL, EXTENDED, MAIN, or DEFAULT",
             mode.syntax().text_range(),
         ));
     }
@@ -674,7 +674,7 @@ fn validate_type_modifiers(ty: &ast::Type, acc: &mut Vec<SyntaxError>) {
     for arg in arg_list.args() {
         if arg.variadic_token().is_some() {
             acc.push(SyntaxError::new(
-                "Type modifiers must be simple constants or identifiers",
+                "type modifiers must be simple constants or identifiers",
                 arg.syntax().text_range(),
             ));
             continue;
@@ -682,14 +682,14 @@ fn validate_type_modifiers(ty: &ast::Type, acc: &mut Vec<SyntaxError>) {
         let arg_expr = arg.func_arg_expr();
         if let Some(ast::FuncArgExpr::NamedArg(named_arg)) = &arg_expr {
             acc.push(SyntaxError::new(
-                "Type modifier cannot have parameter name",
+                "type modifier cannot have parameter name",
                 named_arg.syntax().text_range(),
             ));
             continue;
         }
         if let Some(order_by) = arg.order_by_clause() {
             acc.push(SyntaxError::new(
-                "Type modifier cannot have ORDER BY",
+                "type modifier cannot have ORDER BY",
                 order_by.syntax().text_range(),
             ));
             continue;
@@ -699,7 +699,7 @@ fn validate_type_modifiers(ty: &ast::Type, acc: &mut Vec<SyntaxError>) {
         };
         if !is_simple_type_modifier(&expr) {
             acc.push(SyntaxError::new(
-                "Type modifiers must be simple constants or identifiers",
+                "type modifiers must be simple constants or identifiers",
                 expr.syntax().text_range(),
             ));
         }
@@ -797,7 +797,7 @@ fn validate_create_table(it: &ast::CreateTable, acc: &mut Vec<SyntaxError>) {
                 {
                     let end = col_name.syntax().text_range().end();
                     acc.push(SyntaxError::new(
-                        "Missing column type",
+                        "missing column type",
                         TextRange::new(end, end),
                     ));
                 }
@@ -849,7 +849,7 @@ fn validate_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
                         COMMENT if token.text().starts_with("--") => (),
                         COMMENT => {
                             maybe_errors.push(SyntaxError::new(
-                                "Comments between string literals are not allowed.",
+                                "comments between string literals are not allowed",
                                 token.text_range(),
                             ));
                         }
@@ -857,7 +857,7 @@ fn validate_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
                             // avoid warning twice for the same two string literals, so we check maybe_errors
                             if !seen_new_line && maybe_errors.is_empty() {
                                 maybe_errors.push(SyntaxError::new(
-                                    "Expected new line or comma between string literals",
+                                    "expected new line or comma between string literals",
                                     TextRange::new(text_range_end, token.text_range().start()),
                                 ));
                             }
@@ -918,7 +918,7 @@ fn is_row_in_insert_values(row: &SyntaxNode) -> bool {
 fn validate_set_column_list(list: &ast::SetColumnList, acc: &mut Vec<SyntaxError>) {
     if list.set_columns().next().is_none() {
         acc.push(SyntaxError::new(
-            "Expected at least one column assignment after SET",
+            "expected at least one column assignment after SET",
             list.syntax().text_range(),
         ));
     }
@@ -927,7 +927,7 @@ fn validate_set_column_list(list: &ast::SetColumnList, acc: &mut Vec<SyntaxError
 fn validate_to_config_value(it: &ast::ToConfigValue, acc: &mut Vec<SyntaxError>) {
     if it.default_token().is_none() && it.config_values().next().is_none() {
         acc.push(SyntaxError::new(
-            "Expected DEFAULT, string, identifier, number, or list of values",
+            "expected DEFAULT, string, identifier, number, or list of values",
             it.syntax().text_range(),
         ));
     }
@@ -975,7 +975,7 @@ fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
                     Some(ch) => ch,
                     None => {
                         acc.push(SyntaxError::new(
-                            "Invalid unicode escape character",
+                            "invalid unicode escape character",
                             token.text_range(),
                         ));
                         return;
@@ -1050,7 +1050,7 @@ fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
                         Some(ch) => ch,
                         None => {
                             acc.push(SyntaxError::new(
-                                "Invalid unicode escape character",
+                                "invalid unicode escape character",
                                 string_token.text_range(),
                             ));
                             return;
@@ -1106,7 +1106,7 @@ fn validate_in_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
         Some(ast::Expr::TupleExpr(tuple)) if tuple.row_token().is_none() => {
             if tuple.exprs().next().is_none() {
                 acc.push(SyntaxError::new(
-                    "Expected at least one expression in IN list.",
+                    "expected at least one expression in IN list",
                     tuple.syntax().text_range(),
                 ));
             }
@@ -1115,7 +1115,7 @@ fn validate_in_expr(bin_expr: &ast::BinExpr, acc: &mut Vec<SyntaxError>) {
         Some(rhs) => rhs,
     };
     acc.push(SyntaxError::new(
-        "Expected a parenthesized value list or subquery.",
+        "expected a parenthesized value list or subquery",
         rhs.syntax().text_range(),
     ));
 }
@@ -1179,7 +1179,7 @@ fn validate_join_expr(join_expr: &ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
             if join.join_condition().is_none() {
                 let end = join_expr.syntax().text_range().end();
                 acc.push(SyntaxError::new(
-                    "Join missing condition.",
+                    "join missing condition",
                     TextRange::new(end, end),
                 ));
             }
@@ -1187,7 +1187,7 @@ fn validate_join_expr(join_expr: &ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
         NotAllowed => {
             if let Some(ast::JoinCondition::JoinUsingClause(using_clause)) = join.join_condition() {
                 acc.push(SyntaxError::new(
-                    format!("Join `using` clause is not allowed for {join_name} joins."),
+                    format!("join `using` clause is not allowed for {join_name} joins"),
                     using_clause.syntax().text_range(),
                 ));
             }
@@ -1203,7 +1203,7 @@ fn validate_json_array_fn(it: &ast::JsonArrayFn, acc: &mut Vec<SyntaxError>) {
         return;
     }
     acc.push(SyntaxError::new(
-        "Subquery must be the only argument",
+        "subquery must be the only argument",
         select.syntax().text_range(),
     ));
 }
@@ -1219,7 +1219,7 @@ fn validate_json_object_fn(it: &ast::JsonObjectFn, acc: &mut Vec<SyntaxError>) {
     let func_arg = func_arg.syntax().text_range();
     let range = std::cmp::max_by_key(func_arg, key_value, |range| range.start());
     acc.push(SyntaxError::new(
-        "Cannot mix `key: value` pairs with other arguments",
+        "cannot mix `key: value` pairs with other arguments",
         range,
     ));
 }
@@ -1232,14 +1232,14 @@ fn validate_array_expr(array_expr: &ast::ArrayExpr, acc: &mut Vec<SyntaxError>) 
         }
         let expr_range = array_expr.syntax().text_range();
         let range = TextRange::new(expr_range.start(), expr_range.start());
-        acc.push(SyntaxError::new("Array missing ARRAY keyword.", range));
+        acc.push(SyntaxError::new("array missing ARRAY keyword", range));
     }
     if array_expr.l_paren_token().is_some() && !has_select_variant(array_expr.syntax()) {
         let range = match array_expr.exprs().next() {
             Some(expr) => expr.syntax().text_range(),
             None => array_expr.syntax().text_range(),
         };
-        acc.push(SyntaxError::new("Expected a subquery", range));
+        acc.push(SyntaxError::new("expected a subquery", range));
     }
 }
 
@@ -1291,7 +1291,7 @@ fn validate_custom_op(op: &ast::CustomOp, acc: &mut Vec<SyntaxError>) {
     });
     if let Some(STAR | SLASH | L_ANGLE | R_ANGLE | EQ | PERCENT | CARET) = token {
         acc.push(SyntaxError::new(
-            "Invalid operator.",
+            "invalid operator",
             op.syntax().text_range(),
         ));
     }
@@ -1375,13 +1375,13 @@ fn validate_variadic_param_iter(
                 continue;
             }
             acc.push(SyntaxError::new(
-                "VARIADIC param must be last.",
+                "VARIADIC param must be last",
                 param.syntax().text_range(),
             ));
             continue;
         }
         acc.push(SyntaxError::new(
-            "VARIADIC param must be last input param.",
+            "VARIADIC param must be last input param",
             param.syntax().text_range(),
         ));
     }
@@ -1394,7 +1394,7 @@ fn validate_param_defaults(params: Option<ast::ParamList>, acc: &mut Vec<SyntaxE
     for param in params.all_params() {
         if let Some(default) = param.param_default() {
             acc.push(SyntaxError::new(
-                "Defaults are not allowed.",
+                "defaults are not allowed",
                 default.syntax().text_range(),
             ));
         }
@@ -1408,11 +1408,11 @@ fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut
             if let Some(mode) = p.mode() {
                 match mode {
                     ast::ParamMode::ParamOut(param_out) => acc.push(SyntaxError::new(
-                        "Out params are not allowed with aggregates.",
+                        "OUT params are not allowed with aggregates",
                         param_out.syntax().text_range(),
                     )),
                     ast::ParamMode::ParamInOut(param_in_out) => acc.push(SyntaxError::new(
-                        "In Out params are not allowed with aggregates.",
+                        "INOUT params are not allowed with aggregates",
                         param_in_out.syntax().text_range(),
                     )),
                     ast::ParamMode::ParamIn(_) | ast::ParamMode::ParamVariadic(_) => (),
@@ -1424,12 +1424,12 @@ fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut
 
 fn validate_non_standard_param(param: &ast::NonStandardParam, acc: &mut Vec<SyntaxError>) {
     acc.push(SyntaxError::new(
-        "Invalid parameter type. Use positional params like $1 instead.",
+        "invalid parameter type. Use positional params like $1 instead",
         param.syntax().text_range(),
     ));
 }
 
-const CONFLICTING_OPTIONS: &str = "Conflicting or redundant options.";
+const CONFLICTING_OPTIONS: &str = "conflicting or redundant options";
 
 #[derive(Clone, Copy, PartialEq)]
 enum FuncOptionGroup {
@@ -1502,7 +1502,7 @@ fn validate_routine_body(
         .any(|option| matches!(option, ast::FuncOption::AsFuncOption(_)));
     if has_as_option {
         acc.push(SyntaxError::new(
-            "Duplicate function body.",
+            "duplicate function body",
             body.syntax().text_range(),
         ));
     }
@@ -1518,7 +1518,7 @@ fn validate_do(do_: &ast::Do, acc: &mut Vec<SyntaxError>) {
                     && language_name.name == SqlBody::LANGUAGE
                 {
                     acc.push(SyntaxError::new(
-                        "SQL is not a valid language for DO statements.",
+                        "SQL is not a valid language for DO statements",
                         language_name.range,
                     ));
                 }

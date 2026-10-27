@@ -32,9 +32,9 @@ pub enum UnicodeEscError {
 impl fmt::Display for UnicodeEscError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::InvalidEscape => f.write_str("Invalid Unicode escape sequence"),
-            Self::InvalidSurrogatePair => f.write_str("Invalid Unicode surrogate pair"),
-            Self::OutOfRange => f.write_str("Unicode escape value out of range"),
+            Self::InvalidEscape => f.write_str("invalid unicode escape sequence"),
+            Self::InvalidSurrogatePair => f.write_str("invalid unicode surrogate pair"),
+            Self::OutOfRange => f.write_str("unicode escape value out of range"),
             Self::RequiresHexDigits { kind, escape_char } => {
                 let required = kind.count();
                 let plus = match kind {
@@ -44,7 +44,7 @@ impl fmt::Display for UnicodeEscError {
                 let xs = "X".repeat(required as usize);
                 write!(
                     f,
-                    "Unicode escape requires {required} hex digits: {escape_char}{plus}{xs}"
+                    "unicode escape requires {required} hex digits: {escape_char}{plus}{xs}"
                 )
             }
         }
@@ -423,44 +423,42 @@ mod tests {
     #[test]
     fn incomplete_unicode_escape_breaks_surrogate_pairing() {
         assert_snapshot!(unicode_escape_events(r"\D800\006\DC00", '\\'), @r"
-        0..5 err Invalid Unicode surrogate pair
-        5..9 err Unicode escape requires 4 hex digits: \XXXX
-        9..14 err Invalid Unicode surrogate pair
+        0..5 err invalid unicode surrogate pair
+        5..9 err unicode escape requires 4 hex digits: \XXXX
+        9..14 err invalid unicode surrogate pair
         ");
     }
 
     #[test]
     fn invalid_unicode_escape_breaks_surrogate_pairing() {
-        assert_snapshot!(unicode_escape_events(r"\D800\Q\DC00", '\\'), @r"
-        0..5 err Invalid Unicode surrogate pair
-        5..7 err Invalid Unicode escape sequence
-        7..12 err Invalid Unicode surrogate pair
+        assert_snapshot!(unicode_escape_events(r"\D800\Q\DC00", '\\'), @"
+        0..5 err invalid unicode surrogate pair
+        5..7 err invalid unicode escape sequence
+        7..12 err invalid unicode surrogate pair
         ");
     }
 
     #[test]
     fn invalid_unicode_escape_does_not_emit_literal_char() {
-        assert_snapshot!(unicode_escape_events(r"\0061\Q\0062", '\\'), @r"
+        assert_snapshot!(unicode_escape_events(r"\0061\Q\0062", '\\'), @"
         0..5 ok 'a'
-        5..7 err Invalid Unicode escape sequence
+        5..7 err invalid unicode escape sequence
         7..12 ok 'b'
         ");
     }
 
     #[test]
     fn invalid_unicode_escape_works_with_custom_escape_char() {
-        assert_snapshot!(unicode_escape_events("!0061!Q!0062", '!'), @r"
+        assert_snapshot!(unicode_escape_events("!0061!Q!0062", '!'), @"
         0..5 ok 'a'
-        5..7 err Invalid Unicode escape sequence
+        5..7 err invalid unicode escape sequence
         7..12 ok 'b'
         ");
     }
 
     #[test]
     fn valid_unicode_escape_after_high_surrogate_only_emits_error() {
-        assert_snapshot!(unicode_escape_events(r"\D800\0061", '\\'), @r"
-        0..10 err Invalid Unicode surrogate pair
-        ");
+        assert_snapshot!(unicode_escape_events(r"\D800\0061", '\\'), @"0..10 err invalid unicode surrogate pair");
     }
 
     #[test]

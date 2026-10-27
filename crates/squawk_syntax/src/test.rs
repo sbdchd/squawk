@@ -92,7 +92,7 @@ fn regression_suite_validation(fixture: Fixture<&str>) {
 
     // strings.sql intentionally has a comment between string continuation literals
     if test_name == "strings" {
-        errors.retain(|e| e.message() != "Comments between string literals are not allowed.");
+        errors.retain(|e| e.message() != "comments between string literals are not allowed");
     }
 
     assert!(
@@ -349,8 +349,8 @@ fn parse_errors_are_sorted_by_position() {
         .collect::<Vec<_>>()
         .join("\n");
 
-    assert_snapshot!(rendered, @r"
-    0..6: Leading from clauses are not supported in Postgres
+    assert_snapshot!(rendered, @"
+    0..6: leading from clauses are not supported in Postgres
     17..17: expected an expression, found SEMICOLON
     ");
 }

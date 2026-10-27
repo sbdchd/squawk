@@ -43,7 +43,7 @@ SOURCE_FILE@0..55
     SEMICOLON@53..54 ";"
   WHITESPACE@54..55 "\n"
 
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 1 │ alter routine r(value integer default 1) rename to r2;
   ╰╴                              ━━━━━━━━━

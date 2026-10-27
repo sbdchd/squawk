@@ -81,23 +81,23 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: National character string literals cannot be used in type literals
+error[syntax-error]: national character string literals cannot be used in type literals
   ╭▸ 
 1 │ select varchar n'a';
   ╰╴               ━
-error[syntax-error]: National character string literals cannot be used in type literals
+error[syntax-error]: national character string literals cannot be used in type literals
   ╭▸ 
 2 │ select nchar n'a';
   ╰╴             ━
-error[syntax-error]: National character string literals cannot be used in type literals
+error[syntax-error]: national character string literals cannot be used in type literals
   ╭▸ 
 3 │ select national character n'a';
   ╰╴                          ━
-error[syntax-error]: Bit string literals cannot be used in type literals
+error[syntax-error]: bit string literals cannot be used in type literals
   ╭▸ 
 4 │ select varchar b'01';
   ╰╴               ━
-error[syntax-error]: Hexadecimal string literals cannot be used in type literals
+error[syntax-error]: hexadecimal string literals cannot be used in type literals
   ╭▸ 
 5 │ select varchar x'0a';
   ╰╴               ━

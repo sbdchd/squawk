@@ -243,67 +243,67 @@ SOURCE_FILE@0..519
     SEMICOLON@517..518 ";"
   WHITESPACE@518..519 "\n"
 
-error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+error[syntax-error]: unicode escape requires 4 hex digits: \XXXX
   ╭▸ 
 8 │ select U&"\006";
   ╰╴          ━━━━
-error[syntax-error]: Unicode escape requires 6 hex digits: \+XXXXXX
+error[syntax-error]: unicode escape requires 6 hex digits: \+XXXXXX
   ╭▸ 
 9 │ select U&"\+0061";
   ╰╴          ━━━━━━
-error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+error[syntax-error]: unicode escape requires 4 hex digits: \XXXX
    ╭▸ 
 10 │ select U&"wrong: \06" UESCAPE '\';
    ╰╴                 ━━━
-error[syntax-error]: Unicode escape requires 4 hex digits: !XXXX
+error[syntax-error]: unicode escape requires 4 hex digits: !XXXX
    ╭▸ 
 11 │ select U&"wrong: !061" UESCAPE '!';
    ╰╴                 ━━━━
-error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+error[syntax-error]: unicode escape requires 4 hex digits: \XXXX
    ╭▸ 
 12 │ select U&"many: \061 \+0061 \zzzz";
    ╰╴                ━━━━
-error[syntax-error]: Unicode escape requires 6 hex digits: \+XXXXXX
+error[syntax-error]: unicode escape requires 6 hex digits: \+XXXXXX
    ╭▸ 
 12 │ select U&"many: \061 \+0061 \zzzz";
    ╰╴                     ━━━━━━
-error[syntax-error]: Invalid Unicode escape sequence
+error[syntax-error]: invalid unicode escape sequence
    ╭▸ 
 12 │ select U&"many: \061 \+0061 \zzzz";
    ╰╴                            ━━
-error[syntax-error]: Invalid Unicode surrogate pair
+error[syntax-error]: invalid unicode surrogate pair
    ╭▸ 
 13 │ select U&"\D800\D801\DC00";
    ╰╴          ━━━━━━━━━━
-error[syntax-error]: Invalid Unicode surrogate pair
+error[syntax-error]: invalid unicode surrogate pair
    ╭▸ 
 13 │ select U&"\D800\D801\DC00";
    ╰╴                    ━━━━━
-error[syntax-error]: Invalid Unicode escape sequence
+error[syntax-error]: invalid unicode escape sequence
    ╭▸ 
 14 │ select U&" \";
    ╰╴           ━
-error[syntax-error]: Invalid unicode escape character
+error[syntax-error]: invalid unicode escape character
    ╭▸ 
 15 │ select U&"error" UESCAPE '';
    ╰╴                         ━━
-error[syntax-error]: Invalid unicode escape character
+error[syntax-error]: invalid unicode escape character
    ╭▸ 
 16 │ select U&"error" UESCAPE ' ';
    ╰╴                         ━━━
-error[syntax-error]: Invalid unicode escape character
+error[syntax-error]: invalid unicode escape character
    ╭▸ 
 17 │ select U&"error" UESCAPE '+';
    ╰╴                         ━━━
-error[syntax-error]: Invalid unicode escape character
+error[syntax-error]: invalid unicode escape character
    ╭▸ 
 18 │ select U&"error" UESCAPE 'A';
    ╰╴                         ━━━
-error[syntax-error]: Invalid unicode escape character
+error[syntax-error]: invalid unicode escape character
    ╭▸ 
 19 │ select U&"error" UESCAPE 'é';
    ╰╴                         ━━━
-error[syntax-error]: Invalid unicode escape character
+error[syntax-error]: invalid unicode escape character
    ╭▸ 
 20 │ select U&"error" UESCAPE 'foo';
    ╰╴                         ━━━━━

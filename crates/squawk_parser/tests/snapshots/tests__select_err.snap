@@ -2643,51 +2643,51 @@ error[syntax-error]: expected command, found R_PAREN
     ╭▸ 
 165 │ select cast('42' as text collate "C");
     ╰╴                                    ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 168 │ select 1 group by rollup ();
     ╰╴                          ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 169 │ select 1 group by cube ();
     ╰╴                        ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
     ╭▸ 
 170 │ select distinct on () 1;
     ╰╴                    ━
-error[syntax-error]: Expected at least one GROUP BY item
+error[syntax-error]: expected at least one GROUP BY item
     ╭▸ 
 173 │ select 1 group by;
     ╰╴                 ━
-error[syntax-error]: Expected at least one GROUP BY item
+error[syntax-error]: expected at least one GROUP BY item
     ╭▸ 
 174 │ select 1 group by distinct;
     ╰╴                          ━
-error[syntax-error]: Expected a GROUP BY item after comma
+error[syntax-error]: expected a GROUP BY item after comma
     ╭▸ 
 177 │ select 1 group by a, order by b;
     ╰╴                    ━
-error[syntax-error]: Expected a GROUP BY item after comma
+error[syntax-error]: expected a GROUP BY item after comma
     ╭▸ 
 178 │ with x as (select 1 group by a,)
     ╰╴                               ━
-error[syntax-error]: Expected at least one ORDER BY item
+error[syntax-error]: expected at least one ORDER BY item
     ╭▸ 
 182 │ select 1 order by;
     ╰╴                 ━
-error[syntax-error]: Expected an ORDER BY item after comma
+error[syntax-error]: expected an ORDER BY item after comma
     ╭▸ 
 183 │ select 1 order by a, limit 1;
     ╰╴                    ━
-error[syntax-error]: Expected at least one ORDER BY item
+error[syntax-error]: expected at least one ORDER BY item
     ╭▸ 
 184 │ select array_agg(a order by);
     ╰╴                           ━
-error[syntax-error]: Expected an ORDER BY item after comma
+error[syntax-error]: expected an ORDER BY item after comma
     ╭▸ 
 185 │ select array_agg(a order by a,);
     ╰╴                              ━
-error[syntax-error]: Expected an expression
+error[syntax-error]: expected an expression
     ╭▸ 
 188 │ select ()();
     ╰╴        ━

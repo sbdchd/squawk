@@ -178,7 +178,7 @@ PLPGSQL@0..103
     END_KW@99..102 "end"
   WHITESPACE@102..103 "\n"
 
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
   ╭▸ 
 3 │   a cursor () for select 1;
   ╰╴            ━

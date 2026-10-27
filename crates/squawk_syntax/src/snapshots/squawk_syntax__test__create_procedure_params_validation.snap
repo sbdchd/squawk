@@ -113,11 +113,11 @@ SOURCE_FILE@0..188
     SEMICOLON@186..187 ";"
   WHITESPACE@187..188 "\n"
 
-error[syntax-error]: VARIADIC param must be last input param.
+error[syntax-error]: VARIADIC param must be last input param
   ╭▸ 
 1 │ create procedure invalid_variadic(variadic items int[], following int)
   ╰╴                                                        ━━━━━━━━━━━━━
-error[syntax-error]: VARIADIC param must be last.
+error[syntax-error]: VARIADIC param must be last
   ╭▸ 
 5 │ create procedure invalid_variadic_out(variadic items int[], out result int)
   ╰╴                                                            ━━━━━━━━━━━━━━

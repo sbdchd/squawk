@@ -470,47 +470,47 @@ SOURCE_FILE@0..1001
     SEMICOLON@999..1000 ";"
   WHITESPACE@1000..1001 "\n"
 
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
   ╭▸ 
 2 │ do language plpgsql $$ x $$ language sql;
   ╰╴                            ━━━━━━━━━━━━
-error[syntax-error]: SQL is not a valid language for DO statements.
+error[syntax-error]: SQL is not a valid language for DO statements
   ╭▸ 
 2 │ do language plpgsql $$ x $$ language sql;
   ╰╴                                     ━━━
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
   ╭▸ 
 7 │   language sql
   ╰╴  ━━━━━━━━━━━━
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
    ╭▸ 
 12 │   stable
    ╰╴  ━━━━━━
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
    ╭▸ 
 17 │   called on null input
    ╰╴  ━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
    ╭▸ 
 22 │   external security definer
    ╰╴  ━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
    ╭▸ 
 27 │   as 'foo', 'bar';
    ╰╴  ━━━━━━━━━━━━━━━
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
    ╭▸ 
 29 │ alter function f() cost 1 cost 2;
    ╰╴                          ━━━━━━
-error[syntax-error]: Conflicting or redundant options.
+error[syntax-error]: conflicting or redundant options
    ╭▸ 
 31 │ alter function f() leakproof not leakproof;
    ╰╴                             ━━━━━━━━━━━━━
-error[syntax-error]: Duplicate function body.
+error[syntax-error]: duplicate function body
    ╭▸ 
 34 │ create function f() returns int language sql as 'select 1' return 2;
    ╰╴                                                           ━━━━━━━━
-error[syntax-error]: Duplicate function body.
+error[syntax-error]: duplicate function body
    ╭▸ 
 35 │ create procedure p() language sql as 'select 1' begin atomic end;
    ╰╴                                                ━━━━━━━━━━━━━━━━

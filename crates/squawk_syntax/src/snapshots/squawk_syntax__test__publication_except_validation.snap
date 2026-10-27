@@ -68,11 +68,11 @@ SOURCE_FILE@0..111
     SEMICOLON@109..110 ";"
   WHITESPACE@110..111 "\n"
 
-error[syntax-error]: The first table in an EXCEPT list must use the TABLE keyword
+error[syntax-error]: the first table in an EXCEPT list must use the TABLE keyword
   ╭▸ 
 1 │ create publication p for all tables except (t1, table t2);
   ╰╴                                            ━━
-error[syntax-error]: Expected a table relation name
+error[syntax-error]: expected a table relation name
   ╭▸ 
 2 │ create publication p for all tables except (table);
   ╰╴                                            ━━━━━

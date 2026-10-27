@@ -151,19 +151,19 @@ SOURCE_FILE@0..250
     SEMICOLON@248..249 ";"
   WHITESPACE@249..250 "\n"
 
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 1 │ comment on function f(value integer default 1) is 'function';
   ╰╴                                    ━━━━━━━━━
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 2 │ comment on procedure p(value integer default 1) is 'procedure';
   ╰╴                                     ━━━━━━━━━
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 3 │ comment on routine r(value integer default 1) is 'routine';
   ╰╴                                   ━━━━━━━━━
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 4 │ comment on aggregate a(value integer default 1) is 'aggregate';
   ╰╴                                     ━━━━━━━━━

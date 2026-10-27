@@ -68,7 +68,7 @@ error[syntax-error]: expected an expression
   ╭▸ 
 3 │   x := ;
   ╰╴      ━
-error[syntax-error]: Invalid operator.
+error[syntax-error]: invalid operator
   ╭▸ 
 4 │   a[1 := 2;
   ╰╴       ━

@@ -36,7 +36,7 @@ SOURCE_FILE@0..75
     SEMICOLON@73..74 ";"
   WHITESPACE@74..75 "\n"
 
-error[syntax-error]: Missing column type
+error[syntax-error]: missing column type
   ╭▸ 
 3 │   description
   ╰╴             ━

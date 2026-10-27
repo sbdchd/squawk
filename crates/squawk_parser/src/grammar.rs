@@ -177,7 +177,7 @@ fn tuple_expr(p: &mut Parser<'_>, items: ListItems) -> (CompletedMarker, ExprKin
     let explicit_row = p.eat(ROW_KW);
     p.expect(L_PAREN);
     if matches!(items, ListItems::Required) && p.at(R_PAREN) {
-        p.error("Expected an expression");
+        p.error("expected an expression");
     }
     let mut saw_comma = false;
     let mut saw_expr = false;
@@ -1089,10 +1089,10 @@ fn at_type_literal(p: &Parser<'_>) -> bool {
 
 fn type_literal_string(p: &mut Parser<'_>) {
     let error = match p.current() {
-        BIT_STRING => Some("Bit string literals cannot be used in type literals"),
-        BYTE_STRING => Some("Hexadecimal string literals cannot be used in type literals"),
+        BIT_STRING => Some("bit string literals cannot be used in type literals"),
+        BYTE_STRING => Some("hexadecimal string literals cannot be used in type literals"),
         NATIONAL_STRING => {
-            Some("National character string literals cannot be used in type literals")
+            Some("national character string literals cannot be used in type literals")
         }
         _ => None,
     };
@@ -2145,7 +2145,7 @@ pub(crate) fn delimited(
 ) {
     p.expect(bra);
     if matches!(items, ListItems::Required) && p.at(ket) {
-        p.error("Expected at least one item");
+        p.error("expected at least one item");
     }
     while !p.at(ket) && !p.at(EOF) {
         if p.at(delim) {
@@ -3797,12 +3797,12 @@ fn sort_by_list(p: &mut Parser<'_>) {
             break;
         }
         if !p.at_ts(EXPR_FIRST) {
-            p.error("Expected an ORDER BY item after comma");
+            p.error("expected an ORDER BY item after comma");
             break;
         }
     }
     if !found_item {
-        p.error("Expected at least one ORDER BY item");
+        p.error("expected at least one ORDER BY item");
     }
     m.complete(p, SORT_BY_LIST);
 }
@@ -4729,7 +4729,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, mut kind: ColumnDefKind) -> bool {
         | ColumnDefKind::NameRef => ListItems::Required,
     };
     if matches!(items, ListItems::Required) && p.at(R_PAREN) {
-        p.error("Expected at least one item");
+        p.error("expected at least one item");
     }
     let mut seen_period = false;
     while !p.at(EOF) && !p.at(R_PAREN) {
@@ -5950,7 +5950,7 @@ fn opt_group_by_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let group_by_all = p.at(ALL_KW);
     opt_all_or_distinct(p);
     if !opt_group_by_list(p) && !group_by_all {
-        p.error("Expected at least one GROUP BY item");
+        p.error("expected at least one GROUP BY item");
     }
 
     Some(m.complete(p, GROUP_BY_CLAUSE))
@@ -5975,7 +5975,7 @@ fn opt_group_by_list(p: &mut Parser<'_>) -> bool {
             break;
         }
         if !p.at_ts(GROUP_BY_ITEM_FIRST) {
-            p.error("Expected a GROUP BY item after comma");
+            p.error("expected a GROUP BY item after comma");
             break;
         }
     }
@@ -8451,7 +8451,7 @@ fn alter_sequence(p: &mut Parser<'_>) -> CompletedMarker {
             } else if p.eat(UNLOGGED_KW) {
                 SET_UNLOGGED
             } else {
-                p.error("LOGGED or UNLOGGED");
+                p.error("expected LOGGED or UNLOGGED");
                 SET_LOGGED
             };
             m.complete(p, kind);
@@ -8992,7 +8992,7 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
                 opt_alter_table_action_list(p);
             }
             _ => {
-                p.error("Expected RENAME, SET SCHEMA, [NO] DEPENDS, or action (ALTER, CLUSTER, SET, RESET, OWNER)");
+                p.error("expected RENAME, SET SCHEMA, [NO] DEPENDS, or action (ALTER, CLUSTER, SET, RESET, OWNER)");
             }
         }
     }
@@ -9333,7 +9333,7 @@ fn alter_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
         _ => opt_fdw_option_list(p).is_some(),
     };
     if !found_option {
-        p.error("Missing alter foreign data wrapper option or action.");
+        p.error("missing alter foreign data wrapper option or action");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_FOREIGN_DATA_WRAPPER)
@@ -9989,7 +9989,7 @@ fn privilege_target_type(p: &mut Parser<'_>) {
             m.complete(p, kind);
         }
         _ => p.error(
-            "expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS, LARGE OBJECTS",
+            "expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQUENCES, TYPES, SCHEMAS, or LARGE OBJECTS",
         ),
     }
 }
@@ -10263,7 +10263,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => {
             p.error(
-            "expected CONNECTION, SERVER, SET, ADD, DROP, REFRESH, ENABLE, DISABLE, SKIP, OWNER or RENAME",
+            "expected CONNECTION, SERVER, SET, ADD, DROP, REFRESH, ENABLE, DISABLE, SKIP, OWNER, or RENAME",
         );
         }
     }
@@ -12557,7 +12557,7 @@ fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
             } else if p.eat(VALIDATOR_KW) {
                 OPTION_NO_VALIDATOR
             } else {
-                p.error("expected CONNECTION, HANDLER or VALIDATOR");
+                p.error("expected CONNECTION, HANDLER, or VALIDATOR");
                 OPTION_NO_CONNECTION
             }
         }
@@ -12787,7 +12787,7 @@ fn operator_drop_class_option(p: &mut Parser<'_>) {
             opt_param_list(p, ParamKind::TypeOnly);
             m.complete(p, kind);
         }
-        _ => p.error("expected OPERATOR, or FUNCTION"),
+        _ => p.error("expected OPERATOR or FUNCTION"),
     }
 }
 
@@ -14621,7 +14621,7 @@ fn merge_when_clause(p: &mut Parser<'_>) {
             }
         }
         _ => {
-            p.error("expected MATCHED, or NOT MATCHED");
+            p.error("expected MATCHED or NOT MATCHED");
             MERGE_WHEN_NOT_MATCHED_TARGET
         }
     };

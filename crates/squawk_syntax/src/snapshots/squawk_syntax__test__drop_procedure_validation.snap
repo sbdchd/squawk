@@ -34,7 +34,7 @@ SOURCE_FILE@0..43
     SEMICOLON@41..42 ";"
   WHITESPACE@42..43 "\n"
 
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 1 │ drop procedure p(value integer default 1);
   ╰╴                               ━━━━━━━━━

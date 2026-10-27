@@ -832,11 +832,11 @@ error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
 6 │ SELECT 0.0e1a;
   ╰╴            ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
   ╭▸ 
 7 │ SELECT 0.0e;
   ╰╴          ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
   ╭▸ 
 8 │ SELECT 0.0e+a;
   ╰╴          ━
@@ -844,7 +844,7 @@ error[syntax-error]: trailing junk after positional parameter
   ╭▸ 
 9 │ SELECT $1a;
   ╰╴         ━
-error[syntax-error]: Missing digits after the integer base prefix
+error[syntax-error]: missing digits after the integer base prefix
    ╭▸ 
 10 │ SELECT 0b;
    ╰╴       ━━
@@ -856,7 +856,7 @@ error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 12 │ SELECT 0b0x;
    ╰╴          ━
-error[syntax-error]: Missing digits after the integer base prefix
+error[syntax-error]: missing digits after the integer base prefix
    ╭▸ 
 13 │ SELECT 0o;
    ╰╴       ━━
@@ -868,7 +868,7 @@ error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 15 │ SELECT 0o0x;
    ╰╴          ━
-error[syntax-error]: Missing digits after the integer base prefix
+error[syntax-error]: missing digits after the integer base prefix
    ╭▸ 
 16 │ SELECT 0x;
    ╰╴       ━━
@@ -948,7 +948,7 @@ error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 28 │ SELECT 1_000.5_;
    ╰╴              ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
    ╭▸ 
 29 │ SELECT 1_000.5e_1;
    ╰╴              ━
@@ -984,7 +984,7 @@ error[syntax-error]: expected field name
    ╭▸ 
 40 │ select 0 . 0e ;
    ╰╴           ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
    ╭▸ 
 40 │ select 0 . 0e ;
    ╰╴            ━
@@ -992,7 +992,7 @@ error[syntax-error]: expected field name
    ╭▸ 
 41 │ select t . 0e ;
    ╰╴           ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
    ╭▸ 
 41 │ select t . 0e ;
    ╰╴            ━
@@ -1000,7 +1000,7 @@ error[syntax-error]: expected field name
    ╭▸ 
 42 │ select 1 . 2e ;
    ╰╴           ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
    ╭▸ 
 42 │ select 1 . 2e ;
    ╰╴            ━
@@ -1020,7 +1020,7 @@ error[syntax-error]: expected field name
    ╭▸ 
 45 │ select 1 . 2 . 3e ;
    ╰╴               ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
    ╭▸ 
 45 │ select 1 . 2 . 3e ;
    ╰╴                ━
@@ -1028,7 +1028,7 @@ error[syntax-error]: expected field name
    ╭▸ 
 46 │ select (1) . 0e ;
    ╰╴             ━
-error[syntax-error]: Missing digits after the exponent symbol
+error[syntax-error]: missing digits after the exponent symbol
    ╭▸ 
 46 │ select (1) . 0e ;
    ╰╴              ━

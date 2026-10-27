@@ -528,11 +528,11 @@ SOURCE_FILE@0..892
     SEMICOLON@890..891 ";"
   WHITESPACE@891..892 "\n"
 
-error[syntax-error]: Expected remainder and modulus
+error[syntax-error]: expected remainder and modulus
   ╭▸ 
 6 │ create table p1 partition of p for values with (modulus 3);
   ╰╴                               ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected remainder and modulus
+error[syntax-error]: expected remainder and modulus
   ╭▸ 
 7 │ create table p1 partition of p for values with (remainder 2);
   ╰╴                               ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -544,19 +544,19 @@ error[syntax-error]: remainder provided more than once
   ╭▸ 
 8 │ create table p1 partition of p for values with (modulus 3, remainder 2, modulus 3, remainder 2);
   ╰╴                                                                                   ━━━━━━━━━━━
-error[syntax-error]: Expected modulus but found modulusmodulus
+error[syntax-error]: expected modulus but found modulusmodulus
   ╭▸ 
 9 │ create table p1 partition of p for values with (MODULUSMODULUS 3, REMAINDER 2);
   ╰╴                                                ━━━━━━━━━━━━━━
-error[syntax-error]: Expected remainder but found remaining
+error[syntax-error]: expected remainder but found remaining
    ╭▸ 
 10 │ create table p1 partition of p for values with (modulus 3, remaining 2);
    ╰╴                                                           ━━━━━━━━━
-error[syntax-error]: Expected modulus but found year
+error[syntax-error]: expected modulus but found year
    ╭▸ 
 11 │ create table p1 partition of p for values with (year 3, remainder 2);
    ╰╴                                                ━━━━
-error[syntax-error]: Expected remainder but found collation
+error[syntax-error]: expected remainder but found collation
    ╭▸ 
 12 │ create table p1 partition of p for values with (modulus 3, collation 2);
    ╰╴                                                           ━━━━━━━━━

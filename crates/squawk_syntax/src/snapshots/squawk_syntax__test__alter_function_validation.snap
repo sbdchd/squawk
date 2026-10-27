@@ -43,7 +43,7 @@ SOURCE_FILE@0..56
     SEMICOLON@54..55 ";"
   WHITESPACE@55..56 "\n"
 
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 1 │ alter function f(value integer default 1) rename to f2;
   ╰╴                               ━━━━━━━━━

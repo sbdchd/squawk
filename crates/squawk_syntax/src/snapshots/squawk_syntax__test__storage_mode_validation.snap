@@ -32,7 +32,7 @@ SOURCE_FILE@0..47
     SEMICOLON@45..46 ";"
   WHITESPACE@46..47 "\n"
 
-error[syntax-error]: Expected PLAIN, EXTERNAL, EXTENDED, MAIN, or DEFAULT
+error[syntax-error]: expected PLAIN, EXTERNAL, EXTENDED, MAIN, or DEFAULT
   ╭▸ 
 1 │ alter table t alter column a set storage true;
   ╰╴                                         ━━━━

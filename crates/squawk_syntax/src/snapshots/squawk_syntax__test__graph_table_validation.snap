@@ -45,11 +45,11 @@ error[syntax-error]: expected unsigned integer literal
   ╭▸ 
 1 │ select from graph_table(f match-{()}columns());
   ╰╴                                 ━
-error[syntax-error]: Expected an expression
+error[syntax-error]: expected an expression
   ╭▸ 
 1 │ select from graph_table(f match-{()}columns());
   ╰╴                                  ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one item
   ╭▸ 
 1 │ select from graph_table(f match-{()}columns());
   ╰╴                                            ━

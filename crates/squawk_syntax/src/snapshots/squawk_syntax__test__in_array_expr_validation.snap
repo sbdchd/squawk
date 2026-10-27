@@ -259,31 +259,31 @@ SOURCE_FILE@0..402
     SEMICOLON@400..401 ";"
   WHITESPACE@401..402 "\n"
 
-error[syntax-error]: Expected a parenthesized value list or subquery.
+error[syntax-error]: expected a parenthesized value list or subquery
   ╭▸ 
 1 │ SELECT * FROM recipe WHERE tag IN ARRAY['breakfast', 'snack', 'appetizer'];
   ╰╴                                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected a parenthesized value list or subquery.
+error[syntax-error]: expected a parenthesized value list or subquery
   ╭▸ 
 2 │ SELECT * FROM recipe WHERE tag NOT IN ARRAY['breakfast', 'snack', 'appetizer'];
   ╰╴                                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected a parenthesized value list or subquery.
+error[syntax-error]: expected a parenthesized value list or subquery
   ╭▸ 
 3 │ SELECT * FROM recipe WHERE tag IN 'breakfast';
   ╰╴                                  ━━━━━━━━━━━
-error[syntax-error]: Expected a parenthesized value list or subquery.
+error[syntax-error]: expected a parenthesized value list or subquery
   ╭▸ 
 4 │ SELECT * FROM recipe WHERE tag NOT IN $1;
   ╰╴                                      ━━
-error[syntax-error]: Expected a parenthesized value list or subquery.
+error[syntax-error]: expected a parenthesized value list or subquery
   ╭▸ 
 5 │ SELECT * FROM recipe WHERE tag IN choices;
   ╰╴                                  ━━━━━━━
-error[syntax-error]: Expected a parenthesized value list or subquery.
+error[syntax-error]: expected a parenthesized value list or subquery
   ╭▸ 
 6 │ SELECT * FROM recipe WHERE tag NOT IN get_choices();
   ╰╴                                      ━━━━━━━━━━━━━
-error[syntax-error]: Expected a parenthesized value list or subquery.
+error[syntax-error]: expected a parenthesized value list or subquery
   ╭▸ 
 7 │ SELECT * FROM recipe WHERE tag IN ROW('breakfast', 'snack');
   ╰╴                                  ━━━━━━━━━━━━━━━━━━━━━━━━━
