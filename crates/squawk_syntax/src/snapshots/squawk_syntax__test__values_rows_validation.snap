@@ -48,7 +48,7 @@ SOURCE_FILE@0..54
         COMMA@52..53 ","
   WHITESPACE@53..54 "\n"
 
-error[syntax-error]: expected at least one item
+error[syntax-error]: expected at least one expression
   ╭▸ 
 1 │ insert into t values ();
   ╰╴                      ━

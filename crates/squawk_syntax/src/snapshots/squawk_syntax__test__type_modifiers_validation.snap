@@ -714,7 +714,7 @@ error[syntax-error]: expected unsigned integer literal
    ╭▸ 
 27 │ select''::timestamp(())with time zone;
    ╰╴                    ━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 27 │ select''::timestamp(())with time zone;
    ╰╴                     ━

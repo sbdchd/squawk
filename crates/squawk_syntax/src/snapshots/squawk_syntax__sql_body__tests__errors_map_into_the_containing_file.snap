@@ -13,7 +13,7 @@ SOURCE_FILE@0..13
   WHITESPACE@12..13 " "
 ---
 source 54..67 " select from "
-error[syntax-error]: expected from item, found end of file
+error[syntax-error]: expected a table, subquery, or function call, found end of file
   ╭▸ 
 3 │   as $$ select from $$;
   ╰╴                   ━

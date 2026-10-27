@@ -519,7 +519,7 @@ error[syntax-error]: expected a target after SELECT
   ╭▸ 
 8 │ SELECT(o,select)WHERE''::r;
   ╰╴         ━━━━━━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 10 │ SELECT().n()FROM ONLY p();
    ╰╴       ━
@@ -551,7 +551,7 @@ error[syntax-error]: A subquery alias must follow all closing parentheses
    ╭▸ 
 19 │ create view f as select from((select)a);
    ╰╴                                     ━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 21 │ select () d;
    ╰╴        ━

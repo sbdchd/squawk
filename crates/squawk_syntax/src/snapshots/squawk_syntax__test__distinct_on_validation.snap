@@ -51,7 +51,7 @@ error[syntax-error]: expected at least one expression in DISTINCT ON list
   ╭▸ 
 1 │ select distinct on () 1;
   ╰╴                ━━━━━
-error[syntax-error]: expected at least one item
+error[syntax-error]: expected at least one expression
   ╭▸ 
 1 │ select distinct on () 1;
   ╰╴                    ━

@@ -176,14 +176,16 @@ fn tuple_expr(p: &mut Parser<'_>, items: ListItems) -> (CompletedMarker, ExprKin
     let m = p.start();
     let explicit_row = p.eat(ROW_KW);
     p.expect(L_PAREN);
-    if matches!(items, ListItems::Required) && p.at(R_PAREN) {
-        p.error("expected an expression");
+    if let ListItems::Required(item) = items
+        && p.at(R_PAREN)
+    {
+        p.error(format!("expected at least one {item}"));
     }
     let mut saw_comma = false;
     let mut saw_expr = false;
     let mut saw_select = false;
     if p.eat(COMMA) {
-        p.error("expected expression in tuple_expr");
+        p.error("expected an expression");
         saw_comma = true;
     }
     while !p.at(EOF) && !p.at(R_PAREN) {
@@ -858,7 +860,7 @@ fn json_table_column_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
+            ListItems::Required("column"),
             || "unexpected comma".to_string(),
             JSON_TABLE_COLUMN_FIRST,
             opt_json_table_column,
@@ -1181,7 +1183,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
         (COLLATION_KW, FOR_KW) => collation_for_fn(p),
         (ROW_KW, L_PAREN) => return Some(tuple_expr(p, ListItems::Optional)),
         _ if p.at_ts(NAME_REF_FIRST) => name_ref_(p)?,
-        (L_PAREN, _) => return Some(tuple_expr(p, ListItems::Required)),
+        (L_PAREN, _) => return Some(tuple_expr(p, ListItems::Required("expression"))),
         (ARRAY_KW, L_BRACK | L_PAREN) => {
             let m = p.start();
             p.bump(ARRAY_KW);
@@ -1192,7 +1194,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
         (L_BRACK, _) => array_expr(p, None),
         (CASE_KW, _) => case_expr(p),
         _ => {
-            p.err_and_bump("expected expression in atom_expr");
+            p.err_and_bump("expected an expression");
             return None;
         }
     };
@@ -1251,7 +1253,7 @@ fn xmlpi_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(NAME_KW);
     xml_pi_target(p);
     if p.eat(COMMA) && expr(p).is_none() {
-        p.error("expected expr");
+        p.error("expected an expression");
     }
     p.expect(R_PAREN);
     let m = m.complete(p, XML_PI_FN).precede(p);
@@ -1415,7 +1417,7 @@ fn expr_as_xml_attr_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("attribute"),
         || "unexpected comma".to_string(),
         EXPR_FIRST,
         opt_expr_as_xml_attr,
@@ -1444,7 +1446,7 @@ fn expr_as_property_name_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("property"),
         || "unexpected comma".to_string(),
         EXPR_FIRST,
         opt_expr_as_property_name,
@@ -1473,7 +1475,7 @@ fn expr_as_column_name_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("column"),
         || "unexpected comma".to_string(),
         EXPR_FIRST,
         opt_expr_as_column_name,
@@ -1513,7 +1515,7 @@ fn expr_as_element_tag_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("element"),
         || "unexpected comma".to_string(),
         EXPR_FIRST,
         opt_expr_as_element_tag,
@@ -1908,7 +1910,7 @@ fn opt_json_passing_arg(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     if expr(p).is_none() {
-        p.error("expected expr");
+        p.error("expected an expression");
     }
     opt_json_format_clause(p);
     p.expect(AS_KW);
@@ -2127,7 +2129,7 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
 
 #[derive(Clone, Copy)]
 pub(crate) enum ListItems {
-    Required,
+    Required(&'static str),
     Optional,
 }
 
@@ -2144,8 +2146,10 @@ pub(crate) fn delimited(
     mut parser: impl FnMut(&mut Parser<'_>) -> bool,
 ) {
     p.expect(bra);
-    if matches!(items, ListItems::Required) && p.at(ket) {
-        p.error("expected at least one item");
+    if let ListItems::Required(item) = items
+        && p.at(ket)
+    {
+        p.error(format!("expected at least one {item}"));
     }
     while !p.at(ket) && !p.at(EOF) {
         if p.at(delim) {
@@ -2373,7 +2377,7 @@ fn type_mods(
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
+            ListItems::Required("type modifier"),
             || "unexpected comma".to_string(),
             EXPR_FIRST.union(TokenSet::new(&[VARIADIC_KW])),
             |p| arg_expr(p).is_some(),
@@ -2395,7 +2399,7 @@ fn type_mods(
             }
         }
         if !found_one_array_bracks {
-            p.error("expected L_BRACK for ARRAY_TYPE");
+            p.error("expected `[`");
         }
     }
     m.complete(p, ARRAY_TYPE)
@@ -3896,7 +3900,10 @@ fn opt_from_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     if opt_from_item(p).is_none() {
-        p.error(format!("expected from item, found {}", p.current()));
+        p.error(format!(
+            "expected a table, subquery, or function call, found {}",
+            p.current()
+        ));
     }
     while !p.at(EOF) && p.eat(COMMA) {
         if opt_from_item(p).is_none() {
@@ -4082,7 +4089,7 @@ fn data_source(p: &mut Parser<'_>, in_parens: bool) -> DataSource {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required,
+                ListItems::Required("function call"),
                 || "unexpected comma".to_string(),
                 EXPR_FIRST,
                 opt_row_from_expr,
@@ -4242,7 +4249,7 @@ fn xml_namespace_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("namespace"),
         || "unexpected comma".to_string(),
         XML_NAMESPACE_ELEMENT_FIRST,
         opt_xml_namespace,
@@ -4415,7 +4422,7 @@ fn join(p: &mut Parser<'_>) {
     let result = join_type(p);
     let join_kind = result.map(|x| x.kind()).unwrap_or(JOIN_INNER);
     if opt_from_item(p).is_none() {
-        p.error("expected from_item");
+        p.error("expected a table, subquery, or function call");
     }
     let can_have_on_clause = !is_natural && join_kind != JOIN_CROSS;
     if p.at(ON_KW) && can_have_on_clause {
@@ -4726,10 +4733,12 @@ fn opt_column_list_with(p: &mut Parser<'_>, mut kind: ColumnDefKind) -> bool {
         | ColumnDefKind::ForeignKeyColumnRef
         | ColumnDefKind::FromAliasColumn
         | ColumnDefKind::Name
-        | ColumnDefKind::NameRef => ListItems::Required,
+        | ColumnDefKind::NameRef => ListItems::Required("column"),
     };
-    if matches!(items, ListItems::Required) && p.at(R_PAREN) {
-        p.error("expected at least one item");
+    if let ListItems::Required(item) = items
+        && p.at(R_PAREN)
+    {
+        p.error(format!("expected at least one {item}"));
     }
     let mut seen_period = false;
     while !p.at(EOF) && !p.at(R_PAREN) {
@@ -5114,7 +5123,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         DEFAULT_KW => {
             p.bump(DEFAULT_KW);
             if expr(p).is_none() {
-                p.error("expected expr for default");
+                p.error("expected a default expression");
             }
             DEFAULT_CONSTRAINT
         }
@@ -5581,7 +5590,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             p.bump(CHECK_KW);
             p.expect(L_PAREN);
             if expr(p).is_none() {
-                p.error("expected expr");
+                p.error("expected an expression");
             }
             p.expect(R_PAREN);
             CHECK_CONSTRAINT
@@ -5675,7 +5684,7 @@ fn opt_constraint_where_clause(p: &mut Parser<'_>) {
         p.bump(WHERE_KW);
         p.expect(L_PAREN);
         if expr(p).is_none() {
-            p.error("expected expr");
+            p.error("expected an expression");
         }
         p.expect(R_PAREN);
         m.complete(p, WHERE_CONDITION_CLAUSE);
@@ -5702,7 +5711,7 @@ fn constraint_exclusion_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("exclusion element"),
         || "unexpected comma".to_string(),
         CONSTRAINT_EXCLUSION_FIRST,
         |p| opt_constraint_exclusion(p).is_some(),
@@ -6014,7 +6023,7 @@ fn opt_group_by_item(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required,
+                ListItems::Required("grouping set"),
                 || "unexpected comma".to_string(),
                 GROUP_BY_ITEM_FIRST,
                 |p| opt_group_by_item(p).is_some(),
@@ -6311,7 +6320,7 @@ fn paren_expr_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("expression"),
         || "unexpected comma".to_string(),
         EXPR_FIRST,
         |p| opt_expr(p).is_some(),
@@ -6466,10 +6475,7 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
         opt_as_col_label(p);
     } else {
         m.abandon(p);
-        p.error(format!(
-            "expected an expression in target_el, found {}",
-            p.current()
-        ));
+        p.error(format!("expected an expression, found {}", p.current()));
         return None;
     }
     Some(m.complete(p, TARGET))
@@ -6598,7 +6604,7 @@ fn partition_item(p: &mut Parser<'_>, part_kind: PartitionItemKind) -> Completed
     let m = p.start();
     // TODO: this can be more strict
     if expr(p).is_none() {
-        p.error("expected expr");
+        p.error("expected an expression");
     }
     // [ opclass ]
     opt_index_opclass(p);
@@ -6693,7 +6699,7 @@ fn partition_option(p: &mut Parser<'_>) {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required,
+                ListItems::Required("partition bound"),
                 || "unexpected comma".to_string(),
                 NON_RESERVED_WORD,
                 opt_hash_partition_bound,
@@ -7203,7 +7209,7 @@ fn opt_paren_property_name_ref_list(p: &mut Parser<'_>) -> bool {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("property"),
         || "unexpected comma".to_string(),
         NAME_REF_FIRST,
         opt_property_name_ref,
@@ -10650,7 +10656,7 @@ fn table_name_ref_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("table"),
         || "unexpected comma".to_string(),
         NAME_REF_FIRST,
         |p| {
@@ -11045,7 +11051,7 @@ fn opt_option_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("option"),
         || "unexpected comma".to_string(),
         OPTION_FIRST,
         opt_option,
@@ -11457,7 +11463,7 @@ fn opt_vertex_tables(p: &mut Parser<'_>) -> bool {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("vertex table"),
         || "unexpected comma".to_string(),
         VERTEX_TABLE_DEF_FIRST,
         opt_vertex_table_def,
@@ -11572,7 +11578,7 @@ fn opt_edge_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("edge table"),
         || "unexpected comma".to_string(),
         EDGE_TABLE_DEF_FIRST,
         opt_edge_table_def,
@@ -11697,7 +11703,7 @@ fn drop_edge_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("edge table"),
         || "unexpected comma".to_string(),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
@@ -11717,7 +11723,7 @@ fn drop_vertex_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("vertex table"),
         || "unexpected comma".to_string(),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
@@ -13008,7 +13014,7 @@ fn opt_except_table_clause(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("table"),
         || "unexpected comma".to_string(),
         RELATION_NAME_FIRST.union(TokenSet::new(&[TABLE_KW])),
         |p| {
@@ -13236,7 +13242,7 @@ fn opt_stat_types(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("statistics kind"),
         || "unexpected comma".to_string(),
         NAME_REF_FIRST,
         opt_statistics_kind,
@@ -14288,7 +14294,7 @@ fn opt_explain_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("option"),
         || "unexpected comma".to_string(),
         EXPLAIN_OPTION_FIRST,
         opt_explain_option,
@@ -14363,7 +14369,7 @@ fn alter_option_list_contents(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("option"),
         || "expected alter option".to_string(),
         EXPR_FIRST,
         |p| opt_alter_option(p).is_some(),
@@ -15345,7 +15351,7 @@ fn security_label_object(p: &mut Parser<'_>) {
             p.bump(LARGE_KW);
             p.expect(OBJECT_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected large_object_oid");
+                p.error("expected a large object OID");
             }
             m.complete(p, OBJECT_LARGE_OBJECT);
         }
@@ -15673,7 +15679,7 @@ fn row(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("expression"),
         || "expected expression".to_string(),
         EXPR_FIRST,
         |p| expr(p).is_some(),
@@ -15728,7 +15734,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
+            ListItems::Required("option"),
             || "unexpected comma".to_string(),
             REINDEX_OPTION_FIRST,
             opt_reindex_option,
@@ -15907,7 +15913,7 @@ fn opt_checkpoint_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("option"),
         || "unexpected comma".to_string(),
         NAME_FIRST,
         opt_checkpoint_option,
@@ -16362,7 +16368,7 @@ fn opt_vacuum_option_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
+            ListItems::Required("option"),
             || "unexpected comma".to_string(),
             VACUUM_OPTION_FIRST,
             |p| opt_vacuum_option(p).is_some(),
@@ -16522,7 +16528,7 @@ fn copy_option_arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("value"),
         || "unexpected comma".to_string(),
         COPY_OPTION_ARG_FIRST,
         opt_copy_option_arg,
@@ -16568,7 +16574,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("option"),
         || "unexpected comma".to_string(),
         COL_LABEL_FIRST,
         opt_copy_option,
@@ -17156,7 +17162,7 @@ fn query(p: &mut Parser<'_>) {
     if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default()).is_none())
         && opt_paren_select(p, None, &SelectRestrictions::default()).is_none()
     {
-        p.error("expected select stmt");
+        p.error("expected a SELECT statement");
     }
 }
 
@@ -17297,7 +17303,7 @@ fn conflict_index_item_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("index element"),
         || "unexpected comma".to_string(),
         EXPR_FIRST,
         opt_conflict_index_item,
@@ -17380,7 +17386,7 @@ fn set_expr_list(p: &mut Parser<'_>, m: Marker) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("expression"),
         || "unexpected comma".to_string(),
         SET_EXPR_FIRST,
         opt_set_expr,
@@ -17608,7 +17614,7 @@ fn opt_returning_option_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
+            ListItems::Required("option"),
             || "unexpected comma".to_string(),
             RETURNING_OPTION_FIRST,
             opt_returning_option,
@@ -17726,7 +17732,7 @@ fn opt_drop_database_force_clause(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("option"),
         || "unexpected comma".to_string(),
         DROP_DATABASE_OPTION_FIRST,
         |p| {
@@ -17835,7 +17841,7 @@ fn partition_items(p: &mut Parser<'_>, part_kind: PartitionItemKind) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("partition key"),
         || "unexpected comma".to_string(),
         EXPR_FIRST,
         |p| opt_partition_item(p, part_kind).is_some(),
@@ -18108,7 +18114,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
         COST_KW => {
             p.bump(COST_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected numeric value for execution_cost");
+                p.error("expected a numeric execution cost");
             }
             COST_FUNC_OPTION
         }
@@ -18116,7 +18122,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
         ROWS_KW => {
             p.bump(ROWS_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected numeric value for result_rows");
+                p.error("expected a numeric row estimate");
             }
             ROWS_FUNC_OPTION
         }
@@ -18166,7 +18172,7 @@ fn routine_body_stmt(p: &mut Parser<'_>) {
         let m = p.start();
         p.bump(RETURN_KW);
         if expr(p).is_none() {
-            p.error("expected expr");
+            p.error("expected an expression");
         }
         p.expect(SEMICOLON);
         m.complete(p, RETURN_STMT);
@@ -18224,7 +18230,7 @@ fn return_table_arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("column"),
         || "unexpected comma".to_string(),
         NAME_FIRST,
         return_table_column,
@@ -19287,7 +19293,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 if p.at_ts(COLUMN_FIRST) {
                     column_name_ref(p);
                 } else {
-                    p.error("expected column_name");
+                    p.error("expected a column name");
                 }
                 alter_column_option(p);
                 ALTER_COLUMN
@@ -19318,7 +19324,7 @@ fn partition_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("partition"),
         || "unexpected comma".to_string(),
         TokenSet::new(&[PARTITION_KW]),
         opt_partition,
@@ -19525,7 +19531,7 @@ fn alter_column_option(p: &mut Parser<'_>) {
             p.bump(SET_KW);
             p.bump(DEFAULT_KW);
             if expr(p).is_none() {
-                p.error("expected expr");
+                p.error("expected an expression");
             }
             SET_DEFAULT
         }
@@ -19536,7 +19542,7 @@ fn alter_column_option(p: &mut Parser<'_>) {
             p.expect(AS_KW);
             p.expect(L_PAREN);
             if expr(p).is_none() {
-                p.error("expected expr");
+                p.error("expected an expression");
             }
             p.expect(R_PAREN);
             SET_EXPRESSION
@@ -19593,7 +19599,7 @@ fn attribute_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
+        ListItems::Required("attribute"),
         || "unexpected comma".to_string(),
         COL_LABEL_FIRST,
         opt_attribute_option,

@@ -330,11 +330,11 @@ error[syntax-error]: unexpected comma
    ╭▸ 
 20 │   alter c set (a, , b = 1);
    ╰╴                  ━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 24 │   ADD c t[] DEFAULT (())::t[],
    ╰╴                      ━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 25 │   ALTER c SET DEFAULT ''::d + (()),
    ╰╴                                ━

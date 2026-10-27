@@ -347,7 +347,7 @@ error[syntax-error]: expected path name
     ╭▸ 
 290 │ INSERT INTO 123
     ╰╴            ━
-error[syntax-error]: expected select stmt
+error[syntax-error]: expected a SELECT statement
     ╭▸ 
 290 │ INSERT INTO 123
     ╰╴            ━

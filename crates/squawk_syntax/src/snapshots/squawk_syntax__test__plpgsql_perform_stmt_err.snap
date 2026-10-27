@@ -139,7 +139,7 @@ PLPGSQL@0..168
     END_KW@164..167 "end"
   WHITESPACE@167..168 "\n"
 
-error[syntax-error]: expected from item, found `;`
+error[syntax-error]: expected a table, subquery, or function call, found `;`
   ╭▸ 
 3 │   perform from;
   ╰╴              ━
@@ -167,7 +167,7 @@ error[syntax-error]: expected an expression, found `table`
   ╭▸ 
 7 │   perform table onecol;
   ╰╴          ━
-error[syntax-error]: expected an expression in target_el, found identifier
+error[syntax-error]: expected an expression, found identifier
   ╭▸ 
 7 │   perform table onecol;
   ╰╴               ━

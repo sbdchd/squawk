@@ -73,7 +73,7 @@ error[syntax-error]: expected at least one expression in IN list
   ╭▸ 
 1 │ SELECT * FROM t WHERE a IN ();
   ╰╴                           ━━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
   ╭▸ 
 1 │ SELECT * FROM t WHERE a IN ();
   ╰╴                            ━
@@ -81,7 +81,7 @@ error[syntax-error]: expected at least one expression in IN list
   ╭▸ 
 2 │ SELECT * FROM t WHERE a NOT IN ();
   ╰╴                               ━━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
   ╭▸ 
 2 │ SELECT * FROM t WHERE a NOT IN ();
   ╰╴                                ━

@@ -187,7 +187,7 @@ fn cursor_arg_list(p: &mut Parser) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        grammar::ListItems::Required,
+        grammar::ListItems::Required("argument"),
         || "unexpected comma".to_string(),
         grammar::NAME_FIRST,
         opt_cursor_arg,

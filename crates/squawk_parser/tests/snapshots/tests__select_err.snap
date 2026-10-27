@@ -2475,7 +2475,7 @@ error[syntax-error]: unexpected trailing comma
    ╭▸ 
 44 │ select array[1,2,3,];
    ╰╴                  ━
-error[syntax-error]: expected expression in atom_expr
+error[syntax-error]: expected an expression
    ╭▸ 
 47 │ select * from t group by all order by all;
    ╰╴                                      ━
@@ -2643,15 +2643,15 @@ error[syntax-error]: expected command, found `)`
     ╭▸ 
 165 │ select cast('42' as text collate "C");
     ╰╴                                    ━
-error[syntax-error]: expected at least one item
+error[syntax-error]: expected at least one expression
     ╭▸ 
 168 │ select 1 group by rollup ();
     ╰╴                          ━
-error[syntax-error]: expected at least one item
+error[syntax-error]: expected at least one expression
     ╭▸ 
 169 │ select 1 group by cube ();
     ╰╴                        ━
-error[syntax-error]: expected at least one item
+error[syntax-error]: expected at least one expression
     ╭▸ 
 170 │ select distinct on () 1;
     ╰╴                    ━
@@ -2687,7 +2687,7 @@ error[syntax-error]: expected an ORDER BY item after comma
     ╭▸ 
 185 │ select array_agg(a order by a,);
     ╰╴                              ━
-error[syntax-error]: expected an expression
+error[syntax-error]: expected at least one expression
     ╭▸ 
 188 │ select ()();
     ╰╴        ━
