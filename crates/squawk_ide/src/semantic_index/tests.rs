@@ -61,7 +61,7 @@ mod update;
 mod views;
 mod windows;
 
-use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
+use annotate_snippets::{AnnotationKind, Level, Patch, Renderer, Snippet, renderer::DecorStyle};
 use squawk_syntax::SourceFile;
 
 use crate::file::{FileId, InFile};
@@ -98,10 +98,20 @@ fn check(sql: &str) -> String {
             let mut group = Level::ERROR
                 .primary_title(diagnostic.message.as_ref())
                 .element(snippet);
-            if let Some(hint) = diagnostic.hint {
-                group = group.element(Level::HELP.with_name("hint").message(hint));
+            if let Some(hint) = &diagnostic.hint {
+                group = group.element(Level::HELP.with_name("hint").message(hint.as_ref()));
             }
-            renderer.render(&[group])
+            let Some(suggestion) = &diagnostic.suggestion else {
+                return renderer.render(&[group]);
+            };
+            let patches = suggestion.fix.edits.iter().map(|edit| {
+                let range = edit.text_range.start().into()..edit.text_range.end().into();
+                Patch::new(range, edit.text.as_deref().unwrap_or_default())
+            });
+            let fix_group = Level::HELP
+                .secondary_title(suggestion.message.as_ref())
+                .element(Snippet::source(sql).fold(true).patches(patches));
+            renderer.render(&[group, fix_group])
         })
         .collect::<Vec<_>>()
         .join("\n")

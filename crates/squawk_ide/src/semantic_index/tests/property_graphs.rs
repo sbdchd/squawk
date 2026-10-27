@@ -132,16 +132,16 @@ drop property graph g2;
       ╭▸ 
     5 │ drop property graph g;
       ╰╴                    ━
-    error: relation `g2` does not exist
-       ╭▸ 
-    11 │ drop property graph g2;
-       ╰╴                    ━━
     error: `t` is not a property graph
       ╭▸ 
     7 │ drop property graph t;
       │                     ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
+    error: relation `g2` does not exist
+       ╭▸ 
+    11 │ drop property graph g2;
+       ╰╴                    ━━
     ");
 }
 
@@ -206,19 +206,19 @@ select * from graph_table(g match (c is city) columns (c.title as t));
 select * from graph_table(g match (a is missing_label | human) columns (a.name as n));
 select * from graph_table(missing_graph match (a) columns (a.name as n));
 "), @"
-    error: column `id` does not exist
-       ╭▸ 
-    14 │   where a.id = 1 and e.since is not null and z.name = 'y'
-       ╰╴          ━━
-    error: missing FROM-clause entry for table `z`
-       ╭▸ 
-    14 │   where a.id = 1 and e.since is not null and z.name = 'y'
-       ╰╴                                             ━
-    error: column `missing` does not exist
+    error: column `gt.missing` does not exist
        ╭▸ 
     11 │ select gt.n, gt.d, gt.since, gt.missing
        ╰╴                                ━━━━━━━
-    error: column `title` does not exist
+    error: column `a.id` does not exist
+       ╭▸ 
+    14 │   where a.id = 1 and e.since is not null and z.name = 'y'
+       ╰╴          ━━
+    error: missing `from` clause entry for table `z`
+       ╭▸ 
+    14 │   where a.id = 1 and e.since is not null and z.name = 'y'
+       ╰╴                                             ━
+    error: column `c.title` does not exist
        ╭▸ 
     17 │ select * from graph_table(g match (c is city) columns (c.title as t));
        ╰╴                                                         ━━━━━
@@ -251,14 +251,14 @@ select * from graph_table(g match (p) columns (p.n as x, p.name as y));
       ╭▸ 
     5 │ alter property graph g alter vertex table person alter label person drop properties (n, missing);
       ╰╴                                                                                        ━━━━━━━
-    error: column `name` does not exist
-      ╭▸ 
-    7 │ select * from graph_table(g match (p) columns (p.n as x, p.name as y));
-      ╰╴                                                           ━━━━
     error: property `id` already exists
       ╭▸ 
     6 │ alter property graph g alter vertex table person alter label person add properties (id as n, id);
       ╰╴                                                                                             ━━
+    error: column `p.name` does not exist
+      ╭▸ 
+    7 │ select * from graph_table(g match (p) columns (p.n as x, p.name as y));
+      ╰╴                                                           ━━━━
     ");
 }
 
@@ -278,14 +278,14 @@ alter property graph if exists nope rename to g3;
       ╭▸ 
     5 │ select * from graph_table(g match (x) columns (x.a as a));
       ╰╴                          ━
-    error: relation `nope` does not exist
-      ╭▸ 
-    8 │ alter property graph nope rename to g3;
-      ╰╴                     ━━━━
     error: relation `t` already exists
       ╭▸ 
     7 │ alter property graph g2 rename to t;
       ╰╴                                  ━
+    error: relation `nope` does not exist
+      ╭▸ 
+    8 │ alter property graph nope rename to g3;
+      ╰╴                     ━━━━
     ");
 }
 

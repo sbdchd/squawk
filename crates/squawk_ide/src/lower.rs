@@ -13,6 +13,7 @@ use squawk_syntax::{
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::comments::preceding_comment;
+use crate::edit_distance::find_best_match_for_name_with_substrings;
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
@@ -41,8 +42,11 @@ use crate::{
         TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
         Window, WindowClauses, WindowId,
     },
-    sema_error::{ObjectKind, SemaError, TriggerFunctionKind, WindowClause},
-    semantic_index::{IndexData, NameVersion},
+    sema_error::{
+        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, TriggerFunctionKind,
+        WindowClause,
+    },
+    semantic_index::{IndexData, NameVersion, SimilarColumn},
 };
 use crate::{
     overload::{ArgType, BuiltinTypes, CallArg, Overloads},
@@ -2245,7 +2249,15 @@ impl Lowerer {
                 column,
             },
             (Some(table), None) if self.index.tables[table].columns.complete => {
-                Resolution::Unresolved
+                let relation = self.index.tables[table].name;
+                self.push_error(
+                    segment.syntax(),
+                    SemaError::UnresolvedQualifiedColumn {
+                        qualifier: relation,
+                        column: name,
+                    },
+                );
+                Resolution::Unknown
             }
             (Some(_) | None, None) => Resolution::Unknown,
         };
@@ -9196,7 +9208,30 @@ impl Lowerer {
             Some(id) => Resolution::Operator(id),
             None => match if_missing {
                 IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
+                IfMissing::Error => {
+                    let left = match left {
+                        Operand::None => Some(None),
+                        Operand::Ty(ty) => Some(Some(OperandName::Ty(self.index.ty_name(ty)))),
+                        Operand::Unknown => None,
+                    };
+                    match (left, right) {
+                        (Some(left), Operand::Ty(right)) => {
+                            let error = SemaError::UnresolvedOperator {
+                                schema,
+                                name,
+                                left,
+                                right: OperandName::Ty(self.index.ty_name(right)),
+                                lookup: LookupKind::Signature,
+                            };
+                            let file_range = self.index.range(InIrFile::new(self.file_id, range));
+                            self.index.errors.push(file_range, error);
+                            Resolution::Unknown
+                        }
+                        (None, _) | (Some(_), Operand::None | Operand::Unknown) => {
+                            Resolution::Unresolved
+                        }
+                    }
+                }
             },
         };
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
@@ -9450,10 +9485,40 @@ impl Lowerer {
                 if missing {
                     Some(Resolution::Unknown)
                 } else {
-                    self.find_function_by(schema, name, |function| {
+                    match self.find_function_by(schema, name, |function| {
                         kind.matches(function.kind) && self.has_arg_types(function, &arg_types)
-                    })
-                    .map(Resolution::Function)
+                    }) {
+                        Some(function) => Some(Resolution::Function(function)),
+                        None if matches!(if_missing, IfMissing::Error)
+                            && arg_types.iter().all(Option::is_some) =>
+                        {
+                            let start = self.index.errors.args.next_idx();
+                            for ty in arg_types.iter().flatten() {
+                                let ty = OperandName::Ty(self.index.ty_name(*ty));
+                                self.index.errors.args.alloc(ErrorArg {
+                                    name: None,
+                                    ty,
+                                    variadic: false,
+                                });
+                            }
+                            let args = match param_list.star_token() {
+                                Some(_) => ErrorArgs::Star,
+                                None => ErrorArgs::List(self.index.errors.args.range_from(start)),
+                            };
+                            self.push_error(
+                                segment.syntax(),
+                                SemaError::UnresolvedRoutine {
+                                    kind,
+                                    schema,
+                                    name,
+                                    args,
+                                    lookup: LookupKind::Signature,
+                                },
+                            );
+                            Some(Resolution::Unknown)
+                        }
+                        None => None,
+                    }
                 }
             }
             None => self.find_unique_function(schema, name, kind),
@@ -9805,6 +9870,14 @@ impl Lowerer {
                 let schema = self.lower_schema_qualifier(path.qualifier());
                 let name = self.intern(&segment.text());
                 let resolution = self.find_routine(schema, name, &args, FunctionKind::Procedure);
+                let resolution = self.report_unresolved_routine(
+                    resolution,
+                    RoutineKind::Procedure,
+                    schema,
+                    name,
+                    &args,
+                    segment.syntax(),
+                );
                 self.add_ref(
                     name,
                     ReferenceKind::Function(RoutineKind::Procedure),
@@ -12623,9 +12696,9 @@ impl Lowerer {
             return;
         }
         let op = match compound.op() {
-            Some(ast::CompoundOp::Union(_)) => "UNION",
-            Some(ast::CompoundOp::Intersect(_)) => "INTERSECT",
-            Some(ast::CompoundOp::Except(_)) => "EXCEPT",
+            Some(ast::CompoundOp::Union(_)) => "union",
+            Some(ast::CompoundOp::Intersect(_)) => "intersect",
+            Some(ast::CompoundOp::Except(_)) => "except",
             None => return,
         };
         self.push_error(rhs_node.syntax(), SemaError::CompoundColumnCount { op });
@@ -13243,7 +13316,36 @@ impl Lowerer {
                 },
                 self.index.columns[column].ty,
             ),
-            None if self.index.sources[target].columns.complete => (Resolution::Unresolved, None),
+            None if self.index.sources[target].columns.complete => {
+                let relation = match self.index.sources[target].kind {
+                    SourceKind::Table(table) => Some(self.index.tables[table].name),
+                    SourceKind::Cte(_)
+                    | SourceKind::Returning(_)
+                    | SourceKind::Excluded(_)
+                    | SourceKind::RuleRelation(_)
+                    | SourceKind::External
+                    | SourceKind::Subquery(_)
+                    | SourceKind::Function(_)
+                    | SourceKind::Join
+                    | SourceKind::UsingAlias
+                    | SourceKind::ElementVariable
+                    | SourceKind::Other => self.index.sources[target].name,
+                };
+                let resolution = match relation {
+                    Some(relation) => {
+                        self.push_error(
+                            column_ref.syntax(),
+                            SemaError::UnresolvedQualifiedColumn {
+                                qualifier: relation,
+                                column: name,
+                            },
+                        );
+                        Resolution::Unknown
+                    }
+                    None => Resolution::Unresolved,
+                };
+                (resolution, None)
+            }
             None => (Resolution::Unknown, None),
         };
         self.add_ref(name, ReferenceKind::Column, column_ref.syntax(), resolution);
@@ -14278,7 +14380,7 @@ impl Lowerer {
             specified,
         };
         let error = match owner {
-            ColumnListOwner::Cte(name) => too_long("WITH query", name),
+            ColumnListOwner::Cte(name) => too_long("`with` query", name),
             ColumnListOwner::Table(Some(name)) => too_long("table", name),
             ColumnListOwner::Join(Some(name)) => too_long("join expression", name),
             ColumnListOwner::Table(None) | ColumnListOwner::Join(None) => return,
@@ -14964,8 +15066,20 @@ impl Lowerer {
                     source: None,
                     column,
                 },
-                None if table.is_none() || drop_column.if_exists().is_some() => Resolution::Unknown,
-                None => Resolution::Unresolved,
+                None => match table {
+                    Some(table) if drop_column.if_exists().is_none() => {
+                        let relation = self.index.tables[table].name;
+                        self.push_error(
+                            column_ref.syntax(),
+                            SemaError::UnresolvedQualifiedColumn {
+                                qualifier: relation,
+                                column: name,
+                            },
+                        );
+                        Resolution::Unknown
+                    }
+                    Some(_) | None => Resolution::Unknown,
+                },
             };
             self.add_ref(name, ReferenceKind::Column, column_ref.syntax(), resolution);
             if let Some(table) = table
@@ -17752,7 +17866,22 @@ impl Lowerer {
         right: Option<ArgType>,
     ) -> Option<Ty> {
         let name = self.intern(text);
-        let resolution = self.select_operator(schema, name, left, right);
+        let mut resolution = self.select_operator(schema, name, left, right);
+        if matches!(resolution, Resolution::Unresolved)
+            && let Some(left) = left.map_or(Some(None), |left| self.operand_name(left).map(Some))
+            && let Some(right) = right.and_then(|right| self.operand_name(right))
+        {
+            let error = SemaError::UnresolvedOperator {
+                schema,
+                name,
+                left,
+                right,
+                lookup: LookupKind::Call,
+            };
+            let file_range = self.index.range(InIrFile::new(self.file_id, range));
+            self.index.errors.push(file_range, error);
+            resolution = Resolution::Unknown;
+        }
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
         let Resolution::Operator(operator) = resolution else {
             return None;
@@ -17767,6 +17896,53 @@ impl Lowerer {
             })
             .collect();
         self.call_type(function, &args)
+    }
+
+    fn report_unresolved_routine(
+        &mut self,
+        resolution: Resolution,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+        node: &SyntaxNode,
+    ) -> Resolution {
+        if !matches!(resolution, Resolution::Unresolved)
+            || args.iter().any(|arg| matches!(arg.ty, ArgType::Untyped))
+        {
+            return resolution;
+        }
+        let start = self.index.errors.args.next_idx();
+        for arg in args {
+            let Some(ty) = self.operand_name(arg.ty) else {
+                continue;
+            };
+            self.index.errors.args.alloc(ErrorArg {
+                name: arg.name,
+                ty,
+                variadic: arg.variadic,
+            });
+        }
+        let args = ErrorArgs::List(self.index.errors.args.range_from(start));
+        self.push_error(
+            node,
+            SemaError::UnresolvedRoutine {
+                kind,
+                schema,
+                name,
+                args,
+                lookup: LookupKind::Call,
+            },
+        );
+        Resolution::Unknown
+    }
+
+    fn operand_name(&self, ty: ArgType) -> Option<OperandName> {
+        match ty {
+            ArgType::Known(ty) => Some(OperandName::Ty(self.index.ty_name(ty))),
+            ArgType::UnknownLiteral => Some(OperandName::Unknown),
+            ArgType::Untyped => None,
+        }
     }
 
     fn lower_exclude_constraint(
@@ -18986,7 +19162,10 @@ impl Lowerer {
             },
             (_, None) => {
                 let NameResolution { kind, resolution } = self.resolve_name(name);
-                self.add_ref(name, kind, name_ref.syntax(), resolution);
+                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
+                if matches!(resolution, Resolution::Unresolved) {
+                    self.suggest_column(reference, name);
+                }
                 return;
             }
         };
@@ -19004,7 +19183,10 @@ impl Lowerer {
                 }
                 let name = self.name_ref_name(name_ref)?;
                 let NameResolution { kind, resolution } = self.resolve_name(name);
-                self.add_ref(name, kind, name_ref.syntax(), resolution);
+                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
+                if matches!(resolution, Resolution::Unresolved) {
+                    self.suggest_column(reference, name);
+                }
                 self.check_default_column_ref(name_ref.syntax(), resolution);
                 return self.resolution_type(resolution);
             }
@@ -20262,7 +20444,14 @@ impl Lowerer {
                     Resolution::Unresolved if kind == CalleeKind::OrderedSet || incomplete_row => {
                         Resolution::Unknown
                     }
-                    resolution => resolution,
+                    resolution => self.report_unresolved_routine(
+                        resolution,
+                        RoutineKind::Function,
+                        schema,
+                        name,
+                        args,
+                        name_ref.syntax(),
+                    ),
                 };
                 (ReferenceKind::Function(RoutineKind::Function), resolution)
             }
@@ -20711,7 +20900,20 @@ impl Lowerer {
                     Resolution::Function(function),
                 ),
                 None if self.index.sources[source].columns.complete => {
-                    (ReferenceKind::Column, Resolution::Unresolved)
+                    let resolution = match self.index.sources[source].name {
+                        Some(qualifier) => {
+                            self.push_error(
+                                field.syntax(),
+                                SemaError::UnresolvedQualifiedColumn {
+                                    qualifier,
+                                    column: name,
+                                },
+                            );
+                            Resolution::Unknown
+                        }
+                        None => Resolution::Unresolved,
+                    };
+                    (ReferenceKind::Column, resolution)
                 }
                 None => (ReferenceKind::Column, Resolution::Unknown),
             },
@@ -20828,6 +21030,43 @@ impl Lowerer {
             .iter()
             .copied()
             .find(|id| self.index.sources[*id].name == Some(name))
+    }
+
+    fn suggest_column(&mut self, reference: RefId, name: Name) {
+        let mut candidates: Vec<SimilarColumn> = vec![];
+        for scope in self.scopes.iter().rev() {
+            for source in self.visible_sources(scope) {
+                let source = &self.index.sources[source];
+                if source.kind.is_qualified_only() {
+                    continue;
+                }
+                candidates.extend(source.columns.range.iter().filter_map(|column| {
+                    let column = self.index.columns[column].name?;
+                    (column != name).then_some(SimilarColumn {
+                        qualifier: source.name,
+                        column,
+                    })
+                }));
+            }
+        }
+        let lookup = self.index.names.resolve(name);
+        let Some(mut similar) = find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate.column),
+            lookup,
+            None,
+        ) else {
+            return;
+        };
+        if candidates
+            .iter()
+            .filter(|candidate| candidate.column == similar.column)
+            .count()
+            == 1
+        {
+            similar.qualifier = None;
+        }
+        self.index.errors.similar_columns.insert(reference, similar);
     }
 
     fn resolve_source(&self, name: Name) -> Option<SourceId> {

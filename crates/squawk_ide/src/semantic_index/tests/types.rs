@@ -244,13 +244,13 @@ select null::t;
       ╭▸ 
     7 │ alter type t set (send = t_send, receive = nope);
       ╰╴                                           ━━━━
-    error: type `t` does not exist
-       ╭▸ 
-    10 │ select null::t;
-       ╰╴             ━
     error: cannot drop function `t_send` because other objects depend on it
       ╭▸ 
     8 │ drop function t_send(t);
       ╰╴              ━━━━━━
+    error: type `t` does not exist
+       ╭▸ 
+    10 │ select null::t;
+       ╰╴             ━
     ");
 }

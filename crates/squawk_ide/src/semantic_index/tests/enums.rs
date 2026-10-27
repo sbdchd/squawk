@@ -73,30 +73,22 @@ alter type mood add value 'a' after 'temp';
 alter type mood add value 'b' after 'fine';
 alter type mood add value 'c' after 'ok';
 "), @"
-    error: enum label `nope` does not exist
-      ╭▸ 
-    4 │ alter type mood add value 'meh' before 'nope';
-      ╰╴                                       ━━━━━━
-    error: enum label `sad` does not exist
-      ╭▸ 
-    8 │ alter type mood rename value 'sad' to 'grey';
-      ╰╴                             ━━━━━
-    error: enum label `temp` does not exist
-       ╭▸ 
-    18 │ alter type mood add value 'a' after 'temp';
-       ╰╴                                    ━━━━━━
-    error: enum label `fine` does not exist
-       ╭▸ 
-    19 │ alter type mood add value 'b' after 'fine';
-       ╰╴                                    ━━━━━━
     error: enum label `sad` already exists
       ╭▸ 
     2 │ create type mood as enum ('sad', 'ok', 'sad');
       ╰╴                                       ━━━━━
+    error: enum label `nope` does not exist
+      ╭▸ 
+    4 │ alter type mood add value 'meh' before 'nope';
+      ╰╴                                       ━━━━━━
     error: enum label `ok` already exists
       ╭▸ 
     5 │ alter type mood add value 'ok';
       ╰╴                          ━━━━
+    error: enum label `sad` does not exist
+      ╭▸ 
+    8 │ alter type mood rename value 'sad' to 'grey';
+      ╰╴                             ━━━━━
     error: enum label `ok` already exists
       ╭▸ 
     9 │ alter type mood rename value 'blue' to 'ok';
@@ -109,5 +101,13 @@ alter type mood add value 'c' after 'ok';
        ╭▸ 
     13 │ alter type c rename value 'a' to 'b';
        ╰╴           ━
+    error: enum label `temp` does not exist
+       ╭▸ 
+    18 │ alter type mood add value 'a' after 'temp';
+       ╰╴                                    ━━━━━━
+    error: enum label `fine` does not exist
+       ╭▸ 
+    19 │ alter type mood add value 'b' after 'fine';
+       ╰╴                                    ━━━━━━
     ");
 }

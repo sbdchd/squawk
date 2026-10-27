@@ -64,7 +64,7 @@ fn database_qualified_column() {
 create table t (a int);
 select postgres.public.t.a, postgres.public.t.nope, a.b.c.d.e from t;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     3 │ select postgres.public.t.a, postgres.public.t.nope, a.b.c.d.e from t;
       ╰╴                                              ━━━━
@@ -91,6 +91,10 @@ drop database db3;
       ╭▸ 
     5 │ alter database db owner to current_user;
       ╰╴               ━━
+    error: database `other` already exists
+      ╭▸ 
+    7 │ alter database db2 rename to other;
+      ╰╴                             ━━━━━
     error: database `nope` does not exist
       ╭▸ 
     8 │ alter database nope rename to x;
@@ -99,9 +103,5 @@ drop database db3;
        ╭▸ 
     13 │ drop database db3;
        ╰╴              ━━━
-    error: database `other` already exists
-      ╭▸ 
-    7 │ alter database db2 rename to other;
-      ╰╴                             ━━━━━
     ");
 }

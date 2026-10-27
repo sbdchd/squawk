@@ -20,7 +20,13 @@ insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, 
     error: column `y` does not exist
       ╭▸ 
     4 │ insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, d[1:y] = 2;
-      ╰╴                                                                                    ━
+      │                                                                                     ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, d[1:y] = 2;
+    4 + insert into t values (1, '{}') on conflict (a) do update set d[excluded.a] = 1, d[1:t.a] = 2;
+      ╰╴
     ");
 }
 
@@ -33,7 +39,13 @@ update t set d[a] = 1, d[x:1] = 2;
     error: column `x` does not exist
       ╭▸ 
     3 │ update t set d[a] = 1, d[x:1] = 2;
-      ╰╴                         ━
+      │                          ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - update t set d[a] = 1, d[x:1] = 2;
+    3 + update t set d[a] = 1, d[a:1] = 2;
+      ╰╴
     ");
 }
 
@@ -45,14 +57,18 @@ create function g(x anynonarray) returns int language sql return 1;
 create table t (a int2vector, b oidvector);
 select f(a), f(b), g(a), g(b) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(int2vector)` does not exist
       ╭▸ 
     5 │ select f(a), f(b), g(a), g(b) from t;
-      ╰╴                   ━
-    error: function `g` does not exist
+      │                    ━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: function `g(oidvector)` does not exist
       ╭▸ 
     5 │ select f(a), f(b), g(a), g(b) from t;
-      ╰╴                         ━
+      │                          ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -67,14 +83,18 @@ create function j(x oidvector) returns int language sql return 1;
 create table t (a int2vector, b oidvector, c int2[], d oid[]);
 select f(a), g(a), h(b), i(c), j(d) from t;
 "), @"
-    error: function `i` does not exist
+    error: function `i(int2[])` does not exist
       ╭▸ 
     8 │ select f(a), g(a), h(b), i(c), j(d) from t;
-      ╰╴                         ━
-    error: function `j` does not exist
+      │                          ━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: function `j(oid[])` does not exist
       ╭▸ 
     8 │ select f(a), g(a), h(b), i(c), j(d) from t;
-      ╰╴                               ━
+      │                                ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -87,10 +107,12 @@ create function h(x "char") returns int language sql return 1;
 create table t (p point, l line, b box, s lseg, n name);
 select f(p[0]), f(l[0]), g(b[0]), g(s[0]), h(n[0]), f(n[0]) from t;
 "#), @"
-    error: function `f` does not exist
+    error: function `f(char)` does not exist
       ╭▸ 
     6 │ select f(p[0]), f(l[0]), g(b[0]), g(s[0]), h(n[0]), f(n[0]) from t;
-      ╰╴                                                    ━
+      │                                                     ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -101,10 +123,12 @@ create function f(x anyarray) returns int language sql return 1;
 create table t (p point);
 select f(p) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(point)` does not exist
       ╭▸ 
     4 │ select f(p) from t;
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -116,10 +140,12 @@ create function g(x float8) returns int language sql return 1;
 create table t (p point);
 select f(p[0:1]), g(p[0:1]) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(point)` does not exist
       ╭▸ 
     5 │ select f(p[0:1]), g(p[0:1]) from t;
-      ╰╴                  ━
+      │                   ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -131,10 +157,12 @@ create function g(x int2vector) returns int language sql return 1;
 create table t (a int2vector);
 select f(a[0:1]), g(a[0:1]) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(int2[])` does not exist
       ╭▸ 
     5 │ select f(a[0:1]), g(a[0:1]) from t;
-      ╰╴                  ━
+      │                   ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -148,10 +176,12 @@ create function g(x int[]) returns int language sql return 1;
 create table t (a ints, b more_ints);
 select f(a[1]), f(b[1]), g(a[1:2]), g(b[1:2]), g(a[1]) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(int4)` does not exist
       ╭▸ 
     7 │ select f(a[1]), f(b[1]), g(a[1:2]), g(b[1:2]), g(a[1]) from t;
-      ╰╴                                               ━
+      │                                                ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -163,10 +193,12 @@ create function g(x int) returns int language sql return 1;
 create table t (j jsonb);
 select f(j['a']), f(j['a']['b']), g(j['a']), f(j['a':'b']) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(jsonb)` does not exist
       ╭▸ 
     5 │ select f(j['a']), f(j['a']['b']), g(j['a']), f(j['a':'b']) from t;
-      ╰╴                                  ━
+      │                                   ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -184,10 +216,12 @@ create function g(x hstore) returns int language sql return 1;
 create table t (h hstore);
 select f(h['k']), g(h['k']) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(text)` does not exist
        ╭▸ 
     11 │ select f(h['k']), g(h['k']) from t;
-       ╰╴                  ━
+       │                   ━
+       │
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -206,10 +240,12 @@ create function g(x int[]) returns int language sql return 1;
 create table u (a t);
 select f(a[1]), g(a[1:2]), f(a[1:2]) from u;
 "#), @"
-    error: function `f` does not exist
+    error: function `f(int4[])` does not exist
        ╭▸ 
     12 │ select f(a[1]), g(a[1:2]), f(a[1:2]) from u;
-       ╰╴                           ━
+       │                            ━
+       │
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -223,10 +259,12 @@ create function g(x int) returns int language sql return 1;
 create table u (a t);
 select f(a), g(a[0]) from u;
 "), @"
-    error: function `f` does not exist
+    error: function `f(t)` does not exist
       ╭▸ 
     7 │ select f(a), g(a[0]) from u;
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -237,10 +275,12 @@ create function f(x smallint) returns int language sql return 1;
 create table t (a int2vector, b oidvector);
 select f(a[0]), f(b[0]) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(oid)` does not exist
       ╭▸ 
     4 │ select f(a[0]), f(b[0]) from t;
-      ╰╴                ━
+      │                 ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -264,17 +304,23 @@ select g(v[1]) from x;
 alter type t set (subscript = none);
 select g(v[1]) from x;
 "), @"
-    error: function `g` does not exist
+    error: function `g(int4)` does not exist
        ╭▸ 
     10 │ select g(v[1]), g(v[1:2]) from x;
-       ╰╴       ━
-    error: function `g` does not exist
+       │        ━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `g(int4[])` does not exist
        ╭▸ 
     10 │ select g(v[1]), g(v[1:2]) from x;
-       ╰╴                ━
-    error: function `g` does not exist
+       │                 ━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `g(int4)` does not exist
        ╭▸ 
     15 │ select g(v[1]) from x;
-       ╰╴       ━
+       │        ━
+       │
+       ╰ hint: consider adding explicit type casts
     ");
 }

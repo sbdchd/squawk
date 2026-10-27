@@ -76,6 +76,10 @@ comment on text search configuration nope is 'x';
        ╭▸ 
     19 │ comment on table nope is 'x';
        ╰╴                 ━━━━
+    error: `v` is not a table
+       ╭▸ 
+    20 │ comment on table v is 'x';
+       ╰╴                 ━
     error: relation `nope` does not exist
        ╭▸ 
     22 │ comment on view nope is 'x';
@@ -92,7 +96,7 @@ comment on text search configuration nope is 'x';
        ╭▸ 
     28 │ comment on index nope is 'x';
        ╰╴                 ━━━━
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
        ╭▸ 
     30 │ comment on column t.nope is 'x';
        ╰╴                    ━━━━
@@ -116,11 +120,11 @@ comment on text search configuration nope is 'x';
        ╭▸ 
     40 │ comment on domain nope is 'x';
        ╰╴                  ━━━━
-    error: function `f` does not exist
+    error: function `f(text)` does not exist
        ╭▸ 
     42 │ comment on function f(text) is 'x';
        ╰╴                    ━
-    error: procedure `nope` does not exist
+    error: procedure `nope()` does not exist
        ╭▸ 
     44 │ comment on procedure nope() is 'x';
        ╰╴                     ━━━━
@@ -168,10 +172,6 @@ comment on text search configuration nope is 'x';
        ╭▸ 
     67 │ comment on text search configuration nope is 'x';
        ╰╴                                     ━━━━
-    error: `v` is not a table
-       ╭▸ 
-    20 │ comment on table v is 'x';
-       ╰╴                 ━
     ");
 }
 
@@ -192,7 +192,7 @@ security label on schema nope is 'x';
       ╭▸ 
     5 │ security label for selinux on table nope is 'x';
       ╰╴                                    ━━━━
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     7 │ security label on column t.nope is 'x';
       ╰╴                           ━━━━

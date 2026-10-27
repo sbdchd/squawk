@@ -34,6 +34,18 @@ select 'x'::t;
       ╭▸ 
     5 │ drop table t, nope;
       ╰╴              ━━━━
+    error: `v` is not a table
+      ╭▸ 
+    7 │ drop table v;
+      │            ━
+      │
+      ╰ hint: use `drop view` to remove a view
+    error: `u` is not a view
+      ╭▸ 
+    9 │ drop view u;
+      │           ━
+      │
+      ╰ hint: use `drop table` to remove a table
     error: relation `t` does not exist
        ╭▸ 
     10 │ select * from t;
@@ -46,18 +58,6 @@ select 'x'::t;
        ╭▸ 
     12 │ select 'x'::t;
        ╰╴            ━
-    error: `v` is not a table
-      ╭▸ 
-    7 │ drop table v;
-      │            ━
-      │
-      ╰ hint: Use DROP VIEW to remove a view.
-    error: `u` is not a view
-      ╭▸ 
-    9 │ drop view u;
-      │           ━
-      │
-      ╰ hint: Use DROP TABLE to remove a table.
     ");
 }
 
@@ -73,11 +73,11 @@ alter table if exists nope4 drop column x;
 select a, b, c from t;
 select t.a from t;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     4 │ alter table t drop column a, drop column nope, drop column if exists nope2;
       ╰╴                                         ━━━━
-    error: column `a` does not exist
+    error: column `t.a` does not exist
       ╭▸ 
     5 │ alter table t drop column a;
       ╰╴                          ━
@@ -88,8 +88,14 @@ select t.a from t;
     error: column `a` does not exist
       ╭▸ 
     8 │ select a, b, c from t;
-      ╰╴       ━
-    error: column `a` does not exist
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select a, b, c from t;
+    8 + select b, b, c from t;
+      ╰╴
+    error: column `t.a` does not exist
       ╭▸ 
     9 │ select t.a from t;
       ╰╴         ━
@@ -154,7 +160,13 @@ select a, b from t;
     error: column `a` does not exist
       ╭▸ 
     5 │ select a from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select a from t;
+    5 + select b from t;
+      ╰╴
     ");
 }
 
@@ -343,6 +355,10 @@ select a from t2;
       ╭▸ 
     5 │ select a from t;
       ╰╴              ━
+    error: relation `u` already exists
+      ╭▸ 
+    8 │ alter table t2 rename to u;
+      ╰╴                         ━
     error: relation `nope` does not exist
       ╭▸ 
     9 │ alter table nope rename to y;
@@ -351,10 +367,6 @@ select a from t2;
        ╭▸ 
     14 │ select a from t3;
        ╰╴              ━━
-    error: relation `u` already exists
-      ╭▸ 
-    8 │ alter table t2 rename to u;
-      ╰╴                         ━
     ");
 }
 
@@ -375,14 +387,14 @@ alter table s.t set schema nope;
       ╭▸ 
     7 │ select a from t;
       ╰╴              ━
-    error: schema `nope` does not exist
-       ╭▸ 
-    10 │ alter table s.t set schema nope;
-       ╰╴                           ━━━━
     error: relation `u` already exists
       ╭▸ 
     9 │ alter table u set schema s;
       ╰╴                         ━
+    error: schema `nope` does not exist
+       ╭▸ 
+    10 │ alter table s.t set schema nope;
+       ╰╴                           ━━━━
     ");
 }
 
@@ -405,7 +417,17 @@ select c from t;
     error: column `a` does not exist
       ╭▸ 
     4 │ select a from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a from t;
+    4 + select c from t;
+      ╰╴
+    error: column `t.b` already exists
+      ╭▸ 
+    6 │ alter table t rename c to b;
+      ╰╴                          ━
     error: column `nope` does not exist
       ╭▸ 
     7 │ alter table t rename column nope to x;
@@ -413,11 +435,13 @@ select c from t;
     error: column `d` does not exist
        ╭▸ 
     12 │ select d from t;
-       ╰╴       ━
-    error: column `b` of relation `t` already exists
-      ╭▸ 
-    6 │ alter table t rename c to b;
-      ╰╴                          ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    12 - select d from t;
+    12 + select c from t;
+       ╰╴
     ");
 }
 
@@ -447,6 +471,10 @@ select h from t;
       ╭▸ 
     6 │ alter table t add c int check (c > 0 and nope > 0), add column d int references r (x);
       ╰╴                                         ━━━━
+    error: column `t.a` already exists
+      ╭▸ 
+    8 │ alter table t add column a int;
+      ╰╴                         ━
     error: type `nope_type` does not exist
        ╭▸ 
     10 │ alter table t add column e nope_type;
@@ -458,11 +486,13 @@ select h from t;
     error: column `h` does not exist
        ╭▸ 
     19 │ select h from t;
-       ╰╴       ━
-    error: column `a` of relation `t` already exists
-      ╭▸ 
-    8 │ alter table t add column a int;
-      ╰╴                         ━
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    19 - select h from t;
+    19 + select a from t;
+       ╰╴
     ");
 }
 
@@ -498,7 +528,7 @@ alter table t drop column c, alter column c set default 1;
       ╭▸ 
     7 │ alter table t alter column nope set default 1;
       ╰╴                           ━━━━
-    error: function `nope` does not exist
+    error: function `nope()` does not exist
       ╭▸ 
     8 │ alter table t alter column a set default nope();
       ╰╴                                         ━━━━
@@ -539,10 +569,12 @@ alter table t alter column a type int;
 rollback;
 select f(a) from t;
 "), @"
-    error: function `f` does not exist
+    error: function `f(int4)` does not exist
       ╭▸ 
     4 │ select f(a) from t;
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

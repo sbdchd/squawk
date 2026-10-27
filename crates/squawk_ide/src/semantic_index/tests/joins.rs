@@ -36,7 +36,13 @@ select * from (b cross join lateral (select x) v cross join a);
     error: column `y` does not exist
       ╭▸ 
     8 │ select * from a, lateral (select x, y) w, b;
-      ╰╴                                    ━
+      │                                     ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select * from a, lateral (select x, y) w, b;
+    8 + select * from a, lateral (select x, x) w, b;
+      ╰╴
     error: column `x` does not exist
       ╭▸ 
     9 │ select * from a, (select x) v;
@@ -44,7 +50,13 @@ select * from (b cross join lateral (select x) v cross join a);
     error: column `x` does not exist
        ╭▸ 
     12 │ select * from (b cross join lateral (select x) v cross join a);
-       ╰╴                                            ━
+       │                                             ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    12 - select * from (b cross join lateral (select x) v cross join a);
+    12 + select * from (b cross join lateral (select y) v cross join a);
+       ╰╴
     ");
 }
 
@@ -69,14 +81,20 @@ select * from a right join b on true cross join lateral (select x, y) v;
       ╭▸ 
     6 │ select * from a full join generate_series(1, x) g on true;
       ╰╴                                             ━
-    error: missing FROM-clause entry for table `a`
+    error: missing `from` clause entry for table `a`
       ╭▸ 
     8 │ select * from c, a right join lateral (select z, a.x) v on true;
       ╰╴                                                 ━
     error: column `x` does not exist
       ╭▸ 
     9 │ select * from a right join (b cross join lateral (select x, y) v) on true;
-      ╰╴                                                         ━
+      │                                                          ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select * from a right join (b cross join lateral (select x, y) v) on true;
+    9 + select * from a right join (b cross join lateral (select y, y) v) on true;
+      ╰╴
     ");
 }
 
@@ -99,12 +117,24 @@ select (select 1 from b join c on x = y) from a;
     error: column `x` does not exist
       ╭▸ 
     6 │ select * from a, b join c on x = z;
-      ╰╴                             ━
+      │                              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - select * from a, b join c on x = z;
+    6 + select * from a, b join c on y = z;
+      ╰╴
     error: column `x` does not exist
       ╭▸ 
     7 │ select * from b join c on x = z, a;
-      ╰╴                          ━
-    error: missing FROM-clause entry for table `a`
+      │                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - select * from b join c on x = z, a;
+    7 + select * from b join c on y = z, a;
+      ╰╴
+    error: missing `from` clause entry for table `a`
       ╭▸ 
     8 │ select * from a join (b join c on a.x = y) on true;
       ╰╴                                  ━
@@ -130,23 +160,23 @@ select j.x, j.y, j.z from (a natural join b) as j;
 select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
 select x, y, z from (a join b using (x)) as j;
 "), @"
-    error: column `w` does not exist
+    error: column `j.w` does not exist
       ╭▸ 
     4 │ select j.x, j.y, j.z, j.w from (a join b using (x)) as j;
       ╰╴                        ━
-    error: missing FROM-clause entry for table `a`
+    error: missing `from` clause entry for table `a`
       ╭▸ 
     5 │ select a.x, b.z from (a join b using (x)) as j;
       ╰╴       ━
-    error: missing FROM-clause entry for table `b`
+    error: missing `from` clause entry for table `b`
       ╭▸ 
     5 │ select a.x, b.z from (a join b using (x)) as j;
       ╰╴            ━
-    error: column `r` does not exist
+    error: column `j.r` does not exist
       ╭▸ 
     7 │ select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
       ╰╴                   ━
-    error: column `x` does not exist
+    error: column `j.x` does not exist
       ╭▸ 
     7 │ select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
       ╰╴                        ━
@@ -169,30 +199,42 @@ select x from v;
 create view u as select k.* from a join b using (x) as k;
 select y from u;
 "), @"
-    error: column `y` does not exist
+    error: column `k.y` does not exist
       ╭▸ 
     5 │ select k.x, k.y from a join b using (x) as k;
       ╰╴              ━
-    error: missing FROM-clause entry for table `k`
+    error: missing `from` clause entry for table `k`
       ╭▸ 
     8 │ select * from a join b using (x) as k, (select k.x) v;
       ╰╴                                               ━
-    error: missing FROM-clause entry for table `k`
+    error: missing `from` clause entry for table `k`
       ╭▸ 
     9 │ select * from a join b using (x) as k, c join a as d on k.x = w;
       ╰╴                                                        ━
-    error: column `x` does not exist
-       ╭▸ 
-    11 │ select x from v;
-       ╰╴       ━
-    error: column `y` does not exist
-       ╭▸ 
-    13 │ select y from u;
-       ╰╴       ━
-    error: CREATE VIEW specifies more column names than columns
+    error: `create view` specifies more column names than columns
        ╭▸ 
     10 │ create view v (p, q, r, s) as select * from a join b using (x) as k;
        ╰╴                        ━
+    error: column `x` does not exist
+       ╭▸ 
+    11 │ select x from v;
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    11 - select x from v;
+    11 + select p from v;
+       ╰╴
+    error: column `y` does not exist
+       ╭▸ 
+    13 │ select y from u;
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    13 - select y from u;
+    13 + select x from u;
+       ╰╴
     ");
 }
 

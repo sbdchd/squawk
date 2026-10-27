@@ -14,7 +14,7 @@ drop operator ===(int, int), -(none, int);
 drop operator ===(int, int);
 drop operator if exists ===(int, int);
 "), @"
-    error: operator `===` does not exist
+    error: operator does not exist: `int4 === int4`
       ╭▸ 
     8 │ drop operator ===(int, int);
       ╰╴              ━━━
@@ -33,6 +33,10 @@ drop operator ~~~ (int, int);
 drop operator ~~~ (none, int);
 drop operator ~~~ (none, int);
 "), @"
+    error: operator `~~~` already exists
+      ╭▸ 
+    5 │ create operator ~~~ (rightarg = int, function = sub);
+      ╰╴                ━━━
     error: function `sub` does not exist
       ╭▸ 
     5 │ create operator ~~~ (rightarg = int, function = sub);
@@ -41,10 +45,6 @@ drop operator ~~~ (none, int);
       ╭▸ 
     6 │ create operator ~~~ (leftarg = int, rightarg = int, function = neg);
       ╰╴                                                               ━━━
-    error: operator `~~~` already exists
-      ╭▸ 
-    5 │ create operator ~~~ (rightarg = int, function = sub);
-      ╰╴                ━━━
     ");
 }
 
@@ -58,11 +58,11 @@ drop operator ~~~ (int, int);
 drop operator ~~~ (int, int);
 drop operator ~~~ (none, int);
 "), @"
-    error: operator `~~~` does not exist
+    error: operator does not exist: `~~~ int4`
       ╭▸ 
     3 │ drop operator ~~~ (none, int);
       ╰╴              ━━━
-    error: operator `~~~` does not exist
+    error: operator does not exist: `int4 ~~~ int4`
       ╭▸ 
     6 │ drop operator ~~~ (int, int);
       ╰╴              ━━━
@@ -93,11 +93,11 @@ drop operator === (int, text);
       ╭▸ 
     3 │ create operator s.=== (leftarg = int, rightarg = int, function = int4eq);
       ╰╴                ━
-    error: operator `!==` does not exist
+    error: operator does not exist: `int4 !== int4`
       ╭▸ 
     4 │ alter operator !== (int, int) set (restrict = eqsel);
       ╰╴               ━━━
-    error: operator `===` does not exist
+    error: operator does not exist: `int4 === text`
       ╭▸ 
     5 │ drop operator === (int, text);
       ╰╴              ━━━
@@ -113,7 +113,7 @@ create operator s.=== (leftarg = int, rightarg = int, function = s.f, negator = 
 drop operator === (int, int);
 drop operator s.=== (int, int);
 "), @"
-    error: operator `===` does not exist
+    error: operator does not exist: `int4 === int4`
       ╭▸ 
     5 │ drop operator === (int, int);
       ╰╴              ━━━
@@ -131,7 +131,7 @@ rollback;
 drop operator === (int, int);
 drop operator !== (int, int);
 "), @"
-    error: operator `!==` does not exist
+    error: operator does not exist: `int4 !== int4`
       ╭▸ 
     8 │ drop operator !== (int, int);
       ╰╴              ━━━
@@ -182,22 +182,22 @@ rollback;
 drop operator public.=== (int, int);
 drop operator s.=== (int, int);
 "), @"
-    error: operator `===` does not exist
+    error: operator does not exist: `int4 public.=== int4`
       ╭▸ 
     7 │ alter operator public.=== (int, int) owner to current_user;
       ╰╴                      ━━━
-    error: schema `nope` does not exist
-       ╭▸ 
-    10 │ alter operator s.=== (int, int) set schema nope;
-       ╰╴                                           ━━━━
-    error: operator `===` does not exist
-       ╭▸ 
-    14 │ drop operator public.=== (int, int);
-       ╰╴                     ━━━
     error: operator `===` already exists in schema `s2`
       ╭▸ 
     9 │ alter operator s.=== (int, int) set schema s2;
       ╰╴                                           ━━
+    error: schema `nope` does not exist
+       ╭▸ 
+    10 │ alter operator s.=== (int, int) set schema nope;
+       ╰╴                                           ━━━━
+    error: operator does not exist: `int4 public.=== int4`
+       ╭▸ 
+    14 │ drop operator public.=== (int, int);
+       ╰╴                     ━━━
     ");
 }
 
@@ -207,10 +207,12 @@ fn operator_bin_expr_unresolved() {
 create operator === (leftarg = int, rightarg = int, function = int4eq);
 select 1 === 2, 'a'::text === 'b'::text, 1 operator(===) 2;
 "), @"
-    error: operator `===` does not exist
+    error: operator does not exist: `text === text`
       ╭▸ 
     3 │ select 1 === 2, 'a'::text === 'b'::text, 1 operator(===) 2;
-      ╰╴                          ━━━
+      │                           ━━━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -235,18 +237,22 @@ select 1 operator(nope.+) 2, nope.f(1);
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);
       ╰╴                  ━━━━
-    error: operator `+` does not exist
+    error: operator does not exist: `int4 nope.+ int4`
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);
-      ╰╴                       ━
+      │                        ━
+      │
+      ╰ hint: consider adding explicit type casts
     error: schema `nope` does not exist
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);
       ╰╴                             ━━━━
-    error: function `f` does not exist
+    error: function `nope.f(int4)` does not exist
       ╭▸ 
     2 │ select 1 operator(nope.+) 2, nope.f(1);
-      ╰╴                                  ━
+      │                                   ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -270,30 +276,42 @@ create type mood as enum ('happy', 'sad');
 create table t (i int, s text, m mood);
 select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
 "), @"
-    error: operator `~~` does not exist
+    error: operator does not exist: `int4 ~~ unknown`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
-      ╰╴         ━━━━
-    error: operator `~` does not exist
+      │          ━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `int4 ~ text`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
-      ╰╴                      ━━━━━━━━━━
-    error: operator `!~~*` does not exist
+      │                       ━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `int4 !~~* unknown`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
-      ╰╴                                        ━━━━━━━━━
-    error: operator `=` does not exist
+      │                                         ━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `mood = int4`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
-      ╰╴                                                         ━━━━━━━━━━━━━━━━
-    error: operator `=` does not exist
+      │                                                          ━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `int4 = text`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
-      ╰╴                                                                               ━━
-    error: operator `<>` does not exist
+      │                                                                                ━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `text <> int4`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
-      ╰╴                                                                                         ━━━━━━
+      │                                                                                          ━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -327,5 +345,41 @@ select row(1) = row(1), (1, 2) = (1, 2), (1, 2) in ((1, 2), (3, 4));
       ╭▸ 
     6 │ select (1, 2) between (1, 2) and (1, 2, 3);
       ╰╴                                 ━━━━━━━━━
+    ");
+}
+
+#[test]
+fn unresolved_operator_types() {
+    assert_snapshot!(check("
+create table t (a int, b text[]);
+select 1 = true;
+select a + b from t;
+select - true;
+select a === 1 from t;
+"), @"
+    error: operator does not exist: `int4 = bool`
+      ╭▸ 
+    3 │ select 1 = true;
+      │          ━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `int4 + text[]`
+      ╭▸ 
+    4 │ select a + b from t;
+      │          ━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `- bool`
+      ╭▸ 
+    5 │ select - true;
+      │        ━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `int4 === int4`
+      ╭▸ 
+    6 │ select a === 1 from t;
+      │          ━━━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }

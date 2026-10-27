@@ -23,7 +23,7 @@ create policy p2 on t;
       ╭▸ 
     8 │   using (owner = current_user and t.b > 0 and zz = 1)
       ╰╴                                              ━━
-    error: column `yy` does not exist
+    error: column `t.yy` does not exist
       ╭▸ 
     9 │   with check (b > 0 and t.yy = 1);
       ╰╴                          ━━
@@ -131,6 +131,10 @@ drop policy p3 on t;
       ╭▸ 
     6 │ alter policy p on t to a, public, missing_role using (a > 0) with check (zz > 0);
       ╰╴                                                                         ━━
+    error: policy `p2` for table `t` already exists
+      ╭▸ 
+    7 │ alter policy p on t rename to p2;
+      ╰╴                              ━━
     error: policy `p` does not exist
       ╭▸ 
     9 │ alter policy p on t rename to p4;
@@ -143,9 +147,5 @@ drop policy p3 on t;
        ╭▸ 
     11 │ alter policy p on missing_table to public;
        ╰╴                  ━━━━━━━━━━━━━
-    error: policy `p2` for table `t` already exists
-      ╭▸ 
-    7 │ alter policy p on t rename to p2;
-      ╰╴                              ━━
     ");
 }

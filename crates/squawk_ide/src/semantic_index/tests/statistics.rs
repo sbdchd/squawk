@@ -21,14 +21,14 @@ create statistics missing_schema.s4 on a, b from t;
       ╭▸ 
     5 │ create statistics s3 on a, b from missing_table;
       ╰╴                                  ━━━━━━━━━━━━━
-    error: schema `missing_schema` does not exist
-      ╭▸ 
-    8 │ create statistics missing_schema.s4 on a, b from t;
-      ╰╴                  ━━━━━━━━━━━━━━
     error: statistics object `s` already exists
       ╭▸ 
     6 │ create statistics s on a, b from t;
       ╰╴                  ━
+    error: schema `missing_schema` does not exist
+      ╭▸ 
+    8 │ create statistics missing_schema.s4 on a, b from t;
+      ╰╴                  ━━━━━━━━━━━━━━
     ");
 }
 
@@ -77,14 +77,14 @@ alter statistics s3 owner to r;
        ╭▸ 
     10 │ alter statistics missing owner to r;
        ╰╴                 ━━━━━━━
-    error: statistics object `s3` does not exist
-       ╭▸ 
-    15 │ alter statistics s3 owner to r;
-       ╰╴                 ━━
     error: statistics object `s2` already exists
        ╭▸ 
     11 │ alter statistics s rename to s2;
        ╰╴                             ━━
+    error: statistics object `s3` does not exist
+       ╭▸ 
+    15 │ alter statistics s3 owner to r;
+       ╰╴                 ━━
     ");
 }
 

@@ -10,14 +10,16 @@ create function d(t) returns text as 'select 1' language sql;
 select a, t.a, a(t), t.d, d(t) from t;
 select t.nope, nope(t), t from t;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     5 │ select t.nope, nope(t), t from t;
       ╰╴         ━━━━
-    error: function `nope` does not exist
+    error: function `nope(t)` does not exist
       ╭▸ 
     5 │ select t.nope, nope(t), t from t;
-      ╰╴               ━━━━
+      │                ━━━━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -29,7 +31,7 @@ create table u (b text);
 create function d(u) returns text as 'select 1' language sql;
 select t.d, u.d from t, u;
 "), @"
-    error: column `d` does not exist
+    error: column `t.d` does not exist
       ╭▸ 
     5 │ select t.d, u.d from t, u;
       ╰╴         ━
@@ -72,14 +74,16 @@ from t;
        ╭▸ 
     16 │   (array[p]).x,
        ╰╴             ━
-    error: function `f` does not exist
+    error: function `f()` does not exist
        ╭▸ 
     18 │   (f()).x,
        ╰╴   ━
-    error: operator `-` does not exist
+    error: operator does not exist: `- pair`
        ╭▸ 
     19 │   (-p).x,
-       ╰╴   ━
+       │    ━
+       │
+       ╰ hint: consider adding explicit type casts
     ");
 }
 

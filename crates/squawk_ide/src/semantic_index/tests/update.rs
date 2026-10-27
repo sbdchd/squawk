@@ -12,23 +12,41 @@ update t set a = c from u where t.b = u.c returning a, c, x;
 update t set (a, b) = (1, w), (v) = (select c from u);
 update missing set a = 1;
 "), @"
-    error: column `z` does not exist
+    error: column `t.z` does not exist
       ╭▸ 
     4 │ update t set a = 1, z = 2 where b = 1 and y = 2;
       ╰╴                    ━
     error: column `y` does not exist
       ╭▸ 
     4 │ update t set a = 1, z = 2 where b = 1 and y = 2;
-      ╰╴                                          ━
+      │                                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - update t set a = 1, z = 2 where b = 1 and y = 2;
+    4 + update t set a = 1, z = 2 where b = 1 and a = 2;
+      ╰╴
     error: column `x` does not exist
       ╭▸ 
     5 │ update t set a = c from u where t.b = u.c returning a, c, x;
-      ╰╴                                                          ━
+      │                                                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - update t set a = c from u where t.b = u.c returning a, c, x;
+    5 + update t set a = c from u where t.b = u.c returning a, c, a;
+      ╰╴
     error: column `w` does not exist
       ╭▸ 
     6 │ update t set (a, b) = (1, w), (v) = (select c from u);
-      ╰╴                          ━
-    error: column `v` does not exist
+      │                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - update t set (a, b) = (1, w), (v) = (select c from u);
+    6 + update t set (a, b) = (1, a), (v) = (select c from u);
+      ╰╴
+    error: column `t.v` does not exist
       ╭▸ 
     6 │ update t set (a, b) = (1, w), (v) = (select c from u);
       ╰╴                               ━
@@ -45,7 +63,7 @@ fn update_alias_hides_table_name() {
 create table t(a int);
 update t as x set a = x.a + t.a;
 "), @"
-    error: missing FROM-clause entry for table `t`
+    error: missing `from` clause entry for table `t`
       ╭▸ 
     3 │ update t as x set a = x.a + t.a;
       ╰╴                            ━
@@ -59,7 +77,7 @@ create table t(a int);
 create table u(c int);
 update t set c = 1 from u;
 "), @"
-    error: column `c` does not exist
+    error: column `t.c` does not exist
       ╭▸ 
     4 │ update t set c = 1 from u;
       ╰╴             ━
@@ -89,7 +107,13 @@ select a, b from i;
     error: column `b` does not exist
       ╭▸ 
     4 │ select a, b from i;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a, b from i;
+    4 + select a, a from i;
+      ╰╴
     ");
 }
 
@@ -99,7 +123,7 @@ fn update_returning_old_new() {
 create table t(a int);
 update t set a = 1 returning old.a, new.a, new.z;
 "), @"
-    error: column `z` does not exist
+    error: column `new.z` does not exist
       ╭▸ 
     3 │ update t set a = 1 returning old.a, new.a, new.z;
       ╰╴                                               ━
@@ -114,7 +138,7 @@ update t for portion of valid_at from '2020-01-01' to '2021-01-01' set b = 1;
 update t for portion of nope from '2020-01-01' to nope2 set b = 1;
 update t for portion of valid_at (daterange('2020-01-01', nope3)) set b = 1;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     4 │ update t for portion of nope from '2020-01-01' to nope2 set b = 1;
       ╰╴                        ━━━━

@@ -11,7 +11,13 @@ select a, b from t;
     error: column `b` does not exist
       ╭▸ 
     3 │ select a, b from t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select a, b from t;
+    3 + select a, a from t;
+      ╰╴
     ");
 }
 
@@ -32,7 +38,13 @@ select x, y, a from t;
     error: column `a` does not exist
       ╭▸ 
     3 │ select x, y, a from t;
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select x, y, a from t;
+    3 + select x, y, x from t;
+      ╰╴
     ");
 }
 
@@ -45,7 +57,13 @@ select n, m from t;
     error: column `m` does not exist
       ╭▸ 
     3 │ select n, m from t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select n, m from t;
+    3 + select n, n from t;
+      ╰╴
     ");
 }
 
@@ -62,7 +80,13 @@ select n, m from t;
     error: column `m` does not exist
       ╭▸ 
     3 │ select n, m from t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select n, m from t;
+    3 + select n, n from t;
+      ╰╴
     ");
 }
 
@@ -79,7 +103,13 @@ select n, x from t;
     error: column `x` does not exist
       ╭▸ 
     7 │ select n, x from t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - select n, x from t;
+    7 + select n, n from t;
+      ╰╴
     ");
 }
 
@@ -105,7 +135,13 @@ select a, b from t;
     error: column `b` does not exist
       ╭▸ 
     3 │ select a, b from t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select a, b from t;
+    3 + select a, a from t;
+      ╰╴
     ");
 }
 
@@ -128,7 +164,13 @@ select n, ord, is_cycle, path, z from t;
     error: column `z` does not exist
       ╭▸ 
     5 │ select n, ord, is_cycle, path, z from t;
-      ╰╴                               ━
+      │                                ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select n, ord, is_cycle, path, z from t;
+    5 + select n, ord, is_cycle, path, n from t;
+      ╰╴
     ");
 }
 
@@ -162,11 +204,11 @@ with x as (select 1), x as (select 2) select 1;
 with recursive x as (select 1), x as (select 2) select 1;
 with x as (select 1) select 1 from (with x as (select 2) select 1) s;
 "), @"
-    error: WITH query name `x` specified more than once
+    error: `with` query name `x` specified more than once
       ╭▸ 
     2 │ with x as (select 1), x as (select 2) select 1;
       ╰╴                      ━
-    error: WITH query name `x` specified more than once
+    error: `with` query name `x` specified more than once
       ╭▸ 
     3 │ with recursive x as (select 1), x as (select 2) select 1;
       ╰╴                                ━
@@ -181,17 +223,17 @@ with recursive r (n, m) as (select 1 union all select n + 1 from r) select * fro
 with x (a) as (select 1, 2) select * from x;
 with x (a, b) as (select * from missing) select * from x;
 "), @"
+    error: `with` query `x` has 1 column available but 2 columns specified
+      ╭▸ 
+    2 │ with x (a, b) as (select 1) select * from x;
+      ╰╴           ━
+    error: `with` query `r` has 1 column available but 2 columns specified
+      ╭▸ 
+    3 │ with recursive r (n, m) as (select 1 union all select n + 1 from r) select * from r;
+      ╰╴                     ━
     error: relation `missing` does not exist
       ╭▸ 
     5 │ with x (a, b) as (select * from missing) select * from x;
       ╰╴                                ━━━━━━━
-    error: WITH query `x` has 1 column available but 2 columns specified
-      ╭▸ 
-    2 │ with x (a, b) as (select 1) select * from x;
-      ╰╴           ━
-    error: WITH query `r` has 1 column available but 2 columns specified
-      ╭▸ 
-    3 │ with recursive r (n, m) as (select 1 union all select n + 1 from r) select * from r;
-      ╰╴                     ━
     ");
 }

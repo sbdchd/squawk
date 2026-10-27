@@ -15,18 +15,24 @@ create function h(x int) returns int language sql return 2;
 create table t (a posint, b small, c int, d text);
 select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(posint)` does not exist
        ╭▸ 
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
-       ╰╴                   ━
-    error: function `g` does not exist
+       │                    ━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `g(small)` does not exist
        ╭▸ 
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
-       ╰╴                         ━
-    error: function `h` does not exist
+       │                          ━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `h(text)` does not exist
        ╭▸ 
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
-       ╰╴                                           ━
+       │                                            ━
+       │
+       ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -40,10 +46,12 @@ create function g(x dtext) returns int language sql return 1;
 create table t (a int, b varchar, c text);
 select f('x'), g(a), g(b), g(c) from t;
 "), @"
-    error: function `g` does not exist
+    error: function `g(int4)` does not exist
       ╭▸ 
     7 │ select f('x'), g(a), g(b), g(c) from t;
-      ╰╴               ━
+      │                ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -59,7 +67,7 @@ create domain g as int references t(a);
       ╭▸ 
     3 │ create domain e as int check (nope > 0) default nope() collate nope;
       ╰╴                              ━━━━
-    error: function `nope` does not exist
+    error: function `nope()` does not exist
       ╭▸ 
     3 │ create domain e as int check (nope > 0) default nope() collate nope;
       ╰╴                                                ━━━━
@@ -167,6 +175,10 @@ alter domain e drop default;
       ╭▸ 
     5 │ select 1::d;
       ╰╴          ━
+    error: type `f` already exists
+      ╭▸ 
+    8 │ alter domain e rename to f;
+      ╰╴                         ━
     error: schema `nope` does not exist
       ╭▸ 
     9 │ alter domain e set schema nope;
@@ -175,14 +187,10 @@ alter domain e drop default;
        ╭▸ 
     10 │ alter domain e owner to nope;
        ╰╴                        ━━━━
-    error: function `nope` does not exist
+    error: function `nope()` does not exist
        ╭▸ 
     11 │ alter domain e set default nope();
        ╰╴                           ━━━━
-    error: type `f` already exists
-      ╭▸ 
-    8 │ alter domain e rename to f;
-      ╰╴                         ━
     ");
 }
 

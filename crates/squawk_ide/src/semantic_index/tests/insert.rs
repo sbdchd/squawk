@@ -13,18 +13,30 @@ insert into t select c, x from u;
 insert into t default values returning a, y;
 insert into missing values (1);
 "), @"
-    error: column `z` does not exist
+    error: column `t.z` does not exist
       ╭▸ 
     5 │ insert into t(a, z) values (1, 2);
       ╰╴                 ━
     error: column `x` does not exist
       ╭▸ 
     6 │ insert into t select c, x from u;
-      ╰╴                        ━
+      │                         ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - insert into t select c, x from u;
+    6 + insert into t select c, c from u;
+      ╰╴
     error: column `y` does not exist
       ╭▸ 
     7 │ insert into t default values returning a, y;
-      ╰╴                                          ━
+      │                                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - insert into t default values returning a, y;
+    7 + insert into t default values returning a, a;
+      ╰╴
     error: relation `missing` does not exist
       ╭▸ 
     8 │ insert into missing values (1);
@@ -43,7 +55,7 @@ insert into t select t.a;
       ╭▸ 
     3 │ insert into t values (a);
       ╰╴                      ━
-    error: missing FROM-clause entry for table `t`
+    error: missing `from` clause entry for table `t`
       ╭▸ 
     4 │ insert into t select t.a;
       ╰╴                     ━
@@ -73,7 +85,13 @@ select a, b from i;
     error: column `b` does not exist
       ╭▸ 
     4 │ select a, b from i;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a, b from i;
+    4 + select a, a from i;
+      ╰╴
     ");
 }
 
@@ -87,8 +105,14 @@ insert into t select x, y from v;
     error: column `y` does not exist
       ╭▸ 
     4 │ insert into t select x, y from v;
-      ╰╴                        ━
-    error: INSERT has more expressions than target columns
+      │                         ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - insert into t select x, y from v;
+    4 + insert into t select x, x from v;
+      ╰╴
+    error: `insert` has more expressions than target columns
       ╭▸ 
     4 │ insert into t select x, y from v;
       ╰╴                        ━
@@ -109,16 +133,22 @@ insert into t values (1, 2) on conflict (a) do update set (a, b) = (excluded.a, 
     error: column `z` does not exist
       ╭▸ 
     3 │ insert into t values (1, 2) on conflict (a, z) do nothing;
-      ╰╴                                            ━
-    error: missing FROM-clause entry for table `excluded`
+      │                                             ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - insert into t values (1, 2) on conflict (a, z) do nothing;
+    3 + insert into t values (1, 2) on conflict (a, a) do nothing;
+      ╰╴
+    error: missing `from` clause entry for table `excluded`
       ╭▸ 
     4 │ insert into t values (1, 2) on conflict (excluded.a) do nothing;
       ╰╴                                         ━━━━━━━━
-    error: column `z` does not exist
+    error: column `t.z` does not exist
       ╭▸ 
     5 │ insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
       ╰╴                                                                                            ━
-    error: column `y` does not exist
+    error: column `excluded.y` does not exist
       ╭▸ 
     5 │ insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
       ╰╴                                                                                                                 ━
@@ -130,7 +160,7 @@ insert into t values (1, 2) on conflict (a) do update set (a, b) = (excluded.a, 
       ╭▸ 
     7 │ insert into t values (1, 2) on conflict (a) do update set b = (select b);
       ╰╴                                                                      ━
-    error: missing FROM-clause entry for table `excluded`
+    error: missing `from` clause entry for table `excluded`
       ╭▸ 
     8 │ insert into t values (1, 2) on conflict (a) do update set (a, b) = (excluded.a, excluded.b) returning excluded.a;
       ╰╴                                                                                                      ━━━━━━━━
@@ -143,7 +173,7 @@ fn insert_alias() {
 create table t(a int unique);
 insert into t as x values (1) on conflict (a) do update set a = x.a + t.a returning x.a;
 "), @"
-    error: missing FROM-clause entry for table `t`
+    error: missing `from` clause entry for table `t`
       ╭▸ 
     3 │ insert into t as x values (1) on conflict (a) do update set a = x.a + t.a returning x.a;
       ╰╴                                                                      ━
@@ -156,7 +186,7 @@ fn on_conflict_do_select_for_update_of_excluded() {
 create table t (a int primary key);
 insert into t values (1) on conflict (a) do select for update of excluded;
 "), @"
-    error: missing FROM-clause entry for table `excluded`
+    error: missing `from` clause entry for table `excluded`
       ╭▸ 
     3 │ insert into t values (1) on conflict (a) do select for update of excluded;
       ╰╴                                                                 ━━━━━━━━
@@ -204,6 +234,40 @@ insert into t select * from missing;
 insert into missing values (1, 2, 3);
 insert into missing (a) values (1, 2);
 "), @"
+    error: `insert` has more expressions than target columns
+      ╭▸ 
+    4 │ insert into t (a) values (1, 2);
+      ╰╴                             ━
+    error: `insert` has more target columns than expressions
+      ╭▸ 
+    5 │ insert into t (a, b) values (1);
+      ╰╴                  ━
+    error: `insert` has more expressions than target columns
+      ╭▸ 
+    6 │ insert into t values (1, 2, 3);
+      ╰╴                            ━
+    error: `insert` has more expressions than target columns
+      ╭▸ 
+    7 │ insert into t values (default, default, default);
+      ╰╴                                        ━━━━━━━
+    error: `insert` has more expressions than target columns
+      ╭▸ 
+    8 │ insert into t select 1, 2, 3;
+      ╰╴                           ━
+    error: `insert` has more target columns than expressions
+      ╭▸ 
+    9 │ insert into t (a, b) select 1;
+      ╰╴                  ━
+    error: `insert` has more target columns than expressions
+       ╭▸ 
+    10 │ insert into t (a, b) values ((1, 2));
+       │                   ━
+       │
+       ╰ hint: the insertion source is a row expression containing the same number of columns expected by the `insert`; consider removing the extra parentheses
+    error: `insert` has more expressions than target columns
+       ╭▸ 
+    11 │ insert into t select * from u;
+       ╰╴              ━━━━━━━━━━━━━━━
     error: relation `missing` does not exist
        ╭▸ 
     17 │ insert into t select * from missing;
@@ -216,41 +280,7 @@ insert into missing (a) values (1, 2);
        ╭▸ 
     19 │ insert into missing (a) values (1, 2);
        ╰╴            ━━━━━━━
-    error: INSERT has more expressions than target columns
-      ╭▸ 
-    4 │ insert into t (a) values (1, 2);
-      ╰╴                             ━
-    error: INSERT has more target columns than expressions
-      ╭▸ 
-    5 │ insert into t (a, b) values (1);
-      ╰╴                  ━
-    error: INSERT has more expressions than target columns
-      ╭▸ 
-    6 │ insert into t values (1, 2, 3);
-      ╰╴                            ━
-    error: INSERT has more expressions than target columns
-      ╭▸ 
-    7 │ insert into t values (default, default, default);
-      ╰╴                                        ━━━━━━━
-    error: INSERT has more expressions than target columns
-      ╭▸ 
-    8 │ insert into t select 1, 2, 3;
-      ╰╴                           ━
-    error: INSERT has more target columns than expressions
-      ╭▸ 
-    9 │ insert into t (a, b) select 1;
-      ╰╴                  ━
-    error: INSERT has more target columns than expressions
-       ╭▸ 
-    10 │ insert into t (a, b) values ((1, 2));
-       │                   ━
-       │
-       ╰ hint: The insertion source is a row expression containing the same number of columns expected by the INSERT. Did you accidentally use extra parentheses?
-    error: INSERT has more expressions than target columns
-       ╭▸ 
-    11 │ insert into t select * from u;
-       ╰╴              ━━━━━━━━━━━━━━━
-    error: INSERT has more expressions than target columns
+    error: `insert` has more expressions than target columns
        ╭▸ 
     19 │ insert into missing (a) values (1, 2);
        ╰╴                                   ━
@@ -299,23 +329,23 @@ create function f() returns void
   insert into t (id) values (1) on conflict (a) do nothing;
 $$;
 "), @"
-    error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
        ╭▸ 
     14 │ insert into t (id) values (1) on conflict (a) do nothing;
        ╰╴                                          ━━━
-    error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
        ╭▸ 
     17 │ insert into t (id) values (1) on conflict (a, b, c) do nothing;
        ╰╴                                          ━━━━━━━━━
-    error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
        ╭▸ 
     19 │ insert into t (id) values (1) on conflict (d) do nothing;
        ╰╴                                          ━━━
-    error: ON CONFLICT does not support deferrable unique constraints/exclusion constraints as arbiters
+    error: `on conflict` does not support deferrable unique constraints/exclusion constraints as arbiters
        ╭▸ 
     21 │ insert into t (id) values (1) on conflict (e) do nothing;
        ╰╴                                          ━━━
-    error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
        ╭▸ 
     25 │ insert into t (id) values (1) on conflict (d) where d > 0 do nothing;
        ╰╴                                          ━━━

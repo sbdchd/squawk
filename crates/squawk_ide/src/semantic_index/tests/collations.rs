@@ -156,10 +156,18 @@ drop collation s.c2;
       ╭▸ 
     7 │ create table t (a text collate c);
       ╰╴                               ━
+    error: collation `d` already exists
+      ╭▸ 
+    9 │ alter collation c2 rename to d;
+      ╰╴                             ━
     error: collation `c2` does not exist
        ╭▸ 
     11 │ create table v (a text collate c2);
        ╰╴                               ━━
+    error: collation `e` already exists in schema `s`
+       ╭▸ 
+    14 │ alter collation e set schema s;
+       ╰╴                             ━
     error: collation `nope` does not exist
        ╭▸ 
     15 │ alter collation nope rename to x;
@@ -172,13 +180,5 @@ drop collation s.c2;
        ╭▸ 
     20 │ drop collation s.c3;
        ╰╴                 ━━
-    error: collation `d` already exists
-      ╭▸ 
-    9 │ alter collation c2 rename to d;
-      ╰╴                             ━
-    error: collation `e` already exists in schema `s`
-       ╭▸ 
-    14 │ alter collation e set schema s;
-       ╰╴                             ━
     ");
 }

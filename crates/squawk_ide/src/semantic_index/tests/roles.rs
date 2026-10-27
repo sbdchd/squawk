@@ -83,14 +83,14 @@ alter group d rename to e;
 alter role a rename to f;
 alter role e with login;
 "), @"
-    error: role `a` does not exist
-      ╭▸ 
-    8 │ alter role a rename to f;
-      ╰╴           ━
     error: role `b` already exists
       ╭▸ 
     4 │ alter role a rename to b;
       ╰╴                       ━
+    error: role `a` does not exist
+      ╭▸ 
+    8 │ alter role a rename to f;
+      ╰╴           ━
     ");
 }
 
@@ -302,7 +302,7 @@ revoke admin option for nope from r2;
        ╭▸ 
     23 │ grant select on all tables in schema sc, nope to r;
        ╰╴                                         ━━━━
-    error: function `f` does not exist
+    error: function `f(text)` does not exist
        ╭▸ 
     25 │ grant execute on function f(text) to r;
        ╰╴                          ━

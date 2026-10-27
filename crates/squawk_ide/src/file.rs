@@ -24,6 +24,8 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+use std::cmp::Ordering;
+
 pub use crate::db::FileId;
 use crate::ir::BodyId;
 use rowan::{TextRange, TextSize};
@@ -70,6 +72,22 @@ impl<FileKind: Copy, T> InFileWrapper<FileKind, T> {
 pub type InFile<T> = InFileWrapper<FileId, T>;
 pub type FileRange = InFile<TextRange>;
 pub type FilePosition = InFile<TextSize>;
+
+impl Ord for FileRange {
+    fn cmp(&self, other: &Self) -> Ordering {
+        (self.file_id, self.value.start(), self.value.end()).cmp(&(
+            other.file_id,
+            other.value.start(),
+            other.value.end(),
+        ))
+    }
+}
+
+impl PartialOrd for FileRange {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) enum IrFileId {

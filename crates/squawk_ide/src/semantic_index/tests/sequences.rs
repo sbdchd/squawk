@@ -33,19 +33,19 @@ alter sequence if exists s restart;
     7 │ drop sequence s;
       │               ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a sequence
       ╭▸ 
     8 │ drop sequence s;
       │               ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a sequence
       ╭▸ 
     9 │ drop sequence if exists s;
       │                         ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a sequence
        ╭▸ 
     10 │ alter sequence s restart;
@@ -72,7 +72,7 @@ alter sequence s1 as int no cycle;
       ╭▸ 
     4 │ create sequence s2 as nope owned by t.nope;
       ╰╴                      ━━━━
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     4 │ create sequence s2 as nope owned by t.nope;
       ╰╴                                      ━━━━
@@ -80,7 +80,7 @@ alter sequence s1 as int no cycle;
       ╭▸ 
     5 │ create sequence s3 owned by nope.a;
       ╰╴                            ━━━━
-    error: column `b` does not exist
+    error: column `t.b` does not exist
       ╭▸ 
     7 │ alter sequence s1 owned by t.b;
       ╰╴                             ━
@@ -101,19 +101,19 @@ drop view s;
     4 │ drop table s;
       │            ━
       │
-      ╰ hint: Use DROP SEQUENCE to remove a sequence.
+      ╰ hint: use `drop sequence` to remove a sequence
     error: `t` is not a sequence
       ╭▸ 
     5 │ drop sequence t;
       │               ━
       │
-      ╰ hint: Use DROP TABLE to remove a table.
+      ╰ hint: use `drop table` to remove a table
     error: `s` is not a view
       ╭▸ 
     6 │ drop view s;
       │           ━
       │
-      ╰ hint: Use DROP SEQUENCE to remove a sequence.
+      ╰ hint: use `drop sequence` to remove a sequence
     ");
 }
 
@@ -224,14 +224,14 @@ create table u (id int generated always as identity (sequence name app.ids));
 alter sequence app.ids restart;
 alter sequence t_id_seq restart;
 "), @"
-    error: relation `t_id_seq` does not exist
-      ╭▸ 
-    6 │ alter sequence t_id_seq restart;
-      ╰╴               ━━━━━━━━
     error: relation `ids` already exists
       ╭▸ 
     4 │ create table u (id int generated always as identity (sequence name app.ids));
       ╰╴                                                                       ━━━
+    error: relation `t_id_seq` does not exist
+      ╭▸ 
+    6 │ alter sequence t_id_seq restart;
+      ╰╴               ━━━━━━━━
     ");
 }
 
@@ -340,14 +340,14 @@ alter sequence if exists nope rename to x;
       ╭▸ 
     5 │ select last_value from s;
       ╰╴                       ━
-    error: relation `nope` does not exist
-      ╭▸ 
-    8 │ alter sequence nope rename to x;
-      ╰╴               ━━━━
     error: relation `t` already exists
       ╭▸ 
     7 │ alter sequence s2 rename to t;
       ╰╴                            ━
+    error: relation `nope` does not exist
+      ╭▸ 
+    8 │ alter sequence nope rename to x;
+      ╰╴               ━━━━
     ");
 }
 
@@ -413,15 +413,15 @@ alter table u alter column a drop identity;
       ╭▸ 
     5 │ select last_value from t_a_seq;
       ╰╴                       ━━━━━━━
+    error: column `t.a` is not an identity column
+      ╭▸ 
+    6 │ alter table t alter column a drop identity;
+      ╰╴                           ━
     error: column `nope` does not exist
       ╭▸ 
     8 │ alter table t alter column nope drop identity;
       ╰╴                           ━━━━
-    error: column `a` of relation `t` is not an identity column
-      ╭▸ 
-    6 │ alter table t alter column a drop identity;
-      ╰╴                           ━
-    error: column `c` of relation `t` is not an identity column
+    error: column `t.c` is not an identity column
        ╭▸ 
     15 │ alter table t alter column c drop identity;
        ╰╴                           ━

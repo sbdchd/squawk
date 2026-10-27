@@ -12,7 +12,7 @@ create event trigger e on ddl_command_start
 create event trigger e2 on sql_drop execute procedure missing();
 create event trigger e on ddl_command_end execute function f();
 "), @"
-    error: function `missing` does not exist
+    error: function `missing()` does not exist
       ╭▸ 
     6 │ create event trigger e2 on sql_drop execute procedure missing();
       ╰╴                                                      ━━━━━━━
@@ -86,13 +86,13 @@ drop event trigger e3;
        ╭▸ 
     12 │ alter event trigger missing disable;
        ╰╴                    ━━━━━━━
-    error: event trigger `e` does not exist
-       ╭▸ 
-    15 │ alter event trigger e disable;
-       ╰╴                    ━
     error: event trigger `e2` already exists
        ╭▸ 
     13 │ alter event trigger e rename to e2;
        ╰╴                                ━━
+    error: event trigger `e` does not exist
+       ╭▸ 
+    15 │ alter event trigger e disable;
+       ╰╴                    ━
     ");
 }

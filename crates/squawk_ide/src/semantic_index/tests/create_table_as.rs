@@ -14,7 +14,13 @@ select x from u;
     error: column `b` does not exist
       ╭▸ 
     4 │ select a, c, b from t;
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select a, c, b from t;
+    4 + select a, c, a from t;
+      ╰╴
     error: relation `nope` does not exist
       ╭▸ 
     5 │ select * into u from nope;
@@ -38,7 +44,13 @@ select a, nope2 from pg_temp.w;
     error: column `a` does not exist
       ╭▸ 
     4 │ select x, b, a from t;
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select x, b, a from t;
+    4 + select x, b, x from t;
+      ╰╴
     error: relation `nope` does not exist
       ╭▸ 
     5 │ create table u as select * from nope;

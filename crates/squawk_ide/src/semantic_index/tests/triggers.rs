@@ -19,7 +19,7 @@ create constraint trigger tr2 after insert on t from u
       ╭▸ 
     5 │ create trigger tr after update of a, z on t
       ╰╴                                     ━
-    error: column `zz` does not exist
+    error: column `new.zz` does not exist
       ╭▸ 
     7 │   when (new.a > old.b and new.zz = 1)
       ╰╴                              ━━
@@ -41,7 +41,7 @@ create trigger tr after insert on t
       ╭▸ 
     2 │ create trigger tr after insert on missing_table
       ╰╴                                  ━━━━━━━━━━━━━
-    error: function `missing_fn` does not exist
+    error: function `missing_fn()` does not exist
       ╭▸ 
     3 │   for each row execute function missing_fn();
       ╰╴                                ━━━━━━━━━━
@@ -49,7 +49,7 @@ create trigger tr after insert on t
       ╭▸ 
     7 │   from missing_from
       ╰╴       ━━━━━━━━━━━━
-    error: function `f` does not exist
+    error: function `f()` does not exist
       ╭▸ 
     8 │   for each row execute function f();
       ╰╴                                ━
@@ -174,6 +174,10 @@ alter trigger missing on t depends on extension missing_ext;
       ╭▸ 
     7 │ alter trigger tr on t rename to tr3;
       ╰╴              ━━
+    error: trigger `other` for relation `t` already exists
+      ╭▸ 
+    8 │ alter trigger tr2 on t rename to other;
+      ╰╴                                 ━━━━━
     error: trigger `missing` does not exist
        ╭▸ 
     10 │ alter trigger missing on t depends on extension missing_ext;
@@ -182,10 +186,6 @@ alter trigger missing on t depends on extension missing_ext;
        ╭▸ 
     10 │ alter trigger missing on t depends on extension missing_ext;
        ╰╴                                                ━━━━━━━━━━━
-    error: trigger `other` for relation `t` already exists
-      ╭▸ 
-    8 │ alter trigger tr2 on t rename to other;
-      ╰╴                                 ━━━━━
     ");
 }
 
@@ -202,7 +202,7 @@ create or replace constraint trigger tr2 after insert on t for each row execute 
       ╭▸ 
     5 │ create or replace trigger tr after insert on t for each row execute function f();
       ╰╴                          ━━
-    error: CREATE OR REPLACE CONSTRAINT TRIGGER is not supported
+    error: `create or replace constraint trigger` is not supported
       ╭▸ 
     6 │ create or replace constraint trigger tr2 after insert on t for each row execute function f();
       ╰╴       ━━━━━━━━━━
@@ -271,19 +271,19 @@ create event trigger et on ddl_command_start execute function f();
 create event trigger et2 on ddl_command_start execute function tf();
 create event trigger et3 on ddl_command_start execute function etf();
 "), @"
-    error: function `f` must return type trigger
+    error: function `f` must return type `trigger`
        ╭▸ 
     16 │   execute function f();
        ╰╴                   ━
-    error: function `etf` must return type trigger
+    error: function `etf` must return type `trigger`
        ╭▸ 
     26 │   execute function etf();
        ╰╴                   ━━━
-    error: function `f` must return type event_trigger
+    error: function `f` must return type `event_trigger`
        ╭▸ 
     32 │ create event trigger et on ddl_command_start execute function f();
        ╰╴                                                              ━
-    error: function `tf` must return type event_trigger
+    error: function `tf` must return type `event_trigger`
        ╭▸ 
     33 │ create event trigger et2 on ddl_command_start execute function tf();
        ╰╴                                                               ━━

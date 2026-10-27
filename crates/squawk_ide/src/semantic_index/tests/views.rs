@@ -25,7 +25,13 @@ select x, b, a from v;
     error: column `a` does not exist
       ╭▸ 
     3 │ select x, b, a from v;
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select x, b, a from v;
+    3 + select x, b, x from v;
+      ╰╴
     ");
 }
 
@@ -113,14 +119,6 @@ drop materialized view m, nope;
 drop materialized view if exists nope2;
 select * from m;
 "), @"
-    error: relation `nope` does not exist
-       ╭▸ 
-    12 │ drop materialized view m, nope;
-       ╰╴                          ━━━━
-    error: relation `m` does not exist
-       ╭▸ 
-    14 │ select * from m;
-       ╰╴              ━
     error: `t` is not a materialized view
       ╭▸ 
     6 │ refresh materialized view concurrently t;
@@ -134,13 +132,21 @@ select * from m;
     10 │ drop materialized view v;
        │                        ━
        │
-       ╰ hint: Use DROP VIEW to remove a view.
+       ╰ hint: use `drop view` to remove a view
     error: `m` is not a view
        ╭▸ 
     11 │ drop view m;
        │           ━
        │
-       ╰ hint: Use DROP MATERIALIZED VIEW to remove a materialized view.
+       ╰ hint: use `drop materialized view` to remove a materialized view
+    error: relation `nope` does not exist
+       ╭▸ 
+    12 │ drop materialized view m, nope;
+       ╰╴                          ━━━━
+    error: relation `m` does not exist
+       ╭▸ 
+    14 │ select * from m;
+       ╰╴              ━
     ");
 }
 
@@ -164,7 +170,13 @@ select b from v;
     error: column `a` does not exist
       ╭▸ 
     8 │ select a from v;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select a from v;
+    8 + select b from v;
+      ╰╴
     error: relation `v` does not exist
        ╭▸ 
     10 │ select b from v;
@@ -206,10 +218,6 @@ alter view t rename to z;
       ╭▸ 
     5 │ select a from v;
       ╰╴              ━
-    error: relation `nope` does not exist
-       ╭▸ 
-    10 │ alter view nope rename to y;
-       ╰╴           ━━━━
     error: relation `x` already exists
       ╭▸ 
     8 │ alter view w rename to x;
@@ -218,6 +226,10 @@ alter view t rename to z;
       ╭▸ 
     9 │ alter view w rename to t;
       ╰╴                       ━
+    error: relation `nope` does not exist
+       ╭▸ 
+    10 │ alter view nope rename to y;
+       ╰╴           ━━━━
     error: `t` is not a view
        ╭▸ 
     12 │ alter view t rename to z;
@@ -264,15 +276,21 @@ alter view v rename column nope to d;
     error: column `a` does not exist
       ╭▸ 
     5 │ select a from v;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select a from v;
+    5 + select c from v;
+      ╰╴
+    error: column `v.b` already exists
+      ╭▸ 
+    6 │ alter view v rename column c to b;
+      ╰╴                                ━
     error: column `nope` does not exist
       ╭▸ 
     7 │ alter view v rename column nope to d;
       ╰╴                           ━━━━
-    error: column `b` of relation `v` already exists
-      ╭▸ 
-    6 │ alter view v rename column c to b;
-      ╰╴                                ━
     ");
 }
 
@@ -285,7 +303,7 @@ alter view v alter column nope drop default;
 alter view v set (security_barrier = true);
 alter view v reset (security_barrier);
 "), @"
-    error: function `nope` does not exist
+    error: function `nope()` does not exist
       ╭▸ 
     3 │ alter view v alter column a set default nope();
       ╰╴                                        ━━━━
@@ -322,11 +340,7 @@ create materialized view m (a, b) as select 1;
 create view w (a) as select 1, 2;
 create view z (a, b) as select * from missing;
 "), @"
-    error: relation `missing` does not exist
-      ╭▸ 
-    5 │ create view z (a, b) as select * from missing;
-      ╰╴                                      ━━━━━━━
-    error: CREATE VIEW specifies more column names than columns
+    error: `create view` specifies more column names than columns
       ╭▸ 
     2 │ create view v (a, b) as select 1;
       ╰╴                  ━
@@ -334,6 +348,10 @@ create view z (a, b) as select * from missing;
       ╭▸ 
     3 │ create materialized view m (a, b) as select 1;
       ╰╴                               ━
+    error: relation `missing` does not exist
+      ╭▸ 
+    5 │ create view z (a, b) as select * from missing;
+      ╰╴                                      ━━━━━━━
     ");
 }
 
@@ -363,18 +381,18 @@ refresh materialized view concurrently mv;
     8 │ refresh materialized view concurrently mv;
       │                                        ━━
       │
-      ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+      ╰ hint: create a unique index with no `where` clause on one or more columns of the materialized view
     error: cannot refresh materialized view `mv` concurrently
        ╭▸ 
     11 │ refresh materialized view concurrently mv;
        │                                        ━━
        │
-       ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+       ╰ hint: create a unique index with no `where` clause on one or more columns of the materialized view
     error: cannot refresh materialized view `mv` concurrently
        ╭▸ 
     16 │ refresh materialized view concurrently mv;
        │                                        ━━
        │
-       ╰ hint: Create a unique index with no WHERE clause on one or more columns of the materialized view.
+       ╰ hint: create a unique index with no `where` clause on one or more columns of the materialized view
     ");
 }

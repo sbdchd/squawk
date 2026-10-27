@@ -42,15 +42,15 @@ create table d3 (
 select (select 1) from t where a in (select 1) and exists(select 1);
 create policy pol on t using (a in (select 1));
 "), @"
-    error: cannot use subquery in CALL argument
+    error: cannot use subquery in `call` argument
       ╭▸ 
     9 │ call p((select 1));
       ╰╴        ━━━━━━━━
-    error: cannot use subquery in DEFAULT expression
+    error: cannot use subquery in `default` expression
        ╭▸ 
     10 │ create function f(x int default (select 1)) returns int
        ╰╴                                 ━━━━━━━━
-    error: cannot use subquery in DEFAULT expression
+    error: cannot use subquery in `default` expression
        ╭▸ 
     13 │ create table d (a int default (select 1));
        ╰╴                               ━━━━━━━━
@@ -74,7 +74,7 @@ create policy pol on t using (a in (select 1));
        ╭▸ 
     21 │ alter table t alter column b type bigint using (select 1);
        ╰╴                                                ━━━━━━━━
-    error: cannot use subquery in EXECUTE parameter
+    error: cannot use subquery in `execute` parameter
        ╭▸ 
     24 │ execute s((select 1));
        ╰╴           ━━━━━━━━
@@ -90,7 +90,7 @@ create policy pol on t using (a in (select 1));
        ╭▸ 
     30 │   for values from ((select 1)) to (10);
        ╰╴                    ━━━━━━━━
-    error: cannot use subquery in DEFAULT expression
+    error: cannot use subquery in `default` expression
        ╭▸ 
     31 │ create table d2 (a int default (1 + (select (select 1))));
        ╰╴                                     ━━━━━━━━━━━━━━━━━
@@ -138,14 +138,6 @@ select (select a from t), array(select b from t), exists(select a, b from t);
 update t set (a, b) = (select 1, 2);
 select (select * from nope), 1 in (select * from nope);
 "), @"
-    error: relation `nope` does not exist
-       ╭▸ 
-    30 │ select (select * from nope), 1 in (select * from nope);
-       ╰╴                      ━━━━
-    error: relation `nope` does not exist
-       ╭▸ 
-    30 │ select (select * from nope), 1 in (select * from nope);
-       ╰╴                                                 ━━━━
     error: subquery must return only one column
       ╭▸ 
     6 │ select (select 1, 2);
@@ -206,5 +198,13 @@ select (select * from nope), 1 in (select * from nope);
        ╭▸ 
     20 │ select 1 in ((select 1, 2), 3);
        ╰╴              ━━━━━━━━━━━
+    error: relation `nope` does not exist
+       ╭▸ 
+    30 │ select (select * from nope), 1 in (select * from nope);
+       ╰╴                      ━━━━
+    error: relation `nope` does not exist
+       ╭▸ 
+    30 │ select (select * from nope), 1 in (select * from nope);
+       ╰╴                                                 ━━━━
     ");
 }

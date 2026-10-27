@@ -28,14 +28,14 @@ select id, n, e, o, nope, jt.n
     )
   ) as jt;
 "), @"
-    error: column `missing` does not exist
-      ╭▸ 
-    6 │     data.j, '$ ? (@.n > $x)' passing data.lim as x, missing as y
-      ╰╴                                                    ━━━━━━━
     error: column `nope` does not exist
       ╭▸ 
     3 │ select id, n, e, o, nope, jt.n
       ╰╴                    ━━━━
+    error: column `missing` does not exist
+      ╭▸ 
+    6 │     data.j, '$ ? (@.n > $x)' passing data.lim as x, missing as y
+      ╰╴                                                    ━━━━━━━
     ");
 }
 
@@ -108,10 +108,12 @@ fn unnest_multiple_args_select_list() {
     assert_snapshot!(check("
 select unnest(array[1], array[2]);
 "), @"
-    error: function `unnest` does not exist
+    error: function `unnest(int4[], int4[])` does not exist
       ╭▸ 
     2 │ select unnest(array[1], array[2]);
-      ╰╴       ━━━━━━
+      │        ━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -123,10 +125,12 @@ select x, y
 from t,
   unnest(a, b) as u (x int, y text);
 "), @"
-    error: function `unnest` does not exist
+    error: function `unnest(int4[], text[])` does not exist
       ╭▸ 
     5 │   unnest(a, b) as u (x int, y text);
-      ╰╴  ━━━━━━
+      │   ━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

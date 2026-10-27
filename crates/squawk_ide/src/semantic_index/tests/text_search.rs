@@ -104,6 +104,10 @@ alter text search template s.simple2 rename to simple3;
 alter text search parser missing rename to p;
 create text search dictionary d4 (template = simple);
 "), @"
+    error: text search dictionary `d2` already exists
+      ╭▸ 
+    8 │ alter text search dictionary d rename to d2;
+      ╰╴                                         ━━
     error: text search dictionary `d3` does not exist
        ╭▸ 
     12 │ alter text search dictionary d3 owner to r;
@@ -116,10 +120,6 @@ create text search dictionary d4 (template = simple);
        ╭▸ 
     17 │ create text search dictionary d4 (template = simple);
        ╰╴                                             ━━━━━━
-    error: text search dictionary `d2` already exists
-      ╭▸ 
-    8 │ alter text search dictionary d rename to d2;
-      ╰╴                                         ━━
     ");
 }
 

@@ -48,7 +48,13 @@ select y, x from t;
     error: column `x` does not exist
       ╭▸ 
     7 │ select y, x from t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - select y, x from t;
+    7 + select y, y from t;
+      ╰╴
     ");
 }
 
@@ -213,7 +219,7 @@ create function g() returns int language sql
 select f(), g(), app.f();
 select a from t;
 "), @"
-    error: function `f` does not exist
+    error: function `app.f()` does not exist
        ╭▸ 
     12 │ select f(), g(), app.f();
        ╰╴                     ━
@@ -250,7 +256,13 @@ select b from pg_temp.t;
     error: column `a` does not exist
       ╭▸ 
     5 │ select a from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select a from t;
+    5 + select b from t;
+      ╰╴
     ");
 }
 
@@ -301,7 +313,13 @@ select b from t;
     error: column `b` does not exist
       ╭▸ 
     6 │ select b from t;
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - select b from t;
+    6 + select a from t;
+      ╰╴
     ");
 }
 
@@ -312,7 +330,7 @@ create function pg_temp.f() returns int language sql return 1;
 set search_path = pg_temp, public;
 select f(), pg_temp.f(), pg_temp_2.f();
 "), @"
-    error: function `f` does not exist
+    error: function `f()` does not exist
       ╭▸ 
     4 │ select f(), pg_temp.f(), pg_temp_2.f();
       ╰╴       ━

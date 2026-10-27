@@ -39,42 +39,59 @@ alter type t rename attribute a to a2 cascade;
 select a2, c from x;
 select a, b from x;
 "), @"
-    error: column `c` does not exist
-      ╭▸ 
-    9 │ select c from x;
-      ╰╴       ━
-    error: column `a` does not exist
-       ╭▸ 
-    14 │ select a, b from x;
-       ╰╴       ━
-    error: column `b` does not exist
-       ╭▸ 
-    14 │ select a, b from x;
-       ╰╴          ━
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     4 │ alter type t add attribute c int;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     5 │ alter type t drop attribute b;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     6 │ alter type t rename attribute a to a2;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     7 │ alter type t alter attribute a type bigint;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
+    error: column `c` does not exist
+      ╭▸ 
+    9 │ select c from x;
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select c from x;
+    9 + select a from x;
+      ╰╴
+    error: column `a` does not exist
+       ╭▸ 
+    14 │ select a, b from x;
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    14 │ select a2, b from x;
+       ╰╴        +
+    error: column `b` does not exist
+       ╭▸ 
+    14 │ select a, b from x;
+       │           ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    14 - select a, b from x;
+    14 + select a, c from x;
+       ╰╴
     ");
 }
 
@@ -93,16 +110,22 @@ alter table y of t;
 rollback;
 alter type t add attribute c int;
 "), @"
-    error: column `b` does not exist
-      ╭▸ 
-    8 │ select b from y;
-      ╰╴       ━
     error: cannot alter type `t` because it is the type of a typed table
       ╭▸ 
     5 │ alter type t add attribute b int;
       │            ━
       │
-      ╰ hint: Use ALTER ... CASCADE to alter the typed tables too.
+      ╰ hint: use `alter ... cascade` to alter the typed tables too
+    error: column `b` does not exist
+      ╭▸ 
+    8 │ select b from y;
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select b from y;
+    8 + select a from y;
+      ╰╴
     ");
 }
 
@@ -116,10 +139,12 @@ select g(a) from x;
 alter type t alter attribute a type text cascade;
 select g(a) from x;
 "), @"
-    error: function `g` does not exist
+    error: function `g(text)` does not exist
       ╭▸ 
     7 │ select g(a) from x;
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -144,6 +169,10 @@ alter type t add attribute d nope_type;
       ╭▸ 
     6 │ alter type t drop attribute b;
       ╰╴                            ━
+    error: column `t.a` already exists
+      ╭▸ 
+    8 │ alter type t add attribute a int;
+      ╰╴                           ━
     error: column `nope` does not exist
       ╭▸ 
     9 │ alter type t alter attribute a type text, alter attribute nope type int;
@@ -152,10 +181,6 @@ alter type t add attribute d nope_type;
        ╭▸ 
     10 │ alter type t add attribute d nope_type;
        ╰╴                             ━━━━━━━━━
-    error: column `a` of relation `t` already exists
-      ╭▸ 
-    8 │ alter type t add attribute a int;
-      ╰╴                           ━
     ");
 }
 
@@ -168,10 +193,12 @@ select g((null::t).a);
 alter type t alter attribute a set data type text;
 select g((null::t).a);
 "), @"
-    error: function `g` does not exist
+    error: function `g(int4)` does not exist
       ╭▸ 
     4 │ select g((null::t).a);
-      ╰╴       ━
+      │        ━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 
@@ -189,14 +216,14 @@ alter type t rename attribute nope to y;
       ╭▸ 
     5 │ select (null::t).a;
       ╰╴                 ━
+    error: column `t.b` already exists
+      ╭▸ 
+    6 │ alter type t rename attribute x to b;
+      ╰╴                                   ━
     error: column `nope` does not exist
       ╭▸ 
     7 │ alter type t rename attribute nope to y;
       ╰╴                              ━━━━
-    error: column `b` of relation `t` already exists
-      ╭▸ 
-    6 │ alter type t rename attribute x to b;
-      ╰╴                                   ━
     ");
 }
 

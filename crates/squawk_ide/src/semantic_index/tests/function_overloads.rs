@@ -8,10 +8,12 @@ fn user_function_overloads_builtin() {
 create function lower(a int, b int) returns int language sql return a;
 select lower('A'), lower(1, 2), lower(1, 2, 3);
 "), @"
-    error: function `lower` does not exist
+    error: function `lower(int4, int4, int4)` does not exist
       ╭▸ 
     3 │ select lower('A'), lower(1, 2), lower(1, 2, 3);
-      ╰╴                                ━━━━━
+      │                                 ━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
     ");
 }
 

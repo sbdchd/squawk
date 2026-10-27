@@ -3,7 +3,7 @@ use gen_lsp_types::{
 };
 use salsa::Database as Db;
 use squawk_ide::db::{File, line_index as file_line_index, parse};
-use squawk_ide::diagnostics::diagnostics as semantic_diagnostics;
+use squawk_ide::diagnostics::{Suggestion, diagnostics as semantic_diagnostics};
 use squawk_line_index::{LineIndex, TextRange, find_newline};
 use squawk_linter::{Edit, Linter};
 use url::Url;
@@ -75,6 +75,19 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
             None => error.message.into_owned(),
         };
 
+        let data = error
+            .suggestion
+            .map(|Suggestion { fix, .. }| AssociatedDiagnosticData {
+                title: fix.title.into_owned(),
+                edits: fix
+                    .edits
+                    .into_iter()
+                    .filter_map(|edit| to_text_edit(edit, line_index))
+                    .collect(),
+                ignore_line_edit: None,
+                ignore_file_edit: None,
+            });
+
         let diagnostic = Diagnostic {
             range: diagnostic_range(line_index, error.range.value),
             severity: Some(DiagnosticSeverity::Error),
@@ -84,6 +97,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
             message: Message::String(message),
+            data: data.map(|data| serde_json::to_value(data).unwrap()),
             ..Default::default()
         };
         diagnostics.push(diagnostic);
@@ -137,6 +151,7 @@ mod test {
     use squawk_ide::db::{Database, File};
 
     use super::lint;
+    use crate::diagnostic::AssociatedDiagnosticData;
 
     fn check(sql: &str) -> String {
         let db = Database::default();
@@ -152,12 +167,20 @@ mod test {
                 let Message::String(message) = d.message else {
                     unreachable!()
                 };
-                format!(
+                let line = format!(
                     "{}:{} {:?} {code}: {message}",
                     d.range.start.line,
                     d.range.start.character,
                     d.severity.unwrap(),
-                )
+                );
+                if code != "semantic-error" {
+                    return line;
+                }
+                let Some(data) = d.data else {
+                    return line;
+                };
+                let data: AssociatedDiagnosticData = serde_json::from_value(data).unwrap();
+                format!("{line}\nfix: {}", data.title)
             })
             .collect::<Vec<_>>()
             .join("\n")
@@ -192,7 +215,10 @@ create table t(b int);
 with t as (select 1 a)
 select a, b from t;
 ";
-        assert_snapshot!(check(sql), @"2:10 Error semantic-error: column `b` does not exist");
+        assert_snapshot!(check(sql), @"
+        2:10 Error semantic-error: column `b` does not exist
+        fix: Replace with `a`
+        ");
     }
 
     #[test]
