@@ -19,7 +19,7 @@ create rule r as on update to t
 create rule r2 as on insert to t do instead nothing;
 create rule r3 as on delete to t do instead delete from log where a = old.a;
 "), @"
-    error: column `zz` does not exist
+    error: column `new.zz` does not exist
       ╭▸ 
     5 │   where new.a > old.b and new.zz = 1
       ╰╴                              ━━
@@ -27,7 +27,7 @@ create rule r3 as on delete to t do instead delete from log where a = old.a;
       ╭▸ 
     7 │     insert into log values (new.a, old.zz);
       ╰╴                                   ━━━━━━
-    error: column `zz` does not exist
+    error: column `old.zz` does not exist
       ╭▸ 
     7 │     insert into log values (new.a, old.zz);
       ╰╴                                       ━━

@@ -12,7 +12,7 @@ update t set a = c from u where t.b = u.c returning a, c, x;
 update t set (a, b) = (1, w), (v) = (select c from u);
 update missing set a = 1;
 "), @"
-    error: column `z` does not exist
+    error: column `t.z` does not exist
       ╭▸ 
     4 │ update t set a = 1, z = 2 where b = 1 and y = 2;
       ╰╴                    ━
@@ -28,7 +28,7 @@ update missing set a = 1;
       ╭▸ 
     6 │ update t set (a, b) = (1, w), (v) = (select c from u);
       ╰╴                          ━
-    error: column `v` does not exist
+    error: column `t.v` does not exist
       ╭▸ 
     6 │ update t set (a, b) = (1, w), (v) = (select c from u);
       ╰╴                               ━
@@ -59,7 +59,7 @@ create table t(a int);
 create table u(c int);
 update t set c = 1 from u;
 "), @"
-    error: column `c` does not exist
+    error: column `t.c` does not exist
       ╭▸ 
     4 │ update t set c = 1 from u;
       ╰╴             ━
@@ -99,7 +99,7 @@ fn update_returning_old_new() {
 create table t(a int);
 update t set a = 1 returning old.a, new.a, new.z;
 "), @"
-    error: column `z` does not exist
+    error: column `new.z` does not exist
       ╭▸ 
     3 │ update t set a = 1 returning old.a, new.a, new.z;
       ╰╴                                               ━
@@ -114,7 +114,7 @@ update t for portion of valid_at from '2020-01-01' to '2021-01-01' set b = 1;
 update t for portion of nope from '2020-01-01' to nope2 set b = 1;
 update t for portion of valid_at (daterange('2020-01-01', nope3)) set b = 1;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     4 │ update t for portion of nope from '2020-01-01' to nope2 set b = 1;
       ╰╴                        ━━━━

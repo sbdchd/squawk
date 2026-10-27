@@ -13,7 +13,7 @@ insert into t select c, x from u;
 insert into t default values returning a, y;
 insert into missing values (1);
 "), @"
-    error: column `z` does not exist
+    error: column `t.z` does not exist
       ╭▸ 
     5 │ insert into t(a, z) values (1, 2);
       ╰╴                 ━
@@ -114,11 +114,11 @@ insert into t values (1, 2) on conflict (a) do update set (a, b) = (excluded.a, 
       ╭▸ 
     4 │ insert into t values (1, 2) on conflict (excluded.a) do nothing;
       ╰╴                                         ━━━━━━━━
-    error: column `z` does not exist
+    error: column `t.z` does not exist
       ╭▸ 
     5 │ insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
       ╰╴                                                                                            ━
-    error: column `y` does not exist
+    error: column `excluded.y` does not exist
       ╭▸ 
     5 │ insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
       ╰╴                                                                                                                 ━

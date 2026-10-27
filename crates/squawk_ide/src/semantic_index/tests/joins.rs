@@ -130,7 +130,7 @@ select j.x, j.y, j.z from (a natural join b) as j;
 select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
 select x, y, z from (a join b using (x)) as j;
 "), @"
-    error: column `w` does not exist
+    error: column `j.w` does not exist
       ╭▸ 
     4 │ select j.x, j.y, j.z, j.w from (a join b using (x)) as j;
       ╰╴                        ━
@@ -142,11 +142,11 @@ select x, y, z from (a join b using (x)) as j;
       ╭▸ 
     5 │ select a.x, b.z from (a join b using (x)) as j;
       ╰╴            ━
-    error: column `r` does not exist
+    error: column `j.r` does not exist
       ╭▸ 
     7 │ select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
       ╰╴                   ━
-    error: column `x` does not exist
+    error: column `j.x` does not exist
       ╭▸ 
     7 │ select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
       ╰╴                        ━
@@ -169,7 +169,7 @@ select x from v;
 create view u as select k.* from a join b using (x) as k;
 select y from u;
 "), @"
-    error: column `y` does not exist
+    error: column `k.y` does not exist
       ╭▸ 
     5 │ select k.x, k.y from a join b using (x) as k;
       ╰╴              ━

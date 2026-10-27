@@ -21,7 +21,7 @@ fn qualified_column_unknown() {
 with t as (select 1 a)
 select t.a, t.b, x.a from t;
 "), @"
-    error: column `b` does not exist
+    error: column `t.b` does not exist
       ╭▸ 
     3 │ select t.a, t.b, x.a from t;
       ╰╴              ━
@@ -78,7 +78,7 @@ fn subquery_in_from() {
     assert_snapshot!(check("
 select s.a, s.b from (select 1 a) s;
 "), @"
-    error: column `b` does not exist
+    error: column `s.b` does not exist
       ╭▸ 
     2 │ select s.a, s.b from (select 1 a) s;
       ╰╴              ━
@@ -91,7 +91,7 @@ fn from_alias_column_list() {
 with t as (select 1 a, 2 b)
 select x.c, x.b, x.a from t as x(c);
 "), @"
-    error: column `a` does not exist
+    error: column `x.a` does not exist
       ╭▸ 
     3 │ select x.c, x.b, x.a from t as x(c);
       ╰╴                   ━
@@ -381,5 +381,59 @@ select * from missing x (p, q, r);
        ╭▸ 
     14 │ select * from missing x (p, q, r);
        ╰╴              ━━━━━━━
+    ");
+}
+
+#[test]
+fn unresolved_qualified_column() {
+    assert_snapshot!(check("
+create table t (a int);
+select t.nope from t;
+select x.nope from t as x;
+select public.t.nope from t;
+select s.nope from (select 1 as a) as s;
+with c as (select 1 as a) select c.nope from c;
+comment on column t.nope is 'x';
+update t as u set nope = 1;
+insert into t (nope) values (1);
+alter table t drop column nope;
+alter table t drop column if exists nope;
+"), @"
+    error: column `t.nope` does not exist
+      ╭▸ 
+    3 │ select t.nope from t;
+      ╰╴         ━━━━
+    error: column `x.nope` does not exist
+      ╭▸ 
+    4 │ select x.nope from t as x;
+      ╰╴         ━━━━
+    error: column `t.nope` does not exist
+      ╭▸ 
+    5 │ select public.t.nope from t;
+      ╰╴                ━━━━
+    error: column `s.nope` does not exist
+      ╭▸ 
+    6 │ select s.nope from (select 1 as a) as s;
+      ╰╴         ━━━━
+    error: column `c.nope` does not exist
+      ╭▸ 
+    7 │ with c as (select 1 as a) select c.nope from c;
+      ╰╴                                   ━━━━
+    error: column `t.nope` does not exist
+      ╭▸ 
+    8 │ comment on column t.nope is 'x';
+      ╰╴                    ━━━━
+    error: column `t.nope` does not exist
+      ╭▸ 
+    9 │ update t as u set nope = 1;
+      ╰╴                  ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    10 │ insert into t (nope) values (1);
+       ╰╴               ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    11 │ alter table t drop column nope;
+       ╰╴                          ━━━━
     ");
 }

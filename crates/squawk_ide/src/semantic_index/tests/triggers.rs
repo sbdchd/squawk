@@ -19,7 +19,7 @@ create constraint trigger tr2 after insert on t from u
       ╭▸ 
     5 │ create trigger tr after update of a, z on t
       ╰╴                                     ━
-    error: column `zz` does not exist
+    error: column `new.zz` does not exist
       ╭▸ 
     7 │   when (new.a > old.b and new.zz = 1)
       ╰╴                              ━━

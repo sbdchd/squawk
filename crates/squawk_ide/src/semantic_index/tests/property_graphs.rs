@@ -206,11 +206,11 @@ select * from graph_table(g match (c is city) columns (c.title as t));
 select * from graph_table(g match (a is missing_label | human) columns (a.name as n));
 select * from graph_table(missing_graph match (a) columns (a.name as n));
 "), @"
-    error: column `missing` does not exist
+    error: column `gt.missing` does not exist
        ╭▸ 
     11 │ select gt.n, gt.d, gt.since, gt.missing
        ╰╴                                ━━━━━━━
-    error: column `id` does not exist
+    error: column `a.id` does not exist
        ╭▸ 
     14 │   where a.id = 1 and e.since is not null and z.name = 'y'
        ╰╴          ━━
@@ -218,7 +218,7 @@ select * from graph_table(missing_graph match (a) columns (a.name as n));
        ╭▸ 
     14 │   where a.id = 1 and e.since is not null and z.name = 'y'
        ╰╴                                             ━
-    error: column `title` does not exist
+    error: column `c.title` does not exist
        ╭▸ 
     17 │ select * from graph_table(g match (c is city) columns (c.title as t));
        ╰╴                                                         ━━━━━
@@ -255,7 +255,7 @@ select * from graph_table(g match (p) columns (p.n as x, p.name as y));
       ╭▸ 
     6 │ alter property graph g alter vertex table person alter label person add properties (id as n, id);
       ╰╴                                                                                             ━━
-    error: column `name` does not exist
+    error: column `p.name` does not exist
       ╭▸ 
     7 │ select * from graph_table(g match (p) columns (p.n as x, p.name as y));
       ╰╴                                                           ━━━━

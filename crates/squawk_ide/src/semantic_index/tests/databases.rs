@@ -64,7 +64,7 @@ fn database_qualified_column() {
 create table t (a int);
 select postgres.public.t.a, postgres.public.t.nope, a.b.c.d.e from t;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     3 │ select postgres.public.t.a, postgres.public.t.nope, a.b.c.d.e from t;
       ╰╴                                              ━━━━

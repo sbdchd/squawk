@@ -73,7 +73,7 @@ create table t(a int);
 delete from t returning a, old.a, new.a, old.z, old.*;
 delete from t where old.a = 1;
 "), @"
-    error: column `z` does not exist
+    error: column `old.z` does not exist
       ╭▸ 
     3 │ delete from t returning a, old.a, new.a, old.z, old.*;
       ╰╴                                             ━
@@ -104,7 +104,7 @@ create table t(id int, valid_at daterange);
 delete from t for portion of valid_at from '2020-01-01' to '2021-01-01' where id = 1;
 delete from t for portion of nope (daterange(null, nope2));
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     4 │ delete from t for portion of nope (daterange(null, nope2));
       ╰╴                             ━━━━

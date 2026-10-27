@@ -73,11 +73,11 @@ alter table if exists nope4 drop column x;
 select a, b, c from t;
 select t.a from t;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     4 │ alter table t drop column a, drop column nope, drop column if exists nope2;
       ╰╴                                         ━━━━
-    error: column `a` does not exist
+    error: column `t.a` does not exist
       ╭▸ 
     5 │ alter table t drop column a;
       ╰╴                          ━
@@ -89,7 +89,7 @@ select t.a from t;
       ╭▸ 
     8 │ select a, b, c from t;
       ╰╴       ━
-    error: column `a` does not exist
+    error: column `t.a` does not exist
       ╭▸ 
     9 │ select t.a from t;
       ╰╴         ━

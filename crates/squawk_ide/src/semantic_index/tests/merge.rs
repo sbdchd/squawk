@@ -23,11 +23,11 @@ merge into t using missing on true when matched then delete;
       ╭▸ 
     5 │ when matched and d > 0 and y = 1 then update set b = d, x = 1
       ╰╴                           ━
-    error: column `x` does not exist
+    error: column `t.x` does not exist
       ╭▸ 
     5 │ when matched and d > 0 and y = 1 then update set b = d, x = 1
       ╰╴                                                        ━
-    error: column `w` does not exist
+    error: column `t.w` does not exist
       ╭▸ 
     7 │ when not matched then insert (a, w) values (c, v)
       ╰╴                                 ━
@@ -138,7 +138,7 @@ merge into t using u on t.a = u.c
 when matched then update set a = c
 returning merge_action(), a, c, old.a, new.a, new.c, z;
 "), @"
-    error: column `c` does not exist
+    error: column `new.c` does not exist
       ╭▸ 
     6 │ returning merge_action(), a, c, old.a, new.a, new.c, z;
       ╰╴                                                  ━

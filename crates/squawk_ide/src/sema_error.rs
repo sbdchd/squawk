@@ -245,6 +245,10 @@ pub(crate) enum SemaError {
         ty: TyName,
         language: Name,
     },
+    UnresolvedQualifiedColumn {
+        qualifier: Name,
+        column: Name,
+    },
     UnresolvedRoutine {
         kind: RoutineKind,
         schema: Option<Name>,
@@ -843,6 +847,7 @@ impl SemaError {
             SemaError::UnresolvedTransform { .. } => DiagnosticKind::UnresolvedTransform,
             SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
+            SemaError::UnresolvedQualifiedColumn { .. } => DiagnosticKind::UnresolvedColumn,
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
@@ -1180,6 +1185,9 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(source),
                 self.ty(target)
             ),
+            SemaError::UnresolvedQualifiedColumn { qualifier, column } => {
+                write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
+            }
             SemaError::UnresolvedRoutine {
                 kind,
                 schema,

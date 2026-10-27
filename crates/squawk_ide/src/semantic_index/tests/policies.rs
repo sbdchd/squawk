@@ -23,7 +23,7 @@ create policy p2 on t;
       ╭▸ 
     8 │   using (owner = current_user and t.b > 0 and zz = 1)
       ╰╴                                              ━━
-    error: column `yy` does not exist
+    error: column `t.yy` does not exist
       ╭▸ 
     9 │   with check (b > 0 and t.yy = 1);
       ╰╴                          ━━

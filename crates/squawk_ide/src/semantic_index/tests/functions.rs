@@ -86,7 +86,7 @@ select t.x, t.z from f() as t;
       ╭▸ 
     5 │ select x, y, z from f();
       ╰╴             ━
-    error: column `z` does not exist
+    error: column `t.z` does not exist
       ╭▸ 
     6 │ select t.x, t.z from f() as t;
       ╰╴              ━
@@ -370,7 +370,7 @@ fn create_procedure_string_body() {
 create table t (a int);
 create procedure p(x int) language sql as 'insert into t (b) values (x)';
 "), @"
-    error: column `b` does not exist
+    error: column `t.b` does not exist
       ╭▸ 
     3 │ create procedure p(x int) language sql as 'insert into t (b) values (x)';
       ╰╴                                                          ━
@@ -702,7 +702,7 @@ drop function h(int);
 create function k(x t.nope%type) returns int language sql as 'select 1';
 create function m(x nope.a%type) returns int language sql as 'select 1';
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     7 │ create function k(x t.nope%type) returns int language sql as 'select 1';
       ╰╴                      ━━━━

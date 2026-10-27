@@ -96,7 +96,7 @@ comment on text search configuration nope is 'x';
        ╭▸ 
     28 │ comment on index nope is 'x';
        ╰╴                 ━━━━
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
        ╭▸ 
     30 │ comment on column t.nope is 'x';
        ╰╴                    ━━━━
@@ -192,7 +192,7 @@ security label on schema nope is 'x';
       ╭▸ 
     5 │ security label for selinux on table nope is 'x';
       ╰╴                                    ━━━━
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     7 │ security label on column t.nope is 'x';
       ╰╴                           ━━━━

@@ -72,7 +72,7 @@ alter sequence s1 as int no cycle;
       ╭▸ 
     4 │ create sequence s2 as nope owned by t.nope;
       ╰╴                      ━━━━
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     4 │ create sequence s2 as nope owned by t.nope;
       ╰╴                                      ━━━━
@@ -80,7 +80,7 @@ alter sequence s1 as int no cycle;
       ╭▸ 
     5 │ create sequence s3 owned by nope.a;
       ╰╴                            ━━━━
-    error: column `b` does not exist
+    error: column `t.b` does not exist
       ╭▸ 
     7 │ alter sequence s1 owned by t.b;
       ╰╴                             ━

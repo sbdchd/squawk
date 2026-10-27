@@ -10,7 +10,7 @@ create function d(t) returns text as 'select 1' language sql;
 select a, t.a, a(t), t.d, d(t) from t;
 select t.nope, nope(t), t from t;
 "), @"
-    error: column `nope` does not exist
+    error: column `t.nope` does not exist
       ╭▸ 
     5 │ select t.nope, nope(t), t from t;
       ╰╴         ━━━━
@@ -31,7 +31,7 @@ create table u (b text);
 create function d(u) returns text as 'select 1' language sql;
 select t.d, u.d from t, u;
 "), @"
-    error: column `d` does not exist
+    error: column `t.d` does not exist
       ╭▸ 
     5 │ select t.d, u.d from t, u;
       ╰╴         ━
