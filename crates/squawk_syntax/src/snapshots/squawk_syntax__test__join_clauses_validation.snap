@@ -460,11 +460,15 @@ error[syntax-error]: join missing condition
   ╭▸ 
 8 │ select * from t full join u;
   ╰╴                           ━
-error[syntax-error]: join `using` clause is not allowed for natural joins
+error[syntax-error]: `using` clause is not allowed here
    ╭▸ 
 12 │ select * from t natural join u using (id);
-   ╰╴                               ━━━━━━━━━━
-error[syntax-error]: join `using` clause is not allowed for cross joins
+   │                                ━━━━━━━━━━
+   │
+   ╰ hint: natural joins don't take a join condition
+error[syntax-error]: `using` clause is not allowed here
    ╭▸ 
 15 │ select * from t cross join u using (id);
-   ╰╴                             ━━━━━━━━━━
+   │                              ━━━━━━━━━━
+   │
+   ╰ hint: cross joins don't take a join condition

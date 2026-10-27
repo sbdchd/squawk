@@ -546,10 +546,12 @@ error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 33 │ select e'foo' 'bar' 'buzz';
    ╰╴                   ━
-error[syntax-error]: unicode escape requires 4 hex digits: \uXXXX
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 35 │ '\u00';
-   ╰╴ ━━━━
+   │  ━━━━
+   │
+   ╰ hint: expected 4 hex digits, like `\uXXXX`
 error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 38 │ select u&'foo' 'bar';
@@ -574,10 +576,12 @@ error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 41 │ select u&'foo' 'bar' 'buzz';
    ╰╴                    ━
-error[syntax-error]: unicode escape requires 4 hex digits: \XXXX
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 43 │ '\010';
-   ╰╴ ━━━━
+   │  ━━━━
+   │
+   ╰ hint: expected 4 hex digits, like `\XXXX`
 error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 46 │ select b'01' '10';

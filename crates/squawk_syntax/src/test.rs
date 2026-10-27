@@ -27,12 +27,14 @@ pub(crate) fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
             .fold(true)
             .annotation(AnnotationKind::Primary.span(start..end));
 
-        let rendered_error = renderer
-            .render(&[Level::ERROR
-                .primary_title(syntax_error.message())
-                .id(label)
-                .element(snippet)])
-            .clone();
+        let mut group = Level::ERROR
+            .primary_title(syntax_error.message())
+            .id(label)
+            .element(snippet);
+        if let Some(hint) = syntax_error.hint() {
+            group = group.element(Level::HELP.with_name("hint").message(hint));
+        }
+        let rendered_error = renderer.render(&[group]).clone();
 
         rendered.push_str(&rendered_error);
         rendered.push('\n');
@@ -350,7 +352,7 @@ fn parse_errors_are_sorted_by_position() {
         .join("\n");
 
     assert_snapshot!(rendered, @"
-    0..6: leading from clauses are not supported in Postgres
+    0..6: leading `from` clauses are not supported
     17..17: expected an expression, found `;`
     ");
 }

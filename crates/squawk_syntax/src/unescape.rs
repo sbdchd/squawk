@@ -35,6 +35,15 @@ impl fmt::Display for UnicodeEscError {
             Self::InvalidEscape => f.write_str("invalid unicode escape sequence"),
             Self::InvalidSurrogatePair => f.write_str("invalid unicode surrogate pair"),
             Self::OutOfRange => f.write_str("unicode escape value out of range"),
+            Self::RequiresHexDigits { .. } => f.write_str("incomplete unicode escape"),
+        }
+    }
+}
+
+impl UnicodeEscError {
+    pub fn hint(&self) -> Option<String> {
+        match self {
+            Self::InvalidEscape | Self::InvalidSurrogatePair | Self::OutOfRange => None,
             Self::RequiresHexDigits { kind, escape_char } => {
                 let required = kind.count();
                 let plus = match kind {
@@ -42,10 +51,9 @@ impl fmt::Display for UnicodeEscError {
                     UnicodeEscapeKind::Short => "",
                 };
                 let xs = "X".repeat(required as usize);
-                write!(
-                    f,
-                    "unicode escape requires {required} hex digits: {escape_char}{plus}{xs}"
-                )
+                Some(format!(
+                    "expected {required} hex digits, like `{escape_char}{plus}{xs}`"
+                ))
             }
         }
     }
@@ -422,9 +430,9 @@ mod tests {
 
     #[test]
     fn incomplete_unicode_escape_breaks_surrogate_pairing() {
-        assert_snapshot!(unicode_escape_events(r"\D800\006\DC00", '\\'), @r"
+        assert_snapshot!(unicode_escape_events(r"\D800\006\DC00", '\\'), @"
         0..5 err invalid unicode surrogate pair
-        5..9 err unicode escape requires 4 hex digits: \XXXX
+        5..9 err incomplete unicode escape
         9..14 err invalid unicode surrogate pair
         ");
     }

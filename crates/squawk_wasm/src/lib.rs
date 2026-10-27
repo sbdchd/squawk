@@ -300,7 +300,11 @@ impl SquawkDatabase {
                 end_column: end.col,
                 range_start: range_start.into(),
                 range_end: range_end.into(),
-                messages: vec![],
+                messages: x
+                    .hint()
+                    .map(|hint| hint.to_owned().into())
+                    .into_iter()
+                    .collect(),
                 fix: None,
             }
         });

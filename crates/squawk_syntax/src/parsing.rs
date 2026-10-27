@@ -60,9 +60,14 @@ pub(crate) fn build_tree(
     });
 
     let (node, mut errors) = builder.finish_raw();
-    for (text_range, err) in lexed.errors() {
-        let text_range = TextRange::new(text_range.start.into(), text_range.end.into());
-        errors.push(SyntaxError::new(err, text_range));
+    for lex_error in lexed.errors() {
+        let range = lex_error.range();
+        let text_range = TextRange::new(range.start.into(), range.end.into());
+        let error = SyntaxError::new(lex_error.message(), text_range);
+        errors.push(match lex_error.hint() {
+            Some(hint) => error.with_hint(hint.to_owned()),
+            None => error,
+        });
     }
 
     (node, errors, is_eof)

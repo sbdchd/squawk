@@ -55,6 +55,10 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
     let mut diagnostics = Vec::with_capacity(violations.len() + parse_errors.len());
 
     for error in parse_errors {
+        let message = match error.hint() {
+            Some(hint) => format!("{}\nhint: {hint}", error.message()),
+            None => error.message().to_string(),
+        };
         let diagnostic = Diagnostic {
             range: diagnostic_range(line_index, error.range()),
             severity: Some(DiagnosticSeverity::Error),
@@ -63,7 +67,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
                 href: Url::parse("https://squawkhq.com/docs/syntax-error").unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: Message::String(error.message().to_string()),
+            message: Message::String(message),
             ..Default::default()
         };
         diagnostics.push(diagnostic);

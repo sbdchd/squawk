@@ -55,7 +55,7 @@ fn check_sql(
                     column: line_col.col as usize,
                     column_end: line_end.col as usize,
                     level: ViolationLevel::Error,
-                    help: None,
+                    help: e.hint().map(|hint| hint.to_owned().into()),
                     range: e.range(),
                     message: e.message().to_owned().into(),
                     rule_name: "syntax-error".to_string(),

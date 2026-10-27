@@ -13,9 +13,24 @@ pub struct LexedStr<'a> {
     error: Vec<LexError>,
 }
 
-struct LexError {
+pub struct LexError {
     msg: Cow<'static, str>,
     range: ops::Range<u32>,
+    hint: Option<Cow<'static, str>>,
+}
+
+impl LexError {
+    pub fn range(&self) -> &ops::Range<u32> {
+        &self.range
+    }
+
+    pub fn message(&self) -> &str {
+        &self.msg
+    }
+
+    pub fn hint(&self) -> Option<&str> {
+        self.hint.as_deref()
+    }
 }
 
 impl<'a> LexedStr<'a> {
@@ -105,8 +120,8 @@ impl<'a> LexedStr<'a> {
     //     Some(self.error[err].msg.as_str())
     // }
 
-    pub fn errors(&self) -> impl Iterator<Item = (&ops::Range<u32>, &str)> + '_ {
-        self.error.iter().map(|it| (&it.range, it.msg.as_ref()))
+    pub fn errors(&self) -> impl Iterator<Item = &LexError> + '_ {
+        self.error.iter()
     }
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
@@ -172,6 +187,7 @@ impl<'a> Converter<'a> {
             self.res.error.push(LexError {
                 msg,
                 range: token_start + err_range.start..token_start + err_range.end,
+                hint: None,
             });
         }
     }
@@ -318,6 +334,7 @@ impl<'a> Converter<'a> {
                                 self.res.error.push(LexError {
                                     msg: format!("invalid digit for a base {base} literal").into(),
                                     range: start..end,
+                                    hint: None,
                                 });
                             }
                         }
@@ -441,6 +458,7 @@ impl<'a> Converter<'a> {
                     if !matches!(c, '0' | '1') {
                         self.push_content_error(
                             format!(r#""{c}" is not a valid binary digit"#),
+                            None,
                             inner_start + i,
                             c.len_utf8(),
                         );
@@ -452,6 +470,7 @@ impl<'a> Converter<'a> {
                     if !c.is_ascii_hexdigit() {
                         self.push_content_error(
                             format!(r#""{c}" is not a valid hexadecimal digit"#),
+                            None,
                             inner_start + i,
                             c.len_utf8(),
                         );
@@ -488,7 +507,8 @@ impl<'a> Converter<'a> {
                     }
                     if !got_all {
                         self.push_content_error(
-                            format!("unicode escape requires {required} hex digits: {example}"),
+                            "incomplete unicode escape".to_owned(),
+                            Some(format!("expected {required} hex digits, like `{example}`")),
                             inner_start + escape_start,
                             end - escape_start,
                         );
@@ -498,12 +518,13 @@ impl<'a> Converter<'a> {
         }
     }
 
-    fn push_content_error(&mut self, msg: String, start: usize, len: usize) {
+    fn push_content_error(&mut self, msg: String, hint: Option<String>, start: usize, len: usize) {
         let token_start = u32::try_from(self.offset).unwrap();
         let start = token_start + u32::try_from(start).unwrap();
         self.res.error.push(LexError {
             msg: msg.into(),
             range: start..start + u32::try_from(len).unwrap(),
+            hint: hint.map(Cow::Owned),
         });
     }
 }
@@ -520,13 +541,17 @@ mod tests {
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
         let mut res = String::new();
 
-        for (range, msg) in lexed.errors() {
+        for error in lexed.errors() {
+            let range = error.range();
             let span = range.start as usize..range.end as usize;
-            let group = Level::ERROR.primary_title(msg).element(
+            let mut group = Level::ERROR.primary_title(error.message()).element(
                 Snippet::source(text)
                     .fold(true)
                     .annotation(AnnotationKind::Primary.span(span)),
             );
+            if let Some(hint) = error.hint() {
+                group = group.element(Level::HELP.with_name("hint").message(hint));
+            }
             res.push_str(&renderer.render(&[group]).clone());
             res.push('\n');
         }
@@ -537,7 +562,7 @@ mod tests {
     fn lex_errors(text: &str) -> Vec<(std::ops::Range<u32>, String)> {
         LexedStr::new(text)
             .errors()
-            .map(|(range, msg)| (range.clone(), msg.to_owned()))
+            .map(|error| (error.range().clone(), error.message().to_owned()))
             .collect()
     }
 
@@ -555,7 +580,7 @@ mod tests {
             ),
             (
                 15..19,
-                "unicode escape requires 4 hex digits: \\uXXXX",
+                "incomplete unicode escape",
             ),
         ]
         "#);
@@ -583,7 +608,7 @@ mod tests {
         [
             (
                 7..10,
-                "unicode escape requires 4 hex digits: \\uXXXX",
+                "incomplete unicode escape",
             ),
         ]
         "#);

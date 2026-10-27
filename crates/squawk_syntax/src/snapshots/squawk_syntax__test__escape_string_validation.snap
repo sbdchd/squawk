@@ -68,15 +68,21 @@ SOURCE_FILE@0..148
     SEMICOLON@146..147 ";"
   WHITESPACE@147..148 "\n"
 
-error[syntax-error]: unicode escape requires 4 hex digits: \uXXXX
+error[syntax-error]: incomplete unicode escape
   ╭▸ 
 7 │ select E'\u00';
-  ╰╴         ━━━━
-error[syntax-error]: unicode escape requires 8 hex digits: \UXXXXXXXX
+  │          ━━━━
+  │
+  ╰ hint: expected 4 hex digits, like `\uXXXX`
+error[syntax-error]: incomplete unicode escape
   ╭▸ 
 8 │ select E'\UFFFF';
-  ╰╴         ━━━━━━
-error[syntax-error]: unicode escape requires 8 hex digits: \UXXXXXXXX
+  │          ━━━━━━
+  │
+  ╰ hint: expected 8 hex digits, like `\UXXXXXXXX`
+error[syntax-error]: incomplete unicode escape
   ╭▸ 
 9 │ select E'hello \UFGFF world';
-  ╰╴               ━━━
+  │                ━━━
+  │
+  ╰ hint: expected 8 hex digits, like `\UXXXXXXXX`

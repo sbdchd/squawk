@@ -180,8 +180,12 @@ fn parse_text(text: &str) -> (String, Option<String>) {
         text
     );
 
-    for (range, msg) in lexed.errors() {
-        errors.push((range.start as usize..range.end as usize, msg.to_string()));
+    for error in lexed.errors() {
+        let range = error.range();
+        errors.push((
+            range.start as usize..range.end as usize,
+            error.message().to_string(),
+        ));
     }
 
     let error_message = if !errors.is_empty() {

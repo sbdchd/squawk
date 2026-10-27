@@ -243,30 +243,42 @@ SOURCE_FILE@0..519
     SEMICOLON@517..518 ";"
   WHITESPACE@518..519 "\n"
 
-error[syntax-error]: unicode escape requires 4 hex digits: \XXXX
+error[syntax-error]: incomplete unicode escape
   ╭▸ 
 8 │ select U&"\006";
-  ╰╴          ━━━━
-error[syntax-error]: unicode escape requires 6 hex digits: \+XXXXXX
+  │           ━━━━
+  │
+  ╰ hint: expected 4 hex digits, like `\XXXX`
+error[syntax-error]: incomplete unicode escape
   ╭▸ 
 9 │ select U&"\+0061";
-  ╰╴          ━━━━━━
-error[syntax-error]: unicode escape requires 4 hex digits: \XXXX
+  │           ━━━━━━
+  │
+  ╰ hint: expected 6 hex digits, like `\+XXXXXX`
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 10 │ select U&"wrong: \06" UESCAPE '\';
-   ╰╴                 ━━━
-error[syntax-error]: unicode escape requires 4 hex digits: !XXXX
+   │                  ━━━
+   │
+   ╰ hint: expected 4 hex digits, like `\XXXX`
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 11 │ select U&"wrong: !061" UESCAPE '!';
-   ╰╴                 ━━━━
-error[syntax-error]: unicode escape requires 4 hex digits: \XXXX
+   │                  ━━━━
+   │
+   ╰ hint: expected 4 hex digits, like `!XXXX`
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 12 │ select U&"many: \061 \+0061 \zzzz";
-   ╰╴                ━━━━
-error[syntax-error]: unicode escape requires 6 hex digits: \+XXXXXX
+   │                 ━━━━
+   │
+   ╰ hint: expected 4 hex digits, like `\XXXX`
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 12 │ select U&"many: \061 \+0061 \zzzz";
-   ╰╴                     ━━━━━━
+   │                      ━━━━━━
+   │
+   ╰ hint: expected 6 hex digits, like `\+XXXXXX`
 error[syntax-error]: invalid unicode escape sequence
    ╭▸ 
 12 │ select U&"many: \061 \+0061 \zzzz";

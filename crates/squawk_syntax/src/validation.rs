@@ -9,7 +9,7 @@ use std::ops::Range;
 use either::Either;
 
 use crate::ast::{AstNode, LitKind, PrefixOp};
-use crate::unescape::{escape_unicode_esc_str, uescape_char};
+use crate::unescape::{UnicodeEscError, escape_unicode_esc_str, uescape_char};
 use crate::{
     SyntaxNode, SyntaxToken, ast, match_ast, sql_body::SqlBody, syntax_error::SyntaxError,
 };
@@ -639,10 +639,13 @@ fn validate_select(it: &ast::Select, acc: &mut Vec<SyntaxError>) {
     if let Some(select_clause) = it.select_clause() {
         if from_clause.syntax().text_range().end() <= select_clause.syntax().text_range().start() {
             // Postgres dialect doesn't support leading from clauses, e.g., `from t select c`
-            acc.push(SyntaxError::new(
-                "leading from clauses are not supported in Postgres",
-                from_clause.syntax().text_range(),
-            ));
+            acc.push(
+                SyntaxError::new(
+                    "leading `from` clauses are not supported",
+                    from_clause.syntax().text_range(),
+                )
+                .with_hint("move the `from` clause after the select list"),
+            );
         }
     } else {
         // Postgres dialect doesn't support missing select clauses, e.g., `from t`
@@ -1001,10 +1004,7 @@ fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
     let inner_start = token.text_range().start() + TextSize::new(3);
     escape_unicode_esc_str(inner, escape_char, |range, result| {
         if let Err(err) = result {
-            acc.push(SyntaxError::new(
-                err.to_string(),
-                offset_range(inner_start, range),
-            ));
+            acc.push(unicode_esc_error(&err, offset_range(inner_start, range)));
         }
     });
     for cont in continuations {
@@ -1018,10 +1018,7 @@ fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
         let cont_start = cont.text_range().start() + TextSize::new(1);
         escape_unicode_esc_str(cont_inner, escape_char, |range, result| {
             if let Err(err) = result {
-                acc.push(SyntaxError::new(
-                    err.to_string(),
-                    offset_range(cont_start, range),
-                ));
+                acc.push(unicode_esc_error(&err, offset_range(cont_start, range)));
             }
         });
     }
@@ -1077,12 +1074,17 @@ fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
     let inner_start = token.text_range().start() + TextSize::new(3);
     escape_unicode_esc_str(inner, escape_char, |range, result| {
         if let Err(err) = result {
-            acc.push(SyntaxError::new(
-                err.to_string(),
-                offset_range(inner_start, range),
-            ));
+            acc.push(unicode_esc_error(&err, offset_range(inner_start, range)));
         }
     });
+}
+
+fn unicode_esc_error(err: &UnicodeEscError, range: TextRange) -> SyntaxError {
+    let error = SyntaxError::new(err.to_string(), range);
+    match err.hint() {
+        Some(hint) => error.with_hint(hint),
+        None => error,
+    }
 }
 
 fn offset_range(start: TextSize, range: Range<usize>) -> TextRange {
@@ -1186,10 +1188,13 @@ fn validate_join_expr(join_expr: &ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
         }
         NotAllowed => {
             if let Some(ast::JoinCondition::JoinUsingClause(using_clause)) = join.join_condition() {
-                acc.push(SyntaxError::new(
-                    format!("join `using` clause is not allowed for {join_name} joins"),
-                    using_clause.syntax().text_range(),
-                ));
+                acc.push(
+                    SyntaxError::new(
+                        "`using` clause is not allowed here",
+                        using_clause.syntax().text_range(),
+                    )
+                    .with_hint(format!("{join_name} joins don't take a join condition")),
+                );
             }
         }
     }
@@ -1423,10 +1428,10 @@ fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut
 }
 
 fn validate_non_standard_param(param: &ast::NonStandardParam, acc: &mut Vec<SyntaxError>) {
-    acc.push(SyntaxError::new(
-        "invalid parameter type. Use positional params like $1 instead",
-        param.syntax().text_range(),
-    ));
+    acc.push(
+        SyntaxError::new("invalid parameter type", param.syntax().text_range())
+            .with_hint("use positional params like `$1` instead"),
+    );
 }
 
 const CONFLICTING_OPTIONS: &str = "conflicting or redundant options";

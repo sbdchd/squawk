@@ -499,14 +499,18 @@ SOURCE_FILE@0..730
         COMMA@728..729 ","
   WHITESPACE@729..730 "\n"
 
-error[syntax-error]: leading from clauses are not supported in Postgres
+error[syntax-error]: leading `from` clauses are not supported
   ╭▸ 
 2 │ from t select c;
-  ╰╴━━━━━━
-error[syntax-error]: leading from clauses are not supported in Postgres
+  │ ━━━━━━
+  │
+  ╰ hint: move the `from` clause after the select list
+error[syntax-error]: leading `from` clauses are not supported
   ╭▸ 
 4 │ from f()select;
-  ╰╴━━━━━━━━
+  │ ━━━━━━━━
+  │
+  ╰ hint: move the `from` clause after the select list
 error[syntax-error]: missing select clause
   ╭▸ 
 6 │ from t;
