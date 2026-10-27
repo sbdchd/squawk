@@ -15,6 +15,7 @@ use crate::arena::{IdxRange, LayeredArena};
 use crate::comments::preceding_comment;
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
+use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
 use crate::interner::Name;
 use crate::keyed_index::GraphElementIndex;
 
@@ -15537,14 +15538,13 @@ impl Lowerer {
                 .and_then(|using_method| using_method.access_method_ref())
         {
             let name = self.index.access_methods[access_method].name;
-            match self.index.names.resolve(name) {
-                "hash" | "gist" | "gin" | "spgist" | "brin" => self.push_error(
+            if NON_UNIQUE_INDEX_ACCESS_METHODS.contains(&self.index.names.resolve(name)) {
+                self.push_error(
                     access_method_ref.syntax(),
                     SemaError::UniqueIndexNotSupported {
                         access_method: name,
                     },
-                ),
-                _ => {}
+                );
             }
         }
         match create_index.index() {

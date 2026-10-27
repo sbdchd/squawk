@@ -13,6 +13,7 @@ pub(crate) mod extensions;
 pub mod file;
 pub mod find_references;
 pub mod folding_ranges;
+mod generated;
 pub mod goto_definition;
 pub mod goto_type_definition;
 pub mod hover;

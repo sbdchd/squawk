@@ -276,6 +276,8 @@ create unique index on t using gin (v);
 create unique index on t using spgist (r);
 create unique index on t using brin (a);
 create index on t using gin (v);
+create extension bloom;
+create unique index on t using bloom (a);
 "), @"
     error: access method `hash` does not support unique indexes
       ╭▸ 
@@ -297,5 +299,9 @@ create index on t using gin (v);
        ╭▸ 
     12 │ create unique index on t using brin (a);
        ╰╴                               ━━━━
+    error: access method `bloom` does not support unique indexes
+       ╭▸ 
+    15 │ create unique index on t using bloom (a);
+       ╰╴                               ━━━━━
     ");
 }
