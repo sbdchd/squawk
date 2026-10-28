@@ -8,7 +8,7 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     let mut in_explicit_transaction = false;
-    let assume_in_transaction_help = "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.";
+    let assume_in_transaction_help = "move these statements to a separate migration file, or turn off the `assume-in-transaction` setting";
 
     for stmt in file.stmts() {
         match stmt {
@@ -16,14 +16,14 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if ctx.settings.assume_in_transaction {
                     ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
-                        "There is an existing transaction already in progress, managed by your migration tool.".into(),
+                        "there is an existing transaction already in progress, managed by your migration tool".into(),
                         stmt.syntax(),
                     ).help(assume_in_transaction_help));
                 } else if in_explicit_transaction {
                     ctx.report(
                         Violation::for_node(
                             Rule::TransactionNesting,
-                            "There is an existing transaction already in progress.".into(),
+                            "there is an existing transaction already in progress".into(),
                             stmt.syntax(),
                         )
                         .help(assume_in_transaction_help),
@@ -35,16 +35,16 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if ctx.settings.assume_in_transaction {
                     ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
-                        "Attempting to end the transaction that is managed by your migration tool"
+                        "attempting to end the transaction that is managed by your migration tool"
                             .into(),
                         stmt.syntax(),
                     ).help(assume_in_transaction_help));
                 } else if !in_explicit_transaction {
                     ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
-                        "There is no transaction to `COMMIT` or `ROLLBACK`.".into(),
+                        "there is no transaction to `commit` or `rollback`".into(),
                         stmt.syntax(),
-                    ).help("`BEGIN` a transaction at an earlier point in the migration or remove this statement."));
+                    ).help("`begin` a transaction at an earlier point in the migration or remove this statement"));
                 }
                 in_explicit_transaction = false;
             }

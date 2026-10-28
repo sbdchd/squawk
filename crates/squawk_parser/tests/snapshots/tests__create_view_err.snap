@@ -105,15 +105,15 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+error[syntax-error]: `without overlaps` is only allowed in `primary key` and `unique` constraints
   ╭▸ 
 2 │ create view v (a without overlaps) as select 1;
   ╰╴                 ━
-error[syntax-error]: missing column
+error[syntax-error]: expected a column, found `,`
   ╭▸ 
 5 │ create view v (,) as select 1;
   ╰╴               ━
-error[syntax-error]: missing column
+error[syntax-error]: expected a column, found `,`
   ╭▸ 
 8 │ create view v (,a, b) as select 1;
   ╰╴               ━

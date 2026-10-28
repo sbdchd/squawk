@@ -15,14 +15,14 @@ pub(crate) fn ban_drop_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             match action {
                 ast::AlterTableAction::DropConstraint(node) => ctx.report(Violation::for_node(
                     Rule::BanDropConstraint,
-                    "Dropping a constraint may remove a guarantee that existing clients assume."
+                    "dropping a constraint may remove a guarantee that existing clients assume"
                         .into(),
                     node.syntax(),
                 )),
                 ast::AlterTableAction::AlterConstraint(node) => {
                     for option in node.constraint_options() {
                         if let ast::ConstraintOption::NotEnforced(option) = option {
-                            ctx.report(Violation::for_node(Rule::BanDropConstraint, "Disabling constraint enforcement may remove a guarantee that existing clients assume.".into(), option.syntax()));
+                            ctx.report(Violation::for_node(Rule::BanDropConstraint, "disabling constraint enforcement may remove a guarantee that existing clients assume".into(), option.syntax()));
                         }
                     }
                 }
@@ -34,7 +34,7 @@ pub(crate) fn ban_drop_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanDropConstraint,
-                "Dropping a constraint may remove a guarantee that existing clients assume.".into(),
+                "dropping a constraint may remove a guarantee that existing clients assume".into(),
                 node.syntax(),
             ));
         }

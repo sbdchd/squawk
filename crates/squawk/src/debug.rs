@@ -118,13 +118,16 @@ fn render_syntax_errors(
     for err in errors {
         let text = err.message();
         let span = err.range().into();
-        let report = &[Level::ERROR.primary_title(text).id("syntax-error").element(
+        let mut group = Level::ERROR.primary_title(text).id("syntax-error").element(
             Snippet::source(sql)
                 .path(filename)
                 .fold(true)
                 .annotation(AnnotationKind::Primary.span(span)),
-        )];
-        writeln!(f, "{}", renderer.render(report))?;
+        );
+        if let Some(hint) = err.hint() {
+            group = group.element(Level::HELP.with_name("hint").message(hint));
+        }
+        writeln!(f, "{}", renderer.render(&[group]))?;
     }
     Ok(())
 }

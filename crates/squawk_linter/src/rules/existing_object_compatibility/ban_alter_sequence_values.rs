@@ -8,14 +8,14 @@ pub(super) fn check_table_action(ctx: &mut Linter, action: &ast::AlterTableActio
     {
         match option {
                 ast::AlterColumnOption::Restart(node) => ctx.report(Violation::for_node(
-                    Rule::BanAlterSequenceValues, "Restarting an identity sequence can change values generated for existing clients.".into(), node.syntax())),
+                    Rule::BanAlterSequenceValues, "restarting an identity sequence can change values generated for existing clients".into(), node.syntax())),
                 ast::AlterColumnOption::SetSequenceOption(node) => ctx.report(Violation::for_node(
-                    Rule::BanAlterSequenceValues, "Changing an identity sequence option can change values generated for existing clients.".into(), node.syntax())),
+                    Rule::BanAlterSequenceValues, "changing an identity sequence option can change values generated for existing clients".into(), node.syntax())),
                 ast::AlterColumnOption::SetGeneratedOptions(options) => {
                     for option in options.set_generated_options() {
                         if matches!(option, ast::SetGeneratedOption::Restart(_) | ast::SetGeneratedOption::SetSequenceOption(_)) {
                             ctx.report(Violation::for_node(Rule::BanAlterSequenceValues,
-                                "Changing an identity sequence can change values generated for existing clients.".into(), option.syntax()));
+                                "changing an identity sequence can change values generated for existing clients".into(), option.syntax()));
                         }
                     }
                 }
@@ -38,7 +38,7 @@ pub(super) fn check_sequence(ctx: &mut Linter, seq: &ast::AlterSequence) {
             }
             ctx.report(Violation::for_node(
                 Rule::BanAlterSequenceValues,
-                "Changing a sequence option can change values generated for existing clients."
+                "changing a sequence option can change values generated for existing clients"
                     .into(),
                 option.syntax(),
             ));

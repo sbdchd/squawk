@@ -2,7 +2,9 @@
 source: crates/squawk_linter/src/rules/ban_create_domain_with_constraint.rs
 expression: "lint_errors(sql, Rule::BanCreateDomainWithConstraint)"
 ---
-warning[ban-create-domain-with-constraint]: Domains with constraints have poor support for online migrations. Use table and column constraints instead.
+warning[ban-create-domain-with-constraint]: domains with constraints have poor support for online migrations
   ╭▸ 
 2 │ CREATE DOMAIN domain_name_3 AS NUMERIC(15,5) CHECK (value > 0);
-  ╰╴                                             ━━━━━━━━━━━━━━━━━
+  │                                              ━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: use table and column constraints instead

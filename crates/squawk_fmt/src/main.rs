@@ -55,10 +55,13 @@ fn main() -> Result<ExitCode> {
                 .path(&path)
                 .fold(true)
                 .annotation(AnnotationKind::Primary.span(error.range().into()));
-            let group = Level::ERROR
+            let mut group = Level::ERROR
                 .primary_title(error.message())
                 .id("syntax-error")
                 .element(snippet);
+            if let Some(hint) = error.hint() {
+                group = group.element(Level::HELP.with_name("hint").message(hint));
+            }
             writeln!(stderr, "{}", renderer.render(&[group]))?;
         }
 

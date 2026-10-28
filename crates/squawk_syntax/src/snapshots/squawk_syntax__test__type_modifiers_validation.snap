@@ -654,59 +654,59 @@ SOURCE_FILE@0..733
     SEMICOLON@731..732 ";"
   WHITESPACE@732..733 "\n"
 
-error[syntax-error]: Type modifier cannot have parameter name
+error[syntax-error]: type modifier cannot have parameter name
    ╭▸ 
 13 │ select foo(a => 1) 'x';
    ╰╴           ━━━━━━
-error[syntax-error]: Type modifier cannot have ORDER BY
+error[syntax-error]: type modifier cannot have `order by`
    ╭▸ 
 14 │ select foo(1 order by 2) 'x';
    ╰╴             ━━━━━━━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 15 │ select numeric(1 + 2) '1';
    ╰╴               ━━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 16 │ select foo.bar(nested(1)) '100';
    ╰╴               ━━━━━━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 17 │ select '1'::numeric(1 + 2);
    ╰╴                    ━━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 18 │ select cast('1' as numeric(1 + 2));
    ╰╴                           ━━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 19 │ select numeric(+1) '1';
    ╰╴               ━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 20 │ select numeric(foo.bar) '1';
    ╰╴               ━━━━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 21 │ select numeric(true) '1';
    ╰╴               ━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 22 │ select numeric(null) '1';
    ╰╴               ━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 23 │ select numeric(b'1') '1';
    ╰╴               ━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 24 │ select numeric(x'1') '1';
    ╰╴               ━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 25 │ select numeric(n'1') '1';
    ╰╴               ━━━━
-error[syntax-error]: Type modifiers must be simple constants or identifiers
+error[syntax-error]: type modifiers must be simple constants or identifiers
    ╭▸ 
 26 │ select numeric(variadic 1) '1';
    ╰╴               ━━━━━━━━━━
@@ -714,7 +714,7 @@ error[syntax-error]: expected unsigned integer literal
    ╭▸ 
 27 │ select''::timestamp(())with time zone;
    ╰╴                    ━
-error[syntax-error]: Expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 27 │ select''::timestamp(())with time zone;
    ╰╴                     ━

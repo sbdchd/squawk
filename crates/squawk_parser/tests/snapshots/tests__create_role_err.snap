@@ -83,63 +83,63 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected role, got GROUP_KW
+error[syntax-error]: expected role, found `group`
   ╭▸ 
 2 │ create group group g;
   ╰╴            ━
-error[syntax-error]: expected command, found GROUP_KW
+error[syntax-error]: expected command, found `group`
   ╭▸ 
 2 │ create group group g;
   ╰╴             ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 2 │ create group group g;
   ╰╴                   ━
-error[syntax-error]: expected role, got GROUP_KW
+error[syntax-error]: expected role, found `group`
   ╭▸ 
 3 │ create role group r;
   ╰╴           ━
-error[syntax-error]: expected command, found GROUP_KW
+error[syntax-error]: expected command, found `group`
   ╭▸ 
 3 │ create role group r;
   ╰╴            ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 3 │ create role group r;
   ╰╴                  ━
-error[syntax-error]: expected role, got GROUP_KW
+error[syntax-error]: expected role, found `group`
   ╭▸ 
 4 │ create user group u;
   ╰╴           ━
-error[syntax-error]: expected command, found GROUP_KW
+error[syntax-error]: expected command, found `group`
   ╭▸ 
 4 │ create user group u;
   ╰╴            ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 4 │ create user group u;
   ╰╴                  ━
-error[syntax-error]: expected role, got GROUP_KW
+error[syntax-error]: expected role, found `group`
   ╭▸ 
 5 │ create schema authorization group g;
   ╰╴                           ━
-error[syntax-error]: expected command, found GROUP_KW
+error[syntax-error]: expected command, found `group`
   ╭▸ 
 5 │ create schema authorization group g;
   ╰╴                            ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 5 │ create schema authorization group g;
   ╰╴                                  ━
-error[syntax-error]: expected role, got GROUP_KW
+error[syntax-error]: expected role, found `group`
   ╭▸ 
 6 │ alter role foo rename to group bar;
   ╰╴                        ━
-error[syntax-error]: expected command, found GROUP_KW
+error[syntax-error]: expected command, found `group`
   ╭▸ 
 6 │ alter role foo rename to group bar;
   ╰╴                         ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 6 │ alter role foo rename to group bar;
   ╰╴                               ━

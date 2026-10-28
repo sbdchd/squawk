@@ -2,12 +2,12 @@
 source: crates/squawk_linter/src/rules/require_concurrent_index_deletion.rs
 expression: "lint_errors(sql, Rule::RequireConcurrentIndexDeletion)"
 ---
-warning[require-concurrent-index-deletion]: A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.
+warning[require-concurrent-index-deletion]: a normal `drop index` acquires an `access exclusive` lock on the table, blocking other accesses until the index drop can complete
   ╭▸ 
 3 │   DROP INDEX IF EXISTS "field_name_idx";
   │   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
-  ├ help: Drop the index `CONCURRENTLY`.
+  ├ help: drop the index `concurrently`
   ╭╴
 3 │   DROP INDEX concurrently IF EXISTS "field_name_idx";
   ╰╴             ++++++++++++

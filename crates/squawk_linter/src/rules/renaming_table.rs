@@ -13,7 +13,7 @@ pub(crate) fn renaming_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let ast::AlterTableAction::TableRenameTo(rename_table) = action {
                     ctx.report(Violation::for_node(
                         Rule::RenamingTable,
-                        "Renaming a table may break existing clients.".into(),
+                        "renaming a table may break existing clients".into(),
                         rename_table.syntax(),
                     ));
                 }

@@ -45,7 +45,7 @@ SOURCE_FILE
         R_PAREN ")"
   WHITESPACE "\n"
 ---
-error[syntax-error]: unexpected expression after SELECT
+error[syntax-error]: unexpected expression after `select`
   ╭▸ 
 1 │ ALTER POLICY r ON r USING(x=(SELECT WHERE t y))
   ╰╴                                           ━

@@ -23,10 +23,10 @@ pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, parse: &Pars
                     ctx.report(
                             Violation::for_node(
                                 Rule::RequireConcurrentPartitionDetach,
-                                "Detaching a partition requires an `ACCESS EXCLUSIVE` lock, which prevents reads and writes to the table.".into(),
+                                "detaching a partition requires an `access exclusive` lock, which prevents reads and writes to the table".into(),
                                 detach_partition.syntax(),
                             )
-                            .help("Detach the partition `CONCURRENTLY`.")
+                            .help("detach the partition `concurrently`")
                             .fix(fix),
                         );
                 }
@@ -53,12 +53,12 @@ mod test {
     fn detach_partition_missing_concurrently_err() {
         let sql = "ALTER TABLE t DETACH PARTITION p;";
         assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentPartitionDetach), @"
-        warning[require-concurrent-partition-detach]: Detaching a partition requires an `ACCESS EXCLUSIVE` lock, which prevents reads and writes to the table.
+        warning[require-concurrent-partition-detach]: detaching a partition requires an `access exclusive` lock, which prevents reads and writes to the table
           ╭▸ 
         1 │ ALTER TABLE t DETACH PARTITION p;
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Detach the partition `CONCURRENTLY`.
+          ├ help: detach the partition `concurrently`
           ╭╴
         1 │ ALTER TABLE t DETACH PARTITION p concurrently;
           ╰╴                                 ++++++++++++

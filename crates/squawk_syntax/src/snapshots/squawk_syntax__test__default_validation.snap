@@ -132,27 +132,27 @@ SOURCE_FILE@0..170
     SEMICOLON@168..169 ";"
   WHITESPACE@169..170 "\n"
 
-error[syntax-error]: DEFAULT is not allowed in this context
+error[syntax-error]: `default` is not allowed in this context
   ╭▸ 
 1 │ insert into t VALUES (foo(DEFAULT));
   ╰╴                          ━━━━━━━
-error[syntax-error]: cannot set an array element to DEFAULT
+error[syntax-error]: cannot set an array element to `default`
   ╭▸ 
 3 │ UPDATE t SET arr[1] = DEFAULT;
   ╰╴             ━━━━━━
-error[syntax-error]: cannot set a subfield to DEFAULT
+error[syntax-error]: cannot set a subfield to `default`
   ╭▸ 
 5 │ UPDATE t SET comp.field = DEFAULT;
   ╰╴             ━━━━━━━━━━
-error[syntax-error]: DEFAULT is not allowed in this context
+error[syntax-error]: `default` is not allowed in this context
   ╭▸ 
 7 │ values (default);
   ╰╴        ━━━━━━━
-error[syntax-error]: DEFAULT is not allowed in this context
+error[syntax-error]: `default` is not allowed in this context
   ╭▸ 
 9 │ select default;
   ╰╴       ━━━━━━━
-error[syntax-error]: DEFAULT is not allowed in this context
+error[syntax-error]: `default` is not allowed in this context
    ╭▸ 
 11 │ select 1 where default = 1;
    ╰╴               ━━━━━━━

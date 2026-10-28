@@ -101,27 +101,27 @@ PLPGSQL@0..201
     END_KW@197..200 "end"
   WHITESPACE@200..201 "\n"
 
-error[syntax-error]: expected a cursor variable, got SEMICOLON
+error[syntax-error]: expected a cursor variable, found `;`
   ╭▸ 
 7 │   move;
   ╰╴      ━
-error[syntax-error]: expected FROM or IN
+error[syntax-error]: expected `from` or `in`
   ╭▸ 
 8 │   move next c;
   ╰╴           ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 9 │   move c into x;
   ╰╴        ━
-error[syntax-error]: expected a statement, got INTO_KW
+error[syntax-error]: expected a statement, found `into`
   ╭▸ 
 9 │   move c into x;
   ╰╴         ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
    ╭▸ 
 11 │   move n from c;
    ╰╴        ━
-error[syntax-error]: expected a statement, got FROM_KW
+error[syntax-error]: expected a statement, found `from`
    ╭▸ 
 11 │   move n from c;
    ╰╴         ━

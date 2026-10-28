@@ -499,23 +499,27 @@ SOURCE_FILE@0..730
         COMMA@728..729 ","
   WHITESPACE@729..730 "\n"
 
-error[syntax-error]: Leading from clauses are not supported in Postgres
+error[syntax-error]: leading `from` clauses are not supported
   ╭▸ 
 2 │ from t select c;
-  ╰╴━━━━━━
-error[syntax-error]: Leading from clauses are not supported in Postgres
+  │ ━━━━━━
+  │
+  ╰ hint: move the `from` clause after the select list
+error[syntax-error]: leading `from` clauses are not supported
   ╭▸ 
 4 │ from f()select;
-  ╰╴━━━━━━━━
-error[syntax-error]: Missing select clause
+  │ ━━━━━━━━
+  │
+  ╰ hint: move the `from` clause after the select list
+error[syntax-error]: missing select clause
   ╭▸ 
 6 │ from t;
   ╰╴━
-error[syntax-error]: Expected a target after SELECT
+error[syntax-error]: expected a target after `select`
   ╭▸ 
 8 │ SELECT(o,select)WHERE''::r;
   ╰╴         ━━━━━━
-error[syntax-error]: Expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 10 │ SELECT().n()FROM ONLY p();
    ╰╴       ━
@@ -523,23 +527,23 @@ error[syntax-error]: expected function name before argument list
    ╭▸ 
 10 │ SELECT().n()FROM ONLY p();
    ╰╴          ━
-error[syntax-error]: ONLY cannot be used with a function call
+error[syntax-error]: `only` cannot be used with a function call
    ╭▸ 
 10 │ SELECT().n()FROM ONLY p();
    ╰╴                 ━━━━
-error[syntax-error]: Missing select clause
+error[syntax-error]: missing select clause
    ╭▸ 
 12 │ with t as (from k)
    ╰╴           ━
-error[syntax-error]: Subqueries in tuple expressions must be parenthesized
+error[syntax-error]: subqueries in tuple expressions must be parenthesized
    ╭▸ 
 15 │ SELECT(o,select f);
    ╰╴         ━━━━━━━━
-error[syntax-error]: Expected a target after SELECT
+error[syntax-error]: expected a target after `select`
    ╭▸ 
 17 │ select (select);
    ╰╴        ━━━━━━
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
    ╭▸ 
 19 │ create view f as select from((select)a);
    ╰╴                            ━━━━━━━━━━━
@@ -547,7 +551,7 @@ error[syntax-error]: A subquery alias must follow all closing parentheses
    ╭▸ 
 19 │ create view f as select from((select)a);
    ╰╴                                     ━
-error[syntax-error]: Expected an expression
+error[syntax-error]: expected at least one expression
    ╭▸ 
 21 │ select () d;
    ╰╴        ━
@@ -555,39 +559,39 @@ error[syntax-error]: expected path name
    ╭▸ 
 28 │ SELECT '' COLLATE AS t;
    ╰╴                  ━
-error[syntax-error]: Expected at least one GROUP BY item
+error[syntax-error]: expected at least one `group by` item
    ╭▸ 
 31 │ select group by;
    ╰╴               ━
-error[syntax-error]: Expected a GROUP BY item after comma
+error[syntax-error]: expected a `group by` item after comma
    ╭▸ 
 32 │ select 1 group by a, having true;
    ╰╴                    ━
-error[syntax-error]: Expected a GROUP BY item after comma
+error[syntax-error]: expected a `group by` item after comma
    ╭▸ 
 33 │ with q as (select 1 group by a,) select * from q;
    ╰╴                               ━
-error[syntax-error]: Expected a GROUP BY item after comma
+error[syntax-error]: expected a `group by` item after comma
    ╭▸ 
 34 │ create materialized view v as select 1 group by a, with data;
    ╰╴                                                  ━
-error[syntax-error]: Expected a GROUP BY item after comma
+error[syntax-error]: expected a `group by` item after comma
    ╭▸ 
 35 │ select 1 group by a,;
    ╰╴                    ━
-error[syntax-error]: Expected an ORDER BY item after comma
+error[syntax-error]: expected an `order by` item after comma
    ╭▸ 
 36 │ select 1 order by a,;
    ╰╴                    ━
-error[syntax-error]: Expected a GROUP BY item after comma
+error[syntax-error]: expected a `group by` item after comma
    ╭▸ 
 37 │ select group by a, order by;
    ╰╴                  ━
-error[syntax-error]: Expected at least one ORDER BY item
+error[syntax-error]: expected at least one `order by` item
    ╭▸ 
 37 │ select group by a, order by;
    ╰╴                           ━
-error[syntax-error]: Expected an ORDER BY item after comma
+error[syntax-error]: expected an `order by` item after comma
    ╭▸ 
 40 │ select 1 order by a,
    ╰╴                    ━

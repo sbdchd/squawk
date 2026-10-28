@@ -201,7 +201,7 @@ error[syntax-error]: `any` must follow an operator
   ╭▸ 
 1 │ select any(1);
   ╰╴       ━━━
-error[syntax-error]: Expected a subquery
+error[syntax-error]: expected a subquery
   ╭▸ 
 2 │ select array(1);
   ╰╴             ━
@@ -241,7 +241,7 @@ error[syntax-error]: `all` must follow an operator
    ╭▸ 
 11 │ select (all(1));
    ╰╴        ━━━
-error[syntax-error]: Expected a subquery
+error[syntax-error]: expected a subquery
    ╭▸ 
 12 │ select array();
    ╰╴       ━━━━━━━

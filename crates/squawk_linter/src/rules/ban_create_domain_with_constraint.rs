@@ -25,11 +25,14 @@ pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<
                     }
                 });
             if let Some(range) = range {
-                ctx.report(Violation::for_range(
-                Rule::BanCreateDomainWithConstraint,
-                    "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
-                    range,
-                ));
+                ctx.report(
+                    Violation::for_range(
+                        Rule::BanCreateDomainWithConstraint,
+                        "domains with constraints have poor support for online migrations".into(),
+                        range,
+                    )
+                    .help("use table and column constraints instead"),
+                );
             }
         }
     }

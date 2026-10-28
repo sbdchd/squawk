@@ -89,15 +89,15 @@ PLPGSQL@0..155
     END_KW@151..154 "end"
   WHITESPACE@154..155 "\n"
 
-error[syntax-error]: unrecognized RAISE statement option
+error[syntax-error]: unrecognized `raise` statement option
   ╭▸ 
 3 │   raise notice 'x' using bogus = 1;
   ╰╴                         ━
-error[syntax-error]: expected EQ
+error[syntax-error]: expected `=`
   ╭▸ 
 3 │   raise notice 'x' using bogus = 1;
   ╰╴                         ━
-error[syntax-error]: expected EQ
+error[syntax-error]: expected `=`
   ╭▸ 
 4 │   raise notice 'x' using errcode;
   ╰╴                                ━
@@ -109,11 +109,11 @@ error[syntax-error]: expected an expression
   ╭▸ 
 5 │   raise notice 'x' using errcode = ;
   ╰╴                                  ━
-error[syntax-error]: expected STRING
+error[syntax-error]: expected string literal
   ╭▸ 
 6 │   raise sqlstate;
   ╰╴                ━
-error[syntax-error]: expected a condition name, got SEMICOLON
+error[syntax-error]: expected a condition name, found `;`
   ╭▸ 
 7 │   raise exception;
   ╰╴                 ━

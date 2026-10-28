@@ -51,11 +51,11 @@ PLPGSQL@0..90
     END_KW@86..89 "end"
   WHITESPACE@89..90 "\n"
 
-error[syntax-error]: UESCAPE is not allowed before %TYPE
+error[syntax-error]: `uescape` is not allowed before `%type`
   ╭▸ 
 3 │   a U&"tbl" UESCAPE '!'%type;
   ╰╴                       ━
-error[syntax-error]: UESCAPE is not allowed before %ROWTYPE
+error[syntax-error]: `uescape` is not allowed before `%rowtype`
   ╭▸ 
 4 │   b U&"tbl" UESCAPE '!'%rowtype;
   ╰╴                       ━

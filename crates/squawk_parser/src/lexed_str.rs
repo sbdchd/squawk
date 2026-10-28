@@ -13,9 +13,24 @@ pub struct LexedStr<'a> {
     error: Vec<LexError>,
 }
 
-struct LexError {
+pub struct LexError {
     msg: Cow<'static, str>,
     range: ops::Range<u32>,
+    hint: Option<Cow<'static, str>>,
+}
+
+impl LexError {
+    pub fn range(&self) -> &ops::Range<u32> {
+        &self.range
+    }
+
+    pub fn message(&self) -> &str {
+        &self.msg
+    }
+
+    pub fn hint(&self) -> Option<&str> {
+        self.hint.as_deref()
+    }
 }
 
 impl<'a> LexedStr<'a> {
@@ -105,8 +120,8 @@ impl<'a> LexedStr<'a> {
     //     Some(self.error[err].msg.as_str())
     // }
 
-    pub fn errors(&self) -> impl Iterator<Item = (&ops::Range<u32>, &str)> + '_ {
-        self.error.iter().map(|it| (&it.range, it.msg.as_ref()))
+    pub fn errors(&self) -> impl Iterator<Item = &LexError> + '_ {
+        self.error.iter()
     }
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
@@ -172,6 +187,7 @@ impl<'a> Converter<'a> {
             self.res.error.push(LexError {
                 msg,
                 range: token_start + err_range.start..token_start + err_range.end,
+                hint: None,
             });
         }
     }
@@ -199,7 +215,7 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::LineComment => SyntaxKind::COMMENT,
                 squawk_lexer::TokenKind::BlockComment { terminated } => {
                     if !terminated {
-                        err = "Missing trailing `*/` symbols to terminate the block comment";
+                        err = "missing trailing `*/` symbols to terminate the block comment";
                     }
                     SyntaxKind::COMMENT
                 }
@@ -273,7 +289,7 @@ impl<'a> Converter<'a> {
                     uescape,
                 } => {
                     if !terminated {
-                        err = "Missing trailing \" to terminate the quoted identifier";
+                        err = "missing trailing \" to terminate the quoted identifier";
                     } else if is_empty_quoted_ident(token_text, *uescape) {
                         err = "empty delimited identifier";
                     }
@@ -304,7 +320,7 @@ impl<'a> Converter<'a> {
                 trailing_junk_start,
             } => {
                 if empty_int {
-                    err = Some("Missing digits after the integer base prefix".into());
+                    err = Some("missing digits after the integer base prefix".into());
                 } else {
                     if matches!(base, squawk_lexer::Base::Binary | squawk_lexer::Base::Octal) {
                         let prefix_len = 2u32;
@@ -318,6 +334,7 @@ impl<'a> Converter<'a> {
                                 self.res.error.push(LexError {
                                     msg: format!("invalid digit for a base {base} literal").into(),
                                     range: start..end,
+                                    hint: None,
                                 });
                             }
                         }
@@ -335,7 +352,7 @@ impl<'a> Converter<'a> {
                 trailing_junk_start,
             } => {
                 if let Some(exponent_start) = empty_exponent_start {
-                    err = Some("Missing digits after the exponent symbol".into());
+                    err = Some("missing digits after the exponent symbol".into());
                     err_range = Some(exponent_start..exponent_start + 1);
                 } else if (trailing_junk_start as usize) < token_text.len() {
                     err = Some("trailing junk after numeric literal".into());
@@ -346,7 +363,7 @@ impl<'a> Converter<'a> {
             squawk_lexer::LiteralKind::Str { terminated } => {
                 if !terminated {
                     err =
-                        Some("Missing trailing `'` symbol to terminate the string literal".into());
+                        Some("missing trailing `'` symbol to terminate the string literal".into());
                 } else if let Some(kind) = continuation {
                     self.validate_prefixed_string_content(token_text, 1, kind);
                     self.prefixed_string_continuation = Some(kind);
@@ -356,7 +373,7 @@ impl<'a> Converter<'a> {
             squawk_lexer::LiteralKind::NationalStr { terminated } => {
                 if !terminated {
                     err = Some(
-                        "Missing trailing `'` symbol to terminate the national character string literal"
+                        "missing trailing `'` symbol to terminate the national character string literal"
                             .into(),
                     );
                 }
@@ -365,7 +382,7 @@ impl<'a> Converter<'a> {
             squawk_lexer::LiteralKind::ByteStr { terminated } => {
                 if !terminated {
                     err = Some(
-                        "Missing trailing `'` symbol to terminate the hex bit string literal"
+                        "missing trailing `'` symbol to terminate the hex bit string literal"
                             .into(),
                     );
                 } else {
@@ -377,7 +394,7 @@ impl<'a> Converter<'a> {
             squawk_lexer::LiteralKind::BitStr { terminated } => {
                 if !terminated {
                     err = Some(
-                        "Missing trailing `'` symbol to terminate the bit string literal".into(),
+                        "missing trailing `'` symbol to terminate the bit string literal".into(),
                     );
                 } else {
                     self.validate_prefixed_string_content(token_text, 2, PrefixedStringKind::Bit);
@@ -388,14 +405,14 @@ impl<'a> Converter<'a> {
             squawk_lexer::LiteralKind::DollarQuotedString { terminated } => {
                 if !terminated {
                     // TODO: we could be fancier and say the ending string we're looking for
-                    err = Some("Unterminated dollar quoted string literal".into());
+                    err = Some("unterminated dollar quoted string literal".into());
                 }
                 SyntaxKind::DOLLAR_QUOTED_STRING
             }
             squawk_lexer::LiteralKind::UnicodeEscStr { terminated } => {
                 if !terminated {
                     err = Some(
-                        "Missing trailing `'` symbol to terminate the unicode escape string literal"
+                        "missing trailing `'` symbol to terminate the unicode escape string literal"
                             .into(),
                     );
                 }
@@ -405,7 +422,7 @@ impl<'a> Converter<'a> {
             squawk_lexer::LiteralKind::EscStr { terminated } => {
                 if !terminated {
                     err = Some(
-                        "Missing trailing `'` symbol to terminate the escape string literal".into(),
+                        "missing trailing `'` symbol to terminate the escape string literal".into(),
                     );
                 } else {
                     self.validate_prefixed_string_content(
@@ -441,6 +458,7 @@ impl<'a> Converter<'a> {
                     if !matches!(c, '0' | '1') {
                         self.push_content_error(
                             format!(r#""{c}" is not a valid binary digit"#),
+                            None,
                             inner_start + i,
                             c.len_utf8(),
                         );
@@ -452,6 +470,7 @@ impl<'a> Converter<'a> {
                     if !c.is_ascii_hexdigit() {
                         self.push_content_error(
                             format!(r#""{c}" is not a valid hexadecimal digit"#),
+                            None,
                             inner_start + i,
                             c.len_utf8(),
                         );
@@ -488,7 +507,8 @@ impl<'a> Converter<'a> {
                     }
                     if !got_all {
                         self.push_content_error(
-                            format!("Unicode escape requires {required} hex digits: {example}"),
+                            "incomplete unicode escape".to_owned(),
+                            Some(format!("expected {required} hex digits, like `{example}`")),
                             inner_start + escape_start,
                             end - escape_start,
                         );
@@ -498,12 +518,13 @@ impl<'a> Converter<'a> {
         }
     }
 
-    fn push_content_error(&mut self, msg: String, start: usize, len: usize) {
+    fn push_content_error(&mut self, msg: String, hint: Option<String>, start: usize, len: usize) {
         let token_start = u32::try_from(self.offset).unwrap();
         let start = token_start + u32::try_from(start).unwrap();
         self.res.error.push(LexError {
             msg: msg.into(),
             range: start..start + u32::try_from(len).unwrap(),
+            hint: hint.map(Cow::Owned),
         });
     }
 }
@@ -520,13 +541,17 @@ mod tests {
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
         let mut res = String::new();
 
-        for (range, msg) in lexed.errors() {
+        for error in lexed.errors() {
+            let range = error.range();
             let span = range.start as usize..range.end as usize;
-            let group = Level::ERROR.primary_title(msg).element(
+            let mut group = Level::ERROR.primary_title(error.message()).element(
                 Snippet::source(text)
                     .fold(true)
                     .annotation(AnnotationKind::Primary.span(span)),
             );
+            if let Some(hint) = error.hint() {
+                group = group.element(Level::HELP.with_name("hint").message(hint));
+            }
             res.push_str(&renderer.render(&[group]).clone());
             res.push('\n');
         }
@@ -537,7 +562,7 @@ mod tests {
     fn lex_errors(text: &str) -> Vec<(std::ops::Range<u32>, String)> {
         LexedStr::new(text)
             .errors()
-            .map(|(range, msg)| (range.clone(), msg.to_owned()))
+            .map(|error| (error.range().clone(), error.message().to_owned()))
             .collect()
     }
 
@@ -555,7 +580,7 @@ mod tests {
             ),
             (
                 15..19,
-                "Unicode escape requires 4 hex digits: \\uXXXX",
+                "incomplete unicode escape",
             ),
         ]
         "#);
@@ -583,7 +608,7 @@ mod tests {
         [
             (
                 7..10,
-                "Unicode escape requires 4 hex digits: \\uXXXX",
+                "incomplete unicode escape",
             ),
         ]
         "#);
@@ -601,7 +626,7 @@ mod tests {
     #[test]
     fn empty_int_error() {
         assert_snapshot!(lex("select 0x;"), @"
-        error: Missing digits after the integer base prefix
+        error: missing digits after the integer base prefix
           ╭▸ 
         1 │ select 0x;
           ╰╴       ━━
@@ -675,7 +700,7 @@ mod tests {
     #[test]
     fn empty_exponent_error() {
         assert_snapshot!(lex("select 1e;"), @"
-        error: Missing digits after the exponent symbol
+        error: missing digits after the exponent symbol
           ╭▸ 
         1 │ select 1e;
           ╰╴        ━
@@ -685,7 +710,7 @@ mod tests {
     #[test]
     fn unterminated_string_error() {
         assert_snapshot!(lex("select 'hello;"), @"
-        error: Missing trailing `'` symbol to terminate the string literal
+        error: missing trailing `'` symbol to terminate the string literal
           ╭▸ 
         1 │ select 'hello;
           ╰╴       ━━━━━━━
@@ -695,7 +720,7 @@ mod tests {
     #[test]
     fn unterminated_hex_bit_string_error() {
         assert_snapshot!(lex("select X'1F;"), @"
-        error: Missing trailing `'` symbol to terminate the hex bit string literal
+        error: missing trailing `'` symbol to terminate the hex bit string literal
           ╭▸ 
         1 │ select X'1F;
           ╰╴       ━━━━━
@@ -705,7 +730,7 @@ mod tests {
     #[test]
     fn unterminated_bit_string_error() {
         assert_snapshot!(lex("select B'101;"), @"
-        error: Missing trailing `'` symbol to terminate the bit string literal
+        error: missing trailing `'` symbol to terminate the bit string literal
           ╭▸ 
         1 │ select B'101;
           ╰╴       ━━━━━━
@@ -715,7 +740,7 @@ mod tests {
     #[test]
     fn unterminated_dollar_quoted_string_error() {
         assert_snapshot!(lex("select $tag$hello;"), @"
-        error: Unterminated dollar quoted string literal
+        error: unterminated dollar quoted string literal
           ╭▸ 
         1 │ select $tag$hello;
           ╰╴       ━━━━━━━━━━━
@@ -725,7 +750,7 @@ mod tests {
     #[test]
     fn unterminated_unicode_escape_string_error() {
         assert_snapshot!(lex("select U&'hello;"), @"
-        error: Missing trailing `'` symbol to terminate the unicode escape string literal
+        error: missing trailing `'` symbol to terminate the unicode escape string literal
           ╭▸ 
         1 │ select U&'hello;
           ╰╴       ━━━━━━━━━
@@ -735,7 +760,7 @@ mod tests {
     #[test]
     fn unterminated_escape_string_error() {
         assert_snapshot!(lex("select E'hello;"), @"
-        error: Missing trailing `'` symbol to terminate the escape string literal
+        error: missing trailing `'` symbol to terminate the escape string literal
           ╭▸ 
         1 │ select E'hello;
           ╰╴       ━━━━━━━━

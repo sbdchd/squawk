@@ -79,7 +79,7 @@ SOURCE_FILE@0..103
     SEMICOLON@101..102 ";"
   WHITESPACE@102..103 "\n"
 
-error[syntax-error]: Missing semicolon between statements
+error[syntax-error]: missing semicolon between statements
   ╭▸ 
 2 │   insert into t values (1)
   ╰╴                          ━

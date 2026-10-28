@@ -30,7 +30,7 @@ SOURCE_FILE@0..34
     SEMICOLON@32..33 ";"
   WHITESPACE@33..34 "\n"
 
-error[syntax-error]: Expected DEFAULT, string, identifier, number, or list of values
+error[syntax-error]: expected `default`, string, identifier, number, or list of values
   ╭▸ 
 1 │ set extra_float_digits = -1 = -1;
   ╰╴                       ━━━━━━━━━

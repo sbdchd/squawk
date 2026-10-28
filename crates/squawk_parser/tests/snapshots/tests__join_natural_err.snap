@@ -86,7 +86,7 @@ error[syntax-error]: expected join type
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
-error[syntax-error]: expected from_item
+error[syntax-error]: expected a table, subquery, or function call
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
@@ -94,19 +94,19 @@ error[syntax-error]: expected on clause
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
-error[syntax-error]: expected WHEN_KW
+error[syntax-error]: expected `when`
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
-error[syntax-error]: expected MATCHED, or NOT MATCHED
+error[syntax-error]: expected `matched` or `not matched`
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
-error[syntax-error]: expected THEN_KW
+error[syntax-error]: expected `then`
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
-error[syntax-error]: expected INSERT, UPDATE, DELETE, or DO NOTHING
+error[syntax-error]: expected `insert`, `update`, `delete`, or `do nothing`
   ╭▸ 
 2 │ merge into t using u natural;
   ╰╴                            ━
@@ -114,11 +114,11 @@ error[syntax-error]: expected join type
   ╭▸ 
 3 │ select * from a natural;
   ╰╴                       ━
-error[syntax-error]: expected from_item
+error[syntax-error]: expected a table, subquery, or function call
   ╭▸ 
 3 │ select * from a natural;
   ╰╴                       ━
-error[syntax-error]: expected from_item
+error[syntax-error]: expected a table, subquery, or function call
   ╭▸ 
 4 │ select * from a join natural;
   ╰╴                    ━
@@ -126,7 +126,7 @@ error[syntax-error]: expected join type
   ╭▸ 
 4 │ select * from a join natural;
   ╰╴                            ━
-error[syntax-error]: expected from_item
+error[syntax-error]: expected a table, subquery, or function call
   ╭▸ 
 4 │ select * from a join natural;
   ╰╴                            ━

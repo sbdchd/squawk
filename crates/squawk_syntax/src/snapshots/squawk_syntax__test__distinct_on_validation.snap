@@ -47,19 +47,19 @@ SOURCE_FILE@0..68
     SEMICOLON@66..67 ";"
   WHITESPACE@67..68 "\n"
 
-error[syntax-error]: Expected at least one expression in DISTINCT ON list.
+error[syntax-error]: expected at least one expression in `distinct on` list
   ╭▸ 
 1 │ select distinct on () 1;
   ╰╴                ━━━━━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one expression
   ╭▸ 
 1 │ select distinct on () 1;
   ╰╴                    ━
-error[syntax-error]: Expected a target after SELECT DISTINCT
+error[syntax-error]: expected a target after `select distinct`
   ╭▸ 
 3 │ select distinct on (a);
   ╰╴       ━━━━━━━━━━━━━━━
-error[syntax-error]: Expected a target after SELECT DISTINCT
+error[syntax-error]: expected a target after `select distinct`
   ╭▸ 
 5 │ select distinct;
   ╰╴       ━━━━━━━━

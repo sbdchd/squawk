@@ -23,9 +23,9 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
                 if in_transaction && let Some(concurrently) = create_index.concurrently_token() {
                     errors.push(Violation::for_range(
                             Rule::BanConcurrentIndexCreationInTransaction,
-                            "While regular index creation can happen inside a transaction, this is not allowed when the `CONCURRENTLY` option is used.".into(),
+                            "while regular index creation can happen inside a transaction, this is not allowed when the `concurrently` option is used".into(),
                             concurrently.text_range(),
-                        ).help("Build the index outside any transactions."));
+                        ).help("build the index outside any transactions"));
                 }
             }
             _ => (),

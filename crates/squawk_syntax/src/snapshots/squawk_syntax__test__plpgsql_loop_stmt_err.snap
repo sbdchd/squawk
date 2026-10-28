@@ -67,23 +67,23 @@ PLPGSQL@0..114
     END_KW@110..113 "end"
   WHITESPACE@113..114 "\n"
 
-error[syntax-error]: expected LOOP_KW
+error[syntax-error]: expected `loop`
   ╭▸ 
 5 │   end;
   ╰╴     ━
-error[syntax-error]: expected LOOP_KW
+error[syntax-error]: expected `loop`
   ╭▸ 
 8 │     null;
   ╰╴        ━
-error[syntax-error]: expected a statement, got SEMICOLON
+error[syntax-error]: expected a statement, found `;`
   ╭▸ 
 8 │     null;
   ╰╴        ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
    ╭▸ 
 15 │   exit when
    ╰╴      ━
-error[syntax-error]: expected a statement, got WHEN_KW
+error[syntax-error]: expected a statement, found `when`
    ╭▸ 
 15 │   exit when
    ╰╴       ━

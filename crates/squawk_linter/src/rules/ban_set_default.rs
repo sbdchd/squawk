@@ -11,7 +11,7 @@ pub(crate) fn ban_set_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanSetDefault,
-                "Setting a column default may silently change values written by existing clients."
+                "setting a column default may silently change values written by existing clients"
                     .into(),
                 node.syntax(),
             ));
@@ -23,7 +23,7 @@ pub(crate) fn ban_set_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanSetDefault,
-                "Setting a column default may silently change values written by existing clients."
+                "setting a column default may silently change values written by existing clients"
                     .into(),
                 node.syntax(),
             ));
@@ -37,7 +37,7 @@ pub(crate) fn ban_set_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             if let ast::AlterTableAction::AlterColumn(column) = action
                 && let Some(ast::AlterColumnOption::SetDefault(node)) = column.option()
             {
-                ctx.report(Violation::for_node(Rule::BanSetDefault, "Setting a column default may silently change values written by existing clients.".into(), node.syntax()));
+                ctx.report(Violation::for_node(Rule::BanSetDefault, "setting a column default may silently change values written by existing clients".into(), node.syntax()));
             }
         }
     }

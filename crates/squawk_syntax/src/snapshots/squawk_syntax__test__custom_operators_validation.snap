@@ -340,27 +340,27 @@ error[syntax-error]: missing comma
   ╭▸ 
 2 │ select *c;
   ╰╴        ━
-error[syntax-error]: Invalid operator.
+error[syntax-error]: invalid operator
   ╭▸ 
 3 │ select /d;
   ╰╴       ━
-error[syntax-error]: Invalid operator.
+error[syntax-error]: invalid operator
   ╭▸ 
 4 │ select <e;
   ╰╴       ━
-error[syntax-error]: Invalid operator.
+error[syntax-error]: invalid operator
   ╭▸ 
 5 │ select >f;
   ╰╴       ━
-error[syntax-error]: Invalid operator.
+error[syntax-error]: invalid operator
   ╭▸ 
 6 │ select =g;
   ╰╴       ━
-error[syntax-error]: Invalid operator.
+error[syntax-error]: invalid operator
   ╭▸ 
 7 │ select %l;
   ╰╴       ━
-error[syntax-error]: Invalid operator.
+error[syntax-error]: invalid operator
   ╭▸ 
 8 │ select ^m;
   ╰╴       ━

@@ -56,43 +56,43 @@ PLPGSQL@0..106
     END_KW@102..105 "end"
   WHITESPACE@105..106 "\n"
 
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 3 │   commit work;
   ╰╴        ━
-error[syntax-error]: expected command, found WORK_KW
+error[syntax-error]: expected command, found `work`
   ╭▸ 
 3 │   commit work;
   ╰╴         ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 4 │   commit prepared 'x';
   ╰╴        ━
-error[syntax-error]: expected command, found PREPARED_KW
+error[syntax-error]: expected command, found `prepared`
   ╭▸ 
 4 │   commit prepared 'x';
   ╰╴         ━
-error[syntax-error]: expected SEMICOLON, got STRING
+error[syntax-error]: expected `;`, found string literal
   ╭▸ 
 4 │   commit prepared 'x';
   ╰╴                  ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 5 │   rollback to savepoint s;
   ╰╴          ━
-error[syntax-error]: expected a statement, got TO_KW
+error[syntax-error]: expected a statement, found `to`
   ╭▸ 
 5 │   rollback to savepoint s;
   ╰╴           ━
-error[syntax-error]: expected CHAIN_KW
+error[syntax-error]: expected `chain`
   ╭▸ 
 6 │   commit and;
   ╰╴            ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 7 │   commit chain;
   ╰╴        ━
-error[syntax-error]: expected command, found CHAIN_KW
+error[syntax-error]: expected command, found `chain`
   ╭▸ 
 7 │   commit chain;
   ╰╴         ━

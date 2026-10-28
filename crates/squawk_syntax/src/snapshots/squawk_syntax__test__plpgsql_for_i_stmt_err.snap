@@ -273,15 +273,15 @@ PLPGSQL@0..83
     END_KW@79..82 "end"
   WHITESPACE@82..83 "\n"
 
-error[syntax-error]: cannot specify REVERSE in query FOR loop
+error[syntax-error]: cannot specify `reverse` in query `for` loop
   ╭▸ 
 4 │   for i in reverse 1 loop
   ╰╴           ━━━━━━━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
   ╭▸ 
 4 │   for i in reverse 1 loop
   ╰╴                   ━
-error[syntax-error]: expected a loop variable, got IN_KW
+error[syntax-error]: expected a loop variable, found `in`
    ╭▸ 
 13 │   for in 1..2 loop
    ╰╴     ━
@@ -289,11 +289,11 @@ error[syntax-error]: expected an expression
    ╭▸ 
 22 │   for i in 1.. loop
    ╰╴              ━
-error[syntax-error]: expected LOOP_KW
+error[syntax-error]: expected `loop`
    ╭▸ 
 32 │     null;
    ╰╴        ━
-error[syntax-error]: expected a statement, got SEMICOLON
+error[syntax-error]: expected a statement, found `;`
    ╭▸ 
 32 │     null;
    ╰╴        ━
@@ -301,7 +301,7 @@ error[syntax-error]: expected an expression
    ╭▸ 
 40 │   for i in 1..2 by loop
    ╰╴                  ━
-error[syntax-error]: integer FOR loop takes one variable
+error[syntax-error]: integer `for` loop takes one variable
    ╭▸ 
 52 │   for i, j in 1..2 loop
    ╰╴         ━

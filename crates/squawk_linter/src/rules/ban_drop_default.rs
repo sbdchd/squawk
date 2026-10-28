@@ -12,7 +12,7 @@ pub(crate) fn ban_drop_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanDropDefault,
-                "Dropping a column default may break existing clients.".into(),
+                "dropping a column default may break existing clients".into(),
                 node.syntax(),
             ));
         }
@@ -23,7 +23,7 @@ pub(crate) fn ban_drop_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanDropDefault,
-                "Dropping a column default may break existing clients.".into(),
+                "dropping a column default may break existing clients".into(),
                 node.syntax(),
             ));
         }
@@ -39,7 +39,7 @@ pub(crate) fn ban_drop_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             {
                 ctx.report(Violation::for_node(
                     Rule::BanDropDefault,
-                    "Dropping a column default may break existing clients.".into(),
+                    "dropping a column default may break existing clients".into(),
                     drop_default.syntax(),
                 ));
             }

@@ -2,9 +2,9 @@
 source: crates/squawk_linter/src/rules/ban_concurrent_index_creation_in_transaction.rs
 expression: "lint_errors(sql, Rule::BanConcurrentIndexCreationInTransaction)"
 ---
-warning[ban-concurrent-index-creation-in-transaction]: While regular index creation can happen inside a transaction, this is not allowed when the `CONCURRENTLY` option is used.
+warning[ban-concurrent-index-creation-in-transaction]: while regular index creation can happen inside a transaction, this is not allowed when the `concurrently` option is used
   ╭▸ 
 4 │         CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   │                      ━━━━━━━━━━━━
   │
-  ╰ help: Build the index outside any transactions.
+  ╰ help: build the index outside any transactions

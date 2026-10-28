@@ -707,47 +707,47 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected operator, got AND_KW
+error[syntax-error]: expected operator, found `and`
   ╭▸ 
 2 │ select 1 operator(and) 2;
   ╰╴                  ━
-error[syntax-error]: expected operator, got OR_KW
+error[syntax-error]: expected operator, found `or`
   ╭▸ 
 3 │ select 1 operator(or) 2;
   ╰╴                  ━
-error[syntax-error]: expected operator, got IN_KW
+error[syntax-error]: expected operator, found `in`
   ╭▸ 
 4 │ select 1 operator(in) 2;
   ╰╴                  ━
-error[syntax-error]: expected operator, got AND_KW
+error[syntax-error]: expected operator, found `and`
   ╭▸ 
 5 │ create operator and (leftarg = int, rightarg = int, function = int4pl);
   ╰╴                ━
-error[syntax-error]: expected operator, got AND_KW
+error[syntax-error]: expected operator, found `and`
   ╭▸ 
 6 │ drop operator and (int, int);
   ╰╴              ━
-error[syntax-error]: expected operator, got COLON
+error[syntax-error]: expected operator, found `:`
   ╭▸ 
 9 │ select 1 operator(::) 2;
   ╰╴                  ━
-error[syntax-error]: expected operator, got COLON
+error[syntax-error]: expected operator, found `:`
    ╭▸ 
 10 │ select 1 operator(:=) 2;
    ╰╴                  ━
-error[syntax-error]: expected operator, got EQ
+error[syntax-error]: expected operator, found `=`
    ╭▸ 
 11 │ select 1 operator(=>) 2;
    ╰╴                  ━
-error[syntax-error]: expected operator, got EQ
+error[syntax-error]: expected operator, found `=`
    ╭▸ 
 12 │ create operator => (rightarg = int8, function = factorial);
    ╰╴                ━
-error[syntax-error]: expected operator, got COLON
+error[syntax-error]: expected operator, found `:`
    ╭▸ 
 13 │ create operator class c for type int using btree as operator 1 ::;
    ╰╴                                                               ━
-error[syntax-error]: expected attribute value, got COLON
+error[syntax-error]: expected attribute value, found `:`
    ╭▸ 
 14 │ create operator === (leftarg = int, rightarg = int, commutator = ::);
    ╰╴                                                                 ━
@@ -771,15 +771,15 @@ error[syntax-error]: expected name
    ╭▸ 
 21 │ create operator binary.+ (leftarg = int, rightarg = int, function = int4pl);
    ╰╴                ━
-error[syntax-error]: expected operator, got AND_KW
+error[syntax-error]: expected operator, found `and`
    ╭▸ 
 24 │ select 1 from t order by a using and;
    ╰╴                                 ━
-error[syntax-error]: qualified operator requires OPERATOR(...)
+error[syntax-error]: qualified operator requires `operator(...)`
    ╭▸ 
 25 │ select 1 from t order by a using pg_catalog.<;
    ╰╴                                            ━
-error[syntax-error]: expected operator, got AND_KW
+error[syntax-error]: expected operator, found `and`
    ╭▸ 
 28 │ create table t (c int, exclude using gist (c with and));
    ╰╴                                                  ━

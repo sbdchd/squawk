@@ -5,7 +5,7 @@ title: ban-drop-trigger
 
 ## problem
 
-Dropping a trigger may silently change behaviour for existing clients. For example, updates may stop setting `updated_at` or writing audit rows. This rule is opt-in.
+Dropping a trigger may silently change behavior for existing clients. For example, updates may stop setting `updated_at` or writing audit rows. This rule is opt-in.
 
 ## solution
 

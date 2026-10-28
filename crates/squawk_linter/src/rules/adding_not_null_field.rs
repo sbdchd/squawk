@@ -137,11 +137,11 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         ctx.report(
                             Violation::for_node(
                                 Rule::AddingNotNullableField,
-                                "Setting a column `NOT NULL` blocks reads while the table is scanned."
+                                "setting a column `not null` blocks reads while the table is scanned"
                                     .into(),
                                 option.syntax(),
                             )
-                            .help("Make the field nullable and use a `CHECK` constraint instead."),
+                            .help("make the field nullable and use a `check` constraint instead"),
                         );
                     }
                     _ => (),

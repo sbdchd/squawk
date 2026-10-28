@@ -13,7 +13,7 @@ pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanDropNotNull,
-                "Dropping a `NOT NULL` constraint may break existing clients.".into(),
+                "dropping a `not null` constraint may break existing clients".into(),
                 node.syntax(),
             ));
         }
@@ -29,7 +29,7 @@ pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             {
                 ctx.report(Violation::for_node(
                     Rule::BanDropNotNull,
-                    "Dropping a `NOT NULL` constraint may break existing clients.".into(),
+                    "dropping a `not null` constraint may break existing clients".into(),
                     drop_not_null.syntax(),
                 ));
             }

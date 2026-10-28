@@ -56,19 +56,19 @@ SOURCE_FILE@0..132
     SEMICOLON@130..131 ";"
   WHITESPACE@131..132 "\n"
 
-error[syntax-error]: SQL is not a valid language for DO statements.
+error[syntax-error]: `sql` is not a valid language for `do` statements
   ╭▸ 
 1 │ do $$ select 1 $$ language sql;
   ╰╴                           ━━━
-error[syntax-error]: SQL is not a valid language for DO statements.
+error[syntax-error]: `sql` is not a valid language for `do` statements
   ╭▸ 
 2 │ do language SQL $$ select 1 $$;
   ╰╴            ━━━
-error[syntax-error]: SQL is not a valid language for DO statements.
+error[syntax-error]: `sql` is not a valid language for `do` statements
   ╭▸ 
 3 │ do language "sql" $$ select 1 $$;
   ╰╴            ━━━━━
-error[syntax-error]: SQL is not a valid language for DO statements.
+error[syntax-error]: `sql` is not a valid language for `do` statements
   ╭▸ 
 4 │ do language 'sql' $$ select 1 $$;
   ╰╴            ━━━━━

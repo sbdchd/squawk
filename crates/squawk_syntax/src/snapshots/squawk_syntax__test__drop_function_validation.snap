@@ -34,7 +34,7 @@ SOURCE_FILE@0..42
     SEMICOLON@40..41 ";"
   WHITESPACE@41..42 "\n"
 
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 1 │ drop function f(value integer default 1);
   ╰╴                              ━━━━━━━━━

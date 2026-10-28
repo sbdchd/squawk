@@ -211,27 +211,27 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected command, found LANGUAGE_KW
+error[syntax-error]: expected command, found `language`
   ╭▸ 
 2 │ create function f() returns int return 1 language sql;
   ╰╴                                         ━
-error[syntax-error]: expected command, found SQL_KW
+error[syntax-error]: expected command, found `sql`
   ╭▸ 
 2 │ create function f() returns int return 1 language sql;
   ╰╴                                                  ━
-error[syntax-error]: expected command, found LANGUAGE_KW
+error[syntax-error]: expected command, found `language`
   ╭▸ 
 3 │ create function f() returns int begin atomic select 1; end language sql;
   ╰╴                                                           ━
-error[syntax-error]: expected command, found SQL_KW
+error[syntax-error]: expected command, found `sql`
   ╭▸ 
 3 │ create function f() returns int begin atomic select 1; end language sql;
   ╰╴                                                                    ━
-error[syntax-error]: expected command, found RETURN_KW
+error[syntax-error]: expected command, found `return`
   ╭▸ 
 6 │ create function f() returns int language sql return 1 return 2;
   ╰╴                                                      ━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
   ╭▸ 
 6 │ create function f() returns int language sql return 1 return 2;
   ╰╴                                                             ━
@@ -239,11 +239,11 @@ error[syntax-error]: expected function option
   ╭▸ 
 9 │ alter function f() return 1;
   ╰╴                  ━
-error[syntax-error]: expected command, found RETURN_KW
+error[syntax-error]: expected command, found `return`
   ╭▸ 
 9 │ alter function f() return 1;
   ╰╴                   ━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
   ╭▸ 
 9 │ alter function f() return 1;
   ╰╴                          ━
@@ -251,7 +251,7 @@ error[syntax-error]: expected function option
    ╭▸ 
 10 │ alter procedure p() begin atomic select 1; end;
    ╰╴                   ━
-error[syntax-error]: expected command, found ATOMIC_KW
+error[syntax-error]: expected command, found `atomic`
    ╭▸ 
 10 │ alter procedure p() begin atomic select 1; end;
    ╰╴                          ━
@@ -259,11 +259,11 @@ error[syntax-error]: expected function option
    ╭▸ 
 11 │ alter routine r() return 1;
    ╰╴                 ━
-error[syntax-error]: expected command, found RETURN_KW
+error[syntax-error]: expected command, found `return`
    ╭▸ 
 11 │ alter routine r() return 1;
    ╰╴                  ━
-error[syntax-error]: expected command, found INT_NUMBER
+error[syntax-error]: expected command, found integer literal
    ╭▸ 
 11 │ alter routine r() return 1;
    ╰╴                         ━

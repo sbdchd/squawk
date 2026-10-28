@@ -75,15 +75,15 @@ SOURCE_FILE
       COMMA ","
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected FROM item after comma
+error[syntax-error]: expected `from` item after comma
   ╭▸ 
 1 │ delete from x using f, where true;
   ╰╴                      ━
-error[syntax-error]: expected FROM item after comma
+error[syntax-error]: expected `from` item after comma
   ╭▸ 
 3 │ delete from x using f,;
   ╰╴                      ━
-error[syntax-error]: expected FROM item after comma
+error[syntax-error]: expected `from` item after comma
   ╭▸ 
 5 │ delete from x using f,
   ╰╴                      ━

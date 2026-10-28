@@ -2,9 +2,9 @@
 source: crates/squawk_linter/src/rules/adding_required_field.rs
 expression: "lint_errors(sql, Rule::AddingRequiredField)"
 ---
-warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+warning[adding-required-field]: adding a new column that is `not null` and has no default value to an existing table effectively makes it required
   ╭▸ 
 2 │ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
   │                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
-  ╰ help: Make the field nullable or add a non-VOLATILE DEFAULT
+  ╰ help: make the field nullable or add a non-volatile default

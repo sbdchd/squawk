@@ -9,7 +9,7 @@ pub(crate) fn ban_drop_index(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::DropIndex(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropIndex,
-                "Dropping an index may remove a guarantee or change query plans for existing clients.".into(),
+                "dropping an index may remove a guarantee or change query plans for existing clients".into(),
                 node.syntax(),
             ));
         }

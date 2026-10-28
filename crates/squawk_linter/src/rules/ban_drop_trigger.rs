@@ -10,7 +10,7 @@ pub(crate) fn ban_drop_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::DropTrigger(node) = stmt {
             ctx.report(Violation::for_node(
                 Rule::BanDropTrigger,
-                "Dropping a trigger may silently change behaviour for existing clients.".into(),
+                "dropping a trigger may silently change behavior for existing clients".into(),
                 node.syntax(),
             ));
         }

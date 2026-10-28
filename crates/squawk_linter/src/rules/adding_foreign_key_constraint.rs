@@ -6,8 +6,8 @@ use squawk_syntax::{
 use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let message = "Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.";
-    let help = "Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.";
+    let message = "adding a foreign key constraint requires a table scan and a `share row exclusive` lock on both tables, which blocks writes to each table";
+    let help = "add `not valid` to the constraint in one transaction and then `validate` the constraint in a separate transaction";
     let file = parse.tree();
     let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     // TODO: use match_ast! like in #api_walkthrough
@@ -93,12 +93,12 @@ create table t (id int);
 commit;
 alter table t add foreign key (id) references other_t (id);";
         assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint), @"
-        warning[adding-foreign-key-constraint]: Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.
+        warning[adding-foreign-key-constraint]: adding a foreign key constraint requires a table scan and a `share row exclusive` lock on both tables, which blocks writes to each table
           ╭▸ 
         4 │ alter table t add foreign key (id) references other_t (id);
           │                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.
+          ╰ help: add `not valid` to the constraint in one transaction and then `validate` the constraint in a separate transaction
         ");
     }
 
@@ -109,12 +109,12 @@ create table new.t as select 1 as id;
 alter table existing.t add foreign key (id) references other_t (id);
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint), @"
-        warning[adding-foreign-key-constraint]: Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.
+        warning[adding-foreign-key-constraint]: adding a foreign key constraint requires a table scan and a `share row exclusive` lock on both tables, which blocks writes to each table
           ╭▸ 
         3 │ alter table existing.t add foreign key (id) references other_t (id);
           │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.
+          ╰ help: add `not valid` to the constraint in one transaction and then `validate` the constraint in a separate transaction
         ");
     }
 

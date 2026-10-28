@@ -44,11 +44,11 @@ pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, parse: &Parse<SourceF
                 ctx.report(
                     Violation::for_node(
                         Rule::RequireConcurrentReindex,
-                        "Reindexing a table or index without `concurrently` blocks reads and writes."
+                        "reindexing a table or index without `concurrently` blocks reads and writes"
                             .into(),
                         reindex.syntax(),
                     )
-                    .help("Use `concurrently` to avoid blocking reads and writes.")
+                    .help("use `concurrently` to avoid blocking reads and writes")
                     .fix(fix),
                 );
             }
@@ -74,12 +74,12 @@ mod test {
     fn reindex_table_no_concurrently_err() {
         let sql = "REINDEX TABLE foo;";
         assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentReindex), @"
-        warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
+        warning[require-concurrent-reindex]: reindexing a table or index without `concurrently` blocks reads and writes
           ╭▸ 
         1 │ REINDEX TABLE foo;
           │ ━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `concurrently` to avoid blocking reads and writes.
+          ├ help: use `concurrently` to avoid blocking reads and writes
           ╭╴
         1 │ REINDEX TABLE concurrently foo;
           ╰╴              ++++++++++++
@@ -90,12 +90,12 @@ mod test {
     fn reindex_index_no_concurrently_err() {
         let sql = "REINDEX INDEX foo;";
         assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentReindex), @"
-        warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
+        warning[require-concurrent-reindex]: reindexing a table or index without `concurrently` blocks reads and writes
           ╭▸ 
         1 │ REINDEX INDEX foo;
           │ ━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `concurrently` to avoid blocking reads and writes.
+          ├ help: use `concurrently` to avoid blocking reads and writes
           ╭╴
         1 │ REINDEX INDEX concurrently foo;
           ╰╴              ++++++++++++
@@ -106,12 +106,12 @@ mod test {
     fn reindex_schema_no_concurrently_err() {
         let sql = "REINDEX SCHEMA foo;";
         assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentReindex), @"
-        warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
+        warning[require-concurrent-reindex]: reindexing a table or index without `concurrently` blocks reads and writes
           ╭▸ 
         1 │ REINDEX SCHEMA foo;
           │ ━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `concurrently` to avoid blocking reads and writes.
+          ├ help: use `concurrently` to avoid blocking reads and writes
           ╭╴
         1 │ REINDEX SCHEMA concurrently foo;
           ╰╴               ++++++++++++
@@ -122,12 +122,12 @@ mod test {
     fn reindex_database_no_concurrently_err() {
         let sql = "REINDEX DATABASE foo;";
         assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentReindex), @"
-        warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
+        warning[require-concurrent-reindex]: reindexing a table or index without `concurrently` blocks reads and writes
           ╭▸ 
         1 │ REINDEX DATABASE foo;
           │ ━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `concurrently` to avoid blocking reads and writes.
+          ├ help: use `concurrently` to avoid blocking reads and writes
           ╭╴
         1 │ REINDEX DATABASE concurrently foo;
           ╰╴                 ++++++++++++

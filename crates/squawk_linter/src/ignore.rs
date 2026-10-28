@@ -124,7 +124,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
 
                             ctx.report(Violation::for_range(
                                 Rule::UnusedIgnore,
-                                format!("unknown name {trimmed}").into(),
+                                format!("unknown name `{trimmed}`").into(),
                                 range,
                             ));
                         }
@@ -307,10 +307,13 @@ create table users (
         [
             Violation {
                 code: RequireLockTimeout,
-                message: "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
+                message: "missing `set lock_timeout` before potentially slow `access exclusive` lock operations",
                 text_range: 0..32,
+                note: Some(
+                    "statement requires: `access exclusive` lock; blocking: reads, writes, schema changes",
+                ),
                 help: Some(
-                    "Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.",
+                    "configure a `lock_timeout` before this statement",
                 ),
                 fix: Some(
                     Fix {
@@ -328,10 +331,11 @@ create table users (
             },
             Violation {
                 code: RequireStatementTimeout,
-                message: "Missing `set statement_timeout` before potentially slow operations",
+                message: "missing `set statement_timeout` before potentially slow operations",
                 text_range: 0..32,
+                note: None,
                 help: Some(
-                    "Configure a `statement_timeout` before this statement",
+                    "configure a `statement_timeout` before this statement",
                 ),
                 fix: Some(
                     Fix {
@@ -349,8 +353,9 @@ create table users (
             },
             Violation {
                 code: PreferRobustStmts,
-                message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+                message: "missing `if not exists`, the migration can't be rerun if it fails part way through",
                 text_range: 14..31,
+                note: None,
                 help: None,
                 fix: Some(
                     Fix {
@@ -368,8 +373,9 @@ create table users (
             },
             Violation {
                 code: BanCharField,
-                message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
+                message: "using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`",
                 text_range: 27..31,
+                note: None,
                 help: None,
                 fix: Some(
                     Fix {
@@ -595,31 +601,31 @@ alter table t2 drop column c2 cascade;
         [
             (
                 UnusedIgnore,
-                "unknown name ban-ban-ban-drop-column ignore-something hmm",
+                "unknown name `ban-ban-ban-drop-column ignore-something hmm`",
             ),
             (
                 RequireLockTimeout,
-                "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
+                "missing `set lock_timeout` before potentially slow `access exclusive` lock operations",
             ),
             (
                 RequireStatementTimeout,
-                "Missing `set statement_timeout` before potentially slow operations",
+                "missing `set statement_timeout` before potentially slow operations",
             ),
             (
                 BanDropColumn,
-                "Dropping a column may break existing clients.",
+                "dropping a column may break existing clients",
             ),
             (
                 PreferRobustStmts,
-                "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
+                "missing `if exists`, the migration can't be rerun if it fails part way through",
             ),
             (
                 BanDropColumn,
-                "Dropping a column may break existing clients.",
+                "dropping a column may break existing clients",
             ),
             (
                 PreferRobustStmts,
-                "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
+                "missing `if exists`, the migration can't be rerun if it fails part way through",
             ),
         ]
         "#);

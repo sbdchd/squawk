@@ -94,14 +94,14 @@ enum LockKind {
 impl fmt::Display for LockKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            LockKind::AccessExclusive => f.write_str("ACCESS EXCLUSIVE"),
-            LockKind::AccessShare => f.write_str("ACCESS SHARE"),
-            LockKind::Exclusive => f.write_str("EXCLUSIVE"),
-            LockKind::RowExclusive => f.write_str("ROW EXCLUSIVE"),
-            LockKind::RowShare => f.write_str("ROW SHARE"),
-            LockKind::Share => f.write_str("SHARE"),
-            LockKind::ShareRowExclusive => f.write_str("SHARE ROW EXCLUSIVE"),
-            LockKind::ShareUpdateExclusive => f.write_str("SHARE UPDATE EXCLUSIVE"),
+            LockKind::AccessExclusive => f.write_str("`access exclusive`"),
+            LockKind::AccessShare => f.write_str("`access share`"),
+            LockKind::Exclusive => f.write_str("`exclusive`"),
+            LockKind::RowExclusive => f.write_str("`row exclusive`"),
+            LockKind::RowShare => f.write_str("`row share`"),
+            LockKind::Share => f.write_str("`share`"),
+            LockKind::ShareRowExclusive => f.write_str("`share row exclusive`"),
+            LockKind::ShareUpdateExclusive => f.write_str("`share update exclusive`"),
             LockKind::Unknown => Ok(()),
         }
     }
@@ -275,9 +275,9 @@ impl LockKind {
 
     fn violation_message(self) -> Cow<'static, str> {
         if self == LockKind::Unknown {
-            "Missing `set lock_timeout` before potentially slow operations".into()
+            "missing `set lock_timeout` before potentially slow operations".into()
         } else {
-            format!("Missing `set lock_timeout` before potentially slow {self} lock operations")
+            format!("missing `set lock_timeout` before potentially slow {self} lock operations")
                 .into()
         }
     }
@@ -298,17 +298,15 @@ impl LockKind {
         }
     }
 
-    fn help(self) -> Cow<'static, str> {
-        let help = "Configure a `lock_timeout` before this statement.";
-        let Some(impact) = self.impact() else {
-            return help.into();
-        };
-
+    fn note(self) -> Option<String> {
+        let impact = self.impact()?;
         let blocked = impact.blocked();
         if blocked.is_empty() {
-            format!("{help} Statement requires: {self} lock.").into()
+            Some(format!("statement requires: {self} lock"))
         } else {
-            format!("{help} Statement requires: {self} lock; blocking: {blocked}.").into()
+            Some(format!(
+                "statement requires: {self} lock; blocking: {blocked}"
+            ))
         }
     }
 }
@@ -353,14 +351,19 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
             _ if analyze::possibly_slow_stmt(&stmt) => {
                 let lock = LockKind::from(&stmt);
                 if lock_timeout == ReportOnce::Missing {
+                    let violation = Violation::for_node(
+                        Rule::RequireLockTimeout,
+                        lock.violation_message(),
+                        stmt.syntax(),
+                    );
+                    let violation = match lock.note() {
+                        Some(note) => violation.note(note),
+                        None => violation,
+                    };
                     ctx.report(
-                        Violation::for_node(
-                            Rule::RequireLockTimeout,
-                            lock.violation_message(),
-                            stmt.syntax(),
-                        )
-                        .help(lock.help())
-                        .fix(create_lock_timeout_fix(&file)),
+                        violation
+                            .help("configure a `lock_timeout` before this statement")
+                            .fix(create_lock_timeout_fix(&file)),
                     );
                     lock_timeout = ReportOnce::Reported;
                 }
@@ -368,11 +371,11 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                     ctx.report(
                         Violation::for_node(
                             Rule::RequireStatementTimeout,
-                            "Missing `set statement_timeout` before potentially slow operations"
+                            "missing `set statement_timeout` before potentially slow operations"
                                 .into(),
                             stmt.syntax(),
                         )
-                        .help("Configure a `statement_timeout` before this statement")
+                        .help("configure a `statement_timeout` before this statement")
                         .fix(create_stmt_timeout_fix(&file)),
                     );
                     stmt_timeout = ReportOnce::Reported;
@@ -610,21 +613,22 @@ mod test {
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access exclusive` lock operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: `access exclusive` lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -638,12 +642,13 @@ SET statement_timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access exclusive` lock operations
           ╭▸ 
         3 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: `access exclusive` lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -657,12 +662,12 @@ SET lock_timeout = '1s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         3 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -675,12 +680,13 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireLockTimeout), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access exclusive` lock operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: `access exclusive` lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
@@ -693,12 +699,12 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireStatementTimeout), @"
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -759,21 +765,22 @@ SET foo.statement_timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access exclusive` lock operations
           ╭▸ 
         4 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: `access exclusive` lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         4 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -787,21 +794,22 @@ SET lock_timeout = '1s';
 SET statement_timeout = '5s';
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access exclusive` lock operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: `access exclusive` lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -814,21 +822,21 @@ SET statement_timeout = '5s';
 CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow operations
           ╭▸ 
         2 │ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement.
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -844,21 +852,22 @@ COMMENT ON COLUMN t.c IS 'an opaque id';
         "#;
         let out = lint_errors(sql, Rule::RequireTimeoutSettings);
         assert_snapshot!(out, @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow SHARE UPDATE EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `share update exclusive` lock operations
           ╭▸ 
         2 │ COMMENT ON COLUMN t.c IS 'an opaque id';
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: SHARE UPDATE EXCLUSIVE lock; blocking: schema changes.
+          ├ note: statement requires: `share update exclusive` lock; blocking: schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ COMMENT ON COLUMN t.c IS 'an opaque id';
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -871,21 +880,22 @@ COMMENT ON COLUMN t.c IS 'an opaque id';
 REINDEX (CONCURRENTLY false) INDEX idx;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access exclusive` lock operations
           ╭▸ 
         2 │ REINDEX (CONCURRENTLY false) INDEX idx;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
+          ├ note: statement requires: `access exclusive` lock; blocking: reads, writes, schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ REINDEX (CONCURRENTLY false) INDEX idx;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -898,21 +908,22 @@ REINDEX (CONCURRENTLY false) INDEX idx;
 VACUUM (FULL false) t;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow SHARE UPDATE EXCLUSIVE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `share update exclusive` lock operations
           ╭▸ 
         2 │ VACUUM (FULL false) t;
           │ ━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: SHARE UPDATE EXCLUSIVE lock; blocking: schema changes.
+          ├ note: statement requires: `share update exclusive` lock; blocking: schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ VACUUM (FULL false) t;
           │ ━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴
@@ -925,21 +936,22 @@ VACUUM (FULL false) t;
 LOCK TABLE t IN ACCESS SHARE MODE;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
-        warning[require-lock-timeout]: Missing `set lock_timeout` before potentially slow ACCESS SHARE lock operations
+        warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access share` lock operations
           ╭▸ 
         2 │ LOCK TABLE t IN ACCESS SHARE MODE;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS SHARE lock; blocking: schema changes.
+          ├ note: statement requires: `access share` lock; blocking: schema changes
+          ├ help: configure a `lock_timeout` before this statement
           ╭╴
         2 + set lock_timeout = '1s';
           ╰╴
-        warning[require-statement-timeout]: Missing `set statement_timeout` before potentially slow operations
+        warning[require-statement-timeout]: missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ LOCK TABLE t IN ACCESS SHARE MODE;
           │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Configure a `statement_timeout` before this statement
+          ├ help: configure a `statement_timeout` before this statement
           ╭╴
         2 + set statement_timeout = '5s';
           ╰╴

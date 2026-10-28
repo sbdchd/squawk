@@ -8,33 +8,32 @@ pub(crate) fn ban_replace_view_function(ctx: &mut Linter, parse: &Parse<SourceFi
     for stmt in parse.tree().stmts() {
         match stmt {
             ast::Stmt::CreateView(node) if node.or_replace().is_some() => {
-                ctx.report(Violation::for_node(Rule::BanReplaceViewFunction, "Replacing a view, function, or procedure may silently change behaviour for existing clients.".into(), node.syntax()));
+                ctx.report(Violation::for_node(Rule::BanReplaceViewFunction, "replacing a view, function, or procedure may silently change behavior for existing clients".into(), node.syntax()));
             }
             ast::Stmt::CreateFunction(node) if node.or_replace().is_some() => {
-                ctx.report(Violation::for_node(Rule::BanReplaceViewFunction, "Replacing a view, function, or procedure may silently change behaviour for existing clients.".into(), node.syntax()));
+                ctx.report(Violation::for_node(Rule::BanReplaceViewFunction, "replacing a view, function, or procedure may silently change behavior for existing clients".into(), node.syntax()));
             }
             ast::Stmt::CreateProcedure(node) if node.or_replace().is_some() => {
-                ctx.report(Violation::for_node(Rule::BanReplaceViewFunction, "Replacing a view, function, or procedure may silently change behaviour for existing clients.".into(), node.syntax()));
+                ctx.report(Violation::for_node(Rule::BanReplaceViewFunction, "replacing a view, function, or procedure may silently change behavior for existing clients".into(), node.syntax()));
             }
             ast::Stmt::CreateTrigger(node) if node.or_replace().is_some() => {
                 ctx.report(Violation::for_node(
                     Rule::BanReplaceViewFunction,
-                    "Replacing a trigger may silently change behaviour for existing clients."
-                        .into(),
+                    "replacing a trigger may silently change behavior for existing clients".into(),
                     node.syntax(),
                 ));
             }
             ast::Stmt::CreateRule(node) if node.or_replace().is_some() => {
                 ctx.report(Violation::for_node(
                     Rule::BanReplaceViewFunction,
-                    "Replacing a rule may silently change behaviour for existing clients.".into(),
+                    "replacing a rule may silently change behavior for existing clients".into(),
                     node.syntax(),
                 ));
             }
             ast::Stmt::CreateAggregate(node) if node.or_replace().is_some() => {
                 ctx.report(Violation::for_node(
                     Rule::BanReplaceViewFunction,
-                    "Replacing an aggregate may silently change behaviour for existing clients."
+                    "replacing an aggregate may silently change behavior for existing clients"
                         .into(),
                     node.syntax(),
                 ));

@@ -362,31 +362,31 @@ SOURCE_FILE@0..389
     SEMICOLON@387..388 ";"
   WHITESPACE@388..389 "\n"
 
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
   ╭▸ 
 4 │ select * from (values (0,9998)) v(id,x), (lateral (select 1)) ss;
   ╰╴                                         ━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
   ╭▸ 
 5 │ select * from (foo);
   ╰╴              ━━━━━
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
   ╭▸ 
 6 │ select * from (foo *);
   ╰╴              ━━━━━━━
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
   ╭▸ 
 7 │ select * from (generate_series(1, 2));
   ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
   ╭▸ 
 8 │ select * from (lateral generate_series(1, 2));
   ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
   ╭▸ 
 9 │ select * from (rows from (generate_series(1, 2)));
   ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Parentheses are not allowed
+error[syntax-error]: parentheses are not allowed
    ╭▸ 
 10 │ select * from (only (foo));
    ╰╴              ━━━━━━━━━━━━

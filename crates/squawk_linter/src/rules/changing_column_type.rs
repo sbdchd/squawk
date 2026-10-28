@@ -18,7 +18,7 @@ pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) 
                         if let ast::AlterTypeAttributeAction::AlterAttribute(node) = action {
                             ctx.report(Violation::for_node(
                                 Rule::ChangingColumnType,
-                                "Changing an attribute type may break existing clients.".into(),
+                                "changing an attribute type may break existing clients".into(),
                                 node.syntax(),
                             ));
                         }
@@ -34,9 +34,10 @@ pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) 
             {
                 ctx.report(Violation::for_node(
                         Rule::ChangingColumnType,
-                        "Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.".into(),
+                        "changing a column type rewrites the table under an `access exclusive` lock".into(),
                         set_type.syntax(),
-                    ));
+                    )
+                    .note("the lock blocks reads and writes while the table is rewritten, and the new type may break other clients reading from the table"));
             }
         }
     }

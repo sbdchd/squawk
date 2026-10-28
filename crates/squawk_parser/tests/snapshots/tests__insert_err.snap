@@ -224,27 +224,27 @@ SOURCE_FILE
       VALUES_KW "values"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 2 │ insert into t (a, b c)
   ╰╴                   ━
-error[syntax-error]: missing column
+error[syntax-error]: expected a column, found `,`
   ╭▸ 
 7 │ insert into t (a,,c,)
   ╰╴                 ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
   ╭▸ 
 7 │ insert into t (a,,c,)
   ╰╴                   ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 13 │   values (4, 5  6,)
    ╰╴              ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
    ╭▸ 
 13 │   values (4, 5  6,)
    ╰╴                 ━
-error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+error[syntax-error]: `without overlaps` is only allowed in `primary key` and `unique` constraints
    ╭▸ 
 17 │ insert into t (a without overlaps) values (1);
    ╰╴                 ━

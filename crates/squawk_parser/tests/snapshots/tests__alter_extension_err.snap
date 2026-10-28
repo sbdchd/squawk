@@ -38,7 +38,7 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected LANGUAGE_KW
+error[syntax-error]: expected `language`
   ╭▸ 
 2 │ alter extension e add procedural;
   ╰╴                                ━
@@ -46,7 +46,7 @@ error[syntax-error]: expected name
   ╭▸ 
 2 │ alter extension e add procedural;
   ╰╴                                ━
-error[syntax-error]: expected LANGUAGE_KW
+error[syntax-error]: expected `language`
   ╭▸ 
 3 │ alter extension e drop procedural;
   ╰╴                                 ━

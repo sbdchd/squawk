@@ -44,7 +44,7 @@ PLPGSQL@0..45
     END_KW@41..44 "end"
   WHITESPACE@44..45 "\n"
 
-error[syntax-error]: expected INTO_KW
+error[syntax-error]: expected `into`
   ╭▸ 
 4 │   insert;
   ╰╴        ━
@@ -52,11 +52,11 @@ error[syntax-error]: expected path name
   ╭▸ 
 4 │   insert;
   ╰╴        ━
-error[syntax-error]: expected select stmt
+error[syntax-error]: expected a `select` statement
   ╭▸ 
 4 │   insert;
   ╰╴        ━
-error[syntax-error]: expected SEMICOLON, got IDENT
+error[syntax-error]: expected `;`, found identifier
    ╭▸ 
 11 │   drop table exs_t cascade extra;
    ╰╴                           ━

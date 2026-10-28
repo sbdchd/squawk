@@ -17,13 +17,13 @@ SELECT 1;
 
 
 ```
-warning[adding-not-nullable-field]: Adding a NOT NULL field requires exclusive locks and table rewrites.
+warning[adding-not-nullable-field]: adding a `not null` field requires exclusive locks and table rewrites
   ╭▸ alpha.sql:1:8
   │
 1 │ SELECT 1;
   │        ━
   │
-  ╰ help: Make the field nullable.
+  ╰ help: make the field nullable
 ```
     
 ---

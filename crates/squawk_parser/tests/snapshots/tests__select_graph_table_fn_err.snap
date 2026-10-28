@@ -447,7 +447,7 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 2 │   foo match - columns (a b)
   ╰╴                        ━
@@ -471,11 +471,11 @@ error[syntax-error]: expected unsigned integer literal
    ╭▸ 
 24 │   g match - {} columns (a)
    ╰╴             ━
-error[syntax-error]: expected an expression, found R_CURLY
+error[syntax-error]: expected an expression, found `}`
    ╭▸ 
 24 │   g match - {} columns (a)
    ╰╴             ━
-error[syntax-error]: expected R_CURLY
+error[syntax-error]: expected `}`
    ╭▸ 
 24 │   g match - {} columns (a)
    ╰╴              ━
@@ -483,11 +483,11 @@ error[syntax-error]: expected unsigned integer literal
    ╭▸ 
 28 │   g match - {,} columns (a)
    ╰╴              ━
-error[syntax-error]: expected an expression, found R_CURLY
+error[syntax-error]: expected an expression, found `}`
    ╭▸ 
 28 │   g match - {,} columns (a)
    ╰╴              ━
-error[syntax-error]: expected R_CURLY
+error[syntax-error]: expected `}`
    ╭▸ 
 28 │   g match - {,} columns (a)
    ╰╴               ━

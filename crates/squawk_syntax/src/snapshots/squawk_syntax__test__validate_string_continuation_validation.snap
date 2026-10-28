@@ -498,107 +498,111 @@ SOURCE_FILE@0..1305
     SEMICOLON@1303..1304 ";"
   WHITESPACE@1304..1305 "\n"
 
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 24 │ select 'foo' 'bar';
    ╰╴            ━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 25 │ select 'foo' /* comment */ 'bar';
    ╰╴             ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 26 │ select 'hello' /* comment */ 'bar' /* another comment */ ' world';
    ╰╴               ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 26 │ select 'hello' /* comment */ 'bar' /* another comment */ ' world';
    ╰╴                                   ━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 27 │ select 'foo' 'bar' 'buzz';
    ╰╴            ━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 27 │ select 'foo' 'bar' 'buzz';
    ╰╴                  ━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 30 │ select e'foo' 'bar';
    ╰╴             ━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 31 │ select e'foo' /* comment */ 'bar';
    ╰╴              ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 32 │ select e'hello' /* comment */ 'bar' /* another comment */ ' world';
    ╰╴                ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 32 │ select e'hello' /* comment */ 'bar' /* another comment */ ' world';
    ╰╴                                    ━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 33 │ select e'foo' 'bar' 'buzz';
    ╰╴             ━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 33 │ select e'foo' 'bar' 'buzz';
    ╰╴                   ━
-error[syntax-error]: Unicode escape requires 4 hex digits: \uXXXX
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 35 │ '\u00';
-   ╰╴ ━━━━
-error[syntax-error]: Expected new line or comma between string literals
+   │  ━━━━
+   │
+   ╰ hint: expected 4 hex digits, like `\uXXXX`
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 38 │ select u&'foo' 'bar';
    ╰╴              ━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 39 │ select u&'foo' /* comment */ 'bar';
    ╰╴               ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 40 │ select u&'hello' /* comment */ 'bar' /* another comment */ ' world';
    ╰╴                 ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 40 │ select u&'hello' /* comment */ 'bar' /* another comment */ ' world';
    ╰╴                                     ━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 41 │ select u&'foo' 'bar' 'buzz';
    ╰╴              ━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 41 │ select u&'foo' 'bar' 'buzz';
    ╰╴                    ━
-error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+error[syntax-error]: incomplete unicode escape
    ╭▸ 
 43 │ '\010';
-   ╰╴ ━━━━
-error[syntax-error]: Expected new line or comma between string literals
+   │  ━━━━
+   │
+   ╰ hint: expected 4 hex digits, like `\XXXX`
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 46 │ select b'01' '10';
    ╰╴            ━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 47 │ select b'01' /* comment */ '11';
    ╰╴             ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 48 │ select b'01' /* comment */ '11' /* another comment */ '10';
    ╰╴             ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 48 │ select b'01' /* comment */ '11' /* another comment */ '10';
    ╰╴                                ━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 49 │ select b'10' '10' '11';
    ╰╴            ━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 49 │ select b'10' '10' '11';
    ╰╴                 ━
@@ -606,27 +610,27 @@ error[syntax-error]: "2" is not a valid binary digit
    ╭▸ 
 51 │ '20';
    ╰╴ ━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 54 │ select x'0F' '10';
    ╰╴            ━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 55 │ select x'01' /* comment */ '1F';
    ╰╴             ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 56 │ select x'01' /* comment */ '1F' /* another comment */ '10';
    ╰╴             ━━━━━━━━━━━━━
-error[syntax-error]: Comments between string literals are not allowed.
+error[syntax-error]: comments between string literals are not allowed
    ╭▸ 
 56 │ select x'01' /* comment */ '1F' /* another comment */ '10';
    ╰╴                                ━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 57 │ select x'1F' 'F0' '11';
    ╰╴            ━
-error[syntax-error]: Expected new line or comma between string literals
+error[syntax-error]: expected new line or comma between string literals
    ╭▸ 
 57 │ select x'1F' 'F0' '11';
    ╰╴                 ━

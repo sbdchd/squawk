@@ -72,8 +72,11 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
 const NON_VOLATILE_BUILT_IN_FUNCTIONS: &str = include_str!("non_volatile_built_in_functions.txt");
 
 pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let message = "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.";
-    let help = "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.";
+    let default_message = "adding a column with a volatile default rewrites the table under an `access exclusive` lock";
+    let default_note = "in Postgres 11+, non-volatile defaults can be added without a rewrite";
+    let generated_message =
+        "adding a generated column rewrites the table under an `access exclusive` lock";
+    let help = "add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
     for stmt in file.stmts() {
@@ -94,9 +97,10 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                 ctx.report(
                                     Violation::for_node(
                                         Rule::AddingFieldWithDefault,
-                                        message.into(),
+                                        default_message.into(),
                                         expr.syntax(),
                                     )
+                                    .note(default_note)
                                     .help(help),
                                 );
                             }
@@ -104,7 +108,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                 ctx.report(
                                     Violation::for_node(
                                         Rule::AddingFieldWithDefault,
-                                        message.into(),
+                                        generated_message.into(),
                                         generated.syntax(),
                                     )
                                     .help(help),

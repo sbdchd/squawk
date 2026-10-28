@@ -21,15 +21,15 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected DEPENDS_KW
+error[syntax-error]: expected `depends`
   ╭▸ 
 2 │ alter index idx no;
   ╰╴                  ━
-error[syntax-error]: expected ON_KW
+error[syntax-error]: expected `on`
   ╭▸ 
 2 │ alter index idx no;
   ╰╴                  ━
-error[syntax-error]: expected EXTENSION_KW
+error[syntax-error]: expected `extension`
   ╭▸ 
 2 │ alter index idx no;
   ╰╴                  ━

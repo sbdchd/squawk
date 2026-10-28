@@ -54,23 +54,23 @@ error[syntax-error]: expected path name
   ╭▸ 
 3 │   call;
   ╰╴      ━
-error[syntax-error]: expected L_PAREN
+error[syntax-error]: expected `(`
   ╭▸ 
 3 │   call;
   ╰╴      ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 4 │   call p1(1, 2)
   ╰╴               ━
-error[syntax-error]: expected L_PAREN
+error[syntax-error]: expected `(`
   ╭▸ 
 5 │   call p2 1;
   ╰╴         ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 5 │   call p2 1;
   ╰╴         ━
-error[syntax-error]: expected a statement, got INT_NUMBER
+error[syntax-error]: expected a statement, found integer literal
   ╭▸ 
 5 │   call p2 1;
   ╰╴          ━

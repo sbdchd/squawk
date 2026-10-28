@@ -291,27 +291,27 @@ SOURCE_FILE@0..484
     SEMICOLON@482..483 ";"
   WHITESPACE@483..484 "\n"
 
-error[syntax-error]: Out params are not allowed with aggregates.
+error[syntax-error]: `out` params are not allowed with aggregates
   ╭▸ 
 2 │ create aggregate a(in x, out y, inout z, in out w) (
   ╰╴                         ━━━
-error[syntax-error]: In Out params are not allowed with aggregates.
+error[syntax-error]: `inout` params are not allowed with aggregates
   ╭▸ 
 2 │ create aggregate a(in x, out y, inout z, in out w) (
   ╰╴                                ━━━━━
-error[syntax-error]: In Out params are not allowed with aggregates.
+error[syntax-error]: `inout` params are not allowed with aggregates
   ╭▸ 
 2 │ create aggregate a(in x, out y, inout z, in out w) (
   ╰╴                                         ━━━━━━
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 7 │ create aggregate aggregate_with_default(value integer default 1) (
   ╰╴                                                      ━━━━━━━━━
-error[syntax-error]: VARIADIC param must be last input param.
+error[syntax-error]: `variadic` param must be last input param
    ╭▸ 
 12 │ create aggregate invalid_variadic(variadic items int[], following int) (
    ╰╴                                                        ━━━━━━━━━━━━━
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
    ╭▸ 
 18 │   direct integer order by aggregated integer = 1
    ╰╴                                             ━━━

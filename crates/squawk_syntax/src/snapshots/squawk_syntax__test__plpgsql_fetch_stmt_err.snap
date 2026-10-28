@@ -203,15 +203,15 @@ PLPGSQL@0..350
     END_KW@346..349 "end"
   WHITESPACE@349..350 "\n"
 
-error[syntax-error]: expected INTO, got SEMICOLON
+error[syntax-error]: expected `into`, found `;`
   ╭▸ 
 6 │   fetch c;
   ╰╴         ━
-error[syntax-error]: expected FROM or IN
+error[syntax-error]: expected `from` or `in`
   ╭▸ 
 7 │   fetch next c into x;
   ╰╴            ━
-error[syntax-error]: expected an INTO target, got SEMICOLON
+error[syntax-error]: expected an `into` target, found `;`
   ╭▸ 
 8 │   fetch c into;
   ╰╴              ━
@@ -219,23 +219,23 @@ error[syntax-error]: subscript not allowed
   ╭▸ 
 9 │   fetch c into x[1];
   ╰╴                ━
-error[syntax-error]: FETCH does not support STRICT
+error[syntax-error]: `fetch` does not support `strict`
    ╭▸ 
 10 │   fetch c into strict x;
    ╰╴               ━━━━━━
-error[syntax-error]: FETCH statement cannot return multiple rows
+error[syntax-error]: `fetch` statement cannot return multiple rows
    ╭▸ 
 12 │   fetch all from c into x;
    ╰╴        ━━━
-error[syntax-error]: FETCH statement cannot return multiple rows
+error[syntax-error]: `fetch` statement cannot return multiple rows
    ╭▸ 
 13 │   fetch 2 from c into x;
    ╰╴        ━
-error[syntax-error]: FETCH statement cannot return multiple rows
+error[syntax-error]: `fetch` statement cannot return multiple rows
    ╭▸ 
 14 │   fetch forward all from c into x;
    ╰╴        ━━━━━━━━━━━
-error[syntax-error]: FETCH statement cannot return multiple rows
+error[syntax-error]: `fetch` statement cannot return multiple rows
    ╭▸ 
 15 │   fetch backward 2 from c into x;
    ╰╴        ━━━━━━━━━━

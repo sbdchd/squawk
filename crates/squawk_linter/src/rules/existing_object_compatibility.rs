@@ -141,7 +141,7 @@ ALTER TABLE public.users ADD COLUMN name text;
 ALTER TABLE "public"."users" ADD COLUMN email text;
 ALTER TABLE public."Users" ADD COLUMN age int;"#;
         assert_snapshot!(lint_errors(sql, Rule::BanAddColumn), @r#"
-        warning[ban-add-column]: Adding a column changes the shape of rows existing clients receive and can break positional inserts.
+        warning[ban-add-column]: adding a column changes the shape of rows existing clients receive and can break positional inserts
           ╭▸ 
         4 │ ALTER TABLE public."Users" ADD COLUMN age int;
           ╰╴                           ━━━━━━━━━━━━━━━━━━

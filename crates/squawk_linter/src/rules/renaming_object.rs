@@ -12,7 +12,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterTableAction::TableRenameTo(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::RenamingObject,
-                            "Renaming a foreign table may break existing clients.".into(),
+                            "renaming a foreign table may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -23,7 +23,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterTableAction::RenameConstraint(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::RenamingObject,
-                            "Renaming a constraint may break existing clients.".into(),
+                            "renaming a constraint may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -33,7 +33,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterRoleAction::RoleRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a role may break existing clients.".into(),
+                        "renaming a role may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -42,7 +42,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterUserAction::RoleRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a user may break existing clients.".into(),
+                        "renaming a user may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -51,7 +51,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterGroupAction::RoleRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a group may break existing clients.".into(),
+                        "renaming a group may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -60,7 +60,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterDatabaseAction::DatabaseRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a database may break existing clients.".into(),
+                        "renaming a database may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -69,7 +69,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterTriggerAction::TriggerRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a trigger may break existing clients.".into(),
+                        "renaming a trigger may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -78,7 +78,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterPolicyAction::PolicyRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a policy may break existing clients.".into(),
+                        "renaming a policy may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -87,7 +87,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterRoutineAction::RoutineRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a routine may break existing clients.".into(),
+                        "renaming a routine may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -98,7 +98,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a view may break existing clients.".into(),
+                        "renaming a view may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -108,7 +108,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterMaterializedViewAction::ViewRenameTo(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::RenamingObject,
-                            "Renaming a materialized view may break existing clients.".into(),
+                            "renaming a materialized view may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -120,7 +120,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a function may break existing clients.".into(),
+                        "renaming a function may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -129,7 +129,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if let Some(ast::AlterAggregateAction::AggregateRenameTo(action)) = node.action() {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming an aggregate may break existing clients.".into(),
+                        "renaming an aggregate may break existing clients".into(),
                         action.syntax(),
                     ));
                 }
@@ -140,7 +140,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a procedure may break existing clients.".into(),
+                        "renaming a procedure may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -151,13 +151,13 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         ast::AlterTypeAction::TypeRenameTo(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::RenamingObject,
-                                "Renaming a type may break existing clients.".into(),
+                                "renaming a type may break existing clients".into(),
                                 node.syntax(),
                             ));
                         }
                         ast::AlterTypeAction::RenameValue(node) => ctx.report(Violation::for_node(
                             Rule::RenamingObject,
-                            "Renaming a type value may break existing clients.".into(),
+                            "renaming a type value may break existing clients".into(),
                             node.syntax(),
                         )),
                         _ => (),
@@ -169,7 +169,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let ast::AlterSequenceAction::SequenceRenameTo(node) = action {
                         ctx.report(Violation::for_node(
                             Rule::RenamingObject,
-                            "Renaming a sequence may break existing clients.".into(),
+                            "renaming a sequence may break existing clients".into(),
                             node.syntax(),
                         ));
                     }
@@ -181,7 +181,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming a schema may break existing clients.".into(),
+                        "renaming a schema may break existing clients".into(),
                         node.syntax(),
                     ));
                 }
@@ -192,14 +192,14 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         ast::AlterDomainAction::DomainRenameTo(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::RenamingObject,
-                                "Renaming a domain may break existing clients.".into(),
+                                "renaming a domain may break existing clients".into(),
                                 node.syntax(),
                             ));
                         }
                         ast::AlterDomainAction::RenameConstraint(node) => {
                             ctx.report(Violation::for_node(
                                 Rule::RenamingObject,
-                                "Renaming a constraint may break existing clients.".into(),
+                                "renaming a constraint may break existing clients".into(),
                                 node.syntax(),
                             ));
                         }
@@ -213,7 +213,7 @@ pub(crate) fn renaming_object(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 {
                     ctx.report(Violation::for_node(
                         Rule::RenamingObject,
-                        "Renaming an index may break existing clients.".into(),
+                        "renaming an index may break existing clients".into(),
                         node.syntax(),
                     ));
                 }

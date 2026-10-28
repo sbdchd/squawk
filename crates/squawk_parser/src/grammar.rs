@@ -74,8 +74,7 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
             opening,
             closing,
             COMMA,
-            ListItems::Optional,
-            || "unexpected comma".to_string(),
+            ListItems::Optional(ListItem::Expr),
             EXPR_FIRST,
             |p| opt_expr(p).is_some(),
         );
@@ -176,14 +175,12 @@ fn tuple_expr(p: &mut Parser<'_>, items: ListItems) -> (CompletedMarker, ExprKin
     let m = p.start();
     let explicit_row = p.eat(ROW_KW);
     p.expect(L_PAREN);
-    if matches!(items, ListItems::Required) && p.at(R_PAREN) {
-        p.error("Expected an expression");
-    }
+    items.check_not_empty(p, R_PAREN);
     let mut saw_comma = false;
     let mut saw_expr = false;
     let mut saw_select = false;
     if p.eat(COMMA) {
-        p.error("expected expression in tuple_expr");
+        p.error("expected an expression");
         saw_comma = true;
     }
     while !p.at(EOF) && !p.at(R_PAREN) {
@@ -196,7 +193,7 @@ fn tuple_expr(p: &mut Parser<'_>, items: ListItems) -> (CompletedMarker, ExprKin
             if select.is_none() || p.at(EOF) || p.at(R_PAREN) {
                 break;
             }
-            p.error("unexpected expression after SELECT");
+            p.error("unexpected expression after `select`");
         }
         let Some((expr, expr_kind)) = expr(p) else {
             break;
@@ -308,7 +305,7 @@ fn extract_arg(p: &mut Parser<'_>) {
         m.complete(p, EXTRACT_FIELD_NAME);
     } else {
         p.error(format!(
-            "expected ident, year, month, day, hour, minute, second, or string, got {:?}",
+            "expected ident, year, month, day, hour, minute, second, or string, found {}",
             p.current()
         ));
     }
@@ -714,7 +711,7 @@ fn json_objectagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(JSON_OBJECTAGG_KW);
     p.expect(L_PAREN);
     if expr_or_json_key_value(p).is_none() {
-        p.error("expected VALUE or ':' after JSON_OBJECTAGG key");
+        p.error("expected `value` or `:` after `json_objectagg` key");
     }
     opt_json_null_clause(p);
     opt_json_keys_unique_clause(p);
@@ -795,7 +792,7 @@ fn json_table_plan_choice(p: &mut Parser<'_>) {
         json_table_plan_operator(p);
         m.complete(p, JSON_TABLE_PLAN_CHOICE);
     } else {
-        p.error("expected INNER, OUTER, CROSS, or UNION");
+        p.error("expected `inner`, `outer`, `cross`, or `union`");
     }
 }
 
@@ -858,8 +855,7 @@ fn json_table_column_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Col),
             JSON_TABLE_COLUMN_FIRST,
             opt_json_table_column,
         );
@@ -970,7 +966,7 @@ fn opt_json_array_fn_arg_list(p: &mut Parser<'_>) {
             break;
         }
         if p.at(R_PAREN) || p.at(RETURNING_KW) || p.at(EOF) {
-            p.error("expected JSON array item after comma");
+            p.error("expected a JSON array item after comma");
             break;
         }
     }
@@ -1089,10 +1085,10 @@ fn at_type_literal(p: &Parser<'_>) -> bool {
 
 fn type_literal_string(p: &mut Parser<'_>) {
     let error = match p.current() {
-        BIT_STRING => Some("Bit string literals cannot be used in type literals"),
-        BYTE_STRING => Some("Hexadecimal string literals cannot be used in type literals"),
+        BIT_STRING => Some("bit string literals cannot be used in type literals"),
+        BYTE_STRING => Some("hexadecimal string literals cannot be used in type literals"),
         NATIONAL_STRING => {
-            Some("National character string literals cannot be used in type literals")
+            Some("national character string literals cannot be used in type literals")
         }
         _ => None,
     };
@@ -1179,9 +1175,9 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
         (SOME_KW | ALL_KW | ANY_KW, L_PAREN) => some_any_all_fn(p),
         (EXISTS_KW, L_PAREN) => exists_fn(p),
         (COLLATION_KW, FOR_KW) => collation_for_fn(p),
-        (ROW_KW, L_PAREN) => return Some(tuple_expr(p, ListItems::Optional)),
+        (ROW_KW, L_PAREN) => return Some(tuple_expr(p, ListItems::Optional(ListItem::Expr))),
         _ if p.at_ts(NAME_REF_FIRST) => name_ref_(p)?,
-        (L_PAREN, _) => return Some(tuple_expr(p, ListItems::Required)),
+        (L_PAREN, _) => return Some(tuple_expr(p, ListItems::Required(ListItem::Expr))),
         (ARRAY_KW, L_BRACK | L_PAREN) => {
             let m = p.start();
             p.bump(ARRAY_KW);
@@ -1192,7 +1188,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
         (L_BRACK, _) => array_expr(p, None),
         (CASE_KW, _) => case_expr(p),
         _ => {
-            p.err_and_bump("expected expression in atom_expr");
+            p.err_and_bump("expected an expression");
             return None;
         }
     };
@@ -1251,7 +1247,7 @@ fn xmlpi_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(NAME_KW);
     xml_pi_target(p);
     if p.eat(COMMA) && expr(p).is_none() {
-        p.error("expected expr");
+        p.error("expected an expression");
     }
     p.expect(R_PAREN);
     let m = m.complete(p, XML_PI_FN).precede(p);
@@ -1279,7 +1275,7 @@ fn xmlparse_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(XMLPARSE_KW);
     p.expect(L_PAREN);
     if !opt_xml_document_or_content(p) {
-        p.error("expected DOCUMENT or CONTENT");
+        p.error("expected `document` or `content`");
     }
     if expr(p).is_none() {
         p.error("expected expression");
@@ -1333,7 +1329,7 @@ fn opt_xml_passing_mech(p: &mut Parser<'_>) -> bool {
             m.complete(p, XML_PASSING_MECH_BY_VALUE);
         }
         _ => {
-            p.error("expected REF or VALUE");
+            p.error("expected `ref` or `value`");
             m.abandon(p);
         }
     }
@@ -1415,8 +1411,7 @@ fn expr_as_xml_attr_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Attribute),
         EXPR_FIRST,
         opt_expr_as_xml_attr,
     );
@@ -1444,8 +1439,7 @@ fn expr_as_property_name_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Prop),
         EXPR_FIRST,
         opt_expr_as_property_name,
     );
@@ -1473,8 +1467,7 @@ fn expr_as_column_name_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Col),
         EXPR_FIRST,
         opt_expr_as_column_name,
     );
@@ -1513,8 +1506,7 @@ fn expr_as_element_tag_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Element),
         EXPR_FIRST,
         opt_expr_as_element_tag,
     );
@@ -1546,7 +1538,7 @@ fn xmlserialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(XMLSERIALIZE_KW);
     p.expect(L_PAREN);
     if !opt_xml_document_or_content(p) {
-        p.error("expected DOCUMENT or CONTENT");
+        p.error("expected `document` or `content`");
     }
     if expr(p).is_none() {
         p.error("expected expression");
@@ -1908,7 +1900,7 @@ fn opt_json_passing_arg(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     if expr(p).is_none() {
-        p.error("expected expr");
+        p.error("expected an expression");
     }
     opt_json_format_clause(p);
     p.expect(AS_KW);
@@ -1928,11 +1920,11 @@ fn opt_json_passing_clause(p: &mut Parser<'_>, follow: TokenSet) {
     let m = p.start();
     if p.eat(PASSING_KW) {
         if p.at_ts(follow) || opt_json_passing_arg(p).is_none() {
-            p.error("expected SQL/JSON PASSING argument");
+            p.error("expected a `passing` argument");
         }
         while p.eat(COMMA) {
             if p.at_ts(follow) || opt_json_passing_arg(p).is_none() {
-                p.error("expected SQL/JSON PASSING argument after comma");
+                p.error("expected a `passing` argument after comma");
                 break;
             }
         }
@@ -2127,8 +2119,103 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
 
 #[derive(Clone, Copy)]
 pub(crate) enum ListItems {
-    Required,
-    Optional,
+    Required(ListItem),
+    Optional(ListItem),
+}
+
+impl ListItems {
+    fn item(self) -> ListItem {
+        match self {
+            ListItems::Required(item) | ListItems::Optional(item) => item,
+        }
+    }
+
+    fn check_not_empty(self, p: &mut Parser<'_>, ket: SyntaxKind) {
+        if let ListItems::Required(item) = self
+            && p.at(ket)
+        {
+            p.error(format!("expected at least one {item}"));
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub(crate) enum ListItem {
+    Argument,
+    Attribute,
+    Col,
+    Condition,
+    DiagItem,
+    EdgeTable,
+    Element,
+    ExclusionEl,
+    Expr,
+    FuncCall,
+    GroupingSet,
+    IndexEl,
+    Namespace,
+    Option,
+    Param,
+    Partition,
+    PartitionBound,
+    PartitionKey,
+    Prop,
+    StatsKind,
+    Table,
+    Target,
+    TypeModifier,
+    Value,
+    Var,
+    VertexTable,
+}
+
+impl ListItem {
+    fn name(self) -> &'static str {
+        match self {
+            ListItem::Argument => "argument",
+            ListItem::Attribute => "attribute",
+            ListItem::Col => "column",
+            ListItem::Condition => "condition",
+            ListItem::DiagItem => "diagnostics item",
+            ListItem::EdgeTable => "edge table",
+            ListItem::Element => "element",
+            ListItem::ExclusionEl => "exclusion element",
+            ListItem::Expr => "expression",
+            ListItem::FuncCall => "function call",
+            ListItem::GroupingSet => "grouping set",
+            ListItem::IndexEl => "index element",
+            ListItem::Namespace => "namespace",
+            ListItem::Option => "option",
+            ListItem::Param => "parameter",
+            ListItem::Partition => "partition",
+            ListItem::PartitionBound => "partition bound",
+            ListItem::PartitionKey => "partition key",
+            ListItem::Prop => "property",
+            ListItem::StatsKind => "statistics kind",
+            ListItem::Table => "table",
+            ListItem::Target => "target",
+            ListItem::TypeModifier => "type modifier",
+            ListItem::Value => "value",
+            ListItem::Var => "variable",
+            ListItem::VertexTable => "vertex table",
+        }
+    }
+
+    fn stray_delim_message(self, delim: SyntaxKind) -> String {
+        let name = self.name();
+        let article = if name.starts_with(['a', 'e', 'i', 'o', 'u']) {
+            "an"
+        } else {
+            "a"
+        };
+        format!("expected {article} {name}, found {delim}")
+    }
+}
+
+impl std::fmt::Display for ListItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.name())
+    }
 }
 
 /// The `parser` passed this is required to at least consume one token if it returns `true`.
@@ -2139,14 +2226,11 @@ pub(crate) fn delimited(
     ket: SyntaxKind,
     delim: SyntaxKind,
     items: ListItems,
-    unexpected_delim_message: impl Fn() -> String,
     first_set: TokenSet,
     mut parser: impl FnMut(&mut Parser<'_>) -> bool,
 ) {
     p.expect(bra);
-    if matches!(items, ListItems::Required) && p.at(ket) {
-        p.error("Expected at least one item");
-    }
+    items.check_not_empty(p, ket);
     while !p.at(ket) && !p.at(EOF) {
         if p.at(delim) {
             // Recover if an argument is missing and only got a delimiter,
@@ -2156,7 +2240,7 @@ pub(crate) fn delimited(
             // nodes currently have no concept of a missing node between two delimiters.
             // So doing it this way is easier.
             let m = p.start();
-            p.error(unexpected_delim_message());
+            p.error(items.item().stray_delim_message(delim));
             p.bump(delim);
             m.complete(p, ERROR);
             continue;
@@ -2167,12 +2251,12 @@ pub(crate) fn delimited(
         // f(a,)
         //    ^
         if p.at(delim) && p.nth_at(1, ket) {
-            p.err_and_bump("unexpected trailing comma");
+            p.err_and_bump(&format!("unexpected trailing {delim}"));
             break;
         }
         if !p.eat(delim) {
             if p.at_ts(first_set) {
-                p.error(format!("expected {delim:?}"));
+                p.error(format!("expected {delim}"));
             } else {
                 break;
             }
@@ -2186,7 +2270,7 @@ pub(crate) fn delimited(
 pub(crate) fn separated(
     p: &mut Parser<'_>,
     delim: SyntaxKind,
-    unexpected_delim_message: impl Fn() -> String,
+    item: ListItem,
     first_set: TokenSet,
     follow_set: TokenSet,
     mut parser: impl FnMut(&mut Parser<'_>) -> bool,
@@ -2200,7 +2284,7 @@ pub(crate) fn separated(
             // nodes currently have no concept of a missing node between two delimiters.
             // So doing it this way is easier.
             let m = p.start();
-            p.error(unexpected_delim_message());
+            p.error(item.stray_delim_message(delim));
             p.bump(delim);
             m.complete(p, ERROR);
             continue;
@@ -2210,12 +2294,12 @@ pub(crate) fn separated(
         }
         if p.at(delim) && (p.nth_at(1, EOF) || p.nth_at(1, SEMICOLON) || p.nth_at_ts(1, follow_set))
         {
-            p.err_and_bump(&unexpected_delim_message());
+            p.err_and_bump(&item.stray_delim_message(delim));
             break;
         }
         if !p.eat(delim) {
             if p.at_ts(first_set) && !p.at_ts(follow_set) {
-                p.error(format!("expected {delim:?}"));
+                p.error(format!("expected {delim}"));
             } else {
                 break;
             }
@@ -2248,7 +2332,7 @@ fn path_segment(p: &mut Parser<'_>, kind: PathSegmentKind) {
     } else if p.at_ts(COL_LABEL_FIRST) {
         pg_name(p);
     } else {
-        p.error(format!("expected name, got {:?}", p.current()));
+        p.error(format!("expected name, found {}", p.current()));
         m.abandon(p);
         return;
     }
@@ -2373,8 +2457,7 @@ fn type_mods(
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::TypeModifier),
             EXPR_FIRST.union(TokenSet::new(&[VARIADIC_KW])),
             |p| arg_expr(p).is_some(),
         );
@@ -2395,7 +2478,7 @@ fn type_mods(
             }
         }
         if !found_one_array_bracks {
-            p.error("expected L_BRACK for ARRAY_TYPE");
+            p.error("expected `[`");
         }
     }
     m.complete(p, ARRAY_TYPE)
@@ -2645,14 +2728,13 @@ pub(crate) fn arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "expected expression".into(),
+        ListItems::Optional(ListItem::Argument),
         EXPR_FIRST,
         |p| {
             if std::mem::take(&mut first_arg) {
                 opt_all_or_distinct(p);
             } else if p.at(ALL_KW) || p.at(DISTINCT_KW) {
-                p.err_and_bump("ALL or DISTINCT is only allowed before the first argument");
+                p.err_and_bump("`all` or `distinct` is only allowed before the first argument");
             }
             arg_expr(p).is_some()
         },
@@ -2715,7 +2797,7 @@ fn opt_interval_trailing(p: &mut Parser<'_>, has_precision: bool) {
                     INTERVAL_SECOND
                 }
                 _ => {
-                    p.error("expected HOUR, MINUTE, or SECOND");
+                    p.error("expected `hour`, `minute`, or `second`");
                     INTERVAL_DAY
                 }
             }
@@ -2999,7 +3081,7 @@ fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     } else if p.eat(STAR) {
         //
     } else {
-        p.error(format!("expected field name, got {:?}", p.current()));
+        p.error(format!("expected field name, found {}", p.current()));
     }
     m.complete(p, FIELD_EXPR)
 }
@@ -3182,7 +3264,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: Restrictions) -> Option<(CompletedMark
     let m = p.start();
     if !p.at_ts(EXPR_FIRST) {
         p.err_recover(
-            &format!("expected an expression, found {:?}", p.current()),
+            &format!("expected an expression, found {}", p.current()),
             EXPR_RECOVERY_SET,
         );
         m.abandon(p);
@@ -3265,7 +3347,7 @@ const COMPOUND_SELECT_FIRST: TokenSet = TokenSet::new(&[UNION_KW, INTERSECT_KW, 
 //     [ CYCLE column_name [, ...] SET cycle_mark_col_name [ TO cycle_mark_value DEFAULT cycle_mark_default ] USING cycle_path_col_name ]
 fn with_query(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(WITH_KW) {
-        p.err_and_bump("unexpected WITH");
+        p.err_and_bump("unexpected `with`");
     }
     let m = p.start();
     cte_name(p);
@@ -3312,7 +3394,7 @@ fn search_columns(p: &mut Parser<'_>) {
     separated(
         p,
         COMMA,
-        || "unexpected comma, expected a column name".to_string(),
+        ListItem::Col,
         NAME_REF_FIRST,
         TokenSet::new(&[SET_KW]),
         |p| opt_column_name_ref(p).is_some(),
@@ -3379,7 +3461,7 @@ fn cycle_columns(p: &mut Parser<'_>) {
     separated(
         p,
         COMMA,
-        || "unexpected comma, expected a column name".to_string(),
+        ListItem::Col,
         NAME_REF_FIRST,
         TokenSet::new(&[SET_KW]),
         |p| opt_column_name_ref(p).is_some(),
@@ -3475,7 +3557,7 @@ fn compound_select_operand(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         opt_paren_select(p, None, &SelectRestrictions::none())
     } else if p.at_ts(SELECT_FIRST) {
         if p.at(WITH_KW) {
-            p.error("a WITH clause is only allowed at the start of a select statement");
+            p.error("a `with` clause is only allowed at the start of a select statement");
         }
         select(p, None, &SelectRestrictions::none())
     } else {
@@ -3652,7 +3734,7 @@ fn opt_select_trailing_clauses(p: &mut Parser<'_>) -> bool {
     }
     if p.at_ts(COMPOUND_SELECT_FIRST) {
         p.error(
-            "UNION, INTERSECT, EXCEPT must come before ORDER BY, LIMIT, OFFSET, FETCH, and locking clauses",
+            "`union`, `intersect`, `except` must come before `order by`, `limit`, `offset`, `fetch`, and locking clauses",
         );
     }
     true
@@ -3747,7 +3829,7 @@ fn fetch_quantity(p: &mut Parser<'_>) {
     } else if p.eat(ONLY_KW) {
         m.complete(p, FETCH_ONLY);
     } else {
-        p.error("expected ONLY or WITH TIES");
+        p.error("expected `only` or `with ties`");
         m.abandon(p);
     }
 }
@@ -3797,12 +3879,12 @@ fn sort_by_list(p: &mut Parser<'_>) {
             break;
         }
         if !p.at_ts(EXPR_FIRST) {
-            p.error("Expected an ORDER BY item after comma");
+            p.error("expected an `order by` item after comma");
             break;
         }
     }
     if !found_item {
-        p.error("Expected at least one ORDER BY item");
+        p.error("expected at least one `order by` item");
     }
     m.complete(p, SORT_BY_LIST);
 }
@@ -3896,7 +3978,10 @@ fn opt_from_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     if opt_from_item(p).is_none() {
-        p.error(format!("expected from item, got {:?}", p.current()));
+        p.error(format!(
+            "expected a table, subquery, or function call, found {}",
+            p.current()
+        ));
     }
     while !p.at(EOF) && p.eat(COMMA) {
         if opt_from_item(p).is_none() {
@@ -4016,7 +4101,7 @@ fn from_item_name(p: &mut Parser<'_>) -> SyntaxKind {
                 FUNCTION_FROM_ITEM
             }
             Some(got) => {
-                p.error(format!("expected a function call, got {:?}", got.kind()));
+                p.error(format!("expected a function call, found {}", got.kind()));
                 FUNCTION_FROM_ITEM
             }
             None => {
@@ -4082,8 +4167,7 @@ fn data_source(p: &mut Parser<'_>, in_parens: bool) -> DataSource {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required,
-                || "unexpected comma".to_string(),
+                ListItems::Required(ListItem::FuncCall),
                 EXPR_FIRST,
                 opt_row_from_expr,
             );
@@ -4242,8 +4326,7 @@ fn xml_namespace_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Namespace),
         XML_NAMESPACE_ELEMENT_FIRST,
         opt_xml_namespace,
     );
@@ -4307,7 +4390,7 @@ fn paren_data_source(p: &mut Parser<'_>, in_parens: bool) -> Option<(CompletedMa
         }
         return Some((m.complete(p, kind), lhs_kind));
     } else {
-        p.error("expected table name or SELECT");
+        p.error("expected table name or `select`");
     }
 
     p.expect(R_PAREN);
@@ -4415,7 +4498,7 @@ fn join(p: &mut Parser<'_>) {
     let result = join_type(p);
     let join_kind = result.map(|x| x.kind()).unwrap_or(JOIN_INNER);
     if opt_from_item(p).is_none() {
-        p.error("expected from_item");
+        p.error("expected a table, subquery, or function call");
     }
     let can_have_on_clause = !is_natural && join_kind != JOIN_CROSS;
     if p.at(ON_KW) && can_have_on_clause {
@@ -4430,7 +4513,7 @@ fn join(p: &mut Parser<'_>) {
 fn opt_misplaced_joins(p: &mut Parser<'_>) {
     while p.at_ts(JOIN_FIRST) {
         let m = p.start();
-        p.error("JOINs must appear before WHERE");
+        p.error("joins must appear before `where`");
         join(p);
         m.complete(p, ERROR);
     }
@@ -4439,7 +4522,7 @@ fn opt_misplaced_joins(p: &mut Parser<'_>) {
 fn opt_misplaced_having_clause(p: &mut Parser<'_>) {
     if p.at(HAVING_KW) {
         let m = p.start();
-        p.error("HAVING must appear before ORDER BY");
+        p.error("`having` must appear before `order by`");
         opt_having_clause(p);
         m.complete(p, ERROR);
     }
@@ -4658,7 +4741,7 @@ fn opt_sequence_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             } else if p.eat(CYCLE_KW) {
                 OPTION_NO_CYCLE
             } else {
-                p.error("expected MINVALUE, MAXVALUE, or CYCLE");
+                p.error("expected `minvalue`, `maxvalue`, or `cycle`");
                 OPTION_NO_CYCLE
             }
         }
@@ -4719,38 +4802,36 @@ fn opt_column_list_with(p: &mut Parser<'_>, mut kind: ColumnDefKind) -> bool {
     p.expect(L_PAREN);
     let items = match kind {
         // `create type t as ()` is the only empty column list Postgres accepts
-        ColumnDefKind::CompositeFieldDef => ListItems::Optional,
+        ColumnDefKind::CompositeFieldDef => ListItems::Optional(ListItem::Col),
         ColumnDefKind::ColumnDef
         | ColumnDefKind::ColumnTarget
         | ColumnDefKind::ConstraintColumnRef
         | ColumnDefKind::ForeignKeyColumnRef
         | ColumnDefKind::FromAliasColumn
         | ColumnDefKind::Name
-        | ColumnDefKind::NameRef => ListItems::Required,
+        | ColumnDefKind::NameRef => ListItems::Required(ListItem::Col),
     };
-    if matches!(items, ListItems::Required) && p.at(R_PAREN) {
-        p.error("Expected at least one item");
-    }
+    items.check_not_empty(p, R_PAREN);
     let mut seen_period = false;
     while !p.at(EOF) && !p.at(R_PAREN) {
         if p.at(COMMA) {
-            p.err_and_bump("missing column");
+            p.err_and_bump(&items.item().stray_delim_message(COMMA));
             continue;
         }
         if !p.at_ts(COLUMN_FIRST) {
             break;
         }
         if seen_period {
-            p.error("PERIOD must be the last column in the list");
+            p.error("`period` must be the last column in the list");
         }
         seen_period |= kind == ColumnDefKind::ForeignKeyColumnRef && at_period_column(p);
         kind = column(p, kind);
         if p.at(COMMA) && p.nth_at(1, R_PAREN) {
-            p.err_and_bump("unexpected trailing comma");
+            p.err_and_bump("unexpected trailing `,`");
         }
         if !p.eat(COMMA) {
             if p.at_ts(COLUMN_FIRST) && !(p.at(WITHOUT_KW) && p.nth_at(1, OVERLAPS_KW)) {
-                p.error("expected COMMA");
+                p.error("expected `,`");
             } else {
                 break;
             }
@@ -4821,7 +4902,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> ColumnDefKind {
                 let node_kind = if kind == ColumnDefKind::ForeignKeyColumnRef {
                     PERIOD_COLUMN
                 } else {
-                    p.error("PERIOD is only allowed in FOREIGN KEY column lists");
+                    p.error("`period` is only allowed in `foreign key` column lists");
                     ERROR
                 };
                 p.bump(PERIOD_KW);
@@ -4832,7 +4913,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> ColumnDefKind {
             }
             if p.at(DOT) || p.at(L_BRACK) {
                 let m = p.start();
-                p.error("field access and subscripts are only allowed in INSERT and UPDATE column lists");
+                p.error("field access and subscripts are only allowed in `insert` and `update` column lists");
                 accessors(p);
                 m.complete(p, ERROR);
             }
@@ -4864,7 +4945,7 @@ pub(crate) fn field_accessor(p: &mut Parser<'_>) {
     } else if p.at(INT_NUMBER) || p.at(NUMERIC_NUMBER) {
         p.err_and_bump("expected field name");
     } else if !p.eat(STAR) {
-        p.error(format!("expected field name, got {:?}", p.current()));
+        p.error(format!("expected field name, found {}", p.current()));
     }
     m.complete(p, FIELD_ACCESSOR);
 }
@@ -5114,7 +5195,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         DEFAULT_KW => {
             p.bump(DEFAULT_KW);
             if expr(p).is_none() {
-                p.error("expected expr for default");
+                p.error("expected a default expression");
             }
             DEFAULT_CONSTRAINT
         }
@@ -5208,7 +5289,7 @@ fn opt_match_type(p: &mut Parser<'_>) {
                 MATCH_SIMPLE
             }
             _ => {
-                p.error("expected FULL, PARTIAL, or SIMPLE");
+                p.error("expected `full`, `partial`, or `simple`");
                 MATCH_SIMPLE
             }
         };
@@ -5355,7 +5436,7 @@ fn table_property(p: &mut Parser<'_>) {
         }
         _ => {
             m.abandon(p);
-            p.err_and_bump(&format!("expected like option, got {:?}", p.current()));
+            p.err_and_bump(&format!("expected like option, found {}", p.current()));
             return;
         }
     };
@@ -5393,7 +5474,7 @@ fn op(p: &mut Parser<'_>) {
     if opt_op(p) {
         return;
     }
-    let message = format!("expected operator, got {:?}", p.current());
+    let message = format!("expected operator, found {}", p.current());
     if p.at(EOF) || p.at_ts(OP_RECOVERY) {
         p.error(message);
         return;
@@ -5417,7 +5498,7 @@ fn op_or_opcall(p: &mut Parser<'_>) {
     let m = p.start();
     if p.nth_at(1, DOT) {
         opt_op_path(p);
-        p.error("qualified operator requires OPERATOR(...)");
+        p.error("qualified operator requires `operator(...)`");
     }
     op(p);
     m.complete(p, OP);
@@ -5581,7 +5662,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             p.bump(CHECK_KW);
             p.expect(L_PAREN);
             if expr(p).is_none() {
-                p.error("expected expr");
+                p.error("expected an expression");
             }
             p.expect(R_PAREN);
             CHECK_CONSTRAINT
@@ -5675,7 +5756,7 @@ fn opt_constraint_where_clause(p: &mut Parser<'_>) {
         p.bump(WHERE_KW);
         p.expect(L_PAREN);
         if expr(p).is_none() {
-            p.error("expected expr");
+            p.error("expected an expression");
         }
         p.expect(R_PAREN);
         m.complete(p, WHERE_CONDITION_CLAUSE);
@@ -5702,8 +5783,7 @@ fn constraint_exclusion_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::ExclusionEl),
         CONSTRAINT_EXCLUSION_FIRST,
         |p| opt_constraint_exclusion(p).is_some(),
     );
@@ -5727,7 +5807,7 @@ fn opt_without_overlaps(p: &mut Parser<'_>, kind: ColumnDefKind) {
     let node_kind = if kind == ColumnDefKind::ConstraintColumnRef {
         WITHOUT_OVERLAPS
     } else {
-        p.error("WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints");
+        p.error("`without overlaps` is only allowed in `primary key` and `unique` constraints");
         ERROR
     };
     p.bump(WITHOUT_KW);
@@ -5924,7 +6004,7 @@ fn opt_repeatable_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 fn clause_expr(p: &mut Parser<'_>) {
     if p.at(AND_KW) || p.at(OR_KW) {
-        p.err_and_bump(&format!("expected expression but got {:?}", p.current()));
+        p.err_and_bump(&format!("expected expression, found {}", p.current()));
     }
     expr(p);
 }
@@ -5950,7 +6030,7 @@ fn opt_group_by_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let group_by_all = p.at(ALL_KW);
     opt_all_or_distinct(p);
     if !opt_group_by_list(p) && !group_by_all {
-        p.error("Expected at least one GROUP BY item");
+        p.error("expected at least one `group by` item");
     }
 
     Some(m.complete(p, GROUP_BY_CLAUSE))
@@ -5975,7 +6055,7 @@ fn opt_group_by_list(p: &mut Parser<'_>) -> bool {
             break;
         }
         if !p.at_ts(GROUP_BY_ITEM_FIRST) {
-            p.error("Expected a GROUP BY item after comma");
+            p.error("expected a `group by` item after comma");
             break;
         }
     }
@@ -6014,15 +6094,14 @@ fn opt_group_by_item(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required,
-                || "unexpected comma".to_string(),
+                ListItems::Required(ListItem::GroupingSet),
                 GROUP_BY_ITEM_FIRST,
                 |p| opt_group_by_item(p).is_some(),
             );
             GROUPING_SETS
         }
         L_PAREN if p.nth_at(1, R_PAREN) => {
-            tuple_expr(p, ListItems::Optional);
+            tuple_expr(p, ListItems::Optional(ListItem::Expr));
             GROUPING_EXPR
         }
         _ => {
@@ -6311,8 +6390,7 @@ fn paren_expr_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Expr),
         EXPR_FIRST,
         |p| opt_expr(p).is_some(),
     );
@@ -6466,10 +6544,7 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
         opt_as_col_label(p);
     } else {
         m.abandon(p);
-        p.error(format!(
-            "expected an expression in target_el, found {:?}",
-            p.current()
-        ));
+        p.error(format!("expected an expression, found {}", p.current()));
         return None;
     }
     Some(m.complete(p, TARGET))
@@ -6482,7 +6557,7 @@ fn opt_as_col_label(p: &mut Parser<'_>) {
             column_name(p);
             m.complete(p, AS_NAME);
         } else {
-            p.err_and_bump(&format!("expected column label, got {:?}", p.current()));
+            p.err_and_bump(&format!("expected column label, found {}", p.current()));
             m.abandon(p);
         }
     } else if p.at(FORMAT_KW) && p.nth_at(1, JSON_KW) {
@@ -6503,7 +6578,7 @@ fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
     while !p.at(EOF) && !p.at(SEMICOLON) {
         if opt_target_el(p).is_some() {
             if p.at(COMMA) && p.nth_at_ts(1, TARGET_FOLLOW) {
-                p.err_and_bump("unexpected trailing comma");
+                p.err_and_bump("unexpected trailing `,`");
                 break;
             }
             if !p.eat(COMMA) {
@@ -6562,7 +6637,7 @@ fn drop_table(p: &mut Parser<'_>) -> CompletedMarker {
     separated(
         p,
         COMMA,
-        || "unexpected comma, expected a name".to_string(),
+        ListItem::Table,
         PATH_FIRST,
         DROP_TABLE_FOLLOW,
         |p| opt_table_name_ref(p).is_some(),
@@ -6598,7 +6673,7 @@ fn partition_item(p: &mut Parser<'_>, part_kind: PartitionItemKind) -> Completed
     let m = p.start();
     // TODO: this can be more strict
     if expr(p).is_none() {
-        p.error("expected expr");
+        p.error("expected an expression");
     }
     // [ opclass ]
     opt_index_opclass(p);
@@ -6642,7 +6717,7 @@ fn opt_nulls_order(p: &mut Parser<'_>) {
                 NULLS_LAST
             }
             _ => {
-                p.error("expected FIRST or LAST");
+                p.error("expected `first` or `last`");
                 NULLS_LAST
             }
         };
@@ -6660,8 +6735,7 @@ fn table_arg_list(p: &mut Parser<'_>) -> CompletedMarker {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "unexpected comma".to_string(),
+        ListItems::Optional(ListItem::Col),
         COL_DEF_FIRST,
         |p| opt_col_def(p).is_some(),
     );
@@ -6693,8 +6767,7 @@ fn partition_option(p: &mut Parser<'_>) {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required,
-                || "unexpected comma".to_string(),
+                ListItems::Required(ListItem::PartitionBound),
                 NON_RESERVED_WORD,
                 opt_hash_partition_bound,
             );
@@ -6815,7 +6888,7 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
                 SELECT | COMPOUND_SELECT | SELECT_INTO | PAREN_SELECT | TABLE | VALUES | EXECUTE,
             ) => (),
             _ => {
-                p.error("expected SELECT, TABLE, VALUES, or EXECUTE");
+                p.error("expected `select`, `table`, `values`, or `execute`");
             }
         }
 
@@ -7203,8 +7276,7 @@ fn opt_paren_property_name_ref_list(p: &mut Parser<'_>) -> bool {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Prop),
         NAME_REF_FIRST,
         opt_property_name_ref,
     );
@@ -7698,7 +7770,7 @@ fn op_class_ref(p: &mut Parser<'_>) {
 
 fn using_method(p: &mut Parser<'_>) {
     if opt_using_method(p).is_none() {
-        p.error("expected USING");
+        p.error("expected `using`");
     }
 }
 
@@ -7757,7 +7829,7 @@ fn on_commit_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     } else if p.eat(DROP_KW) {
         DROP
     } else {
-        p.error("expected PRESERVE ROWS, DELETE ROWS, or DROP");
+        p.error("expected `preserve rows`, `delete rows`, or `drop`");
         m.abandon(p);
         return None;
     };
@@ -8075,7 +8147,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
             PARSER_KW => Some(alter_text_search_parser(p)),
             TEMPLATE_KW => Some(alter_text_search_template(p)),
             _ => {
-                p.err_and_bump("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected `configuration`, `dictionary`, `parser`, or `template`");
                 None
             }
         },
@@ -8172,7 +8244,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
             PARSER_KW => Some(create_text_search_parser(p)),
             TEMPLATE_KW => Some(create_text_search_template(p)),
             _ => {
-                p.err_and_bump("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected `configuration`, `dictionary`, `parser`, or `template`");
                 None
             }
         },
@@ -8200,7 +8272,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
             DATA_KW => Some(drop_foreign_data(p)),
             TABLE_KW => Some(drop_foreign_table(p)),
             _ => {
-                p.err_and_bump("expected DATA or TABLE");
+                p.err_and_bump("expected `data` or `table`");
                 None
             }
         },
@@ -8235,7 +8307,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
             PARSER_KW => Some(drop_text_search_parser(p)),
             TEMPLATE_KW => Some(drop_text_search_template(p)),
             _ => {
-                p.err_and_bump("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected `configuration`, `dictionary`, `parser`, or `template`");
                 None
             }
         },
@@ -8329,7 +8401,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
             // commands are outlined in:
             // https://www.postgresql.org/docs/17/sql-commands.html
             // TODO: see error recovery in rust-analyzer's expr_bp
-            p.err_and_bump(&format!("expected command, found {command:?}"));
+            p.err_and_bump(&format!("expected command, found {command}"));
             // m.abandon(p);
             None
         }
@@ -8372,12 +8444,12 @@ fn alter_statistics(p: &mut Parser<'_>) -> CompletedMarker {
                     int_literal(p);
                 }
             } else {
-                p.error("expected SCHEMA or STATISTICS");
+                p.error("expected `schema` or `statistics`");
             }
             m.complete(p, SET_STATISTICS);
         }
         _ => {
-            p.error("expected OWNER, RENAME, or SET");
+            p.error("expected `owner`, `rename`, or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -8412,7 +8484,7 @@ fn alter_server(p: &mut Parser<'_>) -> CompletedMarker {
             }
             found_option |= opt_alter_option_list(p);
             if !found_option {
-                p.error("expected ALTER SERVER option");
+                p.error("expected `alter server` option");
             }
         }
     }
@@ -8451,7 +8523,7 @@ fn alter_sequence(p: &mut Parser<'_>) -> CompletedMarker {
             } else if p.eat(UNLOGGED_KW) {
                 SET_UNLOGGED
             } else {
-                p.error("LOGGED or UNLOGGED");
+                p.error("expected `logged` or `unlogged`");
                 SET_LOGGED
             };
             m.complete(p, kind);
@@ -8471,7 +8543,7 @@ fn alter_sequence(p: &mut Parser<'_>) -> CompletedMarker {
                 found_option = true;
             }
             if !found_option {
-                p.error("expected ALTER SEQUENCE option");
+                p.error("expected `alter sequence` option");
             }
         }
     }
@@ -8495,7 +8567,7 @@ fn alter_schema(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         _ => {
-            p.error("expected RENAME or OWNER");
+            p.error("expected `rename` or `owner`");
         }
     }
     p.eat(SEMICOLON);
@@ -8513,7 +8585,7 @@ fn alter_rule(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(RENAME_KW) {
         rename_to(p, RULE_RENAME_TO, rule);
     } else {
-        p.error("expected RENAME");
+        p.error("expected `rename`");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_RULE)
@@ -8694,7 +8766,7 @@ fn alter_publication(p: &mut Parser<'_>) -> CompletedMarker {
             rename_to(p, PUBLICATION_RENAME_TO, publication);
         }
         _ => {
-            p.error("expected ADD, SET, DROP, OWNER, or RENAME");
+            p.error("expected `add`, `set`, `drop`, `owner`, or `rename`");
         }
     }
     p.eat(SEMICOLON);
@@ -8844,7 +8916,7 @@ fn alter_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
             set_schema(p);
         }
         _ => {
-            p.error("expected ADD, DROP, RENAME, OWNER, or SET");
+            p.error("expected `add`, `drop`, `rename`, `owner`, or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -8895,7 +8967,7 @@ fn alter_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
             set_schema(p);
         }
         _ => {
-            p.error("expected RENAME, OWNER, or SET");
+            p.error("expected `rename`, `owner`, or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -8931,7 +9003,7 @@ fn alter_operator(p: &mut Parser<'_>) -> CompletedMarker {
             set_options(p);
         }
         _ => {
-            p.error("expected OWNER or SET");
+            p.error("expected `owner` or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -8992,7 +9064,7 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
                 opt_alter_table_action_list(p);
             }
             _ => {
-                p.error("Expected RENAME, SET SCHEMA, [NO] DEPENDS, or action (ALTER, CLUSTER, SET, RESET, OWNER)");
+                p.error("expected `rename`, `set schema`, `depends`, `no depends`, `alter`, `cluster`, `set`, `reset`, or `owner`");
             }
         }
     }
@@ -9021,7 +9093,7 @@ fn opt_alter_table_action_list(p: &mut Parser<'_>) {
             break;
         }
         if p.at(COMMA) && matches!(p.nth(1), EOF | SEMICOLON) {
-            p.err_and_bump("unexpected trailing comma");
+            p.err_and_bump("unexpected trailing `,`");
             break;
         }
         if !p.eat(COMMA) {
@@ -9068,7 +9140,7 @@ fn alter_language(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         _ => {
-            p.error("expected RENAME or OWNER");
+            p.error("expected `rename` or `owner`");
         }
     }
     p.eat(SEMICOLON);
@@ -9153,7 +9225,7 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
                 m.complete(p, ALTER_SET_STATISTICS);
             }
             _ => {
-                p.error("expected RENAME, SET, ATTACH, DEPENDS, RESET, or ALTER");
+                p.error("expected `rename`, `set`, `attach`, `depends`, `reset`, or `alter`");
             }
         }
     }
@@ -9190,7 +9262,7 @@ fn alter_group(p: &mut Parser<'_>) -> CompletedMarker {
             });
         }
         _ => {
-            p.error("expected ADD, DROP, or RENAME");
+            p.error("expected `add`, `drop`, or `rename`");
         }
     }
     p.eat(SEMICOLON);
@@ -9333,7 +9405,7 @@ fn alter_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
         _ => opt_fdw_option_list(p).is_some(),
     };
     if !found_option {
-        p.error("Missing alter foreign data wrapper option or action.");
+        p.error("missing alter foreign data wrapper option or action");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_FOREIGN_DATA_WRAPPER)
@@ -9375,7 +9447,7 @@ fn alter_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
             rename_to(p, EVENT_TRIGGER_RENAME_TO, event_trigger);
         }
         _ => {
-            p.error("expected DISABLE, ENABLE, OWNER, or RENAME");
+            p.error("expected `disable`, `enable`, `owner`, or `rename`");
         }
     }
     p.eat(SEMICOLON);
@@ -9452,7 +9524,7 @@ fn alter_extension(p: &mut Parser<'_>) -> CompletedMarker {
             );
         }
         _ => {
-            p.error("expected UPDATE, SET, ADD, or DROP");
+            p.error("expected `update`, `set`, `add`, or `drop`");
         }
     }
     p.eat(SEMICOLON);
@@ -9667,7 +9739,7 @@ fn extension_member_object(p: &mut Parser<'_>) {
                 }
                 _ => {
                     p.error(
-                        "expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE after TEXT SEARCH",
+                        "expected `configuration`, `dictionary`, `parser`, or `template` after `text search`",
                     );
                     m.abandon(p);
                 }
@@ -9744,7 +9816,7 @@ fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                     SET_NOT_NULL
                 }
                 _ => {
-                    p.error("expected DEFAULT, NOT, or SCHEMA");
+                    p.error("expected `default`, `not`, or `schema`");
                     m.abandon(p);
                     return None;
                 }
@@ -9770,7 +9842,7 @@ fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                     DROP_CONSTRAINT
                 }
                 _ => {
-                    p.error("expected DEFAULT, NOT, or CONSTRAINT");
+                    p.error("expected `default`, `not`, or `constraint`");
                     m.abandon(p);
                     return None;
                 }
@@ -9804,7 +9876,7 @@ fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             return Some(owner_to(p));
         }
         _ => {
-            p.error("expected SET, DROP, ADD, RENAME, VALIDATE, or OWNER");
+            p.error("expected `set`, `drop`, `add`, `rename`, `validate`, or `owner`");
             m.abandon(p);
             return None;
         }
@@ -9828,7 +9900,7 @@ fn domain_constraint(p: &mut Parser<'_>) {
         p.expect(R_PAREN);
         CHECK_CONSTRAINT
     } else {
-        p.error("expected NOT NULL or CHECK constraint");
+        p.error("expected `not null` or `check` constraint");
         m.abandon(p);
         opt_constraint_option_list(p);
         return;
@@ -9919,7 +9991,7 @@ fn alter_default_privileges(p: &mut Parser<'_>) -> CompletedMarker {
         let m = p.start();
         p.bump(FOR_KW);
         if !p.eat(ROLE_KW) && !p.eat(USER_KW) {
-            p.error("expected ROLE or USER");
+            p.error("expected `role` or `user`");
         }
         role_list(p);
         m.complete(p, FOR_ROLES);
@@ -9959,7 +10031,7 @@ fn alter_default_privileges(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, REVOKE_DEFAULT_PRIVILEGES);
         }
         _ => {
-            p.error("expected GRANT or REVOKE");
+            p.error("expected `grant` or `revoke`");
         }
     }
     p.eat(SEMICOLON);
@@ -9989,7 +10061,7 @@ fn privilege_target_type(p: &mut Parser<'_>) {
             m.complete(p, kind);
         }
         _ => p.error(
-            "expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS, LARGE OBJECTS",
+            "expected privilege target, `tables`, `functions`, `routines`, `sequences`, `types`, `schemas`, or `large objects`",
         ),
     }
 }
@@ -10090,7 +10162,7 @@ fn alter_conversion(p: &mut Parser<'_>) -> CompletedMarker {
             set_schema(p);
         }
         _ => {
-            p.error("expected RENAME, OWNER, or SET");
+            p.error("expected `rename`, `owner`, or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -10121,7 +10193,7 @@ fn alter_collation(p: &mut Parser<'_>) -> CompletedMarker {
             set_schema(p);
         }
         _ => {
-            p.error("expected REFRESH, RENAME, OWNER, or SET");
+            p.error("expected `refresh`, `rename`, `owner`, or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -10171,7 +10243,7 @@ fn alter_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
             set_schema(p);
         }
         _ => {
-            p.error("expected RENAME, OWNER, or SET");
+            p.error("expected `rename`, `owner`, or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -10263,7 +10335,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => {
             p.error(
-            "expected CONNECTION, SERVER, SET, ADD, DROP, REFRESH, ENABLE, DISABLE, SKIP, OWNER or RENAME",
+            "expected `connection`, `server`, `set`, `add`, `drop`, `refresh`, `enable`, `disable`, `skip`, `owner`, or `rename`",
         );
         }
     }
@@ -10284,7 +10356,7 @@ fn alter_system(p: &mut Parser<'_>) -> CompletedMarker {
     } else if p.at(RESET_KW) {
         reset_config_param(p);
     } else {
-        p.error("expected SET or RESET after ALTER SYSTEM");
+        p.error("expected `set` or `reset` after `alter system`");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_SYSTEM)
@@ -10309,7 +10381,7 @@ fn alter_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     } else if p.at(RESET_KW) {
         reset_options(p);
     } else {
-        p.error("expected RENAME, OWNER, SET, or RESET after tablespace name");
+        p.error("expected `rename`, `owner`, `set`, or `reset` after tablespace name");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_TABLESPACE)
@@ -10348,7 +10420,7 @@ fn alter_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     } else if p.at(SET_KW) {
         set_schema(p);
     } else {
-        p.error("expected RENAME TO or SET SCHEMA");
+        p.error("expected `rename to` or `set schema`");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_TEXT_SEARCH_PARSER)
@@ -10382,7 +10454,7 @@ fn alter_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     } else if p.at(SET_KW) {
         set_schema(p);
     } else {
-        p.error("expected '(', RENAME, OWNER, or SET");
+        p.error("expected `(`, `rename`, `owner`, or `set`");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_TEXT_SEARCH_DICTIONARY)
@@ -10443,12 +10515,12 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
                 } else if p.at(REPLACE_KW) {
                     replace_dictionary(p);
                 } else {
-                    p.error("expected WITH or REPLACE");
+                    p.error("expected `with` or `replace`");
                 }
             } else if p.at(REPLACE_KW) {
                 replace_dictionary(p);
             } else {
-                p.error("expected FOR or REPLACE");
+                p.error("expected `for` or `replace`");
             }
             m.complete(p, ALTER_MAPPING);
         }
@@ -10475,7 +10547,7 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
             set_schema(p);
         }
         _ => {
-            p.error("expected ADD, ALTER, DROP, RENAME, OWNER, or SET");
+            p.error("expected `add`, `alter`, `drop`, `rename`, `owner`, or `set`");
         }
     }
     p.eat(SEMICOLON);
@@ -10650,8 +10722,7 @@ fn table_name_ref_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Table),
         NAME_REF_FIRST,
         |p| {
             table_name_ref(p);
@@ -10681,7 +10752,7 @@ fn alter_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     } else if p.at(SET_KW) {
         set_schema(p);
     } else {
-        p.error("expected RENAME TO or SET SCHEMA");
+        p.error("expected `rename to` or `set schema`");
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_TEXT_SEARCH_TEMPLATE)
@@ -10702,7 +10773,7 @@ fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
         if p.at(NO_KW) || p.at(DEPENDS_KW) {
             depends_on_extension(p);
         } else {
-            p.error(format!("expected NO or DEPENDS, found {:?}", p.current()));
+            p.error(format!("expected `no` or `depends`, found {}", p.current()));
         }
     }
     p.eat(SEMICOLON);
@@ -10795,7 +10866,7 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
                 string_literal(p);
                 m.complete(p, RENAME_VALUE);
             } else {
-                p.error("expected TO, ATTRIBUTE, or VALUE");
+                p.error("expected `to`, `attribute`, or `value`");
                 m.abandon(p);
             }
         }
@@ -10808,7 +10879,7 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             opt_value_position(p);
             m.complete(p, ADD_VALUE);
         }
-        _ => p.error("expected ALTER TYPE option"),
+        _ => p.error("expected `alter type` option"),
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_TYPE)
@@ -10880,7 +10951,7 @@ fn alter_user(p: &mut Parser<'_>) -> CompletedMarker {
         RESET_KW => {
             reset_config_param(p);
         }
-        _ => p.error("expected SET or RESET"),
+        _ => p.error("expected `set` or `reset`"),
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_USER)
@@ -10988,7 +11059,7 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
                 p.expect(DEFAULT_KW);
                 m.complete(p, DROP_DEFAULT);
             } else {
-                p.error("expected SET or DROP");
+                p.error("expected `set` or `drop`");
             }
             m.complete(p, ALTER_VIEW_COLUMN);
         }
@@ -11010,7 +11081,7 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
         RESET_KW => {
             reset_options(p);
         }
-        _ => p.error("expected ALTER, OWNER, RENAME, or SET"),
+        _ => p.error("expected `alter`, `owner`, `rename`, or `set`"),
     }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_VIEW)
@@ -11045,8 +11116,7 @@ fn opt_option_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         OPTION_FIRST,
         opt_option,
     );
@@ -11347,7 +11417,7 @@ fn comment_object(p: &mut Parser<'_>) {
                     m.complete(p, OBJECT_TEXT_SEARCH_TEMPLATE);
                 }
                 _ => {
-                    p.error("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                    p.error("expected `configuration`, `dictionary`, `parser`, or `template`");
                     m.abandon(p);
                 }
             }
@@ -11375,7 +11445,7 @@ fn comment(p: &mut Parser<'_>) -> CompletedMarker {
     comment_object(p);
     p.expect(IS_KW);
     if !p.eat(NULL_KW) && opt_string_literal(p).is_none() {
-        p.error("expected string literal or NULL");
+        p.error("expected string literal or `null`");
     }
     p.eat(SEMICOLON);
     m.complete(p, COMMENT_ON)
@@ -11457,8 +11527,7 @@ fn opt_vertex_tables(p: &mut Parser<'_>) -> bool {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::VertexTable),
         VERTEX_TABLE_DEF_FIRST,
         opt_vertex_table_def,
     );
@@ -11572,8 +11641,7 @@ fn opt_edge_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::EdgeTable),
         EDGE_TABLE_DEF_FIRST,
         opt_edge_table_def,
     );
@@ -11697,8 +11765,7 @@ fn drop_edge_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::EdgeTable),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
     );
@@ -11717,8 +11784,7 @@ fn drop_vertex_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::VertexTable),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
     );
@@ -12019,7 +12085,7 @@ fn create_access_method(p: &mut Parser<'_>) -> CompletedMarker {
         p.bump_any();
         ty.complete(p, kind);
     } else {
-        p.error("expected TABLE or INDEX");
+        p.error("expected `table` or `index`");
     }
     handler_clause(p);
     p.eat(SEMICOLON);
@@ -12128,7 +12194,7 @@ fn opt_cast_context(p: &mut Parser<'_>) {
     } else if p.eat(IMPLICIT_KW) {
         AS_IMPLICIT
     } else {
-        p.error("expected ASSIGNMENT or IMPLICIT");
+        p.error("expected `assignment` or `implicit`");
         ERROR
     };
     m.complete(p, kind);
@@ -12392,7 +12458,7 @@ fn create_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     opt_event_trigger_when_clause(p);
     p.expect(EXECUTE_KW);
     if !p.eat(FUNCTION_KW) && !p.eat(PROCEDURE_KW) {
-        p.error("expected FUNCTION or PROCEDURE");
+        p.error("expected `function` or `procedure`");
     }
     // TODO: add validation to prevent passing arguments here
     call_expr(p);
@@ -12557,7 +12623,7 @@ fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
             } else if p.eat(VALIDATOR_KW) {
                 OPTION_NO_VALIDATOR
             } else {
-                p.error("expected CONNECTION, HANDLER or VALIDATOR");
+                p.error("expected `connection`, `handler`, or `validator`");
                 OPTION_NO_CONNECTION
             }
         }
@@ -12655,11 +12721,11 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | PAREN_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
             p.error(format!(
-                "expected SELECT, TABLE, or VALUES statement, got {kind:?}"
+                "expected `select`, `table`, or `values` statement, found {kind}"
             ));
         }
         None => {
-            p.error("expected SELECT, TABLE, or VALUES statement");
+            p.error("expected `select`, `table`, or `values` statement");
         }
     }
     opt_with_data(p);
@@ -12746,7 +12812,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
                 } else if p.eat(SEARCH_KW) {
                     m.complete(p, OP_CLASS_FOR_SEARCH);
                 } else {
-                    p.error("expected SEARCH or ORDER BY");
+                    p.error("expected `search` or `order by`");
                     m.abandon(p);
                 }
             }
@@ -12765,7 +12831,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
             m.complete(p, OP_CLASS_OPTION_STORAGE);
         }
         _ => {
-            p.error("expected OPERATOR, FUNCTION, or STORAGE");
+            p.error("expected `operator`, `function`, or `storage`");
             m.abandon(p);
         }
     }
@@ -12787,7 +12853,7 @@ fn operator_drop_class_option(p: &mut Parser<'_>) {
             opt_param_list(p, ParamKind::TypeOnly);
             m.complete(p, kind);
         }
-        _ => p.error("expected OPERATOR, or FUNCTION"),
+        _ => p.error("expected `operator` or `function`"),
     }
 }
 
@@ -12842,7 +12908,7 @@ fn opt_policy_command(p: &mut Parser<'_>) {
         DELETE_KW => POLICY_COMMAND_DELETE,
         _ => {
             command.abandon(p);
-            p.error("expected ALL, SELECT, INSERT, UPDATE, or DELETE");
+            p.error("expected `all`, `select`, `insert`, `update`, or `delete`");
             m.complete(p, POLICY_COMMAND);
             return;
         }
@@ -13008,8 +13074,7 @@ fn opt_except_table_clause(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Table),
         RELATION_NAME_FIRST.union(TokenSet::new(&[TABLE_KW])),
         |p| {
             let m = p.start();
@@ -13065,12 +13130,12 @@ fn select_insert_delete_update_or_notify(p: &mut Parser<'_>, semi_allowed: bool)
             | NOTIFY => (),
             kind => {
                 p.error(format!(
-                    "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, got {kind:?}"
+                    "expected `select`, `insert`, `update`, `delete`, `notify`, or `values` statement, found {kind}"
                 ));
             }
         }
     } else {
-        p.error("expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement");
+        p.error("expected `select`, `insert`, `update`, `delete`, `notify`, or `values` statement");
     }
 }
 
@@ -13118,7 +13183,7 @@ fn rule_on(p: &mut Parser<'_>) {
         p.bump_any();
         m.complete(p, RULE_EVENT);
     } else {
-        p.error("expected SELECT, INSERT, UPDATE, or DELETE");
+        p.error("expected `select`, `insert`, `update`, or `delete`");
     }
     p.expect(TO_KW);
     relation_name_ref(p);
@@ -13236,8 +13301,7 @@ fn opt_stat_types(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::StatsKind),
         NAME_REF_FIRST,
         opt_statistics_kind,
     );
@@ -13514,7 +13578,7 @@ fn opt_role_option(p: &mut Parser<'_>) -> bool {
                     m.complete(p, ROLE_OPTION_IN_ROLE);
                 }
                 _ => {
-                    p.error("expected GROUP or ROLE");
+                    p.error("expected `group` or `role`");
                     m.abandon(p);
                     role_list(p);
                 }
@@ -13647,7 +13711,7 @@ fn routine_sig_with_keyword(p: &mut Parser<'_>) -> SyntaxKind {
             routine_sig(p);
             OBJECT_ROUTINE
         }
-        _ => unreachable!("expected FUNCTION, PROCEDURE, or ROUTINE"),
+        _ => unreachable!("expected `function`, `procedure`, or `routine`"),
     }
 }
 
@@ -14258,12 +14322,12 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
             | PAREN_SELECT => (),
             kind => {
                 p.error(format!(
-                    "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {kind:?}",
+                    "expected `select`, `insert`, `update`, `delete`, `merge`, or `values` statement, found {kind}",
                 ));
             }
         }
     } else {
-        p.error("expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS");
+        p.error("expected `select`, `insert`, `update`, `delete`, `merge`, `values`, `execute`, `declare`, `create table as`, or `create materialized view as`");
     }
     p.eat(SEMICOLON);
     m.complete(p, EXPLAIN)
@@ -14288,8 +14352,7 @@ fn opt_explain_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         EXPLAIN_OPTION_FIRST,
         opt_explain_option,
     );
@@ -14363,8 +14426,7 @@ fn alter_option_list_contents(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "expected alter option".to_string(),
+        ListItems::Required(ListItem::Option),
         EXPR_FIRST,
         |p| opt_alter_option(p).is_some(),
     );
@@ -14610,7 +14672,7 @@ fn merge_when_clause(p: &mut Parser<'_>) {
                     let by_kind = if p.eat(TARGET_KW) {
                         BY_TARGET
                     } else {
-                        p.error("expected SOURCE or TARGET");
+                        p.error("expected `source` or `target`");
                         ERROR
                     };
                     m.complete(p, by_kind);
@@ -14621,7 +14683,7 @@ fn merge_when_clause(p: &mut Parser<'_>) {
             }
         }
         _ => {
-            p.error("expected MATCHED, or NOT MATCHED");
+            p.error("expected `matched` or `not matched`");
             MERGE_WHEN_NOT_MATCHED_TARGET
         }
     };
@@ -14656,7 +14718,7 @@ fn opt_overriding_clause(p: &mut Parser<'_>) {
     } else if p.eat(USER_KW) {
         Some(OVERRIDING_USER_VALUE)
     } else {
-        p.error("expected SYSTEM or USER");
+        p.error("expected `system` or `user`");
         None
     };
     p.expect(VALUE_KW);
@@ -14706,7 +14768,7 @@ fn merge_action(p: &mut Parser<'_>) {
             } else if p.at(DEFAULT_KW) {
                 default_values(p);
             } else {
-                p.error("expected VALUES or DEFAULT VALUES");
+                p.error("expected `values` or `default values`");
             }
             MERGE_INSERT
         }
@@ -14717,7 +14779,7 @@ fn merge_action(p: &mut Parser<'_>) {
             MERGE_DO_NOTHING
         }
         _ => {
-            p.error("expected INSERT, UPDATE, DELETE, or DO NOTHING");
+            p.error("expected `insert`, `update`, `delete`, or `do nothing`");
             MERGE_DO_NOTHING
         }
     };
@@ -14845,7 +14907,7 @@ fn grant_role_option_list(p: &mut Parser<'_>) {
     if found_option {
         m.complete(p, GRANT_ROLE_OPTION_LIST);
     } else {
-        p.error("expected GRANT OPTION or role option");
+        p.error("expected `grant option` or role option");
         m.abandon(p);
     }
 }
@@ -14854,7 +14916,7 @@ fn grant_role_option(p: &mut Parser<'_>) {
     let m = p.start();
     grant_role_option_name(p);
     if !(p.eat(OPTION_KW) || p.eat(TRUE_KW) || p.eat(FALSE_KW)) {
-        p.error("expected OPTION, TRUE, or FALSE");
+        p.error("expected `option`, `true`, or `false`");
     }
     m.complete(p, GRANT_ROLE_OPTION);
 }
@@ -14886,7 +14948,7 @@ fn privilege_target(p: &mut Parser<'_>) {
             SEQUENCES_KW => PRIVILEGE_ALL_SEQUENCES_IN_SCHEMA,
             TABLES_KW => PRIVILEGE_ALL_TABLES_IN_SCHEMA,
             _ => {
-                p.error("expected TABLE");
+                p.error("expected `table`");
                 m.abandon(p);
                 return;
             }
@@ -15118,7 +15180,7 @@ fn revoke_command(p: &mut Parser<'_>) {
         } else if p.at_ts(REVOKE_COMMAND_FIRST) {
             p.bump_any();
         } else {
-            p.error(format!("expected command name, got {:?}", p.current()));
+            p.error(format!("expected command name, found {}", p.current()));
         }
     }
     // [ ( column_name [, ...] ) ]
@@ -15134,7 +15196,7 @@ fn revoke_command(p: &mut Parser<'_>) {
 //  | SESSION_USER
 fn role_ref(p: &mut Parser<'_>) {
     if !opt_role_ref(p) {
-        p.error(format!("expected role, got {:?}", p.current()));
+        p.error(format!("expected role, found {}", p.current()));
     }
 }
 
@@ -15154,7 +15216,7 @@ fn opt_role_ref(p: &mut Parser<'_>) -> bool {
 
 fn role(p: &mut Parser<'_>) {
     if !opt_role_(p, ROLE) {
-        p.error(format!("expected role, got {:?}", p.current()));
+        p.error(format!("expected role, found {}", p.current()));
     }
 }
 
@@ -15345,7 +15407,7 @@ fn security_label_object(p: &mut Parser<'_>) {
             p.bump(LARGE_KW);
             p.expect(OBJECT_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected large_object_oid");
+                p.error("expected a large object OID");
             }
             m.complete(p, OBJECT_LARGE_OBJECT);
         }
@@ -15448,7 +15510,7 @@ fn constraint_timing(p: &mut Parser<'_>) {
         DEFERRED_KW => DEFERRED,
         IMMEDIATE_KW => IMMEDIATE,
         _ => {
-            p.error("expected DEFERRED or IMMEDIATE");
+            p.error("expected `deferred` or `immediate`");
             return;
         }
     };
@@ -15638,21 +15700,21 @@ fn row_list(p: &mut Parser<'_>) {
     let mut found_row = false;
     while !p.at(EOF) {
         if !p.at(L_PAREN) {
-            p.err_and_bump("expected L_PAREN");
+            p.err_and_bump("expected `(`");
             continue;
         }
         row(p);
         found_row = true;
         if p.eat(COMMA) {
             while p.at(COMMA) {
-                p.err_and_bump("expected L_PAREN");
+                p.err_and_bump("expected `(`");
             }
             if !p.at(L_PAREN) {
                 p.error("expected row after comma");
                 break;
             }
         } else if p.at(L_PAREN) {
-            p.error("expected COMMA");
+            p.error("expected `,`");
         } else {
             break;
         }
@@ -15673,8 +15735,7 @@ fn row(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "expected expression".to_string(),
+        ListItems::Required(ListItem::Expr),
         EXPR_FIRST,
         |p| expr(p).is_some(),
     );
@@ -15728,8 +15789,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Option),
             REINDEX_OPTION_FIRST,
             opt_reindex_option,
         );
@@ -15774,7 +15834,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, REINDEX_TARGET_SYSTEM);
         }
         _ => {
-            p.error("expected INDEX, TABLE, SCHEMA, DATABASE, or SYSTEM");
+            p.error("expected `index`, `table`, `schema`, `database`, or `system`");
         }
     }
     p.eat(SEMICOLON);
@@ -15839,9 +15899,9 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     match stmt(p, &StmtRestrictions::default()) {
         Some(statement) => match statement.kind() {
             SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | TABLE | PAREN_SELECT => (),
-            kind => p.error(format!("expected SELECT, got {kind:?}")),
+            kind => p.error(format!("expected `select`, found {kind}")),
         },
-        None => p.error("expected SELECT"),
+        None => p.error("expected `select`"),
     }
     opt_with_check_option(p);
     p.eat(SEMICOLON);
@@ -15907,8 +15967,7 @@ fn opt_checkpoint_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         NAME_FIRST,
         opt_checkpoint_option,
     );
@@ -16137,11 +16196,11 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES | PAREN_SELECT) => (),
         Some(kind) => {
             p.error(format!(
-                "expected SELECT, TABLE, or VALUES statement, got {kind:?}",
+                "expected `select`, `table`, or `values` statement, found {kind}",
             ));
         }
         None => {
-            p.error("expected SELECT, TABLE, or VALUES statement");
+            p.error("expected `select`, `table`, or `values` statement");
         }
     }
     p.eat(SEMICOLON);
@@ -16362,8 +16421,7 @@ fn opt_vacuum_option_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Option),
             VACUUM_OPTION_FIRST,
             |p| opt_vacuum_option(p).is_some(),
         );
@@ -16522,8 +16580,7 @@ fn copy_option_arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Value),
         COPY_OPTION_ARG_FIRST,
         opt_copy_option_arg,
     );
@@ -16568,8 +16625,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         COL_LABEL_FIRST,
         opt_copy_option,
     );
@@ -16633,7 +16689,7 @@ fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
                 }
                 None => {
                     m.abandon(p);
-                    p.error("expected NOT, QUOTE, or NULL");
+                    p.error("expected `not`, `quote`, or `null`");
                     false
                 }
             }
@@ -16782,11 +16838,11 @@ fn preparable_stmt(p: &mut Parser<'_>) {
         ) => (),
         Some(kind) => {
             p.error(format!(
-                    "expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement, got {kind:?}"
+                    "expected `select`, `table`, `values`, `insert`, `update`, `delete`, or `merge` statement, found {kind}"
                 ));
         }
         None => {
-            p.error("expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement");
+            p.error("expected `select`, `table`, `values`, `insert`, `update`, `delete`, or `merge` statement");
         }
     }
 }
@@ -16801,7 +16857,7 @@ fn call(p: &mut Parser<'_>, semi_allowed: bool) -> CompletedMarker {
     if p.at(L_PAREN) {
         arg_list(p);
     } else {
-        p.error("expected L_PAREN");
+        p.error("expected `(`");
     }
     if semi_allowed {
         p.eat(SEMICOLON);
@@ -16844,7 +16900,7 @@ fn create_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     // EXECUTE { FUNCTION | PROCEDURE } function_name ( arguments )
     p.expect(EXECUTE_KW);
     if !p.eat(FUNCTION_KW) && !p.eat(PROCEDURE_KW) {
-        p.error("expected FUNCTION or PROCEDURE");
+        p.error("expected `function` or `procedure`");
     }
     // function_name ( arguments )
     call_expr(p);
@@ -16870,7 +16926,7 @@ fn opt_trigger_level(p: &mut Parser<'_>) {
             m.complete(p, FOR_EACH_STATEMENT);
         }
         _ => {
-            p.error("expected ROW or STATEMENT");
+            p.error("expected `row` or `statement`");
             m.abandon(p);
         }
     }
@@ -16960,7 +17016,7 @@ fn trigger_event(p: &mut Parser<'_>) {
             m.complete(p, TRIGGER_EVENT_UPDATE);
         }
         _ => {
-            p.error("expected INSERT, UPDATE, DELETE, or TRUNCATE");
+            p.error("expected `insert`, `update`, `delete`, or `truncate`");
             m.abandon(p);
         }
     }
@@ -16984,7 +17040,7 @@ fn timing(p: &mut Parser<'_>) {
             m.complete(p, TIMING_INSTEAD_OF);
         }
         _ => {
-            p.error("expected BEFORE, AFTER, or INSTEAD OF");
+            p.error("expected `before`, `after`, or `instead of`");
             m.abandon(p);
         }
     }
@@ -17156,7 +17212,7 @@ fn query(p: &mut Parser<'_>) {
     if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default()).is_none())
         && opt_paren_select(p, None, &SelectRestrictions::default()).is_none()
     {
-        p.error("expected select stmt");
+        p.error("expected a `select` statement");
     }
 }
 
@@ -17297,8 +17353,7 @@ fn conflict_index_item_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::IndexEl),
         EXPR_FIRST,
         opt_conflict_index_item,
     );
@@ -17321,7 +17376,7 @@ fn set_column_list(p: &mut Parser<'_>) {
     separated(
         p,
         COMMA,
-        || "unexpected comma".to_string(),
+        ListItem::Col,
         SET_COLUMN_FIRST,
         SET_COLUMN_FOLLOW,
         |p| opt_set_column(p).is_some(),
@@ -17362,7 +17417,7 @@ fn set_expr_list_or_paren_select(p: &mut Parser<'_>) {
     if p.at(L_PAREN) {
         if p.nth_at(1, SELECT_KW) {
             if opt_paren_select(p, Some(m), &SelectRestrictions::default()).is_none() {
-                p.error("expected sub-SELECT");
+                p.error("expected a subquery");
             }
         } else {
             set_expr_list(p, m);
@@ -17380,8 +17435,7 @@ fn set_expr_list(p: &mut Parser<'_>, m: Marker) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Expr),
         SET_EXPR_FIRST,
         opt_set_expr,
     );
@@ -17522,7 +17576,7 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>, r: &SelectRestrictions) -> Option
         _ => {
             m.abandon(p);
             p.error(format!(
-                "expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: {:?}",
+                "expected `delete`, `select`, `table`, `update`, `values`, or `merge`, found {}",
                 p.current()
             ));
             None
@@ -17559,11 +17613,11 @@ fn opt_using_clause(p: &mut Parser<'_>) {
     let m = p.start();
     if p.eat(USING_KW) {
         if opt_from_item(p).is_none() {
-            p.error("expected FROM item after USING");
+            p.error("expected `from` item after `using`");
         }
         while p.eat(COMMA) {
             if opt_from_item(p).is_none() {
-                p.error("expected FROM item after comma");
+                p.error("expected `from` item after comma");
                 break;
             }
         }
@@ -17608,8 +17662,7 @@ fn opt_returning_option_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required,
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Option),
             RETURNING_OPTION_FIRST,
             opt_returning_option,
         );
@@ -17726,8 +17779,7 @@ fn opt_drop_database_force_clause(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         DROP_DATABASE_OPTION_FIRST,
         |p| {
             if !p.at(FORCE_KW) {
@@ -17835,8 +17887,7 @@ fn partition_items(p: &mut Parser<'_>, part_kind: PartitionItemKind) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::PartitionKey),
         EXPR_FIRST,
         |p| opt_partition_item(p, part_kind).is_some(),
     );
@@ -18012,7 +18063,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
                 if p.at_ts(UNRESERVED_KEYWORDS) || p.at(IDENT) {
                     language_ref(p);
                 } else {
-                    p.error(format!("expected a language name, got {:?}", p.current()));
+                    p.error(format!("expected a language name, found {}", p.current()));
                 }
             }
             LANGUAGE_FUNC_OPTION
@@ -18026,7 +18077,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
                     break;
                 }
                 if !p.at(FOR_KW) {
-                    p.error("expected FOR TYPE entry after comma");
+                    p.error("expected `for type` entry after comma");
                     break;
                 }
             }
@@ -18108,7 +18159,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
         COST_KW => {
             p.bump(COST_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected numeric value for execution_cost");
+                p.error("expected a numeric execution cost");
             }
             COST_FUNC_OPTION
         }
@@ -18116,7 +18167,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
         ROWS_KW => {
             p.bump(ROWS_KW);
             if opt_numeric_literal(p).is_none() {
-                p.error("expected numeric value for result_rows");
+                p.error("expected a numeric row estimate");
             }
             ROWS_FUNC_OPTION
         }
@@ -18166,7 +18217,7 @@ fn routine_body_stmt(p: &mut Parser<'_>) {
         let m = p.start();
         p.bump(RETURN_KW);
         if expr(p).is_none() {
-            p.error("expected expr");
+            p.error("expected an expression");
         }
         p.expect(SEMICOLON);
         m.complete(p, RETURN_STMT);
@@ -18224,8 +18275,7 @@ fn return_table_arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Col),
         NAME_FIRST,
         return_table_column,
     );
@@ -18333,8 +18383,7 @@ fn param_list(p: &mut Parser<'_>, kind: ParamKind) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "unexpected comma".to_string(),
+        ListItems::Optional(ListItem::Param),
         PARAM_FIRST,
         |p| opt_param(p, kind),
     );
@@ -18480,8 +18529,7 @@ fn variant_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "unexpected comma".to_string(),
+        ListItems::Optional(ListItem::Value),
         STRING_FIRST,
         opt_variant,
     );
@@ -18515,7 +18563,7 @@ fn create_extension(p: &mut Parser<'_>) -> CompletedMarker {
             if p.at(IDENT) {
                 extension_version(p);
             } else {
-                p.error("expected string literal or IDENT");
+                p.error("expected string literal or identifier");
             }
         }
         m.complete(p, EXTENSION_VERSION_CLAUSE);
@@ -18572,7 +18620,7 @@ fn config_assignment(p: &mut Parser<'_>) {
     } else {
         let _ = p.eat(TO_KW) || p.expect(EQ);
         if !config_value(p) {
-            p.error(format!("expected config value, got {:?}", p.current()));
+            p.error(format!("expected config value, found {}", p.current()));
         }
         m.complete(p, TO_CONFIG_VALUE);
     }
@@ -18652,7 +18700,7 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
         p.bump(XML_KW);
         p.expect(OPTION_KW);
         if !opt_xml_document_or_content(p) {
-            p.error("expected DOCUMENT or CONTENT");
+            p.error("expected `document` or `content`");
         }
         m.complete(p, SET_XML_OPTION);
     } else
@@ -18662,7 +18710,7 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
         p.bump(TIME_KW);
         p.expect(ZONE_KW);
         if !zone_value(p) {
-            p.error(format!("expected time zone value, got {:?}", p.current()));
+            p.error(format!("expected time zone value, found {}", p.current()));
         }
         m.complete(p, SET_TIME_ZONE);
     } else if p.at(CATALOG_KW) || p.at(SCHEMA_KW) {
@@ -19054,7 +19102,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                     ENABLE_RLS
                 }
                 _ => {
-                    p.error("expected TRIGGER, REPLICA, ALWAYS, RULE, or ROW");
+                    p.error("expected `trigger`, `replica`, `always`, `rule`, or `row`");
                     // TODO: just picking something for now
                     ENABLE_RLS
                 }
@@ -19085,7 +19133,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                     DISABLE_RULE
                 }
                 _ => {
-                    p.error("expected TRIGGER, ROW, or RULE");
+                    p.error("expected `trigger`, `row`, or `rule`");
                     // TODO: just picking something for now
                     DISABLE_RULE
                 }
@@ -19287,7 +19335,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 if p.at_ts(COLUMN_FIRST) {
                     column_name_ref(p);
                 } else {
-                    p.error("expected column_name");
+                    p.error("expected a column name");
                 }
                 alter_column_option(p);
                 ALTER_COLUMN
@@ -19318,8 +19366,7 @@ fn partition_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Partition),
         TokenSet::new(&[PARTITION_KW]),
         opt_partition,
     );
@@ -19390,7 +19437,7 @@ fn def_arg(p: &mut Parser<'_>) {
         qual_op(p);
         p.expect(R_PAREN);
     } else if !opt_type_name(p) {
-        let message = format!("expected attribute value, got {:?}", p.current());
+        let message = format!("expected attribute value, found {}", p.current());
         err_recover_run(p, message, ATTRIBUTE_VALUE_RECOVERY);
     }
     m.complete(p, ATTRIBUTE_VALUE);
@@ -19525,7 +19572,7 @@ fn alter_column_option(p: &mut Parser<'_>) {
             p.bump(SET_KW);
             p.bump(DEFAULT_KW);
             if expr(p).is_none() {
-                p.error("expected expr");
+                p.error("expected an expression");
             }
             SET_DEFAULT
         }
@@ -19536,7 +19583,7 @@ fn alter_column_option(p: &mut Parser<'_>) {
             p.expect(AS_KW);
             p.expect(L_PAREN);
             if expr(p).is_none() {
-                p.error("expected expr");
+                p.error("expected an expression");
             }
             p.expect(R_PAREN);
             SET_EXPRESSION
@@ -19593,8 +19640,7 @@ fn attribute_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required,
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Attribute),
         COL_LABEL_FIRST,
         opt_attribute_option,
     );

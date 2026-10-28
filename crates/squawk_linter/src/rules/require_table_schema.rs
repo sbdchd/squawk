@@ -66,11 +66,14 @@ fn check_path_ref(ctx: &mut Linter, path: Option<ast::PathRef>) {
 }
 
 fn report_missing_schema(ctx: &mut Linter, node: &SyntaxNode) {
-    ctx.report(Violation::for_node(
-        Rule::RequireTableSchema,
-        "Table name is not schema-qualified. Use schema.table (e.g., public.my_table).".into(),
-        node,
-    ));
+    ctx.report(
+        Violation::for_node(
+            Rule::RequireTableSchema,
+            "table name is not schema-qualified".into(),
+            node,
+        )
+        .help("qualify the name with its schema, e.g. `public.my_table`"),
+    );
 }
 
 #[cfg(test)]

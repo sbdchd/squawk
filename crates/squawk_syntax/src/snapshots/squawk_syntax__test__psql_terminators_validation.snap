@@ -116,11 +116,11 @@ SOURCE_FILE@0..162
     SEMICOLON@160..161 ";"
   WHITESPACE@161..162 "\n"
 
-error[syntax-error]: Missing semicolon between statements
+error[syntax-error]: missing semicolon between statements
   ╭▸ 
 1 │ SELECT 1
   ╰╴        ━
-error[syntax-error]: Missing semicolon between statements
+error[syntax-error]: missing semicolon between statements
   ╭▸ 
 7 │ SELECT 1
   ╰╴        ━

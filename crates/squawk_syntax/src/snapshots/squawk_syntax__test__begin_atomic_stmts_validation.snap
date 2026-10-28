@@ -158,11 +158,11 @@ SOURCE_FILE@0..239
     SEMICOLON@237..238 ";"
   WHITESPACE@238..239 "\n"
 
-error[syntax-error]: Missing semicolon after statement
+error[syntax-error]: missing semicolon after statement
   ╭▸ 
 6 │   insert into t values (2)
   ╰╴                          ━
-error[syntax-error]: Missing semicolon after statement
+error[syntax-error]: missing semicolon after statement
    ╭▸ 
 13 │   insert into t values (1)
    ╰╴                          ━

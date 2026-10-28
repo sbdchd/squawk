@@ -300,7 +300,11 @@ impl SquawkDatabase {
                 end_column: end.col,
                 range_start: range_start.into(),
                 range_end: range_end.into(),
-                messages: vec![],
+                messages: x
+                    .hint()
+                    .map(|hint| hint.to_owned().into())
+                    .into_iter()
+                    .collect(),
                 fix: None,
             }
         });
@@ -316,7 +320,7 @@ impl SquawkDatabase {
                 .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                 .unwrap();
 
-            let messages = x.help.into_iter().collect();
+            let messages = x.note.into_iter().chain(x.help).collect();
 
             let fix = x.fix.map(|fix| {
                 let edits = fix

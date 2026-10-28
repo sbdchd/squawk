@@ -43,7 +43,7 @@ SOURCE_FILE@0..57
     SEMICOLON@55..56 ";"
   WHITESPACE@56..57 "\n"
 
-error[syntax-error]: Defaults are not allowed.
+error[syntax-error]: defaults are not allowed
   ╭▸ 
 1 │ alter procedure p(value integer default 1) rename to p2;
   ╰╴                                ━━━━━━━━━

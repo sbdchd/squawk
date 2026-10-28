@@ -6,8 +6,8 @@ use squawk_syntax::{
 use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let message = "Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.";
-    let help = "Create an index `CONCURRENTLY` and create the constraint using the index.";
+    let message = "adding a `unique` constraint requires an `access exclusive` lock which blocks reads and writes to the table while the index is built";
+    let help = "create an index `concurrently` and create the constraint using the index";
     let file = parse.tree();
     let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
@@ -73,12 +73,12 @@ create table t as select 1 as id;
 commit;
 alter table t add unique (id);";
         assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint), @"
-        warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
+        warning[disallowed-unique-constraint]: adding a `unique` constraint requires an `access exclusive` lock which blocks reads and writes to the table while the index is built
           ╭▸ 
         4 │ alter table t add unique (id);
           │                   ━━━━━━━━━━━
           │
-          ╰ help: Create an index `CONCURRENTLY` and create the constraint using the index.
+          ╰ help: create an index `concurrently` and create the constraint using the index
         ");
     }
 
@@ -89,12 +89,12 @@ select 1 as id into new.t;
 alter table existing.t add unique (id);
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint), @"
-        warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
+        warning[disallowed-unique-constraint]: adding a `unique` constraint requires an `access exclusive` lock which blocks reads and writes to the table while the index is built
           ╭▸ 
         3 │ alter table existing.t add unique (id);
           │                            ━━━━━━━━━━━
           │
-          ╰ help: Create an index `CONCURRENTLY` and create the constraint using the index.
+          ╰ help: create an index `concurrently` and create the constraint using the index
         ");
     }
 

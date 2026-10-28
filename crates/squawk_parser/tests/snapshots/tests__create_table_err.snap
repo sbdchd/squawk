@@ -1027,63 +1027,63 @@ error[syntax-error]: expected path name
   ╭▸ 
 2 │ create table (
   ╰╴             ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
    ╭▸ 
 10 │ create table t (a text,);
    ╰╴                      ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                 ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                  ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                   ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                    ━
-error[syntax-error]: expected INHERIT_KW
+error[syntax-error]: expected `inherit`
    ╭▸ 
 16 │ create table t ( c int check (c > 10) no;
    ╰╴                                        ━
-error[syntax-error]: expected R_PAREN
+error[syntax-error]: expected `)`
    ╭▸ 
 16 │ create table t ( c int check (c > 10) no;
    ╰╴                                        ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 54 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
    ╰╴                                 ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 54 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
    ╰╴                                                      ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 58 │     for values in (1  2  3);
    ╰╴                    ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 58 │     for values in (1  2  3);
    ╰╴                       ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
    ╭▸ 
 64 │   exclude using btree ( a with buzz.> b with <) 
    ╰╴                                     ━
-error[syntax-error]: WITHOUT OVERLAPS is only allowed in PRIMARY KEY and UNIQUE constraints
+error[syntax-error]: `without overlaps` is only allowed in `primary key` and `unique` constraints
    ╭▸ 
 78 │ create table t (a int, foreign key (a without overlaps) references u (c));
    ╰╴                                      ━
-error[syntax-error]: PERIOD must be the last column in the list
+error[syntax-error]: `period` must be the last column in the list
    ╭▸ 
 81 │ create table t (a int, b daterange, foreign key (period b, a) references u (c, period d));
    ╰╴                                                          ━
@@ -1091,19 +1091,19 @@ error[syntax-error]: expected expression after comma
    ╭▸ 
 84 │ create table error_tbl (i int default (100, ));
    ╰╴                                           ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one expression
    ╭▸ 
 87 │ create table t partition of p for values in ();
    ╰╴                                             ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one expression
    ╭▸ 
 88 │ create table t partition of p for values in (/* c */);
    ╰╴                                             ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one expression
    ╭▸ 
 89 │ create table t partition of p for values from () to (1);
    ╰╴                                               ━
-error[syntax-error]: Expected at least one item
+error[syntax-error]: expected at least one expression
    ╭▸ 
 90 │ create table t partition of p for values from (1) to ();
    ╰╴                                                      ━

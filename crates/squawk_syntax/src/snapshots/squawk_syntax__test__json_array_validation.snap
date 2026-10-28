@@ -65,11 +65,11 @@ SOURCE_FILE@0..100
     SEMICOLON@98..99 ";"
   WHITESPACE@99..100 "\n"
 
-error[syntax-error]: Subquery must be the only argument
+error[syntax-error]: subquery must be the only argument
   ╭▸ 
 2 │ select json_array(1, select 2);
   ╰╴                     ━━━━━━━━
-error[syntax-error]: Subquery must be the only argument
+error[syntax-error]: subquery must be the only argument
   ╭▸ 
 3 │ select json_array(1, 2, select 3);
   ╰╴                        ━━━━━━━━

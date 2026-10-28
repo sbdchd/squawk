@@ -31,9 +31,9 @@ fn not_valid_validate_in_transaction(
                                 ctx.report(
                                         Violation::for_node(
                                         Rule::ConstraintMissingNotValid,
-                                        "Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.".into(),
+                                        "using `not valid` and `validate constraint` in the same transaction will block all reads while the constraint is validated".into(),
                                         validate_constraint.syntax(),
-                                    ).help("Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction."));
+                                    ).help("add constraint as `not valid` in one transaction and `validate constraint` in a separate transaction"));
                             }
                         }
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
@@ -100,9 +100,9 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
 
                     ctx.report(Violation::for_node(
                             Rule::ConstraintMissingNotValid,
-                            "By default new constraints require a table scan and block writes to the table while that scan occurs.".into(),
+                            "by default new constraints require a table scan and block writes to the table while that scan occurs".into(),
                             add_constraint.syntax(),
-                        ).help("Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call."));
+                        ).help("use `not valid` with a later `validate constraint` call"));
                 }
             }
         }
@@ -132,12 +132,12 @@ create table t (id int);
 commit;
 alter table t add check (id > 0);";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         4 │ alter table t add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 
@@ -149,18 +149,18 @@ alter table existing.t add check (id > 0);
 alter table t add check (id > 0);
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         3 │ alter table existing.t add check (id > 0);
           │                        ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╰ help: use `not valid` with a later `validate constraint` call
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         4 │ alter table t add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 
@@ -184,12 +184,12 @@ create table t as select 1 as id;
 rollback;
 alter table t add check (id > 0);";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         4 │ alter table t add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 
@@ -202,12 +202,12 @@ begin;
 alter table t add check (id > 0);
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         5 │ alter table t add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 
@@ -218,12 +218,12 @@ alter table t add check (id > 0);
 create table t (id int);
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         2 │ alter table t add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 
@@ -236,12 +236,12 @@ alter table t add check (id > 0);";
             assume_in_transaction: true,
             ..Default::default()
         }), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         3 │ alter table t add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 
@@ -256,18 +256,18 @@ rollback and chain;
 alter table u add check (id > 0);
 commit;";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         4 │ alter table t add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╰ help: use `not valid` with a later `validate constraint` call
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         7 │ alter table u add check (id > 0);
           │               ━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 
@@ -320,18 +320,18 @@ alter table t add primary key (id);
 select 1 as id into u;
 alter table u add primary key (id);";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         3 │ alter table t add primary key (id);
           │               ━━━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
-        warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+          ╰ help: use `not valid` with a later `validate constraint` call
+        warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
         5 │ alter table u add primary key (id);
           │               ━━━━━━━━━━━━━━━━━━━━
           │
-          ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+          ╰ help: use `not valid` with a later `validate constraint` call
         ");
     }
 

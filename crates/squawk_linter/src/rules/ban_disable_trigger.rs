@@ -8,31 +8,35 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         if let ast::Stmt::AlterTable(table) = stmt {
             for action in table.actions() {
-                let message = match action {
+                let (message, note) = match action {
                     ast::AlterTableAction::EnableReplicaTrigger(_)
-                    | ast::AlterTableAction::EnableReplicaRule(_) => {
-                        "Making a trigger or rule replica-only stops it firing for normal application writes. Earlier application revisions may depend on its side effects."
-                    }
+                    | ast::AlterTableAction::EnableReplicaRule(_) => (
+                        "making a trigger or rule replica-only stops it firing for normal application writes",
+                        Some("earlier application revisions may depend on its side effects"),
+                    ),
                     ast::AlterTableAction::DisableTrigger(_)
                     | ast::AlterTableAction::EnableTrigger(_)
                     | ast::AlterTableAction::EnableRule(_)
                     | ast::AlterTableAction::DisableRule(_)
                     | ast::AlterTableAction::EnableAlwaysTrigger(_)
-                    | ast::AlterTableAction::EnableAlwaysRule(_) => {
-                        "Changing trigger or rule firing may change database side effects for existing clients."
-                    }
+                    | ast::AlterTableAction::EnableAlwaysRule(_) => (
+                        "changing trigger or rule firing may change database side effects for existing clients",
+                        None,
+                    ),
                     ast::AlterTableAction::DisableRls(_)
                     | ast::AlterTableAction::ForceRls(_)
-                    | ast::AlterTableAction::NoForceRls(_) => {
-                        "Changing row level security can change visible rows or reject access for existing clients."
-                    }
+                    | ast::AlterTableAction::NoForceRls(_) => (
+                        "changing row level security can change visible rows or reject access for existing clients",
+                        None,
+                    ),
                     _ => continue,
                 };
-                ctx.report(Violation::for_node(
-                    Rule::BanDisableTrigger,
-                    message.into(),
-                    action.syntax(),
-                ));
+                let violation =
+                    Violation::for_node(Rule::BanDisableTrigger, message.into(), action.syntax());
+                ctx.report(match note {
+                    Some(note) => violation.note(note),
+                    None => violation,
+                });
             }
         }
     }
@@ -78,7 +82,7 @@ mod test {
         assert_eq!(errors.matches("warning[ban-disable-trigger]").count(), 5);
         assert_eq!(
             errors
-                .matches("Earlier application revisions may depend on its side effects.")
+                .matches("earlier application revisions may depend on its side effects")
                 .count(),
             2
         );

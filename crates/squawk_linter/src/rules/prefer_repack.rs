@@ -53,10 +53,10 @@ pub(crate) fn prefer_repack(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 ctx.report(
                     Violation::for_node(
                         Rule::PreferRepack,
-                        "`cluster` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.".into(),
+                        "`cluster` requires an `access exclusive` lock which blocks reads and writes to the table".into(),
                         cluster.syntax(),
                     )
-                    .help("Use `repack` to rewrite the table without blocking reads and writes.")
+                    .help("use `repack` to rewrite the table without blocking reads and writes")
                     .fix(fix),
                 );
             }
@@ -66,10 +66,10 @@ pub(crate) fn prefer_repack(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     ctx.report(
                         Violation::for_node(
                             Rule::PreferRepack,
-                            "`vacuum full` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.".into(),
+                            "`vacuum full` requires an `access exclusive` lock which blocks reads and writes to the table".into(),
                             vacuum.syntax(),
                         )
-                        .help("Use `repack` to rewrite the table without blocking reads and writes.")
+                        .help("use `repack` to rewrite the table without blocking reads and writes")
                         .fix(fix),
                     );
                 }
@@ -99,12 +99,12 @@ mod test {
     fn cluster_err() {
         let sql = "CLUSTER foo;";
         assert_snapshot!(lint_errors_with(sql, pg19(), Rule::PreferRepack), @"
-        warning[prefer-repack]: `cluster` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
+        warning[prefer-repack]: `cluster` requires an `access exclusive` lock which blocks reads and writes to the table
           ╭▸ 
         1 │ CLUSTER foo;
           │ ━━━━━━━━━━━━
           │
-          ├ help: Use `repack` to rewrite the table without blocking reads and writes.
+          ├ help: use `repack` to rewrite the table without blocking reads and writes
           ╭╴
         1 - CLUSTER foo;
         1 + repack (concurrently) foo
@@ -116,12 +116,12 @@ mod test {
     fn cluster_no_path_err() {
         let sql = "CLUSTER;";
         assert_snapshot!(lint_errors_with(sql, pg19(), Rule::PreferRepack), @"
-        warning[prefer-repack]: `cluster` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
+        warning[prefer-repack]: `cluster` requires an `access exclusive` lock which blocks reads and writes to the table
           ╭▸ 
         1 │ CLUSTER;
           │ ━━━━━━━━
           │
-          ├ help: Use `repack` to rewrite the table without blocking reads and writes.
+          ├ help: use `repack` to rewrite the table without blocking reads and writes
           ╭╴
         1 - CLUSTER;
         1 + repack (concurrently)
@@ -133,12 +133,12 @@ mod test {
     fn vacuum_full_err() {
         let sql = "VACUUM FULL foo;";
         assert_snapshot!(lint_errors_with(sql, pg19(), Rule::PreferRepack), @"
-        warning[prefer-repack]: `vacuum full` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
+        warning[prefer-repack]: `vacuum full` requires an `access exclusive` lock which blocks reads and writes to the table
           ╭▸ 
         1 │ VACUUM FULL foo;
           │ ━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `repack` to rewrite the table without blocking reads and writes.
+          ├ help: use `repack` to rewrite the table without blocking reads and writes
           ╭╴
         1 - VACUUM FULL foo;
         1 + repack (concurrently) foo
@@ -150,12 +150,12 @@ mod test {
     fn vacuum_full_option_list_err() {
         let sql = "VACUUM (FULL) foo;";
         assert_snapshot!(lint_errors_with(sql, pg19(), Rule::PreferRepack), @"
-        warning[prefer-repack]: `vacuum full` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
+        warning[prefer-repack]: `vacuum full` requires an `access exclusive` lock which blocks reads and writes to the table
           ╭▸ 
         1 │ VACUUM (FULL) foo;
           │ ━━━━━━━━━━━━━━━━━━
           │
-          ├ help: Use `repack` to rewrite the table without blocking reads and writes.
+          ├ help: use `repack` to rewrite the table without blocking reads and writes
           ╭╴
         1 - VACUUM (FULL) foo;
         1 + repack (concurrently) foo

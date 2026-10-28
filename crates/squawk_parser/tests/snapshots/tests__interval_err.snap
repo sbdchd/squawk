@@ -186,7 +186,7 @@ error[syntax-error]: expected unsigned integer literal
   ╭▸ 
 8 │ select '1'::interval second();
   ╰╴                            ━
-error[syntax-error]: expected an expression, found R_PAREN
+error[syntax-error]: expected an expression, found `)`
   ╭▸ 
 8 │ select '1'::interval second();
   ╰╴                            ━

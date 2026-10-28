@@ -41,7 +41,7 @@ mod syntax_kind;
 mod token_set;
 
 pub use crate::{
-    lexed_str::LexedStr,
+    lexed_str::{LexError, LexedStr},
     // output::{Output, Step},
     shortcuts::StrStep,
     syntax_kind::{
@@ -640,7 +640,7 @@ impl<'t> Parser<'t> {
         if self.eat(kind) {
             return true;
         }
-        self.error(format!("expected {kind:?}"));
+        self.error(format!("expected {kind}"));
         false
     }
 

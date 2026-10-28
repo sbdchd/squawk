@@ -111,6 +111,10 @@ fn format_violations(sql: &str, violations: &[Violation]) -> String {
             .id(&code)
             .element(snippet);
 
+        if let Some(note) = &violation.note {
+            group = group.element(Level::NOTE.message(note.as_ref()));
+        }
+
         if let Some(help) = &violation.help {
             group = group.element(Level::HELP.message(help.as_ref()));
         }

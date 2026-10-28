@@ -15,7 +15,7 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: expected ALTER SERVER option
+error[syntax-error]: expected `alter server` option
   ╭▸ 
 2 │ alter server s;
   ╰╴              ━

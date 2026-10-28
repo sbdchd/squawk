@@ -5,7 +5,7 @@ title: ban-alter-role-options
 
 ## problem
 
-`ALTER ROLE` and its alias `ALTER USER` can change access or behaviour for existing clients that use the role. This rule checks role options and `SET` or `RESET` configuration options, including changes for a specific database. This rule is opt-in. It does not report role renames.
+`ALTER ROLE` and its alias `ALTER USER` can change access or behavior for existing clients that use the role. This rule checks role options and `SET` or `RESET` configuration options, including changes for a specific database. This rule is opt-in. It does not report role renames.
 
 ```sql
 alter role app_user nologin;

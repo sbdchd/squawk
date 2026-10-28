@@ -68,11 +68,11 @@ SOURCE_FILE@0..105
     SEMICOLON@103..104 ";"
   WHITESPACE@104..105 "\n"
 
-error[syntax-error]: In Out params are not allowed with aggregates.
+error[syntax-error]: `inout` params are not allowed with aggregates
   ╭▸ 
 1 │ comment on aggregate a(inout int) is 'invalid';
   ╰╴                       ━━━━━
-error[syntax-error]: In Out params are not allowed with aggregates.
+error[syntax-error]: `inout` params are not allowed with aggregates
   ╭▸ 
 3 │ security label on aggregate a(in out int) is 'invalid';
   ╰╴                              ━━━━━━

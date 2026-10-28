@@ -183,11 +183,11 @@ SOURCE_FILE
         COMMA ","
   WHITESPACE "\n\n"
 ---
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 3 │ returns table (a text  b int)
   ╰╴                     ━
-error[syntax-error]: expected COMMA
+error[syntax-error]: expected `,`
   ╭▸ 
 6 │ create function foo(arg float = 1 int4 = 4)
   ╰╴                                 ━
@@ -203,7 +203,7 @@ error[syntax-error]: expected function option
    ╭▸ 
 16 │ create function f() returns int language sql as '' transform for type int,
    ╰╴━
-error[syntax-error]: expected FOR TYPE entry after comma
+error[syntax-error]: expected `for type` entry after comma
    ╭▸ 
 16 │   create function f() returns int language sql as '' transform for type int,
    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛

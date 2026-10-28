@@ -139,43 +139,43 @@ PLPGSQL@0..168
     END_KW@164..167 "end"
   WHITESPACE@167..168 "\n"
 
-error[syntax-error]: expected from item, got SEMICOLON
+error[syntax-error]: expected a table, subquery, or function call, found `;`
   ╭▸ 
 3 │   perform from;
   ╰╴              ━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
   ╭▸ 
 4 │   perform 1 into x;
   ╰╴  ━━━━━━━━━━━━━━━━
-error[syntax-error]: SELECT ... INTO is not allowed here
+error[syntax-error]: `select ... into` is not allowed here
   ╭▸ 
 5 │   perform 1 into strict x;
   ╰╴  ━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 5 │   perform 1 into strict x;
   ╰╴                       ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 5 │   perform 1 into strict x;
   ╰╴                        ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 6 │   perform with x as (select 1) select * from x;
   ╰╴         ━
-error[syntax-error]: expected an expression, found TABLE_KW
+error[syntax-error]: expected an expression, found `table`
   ╭▸ 
 7 │   perform table onecol;
   ╰╴          ━
-error[syntax-error]: expected an expression in target_el, found IDENT
+error[syntax-error]: expected an expression, found identifier
   ╭▸ 
 7 │   perform table onecol;
   ╰╴               ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected `;`
   ╭▸ 
 7 │   perform table onecol;
   ╰╴               ━
-error[syntax-error]: expected command, found IDENT
+error[syntax-error]: expected command, found identifier
   ╭▸ 
 7 │   perform table onecol;
   ╰╴                ━
