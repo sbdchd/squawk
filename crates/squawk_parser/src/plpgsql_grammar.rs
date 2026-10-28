@@ -187,8 +187,7 @@ fn cursor_arg_list(p: &mut Parser) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        grammar::ListItems::Required("argument"),
-        || "unexpected comma".to_string(),
+        grammar::ListItems::Required(grammar::ListItem::Argument),
         grammar::NAME_FIRST,
         opt_cursor_arg,
     );
@@ -292,7 +291,7 @@ fn exception_handler(p: &mut Parser) {
     grammar::separated(
         p,
         OR_KW,
-        || "unexpected `or`".to_string(),
+        grammar::ListItem::Condition,
         grammar::NAME_FIRST,
         THEN_TERMINATOR,
         opt_condition,
@@ -615,7 +614,7 @@ fn opt_using_clause(p: &mut Parser, param: fn(&mut Parser)) {
     grammar::separated(
         p,
         COMMA,
-        || "unexpected comma".to_string(),
+        grammar::ListItem::Expr,
         TokenSet::EMPTY,
         USING_CLAUSE_FOLLOW,
         |p| {
@@ -683,7 +682,7 @@ fn opt_raise_using_clause(p: &mut Parser) {
     grammar::separated(
         p,
         COMMA,
-        || "unexpected comma".to_string(),
+        grammar::ListItem::Option,
         grammar::NAME_FIRST,
         TokenSet::EMPTY,
         |p| {
@@ -775,7 +774,7 @@ fn diag_item_list(p: &mut Parser) {
     grammar::separated(
         p,
         COMMA,
-        || "unexpected comma".to_string(),
+        grammar::ListItem::DiagItem,
         grammar::NAME_FIRST,
         TokenSet::EMPTY,
         opt_diag_item,
@@ -970,7 +969,7 @@ fn into_target_list(p: &mut Parser) {
     grammar::separated(
         p,
         COMMA,
-        || "unexpected comma".to_string(),
+        grammar::ListItem::Target,
         grammar::NAME_FIRST,
         INTO_TARGET_FOLLOW,
         opt_into_target,
@@ -1186,7 +1185,7 @@ fn for_variable_list(p: &mut Parser) {
     grammar::separated(
         p,
         COMMA,
-        || "unexpected comma".to_string(),
+        grammar::ListItem::Var,
         TokenSet::EMPTY,
         FOR_VARIABLE_FOLLOW,
         opt_for_variable,

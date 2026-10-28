@@ -174,7 +174,7 @@ error[syntax-error]: cursor `for` loop takes one variable
   ╭▸ 
 8 │   for a, b in c loop
   ╰╴         ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
    ╭▸ 
 20 │   for r in c2(1,) loop
    ╰╴               ━

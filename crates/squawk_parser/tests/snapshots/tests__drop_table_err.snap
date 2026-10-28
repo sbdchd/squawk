@@ -103,19 +103,19 @@ error[syntax-error]: expected `,`
   ╭▸ 
 2 │ drop table foo, bar buzz cascade;
   ╰╴                   ━
-error[syntax-error]: unexpected comma, expected a name
+error[syntax-error]: expected a table, found `,`
   ╭▸ 
 5 │ drop table foo,   , buzz cascade;
   ╰╴                  ━
-error[syntax-error]: unexpected comma, expected a name
+error[syntax-error]: expected a table, found `,`
   ╭▸ 
 8 │ drop table p,;
   ╰╴            ━
-error[syntax-error]: unexpected comma, expected a name
+error[syntax-error]: expected a table, found `,`
   ╭▸ 
 9 │ drop table p, cascade;
   ╰╴            ━
-error[syntax-error]: unexpected comma, expected a name
+error[syntax-error]: expected a table, found `,`
    ╭▸ 
 10 │ drop table p,
    ╰╴            ━

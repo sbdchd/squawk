@@ -190,11 +190,11 @@ error[syntax-error]: expected `for`
   ╭▸ 
 5 │   c cursor select 1;
   ╰╴          ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected an argument, found `,`
    ╭▸ 
 14 │   a cursor (x int, , y int) for select 1;
    ╰╴                   ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
    ╭▸ 
 15 │   b cursor (x int,) for select 1;
    ╰╴                 ━

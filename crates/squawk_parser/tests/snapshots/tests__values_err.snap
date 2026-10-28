@@ -72,7 +72,7 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
   ╭▸ 
 3 │ values (1,) (1);
   ╰╴         ━

@@ -326,7 +326,7 @@ error[syntax-error]: expected `,`
    ╭▸ 
 16 │   alter c set (a b = 1);
    ╰╴                ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected an attribute, found `,`
    ╭▸ 
 20 │   alter c set (a, , b = 1);
    ╰╴                  ━
@@ -338,7 +338,7 @@ error[syntax-error]: expected at least one expression
    ╭▸ 
 25 │   ALTER c SET DEFAULT ''::d + (()),
    ╰╴                                ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
    ╭▸ 
 25 │   ALTER c SET DEFAULT ''::d + (()),
    ╰╴                                  ━

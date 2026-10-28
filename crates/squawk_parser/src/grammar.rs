@@ -74,8 +74,7 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
             opening,
             closing,
             COMMA,
-            ListItems::Optional,
-            || "unexpected comma".to_string(),
+            ListItems::Optional(ListItem::Expr),
             EXPR_FIRST,
             |p| opt_expr(p).is_some(),
         );
@@ -176,11 +175,7 @@ fn tuple_expr(p: &mut Parser<'_>, items: ListItems) -> (CompletedMarker, ExprKin
     let m = p.start();
     let explicit_row = p.eat(ROW_KW);
     p.expect(L_PAREN);
-    if let ListItems::Required(item) = items
-        && p.at(R_PAREN)
-    {
-        p.error(format!("expected at least one {item}"));
-    }
+    items.check_not_empty(p, R_PAREN);
     let mut saw_comma = false;
     let mut saw_expr = false;
     let mut saw_select = false;
@@ -860,8 +855,7 @@ fn json_table_column_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required("column"),
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Col),
             JSON_TABLE_COLUMN_FIRST,
             opt_json_table_column,
         );
@@ -1181,9 +1175,9 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
         (SOME_KW | ALL_KW | ANY_KW, L_PAREN) => some_any_all_fn(p),
         (EXISTS_KW, L_PAREN) => exists_fn(p),
         (COLLATION_KW, FOR_KW) => collation_for_fn(p),
-        (ROW_KW, L_PAREN) => return Some(tuple_expr(p, ListItems::Optional)),
+        (ROW_KW, L_PAREN) => return Some(tuple_expr(p, ListItems::Optional(ListItem::Expr))),
         _ if p.at_ts(NAME_REF_FIRST) => name_ref_(p)?,
-        (L_PAREN, _) => return Some(tuple_expr(p, ListItems::Required("expression"))),
+        (L_PAREN, _) => return Some(tuple_expr(p, ListItems::Required(ListItem::Expr))),
         (ARRAY_KW, L_BRACK | L_PAREN) => {
             let m = p.start();
             p.bump(ARRAY_KW);
@@ -1417,8 +1411,7 @@ fn expr_as_xml_attr_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("attribute"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Attribute),
         EXPR_FIRST,
         opt_expr_as_xml_attr,
     );
@@ -1446,8 +1439,7 @@ fn expr_as_property_name_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("property"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Prop),
         EXPR_FIRST,
         opt_expr_as_property_name,
     );
@@ -1475,8 +1467,7 @@ fn expr_as_column_name_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("column"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Col),
         EXPR_FIRST,
         opt_expr_as_column_name,
     );
@@ -1515,8 +1506,7 @@ fn expr_as_element_tag_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("element"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Element),
         EXPR_FIRST,
         opt_expr_as_element_tag,
     );
@@ -2129,8 +2119,103 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
 
 #[derive(Clone, Copy)]
 pub(crate) enum ListItems {
-    Required(&'static str),
-    Optional,
+    Required(ListItem),
+    Optional(ListItem),
+}
+
+impl ListItems {
+    fn item(self) -> ListItem {
+        match self {
+            ListItems::Required(item) | ListItems::Optional(item) => item,
+        }
+    }
+
+    fn check_not_empty(self, p: &mut Parser<'_>, ket: SyntaxKind) {
+        if let ListItems::Required(item) = self
+            && p.at(ket)
+        {
+            p.error(format!("expected at least one {item}"));
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub(crate) enum ListItem {
+    Argument,
+    Attribute,
+    Col,
+    Condition,
+    DiagItem,
+    EdgeTable,
+    Element,
+    ExclusionEl,
+    Expr,
+    FuncCall,
+    GroupingSet,
+    IndexEl,
+    Namespace,
+    Option,
+    Param,
+    Partition,
+    PartitionBound,
+    PartitionKey,
+    Prop,
+    StatsKind,
+    Table,
+    Target,
+    TypeModifier,
+    Value,
+    Var,
+    VertexTable,
+}
+
+impl ListItem {
+    fn name(self) -> &'static str {
+        match self {
+            ListItem::Argument => "argument",
+            ListItem::Attribute => "attribute",
+            ListItem::Col => "column",
+            ListItem::Condition => "condition",
+            ListItem::DiagItem => "diagnostics item",
+            ListItem::EdgeTable => "edge table",
+            ListItem::Element => "element",
+            ListItem::ExclusionEl => "exclusion element",
+            ListItem::Expr => "expression",
+            ListItem::FuncCall => "function call",
+            ListItem::GroupingSet => "grouping set",
+            ListItem::IndexEl => "index element",
+            ListItem::Namespace => "namespace",
+            ListItem::Option => "option",
+            ListItem::Param => "parameter",
+            ListItem::Partition => "partition",
+            ListItem::PartitionBound => "partition bound",
+            ListItem::PartitionKey => "partition key",
+            ListItem::Prop => "property",
+            ListItem::StatsKind => "statistics kind",
+            ListItem::Table => "table",
+            ListItem::Target => "target",
+            ListItem::TypeModifier => "type modifier",
+            ListItem::Value => "value",
+            ListItem::Var => "variable",
+            ListItem::VertexTable => "vertex table",
+        }
+    }
+
+    fn stray_delim_message(self, delim: SyntaxKind) -> String {
+        let name = self.name();
+        let article = if name.starts_with(['a', 'e', 'i', 'o', 'u']) {
+            "an"
+        } else {
+            "a"
+        };
+        format!("expected {article} {name}, found {delim}")
+    }
+}
+
+impl std::fmt::Display for ListItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.name())
+    }
 }
 
 /// The `parser` passed this is required to at least consume one token if it returns `true`.
@@ -2141,16 +2226,11 @@ pub(crate) fn delimited(
     ket: SyntaxKind,
     delim: SyntaxKind,
     items: ListItems,
-    unexpected_delim_message: impl Fn() -> String,
     first_set: TokenSet,
     mut parser: impl FnMut(&mut Parser<'_>) -> bool,
 ) {
     p.expect(bra);
-    if let ListItems::Required(item) = items
-        && p.at(ket)
-    {
-        p.error(format!("expected at least one {item}"));
-    }
+    items.check_not_empty(p, ket);
     while !p.at(ket) && !p.at(EOF) {
         if p.at(delim) {
             // Recover if an argument is missing and only got a delimiter,
@@ -2160,7 +2240,7 @@ pub(crate) fn delimited(
             // nodes currently have no concept of a missing node between two delimiters.
             // So doing it this way is easier.
             let m = p.start();
-            p.error(unexpected_delim_message());
+            p.error(items.item().stray_delim_message(delim));
             p.bump(delim);
             m.complete(p, ERROR);
             continue;
@@ -2171,7 +2251,7 @@ pub(crate) fn delimited(
         // f(a,)
         //    ^
         if p.at(delim) && p.nth_at(1, ket) {
-            p.err_and_bump("unexpected trailing comma");
+            p.err_and_bump(&format!("unexpected trailing {delim}"));
             break;
         }
         if !p.eat(delim) {
@@ -2190,7 +2270,7 @@ pub(crate) fn delimited(
 pub(crate) fn separated(
     p: &mut Parser<'_>,
     delim: SyntaxKind,
-    unexpected_delim_message: impl Fn() -> String,
+    item: ListItem,
     first_set: TokenSet,
     follow_set: TokenSet,
     mut parser: impl FnMut(&mut Parser<'_>) -> bool,
@@ -2204,7 +2284,7 @@ pub(crate) fn separated(
             // nodes currently have no concept of a missing node between two delimiters.
             // So doing it this way is easier.
             let m = p.start();
-            p.error(unexpected_delim_message());
+            p.error(item.stray_delim_message(delim));
             p.bump(delim);
             m.complete(p, ERROR);
             continue;
@@ -2214,7 +2294,7 @@ pub(crate) fn separated(
         }
         if p.at(delim) && (p.nth_at(1, EOF) || p.nth_at(1, SEMICOLON) || p.nth_at_ts(1, follow_set))
         {
-            p.err_and_bump(&unexpected_delim_message());
+            p.err_and_bump(&item.stray_delim_message(delim));
             break;
         }
         if !p.eat(delim) {
@@ -2377,8 +2457,7 @@ fn type_mods(
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required("type modifier"),
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::TypeModifier),
             EXPR_FIRST.union(TokenSet::new(&[VARIADIC_KW])),
             |p| arg_expr(p).is_some(),
         );
@@ -2649,8 +2728,7 @@ pub(crate) fn arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "expected expression".into(),
+        ListItems::Optional(ListItem::Argument),
         EXPR_FIRST,
         |p| {
             if std::mem::take(&mut first_arg) {
@@ -3316,7 +3394,7 @@ fn search_columns(p: &mut Parser<'_>) {
     separated(
         p,
         COMMA,
-        || "unexpected comma, expected a column name".to_string(),
+        ListItem::Col,
         NAME_REF_FIRST,
         TokenSet::new(&[SET_KW]),
         |p| opt_column_name_ref(p).is_some(),
@@ -3383,7 +3461,7 @@ fn cycle_columns(p: &mut Parser<'_>) {
     separated(
         p,
         COMMA,
-        || "unexpected comma, expected a column name".to_string(),
+        ListItem::Col,
         NAME_REF_FIRST,
         TokenSet::new(&[SET_KW]),
         |p| opt_column_name_ref(p).is_some(),
@@ -4089,8 +4167,7 @@ fn data_source(p: &mut Parser<'_>, in_parens: bool) -> DataSource {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required("function call"),
-                || "unexpected comma".to_string(),
+                ListItems::Required(ListItem::FuncCall),
                 EXPR_FIRST,
                 opt_row_from_expr,
             );
@@ -4249,8 +4326,7 @@ fn xml_namespace_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("namespace"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Namespace),
         XML_NAMESPACE_ELEMENT_FIRST,
         opt_xml_namespace,
     );
@@ -4726,24 +4802,20 @@ fn opt_column_list_with(p: &mut Parser<'_>, mut kind: ColumnDefKind) -> bool {
     p.expect(L_PAREN);
     let items = match kind {
         // `create type t as ()` is the only empty column list Postgres accepts
-        ColumnDefKind::CompositeFieldDef => ListItems::Optional,
+        ColumnDefKind::CompositeFieldDef => ListItems::Optional(ListItem::Col),
         ColumnDefKind::ColumnDef
         | ColumnDefKind::ColumnTarget
         | ColumnDefKind::ConstraintColumnRef
         | ColumnDefKind::ForeignKeyColumnRef
         | ColumnDefKind::FromAliasColumn
         | ColumnDefKind::Name
-        | ColumnDefKind::NameRef => ListItems::Required("column"),
+        | ColumnDefKind::NameRef => ListItems::Required(ListItem::Col),
     };
-    if let ListItems::Required(item) = items
-        && p.at(R_PAREN)
-    {
-        p.error(format!("expected at least one {item}"));
-    }
+    items.check_not_empty(p, R_PAREN);
     let mut seen_period = false;
     while !p.at(EOF) && !p.at(R_PAREN) {
         if p.at(COMMA) {
-            p.err_and_bump("missing column");
+            p.err_and_bump(&items.item().stray_delim_message(COMMA));
             continue;
         }
         if !p.at_ts(COLUMN_FIRST) {
@@ -4755,7 +4827,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, mut kind: ColumnDefKind) -> bool {
         seen_period |= kind == ColumnDefKind::ForeignKeyColumnRef && at_period_column(p);
         kind = column(p, kind);
         if p.at(COMMA) && p.nth_at(1, R_PAREN) {
-            p.err_and_bump("unexpected trailing comma");
+            p.err_and_bump("unexpected trailing `,`");
         }
         if !p.eat(COMMA) {
             if p.at_ts(COLUMN_FIRST) && !(p.at(WITHOUT_KW) && p.nth_at(1, OVERLAPS_KW)) {
@@ -5711,8 +5783,7 @@ fn constraint_exclusion_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("exclusion element"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::ExclusionEl),
         CONSTRAINT_EXCLUSION_FIRST,
         |p| opt_constraint_exclusion(p).is_some(),
     );
@@ -6023,15 +6094,14 @@ fn opt_group_by_item(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required("grouping set"),
-                || "unexpected comma".to_string(),
+                ListItems::Required(ListItem::GroupingSet),
                 GROUP_BY_ITEM_FIRST,
                 |p| opt_group_by_item(p).is_some(),
             );
             GROUPING_SETS
         }
         L_PAREN if p.nth_at(1, R_PAREN) => {
-            tuple_expr(p, ListItems::Optional);
+            tuple_expr(p, ListItems::Optional(ListItem::Expr));
             GROUPING_EXPR
         }
         _ => {
@@ -6320,8 +6390,7 @@ fn paren_expr_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("expression"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Expr),
         EXPR_FIRST,
         |p| opt_expr(p).is_some(),
     );
@@ -6509,7 +6578,7 @@ fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
     while !p.at(EOF) && !p.at(SEMICOLON) {
         if opt_target_el(p).is_some() {
             if p.at(COMMA) && p.nth_at_ts(1, TARGET_FOLLOW) {
-                p.err_and_bump("unexpected trailing comma");
+                p.err_and_bump("unexpected trailing `,`");
                 break;
             }
             if !p.eat(COMMA) {
@@ -6568,7 +6637,7 @@ fn drop_table(p: &mut Parser<'_>) -> CompletedMarker {
     separated(
         p,
         COMMA,
-        || "unexpected comma, expected a name".to_string(),
+        ListItem::Table,
         PATH_FIRST,
         DROP_TABLE_FOLLOW,
         |p| opt_table_name_ref(p).is_some(),
@@ -6666,8 +6735,7 @@ fn table_arg_list(p: &mut Parser<'_>) -> CompletedMarker {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "unexpected comma".to_string(),
+        ListItems::Optional(ListItem::Col),
         COL_DEF_FIRST,
         |p| opt_col_def(p).is_some(),
     );
@@ -6699,8 +6767,7 @@ fn partition_option(p: &mut Parser<'_>) {
                 L_PAREN,
                 R_PAREN,
                 COMMA,
-                ListItems::Required("partition bound"),
-                || "unexpected comma".to_string(),
+                ListItems::Required(ListItem::PartitionBound),
                 NON_RESERVED_WORD,
                 opt_hash_partition_bound,
             );
@@ -7209,8 +7276,7 @@ fn opt_paren_property_name_ref_list(p: &mut Parser<'_>) -> bool {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("property"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Prop),
         NAME_REF_FIRST,
         opt_property_name_ref,
     );
@@ -9027,7 +9093,7 @@ fn opt_alter_table_action_list(p: &mut Parser<'_>) {
             break;
         }
         if p.at(COMMA) && matches!(p.nth(1), EOF | SEMICOLON) {
-            p.err_and_bump("unexpected trailing comma");
+            p.err_and_bump("unexpected trailing `,`");
             break;
         }
         if !p.eat(COMMA) {
@@ -10656,8 +10722,7 @@ fn table_name_ref_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("table"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Table),
         NAME_REF_FIRST,
         |p| {
             table_name_ref(p);
@@ -11051,8 +11116,7 @@ fn opt_option_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("option"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         OPTION_FIRST,
         opt_option,
     );
@@ -11463,8 +11527,7 @@ fn opt_vertex_tables(p: &mut Parser<'_>) -> bool {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("vertex table"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::VertexTable),
         VERTEX_TABLE_DEF_FIRST,
         opt_vertex_table_def,
     );
@@ -11578,8 +11641,7 @@ fn opt_edge_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("edge table"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::EdgeTable),
         EDGE_TABLE_DEF_FIRST,
         opt_edge_table_def,
     );
@@ -11703,8 +11765,7 @@ fn drop_edge_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("edge table"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::EdgeTable),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
     );
@@ -11723,8 +11784,7 @@ fn drop_vertex_tables(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("vertex table"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::VertexTable),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
     );
@@ -13014,8 +13074,7 @@ fn opt_except_table_clause(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("table"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Table),
         RELATION_NAME_FIRST.union(TokenSet::new(&[TABLE_KW])),
         |p| {
             let m = p.start();
@@ -13242,8 +13301,7 @@ fn opt_stat_types(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("statistics kind"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::StatsKind),
         NAME_REF_FIRST,
         opt_statistics_kind,
     );
@@ -14294,8 +14352,7 @@ fn opt_explain_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("option"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         EXPLAIN_OPTION_FIRST,
         opt_explain_option,
     );
@@ -14369,8 +14426,7 @@ fn alter_option_list_contents(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("option"),
-        || "expected alter option".to_string(),
+        ListItems::Required(ListItem::Option),
         EXPR_FIRST,
         |p| opt_alter_option(p).is_some(),
     );
@@ -15679,8 +15735,7 @@ fn row(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("expression"),
-        || "expected expression".to_string(),
+        ListItems::Required(ListItem::Expr),
         EXPR_FIRST,
         |p| expr(p).is_some(),
     );
@@ -15734,8 +15789,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required("option"),
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Option),
             REINDEX_OPTION_FIRST,
             opt_reindex_option,
         );
@@ -15913,8 +15967,7 @@ fn opt_checkpoint_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("option"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         NAME_FIRST,
         opt_checkpoint_option,
     );
@@ -16368,8 +16421,7 @@ fn opt_vacuum_option_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required("option"),
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Option),
             VACUUM_OPTION_FIRST,
             |p| opt_vacuum_option(p).is_some(),
         );
@@ -16528,8 +16580,7 @@ fn copy_option_arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("value"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Value),
         COPY_OPTION_ARG_FIRST,
         opt_copy_option_arg,
     );
@@ -16574,8 +16625,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("option"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         COL_LABEL_FIRST,
         opt_copy_option,
     );
@@ -17303,8 +17353,7 @@ fn conflict_index_item_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("index element"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::IndexEl),
         EXPR_FIRST,
         opt_conflict_index_item,
     );
@@ -17327,7 +17376,7 @@ fn set_column_list(p: &mut Parser<'_>) {
     separated(
         p,
         COMMA,
-        || "unexpected comma".to_string(),
+        ListItem::Col,
         SET_COLUMN_FIRST,
         SET_COLUMN_FOLLOW,
         |p| opt_set_column(p).is_some(),
@@ -17386,8 +17435,7 @@ fn set_expr_list(p: &mut Parser<'_>, m: Marker) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("expression"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Expr),
         SET_EXPR_FIRST,
         opt_set_expr,
     );
@@ -17614,8 +17662,7 @@ fn opt_returning_option_list(p: &mut Parser<'_>) {
             L_PAREN,
             R_PAREN,
             COMMA,
-            ListItems::Required("option"),
-            || "unexpected comma".to_string(),
+            ListItems::Required(ListItem::Option),
             RETURNING_OPTION_FIRST,
             opt_returning_option,
         );
@@ -17732,8 +17779,7 @@ fn opt_drop_database_force_clause(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("option"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Option),
         DROP_DATABASE_OPTION_FIRST,
         |p| {
             if !p.at(FORCE_KW) {
@@ -17841,8 +17887,7 @@ fn partition_items(p: &mut Parser<'_>, part_kind: PartitionItemKind) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("partition key"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::PartitionKey),
         EXPR_FIRST,
         |p| opt_partition_item(p, part_kind).is_some(),
     );
@@ -18230,8 +18275,7 @@ fn return_table_arg_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("column"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Col),
         NAME_FIRST,
         return_table_column,
     );
@@ -18339,8 +18383,7 @@ fn param_list(p: &mut Parser<'_>, kind: ParamKind) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "unexpected comma".to_string(),
+        ListItems::Optional(ListItem::Param),
         PARAM_FIRST,
         |p| opt_param(p, kind),
     );
@@ -18486,8 +18529,7 @@ fn variant_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Optional,
-        || "unexpected comma".to_string(),
+        ListItems::Optional(ListItem::Value),
         STRING_FIRST,
         opt_variant,
     );
@@ -19324,8 +19366,7 @@ fn partition_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("partition"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Partition),
         TokenSet::new(&[PARTITION_KW]),
         opt_partition,
     );
@@ -19599,8 +19640,7 @@ fn attribute_list(p: &mut Parser<'_>) {
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required("attribute"),
-        || "unexpected comma".to_string(),
+        ListItems::Required(ListItem::Attribute),
         COL_LABEL_FIRST,
         opt_attribute_option,
     );

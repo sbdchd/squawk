@@ -1027,27 +1027,27 @@ error[syntax-error]: expected path name
   ╭▸ 
 2 │ create table (
   ╰╴             ━
-error[syntax-error]: unexpected trailing comma
+error[syntax-error]: unexpected trailing `,`
    ╭▸ 
 10 │ create table t (a text,);
    ╰╴                      ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                 ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                  ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                   ━
-error[syntax-error]: unexpected comma
+error[syntax-error]: expected a column, found `,`
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                    ━
