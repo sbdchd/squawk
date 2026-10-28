@@ -50,11 +50,23 @@ create table t(a int references u(x), foreign key (a) references v);
     error: relation `u` does not exist
       ╭▸ 
     2 │ create table t(a int references u(x), foreign key (a) references v);
-      ╰╴                                ━
+      │                                 ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    2 - create table t(a int references u(x), foreign key (a) references v);
+    2 + create table t(a int references t(x), foreign key (a) references v);
+      ╰╴
     error: relation `v` does not exist
       ╭▸ 
     2 │ create table t(a int references u(x), foreign key (a) references v);
-      ╰╴                                                                 ━
+      │                                                                  ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    2 - create table t(a int references u(x), foreign key (a) references v);
+    2 + create table t(a int references u(x), foreign key (a) references t);
+      ╰╴
     ");
 }
 

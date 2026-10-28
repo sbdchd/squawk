@@ -39,7 +39,12 @@ select table_name from tables;
     error: relation `tables` does not exist
       ╭▸ 
     4 │ select table_name from tables;
-      ╰╴                       ━━━━━━
+      │                        ━━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    4 │ select table_name from pg_tables;
+      ╰╴                       +++
     ");
 }
 

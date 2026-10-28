@@ -16,6 +16,79 @@ select id, name, email from users;
 }
 
 #[test]
+fn similar_table() {
+    assert_snapshot!(check("
+create schema app;
+create table users (id int);
+create table app.accounts (id int);
+create view user_names as select 1 id;
+select * from usres;
+select * from app.acounts;
+select * from acounts;
+drop view usres;
+with orders as (select 1 id)
+select * from ordrs;
+"), @"
+    error: relation `usres` does not exist
+      ╭▸ 
+    6 │ select * from usres;
+      │               ━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    6 - select * from usres;
+    6 + select * from users;
+      ╰╴
+    error: relation `acounts` does not exist
+      ╭▸ 
+    7 │ select * from app.acounts;
+      │                   ━━━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    7 │ select * from app.accounts;
+      ╰╴                    +
+    error: relation `acounts` does not exist
+      ╭▸ 
+    8 │ select * from acounts;
+      ╰╴              ━━━━━━━
+    error: relation `usres` does not exist
+      ╭▸ 
+    9 │ drop view usres;
+      │           ━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    9 - drop view usres;
+    9 + drop view user_names;
+      ╰╴
+    error: relation `ordrs` does not exist
+       ╭▸ 
+    11 │ select * from ordrs;
+       │               ━━━━━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    11 │ select * from orders;
+       ╰╴                 +
+    ");
+}
+
+#[test]
+fn similar_table_skips_dropped() {
+    assert_snapshot!(check("
+create table users (id int);
+drop table users;
+select * from usres;
+"), @"
+    error: relation `usres` does not exist
+      ╭▸ 
+    4 │ select * from usres;
+      ╰╴              ━━━━━
+    ");
+}
+
+#[test]
 fn dropped_table() {
     assert_snapshot!(check("
 create table t (a int);
@@ -49,11 +122,23 @@ select 'x'::t;
     error: relation `t` does not exist
        ╭▸ 
     10 │ select * from t;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    10 - select * from t;
+    10 + select * from u;
+       ╰╴
     error: relation `v` does not exist
        ╭▸ 
     11 │ select * from v;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    11 - select * from v;
+    11 + select * from u;
+       ╰╴
     error: type `t` does not exist
        ╭▸ 
     12 │ select 'x'::t;
@@ -354,7 +439,13 @@ select a from t2;
     error: relation `t` does not exist
       ╭▸ 
     5 │ select a from t;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    5 - select a from t;
+    5 + select a from u;
+      ╰╴
     error: relation `u` already exists
       ╭▸ 
     8 │ alter table t2 rename to u;
@@ -366,7 +457,13 @@ select a from t2;
     error: relation `t3` does not exist
        ╭▸ 
     14 │ select a from t3;
-       ╰╴              ━━
+       │               ━━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    14 - select a from t3;
+    14 + select a from t2;
+       ╰╴
     ");
 }
 
@@ -386,7 +483,13 @@ alter table s.t set schema nope;
     error: relation `t` does not exist
       ╭▸ 
     7 │ select a from t;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    7 - select a from t;
+    7 + select a from u;
+      ╰╴
     error: relation `u` already exists
       ╭▸ 
     9 │ alter table u set schema s;

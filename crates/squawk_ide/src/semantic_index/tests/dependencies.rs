@@ -53,7 +53,13 @@ select * from u;
     error: relation `t` does not exist
        ╭▸ 
     13 │ select * from t;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    13 - select * from t;
+    13 + select * from u;
+       ╰╴
     error: function `f()` does not exist
        ╭▸ 
     14 │ select f();
@@ -249,7 +255,13 @@ select * from w;
     error: relation `v` does not exist
        ╭▸ 
     12 │ select * from v;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    12 - select * from v;
+    12 + select * from w;
+       ╰╴
     ");
 }
 
@@ -547,11 +559,23 @@ select * from x;
     error: relation `v` does not exist
       ╭▸ 
     8 │ select * from v;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    8 - select * from v;
+    8 + select * from x;
+      ╰╴
     error: relation `w` does not exist
       ╭▸ 
     9 │ select * from w;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    9 - select * from w;
+    9 + select * from x;
+      ╰╴
     ");
 }
 
@@ -1015,7 +1039,13 @@ select (v).m from u;
     error: relation `v` does not exist
        ╭▸ 
     10 │ select * from v;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    10 - select * from v;
+    10 + select * from u;
+       ╰╴
     error: column `m` does not exist
        ╭▸ 
     11 │ select m from t;

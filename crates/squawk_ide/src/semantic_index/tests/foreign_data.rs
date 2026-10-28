@@ -305,7 +305,13 @@ select a from t;
     error: relation `ft` does not exist
       ╭▸ 
     9 │ select a from ft;
-      ╰╴              ━━
+      │               ━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    9 - select a from ft;
+    9 + select a from t;
+      ╰╴
     error: relation `ft` does not exist
        ╭▸ 
     10 │ drop foreign table ft;

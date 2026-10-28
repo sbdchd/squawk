@@ -276,8 +276,9 @@ create function other.unnest(x text) returns setof text as $$ select 1 $$ langua
 select * from unn$0est(a, b);"
             ),
             @"
-create function other.unnest(x text) returns setof text as $$ select 1 $$ language sql;
-select * from rows from (unnest(a), unnest(b));"
+        create function other.unnest(x text) returns setof text as $$ select 1 $$ language sql;
+        select * from rows from (unnest(a), unnest(b));
+        "
         );
     }
 
@@ -302,8 +303,9 @@ create function f(x text) returns setof text as $$ select 1 $$ language sql;
 select * from unn$0est(a, b);"
             ),
             @"
-create function f(x text) returns setof text as $$ select 1 $$ language sql;
-select * from rows from (unnest(a), unnest(b));"
+        create function f(x text) returns setof text as $$ select 1 $$ language sql;
+        select * from rows from (unnest(a), unnest(b));
+        "
         );
     }
 
@@ -317,8 +319,9 @@ select * from unn$0est(a, b);
 create function unnest(x text) returns setof text as $$ select 1 $$ language sql;"
             ),
             @"
-select * from rows from (unnest(a), unnest(b));
-create function unnest(x text) returns setof text as $$ select 1 $$ language sql;"
+        select * from rows from (unnest(a), unnest(b));
+        create function unnest(x text) returns setof text as $$ select 1 $$ language sql;
+        "
         );
     }
 

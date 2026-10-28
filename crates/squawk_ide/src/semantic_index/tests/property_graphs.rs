@@ -277,7 +277,12 @@ alter property graph if exists nope rename to g3;
     error: relation `g` does not exist
       ╭▸ 
     5 │ select * from graph_table(g match (x) columns (x.a as a));
-      ╰╴                          ━
+      │                           ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    5 │ select * from graph_table(g2 match (x) columns (x.a as a));
+      ╰╴                           +
     error: relation `t` already exists
       ╭▸ 
     7 │ alter property graph g2 rename to t;

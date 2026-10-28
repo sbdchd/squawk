@@ -20,6 +20,12 @@ pub(crate) struct SimilarColumn {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Similar {
+    Column(SimilarColumn),
+    Table(Name),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct TyName {
     pub(crate) name: Name,
     pub(crate) array: bool,
@@ -268,7 +274,7 @@ pub(crate) enum SemaError {
     UnresolvedReference {
         kind: ReferenceKind,
         name: Name,
-        similar: Option<SimilarColumn>,
+        similar: Option<Similar>,
     },
     AmbiguousReference {
         kind: ReferenceKind,
@@ -652,7 +658,8 @@ impl TableLookup {
             TableLookup::TableOrForeignTable => "table or foreign table",
             TableLookup::TableOrView => "table or view",
             TableLookup::TableOrMaterializedView => "table or materialized view",
-            TableLookup::Any => "relation",
+            TableLookup::Any | TableLookup::FromItem => "relation",
+            TableLookup::Like => "table, view, materialized view, composite type, or foreign table",
             TableLookup::View => "view",
             TableLookup::MaterializedView => "materialized view",
             TableLookup::Sequence => "sequence",
@@ -847,13 +854,24 @@ impl SemaError {
         else {
             return None;
         };
-        let column = quote_ident(names.resolve(similar.column));
-        let replacement = match similar.qualifier {
-            Some(qualifier) => format!("{}.{column}", quote_ident(names.resolve(qualifier))),
-            None => column,
+        let (message, replacement) = match similar {
+            Similar::Column(similar) => {
+                let column = quote_ident(names.resolve(similar.column));
+                let replacement = match similar.qualifier {
+                    Some(qualifier) => {
+                        format!("{}.{column}", quote_ident(names.resolve(qualifier)))
+                    }
+                    None => column,
+                };
+                ("a column with a similar name exists", replacement)
+            }
+            Similar::Table(table) => (
+                "a relation with a similar name exists",
+                quote_ident(names.resolve(table)),
+            ),
         };
         Some(Suggestion {
-            message: "a column with a similar name exists".into(),
+            message: message.into(),
             fix: Fix {
                 title: format!("Replace with `{replacement}`").into(),
                 edits: vec![Edit::replace(range, replacement)],

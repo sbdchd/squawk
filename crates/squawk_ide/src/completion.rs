@@ -593,7 +593,7 @@ mod tests {
 
     #[test]
     fn completion_at_start() {
-        assert_snapshot!(completions("$0"), @r"
+        assert_snapshot!(completions("$0"), @"
          label       | kind    | detail 
         -------------+---------+--------
          delete from | Snippet |        
@@ -608,7 +608,7 @@ mod tests {
         assert_snapshot!(completions("
 create table t(a int);
 $0
-"), @r"
+"), @"
          label       | kind    | detail 
         -------------+---------+--------
          delete from | Snippet |        
@@ -633,7 +633,7 @@ $0
         assert_snapshot!(completions("
 create table users (id int);
 truncate $0;
-"), @r"
+"), @"
          label              | kind   | detail 
         --------------------+--------+--------
          users              | Table  |        
@@ -647,7 +647,7 @@ truncate $0;
 
     #[test]
     fn completion_table_nested() {
-        assert_snapshot!(completions("select * from ($0)"), @r"
+        assert_snapshot!(completions("select * from ($0)"), @"
          label       | kind    | detail 
         -------------+---------+--------
          delete from | Snippet |        
@@ -662,7 +662,7 @@ truncate $0;
         assert_snapshot!(completions("
 create table users (id int);
 table $0;
-"), @r"
+"), @"
          label              | kind   | detail 
         --------------------+--------+--------
          users              | Table  |        
@@ -679,7 +679,7 @@ table $0;
         assert_snapshot!(completions("
 create table t (a int);
 select $0;
-"), @r"
+"), @"
          label              | kind    | detail 
         --------------------+---------+--------
          except             | Snippet |        
@@ -710,7 +710,7 @@ select $0;
 create table t(a text, b int);
 create function f() returns text as 'select 1::text' language sql;
 select $0 from t;
-"), @r"
+"), @"
          label              | kind     | detail                  
         --------------------+----------+-------------------------
          a                  | Column   | text                    
@@ -922,7 +922,7 @@ create function f() returns int8 as 'select 1' language sql;
 create schema foo;
 create function foo.b() returns int8 as 'select 2' language sql;
 select public.$0;
-"), @r"
+"), @"
          label | kind     | detail                  
         -------+----------+-------------------------
          f()   | Function | public.f() returns int8
@@ -934,7 +934,7 @@ select public.$0;
         assert_snapshot!(completions("
 create table users (id int);
 truncate public.$0;
-"), @r"
+"), @"
          label | kind  | detail 
         -------+-------+--------
          users | Table |
@@ -946,7 +946,7 @@ truncate public.$0;
         assert_snapshot!(completions("
 create table users (id int);
 delete from $0;
-"), @r"
+"), @"
          label              | kind   | detail 
         --------------------+--------+--------
          users              | Table  |        
@@ -963,7 +963,7 @@ delete from $0;
         assert_snapshot!(completions("
 create table t (id int);
 delete from t $0;
-"), @r"
+"), @"
          label     | kind    | detail 
         -----------+---------+--------
          returning | Snippet |        
@@ -978,7 +978,7 @@ delete from t $0;
 create table t (id int, name text);
 create function is_active() returns bool as 'select true' language sql;
 delete from t where $0;
-"), @r"
+"), @"
          label       | kind     | detail                          
         -------------+----------+---------------------------------
          id          | Column   | int                             
@@ -993,7 +993,7 @@ delete from t where $0;
         assert_snapshot!(completions("
 create table t (id int, name text);
 delete from t returning $0;
-"), @r"
+"), @"
          label | kind   | detail 
         -------+--------+--------
          id    | Column | int    
@@ -1015,7 +1015,7 @@ create function f(t) returns int8
   as 'select 1'
   language sql;
 delete from t where t.$0;
-"), @r"
+"), @"
          label | kind     | detail 
         -------+----------+--------
          a     | Column   | int    
@@ -1029,7 +1029,7 @@ delete from t where t.$0;
         assert_snapshot!(completions("
 with t as (select 1 a)
 select a from t $0;
-"), @r"
+"), @"
          label     | kind    | detail 
         -----------+---------+--------
          except    | Snippet |        
@@ -1052,7 +1052,7 @@ select a from t $0;
         assert_snapshot!(completions("
 create table t (a int);
 select 1 from t $0;
-"), @r"
+"), @"
          label     | kind    | detail 
         -----------+---------+--------
          except    | Snippet |        
@@ -1088,7 +1088,7 @@ select a from t group by $0;
         assert_snapshot!(completions("
 create table t (id int, name text);
 select * from t where $0;
-"), @r"
+"), @"
          label | kind   | detail 
         -------+--------+--------
          id    | Column | int    
@@ -1103,7 +1103,7 @@ select * from t where $0;
 create table t (a int);
 create function get_limit() returns int as 'select 10' language sql;
 select 1 from t limit $0;
-"), @r"
+"), @"
          label       | kind     | detail                         
         -------------+----------+--------------------------------
          all         | Keyword  |                                
@@ -1117,7 +1117,7 @@ select 1 from t limit $0;
 create table t (a int);
 create function get_offset() returns int as 'select 10' language sql;
 select 1 from t offset $0;
-"), @r"
+"), @"
          label        | kind     | detail                          
         --------------+----------+---------------------------------
          get_offset() | Function | public.get_offset() returns int

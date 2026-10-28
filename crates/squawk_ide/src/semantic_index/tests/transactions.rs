@@ -52,11 +52,23 @@ select a from t;
     error: relation `u` does not exist
       ╭▸ 
     9 │ select a from u;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    9 - select a from u;
+    9 + select a from t;
+      ╰╴
     error: relation `v` does not exist
        ╭▸ 
     12 │ select a from v;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    12 - select a from v;
+    12 + select a from t;
+       ╰╴
     ");
 }
 

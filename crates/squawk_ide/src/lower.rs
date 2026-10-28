@@ -43,8 +43,8 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, SimilarColumn,
-        TriggerFunctionKind, WindowClause,
+        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
+        SimilarColumn, TriggerFunctionKind, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -936,6 +936,8 @@ pub(crate) enum TableLookup {
     TableOrView,
     TableOrMaterializedView,
     Any,
+    FromItem,
+    Like,
     View,
     MaterializedView,
     Sequence,
@@ -957,7 +959,14 @@ impl TableLookup {
             TableLookup::TableOrMaterializedView => {
                 matches!(kind, TableKind::Table | TableKind::MaterializedView)
             }
-            TableLookup::Any => true,
+            TableLookup::Any | TableLookup::FromItem => true,
+            TableLookup::Like => matches!(
+                kind,
+                TableKind::Table
+                    | TableKind::View
+                    | TableKind::MaterializedView
+                    | TableKind::ForeignTable
+            ),
             TableLookup::View => kind == TableKind::View,
             TableLookup::MaterializedView => kind == TableKind::MaterializedView,
             TableLookup::Sequence => kind == TableKind::Sequence,
@@ -7142,7 +7151,7 @@ impl Lowerer {
             Some(table) => Resolution::Table(table),
             None => Resolution::Unresolved,
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_table_ref(schema, name, segment.syntax(), resolution, TableLookup::Any);
         table
     }
 
@@ -10321,16 +10330,34 @@ impl Lowerer {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier(path.qualifier());
-        let (kind, resolution) = match self.find_table(schema, name) {
-            Some(table) => (ReferenceKind::Table, Resolution::Table(table)),
-            None => match self.find_type(schema, name) {
-                Resolution::Unresolved => (ReferenceKind::Table, Resolution::Unresolved),
-                resolution => (ReferenceKind::Type, resolution),
-            },
+        let resolution = match self.find_table(schema, name) {
+            Some(table) => Resolution::Table(table),
+            None => self.find_type(schema, name),
         };
-        self.add_ref(name, kind, segment.syntax(), resolution);
+        if matches!(resolution, Resolution::Table(_) | Resolution::Unresolved) {
+            self.add_table_ref(
+                schema,
+                name,
+                segment.syntax(),
+                resolution,
+                TableLookup::Like,
+            );
+        } else {
+            self.add_ref(name, ReferenceKind::Type, segment.syntax(), resolution);
+        }
         match resolution {
-            Resolution::Table(table) => Some(table),
+            Resolution::Table(table) => {
+                if !TableLookup::Like.accepts(self.index.tables[table].kind) {
+                    self.report_wrong_relation_kind(
+                        table,
+                        TableLookup::Like,
+                        segment.syntax(),
+                        false,
+                    );
+                    return None;
+                }
+                Some(table)
+            }
             Resolution::Column { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
@@ -14463,7 +14490,16 @@ impl Lowerer {
                 self.unknown_columns(),
             )
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_table_ref(
+            schema,
+            name,
+            segment.syntax(),
+            resolution,
+            match lookup {
+                RelationLookup::Any => TableLookup::FromItem,
+                RelationLookup::OnlyTable => TableLookup::Any,
+            },
+        );
         RelationSource {
             name: Some(name),
             kind,
@@ -14679,7 +14715,7 @@ impl Lowerer {
                 IfMissing::Error => Resolution::Unresolved,
             },
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_table_ref(schema, name, segment.syntax(), resolution, lookup);
         let table = found?;
         if !lookup.accepts(self.index.tables[table].kind) {
             self.report_wrong_relation_kind(table, lookup, segment.syntax(), drop);
@@ -14708,6 +14744,8 @@ impl Lowerer {
             | TableLookup::TableOrView
             | TableLookup::TableOrMaterializedView
             | TableLookup::Any
+            | TableLookup::FromItem
+            | TableLookup::Like
             | TableLookup::View
             | TableLookup::MaterializedView
             | TableLookup::Sequence
@@ -15860,7 +15898,7 @@ impl Lowerer {
             (None, IfMissing::Ignore) => Resolution::Unknown,
             (None, IfMissing::Error) => Resolution::Unresolved,
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_table_ref(schema, name, segment.syntax(), resolution, TableLookup::Any);
         table
     }
 
@@ -21056,6 +21094,28 @@ impl Lowerer {
         Some(similar)
     }
 
+    fn similar_table(&self, schema: Option<Name>, name: Name, lookup: TableLookup) -> Option<Name> {
+        let mut candidates: Vec<Name> = vec![];
+        if lookup == TableLookup::FromItem && schema.is_none() {
+            candidates.extend(self.ctes.iter().map(|cte| self.index.ctes[*cte].name));
+        }
+        for schema in self.search_path(schema, Lookup::Relation) {
+            candidates.extend(self.index.tables.in_schema(schema).filter_map(|id| {
+                let table = &self.index.tables[id];
+                (lookup.accepts(table.kind)
+                    && self.visible(table.schema, table.ptr.file_id)
+                    && !self.dropped_tables.contains(&id))
+                .then_some(table.name)
+            }));
+        }
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
     fn resolve_source(&self, name: Name) -> Option<SourceId> {
         self.scopes.iter().rev().find_map(|scope| {
             self.visible_sources(scope)
@@ -21840,6 +21900,25 @@ impl Lowerer {
         reference
     }
 
+    fn add_table_ref(
+        &mut self,
+        schema: Option<Name>,
+        name: Name,
+        node: &SyntaxNode,
+        resolution: Resolution,
+        lookup: TableLookup,
+    ) -> RefId {
+        let range = InIrFile::new(self.file_id, node.text_range());
+        let reference = self.alloc_ref(name, ReferenceKind::Table, range, resolution);
+        if let Some(mut error) = SemaError::reference(ReferenceKind::Table, resolution, name) {
+            if let SemaError::UnresolvedReference { similar, .. } = &mut error {
+                *similar = self.similar_table(schema, name, lookup).map(Similar::Table);
+            }
+            self.push_error_at(range, error);
+        }
+        reference
+    }
+
     fn add_column_ref(
         &mut self,
         name: Name,
@@ -21851,7 +21930,7 @@ impl Lowerer {
         let reference = self.alloc_ref(name, kind, range, resolution);
         if let Some(mut error) = SemaError::reference(kind, resolution, name) {
             if let SemaError::UnresolvedReference { similar, .. } = &mut error {
-                *similar = self.similar_column(name);
+                *similar = self.similar_column(name).map(Similar::Column);
             }
             self.push_error_at(range, error);
         }

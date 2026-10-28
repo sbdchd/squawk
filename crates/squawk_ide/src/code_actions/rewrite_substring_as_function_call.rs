@@ -122,7 +122,7 @@ mod test {
                 rewrite_substring_as_function_call,
                 r##"select SUBS$0TRING('hello world' SIMILAR '%#"o w#"%' ESCAPE '#');"##,
             ),
-            @r##"select substring('hello world', '%#"o w#"%', '#');"##
+            @r#"select substring('hello world', '%#"o w#"%', '#');"#
         );
     }
 

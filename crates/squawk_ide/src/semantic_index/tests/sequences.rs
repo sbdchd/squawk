@@ -144,7 +144,13 @@ drop sequence app.s, t, u;
     error: relation `s` does not exist
       ╭▸ 
     6 │ drop sequence s;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    6 - drop sequence s;
+    6 + drop sequence t;
+      ╰╴
     ");
 }
 
@@ -179,7 +185,13 @@ drop sequence t_id_seq;
     error: relation `t_id_seq` does not exist
       ╭▸ 
     7 │ drop sequence t_id_seq;
-      ╰╴              ━━━━━━━━
+      │               ━━━━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    7 - drop sequence t_id_seq;
+    7 + drop sequence t_b_seq;
+      ╰╴
     ");
 }
 
@@ -203,11 +215,23 @@ alter sequence t_id_seq restart;
     error: relation `t_d_seq` does not exist
       ╭▸ 
     6 │ alter sequence t_d_seq restart;
-      ╰╴               ━━━━━━━
+      │                ━━━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    6 - alter sequence t_d_seq restart;
+    6 + alter sequence t_c_seq restart;
+      ╰╴
     error: relation `t_b_seq` does not exist
        ╭▸ 
     12 │ alter sequence t_b_seq restart;
-       ╰╴               ━━━━━━━
+       │                ━━━━━━━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    12 - alter sequence t_b_seq restart;
+    12 + alter sequence t_e_seq restart;
+       ╰╴
     error: relation `t_id_seq` does not exist
        ╭▸ 
     14 │ alter sequence t_id_seq restart;
@@ -339,7 +363,12 @@ alter sequence if exists nope rename to x;
     error: relation `s` does not exist
       ╭▸ 
     5 │ select last_value from s;
-      ╰╴                       ━
+      │                        ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    5 │ select last_value from s2;
+      ╰╴                        +
     error: relation `t` already exists
       ╭▸ 
     7 │ alter sequence s2 rename to t;

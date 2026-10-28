@@ -90,7 +90,7 @@ mod test {
                 rewrite_extract_as_function_call,
                 r#"select extract("time""zone" from ts$0);"#,
             ),
-            @"select pg_catalog.extract('time\"zone', ts);"
+            @r#"select pg_catalog.extract('time"zone', ts);"#
         );
     }
 
