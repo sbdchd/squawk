@@ -6,8 +6,18 @@ use crate::interner::{Interner, Name};
 use crate::ir::{
     AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
 };
+use rowan::TextRange;
+use squawk_linter::{Edit, Fix};
+use squawk_syntax::quote::quote_ident;
+
 use crate::lower::{ExprContext, OutputClause, TableLookup};
-use crate::semantic_index::DiagnosticKind;
+use crate::semantic_index::{DiagnosticKind, Suggestion};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct SimilarColumn {
+    pub(crate) qualifier: Option<Name>,
+    pub(crate) column: Name,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct TyName {
@@ -255,6 +265,15 @@ pub(crate) enum SemaError {
         qualifier: Name,
         column: Name,
     },
+    UnresolvedReference {
+        kind: ReferenceKind,
+        name: Name,
+        similar: Option<SimilarColumn>,
+    },
+    AmbiguousReference {
+        kind: ReferenceKind,
+        name: Name,
+    },
     UnresolvedRoutine {
         kind: RoutineKind,
         schema: Option<Name>,
@@ -433,232 +452,96 @@ fn copy_target(copy_from: bool, kind: TableKind) -> (&'static str, Option<&'stat
     }
 }
 
-pub(crate) fn reference_error(
-    kind: ReferenceKind,
-    resolution: Resolution,
-    name: &str,
-) -> Option<(DiagnosticKind, String)> {
-    Some(match (kind, resolution) {
-        (ReferenceKind::Relation, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedRelation,
-            format!("missing `from` clause entry for table `{name}`"),
-        ),
-        (ReferenceKind::Table, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedTable,
-            format!("relation `{name}` does not exist"),
-        ),
-        (ReferenceKind::Column, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedColumn,
-            format!("column `{name}` does not exist"),
-        ),
-        (ReferenceKind::Function(kind), Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedFunction,
-            format!("{} `{name}` does not exist", kind.label()),
-        ),
-        (ReferenceKind::Type, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedType,
-            format!("type `{name}` does not exist"),
-        ),
-        (ReferenceKind::Window, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedWindow,
-            format!("window `{name}` does not exist"),
-        ),
-        (ReferenceKind::JsonPath, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedJsonPath,
-            format!("JSON path `{name}` does not exist"),
-        ),
-        (ReferenceKind::Index, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedIndex,
-            format!("index `{name}` does not exist"),
-        ),
-        (ReferenceKind::Constraint, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedConstraint,
-            format!("constraint `{name}` does not exist"),
-        ),
-        (ReferenceKind::Trigger, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedTrigger,
-            format!("trigger `{name}` does not exist"),
-        ),
-        (ReferenceKind::Rule, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedRule,
-            format!("rule `{name}` does not exist"),
-        ),
-        (ReferenceKind::Role, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedRole,
-            format!("role `{name}` does not exist"),
-        ),
-        (ReferenceKind::Policy, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedPolicy,
-            format!("policy `{name}` does not exist"),
-        ),
-        (ReferenceKind::AccessMethod, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedAccessMethod,
-            format!("access method `{name}` does not exist"),
-        ),
-        (ReferenceKind::EventTrigger, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedEventTrigger,
-            format!("event trigger `{name}` does not exist"),
-        ),
-        (ReferenceKind::Language, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedLanguage,
-            format!("language `{name}` does not exist"),
-        ),
-        (ReferenceKind::ForeignDataWrapper, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedForeignDataWrapper,
-            format!("foreign-data wrapper `{name}` does not exist"),
-        ),
-        (ReferenceKind::Server, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedServer,
-            format!("server `{name}` does not exist"),
-        ),
-        (ReferenceKind::Conversion, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedConversion,
-            format!("conversion `{name}` does not exist"),
-        ),
-        (ReferenceKind::OperatorFamily, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedOperatorFamily,
-            format!("operator family `{name}` does not exist"),
-        ),
-        (ReferenceKind::OperatorClass, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedOperatorClass,
-            format!("operator class `{name}` does not exist"),
-        ),
-        (ReferenceKind::Statistics, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedStatistics,
-            format!("statistics object `{name}` does not exist"),
-        ),
-        (ReferenceKind::TextSearch(kind), Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedTextSearch,
-            format!("{} `{name}` does not exist", kind.label()),
-        ),
-        (ReferenceKind::Publication, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedPublication,
-            format!("publication `{name}` does not exist"),
-        ),
-        (ReferenceKind::Subscription, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedSubscription,
-            format!("subscription `{name}` does not exist"),
-        ),
-        (ReferenceKind::GraphElement, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedGraphElement,
-            format!("element table `{name}` does not exist"),
-        ),
-        (ReferenceKind::GraphLabel, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedGraphLabel,
-            format!("label `{name}` does not exist"),
-        ),
-        (ReferenceKind::EnumLabel, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedEnumLabel,
-            format!("enum label `{name}` does not exist"),
-        ),
-        (ReferenceKind::GraphProperty, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedGraphProperty,
-            format!("property `{name}` does not exist"),
-        ),
-        (ReferenceKind::Collation, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedCollation,
-            format!("collation `{name}` does not exist"),
-        ),
-        (ReferenceKind::Schema, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedSchema,
-            format!("schema `{name}` does not exist"),
-        ),
-        (ReferenceKind::Tablespace, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedTablespace,
-            format!("tablespace `{name}` does not exist"),
-        ),
-        (ReferenceKind::Database, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedDatabase,
-            format!("database `{name}` does not exist"),
-        ),
-        (ReferenceKind::Extension, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedExtension,
-            format!("extension `{name}` does not exist"),
-        ),
-        (ReferenceKind::Operator, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedOperator,
-            format!("operator `{name}` does not exist"),
-        ),
-        (ReferenceKind::Savepoint, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedSavepoint,
-            format!("savepoint `{name}` does not exist"),
-        ),
-        (ReferenceKind::Cursor, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedCursor,
-            format!("cursor `{name}` does not exist"),
-        ),
-        (ReferenceKind::PreparedTransaction, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedPreparedTransaction,
-            format!("prepared transaction `{name}` does not exist"),
-        ),
-        (ReferenceKind::PreparedStatement, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedPreparedStatement,
-            format!("prepared statement `{name}` does not exist"),
-        ),
-        (ReferenceKind::Channel, Resolution::Unresolved) => return None,
-        (ReferenceKind::Param, Resolution::Unresolved) => (
-            DiagnosticKind::UnresolvedParam,
-            format!("there is no parameter `{name}`"),
-        ),
-        (ReferenceKind::Function(kind), Resolution::Ambiguous) => (
-            DiagnosticKind::AmbiguousFunction,
-            format!("{} `{name}` is not unique", kind.label()),
-        ),
-        (ReferenceKind::Operator, Resolution::Ambiguous) => (
-            DiagnosticKind::AmbiguousOperator,
-            format!("operator `{name}` is not unique"),
-        ),
-        (_, Resolution::Ambiguous) => (
-            DiagnosticKind::AmbiguousColumn,
-            format!("column reference `{name}` is ambiguous"),
-        ),
-        (
-            _,
-            Resolution::Column { .. }
-            | Resolution::Source(_)
-            | Resolution::Cte(_)
-            | Resolution::Table(_)
-            | Resolution::Function(_)
-            | Resolution::Param(_)
-            | Resolution::Type(_)
-            | Resolution::Window(_)
-            | Resolution::JsonPath(_)
-            | Resolution::Index(_)
-            | Resolution::Constraint(_)
-            | Resolution::Trigger(_)
-            | Resolution::Rule(_)
-            | Resolution::Role(_)
-            | Resolution::Policy(_)
-            | Resolution::AccessMethod(_)
-            | Resolution::EventTrigger(_)
-            | Resolution::Language(_)
-            | Resolution::ForeignDataWrapper(_)
-            | Resolution::Server(_)
-            | Resolution::Conversion(_)
-            | Resolution::OperatorFamily(_)
-            | Resolution::OperatorClass(_)
-            | Resolution::Statistics(_)
-            | Resolution::TextSearch(_)
-            | Resolution::Publication(_)
-            | Resolution::Subscription(_)
-            | Resolution::GraphElement(_)
-            | Resolution::GraphLabel(_)
-            | Resolution::EnumLabel(_)
-            | Resolution::GraphProperty(_)
-            | Resolution::Collation(_)
-            | Resolution::Schema(_)
-            | Resolution::Tablespace(_)
-            | Resolution::Database(_)
-            | Resolution::Extension(_)
-            | Resolution::Operator(_)
-            | Resolution::Savepoint(_)
-            | Resolution::Cursor(_)
-            | Resolution::PreparedTransaction(_)
-            | Resolution::PreparedStatement(_)
-            | Resolution::Channel(_)
-            | Resolution::Unknown,
-        ) => return None,
-    })
+fn unresolved_kind(kind: ReferenceKind) -> DiagnosticKind {
+    match kind {
+        ReferenceKind::Relation => DiagnosticKind::UnresolvedRelation,
+        ReferenceKind::Table => DiagnosticKind::UnresolvedTable,
+        ReferenceKind::Column => DiagnosticKind::UnresolvedColumn,
+        ReferenceKind::Function(_) => DiagnosticKind::UnresolvedFunction,
+        ReferenceKind::Type => DiagnosticKind::UnresolvedType,
+        ReferenceKind::Window => DiagnosticKind::UnresolvedWindow,
+        ReferenceKind::JsonPath => DiagnosticKind::UnresolvedJsonPath,
+        ReferenceKind::Index => DiagnosticKind::UnresolvedIndex,
+        ReferenceKind::Constraint => DiagnosticKind::UnresolvedConstraint,
+        ReferenceKind::Trigger => DiagnosticKind::UnresolvedTrigger,
+        ReferenceKind::Rule => DiagnosticKind::UnresolvedRule,
+        ReferenceKind::Role => DiagnosticKind::UnresolvedRole,
+        ReferenceKind::Policy => DiagnosticKind::UnresolvedPolicy,
+        ReferenceKind::AccessMethod => DiagnosticKind::UnresolvedAccessMethod,
+        ReferenceKind::EventTrigger => DiagnosticKind::UnresolvedEventTrigger,
+        ReferenceKind::Language => DiagnosticKind::UnresolvedLanguage,
+        ReferenceKind::ForeignDataWrapper => DiagnosticKind::UnresolvedForeignDataWrapper,
+        ReferenceKind::Server => DiagnosticKind::UnresolvedServer,
+        ReferenceKind::Conversion => DiagnosticKind::UnresolvedConversion,
+        ReferenceKind::OperatorFamily => DiagnosticKind::UnresolvedOperatorFamily,
+        ReferenceKind::OperatorClass => DiagnosticKind::UnresolvedOperatorClass,
+        ReferenceKind::Statistics => DiagnosticKind::UnresolvedStatistics,
+        ReferenceKind::TextSearch(_) => DiagnosticKind::UnresolvedTextSearch,
+        ReferenceKind::Publication => DiagnosticKind::UnresolvedPublication,
+        ReferenceKind::Subscription => DiagnosticKind::UnresolvedSubscription,
+        ReferenceKind::GraphElement => DiagnosticKind::UnresolvedGraphElement,
+        ReferenceKind::GraphLabel => DiagnosticKind::UnresolvedGraphLabel,
+        ReferenceKind::EnumLabel => DiagnosticKind::UnresolvedEnumLabel,
+        ReferenceKind::GraphProperty => DiagnosticKind::UnresolvedGraphProperty,
+        ReferenceKind::Collation => DiagnosticKind::UnresolvedCollation,
+        ReferenceKind::Schema => DiagnosticKind::UnresolvedSchema,
+        ReferenceKind::Tablespace => DiagnosticKind::UnresolvedTablespace,
+        ReferenceKind::Database => DiagnosticKind::UnresolvedDatabase,
+        ReferenceKind::Extension => DiagnosticKind::UnresolvedExtension,
+        ReferenceKind::Operator => DiagnosticKind::UnresolvedOperator,
+        ReferenceKind::Savepoint => DiagnosticKind::UnresolvedSavepoint,
+        ReferenceKind::Cursor => DiagnosticKind::UnresolvedCursor,
+        ReferenceKind::PreparedTransaction => DiagnosticKind::UnresolvedPreparedTransaction,
+        ReferenceKind::PreparedStatement => DiagnosticKind::UnresolvedPreparedStatement,
+        ReferenceKind::Param => DiagnosticKind::UnresolvedParam,
+        ReferenceKind::Channel => unreachable!(),
+    }
+}
+
+fn ambiguous_kind(kind: ReferenceKind) -> DiagnosticKind {
+    match kind {
+        ReferenceKind::Function(_) => DiagnosticKind::AmbiguousFunction,
+        ReferenceKind::Operator => DiagnosticKind::AmbiguousOperator,
+        ReferenceKind::Column
+        | ReferenceKind::Relation
+        | ReferenceKind::Table
+        | ReferenceKind::Param
+        | ReferenceKind::Type
+        | ReferenceKind::Window
+        | ReferenceKind::JsonPath
+        | ReferenceKind::Index
+        | ReferenceKind::Constraint
+        | ReferenceKind::Trigger
+        | ReferenceKind::Rule
+        | ReferenceKind::Role
+        | ReferenceKind::Policy
+        | ReferenceKind::AccessMethod
+        | ReferenceKind::EventTrigger
+        | ReferenceKind::Language
+        | ReferenceKind::ForeignDataWrapper
+        | ReferenceKind::Server
+        | ReferenceKind::Conversion
+        | ReferenceKind::OperatorFamily
+        | ReferenceKind::OperatorClass
+        | ReferenceKind::Statistics
+        | ReferenceKind::TextSearch(_)
+        | ReferenceKind::Publication
+        | ReferenceKind::Subscription
+        | ReferenceKind::GraphElement
+        | ReferenceKind::GraphLabel
+        | ReferenceKind::EnumLabel
+        | ReferenceKind::GraphProperty
+        | ReferenceKind::Collation
+        | ReferenceKind::Schema
+        | ReferenceKind::Tablespace
+        | ReferenceKind::Database
+        | ReferenceKind::Extension
+        | ReferenceKind::Savepoint
+        | ReferenceKind::Cursor
+        | ReferenceKind::PreparedTransaction
+        | ReferenceKind::PreparedStatement
+        | ReferenceKind::Channel => DiagnosticKind::AmbiguousColumn,
+    }
 }
 
 impl RoutineKind {
@@ -807,6 +690,65 @@ fn plural_columns(count: usize) -> &'static str {
 }
 
 impl SemaError {
+    pub(crate) fn reference(
+        kind: ReferenceKind,
+        resolution: Resolution,
+        name: Name,
+    ) -> Option<SemaError> {
+        match resolution {
+            Resolution::Unresolved if kind == ReferenceKind::Channel => None,
+            Resolution::Unresolved => Some(SemaError::UnresolvedReference {
+                kind,
+                name,
+                similar: None,
+            }),
+            Resolution::Ambiguous => Some(SemaError::AmbiguousReference { kind, name }),
+            Resolution::Column { .. }
+            | Resolution::Source(_)
+            | Resolution::Cte(_)
+            | Resolution::Table(_)
+            | Resolution::Function(_)
+            | Resolution::Param(_)
+            | Resolution::Type(_)
+            | Resolution::Window(_)
+            | Resolution::JsonPath(_)
+            | Resolution::Index(_)
+            | Resolution::Constraint(_)
+            | Resolution::Trigger(_)
+            | Resolution::Rule(_)
+            | Resolution::Role(_)
+            | Resolution::Policy(_)
+            | Resolution::AccessMethod(_)
+            | Resolution::EventTrigger(_)
+            | Resolution::Language(_)
+            | Resolution::ForeignDataWrapper(_)
+            | Resolution::Server(_)
+            | Resolution::Conversion(_)
+            | Resolution::OperatorFamily(_)
+            | Resolution::OperatorClass(_)
+            | Resolution::Statistics(_)
+            | Resolution::TextSearch(_)
+            | Resolution::Publication(_)
+            | Resolution::Subscription(_)
+            | Resolution::GraphElement(_)
+            | Resolution::GraphLabel(_)
+            | Resolution::EnumLabel(_)
+            | Resolution::GraphProperty(_)
+            | Resolution::Collation(_)
+            | Resolution::Schema(_)
+            | Resolution::Tablespace(_)
+            | Resolution::Database(_)
+            | Resolution::Extension(_)
+            | Resolution::Operator(_)
+            | Resolution::Savepoint(_)
+            | Resolution::Cursor(_)
+            | Resolution::PreparedTransaction(_)
+            | Resolution::PreparedStatement(_)
+            | Resolution::Channel(_)
+            | Resolution::Unknown => None,
+        }
+    }
+
     pub(crate) fn kind(&self) -> DiagnosticKind {
         match *self {
             SemaError::CannotChangeDatabase => DiagnosticKind::CannotChangeDatabase,
@@ -854,6 +796,8 @@ impl SemaError {
             SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::UnresolvedQualifiedColumn { .. } => DiagnosticKind::UnresolvedColumn,
+            SemaError::UnresolvedReference { kind, .. } => unresolved_kind(kind),
+            SemaError::AmbiguousReference { kind, .. } => ambiguous_kind(kind),
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
@@ -893,6 +837,28 @@ impl SemaError {
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
             SemaError::ConflictingNullability { .. } => DiagnosticKind::ConflictingNullability,
         }
+    }
+
+    pub(crate) fn suggestion(&self, range: TextRange, names: &Interner) -> Option<Suggestion> {
+        let SemaError::UnresolvedReference {
+            similar: Some(similar),
+            ..
+        } = *self
+        else {
+            return None;
+        };
+        let column = quote_ident(names.resolve(similar.column));
+        let replacement = match similar.qualifier {
+            Some(qualifier) => format!("{}.{column}", quote_ident(names.resolve(qualifier))),
+            None => column,
+        };
+        Some(Suggestion {
+            message: "a column with a similar name exists".into(),
+            fix: Fix {
+                title: format!("Replace with `{replacement}`").into(),
+                edits: vec![Edit::replace(range, replacement)],
+            },
+        })
     }
 
     pub(crate) fn hint(&self) -> Option<&'static str> {
@@ -1196,6 +1162,128 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(source),
                 self.ty(target)
             ),
+            SemaError::UnresolvedReference { kind, name, .. } => {
+                let name = n(name);
+                match kind {
+                    ReferenceKind::Relation => {
+                        write!(f, "missing `from` clause entry for table `{name}`")
+                    }
+                    ReferenceKind::Table => write!(f, "relation `{name}` does not exist"),
+                    ReferenceKind::Column => write!(f, "column `{name}` does not exist"),
+                    ReferenceKind::Function(kind) => {
+                        write!(f, "{} `{name}` does not exist", kind.label())
+                    }
+                    ReferenceKind::Type => write!(f, "type `{name}` does not exist"),
+                    ReferenceKind::Window => write!(f, "window `{name}` does not exist"),
+                    ReferenceKind::JsonPath => write!(f, "JSON path `{name}` does not exist"),
+                    ReferenceKind::Index => write!(f, "index `{name}` does not exist"),
+                    ReferenceKind::Constraint => write!(f, "constraint `{name}` does not exist"),
+                    ReferenceKind::Trigger => write!(f, "trigger `{name}` does not exist"),
+                    ReferenceKind::Rule => write!(f, "rule `{name}` does not exist"),
+                    ReferenceKind::Role => write!(f, "role `{name}` does not exist"),
+                    ReferenceKind::Policy => write!(f, "policy `{name}` does not exist"),
+                    ReferenceKind::AccessMethod => {
+                        write!(f, "access method `{name}` does not exist")
+                    }
+                    ReferenceKind::EventTrigger => {
+                        write!(f, "event trigger `{name}` does not exist")
+                    }
+                    ReferenceKind::Language => write!(f, "language `{name}` does not exist"),
+                    ReferenceKind::ForeignDataWrapper => {
+                        write!(f, "foreign-data wrapper `{name}` does not exist")
+                    }
+                    ReferenceKind::Server => write!(f, "server `{name}` does not exist"),
+                    ReferenceKind::Conversion => write!(f, "conversion `{name}` does not exist"),
+                    ReferenceKind::OperatorFamily => {
+                        write!(f, "operator family `{name}` does not exist")
+                    }
+                    ReferenceKind::OperatorClass => {
+                        write!(f, "operator class `{name}` does not exist")
+                    }
+                    ReferenceKind::Statistics => {
+                        write!(f, "statistics object `{name}` does not exist")
+                    }
+                    ReferenceKind::TextSearch(kind) => {
+                        write!(f, "{} `{name}` does not exist", kind.label())
+                    }
+                    ReferenceKind::Publication => write!(f, "publication `{name}` does not exist"),
+                    ReferenceKind::Subscription => {
+                        write!(f, "subscription `{name}` does not exist")
+                    }
+                    ReferenceKind::GraphElement => {
+                        write!(f, "element table `{name}` does not exist")
+                    }
+                    ReferenceKind::GraphLabel => write!(f, "label `{name}` does not exist"),
+                    ReferenceKind::EnumLabel => write!(f, "enum label `{name}` does not exist"),
+                    ReferenceKind::GraphProperty => write!(f, "property `{name}` does not exist"),
+                    ReferenceKind::Collation => write!(f, "collation `{name}` does not exist"),
+                    ReferenceKind::Schema => write!(f, "schema `{name}` does not exist"),
+                    ReferenceKind::Tablespace => write!(f, "tablespace `{name}` does not exist"),
+                    ReferenceKind::Database => write!(f, "database `{name}` does not exist"),
+                    ReferenceKind::Extension => write!(f, "extension `{name}` does not exist"),
+                    ReferenceKind::Operator => write!(f, "operator `{name}` does not exist"),
+                    ReferenceKind::Savepoint => write!(f, "savepoint `{name}` does not exist"),
+                    ReferenceKind::Cursor => write!(f, "cursor `{name}` does not exist"),
+                    ReferenceKind::PreparedTransaction => {
+                        write!(f, "prepared transaction `{name}` does not exist")
+                    }
+                    ReferenceKind::PreparedStatement => {
+                        write!(f, "prepared statement `{name}` does not exist")
+                    }
+                    ReferenceKind::Param => write!(f, "there is no parameter `{name}`"),
+                    ReferenceKind::Channel => unreachable!(),
+                }
+            }
+            SemaError::AmbiguousReference { kind, name } => {
+                let name = n(name);
+                match kind {
+                    ReferenceKind::Function(kind) => {
+                        write!(f, "{} `{name}` is not unique", kind.label())
+                    }
+                    ReferenceKind::Operator => write!(f, "operator `{name}` is not unique"),
+                    ReferenceKind::Column
+                    | ReferenceKind::Relation
+                    | ReferenceKind::Table
+                    | ReferenceKind::Param
+                    | ReferenceKind::Type
+                    | ReferenceKind::Window
+                    | ReferenceKind::JsonPath
+                    | ReferenceKind::Index
+                    | ReferenceKind::Constraint
+                    | ReferenceKind::Trigger
+                    | ReferenceKind::Rule
+                    | ReferenceKind::Role
+                    | ReferenceKind::Policy
+                    | ReferenceKind::AccessMethod
+                    | ReferenceKind::EventTrigger
+                    | ReferenceKind::Language
+                    | ReferenceKind::ForeignDataWrapper
+                    | ReferenceKind::Server
+                    | ReferenceKind::Conversion
+                    | ReferenceKind::OperatorFamily
+                    | ReferenceKind::OperatorClass
+                    | ReferenceKind::Statistics
+                    | ReferenceKind::TextSearch(_)
+                    | ReferenceKind::Publication
+                    | ReferenceKind::Subscription
+                    | ReferenceKind::GraphElement
+                    | ReferenceKind::GraphLabel
+                    | ReferenceKind::EnumLabel
+                    | ReferenceKind::GraphProperty
+                    | ReferenceKind::Collation
+                    | ReferenceKind::Schema
+                    | ReferenceKind::Tablespace
+                    | ReferenceKind::Database
+                    | ReferenceKind::Extension
+                    | ReferenceKind::Savepoint
+                    | ReferenceKind::Cursor
+                    | ReferenceKind::PreparedTransaction
+                    | ReferenceKind::PreparedStatement
+                    | ReferenceKind::Channel => {
+                        write!(f, "column reference `{name}` is ambiguous")
+                    }
+                }
+            }
             SemaError::UnresolvedQualifiedColumn { qualifier, column } => {
                 write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
             }

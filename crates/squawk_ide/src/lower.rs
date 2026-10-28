@@ -43,10 +43,10 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, TriggerFunctionKind,
-        WindowClause,
+        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, SimilarColumn,
+        TriggerFunctionKind, WindowClause,
     },
-    semantic_index::{IndexData, NameVersion, SimilarColumn},
+    semantic_index::{IndexData, NameVersion},
 };
 use crate::{
     overload::{ArgType, BuiltinTypes, CallArg, Overloads},
@@ -1455,10 +1455,7 @@ impl Lowerer {
                         .get(ColumnKey { table, column })
                         .is_some_and(|expression| expression.kind == ColumnExprKind::Generated)
                 {
-                    let range = self.index.range(range);
-                    self.index
-                        .errors
-                        .push(range, SemaError::GeneratedColumnReference { column });
+                    self.push_error_at(range, SemaError::GeneratedColumnReference { column });
                 }
             }
         }
@@ -9223,8 +9220,7 @@ impl Lowerer {
                                 right: OperandName::Ty(self.index.ty_name(right)),
                                 lookup: LookupKind::Signature,
                             };
-                            let file_range = self.index.range(InIrFile::new(self.file_id, range));
-                            self.index.errors.push(file_range, error);
+                            self.push_error_at(InIrFile::new(self.file_id, range), error);
                             Resolution::Unknown
                         }
                         (None, _) | (Some(_), Operand::None | Operand::Unknown) => {
@@ -17878,8 +17874,7 @@ impl Lowerer {
                 right,
                 lookup: LookupKind::Call,
             };
-            let file_range = self.index.range(InIrFile::new(self.file_id, range));
-            self.index.errors.push(file_range, error);
+            self.push_error_at(InIrFile::new(self.file_id, range), error);
             resolution = Resolution::Unknown;
         }
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
@@ -19162,10 +19157,7 @@ impl Lowerer {
             },
             (_, None) => {
                 let NameResolution { kind, resolution } = self.resolve_name(name);
-                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
-                if matches!(resolution, Resolution::Unresolved) {
-                    self.suggest_column(reference, name);
-                }
+                self.add_column_ref(name, kind, name_ref.syntax(), resolution);
                 return;
             }
         };
@@ -19183,10 +19175,7 @@ impl Lowerer {
                 }
                 let name = self.name_ref_name(name_ref)?;
                 let NameResolution { kind, resolution } = self.resolve_name(name);
-                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
-                if matches!(resolution, Resolution::Unresolved) {
-                    self.suggest_column(reference, name);
-                }
+                self.add_column_ref(name, kind, name_ref.syntax(), resolution);
                 self.check_default_column_ref(name_ref.syntax(), resolution);
                 return self.resolution_type(resolution);
             }
@@ -21032,7 +21021,7 @@ impl Lowerer {
             .find(|id| self.index.sources[*id].name == Some(name))
     }
 
-    fn suggest_column(&mut self, reference: RefId, name: Name) {
+    fn similar_column(&self, name: Name) -> Option<SimilarColumn> {
         let mut candidates: Vec<SimilarColumn> = vec![];
         for scope in self.scopes.iter().rev() {
             for source in self.visible_sources(scope) {
@@ -21050,14 +21039,12 @@ impl Lowerer {
             }
         }
         let lookup = self.index.names.resolve(name);
-        let Some(mut similar) = find_best_match_for_name_with_substrings(
+        let mut similar = find_best_match_for_name_with_substrings(
             &candidates,
             |candidate| self.index.names.resolve(candidate.column),
             lookup,
             None,
-        ) else {
-            return;
-        };
+        )?;
         if candidates
             .iter()
             .filter(|candidate| candidate.column == similar.column)
@@ -21066,7 +21053,7 @@ impl Lowerer {
         {
             similar.qualifier = None;
         }
-        self.index.errors.similar_columns.insert(reference, similar);
+        Some(similar)
     }
 
     fn resolve_source(&self, name: Name) -> Option<SourceId> {
@@ -21846,6 +21833,38 @@ impl Lowerer {
         resolution: Resolution,
     ) -> RefId {
         let range = InIrFile::new(self.file_id, range);
+        let reference = self.alloc_ref(name, kind, range, resolution);
+        if let Some(error) = SemaError::reference(kind, resolution, name) {
+            self.push_error_at(range, error);
+        }
+        reference
+    }
+
+    fn add_column_ref(
+        &mut self,
+        name: Name,
+        kind: ReferenceKind,
+        node: &SyntaxNode,
+        resolution: Resolution,
+    ) -> RefId {
+        let range = InIrFile::new(self.file_id, node.text_range());
+        let reference = self.alloc_ref(name, kind, range, resolution);
+        if let Some(mut error) = SemaError::reference(kind, resolution, name) {
+            if let SemaError::UnresolvedReference { similar, .. } = &mut error {
+                *similar = self.similar_column(name);
+            }
+            self.push_error_at(range, error);
+        }
+        reference
+    }
+
+    fn alloc_ref(
+        &mut self,
+        name: Name,
+        kind: ReferenceKind,
+        range: IrFileRange,
+        resolution: Resolution,
+    ) -> RefId {
         let id = self.index.references.alloc(Reference {
             name,
             kind,
@@ -21933,7 +21952,11 @@ impl Lowerer {
     }
 
     fn push_error_ptr(&mut self, ptr: InIrFile<SyntaxNodePtr>, error: SemaError) {
-        let range = self.index.range(ptr.file_range());
+        self.push_error_at(ptr.file_range(), error);
+    }
+
+    fn push_error_at(&mut self, range: IrFileRange, error: SemaError) {
+        let range = self.index.range(range);
         self.index.errors.push(range, error);
     }
 
