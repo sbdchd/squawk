@@ -179,6 +179,7 @@ struct QueryScope {
     scope: ScopeId,
     merges: Vec<ScopeMerge>,
     windows: Range<usize>,
+    join_aliased_sources: Vec<SourceId>,
 }
 
 #[derive(Clone, Copy)]
@@ -982,6 +983,12 @@ impl TableLookup {
 #[derive(Clone, Copy)]
 enum RefSource {
     Column,
+    /// table name, alias, CTE, or subquery alias
+    /// ```sql
+    /// -- x is the qualifier
+    /// select x.a, x.*
+    /// ```
+    Qualifier,
     Table {
         schema: Option<Name>,
         lookup: TableLookup,
@@ -997,6 +1004,7 @@ impl RefSource {
     fn kind(self) -> ReferenceKind {
         match self {
             RefSource::Column => ReferenceKind::Column,
+            RefSource::Qualifier => ReferenceKind::Relation,
             RefSource::Table { .. } => ReferenceKind::Table,
             RefSource::Type { .. } => ReferenceKind::Type,
             RefSource::Window => ReferenceKind::Window,
@@ -14190,7 +14198,7 @@ impl Lowerer {
     ) {
         let scope = self
             .scopes
-            .last()
+            .last_mut()
             .expect("from items are lowered inside a select scope");
         let index = &mut self.index;
         let from_sources = &index.queries[scope.query].sources;
@@ -14207,6 +14215,9 @@ impl Lowerer {
         let complete = from_sources[start..]
             .iter()
             .all(|&id| index.sources[id].columns.complete);
+        scope
+            .join_aliased_sources
+            .extend_from_slice(&index.queries[scope.query].sources[start..]);
         index.queries[scope.query].sources.truncate(start);
         self.scope_mut()
             .merges
@@ -14259,6 +14270,7 @@ impl Lowerer {
             scope,
             merges: vec![],
             windows: Range::default(),
+            join_aliased_sources: vec![],
         });
     }
 
@@ -19630,6 +19642,52 @@ impl Lowerer {
         window
     }
 
+    fn similar_source(&self, name: Name) -> Option<Name> {
+        if self.is_shadowed_in_from(name) {
+            return None;
+        }
+        let candidates: Vec<Name> = self
+            .scopes
+            .iter()
+            .rev()
+            .flat_map(|scope| self.visible_sources(scope))
+            .filter_map(|source| self.index.sources[source].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
+    fn is_shadowed_in_from(&self, name: Name) -> bool {
+        self.scopes.iter().any(|scope| {
+            self.index.queries[scope.query]
+                .sources
+                .iter()
+                .chain(&scope.join_aliased_sources)
+                .any(|source| {
+                    let source = &self.index.sources[*source];
+                    source.name == Some(name)
+                        || match source.kind {
+                            SourceKind::Table(table) => self.index.tables[table].name == name,
+                            SourceKind::Cte(cte) => self.index.ctes[cte].name == name,
+                            SourceKind::External
+                            | SourceKind::Subquery(_)
+                            | SourceKind::Function(_)
+                            | SourceKind::Join
+                            | SourceKind::UsingAlias
+                            | SourceKind::Returning(_)
+                            | SourceKind::Excluded(_)
+                            | SourceKind::RuleRelation(_)
+                            | SourceKind::ElementVariable
+                            | SourceKind::Other => false,
+                        }
+                })
+        })
+    }
+
     fn similar_window(&self, name: Name) -> Option<Name> {
         let scope = self.scopes.last()?;
         let candidates: Vec<Name> = self.windows[scope.windows]
@@ -21118,12 +21176,7 @@ impl Lowerer {
         let name = self.name_ref_name(qualifier)?;
         let source = self.resolve_source(name);
         let resolution = source.map_or(Resolution::Unresolved, Resolution::Source);
-        self.add_ref(
-            name,
-            ReferenceKind::Relation,
-            qualifier.syntax(),
-            resolution,
-        );
+        self.add_ref_from(name, qualifier.syntax(), resolution, RefSource::Qualifier);
         source
     }
 
@@ -22109,6 +22162,7 @@ impl Lowerer {
     fn similar(&self, name: Name, source: RefSource) -> Option<Similar> {
         match source {
             RefSource::Column => self.similar_column(name).map(Similar::Column),
+            RefSource::Qualifier => self.similar_source(name).map(Similar::Table),
             RefSource::Table { schema, lookup } => {
                 self.similar_table(schema, name, lookup).map(Similar::Table)
             }

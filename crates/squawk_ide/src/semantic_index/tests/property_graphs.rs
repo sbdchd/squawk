@@ -217,7 +217,13 @@ select * from graph_table(missing_graph match (a) columns (a.name as n));
     error: missing `from` clause entry for table `z`
        ╭▸ 
     14 │   where a.id = 1 and e.since is not null and z.name = 'y'
-       ╰╴                                             ━
+       │                                              ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    14 -   where a.id = 1 and e.since is not null and z.name = 'y'
+    14 +   where a.id = 1 and e.since is not null and a.name = 'y'
+       ╰╴
     error: column `c.title` does not exist
        ╭▸ 
     17 │ select * from graph_table(g match (c is city) columns (c.title as t));

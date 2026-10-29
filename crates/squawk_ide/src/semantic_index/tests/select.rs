@@ -34,7 +34,13 @@ select t.a, t.b, x.a from t;
     error: missing `from` clause entry for table `x`
       ╭▸ 
     3 │ select t.a, t.b, x.a from t;
-      ╰╴                 ━
+      │                  ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    3 - select t.a, t.b, x.a from t;
+    3 + select t.a, t.b, t.a from t;
+      ╰╴
     ");
 }
 
