@@ -30,6 +30,7 @@ pub(crate) enum Similar {
     Column(SimilarColumn),
     Table(Name),
     Type(SimilarType),
+    Window(Name),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -886,6 +887,13 @@ impl SemaError {
                 };
                 ("a type with a similar name exists", replacement)
             }
+            SemaError::UnresolvedReference {
+                similar: Some(Similar::Window(window)),
+                ..
+            } => (
+                "a window with a similar name exists",
+                quote_ident(names.resolve(window)),
+            ),
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),

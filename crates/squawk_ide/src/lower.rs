@@ -980,6 +980,31 @@ impl TableLookup {
 }
 
 #[derive(Clone, Copy)]
+enum RefSource {
+    Column,
+    Table {
+        schema: Option<Name>,
+        lookup: TableLookup,
+    },
+    Type {
+        schema: Option<Name>,
+        candidates: TypeCandidates,
+    },
+    Window,
+}
+
+impl RefSource {
+    fn kind(self) -> ReferenceKind {
+        match self {
+            RefSource::Column => ReferenceKind::Column,
+            RefSource::Table { .. } => ReferenceKind::Table,
+            RefSource::Type { .. } => ReferenceKind::Type,
+            RefSource::Window => ReferenceKind::Window,
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
 enum TypeCandidates {
     TypeName,
     Types(Option<TypeKind>),
@@ -7157,7 +7182,15 @@ impl Lowerer {
             Some(table) => Resolution::Table(table),
             None => Resolution::Unresolved,
         };
-        self.add_table_ref(schema, name, segment.syntax(), resolution, TableLookup::Any);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table {
+                schema,
+                lookup: TableLookup::Any,
+            },
+        );
         table
     }
 
@@ -10344,12 +10377,14 @@ impl Lowerer {
             None => self.find_type(schema, name),
         };
         if matches!(resolution, Resolution::Table(_) | Resolution::Unresolved) {
-            self.add_table_ref(
-                schema,
+            self.add_ref_from(
                 name,
                 segment.syntax(),
                 resolution,
-                TableLookup::Like,
+                RefSource::Table {
+                    schema,
+                    lookup: TableLookup::Like,
+                },
             );
         } else {
             self.add_ref(name, ReferenceKind::Type, segment.syntax(), resolution);
@@ -11960,7 +11995,15 @@ impl Lowerer {
             (Resolution::Unresolved, IfMissing::Ignore) => Resolution::Unknown,
             (resolution, IfMissing::Error | IfMissing::Ignore) => resolution,
         };
-        self.add_type_ref(schema, name, node, resolution, TypeCandidates::TypeName);
+        self.add_ref_from(
+            name,
+            node,
+            resolution,
+            RefSource::Type {
+                schema,
+                candidates: TypeCandidates::TypeName,
+            },
+        );
         match resolution {
             Resolution::Type(ty) => TypeLookup::Found(Ty::Type(ty)),
             Resolution::Table(table) => TypeLookup::Found(Ty::Table(table)),
@@ -12068,12 +12111,14 @@ impl Lowerer {
                 IfMissing::Error => Resolution::Unresolved,
             },
         };
-        self.add_type_ref(
-            schema,
+        self.add_ref_from(
             name,
             segment.syntax(),
             resolution,
-            TypeCandidates::Types(kind),
+            RefSource::Type {
+                schema,
+                candidates: TypeCandidates::Types(kind),
+            },
         );
         let ty = found?;
         if let Some(kind) = kind
@@ -14505,14 +14550,16 @@ impl Lowerer {
                 self.unknown_columns(),
             )
         };
-        self.add_table_ref(
-            schema,
+        self.add_ref_from(
             name,
             segment.syntax(),
             resolution,
-            match lookup {
-                RelationLookup::Any => TableLookup::FromItem,
-                RelationLookup::OnlyTable => TableLookup::Any,
+            RefSource::Table {
+                schema,
+                lookup: match lookup {
+                    RelationLookup::Any => TableLookup::FromItem,
+                    RelationLookup::OnlyTable => TableLookup::Any,
+                },
             },
         );
         RelationSource {
@@ -14730,7 +14777,12 @@ impl Lowerer {
                 IfMissing::Error => Resolution::Unresolved,
             },
         };
-        self.add_table_ref(schema, name, segment.syntax(), resolution, lookup);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table { schema, lookup },
+        );
         let table = found?;
         if !lookup.accepts(self.index.tables[table].kind) {
             self.report_wrong_relation_kind(table, lookup, segment.syntax(), drop);
@@ -15913,7 +15965,15 @@ impl Lowerer {
             (None, IfMissing::Ignore) => Resolution::Unknown,
             (None, IfMissing::Error) => Resolution::Unresolved,
         };
-        self.add_table_ref(schema, name, segment.syntax(), resolution, TableLookup::Any);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table {
+                schema,
+                lookup: TableLookup::Any,
+            },
+        );
         table
     }
 
@@ -19211,8 +19271,7 @@ impl Lowerer {
                 }
             },
             (_, None) => {
-                let NameResolution { kind, resolution } = self.resolve_name(name);
-                self.add_column_ref(name, kind, name_ref.syntax(), resolution);
+                self.add_name_ref(name, name_ref.syntax());
                 return;
             }
         };
@@ -19229,8 +19288,7 @@ impl Lowerer {
                     return self.lower_system_call(function, &[], name_ref.syntax().text_range());
                 }
                 let name = self.name_ref_name(name_ref)?;
-                let NameResolution { kind, resolution } = self.resolve_name(name);
-                self.add_column_ref(name, kind, name_ref.syntax(), resolution);
+                let resolution = self.add_name_ref(name, name_ref.syntax());
                 self.check_default_column_ref(name_ref.syntax(), resolution);
                 return self.resolution_type(resolution);
             }
@@ -19568,8 +19626,22 @@ impl Lowerer {
         let name = self.intern(&window_ref.text());
         let window = self.find_window(name);
         let resolution = window.map_or(Resolution::Unresolved, Resolution::Window);
-        self.add_ref(name, ReferenceKind::Window, window_ref.syntax(), resolution);
+        self.add_ref_from(name, window_ref.syntax(), resolution, RefSource::Window);
         window
+    }
+
+    fn similar_window(&self, name: Name) -> Option<Name> {
+        let scope = self.scopes.last()?;
+        let candidates: Vec<Name> = self.windows[scope.windows]
+            .iter()
+            .map(|&window| self.index.windows[window].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
     }
 
     fn lower_window_spec(
@@ -21999,62 +22071,52 @@ impl Lowerer {
         reference
     }
 
-    fn add_table_ref(
-        &mut self,
-        schema: Option<Name>,
-        name: Name,
-        node: &SyntaxNode,
-        resolution: Resolution,
-        lookup: TableLookup,
-    ) -> RefId {
-        let range = InIrFile::new(self.file_id, node.text_range());
-        let reference = self.alloc_ref(name, ReferenceKind::Table, range, resolution);
-        if let Some(mut error) = SemaError::reference(ReferenceKind::Table, resolution, name) {
-            if let SemaError::UnresolvedReference { similar, .. } = &mut error {
-                *similar = self.similar_table(schema, name, lookup).map(Similar::Table);
-            }
-            self.push_error_at(range, error);
+    fn add_name_ref(&mut self, name: Name, node: &SyntaxNode) -> Resolution {
+        let NameResolution { kind, resolution } = self.resolve_name(name);
+        if kind == ReferenceKind::Column {
+            self.add_ref_from(name, node, resolution, RefSource::Column);
+        } else {
+            self.add_ref(name, kind, node, resolution);
         }
-        reference
+        resolution
     }
 
-    fn add_type_ref(
+    fn add_ref_from(
         &mut self,
-        schema: Option<Name>,
         name: Name,
         node: &SyntaxNode,
         resolution: Resolution,
-        candidates: TypeCandidates,
+        source: RefSource,
     ) -> RefId {
-        let range = InIrFile::new(self.file_id, node.text_range());
-        let reference = self.alloc_ref(name, ReferenceKind::Type, range, resolution);
-        if let Some(mut error) = SemaError::reference(ReferenceKind::Type, resolution, name) {
-            if let SemaError::UnresolvedReference { similar, .. } = &mut error {
-                *similar = self
-                    .similar_type(schema, name, candidates)
-                    .map(Similar::Type);
-            }
-            self.push_error_at(range, error);
-        }
-        reference
-    }
-
-    fn add_column_ref(
-        &mut self,
-        name: Name,
-        kind: ReferenceKind,
-        node: &SyntaxNode,
-        resolution: Resolution,
-    ) -> RefId {
+        let kind = source.kind();
         let range = InIrFile::new(self.file_id, node.text_range());
         let reference = self.alloc_ref(name, kind, range, resolution);
-        if let Some(mut error) = SemaError::reference(kind, resolution, name) {
-            if let SemaError::UnresolvedReference { similar, .. } = &mut error {
-                *similar = self.similar_column(name).map(Similar::Column);
-            }
+        let error = if resolution == Resolution::Unresolved {
+            Some(SemaError::UnresolvedReference {
+                kind,
+                name,
+                similar: self.similar(name, source),
+            })
+        } else {
+            SemaError::reference(kind, resolution, name)
+        };
+        if let Some(error) = error {
             self.push_error_at(range, error);
         }
         reference
+    }
+
+    fn similar(&self, name: Name, source: RefSource) -> Option<Similar> {
+        match source {
+            RefSource::Column => self.similar_column(name).map(Similar::Column),
+            RefSource::Table { schema, lookup } => {
+                self.similar_table(schema, name, lookup).map(Similar::Table)
+            }
+            RefSource::Type { schema, candidates } => self
+                .similar_type(schema, name, candidates)
+                .map(Similar::Type),
+            RefSource::Window => self.similar_window(name).map(Similar::Window),
+        }
     }
 
     fn alloc_ref(
