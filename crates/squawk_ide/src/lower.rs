@@ -9510,6 +9510,8 @@ impl Lowerer {
                                 Some(_) => ErrorArgs::Star,
                                 None => ErrorArgs::List(self.index.errors.args.range_from(start)),
                             };
+                            let similar =
+                                self.similar_function(schema, name, kind, LookupKind::Signature);
                             self.push_error(
                                 segment.syntax(),
                                 SemaError::UnresolvedRoutine {
@@ -9518,6 +9520,7 @@ impl Lowerer {
                                     name,
                                     args,
                                     lookup: LookupKind::Signature,
+                                    similar,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -17957,6 +17960,7 @@ impl Lowerer {
             });
         }
         let args = ErrorArgs::List(self.index.errors.args.range_from(start));
+        let similar = self.similar_function(schema, name, kind, LookupKind::Call);
         self.push_error(
             node,
             SemaError::UnresolvedRoutine {
@@ -17965,6 +17969,7 @@ impl Lowerer {
                 name,
                 args,
                 lookup: LookupKind::Call,
+                similar,
             },
         );
         Resolution::Unknown
@@ -21114,6 +21119,42 @@ impl Lowerer {
             self.index.names.resolve(name),
             None,
         )
+    }
+
+    fn similar_function(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: RoutineKind,
+        lookup: LookupKind,
+    ) -> Option<Name> {
+        let schema = schema?;
+        let candidates: Vec<Name> = self
+            .index
+            .functions
+            .in_schema(schema)
+            .filter_map(|id| {
+                let function = &self.index.functions[id];
+                let accepts = match lookup {
+                    LookupKind::Call => {
+                        (function.kind == FunctionKind::Procedure)
+                            == (kind == RoutineKind::Procedure)
+                    }
+                    LookupKind::Signature => kind.matches(function.kind),
+                };
+                (accepts
+                    && self.visible(function.schema, function.ptr.file_id)
+                    && !self.dropped_functions.contains(&id))
+                .then_some(function.name)
+            })
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+        .filter(|similar| *similar != name)
     }
 
     fn resolve_source(&self, name: Name) -> Option<SourceId> {

@@ -286,6 +286,7 @@ pub(crate) enum SemaError {
         name: Name,
         args: ErrorArgs,
         lookup: LookupKind,
+        similar: Option<Name>,
     },
     UnresolvedOperator {
         schema: Option<Name>,
@@ -847,15 +848,11 @@ impl SemaError {
     }
 
     pub(crate) fn suggestion(&self, range: TextRange, names: &Interner) -> Option<Suggestion> {
-        let SemaError::UnresolvedReference {
-            similar: Some(similar),
-            ..
-        } = *self
-        else {
-            return None;
-        };
-        let (message, replacement) = match similar {
-            Similar::Column(similar) => {
+        let (message, replacement) = match *self {
+            SemaError::UnresolvedReference {
+                similar: Some(Similar::Column(similar)),
+                ..
+            } => {
                 let column = quote_ident(names.resolve(similar.column));
                 let replacement = match similar.qualifier {
                     Some(qualifier) => {
@@ -865,10 +862,28 @@ impl SemaError {
                 };
                 ("a column with a similar name exists", replacement)
             }
-            Similar::Table(table) => (
+            SemaError::UnresolvedReference {
+                similar: Some(Similar::Table(table)),
+                ..
+            } => (
                 "a relation with a similar name exists",
                 quote_ident(names.resolve(table)),
             ),
+            SemaError::UnresolvedRoutine {
+                kind,
+                similar: Some(similar),
+                ..
+            } => {
+                let message = match kind {
+                    RoutineKind::Function | RoutineKind::Routine => {
+                        "a function with a similar name exists"
+                    }
+                    RoutineKind::Aggregate => "an aggregate with a similar name exists",
+                    RoutineKind::Procedure => "a procedure with a similar name exists",
+                };
+                (message, quote_ident(names.resolve(similar)))
+            }
+            _ => return None,
         };
         Some(Suggestion {
             message: message.into(),
@@ -900,7 +915,15 @@ impl SemaError {
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => Some(
                 "create a unique index with no `where` clause on one or more columns of the materialized view",
             ),
-            SemaError::UnresolvedRoutine { args, lookup, .. } => match (lookup, args) {
+            SemaError::UnresolvedRoutine {
+                similar: Some(_), ..
+            } => None,
+            SemaError::UnresolvedRoutine {
+                args,
+                lookup,
+                similar: None,
+                ..
+            } => match (lookup, args) {
                 (LookupKind::Call, ErrorArgs::List(args)) if !args.is_empty() => {
                     Some("consider adding explicit type casts")
                 }
@@ -1311,6 +1334,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 name,
                 args,
                 lookup: _,
+                similar: _,
             } => {
                 let label = match kind {
                     RoutineKind::Routine => RoutineKind::Function.label(),

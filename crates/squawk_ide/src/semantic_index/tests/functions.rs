@@ -915,3 +915,93 @@ drop operator ~~~ (none, int);
        ╰╴              ━━━
     ");
 }
+
+#[test]
+fn similar_qualified_function() {
+    assert_snapshot!(check("
+create schema app;
+create function app.do_thing(int) returns int as 'select 1' language sql;
+create procedure app.do_proc() as 'select 1' language sql;
+select app.do_thnig(1);
+select pg_catalog.json_bild_object('a', 1);
+call app.do_proc_();
+drop function app.do_thnig(int);
+"), @"
+    error: function `app.do_thnig(int4)` does not exist
+      ╭▸ 
+    5 │ select app.do_thnig(1);
+      │            ━━━━━━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    5 - select app.do_thnig(1);
+    5 + select app.do_thing(1);
+      ╰╴
+    error: function `pg_catalog.json_bild_object(unknown, int4)` does not exist
+      ╭▸ 
+    6 │ select pg_catalog.json_bild_object('a', 1);
+      │                   ━━━━━━━━━━━━━━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    6 │ select pg_catalog.json_build_object('a', 1);
+      ╰╴                        +
+    error: procedure `app.do_proc_()` does not exist
+      ╭▸ 
+    7 │ call app.do_proc_();
+      │          ━━━━━━━━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    7 - call app.do_proc_();
+    7 + call app.do_proc();
+      ╰╴
+    error: function `app.do_thnig(int4)` does not exist
+      ╭▸ 
+    8 │ drop function app.do_thnig(int);
+      │                   ━━━━━━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    8 - drop function app.do_thnig(int);
+    8 + drop function app.do_thing(int);
+      ╰╴
+    ");
+}
+
+#[test]
+fn similar_function_requires_qualifier() {
+    assert_snapshot!(check("
+create function do_thing(int) returns int as 'select 1' language sql;
+select do_thnig(1);
+"), @"
+    error: function `do_thnig(int4)` does not exist
+      ╭▸ 
+    3 │ select do_thnig(1);
+      │        ━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn similar_function_skips_existing_name() {
+    assert_snapshot!(check("
+create schema app;
+create function app.do_thing(int) returns int as 'select 1' language sql;
+create function app.do_thing2(int, int) returns int as 'select 1' language sql;
+select app.do_thing(1, 2);
+call app.do_thig();
+"), @"
+    error: function `app.do_thing(int4, int4)` does not exist
+      ╭▸ 
+    5 │ select app.do_thing(1, 2);
+      │            ━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: procedure `app.do_thig()` does not exist
+      ╭▸ 
+    6 │ call app.do_thig();
+      ╰╴         ━━━━━━━
+    ");
+}
