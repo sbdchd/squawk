@@ -8,7 +8,7 @@ use crate::ir::{
 };
 use rowan::TextRange;
 use squawk_linter::{Edit, Fix};
-use squawk_syntax::quote::quote_ident;
+use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
 use crate::semantic_index::{DiagnosticKind, Suggestion};
@@ -31,6 +31,7 @@ pub(crate) enum Similar {
     Table(Name),
     Type(SimilarType),
     Window(Name),
+    EnumLabel(Name),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -307,6 +308,7 @@ pub(crate) enum SemaError {
     InvalidEnumValue {
         ty: Name,
         value: Name,
+        similar: Option<Name>,
     },
     NotEnum {
         name: Name,
@@ -895,6 +897,17 @@ impl SemaError {
                 "a window with a similar name exists",
                 quote_ident(names.resolve(window)),
             ),
+            SemaError::UnresolvedReference {
+                similar: Some(Similar::EnumLabel(label)),
+                ..
+            }
+            | SemaError::InvalidEnumValue {
+                similar: Some(label),
+                ..
+            } => (
+                "an enum label with a similar name exists",
+                quote_string_literal(names.resolve(label)),
+            ),
             SemaError::UnresolvedQualifiedColumn {
                 similar: Some(similar),
                 ..
@@ -1425,7 +1438,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(ty),
                 n(language)
             ),
-            SemaError::InvalidEnumValue { ty, value } => write!(
+            SemaError::InvalidEnumValue {
+                ty,
+                value,
+                similar: _,
+            } => write!(
                 f,
                 "invalid input value for enum `{}`: `{}`",
                 n(ty),

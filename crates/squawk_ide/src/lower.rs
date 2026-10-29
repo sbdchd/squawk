@@ -998,6 +998,9 @@ enum RefSource {
         candidates: TypeCandidates,
     },
     Window,
+    EnumLabel {
+        ty: TypeId,
+    },
 }
 
 impl RefSource {
@@ -1008,6 +1011,7 @@ impl RefSource {
             RefSource::Table { .. } => ReferenceKind::Table,
             RefSource::Type { .. } => ReferenceKind::Type,
             RefSource::Window => ReferenceKind::Window,
+            RefSource::EnumLabel { .. } => ReferenceKind::EnumLabel,
         }
     }
 }
@@ -10915,6 +10919,20 @@ impl Lowerer {
             .find(|id| self.index.enum_labels[*id].name == name)
     }
 
+    fn similar_enum_label(&self, ty: TypeId, name: Name) -> Option<Name> {
+        let candidates: Vec<Name> = self
+            .index
+            .enum_labels(ty)
+            .map(|id| self.index.enum_labels[id].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
     fn lower_enum_label_ref(
         &mut self,
         ty: Option<TypeId>,
@@ -10922,12 +10940,25 @@ impl Lowerer {
     ) -> Option<EnumLabelId> {
         let name = self.intern(&literal.string_value()?);
         let label = ty.and_then(|ty| self.find_enum_label(ty, name));
-        let resolution = match (label, ty) {
-            (Some(label), _) => Resolution::EnumLabel(label),
-            (None, Some(_)) => Resolution::Unresolved,
-            (None, None) => Resolution::Unknown,
-        };
-        self.add_ref(name, ReferenceKind::EnumLabel, literal.syntax(), resolution);
+        match ty {
+            Some(ty) => {
+                let resolution = label.map_or(Resolution::Unresolved, Resolution::EnumLabel);
+                self.add_ref_from(
+                    name,
+                    literal.syntax(),
+                    resolution,
+                    RefSource::EnumLabel { ty },
+                );
+            }
+            None => {
+                self.add_ref(
+                    name,
+                    ReferenceKind::EnumLabel,
+                    literal.syntax(),
+                    Resolution::Unknown,
+                );
+            }
+        }
         label
     }
 
@@ -10987,6 +11018,7 @@ impl Lowerer {
             let error = SemaError::InvalidEnumValue {
                 ty: self.index.types[ty].name,
                 value: name,
+                similar: self.similar_enum_label(ty, name),
             };
             self.push_error(literal.syntax(), error);
         }
@@ -22210,6 +22242,9 @@ impl Lowerer {
                 .similar_type(schema, name, candidates)
                 .map(Similar::Type),
             RefSource::Window => self.similar_window(name).map(Similar::Window),
+            RefSource::EnumLabel { ty } => {
+                self.similar_enum_label(ty, name).map(Similar::EnumLabel)
+            }
         }
     }
 
