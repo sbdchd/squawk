@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.71.0 - 2026-10-29
+
+### Added
+
+- ide: goto type def (#1426)
+- ide: many new semantic errors & suggestions (#1439, #1438, #1436, #1435, #1434, #1433, #1429, #1431)
+
+### Changed
+
+- fmt: adjust cast & json_build_object special casing (#1411)
+- fmt: indent ops & funcs in create op class (#1421)
+
+- linter: update error messages to follow rustc style guide (#1437)
+
+### Fixed
+
+- cli: report invalid include glob patterns (#1415). Thanks @shoaibulhaque!
+
+### Internal
+
+- parser: improve perf by 22.9% (#1414)
+- lexer: improve throughput by 23% (#1430)
+- fmt: improve perf by 78.8% (#1416)
+
+- syntax: upgrade rowan to latest, improve fmt perf by 4.4% (#1419)
+- fmt: upgrade tiny_pretty to 0.4.5, improve fmt perf by 9.8% (#1418)
+
+- ide: new semantic index (#1423, #1425)
+
+  | op                                     | before   | after  |
+  | -------------------------------------- | -------- | ------ |
+  | find refs (pg_catalog in builtins.sql) | 27,000ms | 40ms   |
+  | semantic highlight (builtins.sql)      | 36,200ms | 57ms   |
+  | goto def on `now()`                    | 23ms     | 0.02ms |
+  | goto def on `int`                      | 23ms     | 0.02ms |
+
 ## v2.70.0 - 2026-10-15
 
 ### Changed
