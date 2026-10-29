@@ -34,7 +34,13 @@ select t.d, u.d from t, u;
     error: column `t.d` does not exist
       ╭▸ 
     5 │ select t.d, u.d from t, u;
-      ╰╴         ━
+      │          ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select t.d, u.d from t, u;
+    5 + select t.a, u.d from t, u;
+      ╰╴
     ");
 }
 

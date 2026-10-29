@@ -38,11 +38,23 @@ merge into t using missing on true when matched then delete;
     error: column `t.x` does not exist
       ╭▸ 
     5 │ when matched and d > 0 and y = 1 then update set b = d, x = 1
-      ╰╴                                                        ━
+      │                                                         ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - when matched and d > 0 and y = 1 then update set b = d, x = 1
+    5 + when matched and d > 0 and y = 1 then update set b = d, a = 1
+      ╰╴
     error: column `t.w` does not exist
       ╭▸ 
     7 │ when not matched then insert (a, w) values (c, v)
-      ╰╴                                 ━
+      │                                  ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - when not matched then insert (a, w) values (c, v)
+    7 + when not matched then insert (a, a) values (c, v)
+      ╰╴
     error: column `v` does not exist
       ╭▸ 
     7 │ when not matched then insert (a, w) values (c, v)
@@ -183,7 +195,13 @@ returning merge_action(), a, c, old.a, new.a, new.c, z;
     error: column `new.c` does not exist
       ╭▸ 
     6 │ returning merge_action(), a, c, old.a, new.a, new.c, z;
-      ╰╴                                                  ━
+      │                                                   ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - returning merge_action(), a, c, old.a, new.a, new.c, z;
+    6 + returning merge_action(), a, c, old.a, new.a, new.a, z;
+      ╰╴
     error: column `z` does not exist
       ╭▸ 
     6 │ returning merge_action(), a, c, old.a, new.a, new.c, z;

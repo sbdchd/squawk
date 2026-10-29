@@ -16,7 +16,13 @@ insert into missing values (1);
     error: column `t.z` does not exist
       ╭▸ 
     5 │ insert into t(a, z) values (1, 2);
-      ╰╴                 ━
+      │                  ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - insert into t(a, z) values (1, 2);
+    5 + insert into t(a, a) values (1, 2);
+      ╰╴
     error: column `x` does not exist
       ╭▸ 
     6 │ insert into t select c, x from u;
@@ -147,11 +153,23 @@ insert into t values (1, 2) on conflict (a) do update set (a, b) = (excluded.a, 
     error: column `t.z` does not exist
       ╭▸ 
     5 │ insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
-      ╰╴                                                                                            ━
+      │                                                                                             ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
+    5 + insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, a = 1 where excluded.y = 1;
+      ╰╴
     error: column `excluded.y` does not exist
       ╭▸ 
     5 │ insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
-      ╰╴                                                                                                                 ━
+      │                                                                                                                  ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.y = 1;
+    5 + insert into t values (1, 2) on conflict (a) where b > 0 do update set b = excluded.b + t.b, z = 1 where excluded.a = 1;
+      ╰╴
     error: column reference `b` is ambiguous
       ╭▸ 
     6 │ insert into t values (1, 2) on conflict (a) do update set b = b;

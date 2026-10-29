@@ -2294,12 +2294,18 @@ impl Lowerer {
                 column,
             },
             (Some(table), None) if self.index.tables[table].columns.complete => {
-                let relation = self.index.tables[table].name;
+                let Table {
+                    name: relation,
+                    columns,
+                    ..
+                } = self.index.tables[table];
+                let similar = self.similar_column_in(columns.range.iter(), name);
                 self.push_error(
                     segment.syntax(),
                     SemaError::UnresolvedQualifiedColumn {
                         qualifier: relation,
                         column: name,
+                        similar,
                     },
                 );
                 Resolution::Unknown
@@ -13424,11 +13430,14 @@ impl Lowerer {
                 };
                 let resolution = match relation {
                     Some(relation) => {
+                        let columns = self.index.sources[target].columns.range;
+                        let similar = self.similar_column_in(columns.iter(), name);
                         self.push_error(
                             column_ref.syntax(),
                             SemaError::UnresolvedQualifiedColumn {
                                 qualifier: relation,
                                 column: name,
+                                similar,
                             },
                         );
                         Resolution::Unknown
@@ -15181,12 +15190,24 @@ impl Lowerer {
                 },
                 None => match table {
                     Some(table) if drop_column.if_exists().is_none() => {
-                        let relation = self.index.tables[table].name;
+                        let Table {
+                            name: relation,
+                            columns,
+                            ..
+                        } = self.index.tables[table];
+                        let similar = self.similar_column_in(
+                            columns
+                                .range
+                                .iter()
+                                .filter(|column| !dropped.contains(column)),
+                            name,
+                        );
                         self.push_error(
                             column_ref.syntax(),
                             SemaError::UnresolvedQualifiedColumn {
                                 qualifier: relation,
                                 column: name,
+                                similar,
                             },
                         );
                         Resolution::Unknown
@@ -21076,11 +21097,14 @@ impl Lowerer {
                 None if self.index.sources[source].columns.complete => {
                     let resolution = match self.index.sources[source].name {
                         Some(qualifier) => {
+                            let columns = self.index.sources[source].columns.range;
+                            let similar = self.similar_column_in(columns.iter(), name);
                             self.push_error(
                                 field.syntax(),
                                 SemaError::UnresolvedQualifiedColumn {
                                     qualifier,
                                     column: name,
+                                    similar,
                                 },
                             );
                             Resolution::Unknown
@@ -21338,6 +21362,22 @@ impl Lowerer {
             None,
         )
         .filter(|similar| *similar != name)
+    }
+
+    fn similar_column_in(
+        &self,
+        columns: impl Iterator<Item = ColumnId>,
+        name: Name,
+    ) -> Option<Name> {
+        let candidates: Vec<Name> = columns
+            .filter_map(|column| self.index.columns[column].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
     }
 
     fn resolve_source(&self, name: Name) -> Option<SourceId> {

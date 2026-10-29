@@ -15,7 +15,13 @@ update missing set a = 1;
     error: column `t.z` does not exist
       ╭▸ 
     4 │ update t set a = 1, z = 2 where b = 1 and y = 2;
-      ╰╴                    ━
+      │                     ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - update t set a = 1, z = 2 where b = 1 and y = 2;
+    4 + update t set a = 1, a = 2 where b = 1 and y = 2;
+      ╰╴
     error: column `y` does not exist
       ╭▸ 
     4 │ update t set a = 1, z = 2 where b = 1 and y = 2;
@@ -49,7 +55,13 @@ update missing set a = 1;
     error: column `t.v` does not exist
       ╭▸ 
     6 │ update t set (a, b) = (1, w), (v) = (select c from u);
-      ╰╴                               ━
+      │                                ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - update t set (a, b) = (1, w), (v) = (select c from u);
+    6 + update t set (a, b) = (1, w), (a) = (select c from u);
+      ╰╴
     error: relation `missing` does not exist
       ╭▸ 
     7 │ update missing set a = 1;
@@ -80,7 +92,13 @@ update t set c = 1 from u;
     error: column `t.c` does not exist
       ╭▸ 
     4 │ update t set c = 1 from u;
-      ╰╴             ━
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - update t set c = 1 from u;
+    4 + update t set a = 1 from u;
+      ╰╴
     ");
 }
 
@@ -126,7 +144,13 @@ update t set a = 1 returning old.a, new.a, new.z;
     error: column `new.z` does not exist
       ╭▸ 
     3 │ update t set a = 1 returning old.a, new.a, new.z;
-      ╰╴                                               ━
+      │                                                ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - update t set a = 1 returning old.a, new.a, new.z;
+    3 + update t set a = 1 returning old.a, new.a, new.a;
+      ╰╴
     ");
 }
 

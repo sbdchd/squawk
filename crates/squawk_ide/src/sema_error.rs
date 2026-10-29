@@ -278,6 +278,7 @@ pub(crate) enum SemaError {
     UnresolvedQualifiedColumn {
         qualifier: Name,
         column: Name,
+        similar: Option<Name>,
     },
     UnresolvedReference {
         kind: ReferenceKind,
@@ -894,6 +895,13 @@ impl SemaError {
                 "a window with a similar name exists",
                 quote_ident(names.resolve(window)),
             ),
+            SemaError::UnresolvedQualifiedColumn {
+                similar: Some(similar),
+                ..
+            } => (
+                "a column with a similar name exists",
+                quote_ident(names.resolve(similar)),
+            ),
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),
@@ -1350,7 +1358,11 @@ impl fmt::Display for ErrorMessage<'_> {
                     }
                 }
             }
-            SemaError::UnresolvedQualifiedColumn { qualifier, column } => {
+            SemaError::UnresolvedQualifiedColumn {
+                qualifier,
+                column,
+                similar: _,
+            } => {
                 write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
             }
             SemaError::UnresolvedRoutine {

@@ -171,7 +171,13 @@ select t.a from t;
     error: column `t.a` does not exist
       ╭▸ 
     5 │ alter table t drop column a;
-      ╰╴                          ━
+      │                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - alter table t drop column a;
+    5 + alter table t drop column b;
+      ╰╴
     error: relation `nope3` does not exist
       ╭▸ 
     6 │ alter table nope3 drop column x;
@@ -189,7 +195,13 @@ select t.a from t;
     error: column `t.a` does not exist
       ╭▸ 
     9 │ select t.a from t;
-      ╰╴         ━
+      │          ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select t.a from t;
+    9 + select t.b from t;
+      ╰╴
     ");
 }
 

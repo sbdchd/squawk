@@ -163,7 +163,13 @@ select x, y, z from (a join b using (x)) as j;
     error: column `j.w` does not exist
       ╭▸ 
     4 │ select j.x, j.y, j.z, j.w from (a join b using (x)) as j;
-      ╰╴                        ━
+      │                         ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select j.x, j.y, j.z, j.w from (a join b using (x)) as j;
+    4 + select j.x, j.y, j.z, j.x from (a join b using (x)) as j;
+      ╰╴
     error: missing `from` clause entry for table `a`
       ╭▸ 
     5 │ select a.x, b.z from (a join b using (x)) as j;
@@ -175,11 +181,23 @@ select x, y, z from (a join b using (x)) as j;
     error: column `j.r` does not exist
       ╭▸ 
     7 │ select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
-      ╰╴                   ━
+      │                    ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
+    7 + select j.p, j.q, j.p, j.x from (a join b using (x)) as j(p, q);
+      ╰╴
     error: column `j.x` does not exist
       ╭▸ 
     7 │ select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
-      ╰╴                        ━
+      │                         ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - select j.p, j.q, j.r, j.x from (a join b using (x)) as j(p, q);
+    7 + select j.p, j.q, j.r, j.p from (a join b using (x)) as j(p, q);
+      ╰╴
     ");
 }
 
@@ -202,7 +220,13 @@ select y from u;
     error: column `k.y` does not exist
       ╭▸ 
     5 │ select k.x, k.y from a join b using (x) as k;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select k.x, k.y from a join b using (x) as k;
+    5 + select k.x, k.x from a join b using (x) as k;
+      ╰╴
     error: missing `from` clause entry for table `k`
       ╭▸ 
     8 │ select * from a join b using (x) as k, (select k.x) v;

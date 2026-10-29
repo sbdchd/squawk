@@ -95,7 +95,13 @@ select t.x, t.z from f() as t;
     error: column `t.z` does not exist
       ╭▸ 
     6 │ select t.x, t.z from f() as t;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - select t.x, t.z from f() as t;
+    6 + select t.x, t.x from f() as t;
+      ╰╴
     ");
 }
 
@@ -401,7 +407,13 @@ create procedure p(x int) language sql as 'insert into t (b) values (x)';
     error: column `t.b` does not exist
       ╭▸ 
     3 │ create procedure p(x int) language sql as 'insert into t (b) values (x)';
-      ╰╴                                                          ━
+      │                                                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - create procedure p(x int) language sql as 'insert into t (b) values (x)';
+    3 + create procedure p(x int) language sql as 'insert into t (a) values (x)';
+      ╰╴
     ");
 }
 

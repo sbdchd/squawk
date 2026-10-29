@@ -30,7 +30,13 @@ select t.a, t.b, x.a from t;
     error: column `t.b` does not exist
       ╭▸ 
     3 │ select t.a, t.b, x.a from t;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select t.a, t.b, x.a from t;
+    3 + select t.a, t.a, x.a from t;
+      ╰╴
     error: missing `from` clause entry for table `x`
       ╭▸ 
     3 │ select t.a, t.b, x.a from t;
@@ -93,7 +99,13 @@ select s.a, s.b from (select 1 a) s;
     error: column `s.b` does not exist
       ╭▸ 
     2 │ select s.a, s.b from (select 1 a) s;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    2 - select s.a, s.b from (select 1 a) s;
+    2 + select s.a, s.a from (select 1 a) s;
+      ╰╴
     ");
 }
 
@@ -106,7 +118,13 @@ select x.c, x.b, x.a from t as x(c);
     error: column `x.a` does not exist
       ╭▸ 
     3 │ select x.c, x.b, x.a from t as x(c);
-      ╰╴                   ━
+      │                    ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - select x.c, x.b, x.a from t as x(c);
+    3 + select x.c, x.b, x.c from t as x(c);
+      ╰╴
     ");
 }
 
@@ -578,5 +596,71 @@ select appl from t, t as t2;
     11 - select appl from t, t as t2;
     11 + select t.apple from t, t as t2;
        ╰╴
+    ");
+}
+
+#[test]
+fn similar_qualified_column() {
+    assert_snapshot!(check("
+create table users (id int, name text, email text);
+select users.nme from users;
+select u.emial from users u;
+insert into users (id, emial) values (1, 'a');
+update users set nme = 'b';
+comment on column users.emial is 'x';
+alter table users drop column name, drop column nme;
+"), @"
+    error: column `users.nme` does not exist
+      ╭▸ 
+    3 │ select users.nme from users;
+      │              ━━━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 │ select users.name from users;
+      ╰╴              +
+    error: column `u.emial` does not exist
+      ╭▸ 
+    4 │ select u.emial from users u;
+      │          ━━━━━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select u.emial from users u;
+    4 + select u.email from users u;
+      ╰╴
+    error: column `users.emial` does not exist
+      ╭▸ 
+    5 │ insert into users (id, emial) values (1, 'a');
+      │                        ━━━━━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - insert into users (id, emial) values (1, 'a');
+    5 + insert into users (id, email) values (1, 'a');
+      ╰╴
+    error: column `users.nme` does not exist
+      ╭▸ 
+    6 │ update users set nme = 'b';
+      │                  ━━━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 │ update users set name = 'b';
+      ╰╴                  +
+    error: column `users.emial` does not exist
+      ╭▸ 
+    7 │ comment on column users.emial is 'x';
+      │                         ━━━━━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - comment on column users.emial is 'x';
+    7 + comment on column users.email is 'x';
+      ╰╴
+    error: column `users.nme` does not exist
+      ╭▸ 
+    8 │ alter table users drop column name, drop column nme;
+      ╰╴                                                ━━━
     ");
 }

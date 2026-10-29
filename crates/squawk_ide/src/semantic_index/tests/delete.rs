@@ -94,7 +94,13 @@ delete from t where old.a = 1;
     error: column `old.z` does not exist
       ╭▸ 
     3 │ delete from t returning a, old.a, new.a, old.z, old.*;
-      ╰╴                                             ━
+      │                                              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - delete from t returning a, old.a, new.a, old.z, old.*;
+    3 + delete from t returning a, old.a, new.a, old.a, old.*;
+      ╰╴
     error: missing `from` clause entry for table `old`
       ╭▸ 
     4 │ delete from t where old.a = 1;

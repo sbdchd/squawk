@@ -83,7 +83,13 @@ alter sequence s1 as int no cycle;
     error: column `t.b` does not exist
       ╭▸ 
     7 │ alter sequence s1 owned by t.b;
-      ╰╴                             ━
+      │                              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    7 - alter sequence s1 owned by t.b;
+    7 + alter sequence s1 owned by t.a;
+      ╰╴
     ");
 }
 
