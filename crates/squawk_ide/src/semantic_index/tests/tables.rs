@@ -142,7 +142,13 @@ select 'x'::t;
     error: type `t` does not exist
        ╭▸ 
     12 │ select 'x'::t;
-       ╰╴            ━
+       │             ━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    12 - select 'x'::t;
+    12 + select 'x'::u;
+       ╰╴
     ");
 }
 

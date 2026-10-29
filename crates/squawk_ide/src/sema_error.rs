@@ -20,9 +20,16 @@ pub(crate) struct SimilarColumn {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum SimilarType {
+    Named(Name),
+    Keyword(&'static str),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Similar {
     Column(SimilarColumn),
     Table(Name),
+    Type(SimilarType),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -869,6 +876,16 @@ impl SemaError {
                 "a relation with a similar name exists",
                 quote_ident(names.resolve(table)),
             ),
+            SemaError::UnresolvedReference {
+                similar: Some(Similar::Type(similar)),
+                ..
+            } => {
+                let replacement = match similar {
+                    SimilarType::Named(name) => quote_ident(names.resolve(name)),
+                    SimilarType::Keyword(keyword) => keyword.to_owned(),
+                };
+                ("a type with a similar name exists", replacement)
+            }
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),

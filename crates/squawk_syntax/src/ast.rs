@@ -36,7 +36,9 @@ use std::marker::PhantomData;
 use crate::syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken};
 use squawk_parser::SyntaxKind;
 
-pub use self::node_ext::{LanguageName, is_quoted_name_node, normalize_name_node};
+pub use self::node_ext::{
+    KEYWORD_TYPE_NAMES, LanguageName, is_quoted_name_node, normalize_name_node,
+};
 pub use self::{
     generated::tokens::*,
     node_ext::{

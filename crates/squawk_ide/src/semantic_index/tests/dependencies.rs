@@ -874,15 +874,33 @@ select to_text(null);
     error: type `d` does not exist
        ╭▸ 
     14 │ select null::d;
-       ╰╴             ━
+       │              ━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    14 - select null::d;
+    14 + select null::t;
+       ╰╴
     error: type `r` does not exist
        ╭▸ 
     15 │ select null::r;
-       ╰╴             ━
+       │              ━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    15 - select null::r;
+    15 + select null::t;
+       ╰╴
     error: type `rmultirange` does not exist
        ╭▸ 
     16 │ select null::rmultirange;
-       ╰╴             ━━━━━━━━━━━
+       │              ━━━━━━━━━━━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    16 - select null::rmultirange;
+    16 + select null::tsmultirange;
+       ╰╴
     error: function `to_text(unknown)` does not exist
        ╭▸ 
     17 │ select to_text(null);
@@ -1017,7 +1035,13 @@ select t_out(null);
     error: type `t` does not exist
        ╭▸ 
     10 │ select null::t;
-       ╰╴             ━
+       │              ━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    10 - select null::t;
+    10 + select null::u;
+       ╰╴
     error: column `a` does not exist
        ╭▸ 
     12 │ select a from u;

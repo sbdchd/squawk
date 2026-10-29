@@ -44,7 +44,7 @@ use crate::{
     },
     sema_error::{
         ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
-        SimilarColumn, TriggerFunctionKind, WindowClause,
+        SimilarColumn, SimilarType, TriggerFunctionKind, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -977,6 +977,12 @@ impl TableLookup {
             }
         }
     }
+}
+
+#[derive(Clone, Copy)]
+enum TypeCandidates {
+    TypeName,
+    Types(Option<TypeKind>),
 }
 
 #[derive(Clone, Copy)]
@@ -11954,7 +11960,7 @@ impl Lowerer {
             (Resolution::Unresolved, IfMissing::Ignore) => Resolution::Unknown,
             (resolution, IfMissing::Error | IfMissing::Ignore) => resolution,
         };
-        self.add_ref(name, ReferenceKind::Type, node, resolution);
+        self.add_type_ref(schema, name, node, resolution, TypeCandidates::TypeName);
         match resolution {
             Resolution::Type(ty) => TypeLookup::Found(Ty::Type(ty)),
             Resolution::Table(table) => TypeLookup::Found(Ty::Table(table)),
@@ -12062,7 +12068,13 @@ impl Lowerer {
                 IfMissing::Error => Resolution::Unresolved,
             },
         };
-        self.add_ref(name, ReferenceKind::Type, segment.syntax(), resolution);
+        self.add_type_ref(
+            schema,
+            name,
+            segment.syntax(),
+            resolution,
+            TypeCandidates::Types(kind),
+        );
         let ty = found?;
         if let Some(kind) = kind
             && self.index.types[ty].kind != kind
@@ -21121,6 +21133,54 @@ impl Lowerer {
         )
     }
 
+    fn similar_type(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        candidates: TypeCandidates,
+    ) -> Option<SimilarType> {
+        let (kind, type_names) = match candidates {
+            TypeCandidates::TypeName => (None, true),
+            TypeCandidates::Types(kind) => (kind, false),
+        };
+        let mut similar: Vec<SimilarType> = vec![];
+        if type_names && schema.is_none() {
+            similar.extend(
+                ast::KEYWORD_TYPE_NAMES
+                    .iter()
+                    .copied()
+                    .map(SimilarType::Keyword),
+            );
+        }
+        for schema in self.search_path(schema, Lookup::Type) {
+            similar.extend(self.index.types.in_schema(schema).filter_map(|id| {
+                let ty = &self.index.types[id];
+                (kind.is_none_or(|kind| ty.kind == kind)
+                    && ty.category != Some(TypeCategory::Array)
+                    && self.visible(ty.schema, ty.ptr.file_id)
+                    && !self.dropped_types.contains(&id))
+                .then_some(SimilarType::Named(ty.name))
+            }));
+            if type_names && schema != self.pg_catalog {
+                similar.extend(self.index.tables.in_schema(schema).filter_map(|id| {
+                    let table = &self.index.tables[id];
+                    (self.visible(table.schema, table.ptr.file_id)
+                        && !self.dropped_tables.contains(&id))
+                    .then_some(SimilarType::Named(table.name))
+                }));
+            }
+        }
+        find_best_match_for_name(
+            &similar,
+            |candidate| match candidate {
+                SimilarType::Named(name) => self.index.names.resolve(name),
+                SimilarType::Keyword(keyword) => keyword,
+            },
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
     fn similar_function(
         &self,
         schema: Option<Name>,
@@ -21952,6 +22012,27 @@ impl Lowerer {
         if let Some(mut error) = SemaError::reference(ReferenceKind::Table, resolution, name) {
             if let SemaError::UnresolvedReference { similar, .. } = &mut error {
                 *similar = self.similar_table(schema, name, lookup).map(Similar::Table);
+            }
+            self.push_error_at(range, error);
+        }
+        reference
+    }
+
+    fn add_type_ref(
+        &mut self,
+        schema: Option<Name>,
+        name: Name,
+        node: &SyntaxNode,
+        resolution: Resolution,
+        candidates: TypeCandidates,
+    ) -> RefId {
+        let range = InIrFile::new(self.file_id, node.text_range());
+        let reference = self.alloc_ref(name, ReferenceKind::Type, range, resolution);
+        if let Some(mut error) = SemaError::reference(ReferenceKind::Type, resolution, name) {
+            if let SemaError::UnresolvedReference { similar, .. } = &mut error {
+                *similar = self
+                    .similar_type(schema, name, candidates)
+                    .map(Similar::Type);
             }
             self.push_error_at(range, error);
         }

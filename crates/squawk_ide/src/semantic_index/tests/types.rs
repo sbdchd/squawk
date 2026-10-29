@@ -48,11 +48,23 @@ select 'a'::mood, 1::posint, '{}'::floatmultirange;
     error: type `posint` does not exist
        ╭▸ 
     10 │ select 'a'::mood, 1::posint, '{}'::floatmultirange;
-       ╰╴                     ━━━━━━
+       │                      ━━━━━━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    10 - select 'a'::mood, 1::posint, '{}'::floatmultirange;
+    10 + select 'a'::mood, 1::point, '{}'::floatmultirange;
+       ╰╴
     error: type `floatmultirange` does not exist
        ╭▸ 
     10 │ select 'a'::mood, 1::posint, '{}'::floatmultirange;
-       ╰╴                                   ━━━━━━━━━━━━━━━
+       │                                    ━━━━━━━━━━━━━━━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    10 - select 'a'::mood, 1::posint, '{}'::floatmultirange;
+    10 + select 'a'::mood, 1::posint, '{}'::datemultirange;
+       ╰╴
     ");
 }
 
@@ -215,7 +227,12 @@ alter type s.t2 owner to nope;
     error: type `t` does not exist
       ╭▸ 
     6 │ select 1::t;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    6 │ select 1::t2;
+      ╰╴           +
     error: type `nope` does not exist
        ╭▸ 
     10 │ alter type nope rename to x;
@@ -252,5 +269,89 @@ select null::t;
        ╭▸ 
     10 │ select null::t;
        ╰╴             ━
+    ");
+}
+
+#[test]
+fn similar_type() {
+    assert_snapshot!(check("
+create schema app;
+create type app.status as enum ('a');
+create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+"), @"
+    error: type `intt` does not exist
+      ╭▸ 
+    4 │ create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+      │                   ━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    4 - create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+    4 + create table t (a int, b integr, c bolean, d app.statuss, e txt);
+      ╰╴
+    error: type `integr` does not exist
+      ╭▸ 
+    4 │ create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+      │                           ━━━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    4 │ create table t (a intt, b integer, c bolean, d app.statuss, e txt);
+      ╰╴                               +
+    error: type `bolean` does not exist
+      ╭▸ 
+    4 │ create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+      │                                     ━━━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    4 │ create table t (a intt, b integr, c boolean, d app.statuss, e txt);
+      ╰╴                                      +
+    error: type `statuss` does not exist
+      ╭▸ 
+    4 │ create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+      │                                                   ━━━━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    4 - create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+    4 + create table t (a intt, b integr, c bolean, d app.status, e txt);
+      ╰╴
+    error: type `txt` does not exist
+      ╭▸ 
+    4 │ create table t (a intt, b integr, c bolean, d app.statuss, e txt);
+      │                                                              ━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    4 │ create table t (a intt, b integr, c bolean, d app.statuss, e text);
+      ╰╴                                                              +
+    ");
+}
+
+#[test]
+fn similar_type_respects_kind() {
+    assert_snapshot!(check("
+create type mood as enum ('a');
+alter domain moood owner to current_user;
+"), @"
+    error: type `moood` does not exist
+      ╭▸ 
+    3 │ alter domain moood owner to current_user;
+      ╰╴             ━━━━━
+    ");
+}
+
+#[test]
+fn similar_type_skips_dropped() {
+    assert_snapshot!(check("
+create type mood as enum ('a');
+drop type mood;
+select 'a'::moood;
+"), @"
+    error: type `moood` does not exist
+      ╭▸ 
+    4 │ select 'a'::moood;
+      ╰╴            ━━━━━
     ");
 }

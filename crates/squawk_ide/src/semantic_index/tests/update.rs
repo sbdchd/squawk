@@ -163,7 +163,13 @@ update t set p.x = 1, p.z = 2, q.z = 3, a[1].z = 4;
     error: type `unknown_t` does not exist
       ╭▸ 
     3 │ create table t (p pair, q unknown_t, a int[]);
-      ╰╴                          ━━━━━━━━━
+      │                           ━━━━━━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    3 - create table t (p pair, q unknown_t, a int[]);
+    3 + create table t (p pair, q unknown, a int[]);
+      ╰╴
     error: column `z` does not exist
       ╭▸ 
     4 │ update t set p.x = 1, p.z = 2, q.z = 3, a[1].z = 4;

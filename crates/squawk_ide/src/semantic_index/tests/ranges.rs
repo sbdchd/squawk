@@ -9,16 +9,28 @@ create type floatrange as range (subtype = float8, multirange_type_name = 'MyMul
 select '{}'::"MyMulti";
 select '{}'::mymulti;
 select '{}'::floatmultirange;
-"#), @"
+"#), @r#"
     error: type `mymulti` does not exist
       ╭▸ 
     4 │ select '{}'::mymulti;
-      ╰╴             ━━━━━━━
+      │              ━━━━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    4 - select '{}'::mymulti;
+    4 + select '{}'::"MyMulti";
+      ╰╴
     error: type `floatmultirange` does not exist
       ╭▸ 
     5 │ select '{}'::floatmultirange;
-      ╰╴             ━━━━━━━━━━━━━━━
-    ");
+      │              ━━━━━━━━━━━━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    5 - select '{}'::floatmultirange;
+    5 + select '{}'::datemultirange;
+      ╰╴
+    "#);
 }
 
 #[test]
@@ -71,7 +83,13 @@ select null::m;
     error: type `r_multirange` does not exist
       ╭▸ 
     6 │ select '{}'::r_multirange;
-      ╰╴             ━━━━━━━━━━━━
+      │              ━━━━━━━━━━━━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    6 - select '{}'::r_multirange;
+    6 + select '{}'::tsmultirange;
+      ╰╴
     error: type `m` does not exist
       ╭▸ 
     9 │ select null::m;
