@@ -66,9 +66,11 @@ impl Lowerer {
             file_id: FileId::Builtins.into(),
             ctes: vec![],
             pending_ctes: vec![],
+            future_ctes: vec![],
             scopes: vec![],
             windows: vec![],
             json_paths: vec![],
+            from_subqueries: vec![],
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
             pending_foreign_keys: vec![],
@@ -311,6 +313,22 @@ enum ColumnLookup {
     Missing { complete: bool },
 }
 
+struct LateralSource {
+    table: Name,
+    lateral_at: TextSize,
+}
+
+struct FutureCtes {
+    with_clause: ast::WithClause,
+    current: usize,
+}
+
+struct FromSubquery {
+    scope: usize,
+    sources: usize,
+    lateral_at: TextSize,
+}
+
 enum ScopedColumn {
     Resolved(Resolution),
     Hidden,
@@ -321,9 +339,11 @@ pub(crate) struct Lowerer {
     file_id: IrFileId,
     ctes: Vec<CteId>,
     pending_ctes: Vec<PendingCte>,
+    future_ctes: Vec<FutureCtes>,
     scopes: Vec<QueryScope>,
     windows: Vec<WindowId>,
     json_paths: Vec<JsonPathId>,
+    from_subqueries: Vec<FromSubquery>,
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
     pending_foreign_keys: Vec<PendingForeignKey>,
@@ -13671,13 +13691,20 @@ impl Lowerer {
             self.lower_recursive_with(with_clause);
             return;
         }
-        for with_table in with_clause.with_tables() {
+        let depth = self.future_ctes.len();
+        self.future_ctes.push(FutureCtes {
+            with_clause: with_clause.clone(),
+            current: 0,
+        });
+        for (current, with_table) in with_clause.with_tables().enumerate() {
+            self.future_ctes[depth].current = current;
             let Some(id) = self.alloc_cte(&with_table) else {
                 continue;
             };
             self.lower_cte_body(id, &with_table, CteKind::NonRecursive);
             self.ctes.push(id);
         }
+        self.future_ctes.truncate(depth);
     }
 
     fn lower_recursive_with(&mut self, with_clause: &ast::WithClause) {
@@ -14017,28 +14044,25 @@ impl Lowerer {
                 }
             }
             ast::FromItem::ParenFromItem(paren) => {
-                let lateral = paren.lateral_token().is_some();
-                let query =
-                    if let Some(paren_select) = paren.paren_select() {
-                        Some(self.lower_from_query(
-                            ast::SelectVariant::ParenSelect(paren_select),
-                            lateral,
-                        ))
-                    } else if let Some(paren_expr) = paren.paren_expr() {
-                        if let Some(item) = paren_expr.from_list_item() {
-                            let start = self.scope_sources_len();
-                            self.lower_from_list_item(item);
-                            if let Some(alias) = paren.alias() {
-                                self.lower_join_alias(from_item, &alias, start);
-                            }
-                            return;
+                let query = if let Some(paren_select) = paren.paren_select() {
+                    Some(
+                        self.lower_from_query(paren, ast::SelectVariant::ParenSelect(paren_select)),
+                    )
+                } else if let Some(paren_expr) = paren.paren_expr() {
+                    if let Some(item) = paren_expr.from_list_item() {
+                        let start = self.scope_sources_len();
+                        self.lower_from_list_item(item);
+                        if let Some(alias) = paren.alias() {
+                            self.lower_join_alias(from_item, &alias, start);
                         }
-                        paren_expr
-                            .select_variant()
-                            .map(|query| self.lower_from_query(query, lateral))
-                    } else {
-                        None
-                    };
+                        return;
+                    }
+                    paren_expr
+                        .select_variant()
+                        .map(|query| self.lower_from_query(paren, query))
+                } else {
+                    None
+                };
                 match query {
                     Some(query) => RelationSource {
                         name: None,
@@ -14223,12 +14247,22 @@ impl Lowerer {
         }
     }
 
-    fn lower_from_query(&mut self, query: ast::SelectVariant, lateral: bool) -> QueryId {
-        if lateral {
-            self.with_lateral_sources(|this| this.lower_query(query))
-        } else {
-            self.lower_query(query)
+    fn lower_from_query(
+        &mut self,
+        paren: &ast::ParenFromItem,
+        query: ast::SelectVariant,
+    ) -> QueryId {
+        if paren.lateral_token().is_some() {
+            return self.with_lateral_sources(|this| this.lower_query(query));
         }
+        self.from_subqueries.push(FromSubquery {
+            scope: self.scopes.len() - 1,
+            sources: self.scope_sources_len(),
+            lateral_at: paren.syntax().text_range().start(),
+        });
+        let query = self.lower_query(query);
+        self.from_subqueries.pop();
+        query
     }
 
     fn lower_join_alias(
@@ -22217,11 +22251,7 @@ impl Lowerer {
         let range = InIrFile::new(self.file_id, node.text_range());
         let reference = self.alloc_ref(name, kind, range, resolution);
         let error = if resolution == Resolution::Unresolved {
-            Some(SemaError::UnresolvedReference {
-                kind,
-                name,
-                similar: self.similar(name, source),
-            })
+            Some(self.unresolved_error(name, source))
         } else {
             SemaError::reference(kind, resolution, name)
         };
@@ -22229,6 +22259,106 @@ impl Lowerer {
             self.push_error_at(range, error);
         }
         reference
+    }
+
+    fn unresolved_error(&self, name: Name, source: RefSource) -> SemaError {
+        let column = match source {
+            RefSource::Column => Some(name),
+            RefSource::Qualifier => None,
+            RefSource::Table {
+                schema: None,
+                lookup: TableLookup::FromItem,
+            } if let Some(recursive_at) = self.future_cte(name) => {
+                return SemaError::FutureCte { name, recursive_at };
+            }
+            RefSource::Table { .. }
+            | RefSource::Type { .. }
+            | RefSource::Window
+            | RefSource::EnumLabel { .. } => {
+                return SemaError::UnresolvedReference {
+                    kind: source.kind(),
+                    name,
+                    similar: self.similar(name, source),
+                };
+            }
+        };
+        match self.lateral_source(name, column) {
+            Some(LateralSource { table, lateral_at }) => SemaError::NotLateral {
+                table,
+                column,
+                lateral_at,
+            },
+            None => SemaError::UnresolvedReference {
+                kind: source.kind(),
+                name,
+                similar: self.similar(name, source),
+            },
+        }
+    }
+
+    fn future_cte(&self, name: Name) -> Option<TextSize> {
+        let future = self.future_ctes.iter().rev().find(|future| {
+            future
+                .with_clause
+                .with_tables()
+                .skip(future.current)
+                .filter_map(|with_table| with_table.name())
+                .any(|cte_name| {
+                    self.index
+                        .names
+                        .lookup(postgres::truncate_identifier(&cte_name.text()))
+                        == Some(name)
+                })
+        })?;
+        let with_token = future.with_clause.with_token()?;
+        let recursive_at = self
+            .index
+            .range(InIrFile::new(
+                self.file_id,
+                TextRange::empty(with_token.text_range().end()),
+            ))
+            .value
+            .start();
+        Some(recursive_at)
+    }
+
+    fn lateral_source(&self, name: Name, column: Option<Name>) -> Option<LateralSource> {
+        for subquery in self.from_subqueries.iter().rev() {
+            let scope = &self.scopes[subquery.scope];
+            let hidden = &self.index.scopes[scope.scope].hidden;
+            let sources = &self.index.queries[scope.query].sources[..subquery.sources];
+            let mut matches = sources
+                .iter()
+                .enumerate()
+                .filter(|(index, _)| !hidden.iter().any(|range| range.contains(index)))
+                .map(|(_, source)| &self.index.sources[*source])
+                .filter(|source| match column {
+                    Some(column) => {
+                        !source.kind.is_qualified_only()
+                            && self.columns_contain(source.columns.range, column)
+                    }
+                    None => source.name == Some(name),
+                });
+            let Some(source) = matches.next() else {
+                continue;
+            };
+            if matches.next().is_some() {
+                return None;
+            }
+            let lateral_at = self
+                .index
+                .range(InIrFile::new(
+                    self.file_id,
+                    TextRange::empty(subquery.lateral_at),
+                ))
+                .value
+                .start();
+            return Some(LateralSource {
+                table: source.name?,
+                lateral_at,
+            });
+        }
+        None
     }
 
     fn similar(&self, name: Name, source: RefSource) -> Option<Similar> {

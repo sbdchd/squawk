@@ -285,3 +285,113 @@ select orders.id from orders as orders2;
       ╰╴       ━━━━━━
     ");
 }
+
+#[test]
+fn cte_forward_reference() {
+    assert_snapshot!(check("
+with a as (
+  select * from b
+),
+b as (
+  select 1 x
+)
+select * from a;
+"), @"
+    error: relation `b` does not exist
+      ╭▸ 
+    3 │   select * from b
+      │                 ━
+      ╰╴
+    help: to reference `b`, mark the `with` clause as `recursive`
+      ╭╴
+    2 │ with recursive a as (
+      ╰╴     +++++++++
+    ");
+}
+
+#[test]
+fn cte_self_reference_without_recursive() {
+    assert_snapshot!(check("
+with t as (
+  select 1 x union all select x + 1 from t where x < 3
+)
+select * from t;
+"), @"
+    error: relation `t` does not exist
+      ╭▸ 
+    3 │   select 1 x union all select x + 1 from t where x < 3
+      │                                          ━
+      ╰╴
+    help: to reference `t`, mark the `with` clause as `recursive`
+      ╭╴
+    2 │ with recursive t as (
+      ╰╴     +++++++++
+    ");
+}
+
+#[test]
+fn cte_forward_reference_in_nested_with() {
+    assert_snapshot!(check("
+with a as (
+  with c as (
+    select * from b
+  )
+  select * from c
+),
+b as (
+  select 1 x
+)
+select * from a;
+"), @"
+    error: relation `b` does not exist
+      ╭▸ 
+    4 │     select * from b
+      │                   ━
+      ╰╴
+    help: to reference `b`, mark the `with` clause as `recursive`
+      ╭╴
+    2 │ with recursive a as (
+      ╰╴     +++++++++
+    ");
+}
+
+#[test]
+fn cte_forward_reference_schema_qualified() {
+    assert_snapshot!(check("
+with a as (
+  select * from public.b
+),
+b as (
+  select 1 x
+)
+select * from a;
+"), @"
+    error: relation `b` does not exist
+      ╭▸ 
+    3 │   select * from public.b
+      ╰╴                       ━
+    ");
+}
+
+#[test]
+fn cte_forward_reference_long_name_truncated() {
+    assert_snapshot!(check("
+with a as (
+  select * from bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb_one
+),
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb_two as (
+  select 1 x
+)
+select * from a;
+"), @"
+    error: relation `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` does not exist
+      ╭▸ 
+    3 │   select * from bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb_one
+      │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      ╰╴
+    help: to reference `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`, mark the `with` clause as `recursive`
+      ╭╴
+    2 │ with recursive a as (
+      ╰╴     +++++++++
+    ");
+}

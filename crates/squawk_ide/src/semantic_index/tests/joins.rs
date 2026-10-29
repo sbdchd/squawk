@@ -46,7 +46,12 @@ select * from (b cross join lateral (select x) v cross join a);
     error: column `x` does not exist
       ╭▸ 
     9 │ select * from a, (select x) v;
-      ╰╴                         ━
+      │                          ━
+      ╰╴
+    help: to reference column `x` of table `a`, mark the subquery as `lateral`
+      ╭╴
+    9 │ select * from a, lateral (select x) v;
+      ╰╴                 +++++++
     error: column `x` does not exist
        ╭▸ 
     12 │ select * from (b cross join lateral (select x) v cross join a);
@@ -57,6 +62,105 @@ select * from (b cross join lateral (select x) v cross join a);
     12 - select * from (b cross join lateral (select x) v cross join a);
     12 + select * from (b cross join lateral (select y) v cross join a);
        ╰╴
+    ");
+}
+
+#[test]
+fn missing_lateral() {
+    assert_snapshot!(check("
+create table a (x int);
+create table b (
+  x int,
+  y int
+);
+select * from a, (select a.x) v;
+select * from a join (select x) v on true;
+select * from a, (select 1 from (select x) w) v;
+select * from a, (select (select x)) v;
+select *
+from a,
+  (
+    with c as (
+      select x
+    )
+    select * from c
+  ) v;
+select * from a, (select * from b, (select y) w) v;
+select * from a right join (select x) v on true;
+select * from a full join (select a.x) v on true;
+select * from a, b, (select x) v;
+select * from (select x) v, a;
+"), @"
+    error: invalid reference to `from` clause entry for table `a`
+      ╭▸ 
+    7 │ select * from a, (select a.x) v;
+      │                          ━
+      ╰╴
+    help: to reference table `a`, mark the subquery as `lateral`
+      ╭╴
+    7 │ select * from a, lateral (select a.x) v;
+      ╰╴                 +++++++
+    error: column `x` does not exist
+      ╭▸ 
+    8 │ select * from a join (select x) v on true;
+      │                              ━
+      ╰╴
+    help: to reference column `x` of table `a`, mark the subquery as `lateral`
+      ╭╴
+    8 │ select * from a join lateral (select x) v on true;
+      ╰╴                     +++++++
+    error: column `x` does not exist
+      ╭▸ 
+    9 │ select * from a, (select 1 from (select x) w) v;
+      │                                         ━
+      ╰╴
+    help: to reference column `x` of table `a`, mark the subquery as `lateral`
+      ╭╴
+    9 │ select * from a, lateral (select 1 from (select x) w) v;
+      ╰╴                 +++++++
+    error: column `x` does not exist
+       ╭▸ 
+    10 │ select * from a, (select (select x)) v;
+       │                                  ━
+       ╰╴
+    help: to reference column `x` of table `a`, mark the subquery as `lateral`
+       ╭╴
+    10 │ select * from a, lateral (select (select x)) v;
+       ╰╴                 +++++++
+    error: column `x` does not exist
+       ╭▸ 
+    15 │       select x
+       │              ━
+       ╰╴
+    help: to reference column `x` of table `a`, mark the subquery as `lateral`
+       ╭╴
+    13 │   lateral (
+       ╰╴  +++++++
+    error: column `y` does not exist
+       ╭▸ 
+    19 │ select * from a, (select * from b, (select y) w) v;
+       │                                            ━
+       ╰╴
+    help: to reference column `y` of table `b`, mark the subquery as `lateral`
+       ╭╴
+    19 │ select * from a, (select * from b, lateral (select y) w) v;
+       ╰╴                                   +++++++
+    error: column `x` does not exist
+       ╭▸ 
+    20 │ select * from a right join (select x) v on true;
+       ╰╴                                   ━
+    error: missing `from` clause entry for table `a`
+       ╭▸ 
+    21 │ select * from a full join (select a.x) v on true;
+       ╰╴                                  ━
+    error: column `x` does not exist
+       ╭▸ 
+    22 │ select * from a, b, (select x) v;
+       ╰╴                            ━
+    error: column `x` does not exist
+       ╭▸ 
+    23 │ select * from (select x) v, a;
+       ╰╴                      ━
     ");
 }
 
@@ -227,10 +331,15 @@ select y from u;
     5 - select k.x, k.y from a join b using (x) as k;
     5 + select k.x, k.x from a join b using (x) as k;
       ╰╴
-    error: missing `from` clause entry for table `k`
+    error: invalid reference to `from` clause entry for table `k`
       ╭▸ 
     8 │ select * from a join b using (x) as k, (select k.x) v;
-      ╰╴                                               ━
+      │                                                ━
+      ╰╴
+    help: to reference table `k`, mark the subquery as `lateral`
+      ╭╴
+    8 │ select * from a join b using (x) as k, lateral (select k.x) v;
+      ╰╴                                       +++++++
     error: missing `from` clause entry for table `k`
       ╭▸ 
     9 │ select * from a join b using (x) as k, c join a as d on k.x = w;
