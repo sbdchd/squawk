@@ -322,35 +322,7 @@ impl SquawkDatabase {
 
             let messages = x.note.into_iter().chain(x.help).collect();
 
-            let fix = x.fix.map(|fix| {
-                let edits = fix
-                    .edits
-                    .into_iter()
-                    .map(|edit| {
-                        let start_pos = line_index.line_col(edit.text_range.start());
-                        let end_pos = line_index.line_col(edit.text_range.end());
-                        let start_wide = line_index
-                            .to_wide(squawk_line_index::WideEncoding::Utf16, start_pos)
-                            .unwrap();
-                        let end_wide = line_index
-                            .to_wide(squawk_line_index::WideEncoding::Utf16, end_pos)
-                            .unwrap();
-
-                        TextEdit {
-                            start_line_number: start_wide.line,
-                            start_column: start_wide.col,
-                            end_line_number: end_wide.line,
-                            end_column: end_wide.col,
-                            text: edit.text.unwrap_or_default(),
-                        }
-                    })
-                    .collect();
-
-                Fix {
-                    title: fix.title,
-                    edits,
-                }
-            });
+            let fix = x.fix.map(|fix| convert_fix(line_index, fix));
 
             LintError {
                 code: x.code.to_string(),
@@ -367,7 +339,47 @@ impl SquawkDatabase {
             }
         });
 
-        let mut errors_to_dump = errors.chain(parse_errors).collect::<Vec<_>>();
+        let semantic_errors = squawk_ide::diagnostics::diagnostics(&self.db, file)
+            .into_iter()
+            .map(|x| {
+                let range = x.range.value;
+                let start = line_index.line_col(range.start());
+                let end = line_index.line_col(range.end());
+                let start = line_index
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, start)
+                    .unwrap();
+                let end = line_index
+                    .to_wide(squawk_line_index::WideEncoding::Utf16, end)
+                    .unwrap();
+
+                let (suggestion_message, fix) = match x.suggestion {
+                    Some(suggestion) => (
+                        Some(suggestion.message),
+                        Some(convert_fix(line_index, suggestion.fix)),
+                    ),
+                    None => (None, None),
+                };
+                let messages = x.hint.into_iter().chain(suggestion_message).collect();
+
+                LintError {
+                    severity: Severity::Error,
+                    code: "semantic-error".to_string(),
+                    message: x.message,
+                    start_line_number: start.line,
+                    start_column: start.col,
+                    end_line_number: end.line,
+                    end_column: end.col,
+                    range_start: range.start().into(),
+                    range_end: range.end().into(),
+                    messages,
+                    fix,
+                }
+            });
+
+        let mut errors_to_dump = errors
+            .chain(parse_errors)
+            .chain(semantic_errors)
+            .collect::<Vec<_>>();
         errors_to_dump.sort_by_key(|k| (k.start_line_number, k.start_column));
 
         serde_wasm_bindgen::to_value(&errors_to_dump).map_err(into_error)
@@ -791,6 +803,36 @@ fn convert_document_symbol(
             .into_iter()
             .map(|child| convert_document_symbol(line_index, child))
             .collect(),
+    }
+}
+
+fn convert_fix(line_index: &LineIndex, fix: squawk_linter::Fix) -> Fix {
+    let edits = fix
+        .edits
+        .into_iter()
+        .map(|edit| {
+            let start_pos = line_index.line_col(edit.text_range.start());
+            let end_pos = line_index.line_col(edit.text_range.end());
+            let start_wide = line_index
+                .to_wide(squawk_line_index::WideEncoding::Utf16, start_pos)
+                .unwrap();
+            let end_wide = line_index
+                .to_wide(squawk_line_index::WideEncoding::Utf16, end_pos)
+                .unwrap();
+
+            TextEdit {
+                start_line_number: start_wide.line,
+                start_column: start_wide.col,
+                end_line_number: end_wide.line,
+                end_column: end_wide.col,
+                text: edit.text.unwrap_or_default(),
+            }
+        })
+        .collect();
+
+    Fix {
+        title: fix.title,
+        edits,
     }
 }
 

@@ -928,7 +928,6 @@ function convertSeverity(x: LintError["severity"]): monaco.MarkerSeverity {
 }
 
 type Marker = monaco.editor.IMarkerData & {
-  id: string
   range_start: number
   range_end: number
   messages: string[]
@@ -978,7 +977,6 @@ function useMarkers(text: string, version: number): Array<Marker> {
     }
     return {
       severity: convertSeverity(x.severity),
-      id: `${x.start_line_number}${x.start_column}${x.end_line_number}${x.end_column}${x.severity}${x.code}`,
       startLineNumber,
       startColumn,
       endLineNumber,
@@ -1006,7 +1004,7 @@ function ErrorList({ errors }: { errors: Marker[] }) {
   if (errors.length === 0) {
     return <div>no errors!</div>
   }
-  return errors.map((x) => {
+  return errors.map((x, i) => {
     const severity =
       x.severity === monaco.MarkerSeverity.Warning
         ? styles.errorWarning
@@ -1015,7 +1013,7 @@ function ErrorList({ errors }: { errors: Marker[] }) {
           : null
     const code = typeof x.code === "string" ? x.code : x.code?.value
     return (
-      <div {...stylex.props(styles.error, severity)} key={x.id}>
+      <div {...stylex.props(styles.error, severity)} key={i}>
         <div data-range={`${x.range_start}..${x.range_end}`}>
           {code == null ? (
             <div {...stylex.props(styles.errorCode)}>{code}</div>
