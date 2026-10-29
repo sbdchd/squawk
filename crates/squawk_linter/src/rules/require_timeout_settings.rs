@@ -2,12 +2,13 @@ use std::borrow::Cow;
 use std::fmt;
 
 use rowan::TextSize;
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile, SyntaxKind,
     ast::{self, AstNode},
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation, analyze};
+use crate::{Linter, Rule, Violation, analyze};
 
 fn find_insert_pos(file: &SourceFile) -> TextSize {
     for child in file.syntax().children_with_tokens() {

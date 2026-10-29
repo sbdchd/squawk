@@ -1,9 +1,10 @@
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation};
 
 fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
     let kw_token = match reindex.reindex_target()? {

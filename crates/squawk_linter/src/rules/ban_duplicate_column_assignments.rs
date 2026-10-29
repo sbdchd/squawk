@@ -7,8 +7,9 @@ use squawk_syntax::{
 };
 
 use rowan::TextRange;
+use squawk_diagnostics::{Edit, Fix};
 
-use crate::{Edit, Fix, Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation};
 
 use crate::name::Name;
 

@@ -1,9 +1,10 @@
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation};
 
 fn create_fix(add_value: &ast::AddValue) -> Option<Fix> {
     let literal = add_value.literal()?;

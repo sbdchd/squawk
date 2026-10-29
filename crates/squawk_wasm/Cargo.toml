@@ -20,6 +20,7 @@ default = ["console_error_panic_hook"]
 [dependencies]
 
 squawk-syntax.workspace = true
+squawk-diagnostics.workspace = true
 squawk-linter.workspace = true
 squawk-lexer.workspace = true
 squawk-ide.workspace = true

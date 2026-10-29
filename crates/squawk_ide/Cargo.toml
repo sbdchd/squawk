@@ -16,7 +16,7 @@ doctest = false
 
 [dependencies]
 squawk-syntax.workspace = true
-squawk-linter.workspace = true
+squawk-diagnostics.workspace = true
 rowan.workspace = true
 squawk-line-index.workspace = true
 annotate-snippets.workspace = true

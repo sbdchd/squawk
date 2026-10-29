@@ -3,7 +3,7 @@ use std::ops::Deref;
 
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
-use squawk_linter::Fix;
+use squawk_diagnostics::Fix;
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::constraint_index::ConstraintIndex;

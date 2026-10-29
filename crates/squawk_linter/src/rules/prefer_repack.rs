@@ -1,9 +1,10 @@
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
 };
 
-use crate::{Edit, Fix, Linter, Rule, Version, Violation};
+use crate::{Linter, Rule, Version, Violation};
 
 fn vacuum_full_fix(vacuum: &ast::Vacuum) -> Option<Fix> {
     let tables = vacuum.table_and_columns_list()?;

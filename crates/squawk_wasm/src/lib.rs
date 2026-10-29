@@ -806,7 +806,7 @@ fn convert_document_symbol(
     }
 }
 
-fn convert_fix(line_index: &LineIndex, fix: squawk_linter::Fix) -> Fix {
+fn convert_fix(line_index: &LineIndex, fix: squawk_diagnostics::Fix) -> Fix {
     let edits = fix
         .edits
         .into_iter()

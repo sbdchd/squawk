@@ -2,10 +2,11 @@ use gen_lsp_types::{
     Code, CodeDescription, Diagnostic, DiagnosticSeverity, Message, Position, Range, TextEdit,
 };
 use salsa::Database as Db;
+use squawk_diagnostics::Edit;
 use squawk_ide::db::{File, line_index as file_line_index, parse};
 use squawk_ide::diagnostics::{Suggestion, diagnostics as semantic_diagnostics};
 use squawk_line_index::{LineIndex, TextRange, find_newline};
-use squawk_linter::{Edit, Linter};
+use squawk_linter::Linter;
 use url::Url;
 
 use crate::{

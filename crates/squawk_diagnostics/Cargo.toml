@@ -1,0 +1,20 @@
+[package]
+name = "squawk-diagnostics"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Shared edit and fix types for squawk's linter and IDE."
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[lib]
+doctest = false
+
+[dependencies]
+text-size.workspace = true
+
+[lints]
+workspace = true

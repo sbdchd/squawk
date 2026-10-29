@@ -1,6 +1,7 @@
+use squawk_diagnostics::Edit;
 use squawk_line_index::{LineEnding, LineIndex, TextSize};
 use squawk_linter::{
-    Edit, Rule, Violation,
+    Rule, Violation,
     ignore::{IGNORE_FILE_TEXT, IGNORE_LINE_TEXT},
 };
 use squawk_syntax::{Parse, SourceFile, SyntaxKind, SyntaxToken, ast::AstNode};

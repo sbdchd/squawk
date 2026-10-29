@@ -1,7 +1,7 @@
 use num_bigint::BigUint;
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_linter::Edit;
+use squawk_diagnostics::Edit;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},

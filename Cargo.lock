@@ -2448,6 +2448,7 @@ dependencies = [
  "serde_json",
  "simplelog",
  "snapbox",
+ "squawk-diagnostics",
  "squawk-github",
  "squawk-lexer",
  "squawk-line-index",
@@ -2457,6 +2458,13 @@ dependencies = [
  "squawk-thread",
  "tempfile",
  "toml",
+]
+
+[[package]]
+name = "squawk-diagnostics"
+version = "2.71.0"
+dependencies = [
+ "text-size",
 ]
 
 [[package]]
@@ -2506,8 +2514,8 @@ dependencies = [
  "salsa",
  "smallvec",
  "smol_str",
+ "squawk-diagnostics",
  "squawk-line-index",
- "squawk-linter",
  "squawk-syntax",
  "tabled",
  "url",
@@ -2544,6 +2552,7 @@ dependencies = [
  "serde",
  "serde_plain",
  "smallvec",
+ "squawk-diagnostics",
  "squawk-line-index",
  "squawk-syntax",
  "tabled",
@@ -2579,6 +2588,7 @@ dependencies = [
  "serde",
  "serde_json",
  "simplelog",
+ "squawk-diagnostics",
  "squawk-fmt",
  "squawk-ide",
  "squawk-lexer",
@@ -2630,6 +2640,7 @@ dependencies = [
  "salsa",
  "serde",
  "serde-wasm-bindgen",
+ "squawk-diagnostics",
  "squawk-fmt",
  "squawk-ide",
  "squawk-lexer",
