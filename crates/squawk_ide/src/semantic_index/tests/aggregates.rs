@@ -134,12 +134,22 @@ create aggregate old(int) (sfunc = add, stype = int);
       ╭▸ 
     9 │ select old(1), cnt(*);
       │        ━━━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    9 - select old(1), cnt(*);
+    9 + select oid(1), cnt(*);
+      ╰╴
     error: function `cnt()` does not exist
       ╭▸ 
     9 │ select old(1), cnt(*);
-      ╰╴               ━━━
+      │                ━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    9 - select old(1), cnt(*);
+    9 + select old(1), cot(*);
+      ╰╴
     error: function `old` already exists with same argument types
        ╭▸ 
     11 │ create aggregate old(int) (sfunc = add, stype = int);
@@ -203,8 +213,12 @@ alter aggregate add(int, int) rename to y;
       ╭▸ 
     6 │ select s(1);
       │        ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    6 - select s(1);
+    6 + select t(1);
+      ╰╴
     error: role `nope` does not exist
        ╭▸ 
     10 │ alter aggregate x.t(int) owner to nope;

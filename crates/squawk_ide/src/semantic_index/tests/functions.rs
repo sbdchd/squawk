@@ -154,8 +154,12 @@ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       │                           ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    3 - select f(a => 1, b => x), g(y => 1), f(zz => 1);
+    3 + select f(a => 1, b => x), f(y => 1), f(zz => 1);
+      ╰╴
     error: function `f(zz => int4)` does not exist
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
@@ -431,11 +435,21 @@ select * from p();
     error: function `p()` does not exist
       ╭▸ 
     3 │ select p();
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    3 │ select pi();
+      ╰╴        +
     error: function `p()` does not exist
       ╭▸ 
     4 │ select * from p();
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    4 │ select * from pi();
+      ╰╴               +
     ");
 }
 
@@ -469,7 +483,12 @@ drop function nope;
     error: function `p()` does not exist
       ╭▸ 
     9 │ drop function p();
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    9 │ drop function pi();
+      ╰╴               +
     error: function `nope` does not exist
        ╭▸ 
     10 │ drop function nope;
@@ -527,7 +546,13 @@ drop procedure if exists p;
     error: procedure `f()` does not exist
       ╭▸ 
     4 │ drop procedure f();
-      ╰╴               ━
+      │                ━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    4 - drop procedure f();
+    4 + drop procedure p();
+      ╰╴
     error: procedure `p(int4)` does not exist
       ╭▸ 
     6 │ call p(1);
@@ -571,8 +596,12 @@ alter function nope(int) rename to x;
       ╭▸ 
     5 │ select f(1);
       │        ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    5 - select f(1);
+    5 + select h(1);
+      ╰╴
     error: function `g` already exists with same argument types in schema `public`
       ╭▸ 
     7 │ alter function h rename to g;
@@ -649,7 +678,13 @@ alter routine nope() security definer;
     error: procedure `p()` does not exist
       ╭▸ 
     4 │ call p();
-      ╰╴     ━
+      │      ━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    4 - call p();
+    4 + call q();
+      ╰╴
     error: procedure `nope()` does not exist
       ╭▸ 
     8 │ alter procedure nope() security definer;
@@ -683,7 +718,13 @@ call p((select x from nope));
     error: procedure `f()` does not exist
       ╭▸ 
     8 │ call f();
-      ╰╴     ━
+      │      ━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    8 - call f();
+    8 + call p();
+      ╰╴
     error: procedure `nope()` does not exist
       ╭▸ 
     9 │ call nope();
@@ -970,7 +1011,7 @@ drop function app.do_thnig(int);
 }
 
 #[test]
-fn similar_function_requires_qualifier() {
+fn similar_unqualified_function() {
     assert_snapshot!(check("
 create function do_thing(int) returns int as 'select 1' language sql;
 select do_thnig(1);
@@ -979,8 +1020,12 @@ select do_thnig(1);
       ╭▸ 
     3 │ select do_thnig(1);
       │        ━━━━━━━━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    3 - select do_thnig(1);
+    3 + select do_thing(1);
+      ╰╴
     ");
 }
 

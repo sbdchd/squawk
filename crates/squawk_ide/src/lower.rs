@@ -13,7 +13,7 @@ use squawk_syntax::{
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::comments::preceding_comment;
-use crate::edit_distance::find_best_match_for_name_with_substrings;
+use crate::edit_distance::{find_best_match_for_name, find_best_match_for_name_with_substrings};
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
@@ -21128,11 +21128,9 @@ impl Lowerer {
         kind: RoutineKind,
         lookup: LookupKind,
     ) -> Option<Name> {
-        let schema = schema?;
         let candidates: Vec<Name> = self
-            .index
-            .functions
-            .in_schema(schema)
+            .search_path(schema, Lookup::Function)
+            .flat_map(|schema| self.index.functions.in_schema(schema))
             .filter_map(|id| {
                 let function = &self.index.functions[id];
                 let accepts = match lookup {
@@ -21148,7 +21146,7 @@ impl Lowerer {
                 .then_some(function.name)
             })
             .collect();
-        find_best_match_for_name_with_substrings(
+        find_best_match_for_name(
             &candidates,
             |candidate| self.index.names.resolve(candidate),
             self.index.names.resolve(name),

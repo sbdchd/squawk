@@ -247,11 +247,23 @@ select * from w;
     error: function `g()` does not exist
       ╭▸ 
     9 │ select g();
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    9 - select g();
+    9 + select k();
+      ╰╴
     error: function `h()` does not exist
        ╭▸ 
     10 │ select h();
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a function with a similar name exists
+       ╭╴
+    10 - select h();
+    10 + select k();
+       ╰╴
     error: relation `v` does not exist
        ╭▸ 
     12 │ select * from v;
@@ -875,8 +887,12 @@ select to_text(null);
        ╭▸ 
     17 │ select to_text(null);
        │        ━━━━━━━
-       │
-       ╰ hint: consider adding explicit type casts
+       ╰╴
+    help: a function with a similar name exists
+       ╭╴
+    17 - select to_text(null);
+    17 + select to_hex(null);
+       ╰╴
     ");
 }
 
