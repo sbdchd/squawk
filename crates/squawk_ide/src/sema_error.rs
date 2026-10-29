@@ -6,7 +6,7 @@ use crate::interner::{Interner, Name};
 use crate::ir::{
     AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
 };
-use rowan::TextRange;
+use rowan::{TextRange, TextSize};
 use squawk_linter::{Edit, Fix};
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
@@ -289,6 +289,11 @@ pub(crate) enum SemaError {
     AmbiguousReference {
         kind: ReferenceKind,
         name: Name,
+    },
+    NotLateral {
+        table: Name,
+        column: Option<Name>,
+        lateral_at: TextSize,
     },
     UnresolvedRoutine {
         kind: RoutineKind,
@@ -704,6 +709,16 @@ fn drop_hint(kind: TableKind) -> &'static str {
     }
 }
 
+fn replace_suggestion(message: &'static str, range: TextRange, replacement: String) -> Suggestion {
+    Suggestion {
+        message: message.into(),
+        fix: Fix {
+            title: format!("Replace with `{replacement}`").into(),
+            edits: vec![Edit::replace(range, replacement)],
+        },
+    }
+}
+
 fn plural_columns(count: usize) -> &'static str {
     if count == 1 { "column" } else { "columns" }
 }
@@ -817,6 +832,10 @@ impl SemaError {
             SemaError::UnresolvedQualifiedColumn { .. } => DiagnosticKind::UnresolvedColumn,
             SemaError::UnresolvedReference { kind, .. } => unresolved_kind(kind),
             SemaError::AmbiguousReference { kind, .. } => ambiguous_kind(kind),
+            SemaError::NotLateral {
+                column: Some(_), ..
+            } => DiagnosticKind::UnresolvedColumn,
+            SemaError::NotLateral { column: None, .. } => DiagnosticKind::UnresolvedRelation,
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
@@ -859,7 +878,7 @@ impl SemaError {
     }
 
     pub(crate) fn suggestion(&self, range: TextRange, names: &Interner) -> Option<Suggestion> {
-        let (message, replacement) = match *self {
+        let suggestion = match *self {
             SemaError::UnresolvedReference {
                 similar: Some(Similar::Column(similar)),
                 ..
@@ -871,13 +890,14 @@ impl SemaError {
                     }
                     None => column,
                 };
-                ("a column with a similar name exists", replacement)
+                replace_suggestion("a column with a similar name exists", range, replacement)
             }
             SemaError::UnresolvedReference {
                 similar: Some(Similar::Table(table)),
                 ..
-            } => (
+            } => replace_suggestion(
                 "a relation with a similar name exists",
+                range,
                 quote_ident(names.resolve(table)),
             ),
             SemaError::UnresolvedReference {
@@ -888,13 +908,14 @@ impl SemaError {
                     SimilarType::Named(name) => quote_ident(names.resolve(name)),
                     SimilarType::Keyword(keyword) => keyword.to_owned(),
                 };
-                ("a type with a similar name exists", replacement)
+                replace_suggestion("a type with a similar name exists", range, replacement)
             }
             SemaError::UnresolvedReference {
                 similar: Some(Similar::Window(window)),
                 ..
-            } => (
+            } => replace_suggestion(
                 "a window with a similar name exists",
+                range,
                 quote_ident(names.resolve(window)),
             ),
             SemaError::UnresolvedReference {
@@ -904,15 +925,17 @@ impl SemaError {
             | SemaError::InvalidEnumValue {
                 similar: Some(label),
                 ..
-            } => (
+            } => replace_suggestion(
                 "an enum label with a similar name exists",
+                range,
                 quote_string_literal(names.resolve(label)),
             ),
             SemaError::UnresolvedQualifiedColumn {
                 similar: Some(similar),
                 ..
-            } => (
+            } => replace_suggestion(
                 "a column with a similar name exists",
+                range,
                 quote_ident(names.resolve(similar)),
             ),
             SemaError::UnresolvedRoutine {
@@ -927,17 +950,34 @@ impl SemaError {
                     RoutineKind::Aggregate => "an aggregate with a similar name exists",
                     RoutineKind::Procedure => "a procedure with a similar name exists",
                 };
-                (message, quote_ident(names.resolve(similar)))
+                replace_suggestion(message, range, quote_ident(names.resolve(similar)))
+            }
+            SemaError::NotLateral {
+                table,
+                column,
+                lateral_at,
+            } => {
+                let table = names.resolve(table);
+                let message = match column {
+                    Some(column) => format!(
+                        "to reference column `{}` of table `{table}`, mark the subquery as `lateral`",
+                        names.resolve(column)
+                    ),
+                    None => {
+                        format!("to reference table `{table}`, mark the subquery as `lateral`")
+                    }
+                };
+                Suggestion {
+                    message: message.into(),
+                    fix: Fix {
+                        title: "Add `lateral`".into(),
+                        edits: vec![Edit::insert("lateral ", lateral_at)],
+                    },
+                }
             }
             _ => return None,
         };
-        Some(Suggestion {
-            message: message.into(),
-            fix: Fix {
-                title: format!("Replace with `{replacement}`").into(),
-                edits: vec![Edit::replace(range, replacement)],
-            },
-        })
+        Some(suggestion)
     }
 
     pub(crate) fn hint(&self) -> Option<&'static str> {
@@ -1378,6 +1418,19 @@ impl fmt::Display for ErrorMessage<'_> {
             } => {
                 write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
             }
+            SemaError::NotLateral {
+                column: Some(column),
+                ..
+            } => write!(f, "column `{}` does not exist", n(column)),
+            SemaError::NotLateral {
+                table,
+                column: None,
+                ..
+            } => write!(
+                f,
+                "invalid reference to `from` clause entry for table `{}`",
+                n(table)
+            ),
             SemaError::UnresolvedRoutine {
                 kind,
                 schema,
