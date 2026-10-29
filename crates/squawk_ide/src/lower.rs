@@ -66,6 +66,7 @@ impl Lowerer {
             file_id: FileId::Builtins.into(),
             ctes: vec![],
             pending_ctes: vec![],
+            future_ctes: vec![],
             scopes: vec![],
             windows: vec![],
             json_paths: vec![],
@@ -317,6 +318,11 @@ struct LateralSource {
     lateral_at: TextSize,
 }
 
+struct FutureCtes {
+    with_clause: ast::WithClause,
+    current: usize,
+}
+
 struct FromSubquery {
     scope: usize,
     sources: usize,
@@ -333,6 +339,7 @@ pub(crate) struct Lowerer {
     file_id: IrFileId,
     ctes: Vec<CteId>,
     pending_ctes: Vec<PendingCte>,
+    future_ctes: Vec<FutureCtes>,
     scopes: Vec<QueryScope>,
     windows: Vec<WindowId>,
     json_paths: Vec<JsonPathId>,
@@ -13684,13 +13691,20 @@ impl Lowerer {
             self.lower_recursive_with(with_clause);
             return;
         }
-        for with_table in with_clause.with_tables() {
+        let depth = self.future_ctes.len();
+        self.future_ctes.push(FutureCtes {
+            with_clause: with_clause.clone(),
+            current: 0,
+        });
+        for (current, with_table) in with_clause.with_tables().enumerate() {
+            self.future_ctes[depth].current = current;
             let Some(id) = self.alloc_cte(&with_table) else {
                 continue;
             };
             self.lower_cte_body(id, &with_table, CteKind::NonRecursive);
             self.ctes.push(id);
         }
+        self.future_ctes.truncate(depth);
     }
 
     fn lower_recursive_with(&mut self, with_clause: &ast::WithClause) {
@@ -22251,6 +22265,12 @@ impl Lowerer {
         let column = match source {
             RefSource::Column => Some(name),
             RefSource::Qualifier => None,
+            RefSource::Table {
+                schema: None,
+                lookup: TableLookup::FromItem,
+            } if let Some(recursive_at) = self.future_cte(name) => {
+                return SemaError::FutureCte { name, recursive_at };
+            }
             RefSource::Table { .. }
             | RefSource::Type { .. }
             | RefSource::Window
@@ -22274,6 +22294,32 @@ impl Lowerer {
                 similar: self.similar(name, source),
             },
         }
+    }
+
+    fn future_cte(&self, name: Name) -> Option<TextSize> {
+        let future = self.future_ctes.iter().rev().find(|future| {
+            future
+                .with_clause
+                .with_tables()
+                .skip(future.current)
+                .filter_map(|with_table| with_table.name())
+                .any(|cte_name| {
+                    self.index
+                        .names
+                        .lookup(postgres::truncate_identifier(&cte_name.text()))
+                        == Some(name)
+                })
+        })?;
+        let with_token = future.with_clause.with_token()?;
+        let recursive_at = self
+            .index
+            .range(InIrFile::new(
+                self.file_id,
+                TextRange::empty(with_token.text_range().end()),
+            ))
+            .value
+            .start();
+        Some(recursive_at)
     }
 
     fn lateral_source(&self, name: Name, column: Option<Name>) -> Option<LateralSource> {

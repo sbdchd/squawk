@@ -295,6 +295,10 @@ pub(crate) enum SemaError {
         column: Option<Name>,
         lateral_at: TextSize,
     },
+    FutureCte {
+        name: Name,
+        recursive_at: TextSize,
+    },
     UnresolvedRoutine {
         kind: RoutineKind,
         schema: Option<Name>,
@@ -835,7 +839,9 @@ impl SemaError {
             SemaError::NotLateral {
                 column: Some(_), ..
             } => DiagnosticKind::UnresolvedColumn,
-            SemaError::NotLateral { column: None, .. } => DiagnosticKind::UnresolvedRelation,
+            SemaError::NotLateral { column: None, .. } | SemaError::FutureCte { .. } => {
+                DiagnosticKind::UnresolvedRelation
+            }
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
@@ -975,6 +981,17 @@ impl SemaError {
                     },
                 }
             }
+            SemaError::FutureCte { name, recursive_at } => Suggestion {
+                message: format!(
+                    "to reference `{}`, mark the `with` clause as `recursive`",
+                    names.resolve(name)
+                )
+                .into(),
+                fix: Fix {
+                    title: "Add `recursive`".into(),
+                    edits: vec![Edit::insert(" recursive", recursive_at)],
+                },
+            },
             _ => return None,
         };
         Some(suggestion)
@@ -1422,6 +1439,9 @@ impl fmt::Display for ErrorMessage<'_> {
                 column: Some(column),
                 ..
             } => write!(f, "column `{}` does not exist", n(column)),
+            SemaError::FutureCte { name, .. } => {
+                write!(f, "relation `{}` does not exist", n(name))
+            }
             SemaError::NotLateral {
                 table,
                 column: None,
