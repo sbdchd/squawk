@@ -111,3 +111,80 @@ alter type mood add value 'c' after 'ok';
        ╰╴                                    ━━━━━━
     ");
 }
+
+#[test]
+fn similar_enum_label() {
+    assert_snapshot!(check("
+create type status as enum ('active', 'inactive', 'it''s');
+select 'actve'::status;
+select 'ACTIVE'::status;
+select 'its'::status;
+select 'zzz'::status;
+"), @"
+    error: invalid input value for enum `status`: `actve`
+      ╭▸ 
+    3 │ select 'actve'::status;
+      │        ━━━━━━━
+      ╰╴
+    help: an enum label with a similar name exists
+      ╭╴
+    3 │ select 'active'::status;
+      ╰╴           +
+    error: invalid input value for enum `status`: `ACTIVE`
+      ╭▸ 
+    4 │ select 'ACTIVE'::status;
+      │        ━━━━━━━━
+      ╰╴
+    help: an enum label with a similar name exists
+      ╭╴
+    4 - select 'ACTIVE'::status;
+    4 + select 'active'::status;
+      ╰╴
+    error: invalid input value for enum `status`: `its`
+      ╭▸ 
+    5 │ select 'its'::status;
+      │        ━━━━━
+      ╰╴
+    help: an enum label with a similar name exists
+      ╭╴
+    5 │ select 'it''s'::status;
+      ╰╴          ++
+    error: invalid input value for enum `status`: `zzz`
+      ╭▸ 
+    6 │ select 'zzz'::status;
+      ╰╴       ━━━━━
+    ");
+}
+
+#[test]
+fn similar_enum_label_in_alter_type() {
+    assert_snapshot!(check("
+create type status as enum ('active', 'inactive');
+alter type status rename value 'actve' to 'live';
+alter type status add value 'paused' before 'inactve';
+alter type status add value 'done' after 'zzz';
+"), @"
+    error: enum label `actve` does not exist
+      ╭▸ 
+    3 │ alter type status rename value 'actve' to 'live';
+      │                                ━━━━━━━
+      ╰╴
+    help: an enum label with a similar name exists
+      ╭╴
+    3 │ alter type status rename value 'active' to 'live';
+      ╰╴                                   +
+    error: enum label `inactve` does not exist
+      ╭▸ 
+    4 │ alter type status add value 'paused' before 'inactve';
+      │                                             ━━━━━━━━━
+      ╰╴
+    help: an enum label with a similar name exists
+      ╭╴
+    4 │ alter type status add value 'paused' before 'inactive';
+      ╰╴                                                  +
+    error: enum label `zzz` does not exist
+      ╭▸ 
+    5 │ alter type status add value 'done' after 'zzz';
+      ╰╴                                         ━━━━━
+    ");
+}

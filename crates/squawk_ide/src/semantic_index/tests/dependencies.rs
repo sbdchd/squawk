@@ -53,7 +53,13 @@ select * from u;
     error: relation `t` does not exist
        ╭▸ 
     13 │ select * from t;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    13 - select * from t;
+    13 + select * from u;
+       ╰╴
     error: function `f()` does not exist
        ╭▸ 
     14 │ select f();
@@ -241,15 +247,33 @@ select * from w;
     error: function `g()` does not exist
       ╭▸ 
     9 │ select g();
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    9 - select g();
+    9 + select k();
+      ╰╴
     error: function `h()` does not exist
        ╭▸ 
     10 │ select h();
-       ╰╴       ━
+       │        ━
+       ╰╴
+    help: a function with a similar name exists
+       ╭╴
+    10 - select h();
+    10 + select k();
+       ╰╴
     error: relation `v` does not exist
        ╭▸ 
     12 │ select * from v;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    12 - select * from v;
+    12 + select * from w;
+       ╰╴
     ");
 }
 
@@ -547,11 +571,23 @@ select * from x;
     error: relation `v` does not exist
       ╭▸ 
     8 │ select * from v;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    8 - select * from v;
+    8 + select * from x;
+      ╰╴
     error: relation `w` does not exist
       ╭▸ 
     9 │ select * from w;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    9 - select * from w;
+    9 + select * from x;
+      ╰╴
     ");
 }
 
@@ -838,21 +874,43 @@ select to_text(null);
     error: type `d` does not exist
        ╭▸ 
     14 │ select null::d;
-       ╰╴             ━
+       │              ━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    14 - select null::d;
+    14 + select null::t;
+       ╰╴
     error: type `r` does not exist
        ╭▸ 
     15 │ select null::r;
-       ╰╴             ━
+       │              ━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    15 - select null::r;
+    15 + select null::t;
+       ╰╴
     error: type `rmultirange` does not exist
        ╭▸ 
     16 │ select null::rmultirange;
-       ╰╴             ━━━━━━━━━━━
+       │              ━━━━━━━━━━━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    16 - select null::rmultirange;
+    16 + select null::tsmultirange;
+       ╰╴
     error: function `to_text(unknown)` does not exist
        ╭▸ 
     17 │ select to_text(null);
        │        ━━━━━━━
-       │
-       ╰ hint: consider adding explicit type casts
+       ╰╴
+    help: a function with a similar name exists
+       ╭╴
+    17 - select to_text(null);
+    17 + select to_hex(null);
+       ╰╴
     ");
 }
 
@@ -977,7 +1035,13 @@ select t_out(null);
     error: type `t` does not exist
        ╭▸ 
     10 │ select null::t;
-       ╰╴             ━
+       │              ━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    10 - select null::t;
+    10 + select null::u;
+       ╰╴
     error: column `a` does not exist
        ╭▸ 
     12 │ select a from u;
@@ -1015,7 +1079,13 @@ select (v).m from u;
     error: relation `v` does not exist
        ╭▸ 
     10 │ select * from v;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    10 - select * from v;
+    10 + select * from u;
+       ╰╴
     error: column `m` does not exist
        ╭▸ 
     11 │ select m from t;

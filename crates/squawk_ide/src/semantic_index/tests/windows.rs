@@ -44,6 +44,29 @@ select * from t where false union select count(*) over w, 1 from t window w as (
 }
 
 #[test]
+fn similar_window() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select count(*) over by_dpt from t window by_dept as (partition by a);
+select count(*) over w from t window w as (by_dpt), by_dept as ();
+"), @"
+    error: window `by_dpt` does not exist
+      ╭▸ 
+    3 │ select count(*) over by_dpt from t window by_dept as (partition by a);
+      │                      ━━━━━━
+      ╰╴
+    help: a window with a similar name exists
+      ╭╴
+    3 │ select count(*) over by_dept from t window by_dept as (partition by a);
+      ╰╴                         +
+    error: window `by_dpt` does not exist
+      ╭▸ 
+    4 │ select count(*) over w from t window w as (by_dpt), by_dept as ();
+      ╰╴                                           ━━━━━━
+    ");
+}
+
+#[test]
 fn duplicate_window() {
     assert_snapshot!(check("
 select 1 window w as (), w as ();

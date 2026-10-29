@@ -153,6 +153,15 @@ pub(crate) fn find_best_match_for_name_with_substrings<'a, T: Copy>(
     find_best_match_for_name_impl(true, candidates, &name, lookup, dist)
 }
 
+pub(crate) fn find_best_match_for_name<'a, T: Copy>(
+    candidates: &[T],
+    name: impl Fn(T) -> &'a str,
+    lookup: &str,
+    dist: Option<usize>,
+) -> Option<T> {
+    find_best_match_for_name_impl(false, candidates, &name, lookup, dist)
+}
+
 #[cold]
 fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     use_substring_score: bool,
@@ -254,10 +263,16 @@ fn sort_by_words(name: &str) -> Vec<&str> {
 mod tests {
     use insta::assert_snapshot;
 
-    use super::find_best_match_for_name_with_substrings;
+    use super::{find_best_match_for_name, find_best_match_for_name_with_substrings};
 
     fn best(candidates: &[&str], lookup: &str) -> String {
         find_best_match_for_name_with_substrings(candidates, |c| c, lookup, None)
+            .unwrap_or("no match")
+            .to_string()
+    }
+
+    fn best_without_substrings(candidates: &[&str], lookup: &str) -> String {
+        find_best_match_for_name(candidates, |c| c, lookup, None)
             .unwrap_or("no match")
             .to_string()
     }
@@ -272,5 +287,14 @@ mod tests {
         assert_snapshot!(best(&["id"], "x"), @"no match");
         assert_snapshot!(best(&["a"], "b"), @"a");
         assert_snapshot!(best(&["force_capture", "capture"], "forced_capture"), @"force_capture");
+    }
+
+    #[test]
+    fn suggestions_without_substrings() {
+        assert_snapshot!(best_without_substrings(&["apple", "banana"], "appel"), @"apple");
+        assert_snapshot!(best_without_substrings(&["apple", "banana"], "APPLE"), @"apple");
+        assert_snapshot!(best_without_substrings(&["apple", "banana"], "app"), @"no match");
+        assert_snapshot!(best_without_substrings(&["floor"], "foo"), @"no match");
+        assert_snapshot!(best_without_substrings(&["created_at"], "at_created"), @"created_at");
     }
 }

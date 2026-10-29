@@ -146,7 +146,13 @@ select * from m;
     error: relation `m` does not exist
        ╭▸ 
     14 │ select * from m;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    14 - select * from m;
+    14 + select * from v;
+       ╰╴
     ");
 }
 
@@ -180,7 +186,13 @@ select b from v;
     error: relation `v` does not exist
        ╭▸ 
     10 │ select b from v;
-       ╰╴              ━
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    10 - select b from v;
+    10 + select b from w;
+       ╰╴
     ");
 }
 
@@ -217,7 +229,13 @@ alter view t rename to z;
     error: relation `v` does not exist
       ╭▸ 
     5 │ select a from v;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    5 - select a from v;
+    5 + select a from w;
+      ╰╴
     error: relation `x` already exists
       ╭▸ 
     8 │ alter view w rename to x;
@@ -328,7 +346,13 @@ select b from w;
     error: relation `w` does not exist
       ╭▸ 
     8 │ select b from w;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    8 - select b from w;
+    8 + select b from v;
+      ╰╴
     ");
 }
 

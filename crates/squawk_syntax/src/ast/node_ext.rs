@@ -1563,6 +1563,11 @@ impl ast::Type {
     }
 }
 
+pub const KEYWORD_TYPE_NAMES: &[&str] = &[
+    "int", "integer", "smallint", "bigint", "real", "float", "dec", "decimal", "numeric",
+    "boolean", "json",
+];
+
 impl ast::PathType {
     pub fn keyword_type_name(&self) -> Option<&'static str> {
         let segment = self.path_ref()?.unqualified_segment()?;
@@ -2626,6 +2631,22 @@ fn op_sig_none() {
     let postfix = sigs.next().unwrap();
     assert_snapshot!(postfix.lhs().unwrap().syntax(), @"int4");
     assert!(matches!(postfix.rhs(), Some(ast::OpSigOperand::None(_))));
+}
+
+#[test]
+fn keyword_type_names() {
+    for name in KEYWORD_TYPE_NAMES {
+        let parse = SourceFile::parse(&format!("drop cast (text as {name});"));
+        assert!(parse.errors().is_empty());
+        let stmt = parse.tree().stmts().next().unwrap();
+        let ast::Stmt::DropCast(drop_cast) = stmt else {
+            unreachable!()
+        };
+        let Some(ast::Type::PathType(path_type)) = drop_cast.cast_sig().unwrap().rhs() else {
+            unreachable!()
+        };
+        assert!(path_type.keyword_type_name().is_some(), "{name}");
+    }
 }
 
 #[test]

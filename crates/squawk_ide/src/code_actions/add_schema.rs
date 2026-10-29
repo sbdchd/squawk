@@ -87,8 +87,9 @@ create table t ();
 alter table t$0 add column c text;"
             ),
             @"
-create table t ();
-alter table public.t add column c text;"
+        create table t ();
+        alter table public.t add column c text;
+        "
         );
     }
 
@@ -106,9 +107,11 @@ alter table public.t add column c text;"
         assert_snapshot!(apply_code_action(
             add_schema,
             "create function f$0() returns int8\n  as 'select 1'\n  language sql;"),
-            @"create function public.f() returns int8
-  as 'select 1'
-  language sql;"
+            @"
+        create function public.f() returns int8
+          as 'select 1'
+          language sql;
+        "
         );
     }
 
@@ -131,8 +134,9 @@ create table t ();
 table t$0;"
             ),
             @"
-create table t ();
-table public.t;"
+        create table t ();
+        table public.t;
+        "
         );
     }
 
@@ -142,8 +146,10 @@ table public.t;"
             add_schema,
             "create table t(a text, b int);
         select t from t$0;"),
-            @"create table t(a text, b int);
-        select t from public.t;"
+            @"
+        create table t(a text, b int);
+                select t from public.t;
+        "
         );
     }
 
@@ -190,8 +196,9 @@ set search_path to myschema;
 create table t$0(a text, b int);"
             ),
             @"
-set search_path to myschema;
-create table myschema.t(a text, b int);"
+        set search_path to myschema;
+        create table myschema.t(a text, b int);
+        "
         );
     }
 
@@ -208,11 +215,12 @@ select * from t$0;
 set search_path to other;"
             ),
             @"
-create table app.t ();
-create table other.t ();
-set search_path to app;
-select * from app.t;
-set search_path to other;"
+        create table app.t ();
+        create table other.t ();
+        set search_path to app;
+        select * from app.t;
+        set search_path to other;
+        "
         );
     }
 
@@ -229,11 +237,12 @@ reset search_path;
 select * from t$0;"
             ),
             @"
-create table app.t ();
-create table public.t ();
-set search_path to app;
-reset search_path;
-select * from public.t;"
+        create table app.t ();
+        create table public.t ();
+        set search_path to app;
+        reset search_path;
+        select * from public.t;
+        "
         );
     }
 
@@ -252,13 +261,14 @@ commit;
 select * from t$0;"
             ),
             @"
-create table app.t ();
-create table other.t ();
-set search_path to app;
-begin;
-set local search_path to other;
-commit;
-select * from app.t;"
+        create table app.t ();
+        create table other.t ();
+        set search_path to app;
+        begin;
+        set local search_path to other;
+        commit;
+        select * from app.t;
+        "
         );
     }
 
@@ -282,18 +292,19 @@ create function f() returns int
   end;"
             ),
             @"
-create function app.t() returns int
-  language sql
-  return 1;
-create function public.t() returns int
-  language sql
-  return 1;
-create function f() returns int
-  language sql
-  set search_path to app
-  begin atomic
-    select app.t();
-  end;"
+        create function app.t() returns int
+          language sql
+          return 1;
+        create function public.t() returns int
+          language sql
+          return 1;
+        create function f() returns int
+          language sql
+          set search_path to app
+          begin atomic
+            select app.t();
+          end;
+        "
         );
     }
 
@@ -333,11 +344,12 @@ create function f() returns int8
 
 select f$0();"),
             @"
-create function f() returns int8
-  as 'select 1'
-  language sql;
+        create function f() returns int8
+          as 'select 1'
+          language sql;
 
-select public.f();"
+        select public.f();
+        "
         );
     }
 

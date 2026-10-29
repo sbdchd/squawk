@@ -114,7 +114,13 @@ drop cast if exists (int as nope);
     error: function `g(int4)` does not exist
       ╭▸ 
     5 │ create cast (int as text) with function g(int);
-      ╰╴                                        ━
+      │                                         ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    5 - create cast (int as text) with function g(int);
+    5 + create cast (int as text) with function f(int);
+      ╰╴
     error: function `f(int4, int4)` does not exist
       ╭▸ 
     6 │ create cast (int as text) with function f(int, int);

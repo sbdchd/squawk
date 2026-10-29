@@ -13,7 +13,7 @@ use squawk_syntax::{
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::comments::preceding_comment;
-use crate::edit_distance::find_best_match_for_name_with_substrings;
+use crate::edit_distance::{find_best_match_for_name, find_best_match_for_name_with_substrings};
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
@@ -43,10 +43,10 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, TriggerFunctionKind,
-        WindowClause,
+        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
+        SimilarColumn, SimilarType, TriggerFunctionKind, WindowClause,
     },
-    semantic_index::{IndexData, NameVersion, SimilarColumn},
+    semantic_index::{IndexData, NameVersion},
 };
 use crate::{
     overload::{ArgType, BuiltinTypes, CallArg, Overloads},
@@ -179,6 +179,7 @@ struct QueryScope {
     scope: ScopeId,
     merges: Vec<ScopeMerge>,
     windows: Range<usize>,
+    join_aliased_sources: Vec<SourceId>,
 }
 
 #[derive(Clone, Copy)]
@@ -936,6 +937,8 @@ pub(crate) enum TableLookup {
     TableOrView,
     TableOrMaterializedView,
     Any,
+    FromItem,
+    Like,
     View,
     MaterializedView,
     Sequence,
@@ -957,7 +960,14 @@ impl TableLookup {
             TableLookup::TableOrMaterializedView => {
                 matches!(kind, TableKind::Table | TableKind::MaterializedView)
             }
-            TableLookup::Any => true,
+            TableLookup::Any | TableLookup::FromItem => true,
+            TableLookup::Like => matches!(
+                kind,
+                TableKind::Table
+                    | TableKind::View
+                    | TableKind::MaterializedView
+                    | TableKind::ForeignTable
+            ),
             TableLookup::View => kind == TableKind::View,
             TableLookup::MaterializedView => kind == TableKind::MaterializedView,
             TableLookup::Sequence => kind == TableKind::Sequence,
@@ -968,6 +978,48 @@ impl TableLookup {
             }
         }
     }
+}
+
+#[derive(Clone, Copy)]
+enum RefSource {
+    Column,
+    /// table name, alias, CTE, or subquery alias
+    /// ```sql
+    /// -- x is the qualifier
+    /// select x.a, x.*
+    /// ```
+    Qualifier,
+    Table {
+        schema: Option<Name>,
+        lookup: TableLookup,
+    },
+    Type {
+        schema: Option<Name>,
+        candidates: TypeCandidates,
+    },
+    Window,
+    EnumLabel {
+        ty: TypeId,
+    },
+}
+
+impl RefSource {
+    fn kind(self) -> ReferenceKind {
+        match self {
+            RefSource::Column => ReferenceKind::Column,
+            RefSource::Qualifier => ReferenceKind::Relation,
+            RefSource::Table { .. } => ReferenceKind::Table,
+            RefSource::Type { .. } => ReferenceKind::Type,
+            RefSource::Window => ReferenceKind::Window,
+            RefSource::EnumLabel { .. } => ReferenceKind::EnumLabel,
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+enum TypeCandidates {
+    TypeName,
+    Types(Option<TypeKind>),
 }
 
 #[derive(Clone, Copy)]
@@ -1455,10 +1507,7 @@ impl Lowerer {
                         .get(ColumnKey { table, column })
                         .is_some_and(|expression| expression.kind == ColumnExprKind::Generated)
                 {
-                    let range = self.index.range(range);
-                    self.index
-                        .errors
-                        .push(range, SemaError::GeneratedColumnReference { column });
+                    self.push_error_at(range, SemaError::GeneratedColumnReference { column });
                 }
             }
         }
@@ -2249,12 +2298,18 @@ impl Lowerer {
                 column,
             },
             (Some(table), None) if self.index.tables[table].columns.complete => {
-                let relation = self.index.tables[table].name;
+                let Table {
+                    name: relation,
+                    columns,
+                    ..
+                } = self.index.tables[table];
+                let similar = self.similar_column_in(columns.range.iter(), name);
                 self.push_error(
                     segment.syntax(),
                     SemaError::UnresolvedQualifiedColumn {
                         qualifier: relation,
                         column: name,
+                        similar,
                     },
                 );
                 Resolution::Unknown
@@ -7145,7 +7200,15 @@ impl Lowerer {
             Some(table) => Resolution::Table(table),
             None => Resolution::Unresolved,
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table {
+                schema,
+                lookup: TableLookup::Any,
+            },
+        );
         table
     }
 
@@ -9223,8 +9286,7 @@ impl Lowerer {
                                 right: OperandName::Ty(self.index.ty_name(right)),
                                 lookup: LookupKind::Signature,
                             };
-                            let file_range = self.index.range(InIrFile::new(self.file_id, range));
-                            self.index.errors.push(file_range, error);
+                            self.push_error_at(InIrFile::new(self.file_id, range), error);
                             Resolution::Unknown
                         }
                         (None, _) | (Some(_), Operand::None | Operand::Unknown) => {
@@ -9505,6 +9567,8 @@ impl Lowerer {
                                 Some(_) => ErrorArgs::Star,
                                 None => ErrorArgs::List(self.index.errors.args.range_from(start)),
                             };
+                            let similar =
+                                self.similar_function(schema, name, kind, LookupKind::Signature);
                             self.push_error(
                                 segment.syntax(),
                                 SemaError::UnresolvedRoutine {
@@ -9513,6 +9577,7 @@ impl Lowerer {
                                     name,
                                     args,
                                     lookup: LookupKind::Signature,
+                                    similar,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -10325,16 +10390,36 @@ impl Lowerer {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier(path.qualifier());
-        let (kind, resolution) = match self.find_table(schema, name) {
-            Some(table) => (ReferenceKind::Table, Resolution::Table(table)),
-            None => match self.find_type(schema, name) {
-                Resolution::Unresolved => (ReferenceKind::Table, Resolution::Unresolved),
-                resolution => (ReferenceKind::Type, resolution),
-            },
+        let resolution = match self.find_table(schema, name) {
+            Some(table) => Resolution::Table(table),
+            None => self.find_type(schema, name),
         };
-        self.add_ref(name, kind, segment.syntax(), resolution);
+        if matches!(resolution, Resolution::Table(_) | Resolution::Unresolved) {
+            self.add_ref_from(
+                name,
+                segment.syntax(),
+                resolution,
+                RefSource::Table {
+                    schema,
+                    lookup: TableLookup::Like,
+                },
+            );
+        } else {
+            self.add_ref(name, ReferenceKind::Type, segment.syntax(), resolution);
+        }
         match resolution {
-            Resolution::Table(table) => Some(table),
+            Resolution::Table(table) => {
+                if !TableLookup::Like.accepts(self.index.tables[table].kind) {
+                    self.report_wrong_relation_kind(
+                        table,
+                        TableLookup::Like,
+                        segment.syntax(),
+                        false,
+                    );
+                    return None;
+                }
+                Some(table)
+            }
             Resolution::Column { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
@@ -10834,6 +10919,20 @@ impl Lowerer {
             .find(|id| self.index.enum_labels[*id].name == name)
     }
 
+    fn similar_enum_label(&self, ty: TypeId, name: Name) -> Option<Name> {
+        let candidates: Vec<Name> = self
+            .index
+            .enum_labels(ty)
+            .map(|id| self.index.enum_labels[id].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
     fn lower_enum_label_ref(
         &mut self,
         ty: Option<TypeId>,
@@ -10841,12 +10940,25 @@ impl Lowerer {
     ) -> Option<EnumLabelId> {
         let name = self.intern(&literal.string_value()?);
         let label = ty.and_then(|ty| self.find_enum_label(ty, name));
-        let resolution = match (label, ty) {
-            (Some(label), _) => Resolution::EnumLabel(label),
-            (None, Some(_)) => Resolution::Unresolved,
-            (None, None) => Resolution::Unknown,
-        };
-        self.add_ref(name, ReferenceKind::EnumLabel, literal.syntax(), resolution);
+        match ty {
+            Some(ty) => {
+                let resolution = label.map_or(Resolution::Unresolved, Resolution::EnumLabel);
+                self.add_ref_from(
+                    name,
+                    literal.syntax(),
+                    resolution,
+                    RefSource::EnumLabel { ty },
+                );
+            }
+            None => {
+                self.add_ref(
+                    name,
+                    ReferenceKind::EnumLabel,
+                    literal.syntax(),
+                    Resolution::Unknown,
+                );
+            }
+        }
         label
     }
 
@@ -10906,6 +11018,7 @@ impl Lowerer {
             let error = SemaError::InvalidEnumValue {
                 ty: self.index.types[ty].name,
                 value: name,
+                similar: self.similar_enum_label(ty, name),
             };
             self.push_error(literal.syntax(), error);
         }
@@ -11928,7 +12041,15 @@ impl Lowerer {
             (Resolution::Unresolved, IfMissing::Ignore) => Resolution::Unknown,
             (resolution, IfMissing::Error | IfMissing::Ignore) => resolution,
         };
-        self.add_ref(name, ReferenceKind::Type, node, resolution);
+        self.add_ref_from(
+            name,
+            node,
+            resolution,
+            RefSource::Type {
+                schema,
+                candidates: TypeCandidates::TypeName,
+            },
+        );
         match resolution {
             Resolution::Type(ty) => TypeLookup::Found(Ty::Type(ty)),
             Resolution::Table(table) => TypeLookup::Found(Ty::Table(table)),
@@ -12036,7 +12157,15 @@ impl Lowerer {
                 IfMissing::Error => Resolution::Unresolved,
             },
         };
-        self.add_ref(name, ReferenceKind::Type, segment.syntax(), resolution);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Type {
+                schema,
+                candidates: TypeCandidates::Types(kind),
+            },
+        );
         let ty = found?;
         if let Some(kind) = kind
             && self.index.types[ty].kind != kind
@@ -13333,11 +13462,14 @@ impl Lowerer {
                 };
                 let resolution = match relation {
                     Some(relation) => {
+                        let columns = self.index.sources[target].columns.range;
+                        let similar = self.similar_column_in(columns.iter(), name);
                         self.push_error(
                             column_ref.syntax(),
                             SemaError::UnresolvedQualifiedColumn {
                                 qualifier: relation,
                                 column: name,
+                                similar,
                             },
                         );
                         Resolution::Unknown
@@ -14107,7 +14239,7 @@ impl Lowerer {
     ) {
         let scope = self
             .scopes
-            .last()
+            .last_mut()
             .expect("from items are lowered inside a select scope");
         let index = &mut self.index;
         let from_sources = &index.queries[scope.query].sources;
@@ -14124,6 +14256,9 @@ impl Lowerer {
         let complete = from_sources[start..]
             .iter()
             .all(|&id| index.sources[id].columns.complete);
+        scope
+            .join_aliased_sources
+            .extend_from_slice(&index.queries[scope.query].sources[start..]);
         index.queries[scope.query].sources.truncate(start);
         self.scope_mut()
             .merges
@@ -14176,6 +14311,7 @@ impl Lowerer {
             scope,
             merges: vec![],
             windows: Range::default(),
+            join_aliased_sources: vec![],
         });
     }
 
@@ -14467,7 +14603,18 @@ impl Lowerer {
                 self.unknown_columns(),
             )
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table {
+                schema,
+                lookup: match lookup {
+                    RelationLookup::Any => TableLookup::FromItem,
+                    RelationLookup::OnlyTable => TableLookup::Any,
+                },
+            },
+        );
         RelationSource {
             name: Some(name),
             kind,
@@ -14683,7 +14830,12 @@ impl Lowerer {
                 IfMissing::Error => Resolution::Unresolved,
             },
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table { schema, lookup },
+        );
         let table = found?;
         if !lookup.accepts(self.index.tables[table].kind) {
             self.report_wrong_relation_kind(table, lookup, segment.syntax(), drop);
@@ -14712,6 +14864,8 @@ impl Lowerer {
             | TableLookup::TableOrView
             | TableLookup::TableOrMaterializedView
             | TableLookup::Any
+            | TableLookup::FromItem
+            | TableLookup::Like
             | TableLookup::View
             | TableLookup::MaterializedView
             | TableLookup::Sequence
@@ -15068,12 +15222,24 @@ impl Lowerer {
                 },
                 None => match table {
                     Some(table) if drop_column.if_exists().is_none() => {
-                        let relation = self.index.tables[table].name;
+                        let Table {
+                            name: relation,
+                            columns,
+                            ..
+                        } = self.index.tables[table];
+                        let similar = self.similar_column_in(
+                            columns
+                                .range
+                                .iter()
+                                .filter(|column| !dropped.contains(column)),
+                            name,
+                        );
                         self.push_error(
                             column_ref.syntax(),
                             SemaError::UnresolvedQualifiedColumn {
                                 qualifier: relation,
                                 column: name,
+                                similar,
                             },
                         );
                         Resolution::Unknown
@@ -15864,7 +16030,15 @@ impl Lowerer {
             (None, IfMissing::Ignore) => Resolution::Unknown,
             (None, IfMissing::Error) => Resolution::Unresolved,
         };
-        self.add_ref(name, ReferenceKind::Table, segment.syntax(), resolution);
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table {
+                schema,
+                lookup: TableLookup::Any,
+            },
+        );
         table
     }
 
@@ -17878,8 +18052,7 @@ impl Lowerer {
                 right,
                 lookup: LookupKind::Call,
             };
-            let file_range = self.index.range(InIrFile::new(self.file_id, range));
-            self.index.errors.push(file_range, error);
+            self.push_error_at(InIrFile::new(self.file_id, range), error);
             resolution = Resolution::Unknown;
         }
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
@@ -17924,6 +18097,7 @@ impl Lowerer {
             });
         }
         let args = ErrorArgs::List(self.index.errors.args.range_from(start));
+        let similar = self.similar_function(schema, name, kind, LookupKind::Call);
         self.push_error(
             node,
             SemaError::UnresolvedRoutine {
@@ -17932,6 +18106,7 @@ impl Lowerer {
                 name,
                 args,
                 lookup: LookupKind::Call,
+                similar,
             },
         );
         Resolution::Unknown
@@ -19161,11 +19336,7 @@ impl Lowerer {
                 }
             },
             (_, None) => {
-                let NameResolution { kind, resolution } = self.resolve_name(name);
-                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
-                if matches!(resolution, Resolution::Unresolved) {
-                    self.suggest_column(reference, name);
-                }
+                self.add_name_ref(name, name_ref.syntax());
                 return;
             }
         };
@@ -19182,11 +19353,7 @@ impl Lowerer {
                     return self.lower_system_call(function, &[], name_ref.syntax().text_range());
                 }
                 let name = self.name_ref_name(name_ref)?;
-                let NameResolution { kind, resolution } = self.resolve_name(name);
-                let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
-                if matches!(resolution, Resolution::Unresolved) {
-                    self.suggest_column(reference, name);
-                }
+                let resolution = self.add_name_ref(name, name_ref.syntax());
                 self.check_default_column_ref(name_ref.syntax(), resolution);
                 return self.resolution_type(resolution);
             }
@@ -19524,8 +19691,68 @@ impl Lowerer {
         let name = self.intern(&window_ref.text());
         let window = self.find_window(name);
         let resolution = window.map_or(Resolution::Unresolved, Resolution::Window);
-        self.add_ref(name, ReferenceKind::Window, window_ref.syntax(), resolution);
+        self.add_ref_from(name, window_ref.syntax(), resolution, RefSource::Window);
         window
+    }
+
+    fn similar_source(&self, name: Name) -> Option<Name> {
+        if self.is_shadowed_in_from(name) {
+            return None;
+        }
+        let candidates: Vec<Name> = self
+            .scopes
+            .iter()
+            .rev()
+            .flat_map(|scope| self.visible_sources(scope))
+            .filter_map(|source| self.index.sources[source].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
+    fn is_shadowed_in_from(&self, name: Name) -> bool {
+        self.scopes.iter().any(|scope| {
+            self.index.queries[scope.query]
+                .sources
+                .iter()
+                .chain(&scope.join_aliased_sources)
+                .any(|source| {
+                    let source = &self.index.sources[*source];
+                    source.name == Some(name)
+                        || match source.kind {
+                            SourceKind::Table(table) => self.index.tables[table].name == name,
+                            SourceKind::Cte(cte) => self.index.ctes[cte].name == name,
+                            SourceKind::External
+                            | SourceKind::Subquery(_)
+                            | SourceKind::Function(_)
+                            | SourceKind::Join
+                            | SourceKind::UsingAlias
+                            | SourceKind::Returning(_)
+                            | SourceKind::Excluded(_)
+                            | SourceKind::RuleRelation(_)
+                            | SourceKind::ElementVariable
+                            | SourceKind::Other => false,
+                        }
+                })
+        })
+    }
+
+    fn similar_window(&self, name: Name) -> Option<Name> {
+        let scope = self.scopes.last()?;
+        let candidates: Vec<Name> = self.windows[scope.windows]
+            .iter()
+            .map(|&window| self.index.windows[window].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
     }
 
     fn lower_window_spec(
@@ -20902,11 +21129,14 @@ impl Lowerer {
                 None if self.index.sources[source].columns.complete => {
                     let resolution = match self.index.sources[source].name {
                         Some(qualifier) => {
+                            let columns = self.index.sources[source].columns.range;
+                            let similar = self.similar_column_in(columns.iter(), name);
                             self.push_error(
                                 field.syntax(),
                                 SemaError::UnresolvedQualifiedColumn {
                                     qualifier,
                                     column: name,
+                                    similar,
                                 },
                             );
                             Resolution::Unknown
@@ -21002,12 +21232,7 @@ impl Lowerer {
         let name = self.name_ref_name(qualifier)?;
         let source = self.resolve_source(name);
         let resolution = source.map_or(Resolution::Unresolved, Resolution::Source);
-        self.add_ref(
-            name,
-            ReferenceKind::Relation,
-            qualifier.syntax(),
-            resolution,
-        );
+        self.add_ref_from(name, qualifier.syntax(), resolution, RefSource::Qualifier);
         source
     }
 
@@ -21032,7 +21257,7 @@ impl Lowerer {
             .find(|id| self.index.sources[*id].name == Some(name))
     }
 
-    fn suggest_column(&mut self, reference: RefId, name: Name) {
+    fn similar_column(&self, name: Name) -> Option<SimilarColumn> {
         let mut candidates: Vec<SimilarColumn> = vec![];
         for scope in self.scopes.iter().rev() {
             for source in self.visible_sources(scope) {
@@ -21050,14 +21275,12 @@ impl Lowerer {
             }
         }
         let lookup = self.index.names.resolve(name);
-        let Some(mut similar) = find_best_match_for_name_with_substrings(
+        let mut similar = find_best_match_for_name_with_substrings(
             &candidates,
             |candidate| self.index.names.resolve(candidate.column),
             lookup,
             None,
-        ) else {
-            return;
-        };
+        )?;
         if candidates
             .iter()
             .filter(|candidate| candidate.column == similar.column)
@@ -21066,7 +21289,127 @@ impl Lowerer {
         {
             similar.qualifier = None;
         }
-        self.index.errors.similar_columns.insert(reference, similar);
+        Some(similar)
+    }
+
+    fn similar_table(&self, schema: Option<Name>, name: Name, lookup: TableLookup) -> Option<Name> {
+        let mut candidates: Vec<Name> = vec![];
+        if lookup == TableLookup::FromItem && schema.is_none() {
+            candidates.extend(self.ctes.iter().map(|cte| self.index.ctes[*cte].name));
+        }
+        for schema in self.search_path(schema, Lookup::Relation) {
+            candidates.extend(self.index.tables.in_schema(schema).filter_map(|id| {
+                let table = &self.index.tables[id];
+                (lookup.accepts(table.kind)
+                    && self.visible(table.schema, table.ptr.file_id)
+                    && !self.dropped_tables.contains(&id))
+                .then_some(table.name)
+            }));
+        }
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
+    fn similar_type(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        candidates: TypeCandidates,
+    ) -> Option<SimilarType> {
+        let (kind, type_names) = match candidates {
+            TypeCandidates::TypeName => (None, true),
+            TypeCandidates::Types(kind) => (kind, false),
+        };
+        let mut similar: Vec<SimilarType> = vec![];
+        if type_names && schema.is_none() {
+            similar.extend(
+                ast::KEYWORD_TYPE_NAMES
+                    .iter()
+                    .copied()
+                    .map(SimilarType::Keyword),
+            );
+        }
+        for schema in self.search_path(schema, Lookup::Type) {
+            similar.extend(self.index.types.in_schema(schema).filter_map(|id| {
+                let ty = &self.index.types[id];
+                (kind.is_none_or(|kind| ty.kind == kind)
+                    && ty.category != Some(TypeCategory::Array)
+                    && self.visible(ty.schema, ty.ptr.file_id)
+                    && !self.dropped_types.contains(&id))
+                .then_some(SimilarType::Named(ty.name))
+            }));
+            if type_names && schema != self.pg_catalog {
+                similar.extend(self.index.tables.in_schema(schema).filter_map(|id| {
+                    let table = &self.index.tables[id];
+                    (self.visible(table.schema, table.ptr.file_id)
+                        && !self.dropped_tables.contains(&id))
+                    .then_some(SimilarType::Named(table.name))
+                }));
+            }
+        }
+        find_best_match_for_name(
+            &similar,
+            |candidate| match candidate {
+                SimilarType::Named(name) => self.index.names.resolve(name),
+                SimilarType::Keyword(keyword) => keyword,
+            },
+            self.index.names.resolve(name),
+            None,
+        )
+    }
+
+    fn similar_function(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: RoutineKind,
+        lookup: LookupKind,
+    ) -> Option<Name> {
+        let candidates: Vec<Name> = self
+            .search_path(schema, Lookup::Function)
+            .flat_map(|schema| self.index.functions.in_schema(schema))
+            .filter_map(|id| {
+                let function = &self.index.functions[id];
+                let accepts = match lookup {
+                    LookupKind::Call => {
+                        (function.kind == FunctionKind::Procedure)
+                            == (kind == RoutineKind::Procedure)
+                    }
+                    LookupKind::Signature => kind.matches(function.kind),
+                };
+                (accepts
+                    && self.visible(function.schema, function.ptr.file_id)
+                    && !self.dropped_functions.contains(&id))
+                .then_some(function.name)
+            })
+            .collect();
+        find_best_match_for_name(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
+        .filter(|similar| *similar != name)
+    }
+
+    fn similar_column_in(
+        &self,
+        columns: impl Iterator<Item = ColumnId>,
+        name: Name,
+    ) -> Option<Name> {
+        let candidates: Vec<Name> = columns
+            .filter_map(|column| self.index.columns[column].name)
+            .collect();
+        find_best_match_for_name_with_substrings(
+            &candidates,
+            |candidate| self.index.names.resolve(candidate),
+            self.index.names.resolve(name),
+            None,
+        )
     }
 
     fn resolve_source(&self, name: Name) -> Option<SourceId> {
@@ -21846,6 +22189,72 @@ impl Lowerer {
         resolution: Resolution,
     ) -> RefId {
         let range = InIrFile::new(self.file_id, range);
+        let reference = self.alloc_ref(name, kind, range, resolution);
+        if let Some(error) = SemaError::reference(kind, resolution, name) {
+            self.push_error_at(range, error);
+        }
+        reference
+    }
+
+    fn add_name_ref(&mut self, name: Name, node: &SyntaxNode) -> Resolution {
+        let NameResolution { kind, resolution } = self.resolve_name(name);
+        if kind == ReferenceKind::Column {
+            self.add_ref_from(name, node, resolution, RefSource::Column);
+        } else {
+            self.add_ref(name, kind, node, resolution);
+        }
+        resolution
+    }
+
+    fn add_ref_from(
+        &mut self,
+        name: Name,
+        node: &SyntaxNode,
+        resolution: Resolution,
+        source: RefSource,
+    ) -> RefId {
+        let kind = source.kind();
+        let range = InIrFile::new(self.file_id, node.text_range());
+        let reference = self.alloc_ref(name, kind, range, resolution);
+        let error = if resolution == Resolution::Unresolved {
+            Some(SemaError::UnresolvedReference {
+                kind,
+                name,
+                similar: self.similar(name, source),
+            })
+        } else {
+            SemaError::reference(kind, resolution, name)
+        };
+        if let Some(error) = error {
+            self.push_error_at(range, error);
+        }
+        reference
+    }
+
+    fn similar(&self, name: Name, source: RefSource) -> Option<Similar> {
+        match source {
+            RefSource::Column => self.similar_column(name).map(Similar::Column),
+            RefSource::Qualifier => self.similar_source(name).map(Similar::Table),
+            RefSource::Table { schema, lookup } => {
+                self.similar_table(schema, name, lookup).map(Similar::Table)
+            }
+            RefSource::Type { schema, candidates } => self
+                .similar_type(schema, name, candidates)
+                .map(Similar::Type),
+            RefSource::Window => self.similar_window(name).map(Similar::Window),
+            RefSource::EnumLabel { ty } => {
+                self.similar_enum_label(ty, name).map(Similar::EnumLabel)
+            }
+        }
+    }
+
+    fn alloc_ref(
+        &mut self,
+        name: Name,
+        kind: ReferenceKind,
+        range: IrFileRange,
+        resolution: Resolution,
+    ) -> RefId {
         let id = self.index.references.alloc(Reference {
             name,
             kind,
@@ -21933,7 +22342,11 @@ impl Lowerer {
     }
 
     fn push_error_ptr(&mut self, ptr: InIrFile<SyntaxNodePtr>, error: SemaError) {
-        let range = self.index.range(ptr.file_range());
+        self.push_error_at(ptr.file_range(), error);
+    }
+
+    fn push_error_at(&mut self, range: IrFileRange, error: SemaError) {
+        let range = self.index.range(range);
         self.index.errors.push(range, error);
     }
 

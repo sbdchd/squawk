@@ -217,7 +217,13 @@ select * from graph_table(missing_graph match (a) columns (a.name as n));
     error: missing `from` clause entry for table `z`
        ╭▸ 
     14 │   where a.id = 1 and e.since is not null and z.name = 'y'
-       ╰╴                                             ━
+       │                                              ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    14 -   where a.id = 1 and e.since is not null and z.name = 'y'
+    14 +   where a.id = 1 and e.since is not null and a.name = 'y'
+       ╰╴
     error: column `c.title` does not exist
        ╭▸ 
     17 │ select * from graph_table(g match (c is city) columns (c.title as t));
@@ -277,7 +283,12 @@ alter property graph if exists nope rename to g3;
     error: relation `g` does not exist
       ╭▸ 
     5 │ select * from graph_table(g match (x) columns (x.a as a));
-      ╰╴                          ━
+      │                           ━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    5 │ select * from graph_table(g2 match (x) columns (x.a as a));
+      ╰╴                           +
     error: relation `t` already exists
       ╭▸ 
     7 │ alter property graph g2 rename to t;

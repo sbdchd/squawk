@@ -223,7 +223,7 @@ mod tests {
 -- a com$0ment
 select 1;
 "
-        ), @r"
+        ), @"
         /* a comment */
         select 1;
         ");
@@ -237,7 +237,7 @@ select 1;
 /* a com$0ment */
 select 1;
 "
-        ), @r"
+        ), @"
         -- a comment
         select 1;
         ");
@@ -262,7 +262,7 @@ select 2;
 /* **bo$0ld** */
 select 1;
 "
-        ), @r"
+        ), @"
         -- **bold**
         select 1;
         ");
@@ -278,7 +278,7 @@ select 1;
   */
 select 1;
 "
-        ), @r"
+        ), @"
           -- first line
           -- second line
         select 1;
@@ -386,7 +386,7 @@ select 1;
 select 1; /* com$0ment */
 select 2;
 "
-        ), @r"
+        ), @"
         select 1; -- comment
         select 2;
         ");

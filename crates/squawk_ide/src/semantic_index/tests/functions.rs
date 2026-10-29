@@ -95,7 +95,13 @@ select t.x, t.z from f() as t;
     error: column `t.z` does not exist
       ╭▸ 
     6 │ select t.x, t.z from f() as t;
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - select t.x, t.z from f() as t;
+    6 + select t.x, t.x from f() as t;
+      ╰╴
     ");
 }
 
@@ -154,8 +160,12 @@ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
       │                           ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    3 - select f(a => 1, b => x), g(y => 1), f(zz => 1);
+    3 + select f(a => 1, b => x), f(y => 1), f(zz => 1);
+      ╰╴
     error: function `f(zz => int4)` does not exist
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
@@ -397,7 +407,13 @@ create procedure p(x int) language sql as 'insert into t (b) values (x)';
     error: column `t.b` does not exist
       ╭▸ 
     3 │ create procedure p(x int) language sql as 'insert into t (b) values (x)';
-      ╰╴                                                          ━
+      │                                                           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    3 - create procedure p(x int) language sql as 'insert into t (b) values (x)';
+    3 + create procedure p(x int) language sql as 'insert into t (a) values (x)';
+      ╰╴
     ");
 }
 
@@ -431,11 +447,21 @@ select * from p();
     error: function `p()` does not exist
       ╭▸ 
     3 │ select p();
-      ╰╴       ━
+      │        ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    3 │ select pi();
+      ╰╴        +
     error: function `p()` does not exist
       ╭▸ 
     4 │ select * from p();
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    4 │ select * from pi();
+      ╰╴               +
     ");
 }
 
@@ -469,7 +495,12 @@ drop function nope;
     error: function `p()` does not exist
       ╭▸ 
     9 │ drop function p();
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    9 │ drop function pi();
+      ╰╴               +
     error: function `nope` does not exist
        ╭▸ 
     10 │ drop function nope;
@@ -527,7 +558,13 @@ drop procedure if exists p;
     error: procedure `f()` does not exist
       ╭▸ 
     4 │ drop procedure f();
-      ╰╴               ━
+      │                ━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    4 - drop procedure f();
+    4 + drop procedure p();
+      ╰╴
     error: procedure `p(int4)` does not exist
       ╭▸ 
     6 │ call p(1);
@@ -571,8 +608,12 @@ alter function nope(int) rename to x;
       ╭▸ 
     5 │ select f(1);
       │        ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    5 - select f(1);
+    5 + select h(1);
+      ╰╴
     error: function `g` already exists with same argument types in schema `public`
       ╭▸ 
     7 │ alter function h rename to g;
@@ -649,7 +690,13 @@ alter routine nope() security definer;
     error: procedure `p()` does not exist
       ╭▸ 
     4 │ call p();
-      ╰╴     ━
+      │      ━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    4 - call p();
+    4 + call q();
+      ╰╴
     error: procedure `nope()` does not exist
       ╭▸ 
     8 │ alter procedure nope() security definer;
@@ -683,7 +730,13 @@ call p((select x from nope));
     error: procedure `f()` does not exist
       ╭▸ 
     8 │ call f();
-      ╰╴     ━
+      │      ━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    8 - call f();
+    8 + call p();
+      ╰╴
     error: procedure `nope()` does not exist
       ╭▸ 
     9 │ call nope();
@@ -913,5 +966,99 @@ drop operator ~~~ (none, int);
        ╭▸ 
     13 │ drop operator ~~~ (none, int);
        ╰╴              ━━━
+    ");
+}
+
+#[test]
+fn similar_qualified_function() {
+    assert_snapshot!(check("
+create schema app;
+create function app.do_thing(int) returns int as 'select 1' language sql;
+create procedure app.do_proc() as 'select 1' language sql;
+select app.do_thnig(1);
+select pg_catalog.json_bild_object('a', 1);
+call app.do_proc_();
+drop function app.do_thnig(int);
+"), @"
+    error: function `app.do_thnig(int4)` does not exist
+      ╭▸ 
+    5 │ select app.do_thnig(1);
+      │            ━━━━━━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    5 - select app.do_thnig(1);
+    5 + select app.do_thing(1);
+      ╰╴
+    error: function `pg_catalog.json_bild_object(unknown, int4)` does not exist
+      ╭▸ 
+    6 │ select pg_catalog.json_bild_object('a', 1);
+      │                   ━━━━━━━━━━━━━━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    6 │ select pg_catalog.json_build_object('a', 1);
+      ╰╴                        +
+    error: procedure `app.do_proc_()` does not exist
+      ╭▸ 
+    7 │ call app.do_proc_();
+      │          ━━━━━━━━
+      ╰╴
+    help: a procedure with a similar name exists
+      ╭╴
+    7 - call app.do_proc_();
+    7 + call app.do_proc();
+      ╰╴
+    error: function `app.do_thnig(int4)` does not exist
+      ╭▸ 
+    8 │ drop function app.do_thnig(int);
+      │                   ━━━━━━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    8 - drop function app.do_thnig(int);
+    8 + drop function app.do_thing(int);
+      ╰╴
+    ");
+}
+
+#[test]
+fn similar_unqualified_function() {
+    assert_snapshot!(check("
+create function do_thing(int) returns int as 'select 1' language sql;
+select do_thnig(1);
+"), @"
+    error: function `do_thnig(int4)` does not exist
+      ╭▸ 
+    3 │ select do_thnig(1);
+      │        ━━━━━━━━
+      ╰╴
+    help: a function with a similar name exists
+      ╭╴
+    3 - select do_thnig(1);
+    3 + select do_thing(1);
+      ╰╴
+    ");
+}
+
+#[test]
+fn similar_function_skips_existing_name() {
+    assert_snapshot!(check("
+create schema app;
+create function app.do_thing(int) returns int as 'select 1' language sql;
+create function app.do_thing2(int, int) returns int as 'select 1' language sql;
+select app.do_thing(1, 2);
+call app.do_thig();
+"), @"
+    error: function `app.do_thing(int4, int4)` does not exist
+      ╭▸ 
+    5 │ select app.do_thing(1, 2);
+      │            ━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: procedure `app.do_thig()` does not exist
+      ╭▸ 
+    6 │ call app.do_thig();
+      ╰╴         ━━━━━━━
     ");
 }

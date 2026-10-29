@@ -127,7 +127,12 @@ alter table p merge partitions (p12, nope) into other;
     error: relation `p1` does not exist
       ╭▸ 
     8 │ select a from p1;
-      ╰╴              ━━
+      │               ━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    8 │ select a from p12;
+      ╰╴                +
     error: relation `p_rolled_back` does not exist
        ╭▸ 
     12 │ select a from p_rolled_back;
@@ -164,7 +169,13 @@ alter table p split partition nope into (partition p3 for values from (20) to (3
     error: relation `p12` does not exist
        ╭▸ 
     10 │ select a from p12;
-       ╰╴              ━━━
+       │               ━━━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    10 - select a from p12;
+    10 + select a from p2;
+       ╰╴
     error: relation `nope` does not exist
        ╭▸ 
     11 │ alter table p split partition nope into (partition p3 for values from (20) to (30));

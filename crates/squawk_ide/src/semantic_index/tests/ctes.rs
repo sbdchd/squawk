@@ -237,3 +237,51 @@ with x (a, b) as (select * from missing) select * from x;
       ╰╴                                ━━━━━━━
     ");
 }
+
+#[test]
+fn similar_cte_qualifier() {
+    assert_snapshot!(check("
+with orders as (select 1 id)
+select ordrs.id from orders;
+with orders as (select 1 id)
+select (select ordrs.id) from orders;
+"), @"
+    error: missing `from` clause entry for table `ordrs`
+      ╭▸ 
+    3 │ select ordrs.id from orders;
+      │        ━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    3 │ select orders.id from orders;
+      ╰╴          +
+    error: missing `from` clause entry for table `ordrs`
+      ╭▸ 
+    5 │ select (select ordrs.id) from orders;
+      │                ━━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    5 │ select (select orders.id) from orders;
+      ╰╴                  +
+    ");
+}
+
+#[test]
+fn similar_cte_qualifier_skips_entries_in_from() {
+    assert_snapshot!(check("
+with orders as (select 1 id), items as (select 1 id)
+select orders.id from (orders join items using (id)) as orders_items;
+with orders as (select 1 id)
+select orders.id from orders as orders2;
+"), @"
+    error: missing `from` clause entry for table `orders`
+      ╭▸ 
+    3 │ select orders.id from (orders join items using (id)) as orders_items;
+      ╰╴       ━━━━━━
+    error: missing `from` clause entry for table `orders`
+      ╭▸ 
+    5 │ select orders.id from orders as orders2;
+      ╰╴       ━━━━━━
+    ");
+}

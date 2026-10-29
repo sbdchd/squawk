@@ -99,12 +99,13 @@ create table t (
 select * from t, rows f$0rom (unnest(a), unnest(b));"
             ),
             @"
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select * from t, unnest(a, b);"
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select * from t, unnest(a, b);
+        "
         );
     }
 
@@ -122,12 +123,13 @@ create table t (
 select * from t, rows f$0rom (unnest(a));"
             ),
             @"
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select * from t, unnest(a);"
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select * from t, unnest(a);
+        "
         );
     }
 
@@ -145,12 +147,13 @@ create table t (
 select * from t, rows f$0rom (unnest(a, b), unnest(c));"
             ),
             @"
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select * from t, unnest(a, b, c);"
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select * from t, unnest(a, b, c);
+        "
         );
     }
 
@@ -168,12 +171,13 @@ create table t (
 select * from t, rows f$0rom (unnest(a), unnest(b)) as z (x, y);"
             ),
             @"
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select * from t, unnest(a, b) as z (x, y);"
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select * from t, unnest(a, b) as z (x, y);
+        "
         );
     }
 
@@ -193,14 +197,15 @@ from t,
   rows f$0rom (unnest(a), unnest(b)) with ordinality as z (x, y, n);"
             ),
             @"
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select *
-from t,
-  unnest(a, b) with ordinality as z (x, y, n);"
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select *
+        from t,
+          unnest(a, b) with ordinality as z (x, y, n);
+        "
         );
     }
 
@@ -218,12 +223,13 @@ create table t (
 select * from t, lateral rows f$0rom (unnest(t.a), unnest(t.b));"
             ),
             @"
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select * from t, lateral unnest(t.a, t.b);"
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select * from t, lateral unnest(t.a, t.b);
+        "
         );
     }
 
@@ -248,8 +254,9 @@ create table t(a int[], b text[], c int[]);
 select * from t, ROWS F$0ROM (UNNEST(a), UNNEST(b));"
             ),
             @"
-create table t(a int[], b text[], c int[]);
-select * from t, UNNEST(a, b);"
+        create table t(a int[], b text[], c int[]);
+        select * from t, UNNEST(a, b);
+        "
         );
     }
 
@@ -308,12 +315,13 @@ create table t (
 select * from t, rows f$0rom (unnest(all a), unnest(b));"
             ),
             @"
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select * from t, unnest(a, b);"
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select * from t, unnest(a, b);
+        "
         );
     }
 
@@ -406,15 +414,16 @@ create table t (
 select * from t, rows f$0rom (unnest(a), unnest(b));"
             ),
             @"
-create function other.unnest(x text) returns setof text
-  as $$ select 1 $$
-  language sql;
-create table t (
-  a int[],
-  b text[],
-  c int[]
-);
-select * from t, unnest(a, b);"
+        create function other.unnest(x text) returns setof text
+          as $$ select 1 $$
+          language sql;
+        create table t (
+          a int[],
+          b text[],
+          c int[]
+        );
+        select * from t, unnest(a, b);
+        "
         );
     }
 
@@ -434,14 +443,15 @@ create table t (
 select * from t, rows f$0rom (unnest(a));"
             ),
             @"
-create function unnest(x text) returns setof text
-  as $$ select 1 $$
-  language sql;
-create table t (
-  a text,
-  b text
-);
-select * from t, unnest(a);"
+        create function unnest(x text) returns setof text
+          as $$ select 1 $$
+          language sql;
+        create table t (
+          a text,
+          b text
+        );
+        select * from t, unnest(a);
+        "
         );
     }
 
@@ -461,14 +471,15 @@ create table t (
 select * from t, rows f$0rom (unnest(a, b));"
             ),
             @"
-create function unnest(x text) returns setof text
-  as $$ select 1 $$
-  language sql;
-create table t (
-  a text,
-  b text
-);
-select * from t, unnest(a, b);"
+        create function unnest(x text) returns setof text
+          as $$ select 1 $$
+          language sql;
+        create table t (
+          a text,
+          b text
+        );
+        select * from t, unnest(a, b);
+        "
         );
     }
 

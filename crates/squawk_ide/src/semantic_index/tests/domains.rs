@@ -174,7 +174,13 @@ alter domain e drop default;
     error: type `d` does not exist
       ╭▸ 
     5 │ select 1::d;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    5 - select 1::d;
+    5 + select 1::e;
+      ╰╴
     error: type `f` already exists
       ╭▸ 
     8 │ alter domain e rename to f;
@@ -223,7 +229,13 @@ select 1::e;
     error: type `e` does not exist
       ╭▸ 
     7 │ select 1::e;
-      ╰╴          ━
+      │           ━
+      ╰╴
+    help: a type with a similar name exists
+      ╭╴
+    7 - select 1::e;
+    7 + select 1::d;
+      ╰╴
     ");
 }
 

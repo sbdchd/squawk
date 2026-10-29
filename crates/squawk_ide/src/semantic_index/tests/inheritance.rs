@@ -60,6 +60,30 @@ select a, nope3 from q;
 }
 
 #[test]
+fn like_wrong_kind() {
+    assert_snapshot!(check("
+create sequence item;
+create table items (a int);
+create table t (like item);
+create table u (like itms);
+"), @"
+    error: `item` is not a table, view, materialized view, composite type, or foreign table
+      ╭▸ 
+    4 │ create table t (like item);
+      ╰╴                     ━━━━
+    error: relation `itms` does not exist
+      ╭▸ 
+    5 │ create table u (like itms);
+      │                      ━━━━
+      ╰╴
+    help: a relation with a similar name exists
+      ╭╴
+    5 │ create table u (like items);
+      ╰╴                       +
+    ");
+}
+
+#[test]
 fn alter_table_inherit_and_of() {
     assert_snapshot!(check("
 create type ty as (a int);
