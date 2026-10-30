@@ -10,23 +10,13 @@ use squawk_sema::ir::{Item, Resolution, TableId, TableKind};
 use squawk_sema::lower::is_public_role;
 use squawk_sema::semantic_index::SemanticIndex;
 
-use crate::db::{Db, File, original_file, parse, semantic_index};
+use crate::db::{Db, parse, semantic_index};
 
 pub fn semantic_tokens(
     db: &dyn Db,
     file_id: FileId,
     range_to_highlight: Option<TextRange>,
 ) -> Vec<SemanticToken> {
-    file_semantic_tokens(db, original_file(db, file_id), range_to_highlight)
-}
-
-#[salsa::tracked]
-fn file_semantic_tokens(
-    db: &dyn Db,
-    file: File,
-    range_to_highlight: Option<TextRange>,
-) -> Vec<SemanticToken> {
-    let file_id = file.file_id(db);
     semantic_tokens_with_index(
         semantic_index(db, file_id),
         squawk_sema::file::InFile::new(file_id, &parse(db, file_id).tree()),

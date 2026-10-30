@@ -37,7 +37,7 @@ use squawk_syntax::ast::{self, AstNode, AstToken};
 use squawk_sema::comments::line_comment_group;
 use squawk_sema::file::FileId;
 
-use crate::db::{Db, File, original_file, parse};
+use crate::db::{Db, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FoldKind {
@@ -60,12 +60,7 @@ pub struct Fold {
 }
 
 pub fn folding_ranges(db: &dyn Db, file_id: FileId) -> Vec<Fold> {
-    file_folding_ranges(db, original_file(db, file_id))
-}
-
-#[salsa::tracked]
-fn file_folding_ranges(db: &dyn Db, file: File) -> Vec<Fold> {
-    let parse = parse(db, file.file_id(db));
+    let parse = parse(db, file_id);
 
     let mut folds = vec![];
     let mut visited_comments = FxHashSet::default();

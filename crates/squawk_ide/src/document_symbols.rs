@@ -12,15 +12,9 @@ use squawk_sema::ir::{
 };
 use squawk_sema::semantic_index::SemanticIndex;
 
-use crate::db::{Db, File, original_file, parse, semantic_index};
+use crate::db::{Db, parse, semantic_index};
 
 pub fn document_symbols(db: &dyn Db, file_id: FileId) -> Vec<DocumentSymbol> {
-    file_document_symbols(db, original_file(db, file_id))
-}
-
-#[salsa::tracked]
-fn file_document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
-    let file_id = file.file_id(db);
     document_symbols_with_index(
         semantic_index(db, file_id),
         squawk_sema::file::InFile::new(file_id, &parse(db, file_id).tree()),

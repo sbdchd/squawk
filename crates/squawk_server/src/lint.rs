@@ -2,7 +2,7 @@ use gen_lsp_types::{
     Code, CodeDescription, Diagnostic, DiagnosticSeverity, Message, Position, Range, TextEdit,
 };
 use squawk_diagnostics::Edit;
-use squawk_ide::db::{Db, File, line_index as file_line_index, original_file, parse};
+use squawk_ide::db::{Db, line_index as file_line_index, original_file, parse};
 use squawk_ide::diagnostics::{Suggestion, diagnostics as semantic_diagnostics};
 use squawk_line_index::{LineIndex, TextRange, find_newline};
 use squawk_linter::Linter;
@@ -42,14 +42,22 @@ fn diagnostic_range(line_index: &LineIndex, range: TextRange) -> Range {
 }
 
 pub(crate) fn lint(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
-    file_lint(db, original_file(db, file_id))
+    #[salsa::interned(no_lifetime)]
+    struct InternedFileId {
+        id: FileId,
+    }
+
+    #[salsa::tracked]
+    fn lint(db: &dyn Db, file_id: InternedFileId) -> Vec<Diagnostic> {
+        lint_file(db, file_id.id(db))
+    }
+
+    lint(db, InternedFileId::new(db, file_id))
 }
 
-#[salsa::tracked]
-fn file_lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
-    let file_id = file.file_id(db);
+fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
     let parse = parse(db, file_id);
-    let content = file.content(db);
+    let content = original_file(db, file_id).content(db);
     let parse_errors = parse.errors();
     let mut linter = Linter::with_default_rules();
     let violations = linter.lint(&parse, content);

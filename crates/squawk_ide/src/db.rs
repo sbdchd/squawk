@@ -126,12 +126,17 @@ fn completion_index(db: &dyn Db, completion: CompletionFile) -> CachedIndex {
 }
 
 pub fn line_index(db: &dyn Db, file_id: FileId) -> &LineIndex {
-    file_line_index(db, original_file(db, file_id))
-}
+    #[salsa::interned(no_lifetime)]
+    struct InternedFileId {
+        id: FileId,
+    }
 
-#[salsa::tracked(returns(ref))]
-fn file_line_index(db: &dyn Db, file: File) -> LineIndex {
-    LineIndex::new(file.content(db))
+    #[salsa::tracked(returns(ref))]
+    fn line_index(db: &dyn Db, file_id: InternedFileId) -> LineIndex {
+        LineIndex::new(original_file(db, file_id.id(db)).content(db))
+    }
+
+    line_index(db, InternedFileId::new(db, file_id))
 }
 
 pub fn line_ending(db: &dyn Db, file_id: FileId) -> &'static str {

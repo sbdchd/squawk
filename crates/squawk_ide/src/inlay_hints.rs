@@ -8,15 +8,9 @@ use squawk_sema::file::{FileId, FileRange, InFile};
 use squawk_sema::ir::{ColumnId, FunctionKind, Item, ParamMode, Resolution};
 use squawk_sema::semantic_index::SemanticIndex;
 
-use crate::db::{Db, File, original_file, parse, semantic_index};
+use crate::db::{Db, parse, semantic_index};
 
 pub fn inlay_hints(db: &dyn Db, file_id: FileId) -> Vec<InlayHint> {
-    file_inlay_hints(db, original_file(db, file_id))
-}
-
-#[salsa::tracked]
-fn file_inlay_hints(db: &dyn Db, file: File) -> Vec<InlayHint> {
-    let file_id = file.file_id(db);
     inlay_hints_with_index(
         semantic_index(db, file_id),
         InFile::new(file_id, &parse(db, file_id).tree()),
