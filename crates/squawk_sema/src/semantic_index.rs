@@ -110,6 +110,7 @@ pub enum DiagnosticKind {
     NotIdentityColumn,
     WrongTypeKind,
     WrongRelationKind,
+    WrongRoutineKind,
     CannotChangeDatabase,
     DuplicateRole,
     DuplicatePolicy,

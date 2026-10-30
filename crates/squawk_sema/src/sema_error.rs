@@ -281,6 +281,10 @@ pub(crate) enum SemaError {
         column: Name,
         similar: Option<Name>,
     },
+    QualifiedSetTarget {
+        column: Name,
+        relation: Name,
+    },
     UnresolvedReference {
         kind: ReferenceKind,
         name: Name,
@@ -306,6 +310,12 @@ pub(crate) enum SemaError {
         args: ErrorArgs,
         lookup: LookupKind,
         similar: Option<Name>,
+    },
+    ProcedureCalledAsFunction {
+        schema: Option<Name>,
+        name: Name,
+        args: ErrorArgs,
+        select_range: Option<TextRange>,
     },
     UnresolvedOperator {
         schema: Option<Name>,
@@ -833,7 +843,10 @@ impl SemaError {
             SemaError::UnresolvedTransform { .. } => DiagnosticKind::UnresolvedTransform,
             SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
-            SemaError::UnresolvedQualifiedColumn { .. } => DiagnosticKind::UnresolvedColumn,
+            SemaError::ProcedureCalledAsFunction { .. } => DiagnosticKind::WrongRoutineKind,
+            SemaError::UnresolvedQualifiedColumn { .. } | SemaError::QualifiedSetTarget { .. } => {
+                DiagnosticKind::UnresolvedColumn
+            }
             SemaError::UnresolvedReference { kind, .. } => unresolved_kind(kind),
             SemaError::AmbiguousReference { kind, .. } => ambiguous_kind(kind),
             SemaError::NotLateral {
@@ -944,6 +957,23 @@ impl SemaError {
                 range,
                 quote_ident(names.resolve(similar)),
             ),
+            SemaError::ProcedureCalledAsFunction {
+                select_range: Some(select_range),
+                ..
+            } => Suggestion {
+                message: "to call a procedure, use `call`".into(),
+                fix: Fix {
+                    title: "Replace with `call`".into(),
+                    edits: vec![Edit::replace(select_range, "call")],
+                },
+            },
+            SemaError::QualifiedSetTarget { column, .. } => Suggestion {
+                message: "`set` target columns cannot be qualified with the relation name".into(),
+                fix: Fix {
+                    title: format!("Remove `{}.`", quote_ident(names.resolve(column))).into(),
+                    edits: vec![Edit::delete(range)],
+                },
+            },
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),
@@ -1034,6 +1064,10 @@ impl SemaError {
                     None
                 }
             },
+            SemaError::ProcedureCalledAsFunction {
+                select_range: None,
+                ..
+            } => Some("to call a procedure, use `call`"),
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
@@ -1119,6 +1153,39 @@ impl ErrorMessage<'_> {
         fmt::from_fn(move |f| {
             let suffix = if ty.array { "[]" } else { "" };
             write!(f, "{}{suffix}", self.names.resolve(ty.name))
+        })
+    }
+
+    fn signature(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        args: ErrorArgs,
+    ) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            let n = |name| self.names.resolve(name);
+            if let Some(schema) = schema {
+                write!(f, "{}.", n(schema))?;
+            }
+            write!(f, "{}(", n(name))?;
+            let args = match args {
+                ErrorArgs::List(args) => args,
+                ErrorArgs::Star => return f.write_str("*)"),
+            };
+            for (i, arg) in args.iter().enumerate() {
+                let arg = self.args[arg];
+                if i > 0 {
+                    f.write_str(", ")?;
+                }
+                if arg.variadic {
+                    f.write_str("variadic ")?;
+                }
+                if let Some(name) = arg.name {
+                    write!(f, "{} => ", n(name))?;
+                }
+                write!(f, "{}", self.operand(arg.ty))?;
+            }
+            f.write_str(")")
         })
     }
 
@@ -1435,6 +1502,12 @@ impl fmt::Display for ErrorMessage<'_> {
             } => {
                 write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
             }
+            SemaError::QualifiedSetTarget { column, relation } => write!(
+                f,
+                "column `{}` of relation `{}` does not exist",
+                n(column),
+                n(relation)
+            ),
             SemaError::NotLateral {
                 column: Some(column),
                 ..
@@ -1465,30 +1538,15 @@ impl fmt::Display for ErrorMessage<'_> {
                         kind.label()
                     }
                 };
-                write!(f, "{label} `")?;
-                if let Some(schema) = schema {
-                    write!(f, "{}.", n(schema))?;
-                }
-                write!(f, "{}(", n(name))?;
-                let args = match args {
-                    ErrorArgs::List(args) => args,
-                    ErrorArgs::Star => return f.write_str("*)` does not exist"),
-                };
-                for (i, arg) in args.iter().enumerate() {
-                    let arg = self.args[arg];
-                    if i > 0 {
-                        f.write_str(", ")?;
-                    }
-                    if arg.variadic {
-                        f.write_str("variadic ")?;
-                    }
-                    if let Some(name) = arg.name {
-                        write!(f, "{} => ", n(name))?;
-                    }
-                    write!(f, "{}", self.operand(arg.ty))?;
-                }
-                f.write_str(")` does not exist")
+                write!(
+                    f,
+                    "{label} `{}` does not exist",
+                    self.signature(schema, name, args)
+                )
             }
+            SemaError::ProcedureCalledAsFunction {
+                schema, name, args, ..
+            } => write!(f, "`{}` is a procedure", self.signature(schema, name, args)),
             SemaError::UnresolvedOperator {
                 schema,
                 name,

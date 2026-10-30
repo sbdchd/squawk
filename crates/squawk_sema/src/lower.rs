@@ -13513,6 +13513,11 @@ impl Lowerer {
         let Some(column_ref) = column_target.name() else {
             return;
         };
+        if context == ExprContext::Update
+            && self.check_qualified_set_target(target, &column_ref, column_target)
+        {
+            return;
+        }
         let mut ty = self.add_target_column_ref(target, &column_ref);
         let mut subscript = None;
         for accessor in column_target.accessors() {
@@ -13539,6 +13544,54 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn check_qualified_set_target(
+        &mut self,
+        target: SourceId,
+        column_ref: &ast::ColumnNameRef,
+        column_target: &ast::ColumnTarget,
+    ) -> bool {
+        let Some(ast::Accessor::FieldAccessor(field)) = column_target.accessors().next() else {
+            return false;
+        };
+        let Some(field_ref) = field.composite_field_ref() else {
+            return false;
+        };
+        let name = self.intern(&column_ref.text());
+        let source = &self.index.sources[target];
+        if source.name != Some(name)
+            || !source.columns.complete
+            || self.find_source_column(target, name).is_some()
+        {
+            return false;
+        }
+        let relation = match source.kind {
+            SourceKind::Table(table) => self.index.tables[table].name,
+            SourceKind::Cte(_)
+            | SourceKind::Returning(_)
+            | SourceKind::Excluded(_)
+            | SourceKind::RuleRelation(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::ElementVariable
+            | SourceKind::Other => name,
+        };
+        let range = TextRange::new(
+            column_ref.syntax().text_range().start(),
+            field_ref.syntax().text_range().start(),
+        );
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::QualifiedSetTarget {
+                column: name,
+                relation,
+            },
+        );
+        true
     }
 
     fn add_field_ref(&mut self, ty: Option<Ty>, field_ref: &impl NameLike) -> Option<Ty> {
@@ -18130,7 +18183,31 @@ impl Lowerer {
                 variadic: arg.variadic,
             });
         }
-        let args = ErrorArgs::List(self.index.errors.args.range_from(start));
+        let error_args = ErrorArgs::List(self.index.errors.args.range_from(start));
+        if kind == RoutineKind::Function
+            && let Resolution::Function(_) =
+                self.find_routine(schema, name, args, FunctionKind::Procedure)
+        {
+            let select_range = node
+                .ancestors()
+                .find_map(ast::CallExpr::cast)
+                .and_then(|call| standalone_select_keyword(&call))
+                .map(|token| {
+                    self.index
+                        .range(InIrFile::new(self.file_id, token.text_range()))
+                        .value
+                });
+            self.push_error(
+                node,
+                SemaError::ProcedureCalledAsFunction {
+                    schema,
+                    name,
+                    args: error_args,
+                    select_range,
+                },
+            );
+            return Resolution::Unknown;
+        }
         let similar = self.similar_function(schema, name, kind, LookupKind::Call);
         self.push_error(
             node,
@@ -18138,7 +18215,7 @@ impl Lowerer {
                 kind,
                 schema,
                 name,
-                args,
+                args: error_args,
                 lookup: LookupKind::Call,
                 similar,
             },
@@ -23063,4 +23140,41 @@ pub fn literal_type_name(literal: &ast::Literal) -> Option<&'static str> {
         | ast::LitKind::PositionalParam(_) => return None,
     };
     Some(name)
+}
+
+fn standalone_select_keyword(call: &ast::CallExpr) -> Option<SyntaxToken> {
+    if call.filter_clause().is_some()
+        || call.over_clause().is_some()
+        || call.within_clause().is_some()
+    {
+        return None;
+    }
+    let target = ast::Target::cast(call.syntax().parent()?)?;
+    if target.as_name().is_some() {
+        return None;
+    }
+    let target_list = ast::TargetList::cast(target.syntax().parent()?)?;
+    if target_list.targets().nth(1).is_some() {
+        return None;
+    }
+    let select_clause = ast::SelectClause::cast(target_list.syntax().parent()?)?;
+    if select_clause.select_quantifier().is_some() {
+        return None;
+    }
+    let select = ast::Select::cast(select_clause.syntax().parent()?)?;
+    if select.with_clause().is_some()
+        || select.from_clause().is_some()
+        || select.where_clause().is_some()
+        || select.group_by_clause().is_some()
+        || select.having_clause().is_some()
+        || select.window_clause().is_some()
+        || select.filter_clause().is_some()
+        || select.tail_clauses().next().is_some()
+    {
+        return None;
+    }
+    if !ast::SourceFile::can_cast(select.syntax().parent()?.kind()) {
+        return None;
+    }
+    select_clause.select_token()
 }
