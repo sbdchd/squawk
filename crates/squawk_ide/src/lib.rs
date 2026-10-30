@@ -1,7 +1,6 @@
-pub mod builtins;
-pub mod code_actions;
 pub mod completion;
-pub mod db;
+#[cfg(test)]
+mod db_tests;
 pub mod diagnostics;
 pub mod document_symbols;
 pub mod expand_selection;
@@ -12,7 +11,10 @@ pub mod goto_type_definition;
 pub mod hover;
 mod hover_literal;
 pub mod inlay_hints;
-mod offsets;
 pub mod semantic_tokens;
 #[cfg(test)]
 pub mod test_utils;
+
+pub use squawk_code_actions as code_actions;
+pub use squawk_ide_db as db;
+pub use squawk_ide_db::builtins;

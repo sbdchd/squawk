@@ -10,7 +10,7 @@ use squawk_sema::ir::{Item, Resolution, TableId, TableKind};
 use squawk_sema::lower::is_public_role;
 use squawk_sema::semantic_index::SemanticIndex;
 
-use crate::db::{Db, parse, semantic_index};
+use squawk_ide_db::{Db, parse, semantic_index};
 
 pub fn semantic_tokens(
     db: &dyn Db,

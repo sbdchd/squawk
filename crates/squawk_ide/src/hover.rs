@@ -12,9 +12,9 @@ use std::fmt::{self, Write as _};
 use rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::db::{Db, parse, semantic_index};
 use crate::hover_literal::{LiteralHover, hover_literal};
-use crate::offsets::{TokenAt, item_at_token};
+use squawk_ide_db::offsets::{TokenAt, item_at_token};
+use squawk_ide_db::{Db, parse, semantic_index};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Hover {

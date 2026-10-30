@@ -1,0 +1,130 @@
+use rowan::TextSize;
+use squawk_diagnostics::Edit;
+use squawk_sema::file::InFile;
+use squawk_syntax::ast::{self, AstNode, NameLike};
+
+use squawk_ide_db::Db;
+use squawk_ide_db::offsets::token_from_offset;
+
+use super::{ActionKind, CodeAction};
+
+pub(super) fn quote_identifier(
+    db: &dyn Db,
+    position: InFile<TextSize>,
+    actions: &mut Vec<CodeAction>,
+) -> Option<()> {
+    let token = token_from_offset(db, position)?;
+    let parent = token.parent()?;
+
+    let name = ast::AnyName::cast(parent)?;
+
+    if name.is_quoted() {
+        return None;
+    }
+
+    let quoted = format!(r#""{}""#, name.text());
+
+    actions.push(CodeAction {
+        title: "Quote identifier".to_owned(),
+        edits: vec![Edit::replace(name.syntax().text_range(), quoted)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+#[cfg(test)]
+mod test {
+    use insta::assert_snapshot;
+
+    use crate::test_utils::{apply_code_action, code_action_not_applicable};
+
+    use super::quote_identifier;
+
+    #[test]
+    fn quote_identifier_on_name_ref() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "select x$0 from t;"),
+            @r#"select "x" from t;"#
+        );
+    }
+
+    #[test]
+    fn quote_doesnt_show_up_for_already_quoted_ident() {
+        assert!(code_action_not_applicable(
+            quote_identifier,
+            r#"create table T("X"$0 int);"#
+        ));
+    }
+
+    #[test]
+    fn quote_identifier_on_name() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "create table T(X$0 int);"),
+            @r#"create table T("x" int);"#
+        );
+    }
+
+    #[test]
+    fn quote_identifier_on_role_ref() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "drop role my_role$0;"),
+            @r#"drop role "my_role";"#
+        );
+    }
+
+    #[test]
+    fn quote_identifier_lowercases() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "create table T(COL$0 int);"),
+            @r#"create table T("col" int);"#
+        );
+    }
+
+    #[test]
+    fn quote_identifier_not_applicable_when_already_quoted() {
+        assert!(code_action_not_applicable(
+            quote_identifier,
+            r#"select "x"$0 from t;"#
+        ));
+    }
+
+    #[test]
+    fn quote_identifier_not_applicable_on_select_keyword() {
+        assert!(code_action_not_applicable(
+            quote_identifier,
+            "sel$0ect x from t;"
+        ));
+    }
+
+    #[test]
+    fn quote_identifier_on_keyword_column_name() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "select te$0xt from t;"),
+            @r#"select "text" from t;"#
+        );
+    }
+
+    #[test]
+    fn quote_identifier_example_select() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "select x$0 from t;"),
+            @r#"select "x" from t;"#
+        );
+    }
+
+    #[test]
+    fn quote_identifier_example_create_table() {
+        assert_snapshot!(apply_code_action(
+            quote_identifier,
+            "create table T(X$0 int);"),
+            @r#"create table T("x" int);"#
+        );
+    }
+}
