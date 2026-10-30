@@ -562,3 +562,41 @@ create rule r as on insert to t where count(*) > 1 do nothing;
        ╰╴                                      ━━━━━━━━
     ");
 }
+
+#[test]
+fn parameterless_aggregate_without_star() {
+    assert_snapshot!(check("
+select count();
+select count() over ();
+select pg_catalog.count();
+select count(*), count(*) over (), now(), rank() over (order by 1);
+"), @"
+    error: `count(*)` must be used to call a parameterless aggregate function
+      ╭▸ 
+    2 │ select count();
+      │        ━━━━━
+      ╰╴
+    help: use `*` to call an aggregate with no arguments
+      ╭╴
+    2 │ select count(*);
+      ╰╴             +
+    error: `count(*)` must be used to call a parameterless aggregate function
+      ╭▸ 
+    3 │ select count() over ();
+      │        ━━━━━
+      ╰╴
+    help: use `*` to call an aggregate with no arguments
+      ╭╴
+    3 │ select count(*) over ();
+      ╰╴             +
+    error: `count(*)` must be used to call a parameterless aggregate function
+      ╭▸ 
+    4 │ select pg_catalog.count();
+      │        ━━━━━━━━━━━━━━━━
+      ╰╴
+    help: use `*` to call an aggregate with no arguments
+      ╭╴
+    4 │ select pg_catalog.count(*);
+      ╰╴                        +
+    ");
+}

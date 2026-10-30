@@ -378,6 +378,10 @@ pub(crate) enum SemaError {
     CannotOpenIndex {
         name: Name,
     },
+    ParameterlessAggregate {
+        name: Name,
+        star_at: TextSize,
+    },
     CannotCreateIndex {
         name: Name,
         kind: TableKind,
@@ -853,7 +857,8 @@ impl SemaError {
             SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::ProcedureCalledAsFunction { .. }
-            | SemaError::FunctionCalledAsProcedure { .. } => DiagnosticKind::WrongRoutineKind,
+            | SemaError::FunctionCalledAsProcedure { .. }
+            | SemaError::ParameterlessAggregate { .. } => DiagnosticKind::WrongRoutineKind,
             SemaError::UnresolvedQualifiedColumn { .. } | SemaError::QualifiedSetTarget { .. } => {
                 DiagnosticKind::UnresolvedColumn
             }
@@ -986,6 +991,13 @@ impl SemaError {
                 fix: Fix {
                     title: "Replace with `select`".into(),
                     edits: vec![Edit::replace(call_range, "select")],
+                },
+            },
+            SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
+                message: "use `*` to call an aggregate with no arguments".into(),
+                fix: Fix {
+                    title: "Insert `*`".into(),
+                    edits: vec![Edit::insert("*", star_at)],
                 },
             },
             SemaError::QualifiedSetTarget { column, .. } => Suggestion {
@@ -1647,6 +1659,11 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::CannotOpenIndex { name } => {
                 write!(f, "cannot open relation `{}`", n(name))
             }
+            SemaError::ParameterlessAggregate { name, .. } => write!(
+                f,
+                "`{}(*)` must be used to call a parameterless aggregate function",
+                n(name)
+            ),
             SemaError::CannotCopy {
                 name,
                 copy_from,

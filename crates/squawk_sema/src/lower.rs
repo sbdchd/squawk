@@ -10414,19 +10414,15 @@ impl Lowerer {
             Some(table) => Resolution::Table(table),
             None => self.find_type(schema, name),
         };
-        if matches!(resolution, Resolution::Table(_) | Resolution::Unresolved) {
-            self.add_ref_from(
-                name,
-                segment.syntax(),
-                resolution,
-                RefSource::Table {
-                    schema,
-                    lookup: TableLookup::Like,
-                },
-            );
-        } else {
-            self.add_ref(name, ReferenceKind::Type, segment.syntax(), resolution);
-        }
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table {
+                schema,
+                lookup: TableLookup::Like,
+            },
+        );
         match resolution {
             Resolution::Table(table) => {
                 if !TableLookup::Like.accepts(self.index.tables[table].kind) {
@@ -20535,6 +20531,25 @@ impl Lowerer {
         {
             let ty = self.index.ty_name(element);
             self.push_error(callee.syntax(), SemaError::MissingArrayType { ty });
+        }
+        if let Some(function) = function
+            && let Some(callee) = &callee
+            && within.is_none()
+            && let Function {
+                kind: FunctionKind::Aggregate,
+                name,
+                ..
+            } = self.index.functions[function]
+            && let Some(arg_list) = call.arg_list()
+            && arg_list.star_token().is_none()
+            && arg_list.args().next().is_none()
+            && let Some(r_paren) = arg_list.r_paren_token()
+        {
+            let star_at = self.token_range(&r_paren).start();
+            self.push_error(
+                callee.syntax(),
+                SemaError::ParameterlessAggregate { name, star_at },
+            );
         }
         if self.function.is_none()
             && let Some(function) = function
