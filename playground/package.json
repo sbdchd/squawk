@@ -39,7 +39,7 @@
     "postcss": "^8.5.26",
     "typescript": "~7.0.2",
     "typescript-eslint": "^8.41.0",
-    "vite": "^6.4.4"
+    "vite": "^6.4.5"
   },
   "volta": {
     "node": "20.19.0",
